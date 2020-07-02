@@ -6,8 +6,6 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Survey from '@core/survey/survey'
 
-import { AnalysisActions } from '@webapp/service/storage'
-
 export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalculation, setCalculationDirty }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
@@ -15,11 +13,7 @@ export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalcula
   return ({ calculationUpdated }) => {
     const stepUpdated = Step.assocCalculation(calculationUpdated)(step)
     setStep(stepUpdated)
-    AnalysisActions.persistStep({ step: stepUpdated, stepDirty: true })
-
     setCalculation(calculationUpdated)
-    AnalysisActions.persistCalculation({ calculation: calculationUpdated, calculationDirty: true })
-
     const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
     const chainUpdated = Chain.assocItemValidation(
       Calculation.getUuid(calculationUpdated),
@@ -27,7 +21,6 @@ export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalcula
     )(chain)
 
     setChain(chainUpdated)
-    AnalysisActions.persistChain({ chain: chainUpdated })
 
     setCalculationDirty(true)
     setDirty(true)

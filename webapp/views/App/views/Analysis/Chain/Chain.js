@@ -4,17 +4,21 @@ import './chainListItem.scss'
 import './chainForm.scss'
 
 import React from 'react'
+import { matchPath } from 'react-router'
 
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 
 import * as Chain from '@common/analysis/processingChain'
 
+import { appModuleUri, analysisModules } from '@webapp/app/appModules'
+import { AnalysisActions } from '@webapp/service/storage'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useHistoryListen } from '@webapp/components/hooks'
 
 import { useAnalysis } from './store'
 
@@ -24,9 +28,18 @@ import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
   const analysis = useAnalysis()
-  const { chain, dirty, editingStep, Actions } = analysis
+  const { chain, step, stepDirty, calculation, calculationDirty, dirty, editingStep, Actions } = analysis
   const validation = Chain.getValidation(chain)
   const surveyInfo = useSurveyInfo()
+
+  useHistoryListen(
+    (location) => {
+      if (matchPath(location.pathname, { path: `${appModuleUri(analysisModules.nodeDef)}:uuid/` })) {
+        AnalysisActions.persist(analysis)
+      }
+    },
+    [chain, step, stepDirty, calculation, calculationDirty]
+  )
 
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>

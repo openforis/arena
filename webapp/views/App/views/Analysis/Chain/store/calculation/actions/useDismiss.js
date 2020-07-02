@@ -1,7 +1,6 @@
 import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { AnalysisActions } from '@webapp/service/storage'
 
 import { useReset } from './useReset'
 
@@ -33,7 +32,6 @@ export const useDismiss = ({
 
   const resetCalculation = async () => {
     reset()
-    AnalysisActions.resetCalculation()
     setCalculation(null)
     setCalculationDirty(null)
   }

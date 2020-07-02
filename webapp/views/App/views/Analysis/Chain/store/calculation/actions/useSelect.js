@@ -1,7 +1,6 @@
 import * as A from '@core/arena'
 import { useDispatch } from 'react-redux'
 
-import { AnalysisActions } from '@webapp/service/storage'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from '@webapp/views/App/views/Analysis/Chain/store/calculation/actions/useReset'
@@ -38,7 +37,6 @@ export const useSelect = ({
   const select = ({ calculationSelected }) => {
     setCalculation(calculationSelected)
     setCalculationOriginal(calculationSelected)
-    AnalysisActions.persistCalculation({ calculation: calculationSelected, calculationDirty: false })
     setCalculationDirty(null)
   }
 

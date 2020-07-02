@@ -1,7 +1,7 @@
 import './Step.scss'
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as Category from '@core/survey/category'
 import * as Validation from '@core/validation/validation'
@@ -30,7 +30,6 @@ const getClassName = ({ editingStep, editingCalculation }) => {
 const StepComponent = (props) => {
   const { analysis } = props
   const { chain, step, editingStep, editingCalculation, Actions } = analysis
-  const history = useHistory()
   const i18n = useI18n()
 
   const stepNext = Chain.getStepNext(step)(chain)
@@ -62,15 +61,15 @@ const StepComponent = (props) => {
               }}
               readOnly={disabledEntityOrCategory}
             >
-              <button
+              <Link
                 type="button"
                 className="btn btn-s btn-edit"
-                onClick={() => history.push(`${appModuleUri(analysisModules.nodeDef)}${entityUuid}/`)}
+                to={`${appModuleUri(analysisModules.nodeDef)}${entityUuid}/`}
                 aria-disabled={!entityUuid}
               >
                 <span className="icon icon-pencil2 icon-12px icon-left" />
                 {i18n.t('common.edit')}
-              </button>
+              </Link>
               <button
                 type="button"
                 className="btn btn-s btn-add"

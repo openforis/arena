@@ -2,7 +2,6 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { AnalysisActions } from '@webapp/service/storage'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
@@ -15,7 +14,6 @@ export const useDelete = ({ step, setStep, calculation, calculationDirty, setCal
 
   const resetCalculation = async () => {
     const calculationUuid = Calculation.getUuid(calculation)
-    AnalysisActions.resetCalculation()
     setCalculation(null)
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
 
@@ -24,7 +22,6 @@ export const useDelete = ({ step, setStep, calculation, calculationDirty, setCal
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    AnalysisActions.persistStep({ step: stepWithOutCalculation, stepDirty: true })
     setStep(stepWithOutCalculation)
     setCalculationDirty(null)
   }

@@ -2,8 +2,6 @@ import * as A from '@core/arena'
 
 import { useDispatch } from 'react-redux'
 
-import { AnalysisActions } from '@webapp/service/storage'
-
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from './useReset'
@@ -23,7 +21,6 @@ export const useSelect = ({ stepDirty, chain, setChain, step, setStep, setDirty,
 
   const select = ({ stepSelected }) => {
     setStep(stepSelected)
-    AnalysisActions.persistStep({ step: stepSelected, stepDirty: false })
   }
 
   const selectWithReset = ({ stepSelected }) => () => {

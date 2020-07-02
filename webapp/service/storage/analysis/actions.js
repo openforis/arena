@@ -1,3 +1,4 @@
+import { AnalysisActions } from '@webapp/service/storage'
 import * as AnalysisStorage from './storage'
 
 // ====== chain
@@ -31,8 +32,21 @@ export const getCalculation = () => AnalysisStorage.getCalculation()
 export const resetCalculation = () => AnalysisStorage.removeCalculation()
 
 // ==== Analysus
+export const get = () => {
+  const chain = AnalysisActions.getChain()
+  const { step, stepDirty } = AnalysisActions.getStep()
+  const { calculation, calculationDirty } = AnalysisActions.getCalculation()
+
+  return { chain, step, stepDirty, calculation, calculationDirty }
+}
 export const resetAnalysis = () => {
   resetChain()
   resetStep()
   resetCalculation()
+}
+
+export const persist = (analysis) => {
+  persistChain(analysis)
+  persistStep(analysis)
+  persistCalculation(analysis)
 }

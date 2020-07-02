@@ -1,8 +1,7 @@
 import './Calculation.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Calculation from '@common/analysis/processingStepCalculation'
@@ -31,7 +30,6 @@ const CalculationComponent = (props) => {
     calculation,
   })
 
-  const history = useHistory()
   const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
 
   return (
@@ -65,15 +63,15 @@ const CalculationComponent = (props) => {
             onBeforeChange={Actions.canSelectNodeDef}
             onChange={(def) => Actions.calculation.updateAttribute({ attrDef: def })}
           />
-          <button
+          <Link
             type="button"
             className="btn btn-s btn-edit"
-            onClick={() => history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)}
+            to={`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`}
             aria-disabled={!nodeDefUuid}
           >
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
-          </button>
+          </Link>
           <button type="button" className="btn btn-s btn-add" onClick={Actions.addNodeDefAnalysis}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}

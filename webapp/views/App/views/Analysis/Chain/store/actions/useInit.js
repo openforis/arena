@@ -12,24 +12,23 @@ export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCa
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 
-  const chainSaved = AnalysisActions.getChain()
-  const { step: stepSaved, stepDirty } = AnalysisActions.getStep()
-  const { calculation: calculationSaved, calculationDirty } = AnalysisActions.getCalculation()
+  const { chain, step, stepDirty, calculation, calculationDirty } = AnalysisActions.get()
 
   const { chainUuid } = useParams()
 
   const recover = () => {
-    if (chainSaved) {
-      setChain(chainSaved)
-      if (stepSaved) {
-        setStep(stepSaved)
+    if (chain) {
+      setChain(chain)
+      if (step) {
+        setStep(step)
         setStepDirty(stepDirty)
-        if (calculationSaved) {
-          setCalculation(calculationSaved)
+        if (calculation) {
+          setCalculation(calculation)
           setCalculationDirty(calculationDirty)
         }
       }
     }
+    AnalysisActions.resetAnalysis()
   }
   const create = () => {
     const newChain = Chain.newProcessingChain({
@@ -38,15 +37,15 @@ export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCa
 
     setChain(newChain)
   }
-  const recoverOrCreate = chainSaved && Chain.isTemporary(chainSaved) ? recover : create
+  const recoverOrCreate = chain && Chain.isTemporary(chain) ? recover : create
 
   const fetchOrRecoverChain = async () => {
-    const { data: chain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
+    const { data: chainFetched } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
 
-    if (!A.isNull(chainSaved) && Chain.getUuid(chainSaved) === chainUuid) {
+    if (!A.isNull(chain) && Chain.getUuid(chain) === chainUuid) {
       recover()
     } else {
-      setChain(chain)
+      setChain(chainFetched)
     }
   }
 

@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { AnalysisActions } from '@webapp/service/storage'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
@@ -16,8 +15,6 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
 
   const resetStep = async () => {
     const stepUuid = Step.getUuid(step)
-    AnalysisActions.resetStep()
-    AnalysisActions.resetCalculation()
     setStep(null)
 
     if (chainUuid && !Step.isTemporary(step)) {
@@ -28,7 +25,6 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
     const newChain = Chain.dissocProcessingStep(step)(Chain.dissocProcessingStepTemporary(chain))
 
     setChain(newChain)
-    AnalysisActions.persistChain({ chain: newChain })
     setStepDirty(null)
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }

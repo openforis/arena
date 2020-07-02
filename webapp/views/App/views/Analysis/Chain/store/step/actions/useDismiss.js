@@ -1,7 +1,6 @@
 import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { AnalysisActions } from '@webapp/service/storage'
 
 import { useReset } from './useReset'
 
@@ -20,7 +19,6 @@ export const useDismiss = ({ chain, setChain, step, setStep, setDirty, stepOrigi
 
   const resetStep = async () => {
     reset()
-    AnalysisActions.resetStep()
     setStep(null)
     setStepDirty(null)
   }
