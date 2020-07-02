@@ -10,7 +10,7 @@ export const useDismiss = ({ dirty }) => {
   const history = useHistory()
 
   const navigateToChainsView = () => {
-    AnalysisActions.resetAnalysis()
+    AnalysisActions.reset()
     history.push(appModuleUri(analysisModules.processingChains))
   }
 

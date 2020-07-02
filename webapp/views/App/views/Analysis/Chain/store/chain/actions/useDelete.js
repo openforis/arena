@@ -18,7 +18,7 @@ export const useDelete = ({ chain }) => {
   const { chainUuid } = useParams()
 
   const resetChain = async () => {
-    AnalysisActions.resetAnalysis()
+    AnalysisActions.reset()
 
     if (chainUuid) {
       await axios.delete(`/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}`)

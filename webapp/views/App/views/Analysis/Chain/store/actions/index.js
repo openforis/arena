@@ -45,7 +45,7 @@ export const useActions = ({
     setAtrributesUuidsOtherChains,
     chain,
   }),
-  addEntityVirtual: useAddEntityVirtual({ chain, step, calculation }),
-  addNodeDefAnalysis: useAddNodeDefAnalysis({ chain, step, calculation }),
+  addEntityVirtual: useAddEntityVirtual({ chain, step, stepDirty, calculation, calculationDirty }),
+  addNodeDefAnalysis: useAddNodeDefAnalysis({ chain, step, stepDirty, calculation, calculationDirty }),
   openRStudio: useOpenRStudio({ chain }),
 })

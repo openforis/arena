@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
@@ -9,12 +10,12 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { AnalysisActions } from '@webapp/service/storage'
 
 import { NodeDefsActions, useSurveyInfo, useSurvey } from '@webapp/store/survey'
-import * as R from 'ramda'
+
 import * as Step from '@common/analysis/processingStep'
 
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-export const useAddNodeDefAnalysis = ({ chain, step, calculation }) => {
+export const useAddNodeDefAnalysis = ({ chain, step, stepDirty, calculation, calculationDirty }) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
@@ -32,7 +33,7 @@ export const useAddNodeDefAnalysis = ({ chain, step, calculation }) => {
       const nodeDef = NodeDef.newNodeDef(nodeDefParent, nodeDefType, Survey.getCycleKeys(surveyInfo), {}, {}, true)
 
       await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-      AnalysisActions.persist({ chain, step, calculation })
+      AnalysisActions.persist({ chain, step, stepDirty, calculation, calculationDirty })
       history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
     })()
   }

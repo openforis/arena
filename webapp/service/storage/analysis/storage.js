@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 const keys = {
   chain: 'chain',
   step: 'step',
@@ -12,50 +14,47 @@ export const eventTypes = {
   setCalculation: 'analysis/set-calculation',
 }
 
+const setItem = (key, value) => {
+  if (!R.isNil(value)) {
+    window.localStorage.setItem(key, JSON.stringify(value))
+  }
+}
+const getItem = (key, defaultValue = null) => {
+  const value = window.localStorage.getItem(key)
+  return !R.isNil(value) ? JSON.parse(value) : defaultValue
+}
+const removeItem = (key) => window.localStorage.removeItem(key)
+
 // ====== READ
-export const getChain = () => {
-  const chain = window.localStorage.getItem(keys.chain)
-  if (chain) return JSON.parse(chain)
-  return chain
-}
+export const getChain = () => getItem(keys.chain)
 
-export const getStep = () => {
-  const step = window.localStorage.getItem(keys.step)
-  const stepDirty = window.localStorage.getItem(keys.stepDirty)
+export const getStep = () => ({
+  step: getItem(keys.step),
+  stepDirty: getItem(keys.stepDirty),
+})
 
-  return {
-    step: step ? JSON.parse(step) : {},
-    stepDirty: stepDirty ? JSON.parse(stepDirty) : false,
-  }
-}
-
-export const getCalculation = () => {
-  const calculation = window.localStorage.getItem(keys.calculation)
-  const calculationDirty = window.localStorage.getItem(keys.calculationDirty)
-
-  return {
-    calculation: calculation ? JSON.parse(calculation) : {},
-    calculationDirty: calculationDirty ? JSON.parse(calculationDirty) : false,
-  }
-}
+export const getCalculation = () => ({
+  calculation: getItem(keys.calculation),
+  calculationDirty: getItem(keys.calculationDirty),
+})
 
 // ====== UPDATE
-export const setChain = ({ chain }) => window.localStorage.setItem(keys.chain, JSON.stringify(chain))
+export const setChain = ({ chain }) => setItem(keys.chain, chain)
 export const setStep = ({ step, stepDirty }) => {
-  window.localStorage.setItem(keys.step, JSON.stringify(step))
-  window.localStorage.setItem(keys.stepDirty, JSON.stringify(stepDirty))
+  setItem(keys.step, step)
+  setItem(keys.stepDirty, stepDirty)
 }
 export const setCalculation = ({ calculation, calculationDirty }) => {
-  window.localStorage.setItem(keys.calculation, JSON.stringify(calculation))
-  window.localStorage.setItem(keys.calculationDirty, JSON.stringify(calculationDirty))
+  setItem(keys.calculation, calculation)
+  setItem(keys.calculationDirty, calculationDirty)
 }
 // ====== DELETE
-export const removeChain = () => window.localStorage.removeItem(keys.chain)
+export const removeChain = () => removeItem(keys.chain)
 export const removeStep = () => {
-  window.localStorage.removeItem(keys.step)
-  window.localStorage.removeItem(keys.stepDirty)
+  removeItem(keys.step)
+  removeItem(keys.stepDirty)
 }
 export const removeCalculation = () => {
-  window.localStorage.removeItem(keys.calculation)
-  window.localStorage.removeItem(keys.calculationDirty)
+  removeItem(keys.calculation)
+  removeItem(keys.calculationDirty)
 }

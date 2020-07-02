@@ -28,7 +28,7 @@ export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCa
         }
       }
     }
-    AnalysisActions.resetAnalysis()
+    AnalysisActions.reset()
   }
   const create = () => {
     const newChain = Chain.newProcessingChain({

@@ -82,7 +82,7 @@ export const useSave = ({
         setStepOriginal(step)
         setCalculationDirty(null)
         setCalculationOriginal(calculation)
-        AnalysisActions.resetAnalysis()
+        AnalysisActions.reset()
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
