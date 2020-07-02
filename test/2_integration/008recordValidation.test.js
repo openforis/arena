@@ -170,75 +170,75 @@ describe('Record Validation Test', () => {
 
   // ========== data types
 
-  it('Invalid integer attribute value (decimal)', async () => {
+  test('Invalid integer attribute value (decimal)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/numeric_attr', 1.2, false)
   })
 
-  it('Correct date attribute value', async () => {
+  test('Correct date attribute value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '02/11/2019', true)
   })
 
-  it('Invalid date attribute value (day)', async () => {
+  test('Invalid date attribute value (day)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '32/01/2019', false)
   })
 
-  it('Invalid date attribute value (month)', async () => {
+  test('Invalid date attribute value (month)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '01/13/2019', false)
   })
 
   // ========== required
 
-  it('Required attribute: missing value', async () => {
+  test('Required attribute: missing value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/required_attr', null, false)
   })
 
-  it('Required attribute: empty value', async () => {
+  test('Required attribute: empty value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/required_attr', '', false)
   })
 
-  it('Required attribute: not empty value', async () => {
+  test('Required attribute: not empty value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/required_attr', 'some value', true)
   })
 
-  it('Not required attribute: missing value', async () => {
+  test('Not required attribute: missing value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/not_required_attr', null, true)
   })
 
-  it('Not required attribute: empty value', async () => {
+  test('Not required attribute: empty value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/not_required_attr', '', true)
   })
 
-  it('Not required attribute: not empty value', async () => {
+  test('Not required attribute: not empty value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/not_required_attr', 'some value', true)
   })
 
   // ========== min count
 
-  it('Min count: missing nodes', async () => {
+  test('Min count: missing nodes', async () => {
     // 3 plots before => 2 plots after
     await _deleteNodeAndExpectCountToBe('cluster', 'plot', 3, false)
   })
 
-  it('Min count: correct number of nodes', async () => {
+  test('Min count: correct number of nodes', async () => {
     // 2 plots before => 3 plots after
     await _addNodeAndExpectCountToBe('cluster', 'plot', true)
   })
 
   // ========== max count
 
-  it('Max count: correct number of nodes', async () => {
+  test('Max count: correct number of nodes', async () => {
     // 3 plots before => 4 plots after
     await _addNodeAndExpectCountToBe('cluster', 'plot', true)
   })
 
-  it('Max count: exceeding maximum number of nodes', async () => {
+  test('Max count: exceeding maximum number of nodes', async () => {
     // 4 plots before => 5 plots after
     await _addNodeAndExpectCountToBe('cluster', 'plot', false)
   })
 
   // ========== children count validation deletion
 
-  it('Children count: descendant children count validation deleted on node deletion', async () => {
+  test('Children count: descendant children count validation deleted on node deletion', async () => {
     // 5 plots before => 4 plots after
     const nodeParent = RecordUtils.findNodeByPath('cluster/plot[5]')(survey, record)
     const nodeDefChild = Survey.getNodeDefByName('tree')(survey)
@@ -265,35 +265,35 @@ describe('Record Validation Test', () => {
 
   // ========== expressions
 
-  it('Expressions : invalid value (lower than min)', async () => {
+  test('Expressions : invalid value (lower than min)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/percent_attr', 0, false)
   })
 
-  it('Expressions : valid value', async () => {
+  test('Expressions : valid value', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/percent_attr', 50, true)
   })
 
-  it('Expressions : invalid value (higher than max)', async () => {
+  test('Expressions : invalid value (higher than max)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/percent_attr', 120, false)
   })
 
-  it('Expressions : reference to ancestor attribute (valid value)', async () => {
+  test('Expressions : reference to ancestor attribute (valid value)', async () => {
     // insert a new tree
     await _addNodeAndExpectCountToBe('cluster/plot[1]', 'tree', true)
     // update tree_start_time value
     await _updateNodeAndExpectValidationToBe('cluster/plot[1]/tree[1]/tree_start_time', '10:20', true)
   })
 
-  it('Expressions : reference to ancestor attribute (invalid value)', async () => {
+  test('Expressions : reference to ancestor attribute (invalid value)', async () => {
     await _updateNodeAndExpectValidationToBe('cluster/plot[1]/tree[1]/tree_start_time', '08:20', false)
   })
 
   // ========== entity keys validation
-  it('Entity Keys Validator : add entity with duplicate key and expect 2 validation errors', async () => {
+  test('Entity Keys Validator : add entity with duplicate key and expect 2 validation errors', async () => {
     await _addNodeWithDuplicateKeyAndExpect2ValidationErrors()
   })
 
-  it('Entity Keys Validator : remove entity with duplicate key and expect duplicate node key to be valid', async () => {
+  test('Entity Keys Validator : remove entity with duplicate key and expect duplicate node key to be valid', async () => {
     await _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid()
   })
 })

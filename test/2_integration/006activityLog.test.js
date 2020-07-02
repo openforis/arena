@@ -17,7 +17,7 @@ import * as SB from './utils/surveyBuilder'
 import * as RecordUtils from './utils/recordUtils'
 
 describe('Activity Log Test', () => {
-  it('Activity Log on Survey Creation', async () => {
+  test('Activity Log on Survey Creation', async () => {
     const user = getContextUser()
     const surveyInfo = Survey.newSurvey({
       ownerUuid: User.getUuid(user),
@@ -37,7 +37,7 @@ describe('Activity Log Test', () => {
     await SurveyManager.deleteSurvey(surveyId)
   })
 
-  it('Activity Log on Record Creation', async () => {
+  test('Activity Log on Record Creation', async () => {
     const user = getContextUser()
 
     const survey = await SB.survey(user, SB.entity('cluster', SB.attribute('cluster_no').key())).buildAndStore()

@@ -82,16 +82,16 @@ const badExpressions = [
 
 describe('dataFilter test', () => {
   goodExpressions.forEach(({ q, r }) => {
-    it(q, () => {
+    test(q, () => {
       const ps = Expression.toSql(jsep(q))
       expect(ps).toEqual(r)
     })
   })
 
   badExpressions.forEach(({ q }) => {
-    it(q, () => {
+    test(q, () => {
       const ps = () => Expression.toSql(jsep(q))
-      expect(ps).to.throw()
+      expect(ps).toThrow()
     })
   })
 })

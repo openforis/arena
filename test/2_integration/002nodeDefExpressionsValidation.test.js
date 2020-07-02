@@ -103,7 +103,7 @@ describe('NodeDefExpressions Validation Test', async () => {
   const survey = await fetchFullContextSurvey()
 
   expressions.forEach((expr) => {
-    it(expr.t, async () => {
+    test(expr.t, async () => {
       const validation = await validateExpression(survey, expr.n, expr.e)
       expect(expr.v).toBe(Validation.isValid(validation))
       expect(expr.v).toBe(Validation.isValid(Validation.getFieldValidation('0')(validation)))

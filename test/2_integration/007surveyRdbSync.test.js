@@ -22,7 +22,7 @@ const expectSchemaToExist = async (schemaName, exists = true) => {
 }
 
 describe('Survey RDB Sync Test', () => {
-  it('Survey RDB created on survey creation', async () => {
+  test('Survey RDB created on survey creation', async () => {
     const survey = await SB.survey(
       getContextUser(),
       SB.entity('cluster', SB.attribute('cluster_no').key())
@@ -35,7 +35,7 @@ describe('Survey RDB Sync Test', () => {
     await SurveyManager.deleteSurvey(surveyId)
   })
 
-  it('Survey RDB dropped on survey deletion', async () => {
+  test('Survey RDB dropped on survey deletion', async () => {
     const survey = await SB.survey(
       getContextUser(),
       SB.entity('cluster', SB.attribute('cluster_no').key())

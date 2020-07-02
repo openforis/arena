@@ -53,7 +53,7 @@ describe('Applicable Test', () => {
     }
   })
 
-  it('Applicable update', async () => {
+  test('Applicable update', async () => {
     const nodeSource = RecordUtils.findNodeByPath('cluster/num')(survey, record)
     const nodeDependent = RecordUtils.findNodeByPath('cluster/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
@@ -90,7 +90,7 @@ describe('Applicable Test', () => {
     })
   })
 
-  it('Applicable evaluated on entity creation', async () => {
+  test('Applicable evaluated on entity creation', async () => {
     const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, record)
     const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, record)
 
@@ -98,7 +98,7 @@ describe('Applicable Test', () => {
     expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).toBe(false)
   })
 
-  it('Applicable in multiple entity update', async () => {
+  test('Applicable in multiple entity update', async () => {
     const nodePlotNo = RecordUtils.findNodeByPath('cluster/plot[1]/plot_no')(survey, record)
     const nodePlotNoUpdated = Node.assocValue(11)(nodePlotNo)
     const recordUpdated = await RecordManager.persistNode(getContextUser(), survey, record, nodePlotNoUpdated)

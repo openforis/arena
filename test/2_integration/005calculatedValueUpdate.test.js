@@ -81,11 +81,11 @@ describe('Calculated value test', () => {
     }
   })
 
-  it('Calculated value updated', async () => {
+  test('Calculated value updated', async () => {
     await updateNodeAndExpectDependentNodeValueToBe('cluster/num', 2, 'cluster/num_double', 4)
   })
 
-  it('Calculated value with apply if updated', async () => {
+  test('Calculated value with apply if updated', async () => {
     // Test values, couples of expected values by input
     const testValues = [
       [-1, 'a'],
@@ -108,7 +108,7 @@ describe('Calculated value test', () => {
     })
   })
 
-  it('Calculated value cascade update', async () => {
+  test('Calculated value cascade update', async () => {
     await updateNodeAndExpectDependentNodeValueToBe('cluster/num', 2, 'cluster/num_double_square', 16)
   })
 })
