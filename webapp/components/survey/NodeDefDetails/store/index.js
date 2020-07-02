@@ -1,4 +1,5 @@
-import * as NodeDefState from './state'
+import * as State from './state'
 
-export { useNodeDefDetails, useBasicProps } from './hooks'
-export { NodeDefState }
+export { State }
+export { useActions } from './actions'
+export { useNodeDefDetails } from './useNodeDefDetails'

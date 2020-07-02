@@ -6,25 +6,26 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-import { useIsKeyEditDisabled } from './useKeyEditDisabled'
-import { useIsMultipleEditDisabled } from './useMultipleEditDisabled'
+import { useIsDisplayAsTableDisabled } from './useIsDisplayAsTableDisabled'
+import { useIsDisplayInParentPageDisabled } from './useIsDisplayInParentPageDisabled'
+import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
+import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
-import * as NodeDefState from '../state'
+import { State } from '../../store'
 
 export const useBasicProps = (props) => {
-  const { nodeDefState } = props
+  const { state } = props
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
 
-  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
-  const displayAsEnabled = isEntityAndNotRoot
-  const displayInEnabled = isEntityAndNotRoot
-  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+  const displayAsEnabled = NodeDef.isDisplayAsEnabled(nodeDef)
+  const displayInEnabled = NodeDef.isDisplayInEnabled(nodeDef)
+  const displayAsTableDisabled = useIsDisplayAsTableDisabled({ nodeDef })
+  const displayInParentPageDisabled = useIsDisplayInParentPageDisabled({ nodeDef })
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
 

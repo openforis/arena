@@ -11,15 +11,15 @@ import Checkbox from '@webapp/components/form/checkbox'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
-import { NodeDefState } from './store'
+import { State } from './store'
 
 const AdvancedProps = (props) => {
-  const { nodeDefState, actions } = props
+  const { state, Actions } = props
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const i18n = useI18n()
@@ -33,13 +33,13 @@ const AdvancedProps = (props) => {
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={(value) => actions.setProp({ key: NodeDef.propKeys.readOnly, value })}
+              onChange={(value) => Actions.setProp({ key: NodeDef.propKeys.readOnly, value })}
             />
           </FormItem>
 
           <NodeDefExpressionsProp
-            nodeDefState={nodeDefState}
-            actions={actions}
+            state={state}
+            Actions={Actions}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
             readOnly={readOnly}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
@@ -51,8 +51,8 @@ const AdvancedProps = (props) => {
       )}
 
       <NodeDefExpressionsProp
-        nodeDefState={nodeDefState}
-        actions={actions}
+        state={state}
+        Actions={Actions}
         label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}
         readOnly={readOnly}
         propName={NodeDef.keysPropsAdvanced.applicable}
@@ -67,8 +67,8 @@ const AdvancedProps = (props) => {
 }
 
 AdvancedProps.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default AdvancedProps

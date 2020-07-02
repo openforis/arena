@@ -10,8 +10,8 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 
-import { useValidateNodeDef } from './useValidateNodeDef'
-import * as NodeDefState from '../state'
+import { useValidate } from './useValidate'
+import * as State from '../state'
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
@@ -27,14 +27,14 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   return true
 }
 
-export const useSetProp = ({ nodeDefState, setNodeDefState }) => {
+export const useSetProp = ({ state, setState }) => {
   const dispatch = useDispatch()
   let survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
-  const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
+  const validateNodeDef = useValidate({ state, setState })
 
   return ({ key, value = null, advanced = false }) => {
-    const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+    const nodeDef = State.getNodeDef(state)
 
     if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
       return

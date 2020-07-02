@@ -15,17 +15,17 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
-import { NodeDefState } from './store'
+import { State } from './store'
 
 const CodeProps = (props) => {
-  const { nodeDefState, actions } = props
+  const { state, Actions } = props
 
   const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
   const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
   const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents(nodeDef)(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
@@ -44,8 +44,8 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const setCategoryProp = (category) => {
-    actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: null }) // Reset parent code
-    actions.setProp({ key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(category) })
+    Actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: null }) // Reset parent code
+    Actions.setProp({ key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(category) })
   }
 
   return (
@@ -77,7 +77,7 @@ const CodeProps = (props) => {
                 itemKeyProp="uuid"
                 itemLabelFunction={NodeDef.getName}
                 onChange={(def) =>
-                  actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
+                  Actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
                 }
               />
             </div>
@@ -86,7 +86,7 @@ const CodeProps = (props) => {
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-              onChange={(value) => actions.setLayoutProp({ key: NodeDefLayout.keys.renderType, value })}
+              onChange={(value) => Actions.setLayoutProp({ key: NodeDefLayout.keys.renderType, value })}
               items={displayAsItems}
             />
           </FormItem>
@@ -97,8 +97,8 @@ const CodeProps = (props) => {
 }
 
 CodeProps.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default CodeProps

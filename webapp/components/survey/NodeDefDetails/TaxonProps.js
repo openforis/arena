@@ -18,17 +18,17 @@ import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesVi
 import { useSurvey } from '@webapp/store/survey'
 import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
-import { NodeDefState } from './store'
+import { State } from './store'
 
 const TaxonProps = (props) => {
-  const { nodeDefState, actions } = props
+  const { state, Actions } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
@@ -38,7 +38,7 @@ const TaxonProps = (props) => {
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
 
   const onChange = (taxonomySelected) =>
-    actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
+    Actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
 
   return (
     <>
@@ -109,8 +109,8 @@ const TaxonProps = (props) => {
 }
 
 TaxonProps.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default TaxonProps

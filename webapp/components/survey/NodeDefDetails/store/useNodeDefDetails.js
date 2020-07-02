@@ -10,8 +10,8 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-import * as NodeDefState from '../state'
-import { useActions } from '../actions'
+import { useActions } from './actions'
+import * as State from './state'
 
 export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
@@ -23,9 +23,9 @@ export const useNodeDefDetails = () => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
 
-  const [nodeDefState, setNodeDefState] = useState({})
+  const [state, setState] = useState({})
 
-  const actions = useActions({ nodeDefState, setNodeDefState })
+  const Actions = useActions({ state, setState })
 
   const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
 
@@ -34,7 +34,7 @@ export const useNodeDefDetails = () => {
     if (nodeDefUuid) {
       const nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
-      setNodeDefState(NodeDefState.createNodeDefState({ nodeDef: nodeDefSurvey, validation }))
+      setState(State.create({ nodeDef: nodeDefSurvey, validation }))
     }
   }, [])
 
@@ -47,10 +47,8 @@ export const useNodeDefDetails = () => {
   }, [surveyCycleKey])
 
   return {
-    nodeDefState,
-    actions,
-    survey,
-    surveyCycleKey,
+    state,
+    Actions,
     editingFromDesigner,
   }
 }

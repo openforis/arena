@@ -12,7 +12,7 @@ const keys = {
 
 // ===== CREATE
 
-export const createNodeDefState = ({ nodeDef, validation }) => ({
+export const create = ({ nodeDef, validation }) => ({
   [keys.nodeDefOriginal]: nodeDef,
   [keys.nodeDef]: nodeDef,
   [keys.validation]: validation,
@@ -47,6 +47,14 @@ export const getPropsAdvancedUpdated = (state) => {
   const propsAdvanced = NodeDef.getPropsAdvanced(getNodeDef(state))
   return R.fromPairs(R.difference(R.toPairs(propsAdvanced), R.toPairs(propsAdvancedOriginal)))
 }
+
+const isEntityAndNotRoot = (state) => {
+  const nodeDef = getNodeDef(state)
+  return NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
+}
+
+export const isDisplayAsEnabled = isEntityAndNotRoot
+export const isDisplayInEnabled = isEntityAndNotRoot
 
 // ===== UPDATE
 export const assocNodeDef = R.assoc(keys.nodeDef)
