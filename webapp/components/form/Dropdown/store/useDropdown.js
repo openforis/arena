@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
+
 import * as A from '@core/arena'
-import { useState } from 'react'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useActions } from './actions'
+import { State } from './state'
 
 export const useDropdown = ({
   autocompleteMinChars,
@@ -16,46 +18,29 @@ export const useDropdown = ({
   readOnly,
   selection,
 }) => {
-  // utility getters
-  const getItemKey = (item) => (itemKey.constructor === String ? item[itemKey] : itemKey(item))
-  const getItemLabel = (item) => (itemLabel.constructor === String ? item[itemLabel] : itemLabel(item))
-  const getSelectionLabel = () => (A.isEmpty(selection) ? '' : getItemLabel(selection))
+  const [state, setState] = useState({})
+  const Actions = useActions({ setState, onBeforeChange, onChange })
 
-  // state/action properties
-  const [inputValue, setInputValue] = useState(getSelectionLabel())
-  const [itemsDialog, setItemsDialog] = useState(items)
-  const [showDialog, setShowDialog] = useState(false)
-
-  const Actions = useActions({
-    autocompleteMinChars,
-    disabled,
-    inputValue,
-    items,
-    readOnly,
-    selection,
-    showDialog,
-    getItemKey,
-    getItemLabel,
-    onBeforeChange,
-    onChange,
-    setInputValue,
-    setItemsDialog,
-    setShowDialog,
-  })
+  // on mount create state
+  useEffect(() => {
+    setState(
+      State.create({
+        autocompleteMinChars,
+        disabled,
+        items,
+        itemKey,
+        itemLabel,
+        readOnly,
+        selection,
+      })
+    )
+  }, [])
 
   // on update selection: update input value
   useOnUpdate(() => {
-    setInputValue(selection ? getSelectionLabel() : inputRef.current.value)
+    const inputValue = A.isEmpty(selection) ? inputRef.current.value : State.getItemLabel(state)(selection)
+    setState(State.assocInputValue(inputValue)(state))
   }, [selection])
 
-  return {
-    Actions,
-
-    inputValue,
-    itemsDialog,
-    showDialog,
-
-    getItemKey,
-    getItemLabel,
-  }
+  return { Actions, state }
 }

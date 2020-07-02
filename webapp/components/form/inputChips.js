@@ -113,8 +113,8 @@ const InputChips = (props) => {
       {showDropdown && (
         <Dropdown
           items={items.length > 0 ? dropdownItems : dropdownItemsLookupFunction}
-          itemKey={itemKeyProp || itemKeyFunction}
-          itemLabel={itemLabelProp || itemLabelFunction}
+          itemKey={itemKeyFunction || itemKeyProp}
+          itemLabel={itemLabelFunction || itemLabelProp}
           onChange={onDropdownChange}
           selection={null}
           autocompleteMinChars={dropdownAutocompleteMinChars}
@@ -128,7 +128,7 @@ const InputChips = (props) => {
 }
 
 // TODO When refactoring InputChips:
-// 1. items and itemsLookupFunction become one required prop `item` array or function (see dropdown)
+// 1. items and itemsLookupFunction become one required prop `items` array or function (see dropdown)
 // 2. `itemKeyProp` and `itemKeyFunction` become one required prop `itemKey` string or function (see dropdown)
 // 3. `itemLabelProp` and `itemLabelFunction` become required one prop `itemLabel` string or function (see dropdown)
 // 4: `dropdownAutocompleteMinChars` must be renamed to autocompleteMinChars
@@ -136,10 +136,10 @@ const InputChips = (props) => {
 InputChips.defaultProps = {
   items: [],
   itemsLookupFunction: null, // Async function to find items by specified value
-  itemKeyProp: null,
   itemKeyFunction: null,
+  itemKeyProp: 'key',
   itemLabelFunction: null,
-  itemLabelProp: null,
+  itemLabelProp: 'value',
   selection: [],
   requiredItems: 0,
   dropdownAutocompleteMinChars: 0,

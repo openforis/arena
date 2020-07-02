@@ -1,21 +1,12 @@
-export const useUpdateSelection = ({
-  selection,
-  getItemKey,
-  onBeforeChange,
-  onChange,
-  setInputValue,
-  setShowDialog,
-}) => {
-  return (item) => {
-    ;(async () => {
-      const keySelection = selection && getItemKey(selection)
-      const keyItem = getItemKey(item)
+import { State } from '../state'
 
-      if (keyItem !== keySelection && (!onBeforeChange || (await onBeforeChange(item)))) {
-        setShowDialog(false)
-        setInputValue('')
-        await onChange(item)
-      }
-    })()
+export const useUpdateSelection = ({ closeDialog, onBeforeChange, onChange }) => async ({ item, selection, state }) => {
+  const keySelection = selection && State.getItemKey(state)(selection)
+  const keyItem = State.getItemKey(state)(item)
+
+  await closeDialog({ selection, state })
+
+  if (keyItem !== keySelection && (!onBeforeChange || (await onBeforeChange(item)))) {
+    await onChange(item)
   }
 }

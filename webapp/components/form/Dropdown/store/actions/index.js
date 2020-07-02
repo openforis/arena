@@ -1,50 +1,14 @@
-import { useToggleDialog } from './useToggleDialog'
+import { useCloseDialog } from './useCloseDialog'
+import { useOpenDialog } from './useOpenDialog'
 import { useUpdateSelection } from './useUpdateSelection'
 import { useUpdateInputValue } from './useUpdateInputValue'
 
-export const useActions = ({
-  autocompleteMinChars,
-  disabled,
-  inputValue,
-  items,
-  readOnly,
-  selection,
-  showDialog,
-  getItemKey,
-  getItemLabel,
-  onBeforeChange,
-  onChange,
-  setInputValue,
-  setItemsDialog,
-  setShowDialog,
-}) => ({
-  toggleDialog: useToggleDialog({
-    autocompleteMinChars,
-    disabled,
-    inputValue,
-    items,
-    readOnly,
-    showDialog,
-    getItemKey,
-    getItemLabel,
-    setItemsDialog,
-    setShowDialog,
-  }),
-  updateSelection: useUpdateSelection({
-    selection,
-    getItemKey,
-    onBeforeChange,
-    onChange,
-    setInputValue,
-    setShowDialog,
-  }),
-  updateInputValue: useUpdateInputValue({
-    autocompleteMinChars,
-    items,
-    getItemKey,
-    getItemLabel,
-    onChange,
-    setInputValue,
-    setItemsDialog,
-  }),
-})
+export const useActions = ({ setState, onBeforeChange, onChange }) => {
+  const closeDialog = useCloseDialog({ setState })
+  return {
+    closeDialog,
+    openDialog: useOpenDialog({ setState }),
+    updateSelection: useUpdateSelection({ closeDialog, onBeforeChange, onChange }),
+    updateInputValue: useUpdateInputValue({ setState }),
+  }
+}

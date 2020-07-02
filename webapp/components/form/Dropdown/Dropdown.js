@@ -1,16 +1,14 @@
 import './dropdown.scss'
-import React, { memo, useRef } from 'react'
+import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
-
-import * as A from '@core/arena'
 
 import { Input } from '@webapp/components/form/input'
 import AutocompleteDialog from '@webapp/components/form/autocompleteDialog'
 
 import ItemDialog from './ItemDialog'
-import { useDropdown } from './store'
+import { useDropdown, State } from './store'
 
 const Dropdown = (props) => {
   const {
@@ -34,53 +32,53 @@ const Dropdown = (props) => {
   const dropdownRef = useRef(null)
   const inputRef = useRef(null)
 
-  const dropdown = useDropdown({
+  const { state, Actions } = useDropdown({
     autocompleteMinChars,
     disabled,
     inputRef,
     itemKey,
     itemLabel,
     items,
-    readOnly,
     onBeforeChange,
     onChange,
+    readOnly,
     selection,
   })
-  const { Actions, inputValue, itemsDialog, showDialog, getItemKey, getItemLabel } = dropdown
+  const showDialog = State.getShowDialog(state)
+  const itemsDialog = State.getItemsDialog(state)
 
   return (
     <div
       ref={dropdownRef}
       className={classNames('dropdown', className)}
-      onBlur={(event) => {
-        const { className: classNameTarget = [] } = event.relatedTarget || {}
-        if (showDialog && classNameTarget !== ItemDialog.className) {
-          Actions.toggleDialog()
+      onBlur={async (event) => {
+        const { className: classNameTarget = '' } = event.relatedTarget || {}
+        if (classNameTarget !== ItemDialog.className) {
+          await Actions.closeDialog({ selection, state })
         }
       }}
     >
       <Input
         ref={inputRef}
         placeholder={placeholder}
-        value={inputValue}
+        value={State.getInputValue(state) || ''}
         validation={validation}
         readOnly={readOnly || readOnlyInput}
         disabled={disabled}
-        onChange={(value) => Actions.updateInputValue({ value })}
-        onFocus={() => {
-          if (!showDialog && !A.isEmpty(itemsDialog)) {
-            Actions.toggleDialog()
-          }
+        onChange={async (value) => {
+          await Actions.updateInputValue({ value, state })
         }}
+        onFocus={async () => Actions.openDialog({ state })}
       />
 
       <button
         type="button"
         className="btn-s btn-transparent btn-toggle"
-        onClick={(event) => {
+        onClick={async (event) => {
           event.preventDefault()
           event.stopPropagation()
-          Actions.toggleDialog()
+          if (showDialog) await Actions.closeDialog({ selection, state })
+          else await Actions.openDialog({ state })
         }}
         aria-disabled={disabled}
       >
@@ -92,12 +90,16 @@ const Dropdown = (props) => {
           <AutocompleteDialog
             className={autocompleteDialogClassName}
             inputField={inputRef.current}
-            itemLabel={getItemLabel}
-            itemKeyFunction={getItemKey}
+            itemLabel={State.getItemLabel(state)}
+            itemKeyFunction={State.getItemKey(state)}
             itemRenderer={ItemDialog}
             items={itemsDialog}
-            onItemSelect={Actions.updateSelection}
-            onClose={Actions.toggleDialog}
+            onItemSelect={async (item) => {
+              await Actions.updateSelection({ item, selection, state })
+            }}
+            onClose={async () => {
+              await Actions.closeDialog({ selection, state })
+            }}
             sourceElement={sourceElement || dropdownRef.current}
           />,
           document.body
@@ -140,4 +142,4 @@ Dropdown.defaultProps = {
   validation: {},
 }
 
-export default memo(Dropdown)
+export default Dropdown
