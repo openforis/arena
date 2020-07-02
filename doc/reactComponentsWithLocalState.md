@@ -37,7 +37,8 @@ export { State }
 ```
 
 # actions
-- ...useAction.js
+- useAction1.js
+- ...otherActions.js
 - index.js
 
 index.js
@@ -105,17 +106,4 @@ const SubComponent = (props) => {
     </div>
     )
 }
-```
-
-```javascript
-{
-  chainDraft,
-  chainOriginal,
-  stepDraft,
-  stepOriginal,
-  calculationDraft,
-  calculationOriginal,
-}
-
-const isChainModified = (state) => getChainDraft(state) !== getChainOriginal(state)
 ```
