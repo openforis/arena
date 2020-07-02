@@ -27,5 +27,4 @@ exec pm2-runtime server.js &
 # wait for Arena localhost port 9090 to be available
 while ! nc -z localhost 9090; do sleep 10; done;
 
-# gauge run -d test/browser/
 yarn run test:e2e
