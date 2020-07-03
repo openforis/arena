@@ -4,23 +4,29 @@ import * as A from '@core/arena'
 import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
 
 import { State } from '../../state'
 
 export const useDismiss = ({ setState }) => {
   const dispatch = useDispatch()
 
-  /* const reset = useReset({
-    chainState,
-    ChainState,
-    state,
-    setState,
-    State,
-  }) */
-
   const resetStep = ({ state }) => () => {
-    // reset()
-    setState(A.pipe(State.dissocStep, State.dissocStepEdit)(state))
+    setState(
+      A.pipe(
+        State.assocChainEdit(
+          Step.isTemporary(State.getStepEdit(state))
+            ? State.getChain(state)
+            : A.pipe(
+                Chain.dissocProcessingStepTemporary,
+                Chain.assocProcessingStep(State.getStep(state))
+              )(State.getChainEdit(state))
+        ),
+        State.dissocStep,
+        State.dissocStepEdit
+      )(state)
+    )
   }
 
   return useCallback(({ state }) => {
@@ -28,7 +34,7 @@ export const useDismiss = ({ setState }) => {
     if (stepDirty) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'processingStepCalculation.deleteConfirm',
+          key: 'common.cancelConfirm',
           onOk: resetStep({ state }),
         })
       )

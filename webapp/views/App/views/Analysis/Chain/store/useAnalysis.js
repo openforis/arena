@@ -31,6 +31,5 @@ export const useAnalysis = () => {
     },
     [state]
   )
-
   return { state, Actions }
 }
