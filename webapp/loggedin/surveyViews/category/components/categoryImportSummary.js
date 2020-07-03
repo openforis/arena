@@ -4,7 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
 import * as Category from '@core/survey/category'
@@ -53,7 +53,7 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
           <Dropdown
             readOnlyInput={true}
             items={Object.keys(Category.itemExtraDefDataTypes)}
-            itemLabelFunction={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
+            itemLabel={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
             selection={dataType}
             onChange={dataType => setCategoryImportSummaryColumnDataType(columnName, dataType)}
           />

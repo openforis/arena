@@ -3,7 +3,7 @@ import './inputChips.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import Dropdown from './dropdown'
+import Dropdown from './Dropdown'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item)
@@ -22,7 +22,7 @@ const getItemLabel = (item, itemLabelFunction, itemLabelProp) =>
 const getItemKey = (item, itemKeyFunction, itemKeyProp) =>
   extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
 
-const Chip = props => {
+const Chip = (props) => {
   const { item, itemLabelFunction, itemLabelProp, onDelete, canBeRemoved, readOnly } = props
 
   return (
@@ -40,7 +40,7 @@ const Chip = props => {
   )
 }
 
-const InputChips = props => {
+const InputChips = (props) => {
   const {
     items,
     itemsLookupFunction,
@@ -59,7 +59,7 @@ const InputChips = props => {
     onItemRemove,
   } = props
 
-  const onDropdownChange = item => {
+  const onDropdownChange = (item) => {
     if (item) {
       if (onChange) {
         const newItems = R.append(item)(selection)
@@ -72,7 +72,7 @@ const InputChips = props => {
     }
   }
 
-  const removeItem = item => {
+  const removeItem = (item) => {
     if (onChange) {
       const idx = R.indexOf(item)(selection)
       const newItems = R.remove(idx, 1, selection)
@@ -84,19 +84,19 @@ const InputChips = props => {
     }
   }
 
-  const rejectSelectedItems = R.reject(item => R.includes(item, selection))
+  const rejectSelectedItems = R.reject((item) => R.includes(item, selection))
 
   const dropdownItems = rejectSelectedItems(items)
 
   const dropdownItemsLookupFunction = itemsLookupFunction
-    ? async value => rejectSelectedItems(await itemsLookupFunction(value))
+    ? async (value) => rejectSelectedItems(await itemsLookupFunction(value))
     : null
 
   const showDropdown = !readOnly && (!R.isEmpty(dropdownItems) || itemsLookupFunction)
 
   return (
     <div className="form-input-chip">
-      {selection.map(item => (
+      {selection.map((item) => (
         <Chip
           key={getItemKey(item, itemKeyFunction, itemKeyProp)}
           item={item}
@@ -112,15 +112,11 @@ const InputChips = props => {
 
       {showDropdown && (
         <Dropdown
-          items={dropdownItems}
-          itemsLookupFunction={dropdownItemsLookupFunction}
-          itemKeyProp={itemKeyProp}
-          itemKeyFunction={itemKeyFunction}
-          itemLabelFunction={itemLabelFunction}
-          itemLabelProp={itemLabelProp}
+          items={items.length > 0 ? dropdownItems : dropdownItemsLookupFunction}
+          itemKey={itemKeyFunction || itemKeyProp}
+          itemLabel={itemLabelFunction || itemLabelProp}
           onChange={onDropdownChange}
           selection={null}
-          clearOnSelection={true}
           autocompleteMinChars={dropdownAutocompleteMinChars}
           readOnly={readOnly}
           disabled={disabled}
@@ -131,13 +127,19 @@ const InputChips = props => {
   )
 }
 
+// TODO When refactoring InputChips:
+// 1. items and itemsLookupFunction become one required prop `items` array or function (see dropdown)
+// 2. `itemKeyProp` and `itemKeyFunction` become one required prop `itemKey` string or function (see dropdown)
+// 3. `itemLabelProp` and `itemLabelFunction` become required one prop `itemLabel` string or function (see dropdown)
+// 4: `dropdownAutocompleteMinChars` must be renamed to autocompleteMinChars
+
 InputChips.defaultProps = {
   items: [],
   itemsLookupFunction: null, // Async function to find items by specified value
-  itemKeyProp: null,
   itemKeyFunction: null,
+  itemKeyProp: 'key',
   itemLabelFunction: null,
-  itemLabelProp: null,
+  itemLabelProp: 'value',
   selection: [],
   requiredItems: 0,
   dropdownAutocompleteMinChars: 0,
