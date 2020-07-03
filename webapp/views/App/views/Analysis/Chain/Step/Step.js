@@ -62,9 +62,12 @@ const StepComponent = (props) => {
               Actions={Actions}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
-                Actions.step.updateProps({
-                  [Step.keysProps.entityUuid]: entityUuidUpdate,
-                  [Step.keysProps.categoryUuid]: null,
+                Actions.updatePropsStep({
+                  props: {
+                    [Step.keysProps.entityUuid]: entityUuidUpdate,
+                    [Step.keysProps.categoryUuid]: null,
+                  },
+                  state,
                 })
               }}
               readOnly={disabledEntityOrCategory}
@@ -98,9 +101,12 @@ const StepComponent = (props) => {
                 showManage={false}
                 showAdd={false}
                 onChange={(category) => {
-                  Actions.step.updateProps({
-                    [Step.keysProps.entityUuid]: null,
-                    [Step.keysProps.categoryUuid]: Category.getUuid(category),
+                  Actions.updatePropsStep({
+                    props: {
+                      [Step.keysProps.entityUuid]: null,
+                      [Step.keysProps.categoryUuid]: Category.getUuid(category),
+                    },
+                    state,
                   })
                 }}
               />

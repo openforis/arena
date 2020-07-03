@@ -70,7 +70,12 @@ const EntitySelector = (props) => {
         selection={entity}
         readOnly={readOnly}
         validation={validation}
-        onBeforeChange={(item) => Actions.canSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey))}
+        onBeforeChange={(item) =>
+          Actions.canSelectNodeDef({
+            nodeDef: Survey.getNodeDefByUuid(R.prop('key', item))(survey),
+            state,
+          })
+        }
         onChange={(item) => onChange(R.prop('key', item))}
       />
 

@@ -3,11 +3,12 @@ import { useOpenRStudio } from './chain/useOpenRStudio'
 import { useUpdateChain } from './chain/useUpdateChain'
 import { useUpdateCycles } from './chain/useUpdateCycles'
 import { useDismiss } from './useDismiss'
+import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 
 import { useCreate as useCreateStep } from './step/useCreate'
 import { useSelect as useSelectStep } from './step/useSelect'
+import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
 
-// import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
 // import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
@@ -22,10 +23,14 @@ export const useActions = ({ setState }) => ({
 
   createStep: useCreateStep({ setState }),
   selectStep: useSelectStep({ setState }),
+  updatePropsStep: useUpdatePropsStep({ setState }),
+
+  canSelectNodeDef: useCanSelectNodeDef(),
+
   // save: useSave({
   //   setState,
   // }),
-  // canSelectNodeDef: useCanSelectNodeDef({ chainState, ChainState }),
+
   // getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
   //   setState,
   // }),
