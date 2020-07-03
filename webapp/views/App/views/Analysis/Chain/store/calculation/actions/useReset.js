@@ -5,9 +5,8 @@ import * as Step from '@common/analysis/processingStep'
 import { useUpdate } from './useUpdate'
 
 export const useReset = ({
-  chain,
-  setChain,
-  setDirty,
+  chainState,
+  ChainState,
 
   stepState,
   StepState,
@@ -17,9 +16,8 @@ export const useReset = ({
   State,
 }) => {
   const update = useUpdate({
-    chain,
-    setChain,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -31,7 +29,7 @@ export const useReset = ({
   const { calculation, calculationOriginal } = State.get(state)
 
   const resetCalculation = () => {
-    const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
+    const stepWithOutCalculation = Step.dissocCalculation(calculation)(StepState.getStep(stepState))
 
     StepState.setState({
       step: stepWithOutCalculation,

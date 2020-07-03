@@ -4,13 +4,12 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from './useReset'
 
-export const useDismiss = ({ chain, setChain, setDirty, stepState, StepState, state, setState, State }) => {
+export const useDismiss = ({ chainState, ChainState, stepState, StepState, state, setState, State }) => {
   const dispatch = useDispatch()
 
   const reset = useReset({
-    chain,
-    setChain,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,

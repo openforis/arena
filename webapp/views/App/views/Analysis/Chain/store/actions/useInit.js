@@ -8,12 +8,7 @@ import { AnalysisStorage } from '@webapp/service/storage'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useInit = ({
-  setChain,
-
-  StepState,
-  CalculationState,
-}) => {
+export const useInit = ({ ChainState, StepState, CalculationState }) => {
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 
@@ -23,7 +18,7 @@ export const useInit = ({
 
   const recover = () => {
     if (chain) {
-      setChain(chain)
+      ChainState.setState({ chain })
       if (step) {
         StepState.setState({
           step,
@@ -44,7 +39,7 @@ export const useInit = ({
       [Chain.keysProps.cycles]: [surveyCycleKey],
     })
 
-    setChain(newChain)
+    ChainState.setState({ chain: newChain })
   }
   const recoverOrCreate = chain && Chain.isTemporary(chain) ? recover : create
 
@@ -54,7 +49,7 @@ export const useInit = ({
     if (!A.isNull(chain) && Chain.getUuid(chain) === chainUuid) {
       recover()
     } else {
-      setChain(chainFetched)
+      ChainState.setState({ chain: chainFetched })
     }
   }
 

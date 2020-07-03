@@ -7,18 +7,17 @@ import { useStep } from './step'
 import { useCalculation } from './calculation'
 
 export const useAnalysis = () => {
-  const [dirty, setDirty] = useState(null)
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
-  const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
 
-  const { state: stepState, State: StepState, Actions: StepActions } = useStep({}, { dirty, setDirty, chain, setChain })
+  const { state: chainState, State: ChainState, Actions: ChainActions } = useChain({})
+
+  const { state: stepState, State: StepState, Actions: StepActions } = useStep({}, { chainState, ChainState })
   const { state: calculationState, State: CalculationState, Actions: CalculationActions } = useCalculation(
     {},
     {
-      dirty,
-      setDirty,
-      chain,
-      setChain,
+      chainState,
+      ChainState,
+
       stepState,
       StepState,
     }
@@ -28,10 +27,8 @@ export const useAnalysis = () => {
     attributesUuidsOtherChains,
     setAtrributesUuidsOtherChains,
 
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -39,6 +36,10 @@ export const useAnalysis = () => {
     calculationState,
     CalculationState,
   })
+
+  const { chain, dirty } = ChainState.get(chainState)
+  const { step, stepDirty } = StepState.get(stepState)
+  const { calculation, calculationDirty } = CalculationState.get(calculationState)
 
   useEffect(() => {
     actions.init()
@@ -50,15 +51,12 @@ export const useAnalysis = () => {
 
   const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
 
-  const { calculation, calculationDirty } = CalculationState.get(calculationState)
-  const { step, stepDirty } = StepState.get(stepState)
-
   return {
     attributesUuidsOtherChains,
-    chain,
 
-    dirty,
+    chain,
     editingChain: isNotNullAndNotEmpty(chain),
+    dirty,
 
     step,
     editingStep: isNotNullAndNotEmpty(step),
@@ -70,7 +68,7 @@ export const useAnalysis = () => {
 
     Actions: {
       chain: {
-        ...chainActions,
+        ...ChainActions,
       },
       step: {
         ...StepActions,

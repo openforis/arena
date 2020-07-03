@@ -4,19 +4,19 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from './useReset'
 
-export const useDismiss = ({ chain, setChain, state, setState, State }) => {
+export const useDismiss = ({ chainState, ChainState, state, setState, State }) => {
   const dispatch = useDispatch()
 
   const stepDirty = State.getStepDirty(state)
   const reset = useReset({
-    chain,
-    setChain,
+    chainState,
+    ChainState,
     state,
     setState,
     State,
   })
 
-  const resetStep = async () => {
+  const resetStep = () => {
     reset()
 
     setState({
@@ -35,7 +35,7 @@ export const useDismiss = ({ chain, setChain, state, setState, State }) => {
           })
         )
       } else {
-        await resetStep()
+        resetStep()
       }
     })()
   }

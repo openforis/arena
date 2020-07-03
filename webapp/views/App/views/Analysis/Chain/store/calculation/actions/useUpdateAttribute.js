@@ -4,13 +4,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useUpdate } from './useUpdate'
 
-export const useUpdateAttribute = ({ chain, setChain, stepState, StepState, setDirty, state, setState, State }) => {
+export const useUpdateAttribute = ({ chainState, ChainState, stepState, StepState, state, setState, State }) => {
   const update = useUpdate({
-    chain,
-    setChain,
+    chainState,
+    ChainState,
     stepState,
     StepState,
-    setDirty,
+
     state,
     setState,
     State,

@@ -9,12 +9,20 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { NodeDefsActions, useSurveyInfo } from '@webapp/store/survey'
 import { AnalysisStorage } from '@webapp/service/storage'
 
-export const useAddEntityVirtual = ({ chain, stepState, StepState, calculationState, CalculationState }) => {
+export const useAddEntityVirtual = ({
+  chainState,
+  ChainState,
+  stepState,
+  StepState,
+  calculationState,
+  CalculationState,
+}) => {
   const surveyInfo = useSurveyInfo()
   const dispatch = useDispatch()
   const history = useHistory()
   const { calculation, calculationDirty } = CalculationState.get(calculationState)
   const { step, stepDirty } = StepState.get(stepState)
+  const chain = ChainState.getChain(chainState)
 
   return () => {
     ;(async () => {

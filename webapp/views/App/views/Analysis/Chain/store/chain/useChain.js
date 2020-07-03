@@ -1,20 +1,25 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useActions } from './actions/index'
+import { State } from './state'
 
-export const useChain = (initialState = {}, { dirty, setDirty }) => {
-  const [chain, setChain] = useState(initialState)
+export const useChain = () => {
+  const [state, setState] = useState(State.create({ chain: null, dirty: null }))
 
-  const actions = useActions({
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+  const handleSetState = useCallback((newState) => setState(State.assoc(newState)(state)), [state])
+
+  const Actions = useActions({
+    State,
+    state,
+    setState: handleSetState,
   })
 
   return {
-    chain,
-    setChain,
-    actions,
+    state,
+    State: {
+      ...State,
+      setState: handleSetState,
+    },
+    Actions,
   }
 }

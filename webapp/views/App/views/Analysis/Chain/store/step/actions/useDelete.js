@@ -8,11 +8,12 @@ import * as Step from '@common/analysis/processingStep'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-export const useDelete = ({ chain, setChain, state, setState, State }) => {
+export const useDelete = ({ chainState, ChainState, state, setState, State }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
   const { step, stepDirty } = State.get(state)
+  const chain = ChainState.getChain(chainState)
 
   const resetStep = async () => {
     const stepUuid = Step.getUuid(step)
@@ -24,7 +25,9 @@ export const useDelete = ({ chain, setChain, state, setState, State }) => {
 
     const newChain = Chain.dissocProcessingStep(step)(Chain.dissocProcessingStepTemporary(chain))
 
-    setChain(newChain)
+    ChainState({
+      chain: newChain,
+    })
 
     setState({
       stepDirty: null,

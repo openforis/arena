@@ -5,41 +5,29 @@ import { useDelete } from './useDelete'
 import { useDismiss } from './useDismiss'
 import { useSelect } from './useSelect'
 
-export const useActions = ({
-  dirty,
-  setDirty,
-  chain,
-  setChain,
-
-  state,
-  setState,
-  State,
-}) => ({
+export const useActions = ({ chainState, ChainState, state, setState, State }) => ({
   create: useCreate({
-    chain,
-    setChain,
+    chainState,
+    ChainState,
 
     setState,
   }),
-  update: useUpdate({ dirty, setDirty, chain, setChain, setState }),
+  update: useUpdate({ chainState, ChainState, setState }),
   updateProps: useUpdateProps({
-    dirty,
-    setDirty,
-    chain,
-    setChain,
+    chainState,
+    ChainState,
 
     state,
     setState,
     State,
   }),
-  delete: useDelete({ chain, setChain, state, setState, State }),
+  delete: useDelete({ chainState, ChainState, state, setState, State }),
   dismiss: useDismiss({
-    setDirty,
-    chain,
-    setChain,
+    chainState,
+    ChainState,
     state,
     setState,
     State,
   }),
-  select: useSelect({ chain, setChain, state, setState, State }),
+  select: useSelect({ chainState, ChainState, state, setState, State }),
 })

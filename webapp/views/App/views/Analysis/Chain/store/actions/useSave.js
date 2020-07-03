@@ -45,8 +45,8 @@ const _getStepParam = (step) =>
   )(step)
 
 export const useSave = ({
-  chain,
-  setChain,
+  chainState,
+  ChainState,
 
   stepState,
   StepState,
@@ -58,6 +58,7 @@ export const useSave = ({
   const history = useHistory()
   const surveyId = useSurveyId()
   const lang = useLang()
+  const chain = ChainState.getChain(chainState)
   const step = StepState.getStep(stepState)
   const calculation = CalculationState.getCalculation(calculationState)
 
@@ -94,7 +95,7 @@ export const useSave = ({
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
-        setChain(chainToSave)
+        ChainState.setState({ chain: chainToSave })
         dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
       }
 

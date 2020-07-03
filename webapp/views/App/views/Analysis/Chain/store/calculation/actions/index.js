@@ -7,10 +7,9 @@ import { useSelect } from './useSelect'
 import { useDismiss } from './useDismiss'
 
 export const useActions = ({
-  chain,
-  setChain,
-  dirty,
-  setDirty,
+  chainState,
+  ChainState,
+
   stepState,
   StepState,
 
@@ -19,8 +18,8 @@ export const useActions = ({
   State,
 }) => ({
   create: useCreate({
-    chain,
-    setChain,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -30,10 +29,8 @@ export const useActions = ({
     setState,
   }),
   select: useSelect({
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -44,10 +41,8 @@ export const useActions = ({
   }),
   move: useMove({ stepState, StepState }),
   dismiss: useDismiss({
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -58,10 +53,8 @@ export const useActions = ({
   }),
   delete: useDelete({ stepState, StepState, state, State, setState }),
   updateProp: useUpdateProp({
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,
@@ -71,10 +64,8 @@ export const useActions = ({
     setState,
   }),
   updateAttribute: useUpdateAttribute({
-    chain,
-    setChain,
-    dirty,
-    setDirty,
+    chainState,
+    ChainState,
     stepState,
     StepState,
     state,

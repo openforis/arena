@@ -15,7 +15,14 @@ import * as Step from '@common/analysis/processingStep'
 
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-export const useAddNodeDefAnalysis = ({ chain, stepState, StepState, calculationState, CalculationState }) => {
+export const useAddNodeDefAnalysis = ({
+  chainState,
+  ChainState,
+  stepState,
+  StepState,
+  calculationState,
+  CalculationState,
+}) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
@@ -24,6 +31,7 @@ export const useAddNodeDefAnalysis = ({ chain, stepState, StepState, calculation
 
   const { calculation, calculationDirty } = CalculationState.get(calculationState)
   const { step, stepDirty } = StepState.get(stepState)
+  const chain = ChainState.getChain(chainState)
 
   const nodeDefParent = R.pipe(Step.getEntityUuid, (entityDefUuid) => Survey.getNodeDefByUuid(entityDefUuid)(survey))(
     step

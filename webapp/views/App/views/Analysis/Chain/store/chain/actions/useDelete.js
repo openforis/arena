@@ -11,11 +11,12 @@ import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-export const useDelete = ({ chain }) => {
+export const useDelete = ({ state, State }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
+  const chain = State.getChain(state)
 
   const resetChain = async () => {
     AnalysisStorage.reset()

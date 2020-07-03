@@ -11,16 +11,16 @@ import { NotificationActions } from '@webapp/store/ui'
 
 import { useUpdate } from './useUpdate'
 
-export const useUpdateCycles = ({ chain, setChain, dirty, setDirty }) => {
+export const useUpdateCycles = ({ state, setState, State }) => {
   const survey = useSurvey()
   const dispatch = useDispatch()
-  const update = useUpdate({ chain, setChain, setDirty, dirty })
+  const update = useUpdate({ state, setState, State })
 
   const nodeDefsBelongToCycles = ({ nodeDefUuids, cycles }) =>
     Survey.getNodeDefsByUuids(nodeDefUuids)(survey).every(NodeDef.belongsToAllCycles(cycles))
 
   return ({ cycles }) => {
-    const steps = Chain.getProcessingSteps(chain)
+    const steps = Chain.getProcessingSteps(State.getChain(state))
     const allStepEntitiesBelongToCycles = nodeDefsBelongToCycles({
       nodeDefUuids: steps.map(Step.getEntityUuid),
       cycles,

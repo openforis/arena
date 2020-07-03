@@ -6,7 +6,7 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Survey from '@core/survey/survey'
 
-export const useUpdate = ({ chain, setChain, setDirty, stepState, StepState, setState }) => {
+export const useUpdate = ({ chainState, ChainState, stepState, StepState, setState }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
@@ -22,11 +22,13 @@ export const useUpdate = ({ chain, setChain, setDirty, stepState, StepState, set
     const chainUpdated = Chain.assocItemValidation(
       Calculation.getUuid(calculationUpdated),
       calculationValidation
-    )(chain)
+    )(ChainState.getChain(chainState))
 
-    setChain(chainUpdated)
+    ChainState.setState({
+      chain: chainUpdated,
+      dirty: true,
+    })
 
     setState({ calculation: calculationUpdated, calculationDirty: true })
-    setDirty(true)
   }
 }

@@ -6,9 +6,8 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useReset } from './useReset'
 
 export const useSelect = ({
-  chain,
-  setChain,
-  setDirty,
+  chainState,
+  ChainState,
 
   stepState,
   StepState,
@@ -22,9 +21,8 @@ export const useSelect = ({
   const { calculation, calculationDirty } = State.get(state)
 
   const reset = useReset({
-    chain,
-    setChain,
-    setDirty,
+    chainState,
+    ChainState,
 
     stepState,
     StepState,

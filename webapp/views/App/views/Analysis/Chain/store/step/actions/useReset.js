@@ -3,14 +3,18 @@ import * as A from '@core/arena'
 import * as Chain from '@common/analysis/processingChain'
 import { useUpdate } from './useUpdate'
 
-export const useReset = ({ chain, setChain, setDirty, state, setState, State }) => {
-  const update = useUpdate({ chain, setChain, setDirty, state, setState, State })
+export const useReset = ({ chainState, ChainState, state, setState, State }) => {
+  const update = useUpdate({ chainState, ChainState, state, setState, State })
 
   const stepOriginal = State.getStepOriginal(State)
+  const chain = ChainState.getChain(chainState)
 
-  const resetStep = async () => {
+  const resetStep = () => {
     const newChain = Chain.dissocProcessingStepTemporary(chain)
-    setChain(newChain)
+
+    ChainState.setState({
+      chain: newChain,
+    })
 
     setState({
       step: null,

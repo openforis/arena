@@ -5,7 +5,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { AnalysisStorage } from '@webapp/service/storage'
 
-export const useDismiss = ({ dirty }) => {
+export const useDismiss = ({ chainState, ChainState }) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
@@ -16,7 +16,7 @@ export const useDismiss = ({ dirty }) => {
 
   return () => {
     ;(async () => {
-      if (!dirty) {
+      if (!ChainState.getDirty(chainState)) {
         navigateToChainsView()
       } else {
         dispatch(

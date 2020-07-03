@@ -8,13 +8,15 @@ import * as Chain from '@common/analysis/processingChain'
 export const useGetAttributeUuidsOtherChains = ({
   attributesUuidsOtherChains,
   setAtrributesUuidsOtherChains,
-  chain,
+  chainState,
+  ChainState,
 }) => {
   const surveyId = useSurveyId()
+  const chain = ChainState.getChain(chainState)
 
   return () => {
     ;(async () => {
-      if (!R.isEmpty(chain) && R.isEmpty(attributesUuidsOtherChains)) {
+      if (!R.isNil(Chain.getUuid(chain)) && R.isEmpty(attributesUuidsOtherChains)) {
         const { data: attributeUuidsOtherChains } = await axios.get(
           `/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}/attribute-uuids-other-chains`
         )
