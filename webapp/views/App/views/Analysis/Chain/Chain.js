@@ -16,7 +16,7 @@ import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import { State, useAnalysis } from './store'
-// import StepList from './StepList'
+import StepList from './StepList'
 // import Step from './Step'
 import ButtonBar from './ButtonBar'
 
@@ -64,7 +64,7 @@ const ChainComponent = () => {
           </>
         )}
 
-        {/* <StepList state={state} Actions={Actions} /> */}
+        <StepList state={state} Actions={Actions} />
       </div>
 
       {/* <Step state={state} Actions={Actions} /> */}

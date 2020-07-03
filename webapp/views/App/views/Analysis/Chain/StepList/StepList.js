@@ -11,17 +11,19 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { State } from '../store'
 
-import StepItem from './StepItem'
+// import StepItem from './StepItem'
 
 const StepList = (props) => {
   const { state, Actions } = props
-  const { chain, editingStep } = State.get(state)
   const i18n = useI18n()
+  const chainEdit = State.getChainEdit(state)
+  const editingStep = Boolean(State.getStepEdit(state))
 
-  const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
+  const validation = Chain.getItemValidationByUuid(Chain.getUuid(chainEdit))(chainEdit)
   const stepsValidation = Validation.getFieldValidation(Chain.keys.processingSteps)(validation)
-  const steps = Chain.getProcessingSteps(chain)
+  const steps = Chain.getProcessingSteps(chainEdit)
   const lastStepHasCategory = R.pipe(R.last, Step.hasCategory)(steps)
+
   return (
     <div className={`form-item${editingStep ? ' chain-list__editing-step' : ''}`}>
       {!editingStep && (
@@ -32,7 +34,7 @@ const StepList = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            onClick={Actions.step.create}
+            onClick={() => Actions.createStep({ state })}
             aria-disabled={lastStepHasCategory}
           >
             <span className="icon icon-plus icon-14px" />
@@ -40,11 +42,11 @@ const StepList = (props) => {
         </div>
       )}
 
-      <div className="chain-list">
+      {/* <div className="chain-list">
         {steps.map((processingStep) => (
           <StepItem key={Step.getIndex(processingStep)} step={processingStep} state={state} Actions={Actions} />
         ))}
-      </div>
+      </div> */}
     </div>
   )
 }

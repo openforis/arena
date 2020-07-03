@@ -5,9 +5,9 @@ export const keys = {
   chain: 'chain',
   chainEdit: 'chainEdit',
   step: 'step',
-  stepEdit: 'stepDirty',
+  stepEdit: 'stepEdit',
   calculation: 'calculation',
-  calculationEdit: 'calculationDirty',
+  calculationEdit: 'calculationEdit',
 }
 
 // ==== CREATE
@@ -38,3 +38,6 @@ export const isCalculationDirty = (state) => getCalculation(state) !== getCalcul
 
 // ==== READ
 export const assocChainEdit = A.assoc(keys.chainEdit)
+
+export const assocStep = A.assoc(keys.step)
+export const assocStepEdit = A.assoc(keys.stepEdit)

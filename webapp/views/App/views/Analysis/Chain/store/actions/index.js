@@ -4,6 +4,8 @@ import { useUpdateChain } from './chain/useUpdateChain'
 import { useUpdateCycles } from './chain/useUpdateCycles'
 import { useDismiss } from './useDismiss'
 
+import { useCreate as useCreateStep } from './step/useCreate'
+
 // import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -16,6 +18,8 @@ export const useActions = ({ setState }) => ({
   updateChain: useUpdateChain({ setState }),
   updateCycles: useUpdateCycles({ setState }),
   dismiss: useDismiss(),
+
+  createStep: useCreateStep({ setState }),
   // save: useSave({
   //   setState,
   // }),
