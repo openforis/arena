@@ -11,7 +11,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
@@ -78,8 +78,8 @@ const CalculationView = () => {
             <Dropdown
               items={attributes}
               selection={attribute}
-              itemKeyProp={Calculation.keys.uuid}
-              itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
+              itemKey={Calculation.keys.uuid}
+              itemLabel={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
               validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
               onBeforeChange={(attrDef) => dispatch(checkCanSelectNodeDef(attrDef))}
               onChange={(def) => dispatch(updateCalculationAttribute(def))}

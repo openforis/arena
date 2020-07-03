@@ -145,18 +145,19 @@ class AutocompleteDialog extends React.Component {
   }
 
   render() {
-    const { items, itemRenderer, itemKeyFunction, className } = this.props
+    const { items, itemRenderer, itemLabel, itemKeyFunction, className } = this.props
 
     const ItemRenderer = itemRenderer
 
     return (
       <div ref={this.list} className={`autocomplete-list ${className}`} style={{ ...this.calculatePosition() }}>
-        {items.map(item => (
+        {items.map((item) => (
           <ItemRenderer
             key={itemKeyFunction(item)}
-            tabIndex="1"
+            tabIndex="0"
             item={item}
-            onKeyDown={e => this.onListItemKeyDown(e)}
+            itemLabel={itemLabel}
+            onKeyDown={(e) => this.onListItemKeyDown(e)}
             onMouseDown={() => this.selectItem(item)}
           />
         ))}
@@ -168,7 +169,8 @@ class AutocompleteDialog extends React.Component {
 AutocompleteDialog.defaultProps = {
   items: [],
   itemRenderer: null,
-  itemKeyFunction: null,
+  itemLabel: null, // required prop / string or function
+  itemKeyFunction: null, // required prop / string or function - Rename it to itemKey
   inputField: null,
   sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
   className: '',
