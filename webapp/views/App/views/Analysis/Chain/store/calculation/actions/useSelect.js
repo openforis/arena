@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useReset } from '@webapp/views/App/views/Analysis/Chain/store/calculation/actions/useReset'
+import { useReset } from './useReset'
 
 export const useSelect = ({
   chain,
@@ -12,15 +12,14 @@ export const useSelect = ({
   setStep,
   setDirty,
   calculation,
-  calculationOriginal,
 
-  calculationDirty,
-
-  setCalculation,
-  setCalculationOriginal,
-  setCalculationDirty,
+  state,
+  setState,
+  State,
 }) => {
   const dispatch = useDispatch()
+
+  const calculationDirty = State.getCalculationDirty(state)
 
   const reset = useReset({
     chain,
@@ -28,16 +27,19 @@ export const useSelect = ({
     step,
     setStep,
     setDirty,
-    calculation,
-    calculationOriginal,
-    setCalculation,
-    setCalculationDirty,
+    state,
+    setState,
+    State,
   })
 
   const select = ({ calculationSelected }) => {
-    setCalculation(calculationSelected)
-    setCalculationOriginal(calculationSelected)
-    setCalculationDirty(null)
+    setState(
+      State.assoc({
+        calculation: calculationSelected,
+        calculationOriginal: calculationSelected,
+        calculationDirty: null,
+      })(state)
+    )
   }
 
   const selectWithReset = ({ calculationSelected }) => () => {

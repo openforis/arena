@@ -10,10 +10,10 @@ export const useReset = ({
   step,
   setStep,
   setDirty,
-  calculation,
-  calculationOriginal,
-  setCalculation,
-  setCalculationDirty,
+
+  state,
+  setState,
+  State,
 }) => {
   const update = useUpdate({
     chain,
@@ -21,18 +21,22 @@ export const useReset = ({
     step,
     setStep,
     setDirty,
-    calculation,
-    calculationOriginal,
-    setCalculation,
-    setCalculationDirty,
+    state,
+    setState,
+    State,
   })
+  const { calculation, calculationOriginal } = State.get(state)
 
-  const resetCalculation = async () => {
-    setCalculation(null)
+  const resetCalculation = () => {
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
-
     setStep(stepWithOutCalculation)
-    setCalculationDirty(null)
+
+    setState(
+      State.assoc({
+        calculation: null,
+        calculationDirty: null,
+      })
+    )
   }
 
   return () => {

@@ -14,14 +14,10 @@ export const useAnalysis = () => {
     {},
     { dirty, setDirty, chain, setChain }
   )
-  const {
-    calculation,
-    setCalculation,
-    calculationDirty,
-    setCalculationDirty,
-    setCalculationOriginal,
-    actions: calculationActions,
-  } = useCalculation({}, { dirty, setDirty, chain, setChain, step, setStep })
+  const { state: calculationState, State: CalculationState, Actions: CalculationActions } = useCalculation(
+    {},
+    { dirty, setDirty, chain, setChain, step, setStep }
+  )
 
   const actions = useActions({
     attributesUuidsOtherChains,
@@ -35,11 +31,9 @@ export const useAnalysis = () => {
     stepDirty,
     setStepDirty,
     setStepOriginal,
-    calculation,
-    setCalculation,
-    calculationDirty,
-    setCalculationDirty,
-    setCalculationOriginal,
+
+    calculationState,
+    CalculationState,
   })
 
   useEffect(() => {
@@ -51,6 +45,8 @@ export const useAnalysis = () => {
   }, [chain])
 
   const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
+
+  const { calculation, calculationDirty } = CalculationState.get(calculationState)
 
   return {
     attributesUuidsOtherChains,
@@ -72,7 +68,7 @@ export const useAnalysis = () => {
         ...stepActions,
       },
       calculation: {
-        ...calculationActions,
+        ...CalculationActions,
       },
       ...actions,
     },

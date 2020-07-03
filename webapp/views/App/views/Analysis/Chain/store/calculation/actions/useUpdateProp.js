@@ -10,27 +10,19 @@ const resetAggregateFunctionIfPropIsTypeAndTypeIsCategorical = ({ prop, value })
     ? Calculation.assocProp(Calculation.keysProps.aggregateFn, null)(calculation)
     : calculation
 
-export const useUpdateProp = ({
-  chain,
-  setChain,
-  step,
-  setStep,
-  setDirty,
-  calculation,
-  setCalculation,
-  setCalculationDirty,
-}) => {
+export const useUpdateProp = ({ chain, setChain, step, setStep, setDirty, state, setState, State }) => {
   const update = useUpdate({
     chain,
     setChain,
     step,
     setStep,
     setDirty,
-    calculation,
-    setCalculation,
-    setCalculationDirty,
+    state,
+    setState,
+    State,
   })
 
+  const { calculation } = State.get(state)
   return ({ prop, value }) => {
     let calculationUpdated = Calculation.assocProp(prop, value)(calculation)
     calculationUpdated = resetNodeDefIfPropIsType({ prop })(calculationUpdated)

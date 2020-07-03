@@ -8,7 +8,7 @@ import { AnalysisActions } from '@webapp/service/storage'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCalculationDirty }) => {
+export const useInit = ({ setChain, setStep, setStepDirty, calculationState, CalculationState }) => {
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 
@@ -23,8 +23,12 @@ export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCa
         setStep(step)
         setStepDirty(stepDirty)
         if (calculation) {
-          setCalculation(calculation)
-          setCalculationDirty(calculationDirty)
+          CalculationState.setState(
+            CalculationState.assoc({
+              calculation,
+              calculationDirty,
+            })(calculationState)
+          )
         }
       }
     }

@@ -48,11 +48,10 @@ export const useSave = ({
   chain,
   setChain,
   step,
-  calculation,
   setStepDirty,
   setStepOriginal,
-  setCalculationDirty,
-  setCalculationOriginal,
+  calculationState,
+  CalculationState,
 }) => {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -61,6 +60,8 @@ export const useSave = ({
 
   return () => {
     ;(async () => {
+      const calculation = CalculationState.getCalculation(calculationState)
+
       dispatch(AppSavingActions.showAppSaving())
       const stepValidation = !R.isEmpty(step) ? await ChainValidator.validateStep(step) : null
       const calculationValidation = !R.isEmpty(calculation)
@@ -80,8 +81,14 @@ export const useSave = ({
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         setStepDirty(null)
         setStepOriginal(step)
-        setCalculationDirty(null)
-        setCalculationOriginal(calculation)
+
+        CalculationState.setState(
+          CalculationState.assoc({
+            calculationDirty: null,
+            calculationOriginal: calculation,
+          })(calculationState)
+        )
+
         AnalysisActions.reset()
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)

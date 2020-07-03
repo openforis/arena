@@ -7,14 +7,16 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useDelete = ({ step, setStep, calculation, calculationDirty, setCalculation, setCalculationDirty }) => {
+export const useDelete = ({ step, setStep, State, state, setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
 
+  const { calculation, calculationDirty } = State.get(state)
+
   const resetCalculation = async () => {
     const calculationUuid = Calculation.getUuid(calculation)
-    setCalculation(null)
+
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
 
     if (chainUuid && !Calculation.isTemporary(calculation)) {
@@ -23,7 +25,13 @@ export const useDelete = ({ step, setStep, calculation, calculationDirty, setCal
     }
 
     setStep(stepWithOutCalculation)
-    setCalculationDirty(null)
+
+    setState(
+      State.assoc({
+        calculation: null,
+        calculationDirty: null,
+      })
+    )
   }
 
   return () => {

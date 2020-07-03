@@ -1,34 +1,31 @@
 import { useState } from 'react'
 
 import { useActions } from './actions'
+import { State } from './state'
 
 export const useCalculation = (initialState, { dirty, setDirty, chain, setChain, step, setStep }) => {
-  const [calculation, setCalculation] = useState(null)
-  const [calculationOriginal, setCalculationOriginal] = useState(initialState)
-  const [calculationDirty, setCalculationDirty] = useState(null)
+  const [state, setState] = useState(
+    State.create({ calculation: null, calculationOriginal: null, calculationDirty: null })
+  )
 
-  const actions = useActions({
+  const Actions = useActions({
     dirty,
     setDirty,
     chain,
     setChain,
     step,
     setStep,
-    calculation,
-    setCalculation,
-    calculationOriginal,
-    setCalculationOriginal,
-    calculationDirty,
-    setCalculationDirty,
+    State,
+    state,
+    setState,
   })
 
   return {
-    calculation,
-    setCalculation,
-    calculationDirty,
-    setCalculationDirty,
-    calculationOriginal,
-    setCalculationOriginal,
-    actions,
+    state,
+    State: {
+      ...State,
+      setState,
+    },
+    Actions,
   }
 }
