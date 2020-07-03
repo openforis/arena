@@ -17,7 +17,7 @@ import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import { State, useAnalysis } from './store'
 import StepList from './StepList'
-// import Step from './Step'
+import Step from './Step'
 import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
@@ -67,7 +67,7 @@ const ChainComponent = () => {
         <StepList state={state} Actions={Actions} />
       </div>
 
-      {/* <Step state={state} Actions={Actions} /> */}
+      <Step state={state} Actions={Actions} />
 
       <ButtonBar state={state} Actions={Actions} />
     </div>

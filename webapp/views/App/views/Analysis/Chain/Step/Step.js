@@ -19,8 +19,8 @@ import CategorySelector from '@webapp/components/survey/CategorySelector'
 import { State } from '../store'
 
 import EntitySelector from './EntitySelector'
-import CalculationList from './CalculationList'
-import Calculation from './Calculation'
+// import CalculationList from './CalculationList'
+// import Calculation from './Calculation'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -31,15 +31,20 @@ const getClassName = ({ editingStep, editingCalculation }) => {
 
 const StepComponent = (props) => {
   const { state, Actions } = props
-  const { chain, step, editingStep, editingCalculation } = State.get(state)
+
+  const chainEdit = State.getChainEdit(state)
+  const stepEdit = State.getStepEdit(state)
+  const editingStep = Boolean(State.getStepEdit(state))
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
+
   const i18n = useI18n()
 
-  const stepNext = Chain.getStepNext(step)(chain)
+  const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
-  const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
-  const hasCalculationSteps = (Step.getCalculationsCount(step) || []).length > 0
+  const validation = Chain.getItemValidationByUuid(Step.getUuid(stepEdit))(chainEdit)
+  const hasCalculationSteps = (Step.getCalculationsCount(stepEdit) || []).length > 0
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
-  const entityUuid = Step.getEntityUuid(step)
+  const entityUuid = Step.getEntityUuid(stepEdit)
 
   const className = useMemo(() => getClassName({ editingStep, editingCalculation }), [editingStep, editingCalculation])
 
@@ -48,9 +53,9 @@ const StepComponent = (props) => {
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={Actions.step.dismiss}>
+            {/* <button type="button" className="btn-s btn-close" onClick={Actions.step.dismiss}>
               <span className="icon icon-10px icon-cross" />
-            </button>
+            </button> */}
 
             <EntitySelector
               state={state}
@@ -88,7 +93,7 @@ const StepComponent = (props) => {
               <div className="form-label chain-list__label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
               <CategorySelector
                 disabled={disabledEntityOrCategory}
-                categoryUuid={Step.getCategoryUuid(step)}
+                categoryUuid={Step.getCategoryUuid(stepEdit)}
                 validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
                 showManage={false}
                 showAdd={false}
@@ -102,10 +107,10 @@ const StepComponent = (props) => {
             </div>
           </>
         )}
-        <CalculationList state={state} Actions={Actions} />
+        {/* <CalculationList state={state} Actions={Actions} /> */}
       </div>
 
-      <Calculation state={state} Actions={Actions} />
+      {/* <Calculation state={state} Actions={Actions} /> */}
     </div>
   )
 }
