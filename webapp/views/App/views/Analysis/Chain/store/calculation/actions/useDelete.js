@@ -7,12 +7,13 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useDelete = ({ step, setStep, State, state, setState }) => {
+export const useDelete = ({ stepState, StepState, State, state, setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
 
   const { calculation, calculationDirty } = State.get(state)
+  const step = StepState.getStep(stepState)
 
   const resetCalculation = async () => {
     const calculationUuid = Calculation.getUuid(calculation)
@@ -24,14 +25,14 @@ export const useDelete = ({ step, setStep, State, state, setState }) => {
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    setStep(stepWithOutCalculation)
+    StepState.setState({
+      step: stepWithOutCalculation,
+    })
 
-    setState(
-      State.assoc({
-        calculation: null,
-        calculationDirty: null,
-      })
-    )
+    setState({
+      calculation: null,
+      calculationDirty: null,
+    })
   }
 
   return () => {

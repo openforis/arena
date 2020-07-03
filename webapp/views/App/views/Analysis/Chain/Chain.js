@@ -12,7 +12,7 @@ import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
-import { AnalysisActions } from '@webapp/service/storage'
+import { AnalysisStorage } from '@webapp/service/storage'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -35,7 +35,9 @@ const ChainComponent = () => {
   useHistoryListen(
     (location) => {
       if (matchPath(location.pathname, { path: `${appModuleUri(analysisModules.nodeDef)}:uuid/` })) {
-        AnalysisActions.persist(analysis)
+        AnalysisStorage.persist(analysis)
+      } else {
+        AnalysisStorage.reset()
       }
     },
     [chain, step, stepDirty, calculation, calculationDirty]

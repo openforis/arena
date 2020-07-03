@@ -103,16 +103,12 @@ export const assocProcessingStep = (step) => R.assocPath([keys.processingSteps, 
 
 export const dissocProcessingStepTemporary = (chain) => ({
   ...chain,
-  [keys.processingSteps]: (chain[keys.processingSteps] || []).filter(
-    (processingStep) => !Step.isTemporary(processingStep)
-  ),
+  [keys.processingSteps]: getProcessingSteps(chain).filter((processingStep) => !Step.isTemporary(processingStep)),
 })
 
 export const dissocProcessingStep = (step) => (chain) => ({
   ...chain,
-  [keys.processingSteps]: (chain[keys.processingSteps] || []).filter(
-    (processingStep) => !Step.isEqual(processingStep)(step)
-  ),
+  [keys.processingSteps]: getProcessingSteps(chain).filter((processingStep) => !Step.isEqual(processingStep)(step)),
 })
 
 // ====== VALIDATION

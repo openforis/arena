@@ -3,16 +3,21 @@ import * as A from '@core/arena'
 
 import * as Chain from '@common/analysis/processingChain'
 
-import { AnalysisActions } from '@webapp/service/storage'
+import { AnalysisStorage } from '@webapp/service/storage'
 
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useInit = ({ setChain, setStep, setStepDirty, calculationState, CalculationState }) => {
+export const useInit = ({
+  setChain,
+
+  StepState,
+  CalculationState,
+}) => {
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 
-  const { chain, step, stepDirty, calculation, calculationDirty } = AnalysisActions.get()
+  const { chain, step, stepDirty, calculation, calculationDirty } = AnalysisStorage.get()
 
   const { chainUuid } = useParams()
 
@@ -20,19 +25,19 @@ export const useInit = ({ setChain, setStep, setStepDirty, calculationState, Cal
     if (chain) {
       setChain(chain)
       if (step) {
-        setStep(step)
-        setStepDirty(stepDirty)
+        StepState.setState({
+          step,
+          stepDirty,
+        })
         if (calculation) {
-          CalculationState.setState(
-            CalculationState.assoc({
-              calculation,
-              calculationDirty,
-            })(calculationState)
-          )
+          CalculationState.setState({
+            calculation,
+            calculationDirty,
+          })
         }
       }
     }
-    AnalysisActions.reset()
+    AnalysisStorage.reset()
   }
   const create = () => {
     const newChain = Chain.newProcessingChain({

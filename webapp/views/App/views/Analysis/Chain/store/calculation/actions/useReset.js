@@ -7,9 +7,10 @@ import { useUpdate } from './useUpdate'
 export const useReset = ({
   chain,
   setChain,
-  step,
-  setStep,
   setDirty,
+
+  stepState,
+  StepState,
 
   state,
   setState,
@@ -18,9 +19,11 @@ export const useReset = ({
   const update = useUpdate({
     chain,
     setChain,
-    step,
-    setStep,
     setDirty,
+
+    stepState,
+    StepState,
+
     state,
     setState,
     State,
@@ -29,14 +32,15 @@ export const useReset = ({
 
   const resetCalculation = () => {
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
-    setStep(stepWithOutCalculation)
 
-    setState(
-      State.assoc({
-        calculation: null,
-        calculationDirty: null,
-      })
-    )
+    StepState.setState({
+      step: stepWithOutCalculation,
+    })
+
+    setState({
+      calculation: null,
+      calculationDirty: null,
+    })
   }
 
   return () => {

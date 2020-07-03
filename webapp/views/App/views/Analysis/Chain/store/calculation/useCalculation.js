@@ -1,30 +1,34 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useCalculation = (initialState, { dirty, setDirty, chain, setChain, step, setStep }) => {
+export const useCalculation = (initialState, { dirty, setDirty, chain, setChain, stepState, StepState }) => {
   const [state, setState] = useState(
     State.create({ calculation: null, calculationOriginal: null, calculationDirty: null })
   )
+
+  const handleSetState = useCallback((newState) => setState(State.assoc(newState)(state)), [state])
 
   const Actions = useActions({
     dirty,
     setDirty,
     chain,
     setChain,
-    step,
-    setStep,
+
+    stepState,
+    StepState,
+
     State,
     state,
-    setState,
+    setState: handleSetState,
   })
 
   return {
     state,
     State: {
       ...State,
-      setState,
+      setState: handleSetState,
     },
     Actions,
   }

@@ -1,4 +1,3 @@
-import * as AnalysisActions from './actions'
-import * as AnalysisStorage from './storage'
+import * as AnalysisStorage from './actions'
 
-export { AnalysisActions, AnalysisStorage }
+export { AnalysisStorage }

@@ -8,10 +8,10 @@ import { useReset } from './useReset'
 export const useSelect = ({
   chain,
   setChain,
-  step,
-  setStep,
   setDirty,
-  calculation,
+
+  stepState,
+  StepState,
 
   state,
   setState,
@@ -19,27 +19,27 @@ export const useSelect = ({
 }) => {
   const dispatch = useDispatch()
 
-  const calculationDirty = State.getCalculationDirty(state)
+  const { calculation, calculationDirty } = State.get(state)
 
   const reset = useReset({
     chain,
     setChain,
-    step,
-    setStep,
     setDirty,
+
+    stepState,
+    StepState,
+
     state,
     setState,
     State,
   })
 
   const select = ({ calculationSelected }) => {
-    setState(
-      State.assoc({
-        calculation: calculationSelected,
-        calculationOriginal: calculationSelected,
-        calculationDirty: null,
-      })(state)
-    )
+    setState({
+      calculation: calculationSelected,
+      calculationOriginal: calculationSelected,
+      calculationDirty: null,
+    })
   }
 
   const selectWithReset = ({ calculationSelected }) => () => {

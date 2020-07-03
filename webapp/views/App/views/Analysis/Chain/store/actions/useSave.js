@@ -5,7 +5,7 @@ import { useHistory } from 'react-router'
 import * as Validation from '@core/validation/validation'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { AnalysisActions } from '@webapp/service/storage'
+import { AnalysisStorage } from '@webapp/service/storage'
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
@@ -47,9 +47,10 @@ const _getStepParam = (step) =>
 export const useSave = ({
   chain,
   setChain,
-  step,
-  setStepDirty,
-  setStepOriginal,
+
+  stepState,
+  StepState,
+
   calculationState,
   CalculationState,
 }) => {
@@ -57,11 +58,11 @@ export const useSave = ({
   const history = useHistory()
   const surveyId = useSurveyId()
   const lang = useLang()
+  const step = StepState.getStep(stepState)
+  const calculation = CalculationState.getCalculation(calculationState)
 
   return () => {
     ;(async () => {
-      const calculation = CalculationState.getCalculation(calculationState)
-
       dispatch(AppSavingActions.showAppSaving())
       const stepValidation = !R.isEmpty(step) ? await ChainValidator.validateStep(step) : null
       const calculationValidation = !R.isEmpty(calculation)
@@ -79,17 +80,17 @@ export const useSave = ({
         await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
-        setStepDirty(null)
-        setStepOriginal(step)
+        StepState.setState({
+          stepDirty: null,
+          stepOriginal: step,
+        })
 
-        CalculationState.setState(
-          CalculationState.assoc({
-            calculationDirty: null,
-            calculationOriginal: calculation,
-          })(calculationState)
-        )
+        CalculationState.setState({
+          calculationDirty: null,
+          calculationOriginal: calculation,
+        })
 
-        AnalysisActions.reset()
+        AnalysisStorage.reset()
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {

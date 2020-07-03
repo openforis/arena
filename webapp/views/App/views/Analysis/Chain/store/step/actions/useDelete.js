@@ -8,14 +8,14 @@ import * as Step from '@common/analysis/processingStep'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDirty }) => {
+export const useDelete = ({ chain, setChain, state, setState, State }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
+  const { step, stepDirty } = State.get(state)
 
   const resetStep = async () => {
     const stepUuid = Step.getUuid(step)
-    setStep(null)
 
     if (chainUuid && !Step.isTemporary(step)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${stepUuid}`)
@@ -25,7 +25,11 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
     const newChain = Chain.dissocProcessingStep(step)(Chain.dissocProcessingStepTemporary(chain))
 
     setChain(newChain)
-    setStepDirty(null)
+
+    setState({
+      stepDirty: null,
+      step: null,
+    })
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 

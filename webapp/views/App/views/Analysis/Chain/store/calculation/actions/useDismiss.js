@@ -4,15 +4,17 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from './useReset'
 
-export const useDismiss = ({ chain, setChain, step, setStep, setDirty, state, setState, State }) => {
+export const useDismiss = ({ chain, setChain, setDirty, stepState, StepState, state, setState, State }) => {
   const dispatch = useDispatch()
 
   const reset = useReset({
     chain,
     setChain,
-    step,
-    setStep,
     setDirty,
+
+    stepState,
+    StepState,
+
     state,
     setState,
     State,
@@ -20,18 +22,15 @@ export const useDismiss = ({ chain, setChain, step, setStep, setDirty, state, se
 
   const resetCalculation = async () => {
     reset()
-    setState(
-      State.assoc({
-        calculation: null,
-        calculationDirty: null,
-      })
-    )
+    setState({
+      calculation: null,
+      calculationDirty: null,
+    })
   }
-  const calculationDirty = State.getCalculationDirty(state)
 
   return () => {
     ;(async () => {
-      if (calculationDirty) {
+      if (State.getCalculationDirty(state)) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'processingStepCalculation.deleteConfirm',

@@ -7,13 +7,14 @@ import * as Survey from '@core/survey/survey'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import { NodeDefsActions, useSurveyInfo } from '@webapp/store/survey'
-import { AnalysisActions } from '@webapp/service/storage'
+import { AnalysisStorage } from '@webapp/service/storage'
 
-export const useAddEntityVirtual = ({ chain, step, stepDirty, calculationState, CalculationState }) => {
+export const useAddEntityVirtual = ({ chain, stepState, StepState, calculationState, CalculationState }) => {
   const surveyInfo = useSurveyInfo()
   const dispatch = useDispatch()
   const history = useHistory()
   const { calculation, calculationDirty } = CalculationState.get(calculationState)
+  const { step, stepDirty } = StepState.get(stepState)
 
   return () => {
     ;(async () => {
@@ -27,7 +28,7 @@ export const useAddEntityVirtual = ({ chain, step, stepDirty, calculationState, 
         true
       )
       await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-      AnalysisActions.persist({ chain, step, stepDirty, calculation, calculationDirty })
+      AnalysisStorage.persist({ chain, step, stepDirty, calculation, calculationDirty })
       history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
     })()
   }

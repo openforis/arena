@@ -10,27 +10,31 @@ export const useAnalysis = () => {
   const [dirty, setDirty] = useState(null)
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
   const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
-  const { step, setStep, stepDirty, setStepDirty, setStepOriginal, actions: stepActions } = useStep(
-    {},
-    { dirty, setDirty, chain, setChain }
-  )
+
+  const { state: stepState, State: StepState, Actions: StepActions } = useStep({}, { dirty, setDirty, chain, setChain })
   const { state: calculationState, State: CalculationState, Actions: CalculationActions } = useCalculation(
     {},
-    { dirty, setDirty, chain, setChain, step, setStep }
+    {
+      dirty,
+      setDirty,
+      chain,
+      setChain,
+      stepState,
+      StepState,
+    }
   )
 
   const actions = useActions({
     attributesUuidsOtherChains,
     setAtrributesUuidsOtherChains,
+
     chain,
     setChain,
     dirty,
     setDirty,
-    step,
-    setStep,
-    stepDirty,
-    setStepDirty,
-    setStepOriginal,
+
+    stepState,
+    StepState,
 
     calculationState,
     CalculationState,
@@ -47,16 +51,20 @@ export const useAnalysis = () => {
   const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
 
   const { calculation, calculationDirty } = CalculationState.get(calculationState)
+  const { step, stepDirty } = StepState.get(stepState)
 
   return {
     attributesUuidsOtherChains,
     chain,
-    step,
-    calculation,
+
     dirty,
     editingChain: isNotNullAndNotEmpty(chain),
+
+    step,
     editingStep: isNotNullAndNotEmpty(step),
     stepDirty,
+
+    calculation,
     editingCalculation: isNotNullAndNotEmpty(calculation),
     calculationDirty,
 
@@ -65,7 +73,7 @@ export const useAnalysis = () => {
         ...chainActions,
       },
       step: {
-        ...stepActions,
+        ...StepActions,
       },
       calculation: {
         ...CalculationActions,

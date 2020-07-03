@@ -1,10 +1,13 @@
 import * as Chain from '@common/analysis/processingChain'
 
-export const useUpdate = ({ setStep, chain, setChain, setDirty, setStepDirty }) => ({ stepUpdated }) => {
+export const useUpdate = ({ chain, setChain, setDirty, setState }) => ({ stepUpdated }) => {
   const chainUpdated = Chain.assocProcessingStep(stepUpdated)(chain)
 
   setDirty(true)
   setChain(chainUpdated)
-  setStep(stepUpdated)
-  setStepDirty(true)
+
+  setState({
+    step: stepUpdated,
+    stepDirty: true,
+  })
 }

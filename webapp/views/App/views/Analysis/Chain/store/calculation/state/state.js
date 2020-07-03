@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 export const keys = {
   calculation: 'calculation',
   calculationOriginal: 'calculationOriginal',
@@ -7,7 +5,6 @@ export const keys = {
 }
 
 // ==== CREATE
-
 export const create = ({ calculation, calculationOriginal, calculationDirty }) => ({
   [keys.calculation]: calculation,
   [keys.calculationOriginal]: calculationOriginal,
@@ -26,15 +23,14 @@ export const get = (state) => ({
 })
 
 // ==== UPDATE
-export const updateByKey = ({ key, value }) => (state) =>
-  Object.keys(keys).includes(key) ? { ...state, [key]: value } : { ...state }
-
 export const assoc = (newProps) => (state) => ({
-  [keys.calculation]: R.isNil(newProps[keys.calculation]) ? state[keys.calculation] : newProps[keys.calculation],
-  [keys.calculationOriginal]: R.isNil(newProps[keys.calculationOriginal])
-    ? state[keys.calculationOriginal]
-    : newProps[keys.calculationOriginal],
-  [keys.calculationDirty]: R.isNil(newProps[keys.calculationDirty])
-    ? state[keys.calculationDirty]
-    : newProps[keys.calculationDirty],
+  [keys.calculation]: Object.prototype.hasOwnProperty.call(newProps, keys.calculation)
+    ? newProps[keys.calculation]
+    : state[keys.calculation],
+  [keys.calculationOriginal]: Object.prototype.hasOwnProperty.call(newProps, keys.calculationOriginal)
+    ? newProps[keys.calculationOriginal]
+    : state[keys.calculationOriginal],
+  [keys.calculationDirty]: Object.prototype.hasOwnProperty.call(newProps, keys.calculationDirty)
+    ? newProps[keys.calculationDirty]
+    : state[keys.calculationDirty],
 })

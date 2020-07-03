@@ -18,7 +18,7 @@ export const persistCalculation = ({ calculation, calculationDirty }) => {
   window.dispatchEvent(new CustomEvent(AnalysisStorage.eventTypes.setCalculation))
 }
 
-// ==== Analysus
+// ==== Analysis
 export const get = () => {
   const chain = AnalysisStorage.getChain()
   const { step, stepDirty } = AnalysisStorage.getStep()

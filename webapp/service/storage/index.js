@@ -1,2 +1,2 @@
 export { SidebarActions, useIsSidebarOpened } from './sidebar'
-export { AnalysisActions } from './analysis'
+export { AnalysisStorage } from './analysis'
