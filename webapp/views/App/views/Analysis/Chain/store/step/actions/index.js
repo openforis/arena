@@ -1,4 +1,3 @@
-import { useCreate } from './useCreate'
 import { useUpdate } from './useUpdate'
 import { useUpdateProps } from './useUpdateProps'
 import { useDelete } from './useDelete'
@@ -6,12 +5,6 @@ import { useDismiss } from './useDismiss'
 import { useSelect } from './useSelect'
 
 export const useActions = ({ chainState, ChainState, state, setState, State }) => ({
-  create: useCreate({
-    chainState,
-    ChainState,
-
-    setState,
-  }),
   update: useUpdate({ chainState, ChainState, setState }),
   updateProps: useUpdateProps({
     chainState,
