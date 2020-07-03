@@ -24,7 +24,6 @@ const LanguagesEditor = (props) => {
 
       <InputChips
         items={appLanguages}
-        itemKeyProp="key"
         selection={selection}
         onChange={(items) => {
           setLanguages(R.pluck('key', items))
