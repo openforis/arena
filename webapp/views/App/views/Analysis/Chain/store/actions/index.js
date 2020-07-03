@@ -1,56 +1,32 @@
-import { useInit } from './useInit'
-import { useDismiss } from './useDismiss'
-import { useCanSelectNodeDef } from './useCanSelectNodeDef'
-import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
-import { useAddEntityVirtual } from './useAddEntityVirtual'
-import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
-import { useSave } from './useSave'
-import { useOpenRStudio } from './useOpenRStudio'
+import { useInit } from './chain/useInit'
+import { useOpenRStudio } from './chain/useOpenRStudio'
+import { useUpdateChain } from './chain/useUpdateChain'
+import { useUpdateCycles } from './chain/useUpdateCycles'
 
-export const useActions = ({
-  attributesUuidsOtherChains,
-  setAtrributesUuidsOtherChains,
-  chainState,
-  ChainState,
+// import { useDismiss } from './useDismiss'
+// import { useCanSelectNodeDef } from './useCanSelectNodeDef'
+// import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
+// import { useAddEntityVirtual } from './useAddEntityVirtual'
+// import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
+// import { useSave } from './useSave'
 
-  stepState,
-  StepState,
-
-  calculationState,
-  CalculationState,
-}) => ({
-  init: useInit({ chainState, ChainState, stepState, StepState, calculationState, CalculationState }),
-  dismiss: useDismiss({ chainState, ChainState }),
-  save: useSave({
-    chainState,
-    ChainState,
-    stepState,
-    StepState,
-    calculationState,
-    CalculationState,
-  }),
-  canSelectNodeDef: useCanSelectNodeDef({ chainState, ChainState }),
-  getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
-    attributesUuidsOtherChains,
-    setAtrributesUuidsOtherChains,
-    chainState,
-    ChainState,
-  }),
-  addEntityVirtual: useAddEntityVirtual({
-    chainState,
-    ChainState,
-    stepState,
-    StepState,
-    calculationState,
-    CalculationState,
-  }),
-  addNodeDefAnalysis: useAddNodeDefAnalysis({
-    chainState,
-    ChainState,
-    stepState,
-    StepState,
-    calculationState,
-    CalculationState,
-  }),
-  openRStudio: useOpenRStudio({ chainState, ChainState }),
+export const useActions = ({ setState }) => ({
+  init: useInit({ setState }),
+  openRStudio: useOpenRStudio(),
+  updateChain: useUpdateChain({ setState }),
+  updateCycles: useUpdateCycles({ setState }),
+  // dismiss: useDismiss({ chainState, ChainState }),
+  // save: useSave({
+  //   setState,
+  // }),
+  // canSelectNodeDef: useCanSelectNodeDef({ chainState, ChainState }),
+  // getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
+  //   setState,
+  // }),
+  // addEntityVirtual: useAddEntityVirtual({
+  //   setState,
+  // }),
+  // addNodeDefAnalysis: useAddNodeDefAnalysis({
+  //   setState,
+  // }),
 })

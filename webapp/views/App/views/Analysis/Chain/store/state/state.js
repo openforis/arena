@@ -1,82 +1,40 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
-  attributesUuidsOtherChains: 'attributesUuidsOtherChains',
-
+  attributeUuidsOtherChains: 'attributeUuidsOtherChains',
   chain: 'chain',
-  editingChain: 'editingChain',
-  dirty: 'dirty',
-
+  chainEdit: 'chainEdit',
   step: 'step',
-  editingStep: 'editingStep',
-  stepDirty: 'stepDirty',
-
+  stepEdit: 'stepDirty',
   calculation: 'calculation',
-  editingCalculation: 'editingCalculation',
-  calculationDirty: 'calculationDirty',
+  calculationEdit: 'calculationDirty',
 }
-
-const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
 
 // ==== CREATE
-
-export const create = ({
-  attributesUuidsOtherChains,
-  chainState,
-  ChainState,
-  stepState,
-  StepState,
-  calculationState,
-  CalculationState,
-}) => {
-  const { chain, dirty } = ChainState.get(chainState)
-  const { step, stepDirty } = StepState.get(stepState)
-  const { calculation, calculationDirty } = CalculationState.get(calculationState)
-
-  return {
-    attributesUuidsOtherChains,
-
-    chain,
-    editingChain: isNotNullAndNotEmpty(chain),
-    dirty,
-
-    step,
-    editingStep: isNotNullAndNotEmpty(step),
-    stepDirty,
-
-    calculation,
-    editingCalculation: isNotNullAndNotEmpty(calculation),
-    calculationDirty,
-  }
-}
+export const create = ({ chain, attributeUuidsOtherChains }) => ({
+  [keys.attributeUuidsOtherChains]: attributeUuidsOtherChains,
+  [keys.chain]: chain,
+  [keys.chainEdit]: chain,
+  [keys.step]: null,
+  [keys.stepEdit]: null,
+  [keys.calculation]: null,
+  [keys.calculationEdit]: null,
+})
 
 // ==== READ
-export const getAttributesUuidsOtherChains = (state) => state[keys.attributesUuidsOtherChains]
+export const getAttributeUuidsOtherChains = A.prop(keys.attributeUuidsOtherChains)
 
-export const getChain = (state) => state[keys.chain]
-export const getEditingChain = (state) => isNotNullAndNotEmpty(state[keys.chain])
-export const getDirty = (state) => state[keys.dirty]
+export const getChain = A.prop(keys.chain)
+export const getChainEdit = A.prop(keys.chainEdit)
+export const isChainDirty = (state) => getChain(state) !== getChainEdit(state)
 
-export const getStep = (state) => state[keys.step]
-export const getEditingStep = (state) => isNotNullAndNotEmpty(state[keys.step])
-export const getStepDirty = (state) => state[keys.stepDirty]
+export const getStep = A.prop(keys.step)
+export const getStepEdit = A.prop(keys.stepEdit)
+export const isStepDirty = (state) => getStep(state) !== getStepEdit(state)
 
-export const getCalculation = (state) => state[keys.calculation]
-export const getEditingCalculation = (state) => isNotNullAndNotEmpty(state[keys.calculation])
-export const getCalculationDirty = (state) => state[keys.calculationDirty]
+export const getCalculation = A.prop(keys.calculation)
+export const getCalculationEdit = A.prop(keys.calculationEdit)
+export const isCalculationDirty = (state) => getCalculation(state) !== getCalculationEdit(state)
 
-export const get = (state) => ({
-  [keys.attributesUuidsOtherChains]: getAttributesUuidsOtherChains(state),
-
-  [keys.chain]: getChain(state),
-  [keys.editingChain]: getEditingChain(state),
-  [keys.dirty]: getDirty(state),
-
-  [keys.step]: getStep(state),
-  [keys.editingStep]: getEditingStep(state),
-  [keys.stepDirty]: getStepDirty(state),
-
-  [keys.calculation]: getCalculation(state),
-  [keys.editingCalculation]: getEditingCalculation(state),
-  [keys.calculationDirty]: getCalculationDirty(state),
-})
+// ==== READ
+export const assocChainEdit = A.assoc(keys.chainEdit)

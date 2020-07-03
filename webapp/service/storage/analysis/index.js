@@ -1,3 +1,3 @@
-import * as AnalysisStorage from './actions'
+import * as AnalysisStorage from './storage'
 
 export { AnalysisStorage }

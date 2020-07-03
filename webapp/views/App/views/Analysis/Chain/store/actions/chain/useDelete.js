@@ -5,8 +5,6 @@ import { useHistory, useParams } from 'react-router'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import { AnalysisStorage } from '@webapp/service/storage'
-
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
@@ -19,8 +17,6 @@ export const useDelete = ({ state, State }) => {
   const chain = State.getChain(state)
 
   const resetChain = async () => {
-    AnalysisStorage.reset()
-
     if (chainUuid) {
       await axios.delete(`/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}`)
       dispatch(SurveyActions.chainItemDelete())

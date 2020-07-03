@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -9,18 +10,19 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { useSurvey } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
 
-import { useUpdate } from './useUpdate'
+import { State } from '../../state'
+import { useUpdateChain } from './useUpdateChain'
 
-export const useUpdateCycles = ({ state, setState, State }) => {
+export const useUpdateCycles = ({ setState }) => {
   const survey = useSurvey()
   const dispatch = useDispatch()
-  const update = useUpdate({ state, setState, State })
+  const updateChain = useUpdateChain({ setState })
 
   const nodeDefsBelongToCycles = ({ nodeDefUuids, cycles }) =>
     Survey.getNodeDefsByUuids(nodeDefUuids)(survey).every(NodeDef.belongsToAllCycles(cycles))
 
-  return ({ cycles }) => {
-    const steps = Chain.getProcessingSteps(State.getChain(state))
+  return useCallback(({ cycles, state }) => {
+    const steps = Chain.getProcessingSteps(State.getChainEdit(state))
     const allStepEntitiesBelongToCycles = nodeDefsBelongToCycles({
       nodeDefUuids: steps.map(Step.getEntityUuid),
       cycles,
@@ -31,9 +33,9 @@ export const useUpdateCycles = ({ state, setState, State }) => {
     })
 
     if (allStepEntitiesBelongToCycles && allStepCalculationAttriutesBelongToCycles) {
-      update({ name: Chain.keysProps.cycles, value: cycles })
+      updateChain({ name: Chain.keysProps.cycles, value: cycles, state })
     } else {
       dispatch(NotificationActions.notifyError({ key: 'processingChainView.cannotSelectCycle' }))
     }
-  }
+  }, [])
 }

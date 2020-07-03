@@ -1,75 +1,36 @@
 import { useState, useEffect } from 'react'
+import { matchPath } from 'react-router'
 
-import { useActions } from './actions/index'
-import { useChain } from './chain'
-import { useStep } from './step'
-import { useCalculation } from './calculation'
+import { useHistoryListen } from '@webapp/components/hooks'
 
-import { State } from './state'
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { AnalysisStorage } from '@webapp/service/storage/analysis'
+
+import { useActions } from './actions'
 
 export const useAnalysis = () => {
-  const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
+  const [state, setState] = useState(null)
 
-  const { state: chainState, State: ChainState, Actions: ChainActions } = useChain()
+  const Actions = useActions({ setState })
 
-  const { state: stepState, State: StepState, Actions: StepActions } = useStep({}, { chainState, ChainState })
-  const { state: calculationState, State: CalculationState, Actions: CalculationActions } = useCalculation(
-    {},
-    {
-      chainState,
-      ChainState,
-
-      stepState,
-      StepState,
-    }
-  )
-
-  const actions = useActions({
-    attributesUuidsOtherChains,
-    setAtrributesUuidsOtherChains,
-
-    chainState,
-    ChainState,
-
-    stepState,
-    StepState,
-
-    calculationState,
-    CalculationState,
-  })
-
-  const chain = ChainState.getChain(chainState)
-
+  // on mount init state
   useEffect(() => {
-    actions.init()
+    ;(async () => {
+      await Actions.init()
+    })()
   }, [])
 
-  useEffect(() => {
-    actions.getAttributeUuidsOtherChains()
-  }, [chain])
-
-  return {
-    state: State.create({
-      attributesUuidsOtherChains,
-      chainState,
-      ChainState,
-      stepState,
-      StepState,
-      calculationState,
-      CalculationState,
-    }),
-
-    Actions: {
-      chain: {
-        ...ChainActions,
-      },
-      step: {
-        ...StepActions,
-      },
-      calculation: {
-        ...CalculationActions,
-      },
-      ...actions,
+  // when navigating to nodeDefDetail page, state gets persisted in localstorage, otherwise it gets removed
+  useHistoryListen(
+    (location) => {
+      if (matchPath(location.pathname, { path: `${appModuleUri(analysisModules.nodeDef)}:uuid/` })) {
+        AnalysisStorage.persistChainEdit(state)
+      } else {
+        AnalysisStorage.removeChainEdit()
+      }
     },
-  }
+    [state]
+  )
+
+  return { state, Actions }
 }
