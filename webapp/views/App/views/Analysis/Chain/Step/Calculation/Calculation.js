@@ -61,7 +61,7 @@ const CalculationComponent = (props) => {
             itemKeyProp={Calculation.keys.uuid}
             itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
-            onBeforeChange={Actions.canSelectNodeDef}
+            onBeforeChange={(nodeDef) => Actions.canSelectNodeDef({ nodeDef, state })}
             onChange={(def) => Actions.calculation.updateAttribute({ attrDef: def })}
           />
           <Link
