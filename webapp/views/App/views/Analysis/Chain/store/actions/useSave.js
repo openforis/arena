@@ -65,8 +65,8 @@ export const useSave = ({
   return () => {
     ;(async () => {
       dispatch(AppSavingActions.showAppSaving())
-      const stepValidation = !R.isEmpty(step) ? await ChainValidator.validateStep(step) : null
-      const calculationValidation = !R.isEmpty(calculation)
+      const stepValidation = !R.isNil(step) ? await ChainValidator.validateStep(step) : null
+      const calculationValidation = !R.isNil(calculation)
         ? await ChainValidator.validateCalculation(calculation, lang)
         : null
       const params = { lang, step, stepValidation, calculation, calculationValidation }
