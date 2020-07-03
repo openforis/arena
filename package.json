@@ -20,7 +20,7 @@
     "test:docker": "test/run_docker_tests.sh",
     "test:unit": "jest --testPathPattern=/test/1_unit/*",
     "test:integration": "jest --testPathPattern=/test/2_integration/*",
-    "test:e2e": "jest -i --verbose --testPathPattern=/test/3_e2e/*",
+    "test:e2e": "jest --config ./test/jest.config.js -i --verbose --testPathPattern=/test/3_e2e/*",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",
@@ -180,15 +180,5 @@
   },
   "lint-staged": {
     "{common,core,server,test,webapp}/{**,!(migrations)}/*.js": "eslint --cache --fix"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "@common/(.*)": "<rootDir>/common/$1",
-      "@core/(.*)": "<rootDir>/core/$1",
-      "@server/(.*)": "<rootDir>/server/$1",
-      "@webapp/(.*)": "<rootDir>/webapp/$1",
-      "@test/(.*)": "<rootDir>/test/$1"
-    },
-    "testTimeout": 30000
   }
 }
