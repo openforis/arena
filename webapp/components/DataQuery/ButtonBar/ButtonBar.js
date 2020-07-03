@@ -8,6 +8,7 @@ import { Query } from '@common/model/query'
 import { useIsAppSaving } from '@webapp/store/app'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 
+import { useButtonBar } from './store'
 import ButtonDownload from './ButtonDownload'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
@@ -28,6 +29,8 @@ const ButtonBar = (props) => {
   const modeEdit = Query.isModeRawEdit(query)
   const modeAggregate = Query.isModeAggregate(query)
   const hasSelection = Query.hasSelection(query)
+
+  const { Actions, state } = useButtonBar()
 
   return (
     <div className="data-query-button-bar">
@@ -61,8 +64,20 @@ const ButtonBar = (props) => {
 
       {hasSelection && (
         <div>
-          <ButtonFilter query={query} disabled={modeEdit || !dataLoaded || dataLoading} onChangeQuery={onChangeQuery} />
-          <ButtonSort query={query} disabled={modeEdit || !dataLoaded || dataLoading} onChangeQuery={onChangeQuery} />
+          <ButtonFilter
+            query={query}
+            disabled={modeEdit || !dataLoaded || dataLoading}
+            onChangeQuery={onChangeQuery}
+            state={state}
+            Actions={Actions}
+          />
+          <ButtonSort
+            query={query}
+            disabled={modeEdit || !dataLoaded || dataLoading}
+            onChangeQuery={onChangeQuery}
+            state={state}
+            Actions={Actions}
+          />
           <ButtonDownload query={query} disabled={modeEdit || !dataLoaded || dataLoading} />
         </div>
       )}
