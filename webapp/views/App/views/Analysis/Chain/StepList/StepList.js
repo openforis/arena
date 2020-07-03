@@ -11,7 +11,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { State } from '../store'
 
-// import StepItem from './StepItem'
+import StepItem from './StepItem'
 
 const StepList = (props) => {
   const { state, Actions } = props
@@ -42,11 +42,11 @@ const StepList = (props) => {
         </div>
       )}
 
-      {/* <div className="chain-list">
+      <div className="chain-list">
         {steps.map((processingStep) => (
           <StepItem key={Step.getIndex(processingStep)} step={processingStep} state={state} Actions={Actions} />
         ))}
-      </div> */}
+      </div>
     </div>
   )
 }

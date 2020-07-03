@@ -2,7 +2,6 @@ import { useUpdate } from './useUpdate'
 import { useUpdateProps } from './useUpdateProps'
 import { useDelete } from './useDelete'
 import { useDismiss } from './useDismiss'
-import { useSelect } from './useSelect'
 
 export const useActions = ({ chainState, ChainState, state, setState, State }) => ({
   update: useUpdate({ chainState, ChainState, setState }),
@@ -22,5 +21,4 @@ export const useActions = ({ chainState, ChainState, state, setState, State }) =
     setState,
     State,
   }),
-  select: useSelect({ chainState, ChainState, state, setState, State }),
 })
