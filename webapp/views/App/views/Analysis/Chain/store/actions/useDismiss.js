@@ -1,31 +1,30 @@
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { AnalysisStorage } from '@webapp/service/storage'
 
-export const useDismiss = ({ chainState, ChainState }) => {
+import { State } from '../state'
+
+export const useDismiss = () => {
   const dispatch = useDispatch()
   const history = useHistory()
 
   const navigateToChainsView = () => {
-    AnalysisStorage.reset()
     history.push(appModuleUri(analysisModules.processingChains))
   }
 
-  return () => {
-    ;(async () => {
-      if (!ChainState.getDirty(chainState)) {
-        navigateToChainsView()
-      } else {
-        dispatch(
-          DialogConfirmActions.showDialogConfirm({
-            key: 'common.cancelConfirm',
-            onOk: navigateToChainsView,
-          })
-        )
-      }
-    })()
-  }
+  return useCallback(({ state }) => {
+    if (!State.isChainDirty(state)) {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'common.cancelConfirm',
+          onOk: navigateToChainsView,
+        })
+      )
+    } else {
+      navigateToChainsView()
+    }
+  }, [])
 }

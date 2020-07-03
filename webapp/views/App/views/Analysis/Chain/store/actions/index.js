@@ -2,8 +2,8 @@ import { useInit } from './chain/useInit'
 import { useOpenRStudio } from './chain/useOpenRStudio'
 import { useUpdateChain } from './chain/useUpdateChain'
 import { useUpdateCycles } from './chain/useUpdateCycles'
+import { useDismiss } from './useDismiss'
 
-// import { useDismiss } from './useDismiss'
 // import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -15,7 +15,7 @@ export const useActions = ({ setState }) => ({
   openRStudio: useOpenRStudio(),
   updateChain: useUpdateChain({ setState }),
   updateCycles: useUpdateCycles({ setState }),
-  // dismiss: useDismiss({ chainState, ChainState }),
+  dismiss: useDismiss(),
   // save: useSave({
   //   setState,
   // }),
