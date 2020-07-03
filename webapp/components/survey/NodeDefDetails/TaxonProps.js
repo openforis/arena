@@ -2,20 +2,20 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
-import { FormItem } from '@webapp/components/form/input'
-import Dropdown from '@webapp/components/form/dropdown'
-import { useI18n } from '@webapp/store/system'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
+import { FormItem } from '@webapp/components/form/input'
+import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 
+import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+
 import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
 import { State } from './store'
@@ -37,7 +37,7 @@ const TaxonProps = (props) => {
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
 
-  const onChange = (taxonomySelected) =>
+  const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
 
   return (
@@ -51,12 +51,12 @@ const TaxonProps = (props) => {
         >
           <Dropdown
             items={taxonomies}
-            itemKeyProp="uuid"
-            itemLabelFunction={Taxonomy.getName}
+            itemKey={'uuid'}
+            itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
-            onChange={onChange}
+            onChange={onTaxonomySelect}
           />
           <button
             type="button"
@@ -64,7 +64,7 @@ const TaxonProps = (props) => {
             style={{ justifySelf: 'center' }}
             onClick={async () => {
               const taxonomyCreated = await dispatch(TaxonomyActions.createTaxonomy())
-              onChange(taxonomyCreated)
+              onTaxonomySelect(taxonomyCreated)
               setShowTaxonomyPanel(true)
             }}
           >
@@ -101,7 +101,7 @@ const TaxonProps = (props) => {
           onClose={() => setShowTaxonomiesPanel(false)}
           header={i18n.t('appModules.taxonomies')}
         >
-          <TaxonomiesView canSelect selectedItemUuid={taxonomyUuid} onSelect={onChange} />
+          <TaxonomiesView canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
         </PanelRight>
       )}
     </>

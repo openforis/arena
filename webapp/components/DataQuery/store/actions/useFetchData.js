@@ -13,7 +13,7 @@ const getBody = ({ cycle, offset, limit, query }) => ({
   offset,
   limit,
   filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
-  sort: JSON.stringify([]), // TODO DataSort.toHttpParams(sort),
+  sort: JSON.stringify(Query.getSort(query)),
   editMode: Query.isModeRawEdit(query),
 })
 

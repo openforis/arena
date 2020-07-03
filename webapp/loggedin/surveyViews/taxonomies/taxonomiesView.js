@@ -55,7 +55,9 @@ const TaxonomiesView = (props) => {
     if (onSelect) {
       onSelect(taxonomy)
     }
-    history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomy)}/`)
+    if (inTaxonomiesPath) {
+      history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomy)}/`)
+    }
   }
 
   const onDelete = (taxonomy) =>

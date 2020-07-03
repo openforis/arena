@@ -10,6 +10,7 @@ import { types } from './helpers/types'
 
 export { types } from './helpers/types'
 export { operators } from './helpers/operators'
+export { toSql } from './toSql'
 
 export const modes = {
   json: 'json',

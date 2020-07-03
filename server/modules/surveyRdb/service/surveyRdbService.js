@@ -1,7 +1,5 @@
 import * as Survey from '../../../../core/survey/survey'
 
-import * as SortCriteria from '../../../../common/surveyRdb/sortCriteria'
-
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 

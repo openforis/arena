@@ -8,15 +8,14 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/dropdown'
-import PanelRight from '@webapp/components/PanelRight'
-
-import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
-
 import { useSurvey } from '@webapp/store/survey'
 
-import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
+import Dropdown from '@webapp/components/form/Dropdown'
+import PanelRight from '@webapp/components/PanelRight'
+import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+
+import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
@@ -43,8 +42,8 @@ const CategorySelector = (props) => {
       <Dropdown
         disabled={disabled}
         items={categories}
-        itemKeyProp={Category.keys.uuid}
-        itemLabelFunction={Category.getName}
+        itemKey={Category.keys.uuid}
+        itemLabel={Category.getName}
         validation={validation}
         selection={category}
         onChange={onChange}

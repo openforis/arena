@@ -52,7 +52,9 @@ const CategoriesView = (props) => {
     if (onSelect) {
       onSelect(category)
     }
-    history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}`)
+    if (inCategoriesPath) {
+      history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}`)
+    }
   }
 
   const onDelete = (category) =>

@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai'
 
 import jsep from '@core/expressionParser/helpers/jsep'
-import { getWherePreparedStatement } from '@common/surveyRdb/dataFilter'
+import * as Expression from '@core/expressionParser/expression'
 
 const goodExpressions = [
   { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },
@@ -85,14 +85,14 @@ const badExpressions = [
 describe('dataFilter test', () => {
   goodExpressions.forEach(({ q, r }) => {
     it(q, () => {
-      const ps = getWherePreparedStatement(jsep(q))
+      const ps = Expression.toSql(jsep(q))
       assert.deepEqual(ps, r)
     })
   })
 
   badExpressions.forEach(({ q }) => {
     it(q, () => {
-      const ps = () => getWherePreparedStatement(jsep(q))
+      const ps = () => Expression.toSql(jsep(q))
       expect(ps).to.throw()
     })
   })

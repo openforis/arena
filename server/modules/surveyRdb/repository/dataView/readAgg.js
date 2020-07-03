@@ -5,9 +5,8 @@ import * as Schemata from '@common/model/db/schemata'
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
-import * as SortCriteria from '../../../../../common/surveyRdb/sortCriteria'
-import * as DataSort from '../../../../../common/surveyRdb/dataSort'
-import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
+import * as Expression from '../../../../../core/expressionParser/expression'
+import { Sort } from '../../../../../common/model/query'
 import { ViewDataNodeDef } from '../../../../../common/model/db'
 
 const _getSelectFieldsMesaures = (measures) => {
@@ -52,14 +51,14 @@ const _getSelectQuery = (params) => {
   const { fields: selectFieldsDimensions, params: selectParamsDimensions } = _getSelectFieldsDimensions(dimensions)
 
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filter ? DataFilter.getWherePreparedStatement(filter) : {}
+  const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
   // GROUP clause
   // always group by data_modified (used in sort)
   const groupFields = [ViewDataNodeDef.columnSet.dateModified, ...selectFieldsDimensions]
 
   // SORT clause
-  const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
+  const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
 
   const select = `
     SELECT 

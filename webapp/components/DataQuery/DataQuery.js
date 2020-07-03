@@ -35,6 +35,7 @@ const DataQuery = (props) => {
           <ButtonBar
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
+            dataLoading={dataLoading}
             query={query}
             nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             onChangeQuery={onChangeQuery}

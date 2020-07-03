@@ -6,10 +6,14 @@
   right: 0;
   z-index: $zIndex18PanelRight;
   height: 100vh;
-  animation: panel-enter 0.2s cubic-bezier(0, 0, 0, 1);
   display: grid;
   grid-template-rows: $headerHeight 1fr;
   box-shadow: -3px 0 5px $greyBorder;
+  animation: panel-enter 0.2s cubic-bezier(0, 0, 0, 1);
+
+  > * {
+    padding: 20px;
+  }
 }
 
 .panel-right__header {
