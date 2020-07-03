@@ -7,7 +7,7 @@ import { SortCriteria } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import Tooltip from '@webapp/components/tooltip'
 
 const SortCriteriaEditor = (props) => {
@@ -19,10 +19,10 @@ const SortCriteriaEditor = (props) => {
   return (
     <div className="sort-criteria-editor">
       <Dropdown
-        items={[...variablesAvailable, selection]}
+        items={selection ? [...variablesAvailable, selection] : variablesAvailable}
         selection={selection}
-        itemLabelProp="label"
-        itemKeyProp="value"
+        itemLabel="label"
+        itemKey="value"
         onChange={(variable) =>
           variable &&
           onChange(SortCriteria.assocVariable({ variable: variable.value, label: variable.label })(sortCriteria))
