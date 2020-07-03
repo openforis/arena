@@ -1,5 +1,3 @@
-import * as State from './state'
-
-export { State }
+export { State } from './state'
 export { useActions } from './actions'
 export { useNodeDefDetails } from './useNodeDefDetails'

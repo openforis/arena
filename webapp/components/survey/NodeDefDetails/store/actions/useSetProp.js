@@ -11,7 +11,7 @@ import { NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 
 import { useValidate } from './useValidate'
-import * as State from '../state'
+import { State } from '../state'
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {

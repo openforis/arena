@@ -1,7 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useValidate } from './useValidate'
-import * as State from '../state'
+import { State } from '../state'
 
 export const useSetParentUuid = ({ state, setState }) => {
   const validateNodeDef = useValidate({ state, setState })

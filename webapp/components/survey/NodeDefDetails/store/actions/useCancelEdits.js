@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import { NodeDefsActions } from '@webapp/store/survey'
-import * as State from '../state'
+import { State } from '../state'
 
 export const useCancelEdits = ({ state }) => {
   const history = useHistory()

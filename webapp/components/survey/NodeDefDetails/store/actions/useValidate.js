@@ -6,7 +6,7 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as SurveyState from '@webapp/store/survey/state'
 
 import { NodeDefsActions } from '@webapp/store/survey'
-import * as State from '../state'
+import { State } from '../state'
 
 export const useValidate = ({ state, setState }) => {
   const dispatch = useDispatch()

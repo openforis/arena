@@ -10,7 +10,7 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as SurveyState from '@webapp/store/survey/state'
 import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 
-import * as State from '../state'
+import { State } from '../state'
 
 // Persists the temporary changes applied to the node def in the state
 export const useSaveEdits = ({ state, setState }) => {

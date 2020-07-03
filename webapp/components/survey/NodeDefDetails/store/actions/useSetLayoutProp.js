@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as State from '../state'
+import { State } from '../state'
 import { useValidate } from './useValidate'
 
 export const useSetLayoutProp = ({ state, setState }) => {
