@@ -10,7 +10,7 @@ import { State } from './state'
 export const useAnalysis = () => {
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
 
-  const { state: chainState, State: ChainState, Actions: ChainActions } = useChain({})
+  const { state: chainState, State: ChainState, Actions: ChainActions } = useChain()
 
   const { state: stepState, State: StepState, Actions: StepActions } = useStep({}, { chainState, ChainState })
   const { state: calculationState, State: CalculationState, Actions: CalculationActions } = useCalculation(
