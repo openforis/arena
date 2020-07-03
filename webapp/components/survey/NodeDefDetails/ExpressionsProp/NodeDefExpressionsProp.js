@@ -9,12 +9,12 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './ExpressionsProp'
 
-import { NodeDefState } from '../store'
+import { State } from '../store'
 
 const NodeDefExpressionsProp = (props) => {
   const {
-    nodeDefState,
-    actions,
+    state,
+    Actions,
     nodeDefUuidContext,
     propName,
     label,
@@ -29,13 +29,13 @@ const NodeDefExpressionsProp = (props) => {
     mode,
   } = props
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const nodeDefValidation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const nodeDefValidation = State.getValidation(state)
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   const onChange = (expressions) =>
-    actions.setProp({ key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions), advanced: true })
+    Actions.setProp({ key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions), advanced: true })
 
   return (
     <ExpressionsProp
@@ -59,8 +59,8 @@ const NodeDefExpressionsProp = (props) => {
 }
 
 NodeDefExpressionsProp.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 
   nodeDefUuidContext: PropTypes.string,
   propName: PropTypes.string.isRequired,

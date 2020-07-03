@@ -86,8 +86,8 @@ const CategoryView = (props) => {
           )}
         </div>
 
-        <div className="button-bar">
-          {showClose && (
+        {showClose && (
+          <div className="button-bar">
             <button
               type="button"
               className="btn"
@@ -100,8 +100,8 @@ const CategoryView = (props) => {
             >
               {i18n.t('common.done')}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {importSummary && <CategoryImportSummary summary={importSummary} />}

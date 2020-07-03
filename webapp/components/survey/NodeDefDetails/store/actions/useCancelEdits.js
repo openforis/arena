@@ -2,16 +2,16 @@ import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import { NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '../state'
+import { State } from '../state'
 
-export const useCancelEdits = ({ nodeDefState }) => {
+export const useCancelEdits = ({ state }) => {
   const history = useHistory()
   const dispatch = useDispatch()
 
   return () => {
     ;(async () => {
-      const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-      const nodeDefOriginal = NodeDefState.getNodeDefOriginal(nodeDefState)
+      const nodeDef = State.getNodeDef(state)
+      const nodeDefOriginal = State.getNodeDefOriginal(state)
 
       await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 

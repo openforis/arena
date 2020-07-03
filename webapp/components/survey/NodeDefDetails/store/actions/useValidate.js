@@ -6,9 +6,9 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as SurveyState from '@webapp/store/survey/state'
 
 import { NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '../state'
+import { State } from '../state'
 
-export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => {
+export const useValidate = ({ state, setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
 
@@ -20,7 +20,7 @@ export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => {
       const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
 
       // Update local state
-      setNodeDefState(NodeDefState.assocNodeDefAndValidation(nodeDef, nodeDefValidation)(nodeDefState))
+      setState(State.assocNodeDefAndValidation(nodeDef, nodeDefValidation)(state))
 
       // Dispatch update action
       dispatch(NodeDefsActions.updateNodeDef({ nodeDef }))

@@ -15,20 +15,20 @@ import * as Validation from '@core/validation/validation'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import ExpressionsProp from './ExpressionsProp'
 
-import { NodeDefState } from './store'
+import { State } from './store'
 
 const ValidationsProps = (props) => {
-  const { nodeDefState, actions } = props
+  const { state, Actions } = props
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const onValidationsUpdate = (validations) =>
-    actions.setProp({ key: NodeDef.keysPropsAdvanced.validations, value: validations, advanced: true })
+    Actions.setProp({ key: NodeDef.keysPropsAdvanced.validations, value: validations, advanced: true })
 
   const i18n = useI18n()
 
@@ -96,8 +96,8 @@ const ValidationsProps = (props) => {
 }
 
 ValidationsProps.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default ValidationsProps

@@ -4,10 +4,10 @@ import { useSetLayoutProp } from './useSetLayoutProp'
 import { useSaveEdits } from './useSaveEdits'
 import { useCancelEdits } from './useCancelEdits'
 
-export const useActions = ({ nodeDefState, setNodeDefState }) => ({
-  setProp: useSetProp({ nodeDefState, setNodeDefState }),
-  setParentUuid: useSetParentUuid({ nodeDefState, setNodeDefState }),
-  setLayoutProp: useSetLayoutProp({ nodeDefState, setNodeDefState }),
-  saveEdits: useSaveEdits({ nodeDefState, setNodeDefState }),
-  cancelEdits: useCancelEdits({ nodeDefState }),
+export const useActions = ({ state, setState }) => ({
+  setProp: useSetProp({ state, setState }),
+  setParentUuid: useSetParentUuid({ state, setState }),
+  setLayoutProp: useSetLayoutProp({ state, setState }),
+  saveEdits: useSaveEdits({ state, setState }),
+  cancelEdits: useCancelEdits({ state }),
 })

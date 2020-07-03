@@ -12,19 +12,20 @@ import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { NodeDefState, useNodeDefDetails } from './store'
 import ButtonBar from './ButtonBar'
 import ValidationsProps from './ValidationsProps'
 import AdvancedProps from './AdvancedProps'
 import BasicProps from './BasicProps'
 
+import { State, useNodeDefDetails } from './store'
+
 const NodeDefDetails = () => {
   const i18n = useI18n()
 
-  const { nodeDefState, actions, editingFromDesigner } = useNodeDefDetails()
+  const { state, Actions, editingFromDesigner } = useNodeDefDetails()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
 
   const nodeDefType = NodeDef.getType(nodeDef)
 
@@ -37,7 +38,7 @@ const NodeDefDetails = () => {
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>
-                actions.setProp({ key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
+                Actions.setProp({ key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
               }
             />
             <div className="attribute-selector">
@@ -52,8 +53,8 @@ const NodeDefDetails = () => {
                 label: i18n.t('nodeDefEdit.basic'),
                 component: BasicProps,
                 props: {
-                  nodeDefState,
-                  actions,
+                  state,
+                  Actions,
                   editingFromDesigner,
                 },
               },
@@ -64,23 +65,23 @@ const NodeDefDetails = () => {
                       label: i18n.t('nodeDefEdit.advanced'),
                       component: AdvancedProps,
                       props: {
-                        nodeDefState,
-                        actions,
+                        state,
+                        Actions,
                       },
                     },
                     {
                       label: i18n.t('nodeDefEdit.validations'),
                       component: ValidationsProps,
                       props: {
-                        nodeDefState,
-                        actions,
+                        state,
+                        Actions,
                       },
                     },
                   ]),
             ]}
           />
 
-          <ButtonBar nodeDefState={nodeDefState} actions={actions} />
+          <ButtonBar state={state} Actions={Actions} />
         </div>
       </div>
     </>

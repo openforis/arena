@@ -1,20 +1,29 @@
 import React from 'react'
-import * as R from 'ramda'
-
-import { FormItem, Input } from '@webapp/components/form/input'
-import DownloadButton from '@webapp/components/form/downloadButton'
-import ErrorBadge from '@webapp/components/errorBadge'
-import UploadButton from '@webapp/components/form/uploadButton'
-import { useI18n } from '@webapp/store/system'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
-const TaxonomyEditHeader = props => {
-  const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props
+import { FormItem, Input } from '@webapp/components/form/input'
+import DownloadButton from '@webapp/components/form/downloadButton'
+import ErrorBadge from '@webapp/components/errorBadge'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import UploadButton from '@webapp/components/form/uploadButton'
+
+import { useI18n } from '@webapp/store/system'
+import { useSurveyId } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import * as TaxonomyActions from '../actions'
+import * as TaxonomyState from '../taxonomyState'
+
+const TaxonomyEditHeader = () => {
+  const dispatch = useDispatch()
   const i18n = useI18n()
+  const surveyId = useSurveyId()
+  const canEdit = useAuthCanEditSurvey()
+  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
   const validation = Validation.getValidation(taxonomy)
 
   return (
@@ -28,7 +37,11 @@ const TaxonomyEditHeader = props => {
           <Input
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation(Taxonomy.keysProps.name)(validation)}
-            onChange={value => putTaxonomyProp(taxonomy, Taxonomy.keysProps.name, StringUtils.normalizeName(value))}
+            onChange={(value) =>
+              dispatch(
+                TaxonomyActions.putTaxonomyProp(taxonomy, Taxonomy.keysProps.name, StringUtils.normalizeName(value))
+              )
+            }
             readOnly={!canEdit}
           />
         </FormItem>
@@ -36,7 +49,9 @@ const TaxonomyEditHeader = props => {
         <LabelsEditor
           formLabelKey="common.description"
           labels={Taxonomy.getDescriptions(taxonomy)}
-          onChange={descriptions => putTaxonomyProp(taxonomy, Taxonomy.keysProps.descriptions, descriptions)}
+          onChange={(descriptions) =>
+            dispatch(TaxonomyActions.putTaxonomyProp(taxonomy, Taxonomy.keysProps.descriptions, descriptions))
+          }
         />
       </div>
 
@@ -46,13 +61,12 @@ const TaxonomyEditHeader = props => {
             label={i18n.t('common.csvImport')}
             accept=".csv"
             onChange={async ([file]) => {
-              await uploadTaxonomyFile(taxonomy, file)
+              await dispatch(TaxonomyActions.uploadTaxonomyFile(taxonomy, file))
             }}
           />
         )}
         <DownloadButton
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=${canEdit}`}
-          disabled={R.isEmpty(taxa)}
           label={i18n.t('common.csvExport')}
         />
       </div>

@@ -10,18 +10,18 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as SurveyState from '@webapp/store/survey/state'
 import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 
-import * as NodeDefState from '../state'
+import { State } from '../state'
 
 // Persists the temporary changes applied to the node def in the state
-export const useSaveEdits = ({ nodeDefState, setNodeDefState }) => {
+export const useSaveEdits = ({ state, setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
 
   return () => {
     ;(async () => {
-      const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-      const validation = NodeDefState.getValidation(nodeDefState)
+      const nodeDef = State.getNodeDef(state)
+      const validation = State.getValidation(state)
 
       // Check that node def can be saved
       if (!SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
@@ -45,8 +45,8 @@ export const useSaveEdits = ({ nodeDefState, setNodeDefState }) => {
         }
         await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated }))
       } else {
-        const props = NodeDefState.getPropsUpdated(nodeDefState)
-        const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(nodeDefState)
+        const props = State.getPropsUpdated(state)
+        const propsAdvanced = State.getPropsAdvancedUpdated(state)
 
         await dispatch(
           NodeDefsActions.putNodeDefProps({
@@ -59,7 +59,7 @@ export const useSaveEdits = ({ nodeDefState, setNodeDefState }) => {
       }
 
       // Update local node def state
-      setNodeDefState(NodeDefState.createNodeDefState({ nodeDef: nodeDefUpdated, validation }))
+      setState(State.create({ nodeDef: nodeDefUpdated, validation }))
 
       // Update redux store nodeDefs state
       dispatch(

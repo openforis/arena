@@ -5,16 +5,16 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as NodeDefState from '../state'
-import { useValidateNodeDef } from './useValidateNodeDef'
+import { State } from '../state'
+import { useValidate } from './useValidate'
 
-export const useSetLayoutProp = ({ nodeDefState, setNodeDefState }) => {
+export const useSetLayoutProp = ({ state, setState }) => {
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
-  const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
+  const validateNodeDef = useValidate({ state, setState })
 
   return ({ key, value }) => {
-    const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+    const nodeDef = State.getNodeDef(state)
 
     const nodeDefUpdated = R.pipe(
       Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value }),

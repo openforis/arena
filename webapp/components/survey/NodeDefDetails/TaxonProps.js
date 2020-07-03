@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/dropdown'
@@ -12,26 +11,34 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useSurvey } from '@webapp/store/survey'
-import { createTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
+import PanelRight from '@webapp/components/PanelRight'
+import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
+import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 
-import { NodeDefState } from './store'
+import { useSurvey } from '@webapp/store/survey'
+import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
+
+import { State } from './store'
 
 const TaxonProps = (props) => {
-  const { nodeDefState, actions } = props
+  const { state, Actions } = props
 
   const dispatch = useDispatch()
-  const history = useHistory()
-
-  const survey = useSurvey()
   const i18n = useI18n()
+  const survey = useSurvey()
 
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const validation = NodeDefState.getValidation(nodeDefState)
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
-  const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
   const taxonomies = Survey.getTaxonomiesArray(survey)
+
+  const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
+  const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
+
+  const onChange = (taxonomySelected) =>
+    Actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
 
   return (
     <>
@@ -49,32 +56,61 @@ const TaxonProps = (props) => {
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
-            onChange={(taxonomySelected) =>
-              actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
-            }
+            onChange={onChange}
           />
           <button
             type="button"
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
-            onClick={() => dispatch(createTaxonomy(history))}
+            onClick={async () => {
+              const taxonomyCreated = await dispatch(TaxonomyActions.createTaxonomy())
+              onChange(taxonomyCreated)
+              setShowTaxonomyPanel(true)
+            }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.taxonomies)}>
+          <button
+            type="button"
+            className="btn btn-s"
+            style={{ justifySelf: 'center' }}
+            onClick={() => setShowTaxonomiesPanel(true)}
+          >
             <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
-          </Link>
+          </button>
         </div>
       </FormItem>
+
+      {showTaxonomyPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={() => {
+            dispatch(TaxonomyActions.setTaxonomyForEdit(null))
+            setShowTaxonomyPanel(false)
+          }}
+          header={i18n.t('taxonomy.header')}
+        >
+          <TaxonomyView showClose={false} />
+        </PanelRight>
+      )}
+      {showTaxonomiesPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={() => setShowTaxonomiesPanel(false)}
+          header={i18n.t('appModules.taxonomies')}
+        >
+          <TaxonomiesView canSelect selectedItemUuid={taxonomyUuid} onSelect={onChange} />
+        </PanelRight>
+      )}
     </>
   )
 }
 
 TaxonProps.propTypes = {
-  nodeDefState: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default TaxonProps

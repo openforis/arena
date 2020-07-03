@@ -66,41 +66,9 @@ const metaKeys = {
 
 export const maxKeyAttributes = 3
 
-// ==== CREATE
-
-export const newNodeDef = (
-  nodeDefParent,
-  type,
-  cycles,
-  props,
-  propsAdvanced = {},
-  analysis = false,
-  virtual = false
-) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.parentUuid]: getUuid(nodeDefParent),
-  [keys.type]: type,
-  [keys.props]: {
-    ...props,
-    [propKeys.cycles]: cycles,
-  },
-  [keys.propsAdvanced]: {
-    ...propsAdvanced,
-  },
-  [keys.meta]: {
-    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
-  },
-  [keys.analysis]: analysis,
-  [keys.virtual]: virtual,
-  [keys.temporary]: true,
-})
-
 // ==== READ
 
-export const { getUuid } = ObjectUtils
-export const { getProp } = ObjectUtils
-export const { getProps } = ObjectUtils
-export const { isEqual } = ObjectUtils
+export const { getUuid, getProp, getProps, isEqual } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
@@ -135,7 +103,7 @@ export const isReadOnly = getProp(propKeys.readOnly, false)
 
 export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
-export const isTemporary = ObjectUtils.isTemporary
+export const { isTemporary } = ObjectUtils
 
 export const { getLabels } = ObjectUtils
 export const getDescriptions = getProp(propKeys.descriptions, {})
@@ -144,6 +112,10 @@ export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
+
+// ==== READ meta
+export const getMeta = R.propOr({}, keys.meta)
+export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
 export const getLabel = (nodeDef, lang) => {
@@ -187,12 +159,36 @@ export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 
-// ==== READ meta
-export const getMeta = R.propOr({}, keys.meta)
-
-export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
-
 export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
+
+// ==== CREATE
+
+export const newNodeDef = (
+  nodeDefParent,
+  type,
+  cycles,
+  props,
+  propsAdvanced = {},
+  analysis = false,
+  virtual = false
+) => ({
+  [keys.uuid]: uuidv4(),
+  [keys.parentUuid]: getUuid(nodeDefParent),
+  [keys.type]: type,
+  [keys.props]: {
+    ...props,
+    [propKeys.cycles]: cycles,
+  },
+  [keys.propsAdvanced]: {
+    ...propsAdvanced,
+  },
+  [keys.meta]: {
+    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
+  },
+  [keys.analysis]: analysis,
+  [keys.virtual]: virtual,
+  [keys.temporary]: true,
+})
 
 // ==== UPDATE
 
@@ -221,8 +217,6 @@ export const canNodeDefBeMultiple = (nodeDef) =>
       nodeDefType.text,
     ]))
 
-export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
-
 export const canNodeDefTypeBeKey = (type) =>
   R.includes(type, [
     nodeDefType.date,
@@ -233,6 +227,8 @@ export const canNodeDefTypeBeKey = (type) =>
     nodeDefType.text,
     nodeDefType.time,
   ])
+
+export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
@@ -250,3 +246,7 @@ export const canHaveDefaultValue = (nodeDef) =>
   !getParentCodeDefUuid(nodeDef)
 
 export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+
+const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)
+export const isDisplayAsEnabled = isEntityAndNotRoot
+export const isDisplayInEnabled = isEntityAndNotRoot
