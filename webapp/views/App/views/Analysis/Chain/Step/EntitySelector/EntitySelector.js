@@ -15,6 +15,8 @@ import { useSurvey } from '@webapp/store/survey'
 import Dropdown from '@webapp/components/form/dropdown'
 import * as Chain from '@common/analysis/processingChain'
 
+import { State } from '../../store'
+
 const getEntities = (survey, processingStepPrev, lang) => {
   const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, (entityUuid) =>
     Survey.getNodeDefByUuid(entityUuid)(survey)
@@ -45,9 +47,9 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = (props) => {
-  const { readOnly, validation, children, onChange, analysis } = props
+  const { readOnly, validation, children, onChange, state, Actions } = props
 
-  const { chain, step, Actions } = analysis
+  const { chain, step } = State.get(state)
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -80,8 +82,9 @@ EntitySelector.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
-  analysis: PropTypes.object.isRequired,
   validation: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default EntitySelector

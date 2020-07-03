@@ -9,11 +9,13 @@ import * as Step from '@common/analysis/processingStep'
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
+import { State } from '../store'
+
 import StepItem from './StepItem'
 
 const StepList = (props) => {
-  const { analysis } = props
-  const { chain, editingStep, Actions } = analysis
+  const { state, Actions } = props
+  const { chain, editingStep } = State.get(state)
   const i18n = useI18n()
 
   const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
@@ -40,7 +42,7 @@ const StepList = (props) => {
 
       <div className="chain-list">
         {steps.map((processingStep) => (
-          <StepItem key={Step.getIndex(processingStep)} step={processingStep} analysis={analysis} />
+          <StepItem key={Step.getIndex(processingStep)} step={processingStep} state={state} Actions={Actions} />
         ))}
       </div>
     </div>
@@ -48,7 +50,8 @@ const StepList = (props) => {
 }
 
 StepList.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default StepList

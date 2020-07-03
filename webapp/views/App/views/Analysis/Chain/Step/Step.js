@@ -16,6 +16,8 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
+import { State } from '../store'
+
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
 import Calculation from './Calculation'
@@ -28,8 +30,8 @@ const getClassName = ({ editingStep, editingCalculation }) => {
 }
 
 const StepComponent = (props) => {
-  const { analysis } = props
-  const { chain, step, editingStep, editingCalculation, Actions } = analysis
+  const { state, Actions } = props
+  const { chain, step, editingStep, editingCalculation } = State.get(state)
   const i18n = useI18n()
 
   const stepNext = Chain.getStepNext(step)(chain)
@@ -51,7 +53,8 @@ const StepComponent = (props) => {
             </button>
 
             <EntitySelector
-              analysis={analysis}
+              state={state}
+              Actions={Actions}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
                 Actions.step.updateProps({
@@ -99,16 +102,17 @@ const StepComponent = (props) => {
             </div>
           </>
         )}
-        <CalculationList analysis={analysis} />
+        <CalculationList state={state} Actions={Actions} />
       </div>
 
-      <Calculation analysis={analysis} />
+      <Calculation state={state} Actions={Actions} />
     </div>
   )
 }
 
 StepComponent.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default StepComponent

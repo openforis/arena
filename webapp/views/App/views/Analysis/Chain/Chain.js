@@ -20,22 +20,22 @@ import ButtonRStudio from '@webapp/components/ButtonRStudio'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useHistoryListen } from '@webapp/components/hooks'
 
-import { useAnalysis } from './store'
+import { State, useAnalysis } from './store'
 
 import StepList from './StepList'
 import Step from './Step'
 import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
-  const analysis = useAnalysis()
-  const { chain, step, stepDirty, calculation, calculationDirty, dirty, editingStep, Actions } = analysis
+  const { state, Actions } = useAnalysis()
+  const { chain, step, stepDirty, calculation, calculationDirty, dirty, editingStep } = State.get(state)
   const validation = Chain.getValidation(chain)
   const surveyInfo = useSurveyInfo()
 
   useHistoryListen(
     (location) => {
       if (matchPath(location.pathname, { path: `${appModuleUri(analysisModules.nodeDef)}:uuid/` })) {
-        AnalysisStorage.persist(analysis)
+        AnalysisStorage.persist(state)
       } else {
         AnalysisStorage.reset()
       }
@@ -73,12 +73,12 @@ const ChainComponent = () => {
           </>
         )}
 
-        <StepList analysis={analysis} />
+        <StepList state={state} Actions={Actions} />
       </div>
 
-      <Step analysis={analysis} />
+      <Step state={state} Actions={Actions} />
 
-      <ButtonBar analysis={analysis} />
+      <ButtonBar state={state} Actions={Actions} />
     </div>
   )
 }

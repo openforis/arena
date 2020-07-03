@@ -6,12 +6,13 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
+import { State } from '../store'
 
 const ButtonBar = (props) => {
   const i18n = useI18n()
 
-  const { analysis } = props
-  const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation, Actions } = analysis
+  const { state, Actions } = props
+  const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation } = State.get(state)
 
   const stepNext = Chain.getStepNext(step)(chain)
 
@@ -53,7 +54,8 @@ const ButtonBar = (props) => {
 }
 
 ButtonBar.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default ButtonBar

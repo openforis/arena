@@ -10,6 +10,8 @@ import { useNodeDefByUuid } from '@webapp/store/survey'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
+import { State } from '../../../store'
+
 const getClassName = ({ editingSelf, dragging }) => {
   let className = 'chain-list-item'
   className += editingSelf ? ' editing' : ''
@@ -17,8 +19,8 @@ const getClassName = ({ editingSelf, dragging }) => {
   return className
 }
 const CalculationItem = (props) => {
-  const { calculation, dragging, onDragStart, onDragEnd, onDragOver, analysis } = props
-  const { chain, calculation: calculationForEdit, editingCalculation, Actions } = analysis
+  const { calculation, dragging, onDragStart, onDragEnd, onDragOver, state, Actions } = props
+  const { chain, calculation: calculationForEdit, editingCalculation } = State.get(state)
 
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
@@ -59,7 +61,8 @@ const CalculationItem = (props) => {
 }
 
 CalculationItem.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
   calculation: PropTypes.object.isRequired,
   dragging: PropTypes.bool.isRequired,
   onDragEnd: PropTypes.func.isRequired,

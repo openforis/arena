@@ -1,10 +1,11 @@
-import * as R from 'ramda'
 import { useState, useEffect } from 'react'
 
 import { useActions } from './actions/index'
 import { useChain } from './chain'
 import { useStep } from './step'
 import { useCalculation } from './calculation'
+
+import { State } from './state'
 
 export const useAnalysis = () => {
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
@@ -37,9 +38,7 @@ export const useAnalysis = () => {
     CalculationState,
   })
 
-  const { chain, dirty } = ChainState.get(chainState)
-  const { step, stepDirty } = StepState.get(stepState)
-  const { calculation, calculationDirty } = CalculationState.get(calculationState)
+  const chain = ChainState.getChain(chainState)
 
   useEffect(() => {
     actions.init()
@@ -49,22 +48,16 @@ export const useAnalysis = () => {
     actions.getAttributeUuidsOtherChains()
   }, [chain])
 
-  const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
-
   return {
-    attributesUuidsOtherChains,
-
-    chain,
-    editingChain: isNotNullAndNotEmpty(chain),
-    dirty,
-
-    step,
-    editingStep: isNotNullAndNotEmpty(step),
-    stepDirty,
-
-    calculation,
-    editingCalculation: isNotNullAndNotEmpty(calculation),
-    calculationDirty,
+    state: State.create({
+      attributesUuidsOtherChains,
+      chainState,
+      ChainState,
+      stepState,
+      StepState,
+      calculationState,
+      CalculationState,
+    }),
 
     Actions: {
       chain: {

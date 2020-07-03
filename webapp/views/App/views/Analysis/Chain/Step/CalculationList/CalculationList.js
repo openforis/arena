@@ -9,12 +9,14 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
+import { State } from '../../store'
+
 import CalculationItem from './CalculationItem'
 import useDragDrop from './useDragDrop'
 
 const CalculationList = (props) => {
-  const { analysis } = props
-  const { chain, step, calculation, editingCalculation, Actions } = analysis
+  const { state, Actions } = props
+  const { chain, step, calculation, editingCalculation } = State.get(state)
 
   const i18n = useI18n()
   const calculations = Step.getCalculations(step)
@@ -52,7 +54,8 @@ const CalculationList = (props) => {
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
-            analysis={analysis}
+            state={state}
+            Actions={Actions}
           />
         ))}
 
@@ -66,7 +69,8 @@ const CalculationList = (props) => {
 }
 
 CalculationList.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default CalculationList

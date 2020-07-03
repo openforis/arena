@@ -16,13 +16,14 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
+import { State } from '../../store'
 import useCalculationState from './useCalculationState'
 
 const CalculationComponent = (props) => {
-  const { analysis } = props
+  const { state, Actions } = props
 
   const i18n = useI18n()
-  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation, Actions } = analysis
+  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation } = State.get(state)
   const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
     attributesUuidsOtherChains,
     chain,
@@ -96,7 +97,8 @@ const CalculationComponent = (props) => {
 }
 
 CalculationComponent.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default CalculationComponent
