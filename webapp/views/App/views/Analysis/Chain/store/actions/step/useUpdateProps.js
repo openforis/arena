@@ -11,6 +11,5 @@ export const useUpdateProps = ({ setState }) =>
   useCallback(({ props, state }) => {
     const stepUpdated = Step.mergeProps(props)(State.getStepEdit(state))
     const chainUpdated = Chain.assocProcessingStep(stepUpdated)(State.getChainEdit(state))
-
     setState(A.pipe(State.assocChainEdit(chainUpdated), State.assocStepEdit(stepUpdated))(state))
   }, [])

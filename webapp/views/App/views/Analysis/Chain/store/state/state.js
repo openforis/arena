@@ -41,3 +41,8 @@ export const assocChainEdit = A.assoc(keys.chainEdit)
 
 export const assocStep = A.assoc(keys.step)
 export const assocStepEdit = A.assoc(keys.stepEdit)
+
+// ==== Delete
+
+export const dissocStep = A.dissoc(keys.step)
+export const dissocStepEdit = A.dissoc(keys.stepEdit)

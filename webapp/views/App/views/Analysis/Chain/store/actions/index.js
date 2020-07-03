@@ -8,6 +8,7 @@ import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 import { useCreate as useCreateStep } from './step/useCreate'
 import { useSelect as useSelectStep } from './step/useSelect'
 import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
+import { useDismiss as useDismissStep } from './step/useDismiss'
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -24,6 +25,7 @@ export const useActions = ({ setState }) => ({
   createStep: useCreateStep({ setState }),
   selectStep: useSelectStep({ setState }),
   updatePropsStep: useUpdatePropsStep({ setState }),
+  dismissStep: useDismissStep({ setState }),
 
   canSelectNodeDef: useCanSelectNodeDef(),
 
