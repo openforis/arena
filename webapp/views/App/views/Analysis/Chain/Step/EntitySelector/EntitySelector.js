@@ -49,14 +49,15 @@ const getEntities = (survey, processingStepPrev, lang) => {
 const EntitySelector = (props) => {
   const { readOnly, validation, children, onChange, state, Actions } = props
 
-  const { chain, step } = State.get(state)
+  const chainEdit = State.getChainEdit(state)
+  const stepEdit = State.getStepEdit(state)
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const stepPrev = Chain.getStepPrev(step)(chain)
+  const stepPrev = Chain.getStepPrev(stepEdit)(chainEdit)
 
   const entities = getEntities(survey, stepPrev, i18n.lang)
-  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(step)))
+  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(stepEdit)))
 
   return (
     <div className="form-item step-entity-selector">

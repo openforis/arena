@@ -13,7 +13,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { State } from '../../store'
