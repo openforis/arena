@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -8,16 +8,14 @@ import { useI18n } from '@webapp/store/system'
 
 import Tooltip from '@webapp/components/tooltip'
 
+import { State } from '../store'
 import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {
-  const { disabled, query, onChangeQuery } = props
+  const { disabled, query, onChangeQuery, state, Actions } = props
   const sort = Query.getSort(query)
 
   const i18n = useI18n()
-
-  const [showSortEditor, setShowSortEditor] = useState(false)
-  const toggleSortEditor = () => setShowSortEditor(!showSortEditor)
 
   const tooltipMessages = sort.map(
     (sortCriteria) =>
@@ -30,21 +28,21 @@ const ButtonSort = (props) => {
         <button
           type="button"
           className={classNames('btn', 'btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
-          onClick={toggleSortEditor}
+          onClick={Actions.togglePanelSort}
           aria-disabled={disabled}
         >
           <span className="icon icon-sort-amount-asc icon-14px" />
         </button>
       </Tooltip>
 
-      {showSortEditor && (
+      {State.showPanelSort(state) && (
         <SortEditor
           query={query}
           onChange={(sortUpdated) => {
             onChangeQuery(Query.assocSort(sortUpdated))
-            toggleSortEditor()
+            Actions.closePanels()
           }}
-          onClose={toggleSortEditor}
+          onClose={Actions.closePanels}
         />
       )}
     </>
@@ -55,6 +53,8 @@ ButtonSort.propTypes = {
   disabled: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default ButtonSort

@@ -12,8 +12,10 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import Dropdown from '@webapp/components/form/dropdown'
 import * as Chain from '@common/analysis/processingChain'
+import Dropdown from '@webapp/components/form/Dropdown'
+
+import { State } from '../../store'
 
 const getEntities = (survey, processingStepPrev, lang) => {
   const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, (entityUuid) =>
@@ -45,16 +47,17 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = (props) => {
-  const { readOnly, validation, children, onChange, analysis } = props
+  const { readOnly, validation, children, onChange, state, Actions } = props
 
-  const { chain, step, Actions } = analysis
+  const chainEdit = State.getChainEdit(state)
+  const stepEdit = State.getStepEdit(state)
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const stepPrev = Chain.getStepPrev(step)(chain)
+  const stepPrev = Chain.getStepPrev(stepEdit)(chainEdit)
 
   const entities = getEntities(survey, stepPrev, i18n.lang)
-  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(step)))
+  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(stepEdit)))
 
   return (
     <div className="form-item step-entity-selector">
@@ -67,7 +70,12 @@ const EntitySelector = (props) => {
         selection={entity}
         readOnly={readOnly}
         validation={validation}
-        onBeforeChange={(item) => Actions.canSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey))}
+        onBeforeChange={(item) =>
+          Actions.canSelectNodeDef({
+            nodeDef: Survey.getNodeDefByUuid(R.prop('key', item))(survey),
+            state,
+          })
+        }
         onChange={(item) => onChange(R.prop('key', item))}
       />
 
@@ -80,8 +88,9 @@ EntitySelector.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
-  analysis: PropTypes.object.isRequired,
   validation: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default EntitySelector

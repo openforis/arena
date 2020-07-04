@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+
 import { useDispatch } from 'react-redux'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -7,12 +9,16 @@ import * as Chain from '@common/analysis/processingChain'
 import { NotificationActions } from '@webapp/store/ui'
 import { useLang } from '@webapp/store/system'
 
-export const useCanSelectNodeDef = ({ chain }) => {
+import { State } from '../state'
+
+export const useCanSelectNodeDef = () => {
   const dispatch = useDispatch()
   const lang = useLang()
 
-  return (nodeDef) => {
-    if (NodeDef.belongsToAllCycles(Chain.getCycles(chain))(nodeDef)) {
+  return useCallback(({ nodeDef, state }) => {
+    const chainEdit = State.getChainEdit(state)
+
+    if (NodeDef.belongsToAllCycles(Chain.getCycles(chainEdit))(nodeDef)) {
       return true
     }
     dispatch(
@@ -22,5 +28,5 @@ export const useCanSelectNodeDef = ({ chain }) => {
       })
     )
     return false
-  }
+  }, [])
 }

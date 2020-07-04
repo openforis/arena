@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 
 import { useUser } from '@webapp/store/user'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const DropdownUserGroup = (props) => {
   const { editingLoggedUser, groupUuid, disabled, validation, onChange } = props
@@ -38,8 +38,8 @@ const DropdownUserGroup = (props) => {
       validation={validation}
       placeholder={i18n.t('common.group')}
       items={groups}
-      itemKeyProp={AuthGroup.keys.uuid}
-      itemLabelFunction={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
+      itemKey={AuthGroup.keys.uuid}
+      itemLabel={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
       selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
       onChange={(group) => onChange(AuthGroup.getUuid(group))}
       readOnlyInput

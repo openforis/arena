@@ -10,6 +10,8 @@ import { useNodeDefByUuid } from '@webapp/store/survey'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
+import { State } from '../../../store'
+
 const getClassName = ({ editingSelf, dragging }) => {
   let className = 'chain-list-item'
   className += editingSelf ? ' editing' : ''
@@ -17,14 +19,17 @@ const getClassName = ({ editingSelf, dragging }) => {
   return className
 }
 const CalculationItem = (props) => {
-  const { calculation, dragging, onDragStart, onDragEnd, onDragOver, analysis } = props
-  const { chain, calculation: calculationForEdit, editingCalculation, Actions } = analysis
+  const { calculation, dragging, onDragStart, onDragEnd, onDragOver, state, Actions } = props
+
+  const chainEdit = State.getChainEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
 
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
 
-  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chain)
-  const editingSelf = Calculation.isEqual(calculationForEdit)(calculation)
+  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chainEdit)
+  const editingSelf = Calculation.isEqual(calculationEdit)(calculation)
 
   const className = getClassName({ editingSelf, dragging })
 
@@ -41,7 +46,7 @@ const CalculationItem = (props) => {
       data-index={index}
       onClick={() => {
         if (!editingSelf) {
-          Actions.calculation.select(calculation)
+          Actions.selectCalculation({ calculation, state })
         }
       }}
     >
@@ -59,7 +64,8 @@ const CalculationItem = (props) => {
 }
 
 CalculationItem.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
   calculation: PropTypes.object.isRequired,
   dragging: PropTypes.bool.isRequired,
   onDragEnd: PropTypes.func.isRequired,

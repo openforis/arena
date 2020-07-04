@@ -6,26 +6,39 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
+import { State } from '../store'
 
 const ButtonBar = (props) => {
   const i18n = useI18n()
 
-  const { analysis } = props
-  const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation, Actions } = analysis
+  const { state, Actions } = props
 
-  const stepNext = Chain.getStepNext(step)(chain)
+  const stepEdit = State.getChainEdit(state)
+  const chainEdit = State.getChainEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
+  const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
+
+  const editingChain = Boolean(State.getChainEdit(state))
+  const editingStep = Boolean(State.getStepEdit(state))
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
+  const chainDirty = Boolean(State.isChainDirty(state))
 
   return (
     <>
       <div className="button-bar">
         {editingChain && !editingStep && !editingCalculation && (
-          <button type="button" className="btn-s btn-cancel" onClick={Actions.onDismiss}>
+          <button type="button" className="btn-s btn-cancel" onClick={() => Actions.dismiss({ state })}>
             <span className="icon icon-cross icon-left icon-10px" />
-            {i18n.t(dirty ? 'common.cancel' : 'common.back')}
+            {i18n.t(chainDirty ? 'common.cancel' : 'common.back')}
           </button>
         )}
 
-        <button type="button" className="btn-s btn-primary" onClick={Actions.onSave} aria-disabled={!dirty}>
+        <button
+          type="button"
+          className="btn-s btn-primary"
+          onClick={() => Actions.save({ state })}
+          aria-disabled={!chainDirty}
+        >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
         </button>
@@ -33,15 +46,15 @@ const ButtonBar = (props) => {
           type="button"
           className="btn-s btn-danger btn-delete"
           aria-disabled={
-            (editingCalculation && Calculation.isTemporary(calculation)) ||
-            (editingStep && (Step.isTemporary(step) || Boolean(stepNext))) ||
-            (editingChain && Chain.isTemporary(chain))
+            (editingCalculation && Calculation.isTemporary(calculationEdit)) ||
+            (editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext))) ||
+            (editingChain && Chain.isTemporary(chainEdit))
           }
           onClick={() => {
-            let deleteAction = Actions.chain.delete
-            if (editingStep) deleteAction = Actions.step.delete
-            if (editingCalculation) deleteAction = Actions.calculation.delete
-            deleteAction()
+            let deleteAction = Actions.delete
+            if (editingStep) deleteAction = Actions.deleteStep
+            if (editingCalculation) deleteAction = Actions.deleteCalculation
+            deleteAction({ state })
           }}
         >
           <span className="icon icon-bin icon-left icon-12px" />
@@ -53,7 +66,8 @@ const ButtonBar = (props) => {
 }
 
 ButtonBar.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default ButtonBar

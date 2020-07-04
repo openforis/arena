@@ -1,4 +1,4 @@
-import './chainView.scss'
+import './chain.scss'
 import './chainList.scss'
 import './chainListItem.scss'
 import './chainForm.scss'
@@ -7,63 +7,69 @@ import React from 'react'
 
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
-
 import * as Chain from '@common/analysis/processingChain'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
-import { useSurveyInfo } from '@webapp/store/survey'
-
-import { useAnalysis } from './store'
-
+import { State, useAnalysis } from './store'
 import StepList from './StepList'
 import Step from './Step'
 import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
-  const analysis = useAnalysis()
-  const { chain, dirty, editingStep, Actions } = analysis
-  const validation = Chain.getValidation(chain)
   const surveyInfo = useSurveyInfo()
+  const { state, Actions } = useAnalysis()
+
+  if (state === null) return null
+
+  const chainEdit = State.getChainEdit(state)
+  const editingStep = Boolean(State.getStepEdit(state))
+
+  const validation = Chain.getValidation(chainEdit)
 
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio onClick={Actions.openRStudio} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio
+        onClick={() => Actions.openRStudio({ state })}
+        disabled={Survey.isDraft(surveyInfo) || State.isChainDirty(state)}
+      />
 
       <div className="form">
         <LabelsEditor
-          labels={Chain.getLabels(chain)}
+          labels={Chain.getLabels(chainEdit)}
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => Actions.chain.update({ name: Chain.keysProps.labels, value: labels })}
+          onChange={(labels) => Actions.updateChain({ name: Chain.keysProps.labels, value: labels, state })}
         />
 
         {!editingStep && (
           <>
             <LabelsEditor
               formLabelKey="common.description"
-              labels={Chain.getDescriptions(chain)}
+              labels={Chain.getDescriptions(chainEdit)}
               onChange={(descriptions) =>
-                Actions.chain.update({ name: Chain.keysProps.descriptions, value: descriptions })
+                Actions.updateChain({ name: Chain.keysProps.descriptions, value: descriptions, state })
               }
             />
 
             <CyclesSelector
-              cyclesKeysSelected={Chain.getCycles(chain)}
-              onChange={(cycles) => Actions.chain.updateCycles({ cycles })}
+              cyclesKeysSelected={Chain.getCycles(chainEdit)}
+              onChange={(cycles) => Actions.updateCycles({ cycles, state })}
             />
           </>
         )}
 
-        <StepList analysis={analysis} />
+        <StepList state={state} Actions={Actions} />
       </div>
 
-      <Step analysis={analysis} />
+      <Step state={state} Actions={Actions} />
 
-      <ButtonBar analysis={analysis} />
+      <ButtonBar state={state} Actions={Actions} />
     </div>
   )
 }

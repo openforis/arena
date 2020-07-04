@@ -1,1 +1,0 @@
-export { useChain } from './useChain'

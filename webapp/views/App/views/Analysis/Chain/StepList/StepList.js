@@ -9,17 +9,21 @@ import * as Step from '@common/analysis/processingStep'
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
+import { State } from '../store'
+
 import StepItem from './StepItem'
 
 const StepList = (props) => {
-  const { analysis } = props
-  const { chain, editingStep, Actions } = analysis
+  const { state, Actions } = props
   const i18n = useI18n()
+  const chainEdit = State.getChainEdit(state)
+  const editingStep = Boolean(State.getStepEdit(state))
 
-  const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
+  const validation = Chain.getItemValidationByUuid(Chain.getUuid(chainEdit))(chainEdit)
   const stepsValidation = Validation.getFieldValidation(Chain.keys.processingSteps)(validation)
-  const steps = Chain.getProcessingSteps(chain)
+  const steps = Chain.getProcessingSteps(chainEdit)
   const lastStepHasCategory = R.pipe(R.last, Step.hasCategory)(steps)
+
   return (
     <div className={`form-item${editingStep ? ' chain-list__editing-step' : ''}`}>
       {!editingStep && (
@@ -30,7 +34,7 @@ const StepList = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            onClick={Actions.step.create}
+            onClick={() => Actions.createStep({ state })}
             aria-disabled={lastStepHasCategory}
           >
             <span className="icon icon-plus icon-14px" />
@@ -40,7 +44,7 @@ const StepList = (props) => {
 
       <div className="chain-list">
         {steps.map((processingStep) => (
-          <StepItem key={Step.getIndex(processingStep)} step={processingStep} analysis={analysis} />
+          <StepItem key={Step.getIndex(processingStep)} step={processingStep} state={state} Actions={Actions} />
         ))}
       </div>
     </div>
@@ -48,7 +52,8 @@ const StepList = (props) => {
 }
 
 StepList.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default StepList

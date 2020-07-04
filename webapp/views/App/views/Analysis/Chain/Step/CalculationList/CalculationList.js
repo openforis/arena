@@ -9,22 +9,28 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
+import { State } from '../../store'
+
 import CalculationItem from './CalculationItem'
 import useDragDrop from './useDragDrop'
 
 const CalculationList = (props) => {
-  const { analysis } = props
-  const { chain, step, calculation, editingCalculation, Actions } = analysis
+  const { state, Actions } = props
+
+  const chainEdit = State.getChainEdit(state)
+  const stepEdit = State.getStepEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
 
   const i18n = useI18n()
-  const calculations = Step.getCalculations(step)
-  const stepValidation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
+  const calculations = Step.getCalculations(stepEdit)
+  const stepValidation = Chain.getItemValidationByUuid(Step.getUuid(stepEdit))(chainEdit)
   const calculationsValidation = Validation.getFieldValidation(Step.keys.calculations)(stepValidation)
 
   const placeholderRef = useRef(null)
   const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
     placeholderRef,
-    onDragEndFn: Actions.calculation.move,
+    onDragEndFn: ({ indexFrom, indexTo }) => Actions.moveCalculation({ indexFrom, indexTo, state }),
   })
 
   return (
@@ -34,7 +40,7 @@ const CalculationList = (props) => {
           <ValidationTooltip validation={calculationsValidation}>
             {i18n.t('processingStepView.calculationSteps')}
           </ValidationTooltip>
-          <button type="button" className="btn-s btn-transparent" onClick={Actions.calculation.create}>
+          <button type="button" className="btn-s btn-transparent" onClick={() => Actions.createCalculation({ state })}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>
@@ -44,15 +50,16 @@ const CalculationList = (props) => {
         {calculations.map((processingCalculation) => (
           <CalculationItem
             key={Calculation.getUuid(processingCalculation)}
-            chain={chain}
+            chain={chainEdit}
             calculation={processingCalculation}
-            calculationForEdit={calculation}
+            calculationForEdit={calculationEdit}
             editingCalculation={editingCalculation}
             dragging={dragging}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
-            analysis={analysis}
+            state={state}
+            Actions={Actions}
           />
         ))}
 
@@ -66,7 +73,8 @@ const CalculationList = (props) => {
 }
 
 CalculationList.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default CalculationList

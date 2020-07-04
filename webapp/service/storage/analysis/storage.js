@@ -1,40 +1,14 @@
+import * as A from '@core/arena'
+
 const keys = {
-  chain: 'chain',
-  step: 'step',
-  calculation: 'calculation',
+  chainEdit: 'chain-edit',
 }
 
-export const eventTypes = {
-  setChain: 'analysis/set-chain',
-  setStep: 'analysis/set-step',
-  setCalculation: 'analysis/set-calculation',
+export const getChainEdit = () => {
+  const chainEdit = window.localStorage.getItem(keys.chainEdit)
+  return A.isEmpty(chainEdit) ? null : JSON.parse(chainEdit)
 }
 
-// ====== READ
-export const getChain = () => {
-  const chain = window.localStorage.getItem(keys.chain)
-  if (chain) return JSON.parse(chain)
-  return chain
-}
+export const persistChainEdit = (chainEdit) => window.localStorage.setItem(keys.chainEdit, JSON.stringify(chainEdit))
 
-export const getStep = () => {
-  const step = window.localStorage.getItem(keys.step)
-  if (step) return JSON.parse(step)
-  return step
-}
-
-export const getCalculation = () => {
-  const calculation = window.localStorage.getItem(keys.calculation)
-  if (calculation) return JSON.parse(calculation)
-  return calculation
-}
-
-// ====== UPDATE
-export const setChain = ({ chain }) => window.localStorage.setItem(keys.chain, JSON.stringify(chain))
-export const setStep = ({ step }) => window.localStorage.setItem(keys.step, JSON.stringify(step))
-export const setCalculation = ({ calculation }) =>
-  window.localStorage.setItem(keys.calculation, JSON.stringify(calculation))
-// ====== DELETE
-export const clearChain = () => window.localStorage.removeItem(keys.chain)
-export const clearStep = () => window.localStorage.removeItem(keys.step)
-export const clearCalculation = () => window.localStorage.removeItem(keys.calculation)
+export const removeChainEdit = () => window.localStorage.removeItem(keys.chainEdit)

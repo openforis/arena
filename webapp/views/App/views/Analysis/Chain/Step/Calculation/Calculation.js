@@ -1,8 +1,7 @@
 import './Calculation.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Calculation from '@common/analysis/processingStepCalculation'
@@ -14,42 +13,44 @@ import { useI18n } from '@webapp/store/system'
 
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
+import { State } from '../../store'
 import useCalculationState from './useCalculationState'
 
 const CalculationComponent = (props) => {
-  const { analysis } = props
+  const { state, Actions } = props
 
   const i18n = useI18n()
-  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation, Actions } = analysis
+
+  const calculationEdit = State.getCalculationEdit(state)
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
+
   const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
-    attributesUuidsOtherChains,
-    chain,
-    step,
-    calculation,
+    state,
   })
 
-  const history = useHistory()
-  const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
+  const nodeDefUuid = Calculation.getNodeDefUuid(calculationEdit)
 
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
-      <button type="button" className="btn-s btn-close" onClick={Actions.calculation.delete}>
+      <button type="button" className="btn-s btn-close" onClick={() => Actions.dismissCalculation({ state })}>
         <span className="icon icon-10px icon-cross" />
       </button>
 
       <LabelsEditor
-        labels={Calculation.getLabels(calculation)}
+        labels={Calculation.getLabels(calculationEdit)}
         validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
-        onChange={(labels) => Actions.calculation.updateProp({ prop: Calculation.keysProps.labels, value: labels })}
+        onChange={(labels) =>
+          Actions.updatePropCalculation({ prop: Calculation.keysProps.labels, value: labels, state })
+        }
       />
 
       <FormItem label={i18n.t('common.type')}>
         <ButtonGroup
-          selectedItemKey={Calculation.getType(calculation)}
-          onChange={(type) => Actions.calculation.updateProp({ prop: Calculation.keysProps.type, value: type })}
+          selectedItemKey={Calculation.getType(calculationEdit)}
+          onChange={(type) => Actions.updatePropCalculation({ prop: Calculation.keysProps.type, value: type, state })}
           items={types}
         />
       </FormItem>
@@ -59,22 +60,22 @@ const CalculationComponent = (props) => {
           <Dropdown
             items={attributes}
             selection={attribute}
-            itemKeyProp={Calculation.keys.uuid}
-            itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
+            itemKey={Calculation.keys.uuid}
+            itemLabel={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
-            onBeforeChange={Actions.canSelectNodeDef}
-            onChange={(def) => Actions.calculation.updateAttribute({ attrDef: def })}
+            onBeforeChange={(nodeDef) => Actions.canSelectNodeDef({ nodeDef, state })}
+            onChange={(def) => Actions.updateAttributeCalculation({ attrDef: def, state })}
           />
-          <button
+          <Link
             type="button"
             className="btn btn-s btn-edit"
-            onClick={() => history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)}
+            to={`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`}
             aria-disabled={!nodeDefUuid}
           >
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
-          </button>
-          <button type="button" className="btn btn-s btn-add" onClick={Actions.addNodeDefAnalysis}>
+          </Link>
+          <button type="button" className="btn btn-s btn-add" onClick={() => Actions.addNodeDefAnalysis({ state })}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
@@ -84,9 +85,9 @@ const CalculationComponent = (props) => {
       {aggregateFunctionEnabled && (
         <FormItem label={i18n.t('processingStepCalculation.aggregateFunction')}>
           <ButtonGroup
-            selectedItemKey={Calculation.getAggregateFunction(calculation)}
+            selectedItemKey={Calculation.getAggregateFunction(calculationEdit)}
             onChange={(aggregateFn) =>
-              Actions.calculation.updateProp({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn })
+              Actions.updatePropCalculation({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn, state })
             }
             items={aggregateFns}
             deselectable
@@ -98,7 +99,8 @@ const CalculationComponent = (props) => {
 }
 
 CalculationComponent.propTypes = {
-  analysis: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default CalculationComponent

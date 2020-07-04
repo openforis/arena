@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -7,13 +7,12 @@ import { Query } from '@common/model/query'
 import Tooltip from '@webapp/components/tooltip'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 
+import { State } from '../store'
+
 const ButtonFilter = (props) => {
-  const { disabled, query, onChangeQuery } = props
+  const { disabled, query, onChangeQuery, state, Actions } = props
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
-
-  const [showExpressionEditor, setShowExpressionEditor] = useState(false)
-  const toggleExpressionEditor = () => setShowExpressionEditor(!showExpressionEditor)
 
   return (
     <>
@@ -21,14 +20,14 @@ const ButtonFilter = (props) => {
         <button
           type="button"
           className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
-          onClick={toggleExpressionEditor}
+          onClick={Actions.togglePanelFilter}
           aria-disabled={disabled}
         >
           <span className="icon icon-filter icon-14px" />
         </button>
       </Tooltip>
 
-      {showExpressionEditor && (
+      {State.showPanelFilter(state) && (
         <ExpressionEditorPopup
           nodeDefUuidContext={entityDefUuid}
           query={filter ? Expression.toString(filter) : ''}
@@ -36,9 +35,9 @@ const ButtonFilter = (props) => {
           hideAdvanced
           onChange={(_, expr) => {
             onChangeQuery(Query.assocFilter(expr))
-            toggleExpressionEditor()
+            Actions.closePanels()
           }}
-          onClose={toggleExpressionEditor}
+          onClose={Actions.closePanels}
         />
       )}
     </>
@@ -49,6 +48,8 @@ ButtonFilter.propTypes = {
   disabled: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default ButtonFilter

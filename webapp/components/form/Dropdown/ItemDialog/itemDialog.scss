@@ -1,0 +1,14 @@
+@import 'webapp/style/vars';
+
+.dropdown__list-item {
+  padding: 0.4rem 0;
+  grid-column: 2;
+  text-align: center;
+
+  &:hover,
+  &:focus {
+    cursor: pointer;
+    background-color: rgba($blueLight, 0.5);
+    outline: none;
+  }
+}
