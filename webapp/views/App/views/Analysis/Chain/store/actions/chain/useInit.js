@@ -17,22 +17,25 @@ export const useInit = ({ setState }) => {
 
   return async () => {
     const chainEdit = AnalysisStorage.getChainEdit()
-
-    // the last edited chain is the same then the url uuid
     let chainCurrent = null
-    if (chainEdit && chainUuid === A.pipe(State.getChain, Chain.getUuid)(chainEdit)) {
-      setState(chainEdit)
+
+    if (
+      (chainEdit && !chainUuid) ||
+      (chainEdit && chainUuid && chainUuid === A.pipe(State.getChain, Chain.getUuid)(chainEdit))
+    ) {
+      // recover
+      chainCurrent = State.getChainEdit(chainEdit)
     } else if (chainUuid) {
-      // editing a chain
+      // fetch
       const { data } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
       chainCurrent = data
-      setState(data)
     } else {
-      // creating a chain
+      // create
       chainCurrent = Chain.newProcessingChain({
         [Chain.keysProps.cycles]: [surveyCycleKey],
       })
     }
+
     const { data: attributeUuidsOtherChains } = await axios.get(
       `/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chainCurrent)}/attribute-uuids-other-chains`
     )

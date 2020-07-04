@@ -21,7 +21,7 @@ export const useSelect = ({ setState }) => {
                 Chain.dissocProcessingStepTemporary,
                 Chain.assocProcessingStep(State.getStep(state))
               )(State.getChainEdit(state))
-            : State.getChain(state)
+            : State.getChainEdit(state)
         ),
         State.assocStep(step),
         State.assocStepEdit(step)
