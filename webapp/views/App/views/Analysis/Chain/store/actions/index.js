@@ -20,7 +20,6 @@ import { useUpdateAttribute as useUpdateAttributeCalculation } from './calculati
 import { useDismiss as useDismissCalculation } from './calculation/useDismiss'
 import { useDelete as useDeleteCalculation } from './calculation/useDelete'
 
-// import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 import { useAddEntityVirtual } from './useAddEntityVirtual'
 import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 // import { useSave } from './useSave'
@@ -53,9 +52,6 @@ export const useActions = ({ setState }) => ({
   //   setState,
   // }),
 
-  // getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
-  //   setState,
-  // }),
   addEntityVirtual: useAddEntityVirtual(),
   addNodeDefAnalysis: useAddNodeDefAnalysis(),
 })
