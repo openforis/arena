@@ -75,7 +75,7 @@ const CalculationComponent = (props) => {
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
           </Link>
-          <button type="button" className="btn btn-s btn-add" onClick={Actions.addNodeDefAnalysis}>
+          <button type="button" className="btn btn-s btn-add" onClick={() => Actions.addNodeDefAnalysis({ state })}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>

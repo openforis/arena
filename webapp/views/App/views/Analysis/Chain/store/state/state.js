@@ -11,14 +11,14 @@ export const keys = {
 }
 
 // ==== CREATE
-export const create = ({ chain, step = null, attributeUuidsOtherChains }) => ({
+export const create = ({ chain, step = null, calculation = null, attributeUuidsOtherChains }) => ({
   [keys.attributeUuidsOtherChains]: attributeUuidsOtherChains,
   [keys.chain]: chain,
   [keys.chainEdit]: chain,
   [keys.step]: step,
   [keys.stepEdit]: step,
-  [keys.calculation]: null,
-  [keys.calculationEdit]: null,
+  [keys.calculation]: calculation,
+  [keys.calculationEdit]: calculation,
 })
 
 // ==== READ

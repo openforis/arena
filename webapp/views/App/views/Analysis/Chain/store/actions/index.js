@@ -19,8 +19,8 @@ import { useUpdateProp as useUpdatePropCalculation } from './calculation/useUpda
 import { useUpdateAttribute as useUpdateAttributeCalculation } from './calculation/useUpdateAttribute'
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
-// import { useAddEntityVirtual } from './useAddEntityVirtual'
-// import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
+import { useAddEntityVirtual } from './useAddEntityVirtual'
+import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 // import { useSave } from './useSave'
 
 export const useActions = ({ setState }) => ({
@@ -52,10 +52,6 @@ export const useActions = ({ setState }) => ({
   // getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
   //   setState,
   // }),
-  // addEntityVirtual: useAddEntityVirtual({
-  //   setState,
-  // }),
-  // addNodeDefAnalysis: useAddNodeDefAnalysis({
-  //   setState,
-  // }),
+  addEntityVirtual: useAddEntityVirtual(),
+  addNodeDefAnalysis: useAddNodeDefAnalysis(),
 })

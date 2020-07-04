@@ -84,7 +84,7 @@ const StepComponent = (props) => {
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={Actions.addEntityVirtual}
+                onClick={() => Actions.addEntityVirtual({ state })}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
