@@ -16,7 +16,7 @@ export const useDismiss = () => {
   }
 
   return useCallback(({ state }) => {
-    if (!State.isChainDirty(state)) {
+    if (State.isChainDirty(state)) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',

@@ -12,7 +12,6 @@ const ButtonBar = (props) => {
   const i18n = useI18n()
 
   const { state, Actions } = props
-  // const { dirty } = State.get(state)
 
   const stepEdit = State.getChainEdit(state)
   const chainEdit = State.getChainEdit(state)
@@ -34,10 +33,15 @@ const ButtonBar = (props) => {
           </button>
         )}
 
-        {/* <button type="button" className="btn-s btn-primary" onClick={Actions.save} aria-disabled={!dirty}>
+        <button
+          type="button"
+          className="btn-s btn-primary"
+          onClick={() => Actions.save({ state })}
+          aria-disabled={!chainDirty}
+        >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
-        </button> */}
+        </button>
         <button
           type="button"
           className="btn-s btn-danger btn-delete"
