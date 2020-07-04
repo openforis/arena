@@ -20,7 +20,7 @@ import { useUpdateAttribute as useUpdateAttributeCalculation } from './calculati
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
-// import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
+import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 // import { useSave } from './useSave'
 
 export const useActions = ({ setState }) => ({
@@ -55,7 +55,5 @@ export const useActions = ({ setState }) => ({
   // addEntityVirtual: useAddEntityVirtual({
   //   setState,
   // }),
-  // addNodeDefAnalysis: useAddNodeDefAnalysis({
-  //   setState,
-  // }),
+  addNodeDefAnalysis: useAddNodeDefAnalysis({ setState }),
 })

@@ -20,6 +20,7 @@ export const useInit = ({ setState }) => {
 
     let chainCurrent = null
     let stepCurrent = null
+    let calculationCurrent = null
 
     if (
       (chainEdit && !chainUuid) ||
@@ -28,6 +29,7 @@ export const useInit = ({ setState }) => {
       // recover
       chainCurrent = State.getChainEdit(chainEdit)
       stepCurrent = State.getStepEdit(chainEdit)
+      calculationCurrent = State.getCalculationEdit(chainEdit)
     } else if (chainUuid) {
       // fetch
       const { data } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
@@ -43,6 +45,13 @@ export const useInit = ({ setState }) => {
       `/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chainCurrent)}/attribute-uuids-other-chains`
     )
 
-    setState(State.create({ chain: chainCurrent, step: stepCurrent, attributeUuidsOtherChains }))
+    setState(
+      State.create({
+        chain: chainCurrent,
+        step: stepCurrent,
+        calculation: calculationCurrent,
+        attributeUuidsOtherChains,
+      })
+    )
   }
 }
