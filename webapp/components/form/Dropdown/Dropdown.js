@@ -35,7 +35,6 @@ const Dropdown = (props) => {
   const { state, Actions } = useDropdown({
     autocompleteMinChars,
     disabled,
-    inputRef,
     itemKey,
     itemLabel,
     items,
@@ -51,10 +50,10 @@ const Dropdown = (props) => {
     <div
       ref={dropdownRef}
       className={classNames('dropdown', className)}
-      onBlur={async (event) => {
+      onBlur={(event) => {
         const { className: classNameTarget = '' } = event.relatedTarget || {}
         if (classNameTarget !== ItemDialog.className) {
-          await Actions.closeDialog({ selection, state })
+          Actions.closeDialog({ selection, state })
         }
       }}
     >
@@ -77,7 +76,7 @@ const Dropdown = (props) => {
         onClick={async (event) => {
           event.preventDefault()
           event.stopPropagation()
-          if (showDialog) await Actions.closeDialog({ selection, state })
+          if (showDialog) Actions.closeDialog({ selection, state })
           else await Actions.openDialog({ state })
         }}
         aria-disabled={disabled}
@@ -97,8 +96,8 @@ const Dropdown = (props) => {
             onItemSelect={async (item) => {
               await Actions.updateSelection({ item, selection, state })
             }}
-            onClose={async () => {
-              await Actions.closeDialog({ selection, state })
+            onClose={() => {
+              Actions.closeDialog({ selection, state })
             }}
             sourceElement={sourceElement || dropdownRef.current}
           />,
