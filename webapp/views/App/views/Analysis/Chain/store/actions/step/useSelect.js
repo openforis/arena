@@ -6,6 +6,7 @@ import * as A from '@core/arena'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
 
 import { State } from '../../state'
 
@@ -13,15 +14,15 @@ export const useSelect = ({ setState }) => {
   const dispatch = useDispatch()
 
   const select = ({ step, state }) => () => {
+    const stepEdit = State.getStepEdit(state)
+    const chainUpdated = State.getChainEdit(state)
+
     setState(
       A.pipe(
         State.assocChainEdit(
-          !A.isEmpty(State.getStep(state))
-            ? A.pipe(
-                Chain.dissocProcessingStepTemporary,
-                Chain.assocProcessingStep(State.getStep(state))
-              )(State.getChainEdit(state))
-            : State.getChainEdit(state)
+          !A.isEmpty(stepEdit) && !Step.isTemporary(stepEdit)
+            ? Chain.assocProcessingStep(State.getStep(state))(chainUpdated)
+            : Chain.dissocProcessingStepTemporary(chainUpdated)
         ),
         State.assocStep(step),
         State.assocStepEdit(step)
