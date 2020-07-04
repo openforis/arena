@@ -23,31 +23,31 @@ const CalculationComponent = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
-  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation } = State.get(state)
+
+  const calculationEdit = State.getCalculationEdit(state)
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
+
   const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
-    attributesUuidsOtherChains,
-    chain,
-    step,
-    calculation,
+    state,
   })
 
-  const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
+  const nodeDefUuid = Calculation.getNodeDefUuid(calculationEdit)
 
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
-      <button type="button" className="btn-s btn-close" onClick={Actions.calculation.dismiss}>
+      {/* <button type="button" className="btn-s btn-close" onClick={Actions.calculation.dismiss}>
         <span className="icon icon-10px icon-cross" />
-      </button>
+      </button> */}
 
       <LabelsEditor
-        labels={Calculation.getLabels(calculation)}
+        labels={Calculation.getLabels(calculationEdit)}
         validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
         onChange={(labels) => Actions.calculation.updateProp({ prop: Calculation.keysProps.labels, value: labels })}
       />
 
       <FormItem label={i18n.t('common.type')}>
         <ButtonGroup
-          selectedItemKey={Calculation.getType(calculation)}
+          selectedItemKey={Calculation.getType(calculationEdit)}
           onChange={(type) => Actions.calculation.updateProp({ prop: Calculation.keysProps.type, value: type })}
           items={types}
         />
@@ -83,7 +83,7 @@ const CalculationComponent = (props) => {
       {aggregateFunctionEnabled && (
         <FormItem label={i18n.t('processingStepCalculation.aggregateFunction')}>
           <ButtonGroup
-            selectedItemKey={Calculation.getAggregateFunction(calculation)}
+            selectedItemKey={Calculation.getAggregateFunction(calculationEdit)}
             onChange={(aggregateFn) =>
               Actions.calculation.updateProp({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn })
             }

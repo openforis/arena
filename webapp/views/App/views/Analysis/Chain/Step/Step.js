@@ -19,8 +19,8 @@ import CategorySelector from '@webapp/components/survey/CategorySelector'
 import { State } from '../store'
 
 import EntitySelector from './EntitySelector'
-// import CalculationList from './CalculationList'
-// import Calculation from './Calculation'
+import CalculationList from './CalculationList'
+import Calculation from './Calculation'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -113,10 +113,10 @@ const StepComponent = (props) => {
             </div>
           </>
         )}
-        {/* <CalculationList state={state} Actions={Actions} /> */}
+        <CalculationList state={state} Actions={Actions} />
       </div>
 
-      {/* <Calculation state={state} Actions={Actions} /> */}
+      <Calculation state={state} Actions={Actions} />
     </div>
   )
 }

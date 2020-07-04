@@ -11,6 +11,8 @@ import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
 import { useDismiss as useDismissStep } from './step/useDismiss'
 import { useDelete as useDeleteStep } from './step/useDelete'
 
+import { useCreate as useCreateCalculation } from './calculation/useCreate'
+
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
 // import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
@@ -28,6 +30,8 @@ export const useActions = ({ setState }) => ({
   updatePropsStep: useUpdatePropsStep({ setState }),
   dismissStep: useDismissStep({ setState }),
   deleteStep: useDeleteStep({ setState }),
+
+  createCalculation: useCreateCalculation({ setState }),
 
   canSelectNodeDef: useCanSelectNodeDef(),
 
