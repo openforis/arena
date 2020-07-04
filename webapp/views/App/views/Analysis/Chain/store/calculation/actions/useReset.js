@@ -2,7 +2,7 @@ import * as A from '@core/arena'
 
 import * as Step from '@common/analysis/processingStep'
 
-import { useUpdate } from './useUpdate'
+const useUpdate = () => ({})
 
 export const useReset = ({
   chainState,

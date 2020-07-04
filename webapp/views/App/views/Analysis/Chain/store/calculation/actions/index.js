@@ -1,6 +1,5 @@
 import { useDelete } from './useDelete'
 import { useSelect } from './useSelect'
-import { useDismiss } from './useDismiss'
 
 export const useActions = ({
   chainState,
@@ -14,17 +13,6 @@ export const useActions = ({
   State,
 }) => ({
   select: useSelect({
-    chainState,
-    ChainState,
-
-    stepState,
-    StepState,
-
-    state,
-    State,
-    setState,
-  }),
-  dismiss: useDismiss({
     chainState,
     ChainState,
 

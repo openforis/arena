@@ -50,3 +50,6 @@ export const assocCalculationEdit = A.assoc(keys.calculationEdit)
 
 export const dissocStep = A.dissoc(keys.step)
 export const dissocStepEdit = A.dissoc(keys.stepEdit)
+
+export const dissocCalculation = A.dissoc(keys.calculation)
+export const dissocCalculationEdit = A.dissoc(keys.calculationEdit)
