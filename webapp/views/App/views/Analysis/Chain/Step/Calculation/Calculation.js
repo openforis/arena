@@ -42,13 +42,15 @@ const CalculationComponent = (props) => {
       <LabelsEditor
         labels={Calculation.getLabels(calculationEdit)}
         validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
-        onChange={(labels) => Actions.calculation.updateProp({ prop: Calculation.keysProps.labels, value: labels })}
+        onChange={(labels) =>
+          Actions.updatePropCalculation({ prop: Calculation.keysProps.labels, value: labels, state })
+        }
       />
 
       <FormItem label={i18n.t('common.type')}>
         <ButtonGroup
           selectedItemKey={Calculation.getType(calculationEdit)}
-          onChange={(type) => Actions.calculation.updateProp({ prop: Calculation.keysProps.type, value: type })}
+          onChange={(type) => Actions.updatePropCalculation({ prop: Calculation.keysProps.type, value: type, state })}
           items={types}
         />
       </FormItem>
@@ -62,7 +64,7 @@ const CalculationComponent = (props) => {
             itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
             onBeforeChange={(nodeDef) => Actions.canSelectNodeDef({ nodeDef, state })}
-            onChange={(def) => Actions.calculation.updateAttribute({ attrDef: def })}
+            onChange={(def) => Actions.updateAttributeCalculation({ attrDef: def, state })}
           />
           <Link
             type="button"
@@ -85,7 +87,7 @@ const CalculationComponent = (props) => {
           <ButtonGroup
             selectedItemKey={Calculation.getAggregateFunction(calculationEdit)}
             onChange={(aggregateFn) =>
-              Actions.calculation.updateProp({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn })
+              Actions.updatePropCalculation({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn, state })
             }
             items={aggregateFns}
             deselectable
