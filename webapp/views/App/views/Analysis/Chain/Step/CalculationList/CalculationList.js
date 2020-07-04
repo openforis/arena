@@ -30,7 +30,7 @@ const CalculationList = (props) => {
   const placeholderRef = useRef(null)
   const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
     placeholderRef,
-    onDragEndFn: () => ({}), // TODO refactor next branch Actions.calculation.move,
+    onDragEndFn: ({ indexFrom, indexTo }) => Actions.moveCalculation({ indexFrom, indexTo, state }),
   })
 
   return (
