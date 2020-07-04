@@ -1,37 +1,37 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
-// import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { State } from '../../store'
 
-// import CalculationItem from './CalculationItem'
-// import useDragDrop from './useDragDrop'
+import CalculationItem from './CalculationItem'
+import useDragDrop from './useDragDrop'
 
 const CalculationList = (props) => {
   const { state, Actions } = props
 
   const chainEdit = State.getChainEdit(state)
   const stepEdit = State.getStepEdit(state)
-  // const calculationEdit = State.getCalculationEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
   const editingCalculation = Boolean(State.getCalculationEdit(state))
 
   const i18n = useI18n()
-  // const calculations = Step.getCalculations(stepEdit)
+  const calculations = Step.getCalculations(stepEdit)
   const stepValidation = Chain.getItemValidationByUuid(Step.getUuid(stepEdit))(chainEdit)
   const calculationsValidation = Validation.getFieldValidation(Step.keys.calculations)(stepValidation)
 
-  // const placeholderRef = useRef(null)
-  /* const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
+  const placeholderRef = useRef(null)
+  const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
     placeholderRef,
-    onDragEndFn: Actions.calculation.move,
-  }) */
+    onDragEndFn: () => ({}), // TODO refactor next branch Actions.calculation.move,
+  })
 
   return (
     <div className="form-item">
@@ -46,7 +46,7 @@ const CalculationList = (props) => {
         </div>
       )}
 
-      {/* <div className="chain-list">
+      <div className="chain-list">
         {calculations.map((processingCalculation) => (
           <CalculationItem
             key={Calculation.getUuid(processingCalculation)}
@@ -67,7 +67,7 @@ const CalculationList = (props) => {
           <div className="chain-list-item__index" />
           <div className="chain-list-item__content" />
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }

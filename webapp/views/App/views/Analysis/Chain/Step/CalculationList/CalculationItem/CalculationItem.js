@@ -20,13 +20,16 @@ const getClassName = ({ editingSelf, dragging }) => {
 }
 const CalculationItem = (props) => {
   const { calculation, dragging, onDragStart, onDragEnd, onDragOver, state, Actions } = props
-  const { chain, calculation: calculationForEdit, editingCalculation } = State.get(state)
+
+  const chainEdit = State.getChainEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
+  const editingCalculation = Boolean(State.getCalculationEdit(state))
 
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
 
-  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chain)
-  const editingSelf = Calculation.isEqual(calculationForEdit)(calculation)
+  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chainEdit)
+  const editingSelf = Calculation.isEqual(calculationEdit)(calculation)
 
   const className = getClassName({ editingSelf, dragging })
 
@@ -43,7 +46,7 @@ const CalculationItem = (props) => {
       data-index={index}
       onClick={() => {
         if (!editingSelf) {
-          Actions.calculation.select(calculation)
+          Actions.selectCalculation({ calculation, state })
         }
       }}
     >
