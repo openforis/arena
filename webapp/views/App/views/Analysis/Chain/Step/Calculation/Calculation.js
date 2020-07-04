@@ -60,8 +60,8 @@ const CalculationComponent = (props) => {
           <Dropdown
             items={attributes}
             selection={attribute}
-            itemKeyProp={Calculation.keys.uuid}
-            itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
+            itemKey={Calculation.keys.uuid}
+            itemLabel={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
             onBeforeChange={(nodeDef) => Actions.canSelectNodeDef({ nodeDef, state })}
             onChange={(def) => Actions.updateAttributeCalculation({ attrDef: def, state })}

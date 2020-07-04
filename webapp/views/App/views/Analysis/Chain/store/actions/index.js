@@ -23,7 +23,7 @@ import { useDelete as useDeleteCalculation } from './calculation/useDelete'
 
 import { useAddEntityVirtual } from './useAddEntityVirtual'
 import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
-// import { useSave } from './useSave'
+import { useSave } from './useSave'
 
 export const useActions = ({ setState }) => ({
   init: useInit({ setState }),
@@ -50,9 +50,7 @@ export const useActions = ({ setState }) => ({
 
   canSelectNodeDef: useCanSelectNodeDef(),
 
-  // save: useSave({
-  //   setState,
-  // }),
+  save: useSave({ setState }),
 
   addEntityVirtual: useAddEntityVirtual(),
   addNodeDefAnalysis: useAddNodeDefAnalysis(),
