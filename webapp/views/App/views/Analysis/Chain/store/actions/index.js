@@ -11,6 +11,8 @@ import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
 import { useDismiss as useDismissStep } from './step/useDismiss'
 import { useDelete as useDeleteStep } from './step/useDelete'
 
+import { useMoveCalculation } from './useMoveCalculation'
+
 import { useCreate as useCreateCalculation } from './calculation/useCreate'
 import { useSelect as useSelectCalculation } from './calculation/useSelect'
 
@@ -31,6 +33,8 @@ export const useActions = ({ setState }) => ({
   updatePropsStep: useUpdatePropsStep({ setState }),
   dismissStep: useDismissStep({ setState }),
   deleteStep: useDeleteStep({ setState }),
+
+  moveCalculation: useMoveCalculation({ setState }),
 
   createCalculation: useCreateCalculation({ setState }),
   selectCalculation: useSelectCalculation({ setState }),
