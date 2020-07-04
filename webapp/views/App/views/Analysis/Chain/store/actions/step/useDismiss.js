@@ -1,45 +1,45 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-
 import * as A from '@core/arena'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { useDispatch } from 'react-redux'
 
+import { DialogConfirmActions } from '@webapp/store/ui'
 import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
 
 import { State } from '../../state'
 
-export const useSelect = ({ setState }) => {
+export const useDismiss = ({ setState }) => {
   const dispatch = useDispatch()
 
-  const select = ({ step, state }) => () => {
+  const resetStep = ({ state }) => () => {
     setState(
       A.pipe(
         State.assocChainEdit(
-          !A.isEmpty(State.getStep(state))
-            ? A.pipe(
+          Step.isTemporary(State.getStepEdit(state))
+            ? State.getChain(state)
+            : A.pipe(
                 Chain.dissocProcessingStepTemporary,
                 Chain.assocProcessingStep(State.getStep(state))
               )(State.getChainEdit(state))
-            : State.getChain(state)
         ),
-        State.assocStep(step),
-        State.assocStepEdit(step)
+        State.dissocStep,
+        State.dissocStepEdit
       )(state)
     )
   }
 
-  return useCallback(({ step, state }) => {
+  return useCallback(({ state }) => {
     const stepDirty = State.isStepDirty(state)
     if (stepDirty) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: select({ step, state }),
+          onOk: resetStep({ state }),
         })
       )
     } else {
-      select({ step, state })()
+      resetStep({ state })()
     }
   }, [])
 }

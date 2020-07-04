@@ -37,7 +37,13 @@ export const getCalculationEdit = A.prop(keys.calculationEdit)
 export const isCalculationDirty = (state) => getCalculation(state) !== getCalculationEdit(state)
 
 // ==== READ
+export const assocChain = A.assoc(keys.chain)
 export const assocChainEdit = A.assoc(keys.chainEdit)
 
 export const assocStep = A.assoc(keys.step)
 export const assocStepEdit = A.assoc(keys.stepEdit)
+
+// ==== Delete
+
+export const dissocStep = A.dissoc(keys.step)
+export const dissocStepEdit = A.dissoc(keys.stepEdit)

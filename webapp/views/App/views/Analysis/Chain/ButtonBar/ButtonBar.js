@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-// import * as Chain from '@common/analysis/processingChain'
-// import * as Step from '@common/analysis/processingStep'
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
 // import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
@@ -14,7 +14,9 @@ const ButtonBar = (props) => {
   const { state, Actions } = props
   // const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation } = State.get(state)
 
-  // const stepNext = Chain.getStepNext(step)(chain)
+  const stepEdit = State.getChainEdit(state)
+  const chainEdit = State.getChainEdit(state)
+  const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
   const editingChain = Boolean(State.getChainEdit(state))
   const editingStep = Boolean(State.getStepEdit(state))
@@ -35,24 +37,25 @@ const ButtonBar = (props) => {
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
         </button> */}
-        {/* <button
+        <button
           type="button"
           className="btn-s btn-danger btn-delete"
           aria-disabled={
-            (editingCalculation && Calculation.isTemporary(calculation)) ||
-            (editingStep && (Step.isTemporary(step) || Boolean(stepNext))) ||
-            (editingChain && Chain.isTemporary(chain))
+            // (editingCalculation && Calculation.isTemporary(State.getCalculationEdit(state))) ||
+            editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext))
+            // || (editingChain && Chain.isTemporary(chainEdit))
           }
           onClick={() => {
-            let deleteAction = Actions.chain.delete
-            if (editingStep) deleteAction = Actions.step.delete
-            if (editingCalculation) deleteAction = Actions.calculation.delete
-            deleteAction()
+            // let deleteAction = Actions.chain.delete
+            if (editingStep) Actions.deleteStep({ state })
+            // deleteAction = Actions.deleteStep
+            // if (editingCalculation) deleteAction = Actions.calculation.delete
+            // deleteAction({ state })
           }}
         >
           <span className="icon icon-bin icon-left icon-12px" />
           {i18n.t('common.delete')}
-        </button> */}
+        </button>
       </div>
     </>
   )

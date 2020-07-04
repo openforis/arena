@@ -11,6 +11,6 @@ export const useCreate = ({ setState }) => {
     const step = Chain.newProcessingStep(chain)
     const chainWithStep = Chain.assocProcessingStep(step)(chain)
 
-    setState(A.pipe(State.assocChainEdit(chainWithStep), State.assocStep(step), State.assocStepEdit(step))(state))
+    setState(A.pipe(State.assocChainEdit(chainWithStep), State.assocStepEdit(step))(state))
   }, [])
 }
