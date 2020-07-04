@@ -12,6 +12,7 @@ import { useDismiss as useDismissStep } from './step/useDismiss'
 import { useDelete as useDeleteStep } from './step/useDelete'
 
 import { useCreate as useCreateCalculation } from './calculation/useCreate'
+import { useSelect as useSelectCalculation } from './calculation/useSelect'
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -32,6 +33,7 @@ export const useActions = ({ setState }) => ({
   deleteStep: useDeleteStep({ setState }),
 
   createCalculation: useCreateCalculation({ setState }),
+  selectCalculation: useSelectCalculation({ setState }),
 
   canSelectNodeDef: useCanSelectNodeDef(),
 
