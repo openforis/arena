@@ -8,6 +8,7 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useNodeDefByUuid } from '@webapp/store/survey'
+import { State } from '../../store'
 
 const getTypes = (i18n) =>
   R.pipe(
@@ -27,9 +28,14 @@ const getAggregateFns = (i18n) =>
     }))
   )(Calculation.aggregateFn)
 
-export default ({ attributesUuidsOtherChains, chain, step, calculation }) => {
+export default ({ state }) => {
   const i18n = useI18n()
   const survey = useSurvey()
+
+  const attributesUuidsOtherChains = State.getAttributeUuidsOtherChains(state)
+  const chain = State.getChainEdit(state)
+  const step = State.getStepEdit(state)
+  const calculation = State.getCalculationEdit(state)
 
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
   const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
