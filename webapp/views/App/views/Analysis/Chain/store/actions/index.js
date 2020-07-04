@@ -15,6 +15,8 @@ import { useMoveCalculation } from './useMoveCalculation'
 
 import { useCreate as useCreateCalculation } from './calculation/useCreate'
 import { useSelect as useSelectCalculation } from './calculation/useSelect'
+import { useUpdateProp as useUpdatePropCalculation } from './calculation/useUpdateProp'
+import { useUpdateAttribute as useUpdateAttributeCalculation } from './calculation/useUpdateAttribute'
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 // import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -38,6 +40,8 @@ export const useActions = ({ setState }) => ({
 
   createCalculation: useCreateCalculation({ setState }),
   selectCalculation: useSelectCalculation({ setState }),
+  updatePropCalculation: useUpdatePropCalculation({ setState }),
+  updateAttributeCalculation: useUpdateAttributeCalculation({ setState }),
 
   canSelectNodeDef: useCanSelectNodeDef(),
 

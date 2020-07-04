@@ -7,7 +7,7 @@ import * as A from '@core/arena'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { State } from '@webapp/views/App/views/Analysis/Chain/store'
+import { State } from '../../state'
 
 export const useSelect = ({ setState }) => {
   const dispatch = useDispatch()
