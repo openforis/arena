@@ -17,7 +17,9 @@ export const useInit = ({ setState }) => {
 
   return async () => {
     const chainEdit = AnalysisStorage.getChainEdit()
+
     let chainCurrent = null
+    let stepCurrent = null
 
     if (
       (chainEdit && !chainUuid) ||
@@ -25,6 +27,7 @@ export const useInit = ({ setState }) => {
     ) {
       // recover
       chainCurrent = State.getChainEdit(chainEdit)
+      stepCurrent = State.getStepEdit(chainEdit)
     } else if (chainUuid) {
       // fetch
       const { data } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
@@ -40,6 +43,6 @@ export const useInit = ({ setState }) => {
       `/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chainCurrent)}/attribute-uuids-other-chains`
     )
 
-    setState(State.create({ chain: chainCurrent, attributeUuidsOtherChains }))
+    setState(State.create({ chain: chainCurrent, step: stepCurrent, attributeUuidsOtherChains }))
   }
 }
