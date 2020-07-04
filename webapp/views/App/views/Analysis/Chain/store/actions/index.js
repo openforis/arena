@@ -18,6 +18,7 @@ import { useSelect as useSelectCalculation } from './calculation/useSelect'
 import { useUpdateProp as useUpdatePropCalculation } from './calculation/useUpdateProp'
 import { useUpdateAttribute as useUpdateAttributeCalculation } from './calculation/useUpdateAttribute'
 import { useDismiss as useDismissCalculation } from './calculation/useDismiss'
+import { useDelete as useDeleteCalculation } from './calculation/useDelete'
 
 // import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 import { useAddEntityVirtual } from './useAddEntityVirtual'
@@ -44,6 +45,7 @@ export const useActions = ({ setState }) => ({
   updatePropCalculation: useUpdatePropCalculation({ setState }),
   updateAttributeCalculation: useUpdateAttributeCalculation({ setState }),
   dismissCalculation: useDismissCalculation({ setState }),
+  deleteCalculation: useDeleteCalculation({ setState }),
 
   canSelectNodeDef: useCanSelectNodeDef(),
 
