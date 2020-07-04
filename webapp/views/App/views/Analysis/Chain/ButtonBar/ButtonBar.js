@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
-// import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
 import { State } from '../store'
@@ -12,10 +12,11 @@ const ButtonBar = (props) => {
   const i18n = useI18n()
 
   const { state, Actions } = props
-  // const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation } = State.get(state)
+  // const { dirty } = State.get(state)
 
   const stepEdit = State.getChainEdit(state)
   const chainEdit = State.getChainEdit(state)
+  const calculationEdit = State.getCalculationEdit(state)
   const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
   const editingChain = Boolean(State.getChainEdit(state))
@@ -41,15 +42,14 @@ const ButtonBar = (props) => {
           type="button"
           className="btn-s btn-danger btn-delete"
           aria-disabled={
-            // (editingCalculation && Calculation.isTemporary(State.getCalculationEdit(state))) ||
-            editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext))
+            (editingCalculation && Calculation.isTemporary(calculationEdit)) ||
+            (editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext)))
             // || (editingChain && Chain.isTemporary(chainEdit))
           }
           onClick={() => {
             // let deleteAction = Actions.chain.delete
             if (editingStep) Actions.deleteStep({ state })
-            // deleteAction = Actions.deleteStep
-            // if (editingCalculation) deleteAction = Actions.calculation.delete
+            if (editingCalculation) Actions.deleteCalculation({ state })
             // deleteAction({ state })
           }}
         >
