@@ -29,11 +29,9 @@ export const useDropdown = ({
   )
   const Actions = useActions({ setState, onBeforeChange, onChange })
 
-  // on update selection: update input value
+  // on update selection: call closeDialog to reset input value
   useOnUpdate(() => {
-    ;(async () => {
-      await Actions.closeDialog({ selection, state })
-    })()
+    Actions.closeDialog({ selection, state })
   }, [selection])
 
   return { Actions, state }
