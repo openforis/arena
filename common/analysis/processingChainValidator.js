@@ -23,12 +23,8 @@ const _validationsCommonProps = (defaultLang) => ({
   ],
 })
 
-/**
- * Validates a processing chain.
- * The processing chain must have processing steps pre-loaded.
- */
 export const validateChain = async (chain, defaultLang) =>
-  await Validator.validate(chain, {
+  Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
     [ProcessingChain.keys.processingSteps]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingChain.stepsRequired),
@@ -56,7 +52,7 @@ export const validateStep = async (step) => {
 }
 
 export const validateCalculation = async (calculation, defaultLang) =>
-  await Validator.validate(calculation, {
+  Validator.validate(calculation, {
     ..._validationsCommonProps(defaultLang),
     [ProcessingStepCalculation.keys.nodeDefUuid]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStepCalculation.attributeRequired),
