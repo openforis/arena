@@ -35,7 +35,6 @@ const Dropdown = (props) => {
   const { state, Actions } = useDropdown({
     autocompleteMinChars,
     disabled,
-    inputRef,
     itemKey,
     itemLabel,
     items,
