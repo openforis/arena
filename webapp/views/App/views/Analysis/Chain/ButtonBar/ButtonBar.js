@@ -43,14 +43,14 @@ const ButtonBar = (props) => {
           className="btn-s btn-danger btn-delete"
           aria-disabled={
             (editingCalculation && Calculation.isTemporary(calculationEdit)) ||
-            (editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext)))
-            // || (editingChain && Chain.isTemporary(chainEdit))
+            (editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext))) ||
+            (editingChain && Chain.isTemporary(chainEdit))
           }
           onClick={() => {
-            // let deleteAction = Actions.chain.delete
-            if (editingStep) Actions.deleteStep({ state })
-            if (editingCalculation) Actions.deleteCalculation({ state })
-            // deleteAction({ state })
+            let deleteAction = Actions.delete
+            if (editingStep) deleteAction = Actions.deleteStep
+            if (editingCalculation) deleteAction = Actions.deleteCalculation
+            deleteAction({ state })
           }}
         >
           <span className="icon icon-bin icon-left icon-12px" />

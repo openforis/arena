@@ -3,6 +3,7 @@ import { useOpenRStudio } from './chain/useOpenRStudio'
 import { useUpdateChain } from './chain/useUpdateChain'
 import { useUpdateCycles } from './chain/useUpdateCycles'
 import { useDismiss } from './useDismiss'
+import { useDelete } from './chain/useDelete'
 import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 
 import { useCreate as useCreateStep } from './step/useCreate'
@@ -30,6 +31,7 @@ export const useActions = ({ setState }) => ({
   updateChain: useUpdateChain({ setState }),
   updateCycles: useUpdateCycles({ setState }),
   dismiss: useDismiss(),
+  delete: useDelete(),
 
   createStep: useCreateStep({ setState }),
   selectStep: useSelectStep({ setState }),
