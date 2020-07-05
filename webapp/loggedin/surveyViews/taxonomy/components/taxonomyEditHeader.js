@@ -6,7 +6,7 @@ import DownloadButton from '@webapp/components/form/downloadButton'
 import ErrorBadge from '@webapp/components/errorBadge'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useI18n } from '@webapp/store/system'
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'

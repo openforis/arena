@@ -4,6 +4,7 @@
   .btn-toggle {
     color: $black;
     padding: 1px 0.3rem 0;
+    transform: rotate(90deg);
 
     &:hover {
       color: lighten($black, 25%);
@@ -13,7 +14,7 @@
 
 .expansion-panel.close {
   .btn-toggle {
-    transform: rotate(45deg);
+    transform: unset;
   }
 }
 

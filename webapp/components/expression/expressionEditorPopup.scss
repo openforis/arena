@@ -1,7 +1,6 @@
 @import '~codemirror/lib/codemirror.css';
 @import '~codemirror/addon/hint/show-hint';
-
-@import '~@webapp/style/vars';
+@import 'webapp/style/vars';
 
 .expression-editor-popup {
   display: grid;
@@ -13,20 +12,23 @@
   }
 }
 
-.expression-editor-popup__editor-help kbd {
-  border: 1px solid #aaa;
-  border-radius: 0.2em;
-  box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
-  background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
-  color: #000;
-  padding: 0.1em 0.3em;
-  font-family: inherit;
-}
+.expression-editor-popup__editor-help {
+  font-size: 0.9rem;
 
+  kbd {
+    border: 1px solid #aaa;
+    border-radius: 0.2em;
+    box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
+    color: #000;
+    padding: 0.1em 0.3em;
+    font-family: inherit;
+  }
+}
 .expression-editor-popup__toggle-advanced {
   position: absolute;
-  right: 0;
+  right: 20px;
 }
 
 .expression-editor__variables-search {
@@ -42,6 +44,8 @@
 .expression-editor-popup__expr-container {
   margin-top: 1.5rem;
   position: relative;
+  justify-self: center;
+  width: 100%;
 
   // These must match, for the autocomplete to work properly.
   textarea {
@@ -70,7 +74,6 @@
   }
 
   input {
-    padding: 0;
     text-align: center;
     height: 100%;
   }
@@ -78,6 +81,7 @@
   //types
   .binary {
     display: flex;
+    justify-content: center;
 
     .btns {
       width: 200px;
@@ -89,12 +93,9 @@
     }
 
     .btn-switch-operand {
-      font-size: 0.7rem;
-      font-weight: 600;
+      font-size: 0.75rem;
       margin: 0 0.1rem;
-      padding: 0.3rem;
       align-self: flex-end;
-      letter-spacing: -0.05rem;
     }
 
     .operator {
@@ -133,6 +134,7 @@
 .expression-editor-popup__footer {
   text-align: center;
   align-self: end;
+  margin-top: 2rem;
 
   > button {
     margin: 0px 0.3rem;

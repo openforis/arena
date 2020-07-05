@@ -5,11 +5,6 @@ import * as Survey from '@core/survey/survey'
 // App actions
 import { SystemActions } from '@webapp/store/system'
 
-// Processing chain actions
-import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
-import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
-import { calculationDelete } from '@webapp/loggedin/modules/analysis/calculation/actions'
-
 import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
 import { NodeDefsActions } from '../nodeDefs'
@@ -33,6 +28,10 @@ const actionHandlers = {
   [SurveyInfoActions.surveyInfoValidationUpdate]: (state, { validation }) =>
     SurveyInfoState.assocValidation(validation)(state),
 
+  // Chain/Analysis
+  [SurveyActions.surveyChainSave]: SurveyInfoState.markDraft,
+  [SurveyActions.surveyChainItemDelete]: SurveyInfoState.markDraft,
+
   // NodeDef
   [NodeDefsActions.nodeDefCreate]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefDelete]: SurveyInfoState.markDraft,
@@ -49,12 +48,6 @@ const actionHandlers = {
   [TaxonomiesActions.taxonomyUpdate]: SurveyInfoState.markDraft,
   [TaxonomiesActions.taxonomyPropUpdate]: SurveyInfoState.markDraft,
   [TaxonomiesActions.taxonomyDelete]: SurveyInfoState.markDraft,
-
-  // Processing chain
-  [chainSave]: SurveyInfoState.markDraft,
-  [chainDelete]: SurveyInfoState.markDraft,
-  [stepDelete]: SurveyInfoState.markDraft,
-  [calculationDelete]: SurveyInfoState.markDraft,
 }
 
 export default exportReducer(actionHandlers)

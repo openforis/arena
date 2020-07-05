@@ -1,0 +1,50 @@
+@import 'webapp/style/vars';
+
+.panel-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: $zIndex18PanelRight;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: $headerHeight 1fr;
+  box-shadow: -3px 0 5px $greyBorder;
+  animation: panel-enter 0.2s cubic-bezier(0, 0, 0, 1);
+
+  > * {
+    padding: 20px;
+  }
+}
+
+.panel-right__header {
+  position: relative;
+  background-color: $black;
+  color: $white;
+  border-bottom: 1px solid $blue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .btn-close {
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    color: $white;
+  }
+}
+
+.panel-right__content {
+  position: relative;
+  background-color: darken($greyAppBg, 1%);
+}
+
+@keyframes panel-enter {
+  from {
+    transform: translateX(500px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

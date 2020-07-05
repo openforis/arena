@@ -9,7 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { analysisModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
@@ -20,7 +20,6 @@ import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
@@ -79,7 +78,7 @@ const NodeDefView = () => {
     if (editingNodeDefFromDesigner) {
       history.goBack()
     } else {
-      dispatch(navigateToChainsView(history))
+      history.push(appModuleUri(analysisModules.processingChains))
     }
   }, [surveyCycleKey])
 

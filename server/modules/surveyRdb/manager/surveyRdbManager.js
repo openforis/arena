@@ -5,7 +5,6 @@ import * as Chain from '../../../../common/analysis/processingChain'
 import * as Step from '../../../../common/analysis/processingStep'
 import * as Calculation from '../../../../common/analysis/processingStepCalculation'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-import * as SortCriteria from '../../../../common/surveyRdb/sortCriteria'
 import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
 
 import * as Survey from '../../../../core/survey/survey'

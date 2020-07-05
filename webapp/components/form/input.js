@@ -15,7 +15,7 @@ export const FormItem = ({ label, children, className = '' }) => (
 const InputComponent = (props, ref) => {
   const { validation = {}, disabled = false, mask = false, onChange, value, ...inputProps } = props
 
-  const onChangeValue = newValue => {
+  const onChangeValue = (newValue) => {
     if (onChange && value !== newValue) {
       onChange(newValue)
     }
@@ -30,6 +30,7 @@ const InputComponent = (props, ref) => {
           mask={mask}
           className="form-input"
           aria-disabled={disabled}
+          disabled={disabled}
           isControlled={true}
           value={value}
           onChange={(e, { value }) => onChangeValue(value)}
@@ -40,8 +41,9 @@ const InputComponent = (props, ref) => {
           ref={ref}
           className="form-input"
           aria-disabled={disabled}
+          disabled={disabled}
           value={value}
-          onChange={e => onChangeValue(e.target.value)}
+          onChange={(e) => onChangeValue(e.target.value)}
           {...inputProps}
         />
       )}

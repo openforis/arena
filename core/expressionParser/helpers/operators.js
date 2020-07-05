@@ -25,7 +25,24 @@ const arithmetic = {
 const binary = R.mergeLeft(arithmetic, comparison)
 const binaryValues = R.values(binary)
 
-const findBinary = operator => R.find(R.propEq('key', operator), binaryValues)
+const findBinary = (operator) => R.find(R.propEq('key', operator), binaryValues)
+
+const js2sqlOperators = {
+  '&&': 'AND',
+  '||': 'OR',
+  // IS (NOT) DISTINCT FROM always returns true/false, even for nulls
+  '==': 'IS NOT DISTINCT FROM',
+  '!=': 'IS DISTINCT FROM',
+  '>': '>',
+  '<': '<',
+  '>=': '>=',
+  '<=': '<=',
+  '+': '+',
+  '-': '-',
+  '*': '*',
+  '/': '/',
+  '%': '%',
+}
 
 export const operators = {
   logical,
@@ -34,4 +51,5 @@ export const operators = {
   binary,
   binaryValues,
   findBinary,
+  js2sqlOperators,
 }

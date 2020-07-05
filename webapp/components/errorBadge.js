@@ -1,7 +1,7 @@
 import './errorBadge.scss'
-
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
@@ -9,19 +9,22 @@ import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = (props) => {
-  const { children, className: classNameProps, labelKey, showIcon, showLabel, showKeys, validation } = props
+  const { children, className, labelKey, showIcon, showLabel, showKeys, validation } = props
 
   const i18n = useI18n()
   const valid = Validation.isValid(validation)
 
-  let className = classNameProps
-  if (Validation.isError(validation)) className += ' error'
-  else if (Validation.isWarning(validation)) className += ' warning'
-
-  if (valid) return null
+  if (valid) return children
 
   return (
-    <ValidationTooltip validation={validation} showKeys={showKeys} className={`badge error-badge ${className}`}>
+    <ValidationTooltip
+      validation={validation}
+      showKeys={showKeys}
+      className={classNames(className, 'badge', 'error-badge', {
+        error: Validation.isError(validation),
+        warning: Validation.isWarning(validation),
+      })}
+    >
       <div className="badge__content">
         {children}
 

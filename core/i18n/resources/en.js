@@ -5,6 +5,7 @@ export const enTranslation = {
   common: {
     add: 'Add',
     apply: 'Apply',
+    ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
     cancelConfirm: `**There are unsaved changes**.
@@ -23,6 +24,7 @@ Do you want to cancel them?`,
     dateLastModified: 'Date last modified',
     delete: 'Delete',
     deleted: 'Deleted!',
+    descending: 'Descending',
     description: 'Description',
     description_plural: 'Descriptions',
     dimension: 'Dimension',
@@ -59,6 +61,7 @@ Do you want to cancel them?`,
     new: 'New',
     no: 'No',
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
+    orderBy: 'Order by',
     of: 'of',
     ok: 'Ok',
     owner: 'Owner',
@@ -149,7 +152,7 @@ Do you want to cancel them?`,
 
     data: 'Data',
     records: 'Records',
-    dataVis: 'Data vis',
+    explorer: 'Explorer',
     validationReport: 'Validation report',
 
     users: 'Users',
@@ -316,12 +319,6 @@ Do you want to cancel them?`,
     invalidRecord: 'Invalid record',
     dataVis: {
       noData: 'This query returned no data',
-      dataSort: {
-        orderBy: 'Order by:',
-        thenBy: 'Then by:',
-        ascending: 'ascending',
-        descending: 'descending',
-      },
     },
   },
 
@@ -367,7 +364,7 @@ $t(common.cantUndoWarning)`,
     virtualEntity: 'Virtual Entity',
   },
 
-  processingStepCalculationView: {
+  processingStepCalculation: {
     attribute: 'Attribute',
     types: {
       quantitative: 'Quantitative',

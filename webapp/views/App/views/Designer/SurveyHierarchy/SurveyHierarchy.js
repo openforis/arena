@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import NodeDefsSelectorView from '@webapp/loggedin/surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {
@@ -36,7 +36,7 @@ const SurveyHierarchy = () => {
       <div className="survey-hierarchy__tree" ref={treeRef} />
 
       <div className="survey-hierarchy__attributes">
-        <NodeDefsSelectorView
+        <NodeDefsSelector
           hierarchy={hierarchy}
           nodeDefUuidEntity={selectedNodeDefUuid}
           onChangeEntity={(nodeDefUuidEntity) => {

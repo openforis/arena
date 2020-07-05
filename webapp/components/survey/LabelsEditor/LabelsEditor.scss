@@ -1,0 +1,37 @@
+.labels-editor {
+  display: grid;
+  grid-column-gap: 1rem;
+
+  &.with-label {
+    grid-template-columns: 0.2fr 0.65fr;
+  }
+
+  .labels-editor-label {
+    text-align: end;
+  }
+
+}
+
+.labels-editor__btn-toggle {
+  padding: 0.4rem;
+  margin-left: 0.5rem;
+  height: 30px;
+  justify-self: end;
+}
+
+.labels-editor__labels {
+  display: grid;
+  grid-row-gap: 1rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.labels-editor__label {
+  position: relative;
+}
+
+.labels-editor__badge {
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+}

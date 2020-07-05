@@ -1,6 +1,6 @@
 {
   "parser": "babel-eslint",
-  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
+  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react", "plugin:react-hooks/recommended"],
   "env": {
     "browser": true,
     "commonjs": true,
@@ -9,13 +9,18 @@
     "mocha": true,
     "node": true
   },
-  "plugins": ["prettier", "jsdoc"],
+  "globals": {
+    "step": "readonly"
+  },
+  "plugins": ["prettier", "jsdoc", "react-hooks"],
   "rules": {
     "no-console": "error",
     "no-underscore-dangle": 0,
     "prettier/prettier": "error",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "react/forbid-prop-types": 0,
+    "react-hooks/rules-of-hooks": 2,
+    "react-hooks/exhaustive-deps": 1,
     "import/prefer-default-export": 0,
     "jsdoc/check-alignment": 2,
     "jsdoc/check-examples": 2,
@@ -44,8 +49,10 @@
     "jsdoc/require-returns-type": 2,
     "jsdoc/valid-types": 2
   },
+
   "settings": {
     "import/resolver": {
+      "node": {},
       "webpack": {
         "config": "webpack.config.babel.js"
       }

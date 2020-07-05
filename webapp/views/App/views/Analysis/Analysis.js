@@ -1,5 +1,4 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
@@ -9,31 +8,33 @@ import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesVi
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import ChainsView from '@webapp/loggedin/modules/analysis/chains/view'
-import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 
-import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
+import Chains from './Chains'
+import Chain from './Chain'
 
 const Analysis = () => {
-  const dispatch = useDispatch()
   const history = useHistory()
   return (
     <SurveyDefsLoader
       draft
       validate={false}
       requirePublish
-      onSurveyCycleUpdate={() => dispatch(navigateToChainsView(history))}
+      onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.processingChains))}
     >
       <ModuleSwitch
         moduleRoot={appModules.analysis}
         moduleDefault={analysisModules.processingChains}
         modules={[
           {
-            component: ChainsView,
+            component: Chains,
             path: appModuleUri(analysisModules.processingChains),
           },
           {
-            component: ChainView,
+            component: Chain,
+            path: `${appModuleUri(analysisModules.processingChain)}`,
+          },
+          {
+            component: Chain,
             path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
           },
           {

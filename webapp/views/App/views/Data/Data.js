@@ -9,12 +9,12 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
-import DataVisView from '@webapp/loggedin/modules/data/dataVis/dataVisView'
 
-import { resetDataVis } from '@webapp/loggedin/modules/data/dataVis/actions'
+import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 
 import ValidationReport from './ValidationReport'
 import Records from './Records'
+import Explorer from './Explorer'
 
 const Data = () => {
   const dispatch = useDispatch()
@@ -45,8 +45,8 @@ const Data = () => {
           },
           // Data visualization
           {
-            component: DataVisView,
-            path: appModuleUri(dataModules.dataVis),
+            component: Explorer,
+            path: appModuleUri(dataModules.explorer),
           },
           // Validation report
           {

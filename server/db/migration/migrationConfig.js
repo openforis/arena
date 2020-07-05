@@ -1,4 +1,4 @@
-import * as ProcessUtils from '@core/processUtils'
+const ProcessUtils = require('../../../core/processUtils')
 
 const config = {
   driver: 'pg',
@@ -9,5 +9,7 @@ const config = {
   ssl: ProcessUtils.ENV.pgSsl,
 }
 
-export const development = config
-export const production = config
+module.exports = {
+  development: config,
+  production: config,
+}

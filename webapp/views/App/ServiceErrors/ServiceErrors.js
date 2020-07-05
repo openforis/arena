@@ -12,7 +12,7 @@ import ServiceError from './ServiceError'
 const ServiceErrors = () => {
   const errors = useServiceErrors()
   return (
-    <TransitionGroup className={`seervice-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
+    <TransitionGroup className={`service-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {errors.map((error) => (
         <CSSTransition key={error.id} timeout={500} classNames="fade">
           <ServiceError error={error} />

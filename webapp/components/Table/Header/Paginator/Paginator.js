@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/store/system'
-import { getLink } from '@webapp/components/Table/tableLink'
 
 const Paginator = (props) => {
-  const { offset, limit, count } = props
+  const { count, limit, offset, setOffset } = props
   const pageNo = offset / limit + 1
   const totalNoPages = Math.ceil(count / limit)
   const isFirstPage = pageNo === 1
@@ -16,37 +14,53 @@ const Paginator = (props) => {
 
   return (
     <div className="table__paginator">
-      <Link className="btn btn-transparent" aria-disabled={count < limit || isFirstPage} to={getLink(0)}>
+      <button
+        type="button"
+        className="btn btn-transparent"
+        aria-disabled={count < limit || isFirstPage}
+        onClick={() => setOffset(0)}
+      >
         <span className="icon icon-backward2 icon-14px" />
-      </Link>
-      <Link
+      </button>
+      <button
         type="button"
         className="btn btn-transparent"
         aria-disabled={isFirstPage}
-        to={getLink(offset - limit)}
+        onClick={() => setOffset(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
       >
         <span className="icon icon-play3 icon-14px" />
-      </Link>
+      </button>
 
       <span className="counts">
         {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
-      <Link className="btn btn-transparent" aria-disabled={isLastPage} to={getLink(offset + limit)}>
+      <button
+        type="button"
+        className="btn btn-transparent"
+        aria-disabled={isLastPage}
+        onClick={() => setOffset(offset + limit)}
+      >
         <span className="icon icon-play3 icon-14px" />
-      </Link>
-      <Link className="btn btn-transparent" aria-disabled={isLastPage} to={getLink((totalNoPages - 1) * limit)}>
+      </button>
+      <button
+        type="button"
+        className="btn btn-transparent"
+        aria-disabled={isLastPage}
+        onClick={() => setOffset((totalNoPages - 1) * limit)}
+      >
         <span className="icon icon-forward3 icon-14px" />
-      </Link>
+      </button>
     </div>
   )
 }
 
 Paginator.propTypes = {
-  offset: PropTypes.number.isRequired,
-  limit: PropTypes.number.isRequired,
   count: PropTypes.number.isRequired,
+  limit: PropTypes.number.isRequired,
+  offset: PropTypes.number.isRequired,
+  setOffset: PropTypes.func.isRequired,
 }
 
 export default Paginator

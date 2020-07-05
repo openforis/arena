@@ -24,9 +24,12 @@ export {
   useSurveyId,
   useSurveyInfo,
   useSurveyCycleKey,
+  useSurveyCycleKeys,
   useSurveyLang,
+  useSurveyLangs,
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
+  useNodeDefsByUuids,
   useCategoryByUuid,
   useNodeDefRootKeys,
 } from './hooks'

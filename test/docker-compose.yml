@@ -1,8 +1,7 @@
 version: '3.4'
 services:
-
   arena_db:
-    image: "mdillon/postgis:11"
+    image: 'postgis/postgis:12-3.0'
     environment:
       # Must duplicate variables due to limitations of docker-compose:
       POSTGRES_DB: of-arena-test
@@ -16,7 +15,6 @@ services:
       context: ..
       dockerfile: test/Dockerfile
       target: test
-
     environment:
       PGHOST: arena_db
       PGPORT: 5432
@@ -25,12 +23,9 @@ services:
       PGPASSWORD: arena
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
+      SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+      HEADLESS_CHROME: 'true'
+      TAIKO_BROWSER_PATH: /usr/local/lib/node_modules/chromium/lib/chromium/chrome-linux/chrome
 
     # Execute tests and migrations when postgres is finished:
-    command: |
-      sh -c '
-        set -e # exit on first failure
-        while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
-        mkdir -p $$TEMP_FOLDER $$ANALYSIS_OUTPUT_DIR;
-        yarn run npm-run-all server:migrate test
-      '
+    command: ./test/scripts/test_start.sh

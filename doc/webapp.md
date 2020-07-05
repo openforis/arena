@@ -2,6 +2,20 @@
     - Main.js
     - Routes.js
     - components
+      - survey
+        - Categories
+        - Category
+        - CategorySelector
+        - CyclesSelect
+        - Items
+        - LabelsEditor
+        - NodeDef
+        - NodeDefsSelector
+        - Record
+        - SurveyDefsLoader
+        - SurveyForm
+        - Taxonomies
+        - Taxonomy
     - main
         - style
         - middleware
@@ -36,19 +50,6 @@
                 - User
                 - Table
                 - survey
-                    - Categories
-                    - Category
-                    - CategorySelector
-                    - CyclesSelect
-                    - Items
-                    - LabelsEditor
-                    - NodeDef
-                    - NodeDefsSelector
-                    - Record
-                    - SurveyDefsLoader
-                    - SurveyForm
-                    - Taxonomies
-                    - Taxonomy
     - store
         - app
             - actions

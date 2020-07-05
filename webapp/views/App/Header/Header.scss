@@ -47,14 +47,16 @@
   }
 }
 
-.header__user {
+.header__btn-user {
+  height: $headerHeight - 1px;
   margin-right: 20px;
   display: flex;
   align-items: center;
   cursor: pointer;
+  border: unset;
 
-  .btn {
-    padding: 1.2rem 0.5rem 0.7rem;
-    transform: scaleY(-0.6);
+  .icon {
+    padding: 1.2rem 0 0.7rem 0.2rem;
+    transform: scaleY(-0.7);
   }
 }

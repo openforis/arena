@@ -13,7 +13,7 @@ import * as NodeDefUIProps from '../../nodeDefUIProps'
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
-      aria-disabled={edit || !canEditRecord || readOnly}
+      disabled={edit || !canEditRecord || readOnly}
       {...NodeDefUIProps.getInputTextProps(nodeDef)}
       value={Node.getValue(node, '')}
       onChange={value => updateNode(nodeDef, node, value)}

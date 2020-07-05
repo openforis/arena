@@ -4,9 +4,9 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
+import CategorySelector from '@webapp/components/survey/CategorySelector'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -74,8 +74,8 @@ const CodeProps = (props) => {
                 disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
-                itemKeyProp={'uuid'}
-                itemLabelFunction={NodeDef.getName}
+                itemKey={'uuid'}
+                itemLabel={NodeDef.getName}
                 onChange={(def) => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
               />
             </div>
