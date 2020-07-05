@@ -2,7 +2,6 @@ import './CategorySelector.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
