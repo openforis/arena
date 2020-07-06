@@ -59,6 +59,8 @@ export const fetchTaxonomiesBySurveyId = async (
     : taxonomies
 }
 
+export const countTaxonomiesBySurveyId = TaxonomyRepository.countTaxonomiesBySurveyId
+
 export const countTaxaByTaxonomyUuid = TaxonomyRepository.countTaxaByTaxonomyUuid
 
 const validateTaxonomy = async (surveyId, taxonomies, taxonomy, draft, client = db) => {

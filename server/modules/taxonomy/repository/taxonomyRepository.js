@@ -99,6 +99,15 @@ export const fetchTaxonomiesBySurveyId = async ({ surveyId, draft = false, limit
     (record) => dbTransformCallback(record, draft, true)
   )
 
+export const countTaxonomiesBySurveyId = async (surveyId, client = db) =>
+  await client.one(
+    `
+      SELECT COUNT(*) 
+      FROM ${getSurveyDBSchema(surveyId)}.taxonomy`,
+    [],
+    (r) => parseInt(r.count, 10)
+  )
+
 export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) =>
   await client.one(
     `
