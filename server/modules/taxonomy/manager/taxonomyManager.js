@@ -21,7 +21,7 @@ import * as TaxonomyValidator from '../taxonomyValidator'
  * ====== CREATE
  */
 export const insertTaxonomy = async (user, surveyId, taxonomy, system = false, client = db) =>
-  await client.tx(async t => {
+  await client.tx(async (t) => {
     const [taxonomyInserted] = await Promise.all([
       TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t),
@@ -31,27 +31,30 @@ export const insertTaxonomy = async (user, surveyId, taxonomy, system = false, c
 
 export const insertTaxa = async (user, surveyId, taxa, client = db) =>
   await client.tx(
-    async t =>
+    async (t) =>
       await Promise.all([
         TaxonomyRepository.insertTaxa(surveyId, taxa, t),
         ActivityLogRepository.insertMany(
           user,
           surveyId,
-          taxa.map(taxon => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
-          t,
+          taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
+          t
         ),
-      ]),
+      ])
   )
 
 /**
  * ====== READ
  */
-export const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = false, client = db) => {
-  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
+export const fetchTaxonomiesBySurveyId = async (
+  { surveyId, draft = false, validate = false, limit = null, offset = 0 },
+  client = db
+) => {
+  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft, limit, offset }, client)
 
   return validate
     ? await Promise.all(
-        taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client)),
+        taxonomies.map(async (taxonomy) => await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client))
       )
     : taxonomies
 }
@@ -63,7 +66,7 @@ const validateTaxonomy = async (surveyId, taxonomies, taxonomy, draft, client = 
     surveyId,
     Taxonomy.getUuid(taxonomy),
     draft,
-    client,
+    client
   )
 
   return {
@@ -76,7 +79,7 @@ export const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false,
   const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft, client)
 
   if (validate) {
-    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
+    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client)
     return await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client)
   }
 
@@ -97,14 +100,14 @@ export const findTaxaByCode = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
-  client = db,
+  client = db
 ) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
     await TaxonomyRepository.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
-    draft,
+    draft
   )
 
 export const findTaxaByScientificName = async (
@@ -113,14 +116,14 @@ export const findTaxaByScientificName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
-  client = db,
+  client = db
 ) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
     await TaxonomyRepository.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
-    draft,
+    draft
   )
 
 export const findTaxaByCodeOrScientificName = async (
@@ -129,14 +132,14 @@ export const findTaxaByCodeOrScientificName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
-  client = db,
+  client = db
 ) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
     await TaxonomyRepository.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
-    draft,
+    draft
   )
 
 export const findTaxaByVernacularName = async (
@@ -145,7 +148,7 @@ export const findTaxaByVernacularName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
-  client = db,
+  client = db
 ) => {
   const taxaDb = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
@@ -169,7 +172,7 @@ export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid,
       surveyId,
       taxonomyUuid,
       vernacularLangCodes,
-      draft,
+      draft
     ),
   }
 }
@@ -184,7 +187,7 @@ export const publishTaxonomiesProps = async (surveyId, client = db) => {
 
 export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
   await client.tx(
-    async t =>
+    async (t) =>
       (
         await Promise.all([
           TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
@@ -199,39 +202,39 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
               [ActivityLog.keysContent.value]: value,
             },
             system,
-            t,
+            t
           ),
         ])
-      )[0],
+      )[0]
   )
 
 export const updateTaxon = async (user, surveyId, taxon, client = db) =>
   await client.tx(
-    async t =>
+    async (t) =>
       await Promise.all([
         TaxonomyRepository.updateTaxon(surveyId, taxon, t),
         ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonUpdate, taxon, true, t),
-      ]),
+      ])
   )
 
 export const updateTaxa = async (user, surveyId, taxa, client = db) =>
   await client.tx(
-    async t =>
+    async (t) =>
       await Promise.all([
         TaxonomyRepository.updateTaxa(surveyId, taxa, t),
         ActivityLogRepository.insertMany(
           user,
           surveyId,
-          taxa.map(taxon => ActivityLog.newActivity(ActivityLog.type.taxonUpdate, taxon, true)),
-          t,
+          taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonUpdate, taxon, true)),
+          t
         ),
-      ]),
+      ])
   )
 
 // ============== DELETE
 
 export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
-  await client.tx(async t => {
+  await client.tx(async (t) => {
     const taxonomy = await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: taxonomyUuid,
@@ -252,6 +255,6 @@ export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid
       ActivityLog.type.taxonomyTaxaDelete,
       { [ActivityLog.keysContent.uuid]: taxonomyUuid },
       true,
-      t,
+      t
     ),
   ])
