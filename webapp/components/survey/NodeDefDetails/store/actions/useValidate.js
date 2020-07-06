@@ -24,5 +24,5 @@ export const useValidate = ({ setState }) => {
 
     // Dispatch update action
     dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
-  })
+  }, [])
 }

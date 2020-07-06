@@ -23,5 +23,5 @@ export const useSetLayoutProp = ({ setState }) => {
     )(survey)
 
     validateNodeDef({ state, nodeDefUpdated })
-  })
+  }, [])
 }

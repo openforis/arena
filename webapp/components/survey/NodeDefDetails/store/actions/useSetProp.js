@@ -74,5 +74,5 @@ export const useSetProp = ({ setState }) => {
     }
 
     validateNodeDef({ state, nodeDefUpdated })
-  })
+  }, [])
 }

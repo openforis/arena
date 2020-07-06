@@ -74,5 +74,5 @@ export const useSaveEdits = ({ setState }) => {
     dispatch(LoaderActions.hideLoader())
 
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
-  })
+  }, [])
 }

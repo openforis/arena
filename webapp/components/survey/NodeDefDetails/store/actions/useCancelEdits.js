@@ -16,5 +16,5 @@ export const useCancelEdits = () => {
     await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
     history.goBack()
-  })
+  }, [])
 }

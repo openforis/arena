@@ -14,5 +14,5 @@ export const useSetParentUuid = ({ setState }) => {
     const nodeDefUpdated = NodeDef.assocParentUuid(parentUuid)(nodeDef)
 
     validateNodeDef({ state, nodeDefUpdated })
-  })
+  }, [])
 }
