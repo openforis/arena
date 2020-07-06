@@ -38,7 +38,7 @@ const NodeDefDetails = () => {
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>
-                Actions.setProp({ key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
+                Actions.setProp({ state, key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
               }
             />
             <div className="attribute-selector">

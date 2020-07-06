@@ -1,6 +1,5 @@
+import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,7 +12,7 @@ import { SurveyState } from '@webapp/store/survey'
 import { useValidate } from './useValidate'
 import { State } from '../state'
 
-const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
+const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // NodeDef has default values, cannot change into multiple
     dispatch(
@@ -27,47 +26,53 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   return true
 }
 
-export const useSetProp = ({ state, setState }) => {
-  const dispatch = useDispatch()
-  let survey = useSelector(SurveyState.getSurvey)
-  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
-  const validateNodeDef = useValidate({ state, setState })
+const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, multiple }) => {
+  // Reset validations required or count
+  const validations = NodeDef.getValidations(nodeDef)
+  const validationsUpdated = multiple
+    ? NodeDefValidations.dissocRequired(validations)
+    : NodeDefValidations.dissocCount(validations)
+  const nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
 
-  return ({ key, value = null, advanced = false }) => {
+  if (NodeDef.isEntity(nodeDefUpdated) && !multiple && NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
+    const surveyUpdated = Survey.updateNodeDefLayoutProp({
+      surveyCycleKey,
+      nodeDef: nodeDefUpdated,
+      key: NodeDefLayout.keys.renderType,
+      value: NodeDefLayout.renderType.form,
+    })(survey)
+
+    return Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(surveyUpdated)
+  }
+  return nodeDefUpdated
+}
+
+const _onUpdateCategoryUuid = ({ nodeDef }) => {
+  // Reset parent code if changing category uuid
+  return NodeDef.mergeProps({ [NodeDef.propKeys.parentCodeDefUuid]: null })(nodeDef)
+}
+
+export const useSetProp = ({ setState }) => {
+  const dispatch = useDispatch()
+  const survey = useSelector(SurveyState.getSurvey)
+  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
+  const validateNodeDef = useValidate({ setState })
+
+  return useCallback(({ state, key, value = null }) => {
     const nodeDef = State.getNodeDef(state)
 
-    if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
+    if (!_checkCanChangeProp({ dispatch, nodeDef, key, value })) {
       return
     }
 
-    const props = advanced ? {} : { [key]: value }
-    const propsAdvanced = advanced ? { [key]: value } : {}
+    let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
 
     if (key === NodeDef.propKeys.multiple) {
-      // Reset validations required or count
-      propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
-        ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
-        : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
+      nodeDefUpdated = _onUpdateMultiple({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, multiple: value })
+    } else if (key === NodeDef.propKeys.categoryUuid) {
+      nodeDefUpdated = _onUpdateCategoryUuid({ nodeDef: nodeDefUpdated })
     }
 
-    let nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
-
-    // If setting "multiple" and nodeDef is single entity and renderType is table, set renderType to Form
-    if (
-      key === NodeDef.propKeys.multiple &&
-      NodeDef.isEntity(nodeDef) &&
-      !value &&
-      NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
-    ) {
-      survey = Survey.updateNodeDefLayoutProp({
-        surveyCycleKey,
-        nodeDef: nodeDefUpdated,
-        key: NodeDefLayout.keys.renderType,
-        value: NodeDefLayout.renderType.form,
-      })(survey)
-      nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
-    }
-
-    validateNodeDef({ nodeDef: nodeDefUpdated })
-  }
+    validateNodeDef({ state, nodeDefUpdated })
+  })
 }

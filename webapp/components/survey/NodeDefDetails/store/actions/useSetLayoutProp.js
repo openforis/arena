@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import * as R from 'ramda'
 
@@ -8,12 +9,12 @@ import { SurveyState } from '@webapp/store/survey'
 import { State } from '../state'
 import { useValidate } from './useValidate'
 
-export const useSetLayoutProp = ({ state, setState }) => {
+export const useSetLayoutProp = ({ setState }) => {
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
-  const validateNodeDef = useValidate({ state, setState })
+  const validateNodeDef = useValidate({ setState })
 
-  return ({ key, value }) => {
+  return useCallback(({ state, key, value }) => {
     const nodeDef = State.getNodeDef(state)
 
     const nodeDefUpdated = R.pipe(
@@ -21,6 +22,6 @@ export const useSetLayoutProp = ({ state, setState }) => {
       Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDef))
     )(survey)
 
-    validateNodeDef({ nodeDef: nodeDefUpdated })
-  }
+    validateNodeDef({ state, nodeDefUpdated })
+  })
 }

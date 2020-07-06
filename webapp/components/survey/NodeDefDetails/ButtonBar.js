@@ -35,7 +35,7 @@ const ButtonBar = (props) => {
                   onOk: Actions.cancelEdits,
                 })
               )
-            : Actions.cancelEdits()
+            : Actions.cancelEdits({ state })
         }
       >
         {i18n.t(dirty ? 'common.cancel' : 'common.back')}
@@ -43,7 +43,7 @@ const ButtonBar = (props) => {
       <button
         type="button"
         className="btn btn-primary"
-        onClick={() => Actions.saveEdits()}
+        onClick={() => Actions.saveEdits({ state })}
         aria-disabled={!dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
       >
         <span className="icon icon-floppy-disk icon-left icon-12px" />

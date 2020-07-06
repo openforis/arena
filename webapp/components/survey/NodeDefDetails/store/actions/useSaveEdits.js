@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -13,67 +14,65 @@ import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 import { State } from '../state'
 
 // Persists the temporary changes applied to the node def in the state
-export const useSaveEdits = ({ state, setState }) => {
+export const useSaveEdits = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
 
-  return () => {
-    ;(async () => {
-      const nodeDef = State.getNodeDef(state)
-      const validation = State.getValidation(state)
+  return useCallback(async ({ state }) => {
+    const nodeDef = State.getNodeDef(state)
+    const validation = State.getValidation(state)
 
-      // Check that node def can be saved
-      if (!SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
-        // Cannot save node def: show notification
-        dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
-        return
-      }
+    // Check that node def can be saved
+    if (!SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
+      // Cannot save node def: show notification
+      dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
+      return
+    }
 
-      dispatch(LoaderActions.showLoader())
+    dispatch(LoaderActions.showLoader())
 
-      const isNodeDefNew = NodeDef.isTemporary(nodeDef)
-      const nodeDefCycleKeys = NodeDef.getCycles(nodeDef)
-      let nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
+    const isNodeDefNew = NodeDef.isTemporary(nodeDef)
+    const nodeDefCycleKeys = NodeDef.getCycles(nodeDef)
+    let nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
 
-      if (isNodeDefNew) {
-        if (nodeDefCycleKeys.length > 1) {
-          // copy layout of current cycle to all selected cycles
-          nodeDefUpdated = NodeDefLayout.copyLayout({ cycleFrom: surveyCycleKey, cyclesTo: nodeDefCycleKeys })(
-            nodeDefUpdated
-          )
-        }
-        await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated }))
-      } else {
-        const props = State.getPropsUpdated(state)
-        const propsAdvanced = State.getPropsAdvancedUpdated(state)
-
-        await dispatch(
-          NodeDefsActions.putNodeDefProps({
-            nodeDefUuid: NodeDef.getUuid(nodeDef),
-            parentUuid: NodeDef.getParentUuid(nodeDef),
-            props,
-            propsAdvanced,
-          })
+    if (isNodeDefNew) {
+      if (nodeDefCycleKeys.length > 1) {
+        // copy layout of current cycle to all selected cycles
+        nodeDefUpdated = NodeDefLayout.copyLayout({ cycleFrom: surveyCycleKey, cyclesTo: nodeDefCycleKeys })(
+          nodeDefUpdated
         )
       }
+      await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated }))
+    } else {
+      const props = State.getPropsUpdated(state)
+      const propsAdvanced = State.getPropsAdvancedUpdated(state)
 
-      // Update local node def state
-      setState(State.create({ nodeDef: nodeDefUpdated, validation }))
-
-      // Update redux store nodeDefs state
-      dispatch(
-        NodeDefsActions.saveNodeDef({
-          nodeDef: nodeDefUpdated,
-          nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
-          surveyCycleKey,
-          nodeDefValidation: validation,
+      await dispatch(
+        NodeDefsActions.putNodeDefProps({
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          parentUuid: NodeDef.getParentUuid(nodeDef),
+          props,
+          propsAdvanced,
         })
       )
+    }
 
-      dispatch(LoaderActions.hideLoader())
+    // Update local node def state
+    setState(State.create({ nodeDef: nodeDefUpdated, validation }))
 
-      dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
-    })()
-  }
+    // Update redux store nodeDefs state
+    dispatch(
+      NodeDefsActions.saveNodeDef({
+        nodeDef: nodeDefUpdated,
+        nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
+        surveyCycleKey,
+        nodeDefValidation: validation,
+      })
+    )
+
+    dispatch(LoaderActions.hideLoader())
+
+    dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
+  })
 }

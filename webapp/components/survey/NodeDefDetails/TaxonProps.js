@@ -38,7 +38,7 @@ const TaxonProps = (props) => {
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
 
   const onTaxonomySelect = (taxonomySelected) =>
-    Actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
+    Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
 
   return (
     <>
@@ -51,7 +51,7 @@ const TaxonProps = (props) => {
         >
           <Dropdown
             items={taxonomies}
-            itemKey={'uuid'}
+            itemKey="uuid"
             itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}

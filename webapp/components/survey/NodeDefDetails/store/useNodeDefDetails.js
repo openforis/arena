@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-
-import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 import { useActions } from './actions'
 import { State } from './state'
@@ -16,7 +13,6 @@ import { State } from './state'
 export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
-  const dispatch = useDispatch()
   const history = useHistory()
   const { pathname } = useLocation()
 
@@ -25,7 +21,7 @@ export const useNodeDefDetails = () => {
 
   const [state, setState] = useState({})
 
-  const Actions = useActions({ state, setState })
+  const Actions = useActions({ setState })
 
   const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
 
@@ -42,7 +38,7 @@ export const useNodeDefDetails = () => {
     if (editingFromDesigner) {
       history.goBack()
     } else {
-      dispatch(navigateToChainsView(history))
+      history.push(appModuleUri(analysisModules.processingChains))
     }
   }, [surveyCycleKey])
 

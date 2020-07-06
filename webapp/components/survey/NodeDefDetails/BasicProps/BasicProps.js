@@ -53,13 +53,13 @@ const BasicProps = (props) => {
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labels) => Actions.setProp({ key: NodeDef.propKeys.labels, value: labels })}
+        onChange={(labels) => Actions.setProp({ state, key: NodeDef.propKeys.labels, value: labels })}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(descriptions) => Actions.setProp({ key: NodeDef.propKeys.descriptions, value: descriptions })}
+        onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
 
       {NodeDef.isCode(nodeDef) && <CodeProps state={state} Actions={Actions} />}
@@ -71,7 +71,7 @@ const BasicProps = (props) => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={keyEditDisabled}
-            onChange={(value) => Actions.setProp({ key: NodeDef.propKeys.key, value })}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
           />
         </FormItem>
       )}
@@ -81,7 +81,7 @@ const BasicProps = (props) => {
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={multipleEditDisabled}
-            onChange={(value) => Actions.setProp({ key: NodeDef.propKeys.multiple, value })}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
           />
         </FormItem>
       )}
@@ -90,7 +90,7 @@ const BasicProps = (props) => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={(value) => Actions.setLayoutProp({ key: NodeDefLayout.keys.renderType, value })}
+            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -112,6 +112,7 @@ const BasicProps = (props) => {
             selectedItemKey={displayIn}
             onChange={(value) =>
               Actions.setLayoutProp({
+                state,
                 key: NodeDefLayout.keys.pageUuid,
                 value: value === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
               })
@@ -136,7 +137,7 @@ const BasicProps = (props) => {
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
           disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner}
-          onChange={(cycles) => Actions.setProp({ key: NodeDef.propKeys.cycles, value: cycles })}
+          onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
         />
       )}
 
@@ -148,7 +149,7 @@ const BasicProps = (props) => {
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               lang={i18n.lang}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
-              onChange={(uuid) => Actions.setParentUuid({ parentUuid: uuid })}
+              onChange={(uuid) => Actions.setParentUuid({ state, parentUuid: uuid })}
             />
           </FormItem>
           <NodeDefExpressionsProp

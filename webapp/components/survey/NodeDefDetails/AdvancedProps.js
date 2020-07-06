@@ -33,7 +33,7 @@ const AdvancedProps = (props) => {
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={(value) => Actions.setProp({ key: NodeDef.propKeys.readOnly, value })}
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
             />
           </FormItem>
 

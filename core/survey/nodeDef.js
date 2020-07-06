@@ -147,6 +147,7 @@ export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
 export const getPropAdvanced = (prop, defaultTo = null) =>
   R.pipe(getPropsAdvanced, R.pathOr(defaultTo, prop.split('.')))
 export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
+const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
@@ -200,8 +201,10 @@ export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
   R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
-
+export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
 export const dissocTemporary = R.dissoc(keys.temporary)
+export const assocProp = ({ key, value }) =>
+  isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>

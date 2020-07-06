@@ -28,7 +28,7 @@ const ValidationsProps = (props) => {
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const onValidationsUpdate = (validations) =>
-    Actions.setProp({ key: NodeDef.keysPropsAdvanced.validations, value: validations, advanced: true })
+    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations })
 
   const i18n = useI18n()
 
