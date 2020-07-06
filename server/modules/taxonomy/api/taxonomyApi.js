@@ -14,7 +14,8 @@ import * as TaxonomyService from '../service/taxonomyService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
-  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
+  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
+
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
@@ -36,11 +37,22 @@ export const init = (app) => {
 
   // ====== READ
 
-  app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  // Old get method
+  app.get('/survey/:surveyId/taxonomiesAll', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
 
       await sendTaxonomies(res, surveyId, draft, validate)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft, validate, offset, limit } = Request.getParams(req)
+      const list = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate, offset, limit })
+      res.json({ list })
     } catch (error) {
       next(error)
     }
