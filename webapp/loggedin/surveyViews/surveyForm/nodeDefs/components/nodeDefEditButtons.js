@@ -1,7 +1,8 @@
 import './nodeDefEditButtons.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/store/system'
@@ -17,22 +18,17 @@ import { NodeDefsActions } from '@webapp/store/survey'
 import { setFormNodeDefAddChildTo } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
 const NodeDefEditButtons = (props) => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    edit,
-    canEditDef,
-    hasNodeDefAddChildTo,
-    putNodeDefLayoutProp,
-    setFormNodeDefAddChildTo,
-    removeNodeDef,
-  } = props
+  const { surveyCycleKey, nodeDef, edit, canEditDef } = props
+
+  const dispatch = useDispatch()
 
   const show = edit && canEditDef
   const elementRef = useRef(null)
   const [style, setStyle] = useState({})
 
   const i18n = useI18n()
+
+  const hasNodeDefAddChildTo = Boolean(useSelector(SurveyFormState.getNodeDefAddChildTo))
 
   useEffect(() => {
     if (show) {
@@ -43,7 +39,7 @@ const NodeDefEditButtons = (props) => {
         setStyle({ position: 'fixed', top: `${top}px`, right: `${right}px` })
       }
     }
-  }, [hasNodeDefAddChildTo])
+  }, [show, hasNodeDefAddChildTo])
 
   return (
     show && (
@@ -57,11 +53,17 @@ const NodeDefEditButtons = (props) => {
               min="1"
               max="12"
               step="1"
-              onChange={(e) =>
-                e.target.value > 0
-                  ? putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
-                  : null
-              }
+              onChange={(event) => {
+                const value = Number(event.target.value)
+                if (value > 0)
+                  dispatch(
+                    NodeDefsActions.putNodeDefLayoutProp({
+                      nodeDef,
+                      key: NodeDefLayout.keys.columnsNo,
+                      value,
+                    })
+                  )
+              }}
             />
           </div>
         )}
@@ -75,8 +77,9 @@ const NodeDefEditButtons = (props) => {
 
         {NodeDef.isEntity(nodeDef) && (
           <button
+            type="button"
             className="btn btn-s btn-transparent"
-            onClick={() => setFormNodeDefAddChildTo(nodeDef)}
+            onClick={() => dispatch(setFormNodeDefAddChildTo(nodeDef))}
             onMouseDown={(e) => {
               e.stopPropagation()
             }}
@@ -87,8 +90,9 @@ const NodeDefEditButtons = (props) => {
 
         {!NodeDef.isRoot(nodeDef) && (
           <button
+            type="button"
             className="btn btn-s btn-transparent"
-            onClick={() => removeNodeDef(nodeDef)}
+            onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
             onMouseDown={(e) => {
               e.stopPropagation()
             }}
@@ -101,12 +105,11 @@ const NodeDefEditButtons = (props) => {
   )
 }
 
-const mapStateToProps = (state) => ({
-  hasNodeDefAddChildTo: Boolean(SurveyFormState.getNodeDefAddChildTo(state)),
-})
+NodeDefEditButtons.propTypes = {
+  surveyCycleKey: PropTypes.string.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  edit: PropTypes.bool.isRequired,
+  canEditDef: PropTypes.bool.isRequired,
+}
 
-export default connect(mapStateToProps, {
-  setFormNodeDefAddChildTo,
-  putNodeDefLayoutProp: NodeDefsActions.putNodeDefLayoutProp,
-  removeNodeDef: NodeDefsActions.removeNodeDef,
-})(NodeDefEditButtons)
+export default NodeDefEditButtons

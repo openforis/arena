@@ -9,12 +9,18 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
+import { State } from './store'
 
 const AdvancedProps = (props) => {
-  const { nodeDef, validation, nodeDefParent, setNodeDefProp, readOnly } = props
+  const { state, Actions } = props
 
-  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
+  const readOnly = !useAuthCanEditSurvey()
+
+  const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
+  const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const i18n = useI18n()
 
@@ -27,14 +33,13 @@ const AdvancedProps = (props) => {
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={(checked) => setNodeDefProp(NodeDef.propKeys.readOnly, checked)}
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
             />
           </FormItem>
 
           <NodeDefExpressionsProp
-            nodeDef={nodeDef}
-            nodeDefValidation={validation}
-            setNodeDefProp={setNodeDefProp}
+            state={state}
+            Actions={Actions}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
             readOnly={readOnly}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
@@ -46,9 +51,8 @@ const AdvancedProps = (props) => {
       )}
 
       <NodeDefExpressionsProp
-        nodeDef={nodeDef}
-        nodeDefValidation={validation}
-        setNodeDefProp={setNodeDefProp}
+        state={state}
+        Actions={Actions}
         label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}
         readOnly={readOnly}
         propName={NodeDef.keysPropsAdvanced.applicable}
@@ -63,15 +67,8 @@ const AdvancedProps = (props) => {
 }
 
 AdvancedProps.propTypes = {
-  nodeDef: PropTypes.object.isRequired,
-  nodeDefParent: PropTypes.object.isRequired,
-  readOnly: PropTypes.bool,
-  setNodeDefProp: PropTypes.func.isRequired,
-  validation: PropTypes.object.isRequired,
-}
-
-AdvancedProps.defaultProps = {
-  readOnly: false,
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default AdvancedProps

@@ -1,68 +1,41 @@
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { matchPath, useHistory, useLocation } from 'react-router'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
-import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as Authorizer from '@core/auth/authorizer'
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
+
+import PanelRight from '@webapp/components/PanelRight'
+
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import { UserState } from '@webapp/store/user'
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+import { SurveyState } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
+import CategoryView from '../category/categoryView'
+
+import * as CategoryActions from '../category/actions'
+import * as CategoryState from '../category/categoryState'
 
 const CategoriesView = (props) => {
-  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, analysis, setNodeDefProp } = props
-  const selectedItemUuid = nodeDef && NodeDef.getCategoryUuid(nodeDef)
+  const { canSelect, onSelect, selectedItemUuid, onClose } = props
 
   const i18n = useI18n()
-  const history = useHistory()
   const dispatch = useDispatch()
+  const { pathname } = useLocation()
+  const history = useHistory()
 
-  const onClose = nodeDef ? history.goBack : null
+  const inCategoriesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.categories)))
 
-  const canDeleteCategory = (category) =>
-    category.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' })) : true
-
-  const onDelete = (category) =>
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'categoryEdit.confirmDelete',
-        params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-        onOk: () => deleteCategory(category),
-      })
-    )
-
-  return (
-    <ItemsView
-      itemLabelFunction={(category) => Category.getName(category)}
-      itemLink={appModuleUri(analysis ? analysisModules.category : designerModules.category)}
-      items={categories}
-      selectedItemUuid={selectedItemUuid}
-      onAdd={createCategory}
-      canDelete={canDeleteCategory}
-      onDelete={onDelete}
-      canSelect={canSelect}
-      onSelect={(category) => setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
-      onClose={onClose}
-      readOnly={readOnly}
-    />
-  )
-}
-
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = UserState.getUser(state)
-  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
+  const survey = useSelector(SurveyState.getSurvey)
+  const readOnly = !useAuthCanEditSurvey()
+  const editedCategory = useSelector(CategoryState.getCategoryForEdit)
   const categories = R.pipe(
     Survey.getCategoriesArray,
     R.map((category) => ({
@@ -70,20 +43,72 @@ const mapStateToProps = (state) => {
       usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)),
     }))
   )(survey)
-  // A nodeDef code is begin edited.
-  const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
-  const canSelect = nodeDef && NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
 
-  return {
-    categories,
-    readOnly,
-    nodeDef,
-    canSelect,
+  const canDeleteCategory = (category) =>
+    category.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' })) : true
+
+  const onAdd = async () => {
+    const category = await dispatch(CategoryActions.createCategory())
+    if (onSelect) {
+      onSelect(category)
+    }
+    if (inCategoriesPath) {
+      history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}`)
+    }
   }
+
+  const onDelete = (category) =>
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'categoryEdit.confirmDelete',
+        params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
+        onOk: () => dispatch(CategoryActions.deleteCategory(category)),
+      })
+    )
+
+  return (
+    <>
+      <ItemsView
+        itemLabelFunction={Category.getName}
+        items={categories}
+        itemLink={inCategoriesPath ? appModuleUri(designerModules.category) : null}
+        selectedItemUuid={selectedItemUuid}
+        onAdd={onAdd}
+        onEdit={(category) =>
+          !inCategoriesPath && dispatch(CategoryActions.setCategoryForEdit(Category.getUuid(category)))
+        }
+        canDelete={canDeleteCategory}
+        onDelete={onDelete}
+        canSelect={canSelect}
+        onSelect={onSelect}
+        onClose={onClose}
+        readOnly={readOnly}
+      />
+      {editedCategory && (
+        <PanelRight
+          width="100vw"
+          header={i18n.t('categoryEdit.header')}
+          onClose={() => dispatch(CategoryActions.setCategoryForEdit(null))}
+        >
+          <CategoryView showClose={false} />
+        </PanelRight>
+      )}
+    </>
+  )
 }
 
-export default connect(mapStateToProps, {
-  createCategory,
-  deleteCategory,
-  setNodeDefProp: NodeDefsActions.setNodeDefProp,
-})(CategoriesView)
+CategoriesView.propTypes = {
+  canSelect: PropTypes.bool,
+  onSelect: PropTypes.func,
+  selectedItemUuid: PropTypes.string,
+  onClose: PropTypes.func,
+}
+
+CategoriesView.defaultProps = {
+  canSelect: false,
+  onSelect: null,
+  selectedItemUuid: null,
+  onClose: null,
+}
+
+export default CategoriesView

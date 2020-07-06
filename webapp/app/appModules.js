@@ -146,10 +146,6 @@ export const analysisModules = {
     key: 'nodeDef',
     path: `${appModules.analysis.path}/nodeDef`,
   },
-  categories: {
-    key: 'categories',
-    path: `${appModules.analysis.path}/categories`,
-  },
   category: {
     key: 'category',
     path: `${appModules.analysis.path}/category`,

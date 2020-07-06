@@ -1,32 +1,41 @@
 import './CategorySelector.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/Dropdown'
-
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
-
 import { useSurvey } from '@webapp/store/survey'
 
-import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
+import Dropdown from '@webapp/components/form/Dropdown'
+import PanelRight from '@webapp/components/PanelRight'
+import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+
+import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, analysis, onChange } = props
+  const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
 
   const i18n = useI18n()
 
   const dispatch = useDispatch()
-  const history = useHistory()
+
+  const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
+  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
+
   const survey = useSurvey()
   const categories = Survey.getCategoriesArray(survey)
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+
+  const onAdd = async () => {
+    const newCategory = await dispatch(CategoryActions.createCategory())
+    onChange(newCategory)
+    setShowCategoryPanel(true)
+  }
 
   return (
     <div className="category-selector">
@@ -44,10 +53,7 @@ const CategorySelector = (props) => {
           type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          onClick={async () => {
-            const newCategory = await dispatch(createCategory(history, analysis))
-            onChange(newCategory)
-          }}
+          onClick={onAdd}
           aria-disabled={disabled}
         >
           <span className="icon icon-plus icon-12px icon-left" />
@@ -55,14 +61,36 @@ const CategorySelector = (props) => {
         </button>
       )}
       {showManage && (
-        <Link
+        <button
+          type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          to={appModuleUri(analysis ? analysisModules.categories : designerModules.categories)}
+          onClick={() => setShowCategoriesPanel(true)}
         >
           <span className="icon icon-list icon-12px icon-left" />
           {i18n.t('common.manage')}
-        </Link>
+        </button>
+      )}
+      {showCategoryPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={async () => {
+            await dispatch(CategoryActions.setCategoryForEdit(null))
+            setShowCategoryPanel(false)
+          }}
+          header={i18n.t('categoryEdit.header')}
+        >
+          <CategoryView showClose={false} />
+        </PanelRight>
+      )}
+      {showCategoriesPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={() => setShowCategoriesPanel(false)}
+          header={i18n.t('appModules.categories')}
+        >
+          <CategoriesView canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
+        </PanelRight>
       )}
     </div>
   )
@@ -74,7 +102,6 @@ CategorySelector.propTypes = {
   disabled: PropTypes.bool,
   showManage: PropTypes.bool,
   showAdd: PropTypes.bool,
-  analysis: PropTypes.bool,
   onChange: PropTypes.func,
 }
 
@@ -84,7 +111,6 @@ CategorySelector.defaultProps = {
   disabled: false,
   showManage: true,
   showAdd: true,
-  analysis: false, // True if used inside analysis/nodeDef editor
   onChange: () => ({}),
 }
 
