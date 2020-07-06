@@ -54,7 +54,7 @@ export const init = (app) => {
       const list = await TaxonomyService.fetchTaxonomiesBySurveyId({
         surveyId,
         draft: true,
-        validate: false,
+        validate: true,
         offset,
         limit,
       })
