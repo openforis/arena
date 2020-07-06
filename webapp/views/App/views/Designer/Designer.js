@@ -16,6 +16,7 @@ import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
+import TaxonomyList from './TaxonomyList'
 
 const Designer = () => {
   const dispatch = useDispatch()
@@ -59,6 +60,10 @@ const Designer = () => {
           {
             component: CategoryView,
             path: `${appModuleUri(designerModules.category)}:categoryUuid`,
+          },
+          {
+            component: TaxonomyList,
+            path: `${appModuleUri(designerModules.taxonomies)}/new`,
           },
 
           {
