@@ -63,7 +63,7 @@ const Designer = () => {
           },
           {
             component: TaxonomyList,
-            path: `${appModuleUri(designerModules.taxonomies)}/new`,
+            path: `${appModuleUri(designerModules.taxonomies)}new`,
           },
 
           {
