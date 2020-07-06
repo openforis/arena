@@ -1,33 +1,37 @@
 import './taxonomyView.scss'
 
 import React, { useEffect } from 'react'
-import * as R from 'ramda'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
+import * as R from 'ramda'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n } from '@webapp/store/system'
-
-import { SurveyState } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table/Table'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
+
+import * as TaxonomyActions from './actions'
 import * as TaxonomyState from './taxonomyState'
 
-import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
-import { UserState } from '@webapp/store/user'
-
 const TaxonomyView = (props) => {
-  const { surveyId, taxonomy, canEdit, setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile } = props
+  const { showClose } = props
 
+  const dispatch = useDispatch()
   const history = useHistory()
-  const { taxonomyUuid } = useParams()
+  const { taxonomyUuid: taxonomyUuidParam } = useParams()
   const i18n = useI18n()
 
+  const surveyId = useSurveyId()
+  const canEdit = useAuthCanEditSurvey()
+  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
+  const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${
@@ -35,12 +39,16 @@ const TaxonomyView = (props) => {
   }`
 
   useEffect(() => {
-    setTaxonomyForEdit(taxonomyUuid)
+    if (taxonomyUuidParam) {
+      dispatch(TaxonomyActions.setTaxonomyForEdit(taxonomyUuidParam))
+    }
+
+    return () => dispatch(TaxonomyActions.setTaxonomyForEdit(null))
   }, [])
 
   return taxonomy ? (
     <div className="taxonomy">
-      <TaxonomyEditHeader {...props} />
+      <TaxonomyEditHeader />
 
       <Table
         module={TaxonomyState.keys.taxa}
@@ -49,43 +57,27 @@ const TaxonomyView = (props) => {
         gridTemplateColumns={gridTemplateColumns}
         rowHeaderComponent={TaxaTableRowHeader}
         rowComponent={TaxaTableRow}
-        noItemsLabelKey={'taxonomy.edit.taxaNotImported'}
-        surveyId={surveyId}
-        putTaxonomyProp={putTaxonomyProp}
-        uploadTaxonomyFile={uploadTaxonomyFile}
-        vernacularLanguageCodes={vernacularLanguageCodes}
-        taxonomy={taxonomy}
-        readOnly={!canEdit}
+        noItemsLabelKey="taxonomy.edit.taxaNotImported"
+        rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
       />
 
-      <div className="button-bar">
-        <button
-          className="btn"
-          onClick={() => {
-            history.goBack()
-            setTaxonomyForEdit(null)
-          }}
-        >
-          {i18n.t('common.done')}
-        </button>
-      </div>
+      {showClose && (
+        <div className="button-bar">
+          <button type="button" className="btn" onClick={() => history.goBack()}>
+            {i18n.t('common.done')}
+          </button>
+        </div>
+      )}
     </div>
   ) : null
 }
 
-const mapStateToProps = (state) => {
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = UserState.getUser(state)
-
-  return {
-    surveyId: SurveyState.getSurveyId(state),
-    taxonomy: TaxonomyState.getTaxonomy(state),
-    canEdit: Authorizer.canEditSurvey(user, surveyInfo),
-  }
+TaxonomyView.propTypes = {
+  showClose: PropTypes.bool,
 }
 
-export default connect(mapStateToProps, {
-  setTaxonomyForEdit,
-  putTaxonomyProp,
-  uploadTaxonomyFile,
-})(TaxonomyView)
+TaxonomyView.defaultProps = {
+  showClose: true,
+}
+
+export default TaxonomyView

@@ -10,7 +10,7 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
-import { useIsSidebarOpened } from '@webapp/service/storage'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyState } from '@webapp/store/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'

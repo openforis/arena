@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
+import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
@@ -37,12 +37,12 @@ const Designer = () => {
           },
 
           {
-            component: NodeDefView,
+            component: NodeDefDetails,
             path: appModuleUri(designerModules.nodeDef),
           },
 
           {
-            component: NodeDefView,
+            component: NodeDefDetails,
             path: `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid/`,
           },
 

@@ -1,80 +1,32 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
-import { Link, useHistory } from 'react-router-dom'
-
-import * as ObjectUtils from '@core/objectUtils'
 
 import { useI18n } from '@webapp/store/system'
 
-const TableRow = props => {
-  const { columns, item, itemLink, selectedItemUuid, canSelect, onSelect, canDelete, onDelete, readOnly } = props
+import ItemsTableRow from './itemsTableRow'
+import ItemsTableHeader from './itemsTableHeader'
 
-  const i18n = useI18n()
-
-  const selected = item.uuid === selectedItemUuid
-
-  return (
-    <div className="table__row">
-      {columns.map((column, idx) => (
-        <div key={idx} className={column.className}>
-          {React.createElement(column.cellRenderer, props)}
-        </div>
-      ))}
-
-      <div className="buttons">
-        {onSelect && (canSelect || selected) && (
-          <button className={`btn btn-s${selected ? ' active' : ''}`} onClick={() => onSelect(item)}>
-            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
-            {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
-          </button>
-        )}
-
-        <Link className="btn btn-s" to={`${itemLink}${ObjectUtils.getUuid(item)}/`}>
-          <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`} />
-          {readOnly ? i18n.t('common.view') : i18n.t('common.edit')}
-        </Link>
-
-        {!readOnly && (
-          <button
-            className="btn btn-s"
-            onClick={() => {
-              if (canDelete(item)) {
-                onDelete(item)
-              }
-            }}
-          >
-            <span className="icon icon-bin2 icon-12px icon-left" />
-            {i18n.t('common.delete')}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-const Header = ({ onAdd, readOnly }) => {
-  const i18n = useI18n()
-  const history = useHistory()
-
-  return (
-    !readOnly && (
-      <div className="table__header">
-        <button className="btn btn-s" onClick={() => onAdd(history)}>
-          <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('common.add')}
-        </button>
-      </div>
-    )
-  )
-}
-
-const ItemsTable = props => {
-  const { items, columns } = props
+const ItemsTable = (props) => {
+  const {
+    onAdd,
+    readOnly,
+    items,
+    columns,
+    itemLink,
+    itemLabelFunction,
+    selectedItemUuid,
+    canSelect,
+    onSelect,
+    canDelete,
+    onDelete,
+    onEdit,
+  } = props
   const i18n = useI18n()
 
   return (
     <div className="table">
-      <Header {...props} />
+      <ItemsTableHeader onAdd={onAdd} readOnly={readOnly} />
 
       {R.isEmpty(items) ? (
         <div className="table__empty-rows">{i18n.t('itemsTable.noItemsAdded')}</div>
@@ -82,7 +34,7 @@ const ItemsTable = props => {
         <div className="table__content">
           <div className="table__row-header">
             {columns.map((column, idx) => (
-              <div key={idx} className={column.className}>
+              <div key={String(idx)} className={column.className}>
                 {i18n.t(column.heading)}
               </div>
             ))}
@@ -90,14 +42,55 @@ const ItemsTable = props => {
           </div>
 
           <div className="table__rows">
-            {items.map(item => (
-              <TableRow {...props} key={item.uuid} item={item} />
+            {items.map((item) => (
+              <ItemsTableRow
+                key={item.uuid}
+                item={item}
+                columns={columns}
+                itemLink={itemLink}
+                itemLabelFunction={itemLabelFunction}
+                selectedItemUuid={selectedItemUuid}
+                canSelect={canSelect}
+                canDelete={canDelete}
+                readOnly={readOnly}
+                onSelect={onSelect}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             ))}
           </div>
         </div>
       )}
     </div>
   )
+}
+
+ItemsTable.propTypes = {
+  columns: PropTypes.arrayOf(Object).isRequired,
+  items: PropTypes.array.isRequired,
+  itemLink: PropTypes.string,
+  itemLabelFunction: PropTypes.func,
+  selectedItemUuid: PropTypes.string,
+  canSelect: PropTypes.bool,
+  canDelete: PropTypes.func,
+  readOnly: PropTypes.bool,
+  onAdd: PropTypes.func,
+  onSelect: PropTypes.func,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+}
+
+ItemsTable.defaultProps = {
+  itemLink: null,
+  itemLabelFunction: null,
+  selectedItemUuid: null,
+  canSelect: false,
+  canDelete: null,
+  readOnly: true,
+  onAdd: null,
+  onSelect: null,
+  onEdit: null,
+  onDelete: null,
 }
 
 export default ItemsTable

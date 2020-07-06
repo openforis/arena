@@ -364,7 +364,7 @@ $t(common.cantUndoWarning)`,
     virtualEntity: 'Virtual Entity',
   },
 
-  processingStepCalculationView: {
+  processingStepCalculation: {
     attribute: 'Attribute',
     types: {
       quantitative: 'Quantitative',
@@ -500,6 +500,7 @@ $t(common.cantUndoWarning)`,
   },
 
   taxonomy: {
+    header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     edit: {
@@ -512,6 +513,7 @@ $t(common.cantUndoWarning)`,
   },
 
   categoryEdit: {
+    header: 'Category',
     addLevel: 'Add level',
     categoryName: 'Category name',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,

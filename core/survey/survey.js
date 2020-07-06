@@ -6,6 +6,7 @@ import * as Srs from '@core/geo/srs'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
+import * as SurveyNodeDefsLayout from './_survey/surveyNodeDefsLayout'
 import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
 import * as SurveyCategories from './_survey/surveyCategories'
 import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
@@ -119,7 +120,16 @@ export const {
 export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependencies
 
 // ====== UPDATE
-export const { assocNodeDefs, assocNodeDef } = SurveyNodeDefs
+const updateNodeDefs = ({ updateFn, updateDependencyGraph }) =>
+  R.pipe(updateFn, R.when(R.always(updateDependencyGraph), SurveyDependencies.buildAndAssocDependencyGraph))
+
+export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) =>
+  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDefs(nodeDefs), updateDependencyGraph })
+
+export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) =>
+  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDef(nodeDef), updateDependencyGraph })
+
+export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
