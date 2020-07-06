@@ -3,7 +3,7 @@ import './SideBar.scss'
 import React, { useRef } from 'react'
 import { useLocation } from 'react-router'
 
-import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage'
+import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
