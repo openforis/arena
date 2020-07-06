@@ -50,8 +50,14 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft, validate, offset, limit } = Request.getParams(req)
-      const list = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate, offset, limit })
+      const { surveyId, offset, limit } = Request.getParams(req)
+      const list = await TaxonomyService.fetchTaxonomiesBySurveyId({
+        surveyId,
+        draft: true,
+        validate: false,
+        offset,
+        limit,
+      })
       res.json({ list })
     } catch (error) {
       next(error)
@@ -61,7 +67,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/taxonomies/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
-      const count = await TaxonomyService.countTaxonomiesBySurveyId( surveyId )
+      const count = await TaxonomyService.countTaxonomiesBySurveyId(surveyId)
       res.json({ count })
     } catch (error) {
       next(error)
