@@ -68,11 +68,10 @@ export const maxKeyAttributes = 3
 
 // ==== READ
 
-export const { getUuid, getProp, getProps, isEqual } = ObjectUtils
+export const { getLabels, getParentUuid, getProp, getProps, getUuid, isEqual, isTemporary } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
-export const { getParentUuid } = ObjectUtils
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
@@ -103,9 +102,7 @@ export const isReadOnly = getProp(propKeys.readOnly, false)
 
 export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
-export const { isTemporary } = ObjectUtils
 
-export const { getLabels } = ObjectUtils
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)

@@ -24,16 +24,13 @@ const _updateRenderType = ({ survey, surveyCycleKey, nodeDef, renderType, nodeDe
   return nodeDefLayout
 }
 
-const _isEntityAndKeyRenderMode = ({ nodeDef, key }) =>
-  NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType
-
 export const updateNodeDefLayoutProp = ({ surveyCycleKey, nodeDef, key, value }) => (survey) => {
   let nodeDefLayoutUpdated = R.pipe(
     NodeDefLayout.getLayout,
     NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)
   )(nodeDef)
 
-  if (_isEntityAndKeyRenderMode({ nodeDef, key }))
+  if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef))
     nodeDefLayoutUpdated = _updateRenderType({
       survey,
       surveyCycleKey,
