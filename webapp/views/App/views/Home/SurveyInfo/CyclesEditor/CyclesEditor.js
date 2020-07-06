@@ -50,10 +50,13 @@ const CyclesEditor = (props) => {
 }
 
 CyclesEditor.propTypes = {
-  cycles: PropTypes.array.isRequired,
+  cycles: PropTypes.object.isRequired,
   readOnly: PropTypes.bool.isRequired,
   setCycles: PropTypes.func.isRequired,
-  validation: PropTypes.object.isRequired,
+  validation: PropTypes.object,
+}
+CyclesEditor.defaultProps = {
+  validation: {},
 }
 
 export default CyclesEditor
