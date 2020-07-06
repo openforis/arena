@@ -18,7 +18,8 @@ const Row = (props) => {
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
       <div>{Taxonomy.getDescription(lang, defaultLang)(taxonomy)}</div>
-
+      <div />
+      <div />
       <div />
       <div />
     </>
