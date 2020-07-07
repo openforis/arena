@@ -7,7 +7,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as CategoryService from '../service/categoryService'
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
   app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
@@ -43,7 +43,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.post(
@@ -60,7 +60,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.post(
@@ -78,7 +78,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.post(
@@ -96,18 +96,36 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ==== READ
 
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft, validate } = Request.getParams(req)
+      const { surveyId, draft, validate, offset = 0, limit = null } = Request.getParams(req)
 
-      const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId(surveyId, draft, validate)
+      const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
+        surveyId,
+        draft,
+        includeValidation: validate,
+        offset,
+        limit,
+      })
 
       res.json({ categories })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      const count = await CategoryService.countCategories({ surveyId, draft })
+
+      res.json({ count })
     } catch (error) {
       next(error)
     }
@@ -122,14 +140,14 @@ export const init = app => {
         const { surveyId, categoryUuid, parentUuid, draft } = Request.getParams(req)
 
         const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft),
+          await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
         )
 
         res.json({ items })
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ==== UPDATE
@@ -148,7 +166,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.put(
@@ -165,7 +183,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.put(
@@ -182,7 +200,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ==== DELETE
@@ -201,7 +219,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.delete(
@@ -218,7 +236,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.delete(
@@ -235,6 +253,6 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 }
