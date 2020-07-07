@@ -11,7 +11,7 @@ const TaxonomyList = () => {
     <Table
       module="taxonomies"
       className="taxonomies-list"
-      gridTemplateColumns="repeat(4, 1fr) 10rem 10rem"
+      gridTemplateColumns="repeat(2, 1fr) repeat(3, 6rem)"
       headerLeftComponent={HeaderLeft}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
