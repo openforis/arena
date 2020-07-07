@@ -119,6 +119,18 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      const count = await CategoryService.countCategories({ surveyId, draft })
+
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // Fetch items by parent item Uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/items',

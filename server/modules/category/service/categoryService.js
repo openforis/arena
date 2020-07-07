@@ -23,6 +23,7 @@ export const {
   insertLevel,
   insertItem,
 
+  countCategories,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,

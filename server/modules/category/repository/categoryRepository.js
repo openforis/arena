@@ -14,6 +14,7 @@ import {
   deleteSurveySchemaTableProp,
   dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+
 // ============== CREATE
 
 export const insertCategory = async (surveyId, category, client = db) =>
@@ -87,7 +88,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       (
         SELECT * 
         FROM ${getSurveyDBSchema(surveyId)}.category
-        ORDER BY (props || props_draft) -> 'name'
+        ORDER BY (props || props_draft) -> '${Category.props.name}'
         OFFSET $/offset/
         ${limit ? 'LIMIT $/limit/' : ''}
       )
@@ -106,6 +107,15 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       levels l
     ON
       c.uuid = l.category_uuid`
+
+export const countCategories = async ({ surveyId, draft = false }, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+     FROM ${getSurveyDBSchema(surveyId)}.category
+     ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
+    [],
+    (r) => parseInt(r.count, 10)
+  )
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
   { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },

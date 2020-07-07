@@ -119,6 +119,7 @@ export const { createImportSummary, createImportSummaryFromStream } = CategoryIm
 
 // ====== READ
 export const {
+  countCategories,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
   fetchItemsByCategoryUuid,
