@@ -6,24 +6,26 @@ export const keys = {
   deleted: 'deleted',
   canDelete: 'canDelete',
   selectedItemUuid: 'selectedItemUuid',
-  onSelectTaxonomy: 'onSelectTaxonomy',
+  onSelect: 'onSelect',
   canSelect: 'canSelect',
+  refetch: 'refetch',
 }
 
 // ==== CREATE
-export const create = ({ row: taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect }) => ({
+export const create = ({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, refetchData }) => ({
   [keys.taxonomy]: taxonomy,
   [keys.deleted]: false,
   [keys.canDelete]: canDelete,
   [keys.selectedItemUuid]: selectedItemUuid,
-  [keys.onSelectTaxonomy]: onSelectTaxonomy,
+  [keys.onSelect]: onSelectTaxonomy,
   [keys.canSelect]: canSelect,
+  [keys.refetch]: refetchData,
 })
 
 // ==== READ
-export const getOnSelectTaxonomy = A.prop(keys.onSelectTaxonomy)
+export const getOnSelect = A.prop(keys.onSelect)
+export const getRefetch = A.prop(keys.refetch)
 export const getTaxonomy = A.prop(keys.taxonomy)
-export const getDeleted = A.prop(keys.deleted)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
 export const getCanSelect = A.prop(keys.canSelect)
 
@@ -32,4 +34,3 @@ export const getSelected = (state) =>
 
 // ==== UPDATE
 export const assocSelectedItemUuid = A.assoc(keys.selectedItemUuid)
-export const assocDeleted = A.assoc(keys.deleted)

@@ -16,6 +16,7 @@ const Content = (props) => {
     rowHeaderComponent,
     rowComponent,
     rowProps,
+    refetchData,
   } = props
 
   const i18n = useI18n()
@@ -43,7 +44,15 @@ const Content = (props) => {
               className={className}
               style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, { idx: i, offset, row, rowNo: i + offset + 1, active, ...rowProps })}
+              {React.createElement(rowComponent, {
+                idx: i,
+                offset,
+                row,
+                rowNo: i + offset + 1,
+                active,
+                refetchData,
+                ...rowProps,
+              })}
             </div>
           )
         })}
@@ -59,6 +68,7 @@ Content.propTypes = {
   noItemsLabelKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
+  refetchData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
   rowProps: PropTypes.object,
@@ -67,6 +77,7 @@ Content.propTypes = {
 Content.defaultProps = {
   isRowActive: null,
   onRowClick: null,
+  refetchData: null,
   rowProps: {},
 }
 

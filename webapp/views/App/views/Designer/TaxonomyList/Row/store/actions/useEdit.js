@@ -16,14 +16,15 @@ export const useEdit = () => {
 
   const { pathname } = useLocation()
   const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
-  const itemLink = inTaxonomiesPath ? appModuleUri(designerModules.taxonomy) : null
 
   return useCallback(({ state }) => {
     const taxonomy = State.getTaxonomy(state)
     if (!inTaxonomiesPath) {
       dispatch(TaxonomyActions.setTaxonomyForEdit(Taxonomy.getUuid(taxonomy)))
     } else {
-      history.push(`${itemLink}${ObjectUtils.getUuid(taxonomy)}/`)
+      history.push(
+        `${inTaxonomiesPath ? appModuleUri(designerModules.taxonomy) : null}${ObjectUtils.getUuid(taxonomy)}/`
+      )
     }
   }, [])
 }

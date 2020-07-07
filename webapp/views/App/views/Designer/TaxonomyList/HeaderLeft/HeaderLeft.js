@@ -26,7 +26,7 @@ const HeaderLeft = () => {
   return (
     <div>
       <button type="button" onClick={add} className="btn btn-s">
-        <span className="icon icon-user-plus icon-12px icon-left" />
+        <span className="icon icon-plus icon-12px icon-left" />
         {i18n.t('common.add')}
       </button>
     </div>

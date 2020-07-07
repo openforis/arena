@@ -40,13 +40,6 @@
   .table {
     height: calc(100% - 100px);
   }
-  .table__content {
-    position: unset;
-  }
-  .table__rows {
-    position: unset;
-    height: unset;
-  }
 }
 
 @keyframes panel-enter {

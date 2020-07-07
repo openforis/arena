@@ -1,7 +1,6 @@
 import './Row.scss'
 import * as A from '@core/arena'
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -15,28 +14,6 @@ import WarningBadge from '@webapp/components/warningBadge'
 
 import { State, useTaxonomyRow } from './store'
 
-const TableButton = ({ show = true, label, onClick, icon }) => {
-  if (!show) return null
-  return (
-    <button type="button" className="btn btn-s" onClick={onClick}>
-      {icon && icon}
-      {label}
-    </button>
-  )
-}
-
-TableButton.propTypes = {
-  show: PropTypes.bool,
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.string.isRequired,
-  icon: PropTypes.node,
-}
-
-TableButton.defaultProps = {
-  show: true,
-  icon: null,
-}
-
 const Row = (props) => {
   const { state, Actions } = useTaxonomyRow(props)
 
@@ -47,49 +24,43 @@ const Row = (props) => {
   const i18n = useI18n()
 
   const taxonomy = State.getTaxonomy(state)
-  const deleted = State.getDeleted(state)
   const canSelect = State.getCanSelect(state)
   const selected = State.getSelected(state)
   const canEdit = useAuthCanEditSurvey()
 
-  if (!taxonomy) return <></>
   return (
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
       <div>{Taxonomy.getDescription(lang, defaultLang)(taxonomy)}</div>
-      <div className="taxonomy__row__badge-container">
-        {!deleted && <ErrorBadge validation={taxonomy.validation} />}
+      <div className="taxonomy-row__badge-container">
+        <ErrorBadge validation={taxonomy.validation} />
       </div>
-      <div className="taxonomy__row__badge-container">
+      <div className="taxonomy-row__badge-container">
         <WarningBadge
-          show={!deleted && A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))}
+          show={A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))}
           label={i18n.t('itemsTable.unused')}
         />
       </div>
-      <div className="taxonomy__row__badge-container">
-        <WarningBadge label={i18n.t('common.deleted')} show={deleted} />
-      </div>
 
-      <TableButton
-        show={!deleted && (canSelect || selected)}
-        label={selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
-        onClick={() => Actions.select({ state })}
-        icon={<span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />}
-      />
+      {(canSelect || selected) && (
+        <button type="button" className="btn btn-s" onClick={() => Actions.select({ state })}>
+          <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
+          {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
+        </button>
+      )}
 
-      <TableButton
-        show={!deleted && canEdit}
-        label={i18n.t('common.edit')}
-        onClick={() => Actions.edit({ state })}
-        icon={<span className="icon icon-pencil2 icon-12px icon-left" />}
-      />
-
-      <TableButton
-        show={!deleted && canEdit}
-        label={i18n.t('common.delete')}
-        onClick={() => Actions.delete({ state })}
-        icon={<span className="icon icon-bin2 icon-12px icon-left" />}
-      />
+      {canEdit && (
+        <button type="button" className="btn btn-s" onClick={() => Actions.edit({ state })}>
+          <span className="icon icon-pencil2 icon-12px icon-left" />
+          {i18n.t('common.edit')}
+        </button>
+      )}
+      {canEdit && (
+        <button type="button" className="btn btn-s" onClick={() => Actions.delete({ state })}>
+          <span className="icon icon-bin2 icon-12px icon-left" />
+          {i18n.t('common.delete')}
+        </button>
+      )}
     </>
   )
 }
