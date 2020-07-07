@@ -60,6 +60,10 @@ const Designer = () => {
             component: CategoryView,
             path: `${appModuleUri(designerModules.category)}:categoryUuid`,
           },
+          {
+            component: TaxonomyList,
+            path: `${appModuleUri(designerModules.taxonomies)}new`,
+          },
 
           {
             component: TaxonomyList,
