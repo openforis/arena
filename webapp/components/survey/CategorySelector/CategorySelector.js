@@ -71,6 +71,15 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
+      {showCategoriesPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={() => setShowCategoriesPanel(false)}
+          header={i18n.t('appModules.categories')}
+        >
+          <CategoryList canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
+        </PanelRight>
+      )}
       {editedCategory && (
         <PanelRight
           width="100vw"
@@ -80,15 +89,6 @@ const CategorySelector = (props) => {
           header={i18n.t('categoryEdit.header')}
         >
           <CategoryView showClose={false} />
-        </PanelRight>
-      )}
-      {showCategoriesPanel && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setShowCategoriesPanel(false)}
-          header={i18n.t('appModules.categories')}
-        >
-          <CategoryList canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
         </PanelRight>
       )}
     </div>

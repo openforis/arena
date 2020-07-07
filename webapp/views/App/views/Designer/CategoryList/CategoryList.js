@@ -1,3 +1,5 @@
+import './CategoryList.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
@@ -27,18 +29,26 @@ const CategoryList = (props) => {
   const surveyId = Survey.getId(survey)
   const canEdit = useAuthCanEditSurvey()
 
+  const gridTemplateColumns = [
+    '50px', // index
+    '1fr', // name
+    ...(canEdit ? ['repeat(2, 80px)'] : []), // select button
+    ...(canSelect ? ['80px'] : []), // error and warning badges
+    ...(canEdit ? ['repeat(2, 75px)'] : []), // edit and delete buttons
+  ].join(' ')
+
   return (
     <>
       <Table
         module={CategoriesState.stateKey}
         moduleApiUri={`/api/survey/${surveyId}/categories`}
         restParams={{ draft: canEdit, validate: canEdit }}
-        gridTemplateColumns=".05fr .7fr .05fr .05fr .05fr .05fr .05fr"
+        gridTemplateColumns={gridTemplateColumns}
         headerLeftComponent={TableHeaderLeft}
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
-        headerProps={{ inCategoriesPath, onSelect }}
-        rowProps={{ inCategoriesPath, surveyId, canSelect, onSelect, selectedItemUuid }}
+        headerProps={{ inCategoriesPath, canEdit, canSelect, onSelect }}
+        rowProps={{ inCategoriesPath, surveyId, canEdit, canSelect, onSelect, selectedItemUuid }}
       />
     </>
   )
