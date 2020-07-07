@@ -6,22 +6,30 @@ import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n, useLang } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
-import useTaxonomyRow from './useTaxonomyRow'
+import { State, useTaxonomyRow } from './store'
 
 const Row = (props) => {
-  const { taxonomy, selected, defaultLang, onDelete, deleted, onEdit, canSelect, selectTaxonomy } = useTaxonomyRow(
-    props
-  )
+  const { state, Actions } = useTaxonomyRow(props)
 
+  const surveyInfo = useSurveyInfo()
   const survey = useSurvey()
+  const defaultLang = Survey.getDefaultLanguage(surveyInfo)
   const lang = useLang()
   const i18n = useI18n()
 
+  const taxonomy = State.getTaxonomy(state)
+  const deleted = State.getDeleted(state)
+  const canSelect = State.getCanSelect(state)
+  const selected = State.getSelected(state)
+  const canEdit = useAuthCanEditSurvey()
+
+  if (!taxonomy) return <></>
   return (
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
@@ -40,20 +48,24 @@ const Row = (props) => {
       </div>
       <div>
         {!deleted && (canSelect || selected) && (
-          <button type="button" className={`btn btn-s${selected ? ' active' : ''}`} onClick={selectTaxonomy}>
+          <button
+            type="button"
+            className={`btn btn-s${selected ? ' active' : ''}`}
+            onClick={() => Actions.select({ state })}
+          >
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
           </button>
         )}
       </div>
-      {!deleted && (
-        <button type="button" className="btn btn-s" onClick={onEdit}>
+      {!deleted && canEdit && (
+        <button type="button" className="btn btn-s" onClick={(e) => Actions.edit({ e, state })}>
           <span className="icon icon-pencil2 icon-12px icon-left" />
           {i18n.t('common.edit')}
         </button>
       )}
-      {!deleted && (
-        <button type="button" className="btn btn-s" onClick={onDelete}>
+      {!deleted && canEdit && (
+        <button type="button" className="btn btn-s" onClick={() => Actions.delete({ state })}>
           <span className="icon icon-bin2 icon-12px icon-left" />
           {i18n.t('common.delete')}
         </button>
