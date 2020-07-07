@@ -8,8 +8,6 @@ const RowHeader = () => {
     <>
       <div>{i18n.t('common.name')}</div>
       <div>{i18n.t('common.description')}</div>
-      <div />
-      <div />
     </>
   )
 }

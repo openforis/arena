@@ -51,7 +51,7 @@ export const fetchTaxonomiesBySurveyId = async (
   client = db
 ) => {
   const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft, limit, offset }, client)
-  
+
   return validate
     ? await Promise.all(
         taxonomies.map(async (taxonomy) => await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client))
