@@ -54,3 +54,14 @@
   text-align: center;
   margin: 10vh 30vw auto;
 }
+
+.table {
+  height: calc(100% - 100px);
+}
+.table__content {
+  position: unset;
+}
+.table__rows {
+  position: unset;
+  height: unset;
+}

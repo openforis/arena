@@ -6,7 +6,6 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
-import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
@@ -61,13 +60,9 @@ const Designer = () => {
             component: CategoryView,
             path: `${appModuleUri(designerModules.category)}:categoryUuid`,
           },
-          {
-            component: TaxonomyList,
-            path: `${appModuleUri(designerModules.taxonomies)}new`,
-          },
 
           {
-            component: TaxonomiesView,
+            component: TaxonomyList,
             path: appModuleUri(designerModules.taxonomies),
           },
 

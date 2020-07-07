@@ -50,11 +50,11 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, offset, limit } = Request.getParams(req)
+      const { surveyId, offset, limit, draft, validate } = Request.getParams(req)
       const list = await TaxonomyService.fetchTaxonomiesBySurveyId({
         surveyId,
-        draft: true,
-        validate: true,
+        draft,
+        validate,
         offset,
         limit,
       })
