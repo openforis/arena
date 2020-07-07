@@ -22,9 +22,7 @@ export const useEdit = () => {
     if (!inTaxonomiesPath) {
       dispatch(TaxonomyActions.setTaxonomyForEdit(Taxonomy.getUuid(taxonomy)))
     } else {
-      history.push(
-        `${inTaxonomiesPath ? appModuleUri(designerModules.taxonomy) : null}${ObjectUtils.getUuid(taxonomy)}/`
-      )
+      history.push(`${appModuleUri(designerModules.taxonomy)}${ObjectUtils.getUuid(taxonomy)}/`)
     }
   }, [])
 }

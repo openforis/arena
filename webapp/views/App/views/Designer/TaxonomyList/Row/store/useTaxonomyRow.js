@@ -14,7 +14,7 @@ export const useTaxonomyRow = (props) => {
     setState((prevState) => State.assocSelectedItemUuid(selectedItemUuid)(prevState))
   }, [selectedItemUuid])
 
-  const Actions = useActions({ setState })
+  const Actions = useActions()
 
   return { state, Actions }
 }
