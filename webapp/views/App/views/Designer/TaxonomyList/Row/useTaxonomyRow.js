@@ -32,7 +32,9 @@ const useTaxonomyRow = (props) => {
 
   /* delete */
   const canDelete = () =>
-    taxonomy.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'taxonomy.cantBeDeleted' })) : true
+    onSelectTaxonomy && taxonomy.usedByNodeDefs
+      ? dispatch(NotificationActions.notifyInfo({ key: 'taxonomy.cantBeDeleted' }))
+      : true
 
   const onDelete = () => {
     if (canDelete()) {

@@ -37,7 +37,7 @@ const Row = (props) => {
         <WarningBadge label={i18n.t('common.deleted')} show={deleted} />
       </div>
       <div>
-        {!deleted && selectTaxonomy && (canSelect || selected) && (
+        {!deleted && (canSelect || selected) && (
           <button type="button" className={`btn btn-s${selected ? ' active' : ''}`} onClick={selectTaxonomy}>
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
