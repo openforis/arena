@@ -11,7 +11,7 @@ import { useSurvey } from '@webapp/store/survey'
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
-import useTaxonomyRow from '@webapp/views/App/views/Designer/TaxonomyList/Row/useTaxonomyRow'
+import useTaxonomyRow from './useTaxonomyRow'
 
 const Row = (props) => {
   const { taxonomy, selected, defaultLang, onDelete, deleted, onEdit, canSelect, selectTaxonomy } = useTaxonomyRow(
@@ -26,14 +26,16 @@ const Row = (props) => {
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
       <div>{Taxonomy.getDescription(lang, defaultLang)(taxonomy)}</div>
-      <div>{!deleted && <ErrorBadge validation={taxonomy.validation} />}</div>
-      <div>
+      <div className="taxonomy__row__badge-container">
+        {!deleted && <ErrorBadge validation={taxonomy.validation} />}
+      </div>
+      <div className="taxonomy__row__badge-container">
         <WarningBadge
           show={!deleted && A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))}
           label={i18n.t('itemsTable.unused')}
         />
       </div>
-      <div>
+      <div className="taxonomy__row__badge-container">
         <WarningBadge label={i18n.t('common.deleted')} show={deleted} />
       </div>
       <div>

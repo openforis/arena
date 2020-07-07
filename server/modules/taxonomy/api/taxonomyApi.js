@@ -68,7 +68,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/taxonomies/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
-      const count = await TaxonomyService.countTaxonomiesBySurveyId(surveyId)
+      const count = await TaxonomyService.countTaxonomiesBySurveyId({ surveyId })
       res.json({ count })
     } catch (error) {
       next(error)

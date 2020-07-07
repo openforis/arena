@@ -99,7 +99,7 @@ export const fetchTaxonomiesBySurveyId = async ({ surveyId, draft = false, limit
     (record) => dbTransformCallback(record, draft, true)
   )
 
-export const countTaxonomiesBySurveyId = async (surveyId, client = db) =>
+export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
   await client.one(
     `
       SELECT COUNT(*) 
