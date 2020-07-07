@@ -31,12 +31,18 @@ const _validateCategoryFromCategories = async (surveyId, categories, categoryUui
 }
 
 export const validateCategory = async (surveyId, categoryUuid, client = db) => {
-  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
+  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
+    { surveyId, draft: true, includeValidation: true },
+    client
+  )
   return _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
 }
 
 export const validateCategories = async (surveyId, client = db) => {
-  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
+  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
+    { surveyId, draft: true, includeValidation: true },
+    client
+  )
 
   const categoriesValidated = await Promise.all(
     Object.keys(categories).map((categoryUuid) =>

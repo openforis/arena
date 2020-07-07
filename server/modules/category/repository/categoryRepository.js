@@ -66,7 +66,7 @@ export const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) => `
+const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, limit = null }) => `
     WITH
       levels AS
       (
@@ -82,7 +82,16 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
           ${getSurveyDBSchema(surveyId)}.category_level l
         GROUP BY
           l.category_uuid
+      ),
+      c AS
+      (
+        SELECT * 
+        FROM ${getSurveyDBSchema(surveyId)}.category
+        ORDER BY (props || props_draft) -> 'name'
+        OFFSET $/offset/
+        ${limit ? 'LIMIT $/limit/' : ''}
       )
+    
     SELECT
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
@@ -92,20 +101,23 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       'levels', l.levels
       ${includeValidation ? ", 'validation', c.validation" : ''}
       )) AS categories
-    FROM
-      ${getSurveyDBSchema(surveyId)}.category c
+    FROM c
     JOIN
       levels l
     ON
       c.uuid = l.category_uuid`
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  surveyId,
-  draft = false,
-  includeValidation = false,
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
   client = db
 ) => {
-  const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
+  const { categories } = await client.one(
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, offset, limit }),
+    {
+      offset,
+      limit,
+    }
+  )
   return categories || {}
 }
 
@@ -117,7 +129,8 @@ export const fetchCategoryAndLevelsByUuid = async (
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation })} 
+    WHERE c.uuid = $1`,
     [categoryUuid]
   )
   return R.pipe(R.values, R.head)(categories)
