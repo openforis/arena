@@ -19,7 +19,7 @@ export const initSurveyDefs = ({ draft = false, validate = false }) => async (di
 
     const [nodeDefsResp, categoriesResp, taxonomiesResp] = await Promise.all([
       _fetchDefs(surveyId, 'nodeDefs', params),
-      _fetchDefs(surveyId, 'categories', params),
+      _fetchDefs(surveyId, 'categoriesAll', params),
       _fetchDefs(surveyId, 'taxonomies', params),
     ])
     const { nodeDefs, nodeDefsValidation } = nodeDefsResp.data

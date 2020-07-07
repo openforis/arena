@@ -101,16 +101,14 @@ export const init = (app) => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/categoriesAll', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft, validate, offset = 0, limit = null } = Request.getParams(req)
+      const { surveyId, draft, validate } = Request.getParams(req)
 
       const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
         surveyId,
         draft,
         includeValidation: validate,
-        offset,
-        limit,
       })
 
       res.json({ categories })
@@ -119,17 +117,39 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft } = Request.getParams(req)
+      const { surveyId, draft, validate, offset = 0, limit = null } = Request.getParams(req)
 
-      const count = await CategoryService.countCategories({ surveyId, draft })
+      const list = await CategoryService.fetchCategoriesBySurveyId({
+        surveyId,
+        draft,
+        includeValidation: validate,
+        offset,
+        limit,
+      })
 
-      res.json({ count })
+      res.json({ list })
     } catch (error) {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/categories/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft } = Request.getParams(req)
+
+        const count = await CategoryService.countCategories({ surveyId, draft })
+
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // Fetch items by parent item Uuid
   app.get(

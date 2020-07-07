@@ -4,3 +4,7 @@
   display: grid;
   grid-template-columns: 1fr repeat(2, 100px);
 }
+
+.panel-right__content .table {
+  height: 100%;
+}

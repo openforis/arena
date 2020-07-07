@@ -1,11 +1,12 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
+import * as DB from '../../../db'
+import { db } from '../../../db/db'
+import * as DbUtils from '../../../db/dbUtils'
 
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
+import * as Category from '../../../../core/survey/category'
+import * as CategoryLevel from '../../../../core/survey/categoryLevel'
+import * as CategoryItem from '../../../../core/survey/categoryItem'
 
 import {
   getSurveyDBSchema,
@@ -67,7 +68,7 @@ export const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, limit = null }) => `
+const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, offset = null, limit = null }) => `
     WITH
       levels AS
       (
@@ -89,7 +90,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
         SELECT * 
         FROM ${getSurveyDBSchema(surveyId)}.category
         ORDER BY (props || props_draft) -> '${Category.props.name}'
-        OFFSET $/offset/
+        ${offset ? 'OFFSET $/offset/' : ''}
         ${limit ? 'LIMIT $/limit/' : ''}
       )
     
@@ -115,6 +116,27 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
      ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
     [],
     (r) => parseInt(r.count, 10)
+  )
+
+export const fetchCategoriesBySurveyId = async (
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  client = db
+) =>
+  client.map(
+    `SELECT 
+      id,
+      uuid,
+      props,
+      props_draft,
+      published
+      ${includeValidation ? ', validation' : ''}
+    FROM ${getSurveyDBSchema(surveyId)}.category
+    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}`,
+    {
+      offset,
+      limit,
+    },
+    (row) => DB.transformCallback(row, draft, true)
   )
 
 export const fetchCategoriesAndLevelsBySurveyId = async (

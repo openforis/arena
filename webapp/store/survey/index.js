@@ -12,7 +12,7 @@ export { SurveyInfoActions } from './surveyInfo'
 export { NodeDefsActions } from './nodeDefs'
 
 // ====== categories
-export { CategoriesActions } from './categories'
+export { CategoriesActions, CategoriesState } from './categories'
 
 // ====== taxonomies
 export { TaxonomiesActions } from './taxonomies'
