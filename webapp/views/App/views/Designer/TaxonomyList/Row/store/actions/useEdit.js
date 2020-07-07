@@ -18,11 +18,9 @@ export const useEdit = () => {
   const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
   const itemLink = inTaxonomiesPath ? appModuleUri(designerModules.taxonomy) : null
 
-  return useCallback(({ e, state }) => {
+  return useCallback(({ state }) => {
     const taxonomy = State.getTaxonomy(state)
     if (!inTaxonomiesPath) {
-      e.preventDefault()
-      e.stopPropagation()
       dispatch(TaxonomyActions.setTaxonomyForEdit(Taxonomy.getUuid(taxonomy)))
     } else {
       history.push(`${itemLink}${ObjectUtils.getUuid(taxonomy)}/`)

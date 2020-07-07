@@ -27,7 +27,8 @@ export const getDeleted = A.prop(keys.deleted)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
 export const getCanSelect = A.prop(keys.canSelect)
 
-export const getSelected = (state) => getSelectedItemUuid(state) === ObjectUtils.getUuid(getTaxonomy(state))
+export const getSelected = (state) =>
+  !A.isEmpty(getSelectedItemUuid(state)) && getSelectedItemUuid(state) === ObjectUtils.getUuid(getTaxonomy(state))
 
 // ==== UPDATE
 export const assocSelectedItemUuid = A.assoc(keys.selectedItemUuid)

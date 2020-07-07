@@ -1,6 +1,7 @@
 import './Row.scss'
 import * as A from '@core/arena'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -13,6 +14,28 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
 import { State, useTaxonomyRow } from './store'
+
+const TableButton = ({ show = true, label, onClick, icon }) => {
+  if (!show) return null
+  return (
+    <button type="button" className="btn btn-s" onClick={onClick}>
+      {icon && icon}
+      {label}
+    </button>
+  )
+}
+
+TableButton.propTypes = {
+  show: PropTypes.bool,
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.string.isRequired,
+  icon: PropTypes.node,
+}
+
+TableButton.defaultProps = {
+  show: true,
+  icon: null,
+}
 
 const Row = (props) => {
   const { state, Actions } = useTaxonomyRow(props)
@@ -46,30 +69,27 @@ const Row = (props) => {
       <div className="taxonomy__row__badge-container">
         <WarningBadge label={i18n.t('common.deleted')} show={deleted} />
       </div>
-      <div>
-        {!deleted && (canSelect || selected) && (
-          <button
-            type="button"
-            className={`btn btn-s${selected ? ' active' : ''}`}
-            onClick={() => Actions.select({ state })}
-          >
-            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
-            {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
-          </button>
-        )}
-      </div>
-      {!deleted && canEdit && (
-        <button type="button" className="btn btn-s" onClick={(e) => Actions.edit({ e, state })}>
-          <span className="icon icon-pencil2 icon-12px icon-left" />
-          {i18n.t('common.edit')}
-        </button>
-      )}
-      {!deleted && canEdit && (
-        <button type="button" className="btn btn-s" onClick={() => Actions.delete({ state })}>
-          <span className="icon icon-bin2 icon-12px icon-left" />
-          {i18n.t('common.delete')}
-        </button>
-      )}
+
+      <TableButton
+        show={!deleted && (canSelect || selected)}
+        label={selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
+        onClick={() => Actions.select({ state })}
+        icon={<span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />}
+      />
+
+      <TableButton
+        show={!deleted && canEdit}
+        label={i18n.t('common.edit')}
+        onClick={() => Actions.edit({ state })}
+        icon={<span className="icon icon-pencil2 icon-12px icon-left" />}
+      />
+
+      <TableButton
+        show={!deleted && canEdit}
+        label={i18n.t('common.delete')}
+        onClick={() => Actions.delete({ state })}
+        icon={<span className="icon icon-bin2 icon-12px icon-left" />}
+      />
     </>
   )
 }
