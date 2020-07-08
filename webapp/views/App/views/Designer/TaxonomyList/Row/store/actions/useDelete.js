@@ -29,7 +29,7 @@ export const useDelete = () => {
             key: 'taxonomy.confirmDelete',
             params: { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
             onOk: () => {
-              dispatch(TaxonomyActions.deleteTaxonomy(taxonomy, State.getRefetch(state)))
+              dispatch(TaxonomyActions.deleteTaxonomy(taxonomy, State.getInitData(state)))
             },
           })
         )

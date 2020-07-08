@@ -16,7 +16,7 @@ const Content = (props) => {
     rowHeaderComponent,
     rowComponent,
     rowProps,
-    refetchData,
+    initData,
   } = props
 
   const i18n = useI18n()
@@ -50,7 +50,7 @@ const Content = (props) => {
                 row,
                 rowNo: i + offset + 1,
                 active,
-                refetchData,
+                initData,
                 ...rowProps,
               })}
             </div>
@@ -68,7 +68,7 @@ Content.propTypes = {
   noItemsLabelKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
-  refetchData: PropTypes.func,
+  initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
   rowProps: PropTypes.object,
@@ -77,7 +77,7 @@ Content.propTypes = {
 Content.defaultProps = {
   isRowActive: null,
   onRowClick: null,
-  refetchData: null,
+  initData: null,
   rowProps: {},
 }
 

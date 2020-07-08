@@ -8,23 +8,23 @@ export const keys = {
   selectedItemUuid: 'selectedItemUuid',
   onSelect: 'onSelect',
   canSelect: 'canSelect',
-  refetch: 'refetch',
+  initData: 'initData',
 }
 
 // ==== CREATE
-export const create = ({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, refetchData }) => ({
+export const create = ({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, initData }) => ({
   [keys.taxonomy]: taxonomy,
   [keys.deleted]: false,
   [keys.canDelete]: canDelete,
   [keys.selectedItemUuid]: selectedItemUuid,
   [keys.onSelect]: onSelectTaxonomy,
   [keys.canSelect]: canSelect,
-  [keys.refetch]: refetchData,
+  [keys.initData]: initData,
 })
 
 // ==== READ
 export const getOnSelect = A.prop(keys.onSelect)
-export const getRefetch = A.prop(keys.refetch)
+export const getInitData = A.prop(keys.initData)
 export const getTaxonomy = A.prop(keys.taxonomy)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
 export const getCanSelect = A.prop(keys.canSelect)

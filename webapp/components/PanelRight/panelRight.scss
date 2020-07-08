@@ -36,10 +36,6 @@
 .panel-right__content {
   position: relative;
   background-color: darken($greyAppBg, 1%);
-
-  .table {
-    height: calc(100% - 100px);
-  }
 }
 
 @keyframes panel-enter {

@@ -18,19 +18,16 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     params: restParams,
   })
 
-  const refetchData = useCallback(() => {
+  const initData = useCallback(() => {
     fetchData()
     fetchCount()
   }, [])
 
-  useEffect(() => {
-    fetchData()
-    fetchCount()
-  }, [])
+  useEffect(initData, [])
 
   useOnUpdate(() => {
     fetchData()
   }, [offset])
 
-  return { list, offset, limit, count: Number(count), refetchData }
+  return { list, offset, limit, count: Number(count), initData }
 }
