@@ -74,10 +74,11 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
 }
 
 // ====== DELETE
-export const deleteTaxonomy = (taxonomy) => async (dispatch, getState) => {
+export const deleteTaxonomy = (taxonomy, callback) => async (dispatch, getState) => {
   dispatch({ type: TaxonomiesActions.taxonomyDelete, taxonomy })
 
   const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
   dispatch({ type: TaxonomiesActions.taxonomiesUpdate, taxonomies: data.taxonomies })
+  if (callback) callback()
 }

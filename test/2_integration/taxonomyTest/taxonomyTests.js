@@ -43,7 +43,7 @@ after(async () => {
 })
 
 export const taxonomyTests = async () => {
-  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(Survey.getId(survey), true)
+  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId: Survey.getId(survey), draft: true })
   expect(taxonomies.length).to.be.equal(1, 'None or more than one taxonomies found')
   const taxonomy = R.head(taxonomies)
   expect(Taxonomy.getName(taxonomy)).to.be.equal(taxonomyNameDefault)
@@ -73,7 +73,7 @@ export const taxonomyUpdateTest = async () => {
 }
 
 /**
- * Insert new taxa and expect taxa count to become 5
+ * Insert new taxa and expect taxa count to become 5.
  */
 export const taxaInsertTest = async () => {
   const user = getContextUser()
@@ -98,7 +98,7 @@ export const taxaInsertTest = async () => {
 }
 
 /**
- * Update existing taxon with new props
+ * Update existing taxon with new props.
  */
 export const taxonUpdateTest = async () => {
   const user = getContextUser()
