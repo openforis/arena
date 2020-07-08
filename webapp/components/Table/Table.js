@@ -22,7 +22,7 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { list, offset, limit, count } = useTable({ moduleApiUri, module, restParams })
+  const { list, offset, limit, count, initData } = useTable({ moduleApiUri, module, restParams })
 
   return (
     <div className={`table ${className}`}>
@@ -46,6 +46,7 @@ const Table = (props) => {
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
         rowProps={rowProps}
+        initData={initData}
       />
     </div>
   )

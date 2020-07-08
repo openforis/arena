@@ -40,6 +40,7 @@ export const insertTaxonomy = TaxonomyManager.insertTaxonomy
 export const fetchTaxonomyByUuid = TaxonomyManager.fetchTaxonomyByUuid
 export const fetchTaxonomiesBySurveyId = TaxonomyManager.fetchTaxonomiesBySurveyId
 
+export const countTaxonomiesBySurveyId = TaxonomyManager.countTaxonomiesBySurveyId
 export const countTaxaByTaxonomyUuid = TaxonomyManager.countTaxaByTaxonomyUuid
 export const findTaxaByCode = TaxonomyManager.findTaxaByCode
 export const findTaxaByScientificName = TaxonomyManager.findTaxaByScientificName
