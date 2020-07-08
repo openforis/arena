@@ -23,5 +23,5 @@ export const useEdit = () => {
     } else {
       dispatch(CategoryActions.setCategoryForEdit(categoryUuid))
     }
-  })
+  }, [])
 }
