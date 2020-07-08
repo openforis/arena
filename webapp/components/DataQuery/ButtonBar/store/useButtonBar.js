@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { State } from './state'
 
 export const useButtonBar = () => {
-  const [state, setState] = useState(State.create())
+  const [state, setState] = useState(() => State.create())
 
   const Actions = {
     closePanels: () => setState(State.create()),
