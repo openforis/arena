@@ -6,17 +6,26 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { useTableRow } from './useTableRow'
+import { State, useCategoryRow } from './store'
 
 const TableRow = (props) => {
-  const { canEdit, canSelect, category, onDelete, onEdit, onSelect, rowPosition, selected, unused } = useTableRow(props)
+  const { state, Actions } = useCategoryRow(props)
 
   const i18n = useI18n()
 
+  const canEdit = useAuthCanEditSurvey()
+
+  const category = State.getCategory(state)
+  const canSelect = State.getCanSelect(state)
+  const position = State.getPosition(state)
+  const selected = State.isSelected(state)
+  const unused = State.isUnused(state)
+
   return (
     <>
-      <div>{rowPosition}</div>
+      <div>{position}</div>
       <div>{Category.getName(category)}</div>
       {canEdit && (
         <>
@@ -30,7 +39,11 @@ const TableRow = (props) => {
       )}
       {canSelect && (
         <div>
-          <button type="button" className={`btn btn-s${selected ? ' active' : ''}`} onClick={onSelect}>
+          <button
+            type="button"
+            className={`btn btn-s${selected ? ' active' : ''}`}
+            onClick={() => Actions.select({ state })}
+          >
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {i18n.t(selected ? 'common.selected' : 'common.select')}
           </button>
@@ -39,13 +52,13 @@ const TableRow = (props) => {
       {canEdit && (
         <>
           <div>
-            <button type="button" className="btn btn-s" onClick={onEdit}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.edit({ state })}>
               <span className="icon icon-pencil2 icon-12px icon-left" />
               {i18n.t('common.edit')}
             </button>
           </div>
           <div>
-            <button type="button" className="btn btn-s" onClick={onDelete}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.delete({ state })}>
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('common.delete')}
             </button>

@@ -71,7 +71,7 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && (
+      {showCategoriesPanel && !editedCategory && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}

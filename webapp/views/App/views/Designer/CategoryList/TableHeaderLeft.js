@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
@@ -6,6 +7,7 @@ import * as Category from '@core/survey/category'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
+
 import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const TableHeaderLeft = (props) => {
@@ -31,6 +33,14 @@ const TableHeaderLeft = (props) => {
       {i18n.t('common.new')}
     </button>
   )
+}
+
+TableHeaderLeft.propTypes = {
+  headerProps: PropTypes.object,
+}
+
+TableHeaderLeft.defaultProps = {
+  headerProps: {},
 }
 
 export default TableHeaderLeft

@@ -2,16 +2,12 @@ import './CategoryList.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
 import { matchPath, useLocation } from 'react-router'
-
-import * as Survey from '@core/survey/survey'
 
 import Table from '@webapp/components/Table'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { SurveyState, CategoriesState } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import TableRow from './TableRow'
@@ -25,8 +21,6 @@ const CategoryList = (props) => {
 
   const inCategoriesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.categories)))
 
-  const survey = useSelector(SurveyState.getSurvey)
-  const surveyId = Survey.getId(survey)
   const canEdit = useAuthCanEditSurvey()
 
   const gridTemplateColumns = [
@@ -40,15 +34,14 @@ const CategoryList = (props) => {
   return (
     <>
       <Table
-        module={CategoriesState.stateKey}
-        moduleApiUri={`/api/survey/${surveyId}/categories`}
+        module="categories"
         restParams={{ draft: canEdit, validate: canEdit }}
         gridTemplateColumns={gridTemplateColumns}
         headerLeftComponent={TableHeaderLeft}
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
-        headerProps={{ inCategoriesPath, canEdit, canSelect, onSelect }}
-        rowProps={{ inCategoriesPath, surveyId, canEdit, canSelect, onSelect, selectedItemUuid }}
+        headerProps={{ inCategoriesPath, canSelect, onSelect }}
+        rowProps={{ inCategoriesPath, canSelect, onSelect, selectedItemUuid }}
       />
     </>
   )

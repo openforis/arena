@@ -2,11 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const TableRowHeader = (props) => {
-  const { canEdit, canSelect } = props
+  const { canSelect } = props
 
   const i18n = useI18n()
+  const canEdit = useAuthCanEditSurvey()
 
   return (
     <>
@@ -34,7 +36,6 @@ const TableRowHeader = (props) => {
 }
 
 TableRowHeader.propTypes = {
-  canEdit: PropTypes.bool.isRequired,
   canSelect: PropTypes.bool.isRequired,
 }
 
