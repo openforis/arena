@@ -88,27 +88,29 @@ const TaxonProps = (props) => {
         </div>
       </FormItem>
 
-      {(showTaxonomyPanel || editedTaxonomy) && (
-        <PanelRight
-          width="100vw"
-          onClose={() => {
-            dispatch(TaxonomyActions.setTaxonomyForEdit(null))
-            setShowTaxonomyPanel(false)
-          }}
-          header={i18n.t('taxonomy.header')}
-        >
-          <TaxonomyView showClose={false} />
-        </PanelRight>
-      )}
-      {!editedTaxonomy && showTaxonomiesPanel && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setShowTaxonomiesPanel(false)}
-          header={i18n.t('appModules.taxonomies')}
-        >
-          <TaxonomyList canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
-        </PanelRight>
-      )}
+      <div className="taxon-props__panel-right">
+        {(showTaxonomyPanel || editedTaxonomy) && (
+          <PanelRight
+            width="100vw"
+            onClose={() => {
+              dispatch(TaxonomyActions.setTaxonomyForEdit(null))
+              setShowTaxonomyPanel(false)
+            }}
+            header={i18n.t('taxonomy.header')}
+          >
+            <TaxonomyView showClose={false} />
+          </PanelRight>
+        )}
+        {!editedTaxonomy && showTaxonomiesPanel && (
+          <PanelRight
+            width="100vw"
+            onClose={() => setShowTaxonomiesPanel(false)}
+            header={i18n.t('appModules.taxonomies')}
+          >
+            <TaxonomyList canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
+          </PanelRight>
+        )}
+      </div>
     </>
   )
 }
