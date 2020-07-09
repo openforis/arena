@@ -24,7 +24,7 @@ export const useUpload = ({ setState }) => {
       formData
     )
 
-    dispatch(
+    await dispatch(
       JobActions.showJobMonitor({
         job: data.job,
         onComplete: () => {
