@@ -16,10 +16,10 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import TaxonomyList from '@webapp/views/App/views/Designer/TaxonomyList'
-import TaxonomyComponent from '@webapp/views/App/views/Designer/Taxonomy'
+import TaxonomyDetail from '@webapp/views/App/views/Designer/TaxonomyDetail'
 
-import * as TaxonomyActions from '@webapp/views/App/views/Designer/Taxonomy/actions'
-import * as TaxonomyState from '@webapp/views/App/views/Designer/Taxonomy/taxonomyState'
+import * as TaxonomyActions from '@webapp/views/App/views/Designer/TaxonomyDetail/actions'
+import * as TaxonomyState from '@webapp/views/App/views/Designer/TaxonomyDetail/taxonomyState'
 
 import { State } from './store'
 
@@ -98,7 +98,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyComponent showClose={false} />
+            <TaxonomyDetail showClose={false} />
           </PanelRight>
         )}
         {!editedTaxonomy && showTaxonomiesPanel && (

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -18,7 +19,8 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import * as TaxonomyActions from '../actions'
 import * as TaxonomyState from '../taxonomyState'
 
-const EditHeader = () => {
+const EditHeader = (props) => {
+  const { state, Actions } = props
   const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -60,9 +62,7 @@ const EditHeader = () => {
           <UploadButton
             label={i18n.t('common.csvImport')}
             accept=".csv"
-            onChange={async ([file]) => {
-              await dispatch(TaxonomyActions.uploadTaxonomyFile(taxonomy, file))
-            }}
+            onChange={([file]) => Actions.upload({ state, file })}
           />
         )}
         <DownloadButton
@@ -72,6 +72,10 @@ const EditHeader = () => {
       </div>
     </div>
   )
+}
+EditHeader.propTypes = {
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default EditHeader

@@ -5,7 +5,7 @@ import * as A from '@core/arena'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Survey from '@core/survey/survey'
-import * as TaxonomyActions from '@webapp/views/App/views/Designer/Taxonomy/actions'
+import * as TaxonomyActions from '@webapp/views/App/views/Designer/TaxonomyDetail/actions'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'

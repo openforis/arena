@@ -1,4 +1,4 @@
-import './Taxonomy.scss'
+import './TaxonomyDetail.scss'
 
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
@@ -20,8 +20,12 @@ import TaxaTableRow from './TaxaTableRow'
 import * as TaxonomyActions from './actions'
 import * as TaxonomyState from './taxonomyState'
 
-const TaxonomyComponent = (props) => {
+import { State, useTaxonomyDetail } from './store'
+
+const TaxonomyDetail = (props) => {
   const { showClose } = props
+  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
+  const { state, Actions } = useTaxonomyDetail({ taxonomy })
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -30,7 +34,7 @@ const TaxonomyComponent = (props) => {
 
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
-  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
+
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
@@ -48,18 +52,20 @@ const TaxonomyComponent = (props) => {
 
   return taxonomy ? (
     <div className="taxonomy">
-      <EditHeader />
+      <EditHeader state={state} Actions={Actions} />
 
-      <Table
-        module={TaxonomyState.keys.taxa}
-        moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
-        restParams={{ draft: canEdit }}
-        gridTemplateColumns={gridTemplateColumns}
-        rowHeaderComponent={TaxaTableRowHeader}
-        rowComponent={TaxaTableRow}
-        noItemsLabelKey="taxonomy.edit.taxaNotImported"
-        rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
-      />
+      <div key={State.getTaxaVersion(state)} className="taxonomy__table-container">
+        <Table
+          module={TaxonomyState.keys.taxa}
+          moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
+          restParams={{ draft: canEdit }}
+          gridTemplateColumns={gridTemplateColumns}
+          rowHeaderComponent={TaxaTableRowHeader}
+          rowComponent={TaxaTableRow}
+          noItemsLabelKey="taxonomy.edit.taxaNotImported"
+          rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
+        />
+      </div>
 
       {showClose && (
         <div className="button-bar">
@@ -72,12 +78,12 @@ const TaxonomyComponent = (props) => {
   ) : null
 }
 
-TaxonomyComponent.propTypes = {
+TaxonomyDetail.propTypes = {
   showClose: PropTypes.bool,
 }
 
-TaxonomyComponent.defaultProps = {
+TaxonomyDetail.defaultProps = {
   showClose: true,
 }
 
-export default TaxonomyComponent
+export default TaxonomyDetail
