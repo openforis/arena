@@ -8,7 +8,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurvey, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
 
@@ -30,6 +30,7 @@ export const useDelete = () => {
             key: 'taxonomy.confirmDelete',
             params: { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
             onOk: async () => {
+              dispatch(SurveyActions.metaUpdated())
               await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
               const initData = State.getInitData(state)
               if (initData) initData()
