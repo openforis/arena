@@ -24,6 +24,7 @@ export const {
   insertItem,
 
   countCategories,
+  fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,

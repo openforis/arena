@@ -2,7 +2,7 @@ import './CategorySelector.scss'
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -12,9 +12,10 @@ import { useSurvey } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
+import * as CategoryState from '@webapp/loggedin/surveyViews/category/categoryState'
 import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
@@ -25,16 +26,15 @@ const CategorySelector = (props) => {
   const dispatch = useDispatch()
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
-  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
 
   const survey = useSurvey()
   const categories = Survey.getCategoriesArray(survey)
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+  const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
   const onAdd = async () => {
     const newCategory = await dispatch(CategoryActions.createCategory())
     onChange(newCategory)
-    setShowCategoryPanel(true)
   }
 
   return (
@@ -71,25 +71,24 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoryPanel && (
-        <PanelRight
-          width="100vw"
-          onClose={async () => {
-            await dispatch(CategoryActions.setCategoryForEdit(null))
-            setShowCategoryPanel(false)
-          }}
-          header={i18n.t('categoryEdit.header')}
-        >
-          <CategoryView showClose={false} />
-        </PanelRight>
-      )}
-      {showCategoriesPanel && (
+      {showCategoriesPanel && !editedCategory && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}
           header={i18n.t('appModules.categories')}
         >
-          <CategoriesView canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
+          <CategoryList canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
+        </PanelRight>
+      )}
+      {editedCategory && (
+        <PanelRight
+          width="100vw"
+          onClose={async () => {
+            await dispatch(CategoryActions.setCategoryForEdit(null))
+          }}
+          header={i18n.t('categoryEdit.header')}
+        >
+          <CategoryView showClose={false} />
         </PanelRight>
       )}
     </div>

@@ -1,7 +1,6 @@
-import './Row.scss'
-import * as A from '@core/arena'
 import React from 'react'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 

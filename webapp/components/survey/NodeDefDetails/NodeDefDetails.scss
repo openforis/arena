@@ -24,6 +24,16 @@
   .form-item {
     grid-template-columns: 0.2fr 0.7fr;
   }
+
+  .panel-right__content {
+    .table {
+      height: 100%;
+
+      .badge {
+        position: inherit;
+      }
+    }
+  }
 }
 
 .form-item.node-def-edit__title {

@@ -59,6 +59,7 @@ export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys,
 // ====== READ
 export const { getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(props.name, '')
+export const getValidation = Validation.getValidation
 
 const getLevels = R.propOr([], keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
@@ -69,11 +70,7 @@ export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
 export const isPublished = R.propOr(false, keys.published)
 
 export const getLevelValidation = (levelIndex) =>
-  R.pipe(
-    Validation.getValidation,
-    Validation.getFieldValidation(keys.levels),
-    Validation.getFieldValidation(levelIndex)
-  )
+  R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
 // ====== UPDATE
 export const assocLevelsArray = (array) => R.assoc(keys.levels, ObjectUtils.toIndexedObj(array, 'index'))
@@ -94,7 +91,7 @@ export const isItemLeaf = (item) => (category) =>
 
 export const getItemValidation = (item) =>
   R.pipe(
-    Validation.getValidation,
+    getValidation,
     Validation.getFieldValidation(keys.items),
     Validation.getFieldValidation(CategoryItem.getUuid(item))
   )
