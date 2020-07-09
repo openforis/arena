@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
+import TaxonomyDetail from '@webapp/components/survey/TaxonomyDetail'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
@@ -14,8 +16,6 @@ import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
-import TaxonomyList from './TaxonomyList'
-import TaxonomyDetail from './TaxonomyDetail'
 
 const Designer = () => {
   const dispatch = useDispatch()

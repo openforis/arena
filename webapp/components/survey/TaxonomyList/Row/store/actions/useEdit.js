@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as TaxonomyActions from '@webapp/views/App/views/Designer/TaxonomyDetail/actions'
+import * as TaxonomyActions from '@webapp/components/survey/TaxonomyDetail'
 
 import { State } from '../state'
 

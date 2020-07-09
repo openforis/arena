@@ -14,8 +14,8 @@ import PanelRight from '@webapp/components/PanelRight'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import TaxonomyList from '@webapp/views/App/views/Designer/TaxonomyList'
-import TaxonomyDetail from '@webapp/views/App/views/Designer/TaxonomyDetail'
+import TaxonomyList from '../TaxonomyList'
+import TaxonomyDetail from '../TaxonomyDetail'
 
 import { State } from './store'
 
