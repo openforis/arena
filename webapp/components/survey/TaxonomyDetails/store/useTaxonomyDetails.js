@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useActions } from './actions'
 import * as TaxonomyActions from '../actions'
 
-export const useTaxonomyDetail = (props) => {
+export const useTaxonomyDetails = (props) => {
   const { onTaxonomyCreated } = props
   const dispatch = useDispatch()
   const [state, setState] = useState({})

@@ -1,4 +1,4 @@
-import './TaxonomyDetail.scss'
+import './TaxonomyDetails.scss'
 
 import * as A from '@core/arena'
 
@@ -21,12 +21,12 @@ import TaxaTableRow from './TaxaTableRow'
 
 import * as TaxonomyState from './taxonomyState'
 
-import { State, useTaxonomyDetail } from './store'
+import { State, useTaxonomyDetails } from './store'
 
-const TaxonomyDetail = (props) => {
+const TaxonomyDetails = (props) => {
   const { showClose } = props
 
-  const { state, Actions } = useTaxonomyDetail(props)
+  const { state, Actions } = useTaxonomyDetails(props)
 
   const history = useHistory()
 
@@ -75,12 +75,12 @@ const TaxonomyDetail = (props) => {
   )
 }
 
-TaxonomyDetail.propTypes = {
+TaxonomyDetails.propTypes = {
   showClose: PropTypes.bool,
 }
 
-TaxonomyDetail.defaultProps = {
+TaxonomyDetails.defaultProps = {
   showClose: true,
 }
 
-export default TaxonomyDetail
+export default TaxonomyDetails
