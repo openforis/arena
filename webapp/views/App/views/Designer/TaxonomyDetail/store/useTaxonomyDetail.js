@@ -6,7 +6,7 @@ import * as TaxonomyActions from '../actions'
 export const useTaxonomyDetail = (props) => {
   const { onTaxonomyCreate } = props
   const dispatch = useDispatch()
-  const [state, setState] = useState(null)
+  const [state, setState] = useState({})
 
   const Actions = useActions({ setState })
 

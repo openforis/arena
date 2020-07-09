@@ -1,10 +1,10 @@
 import React from 'react'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
+import PropTypes from 'prop-types'
 import { matchPath, useHistory, useLocation } from 'react-router'
 
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
+
 import { useI18n } from '@webapp/store/system'
-import PropTypes from 'prop-types'
 
 const HeaderLeft = (props) => {
   const i18n = useI18n()
@@ -17,7 +17,7 @@ const HeaderLeft = (props) => {
 
   const add = async () => {
     if (inTaxonomiesPath) {
-      history.push(`${appModuleUri(designerModules.taxonomy)}`)
+      history.push(appModuleUri(designerModules.taxonomy))
     } else {
       onTaxonomyCreated()
     }

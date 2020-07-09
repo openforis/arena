@@ -35,7 +35,6 @@ const TaxonomyDetail = (props) => {
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
 
-  if (A.isEmpty(state)) return null
   const taxonomy = State.getTaxonomy(state)
 
   if (A.isEmpty(taxonomy)) return null
