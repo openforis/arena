@@ -16,7 +16,8 @@ export const useUpdate = ({ setState }) => {
   return useCallback(({ key, value, state }) => {
     const taxonomy = State.getTaxonomy(state)
 
-    setState(State.assocTaxonomy(State.assocTaxonomyProp({ key, value })(taxonomy))(state))
+    const taxonomyUpdated = State.assocTaxonomyProp({ key, value })(taxonomy)
+    setState(State.assocTaxonomy(taxonomyUpdated)(state))
 
     const action = async () => {
       dispatch({ type: TaxonomiesActions.taxonomyPropUpdate, taxonomy, key, value })
