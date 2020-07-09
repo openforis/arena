@@ -15,11 +15,9 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table/Table'
-import EditHeader from './EditHeader'
+import Header from './Header'
 import TaxaTableRowHeader from './TaxaTableRowHeader'
 import TaxaTableRow from './TaxaTableRow'
-
-import * as TaxonomyState from './taxonomyState'
 
 import { State, useTaxonomyDetails } from './store'
 
@@ -47,12 +45,12 @@ const TaxonomyDetails = (props) => {
 
   return (
     <div className="taxonomy">
-      <EditHeader state={state} Actions={Actions} />
+      <Header state={state} Actions={Actions} />
 
       <div key={State.getTaxaVersion(state)} className="taxonomy__table-container">
         {!A.isEmpty(taxonomyUuid) && (
           <Table
-            module={TaxonomyState.keys.taxa}
+            module={State.Taxonomykeys.taxa}
             moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
             restParams={{ draft: canEdit }}
             gridTemplateColumns={gridTemplateColumns}

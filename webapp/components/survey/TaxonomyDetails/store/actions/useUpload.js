@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { JobActions } from '@webapp/store/app'
-import { useSurveyId, TaxonomiesActions } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
 
@@ -37,7 +37,6 @@ export const useUpload = ({ setState }) => {
       data: { taxonomyWithTaxa },
     } = await axios.get(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}?draft=true&validate=true`)
 
-    dispatch({ type: TaxonomiesActions.taxonomyUpdate, taxonomyWithTaxa })
     setState(State.assocTaxonomy(taxonomyWithTaxa)(state))
   }, [])
 }

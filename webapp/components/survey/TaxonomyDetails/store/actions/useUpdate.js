@@ -20,12 +20,10 @@ export const useUpdate = ({ setState }) => {
     setState(State.assocTaxonomy(taxonomyUpdated)(state))
 
     const action = async () => {
-      dispatch({ type: TaxonomiesActions.taxonomyPropUpdate, taxonomy, key, value })
-      const { data } = await axios.put(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`, {
+      await axios.put(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`, {
         key,
         value,
       })
-      dispatch({ type: TaxonomiesActions.taxonomiesUpdate, taxonomies: data.taxonomies })
     }
 
     dispatch(debounceAction(action, `${TaxonomiesActions.taxonomyPropUpdate}_${Taxonomy.getUuid(taxonomy)}`))

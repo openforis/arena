@@ -34,6 +34,7 @@ const TaxonProps = (props) => {
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
+  const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
   const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
@@ -80,18 +81,19 @@ const TaxonProps = (props) => {
       </FormItem>
 
       <div className="taxon-props__panel-right">
-        {showTaxonomyPanel && (
+        {(showTaxonomyPanel || taxonomyToEdit) && (
           <PanelRight
             width="100vw"
             onClose={() => {
               setShowTaxonomyPanel(false)
+              setTaxonomyToEdit(null)
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} />
+            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
           </PanelRight>
         )}
-        {!showTaxonomyPanel && showTaxonomiesPanel && (
+        {!showTaxonomyPanel && showTaxonomiesPanel && !taxonomyToEdit && (
           <PanelRight
             width="100vw"
             onClose={() => setShowTaxonomiesPanel(false)}
@@ -101,8 +103,8 @@ const TaxonProps = (props) => {
               canSelect
               selectedItemUuid={taxonomyUuid}
               onSelect={onTaxonomySelect}
-              onOpenTaxonomy={() => {
-                setShowTaxonomyPanel(true)
+              onOpenTaxonomy={(taxonomySelected) => {
+                setTaxonomyToEdit(taxonomySelected)
               }}
             />
           </PanelRight>
