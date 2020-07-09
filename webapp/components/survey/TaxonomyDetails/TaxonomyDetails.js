@@ -1,9 +1,11 @@
-import './Taxonomy.scss'
+import './TaxonomyDetails.scss'
 
-import React, { useEffect } from 'react'
+import * as A from '@core/arena'
+
+import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector, useDispatch } from 'react-redux'
-import { useHistory, useParams } from 'react-router'
+
+import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -17,20 +19,25 @@ import EditHeader from './EditHeader'
 import TaxaTableRowHeader from './TaxaTableRowHeader'
 import TaxaTableRow from './TaxaTableRow'
 
-import * as TaxonomyActions from './actions'
 import * as TaxonomyState from './taxonomyState'
 
-const TaxonomyComponent = (props) => {
+import { State, useTaxonomyDetails } from './store'
+
+const TaxonomyDetails = (props) => {
   const { showClose } = props
 
-  const dispatch = useDispatch()
+  const { state, Actions } = useTaxonomyDetails(props)
+
   const history = useHistory()
-  const { taxonomyUuid: taxonomyUuidParam } = useParams()
+
   const i18n = useI18n()
 
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
-  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
+
+  const taxonomy = State.getTaxonomy(state)
+
+  if (A.isEmpty(taxonomy)) return null
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
@@ -38,28 +45,24 @@ const TaxonomyComponent = (props) => {
     R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`
   }`
 
-  useEffect(() => {
-    if (taxonomyUuidParam) {
-      dispatch(TaxonomyActions.setTaxonomyForEdit(taxonomyUuidParam))
-    }
-
-    return () => dispatch(TaxonomyActions.setTaxonomyForEdit(null))
-  }, [])
-
-  return taxonomy ? (
+  return (
     <div className="taxonomy">
-      <EditHeader />
+      <EditHeader state={state} Actions={Actions} />
 
-      <Table
-        module={TaxonomyState.keys.taxa}
-        moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
-        restParams={{ draft: canEdit }}
-        gridTemplateColumns={gridTemplateColumns}
-        rowHeaderComponent={TaxaTableRowHeader}
-        rowComponent={TaxaTableRow}
-        noItemsLabelKey="taxonomy.edit.taxaNotImported"
-        rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
-      />
+      <div key={State.getTaxaVersion(state)} className="taxonomy__table-container">
+        {!A.isEmpty(taxonomyUuid) && (
+          <Table
+            module={TaxonomyState.keys.taxa}
+            moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
+            restParams={{ draft: canEdit }}
+            gridTemplateColumns={gridTemplateColumns}
+            rowHeaderComponent={TaxaTableRowHeader}
+            rowComponent={TaxaTableRow}
+            noItemsLabelKey="taxonomy.edit.taxaNotImported"
+            rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
+          />
+        )}
+      </div>
 
       {showClose && (
         <div className="button-bar">
@@ -69,15 +72,15 @@ const TaxonomyComponent = (props) => {
         </div>
       )}
     </div>
-  ) : null
+  )
 }
 
-TaxonomyComponent.propTypes = {
+TaxonomyDetails.propTypes = {
   showClose: PropTypes.bool,
 }
 
-TaxonomyComponent.defaultProps = {
+TaxonomyDetails.defaultProps = {
   showClose: true,
 }
 
-export default TaxonomyComponent
+export default TaxonomyDetails

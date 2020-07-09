@@ -4,10 +4,10 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useTaxonomyRow = (props) => {
-  const { selectedItemUuid, row: taxonomy, canDelete, onSelectTaxonomy, canSelect, initData } = props
+  const { selectedItemUuid, row: taxonomy, canDelete, onSelectTaxonomy, canSelect, initData, onOpenTaxonomy } = props
 
   const [state, setState] = useState(() =>
-    State.create({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, initData })
+    State.create({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, initData, onOpenTaxonomy })
   )
 
   useEffect(() => {

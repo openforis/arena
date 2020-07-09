@@ -18,6 +18,7 @@ const Table = (props) => {
     restParams,
     rowComponent,
     rowHeaderComponent,
+    headerProps,
     rowProps,
   } = props
 
@@ -25,7 +26,14 @@ const Table = (props) => {
 
   return (
     <div className={`table ${className}`}>
-      <Header offset={offset} list={list} limit={limit} count={count} headerLeftComponent={headerLeftComponent} />
+      <Header
+        offset={offset}
+        list={list}
+        limit={limit}
+        count={count}
+        headerLeftComponent={headerLeftComponent}
+        headerProps={headerProps}
+      />
 
       <Content
         gridTemplateColumns={gridTemplateColumns}
@@ -59,6 +67,7 @@ Table.propTypes = {
   rowComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
+  headerProps: PropTypes.object,
 }
 
 Table.defaultProps = {
@@ -73,6 +82,7 @@ Table.defaultProps = {
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
   rowProps: {},
+  headerProps: {},
 }
 
 export default Table

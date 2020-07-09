@@ -1,25 +1,25 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
+import PropTypes from 'prop-types'
 import { matchPath, useHistory, useLocation } from 'react-router'
-import * as TaxonomyActions from '@webapp/views/App/views/Designer/Taxonomy/actions'
 
-import * as Taxonomy from '@core/survey/taxonomy'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 
-const HeaderLeft = () => {
+const HeaderLeft = (props) => {
   const i18n = useI18n()
-  const dispatch = useDispatch()
   const { pathname } = useLocation()
   const history = useHistory()
   const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
 
+  const { headerProps } = props
+  const { onTaxonomyCreated } = headerProps
+
   const add = async () => {
-    const taxonomy = await dispatch(TaxonomyActions.createTaxonomy())
     if (inTaxonomiesPath) {
-      history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomy)}/`)
+      history.push(appModuleUri(designerModules.taxonomy))
+    } else {
+      onTaxonomyCreated()
     }
   }
 
@@ -31,6 +31,14 @@ const HeaderLeft = () => {
       </button>
     </div>
   )
+}
+
+HeaderLeft.propTypes = {
+  headerProps: PropTypes.object,
+}
+
+HeaderLeft.defaultProps = {
+  headerProps: {},
 }
 
 export default HeaderLeft

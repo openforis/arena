@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
@@ -14,8 +16,6 @@ import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
-import TaxonomyList from './TaxonomyList'
-import Taxonomy from './Taxonomy'
 
 const Designer = () => {
   const dispatch = useDispatch()
@@ -65,9 +65,12 @@ const Designer = () => {
             component: TaxonomyList,
             path: appModuleUri(designerModules.taxonomies),
           },
-
           {
-            component: Taxonomy,
+            component: TaxonomyDetails,
+            path: `${appModuleUri(designerModules.taxonomy)}`,
+          },
+          {
+            component: TaxonomyDetails,
             path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
           },
         ]}
