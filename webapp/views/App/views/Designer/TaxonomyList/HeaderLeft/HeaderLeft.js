@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { matchPath, useHistory, useLocation } from 'react-router'
+
 import * as TaxonomyActions from '@webapp/views/App/views/Designer/TaxonomyDetail/actions'
 
 import * as Taxonomy from '@core/survey/taxonomy'

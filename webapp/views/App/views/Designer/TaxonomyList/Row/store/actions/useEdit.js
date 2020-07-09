@@ -6,6 +6,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as TaxonomyActions from '@webapp/views/App/views/Designer/TaxonomyDetail/actions'
+
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { State } from '../state'

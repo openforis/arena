@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 
+
 import * as TaxonomyState from '@webapp/views/App/views/Designer/TaxonomyDetail/taxonomyState'
 import taxonomyEdit from '@webapp/views/App/views/Designer/TaxonomyDetail/reducer'
 
