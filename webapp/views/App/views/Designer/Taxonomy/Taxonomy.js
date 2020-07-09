@@ -1,4 +1,4 @@
-import './taxonomyView.scss'
+import './Taxonomy.scss'
 
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
@@ -13,14 +13,14 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table/Table'
-import TaxonomyEditHeader from './components/taxonomyEditHeader'
-import TaxaTableRowHeader from './components/taxaTableRowHeader'
-import TaxaTableRow from './components/taxaTableRow'
+import EditHeader from './EditHeader'
+import TaxaTableRowHeader from './TaxaTableRowHeader'
+import TaxaTableRow from './TaxaTableRow'
 
 import * as TaxonomyActions from './actions'
 import * as TaxonomyState from './taxonomyState'
 
-const TaxonomyView = (props) => {
+const TaxonomyComponent = (props) => {
   const { showClose } = props
 
   const dispatch = useDispatch()
@@ -48,7 +48,7 @@ const TaxonomyView = (props) => {
 
   return taxonomy ? (
     <div className="taxonomy">
-      <TaxonomyEditHeader />
+      <EditHeader />
 
       <Table
         module={TaxonomyState.keys.taxa}
@@ -63,7 +63,7 @@ const TaxonomyView = (props) => {
 
       {showClose && (
         <div className="button-bar">
-          <button type="button" className="btn" onClick={() => history.goBack()}>
+          <button type="button" className="btn" onClick={history.goBack}>
             {i18n.t('common.done')}
           </button>
         </div>
@@ -72,12 +72,12 @@ const TaxonomyView = (props) => {
   ) : null
 }
 
-TaxonomyView.propTypes = {
+TaxonomyComponent.propTypes = {
   showClose: PropTypes.bool,
 }
 
-TaxonomyView.defaultProps = {
+TaxonomyComponent.defaultProps = {
   showClose: true,
 }
 
-export default TaxonomyView
+export default TaxonomyComponent

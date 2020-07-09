@@ -11,15 +11,15 @@ import * as Validation from '@core/validation/validation'
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
-import * as TaxonomyState from '@webapp/loggedin/surveyViews/taxonomy/taxonomyState'
-
 import TaxonomyList from '@webapp/views/App/views/Designer/TaxonomyList'
+import TaxonomyComponent from '@webapp/views/App/views/Designer/Taxonomy'
+
+import * as TaxonomyActions from '@webapp/views/App/views/Designer/Taxonomy/actions'
+import * as TaxonomyState from '@webapp/views/App/views/Designer/Taxonomy/taxonomyState'
 
 import { State } from './store'
 
@@ -98,7 +98,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyView showClose={false} />
+            <TaxonomyComponent showClose={false} />
           </PanelRight>
         )}
         {!editedTaxonomy && showTaxonomiesPanel && (

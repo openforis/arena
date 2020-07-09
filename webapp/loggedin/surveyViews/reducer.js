@@ -1,14 +1,15 @@
 import { combineReducers } from 'redux'
 
+import * as TaxonomyState from '@webapp/views/App/views/Designer/Taxonomy/taxonomyState'
+import taxonomyEdit from '@webapp/views/App/views/Designer/Taxonomy/reducer'
+
 import * as CategoryState from './category/categoryState'
 import * as RecordState from './record/recordState'
 import * as SurveyFormState from './surveyForm/surveyFormState'
-import * as TaxonomyState from './taxonomy/taxonomyState'
 
 import category from './category/reducer'
 import record from './record/reducer'
 import surveyForm from './surveyForm/reducer'
-import taxonomyEdit from './taxonomy/reducer'
 
 export default combineReducers({
   [CategoryState.stateKey]: category,

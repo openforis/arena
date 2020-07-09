@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as SurveyViewsState from '../surveyViewsState'
+import * as SurveyViewsState from '@webapp/loggedin/surveyViews/surveyViewsState'
 
 export const keys = {
   taxa: 'taxa',
