@@ -25,7 +25,7 @@ export const useInit = ({ setState }) => {
     if (A.isEmpty(taxonomyToSet)) {
       if (A.isEmpty(taxonomyUuidParam)) {
         const {
-          data: { taxonomyCreated },
+          data: { taxonomy: taxonomyCreated },
         } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
 
         if (onTaxonomyCreated) {

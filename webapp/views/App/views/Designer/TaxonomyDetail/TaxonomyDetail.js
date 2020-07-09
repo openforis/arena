@@ -67,13 +67,7 @@ const TaxonomyDetail = (props) => {
 
       {showClose && (
         <div className="button-bar">
-          <button
-            type="button"
-            className="btn"
-            onClick={() => {
-              history.goBack()
-            }}
-          >
+          <button type="button" className="btn" onClick={history.goBack}>
             {i18n.t('common.done')}
           </button>
         </div>
