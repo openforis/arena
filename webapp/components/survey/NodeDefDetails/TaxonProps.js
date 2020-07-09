@@ -88,7 +88,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetail showClose={false} onTaxonomyCreate={onTaxonomySelect} />
+            <TaxonomyDetail showClose={false} onTaxonomyCreated={onTaxonomySelect} />
           </PanelRight>
         )}
         {!showTaxonomyPanel && showTaxonomiesPanel && (

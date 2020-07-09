@@ -31,7 +31,7 @@ export const useInit = ({ setState }) => {
         if (onTaxonomyCreated) {
           onTaxonomyCreated(taxonomyCreated)
         }
-        await dispatch({ type: TaxonomiesActions.taxonomyCreate, taxonomy })
+        await dispatch({ type: TaxonomiesActions.taxonomyCreate, taxonomy: taxonomyCreated })
         taxonomyToSet = taxonomyCreated
       } else {
         const {

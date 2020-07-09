@@ -4,14 +4,14 @@ import { useActions } from './actions'
 import * as TaxonomyActions from '../actions'
 
 export const useTaxonomyDetail = (props) => {
-  const { onTaxonomyCreate } = props
+  const { onTaxonomyCreated } = props
   const dispatch = useDispatch()
   const [state, setState] = useState({})
 
   const Actions = useActions({ setState })
 
   useEffect(() => {
-    Actions.init({ state, onTaxonomyCreate })
+    Actions.init({ state, onTaxonomyCreated })
     return () => dispatch(TaxonomyActions.setTaxonomyForEdit(null))
   }, [])
 
