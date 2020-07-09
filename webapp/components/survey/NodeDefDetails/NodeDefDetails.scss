@@ -24,6 +24,16 @@
   .form-item {
     grid-template-columns: 0.2fr 0.7fr;
   }
+
+  .panel-right__content {
+    .table {
+      height: 100%;
+
+      .badge {
+        position: inherit;
+      }
+    }
+  }
 }
 
 .form-item.node-def-edit__title {
@@ -53,16 +63,4 @@
 .node-def-edit__cancel-confirm-dialog .modal-content {
   text-align: center;
   margin: 10vh 30vw auto;
-}
-
-.node-def-edit__container {
-  .panel-right__content {
-    .table {
-      height: 100%;
-
-      .badge {
-        position: inherit;
-      }
-    }
-  }
 }
