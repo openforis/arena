@@ -54,3 +54,15 @@
   text-align: center;
   margin: 10vh 30vw auto;
 }
+
+.node-def-edit__container {
+  .panel-right__content {
+    .table {
+      height: 100%;
+
+      .badge {
+        position: inherit;
+      }
+    }
+  }
+}
