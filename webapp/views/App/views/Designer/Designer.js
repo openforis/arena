@@ -6,7 +6,6 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
-import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -16,6 +15,7 @@ import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
 import TaxonomyList from './TaxonomyList'
+import Taxonomy from './Taxonomy'
 
 const Designer = () => {
   const dispatch = useDispatch()
@@ -67,7 +67,7 @@ const Designer = () => {
           },
 
           {
-            component: TaxonomyView,
+            component: Taxonomy,
             path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
           },
         ]}

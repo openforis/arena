@@ -18,7 +18,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import * as TaxonomyActions from '../actions'
 import * as TaxonomyState from '../taxonomyState'
 
-const TaxonomyEditHeader = () => {
+const EditHeader = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -74,4 +74,4 @@ const TaxonomyEditHeader = () => {
   )
 }
 
-export default TaxonomyEditHeader
+export default EditHeader
