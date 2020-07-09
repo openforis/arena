@@ -1,4 +1,8 @@
 import * as A from '@core/arena'
+import * as R from 'ramda'
+
+import * as Validation from '@core/validation/validation'
+import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
   taxonomy: 'taxonomy',
@@ -18,3 +22,9 @@ export const getTaxaVersion = A.prop(keys.taxaVersion)
 // ==== UPDATE
 export const assocTaxonomy = A.assoc(keys.taxonomy)
 export const assocTaxaVersion = A.assoc(keys.taxaVersion)
+
+export const assocTaxonomyProp = ({ key, value }) =>
+  A.pipe(
+    R.assocPath([ObjectUtils.keys.props, key], value),
+    R.dissocPath([Validation.keys.validation, Validation.keys.fields, key])
+  )
