@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
-
+import { useDispatch } from 'react-redux'
 import { useActions } from './actions'
-import { State } from './state'
+import * as TaxonomyActions from '../actions'
 
 export const useTaxonomyDetail = (props) => {
-  const { taxonomy } = props
-
-  const [state, setState] = useState(() => State.create({ taxonomy }))
-
-  useEffect(() => {
-    setState(State.assocTaxonomy(taxonomy)(state))
-  }, [taxonomy])
+  const { onTaxonomyCreate } = props
+  const dispatch = useDispatch()
+  const [state, setState] = useState(null)
 
   const Actions = useActions({ setState })
+
+  useEffect(() => {
+    Actions.init({ state, onTaxonomyCreate })
+    return () => dispatch(TaxonomyActions.setTaxonomyForEdit(null))
+  }, [])
 
   return { state, Actions }
 }
