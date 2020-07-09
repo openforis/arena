@@ -5,7 +5,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
-import TaxonomyDetail from '@webapp/components/survey/TaxonomyDetail'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
@@ -66,11 +66,11 @@ const Designer = () => {
             path: appModuleUri(designerModules.taxonomies),
           },
           {
-            component: TaxonomyDetail,
+            component: TaxonomyDetails,
             path: `${appModuleUri(designerModules.taxonomy)}`,
           },
           {
-            component: TaxonomyDetail,
+            component: TaxonomyDetails,
             path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
           },
         ]}

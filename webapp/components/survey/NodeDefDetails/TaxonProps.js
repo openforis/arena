@@ -14,8 +14,8 @@ import PanelRight from '@webapp/components/PanelRight'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import TaxonomyList from '../TaxonomyList'
-import TaxonomyDetail from '../TaxonomyDetail'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 
 import { State } from './store'
 
@@ -88,7 +88,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetail showClose={false} onTaxonomyCreated={onTaxonomySelect} />
+            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} />
           </PanelRight>
         )}
         {!showTaxonomyPanel && showTaxonomiesPanel && (
