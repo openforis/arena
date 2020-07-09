@@ -13,13 +13,13 @@ const HeaderLeft = (props) => {
   const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
 
   const { headerProps } = props
-  const { onTaxonomyCreated } = headerProps
+  const { onNewTaxonomy } = headerProps
 
   const add = async () => {
     if (inTaxonomiesPath) {
       history.push(appModuleUri(designerModules.taxonomy))
     } else {
-      onTaxonomyCreated()
+      onNewTaxonomy()
     }
   }
 

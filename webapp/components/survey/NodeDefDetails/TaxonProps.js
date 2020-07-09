@@ -103,6 +103,7 @@ const TaxonProps = (props) => {
               canSelect
               selectedItemUuid={taxonomyUuid}
               onSelect={onTaxonomySelect}
+              onNewTaxonomy={() => setShowTaxonomyPanel(true)}
               onOpenTaxonomy={(taxonomySelected) => {
                 setTaxonomyToEdit(taxonomySelected)
               }}

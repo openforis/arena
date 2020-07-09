@@ -8,7 +8,7 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const TaxonomyList = (props) => {
-  const { canSelect, selectedItemUuid, onSelect: onSelectTaxonomy, onOpenTaxonomy, onTaxonomyCreated } = props
+  const { canSelect, selectedItemUuid, onSelect: onSelectTaxonomy, onOpenTaxonomy, onNewTaxonomy } = props
 
   return (
     <Table
@@ -20,7 +20,7 @@ const TaxonomyList = (props) => {
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
       rowProps={{ canSelect, selectedItemUuid, onSelectTaxonomy, onOpenTaxonomy }}
-      headerProps={{ onOpenTaxonomy, onTaxonomyCreated }}
+      headerProps={{ onOpenTaxonomy, onNewTaxonomy }}
     />
   )
 }
@@ -29,7 +29,7 @@ TaxonomyList.propTypes = {
   canSelect: PropTypes.bool,
   onSelect: PropTypes.func,
   onOpenTaxonomy: PropTypes.func,
-  onTaxonomyCreated: PropTypes.func,
+  onNewTaxonomy: PropTypes.func,
   selectedItemUuid: PropTypes.string,
 }
 
@@ -37,7 +37,7 @@ TaxonomyList.defaultProps = {
   canSelect: false,
   onSelect: null,
   onOpenTaxonomy: null,
-  onTaxonomyCreated: null,
+  onNewTaxonomy: null,
   selectedItemUuid: null,
 }
 
