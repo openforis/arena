@@ -81,19 +81,7 @@ const TaxonProps = (props) => {
       </FormItem>
 
       <div className="taxon-props__panel-right">
-        {(showTaxonomyPanel || taxonomyToEdit) && (
-          <PanelRight
-            width="100vw"
-            onClose={() => {
-              setShowTaxonomyPanel(false)
-              setTaxonomyToEdit(null)
-            }}
-            header={i18n.t('taxonomy.header')}
-          >
-            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
-          </PanelRight>
-        )}
-        {!showTaxonomyPanel && showTaxonomiesPanel && !taxonomyToEdit && (
+        {showTaxonomiesPanel && (
           <PanelRight
             width="100vw"
             onClose={() => setShowTaxonomiesPanel(false)}
@@ -108,6 +96,19 @@ const TaxonProps = (props) => {
                 setTaxonomyToEdit(taxonomySelected)
               }}
             />
+          </PanelRight>
+        )}
+
+        {(showTaxonomyPanel || taxonomyToEdit) && (
+          <PanelRight
+            width="100vw"
+            onClose={() => {
+              setShowTaxonomyPanel(false)
+              setTaxonomyToEdit(null)
+            }}
+            header={i18n.t('taxonomy.header')}
+          >
+            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
           </PanelRight>
         )}
       </div>

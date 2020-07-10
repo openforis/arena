@@ -4,11 +4,6 @@ import * as R from 'ramda'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
 
-export const Taxonomykeys = {
-  taxa: 'taxa',
-  taxonomyUuid: 'taxonomyUuid',
-}
-
 export const keys = {
   taxonomy: 'taxonomy',
   taxaVersion: 'taxaVersion',

@@ -50,7 +50,7 @@ const TaxonomyDetails = (props) => {
       <div key={State.getTaxaVersion(state)} className="taxonomy__table-container">
         {!A.isEmpty(taxonomyUuid) && (
           <Table
-            module={State.Taxonomykeys.taxa}
+            module="taxa"
             moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
             restParams={{ draft: canEdit }}
             gridTemplateColumns={gridTemplateColumns}
