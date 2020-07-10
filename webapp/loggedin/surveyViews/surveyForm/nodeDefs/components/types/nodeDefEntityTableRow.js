@@ -1,39 +1,40 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import { NodeDefsActions } from '@webapp/store/survey'
+
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
-class NodeDefEntityTableRow extends React.Component {
-  constructor(props) {
-    super(props)
+const NodeDefEntityTableRow = (props) => {
+  const { edit, nodeDef, nodeDefColumns, node, canEditRecord, canEditDef, renderType, i = 'header', removeNode } = props
 
-    this.placeholderRef = React.createRef()
-    this.rowRef = React.createRef()
-    this.state = { dragged: null }
-  }
+  const placeholderRef = useRef()
+  const placeholder = placeholderRef.current
+  const rowRef = useRef()
+  const [dragged, setDragged] = useState(null)
 
-  dragStart(evt) {
-    this.setState({ dragged: evt.currentTarget }, () => {
-      const { dragged } = this.state
-      const placeholder = this.placeholderRef.current
+  const dispatch = useDispatch()
 
-      placeholder.style.width = `${dragged.clientWidth}px`
-      placeholder.style.height = `${dragged.clientHeight}px`
-    })
+  const dragStart = (evt) => {
+    const { currentTarget, dataTransfer } = evt
 
-    evt.dataTransfer.effectAllowed = 'move'
+    placeholder.style.width = `${currentTarget.clientWidth}px`
+    placeholder.style.height = `${currentTarget.clientHeight}px`
+
+    dataTransfer.effectAllowed = 'move'
     // Firefox requires dataTransfer data to be set
-    evt.dataTransfer.setData('text/html', evt.currentTarget)
+    dataTransfer.setData('text/html', currentTarget)
+
+    setDragged(currentTarget)
   }
 
-  dragOver(evt) {
-    const { dragged } = this.state
-    const placeholder = this.placeholderRef.current
-
+  const dragOver = (evt) => {
     evt.preventDefault()
 
     dragged.style.display = 'none'
@@ -51,70 +52,66 @@ class NodeDefEntityTableRow extends React.Component {
     }
   }
 
-  dragEnd() {
-    const { nodeDef, putNodeDefLayoutProp } = this.props
-
-    const { dragged } = this.state
-    const placeholder = this.placeholderRef.current
-
+  const dragEnd = () => {
     dragged.style.display = 'block'
     placeholder.style.display = 'none'
 
     placeholder.parentNode.insertBefore(dragged, placeholder)
-    this.setState({ dragged: null })
+    setDragged(null)
 
-    const childNodes = this.rowRef.current.childNodes
-    const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
+    const childNodes = rowRef.current.childNodes
+    const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
 
-    putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, uuids)
+    dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
   }
 
-  render() {
-    const {
-      edit,
-      nodeDef,
-      nodeDefColumns,
-      node,
-      canEditRecord,
-      canEditDef,
-      renderType,
-      i = 'header',
-      removeNode,
-    } = this.props
+  const className =
+    'survey-form__node-def-entity-table-row' +
+    (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
+    (dragged ? ' drag-in-progress' : '')
 
-    const { dragged } = this.state
+  return (
+    <div ref={rowRef} className={className} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
+      {nodeDefColumns.map((nodeDefChild) => (
+        <NodeDefEntityTableCell
+          key={NodeDef.getUuid(nodeDefChild)}
+          {...props}
+          nodeDef={nodeDefChild}
+          parentNode={node}
+          canEditDef={canEditDef}
+          renderType={renderType}
+          onDragStart={dragStart}
+          onDragOver={dragOver}
+          onDragEnd={dragEnd}
+        />
+      ))}
 
-    const className =
-      'survey-form__node-def-entity-table-row' +
-      (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
-      (dragged ? ' drag-in-progress' : '')
+      {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
 
-    return (
-      <div ref={this.rowRef} className={className} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
-        {nodeDefColumns.map(nodeDefChild => (
-          <NodeDefEntityTableCell
-            key={NodeDef.getUuid(nodeDefChild)}
-            {...this.props}
-            nodeDef={nodeDefChild}
-            parentNode={node}
-            canEditDef={canEditDef}
-            renderType={renderType}
-            onDragStart={e => this.dragStart(e)}
-            onDragOver={e => this.dragOver(e)}
-            onDragEnd={e => this.dragEnd(e)}
-          />
-        ))}
+      {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
+        <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode} />
+      )}
+    </div>
+  )
+}
 
-        {edit && (
-          <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef} />
-        )}
+NodeDefEntityTableRow.propTypes = {
+  edit: PropTypes.bool.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  nodeDefColumns: PropTypes.array,
+  node: PropTypes.object,
+  canEditDef: PropTypes.bool.isRequired,
+  canEditRecord: PropTypes.bool.isRequired,
+  renderType: PropTypes.string.isRequired,
+  i: PropTypes.any,
+  removeNode: PropTypes.func,
+}
 
-        {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
-          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode} />
-        )}
-      </div>
-    )
-  }
+NodeDefEntityTableRow.defaultProps = {
+  nodeDefColumns: [],
+  node: null,
+  i: 'header',
+  removeNode: null,
 }
 
 export default NodeDefEntityTableRow

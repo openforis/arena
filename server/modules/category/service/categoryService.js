@@ -16,20 +16,24 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
   return job
 }
 
-export const insertCategory = CategoryManager.insertCategory
-export const createImportSummary = CategoryManager.createImportSummary
-export const createImportSummaryFromStream = CategoryManager.createImportSummaryFromStream
-export const insertLevel = CategoryManager.insertLevel
-export const insertItem = CategoryManager.insertItem
+export const {
+  insertCategory,
+  createImportSummary,
+  createImportSummaryFromStream,
+  insertLevel,
+  insertItem,
 
-export const fetchCategoriesAndLevelsBySurveyId = CategoryManager.fetchCategoriesAndLevelsBySurveyId
-export const fetchCategoryAndLevelsByUuid = CategoryManager.fetchCategoryAndLevelsByUuid
-export const fetchItemsByParentUuid = CategoryManager.fetchItemsByParentUuid
+  countCategories,
+  fetchCategoriesBySurveyId,
+  fetchCategoriesAndLevelsBySurveyId,
+  fetchCategoryAndLevelsByUuid,
+  fetchItemsByParentUuid,
 
-export const updateCategoryProp = CategoryManager.updateCategoryProp
-export const updateLevelProp = CategoryManager.updateLevelProp
-export const updateItemProp = CategoryManager.updateItemProp
+  updateCategoryProp,
+  updateLevelProp,
+  updateItemProp,
 
-export const deleteCategory = CategoryManager.deleteCategory
-export const deleteLevel = CategoryManager.deleteLevel
-export const deleteItem = CategoryManager.deleteItem
+  deleteCategory,
+  deleteLevel,
+  deleteItem,
+} = CategoryManager

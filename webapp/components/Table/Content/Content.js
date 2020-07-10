@@ -15,6 +15,8 @@ const Content = (props) => {
     onRowClick,
     rowHeaderComponent,
     rowComponent,
+    rowProps,
+    initData,
   } = props
 
   const i18n = useI18n()
@@ -24,7 +26,7 @@ const Content = (props) => {
   ) : (
     <div className="table__content">
       <div className="table__row-header" style={{ gridTemplateColumns }}>
-        {React.createElement(rowHeaderComponent, props)}
+        {React.createElement(rowHeaderComponent, { props, ...rowProps })}
       </div>
       <div className="table__rows">
         {list.map((row, i) => {
@@ -42,7 +44,15 @@ const Content = (props) => {
               className={className}
               style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, { idx: i, offset, row, rowNo: i + offset + 1, active })}
+              {React.createElement(rowComponent, {
+                idx: i,
+                offset,
+                row,
+                rowNo: i + offset + 1,
+                active,
+                initData,
+                ...rowProps,
+              })}
             </div>
           )
         })}
@@ -58,13 +68,17 @@ Content.propTypes = {
   noItemsLabelKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
+  initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
+  rowProps: PropTypes.object,
 }
 
 Content.defaultProps = {
   isRowActive: null,
   onRowClick: null,
+  initData: null,
+  rowProps: {},
 }
 
 export default Content

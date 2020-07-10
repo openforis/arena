@@ -42,8 +42,8 @@ afterAll(async () => {
 })
 
 export const taxonomyTests = async () => {
-  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(Survey.getId(survey), true)
-  expect(taxonomies.length).toBe(1)
+  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId: Survey.getId(survey), draft: true })
+  expect(taxonomies.length).to.be.equal(1, 'None or more than one taxonomies found')
   const taxonomy = R.head(taxonomies)
   expect(Taxonomy.getName(taxonomy)).toBe(taxonomyNameDefault)
 

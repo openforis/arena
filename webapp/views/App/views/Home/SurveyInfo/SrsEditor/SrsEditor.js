@@ -32,10 +32,14 @@ const SrsEditor = (props) => {
 }
 
 SrsEditor.propTypes = {
-  srs: PropTypes.string.isRequired,
-  validation: PropTypes.object.isRequired,
+  srs: PropTypes.array.isRequired,
+  validation: PropTypes.object,
   readOnly: PropTypes.bool.isRequired,
   setSrs: PropTypes.func.isRequired,
+}
+
+SrsEditor.defaultProps = {
+  validation: {},
 }
 
 export default SrsEditor

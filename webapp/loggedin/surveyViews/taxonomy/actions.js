@@ -6,8 +6,6 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { SurveyState, TaxonomiesActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
 // Taxonomy editor actions
 export const taxonomyViewTaxonomyUpdate = 'taxonomyView/taxonomy/update'
 export const taxonomyViewTaxonomyPropsUpdate = 'taxonomyView/taxonomy/props/update'
@@ -19,14 +17,15 @@ export const setTaxonomyForEdit = (taxonomyUuid) => (dispatch) =>
 
 // ====== CREATE
 
-export const createTaxonomy = (history) => async (dispatch, getState) => {
+export const createTaxonomy = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   const {
     data: { taxonomy },
   } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
 
-  dispatch({ type: TaxonomiesActions.taxonomyCreate, taxonomy })
-  history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomy)}/`)
+  await dispatch({ type: TaxonomiesActions.taxonomyCreate, taxonomy })
+
+  await dispatch(setTaxonomyForEdit(Taxonomy.getUuid(taxonomy)))
 
   return taxonomy
 }
@@ -75,10 +74,11 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
 }
 
 // ====== DELETE
-export const deleteTaxonomy = (taxonomy) => async (dispatch, getState) => {
+export const deleteTaxonomy = (taxonomy, callback) => async (dispatch, getState) => {
   dispatch({ type: TaxonomiesActions.taxonomyDelete, taxonomy })
 
   const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
   dispatch({ type: TaxonomiesActions.taxonomiesUpdate, taxonomies: data.taxonomies })
+  if (callback) callback()
 }

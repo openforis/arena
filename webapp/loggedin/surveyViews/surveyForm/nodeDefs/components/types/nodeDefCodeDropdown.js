@@ -2,7 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import InputChips from '@webapp/components/form/inputChips'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -43,8 +43,8 @@ const NodeDefCodeDropdown = props => {
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}
-          itemKeyProp="uuid"
-          itemLabelFunction={CategoryItem.getLabel(lang)}
+          itemKey="uuid"
+          itemLabel={CategoryItem.getLabel(lang)}
           selection={R.head(selectedItems)}
           onChange={item => {
             // NB: onItemRemove is not possible?
