@@ -2,7 +2,7 @@
 # store folder
 - actions
 - state
-- useComponent.js
+- useLocalState.js
 - index.js
 
 # state
@@ -46,29 +46,45 @@ index.js
 import { State } from '../state'
 import { useAction1 } from './useAction1'
 
-export const useActions({ state, setState }) => ({
-  action1: useAction1({ state, setState})
+export const useActions({ setState }) => ({
+  action1: useAction1({ setState})
 })
 ```
 
-# useComponent.js
+useActions1.js
+```javascript
+import { State } from '../state'
+
+export const useActions1 = ({ setState }) => {
+    ...
+    return useCallback(({}) => {
+        ...
+        setState((state)=> {
+            const stateUpdated = State.assocSomething(propUpdated)(state)
+            return stateUpdated
+        })
+    }, [])
+}
+```
+
+# useLocalState.js
 ```javascript
 import { useState } from 'react'
 
-export const useComponent = ({prop1, prop2...}) => {
-  const [state, setState] = useState(State.create({prop1,...}))
-  const Actions = useActions({state, setState})
+export const useLocalState = ({prop1, prop2...}) => {
+  const [state, setState] = useState(() => State.create({prop1,...}))
 
-  return { state, Actions }
+  return { state, setState }
 }
 ```
 
 # index.js
 ```javascript
 import { State } from './state'
-import { useComponent } from './useComponent'
+import { useLocalState } from './useLocalState'
+import { useActions } from './actions'
 
-export { State, useComponent }
+export { State, useLocalState, useActions }
 ```
 
 # Component.js
@@ -76,17 +92,19 @@ export { State, useComponent }
 import React from 'react'
 ...
 import SubComponent from './SubComponent'
-import { State, useComponent } from './store'
+import { State, useLocalState, useActions } from './store'
 
 const Component = (props) => {
   const { prop1, prop2 } = props
-  const { Actions, state } = useComponent({prop1, prop2})
+  const { state, setState } = useLocalState({ prop1, prop2 })
+  const Actions = useActions({ setState })
+
   return (
     <div>
-      <SubComponent state={state} Actions={Actions}/>
+      <SubComponent state={state} setState={setState}/>
       <button onClick={Actions.updateSometing()}>a button</button>      
     </div>
-    )
+  )
 }
 ```
 
@@ -95,13 +113,15 @@ const Component = (props) => {
 import React from 'react'
 ...
 import SubSubComponent from './SubSubComponent'
-import { State } from '../store'
+import { State, useActions } from '../store'
 
 const SubComponent = (props) => {
-  const { state, Actions } = props
+  const { state, setState } = props
+  const Actions = useActions({ setState })
+
   return (
     <div>
-      <SubSubComponent state={state} Actions={Actions}/>
+      <SubSubComponent state={state} setState={setState}/>
       <button onClick={Actions.updateSometing()}>a subcomopnent button</button>      
     </div>
     )
