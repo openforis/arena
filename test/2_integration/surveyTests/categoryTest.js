@@ -27,7 +27,7 @@ export const createCategoryTest = async () => {
 }
 
 const _fetchFirstCategory = async (surveyId) => {
-  const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(surveyId, true, false)
+  const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true })
   return R.pipe(R.values, R.head)(categories)
 }
 

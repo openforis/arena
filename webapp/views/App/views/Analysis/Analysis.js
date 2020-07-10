@@ -4,9 +4,8 @@ import { useHistory } from 'react-router'
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
-import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
+import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import Chains from './Chains'
@@ -38,13 +37,8 @@ const Analysis = () => {
             path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
           },
           {
-            component: NodeDefView,
+            component: NodeDefDetails,
             path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
-          },
-          {
-            component: CategoriesView,
-            path: appModuleUri(analysisModules.categories),
-            props: { analysis: true },
           },
           {
             component: CategoryView,

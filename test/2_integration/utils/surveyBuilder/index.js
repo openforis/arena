@@ -1,5 +1,4 @@
 import pgPromise from 'pg-promise'
-import * as R from 'ramda'
 
 import { db } from '../../../../server/db/db'
 
@@ -56,7 +55,7 @@ class SurveyBuilder {
     })
     const nodeDefs = this.rootDefBuilder.build(survey)
 
-    return R.pipe(Survey.assocNodeDefs(nodeDefs), Survey.buildAndAssocDependencyGraph)(survey)
+    return Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: true })(survey)
   }
 
   /**

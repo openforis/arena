@@ -24,7 +24,6 @@ const NodeDefEntityTableRows = (props) => {
     nodes,
     parentNode,
     preview,
-    putNodeDefLayoutProp,
     recordUuid,
     surveyCycleKey,
     surveyInfo,
@@ -132,7 +131,6 @@ const NodeDefEntityTableRows = (props) => {
       nodes={null}
       parentNode={parentNode}
       preview={preview}
-      putNodeDefLayoutProp={putNodeDefLayoutProp}
       recordUuid={recordUuid}
       renderType={renderType}
       surveyCycleKey={surveyCycleKey}
@@ -170,7 +168,6 @@ NodeDefEntityTableRows.propTypes = {
   nodes: PropTypes.array,
   parentNode: PropTypes.any,
   preview: PropTypes.bool,
-  putNodeDefLayoutProp: PropTypes.func.isRequired,
   recordUuid: PropTypes.string,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.any.isRequired,

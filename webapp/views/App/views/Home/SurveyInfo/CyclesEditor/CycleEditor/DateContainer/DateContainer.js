@@ -25,8 +25,12 @@ const DateEditor = ({ date, onChange }) => {
 }
 
 DateEditor.propTypes = {
-  date: PropTypes.string.isRequired,
+  date: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+}
+
+DateEditor.defaultProps = {
+  date: null,
 }
 
 const DateContainer = ({ date, keyLabel, readOnly, onChange }) => {
@@ -41,10 +45,14 @@ const DateContainer = ({ date, keyLabel, readOnly, onChange }) => {
 }
 
 DateContainer.propTypes = {
-  date: PropTypes.string.isRequired,
+  date: PropTypes.string,
   keyLabel: PropTypes.string.isRequired,
   readOnly: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+}
+
+DateContainer.defaultProps = {
+  date: null,
 }
 
 export default DateContainer
