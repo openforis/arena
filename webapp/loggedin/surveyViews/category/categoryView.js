@@ -15,10 +15,10 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import * as CategoryState from './categoryState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
 
+import * as CategoryState from './categoryState'
 import * as Actions from './actions'
 
 const CategoryView = (props) => {
@@ -41,6 +41,7 @@ const CategoryView = (props) => {
     if (categoryUuid) {
       dispatch(Actions.setCategoryForEdit(categoryUuid))
     }
+    return () => dispatch(Actions.setCategoryForEdit(null))
   }, [])
 
   return category ? (

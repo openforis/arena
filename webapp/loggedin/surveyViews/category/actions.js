@@ -164,12 +164,16 @@ export const putCategoryItemProp = (category, level, item, key, value) => async 
 // ====== DELETE
 // ======
 
-export const deleteCategory = (category) => async (dispatch, getState) => {
+export const deleteCategory = ({ category, callback }) => async (dispatch, getState) => {
   dispatch({ type: CategoriesActions.categoryDelete, category })
 
   const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}`)
   dispatch({ type: CategoriesActions.categoriesUpdate, categories: data.categories })
+
+  if (callback) {
+    callback()
+  }
 }
 
 export const deleteCategoryLevel = (category, level) => async (dispatch, getState) => {

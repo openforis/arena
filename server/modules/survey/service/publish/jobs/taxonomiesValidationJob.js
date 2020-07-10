@@ -13,7 +13,10 @@ export default class TaxonomiesValidationJob extends Job {
   }
 
   async execute() {
-    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, this.tx)
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(
+      { surveyId: this.surveyId, draft: true, validate: true },
+      this.tx
+    )
 
     const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
 
@@ -22,7 +25,7 @@ export default class TaxonomiesValidationJob extends Job {
         (acc, taxonomy) =>
           R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
-        invalidTaxonomies,
+        invalidTaxonomies
       )
       await this.setStatusFailed()
     }

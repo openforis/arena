@@ -18,14 +18,22 @@ const Table = (props) => {
     restParams,
     rowComponent,
     rowHeaderComponent,
+    headerProps,
     rowProps,
   } = props
 
-  const { list, offset, limit, count } = useTable({ moduleApiUri, module, restParams })
+  const { list, offset, limit, count, initData } = useTable({ moduleApiUri, module, restParams })
 
   return (
     <div className={`table ${className}`}>
-      <Header offset={offset} list={list} limit={limit} count={count} headerLeftComponent={headerLeftComponent} />
+      <Header
+        offset={offset}
+        list={list}
+        limit={limit}
+        count={count}
+        headerLeftComponent={headerLeftComponent}
+        headerProps={headerProps}
+      />
 
       <Content
         gridTemplateColumns={gridTemplateColumns}
@@ -38,6 +46,7 @@ const Table = (props) => {
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
         rowProps={rowProps}
+        initData={initData}
       />
     </div>
   )
@@ -58,6 +67,7 @@ Table.propTypes = {
   rowComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
+  headerProps: PropTypes.object,
 }
 
 Table.defaultProps = {
@@ -72,6 +82,7 @@ Table.defaultProps = {
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
   rowProps: {},
+  headerProps: {},
 }
 
 export default Table

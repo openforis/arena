@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,12 +11,14 @@ import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
-import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
+import * as TaxonomyState from '@webapp/loggedin/surveyViews/taxonomy/taxonomyState'
+
+import TaxonomyList from '@webapp/views/App/views/Designer/TaxonomyList'
 
 import { State } from './store'
 
@@ -39,6 +41,8 @@ const TaxonProps = (props) => {
 
   const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
+
+  const editedTaxonomy = useSelector(TaxonomyState.getTaxonomy)
 
   return (
     <>
@@ -83,27 +87,29 @@ const TaxonProps = (props) => {
         </div>
       </FormItem>
 
-      {showTaxonomyPanel && (
-        <PanelRight
-          width="100vw"
-          onClose={() => {
-            dispatch(TaxonomyActions.setTaxonomyForEdit(null))
-            setShowTaxonomyPanel(false)
-          }}
-          header={i18n.t('taxonomy.header')}
-        >
-          <TaxonomyView showClose={false} />
-        </PanelRight>
-      )}
-      {showTaxonomiesPanel && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setShowTaxonomiesPanel(false)}
-          header={i18n.t('appModules.taxonomies')}
-        >
-          <TaxonomiesView canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
-        </PanelRight>
-      )}
+      <div className="taxon-props__panel-right">
+        {(showTaxonomyPanel || editedTaxonomy) && (
+          <PanelRight
+            width="100vw"
+            onClose={() => {
+              dispatch(TaxonomyActions.setTaxonomyForEdit(null))
+              setShowTaxonomyPanel(false)
+            }}
+            header={i18n.t('taxonomy.header')}
+          >
+            <TaxonomyView showClose={false} />
+          </PanelRight>
+        )}
+        {!editedTaxonomy && showTaxonomiesPanel && (
+          <PanelRight
+            width="100vw"
+            onClose={() => setShowTaxonomiesPanel(false)}
+            header={i18n.t('appModules.taxonomies')}
+          >
+            <TaxonomyList canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
+          </PanelRight>
+        )}
+      </div>
     </>
   )
 }

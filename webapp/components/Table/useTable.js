@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
@@ -18,14 +18,16 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     params: restParams,
   })
 
-  useEffect(() => {
+  const initData = useCallback(() => {
     fetchData()
     fetchCount()
   }, [])
+
+  useEffect(initData, [])
 
   useOnUpdate(() => {
     fetchData()
   }, [offset])
 
-  return { list, offset, limit, count: Number(count) }
+  return { list, offset, limit, count: Number(count), initData }
 }
