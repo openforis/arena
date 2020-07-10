@@ -5,7 +5,10 @@
   grid-template-rows: 4rem 1fr 3rem;
   align-items: center;
   height: 100%;
+}
 
+.taxonomy__table-container {
+  align-self: stretch;
   .table {
     align-self: start;
     height: 100%;

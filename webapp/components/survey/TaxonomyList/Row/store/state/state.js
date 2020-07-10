@@ -9,21 +9,32 @@ export const keys = {
   onSelect: 'onSelect',
   canSelect: 'canSelect',
   initData: 'initData',
+  onTaxonomyOpen: 'onTaxonomyOpen',
 }
 
 // ==== CREATE
-export const create = ({ taxonomy, canDelete, selectedItemUuid, onSelectTaxonomy, canSelect, initData }) => ({
+export const create = ({
+  taxonomy,
+  canDelete,
+  selectedItemUuid,
+  onTaxonomySelect,
+  canSelect,
+  initData,
+  onTaxonomyOpen,
+}) => ({
   [keys.taxonomy]: taxonomy,
   [keys.deleted]: false,
   [keys.canDelete]: canDelete,
   [keys.selectedItemUuid]: selectedItemUuid,
-  [keys.onSelect]: onSelectTaxonomy,
+  [keys.onSelect]: onTaxonomySelect,
   [keys.canSelect]: canSelect,
   [keys.initData]: initData,
+  [keys.onTaxonomyOpen]: onTaxonomyOpen,
 })
 
 // ==== READ
 export const getOnSelect = A.prop(keys.onSelect)
+export const getOnTaxonomyOpen = A.prop(keys.onTaxonomyOpen)
 export const getInitData = A.prop(keys.initData)
 export const getTaxonomy = A.prop(keys.taxonomy)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
@@ -34,3 +45,4 @@ export const getSelected = (state) =>
 
 // ==== UPDATE
 export const assocSelectedItemUuid = A.assoc(keys.selectedItemUuid)
+export const assocTaxonomy = A.assoc(keys.taxonomy)
