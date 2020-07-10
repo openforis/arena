@@ -1,5 +1,5 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -15,15 +15,14 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import * as TaxonomyActions from '../actions'
-import * as TaxonomyState from '../taxonomyState'
+import { State } from '../store'
 
-const TaxonomyEditHeader = () => {
-  const dispatch = useDispatch()
+const Header = (props) => {
+  const { state, Actions } = props
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
-  const taxonomy = useSelector(TaxonomyState.getTaxonomy)
+  const taxonomy = State.getTaxonomy(state)
   const validation = Validation.getValidation(taxonomy)
 
   return (
@@ -38,9 +37,7 @@ const TaxonomyEditHeader = () => {
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation(Taxonomy.keysProps.name)(validation)}
             onChange={(value) =>
-              dispatch(
-                TaxonomyActions.putTaxonomyProp(taxonomy, Taxonomy.keysProps.name, StringUtils.normalizeName(value))
-              )
+              Actions.update({ key: Taxonomy.keysProps.name, value: StringUtils.normalizeName(value), state })
             }
             readOnly={!canEdit}
           />
@@ -50,7 +47,7 @@ const TaxonomyEditHeader = () => {
           formLabelKey="common.description"
           labels={Taxonomy.getDescriptions(taxonomy)}
           onChange={(descriptions) =>
-            dispatch(TaxonomyActions.putTaxonomyProp(taxonomy, Taxonomy.keysProps.descriptions, descriptions))
+            Actions.update({ key: Taxonomy.keysProps.descriptions, value: descriptions, state })
           }
         />
       </div>
@@ -60,9 +57,7 @@ const TaxonomyEditHeader = () => {
           <UploadButton
             label={i18n.t('common.csvImport')}
             accept=".csv"
-            onChange={async ([file]) => {
-              await dispatch(TaxonomyActions.uploadTaxonomyFile(taxonomy, file))
-            }}
+            onChange={([file]) => Actions.upload({ state, file })}
           />
         )}
         <DownloadButton
@@ -73,5 +68,9 @@ const TaxonomyEditHeader = () => {
     </div>
   )
 }
+Header.propTypes = {
+  state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
+}
 
-export default TaxonomyEditHeader
+export default Header

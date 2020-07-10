@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import axios from 'axios'
 import * as A from '@core/arena'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Survey from '@core/survey/survey'
-import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { SurveyActions, useSurvey, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
 
@@ -16,6 +16,7 @@ export const useDelete = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const survey = useSurvey()
+  const surveyId = useSurveyId()
 
   return useCallback(
     ({ state }) => {
@@ -28,8 +29,11 @@ export const useDelete = () => {
           DialogConfirmActions.showDialogConfirm({
             key: 'taxonomy.confirmDelete',
             params: { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
-            onOk: () => {
-              dispatch(TaxonomyActions.deleteTaxonomy(taxonomy, State.getInitData(state)))
+            onOk: async () => {
+              dispatch(SurveyActions.metaUpdated())
+              await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
+              const initData = State.getInitData(state)
+              if (initData) initData()
             },
           })
         )
