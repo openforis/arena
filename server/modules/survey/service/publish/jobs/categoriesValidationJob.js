@@ -11,20 +11,22 @@ export default class CategoriesValidationJob extends Job {
   }
 
   async execute() {
-    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId, true, true, this.tx)
+    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(
+      { surveyId: this.surveyId, draft: true, includeValidation: true },
+      this.tx
+    )
 
     const categoriesArr = Object.values(categories)
 
     this.total = categoriesArr.length
 
-    for (const category of categoriesArr) {
+    categoriesArr.forEach((category) => {
       const validation = Validation.getValidation(category)
       if (!Validation.isValid(validation)) {
         this.addError(Validation.getFieldValidations(validation), Category.getName(category))
       }
-
       this.incrementProcessedItems()
-    }
+    })
 
     if (this.hasErrors()) {
       await this.setStatusFailed()
