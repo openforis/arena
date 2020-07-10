@@ -1,3 +1,4 @@
+import './Row.scss'
 import React from 'react'
 
 import * as A from '@core/arena'

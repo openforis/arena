@@ -1,5 +1,5 @@
 import BluebirdPromise from 'bluebird'
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
 

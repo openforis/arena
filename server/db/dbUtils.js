@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
 import { db } from '@server/db/db'

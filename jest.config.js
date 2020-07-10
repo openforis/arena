@@ -6,5 +6,11 @@ module.exports = {
     '@webapp/(.*)': '<rootDir>/webapp/$1',
     '@test/(.*)': '<rootDir>/test/$1',
   },
+  transform: {
+    '.*': '<rootDir>/node_modules/babel-jest',
+  },
+  transformIgnorePatterns: ['/node_modules/'],
+  moduleFileExtensions: ['js', 'json', 'html', 'scss'],
   testTimeout: 30000,
+  coveragePathIgnorePatterns: ['/node_modules/'],
 }
