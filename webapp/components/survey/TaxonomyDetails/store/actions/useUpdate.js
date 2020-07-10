@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useSurveyId, TaxonomiesActions, SurveyActions } from '@webapp/store/survey'
+import { useSurveyId, SurveyActions } from '@webapp/store/survey'
 
 import { State } from '../state'
 
@@ -26,6 +26,6 @@ export const useUpdate = ({ setState }) => {
       })
     }
     dispatch(SurveyActions.metaUpdated())
-    dispatch(debounceAction(action, `${TaxonomiesActions.taxonomyPropUpdate}_${Taxonomy.getUuid(taxonomy)}`))
+    dispatch(debounceAction(action, Taxonomy.getUuid(taxonomy)))
   }, [])
 }

@@ -16,9 +16,9 @@ export const useEdit = () => {
     const taxonomy = State.getTaxonomy(state)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
     if (!inTaxonomiesPath) {
-      const onOpenTaxonomy = State.getOnOpenTaxonomy(state)
-      if (onOpenTaxonomy) {
-        onOpenTaxonomy(taxonomy)
+      const onTaxonomyOpen = State.getOnTaxonomyOpen(state)
+      if (onTaxonomyOpen) {
+        onTaxonomyOpen(taxonomy)
       }
     } else {
       history.push(`${appModuleUri(designerModules.taxonomy)}${taxonomyUuid}/`)
