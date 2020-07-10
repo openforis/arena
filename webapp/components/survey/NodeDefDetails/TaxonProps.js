@@ -34,6 +34,7 @@ const TaxonProps = (props) => {
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
+  const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
   const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
@@ -80,18 +81,7 @@ const TaxonProps = (props) => {
       </FormItem>
 
       <div className="taxon-props__panel-right">
-        {showTaxonomyPanel && (
-          <PanelRight
-            width="100vw"
-            onClose={() => {
-              setShowTaxonomyPanel(false)
-            }}
-            header={i18n.t('taxonomy.header')}
-          >
-            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} />
-          </PanelRight>
-        )}
-        {!showTaxonomyPanel && showTaxonomiesPanel && (
+        {showTaxonomiesPanel && (
           <PanelRight
             width="100vw"
             onClose={() => setShowTaxonomiesPanel(false)}
@@ -101,10 +91,24 @@ const TaxonProps = (props) => {
               canSelect
               selectedItemUuid={taxonomyUuid}
               onSelect={onTaxonomySelect}
-              onOpenTaxonomy={() => {
-                setShowTaxonomyPanel(true)
+              onTaxonomyCreate={() => setShowTaxonomyPanel(true)}
+              onTaxonomyOpen={(taxonomySelected) => {
+                setTaxonomyToEdit(taxonomySelected)
               }}
             />
+          </PanelRight>
+        )}
+
+        {(showTaxonomyPanel || taxonomyToEdit) && (
+          <PanelRight
+            width="100vw"
+            onClose={() => {
+              setShowTaxonomyPanel(false)
+              setTaxonomyToEdit(null)
+            }}
+            header={i18n.t('taxonomy.header')}
+          >
+            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
           </PanelRight>
         )}
       </div>

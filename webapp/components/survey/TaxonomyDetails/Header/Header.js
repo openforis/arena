@@ -17,7 +17,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State } from '../store'
 
-const EditHeader = (props) => {
+const Header = (props) => {
   const { state, Actions } = props
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -68,9 +68,9 @@ const EditHeader = (props) => {
     </div>
   )
 }
-EditHeader.propTypes = {
+Header.propTypes = {
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
 }
 
-export default EditHeader
+export default Header

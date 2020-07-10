@@ -9,7 +9,6 @@ import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
 import { NodeDefsActions } from '../nodeDefs'
 import { CategoriesActions } from '../categories'
-import { TaxonomiesActions } from '../taxonomies'
 
 import * as SurveyInfoState from './state'
 
@@ -44,10 +43,7 @@ const actionHandlers = {
   [CategoriesActions.categoryDelete]: SurveyInfoState.markDraft,
 
   // Taxonomy
-  [TaxonomiesActions.taxonomyCreate]: SurveyInfoState.markDraft,
-  [TaxonomiesActions.taxonomyUpdate]: SurveyInfoState.markDraft,
-  [TaxonomiesActions.taxonomyPropUpdate]: SurveyInfoState.markDraft,
-  [TaxonomiesActions.taxonomyDelete]: SurveyInfoState.markDraft,
+  [SurveyActions.surveyMetaUpdated]: SurveyInfoState.markDraft,
 }
 
 export default exportReducer(actionHandlers)
