@@ -13,7 +13,7 @@ import TableRowHeader from './TableRowHeader'
 import TableHeaderLeft from './TableHeaderLeft'
 
 const CategoryList = (props) => {
-  const { canSelect, onSelect, selectedItemUuid } = props
+  const { canSelect, onEdit, onSelect, selectedItemUuid } = props
 
   const { pathname } = useLocation()
 
@@ -39,7 +39,7 @@ const CategoryList = (props) => {
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
         headerProps={{ inCategoriesPath, canSelect, onSelect }}
-        rowProps={{ inCategoriesPath, canSelect, onSelect, selectedItemUuid }}
+        rowProps={{ inCategoriesPath, onEdit, canSelect, onSelect, selectedItemUuid }}
       />
     </>
   )
@@ -47,12 +47,14 @@ const CategoryList = (props) => {
 
 CategoryList.propTypes = {
   canSelect: PropTypes.bool,
+  onEdit: PropTypes.func,
   onSelect: PropTypes.func,
   selectedItemUuid: PropTypes.string,
 }
 
 CategoryList.defaultProps = {
   canSelect: false,
+  onEdit: null,
   onSelect: null,
   selectedItemUuid: null,
 }

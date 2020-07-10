@@ -10,14 +10,34 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useCategoryRow = (props) => {
-  const { canSelect, idx, inCategoriesPath, initData, offset, onSelect, row: category, selectedItemUuid } = props
+  const {
+    canSelect,
+    idx,
+    inCategoriesPath,
+    initData,
+    offset,
+    onEdit,
+    onSelect,
+    row: category,
+    selectedItemUuid,
+  } = props
 
   const survey = useSurvey()
   const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
   const position = idx + offset + 1
 
   const [state, setState] = useState(() =>
-    State.create({ canSelect, category, inCategoriesPath, initData, onSelect, position, selectedItemUuid, unused })
+    State.create({
+      canSelect,
+      category,
+      inCategoriesPath,
+      initData,
+      onEdit,
+      onSelect,
+      position,
+      selectedItemUuid,
+      unused,
+    })
   )
 
   useEffect(() => {

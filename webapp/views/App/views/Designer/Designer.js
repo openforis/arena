@@ -60,6 +60,11 @@ const Designer = () => {
 
           {
             component: CategoryDetails,
+            path: `${appModuleUri(designerModules.category)}`,
+          },
+
+          {
+            component: CategoryDetails,
             path: `${appModuleUri(designerModules.category)}:categoryUuid`,
           },
 

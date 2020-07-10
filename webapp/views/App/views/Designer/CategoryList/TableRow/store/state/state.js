@@ -7,6 +7,7 @@ export const keys = {
   inCategoriesPath: 'inCategoriesPath',
   initData: 'initData',
   position: 'position',
+  onEdit: 'onEdit',
   onSelect: 'onSelect',
   selectedItemUuid: 'selectedItemUuid',
   unused: 'unused',
@@ -18,6 +19,7 @@ export const create = ({
   category,
   inCategoriesPath,
   initData,
+  onEdit,
   onSelect,
   position,
   selectedItemUuid,
@@ -28,6 +30,7 @@ export const create = ({
   [keys.inCategoriesPath]: inCategoriesPath,
   [keys.initData]: initData,
   [keys.position]: position,
+  [keys.onEdit]: onEdit,
   [keys.onSelect]: onSelect,
   [keys.selectedItemUuid]: selectedItemUuid,
   [keys.unused]: unused,
@@ -39,6 +42,7 @@ export const getCanSelect = A.prop(keys.canSelect)
 export const getCategory = A.prop(keys.category)
 export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getInitData = A.prop(keys.initData)
+export const getOnEdit = A.prop(keys.onEdit)
 export const getOnSelect = A.prop(keys.onSelect)
 export const getPosition = A.prop(keys.position)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)

@@ -15,13 +15,18 @@ export const useEdit = () => {
   const history = useHistory()
 
   return useCallback(({ state }) => {
-    const category = State.getCategory(state)
     const inCategoriesPath = State.isInCategoriesPath(state)
+    const onEdit = State.getOnEdit(state)
+    const category = State.getCategory(state)
     const categoryUuid = Category.getUuid(category)
+
     if (inCategoriesPath) {
       history.push(`${appModuleUri(designerModules.category)}${categoryUuid}`)
     } else {
       dispatch(CategoryActions.setCategoryForEdit(categoryUuid))
+    }
+    if (onEdit) {
+      onEdit(category)
     }
   }, [])
 }

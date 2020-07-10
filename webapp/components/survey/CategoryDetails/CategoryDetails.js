@@ -1,8 +1,8 @@
 import './CategoryDetails.scss'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -18,31 +18,28 @@ import UploadButton from '@webapp/components/form/uploadButton'
 import ImportSummary from './ImportSummary'
 import LevelEdit from './LevelEdit'
 
-import * as CategoryState from '../../../loggedin/surveyViews/category/categoryState'
 import * as Actions from '../../../loggedin/surveyViews/category/actions'
+import { State, useLocalState } from './store'
 
 const CategoryDetails = (props) => {
-  const { showClose } = props
+  const { showClose, onCategoryCreated, category: categoryProp } = props
+
   const { categoryUuid } = useParams()
   const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const category = useSelector(CategoryState.getCategoryForEdit)
-  const importSummary = useSelector(CategoryState.getImportSummary)
   const readOnly = !useAuthCanEditSurvey()
+
+  const { state } = useLocalState({ onCategoryCreated, category: categoryProp })
+
+  const category = State.getCategory(state)
+  const importSummary = State.getImportSummary(state)
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
   const inCategoriesPath = Boolean(categoryUuid)
-
-  useEffect(() => {
-    if (categoryUuid) {
-      dispatch(Actions.setCategoryForEdit(categoryUuid))
-    }
-    return () => dispatch(Actions.setCategoryForEdit(null))
-  }, [])
 
   return category ? (
     <>
@@ -111,10 +108,14 @@ const CategoryDetails = (props) => {
 }
 
 CategoryDetails.propTypes = {
+  category: PropTypes.object,
+  onCategoryCreated: PropTypes.func,
   showClose: PropTypes.bool,
 }
 
 CategoryDetails.defaultProps = {
+  category: null,
+  onCategoryCreated: null,
   showClose: true,
 }
 

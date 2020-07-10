@@ -135,16 +135,28 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      const count = await CategoryService.countCategories({ surveyId, draft })
+
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get(
-    '/survey/:surveyId/categories/count',
+    '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft, validate } = Request.getParams(req)
 
-        const count = await CategoryService.countCategories({ surveyId, draft })
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
 
-        res.json({ count })
+        res.json({ category })
       } catch (error) {
         next(error)
       }
