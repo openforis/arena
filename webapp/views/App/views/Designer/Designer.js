@@ -4,9 +4,12 @@ import { useDispatch } from 'react-redux'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
+
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
-import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+
+import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
+
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
@@ -52,7 +55,7 @@ const Designer = () => {
           },
 
           {
-            component: CategoriesView,
+            component: CategoryList,
             path: appModuleUri(designerModules.categories),
           },
 

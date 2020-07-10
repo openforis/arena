@@ -1,11 +1,12 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
+import * as DB from '../../../db'
+import { db } from '../../../db/db'
+import * as DbUtils from '../../../db/dbUtils'
 
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
+import * as Category from '../../../../core/survey/category'
+import * as CategoryLevel from '../../../../core/survey/categoryLevel'
+import * as CategoryItem from '../../../../core/survey/categoryItem'
 
 import {
   getSurveyDBSchema,
@@ -14,6 +15,7 @@ import {
   deleteSurveySchemaTableProp,
   dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+
 // ============== CREATE
 
 export const insertCategory = async (surveyId, category, client = db) =>
@@ -66,7 +68,7 @@ export const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) => `
+const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, offset = null, limit = null }) => `
     WITH
       levels AS
       (
@@ -82,7 +84,16 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
           ${getSurveyDBSchema(surveyId)}.category_level l
         GROUP BY
           l.category_uuid
+      ),
+      c AS
+      (
+        SELECT * 
+        FROM ${getSurveyDBSchema(surveyId)}.category
+        ORDER BY (props || props_draft) -> '${Category.props.name}'
+        ${offset ? 'OFFSET $/offset/' : ''}
+        ${limit ? 'LIMIT $/limit/' : ''}
       )
+    
     SELECT
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
@@ -92,20 +103,53 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       'levels', l.levels
       ${includeValidation ? ", 'validation', c.validation" : ''}
       )) AS categories
-    FROM
-      ${getSurveyDBSchema(surveyId)}.category c
+    FROM c
     JOIN
       levels l
     ON
       c.uuid = l.category_uuid`
 
+export const countCategories = async ({ surveyId, draft = false }, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+     FROM ${getSurveyDBSchema(surveyId)}.category
+     ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
+    [],
+    (r) => parseInt(r.count, 10)
+  )
+
+export const fetchCategoriesBySurveyId = async (
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  client = db
+) =>
+  client.map(
+    `SELECT 
+      id,
+      uuid,
+      props,
+      props_draft,
+      published
+      ${includeValidation ? ', validation' : ''}
+    FROM ${getSurveyDBSchema(surveyId)}.category
+    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}`,
+    {
+      offset,
+      limit,
+    },
+    (row) => DB.transformCallback(row, draft, true)
+  )
+
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  surveyId,
-  draft = false,
-  includeValidation = false,
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
   client = db
 ) => {
-  const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
+  const { categories } = await client.one(
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, offset, limit }),
+    {
+      offset,
+      limit,
+    }
+  )
   return categories || {}
 }
 
@@ -117,7 +161,8 @@ export const fetchCategoryAndLevelsByUuid = async (
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation })} 
+    WHERE c.uuid = $1`,
     [categoryUuid]
   )
   return R.pipe(R.values, R.head)(categories)
