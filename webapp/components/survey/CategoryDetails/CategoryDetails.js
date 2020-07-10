@@ -1,4 +1,4 @@
-import './categoryView.scss'
+import './CategoryDetails.scss'
 
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
@@ -15,13 +15,13 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import CategoryImportSummary from './components/categoryImportSummary'
-import LevelEdit from './components/levelEdit'
+import ImportSummary from './ImportSummary'
+import LevelEdit from './LevelEdit'
 
-import * as CategoryState from './categoryState'
-import * as Actions from './actions'
+import * as CategoryState from '../../../loggedin/surveyViews/category/categoryState'
+import * as Actions from '../../../loggedin/surveyViews/category/actions'
 
-const CategoryView = (props) => {
+const CategoryDetails = (props) => {
   const { showClose } = props
   const { categoryUuid } = useParams()
   const i18n = useI18n()
@@ -105,17 +105,17 @@ const CategoryView = (props) => {
         )}
       </div>
 
-      {importSummary && <CategoryImportSummary summary={importSummary} />}
+      {importSummary && <ImportSummary summary={importSummary} />}
     </>
   ) : null
 }
 
-CategoryView.propTypes = {
+CategoryDetails.propTypes = {
   showClose: PropTypes.bool,
 }
 
-CategoryView.defaultProps = {
+CategoryDetails.defaultProps = {
   showClose: true,
 }
 
-export default CategoryView
+export default CategoryDetails

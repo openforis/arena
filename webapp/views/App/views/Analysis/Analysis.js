@@ -4,7 +4,7 @@ import { useHistory } from 'react-router'
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
@@ -41,7 +41,7 @@ const Analysis = () => {
             path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
           },
           {
-            component: CategoryView,
+            component: CategoryDetails,
             path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
             props: { analysis: true },
           },

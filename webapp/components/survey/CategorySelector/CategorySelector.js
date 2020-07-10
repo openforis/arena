@@ -13,7 +13,7 @@ import { useSurvey } from '@webapp/store/survey'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
-import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 import * as CategoryState from '@webapp/loggedin/surveyViews/category/categoryState'
 import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
@@ -88,7 +88,7 @@ const CategorySelector = (props) => {
           }}
           header={i18n.t('categoryEdit.header')}
         >
-          <CategoryView showClose={false} />
+          <CategoryDetails showClose={false} />
         </PanelRight>
       )}
     </div>
