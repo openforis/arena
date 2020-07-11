@@ -14,20 +14,9 @@ export const keys = {
 }
 
 // ==== CREATE
-export const create = ({
-  canSelect,
-  category,
-  inCategoriesPath,
-  initData,
-  onEdit,
-  onSelect,
-  position,
-  selectedItemUuid,
-  unused,
-}) => ({
+export const create = ({ canSelect, category, initData, onEdit, onSelect, position, selectedItemUuid, unused }) => ({
   [keys.canSelect]: canSelect,
   [keys.category]: category,
-  [keys.inCategoriesPath]: inCategoriesPath,
   [keys.initData]: initData,
   [keys.position]: position,
   [keys.onEdit]: onEdit,
@@ -40,7 +29,6 @@ export const create = ({
 export const getCanDelete = A.prop(keys.canDelete)
 export const getCanSelect = A.prop(keys.canSelect)
 export const getCategory = A.prop(keys.category)
-export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getInitData = A.prop(keys.initData)
 export const getOnEdit = A.prop(keys.onEdit)
 export const getOnSelect = A.prop(keys.onSelect)

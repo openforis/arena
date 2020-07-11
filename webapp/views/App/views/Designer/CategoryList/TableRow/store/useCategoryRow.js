@@ -10,17 +10,7 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useCategoryRow = (props) => {
-  const {
-    canSelect,
-    idx,
-    inCategoriesPath,
-    initData,
-    offset,
-    onEdit,
-    onSelect,
-    row: category,
-    selectedItemUuid,
-  } = props
+  const { canSelect, idx, initData, offset, onEdit, onSelect, row: category, selectedItemUuid } = props
 
   const survey = useSurvey()
   const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
@@ -30,7 +20,6 @@ export const useCategoryRow = (props) => {
     State.create({
       canSelect,
       category,
-      inCategoriesPath,
       initData,
       onEdit,
       onSelect,

@@ -37,17 +37,16 @@ export const useInit = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ onCategoryCreated, category }) => {
-    let categoryToSet = category
+  return useCallback(async ({ onCategoryCreated, categoryUuid }) => {
+    const categoryUuidToFetch = categoryUuid || categoryUuidParam
+    let category = null
 
-    if (A.isEmpty(categoryToSet)) {
-      if (A.isEmpty(categoryUuidParam)) {
-        categoryToSet = await _createCategory({ surveyId, onCategoryCreated, categoryToSet, dispatch })
-      } else {
-        categoryToSet = await _fetchCategory({ surveyId, categoryUuid: categoryUuidParam })
-      }
+    if (A.isEmpty(categoryUuidToFetch)) {
+      category = await _createCategory({ surveyId, onCategoryCreated, dispatch })
+    } else {
+      category = await _fetchCategory({ surveyId, categoryUuid: categoryUuidToFetch })
     }
 
-    setState(State.create({ category: categoryToSet }))
+    setState(State.create({ category }))
   }, [])
 }

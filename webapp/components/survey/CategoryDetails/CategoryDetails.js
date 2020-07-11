@@ -22,7 +22,7 @@ import * as Actions from '../../../loggedin/surveyViews/category/actions'
 import { State, useLocalState } from './store'
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryCreated, category: categoryProp } = props
+  const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
 
   const { categoryUuid } = useParams()
   const i18n = useI18n()
@@ -31,7 +31,7 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state } = useLocalState({ onCategoryCreated, category: categoryProp })
+  const { state } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp })
 
   const category = State.getCategory(state)
   const importSummary = State.getImportSummary(state)
@@ -89,8 +89,7 @@ const CategoryDetails = (props) => {
             <button
               type="button"
               className="btn"
-              onClick={async () => {
-                await dispatch(Actions.setCategoryForEdit(null))
+              onClick={() => {
                 if (inCategoriesPath) {
                   history.goBack()
                 }
@@ -108,13 +107,13 @@ const CategoryDetails = (props) => {
 }
 
 CategoryDetails.propTypes = {
-  category: PropTypes.object,
+  categoryUuid: PropTypes.string,
   onCategoryCreated: PropTypes.func,
   showClose: PropTypes.bool,
 }
 
 CategoryDetails.defaultProps = {
-  category: null,
+  categoryUuid: null,
   onCategoryCreated: null,
   showClose: true,
 }

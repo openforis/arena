@@ -21,7 +21,7 @@ const CategorySelector = (props) => {
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [showCategoryPanel, setShowCategoryPanel] = useState(false)
-  const [categoryToEdit, setCategoryToEdit] = useState(null)
+  const [categoryUuidToEdit, setCategoryUuidToEdit] = useState(null)
 
   const survey = useSurvey()
   const categories = Survey.getCategoriesArray(survey)
@@ -61,7 +61,7 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && !categoryToEdit && (
+      {showCategoriesPanel && !categoryUuidToEdit && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}
@@ -72,7 +72,7 @@ const CategorySelector = (props) => {
             selectedItemUuid={categoryUuid}
             onSelect={onChange}
             onEdit={(categoryToEditSelected) => {
-              setCategoryToEdit(categoryToEditSelected)
+              setCategoryUuidToEdit(Category.getUuid(categoryToEditSelected))
               setShowCategoryPanel(true)
             }}
           />
@@ -83,11 +83,11 @@ const CategorySelector = (props) => {
           width="100vw"
           onClose={() => {
             setShowCategoryPanel(false)
-            setCategoryToEdit(null)
+            setCategoryUuidToEdit(null)
           }}
           header={i18n.t('categoryEdit.header')}
         >
-          <CategoryDetails category={categoryToEdit} onCategoryCreated={onChange} showClose={false} />
+          <CategoryDetails categoryUuid={categoryUuidToEdit} onCategoryCreated={onChange} showClose={false} />
         </PanelRight>
       )}
     </div>
