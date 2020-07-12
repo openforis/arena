@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
-import { useParams } from 'react-router'
+import { matchPath, useLocation } from 'react-router'
 import { useDispatch } from 'react-redux'
-
 import axios from 'axios'
 
 import * as A from '@core/arena'
-
 import * as Category from '@core/survey/category'
+
+import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
@@ -33,20 +33,20 @@ const _fetchCategory = async ({ surveyId, categoryUuid }) => {
 }
 
 export const useInit = ({ setState }) => {
-  const { categoryUuid: categoryUuidParam } = useParams()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const { pathname } = useLocation()
+  const inCategoriesPath = Boolean(matchPath(pathname, `${appModuleUri(designerModules.category)}:uuid/`))
 
   return useCallback(async ({ onCategoryCreated, categoryUuid }) => {
-    const categoryUuidToFetch = categoryUuid || categoryUuidParam
     let category = null
 
-    if (A.isEmpty(categoryUuidToFetch)) {
+    if (A.isEmpty(categoryUuid)) {
       category = await _createCategory({ surveyId, onCategoryCreated, dispatch })
     } else {
-      category = await _fetchCategory({ surveyId, categoryUuid: categoryUuidToFetch })
+      category = await _fetchCategory({ surveyId, categoryUuid })
     }
 
-    setState(State.create({ category }))
+    setState(State.create({ category, inCategoriesPath }))
   }, [])
 }

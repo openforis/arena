@@ -24,22 +24,21 @@ import { State, useLocalState } from './store'
 const CategoryDetails = (props) => {
   const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
 
-  const { categoryUuid } = useParams()
+  const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp })
+  const { state } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
 
   const category = State.getCategory(state)
+  const inCategoriesPath = State.isInCategoriesPath(state)
   const importSummary = State.getImportSummary(state)
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
-
-  const inCategoriesPath = Boolean(categoryUuid)
 
   return category ? (
     <>
