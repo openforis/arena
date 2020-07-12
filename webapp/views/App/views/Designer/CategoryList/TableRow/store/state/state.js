@@ -1,43 +1,34 @@
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 
+import { State as ListState } from '../../../store'
+
 export const keys = {
-  canSelect: 'canSelect',
-  category: 'taxonomy',
-  inCategoriesPath: 'inCategoriesPath',
+  category: 'category',
   initData: 'initData',
+  listState: 'listState',
   position: 'position',
-  onEdit: 'onEdit',
-  onSelect: 'onSelect',
-  selectedItemUuid: 'selectedItemUuid',
   unused: 'unused',
 }
 
 // ==== CREATE
-export const create = ({ canSelect, category, initData, onEdit, onSelect, position, selectedItemUuid, unused }) => ({
-  [keys.canSelect]: canSelect,
+export const create = ({ category, initData, listState, position, unused }) => ({
   [keys.category]: category,
   [keys.initData]: initData,
+  [keys.listState]: listState,
   [keys.position]: position,
-  [keys.onEdit]: onEdit,
-  [keys.onSelect]: onSelect,
-  [keys.selectedItemUuid]: selectedItemUuid,
   [keys.unused]: unused,
 })
 
 // ==== READ
-export const getCanDelete = A.prop(keys.canDelete)
-export const getCanSelect = A.prop(keys.canSelect)
 export const getCategory = A.prop(keys.category)
 export const getInitData = A.prop(keys.initData)
-export const getOnEdit = A.prop(keys.onEdit)
-export const getOnSelect = A.prop(keys.onSelect)
+export const getListState = A.prop(keys.listState)
 export const getPosition = A.prop(keys.position)
-export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
 export const isUnused = A.prop(keys.unused)
 
 export const isSelected = (state) => {
-  const selectedItemUuid = getSelectedItemUuid(state)
+  const selectedItemUuid = A.pipe(getListState, ListState.getSelectedItemUuid)(state)
   return selectedItemUuid && selectedItemUuid === Category.getUuid(getCategory(state))
 }
 

@@ -10,25 +10,28 @@ import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 import { State } from '../state'
 
-export const useDelete = () => {
+export const useDelete = ({ setState }) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  return useCallback(({ state }) => {
-    const category = State.getCategory(state)
-    const categoryName = Category.getName(category)
-    const unused = State.isUnused(state)
+  return useCallback(() => {
+    setState((state) => {
+      const category = State.getCategory(state)
+      const initData = State.getInitData(state)
+      const unused = State.isUnused(state)
 
-    if (unused) {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'categoryEdit.confirmDelete',
-          params: { categoryName: categoryName || i18n.t('common.undefinedName') },
-          onOk: () => dispatch(CategoryActions.deleteCategory({ category, callback: State.getInitData(state) })),
-        })
-      )
-    } else {
-      dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' }))
-    }
+      if (unused) {
+        dispatch(
+          DialogConfirmActions.showDialogConfirm({
+            key: 'categoryEdit.confirmDelete',
+            params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
+            onOk: () => dispatch(CategoryActions.deleteCategory({ category, callback: initData })),
+          })
+        )
+      } else {
+        dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' }))
+      }
+      return state
+    })
   }, [])
 }

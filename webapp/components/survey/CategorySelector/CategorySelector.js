@@ -61,7 +61,7 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && !categoryUuidToEdit && (
+      {showCategoriesPanel && !showCategoryPanel && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}
@@ -70,6 +70,7 @@ const CategorySelector = (props) => {
           <CategoryList
             canSelect
             selectedItemUuid={categoryUuid}
+            onAdd={() => setShowCategoryPanel(true)}
             onSelect={onChange}
             onEdit={(categoryToEditSelected) => {
               setCategoryUuidToEdit(Category.getUuid(categoryToEditSelected))
