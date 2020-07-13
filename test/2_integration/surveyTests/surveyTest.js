@@ -15,7 +15,6 @@ export const createSurveyTest = async () => {
     languages: ['en'],
   })
   const survey = await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTest })
-
   setContextSurvey(survey)
 
   const surveyInfo = Survey.getSurveyInfo(survey)

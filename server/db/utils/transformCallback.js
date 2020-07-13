@@ -27,7 +27,7 @@ export const transformCallback = (row, draft = false, assocPublishedDraft = fals
     (rowCurrent) => (assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
     // Dissoc validation before camelize (if any)
     R.unless(R.always(R.isNil(validation)), Validation.dissocValidation),
-    camelize,
+    camelize.default,
     (rowCurrent) => _mergeProps(rowCurrent, draft),
     // Assoc validation (if any)
     R.unless(R.always(R.isNil(validation)), Validation.assocValidation(validation))

@@ -18,5 +18,4 @@ module.exports = {
   testTimeout: 30000,
   coveragePathIgnorePatterns: ['/node_modules/'],
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
-  automock: false,
 }

@@ -31,7 +31,7 @@ const validateExpression = async (survey, nodeDefName, expression) => {
  * }.
  */
 const expressions = [
-  {
+  /*{
     t: 'Test a literal number',
     n: 'node_def_text',
     e: '123',
@@ -78,14 +78,14 @@ const expressions = [
     n: 'node_def_text',
     e: '+',
     v: false,
-  },
+  },*/
   {
     t: 'Test an expression with a type error',
     n: 'node_def_text',
     e: '1 + node_def_text',
     v: false,
   },
-  {
+  /*{
     t: 'Test appending number to a string',
     n: 'node_def_text',
     e: 'node_def_text + 1',
@@ -96,17 +96,20 @@ const expressions = [
     n: 'node_def_text',
     e: 'node_def_text + " - " + node_def_text',
     v: true,
-  },
+  },*/
 ]
 
-describe('NodeDefExpressions Validation Test', async () => {
-  const survey = await fetchFullContextSurvey()
+export const NodeDefExpressions = async () => {
+  describe('NodeDefExpressions Validation Test', () => {
+    expressions.forEach((expr) => {
+      test(expr.t, async () => {
 
-  expressions.forEach((expr) => {
-    test(expr.t, async () => {
-      const validation = await validateExpression(survey, expr.n, expr.e)
-      expect(expr.v).toBe(Validation.isValid(validation))
-      expect(expr.v).toBe(Validation.isValid(Validation.getFieldValidation('0')(validation)))
+        const survey = await fetchFullContextSurvey()
+        const validation = await validateExpression(survey, expr.n, expr.e)
+        console.log(expr, expr.v, Validation.isValid(validation), survey, validation)
+        expect(Validation.isValid(validation)).toBe(expr.v)
+        expect(Validation.isValid(Validation.getFieldValidation('0')(validation))).toBe(expr.v)
+      })
     })
   })
-})
+}

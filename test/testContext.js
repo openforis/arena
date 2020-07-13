@@ -18,7 +18,7 @@ export const getContextUser = () => {
   return global.user || user
 }
 export const getContextSurvey = () => global.survey || survey
-export const getContextSurveyId = () => Survey.getId(getContextSurvey)
+export const getContextSurveyId = () => Survey.getId(getContextSurvey())
 
 const createAdminUser = async () =>
   await db.multi(`
@@ -58,9 +58,8 @@ export const destroyTestContext = async () => {
   }
 }
 
-export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    Survey.getId(getContextSurvey()),
+export const fetchFullContextSurvey = async (draft = true, advanced = true) => await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    getContextSurveyId(),
     Survey.cycleOneKey,
     draft,
     advanced

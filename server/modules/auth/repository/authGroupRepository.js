@@ -1,7 +1,7 @@
 import * as camelize from 'camelize'
 import { db } from '@server/db/db'
 
-const dbTransformCallback = camelize
+const dbTransformCallback = camelize.default
 
 import * as AuthGroup from '@core/auth/authGroup'
 
