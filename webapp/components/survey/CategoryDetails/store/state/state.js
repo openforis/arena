@@ -6,13 +6,15 @@ const keys = {
   inCategoriesPath: 'inCategoriesPath',
   levelItems: 'levelItems',
   levelActiveItems: 'levelActiveItems',
+  onCategoryCreated: 'onCategoryCreated',
 }
 
-export const create = ({ category, inCategoriesPath }) => ({
-  [keys.category]: category,
+export const create = ({ inCategoriesPath }) => ({
   [keys.inCategoriesPath]: inCategoriesPath,
 })
 
 export const getCategory = A.prop(keys.category)
 export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getImportSummary = A.prop(keys.importSummary)
+
+export const assocCategory = (category) => A.assoc(keys.category, category)

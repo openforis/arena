@@ -1,12 +1,10 @@
 import { useCallback } from 'react'
-import { matchPath, useLocation } from 'react-router'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
@@ -35,10 +33,8 @@ const _fetchCategory = async ({ surveyId, categoryUuid }) => {
 export const useInit = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
-  const { pathname } = useLocation()
-  const inCategoriesPath = Boolean(matchPath(pathname, `${appModuleUri(designerModules.category)}:uuid/`))
 
-  return useCallback(async ({ onCategoryCreated, categoryUuid }) => {
+  return useCallback(async ({ categoryUuid, onCategoryCreated }) => {
     let category = null
 
     if (A.isEmpty(categoryUuid)) {
@@ -47,6 +43,6 @@ export const useInit = ({ setState }) => {
       category = await _fetchCategory({ surveyId, categoryUuid })
     }
 
-    setState(State.create({ category, inCategoriesPath }))
+    setState((statePrev) => State.assocCategory(category)(statePrev))
   }, [])
 }
