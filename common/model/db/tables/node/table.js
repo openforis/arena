@@ -1,4 +1,4 @@
-import camelize from 'camelize'
+import * as camelize from 'camelize'
 import * as R from 'ramda'
 
 import * as Node from '../../../../../core/record/node'
@@ -50,6 +50,6 @@ export default class TableNode extends TableSurvey {
 }
 
 TableNode.dbTransformCallback = (node) =>
-  R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node)
+  R.pipe(R.dissoc(Node.keys.meta), camelize.default, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node)
 
 TableNode.columnSet = columnSet

@@ -22,5 +22,5 @@ export const fetchNodeResults = async (params, client = db) => {
   const { surveyId, uuid, recordUuid, parentUuid, nodeDefUuid } = params
   const table = new TableResultNode(surveyId)
 
-  return client.map(table.getSelect({ surveyId, uuid, recordUuid, parentUuid, nodeDefUuid }), [], camelize)
+  return client.map(table.getSelect({ surveyId, uuid, recordUuid, parentUuid, nodeDefUuid }), [], camelize.default)
 }

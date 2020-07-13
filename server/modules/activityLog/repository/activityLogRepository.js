@@ -1,4 +1,4 @@
-import camelize from 'camelize'
+import * as camelize from 'camelize'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -182,6 +182,6 @@ export const fetch = async (
     ORDER BY
       l.id DESC`,
     [surveyUuid, activityTypes, limit],
-    camelize
+    camelize.default
   )
 }

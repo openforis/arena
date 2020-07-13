@@ -22,7 +22,7 @@ export const tableColumns = [
 
 // camelize all but "meta"
 const dbTransformCallback = node =>
-  node ? R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
+  node ? R.pipe(R.dissoc(Node.keys.meta), camelize.default, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
 
 const _getNodeSelectQuery = (surveyId, draft) => {
   const schema = getSurveyDBSchema(surveyId)

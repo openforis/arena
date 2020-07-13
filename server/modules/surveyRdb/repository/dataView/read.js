@@ -294,6 +294,6 @@ export const fetchRecordsCountByKeys = async (
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
     [recordUuidExcluded, cycle],
-    camelize
+    camelize.default
   )
 }

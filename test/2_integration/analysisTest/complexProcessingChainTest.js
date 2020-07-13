@@ -17,14 +17,16 @@ import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
 import * as ChainBuilder from '../utils/chainBuilder'
 
-let user = null
-let survey = null
-let records = []
+const getContext = () => {
+  const survey = global.applicableSurvey
+  const records = global.applicableRecords
+  return { survey, records, user: getContextUser() }
+}
 
 beforeAll(async () => {
-  user = getContextUser()
+  const user = getContextUser()
 
-  survey = await SB.survey(
+  global.applicableSurvey = await SB.survey(
     user,
     // Cluster
     SB.entity(
@@ -53,6 +55,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  const { survey } = getContext()
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }
@@ -60,9 +63,10 @@ afterAll(async () => {
 
 const _insertRecords = async () => {
   // Delete records
+  const { records, user, survey } = getContext()
   await Promise.all(records.map((record) => RecordManager.deleteRecord(user, survey, Record.getUuid(record))))
 
-  records = []
+  global.applicableRecords = []
 
   const newTree = (treeNo, dbh, height) =>
     RB.entity(
@@ -84,11 +88,12 @@ const _insertRecords = async () => {
       )
     ).buildAndStore()
 
-    records.push(record)
+    global.applicableRecords = [...(global.applicableRecords || []), record]
   })
 }
 
 export const chainWithSimpleEntityTest = async () => {
+  const { user, survey } = getContext()
   await ChainBuilder.chain(
     user,
     survey,
@@ -105,6 +110,7 @@ export const chainWithSimpleEntityTest = async () => {
 }
 
 export const chainWithVirtualEntityTest = async () => {
+  const { user, survey } = getContext()
   await ChainBuilder.chain(
     user,
     survey,
@@ -124,6 +130,7 @@ export const chainWithVirtualEntityTest = async () => {
 }
 
 export const chainWithVirtualEntityAndAggregationTest = async () => {
+  const { user, survey } = getContext()
   await ChainBuilder.chain(
     user,
     survey,

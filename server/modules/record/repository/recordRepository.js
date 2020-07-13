@@ -18,7 +18,7 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
   const validation = Record.getValidation(record)
   return R.pipe(
     R.dissoc(Validation.keys.validation),
-    camelize,
+    camelize.default,
     R.assoc('surveyId', surveyId),
     R.assoc(
       Validation.keys.validation,

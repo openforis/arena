@@ -11,14 +11,18 @@ import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
 import * as ChainBuilder from '../utils/chainBuilder'
 
-let survey = null
-const records = []
-let processingChain = null
+const getContext = () => {
+  const survey = global.applicableSurvey
+  const record = global.applicableRecord
+  const processingChain = global.applicableProcessingChain
+  const records = global.applicableRecords
+  return { survey, record, processingChain, records }
+}
 
 beforeAll(async () => {
   const user = getContextUser()
 
-  survey = await SB.survey(
+  global.applicableSurvey = await SB.survey(
     user,
     // Cluster
     SB.entity(
@@ -57,7 +61,7 @@ beforeAll(async () => {
   await PromiseUtils.each([1, 2, 3, 4, 5], async (clusterNum) => {
     const record = await RB.record(
       user,
-      survey,
+      global.applicableSurvey,
       RB.entity(
         'cluster',
         RB.attribute('cluster_no', clusterNum),
@@ -68,12 +72,12 @@ beforeAll(async () => {
       )
     ).buildAndStore()
 
-    records.push(record)
+    global.applicableRecords = [...(global.applicableRecords || []), record]
   })
 
-  processingChain = ChainBuilder.chain(
+  global.applicableProcessingChain = ChainBuilder.chain(
     user,
-    survey,
+    global.applicableSurvey,
     'Simple chain',
     ChainBuilder.step(
       'tree',
@@ -83,12 +87,14 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  const { survey } = getContext()
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }
 })
 
 export const simpleTest = async () => {
+  const { processingChain } = getContext()
   // Console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
   // await ProcessingChainService.generateScriptDeprecated(Survey.getId(survey), Survey.cycleOneKey, processingChain)

@@ -16,11 +16,15 @@ import * as SB from '../utils/surveyBuilder'
 import * as TaxonomyUtils from './taxonomyUtils'
 
 const taxonomyNameDefault = 'species_list'
-let survey = null
+
+const getContext = () => {
+  const survey = global.applicableSurvey
+  return { survey }
+}
 
 beforeAll(async () => {
   const user = getContextUser()
-  survey = await SB.survey(
+  global.applicableSurvey = await SB.survey(
     user,
     // Cluster
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
@@ -36,12 +40,14 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  const { survey } = getContext()
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }
 })
 
 export const taxonomyTests = async () => {
+  const { survey } = getContext()
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId: Survey.getId(survey), draft: true })
   expect(taxonomies.length).to.be.equal(1, 'None or more than one taxonomies found')
   const taxonomy = R.head(taxonomies)
@@ -56,6 +62,7 @@ export const taxonomyTests = async () => {
 }
 
 export const taxonomyUpdateTest = async () => {
+  const { survey } = getContext()
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
   const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyNameDefault, true)
@@ -75,6 +82,7 @@ export const taxonomyUpdateTest = async () => {
  * Insert new taxa and expect taxa count to become 5.
  */
 export const taxaInsertTest = async () => {
+  const { survey } = getContext()
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
   const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyNameDefault, true)
@@ -100,6 +108,7 @@ export const taxaInsertTest = async () => {
  * Update existing taxon with new props.
  */
 export const taxonUpdateTest = async () => {
+  const { survey } = getContext()
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
   const taxonomy = await TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameDefault, true)
@@ -126,8 +135,10 @@ export const taxonUpdateTest = async () => {
   expect(Taxon.getProps(taxonReloaded)).toEqual(Taxon.getProps(taxonNew))
 }
 
-const _importFile = async (taxonomyName, importFileName) =>
-  TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
+const _importFile = async (taxonomyName, importFileName) => {
+  const { survey } = getContext()
+  await TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
+}
 
 export const taxonomyImportErrorMissingColumnsTest = async () => {
   const { job } = await _importFile(
@@ -146,6 +157,7 @@ export const taxonomyImportErrorDuplicateItemsTest = async () => {
 }
 
 export const taxonomyImportNewTest = async () => {
+  const { survey } = getContext()
   const { job, taxonomyUuid } = await _importFile('New taxonomy', 'species list test (short with vernacular names).csv')
 
   // Check that the job completed successfully
