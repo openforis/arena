@@ -151,7 +151,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
 
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) =>
-  await client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+  await client.query('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = R.pipe(

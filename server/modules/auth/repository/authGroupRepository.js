@@ -21,11 +21,11 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
       JSON.stringify(AuthGroup.getPermissions(authGroup)),
       JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
     ],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
-  await Promise.all(surveyGroups.map(authGroup => insertGroup(authGroup, surveyId, client)))
+  await Promise.all(surveyGroups.map((authGroup) => insertGroup(authGroup, surveyId, client)))
 
 export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
   await client.one(
@@ -34,7 +34,7 @@ export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
     VALUES ($1, $2)
     RETURNING *`,
     [groupUuid, userUuid],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 // ==== READ
@@ -46,7 +46,7 @@ export const fetchGroupByUuid = async (groupUuid, client = db) =>
     FROM auth_group
     WHERE auth_group.uuid = $1`,
     [groupUuid],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 export const fetchSurveyGroups = async (surveyId, client = db) =>
@@ -58,7 +58,7 @@ export const fetchSurveyGroups = async (surveyId, client = db) =>
     ON s.id = $1
     WHERE auth_group.survey_uuid = s.uuid`,
     [surveyId],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 export const fetchUserGroups = async (userUuid, client = db) =>
@@ -72,7 +72,7 @@ export const fetchUserGroups = async (userUuid, client = db) =>
       gu.user_uuid = $1
     `,
     [userUuid],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 // ==== UPDATE
@@ -93,7 +93,7 @@ export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db
     ) 
     RETURNING *`,
     [groupUuid, userUuid, surveyId],
-    dbTransformCallback,
+    dbTransformCallback
   )
 }
 
@@ -104,7 +104,7 @@ export const deleteAllUserGroups = async (userUuid, client = db) =>
     `
     DELETE FROM auth_group_user
     WHERE user_uuid = $1`,
-    userUuid,
+    userUuid
   )
 
 // ==== DELETE
@@ -134,5 +134,5 @@ export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
           gu.user_uuid = $1
     )               
   `,
-    [userUuid, surveyId],
+    [userUuid, surveyId]
   )

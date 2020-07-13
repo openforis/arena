@@ -1,17 +1,13 @@
 import 'dotenv/config'
 
-import { initTestContext, destroyTestContext } from '../testContext'
-
 import * as SurveyIntegrationTest from './surveyTests/surveyTest'
 import * as CategoryTest from './surveyTests/categoryTest'
 import * as NodeDefTest from './surveyTests/nodeDefTest'
 
-beforeAll(initTestContext)
-
 describe('Survey Test', () => {
   // ==== SURVEY
 
-  test('Create Survey', async () => SurveyIntegrationTest.createSurveyTest())
+  it('Create Survey', async () => SurveyIntegrationTest.createSurveyTest())
 
   // ==== CATEGORY
 
@@ -28,6 +24,5 @@ describe('Survey Test', () => {
   test('Create Node Defs', async () => NodeDefTest.createNodeDefsTest())
 
   test('Update Node Def', async () => NodeDefTest.updateNodeDefTest())
-})
 
-afterAll(destroyTestContext)
+})

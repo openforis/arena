@@ -9,7 +9,18 @@ import * as UserManager from '../server/modules/user/manager/userManager'
 let user = null
 let survey = null
 
-const createAdminUser = async () => {
+export const setContextUser = (userToSave) => {
+  global.user = userToSave
+  user = userToSave
+}
+
+export const getContextUser = () => {
+  return global.user || user
+}
+export const getContextSurvey = () => global.survey || survey
+export const getContextSurveyId = () => Survey.getId(getContextSurvey)
+
+const createAdminUser = async () =>
   await db.multi(`
     -- Insert the admin user to be used in the test suite:
     INSERT INTO "user" (name, email, password, status)
@@ -22,7 +33,6 @@ const createAdminUser = async () => {
     WHERE u.email = 'admin@openforis.org' AND g.name = '${AuthGroup.groupNames.systemAdmin}'
     ON CONFLICT DO NOTHING;
     `)
-}
 
 /**
  * Initializing test context (user)
@@ -30,23 +40,28 @@ const createAdminUser = async () => {
  */
 export const initTestContext = async () => {
   await createAdminUser()
-  user = await UserManager.fetchUserByEmail('admin@openforis.org')
-}
-
-export const destroyTestContext = async () => {
-  if (survey) {
-    await SurveyManager.deleteSurvey(Survey.getId(survey))
-  }
+  const userSaved = await UserManager.fetchUserByEmail('admin@openforis.org')
+  setContextUser(userSaved)
 }
 
 export const setContextSurvey = (s) => {
+  global.survey = s
   survey = s
-  user = User.assocPrefSurveyCurrent(Survey.getId(survey))(user)
+  setContextUser(User.assocPrefSurveyCurrent(Survey.getId(getContextSurvey()))(getContextUser()))
+}
+
+export const destroyTestContext = async () => {
+  if (getContextUser) {
+    await SurveyManager.deleteSurvey(Survey.getId(getContextSurvey()))
+    setContextSurvey(null)
+    setContextUser(null)
+  }
 }
 
 export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), Survey.cycleOneKey, draft, advanced)
-
-export const getContextUser = () => user
-export const getContextSurvey = () => survey
-export const getContextSurveyId = () => Survey.getId(survey)
+  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    Survey.getId(getContextSurvey()),
+    Survey.cycleOneKey,
+    draft,
+    advanced
+  )

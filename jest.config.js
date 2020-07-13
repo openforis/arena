@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: './.env',
+})
+
 module.exports = {
   moduleNameMapper: {
     '@common/(.*)': '<rootDir>/common/$1',
@@ -13,4 +17,6 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'html', 'scss'],
   testTimeout: 30000,
   coveragePathIgnorePatterns: ['/node_modules/'],
+  setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
+  automock: false,
 }
