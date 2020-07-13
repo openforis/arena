@@ -6,7 +6,6 @@ const keys = {
   inCategoriesPath: 'inCategoriesPath',
   levelItems: 'levelItems',
   levelActiveItems: 'levelActiveItems',
-  onCategoryCreated: 'onCategoryCreated',
 }
 
 export const create = ({ inCategoriesPath }) => ({

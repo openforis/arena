@@ -14,7 +14,7 @@ import { useLocalState } from './store'
 const CategoryList = (props) => {
   const { canSelect, onAdd, onEdit, onSelect, selectedItemUuid } = props
 
-  const { state } = useLocalState({ canSelect, onAdd, onEdit, onSelect, selectedItemUuid })
+  const { state, setState } = useLocalState({ canSelect, onAdd, onEdit, onSelect, selectedItemUuid })
 
   const canEdit = useAuthCanEditSurvey()
 
@@ -36,7 +36,7 @@ const CategoryList = (props) => {
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
         headerProps={{ listState: state }}
-        rowProps={{ listState: state }}
+        rowProps={{ listState: state, setListState: setState }}
       />
     </>
   )

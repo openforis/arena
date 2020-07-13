@@ -1,24 +1,24 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
-import { State } from '../state'
-
-export const useDelete = ({ setState }) => {
+export const useDelete = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const survey = useSurvey()
 
-  return useCallback(() => {
-    setState((state) => {
-      const category = State.getCategory(state)
-      const initData = State.getInitData(state)
-      const unused = State.isUnused(state)
+  return useCallback(
+    ({ category, initData }) => {
+      const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
 
       if (unused) {
         dispatch(
@@ -31,7 +31,7 @@ export const useDelete = ({ setState }) => {
       } else {
         dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' }))
       }
-      return state
-    })
-  }, [])
+    },
+    [survey]
+  )
 }

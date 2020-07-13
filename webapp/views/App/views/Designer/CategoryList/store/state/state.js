@@ -21,11 +21,11 @@ export const create = ({ canSelect, inCategoriesPath, onAdd, onEdit, onSelect, s
 
 // ==== READ
 export const getCanSelect = A.prop(keys.canSelect)
+export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getOnAdd = A.prop(keys.onAdd)
 export const getOnEdit = A.prop(keys.onEdit)
 export const getOnSelect = A.prop(keys.onSelect)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
-export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 
 // ==== UPDATE
 export const assocSelectedItemUuid = A.assoc(keys.selectedItemUuid)

@@ -20,5 +20,5 @@ export const useLocalState = (props) => {
     setState((prevState) => State.assocSelectedItemUuid(selectedItemUuid)(prevState))
   }, [selectedItemUuid])
 
-  return { state }
+  return { state, setState }
 }
