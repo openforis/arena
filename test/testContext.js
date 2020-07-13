@@ -51,16 +51,13 @@ export const setContextSurvey = (s) => {
 }
 
 export const destroyTestContext = async () => {
-  if (getContextUser) {
-    await SurveyManager.deleteSurvey(Survey.getId(getContextSurvey()))
+  if (getContextUser() && getContextSurveyId()) {
+    await SurveyManager.deleteSurvey(getContextSurveyId())
     setContextSurvey(null)
     setContextUser(null)
   }
+  return null
 }
 
-export const fetchFullContextSurvey = async (draft = true, advanced = true) => await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    getContextSurveyId(),
-    Survey.cycleOneKey,
-    draft,
-    advanced
-  )
+export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
+  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(getContextSurveyId(), Survey.cycleOneKey, draft, advanced)

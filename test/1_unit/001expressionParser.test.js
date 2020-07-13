@@ -13,9 +13,9 @@ const queries = [
 
 describe('ExpressionParser test', () => {
   queries.forEach((query) => {
-    it(query.q, () => {
+    test(query.q, () => {
       const res = Expression.evalString(query.q)
-      expect(res).toEqual(query.r)
+      expect(query.r).toEqual(res)
     })
   })
 })

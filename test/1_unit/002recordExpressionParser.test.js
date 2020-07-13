@@ -32,7 +32,7 @@ describe('RecordExpressionParser Test', () => {
     // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
     node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
     // Dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
-  })
+  }, 10000)
 
   // ====== nodes hierarchy tests
   // it('this.parent()', async () => {
