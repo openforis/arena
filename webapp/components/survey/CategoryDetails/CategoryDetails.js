@@ -31,7 +31,7 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const { state, setState } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
 
   const category = State.getCategory(state)
   const inCategoriesPath = State.isInCategoriesPath(state)
@@ -67,7 +67,7 @@ const CategoryDetails = (props) => {
 
         <div className="category__levels">
           {levels.map((level) => (
-            <LevelEdit key={CategoryLevel.getUuid(level)} level={level} />
+            <LevelEdit key={CategoryLevel.getUuid(level)} level={level} state={state} setState={setState} />
           ))}
 
           {!readOnly && (

@@ -1,8 +1,7 @@
 import React from 'react'
-import * as R from 'ramda'
-import { connect, useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -10,14 +9,11 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { useI18n } from '@webapp/store/system'
-
-import * as CategoryState from '../../../loggedin/surveyViews/category/categoryState'
 
 import {
   createCategoryLevelItem,
@@ -29,48 +25,34 @@ import {
 } from '../../../loggedin/surveyViews/category/actions'
 
 import ItemEdit from './ItemEdit'
-import { UserState } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import { State, useActions } from './store'
 
 const LevelEdit = (props) => {
+  const { level, state, setState } = props
+  const index = CategoryLevel.getIndex(level)
+
+  const readOnly = !useAuthCanEditSurvey()
   const dispatch = useDispatch()
 
-  const handleDelete = () => {
-    const { category, level, usedByNodeDefs, deleteCategoryLevel } = props
-
-    if (usedByNodeDefs) {
-      dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
-    } else {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'categoryEdit.confirmDeleteLevel',
-          params: { levelName: CategoryLevel.getName(level) },
-          onOk: () => deleteCategoryLevel(category, level),
-        })
-      )
-    }
-  }
-
-  const {
-    surveyInfo,
-    category,
-    level,
-    parentItem,
-    items,
-    activeItemUuid,
-    canAddItem,
-    canBeDeleted,
-    createCategoryLevelItem,
-    putCategoryLevelProp,
-    putCategoryItemProp,
-    setCategoryItemForEdit,
-    deleteCategoryItem,
-    readOnly,
-  } = props
-
-  const validation = Category.getLevelValidation(CategoryLevel.getIndex(level))(category)
-
   const i18n = useI18n()
+  const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
+
+  const Actions = useActions({ setState })
+
+  const category = State.getCategory(state)
+  const activeItem = State.getLevelActiveItem(index)(state)
+  const activeItemUuid = activeItem ? CategoryItem.getUuid(activeItem) : null
+  const parentItem = State.getLevelActiveItem(index - 1)(state)
+
+  const canAddItem = index === 0 || parentItem
+  const items = canAddItem ? State.getLevelItemsArray(index)(state) : []
+  const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
+
+  const validation = Category.getLevelValidation(index)(category)
 
   return (
     <div className="category__level">
@@ -80,7 +62,7 @@ const LevelEdit = (props) => {
           {i18n.t('categoryEdit.level')} {level.index + 1}
         </h4>
         {!readOnly && (
-          <button className="btn btn-s" onClick={() => handleDelete()} aria-disabled={!canBeDeleted}>
+          <button className="btn btn-s" onClick={() => Actions.deleteLevel({ level })} aria-disabled={!canBeDeleted}>
             <span className="icon icon-bin2 icon-12px" />
           </button>
         )}
@@ -90,7 +72,7 @@ const LevelEdit = (props) => {
         <Input
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={(value) => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
+          onChange={(value) => Actions.updateLevelProp({ category, level, key: 'name', value: normalizeName(value) })}
           readOnly={readOnly}
         />
       </FormItem>
@@ -129,43 +111,10 @@ const LevelEdit = (props) => {
   )
 }
 
-const mapStateToProps = (state, props) => {
-  const { level } = props
-  const { index } = level
-
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-
-  const category = CategoryState.getCategoryForEdit(state)
-  const activeItem = CategoryState.getLevelActiveItem(index)(state)
-  const parentItem = CategoryState.getLevelActiveItem(index - 1)(state)
-
-  const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
-  const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
-  const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-  const usedByNodeDefs = R.any((def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
-
-  const user = UserState.getUser(state)
-
-  return {
-    surveyInfo,
-    category,
-    items,
-    activeItemUuid: activeItem ? CategoryItem.getUuid(activeItem) : null,
-    parentItem,
-    canAddItem,
-    canBeDeleted,
-    usedByNodeDefs,
-    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
-  }
+LevelEdit.propTypes = {
+  level: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  setState: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, {
-  createCategoryLevelItem,
-  putCategoryLevelProp,
-  putCategoryItemProp,
-  deleteCategoryLevel,
-  setCategoryItemForEdit,
-  deleteCategoryItem,
-})(LevelEdit)
+export default LevelEdit
