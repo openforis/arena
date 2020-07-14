@@ -11,25 +11,26 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 
 import { State } from './store'
+import axios from 'axios'
 
 const TaxonProps = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
+  const surveyId = useSurveyId()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
-  const taxonomies = Survey.getTaxonomiesArray(survey)
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
@@ -37,6 +38,13 @@ const TaxonProps = (props) => {
 
   const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
+
+  const itemsLookupFunction = async (value) => {
+    const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies`, {
+      params: { search: value, draft: true, validate: false },
+    })
+    return data.list
+  }
 
   return (
     <>
@@ -48,7 +56,7 @@ const TaxonProps = (props) => {
           }}
         >
           <Dropdown
-            items={taxonomies}
+            items={itemsLookupFunction}
             itemKey="uuid"
             itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
