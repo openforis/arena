@@ -99,8 +99,14 @@ export const fetchTaxonomiesBySurveyId = async (
        search
          ? `WHERE 
       ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE '%${search}%'
-      OR 
-      ${DbUtils.getPropColCombined(Taxonomy.keysProps.descriptions, draft)} ILIKE '%${search}%'
+        OR 
+      EXISTS(
+        SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
+          Taxonomy.keysProps.descriptions,
+          draft
+        )})::jsonb, '{}'::jsonb))
+        WHERE value ILIKE '%${search}%'
+        )
       `
          : ''
      } 
