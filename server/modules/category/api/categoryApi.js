@@ -192,9 +192,9 @@ export const init = (app) => {
         const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const { categories } = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
+        const category = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
-        res.json({ categories })
+        res.json({ category })
       } catch (error) {
         next(error)
       }

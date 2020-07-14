@@ -18,8 +18,8 @@ import UploadButton from '@webapp/components/form/uploadButton'
 import ImportSummary from './ImportSummary'
 import LevelEdit from './LevelEdit'
 
-import * as Actions from '../../../loggedin/surveyViews/category/actions'
-import { State, useLocalState } from './store'
+import * as CategoryActions from '../../../loggedin/surveyViews/category/actions'
+import { State, useActions, useLocalState } from './store'
 
 const CategoryDetails = (props) => {
   const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
@@ -31,7 +31,8 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const { state, setState } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
   const inCategoriesPath = State.isInCategoriesPath(state)
@@ -49,7 +50,7 @@ const CategoryDetails = (props) => {
               value={Category.getName(category)}
               validation={Validation.getFieldValidation(Category.props.name)(validation)}
               onChange={(value) =>
-                dispatch(Actions.putCategoryProp(category, Category.props.name, StringUtils.normalizeName(value)))
+                Actions.updateCategoryProp({ key: Category.props.name, value: StringUtils.normalizeName(value) })
               }
               readOnly={readOnly}
             />
@@ -59,7 +60,7 @@ const CategoryDetails = (props) => {
             <UploadButton
               label={i18n.t('common.csvImport')}
               accept=".csv"
-              onChange={(files) => dispatch(Actions.uploadCategory(Category.getUuid(category), files[0]))}
+              onChange={(files) => dispatch(CategoryActions.uploadCategory(Category.getUuid(category), files[0]))}
               disabled={Category.isPublished(category)}
             />
           )}
@@ -74,7 +75,7 @@ const CategoryDetails = (props) => {
             <button
               type="button"
               className="btn btn-s btn-add-level"
-              onClick={() => dispatch(Actions.createCategoryLevel(category))}
+              onClick={() => dispatch(CategoryActions.createCategoryLevel(category))}
               aria-disabled={levels.length === 5}
             >
               <span className="icon icon-plus icon-16px icon-left" />
