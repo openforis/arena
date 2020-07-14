@@ -88,10 +88,22 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
     (record) => dbTransformCallback(record, draft, true)
   )
 
-export const fetchTaxonomiesBySurveyId = async ({ surveyId, draft = false, limit = null, offset = 0 }, client = db) =>
+export const fetchTaxonomiesBySurveyId = async (
+  { surveyId, draft = false, limit = null, offset = 0, search = '' },
+  client = db
+) =>
   await client.map(
     `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxonomy 
+     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
+     ${
+       search
+         ? `WHERE 
+      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE '%${search}%'
+      OR 
+      ${DbUtils.getPropColCombined(Taxonomy.keysProps.descriptions, draft)} ILIKE '%${search}%'
+      `
+         : ''
+     } 
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
      LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
