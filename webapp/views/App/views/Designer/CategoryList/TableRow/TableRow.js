@@ -25,7 +25,7 @@ const TableRow = (props) => {
 
   const canEdit = useAuthCanEditSurvey()
 
-  const ListActions = useActions({ setState })
+  const Actions = useActions({ setState })
 
   const canSelect = State.getCanSelect(state)
   const selectedItemUuid = State.getSelectedItemUuid(state)
@@ -50,7 +50,7 @@ const TableRow = (props) => {
           <button
             type="button"
             className={`btn btn-s${selected ? ' active' : ''}`}
-            onClick={() => ListActions.select({ category })}
+            onClick={() => Actions.select({ category })}
           >
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {i18n.t(selected ? 'common.selected' : 'common.select')}
@@ -60,13 +60,13 @@ const TableRow = (props) => {
       {canEdit && (
         <>
           <div>
-            <button type="button" className="btn btn-s" onClick={() => ListActions.edit({ category })}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.edit({ category })}>
               <span className="icon icon-pencil2 icon-12px icon-left" />
               {i18n.t('common.edit')}
             </button>
           </div>
           <div>
-            <button type="button" className="btn btn-s" onClick={() => ListActions.delete({ category, initData })}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.delete({ category, initData })}>
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('common.delete')}
             </button>
