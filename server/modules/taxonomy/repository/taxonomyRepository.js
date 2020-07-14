@@ -95,7 +95,15 @@ export const fetchTaxonomiesBySurveyId = async (
   await client.map(
     `SELECT * 
      FROM ${getSurveyDBSchema(surveyId)}.taxonomy
-     ${search ? `WHERE ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE '%${search}%'` : ''} 
+     ${
+       search
+         ? `WHERE 
+      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE '%${search}%'
+      OR 
+      ${DbUtils.getPropColCombined(Taxonomy.keysProps.descriptions, draft)} ILIKE '%${search}%'
+      `
+         : ''
+     } 
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
      LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
