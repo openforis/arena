@@ -35,8 +35,8 @@ const CategoryList = (props) => {
         headerLeftComponent={TableHeaderLeft}
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
-        headerProps={{ listState: state }}
-        rowProps={{ listState: state, setListState: setState }}
+        headerProps={{ state }}
+        rowProps={{ state, setState }}
       />
     </>
   )

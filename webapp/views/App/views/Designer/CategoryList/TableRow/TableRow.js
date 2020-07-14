@@ -12,10 +12,10 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { State as ListState, useActions as useListActions } from '../store'
+import { State, useActions } from '../store'
 
 const TableRow = (props) => {
-  const { idx, initData, listState, setListState, offset, row: category } = props
+  const { idx, initData, state, setState, offset, row: category } = props
 
   const survey = useSurvey()
   const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
@@ -25,10 +25,10 @@ const TableRow = (props) => {
 
   const canEdit = useAuthCanEditSurvey()
 
-  const ListActions = useListActions({ setState: setListState })
+  const ListActions = useActions({ setState })
 
-  const canSelect = ListState.getCanSelect(listState)
-  const selectedItemUuid = ListState.getSelectedItemUuid(listState)
+  const canSelect = State.getCanSelect(state)
+  const selectedItemUuid = State.getSelectedItemUuid(state)
   const selected = selectedItemUuid && selectedItemUuid === Category.getUuid(category)
 
   return (
@@ -80,10 +80,10 @@ const TableRow = (props) => {
 TableRow.propTypes = {
   idx: PropTypes.number.isRequired,
   initData: PropTypes.func.isRequired,
-  listState: PropTypes.object.isRequired,
   offset: PropTypes.number.isRequired,
   row: PropTypes.object.isRequired,
-  setListState: PropTypes.func.isRequired,
+  state: PropTypes.object.isRequired,
+  setState: PropTypes.func.isRequired,
 }
 
 export default TableRow
