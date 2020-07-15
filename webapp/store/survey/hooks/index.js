@@ -51,14 +51,14 @@ const useSurveyItem = ({ type }) => {
     fetchData()
   }, [surveyId])
 
-  const getItemsById = useCallback(
+  const getItemsIndexedByUuid = useCallback(
     () => (state || []).reduce((byId, item) => ({ ...byId, [ObjectUtils.getUuid(item)]: { ...item } }), {}),
     [state]
   )
 
-  const getItemsByUuid = useCallback(
+  const getItemByUuid = useCallback(
     (uuid) => {
-      const itemsById = getItemsById()
+      const itemsById = getItemsIndexedByUuid()
       return itemsById[uuid]
     },
     [state]
@@ -66,16 +66,16 @@ const useSurveyItem = ({ type }) => {
 
   return {
     items: state,
-    getItemsByUuid,
+    getItemByUuid,
   }
 }
 
 export const useSurveyCategories = () => {
-  const { items: categories, getItemsByUuid } = useSurveyItem({ type: 'categories' })
+  const { items: categories, getItemByUuid } = useSurveyItem({ type: 'categories' })
   return {
     categories,
     Actions: {
-      getCategoryByUuid: getItemsByUuid,
+      getCategoryByUuid: getItemByUuid,
     },
   }
 }
@@ -83,11 +83,11 @@ export const useSurveyCategories = () => {
 // ==== Taxonomies
 
 export const useSurveyTaxonomies = () => {
-  const { items: taxonomies, getItemsByUuid } = useSurveyItem({ type: 'taxonomies' })
+  const { items: taxonomies, getItemByUuid } = useSurveyItem({ type: 'taxonomies' })
   return {
     taxonomies,
     Actions: {
-      getTaxonomyByUuid: getItemsByUuid,
+      getTaxonomyByUuid: getItemByUuid,
     },
   }
 }
