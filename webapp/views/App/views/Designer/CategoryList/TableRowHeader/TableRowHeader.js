@@ -4,8 +4,12 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+import { State } from '../store'
+
 const TableRowHeader = (props) => {
-  const { canSelect } = props
+  const { state } = props
+
+  const canSelect = State.getCanSelect(state)
 
   const i18n = useI18n()
   const canEdit = useAuthCanEditSurvey()
@@ -36,7 +40,7 @@ const TableRowHeader = (props) => {
 }
 
 TableRowHeader.propTypes = {
-  canSelect: PropTypes.bool.isRequired,
+  state: PropTypes.object.isRequired,
 }
 
 export default TableRowHeader

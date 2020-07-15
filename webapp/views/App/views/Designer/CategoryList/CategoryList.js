@@ -1,10 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { matchPath, useLocation } from 'react-router'
 
 import Table from '@webapp/components/Table'
-
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
@@ -12,12 +9,12 @@ import TableRow from './TableRow'
 import TableRowHeader from './TableRowHeader'
 import TableHeaderLeft from './TableHeaderLeft'
 
+import { useLocalState } from './store'
+
 const CategoryList = (props) => {
-  const { canSelect, onSelect, selectedItemUuid } = props
+  const { canSelect, onAdd, onEdit, onSelect, selectedItemUuid } = props
 
-  const { pathname } = useLocation()
-
-  const inCategoriesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.categories)))
+  const { state, setState } = useLocalState({ canSelect, onAdd, onEdit, onSelect, selectedItemUuid })
 
   const canEdit = useAuthCanEditSurvey()
 
@@ -38,8 +35,8 @@ const CategoryList = (props) => {
         headerLeftComponent={TableHeaderLeft}
         rowHeaderComponent={TableRowHeader}
         rowComponent={TableRow}
-        headerProps={{ inCategoriesPath, canSelect, onSelect }}
-        rowProps={{ inCategoriesPath, canSelect, onSelect, selectedItemUuid }}
+        headerProps={{ state }}
+        rowProps={{ state, setState }}
       />
     </>
   )
@@ -47,12 +44,16 @@ const CategoryList = (props) => {
 
 CategoryList.propTypes = {
   canSelect: PropTypes.bool,
+  onAdd: PropTypes.func,
+  onEdit: PropTypes.func,
   onSelect: PropTypes.func,
   selectedItemUuid: PropTypes.string,
 }
 
 CategoryList.defaultProps = {
   canSelect: false,
+  onAdd: null,
+  onEdit: null,
   onSelect: null,
   selectedItemUuid: null,
 }

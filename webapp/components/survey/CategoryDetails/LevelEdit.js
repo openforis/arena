@@ -13,12 +13,11 @@ import { normalizeName } from '@core/stringUtils'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 
-
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { useI18n } from '@webapp/store/system'
 
-import * as CategoryState from '../categoryState'
+import * as CategoryState from '../../../loggedin/surveyViews/category/categoryState'
 
 import {
   createCategoryLevelItem,
@@ -27,9 +26,9 @@ import {
   deleteCategoryItem,
   deleteCategoryLevel,
   setCategoryItemForEdit,
-} from '../actions'
+} from '../../../loggedin/surveyViews/category/actions'
 
-import ItemEdit from './itemEdit'
+import ItemEdit from './ItemEdit'
 import { UserState } from '@webapp/store/user'
 
 const LevelEdit = (props) => {
