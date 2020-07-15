@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-
 import axios from 'axios'
 
 import { useI18n } from '@webapp/store/system'

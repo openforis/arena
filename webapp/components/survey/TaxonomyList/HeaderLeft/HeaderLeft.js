@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { matchPath, useHistory, useLocation } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
