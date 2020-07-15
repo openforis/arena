@@ -3,12 +3,13 @@ import './CategorySelector.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -28,7 +29,7 @@ const CategorySelector = (props) => {
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
 
   const survey = useSurvey()
-  const categories = Survey.getCategoriesArray(survey)
+  const surveyId = useSurveyId()
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
   const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
@@ -37,11 +38,18 @@ const CategorySelector = (props) => {
     onChange(newCategory)
   }
 
+  const categoriesLookupFunction = async (value) => {
+    const { data } = await axios.get(`/api/survey/${surveyId}/categories`, {
+      params: { search: value, draft: true, validate: false },
+    })
+    return data.list
+  }
+
   return (
     <div className="category-selector">
       <Dropdown
         disabled={disabled}
-        items={categories}
+        items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
         itemLabel={Category.getName}
         validation={validation}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,7 +18,6 @@ import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 
 import { State } from './store'
-import axios from 'axios'
 
 const TaxonProps = (props) => {
   const { state, Actions } = props

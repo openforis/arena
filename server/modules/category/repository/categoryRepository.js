@@ -1,13 +1,5 @@
 import * as R from 'ramda'
 
-import * as DB from '../../../db'
-import { db } from '../../../db/db'
-import * as DbUtils from '../../../db/dbUtils'
-
-import * as Category from '../../../../core/survey/category'
-import * as CategoryLevel from '../../../../core/survey/categoryLevel'
-import * as CategoryItem from '../../../../core/survey/categoryItem'
-
 import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
@@ -15,6 +7,13 @@ import {
   deleteSurveySchemaTableProp,
   dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as DB from '../../../db'
+import { db } from '../../../db/db'
+import * as DbUtils from '../../../db/dbUtils'
+
+import * as Category from '../../../../core/survey/category'
+import * as CategoryLevel from '../../../../core/survey/categoryLevel'
+import * as CategoryItem from '../../../../core/survey/categoryItem'
 
 // ============== CREATE
 
@@ -119,7 +118,7 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
   )
 
 export const fetchCategoriesBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = '' },
   client = db
 ) =>
   client.map(
@@ -131,6 +130,7 @@ export const fetchCategoriesBySurveyId = async (
       published
       ${includeValidation ? ', validation' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.category
+     ${search ? `WHERE ${DbUtils.getPropColCombined(Category.props.name, draft)} ILIKE '%${search}%' ` : ''} 
     ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}`,
     {
       offset,
