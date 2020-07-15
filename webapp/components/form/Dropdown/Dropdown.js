@@ -120,7 +120,7 @@ Dropdown.propTypes = {
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
-  selection: PropTypes.object,
+  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
   validation: PropTypes.object,
 }

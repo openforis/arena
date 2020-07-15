@@ -1,16 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
 
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
-
-const dataTypeItems = Object.keys(Category.itemExtraDefDataTypes).map((type) => ({
-  key: type,
-}))
 
 const TableRow = (props) => {
   const { column, columnName, idx, onDataTypeChange } = props
@@ -43,10 +40,11 @@ const TableRow = (props) => {
         {CategoryImportSummary.isColumnExtra(column) && (
           <Dropdown
             readOnlyInput
-            items={dataTypeItems}
-            itemLabel={(item) => i18n.t(`categoryEdit.importSummary.columnDataType.${item.key}`)}
-            selection={dataTypeItems.find((item) => item.key === dataType)}
-            onChange={(item) => onDataTypeChange(item.key)}
+            items={Object.keys(Category.itemExtraDefDataTypes)}
+            itemKey={A.identity}
+            itemLabel={(item) => i18n.t(`categoryEdit.importSummary.columnDataType.${item}`)}
+            selection={dataType}
+            onChange={(item) => onDataTypeChange(item)}
           />
         )}
       </div>
