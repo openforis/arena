@@ -14,6 +14,7 @@ import { useI18n } from '@webapp/store/system'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
+import ButtonTaxonomyAdd from '@webapp/components/survey/ButtonTaxonomyAdd'
 
 import { State } from './store'
 
@@ -59,17 +60,7 @@ const TaxonProps = (props) => {
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
-          <button
-            type="button"
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={() => {
-              setShowTaxonomyPanel(true)
-            }}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('common.add')}
-          </button>
+          <ButtonTaxonomyAdd onTaxonomyCreated={setTaxonomyToEdit} />
           <button
             type="button"
             className="btn btn-s"
@@ -93,10 +84,8 @@ const TaxonProps = (props) => {
               canSelect
               selectedItemUuid={taxonomyUuid}
               onSelect={onTaxonomySelect}
-              onTaxonomyCreate={() => setShowTaxonomyPanel(true)}
-              onTaxonomyOpen={(taxonomySelected) => {
-                setTaxonomyToEdit(taxonomySelected)
-              }}
+              onTaxonomyCreated={setTaxonomyToEdit}
+              onTaxonomyOpen={setTaxonomyToEdit}
             />
           </PanelRight>
         )}
@@ -110,7 +99,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
+            <TaxonomyDetails showClose={false} taxonomy={taxonomyToEdit} />
           </PanelRight>
         )}
       </div>
