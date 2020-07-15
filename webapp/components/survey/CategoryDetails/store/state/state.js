@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
 const keys = {
@@ -44,7 +45,17 @@ export const assocCategoryProp = ({ key, value }) => (state) => {
   const categoryUpdated = Category.assocProp({ key, value })(category)
   return assocCategory({ category: categoryUpdated })(state)
 }
-export const assocLevelItems = (levelIndex, items) => R.assocPath([keys.levelItems, String(levelIndex)], items)
+export const assocLevelProp = ({ levelIndex, key, value }) => (state) => {
+  const category = getCategory(state)
+  const level = Category.getLevelByIndex(levelIndex)(category)
+  const levelUpdated = CategoryLevel.assocProp({ key, value })(level)
+  const categoryUpdated = Category.assocLevel({ level: levelUpdated })(category)
+  return assocCategory({ category: categoryUpdated })(state)
+}
+export const assocLevelItems = ({ levelIndex, items }) => R.assocPath([keys.levelItems, String(levelIndex)], items)
+export const dissocLevelItems = ({ levelIndex }) => R.dissocPath([keys.levelItems, String(levelIndex)])
+export const dissocLevelActiveItem = ({ levelIndex }) => R.dissocPath([keys.levelActiveItems, String(levelIndex)])
+export const dissocLevelActiveItems = A.dissoc(keys.levelActiveItems)
 
 export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
 export const assocImportSummaryColumnDataType = ({ columnName, dataType }) => (state) => {

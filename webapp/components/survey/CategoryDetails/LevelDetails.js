@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -9,32 +8,29 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
-import { useSurvey } from '@webapp/store/survey'
-
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
+
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import {
   createCategoryLevelItem,
   putCategoryItemProp,
-  putCategoryLevelProp,
   deleteCategoryItem,
-  deleteCategoryLevel,
   setCategoryItemForEdit,
 } from '../../../loggedin/surveyViews/category/actions'
 
 import ItemEdit from './ItemEdit'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State, useActions } from './store'
 
-const LevelEdit = (props) => {
+const LevelDetails = (props) => {
   const { level, state, setState } = props
   const index = CategoryLevel.getIndex(level)
 
   const readOnly = !useAuthCanEditSurvey()
-  const dispatch = useDispatch()
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -62,7 +58,12 @@ const LevelEdit = (props) => {
           {i18n.t('categoryEdit.level')} {level.index + 1}
         </h4>
         {!readOnly && (
-          <button className="btn btn-s" onClick={() => Actions.deleteLevel({ level })} aria-disabled={!canBeDeleted}>
+          <button
+            type="button"
+            className="btn btn-s"
+            onClick={() => Actions.deleteLevel({ category, level })}
+            aria-disabled={!canBeDeleted}
+          >
             <span className="icon icon-bin2 icon-12px" />
           </button>
         )}
@@ -81,6 +82,7 @@ const LevelEdit = (props) => {
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
         {!readOnly && (
           <button
+            type="button"
             className="btn btn-s btn-add-item"
             aria-disabled={!canAddItem}
             onClick={() => createCategoryLevelItem(category, level, parentItem)}
@@ -111,10 +113,10 @@ const LevelEdit = (props) => {
   )
 }
 
-LevelEdit.propTypes = {
+LevelDetails.propTypes = {
   level: PropTypes.object.isRequired,
   state: PropTypes.object.isRequired,
   setState: PropTypes.func.isRequired,
 }
 
-export default LevelEdit
+export default LevelDetails

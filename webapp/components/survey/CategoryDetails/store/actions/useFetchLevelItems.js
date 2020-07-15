@@ -10,7 +10,7 @@ export const useFetchLevelItems = ({ setState }) => {
 
   return useCallback(async ({ categoryUuid, levelIndex = 0, parentUuid = null }) => {
     // Reset level items
-    setState((statePrev) => State.assocLevelItems(levelIndex, null)(statePrev))
+    setState(State.dissocLevelItems({ levelIndex }))
 
     const {
       data: { items },
@@ -18,6 +18,6 @@ export const useFetchLevelItems = ({ setState }) => {
       params: { draft: true, parentUuid },
     })
 
-    setState((statePrev) => State.assocLevelItems(levelIndex, items)(statePrev))
+    setState(State.assocLevelItems({ levelIndex, items }))
   }, [])
 }

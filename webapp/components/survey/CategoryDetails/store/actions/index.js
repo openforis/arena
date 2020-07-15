@@ -7,6 +7,7 @@ import { useImportCategory } from './useImportCategory'
 import { useFetchLevelItems } from './useFetchLevelItems'
 import { useDeleteLevel } from './useDeleteLevel'
 import { useUpdateLevelProp } from './useUpdateLevelProp'
+import { useCreateLevel } from './useCreateLevel'
 
 export const useActions = ({ setState }) => ({
   init: useInit({ setState }),
@@ -18,4 +19,5 @@ export const useActions = ({ setState }) => ({
   fetchLevelItems: useFetchLevelItems({ setState }),
   deleteLevel: useDeleteLevel({ setState }),
   updateLevelProp: useUpdateLevelProp({ setState }),
+  createLevel: useCreateLevel({ setState }),
 })

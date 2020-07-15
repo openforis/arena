@@ -189,7 +189,7 @@ const validateItems = async (category, itemsByParentUuid) => {
 // ====== CATEGORY
 
 const categoryValidators = (categories) => ({
-  [`${Category.keys.props}.${Category.props.name}`]: [
+  [`${Category.keys.props}.${Category.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories),
