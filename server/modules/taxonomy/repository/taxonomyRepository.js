@@ -90,7 +90,7 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
   )
 
 export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, limit = null, offset = 0, search = '' },
+  { surveyId, draft = false, limit = null, offset = 0, search = null },
   client = db
 ) =>
   await client.map(

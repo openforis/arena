@@ -119,7 +119,7 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
   )
 
 export const fetchCategoriesBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = '' },
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = null },
   client = db
 ) =>
   client.map(
