@@ -13,7 +13,7 @@ const ItemDialog = (props) => {
 }
 
 ItemDialog.propTypes = {
-  item: PropTypes.object.isRequired,
+  item: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]).isRequired,
   itemLabel: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
   onMouseDown: PropTypes.func.isRequired,

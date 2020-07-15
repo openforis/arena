@@ -12,10 +12,10 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { State as ListState, useActions as useListActions } from '../store'
+import { State, useActions } from '../store'
 
 const TableRow = (props) => {
-  const { idx, initData, listState, setListState, offset, row: category } = props
+  const { idx, initData, state, setState, offset, row: category } = props
 
   const survey = useSurvey()
   const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
@@ -25,10 +25,10 @@ const TableRow = (props) => {
 
   const canEdit = useAuthCanEditSurvey()
 
-  const ListActions = useListActions({ setState: setListState })
+  const Actions = useActions({ setState })
 
-  const canSelect = ListState.getCanSelect(listState)
-  const selectedItemUuid = ListState.getSelectedItemUuid(listState)
+  const canSelect = State.getCanSelect(state)
+  const selectedItemUuid = State.getSelectedItemUuid(state)
   const selected = selectedItemUuid && selectedItemUuid === Category.getUuid(category)
 
   return (
@@ -50,7 +50,7 @@ const TableRow = (props) => {
           <button
             type="button"
             className={`btn btn-s${selected ? ' active' : ''}`}
-            onClick={() => ListActions.select({ category })}
+            onClick={() => Actions.select({ category })}
           >
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {i18n.t(selected ? 'common.selected' : 'common.select')}
@@ -60,13 +60,13 @@ const TableRow = (props) => {
       {canEdit && (
         <>
           <div>
-            <button type="button" className="btn btn-s" onClick={() => ListActions.edit({ category })}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.edit({ category })}>
               <span className="icon icon-pencil2 icon-12px icon-left" />
               {i18n.t('common.edit')}
             </button>
           </div>
           <div>
-            <button type="button" className="btn btn-s" onClick={() => ListActions.delete({ category, initData })}>
+            <button type="button" className="btn btn-s" onClick={() => Actions.delete({ category, initData })}>
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('common.delete')}
             </button>
@@ -80,10 +80,10 @@ const TableRow = (props) => {
 TableRow.propTypes = {
   idx: PropTypes.number.isRequired,
   initData: PropTypes.func.isRequired,
-  listState: PropTypes.object.isRequired,
   offset: PropTypes.number.isRequired,
   row: PropTypes.object.isRequired,
-  setListState: PropTypes.func.isRequired,
+  state: PropTypes.object.isRequired,
+  setState: PropTypes.func.isRequired,
 }
 
 export default TableRow

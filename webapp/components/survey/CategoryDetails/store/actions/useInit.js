@@ -43,6 +43,6 @@ export const useInit = ({ setState }) => {
       category = await _fetchCategory({ surveyId, categoryUuid })
     }
 
-    setState((statePrev) => State.assocCategory(category)(statePrev))
+    setState((statePrev) => State.assocCategory({ category })(statePrev))
   }, [])
 }

@@ -3,6 +3,9 @@ import * as R from 'ramda'
 import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
 
+import * as Category from '@core/survey/category'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+
 const keys = {
   category: 'category',
   importSummary: 'importSummary',
@@ -35,5 +38,18 @@ export const getLevelActiveItem = (levelIndex) => (state) => {
 }
 
 // ===== UPDATE
-export const assocCategory = (category) => A.assoc(keys.category, category)
+export const assocCategory = ({ category }) => A.assoc(keys.category, category)
+export const assocCategoryProp = ({ key, value }) => (state) => {
+  const category = getCategory(state)
+  const categoryUpdated = Category.assocProp({ key, value })(category)
+  return assocCategory({ category: categoryUpdated })(state)
+}
 export const assocLevelItems = (levelIndex, items) => R.assocPath([keys.levelItems, String(levelIndex)], items)
+
+export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
+export const assocImportSummaryColumnDataType = ({ columnName, dataType }) => (state) => {
+  const summary = getImportSummary(state)
+  const summaryUpdated = CategoryImportSummary.assocColumnDataType(columnName, dataType)(summary)
+  return assocImportSummary({ summary: summaryUpdated })(state)
+}
+export const dissocImportSummary = A.dissoc(keys.importSummary)

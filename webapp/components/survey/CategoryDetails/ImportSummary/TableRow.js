@@ -1,5 +1,7 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
@@ -7,14 +9,19 @@ import * as Languages from '@core/app/languages'
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataType }) => {
+const TableRow = (props) => {
+  const { column, columnName, idx, onDataTypeChange } = props
+
   const i18n = useI18n()
 
-  const columnSummaryKey = CategoryImportSummary.hasColumnLang(column)
-    ? 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
-    : CategoryImportSummary.isColumnExtra(column)
-    ? 'categoryEdit.importSummary.columnTypeSummaryExtra'
-    : 'categoryEdit.importSummary.columnTypeSummary'
+  let columnSummaryKey = null
+  if (CategoryImportSummary.hasColumnLang(column)) {
+    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
+  } else if (CategoryImportSummary.isColumnExtra(column)) {
+    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummaryExtra'
+  } else {
+    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummary'
+  }
 
   const dataType = CategoryImportSummary.getColumnDataType(column)
 
@@ -32,16 +39,24 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
       <div>
         {CategoryImportSummary.isColumnExtra(column) && (
           <Dropdown
-            readOnlyInput={true}
+            readOnlyInput
             items={Object.keys(Category.itemExtraDefDataTypes)}
-            itemLabel={(dataType) => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
+            itemKey={A.identity}
+            itemLabel={(item) => i18n.t(`categoryEdit.importSummary.columnDataType.${item}`)}
             selection={dataType}
-            onChange={(dataType) => setCategoryImportSummaryColumnDataType(columnName, dataType)}
+            onChange={(item) => onDataTypeChange(item)}
           />
         )}
       </div>
     </div>
   )
+}
+
+TableRow.propTypes = {
+  column: PropTypes.object.isRequired,
+  columnName: PropTypes.string.isRequired,
+  idx: PropTypes.number.isRequired,
+  onDataTypeChange: PropTypes.func.isRequired,
 }
 
 export default TableRow

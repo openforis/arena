@@ -5,20 +5,20 @@ import { useHistory } from 'react-router'
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 
-import { State as ListState } from './store'
+import { State } from '../store'
 
 const TableHeaderLeft = (props) => {
   const { headerProps } = props
-  const { listState } = headerProps
+  const { state } = headerProps
 
   const i18n = useI18n()
   const history = useHistory()
 
   const onAdd = () => {
-    if (ListState.isInCategoriesPath(listState)) {
+    if (State.isInCategoriesPath(state)) {
       history.push(appModuleUri(designerModules.category))
     } else {
-      const onCreate = ListState.getOnAdd(listState)
+      const onCreate = State.getOnAdd(state)
       if (onCreate) {
         onCreate()
       }

@@ -12,7 +12,7 @@ export const useLocalState = (props) => {
   const { pathname } = useLocation()
   const inCategoriesPath = Boolean(matchPath(pathname, `${appModuleUri(designerModules.category)}:uuid/`))
 
-  const [state, setState] = useState(State.create({ inCategoriesPath }))
+  const [state, setState] = useState(() => State.create({ inCategoriesPath }))
 
   const Actions = useActions({ setState })
 

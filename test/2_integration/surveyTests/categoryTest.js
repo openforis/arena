@@ -87,7 +87,7 @@ export const updateCategoryTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const newName = 'category_modified'
-  const { category: updatedCategory } = await CategoryManager.updateCategoryProp(
+  const updatedCategory = await CategoryManager.updateCategoryProp(
     user,
     surveyId,
     Category.getUuid(category),

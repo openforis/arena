@@ -73,6 +73,12 @@ export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
 // ====== UPDATE
+export const assocProp = ({ key, value }) => (category) => {
+  const categoryUpdated = ObjectUtils.setProp(key, value)(category)
+  const validationUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(key))(categoryUpdated)
+  return Validation.assocValidation(validationUpdated)(categoryUpdated)
+}
+
 export const assocLevelsArray = (array) => R.assoc(keys.levels, ObjectUtils.toIndexedObj(array, 'index'))
 
 export const assocLevel = (level) => (category) =>
