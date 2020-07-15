@@ -130,11 +130,14 @@ export const fetchCategoriesBySurveyId = async (
       published
       ${includeValidation ? ', validation' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.category
-     ${search ? `WHERE ${DbUtils.getPropColCombined(Category.props.name, draft)} ILIKE '%${search}%' ` : ''} 
-    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}`,
+     ${search ? `WHERE ${DbUtils.getPropColCombined(Category.props.name, draft)} ILIKE $/search/` : ''} 
+    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}
+    LIMIT ${limit ? `$/limit/` : 'ALL'}
+    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       offset,
       limit,
+      search: `%${search}%`,
     },
     (row) => DB.transformCallback(row, draft, true)
   )

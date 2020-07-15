@@ -98,22 +98,26 @@ export const fetchTaxonomiesBySurveyId = async (
      ${
        search
          ? `WHERE 
-      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE '%${search}%'
+      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
         OR 
       EXISTS(
         SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
           Taxonomy.keysProps.descriptions,
           draft
         )})::jsonb, '{}'::jsonb))
-        WHERE value ILIKE '%${search}%'
+        WHERE value ILIKE $/search/
         )
       `
          : ''
      } 
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
-     LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    [],
+     LIMIT ${limit ? `$/limit/` : 'ALL'}
+    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`,
+    {
+      limit,
+      offset,
+      search: `%${search}%`,
+    },
     (record) => dbTransformCallback(record, draft, true)
   )
 
