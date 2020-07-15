@@ -39,33 +39,28 @@ export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSur
 
 const useSurveyItem = ({ type }) => {
   const surveyId = useSurveyId()
-  const [state, setState] = useState([])
+  const [state, setState] = useState({
+    items: [],
+    itemsByUuid: {},
+  })
 
   useEffect(() => {
     const fetchData = async () => {
       const { data } = await axios.get(`/api/survey/${surveyId}/${type}`, {
         params: { draft: true, validate: false },
       })
-      setState(data.list)
+      setState({
+        items: data.list,
+        itemsByUuid: ObjectUtils.toUuidIndexedObj(data.list),
+      })
     }
     fetchData()
   }, [surveyId])
 
-  const getItemsIndexedByUuid = useCallback(
-    () => (state || []).reduce((byId, item) => ({ ...byId, [ObjectUtils.getUuid(item)]: { ...item } }), {}),
-    [state]
-  )
-
-  const getItemByUuid = useCallback(
-    (uuid) => {
-      const itemsById = getItemsIndexedByUuid()
-      return itemsById[uuid]
-    },
-    [state]
-  )
+  const getItemByUuid = useCallback((uuid) => state.itemsByUuid[uuid], [state])
 
   return {
-    items: state,
+    ...state,
     getItemByUuid,
   }
 }
