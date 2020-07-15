@@ -13,6 +13,7 @@ export const useUploadCategory = ({ setState }) => {
     formData.append('file', file)
 
     const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
+
     setState(State.assocImportSummary({ summary }))
   }, [])
 }

@@ -5,7 +5,7 @@ import axios from 'axios'
 import * as A from '@core/arena'
 
 import { JobActions } from '@webapp/store/app'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
 
@@ -25,6 +25,7 @@ export const useImportCategory = ({ setState }) => {
           // Reload category
           setState(A.pipe(State.assocCategory({ category: jobCompleted.result.category }), State.dissocImportSummary))
           // TODO reset active items, load first level items
+          dispatch(SurveyActions.metaUpdated())
         },
       })
     )

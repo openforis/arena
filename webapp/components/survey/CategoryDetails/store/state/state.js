@@ -11,14 +11,17 @@ const keys = {
   levelActiveItems: 'levelActiveItems',
 }
 
+// ===== CREATE
 export const create = ({ inCategoriesPath }) => ({
   [keys.inCategoriesPath]: inCategoriesPath,
 })
 
+// ===== READ
 export const getCategory = A.prop(keys.category)
 export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getImportSummary = A.prop(keys.importSummary)
 
+// ===== UPDATE
 export const assocCategory = ({ category }) => A.assoc(keys.category, category)
 export const assocCategoryProp = ({ key, value }) => (state) => {
   const category = getCategory(state)
