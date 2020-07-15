@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as toSnakeCase from 'to-snake-case'
 
 import { db } from '@server/db/db'
@@ -49,7 +50,7 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
  * }
  */
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
-  R.pipe(
+  A.pipe(
     R.values,
     R.flatten,
     R.map((vernacularName) =>
@@ -112,7 +113,7 @@ export const fetchTaxonomiesBySurveyId = async (
      } 
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
      LIMIT ${limit ? `$/limit/` : 'ALL'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`,
+    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       limit,
       offset,
@@ -193,7 +194,7 @@ export const fetchTaxaWithVernacularNames = async (
   )
 
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
-  const vernacularNamesSubSelects = R.pipe(
+  const vernacularNamesSubSelects = A.pipe(
     R.map(
       (langCode) =>
         `(SELECT
@@ -210,14 +211,14 @@ export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, verna
     R.join(', ')
   )(vernacularLangCodes)
 
-  const propsFields = R.pipe(
+  const propsFields = A.pipe(
     R.map((prop) => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
     R.join(', ')
   )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
 
   const select = `SELECT
           ${propsFields}
-          ${R.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
+          ${A.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
       WHERE
@@ -416,5 +417,5 @@ export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, clie
 
 const toSearchValue = (filterValue) =>
   filterValue
-    ? R.pipe(R.ifElse(R.is(String), R.identity, R.toString), R.trim, R.toLower, R.replace(/\*/g, '%'))(filterValue)
+    ? A.pipe(R.ifElse(R.is(String), R.identity, R.toString), R.trim, R.toLower, R.replace(/\*/g, '%'))(filterValue)
     : null

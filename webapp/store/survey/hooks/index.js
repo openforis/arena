@@ -1,6 +1,10 @@
+import axios from 'axios'
+
+import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useLang } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -32,3 +36,38 @@ export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(us
 
 // ==== Categories
 export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())
+
+// ==== Taxonomies
+export const useSurveyTaxonomies = () => {
+  const surveyId = useSurveyId()
+  const [state, setState] = useState([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies`, {
+        params: { draft: true, validate: false },
+      })
+      setState(data.list)
+    }
+    fetchData()
+  }, [surveyId])
+
+  const getTaxomiesById = useCallback(
+    () => (state || []).reduce((byId, item) => ({ ...byId, [Taxonomy.getUuid(item)]: { ...item } }), {}),
+    [state]
+  )
+
+  const getTaxonomyByUuid = useCallback(
+    (uuid) => {
+      const taxonomiesById = getTaxomiesById()
+      return taxonomiesById[uuid]
+    },
+    [state]
+  )
+  return {
+    taxonomies: state,
+    Actions: {
+      getTaxonomyByUuid,
+    },
+  }
+}

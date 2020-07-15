@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -12,7 +11,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyTaxonomies } from '@webapp/store/survey'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
@@ -23,14 +22,14 @@ const TaxonProps = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
-  const survey = useSurvey()
   const surveyId = useSurveyId()
+  const { Actions: SurveyTaxonomyActions } = useSurveyTaxonomies()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
+  const taxonomy = SurveyTaxonomyActions.getTaxonomyByUuid(taxonomyUuid)
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)

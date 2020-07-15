@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import {
   getSurveyDBSchema,
@@ -133,7 +134,7 @@ export const fetchCategoriesBySurveyId = async (
      ${search ? `WHERE ${DbUtils.getPropColCombined(Category.props.name, draft)} ILIKE $/search/` : ''} 
     ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}
     LIMIT ${limit ? `$/limit/` : 'ALL'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`,
+    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       offset,
       limit,
@@ -168,7 +169,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     WHERE c.uuid = $1`,
     [categoryUuid]
   )
-  return R.pipe(R.values, R.head)(categories)
+  return A.pipe(R.values, R.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {

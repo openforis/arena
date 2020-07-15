@@ -32,4 +32,5 @@ export {
   useNodeDefsByUuids,
   useCategoryByUuid,
   useNodeDefRootKeys,
+  useSurveyTaxonomies,
 } from './hooks'
