@@ -5,11 +5,10 @@ import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyCategories } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -21,6 +20,7 @@ import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
+  const { Actions: SurveyCategoryActions } = useSurveyCategories()
 
   const i18n = useI18n()
 
@@ -28,9 +28,8 @@ const CategorySelector = (props) => {
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
 
-  const survey = useSurvey()
   const surveyId = useSurveyId()
-  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+  const category = SurveyCategoryActions.getCategoryByUuid(categoryUuid)
   const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
   const onAdd = async () => {

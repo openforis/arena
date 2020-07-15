@@ -33,4 +33,5 @@ export {
   useCategoryByUuid,
   useNodeDefRootKeys,
   useSurveyTaxonomies,
+  useSurveyCategories,
 } from './hooks'

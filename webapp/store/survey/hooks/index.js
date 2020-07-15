@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-import * as Taxonomy from '@core/survey/taxonomy'
+import * as ObjectUtils from '@core/objectUtils'
 
 import { useLang } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -37,14 +37,13 @@ export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(us
 // ==== Categories
 export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())
 
-// ==== Taxonomies
-export const useSurveyTaxonomies = () => {
+const useSurveyItem = ({ type }) => {
   const surveyId = useSurveyId()
   const [state, setState] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies`, {
+      const { data } = await axios.get(`/api/survey/${surveyId}/${type}`, {
         params: { draft: true, validate: false },
       })
       setState(data.list)
@@ -52,22 +51,43 @@ export const useSurveyTaxonomies = () => {
     fetchData()
   }, [surveyId])
 
-  const getTaxomiesById = useCallback(
-    () => (state || []).reduce((byId, item) => ({ ...byId, [Taxonomy.getUuid(item)]: { ...item } }), {}),
+  const getItemsById = useCallback(
+    () => (state || []).reduce((byId, item) => ({ ...byId, [ObjectUtils.getUuid(item)]: { ...item } }), {}),
     [state]
   )
 
-  const getTaxonomyByUuid = useCallback(
+  const getItemsByUuid = useCallback(
     (uuid) => {
-      const taxonomiesById = getTaxomiesById()
-      return taxonomiesById[uuid]
+      const itemsById = getItemsById()
+      return itemsById[uuid]
     },
     [state]
   )
+
   return {
-    taxonomies: state,
+    items: state,
+    getItemsByUuid,
+  }
+}
+
+export const useSurveyCategories = () => {
+  const { items: categories, getItemsByUuid } = useSurveyItem({ type: 'categories' })
+  return {
+    categories,
     Actions: {
-      getTaxonomyByUuid,
+      getCategoryByUuid: getItemsByUuid,
+    },
+  }
+}
+
+// ==== Taxonomies
+
+export const useSurveyTaxonomies = () => {
+  const { items: taxonomies, getItemsByUuid } = useSurveyItem({ type: 'taxonomies' })
+  return {
+    taxonomies,
+    Actions: {
+      getTaxonomyByUuid: getItemsByUuid,
     },
   }
 }
