@@ -6,23 +6,23 @@ import { useSurveyId } from '@webapp/store/survey'
 
 export const useFetchItems = ({ type }) => {
   const surveyId = useSurveyId()
-  const [state, setState] = useState({})
+  const [items, setItems] = useState({})
 
-  const fetchItems = async ({ search = '' }) => {
+  const fetchItems = async ({ search = '', draft = true, validate = false }) => {
     const { data } = await axios.get(`/api/survey/${surveyId}/${type}`, {
-      params: { draft: true, validate: false, search },
+      params: { draft, validate, search },
     })
 
     return data.list
   }
 
   const initItems = async () => {
-    const items = await fetchItems({ search: '' })
-    setState(ObjectUtils.toUuidIndexedObj(items))
+    const itemsFetched = await fetchItems({ search: '' })
+    setItems(ObjectUtils.toUuidIndexedObj(itemsFetched))
   }
 
   return {
-    items: state,
+    items,
     initItems,
     fetchItems,
   }
