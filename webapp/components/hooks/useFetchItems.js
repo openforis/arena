@@ -16,8 +16,9 @@ export const useFetchItems = ({ type }) => {
     return data.list
   }
 
-  const initItems = async () => {
-    const itemsFetched = await fetchItems({ search: '' })
+  const initItems = async (params = {}) => {
+    const { draft = true, validate = false } = params
+    const itemsFetched = await fetchItems({ search: '', draft, validate })
     setItems(ObjectUtils.toUuidIndexedObj(itemsFetched))
   }
 
