@@ -1,31 +1,30 @@
-import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import axios from 'axios'
+
+import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
+
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import * as Taxonomy from '@core/survey/taxonomy'
-
-import { useDispatch } from 'react-redux'
-
 const ButtonTaxonomyAdd = (props) => {
-  const i18n = useI18n()
-
-  const dispatch = useDispatch()
-
   const { onAdd } = props
+
+  const i18n = useI18n()
+  const dispatch = useDispatch()
 
   const surveyId = useSurveyId()
 
   const add = useCallback(async () => {
     const {
-      data: { taxonomy: taxonomyCreated },
+      data: { taxonomy },
     } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
 
     dispatch(SurveyActions.metaUpdated())
 
-    onAdd(taxonomyCreated)
+    onAdd(taxonomy)
   }, [])
 
   return (
