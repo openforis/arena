@@ -31,7 +31,7 @@ export const useImportCategory = ({ setState }) => {
             A.pipe(
               State.assocCategory({ category: jobCompleted.result.category }),
               State.dissocImportSummary,
-              State.dissocLevelActiveItems
+              State.dissocActiveItems
             )
           )
           // Fetch first level items

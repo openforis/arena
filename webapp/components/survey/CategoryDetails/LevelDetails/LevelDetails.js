@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -11,7 +10,6 @@ import { normalizeName } from '@core/stringUtils'
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
 
-import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
@@ -19,36 +17,30 @@ import {
   createCategoryLevelItem,
   putCategoryItemProp,
   deleteCategoryItem,
-  setCategoryItemForEdit,
 } from '@webapp/loggedin/surveyViews/category/actions'
 
-import ItemEdit from '../ItemEdit'
+import ItemDetails from '../ItemDetails'
 
 import { State, useActions } from '../store'
 
 const LevelDetails = (props) => {
   const { level, state, setState } = props
-  const index = CategoryLevel.getIndex(level)
+  const levelIndex = CategoryLevel.getIndex(level)
 
   const readOnly = !useAuthCanEditSurvey()
 
   const i18n = useI18n()
-  const survey = useSurvey()
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
-  const activeItem = State.getLevelActiveItem(index)(state)
-  const activeItemUuid = activeItem ? CategoryItem.getUuid(activeItem) : null
-  const parentItem = State.getLevelActiveItem(index - 1)(state)
+  const parentItem = State.getActiveItem({ levelIndex: levelIndex - 1 })(state)
 
-  const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? State.getLevelItemsArray(index)(state) : []
+  const canAddItem = levelIndex === 0 || parentItem
+  const items = canAddItem ? State.getItemsArray({ levelIndex })(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
-  const validation = Category.getLevelValidation(index)(category)
+  const validation = Category.getLevelValidation(levelIndex)(category)
 
   return (
     <div className="category__level">
@@ -95,17 +87,14 @@ const LevelDetails = (props) => {
 
       <div className="category__level-items">
         {items.map((item) => (
-          <ItemEdit
+          <ItemDetails
             key={CategoryItem.getUuid(item)}
-            lang={lang}
-            category={category}
             level={level}
             item={item}
-            active={CategoryItem.getUuid(item) === activeItemUuid}
+            state={state}
+            setState={setState}
             putCategoryItemProp={putCategoryItemProp}
-            setCategoryItemForEdit={setCategoryItemForEdit}
             deleteCategoryItem={deleteCategoryItem}
-            readOnly={readOnly}
           />
         ))}
       </div>

@@ -11,8 +11,8 @@ const keys = {
   category: 'category',
   importSummary: 'importSummary',
   inCategoriesPath: 'inCategoriesPath',
-  levelItems: 'levelItems',
-  levelActiveItems: 'levelActiveItems',
+  items: 'items',
+  activeItems: 'activeItems',
 }
 
 // ===== CREATE
@@ -24,18 +24,16 @@ export const create = ({ inCategoriesPath }) => ({
 export const getCategory = A.prop(keys.category)
 export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 export const getImportSummary = A.prop(keys.importSummary)
-export const getLevelItemsArray = (levelIndex) =>
+export const getItemsArray = ({ levelIndex }) =>
   A.pipe(
-    R.pathOr({}, [keys.levelItems, levelIndex]),
+    R.pathOr({}, [keys.items, levelIndex]),
     R.values,
     R.sort((a, b) => Number(a.id) - Number(b.id))
   )
-const getLevelActiveItems = A.propOr(keys.levelActiveItems, {})
-const getLevelActiveItemUuid = (levelIndex) => A.pipe(getLevelActiveItems, A.prop(String(levelIndex)))
-export const getLevelActiveItem = (levelIndex) => (state) => {
-  const activeItemUuid = getLevelActiveItemUuid(levelIndex)(state)
-  const levelItems = getLevelItemsArray(levelIndex)(state)
-  return levelItems.find((item) => CategoryItem.getUuid(item) === activeItemUuid)
+export const getActiveItem = ({ levelIndex }) => (state) => {
+  const activeItemUuid = R.path([keys.activeItems, String(levelIndex)])(state)
+  const items = getItemsArray({ levelIndex })(state)
+  return items.find((item) => CategoryItem.getUuid(item) === activeItemUuid)
 }
 
 // ===== UPDATE
@@ -52,10 +50,35 @@ export const assocLevelProp = ({ levelIndex, key, value }) => (state) => {
   const categoryUpdated = Category.assocLevel({ level: levelUpdated })(category)
   return assocCategory({ category: categoryUpdated })(state)
 }
-export const assocLevelItems = ({ levelIndex, items }) => R.assocPath([keys.levelItems, String(levelIndex)], items)
-export const dissocLevelItems = ({ levelIndex }) => R.dissocPath([keys.levelItems, String(levelIndex)])
-export const dissocLevelActiveItem = ({ levelIndex }) => R.dissocPath([keys.levelActiveItems, String(levelIndex)])
-export const dissocLevelActiveItems = A.dissoc(keys.levelActiveItems)
+export const assocItems = ({ levelIndex, items }) => R.assocPath([keys.items, String(levelIndex)], items)
+export const dissocItems = ({ levelIndex }) => R.dissocPath([keys.items, String(levelIndex)])
+
+const _resetNextLevelsByProp = ({ levelIndex, prop }) => (state) => {
+  const levelIndexesProp = A.pipe(
+    A.prop(prop),
+    R.keys,
+    R.map((k) => Number(k))
+  )(state)
+
+  return levelIndexesProp.reduce(
+    (accState, idx) => (idx > levelIndex ? R.dissocPath([prop, idx], accState) : accState),
+    state
+  )
+}
+
+const _resetNextLevels = ({ levelIndex }) =>
+  A.pipe(
+    _resetNextLevelsByProp({ levelIndex, prop: keys.items }),
+    _resetNextLevelsByProp({ levelIndex, prop: keys.activeItems })
+  )
+
+export const assocActiveItem = ({ levelIndex, itemUuid }) =>
+  A.pipe(_resetNextLevels({ levelIndex }), R.assocPath([keys.activeItems, String(levelIndex)], itemUuid))
+
+export const dissocActiveItem = ({ levelIndex }) =>
+  A.pipe(_resetNextLevels({ levelIndex }), R.dissocPath([keys.activeItems, levelIndex]))
+
+export const dissocActiveItems = A.dissoc(keys.activeItems)
 
 export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
 export const assocImportSummaryColumnDataType = ({ columnName, dataType }) => (state) => {
