@@ -60,7 +60,7 @@ const CategoryDetails = (props) => {
             <UploadButton
               label={i18n.t('common.csvImport')}
               accept=".csv"
-              onChange={(files) => dispatch(CategoryActions.uploadCategory(Category.getUuid(category), files[0]))}
+              onChange={(files) => Actions.uploadCategory({ categoryUuid: Category.getUuid(category), file: files[0] })}
               disabled={Category.isPublished(category)}
             />
           )}
@@ -101,7 +101,7 @@ const CategoryDetails = (props) => {
         )}
       </div>
 
-      {importSummary && <ImportSummary summary={importSummary} />}
+      {importSummary && <ImportSummary state={state} setState={setState} />}
     </>
   ) : null
 }
