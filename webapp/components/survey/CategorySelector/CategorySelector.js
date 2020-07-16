@@ -1,15 +1,14 @@
 import './CategorySelector.scss'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
-import axios from 'axios'
 
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyId, useSurveyCategories } from '@webapp/store/survey'
 
+import { useFetchCategories } from '@webapp/components/hooks'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
@@ -20,7 +19,7 @@ import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
-  const { Actions: SurveyCategoryActions } = useSurveyCategories()
+  const { categories, initCategories, fetchCategories } = useFetchCategories()
 
   const i18n = useI18n()
 
@@ -28,8 +27,7 @@ const CategorySelector = (props) => {
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
 
-  const surveyId = useSurveyId()
-  const category = SurveyCategoryActions.getCategoryByUuid(categoryUuid)
+  const category = categories[categoryUuid]
   const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
   const onAdd = async () => {
@@ -37,12 +35,11 @@ const CategorySelector = (props) => {
     onChange(newCategory)
   }
 
-  const categoriesLookupFunction = async (value) => {
-    const { data } = await axios.get(`/api/survey/${surveyId}/categories`, {
-      params: { search: value, draft: true, validate: false },
-    })
-    return data.list
-  }
+  const categoriesLookupFunction = async (value) => fetchCategories({ search: value })
+
+  useEffect(() => {
+    initCategories()
+  }, [])
 
   return (
     <div className="category-selector">

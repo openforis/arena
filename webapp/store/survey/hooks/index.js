@@ -1,10 +1,6 @@
-import axios from 'axios'
-
-import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-import * as ObjectUtils from '@core/objectUtils'
 
 import { useLang } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -36,53 +32,3 @@ export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(us
 
 // ==== Categories
 export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())
-
-const useSurveyItem = ({ type }) => {
-  const surveyId = useSurveyId()
-  const [state, setState] = useState({
-    items: [],
-    itemsByUuid: {},
-  })
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await axios.get(`/api/survey/${surveyId}/${type}`, {
-        params: { draft: true, validate: false },
-      })
-      setState({
-        items: data.list,
-        itemsByUuid: ObjectUtils.toUuidIndexedObj(data.list),
-      })
-    }
-    fetchData()
-  }, [surveyId])
-
-  const getItemByUuid = useCallback((uuid) => state.itemsByUuid[uuid], [state])
-
-  return {
-    ...state,
-    getItemByUuid,
-  }
-}
-
-export const useSurveyCategories = () => {
-  const { items: categories, getItemByUuid } = useSurveyItem({ type: 'categories' })
-  return {
-    categories,
-    Actions: {
-      getCategoryByUuid: getItemByUuid,
-    },
-  }
-}
-
-// ==== Taxonomies
-
-export const useSurveyTaxonomies = () => {
-  const { items: taxonomies, getItemByUuid } = useSurveyItem({ type: 'taxonomies' })
-  return {
-    taxonomies,
-    Actions: {
-      getTaxonomyByUuid: getItemByUuid,
-    },
-  }
-}

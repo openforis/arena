@@ -15,5 +15,8 @@ export { default as useOnIntersect } from './useOnIntersect'
 export { default as useInterval } from './useInterval'
 export { useHistoryListen } from './useHistoryListen'
 
+export { useFetchTaxonomies } from './useFetchTaxonomies'
+export { useFetchCategories } from './useFetchCategories'
+
 // rxjs hooks
 export { usePost } from './usePost'
