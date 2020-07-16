@@ -18,7 +18,6 @@ const actionHandlers = {
   [SurveyActions.surveyDefsReset]: () => ({}),
 
   // Taxonomies
-  [SurveyActions.surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
   [TaxonomiesActions.taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
 
   // Create

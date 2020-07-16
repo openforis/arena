@@ -1,6 +1,13 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
+
+import * as Survey from '@core/survey/survey'
+
+import * as API from '@webapp/service/api'
+
 import { useInterval } from '@webapp/components/hooks'
 
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
@@ -31,12 +38,24 @@ export const useFetchMessages = ({ messages, setMessages }) => {
         data: { activityLogs },
       } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params })
 
-      if (R.isEmpty(activityLogs)) {
+      if (A.isEmpty(activityLogs)) {
         return null
       }
 
+      const [taxonomies, categories] = await Promise.all([
+        API.fetchTaxonomies({ surveyId }),
+        API.fetchCategories({ surveyId }),
+      ])
+
       const highlighted = newest && initialized
-      const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+      const surveyWithCategoriesAndTaxonomies = A.pipe(
+        Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies)),
+        Survey.assocCategories(ObjectUtils.toUuidIndexedObj(categories))
+      )(survey)
+
+      const messagesNew = R.map(
+        ActivityLogMessageParser.toMessage(i18n, surveyWithCategoriesAndTaxonomies, highlighted)
+      )(activityLogs)
       const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
       const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
       if (newMessages) {

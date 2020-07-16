@@ -17,7 +17,6 @@ const actionHandlers = {
   [SurveyActions.surveyDefsReset]: () => ({}),
 
   // Categories
-  [SurveyActions.surveyDefsLoad]: (state, { categories }) => categories,
   [CategoriesActions.categoriesUpdate]: (state, { categories }) => categories,
 
   // Category
