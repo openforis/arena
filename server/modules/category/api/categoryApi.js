@@ -119,7 +119,7 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft, validate, offset = 0, limit = null, search } = Request.getParams(req)
+      const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)
 
       const list = await CategoryService.fetchCategoriesBySurveyId({
         surveyId,
