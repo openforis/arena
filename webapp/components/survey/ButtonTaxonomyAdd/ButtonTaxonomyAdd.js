@@ -38,11 +38,7 @@ const ButtonTaxonomyAdd = (props) => {
 }
 
 ButtonTaxonomyAdd.propTypes = {
-  onAdd: PropTypes.func,
-}
-
-ButtonTaxonomyAdd.defaultProps = {
-  onAdd: () => ({}),
+  onAdd: PropTypes.func.isRequired,
 }
 
 export default ButtonTaxonomyAdd
