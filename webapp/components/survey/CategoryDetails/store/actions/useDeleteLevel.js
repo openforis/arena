@@ -30,6 +30,17 @@ const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch 
   dispatch(SurveyActions.metaUpdated())
 }
 
+const _checkCanBeDeleted = ({ survey, categoryUuid, level, dispatch }) => {
+  const levelIndex = CategoryLevel.getIndex(level)
+  const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(categoryUuid)(survey)
+  const usedByNodeDefs = nodeDefsCode.some((def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= levelIndex)
+  if (usedByNodeDefs) {
+    dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
+    return false
+  }
+  return true
+}
+
 export const useDeleteLevel = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSurvey()
@@ -37,14 +48,7 @@ export const useDeleteLevel = ({ setState }) => {
   return useCallback(
     async ({ category, level }) => {
       const categoryUuid = Category.getUuid(category)
-      const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(categoryUuid)(survey)
-      const usedByNodeDefs = nodeDefsCode.some(
-        (def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level)
-      )
-
-      if (usedByNodeDefs) {
-        dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
-      } else {
+      if (_checkCanBeDeleted({ survey, categoryUuid, level, dispatch })) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'categoryEdit.confirmDeleteLevel',
