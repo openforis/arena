@@ -64,7 +64,7 @@ const TaxonProps = (props) => {
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
-          <ButtonTaxonomyAdd onTaxonomyCreated={setTaxonomyToEdit} />
+          <ButtonTaxonomyAdd onAdd={setTaxonomyToEdit} />
           <button
             type="button"
             className="btn btn-s"
