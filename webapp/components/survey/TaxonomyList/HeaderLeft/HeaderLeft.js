@@ -1,5 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { matchPath, useHistory, useLocation } from 'react-router'
+
+import * as A from '@core/arena'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -13,6 +17,18 @@ const HeaderLeft = (props) => {
 
   const { headerProps } = props
   const { onTaxonomyCreated } = headerProps
+  const history = useHistory()
+  const { pathname } = useLocation()
+
+  const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
+
+  const onAdd = (taxonomyCreated) => {
+    if (inTaxonomiesPath || A.isNull(onTaxonomyCreated)) {
+      history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomyCreated)}`)
+    } else {
+      onTaxonomyCreated(taxonomyCreated)
+    }
+  }
 
   const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {
