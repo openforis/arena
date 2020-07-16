@@ -20,11 +20,11 @@ import {
   putCategoryItemProp,
   deleteCategoryItem,
   setCategoryItemForEdit,
-} from '../../../loggedin/surveyViews/category/actions'
+} from '@webapp/loggedin/surveyViews/category/actions'
 
-import ItemEdit from './ItemEdit'
+import ItemEdit from '../ItemEdit'
 
-import { State, useActions } from './store'
+import { State, useActions } from '../store'
 
 const LevelDetails = (props) => {
   const { level, state, setState } = props
