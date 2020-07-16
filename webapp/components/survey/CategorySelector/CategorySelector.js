@@ -41,13 +41,12 @@ const CategorySelector = (props) => {
   const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
 
   useEffect(() => {
-    const selectCategory = async () => {
+    ;(async () => {
       if (!A.isEmpty(categoryUuid)) {
         const categorySelected = await API.fetchCategory({ surveyId, Uuid: categoryUuid })
         setCategory(categorySelected)
       }
-    }
-    selectCategory()
+    })()
   }, [categoryUuid])
 
   return (

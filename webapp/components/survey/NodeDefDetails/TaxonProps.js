@@ -43,13 +43,12 @@ const TaxonProps = (props) => {
   const itemsLookupFunction = async (value) => API.fetchTaxonomies({ surveyId, search: value })
 
   useEffect(() => {
-    const selectTaxonomy = async () => {
+    ;(async () => {
       if (!A.isEmpty(taxonomyUuid)) {
         const taxonomySelected = await API.fetchTaxonomy({ surveyId, Uuid: taxonomyUuid })
         setTaxonomy(taxonomySelected)
       }
-    }
-    selectTaxonomy()
+    })()
   }, [taxonomyUuid, showTaxonomiesPanel, showTaxonomyPanel])
 
   return (
