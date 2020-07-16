@@ -7,7 +7,7 @@ import * as Category from '@core/survey/category'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 const _putCategoryProp = ({ dispatch, surveyId, categoryUuid, key, value, setState }) => {
   dispatch(

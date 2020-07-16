@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { State } from '../state'
+
+import { State } from '../../state'
 
 export const useSetImportSummaryColumnDataType = ({ setState }) =>
   useCallback(

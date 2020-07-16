@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import { useSurveyId } from '@webapp/store/survey'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 export const useUploadCategory = ({ setState }) => {
   const surveyId = useSurveyId()

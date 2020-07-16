@@ -7,7 +7,7 @@ import * as Category from '@core/survey/category'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 const _createCategory = async ({ surveyId, onCategoryCreated, dispatch }) => {
   const {

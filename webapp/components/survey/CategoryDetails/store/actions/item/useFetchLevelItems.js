@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 export const useFetchLevelItems = ({ setState }) => {
   const surveyId = useSurveyId()

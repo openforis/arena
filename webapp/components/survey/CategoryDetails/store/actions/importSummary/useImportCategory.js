@@ -7,8 +7,8 @@ import * as A from '@core/arena'
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import { State } from '../state'
-import { useFetchLevelItems } from './useFetchLevelItems'
+import { State } from '../../state'
+import { useFetchLevelItems } from '../item/useFetchLevelItems'
 
 export const useImportCategory = ({ setState }) => {
   const dispatch = useDispatch()

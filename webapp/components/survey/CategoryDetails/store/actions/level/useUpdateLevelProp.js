@@ -8,7 +8,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 const _putProp = ({ surveyId, categoryUuid, levelUuid, key, value, dispatch }) => {
   const action = async () => {
