@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,39 +9,42 @@ import * as Validation from '@core/validation/validation'
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
-import * as TaxonomyActions from '@webapp/loggedin/surveyViews/taxonomy/actions'
-import * as TaxonomyState from '@webapp/loggedin/surveyViews/taxonomy/taxonomyState'
-
-import TaxonomyList from '@webapp/views/App/views/Designer/TaxonomyList'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 
 import { State } from './store'
+import axios from 'axios'
 
 const TaxonProps = (props) => {
   const { state, Actions } = props
 
-  const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
+  const surveyId = useSurveyId()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
-  const taxonomies = Survey.getTaxonomiesArray(survey)
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
+  const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
   const onTaxonomySelect = (taxonomySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
 
-  const editedTaxonomy = useSelector(TaxonomyState.getTaxonomy)
+  const itemsLookupFunction = async (value) => {
+    const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies`, {
+      params: { search: value, draft: true, validate: false },
+    })
+    return data.list
+  }
 
   return (
     <>
@@ -54,7 +56,7 @@ const TaxonProps = (props) => {
           }}
         >
           <Dropdown
-            items={taxonomies}
+            items={itemsLookupFunction}
             itemKey="uuid"
             itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
@@ -66,9 +68,7 @@ const TaxonProps = (props) => {
             type="button"
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
-            onClick={async () => {
-              const taxonomyCreated = await dispatch(TaxonomyActions.createTaxonomy())
-              onTaxonomySelect(taxonomyCreated)
+            onClick={() => {
               setShowTaxonomyPanel(true)
             }}
           >
@@ -88,25 +88,34 @@ const TaxonProps = (props) => {
       </FormItem>
 
       <div className="taxon-props__panel-right">
-        {(showTaxonomyPanel || editedTaxonomy) && (
-          <PanelRight
-            width="100vw"
-            onClose={() => {
-              dispatch(TaxonomyActions.setTaxonomyForEdit(null))
-              setShowTaxonomyPanel(false)
-            }}
-            header={i18n.t('taxonomy.header')}
-          >
-            <TaxonomyView showClose={false} />
-          </PanelRight>
-        )}
-        {!editedTaxonomy && showTaxonomiesPanel && (
+        {showTaxonomiesPanel && (
           <PanelRight
             width="100vw"
             onClose={() => setShowTaxonomiesPanel(false)}
             header={i18n.t('appModules.taxonomies')}
           >
-            <TaxonomyList canSelect selectedItemUuid={taxonomyUuid} onSelect={onTaxonomySelect} />
+            <TaxonomyList
+              canSelect
+              selectedItemUuid={taxonomyUuid}
+              onSelect={onTaxonomySelect}
+              onTaxonomyCreate={() => setShowTaxonomyPanel(true)}
+              onTaxonomyOpen={(taxonomySelected) => {
+                setTaxonomyToEdit(taxonomySelected)
+              }}
+            />
+          </PanelRight>
+        )}
+
+        {(showTaxonomyPanel || taxonomyToEdit) && (
+          <PanelRight
+            width="100vw"
+            onClose={() => {
+              setShowTaxonomyPanel(false)
+              setTaxonomyToEdit(null)
+            }}
+            header={i18n.t('taxonomy.header')}
+          >
+            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
           </PanelRight>
         )}
       </div>

@@ -47,10 +47,13 @@ export const insertTaxa = async (user, surveyId, taxa, client = db) =>
  * ====== READ
  */
 export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, validate = false, limit = null, offset = 0 },
+  { surveyId, draft = false, validate = false, limit = null, offset = 0, search = null },
   client = db
 ) => {
-  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft, limit, offset }, client)
+  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(
+    { surveyId, draft, limit, offset, search },
+    client
+  )
 
   return validate
     ? await Promise.all(
