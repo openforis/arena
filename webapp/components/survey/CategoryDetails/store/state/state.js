@@ -63,12 +63,17 @@ export const assocLevelItems = ({ levelIndex, items }) => R.assocPath([keys.item
 
 export const dissocLevelItems = ({ levelIndex }) => R.dissocPath([keys.items, String(levelIndex)])
 
+export const assocItem = ({ levelIndex, item }) => (state) => {
+  const items = _getLevelItems({ levelIndex })(state)
+  const itemsUpdated = A.assoc(CategoryItem.getUuid(item), item)(items)
+  return assocLevelItems({ levelIndex, items: itemsUpdated })(state)
+}
+
 export const assocItemProp = ({ levelIndex, itemUuid, key, value }) => (state) => {
   const items = _getLevelItems({ levelIndex })(state)
   const item = A.prop(itemUuid, items)
   const itemUpdated = CategoryItem.assocProp({ key, value })(item)
-  const itemsUpdated = A.assoc(itemUuid, itemUpdated)(items)
-  return assocLevelItems({ levelIndex, items: itemsUpdated })(state)
+  return assocItem({ levelIndex, item: itemUpdated })(state)
 }
 
 const _resetNextLevelsByProp = ({ levelIndex, prop }) => (state) => {

@@ -13,12 +13,6 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import {
-  createCategoryLevelItem,
-  putCategoryItemProp,
-  deleteCategoryItem,
-} from '@webapp/loggedin/surveyViews/category/actions'
-
 import ItemDetails from '../ItemDetails'
 
 import { State, useActions } from '../store'
@@ -77,7 +71,7 @@ const LevelDetails = (props) => {
             type="button"
             className="btn btn-s btn-add-item"
             aria-disabled={!canAddItem}
-            onClick={() => createCategoryLevelItem(category, level, parentItem)}
+            onClick={() => Actions.createItem({ category, level, parentItemUuid: CategoryItem.getUuid(parentItem) })}
           >
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
@@ -87,15 +81,7 @@ const LevelDetails = (props) => {
 
       <div className="category__level-items">
         {items.map((item) => (
-          <ItemDetails
-            key={CategoryItem.getUuid(item)}
-            level={level}
-            item={item}
-            state={state}
-            setState={setState}
-            putCategoryItemProp={putCategoryItemProp}
-            deleteCategoryItem={deleteCategoryItem}
-          />
+          <ItemDetails key={CategoryItem.getUuid(item)} level={level} item={item} state={state} setState={setState} />
         ))}
       </div>
     </div>

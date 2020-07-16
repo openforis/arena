@@ -7,6 +7,7 @@ import { useSetImportSummaryColumnDataType } from './importSummary/useSetImportS
 import { useDeleteLevel } from './level/useDeleteLevel'
 import { useUpdateLevelProp } from './level/useUpdateLevelProp'
 import { useCreateLevel } from './level/useCreateLevel'
+import { useCreateItem } from './item/useCreateItem'
 import { useFetchLevelItems } from './item/useFetchLevelItems'
 import { useSetItemActive } from './item/useSetItemActive'
 import { useResetItemActive } from './item/useResetItemActive'
@@ -29,6 +30,7 @@ export const useActions = ({ setState }) => ({
   createLevel: useCreateLevel({ setState }),
 
   // Items
+  createItem: useCreateItem({ setState }),
   setItemActive: useSetItemActive({ setState }),
   resetItemActive: useResetItemActive({ setState }),
   updateItemProp: useUpdateItemProp({ setState }),
