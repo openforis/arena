@@ -416,6 +416,4 @@ export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, clie
   )
 
 const toSearchValue = (filterValue) =>
-  filterValue
-    ? A.pipe(R.ifElse(R.is(String), R.identity, R.toString), R.trim, R.toLower, R.replace(/\*/g, '%'))(filterValue)
-    : null
+  filterValue ? String(filterValue).trim().toLowerCase().replace(/\*/g, '%') : null
