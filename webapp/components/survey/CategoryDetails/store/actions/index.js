@@ -10,6 +10,7 @@ import { useUpdateLevelProp } from './useUpdateLevelProp'
 import { useCreateLevel } from './useCreateLevel'
 import { useSetItemActive } from './useSetItemActive'
 import { useResetItemActive } from './useResetItemActive'
+import { useUpdateItemProp } from './useUpdateItemProp'
 
 export const useActions = ({ setState }) => ({
   init: useInit({ setState }),
@@ -30,4 +31,5 @@ export const useActions = ({ setState }) => ({
   // Items
   setItemActive: useSetItemActive({ setState }),
   resetItemActive: useResetItemActive({ setState }),
+  updateItemProp: useUpdateItemProp({ setState }),
 })

@@ -38,3 +38,6 @@ export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, g
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
 export const getExtraProp = (prop) => R.pipe(getExtra, R.propOr('', prop))
+
+// ====== UPDATE
+export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)

@@ -23,7 +23,6 @@ import { State, useActions } from '../store'
 const ItemDetails = (props) => {
   const { level, item, state, setState } = props
 
-  const putCategoryItemProp = () => {}
   const deleteCategoryItem = () => {}
 
   const elemRef = useRef(null)
@@ -39,7 +38,7 @@ const ItemDetails = (props) => {
   const { published: disabled } = item
 
   const levelIndex = CategoryLevel.getIndex(level)
-  const activeItem = State.getActiveItem({ levelIndex })(state)
+  const activeItem = State.getLevelActiveItem({ levelIndex })(state)
   const activeItemUuid = activeItem ? CategoryItem.getUuid(activeItem) : null
   const itemUuid = CategoryItem.getUuid(item)
   const active = itemUuid === activeItemUuid
@@ -47,6 +46,9 @@ const ItemDetails = (props) => {
   const Actions = useActions({ setState })
 
   const setActive = () => (active ? null : Actions.setItemActive({ levelIndex, itemUuid }))
+
+  const updateProp = ({ key, value }) =>
+    Actions.updateItemProp({ categoryUuid: Category.getUuid(category), levelIndex, itemUuid, key, value })
 
   useEffect(() => {
     if (active) {
@@ -75,16 +77,14 @@ const ItemDetails = (props) => {
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
-              onChange={(value) =>
-                putCategoryItemProp(category, level, item, CategoryItem.keysProps.code, normalizeName(value))
-              }
+              onChange={(value) => updateProp({ key: CategoryItem.keysProps.code, value: normalizeName(value) })}
               readOnly={readOnly}
             />
           </FormItem>
 
           <LabelsEditor
             labels={CategoryItem.getLabels(item)}
-            onChange={(labels) => putCategoryItemProp(category, level, item, CategoryItem.keysProps.labels, labels)}
+            onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
             readOnly={readOnly}
           />
 
@@ -97,7 +97,7 @@ const ItemDetails = (props) => {
                 validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                 onChange={(value) => {
                   const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
-                  putCategoryItemProp(category, level, item, CategoryItem.keysProps.extra, extra)
+                  updateProp({ key: CategoryItem.keysProps.extra, value: extra })
                 }}
               />
             </FormItem>

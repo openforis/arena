@@ -21,8 +21,8 @@ const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch 
   )
   await setState(
     A.pipe(
-      State.dissocActiveItem({ levelIndex }),
-      State.dissocItems({ levelIndex }),
+      State.dissocLevelActiveItem({ levelIndex }),
+      State.dissocLevelItems({ levelIndex }),
       State.assocCategory(categoryUpdated)
     )
   )
