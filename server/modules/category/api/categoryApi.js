@@ -150,6 +150,23 @@ export const init = (app) => {
 
   // Fetch items by parent item Uuid
   app.get(
+    '/survey/:surveyId/categories/:categoryUuid',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft, validate } = Request.getParams(req)
+
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // Fetch items by parent item Uuid
+  app.get(
     '/survey/:surveyId/categories/:categoryUuid/items',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {

@@ -4,11 +4,15 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
+
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
+import { useSurveyId } from '@webapp/store/survey'
 
-import { useFetchCategories } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
+
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
@@ -19,15 +23,14 @@ import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
-  const { categories, initCategories, fetchCategories } = useFetchCategories()
+  const [category, setCategory] = useState({})
 
   const i18n = useI18n()
-
+  const surveyId = useSurveyId()
   const dispatch = useDispatch()
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
 
-  const category = categories[categoryUuid]
   const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
   const onAdd = async () => {
@@ -35,11 +38,17 @@ const CategorySelector = (props) => {
     onChange(newCategory)
   }
 
-  const categoriesLookupFunction = async (value) => fetchCategories({ search: value })
+  const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
 
   useEffect(() => {
-    initCategories()
-  }, [])
+    const selectCategory = async () => {
+      if (!A.isEmpty(categoryUuid)) {
+        const categorySelected = await API.fetchCategory({ surveyId, Uuid: categoryUuid })
+        setCategory(categorySelected)
+      }
+    }
+    selectCategory()
+  }, [categoryUuid])
 
   return (
     <div className="category-selector">
