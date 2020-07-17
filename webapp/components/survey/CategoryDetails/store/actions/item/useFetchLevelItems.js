@@ -30,6 +30,6 @@ export const useFetchLevelItems = ({ setState }) => {
       params: { draft: canEdit, parentUuid },
     })
 
-    await setState(State.assocItems({ levelIndex, items }))
+    setState(State.assocItems({ levelIndex, items }))
   }, [])
 }
