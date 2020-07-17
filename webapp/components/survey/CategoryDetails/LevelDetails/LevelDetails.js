@@ -13,7 +13,7 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import ItemDetails from '../ItemDetails'
+import ItemDetails from './ItemDetails'
 
 import { State, useActions } from '../store'
 

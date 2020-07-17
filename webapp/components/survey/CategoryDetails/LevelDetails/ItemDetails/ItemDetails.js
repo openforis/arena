@@ -17,7 +17,7 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyLang } from '@webapp/store/survey'
 
-import { State, useActions } from '../store'
+import { State, useActions } from '../../store'
 
 const ItemDetails = (props) => {
   const { level, item, state, setState } = props
