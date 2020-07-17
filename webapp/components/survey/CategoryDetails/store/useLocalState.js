@@ -12,13 +12,13 @@ export const useLocalState = (props) => {
   const { pathname } = useLocation()
   const inCategoriesPath = Boolean(matchPath(pathname, `${appModuleUri(designerModules.category)}:uuid/`))
 
-  const [state, setState] = useState(() => State.create({ inCategoriesPath }))
+  const [state, setState] = useState(() => State.create({ categoryUuid, inCategoriesPath }))
 
   const Actions = useActions({ setState })
 
   useEffect(() => {
     ;(async () => {
-      await Actions.init({ categoryUuid, onCategoryCreated })
+      await Actions.init({ state, onCategoryCreated })
     })()
   }, [])
 

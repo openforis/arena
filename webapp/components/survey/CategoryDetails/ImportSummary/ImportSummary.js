@@ -3,7 +3,6 @@ import './ImportSummary.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
 import { useI18n } from '@webapp/store/system'
@@ -21,7 +20,6 @@ const ImportSummary = (props) => {
 
   const Actions = useActions({ setState })
 
-  const category = State.getCategory(state)
   const importSummary = State.getImportSummary(state)
   const columns = CategoryImportSummary.getColumns(importSummary)
 
@@ -47,11 +45,7 @@ const ImportSummary = (props) => {
       </ModalBody>
 
       <ModalFooter>
-        <button
-          type="button"
-          className="btn modal-footer__item"
-          onClick={() => Actions.importCategory({ categoryUuid: Category.getUuid(category), importSummary })}
-        >
+        <button type="button" className="btn modal-footer__item" onClick={() => Actions.importCategory({ state })}>
           <span className="icon icon-upload2 icon-12px icon-left" />
           {i18n.t('common.import')}
         </button>

@@ -2,8 +2,10 @@ export { create } from './create'
 
 export {
   getCategory,
+  getCategoryUuid,
   getImportSummary,
   getItemActive,
+  getItemActiveLastLevelIndex,
   getItemsArray,
   isItemActiveLeaf,
   isInCategoriesPath,

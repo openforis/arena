@@ -36,23 +36,19 @@ export const useInit = ({ setState }) => {
   const surveyId = useSurveyId()
   const fetchLevelItems = useFetchLevelItems({ setState })
 
-  return useCallback(async ({ categoryUuid, onCategoryCreated }) => {
+  return useCallback(async ({ state, onCategoryCreated }) => {
+    const categoryUuid = State.getCategoryUuid(state)
     let category = null
-    let items = null
 
     if (A.isEmpty(categoryUuid)) {
       category = await _createCategory({ surveyId, onCategoryCreated, dispatch })
     } else {
       category = await _fetchCategory({ surveyId, categoryUuid })
-      items = await fetchLevelItems({ categoryUuid: Category.getUuid(category) })
     }
 
-    setState((statePrev) => {
-      let stateUpdated = State.assocCategory({ category })(statePrev)
-      if (items) {
-        stateUpdated = State.assocItems({ levelIndex: 0, items })(stateUpdated)
-      }
-      return stateUpdated
-    })
+    const stateUpdated = State.assocCategory({ category })(state)
+    setState(stateUpdated)
+
+    await fetchLevelItems({ state: stateUpdated })
   }, [])
 }

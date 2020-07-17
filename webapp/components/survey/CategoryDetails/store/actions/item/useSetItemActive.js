@@ -7,10 +7,14 @@ import { State } from '../../state'
 export const useSetItemActive = ({ setState }) => {
   const fetchLevelItems = useFetchLevelItems({ setState })
 
-  return useCallback(async ({ categoryUuid, levelIndex, itemUuid }) => {
-    setState(State.assocItemActive({ levelIndex, itemUuid }))
+  return useCallback(async ({ levelIndex, itemUuid }) => {
+    let stateUpdated = null
+    await setState((statePrev) => {
+      stateUpdated = State.assocItemActive({ levelIndex, itemUuid })(statePrev)
+      return stateUpdated
+    })
 
     // Fetch next level items
-    await fetchLevelItems({ categoryUuid, levelIndex: levelIndex + 1, parentUuid: itemUuid })
+    await fetchLevelItems({ state: stateUpdated })
   }, [])
 }

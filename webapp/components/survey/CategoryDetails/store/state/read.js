@@ -7,6 +7,8 @@ import { keys } from './keys'
 
 export const getCategory = A.prop(keys.category)
 
+export const getCategoryUuid = A.prop(keys.categoryUuid)
+
 export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
 
 export const getImportSummary = A.prop(keys.importSummary)
@@ -30,3 +32,11 @@ export const isItemActiveLeaf = ({ levelIndex }) => (state) => {
   const itemsChildren = getItemsArray({ levelIndex: levelIndex + 1 })(state)
   return A.isEmpty(itemsChildren)
 }
+
+export const getItemActiveLastLevelIndex = A.pipe(
+  A.prop(keys.itemsActive),
+  R.keys,
+  R.map(Number),
+  R.sort((a, b) => a - b),
+  R.last
+)
