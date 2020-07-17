@@ -1,14 +1,17 @@
 import './CategorySelector.scss'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
+
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
+
+import * as API from '@webapp/service/api'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -20,16 +23,14 @@ import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
+  const [category, setCategory] = useState({})
 
   const i18n = useI18n()
-
+  const surveyId = useSurveyId()
   const dispatch = useDispatch()
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
 
-  const survey = useSurvey()
-  const categories = Survey.getCategoriesArray(survey)
-  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
   const editedCategory = useSelector(CategoryState.getCategoryForEdit)
 
   const onAdd = async () => {
@@ -37,11 +38,22 @@ const CategorySelector = (props) => {
     onChange(newCategory)
   }
 
+  const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
+
+  useEffect(() => {
+    ;(async () => {
+      if (!A.isEmpty(categoryUuid)) {
+        const categorySelected = await API.fetchCategory({ surveyId, Uuid: categoryUuid })
+        setCategory(categorySelected)
+      }
+    })()
+  }, [categoryUuid])
+
   return (
     <div className="category-selector">
       <Dropdown
         disabled={disabled}
-        items={categories}
+        items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
         itemLabel={Category.getName}
         validation={validation}
