@@ -23,8 +23,6 @@ import { State, useActions } from '../store'
 const ItemDetails = (props) => {
   const { level, item, state, setState } = props
 
-  const deleteCategoryItem = () => {}
-
   const elemRef = useRef(null)
 
   const i18n = useI18n()
@@ -42,6 +40,7 @@ const ItemDetails = (props) => {
   const activeItemUuid = activeItem ? CategoryItem.getUuid(activeItem) : null
   const itemUuid = CategoryItem.getUuid(item)
   const active = itemUuid === activeItemUuid
+  const leaf = State.isItemLeaf({ item })
 
   const Actions = useActions({ setState })
 
@@ -108,7 +107,7 @@ const ItemDetails = (props) => {
               type="button"
               className="btn btn-delete"
               aria-disabled={disabled}
-              onClick={() => deleteCategoryItem(category, level, item)}
+              onClick={() => Actions.deleteItem({ category, level, item, leaf })}
             >
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('categoryEdit.deleteItem')}

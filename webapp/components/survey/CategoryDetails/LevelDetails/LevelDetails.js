@@ -19,21 +19,18 @@ import { State, useActions } from '../store'
 
 const LevelDetails = (props) => {
   const { level, state, setState } = props
-  const levelIndex = CategoryLevel.getIndex(level)
 
   const readOnly = !useAuthCanEditSurvey()
-
   const i18n = useI18n()
 
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
+  const levelIndex = CategoryLevel.getIndex(level)
+  const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
   const parentItem = State.getLevelActiveItem({ levelIndex: levelIndex - 1 })(state)
-
   const canAddItem = levelIndex === 0 || parentItem
   const items = canAddItem ? State.getLevelItemsArray({ levelIndex })(state) : []
-  const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
-
   const validation = Category.getLevelValidation(levelIndex)(category)
 
   return (
