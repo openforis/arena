@@ -50,7 +50,7 @@ export const useInit = ({ setState }) => {
     setState((statePrev) => {
       let stateUpdated = State.assocCategory({ category })(statePrev)
       if (items) {
-        stateUpdated = State.assocLevelItems({ levelIndex: 0, items })(stateUpdated)
+        stateUpdated = State.assocItems({ levelIndex: 0, items })(stateUpdated)
       }
       return stateUpdated
     })

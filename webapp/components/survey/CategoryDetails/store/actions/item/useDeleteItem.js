@@ -22,7 +22,7 @@ const _delete = async ({ surveyId, category, level, item, setState, dispatch }) 
   )
   setState(
     A.pipe(
-      State.dissocLevelItem({ levelIndex: CategoryLevel.getIndex(level), item }),
+      State.dissocItem({ levelIndex: CategoryLevel.getIndex(level), itemUuid: CategoryItem.getUuid(item) }),
       State.assocCategory({ category: categoryUpdated })
     )
   )

@@ -8,7 +8,7 @@ export const useSetItemActive = ({ setState }) => {
   const fetchLevelItems = useFetchLevelItems({ setState })
 
   return useCallback(async ({ categoryUuid, levelIndex, itemUuid }) => {
-    setState(State.assocLevelActiveItem({ levelIndex, itemUuid }))
+    setState(State.assocItemActive({ levelIndex, itemUuid }))
 
     // Fetch next level items
     await fetchLevelItems({ categoryUuid, levelIndex: levelIndex + 1, parentUuid: itemUuid })

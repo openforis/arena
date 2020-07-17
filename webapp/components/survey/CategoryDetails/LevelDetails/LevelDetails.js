@@ -28,9 +28,9 @@ const LevelDetails = (props) => {
   const category = State.getCategory(state)
   const levelIndex = CategoryLevel.getIndex(level)
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
-  const parentItem = State.getLevelActiveItem({ levelIndex: levelIndex - 1 })(state)
+  const parentItem = State.getItemActive({ levelIndex: levelIndex - 1 })(state)
   const canAddItem = levelIndex === 0 || parentItem
-  const items = canAddItem ? State.getLevelItemsArray({ levelIndex })(state) : []
+  const items = canAddItem ? State.getItemsArray({ levelIndex })(state) : []
   const validation = Category.getLevelValidation(levelIndex)(category)
 
   return (

@@ -23,7 +23,7 @@ export const useCreateItem = ({ setState }) => {
     setState(
       A.pipe(
         State.assocItem({ levelIndex, item }),
-        State.assocLevelActiveItem({ levelIndex, itemUuid: CategoryItem.getUuid(item) })
+        State.assocItemActive({ levelIndex, itemUuid: CategoryItem.getUuid(item) })
       )
     )
 
