@@ -1,6 +1,6 @@
-@import "~@webapp/style/vars";
-@import "./surveyFormVars";
-@import "./react-grid-layout";
+@import 'webapp/style/vars';
+@import './surveyFormVars';
+@import './react-grid-layout';
 
 .survey-form {
   display: grid;
@@ -13,6 +13,10 @@
       transition-property: none;
     }
 
+    .react-grid-item > .react-resizable-handle {
+      display: none;
+    }
+
     &.mounted {
       //react-grid-item css animation are enabled after component didMount
       .react-grid-item.cssTransforms {
@@ -20,7 +24,6 @@
       }
     }
   }
-
 }
 
 // Survey form grid style
@@ -35,9 +38,13 @@
   .react-grid-item {
     border: $formBorderEdit;
 
-    > .react-resizable-handle::after {
-      border-right: 2px solid $greyBorder;
-      border-bottom: 2px solid $greyBorder;
+    > .react-resizable-handle {
+      display: block;
+
+      &::after {
+        border-right: 2px solid $greyBorder;
+        border-bottom: 2px solid $greyBorder;
+      }
     }
   }
 }
