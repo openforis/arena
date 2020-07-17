@@ -31,6 +31,7 @@ const ItemDetails = (props) => {
 
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
   const category = State.getCategory(state)
+  const categoryUuid = Category.getUuid(category)
   const itemExtraDefs = Category.getItemExtraDef(category)
   const validation = Category.getItemValidation(item)(category)
   const { published: disabled } = item
@@ -40,14 +41,13 @@ const ItemDetails = (props) => {
   const activeItemUuid = activeItem ? CategoryItem.getUuid(activeItem) : null
   const itemUuid = CategoryItem.getUuid(item)
   const active = itemUuid === activeItemUuid
-  const leaf = State.isItemLeaf({ item })
+  const leaf = active && State.isLevelActiveItemLeaf({ levelIndex })(state)
 
   const Actions = useActions({ setState })
 
-  const setActive = () => (active ? null : Actions.setItemActive({ levelIndex, itemUuid }))
+  const setActive = () => (active ? null : Actions.setItemActive({ categoryUuid, levelIndex, itemUuid }))
 
-  const updateProp = ({ key, value }) =>
-    Actions.updateItemProp({ categoryUuid: Category.getUuid(category), levelIndex, itemUuid, key, value })
+  const updateProp = ({ key, value }) => Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
 
   useEffect(() => {
     if (active) {

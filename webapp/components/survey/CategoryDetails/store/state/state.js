@@ -42,9 +42,7 @@ export const getLevelActiveItem = ({ levelIndex }) => (state) => {
   return items.find((item) => CategoryItem.getUuid(item) === activeItemUuid)
 }
 
-export const isItemLeaf = ({ item }) => (state) => {
-  const level = Category.getLevelByUuid(CategoryItem.getLevelUuid(item))
-  const levelIndex = CategoryLevel.getIndex(level)
+export const isLevelActiveItemLeaf = ({ levelIndex }) => (state) => {
   const itemsChildren = getLevelItemsArray({ levelIndex: levelIndex + 1 })(state)
   return A.isEmpty(itemsChildren)
 }
