@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import axios from 'axios'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -9,7 +10,16 @@ import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
+const _delete = async ({ survey, category, callback }) => {
+  const surveyId = Survey.getId(survey)
+  const categoryUuid = Category.getUuid(category)
+
+  await axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
+
+  if (callback) {
+    callback()
+  }
+}
 
 export const useDelete = () => {
   const i18n = useI18n()
@@ -25,7 +35,7 @@ export const useDelete = () => {
           DialogConfirmActions.showDialogConfirm({
             key: 'categoryEdit.confirmDelete',
             params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-            onOk: () => dispatch(CategoryActions.deleteCategory({ category, callback: initData })),
+            onOk: async () => _delete({ survey, category, callback: initData }),
           })
         )
       } else {
