@@ -22,7 +22,7 @@ export const useFetchLevelItems = ({ setState }) => {
     const parentUuid = CategoryItem.getUuid(itemActiveLastLevel)
 
     // Reset level items
-    await setState(State.dissocItems({ levelIndex }))
+    setState(State.dissocItems({ levelIndex }))
 
     const {
       data: { items },
