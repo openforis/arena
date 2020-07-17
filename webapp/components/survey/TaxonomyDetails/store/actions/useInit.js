@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import { useParams } from 'react-router'
 
-import axios from 'axios'
-
 import * as A from '@core/arena'
+
+import * as API from '@webapp/service/api'
 
 import { useSurveyId } from '@webapp/store/survey'
 
@@ -13,16 +13,10 @@ export const useInit = ({ setState }) => {
   const { taxonomyUuid: taxonomyUuidParam } = useParams()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ taxonomy }) => {
-    let taxonomyToSet = taxonomy
-
-    if (A.isEmpty(taxonomyToSet) && !A.isEmpty(taxonomyUuidParam)) {
-      const {
-        data: { taxonomy: taxonomyFetched },
-      } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuidParam}?draft=true&validate=true`)
-      taxonomyToSet = taxonomyFetched
+  return useCallback(async ({ taxonomyUuid }) => {
+    if (!A.isEmpty(taxonomyUuid) || !A.isEmpty(taxonomyUuidParam)) {
+      const taxonomy = await API.fetchTaxonomy({ surveyId, Uuid: taxonomyUuidParam || taxonomyUuid })
+      setState(State.create({ taxonomy }))
     }
-
-    setState(State.create({ taxonomy: taxonomyToSet }))
   }, [])
 }

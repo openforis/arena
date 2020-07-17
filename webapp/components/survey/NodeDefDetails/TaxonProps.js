@@ -108,7 +108,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetails showClose={false} taxonomy={taxonomyToEdit} />
+            <TaxonomyDetails showClose={false} taxonomyUuid={Taxonomy.getUuid(taxonomyToEdit)} />
           </PanelRight>
         )}
       </div>
