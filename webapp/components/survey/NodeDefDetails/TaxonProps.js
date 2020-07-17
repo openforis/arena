@@ -17,7 +17,7 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
-import ButtonTaxonomyAdd from '@webapp/components/survey/ButtonTaxonomyAdd'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 import { State } from './store'
 
@@ -69,7 +69,7 @@ const TaxonProps = (props) => {
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
-          <ButtonTaxonomyAdd onAdd={setTaxonomyToEdit} />
+          <ButtonMetaItemAdd onAdd={setTaxonomyToEdit} metaItemType={metaItemTypes.taxonomy} />
           <button
             type="button"
             className="btn btn-s"

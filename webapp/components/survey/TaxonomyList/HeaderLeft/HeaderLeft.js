@@ -4,7 +4,7 @@ import { matchPath, useHistory, useLocation } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import ButtonTaxonomyAdd from '@webapp/components/survey/ButtonTaxonomyAdd'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 const HeaderLeft = (props) => {
@@ -26,7 +26,7 @@ const HeaderLeft = (props) => {
 
   return (
     <div>
-      <ButtonTaxonomyAdd onAdd={onAdd} />
+      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.taxonomy} />
     </div>
   )
 }

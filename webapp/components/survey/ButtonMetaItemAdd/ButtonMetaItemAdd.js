@@ -1,30 +1,34 @@
-import axios from 'axios'
-
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import * as Taxonomy from '@core/survey/taxonomy'
+import * as API from '@webapp/service/api'
 
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-const ButtonTaxonomyAdd = (props) => {
-  const { onAdd } = props
+export const metaItemTypes = {
+  taxonomy: 'taxonomy',
+  category: 'category',
+}
+
+const creatorsByType = {
+  [metaItemTypes.taxonomy]: API.createTaxonomy,
+}
+
+const ButtonMetaItemAdd = (props) => {
+  const { onAdd, metaItemType } = props
 
   const i18n = useI18n()
   const dispatch = useDispatch()
-
   const surveyId = useSurveyId()
 
   const add = useCallback(async () => {
-    const {
-      data: { taxonomy },
-    } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
-
-    dispatch(SurveyActions.metaUpdated())
-
-    onAdd(taxonomy)
+    if (creatorsByType[metaItemType]) {
+      const item = await creatorsByType[metaItemType]({ surveyId })
+      dispatch(SurveyActions.metaUpdated())
+      onAdd(item)
+    }
   }, [])
 
   return (
@@ -35,8 +39,9 @@ const ButtonTaxonomyAdd = (props) => {
   )
 }
 
-ButtonTaxonomyAdd.propTypes = {
+ButtonMetaItemAdd.propTypes = {
   onAdd: PropTypes.func.isRequired,
+  metaItemType: PropTypes.string.isRequired,
 }
 
-export default ButtonTaxonomyAdd
+export default ButtonMetaItemAdd
