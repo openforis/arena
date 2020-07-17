@@ -1,1 +1,1 @@
-export { default } from './ItemDetails'
+export { default } from '../LevelDetails/ItemDetails'
