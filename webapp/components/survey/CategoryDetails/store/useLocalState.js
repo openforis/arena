@@ -17,7 +17,10 @@ export const useLocalState = (props) => {
   const Actions = useActions({ setState })
 
   useEffect(() => {
-    Actions.init({ categoryUuid, onCategoryCreated })
+    ;(async () => {
+      await Actions.init({ categoryUuid, onCategoryCreated })
+      await Actions.fetchLevelItems({ categoryUuid })
+    })()
   }, [])
 
   return { state, setState }

@@ -16,7 +16,7 @@ export const keys = {
   published: 'published',
 }
 
-export const props = {
+export const keysProps = {
   name: 'name',
   itemExtraDef: 'itemExtraDef',
 }
@@ -27,41 +27,16 @@ export const itemExtraDefDataTypes = {
   geometryPoint: 'geometryPoint',
 }
 
-/**
- * CATEGORY
- */
-// ====== CREATE
-export const newCategory = (props = {}, levels = null) => {
-  const category = {
-    [keys.uuid]: uuidv4(),
-    props,
-  }
-  return {
-    ...category,
-    [keys.levels]: levels || [newLevel(category)],
-  }
-}
-
-/**
- * LEVELS
- */
-// ==== CREATE
-export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
-  [CategoryLevel.keys.uuid]: uuidv4(),
-  [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
-  [CategoryLevel.keys.index]: index,
-  [CategoryLevel.keys.props]: {
-    [CategoryLevel.keysProps.name]: `level_${index + 1}`,
-    ...props,
-  },
-})
+// ========
+// LEVELS
+// ========
 
 // ====== READ
 export const { getUuid } = ObjectUtils
-export const getName = ObjectUtils.getProp(props.name, '')
+export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const getValidation = Validation.getValidation
 
-const getLevels = R.propOr([], keys.levels)
+const getLevels = R.propOr({}, keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
 
 export const getLevelByUuid = (uuid) => R.pipe(getLevelsArray, R.find(R.propEq('uuid', uuid)))
@@ -79,16 +54,30 @@ export const assocProp = ({ key, value }) => (category) => {
   return Validation.assocValidation(validationUpdated)(categoryUpdated)
 }
 
-export const assocLevelsArray = (array) => R.assoc(keys.levels, ObjectUtils.toIndexedObj(array, 'index'))
+// ==== CREATE
+export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
+  [CategoryLevel.keys.uuid]: uuidv4(),
+  [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
+  [CategoryLevel.keys.index]: index,
+  [CategoryLevel.keys.props]: {
+    [CategoryLevel.keysProps.name]: `level_${index + 1}`,
+    ...props,
+  },
+})
 
-export const assocLevel = (level) => (category) =>
-  R.pipe(getLevelsArray, R.append(level), (levels) => assocLevelsArray(levels)(category))(category)
+const assocLevels = ({ levels }) => R.assoc(keys.levels, levels)
 
-export const assocLevelName = (name) => ObjectUtils.setProp(CategoryLevel.keysProps.name, name)
+export const assocLevelsArray = (array) => assocLevels({ levels: ObjectUtils.toIndexedObj(array, 'index') })
 
-/**
- * ITEMS
- */
+export const assocLevel = ({ level }) => (category) => {
+  const levelsUpdated = R.pipe(getLevels, R.assoc(CategoryLevel.getIndex(level), level))(category)
+  return assocLevels({ levels: levelsUpdated })(category)
+}
+
+// ========
+// ITEMS
+// ========
+
 const getItemLevelIndex = (item) => (category) =>
   R.pipe(CategoryItem.getLevelUuid, (levelUuid) => getLevelByUuid(levelUuid)(category), CategoryLevel.getIndex)(item)
 
@@ -103,10 +92,24 @@ export const getItemValidation = (item) =>
   )
 
 // ====== ITEMS extra def
-export const getItemExtraDef = ObjectUtils.getProp(props.itemExtraDef, {})
-export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(props.itemExtraDef, extraDef)
+export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
+export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
-// ======= UPDATE
+// ========
+// CATEGORY
+// ========
+
+// ====== CREATE
+export const newCategory = (props = {}, levels = null) => {
+  const category = {
+    [keys.uuid]: uuidv4(),
+    props,
+  }
+  return {
+    ...category,
+    [keys.levels]: levels || [newLevel(category)],
+  }
+}
 
 // UTILS
 export const isLevelDeleteAllowed = (level) =>

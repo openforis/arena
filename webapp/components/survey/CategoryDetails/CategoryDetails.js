@@ -2,7 +2,6 @@ import './CategoryDetails.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -16,9 +15,8 @@ import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
 import ImportSummary from './ImportSummary'
-import LevelEdit from './LevelEdit'
+import LevelDetails from './LevelDetails'
 
-import * as CategoryActions from '../../../loggedin/surveyViews/category/actions'
 import { State, useActions, useLocalState } from './store'
 
 const CategoryDetails = (props) => {
@@ -26,7 +24,6 @@ const CategoryDetails = (props) => {
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
-  const dispatch = useDispatch()
   const history = useHistory()
 
   const readOnly = !useAuthCanEditSurvey()
@@ -48,9 +45,9 @@ const CategoryDetails = (props) => {
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
               value={Category.getName(category)}
-              validation={Validation.getFieldValidation(Category.props.name)(validation)}
+              validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
               onChange={(value) =>
-                Actions.updateCategoryProp({ key: Category.props.name, value: StringUtils.normalizeName(value) })
+                Actions.updateCategoryProp({ key: Category.keysProps.name, value: StringUtils.normalizeName(value) })
               }
               readOnly={readOnly}
             />
@@ -68,14 +65,14 @@ const CategoryDetails = (props) => {
 
         <div className="category__levels">
           {levels.map((level) => (
-            <LevelEdit key={CategoryLevel.getUuid(level)} level={level} />
+            <LevelDetails key={CategoryLevel.getUuid(level)} level={level} state={state} setState={setState} />
           ))}
 
           {!readOnly && (
             <button
               type="button"
               className="btn btn-s btn-add-level"
-              onClick={() => dispatch(CategoryActions.createCategoryLevel(category))}
+              onClick={() => Actions.createLevel({ category })}
               aria-disabled={levels.length === 5}
             >
               <span className="icon icon-plus icon-16px icon-left" />

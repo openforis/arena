@@ -126,7 +126,7 @@ export default class CategoryImportJob extends Job {
     }
 
     const category = Category.newCategory({
-      [Category.props.name]: CategoryImportJobParams.getCategoryName(this.params),
+      [Category.keysProps.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
     return await CategoryManager.insertCategory(this.user, this.surveyId, category, true, this.tx)
   }
@@ -151,7 +151,7 @@ export default class CategoryImportJob extends Job {
         this.user,
         this.surveyId,
         Category.getUuid(this.category),
-        Category.props.itemExtraDef,
+        Category.keysProps.itemExtraDef,
         itemExtraDef,
         true,
         this.tx,

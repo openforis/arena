@@ -8,10 +8,12 @@ import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
+import { useFetchLevelItems } from './useFetchLevelItems'
 
 export const useImportCategory = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const fetchLevelItems = useFetchLevelItems({ setState })
 
   return useCallback(async ({ categoryUuid, importSummary }) => {
     const {
@@ -21,11 +23,19 @@ export const useImportCategory = ({ setState }) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
-        onComplete: (jobCompleted) => {
-          // Reload category
-          setState(A.pipe(State.assocCategory({ category: jobCompleted.result.category }), State.dissocImportSummary))
-          // TODO reset active items, load first level items
+        onComplete: async (jobCompleted) => {
           dispatch(SurveyActions.metaUpdated())
+
+          // Update category details state
+          setState(
+            A.pipe(
+              State.assocCategory({ category: jobCompleted.result.category }),
+              State.dissocImportSummary,
+              State.dissocLevelActiveItems
+            )
+          )
+          // Fetch first level items
+          await fetchLevelItems({ categoryUuid })
         },
       })
     )

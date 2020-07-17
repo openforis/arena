@@ -19,3 +19,6 @@ export const { getUuid } = ObjectUtils
 export const getIndex = R.prop(keys.index)
 export const getName = ObjectUtils.getProp(keysProps.name)
 export const getCategoryUuid = R.prop(keys.categoryUuid)
+
+// UPDATE
+export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
