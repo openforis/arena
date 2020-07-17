@@ -8,25 +8,21 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { State } from '../../state'
 
-const _putProp = ({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch }) => {
-  const action = async () => {
-    dispatch(AppSavingActions.showAppSaving())
-    const {
-      data: { category },
-    } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/items/${itemUuid}`, {
-      key,
-      value,
-    })
+const _putPropAction = ({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch }) => async () => {
+  dispatch(AppSavingActions.showAppSaving())
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/items/${itemUuid}`, {
+    key,
+    value,
+  })
 
-    dispatch(SurveyActions.metaUpdated())
+  dispatch(SurveyActions.metaUpdated())
 
-    // Update category with validation in state
-    setState(State.assocCategory({ category }))
+  // Update category with validation in state
+  setState(State.assocCategory({ category }))
 
-    dispatch(AppSavingActions.hideAppSaving())
-  }
-
-  dispatch(debounceAction(action, `category_item_update_${itemUuid}`))
+  dispatch(AppSavingActions.hideAppSaving())
 }
 
 export const useUpdateItemProp = ({ setState }) => {
@@ -36,6 +32,11 @@ export const useUpdateItemProp = ({ setState }) => {
   return useCallback(async ({ categoryUuid, levelIndex, itemUuid, key, value }) => {
     setState(State.assocItemProp({ levelIndex, itemUuid, key, value }))
 
-    _putProp({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch })
+    dispatch(
+      debounceAction(
+        _putPropAction({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch }),
+        `category_item_update_${itemUuid}`
+      )
+    )
   }, [])
 }
