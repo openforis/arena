@@ -12,7 +12,7 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../../state'
 
-const _delete = async ({ surveyId, category, level, item, setState, dispatch }) => {
+const _delete = ({ surveyId, category, level, item, setState }) => async (dispatch) => {
   dispatch(LoaderActions.showLoader())
 
   const {
@@ -41,9 +41,7 @@ export const useDeleteItem = ({ setState }) => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
         key: messageKeyConfirm,
-        onOk: async () => {
-          await _delete({ surveyId, category, level, item, setState, dispatch })
-        },
+        onOk: () => dispatch(_delete({ surveyId, category, level, item, setState })),
       })
     )
   }, [])

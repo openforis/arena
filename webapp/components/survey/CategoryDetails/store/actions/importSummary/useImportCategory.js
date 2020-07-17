@@ -11,12 +11,11 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { State } from '../../state'
 import { useFetchLevelItems } from '../item/useFetchLevelItems'
 
-const _onImportComplete = ({ state, setState, fetchLevelItems, dispatch }) => async (jobCompleted) => {
+const _onImportComplete = ({ state, setState, fetchLevelItems, job }) => async (dispatch) => {
   dispatch(SurveyActions.metaUpdated())
 
-  // Update category details state
   const stateUpdated = A.pipe(
-    State.assocCategory({ category: jobCompleted.result.category }),
+    State.assocCategory({ category: job.result.category }),
     State.dissocImportSummary,
     State.dissocItemsActive
   )(state)
@@ -44,7 +43,8 @@ export const useImportCategory = ({ setState }) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
-        onComplete: _onImportComplete({ state, setState, fetchLevelItems, dispatch }),
+        onComplete: (jobCompleted) =>
+          dispatch(_onImportComplete({ state, setState, fetchLevelItems, job: jobCompleted })),
       })
     )
   }, [])

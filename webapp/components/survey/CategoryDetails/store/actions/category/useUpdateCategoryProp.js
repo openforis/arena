@@ -9,18 +9,14 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { State } from '../../state'
 
-const _putCategoryProp = ({ dispatch, surveyId, categoryUuid, key, value, setState }) => {
-  dispatch(
-    debounceAction(async () => {
-      const {
-        data: { category },
-      } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}`, { key, value })
+const _putCategoryProp = ({ surveyId, categoryUuid, key, value, setState }) => async (dispatch) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}`, { key, value })
 
-      setState(State.assocCategory({ category }))
+  setState(State.assocCategory({ category }))
 
-      dispatch(SurveyActions.metaUpdated())
-    }, `category_prop_update_${categoryUuid}`)
-  )
+  dispatch(SurveyActions.metaUpdated())
 }
 
 export const useUpdateCategoryProp = ({ setState }) => {
@@ -32,7 +28,12 @@ export const useUpdateCategoryProp = ({ setState }) => {
       const category = State.getCategory(statePrev)
       const categoryUuid = Category.getUuid(category)
 
-      _putCategoryProp({ dispatch, surveyId, categoryUuid, key, value, setState })
+      dispatch(
+        debounceAction(
+          _putCategoryProp({ surveyId, categoryUuid, key, value, setState }),
+          `category_prop_update_${categoryUuid}`
+        )
+      )
 
       return State.assocCategoryProp({ key, value })(statePrev)
     })

@@ -8,7 +8,7 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { State } from '../../state'
 
-const _putPropAction = ({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch }) => async () => {
+const _putPropAction = ({ surveyId, categoryUuid, itemUuid, key, value, setState }) => async (dispatch) => {
   dispatch(AppSavingActions.showAppSaving())
   const {
     data: { category },
@@ -34,7 +34,7 @@ export const useUpdateItemProp = ({ setState }) => {
 
     dispatch(
       debounceAction(
-        _putPropAction({ surveyId, categoryUuid, itemUuid, key, value, setState, dispatch }),
+        _putPropAction({ surveyId, categoryUuid, itemUuid, key, value, setState }),
         `category_item_update_${itemUuid}`
       )
     )
