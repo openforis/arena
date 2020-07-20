@@ -14,7 +14,7 @@ import * as API from '@webapp/service/api'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
+import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 const CategorySelector = (props) => {
