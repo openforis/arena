@@ -6,22 +6,26 @@ import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
 
-import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
+
+import { useI18n } from '@webapp/store/system'
+
+const _getColumnSummaryKey = ({ column }) => {
+  if (CategoryImportSummary.hasColumnLang(column)) {
+    return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
+  }
+  if (CategoryImportSummary.isColumnExtra(column)) {
+    return 'categoryEdit.importSummary.columnTypeSummaryExtra'
+  }
+  return 'categoryEdit.importSummary.columnTypeSummary'
+}
 
 const TableRow = (props) => {
   const { column, columnName, idx, onDataTypeChange } = props
 
   const i18n = useI18n()
 
-  let columnSummaryKey = null
-  if (CategoryImportSummary.hasColumnLang(column)) {
-    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
-  } else if (CategoryImportSummary.isColumnExtra(column)) {
-    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummaryExtra'
-  } else {
-    columnSummaryKey = 'categoryEdit.importSummary.columnTypeSummary'
-  }
+  const columnSummaryKey = _getColumnSummaryKey({ column })
 
   const dataType = CategoryImportSummary.getColumnDataType(column)
 
