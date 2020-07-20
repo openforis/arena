@@ -138,10 +138,21 @@ export const fetch = async (
       t.uuid = l.content_uuid   
       
      LEFT OUTER JOIN
-      ${schema}.category c
+     (
+        SELECT 
+          *,
+          (
+            SELECT
+              json_agg(level.*)
+            FROM  ${schema}.category_level level
+            WHERE level.category_uuid = c.uuid
+        ) as levels
+       
+        FROM  ${schema}.category c
+       ) as c
     ON
       c.uuid = l.content_uuid OR (l.content::json->>'categoryUuid' IS NOT NULL AND c.uuid = (l.content::json->>'categoryUuid')::uuid)
-
+    
     -- start of node activities part
     ${
       published
