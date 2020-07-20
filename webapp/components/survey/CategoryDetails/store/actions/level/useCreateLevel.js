@@ -6,7 +6,7 @@ import * as Category from '@core/survey/category'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 export const useCreateLevel = ({ setState }) => {
   const dispatch = useDispatch()

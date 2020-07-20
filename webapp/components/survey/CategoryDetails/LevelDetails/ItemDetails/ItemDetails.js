@@ -1,55 +1,71 @@
 import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
-import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as InputMasks from '@webapp/components/form/inputMasks'
-
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
-const ItemEdit = props => {
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useSurveyLang } from '@webapp/store/survey'
+
+import { State, useActions } from '../../store'
+
+const ItemDetails = (props) => {
+  const { level, item, state, setState } = props
+
   const elemRef = useRef(null)
 
-  useEffect(() => {
-    if (props.active) {
-      elemRef.current.scrollIntoView(false)
-    }
-  }, [props.active])
+  const i18n = useI18n()
+  const readOnly = !useAuthCanEditSurvey()
+  const lang = useSurveyLang()
 
-  const {
-    category,
-    level,
-    item,
-    active,
-    putCategoryItemProp,
-    setCategoryItemForEdit,
-    deleteCategoryItem,
-    lang,
-    readOnly,
-  } = props
-
+  const category = State.getCategory(state)
+  const categoryUuid = Category.getUuid(category)
   const itemExtraDefs = Category.getItemExtraDef(category)
   const validation = Category.getItemValidation(item)(category)
-  const disabled = item.published
+  const { published: disabled } = item
 
-  const i18n = useI18n()
+  const levelIndex = CategoryLevel.getIndex(level)
+  const itemActive = State.getItemActive({ levelIndex })(state)
+  const itemActiveUuid = itemActive ? CategoryItem.getUuid(itemActive) : null
+  const itemUuid = CategoryItem.getUuid(item)
+  const active = itemUuid === itemActiveUuid
+  const leaf = active && State.isItemActiveLeaf({ levelIndex })(state)
+
+  const Actions = useActions({ setState })
+
+  const setActive = () => (active ? null : Actions.setItemActive({ categoryUuid, levelIndex, itemUuid }))
+
+  const updateProp = ({ key, value }) => Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
+
+  useEffect(() => {
+    if (active) {
+      elemRef.current.scrollIntoView(false)
+    }
+  }, [active])
 
   return (
     <div
       className={`category__item ${active ? 'active' : ''}`}
-      onClick={() => (active ? null : setCategoryItemForEdit(category, level, item, true))}
+      onKeyDown={setActive}
+      onClick={setActive}
       ref={elemRef}
+      role="button"
+      tabIndex={0}
     >
       <ErrorBadge validation={validation} showLabel={false} />
       {active ? (
-        <React.Fragment>
-          <button className="btn btn-s btn-close" onClick={() => setCategoryItemForEdit(category, level, item, false)}>
+        <>
+          <button type="button" className="btn btn-s btn-close" onClick={() => Actions.resetItemActive({ levelIndex })}>
             <span className="icon icon-arrow-up icon-12px" />
           </button>
 
@@ -58,16 +74,14 @@ const ItemEdit = props => {
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
-              onChange={value =>
-                putCategoryItemProp(category, level, item, CategoryItem.keysProps.code, normalizeName(value))
-              }
+              onChange={(value) => updateProp({ key: CategoryItem.keysProps.code, value: normalizeName(value) })}
               readOnly={readOnly}
             />
           </FormItem>
 
           <LabelsEditor
             labels={CategoryItem.getLabels(item)}
-            onChange={labels => putCategoryItemProp(category, level, item, CategoryItem.keysProps.labels, labels)}
+            onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
             readOnly={readOnly}
           />
 
@@ -78,9 +92,9 @@ const ItemEdit = props => {
                 mask={dataType === Category.itemExtraDefDataTypes.number ? InputMasks.decimal : null}
                 readOnly={readOnly}
                 validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
-                onChange={value => {
+                onChange={(value) => {
                   const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
-                  putCategoryItemProp(category, level, item, CategoryItem.keysProps.extra, extra)
+                  updateProp({ key: CategoryItem.keysProps.extra, value: extra })
                 }}
               />
             </FormItem>
@@ -88,26 +102,34 @@ const ItemEdit = props => {
 
           {!readOnly && (
             <button
+              type="button"
               className="btn btn-delete"
               aria-disabled={disabled}
-              onClick={() => deleteCategoryItem(category, level, item)}
+              onClick={() => Actions.deleteItem({ category, level, item, leaf })}
             >
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('categoryEdit.deleteItem')}
             </button>
           )}
-        </React.Fragment>
+        </>
       ) : (
-        <React.Fragment>
+        <>
           <div className="ellipsis">{CategoryItem.getCode(item)}</div>
           <div className="ellipsis">
             {'\u00A0'}-{'\u00A0'}
           </div>
           <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
-        </React.Fragment>
+        </>
       )}
     </div>
   )
 }
 
-export default ItemEdit
+ItemDetails.propTypes = {
+  level: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
+  setState: PropTypes.func.isRequired,
+}
+
+export default ItemDetails

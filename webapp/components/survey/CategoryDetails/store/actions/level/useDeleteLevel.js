@@ -10,7 +10,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import { NotificationActions, DialogConfirmActions } from '@webapp/store/ui'
 import { SurveyActions, useSurvey } from '@webapp/store/survey'
 
-import { State } from '../state'
+import { State } from '../../state'
 
 const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch }) => {
   const levelUuid = CategoryLevel.getUuid(level)
@@ -21,8 +21,8 @@ const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch 
   )
   await setState(
     A.pipe(
-      State.dissocLevelActiveItem({ levelIndex }),
-      State.dissocLevelItems({ levelIndex }),
+      State.dissocItemActive({ levelIndex }),
+      State.dissocItems({ levelIndex }),
       State.assocCategory(categoryUpdated)
     )
   )

@@ -29,17 +29,15 @@ export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-export const { getUuid } = ObjectUtils
+export const { getDescription, getDescriptions, getLabels, getProps, getUuid, isEqual } = ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
-export const { getLabels } = ObjectUtils
 export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, getCode(item))(item)
-export const { getDescriptions } = ObjectUtils
-export const { getDescription } = ObjectUtils
-export const { getProps } = ObjectUtils
-export const { isEqual } = ObjectUtils
 
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
 export const getExtraProp = (prop) => R.pipe(getExtra, R.propOr('', prop))
+
+// ====== UPDATE
+export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)

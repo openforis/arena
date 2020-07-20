@@ -7,7 +7,8 @@ import * as Category from '@core/survey/category'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import { State } from '../state'
+import { useFetchLevelItems } from '../item/useFetchLevelItems'
+import { State } from '../../state'
 
 const _createCategory = async ({ surveyId, onCategoryCreated, dispatch }) => {
   const {
@@ -33,8 +34,10 @@ const _fetchCategory = async ({ surveyId, categoryUuid }) => {
 export const useInit = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const fetchLevelItems = useFetchLevelItems({ setState })
 
-  return useCallback(async ({ categoryUuid, onCategoryCreated }) => {
+  return useCallback(async ({ state, onCategoryCreated }) => {
+    const categoryUuid = State.getCategoryUuid(state)
     let category = null
 
     if (A.isEmpty(categoryUuid)) {
@@ -43,6 +46,9 @@ export const useInit = ({ setState }) => {
       category = await _fetchCategory({ surveyId, categoryUuid })
     }
 
-    setState((statePrev) => State.assocCategory({ category })(statePrev))
+    const stateUpdated = State.assocCategory({ category })(state)
+    setState(stateUpdated)
+
+    await fetchLevelItems({ state: stateUpdated })
   }, [])
 }
