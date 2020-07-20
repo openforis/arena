@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
 
 // ===== SURVEY
 
@@ -16,6 +17,11 @@ export const getItemCategory = ActivityLog.getCategory
 export const isItemCategoryDeleted = () => R.pipe(ActivityLog.getCategory, R.isNil)
 
 export const isCategoryDeleted = isItemCategoryDeleted
+
+// ==== CATEGORY, LEVELS
+
+export const isLevelDeleted = ({ category, levelUuid }) =>
+  A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
 
 // ===== TAXONOMY
 

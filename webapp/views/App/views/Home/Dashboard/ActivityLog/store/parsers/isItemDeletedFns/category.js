@@ -1,6 +1,3 @@
-import * as A from '@core/arena'
-
-import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
@@ -22,14 +19,14 @@ export default {
     const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = CategoryLevel.getUuid(categoryLevelInserted)
 
-    return A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
+    return ActivityLogMessageParserUtils.isLevelDeleted({ category, levelUuid })
   },
 
   [ActivityLog.type.categoryLevelPropUpdate]: () => (activityLog) => {
     const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = ActivityLog.getContentUuid(activityLog)
 
-    return A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
+    return ActivityLogMessageParserUtils.isLevelDeleted({ category, levelUuid })
   },
 
   [ActivityLog.type.categoryLevelDelete]: () => ActivityLogMessageParserUtils.isItemCategoryDeleted,
@@ -41,14 +38,14 @@ export default {
     const itemInserted = ActivityLog.getContent(activityLog)
     const levelUuid = CategoryItem.getLevelUuid(itemInserted)
 
-    return A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
+    return ActivityLogMessageParserUtils.isLevelDeleted({ category, levelUuid })
   },
 
   [ActivityLog.type.categoryItemPropUpdate]: () => (activityLog) => {
     const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = ActivityLog.getContentLevelUuid(activityLog)
 
-    return A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
+    return ActivityLogMessageParserUtils.isLevelDeleted({ category, levelUuid })
   },
 
   [ActivityLog.type.categoryItemDelete]: () => ActivityLogMessageParserUtils.isItemCategoryDeleted,
