@@ -1,13 +1,16 @@
 import './CategorySelector.scss'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
+
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
+
+import * as API from '@webapp/service/api'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -18,20 +21,29 @@ const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
 
   const i18n = useI18n()
+  const surveyId = useSurveyId()
 
+  const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [showCategoryPanel, setShowCategoryPanel] = useState(false)
   const [categoryUuidToEdit, setCategoryUuidToEdit] = useState(null)
 
-  const survey = useSurvey()
-  const categories = Survey.getCategoriesArray(survey)
-  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+  const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
+
+  useEffect(() => {
+    ;(async () => {
+      if (!A.isEmpty(categoryUuid)) {
+        const categorySelected = await API.fetchCategory({ surveyId, uuid: categoryUuid })
+        setCategory(categorySelected)
+      }
+    })()
+  }, [categoryUuid])
 
   return (
     <div className="category-selector">
       <Dropdown
         disabled={disabled}
-        items={categories}
+        items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
         itemLabel={Category.getName}
         validation={validation}

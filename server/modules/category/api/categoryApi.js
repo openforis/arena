@@ -119,7 +119,7 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, draft, validate, offset = 0, limit = null } = Request.getParams(req)
+      const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)
 
       const list = await CategoryService.fetchCategoriesBySurveyId({
         surveyId,
@@ -127,6 +127,7 @@ export const init = (app) => {
         includeValidation: validate,
         offset,
         limit,
+        search,
       })
 
       res.json({ list })
@@ -147,6 +148,7 @@ export const init = (app) => {
     }
   })
 
+  // Fetch item by uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyViewPermission,
@@ -163,7 +165,7 @@ export const init = (app) => {
     }
   )
 
-  // Fetch items by parent item Uuid
+  // Fetch items by parent item uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/items',
     AuthMiddleware.requireSurveyViewPermission,

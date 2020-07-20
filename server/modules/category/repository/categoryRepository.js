@@ -1,12 +1,5 @@
 import * as R from 'ramda'
-
-import * as DB from '../../../db'
-import { db } from '../../../db/db'
-import * as DbUtils from '../../../db/dbUtils'
-
-import * as Category from '../../../../core/survey/category'
-import * as CategoryLevel from '../../../../core/survey/categoryLevel'
-import * as CategoryItem from '../../../../core/survey/categoryItem'
+import * as A from '@core/arena'
 
 import {
   getSurveyDBSchema,
@@ -15,6 +8,13 @@ import {
   deleteSurveySchemaTableProp,
   dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as DB from '../../../db'
+import { db } from '../../../db/db'
+import * as DbUtils from '../../../db/dbUtils'
+
+import * as Category from '../../../../core/survey/category'
+import * as CategoryLevel from '../../../../core/survey/categoryLevel'
+import * as CategoryItem from '../../../../core/survey/categoryItem'
 
 // ============== CREATE
 
@@ -119,7 +119,7 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
   )
 
 export const fetchCategoriesBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = null },
   client = db
 ) =>
   client.map(
@@ -131,10 +131,14 @@ export const fetchCategoriesBySurveyId = async (
       published
       ${includeValidation ? ', validation' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.category
-    ORDER BY ${DbUtils.getPropColCombined(Category.keysProps.name, draft)}`,
+    ${search ? `WHERE ${DbUtils.getPropColCombined(Category.keysProps.name, draft)} ILIKE $/search/` : ''} 
+    ORDER BY ${DbUtils.getPropColCombined(Category.keysProps.name, draft)}
+    LIMIT ${limit ? `$/limit/` : 'ALL'}
+    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       offset,
       limit,
+      search: `%${search}%`,
     },
     (row) => DB.transformCallback(row, draft, true)
   )
@@ -165,7 +169,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     WHERE c.uuid = $1`,
     [categoryUuid]
   )
-  return R.pipe(R.values, R.head)(categories)
+  return A.pipe(R.values, R.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
