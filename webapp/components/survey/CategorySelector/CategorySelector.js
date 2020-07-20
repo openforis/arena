@@ -43,7 +43,7 @@ const CategorySelector = (props) => {
   useEffect(() => {
     ;(async () => {
       if (!A.isEmpty(categoryUuid)) {
-        const categorySelected = await API.fetchCategory({ surveyId, Uuid: categoryUuid })
+        const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
         setCategory(categorySelected)
       }
     })()

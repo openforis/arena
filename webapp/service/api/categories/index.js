@@ -9,10 +9,10 @@ export const fetchCategories = async ({ surveyId, draft = true, validate = false
   return categories
 }
 
-export const fetchCategory = async ({ surveyId, Uuid, draft = true, validate = true }) => {
+export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, validate = true }) => {
   const {
     data: { category },
-  } = await axios.get(`/api/survey/${surveyId}/categories/${Uuid}`, {
+  } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}`, {
     params: {
       draft,
       validate,
