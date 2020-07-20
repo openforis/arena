@@ -16,7 +16,7 @@ const TableRowHeader = (props) => {
 
   return (
     <>
-      <div>{i18n.t('#')}</div>
+      <div>#</div>
       <div>{i18n.t('common.name')}</div>
       {canEdit && (
         <>
