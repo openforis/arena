@@ -1,4 +1,3 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -10,10 +9,8 @@ import * as ActivityLogMessageParserUtils from '../utils'
 export default {
   // ===== CATEGORY
 
-  [ActivityLog.type.categoryPropUpdate]: (survey) => (activityLog) => {
-    const categoryUuid = ActivityLog.getContentUuid(activityLog)
-    const category = Survey.getCategoryByUuid(categoryUuid)(survey)
-
+  [ActivityLog.type.categoryPropUpdate]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     return {
       key: ActivityLog.getContentKey(activityLog),
       categoryName: Category.getName(category),
@@ -26,9 +23,9 @@ export default {
 
   // ===== CATEGORY LEVEL
 
-  [ActivityLog.type.categoryLevelInsert]: (survey) => (activityLog) => {
+  [ActivityLog.type.categoryLevelInsert]: () => (activityLog) => {
     const categoryLevelInserted = ActivityLog.getContent(activityLog)
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
 
     return {
       index: CategoryLevel.getIndex(categoryLevelInserted),
@@ -36,8 +33,8 @@ export default {
     }
   },
 
-  [ActivityLog.type.categoryLevelPropUpdate]: (survey) => (activityLog) => {
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+  [ActivityLog.type.categoryLevelPropUpdate]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = ActivityLog.getContentUuid(activityLog)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -48,8 +45,8 @@ export default {
     }
   },
 
-  [ActivityLog.type.categoryLevelDelete]: (survey) => (activityLog) => {
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+  [ActivityLog.type.categoryLevelDelete]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const index = ActivityLog.getContentIndex(activityLog)
 
     return {
@@ -60,9 +57,9 @@ export default {
 
   // ===== CATEGORY ITEM
 
-  [ActivityLog.type.categoryItemInsert]: (survey) => (activityLog) => {
+  [ActivityLog.type.categoryItemInsert]: () => (activityLog) => {
     const itemInserted = ActivityLog.getContent(activityLog)
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = CategoryItem.getLevelUuid(itemInserted)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -72,8 +69,8 @@ export default {
     }
   },
 
-  [ActivityLog.type.categoryItemPropUpdate]: (survey) => (activityLog) => {
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+  [ActivityLog.type.categoryItemPropUpdate]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
 
     return {
       code: ActivityLog.getContentCode(activityLog),
@@ -82,8 +79,8 @@ export default {
     }
   },
 
-  [ActivityLog.type.categoryItemDelete]: (survey) => (activityLog) => {
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+  [ActivityLog.type.categoryItemDelete]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
     const levelUuid = ActivityLog.getContentLevelUuid(activityLog)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -96,8 +93,8 @@ export default {
 
   // ===== CATEGORY IMPORT
 
-  [ActivityLog.type.categoryImport]: (survey) => (activityLog) => {
-    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
+  [ActivityLog.type.categoryImport]: () => (activityLog) => {
+    const category = ActivityLogMessageParserUtils.getItemCategory(activityLog)
 
     return {
       categoryName: Category.getName(category),

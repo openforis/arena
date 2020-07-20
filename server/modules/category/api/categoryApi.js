@@ -101,22 +101,6 @@ export const init = (app) => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/categoriesAll', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, draft, validate } = Request.getParams(req)
-
-      const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
-        surveyId,
-        draft,
-        includeValidation: validate,
-      })
-
-      res.json({ categories })
-    } catch (error) {
-      next(error)
-    }
-  })
-
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)

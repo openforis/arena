@@ -37,17 +37,6 @@ export const init = (app) => {
 
   // ====== READ
 
-  // Old get method
-  app.get('/survey/:surveyId/taxonomiesAll', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, draft, validate } = Request.getParams(req)
-
-      await sendTaxonomies(res, surveyId, draft, validate)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, offset, limit, draft, validate, search } = Request.getParams(req)

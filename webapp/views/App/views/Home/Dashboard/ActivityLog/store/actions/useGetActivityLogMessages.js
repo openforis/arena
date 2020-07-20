@@ -1,6 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as A from '@core/arena'
+
 import { useInterval } from '@webapp/components/hooks'
 
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
@@ -31,11 +33,12 @@ export const useFetchMessages = ({ messages, setMessages }) => {
         data: { activityLogs },
       } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params })
 
-      if (R.isEmpty(activityLogs)) {
+      if (A.isEmpty(activityLogs)) {
         return null
       }
 
       const highlighted = newest && initialized
+
       const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
       const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
       const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
