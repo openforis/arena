@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+import * as Taxonomy from '@core/survey/taxonomy'
+
+// ==== READ
 export const fetchTaxonomies = async ({ surveyId, draft = true, validate = false, search = '' }) => {
   const {
     data: { list: taxonomies },
@@ -9,11 +12,20 @@ export const fetchTaxonomies = async ({ surveyId, draft = true, validate = false
   return taxonomies
 }
 
-export const fetchTaxonomy = async ({ surveyId, Uuid, draft = true, validate = true }) => {
+export const fetchTaxonomy = async ({ surveyId, taxonomyUuid, draft = true, validate = true }) => {
   const {
     data: { taxonomy },
-  } = await axios.get(`/api/survey/${surveyId}/taxonomies/${Uuid}`, {
+  } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, {
     params: { draft, validate },
   })
+  return taxonomy
+}
+
+// CREATE
+export const createTaxonomy = async ({ surveyId }) => {
+  const {
+    data: { taxonomy },
+  } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
+
   return taxonomy
 }
