@@ -10,7 +10,7 @@ export const useInit = ({ setState }) => {
   const surveyId = useSurveyId()
 
   return useCallback(async ({ taxonomyUuid }) => {
-    const taxonomy = await API.fetchTaxonomy({ surveyId, Uuid: taxonomyUuid })
+    const taxonomy = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
     setState(State.create({ taxonomy }))
   }, [])
 }

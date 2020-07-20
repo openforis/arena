@@ -45,7 +45,7 @@ const TaxonProps = (props) => {
   useEffect(() => {
     ;(async () => {
       if (!A.isEmpty(taxonomyUuid)) {
-        const taxonomySelected = await API.fetchTaxonomy({ surveyId, Uuid: taxonomyUuid })
+        const taxonomySelected = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
         setTaxonomy(taxonomySelected)
       }
     })()
