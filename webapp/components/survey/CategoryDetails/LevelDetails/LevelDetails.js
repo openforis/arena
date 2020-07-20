@@ -5,7 +5,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
-import { normalizeName } from '@core/stringUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -56,7 +56,9 @@ const LevelDetails = (props) => {
         <Input
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={(value) => Actions.updateLevelProp({ category, level, key: 'name', value: normalizeName(value) })}
+          onChange={(value) =>
+            Actions.updateLevelProp({ category, level, key: 'name', value: StringUtils.normalizeName(value) })
+          }
           readOnly={readOnly}
         />
       </FormItem>
