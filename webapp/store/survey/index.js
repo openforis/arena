@@ -14,9 +14,6 @@ export { NodeDefsActions } from './nodeDefs'
 // ====== categories
 export { CategoriesActions, CategoriesState } from './categories'
 
-// ====== taxonomies
-export { TaxonomiesActions } from './taxonomies'
-
 // ====== hooks
 export {
   useSurveyDefsFetched,

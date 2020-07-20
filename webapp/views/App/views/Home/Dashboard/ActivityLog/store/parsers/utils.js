@@ -1,7 +1,9 @@
 import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
 
 // ===== SURVEY
 
@@ -10,19 +12,19 @@ export const getNodeDef = (survey) =>
 
 // ===== CATEGORY
 
-export const isCategoryDeleted = (survey) =>
-  R.pipe(ActivityLog.getContentUuid, (categoryUuid) => Survey.getCategoryByUuid(categoryUuid)(survey), R.isNil)
+export const getItemCategory = ActivityLog.getCategory
 
-export const getItemCategory = (survey) => (activityLog) =>
-  R.pipe(ActivityLog.getContentCategoryUuid, (categoryUuid) => Survey.getCategoryByUuid(categoryUuid)(survey))(
-    activityLog
-  )
+export const isItemCategoryDeleted = () => R.pipe(ActivityLog.getCategory, R.isNil)
 
-export const isItemCategoryDeleted = (survey) => R.pipe(getItemCategory(survey), R.isNil)
+export const isCategoryDeleted = isItemCategoryDeleted
+
+// ==== CATEGORY, LEVELS
+
+export const isLevelDeleted = ({ category, levelUuid }) =>
+  A.isEmpty(category) || !Category.getLevelByUuid(levelUuid)(category)
 
 // ===== TAXONOMY
 
-export const getTaxonomy = (survey) =>
-  R.pipe(ActivityLog.getContentUuid, (taxonomyUuid) => Survey.getTaxonomyByUuid(taxonomyUuid)(survey))
+export const { getTaxonomy } = ActivityLog
 
-export const isTaxonomyDeleted = (survey) => R.pipe(getTaxonomy(survey), R.isNil)
+export const isTaxonomyDeleted = () => A.pipe(ActivityLog.getTaxonomy, R.isNil)

@@ -2,33 +2,31 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { matchPath, useHistory, useLocation } from 'react-router'
 
+import * as Taxonomy from '@core/survey/taxonomy'
+
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { useI18n } from '@webapp/store/system'
-
 const HeaderLeft = (props) => {
-  const i18n = useI18n()
-  const { pathname } = useLocation()
+  const { headerProps } = props
+  const { onTaxonomyCreated } = headerProps
+
   const history = useHistory()
+  const { pathname } = useLocation()
+
   const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
 
-  const { headerProps } = props
-  const { onTaxonomyCreate } = headerProps
-
-  const add = async () => {
+  const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {
-      history.push(appModuleUri(designerModules.taxonomy))
+      history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomyCreated)}`)
     } else {
-      onTaxonomyCreate()
+      onTaxonomyCreated(taxonomyCreated)
     }
   }
 
   return (
     <div>
-      <button type="button" onClick={add} className="btn btn-s">
-        <span className="icon icon-plus icon-12px icon-left" />
-        {i18n.t('common.add')}
-      </button>
+      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.taxonomy} />
     </div>
   )
 }

@@ -17,6 +17,7 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 import { State } from './store'
 
@@ -44,7 +45,7 @@ const TaxonProps = (props) => {
   useEffect(() => {
     ;(async () => {
       if (!A.isEmpty(taxonomyUuid)) {
-        const taxonomySelected = await API.fetchTaxonomy({ surveyId, Uuid: taxonomyUuid })
+        const taxonomySelected = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
         setTaxonomy(taxonomySelected)
       }
     })()
@@ -68,17 +69,7 @@ const TaxonProps = (props) => {
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
-          <button
-            type="button"
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={() => {
-              setShowTaxonomyPanel(true)
-            }}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('common.add')}
-          </button>
+          <ButtonMetaItemAdd onAdd={setTaxonomyToEdit} metaItemType={metaItemTypes.taxonomy} />
           <button
             type="button"
             className="btn btn-s"
@@ -102,10 +93,8 @@ const TaxonProps = (props) => {
               canSelect
               selectedItemUuid={taxonomyUuid}
               onSelect={onTaxonomySelect}
-              onTaxonomyCreate={() => setShowTaxonomyPanel(true)}
-              onTaxonomyOpen={(taxonomySelected) => {
-                setTaxonomyToEdit(taxonomySelected)
-              }}
+              onTaxonomyCreated={setTaxonomyToEdit}
+              onTaxonomyOpen={setTaxonomyToEdit}
             />
           </PanelRight>
         )}
@@ -119,7 +108,7 @@ const TaxonProps = (props) => {
             }}
             header={i18n.t('taxonomy.header')}
           >
-            <TaxonomyDetails showClose={false} onTaxonomyCreated={onTaxonomySelect} taxonomy={taxonomyToEdit} />
+            <TaxonomyDetails showClose={false} taxonomyUuid={Taxonomy.getUuid(taxonomyToEdit)} />
           </PanelRight>
         )}
       </div>
