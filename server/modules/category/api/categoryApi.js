@@ -135,16 +135,28 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      const count = await CategoryService.countCategories({ surveyId, draft })
+
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get(
-    '/survey/:surveyId/categories/count',
+    '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft, validate } = Request.getParams(req)
 
-        const count = await CategoryService.countCategories({ surveyId, draft })
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
 
-        res.json({ count })
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -180,9 +192,9 @@ export const init = (app) => {
         const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const { categories } = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
+        const category = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
-        res.json({ categories })
+        res.json({ category })
       } catch (error) {
         next(error)
       }

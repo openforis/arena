@@ -159,11 +159,7 @@ export const updateCategoryProp = async (user, surveyId, categoryUuid, key, valu
         t
       ),
     ])
-    const categories = await validateCategories(surveyId, t)
-    return {
-      categories,
-      category: R.prop(categoryUuid, categories),
-    }
+    return validateCategory(surveyId, categoryUuid, t)
   })
 
 export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
