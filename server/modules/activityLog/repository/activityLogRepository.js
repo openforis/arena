@@ -98,8 +98,14 @@ export const fetch = async (
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid AS record_uuid,      
-      to_json(t) AS taxonomy,
+      r.uuid AS record_uuid,  
+      to_json(
+        json_build_object(
+              'uuid', t.uuid,
+              'id', t.id,
+              'props', (t.props || t.props_draft)
+              )
+             ) AS taxonomy,
       to_json(c) AS category,
       
       -- node activities keys
@@ -140,10 +146,22 @@ export const fetch = async (
      LEFT OUTER JOIN
      (
         SELECT 
-          *,
+          c.id,
+          c.published,
+          c.validation,
+          c.uuid,
+          (c.props || c.props_draft) as props,
           (
             SELECT
-              json_agg(level.*)
+              json_agg(
+              json_build_object(
+              'uuid', level.uuid,
+              'id', level.id,
+              'props', (level.props || level.props_draft),
+              'category_uuid', level.category_uuid,
+              'index', level.index
+              )
+              )
             FROM  ${schema}.category_level level
             WHERE level.category_uuid = c.uuid
         ) as levels
