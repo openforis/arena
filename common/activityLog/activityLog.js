@@ -95,12 +95,14 @@ export const keysContent = {
   key: 'key',
   value: 'value',
   // Category
+  category: 'category',
   categoryName: 'categoryName',
   categoryUuid: 'categoryUuid',
   index: 'index',
   code: 'code',
   levelUuid: 'levelUuid',
   // Taxonomy
+  taxonomy: 'taxonomy',
   taxonomyName: 'taxonomyName',
   // Record
   keys: 'keys',
@@ -134,6 +136,10 @@ export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
 export const { getDateCreated } = ObjectUtils
+// taxonomy
+export const getTaxonomy = R.prop(keysContent.taxonomy)
+// cateogry
+export const getCategory = R.prop(keysContent.category)
 
 // Props associated from fetch
 export const getUserName = R.prop(keys.userName)

@@ -98,7 +98,9 @@ export const fetch = async (
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid AS record_uuid,
+      r.uuid AS record_uuid,      
+      to_json(t) AS taxonomy,
+      to_json(c) AS category,
       
       -- node activities keys
     ${
@@ -129,6 +131,16 @@ export const fetch = async (
       ${schema}.record r
     ON
       r.uuid = l.content_uuid
+      
+    LEFT OUTER JOIN
+      ${schema}.taxonomy t
+    ON
+      t.uuid = l.content_uuid   
+      
+     LEFT OUTER JOIN
+      ${schema}.category c
+    ON
+      c.uuid = l.content_uuid OR (l.content::json->>'categoryUuid' IS NOT NULL AND c.uuid = (l.content::json->>'categoryUuid')::uuid)
 
     -- start of node activities part
     ${
