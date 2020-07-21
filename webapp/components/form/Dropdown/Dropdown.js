@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 
 import { Input } from '@webapp/components/form/input'
-import AutocompleteDialog from '@webapp/components/form/autocompleteDialog'
+import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
 import ItemDialog from './ItemDialog'
 import { useDropdown, State } from './store'
