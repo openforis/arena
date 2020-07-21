@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .form-input-chip {
   display: flex;
@@ -18,7 +18,6 @@
   .dropdown {
     align-self: stretch;
   }
-
 }
 
 .form-input-chip-item {
@@ -31,7 +30,7 @@
   border: 1px solid $greyBorder;
 
   .btn-remove {
-    padding: .2rem .5rem;
+    padding: 0.2rem 0.5rem;
     margin-left: 0.3rem;
     border: none;
   }
