@@ -114,7 +114,7 @@ Dropdown.propTypes = {
   disabled: PropTypes.bool,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  items: PropTypes.oneOfType([PropTypes.array.isRequired, PropTypes.func]).isRequired,
+  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
