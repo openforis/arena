@@ -2,7 +2,6 @@ import './CategorySelector.scss'
 
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
 
 import * as A from '@core/arena'
 
@@ -15,28 +14,19 @@ import * as API from '@webapp/service/api'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
-import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
-
-import * as CategoryState from '@webapp/loggedin/surveyViews/category/categoryState'
-import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
+import CategoryList from '@webapp/components/survey/CategoryList'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
-  const [category, setCategory] = useState({})
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
-  const dispatch = useDispatch()
 
+  const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
-
-  const editedCategory = useSelector(CategoryState.getCategoryForEdit)
-
-  const onAdd = async () => {
-    const newCategory = await dispatch(CategoryActions.createCategory())
-    onChange(newCategory)
-  }
+  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
+  const [categoryUuidToEdit, setCategoryUuidToEdit] = useState(null)
 
   const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
 
@@ -65,7 +55,7 @@ const CategorySelector = (props) => {
           type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          onClick={onAdd}
+          onClick={() => setShowCategoryPanel(true)}
           aria-disabled={disabled}
         >
           <span className="icon icon-plus icon-12px icon-left" />
@@ -83,24 +73,34 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && !editedCategory && (
+      {showCategoriesPanel && !showCategoryPanel && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}
           header={i18n.t('appModules.categories')}
         >
-          <CategoryList canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
+          <CategoryList
+            canSelect
+            selectedItemUuid={categoryUuid}
+            onAdd={() => setShowCategoryPanel(true)}
+            onSelect={onChange}
+            onEdit={(categoryToEditSelected) => {
+              setCategoryUuidToEdit(Category.getUuid(categoryToEditSelected))
+              setShowCategoryPanel(true)
+            }}
+          />
         </PanelRight>
       )}
-      {editedCategory && (
+      {showCategoryPanel && (
         <PanelRight
           width="100vw"
-          onClose={async () => {
-            await dispatch(CategoryActions.setCategoryForEdit(null))
+          onClose={() => {
+            setShowCategoryPanel(false)
+            setCategoryUuidToEdit(null)
           }}
           header={i18n.t('categoryEdit.header')}
         >
-          <CategoryView showClose={false} />
+          <CategoryDetails categoryUuid={categoryUuidToEdit} onCategoryCreated={onChange} showClose={false} />
         </PanelRight>
       )}
     </div>

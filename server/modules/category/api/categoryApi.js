@@ -132,7 +132,7 @@ export const init = (app) => {
     }
   })
 
-  // Fetch items by parent item Uuid
+  // Fetch item by uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyViewPermission,
@@ -149,7 +149,7 @@ export const init = (app) => {
     }
   )
 
-  // Fetch items by parent item Uuid
+  // Fetch items by parent item uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/items',
     AuthMiddleware.requireSurveyViewPermission,
@@ -178,9 +178,9 @@ export const init = (app) => {
         const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const { categories } = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
+        const category = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
-        res.json({ categories })
+        res.json({ category })
       } catch (error) {
         next(error)
       }
