@@ -3,7 +3,17 @@ import * as ProcessingChain from '../../../../../../../common/analysis/processin
 
 import RFileSystem from './rFileSystem'
 
-import { arenaEndTime, arenaStartTime, arenaPut, asNumeric, paste, setVar, sysTime } from '../../rFunctions'
+import {
+  arenaEndTime,
+  arenaStartTime,
+  arenaPut,
+  asNumeric,
+  paste,
+  q,
+  setVar,
+  sysTime,
+  unlinkWd,
+} from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -23,6 +33,8 @@ export default class RFileClose extends RFileSystem {
 
     const execTime = asNumeric(`(${arenaEndTime} - ${arenaStartTime})`, 'secs')
     const logEnd = paste([`'Processing chain successfully executed in'`, execTime, `'seconds'`])
-    return this.logInfo(logEnd)
+    await this.logInfo(logEnd)
+
+    return this.appendContent(unlinkWd, q())
   }
 }
