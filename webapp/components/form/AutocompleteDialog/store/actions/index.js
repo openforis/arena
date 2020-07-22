@@ -7,7 +7,7 @@ export const useActions = ({ setState, onItemSelect, onClose }) => {
   const focusItem = useFocusItem({ setState })
   return {
     onListItemKeyDown: useOnListItemKeyDown({ onItemSelect, onClose, focusItem }),
-    onInputFieldKeyDown: useOnInputFieldKeyDown({ onItemSelect, onClose, focusItem }),
+    onInputFieldKeyDown: useOnInputFieldKeyDown({ onClose, focusItem }),
     onOutsideClick: useOnOutsideClick({ onClose }),
   }
 }
