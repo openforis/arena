@@ -21,42 +21,45 @@ const calculateNewIndexWithOffset = ({ offset, focusedItemIndex, itemsSize }) =>
   return index
 }
 
-export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem}) =>
-  useCallback(({ event, list, state }) => {
-    event.stopPropagation()
-    event.preventDefault()
+export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
+  useCallback(
+    ({ list, state }) => (event) => {
+      event.stopPropagation()
+      event.preventDefault()
 
-    const items = State.getItems(state)
-    const focusedItemIndex = State.getFocusedItemIndex(state)
-    const inputField = State.getInputField(state)
+      const items = State.getItems(state)
+      const focusedItemIndex = State.getFocusedItemIndex(state)
+      const inputField = State.getInputField(state)
 
-    const itemsSize = State.getItemsSize(state)
+      const itemsSize = State.getItemsSize(state)
 
-    if (itemsSize > 0) {
-      switch (event.keyCode) {
-        case KeyboardMap.Enter:
-        case KeyboardMap.Space:
-          onItemSelect(items[focusedItemIndex])
-          break
-        case KeyboardMap.Esc:
-          onClose()
-          inputField.focus()
-          break
-        case KeyboardMap.PageUp:
-        case KeyboardMap.PageDown:
-        case KeyboardMap.Up:
-        case KeyboardMap.Down:
-          focusItem({
-            list,
-            index: calculateNewIndexWithOffset({
-              offset: offsetByKey[event.keyCode],
-              focusedItemIndex,
-              itemsSize,
-            }),
-          })
-          break
-        default:
-        // Do nothing
+      if (itemsSize > 0) {
+        switch (event.keyCode) {
+          case KeyboardMap.Enter:
+          case KeyboardMap.Space:
+            onItemSelect(items[focusedItemIndex])
+            break
+          case KeyboardMap.Esc:
+            onClose()
+            inputField.focus()
+            break
+          case KeyboardMap.PageUp:
+          case KeyboardMap.PageDown:
+          case KeyboardMap.Up:
+          case KeyboardMap.Down:
+            focusItem({
+              list,
+              index: calculateNewIndexWithOffset({
+                offset: offsetByKey[event.keyCode],
+                focusedItemIndex,
+                itemsSize,
+              }),
+            })
+            break
+          default:
+          // Do nothing
+        }
       }
-    }
-  }, [])
+    },
+    []
+  )
