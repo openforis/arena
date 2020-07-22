@@ -1,10 +1,13 @@
 import './AutocompleteDialog.scss'
 
-import React, { useRef, useCallback, useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
-
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
 import { clickedOutside, elementOffset } from '@webapp/utils/domUtils'
+import { KeyboardMap } from '@webapp/utils/keyboardMap'
+
+import { useAutocompleteDialog, State } from './store'
+
+
 
 const offsetByKey = {
   [KeyboardMap.PageUp]: -10,
@@ -13,14 +16,14 @@ const offsetByKey = {
   [KeyboardMap.Down]: 1,
 }
 
-const AutocompleteDialog = (props) => {
+const _AutocompleteDialog = (props) => {
   const {
     inputField,
     sourceElement,
     items,
     itemRenderer: ItemRenderer,
     itemLabel,
-    itemKeyFunction,
+    itemKey,
     className,
     onItemSelect: selectItem,
     onClose: close,
@@ -142,12 +145,124 @@ const AutocompleteDialog = (props) => {
     <div ref={list} className={`autocomplete-list ${className}`} style={{ ...calculatePosition() }}>
       {(items || []).map((item) => (
         <ItemRenderer
-          key={itemKeyFunction(item)}
+          key={itemKey(item)}
           tabIndex="0"
           item={item}
           itemLabel={itemLabel}
           onKeyDown={onListItemKeyDown}
           onMouseDown={selectItem}
+        />
+      ))}
+    </div>
+  )
+}
+
+_AutocompleteDialog.propTypes = {
+  inputField: PropTypes.any,
+  sourceElement: PropTypes.any,
+  items: PropTypes.array,
+  itemRenderer: PropTypes.any,
+  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemKey: PropTypes.func,
+  className: PropTypes.string,
+  onItemSelect: PropTypes.func,
+  onClose: PropTypes.func,
+}
+
+_AutocompleteDialog.defaultProps = {
+  items: [],
+  itemRenderer: null,
+  itemLabel: null, // required prop / string or function
+  itemKey: null, // required prop / string or function - Rename it to itemKey
+  inputField: null,
+  sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
+  className: '',
+  onItemSelect: null,
+  onClose: null,
+}
+
+const AutocompleteDialog = (props) => {
+  const {
+    inputField,
+    sourceElement,
+    items,
+    itemRenderer: ItemRenderer,
+    itemLabel,
+    itemKey,
+    className,
+    onItemSelect,
+    onClose,
+  } = props
+  const list = useRef(null)
+  const { state, Actions } = useAutocompleteDialog({
+    inputField,
+    sourceElement,
+    items,
+    itemLabel,
+    itemKey,
+    onItemSelect,
+    onClose,
+  })
+
+  const calculatedPosition = useMemo(() => State.calculatePosition(state), [
+    State.getSourceElement(state),
+    State.getInputField(state),
+  ])
+
+  const onOutsideClick = useCallback(
+    (event) => {
+      if (clickedOutside(list.current, event) && clickedOutside(inputField, event)) {
+        onClose()
+      }
+    },
+    [State.getInputField(state), list]
+  )
+
+  useEffect(() => {
+    const keyDownListener = (event) => {
+      Actions.onInputFieldKeyDown({
+        event,
+        list,
+        state,
+      })
+    }
+    const clickListener = (event) => {
+      Actions.onOutsideClick({
+        event,
+        list,
+        state,
+      })
+    }
+    if (inputField) {
+      inputField.addEventListener('keydown', keyDownListener)
+    }
+    window.addEventListener('click', onOutsideClick)
+
+    return () => {
+      if (inputField) {
+        inputField.removeEventListener('keydown', keyDownListener)
+      }
+
+      window.removeEventListener('click', onOutsideClick)
+    }
+  }, [State.getInputField(state), list.current])
+
+  return (
+    <div ref={list} className={`autocomplete-list ${className}`} style={{ ...calculatedPosition }}>
+      {items.map((item) => (
+        <ItemRenderer
+          key={State.getItemKey(state)(item)}
+          tabIndex="0"
+          item={item}
+          itemLabel={State.getItemLabel(state)}
+          onKeyDown={(event) =>
+            Actions.onListItemKeyDown({
+              event,
+              list,
+              state,
+            })
+          }
+          onMouseDown={onItemSelect}
         />
       ))}
     </div>
@@ -160,7 +275,7 @@ AutocompleteDialog.propTypes = {
   items: PropTypes.array,
   itemRenderer: PropTypes.any,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  itemKeyFunction: PropTypes.func,
+  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   className: PropTypes.string,
   onItemSelect: PropTypes.func,
   onClose: PropTypes.func,
@@ -169,8 +284,8 @@ AutocompleteDialog.propTypes = {
 AutocompleteDialog.defaultProps = {
   items: [],
   itemRenderer: null,
-  itemLabel: null, // required prop / string or function
-  itemKeyFunction: null, // required prop / string or function - Rename it to itemKey
+  itemLabel: null,
+  itemKey: null,
   inputField: null,
   sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
   className: '',
@@ -178,4 +293,4 @@ AutocompleteDialog.defaultProps = {
   onClose: null,
 }
 
-export default AutocompleteDialog
+export default _AutocompleteDialog

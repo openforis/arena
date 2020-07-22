@@ -90,7 +90,7 @@ const Dropdown = (props) => {
             className={autocompleteDialogClassName}
             inputField={inputRef.current}
             itemLabel={State.getItemLabel(state)}
-            itemKeyFunction={State.getItemKey(state)}
+            itemKey={State.getItemKey(state)}
             itemRenderer={ItemDialog}
             items={itemsDialog}
             onItemSelect={async (item) => {
