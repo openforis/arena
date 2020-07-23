@@ -69,7 +69,7 @@ InputChips.propTypes = {
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
+  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
 
   requiredItems: PropTypes.number,
   autocompleteMinChars: PropTypes.number,
