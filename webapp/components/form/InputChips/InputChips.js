@@ -1,9 +1,13 @@
 import './InputChips.scss'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import Dropdown from '../Dropdown'
+import Chip from './Chip'
+
+import { useInputChips, State } from './store'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item)
@@ -16,41 +20,17 @@ const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
       : item
     : item // Primitive
 
-const getItemLabel = (item, itemLabelFunction, itemLabelProp) =>
-  extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
-
 const getItemKey = (item, itemKeyFunction, itemKeyProp) =>
   extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
-
-const Chip = (props) => {
-  const { item, itemLabelFunction, itemLabelProp, onDelete, canBeRemoved, readOnly } = props
-
-  return (
-    <div className="form-input">
-      <div className="form-input-chip-item">
-        {getItemLabel(item, itemLabelFunction, itemLabelProp)}
-
-        {!readOnly && (
-          <button className="btn btn-s btn-remove" onClick={() => onDelete(item)} aria-disabled={!canBeRemoved}>
-            <span className="icon icon-cross icon-8px" />
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
 
 const InputChips = (props) => {
   const {
     items,
-    itemsLookupFunction,
-    itemKeyProp,
-    itemKeyFunction,
-    itemLabelFunction,
-    itemLabelProp,
+    itemKey,
+    itemLabel,
     selection,
     requiredItems,
-    dropdownAutocompleteMinChars,
+    autocompleteMinChars,
     readOnly,
     disabled,
     validation,
@@ -59,52 +39,40 @@ const InputChips = (props) => {
     onItemRemove,
   } = props
 
-  const onDropdownChange = (item) => {
-    if (item) {
-      if (onChange) {
-        const newItems = R.append(item)(selection)
-        onChange(newItems)
-      }
-
-      if (onItemAdd) {
-        onItemAdd(item)
-      }
-    }
-  }
-
-  const removeItem = (item) => {
-    if (onChange) {
-      const idx = R.indexOf(item)(selection)
-      const newItems = R.remove(idx, 1, selection)
-      onChange(newItems)
-    }
-
-    if (onItemRemove) {
-      onItemRemove(item)
-    }
-  }
+  const { state, Actions } = useInputChips({
+    items,
+    itemKey,
+    itemLabel,
+    selection,
+    readOnly,
+    disabled,
+    validation,
+    onChange,
+    onItemAdd,
+    onItemRemove,
+  })
 
   const rejectSelectedItems = R.reject((item) => R.includes(item, selection))
+  console.log( selection, items)
 
   const dropdownItems = rejectSelectedItems(items)
+  console.log( selection, items)
 
-  const dropdownItemsLookupFunction = itemsLookupFunction
+  /*const dropdownItemsLookupFunction = itemsLookupFunction
     ? async (value) => rejectSelectedItems(await itemsLookupFunction(value))
-    : null
+    : null*/
 
-  const showDropdown = !readOnly && (!R.isEmpty(dropdownItems) || itemsLookupFunction)
+  const showDropdown = !readOnly && !R.isEmpty(dropdownItems)
 
   return (
     <div className="form-input-chip">
       {selection.map((item) => (
         <Chip
-          key={getItemKey(item, itemKeyFunction, itemKeyProp)}
+          key={State.getItemKey(state)}
           item={item}
-          itemKeyProp={itemKeyProp}
-          itemKeyFunction={itemKeyFunction}
-          itemLabelFunction={itemLabelFunction}
-          itemLabelProp={itemLabelProp}
-          onDelete={removeItem}
+          itemKey={State.getItemKey(state)}
+          itemLabelFunction={State.getItemLabel(state)}
+          onDelete={Actions.removeItem({ selection })}
           canBeRemoved={selection.length > requiredItems}
           readOnly={readOnly}
         />
@@ -112,12 +80,12 @@ const InputChips = (props) => {
 
       {showDropdown && (
         <Dropdown
-          items={items.length > 0 ? dropdownItems : dropdownItemsLookupFunction}
-          itemKey={itemKeyFunction || itemKeyProp}
-          itemLabel={itemLabelFunction || itemLabelProp}
-          onChange={onDropdownChange}
+          items={State.getItems(state)}
+          itemKey={State.getItemKey(state)}
+          itemLabel={State.getItemLabel(state)}
+          onChange={Actions.onDropdownChange({ selection })}
           selection={null}
-          autocompleteMinChars={dropdownAutocompleteMinChars}
+          autocompleteMinChars={autocompleteMinChars}
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
@@ -133,16 +101,20 @@ const InputChips = (props) => {
 // 3. `itemLabelProp` and `itemLabelFunction` become required one prop `itemLabel` string or function (see dropdown)
 // 4: `dropdownAutocompleteMinChars` must be renamed to autocompleteMinChars
 
+InputChips.propTypes = {
+  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
+}
+
 InputChips.defaultProps = {
   items: [],
-  itemsLookupFunction: null, // Async function to find items by specified value
-  itemKeyFunction: null,
-  itemKeyProp: 'key',
-  itemLabelFunction: null,
-  itemLabelProp: 'value',
+  itemLabel: 'value',
+  itemKey: 'key',
   selection: [],
   requiredItems: 0,
-  dropdownAutocompleteMinChars: 0,
+  autocompleteMinChars: 0,
   readOnly: false,
   disabled: false,
   validation: {},
