@@ -46,3 +46,5 @@ export const create = ({ inputField, sourceElement, items, itemLabel, itemKey })
 // ===== UPDATE
 
 export const assocFocusedItemIndex = R.assoc(keys.focusedItemIndex)
+export const assocItems = R.assoc(keys.items)
+export const assocInputFields = R.assoc(keys.inputField)
