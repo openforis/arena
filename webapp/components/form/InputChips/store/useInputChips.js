@@ -6,33 +6,27 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useInputChips = ({
-  autocompleteMinChars,
-  disabled,
+  items,
   itemKey,
   itemLabel,
-  items,
-  onBeforeChange,
-  onChange,
   readOnly,
-  selection,
+  disabled,
+  validation,
+  onChange,
+  onItemAdd,
+  onItemRemove,
 }) => {
   const [state, setState] = useState(() =>
     State.create({
-      autocompleteMinChars,
-      disabled,
       items,
       itemKey,
       itemLabel,
       readOnly,
-      selection,
+      disabled,
+      validation,
     })
   )
-  const Actions = useActions({ setState, onBeforeChange, onChange })
-
-  // on update selection: call closeDialog to reset input value
-  useOnUpdate(() => {
-    Actions.closeDialog({ selection, state })
-  }, [selection])
+  const Actions = useActions({ setState, onChange, onItemAdd, onItemRemove })
 
   return { Actions, state }
 }
