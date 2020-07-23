@@ -1,4 +1,4 @@
-@import "webapp/style/vars";
+@import 'webapp/style/vars';
 
 .autocomplete-list {
   position: fixed;
@@ -8,15 +8,16 @@
 
   overflow-y: auto;
   max-height: 200px;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   .item {
-    padding: .4rem 0;
+    padding: 0.4rem 0;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       cursor: pointer;
-      background-color: rgba($blueLight, .5);
-      outline: none
+      background-color: rgba($blueLight, 0.5);
+      outline: none;
     }
   }
 }
