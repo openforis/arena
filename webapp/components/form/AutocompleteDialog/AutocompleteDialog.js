@@ -3,7 +3,7 @@ import './AutocompleteDialog.scss'
 import React, { useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
-import { useAutocompleteDialog, State } from './store'
+import { useLocalState, State } from './store'
 
 const AutocompleteDialog = (props) => {
   const {
@@ -18,7 +18,7 @@ const AutocompleteDialog = (props) => {
     onClose,
   } = props
   const list = useRef(null)
-  const { state, Actions } = useAutocompleteDialog({
+  const { state, Actions } = useLocalState({
     inputField,
     sourceElement,
     items,

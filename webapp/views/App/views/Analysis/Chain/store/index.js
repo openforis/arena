@@ -1,2 +1,2 @@
-export { useAnalysis } from './useAnalysis'
+export { useLocalState } from './useLocalState'
 export { State } from './state'
