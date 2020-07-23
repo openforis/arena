@@ -32,8 +32,6 @@ const InputChips = (props) => {
     onItemRemove,
   })
 
-  const showDropdown = !readOnly
-
   return (
     <div className="form-input-chip">
       {selection.map((item) => (
@@ -48,7 +46,7 @@ const InputChips = (props) => {
         />
       ))}
 
-      {showDropdown && (
+      {!readOnly && (
         <Dropdown
           items={items}
           itemKey={State.getItemKey(state)}
