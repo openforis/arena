@@ -1,32 +1,16 @@
 import { useState } from 'react'
 
-import { useOnUpdate } from '@webapp/components/hooks'
-
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useInputChips = ({
-  items,
-  itemKey,
-  itemLabel,
-  readOnly,
-  disabled,
-  validation,
-  onChange,
-  onItemAdd,
-  onItemRemove,
-}) => {
-  const [state, setState] = useState(() =>
+export const useInputChips = ({ itemKey, itemLabel, onChange, onItemAdd, onItemRemove }) => {
+  const [state] = useState(() =>
     State.create({
-      items,
       itemKey,
       itemLabel,
-      readOnly,
-      disabled,
-      validation,
     })
   )
-  const Actions = useActions({ setState, onChange, onItemAdd, onItemRemove })
+  const Actions = useActions({ onChange, onItemAdd, onItemRemove })
 
   return { Actions, state }
 }

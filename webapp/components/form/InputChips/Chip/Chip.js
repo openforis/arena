@@ -1,28 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
-
-const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
-  R.is(Object, item)
-    ? func
-      ? func(item)
-      : prop
-      ? R.prop(prop)(item)
-      : R.has(defaultProp)(item)
-      ? R.prop(defaultProp)(item)
-      : item
-    : item // Primitive
-
-const getItemLabel = (item, itemLabelFunction, itemLabelProp) =>
-  extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
 
 const Chip = (props) => {
-  const { item, itemLabelFunction, itemLabelProp, onDelete, canBeRemoved, readOnly } = props
+  const { item, itemLabel, onDelete, canBeRemoved, readOnly } = props
 
   return (
     <div className="form-input">
       <div className="form-input-chip-item">
-        {getItemLabel(item, itemLabelFunction, itemLabelProp)}
+        {itemLabel}
 
         {!readOnly && (
           <button
@@ -40,25 +25,19 @@ const Chip = (props) => {
 }
 
 Chip.propTypes = {
-  item: [],
+  item: PropTypes.object,
+  itemLabel: PropTypes.string,
+  readOnly: PropTypes.bool,
 
-  itemLabelFunction: null,
-  itemLabelProp: 'value',
-
-  readOnly: false,
-
-  onDelete: null,
-  canBeRemoved: null,
+  onDelete: PropTypes.func,
+  canBeRemoved: PropTypes.bool,
 }
 
 Chip.defaultProps = {
-  item: PropTypes.any,
-  itemLabelFunction: PropTypes.any,
-  itemLabelProp: PropTypes.any,
-  readOnly: PropTypes.any,
-
-  onDelete: PropTypes.any,
-  canBeRemoved: PropTypes.any,
+  item: {},
+  itemLabel: 'value',
+  readOnly: false,
+  canBeRemoved: false,
+  onDelete: null,
 }
-
 export default Chip
