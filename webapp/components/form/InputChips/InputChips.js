@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 import Dropdown from '../Dropdown'
 
-import { useInputChips, State } from './store'
+import { useLocalState, State } from './store'
 import Chip from './Chip'
 
 const InputChips = (props) => {
@@ -24,7 +24,7 @@ const InputChips = (props) => {
     onItemRemove,
   } = props
 
-  const { state, Actions } = useInputChips({
+  const { state, Actions } = useLocalState({
     itemKey,
     itemLabel,
     onChange,
@@ -38,7 +38,6 @@ const InputChips = (props) => {
         <Chip
           key={State.getItemKey(state)(item)}
           item={item}
-          itemKey={State.getItemKey}
           itemLabel={State.getItemLabel(state)(item)}
           onDelete={Actions.removeItem({ selection, state })}
           canBeRemoved={selection.length > requiredItems}

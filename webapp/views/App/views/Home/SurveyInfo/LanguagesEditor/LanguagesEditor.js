@@ -30,7 +30,6 @@ const LanguagesEditor = (props) => {
         }}
         requiredItems={1}
         readOnly={readOnly}
-        itemKey="key"
       />
     </div>
   )

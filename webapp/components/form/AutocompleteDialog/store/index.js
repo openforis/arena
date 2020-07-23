@@ -1,2 +1,2 @@
-export { useAutocompleteDialog } from './useAutocompleteDialog'
+export { useLocalState } from './useLocalState'
 export { State } from './state'

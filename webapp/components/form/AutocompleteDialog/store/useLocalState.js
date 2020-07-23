@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useAutocompleteDialog = ({
+export const useLocalState = ({
   inputField,
   sourceElement,
   items,
