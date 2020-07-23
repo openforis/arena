@@ -56,6 +56,7 @@ const InputChips = (props) => {
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
+          customItemsFilter={Actions.rejectSelectedItems({ selection, state })}
         />
       )}
     </div>

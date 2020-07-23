@@ -11,6 +11,7 @@ const keys = {
   itemLabel: 'itemLabel',
   items: 'items',
   readOnly: 'readOnly',
+  customItemsFilter: 'customItemsFilter',
 }
 
 // ====== READ
@@ -23,16 +24,27 @@ export const getItems = A.prop(keys.items)
 export const getItemKey = A.prop(keys.itemKey)
 export const getItemLabel = A.prop(keys.itemLabel)
 export const getReadOnly = A.prop(keys.readOnly)
+export const getCustomItemsFilter = A.prop(keys.customItemsFilter)
 
 // ====== UPDATE
 export const assocInputValue = A.assoc(keys.inputValue)
 export const assocItemsDialog = A.assoc(keys.itemsDialog)
 export const assocShowDialog = A.assoc(keys.showDialog)
+export const assocCustomItemsFilter = A.assoc(keys.customItemsFilter)
 
 // ====== CREATE
 const _createGetItemProp = (prop) => (prop.constructor === String ? A.prop(prop) : (item) => prop(item))
 
-export const create = ({ autocompleteMinChars, disabled, items, itemKey, itemLabel, readOnly, selection }) => {
+export const create = ({
+  autocompleteMinChars,
+  disabled,
+  items,
+  itemKey,
+  itemLabel,
+  readOnly,
+  selection,
+  customItemsFilter,
+}) => {
   const state = {
     [keys.autocompleteMinChars]: autocompleteMinChars,
     [keys.disabled]: disabled,
@@ -42,6 +54,7 @@ export const create = ({ autocompleteMinChars, disabled, items, itemKey, itemLab
     [keys.itemLabel]: _createGetItemProp(itemLabel),
     [keys.readOnly]: readOnly,
     [keys.showDialog]: false,
+    [keys.customItemsFilter]: customItemsFilter,
   }
   const inputValue = A.isEmpty(selection) ? '' : getItemLabel(state)(selection)
   return assocInputValue(inputValue, state)

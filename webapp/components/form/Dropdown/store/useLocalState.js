@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useDropdown = ({
+export const useLocalState = ({
   autocompleteMinChars,
   disabled,
   itemKey,
@@ -15,6 +15,7 @@ export const useDropdown = ({
   onChange,
   readOnly,
   selection,
+  customItemsFilter,
 }) => {
   const [state, setState] = useState(() =>
     State.create({
@@ -27,12 +28,16 @@ export const useDropdown = ({
       selection,
     })
   )
-  const Actions = useActions({ setState, onBeforeChange, onChange })
+  const Actions = useActions({ setState, onBeforeChange, onChange, customItemsFilter })
 
   // on update selection: call closeDialog to reset input value
   useOnUpdate(() => {
     Actions.closeDialog({ selection, state })
   }, [selection])
+
+  useEffect(() => {
+    setState(State.assocCustomItemsFilter(customItemsFilter))
+  }, [customItemsFilter])
 
   return { Actions, state }
 }
