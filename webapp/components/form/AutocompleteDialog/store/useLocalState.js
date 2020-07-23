@@ -25,6 +25,14 @@ export const useLocalState = ({
   const Actions = useActions({ setState, onItemSelect, onClose })
 
   useEffect(() => {
+    setState(State.assocItems(items))
+  }, [items, inputField])
+
+  useEffect(() => {
+    setState(State.assocInputFields(inputField))
+  }, [inputField])
+
+  useEffect(() => {
     const keyDownListener = Actions.onInputFieldKeyDown({
       list,
       state,
@@ -47,7 +55,7 @@ export const useLocalState = ({
 
       window.removeEventListener('click', clickListener)
     }
-  }, [State.getInputField(state), list.current])
+  }, [list.current, state])
 
   return { Actions, state }
 }
