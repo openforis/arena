@@ -1,12 +1,12 @@
 @import 'webapp/style/vars';
 
-.job-monitor {
+.app-job-monitor {
   .modal-body {
     padding-top: 0;
   }
 }
 
-.job-monitor__job-errors {
+.app-job-monitor__job-errors {
   justify-self: stretch;
 
   .header,
@@ -47,10 +47,14 @@
       border-left: 1px solid rgba($greyBorder, 0.8);
       border-right: 1px solid rgba($greyBorder, 0.8);
     }
+
+    .validation-field_message {
+      color: inherit;
+    }
   }
 }
 
-.job-monitor__inner-jobs {
+.app-job-monitor__inner-jobs {
   max-height: 45vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -71,11 +75,7 @@
     margin-bottom: 2rem;
   }
 
-  .job-monitor__job-errors {
+  .app-job-monitor__job-errors {
     padding: 0 1rem 2rem 1rem;
-
-    .validation-field_message {
-      color: inherit;
-    }
   }
 }
