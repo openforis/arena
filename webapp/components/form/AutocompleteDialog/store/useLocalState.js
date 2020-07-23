@@ -26,7 +26,7 @@ export const useLocalState = ({
 
   useEffect(() => {
     setState(State.assocItems(items))
-  }, [items, inputField])
+  }, [items])
 
   useEffect(() => {
     setState(State.assocInputFields(inputField))
@@ -55,7 +55,7 @@ export const useLocalState = ({
 
       window.removeEventListener('click', clickListener)
     }
-  }, [list.current, state])
+  }, [list.current, State.getItems(state), State.getInputField(state)])
 
   return { Actions, state }
 }
