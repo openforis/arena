@@ -74,7 +74,7 @@ export default class CategoriesImportJob extends Job {
 
     // Create category
     let categoryToCreate = Category.newCategory({
-      [Category.props.name]: categoryName,
+      [Category.keysProps.name]: categoryName,
     })
 
     // Create levels

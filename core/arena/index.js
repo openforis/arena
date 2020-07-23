@@ -1,5 +1,6 @@
 export { assoc } from './assoc'
 export { dissoc } from './dissoc'
+export { identity } from './identity'
 export { isEmpty } from './isEmpty'
 export { isNull } from './isNull'
 export { pipe } from './pipe'

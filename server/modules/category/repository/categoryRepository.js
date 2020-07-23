@@ -89,7 +89,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       (
         SELECT * 
         FROM ${getSurveyDBSchema(surveyId)}.category
-        ORDER BY (props || props_draft) -> '${Category.props.name}'
+        ORDER BY (props || props_draft) -> '${Category.keysProps.name}'
         ${offset ? 'OFFSET $/offset/' : ''}
         ${limit ? 'LIMIT $/limit/' : ''}
       )
@@ -131,8 +131,8 @@ export const fetchCategoriesBySurveyId = async (
       published
       ${includeValidation ? ', validation' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.category
-     ${search ? `WHERE ${DbUtils.getPropColCombined(Category.props.name, draft)} ILIKE $/search/` : ''} 
-    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}
+    ${search ? `WHERE ${DbUtils.getPropColCombined(Category.keysProps.name, draft)} ILIKE $/search/` : ''} 
+    ORDER BY ${DbUtils.getPropColCombined(Category.keysProps.name, draft)}
     LIMIT ${limit ? `$/limit/` : 'ALL'}
     ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {

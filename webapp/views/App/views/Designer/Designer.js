@@ -8,9 +8,8 @@ import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 
-import CategoryList from '@webapp/views/App/views/Designer/CategoryList'
-
-import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+import CategoryList from '@webapp/components/survey/CategoryList'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -60,7 +59,12 @@ const Designer = () => {
           },
 
           {
-            component: CategoryView,
+            component: CategoryDetails,
+            path: `${appModuleUri(designerModules.category)}`,
+          },
+
+          {
+            component: CategoryDetails,
             path: `${appModuleUri(designerModules.category)}:categoryUuid`,
           },
 

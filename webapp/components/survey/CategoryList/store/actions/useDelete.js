@@ -1,0 +1,47 @@
+import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
+import axios from 'axios'
+
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+
+const _delete = async ({ survey, category, callback }) => {
+  const surveyId = Survey.getId(survey)
+  const categoryUuid = Category.getUuid(category)
+
+  await axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
+
+  if (callback) {
+    callback()
+  }
+}
+
+export const useDelete = () => {
+  const i18n = useI18n()
+  const dispatch = useDispatch()
+  const survey = useSurvey()
+
+  return useCallback(
+    ({ category, initData }) => {
+      const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
+
+      if (unused) {
+        dispatch(
+          DialogConfirmActions.showDialogConfirm({
+            key: 'categoryEdit.confirmDelete',
+            params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
+            onOk: async () => _delete({ survey, category, callback: initData }),
+          })
+        )
+      } else {
+        dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' }))
+      }
+    },
+    [survey]
+  )
+}
