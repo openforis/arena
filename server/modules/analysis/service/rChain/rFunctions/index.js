@@ -10,6 +10,7 @@ export {
   isNa,
   withDF,
   unlink,
+  unlinkWd,
   dirCreate,
   writeCsv,
   vector,
@@ -18,6 +19,7 @@ export {
   asNumeric,
   paste,
   paste0,
+  q,
 } from './utility'
 
 export { zipr } from './zip'

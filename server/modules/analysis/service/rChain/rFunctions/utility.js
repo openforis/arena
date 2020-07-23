@@ -1,7 +1,5 @@
 export const NA = 'NA'
 
-export const sysTime = () => `Sys.time()`
-
 export const comment = (text) => `# ${text}`
 
 export const source = (path) => `source("${path}")`
@@ -36,6 +34,8 @@ export const isNa = (x) => `is.na(${x})`
 
 export const unlink = (path) => `unlink('${path}' , recursive = T)`
 
+export const unlinkWd = `unlink(getwd(), recursive = T)`
+
 export const dirCreate = (path) => `dir.create(path = '${path}', showWarnings = F, recursive = T)`
 
 // == csv
@@ -51,3 +51,9 @@ export const asNumeric = (value, units = null) => `as.numeric(${value}${units ? 
 export const paste = (parts, separator = ' ') => `paste(${parts.join(', ')}, sep='${separator}')`
 
 export const paste0 = (parts) => paste(parts, '')
+
+// == system
+
+export const sysTime = () => `Sys.time()`
+
+export const q = () => `q()`
