@@ -15,7 +15,6 @@ export const useLocalState = ({
   onChange,
   readOnly,
   selection,
-  customItemsFilter,
 }) => {
   const [state, setState] = useState(() =>
     State.create({
@@ -28,7 +27,7 @@ export const useLocalState = ({
       selection,
     })
   )
-  const Actions = useActions({ setState, onBeforeChange, onChange, customItemsFilter })
+  const Actions = useActions({ setState, onBeforeChange, onChange })
 
   // on update selection: call closeDialog to reset input value
   useOnUpdate(() => {
@@ -36,8 +35,8 @@ export const useLocalState = ({
   }, [selection])
 
   useEffect(() => {
-    setState(State.assocCustomItemsFilter(customItemsFilter))
-  }, [customItemsFilter])
+    setState(State.assocItems(items))
+  }, [items])
 
   return { Actions, state }
 }

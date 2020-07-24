@@ -47,7 +47,7 @@ const InputChips = (props) => {
 
       {!readOnly && (
         <Dropdown
-          items={items}
+          items={Actions.rejectSelectedItems({ selection, state, items })}
           itemKey={State.getItemKey(state)}
           itemLabel={State.getItemLabel(state)}
           onChange={Actions.onDropdownChange({ selection, state })}
@@ -56,7 +56,6 @@ const InputChips = (props) => {
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
-          customItemsFilter={Actions.rejectSelectedItems({ selection, state })}
         />
       )}
     </div>
