@@ -183,7 +183,9 @@ const validateItems = async (category, itemsByParentUuid) => {
     visitedUuids.add(itemUuid)
   }
 
-  return R.isEmpty(itemsValidationsByUuid)
+  const valid = R.isEmpty(itemsValidationsByUuid)
+
+  return valid
     ? null
     : Validation.newInstance(false, { ...itemsValidationsByUuid }, [
         { key: Validation.messageKeys.categoryEdit.itemsInvalid },
