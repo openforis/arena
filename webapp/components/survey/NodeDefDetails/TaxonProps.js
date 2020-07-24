@@ -34,7 +34,6 @@ const TaxonProps = (props) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
-  const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
   const onTaxonomySelect = (taxonomySelected) =>
@@ -49,7 +48,7 @@ const TaxonProps = (props) => {
         setTaxonomy(taxonomySelected)
       }
     })()
-  }, [taxonomyUuid, showTaxonomiesPanel, showTaxonomyPanel])
+  }, [taxonomyUuid, showTaxonomiesPanel])
 
   return (
     <>
@@ -99,15 +98,8 @@ const TaxonProps = (props) => {
           </PanelRight>
         )}
 
-        {(showTaxonomyPanel || taxonomyToEdit) && (
-          <PanelRight
-            width="100vw"
-            onClose={() => {
-              setShowTaxonomyPanel(false)
-              setTaxonomyToEdit(null)
-            }}
-            header={i18n.t('taxonomy.header')}
-          >
+        {taxonomyToEdit && (
+          <PanelRight width="100vw" onClose={() => setTaxonomyToEdit(null)} header={i18n.t('taxonomy.header')}>
             <TaxonomyDetails showClose={false} taxonomyUuid={Taxonomy.getUuid(taxonomyToEdit)} />
           </PanelRight>
         )}
