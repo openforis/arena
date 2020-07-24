@@ -22,7 +22,7 @@ const JobMonitor = () => {
   return (
     job &&
     !JobSerialized.isCanceled(job) && (
-      <Modal className="job-monitor" closeOnEsc={false}>
+      <Modal className="app-job-monitor" closeOnEsc={false}>
         <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
 
         <ModalBody>

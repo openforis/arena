@@ -37,7 +37,7 @@ const LevelDetails = (props) => {
     <div className="category__level">
       <div className="category__level-header">
         <h4 className="label">
-          <ErrorBadge validation={validation} />
+          <ErrorBadge validation={validation} showLabel={false} showIcon />
           {i18n.t('categoryEdit.level')} {level.index + 1}
         </h4>
         {!readOnly && (
