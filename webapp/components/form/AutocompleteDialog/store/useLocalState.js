@@ -29,7 +29,7 @@ export const useLocalState = ({
   }, [items])
 
   useEffect(() => {
-    setState(State.assocInputFields(inputField))
+    setState(State.assocInputField(inputField))
   }, [inputField])
 
   useEffect(() => {
