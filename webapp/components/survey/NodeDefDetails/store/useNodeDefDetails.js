@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { matchPath, useHistory, useLocation, useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
+
+import { useIsInPath } from '@webapp/utils/isInPath'
 
 import * as Survey from '@core/survey/survey'
 
@@ -14,7 +16,6 @@ export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
   const history = useHistory()
-  const { pathname } = useLocation()
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
@@ -23,7 +24,7 @@ export const useNodeDefDetails = () => {
 
   const Actions = useActions({ setState })
 
-  const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
+  const editingFromDesigner = useIsInPath(`${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
 
   useEffect(() => {
     // Editing a nodeDef

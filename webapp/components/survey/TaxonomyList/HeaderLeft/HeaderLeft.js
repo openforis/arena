@@ -1,20 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { matchPath, useHistory, useLocation } from 'react-router'
+import { useHistory } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { useInTaxonomiesPath } from '@webapp/utils/isInPath'
 
 const HeaderLeft = (props) => {
   const { headerProps } = props
   const { onTaxonomyCreated } = headerProps
 
   const history = useHistory()
-  const { pathname } = useLocation()
 
-  const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
+  const inTaxonomiesPath = useInTaxonomiesPath()
 
   const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {

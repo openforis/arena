@@ -26,6 +26,7 @@ const CategorySelector = (props) => {
 
   const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
+  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
   const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
@@ -37,7 +38,7 @@ const CategorySelector = (props) => {
         setCategory(categorySelected)
       }
     })()
-  }, [categoryUuid, showCategoriesPanel])
+  }, [categoryUuid, showCategoriesPanel, setShowCategoryPanel])
 
   return (
     <div className="category-selector">
@@ -72,13 +73,20 @@ const CategorySelector = (props) => {
             canSelect
             selectedItemUuid={categoryUuid}
             onSelect={onChange}
-            onEdit={setCategoryToEdit}
-            onAdd={setCategoryToEdit}
+            onCategoryCreated={setCategoryToEdit}
+            onCategoryOpen={setCategoryToEdit}
           />
         </PanelRight>
       )}
-      {categoryToEdit && (
-        <PanelRight width="100vw" onClose={() => setCategoryToEdit(null)} header={i18n.t('categoryEdit.header')}>
+      {(showCategoryPanel || categoryToEdit) && (
+        <PanelRight
+          width="100vw"
+          onClose={() => {
+            setCategoryToEdit(null)
+            setShowCategoryPanel(false)
+          }}
+          header={i18n.t('categoryEdit.header')}
+        >
           <CategoryDetails categoryUuid={Category.getUuid(categoryToEdit)} showClose={false} />
         </PanelRight>
       )}

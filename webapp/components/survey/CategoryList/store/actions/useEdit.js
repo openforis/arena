@@ -12,7 +12,7 @@ export const useEdit = ({ setState }) => {
 
   return useCallback(({ category }) => {
     setState((statePrev) => {
-      const onEdit = State.getOnEdit(statePrev)
+      const onEdit = State.getOnCategoryOpen(statePrev)
 
       if (onEdit) {
         onEdit(category)
