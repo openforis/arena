@@ -22,7 +22,7 @@ import * as NodeDefUiProps from './nodeDefUIProps'
 import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
-import NodeDefFormItem from './components/NodeDefIconKey'
+import NodeDefFormItem from './components/NodeDefFormItem'
 
 class NodeDefSwitch extends React.Component {
   constructor(props) {
