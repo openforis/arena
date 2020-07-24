@@ -10,7 +10,6 @@ export const getItemsDialog = async ({ state, value }) => {
     return []
   }
 
-  const customItemsFilter = State.getCustomItemsFilter(state)
   const items = State.getItems(state)
 
   let itemsDialog = []
@@ -28,5 +27,5 @@ export const getItemsDialog = async ({ state, value }) => {
     itemsDialog = await items(searchValue)
   }
 
-  return customItemsFilter ? itemsDialog.filter(customItemsFilter) : itemsDialog
+  return itemsDialog
 }

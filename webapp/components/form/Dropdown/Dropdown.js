@@ -27,7 +27,6 @@ const Dropdown = (props) => {
     selection,
     sourceElement,
     validation,
-    customItemsFilter,
   } = props
 
   const dropdownRef = useRef(null)
@@ -43,7 +42,6 @@ const Dropdown = (props) => {
     onChange,
     readOnly,
     selection,
-    customItemsFilter,
   })
   const showDialog = State.getShowDialog(state)
   const itemsDialog = State.getItemsDialog(state)
@@ -125,7 +123,6 @@ Dropdown.propTypes = {
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
   validation: PropTypes.object,
-  customItemsFilter: PropTypes.func,
 }
 
 Dropdown.defaultProps = {
@@ -142,7 +139,6 @@ Dropdown.defaultProps = {
   selection: null,
   sourceElement: null,
   validation: {},
-  customItemsFilter: null,
 }
 
 export default Dropdown
