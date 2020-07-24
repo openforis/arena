@@ -66,7 +66,9 @@ const CategorySelector = (props) => {
       {showCategoriesPanel && (
         <PanelRight
           width="100vw"
-          onClose={() => setShowCategoriesPanel(false)}
+          onClose={() => {
+            setShowCategoriesPanel(false)
+          }}
           header={i18n.t('appModules.categories')}
         >
           <CategoryList
