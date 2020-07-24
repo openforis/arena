@@ -9,4 +9,5 @@ export const useIsInPath = (paths) => {
 export const useInCategoriesPath = () =>
   useIsInPath([`${appModuleUri(designerModules.category)}:uuid/`, appModuleUri(designerModules.categories)])
 
-export const useInTaxonomiesPath = () => useIsInPath([`${appModuleUri(designerModules.taxonomy)}:uuid/`])
+export const useInTaxonomiesPath = () =>
+  useIsInPath([`${appModuleUri(designerModules.taxonomy)}:uuid/`, appModuleUri(designerModules.taxonomies)])

@@ -26,7 +26,6 @@ const CategorySelector = (props) => {
 
   const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
-  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
   const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
@@ -38,7 +37,7 @@ const CategorySelector = (props) => {
         setCategory(categorySelected)
       }
     })()
-  }, [categoryUuid, showCategoriesPanel, setShowCategoryPanel])
+  }, [categoryUuid, showCategoriesPanel])
 
   return (
     <div className="category-selector">
@@ -63,12 +62,10 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && (
+      {showCategoriesPanel && !categoryToEdit && (
         <PanelRight
           width="100vw"
-          onClose={() => {
-            setShowCategoriesPanel(false)
-          }}
+          onClose={() => setShowCategoriesPanel(false)}
           header={i18n.t('appModules.categories')}
         >
           <CategoryList
@@ -80,12 +77,12 @@ const CategorySelector = (props) => {
           />
         </PanelRight>
       )}
-      {(showCategoryPanel || categoryToEdit) && (
+      {categoryToEdit && (
         <PanelRight
           width="100vw"
           onClose={() => {
+            onChange(categoryToEdit)
             setCategoryToEdit(null)
-            setShowCategoryPanel(false)
           }}
           header={i18n.t('categoryEdit.header')}
         >
