@@ -1,14 +1,14 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .survey-form__node-def-table-cell-header {
   display: grid;
   background-color: $black;
 
-  label {
+  .label {
     justify-self: center;
     align-self: center;
     font-weight: 600;
-    font-size: .8rem;
+    font-size: 0.8rem;
     text-align: center;
     text-transform: uppercase;
     color: white;
