@@ -88,17 +88,6 @@ export const copyLayout = ({ cycleFrom, cyclesTo }) => (nodeDef) => {
   return assocLayout(layoutUpdated)(nodeDef)
 }
 
-const _updateLayoutChildren = ({ cycle, updateFn }) => (layout) => {
-  const layoutChildrenUpdated = R.pipe(R.pathOr([], [cycle, keys.layoutChildren]), updateFn)(layout)
-  return assocLayoutChildren(cycle, layoutChildrenUpdated)(layout)
-}
-
-export const addLayoutChild = ({ cycle, nodeDefUuid }) =>
-  _updateLayoutChildren({ cycle, updateFn: R.append(nodeDefUuid) })
-
-export const removeLayoutChild = ({ cycle, nodeDefUuid }) =>
-  _updateLayoutChildren({ cycle, updateFn: R.without(nodeDefUuid) })
-
 // ====== UTILS
 
 export const rejectNodeDefsWithPage = (cycle) => R.reject(hasPage(cycle))
