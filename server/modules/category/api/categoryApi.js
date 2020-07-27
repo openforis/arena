@@ -231,9 +231,9 @@ export const init = (app) => {
         const { surveyId, categoryUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const categories = await CategoryService.deleteCategory(user, surveyId, categoryUuid)
+        await CategoryService.deleteCategory(user, surveyId, categoryUuid)
 
-        res.json({ categories })
+        res.status(204).json({})
       } catch (error) {
         next(error)
       }
