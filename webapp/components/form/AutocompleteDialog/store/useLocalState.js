@@ -22,6 +22,7 @@ export const useLocalState = ({
       items,
       itemLabel,
       itemKey,
+      list,
     })
   )
   const Actions = useActions({ setState, onItemSelect, onClose })
@@ -34,16 +35,14 @@ export const useLocalState = ({
     setState(State.assocInputField(inputField))
   }, [inputField])
 
-  useEffect(() => {
-    const keyDownListener = Actions.onInputFieldKeyDown({
-      list,
-      state,
-    })
+  useOnUpdate(() => {
+    setState(State.assocList(list))
+  }, [list])
 
-    const clickListener = Actions.onOutsideClick({
-      list,
-      state,
-    })
+  useEffect(() => {
+    const keyDownListener = Actions.onInputFieldKeyDown({ state })
+
+    const clickListener = Actions.onOutsideClick({ state })
 
     if (inputField) {
       inputField.addEventListener('keydown', keyDownListener)
@@ -57,7 +56,7 @@ export const useLocalState = ({
 
       window.removeEventListener('click', clickListener)
     }
-  }, [list.current, State.getItems(state), State.getInputField(state)])
+  }, [State.getList(state), State.getItems(state), State.getInputField(state)])
 
   return { Actions, state }
 }

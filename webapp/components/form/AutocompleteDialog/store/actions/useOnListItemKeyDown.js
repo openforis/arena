@@ -23,10 +23,11 @@ const calculateNewIndexWithOffset = ({ offset, focusedItemIndex, itemsSize }) =>
 
 export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
   useCallback(
-    ({ list, state }) => (event) => {
+    ({ state }) => (event) => {
       event.stopPropagation()
       event.preventDefault()
 
+      const list = State.getList(state)
       const items = State.getItems(state)
       const focusedItemIndex = State.getFocusedItemIndex(state)
       const inputField = State.getInputField(state)

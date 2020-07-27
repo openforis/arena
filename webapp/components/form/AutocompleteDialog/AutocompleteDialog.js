@@ -43,7 +43,6 @@ const AutocompleteDialog = (props) => {
           item={item}
           itemLabel={State.getItemLabel(state)}
           onKeyDown={Actions.onListItemKeyDown({
-            list,
             state,
           })}
           onMouseDown={() => onItemSelect(item)}

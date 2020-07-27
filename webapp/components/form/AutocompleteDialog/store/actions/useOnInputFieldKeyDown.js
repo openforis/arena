@@ -4,7 +4,8 @@ import { State } from '../state'
 
 export const useOnInputFieldKeyDown = ({ onClose, focusItem }) =>
   useCallback(
-    ({ list, state }) => (event) => {
+    ({ state }) => (event) => {
+      const list = State.getList(state)
       const items = State.getItems(state)
       const inputField = State.getInputField(state)
       switch (event.keyCode) {
