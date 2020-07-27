@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { useOnUpdate } from '@webapp/components/hooks'
+
 import { useActions } from './actions'
 import { State } from './state'
 
@@ -24,11 +26,11 @@ export const useLocalState = ({
   )
   const Actions = useActions({ setState, onItemSelect, onClose })
 
-  useEffect(() => {
+  useOnUpdate(() => {
     setState(State.assocItems(items))
   }, [items])
 
-  useEffect(() => {
+  useOnUpdate(() => {
     setState(State.assocInputField(inputField))
   }, [inputField])
 

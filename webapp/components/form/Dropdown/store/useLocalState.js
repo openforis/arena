@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
@@ -33,10 +33,6 @@ export const useLocalState = ({
   useOnUpdate(() => {
     Actions.closeDialog({ selection, state })
   }, [selection])
-
-  useEffect(() => {
-    setState(State.assocItems(items))
-  }, [items])
 
   return { Actions, state }
 }

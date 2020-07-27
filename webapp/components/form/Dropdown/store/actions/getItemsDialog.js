@@ -2,7 +2,7 @@ import * as StringUtils from '@core/stringUtils'
 import { State } from '../state'
 
 // Utility function used to get or fetch the dialog items
-export const getItemsDialog = ({ state, value }) => {
+export const getItemsDialog = async ({ state, value }) => {
   const autocompleteMinChars = State.getAutocompleteMinChars(state)
   const items = State.getItems(state)
   const searchValue = value.trim()

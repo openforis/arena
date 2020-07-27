@@ -27,7 +27,6 @@ export const getReadOnly = A.prop(keys.readOnly)
 // ====== UPDATE
 export const assocInputValue = A.assoc(keys.inputValue)
 export const assocItemsDialog = A.assoc(keys.itemsDialog)
-export const assocItems = A.assoc(keys.items)
 export const assocShowDialog = A.assoc(keys.showDialog)
 
 // ====== CREATE
