@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
 
-import { useIsInPath } from '@webapp/utils/isInPath'
+import { useIsDesignerNodeDefRoute, useOnUpdate } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 
-import { useOnUpdate } from '@webapp/components/hooks'
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
+import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useActions } from './actions'
@@ -24,7 +23,7 @@ export const useNodeDefDetails = () => {
 
   const Actions = useActions({ setState })
 
-  const editingFromDesigner = useIsInPath(`${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
+  const editingFromDesigner = useIsDesignerNodeDefRoute()
 
   useEffect(() => {
     // Editing a nodeDef

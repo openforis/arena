@@ -6,7 +6,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useInTaxonomiesPath } from '@webapp/utils/isInPath'
+import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
 
 const HeaderLeft = (props) => {
   const { headerProps } = props
@@ -14,7 +14,7 @@ const HeaderLeft = (props) => {
 
   const history = useHistory()
 
-  const inTaxonomiesPath = useInTaxonomiesPath()
+  const inTaxonomiesPath = useIsTaxonomiesRoute()
 
   const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {
