@@ -9,7 +9,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-import * as NodeDefManagerLayout from './nodeDefManagerLayout'
+import * as NodeDefLayoutManager from './layout'
 
 export {
   addNodeDefsCycles,
@@ -26,7 +26,7 @@ export const insertNodeDef = async (user, surveyId, cycle, nodeDefParam, system 
   client.tx(async (t) => {
     const [nodeDef, nodeDefsParentUpdated] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
-      NodeDefManagerLayout.updateParentLayout({ surveyId, nodeDef: nodeDefParam, cyclesAdded: [cycle] }, t),
+      NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef: nodeDefParam, cyclesAdded: [cycle] }, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t),
     ])
@@ -72,18 +72,18 @@ export const updateNodeDefProps = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    // Update descendants cycle when updating entity cycle
-    const nodeDefsUpdated =
-      NodeDef.propKeys.cycles in props
-        ? await NodeDefManagerLayout.updateNodeDefLayoutOnCyclesUpdate(
-            {
-              surveyId,
-              nodeDefUuid,
-              cycles: props[NodeDef.propKeys.cycles],
-            },
-            t
-          )
-        : {}
+    const updatingCycles = NodeDef.propKeys.cycles in props
+
+    const nodeDefsUpdated = updatingCycles
+      ? await NodeDefLayoutManager.updateNodeDefLayoutOnCyclesUpdate(
+          {
+            surveyId,
+            nodeDefUuid,
+            cycles: props[NodeDef.propKeys.cycles],
+          },
+          t
+        )
+      : {}
 
     const logContent = {
       uuid: nodeDefUuid,
@@ -125,7 +125,7 @@ export const markNodeDefDeleted = async (user, surveyId, cycle, nodeDefUuid) =>
     const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
     const [nodeDefsUpdated] = await Promise.all([
-      NodeDefManagerLayout.updateParentLayout({ surveyId, nodeDef, cyclesDeleted: [cycle] }, t),
+      NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef, cyclesDeleted: [cycle] }, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t),
     ])
