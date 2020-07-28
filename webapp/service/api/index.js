@@ -1,4 +1,4 @@
 export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
-export { fetchCategories, fetchCategory } from './categories'
-export { fetchTaxonomies, fetchTaxonomy, createTaxonomy } from './taxonomies'
+export { fetchCategories, fetchCategory, createCategory, fetchCategoryItems, deleteCategory } from './categories'
+export { fetchTaxonomies, fetchTaxonomy, createTaxonomy, uploadTaxa, updateTaxonomy } from './taxonomies'

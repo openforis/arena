@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
-import { matchPath, useHistory, useLocation } from 'react-router'
+import { useHistory } from 'react-router'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -9,8 +10,7 @@ import { State } from '../state'
 
 export const useEdit = () => {
   const history = useHistory()
-  const { pathname } = useLocation()
-  const inTaxonomiesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.taxonomies)))
+  const inTaxonomiesPath = useIsTaxonomiesRoute()
 
   return useCallback(({ state }) => {
     const taxonomy = State.getTaxonomy(state)
