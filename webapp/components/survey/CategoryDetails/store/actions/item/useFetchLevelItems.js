@@ -1,8 +1,9 @@
 import { useCallback } from 'react'
-import axios from 'axios'
 
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+
+import * as API from '@webapp/service/api'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -24,10 +25,11 @@ export const useFetchLevelItems = ({ setState }) => {
     // Reset level items
     setState(State.dissocItems({ levelIndex }))
 
-    const {
-      data: { items },
-    } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
-      params: { draft: canEdit, parentUuid },
+    const items = await API.fetchCategoryItems({
+      surveyId,
+      categoryUuid,
+      draft: canEdit,
+      parentUuid,
     })
 
     setState(State.assocItems({ levelIndex, items }))

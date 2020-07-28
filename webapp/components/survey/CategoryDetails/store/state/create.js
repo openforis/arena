@@ -1,6 +1,5 @@
 import { keys } from './keys'
 
-export const create = ({ categoryUuid, inCategoriesPath }) => ({
-  [keys.categoryUuid]: categoryUuid,
-  [keys.inCategoriesPath]: inCategoriesPath,
+export const create = ({ category }) => ({
+  [keys.category]: category,
 })

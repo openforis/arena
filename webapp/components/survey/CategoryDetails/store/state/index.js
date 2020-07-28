@@ -2,13 +2,11 @@ import { create } from './create'
 
 import {
   getCategory,
-  getCategoryUuid,
   getImportSummary,
   getItemActive,
   getItemActiveLastLevelIndex,
   getItemsArray,
   isItemActiveLeaf,
-  isInCategoriesPath,
 } from './read'
 
 import {
@@ -32,13 +30,11 @@ export const State = {
   create,
 
   getCategory,
-  getCategoryUuid,
   getImportSummary,
   getItemActive,
   getItemActiveLastLevelIndex,
   getItemsArray,
   isItemActiveLeaf,
-  isInCategoriesPath,
 
   assocCategory,
   assocCategoryProp,
