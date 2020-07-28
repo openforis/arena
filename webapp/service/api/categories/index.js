@@ -39,3 +39,7 @@ export const createCategory = async ({ surveyId }) => {
 
   return category
 }
+
+// DELETE
+export const deleteCategory = async ({ surveyId, categoryUuid }) =>
+  axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)

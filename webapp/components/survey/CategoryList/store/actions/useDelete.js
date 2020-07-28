@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import axios from 'axios'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -9,12 +8,12 @@ import * as Category from '@core/survey/category'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import * as API from '@webapp/service/api'
 
 const _delete = async ({ survey, category, callback }) => {
   const surveyId = Survey.getId(survey)
   const categoryUuid = Category.getUuid(category)
-
-  await axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
+  await API.deleteCategory({ surveyId, categoryUuid })
 
   if (callback) {
     callback()
