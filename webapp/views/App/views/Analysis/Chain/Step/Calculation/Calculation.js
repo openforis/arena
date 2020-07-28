@@ -27,7 +27,7 @@ const CalculationComponent = (props) => {
   const calculationEdit = State.getCalculationEdit(state)
   const editingCalculation = Boolean(State.getCalculationEdit(state))
 
-  const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
+  const { validation, attributes, attribute, types } = useCalculationState({
     state,
   })
 
@@ -81,19 +81,6 @@ const CalculationComponent = (props) => {
           </button>
         </div>
       </FormItem>
-
-      {aggregateFunctionEnabled && (
-        <FormItem label={i18n.t('processingStepCalculation.aggregateFunction')}>
-          <ButtonGroup
-            selectedItemKey={Calculation.getAggregateFunction(calculationEdit)}
-            onChange={(aggregateFn) =>
-              Actions.updatePropCalculation({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn, state })
-            }
-            items={aggregateFns}
-            deselectable
-          />
-        </FormItem>
-      )}
     </div>
   )
 }
