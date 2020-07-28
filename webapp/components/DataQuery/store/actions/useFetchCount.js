@@ -1,15 +1,9 @@
 import { useCallback } from 'react'
 
-import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
 import { getUrl, throttleTime } from './useFetchData'
-
-const getBody = ({ cycle, query }) => ({
-  cycle,
-  filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
-})
 
 export const useFetchCount = ({ setCount }) => {
   const surveyId = useSurveyId()
@@ -21,7 +15,7 @@ export const useFetchCount = ({ setCount }) => {
       ({ query }) =>
         post({
           url: `${getUrl({ surveyId, query })}/count`,
-          body: getBody({ cycle, query }),
+          body: { cycle, query },
         }),
       [cycle, surveyId, post]
     ),
