@@ -233,7 +233,7 @@ export const init = (app) => {
 
         await CategoryService.deleteCategory(user, surveyId, categoryUuid)
 
-        res.status(204).json({})
+        res.json({})
       } catch (error) {
         next(error)
       }
