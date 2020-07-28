@@ -2,28 +2,25 @@ import * as A from '@core/arena'
 
 export const keys = {
   canSelect: 'canSelect',
-  inCategoriesPath: 'inCategoriesPath',
-  onAdd: 'onAdd',
-  onEdit: 'onEdit',
+  onCategoryCreated: 'onCategoryCreated',
+  onCategoryOpen: 'onCategoryOpen',
   onSelect: 'onSelect',
   selectedItemUuid: 'selectedItemUuid',
 }
 
 // ==== CREATE
-export const create = ({ canSelect, inCategoriesPath, onAdd, onEdit, onSelect, selectedItemUuid }) => ({
+export const create = ({ canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid }) => ({
   [keys.canSelect]: canSelect,
-  [keys.inCategoriesPath]: inCategoriesPath,
-  [keys.onAdd]: onAdd,
-  [keys.onEdit]: onEdit,
+  [keys.onCategoryCreated]: onCategoryCreated,
+  [keys.onCategoryOpen]: onCategoryOpen,
   [keys.onSelect]: onSelect,
   [keys.selectedItemUuid]: selectedItemUuid,
 })
 
 // ==== READ
 export const getCanSelect = A.prop(keys.canSelect)
-export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
-export const getOnAdd = A.prop(keys.onAdd)
-export const getOnEdit = A.prop(keys.onEdit)
+export const getOnCategoryCreated = A.prop(keys.onCategoryCreated)
+export const getOnCategoryOpen = A.prop(keys.onCategoryOpen)
 export const getOnSelect = A.prop(keys.onSelect)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)
 

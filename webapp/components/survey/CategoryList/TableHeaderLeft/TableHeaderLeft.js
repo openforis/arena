@@ -2,35 +2,33 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useHistory } from 'react-router'
 
+import * as Category from '@core/survey/category'
+import { useIsCategoriesRoute } from '@webapp/components/hooks'
+
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 import { State } from '../store'
 
 const TableHeaderLeft = (props) => {
   const { headerProps } = props
   const { state } = headerProps
-
-  const i18n = useI18n()
   const history = useHistory()
 
-  const onAdd = () => {
-    if (State.isInCategoriesPath(state)) {
-      history.push(appModuleUri(designerModules.category))
+  const inCategoriesPath = useIsCategoriesRoute()
+
+  const onAdd = (categoryCreated) => {
+    if (inCategoriesPath) {
+      history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(categoryCreated)}`)
     } else {
-      const onCreate = State.getOnAdd(state)
+      const onCreate = State.getOnCategoryCreated(state)
       if (onCreate) {
-        onCreate()
+        onCreate(categoryCreated)
       }
     }
   }
 
-  return (
-    <button type="button" className="btn btn-s" onClick={onAdd}>
-      <span className="icon icon-plus icon-12px icon-left" />
-      {i18n.t('common.new')}
-    </button>
-  )
+  return <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
 }
 
 TableHeaderLeft.propTypes = {

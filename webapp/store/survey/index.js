@@ -11,9 +11,6 @@ export { SurveyInfoActions } from './surveyInfo'
 // ====== node defs
 export { NodeDefsActions } from './nodeDefs'
 
-// ====== categories
-export { CategoriesActions, CategoriesState } from './categories'
-
 // ====== hooks
 export {
   useSurveyDefsFetched,
