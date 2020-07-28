@@ -22,9 +22,14 @@ export const useUpdate = ({ setState }) => {
     setState(State.assocTaxonomy(taxonomyUpdated)(state))
 
     const action = async () => {
-      await API.updateTaxonomy({ surveyId, taxonomyUuid, data: { key, value } })
+      await API.updateTaxonomy({
+        surveyId,
+        taxonomyUuid,
+        data: { key, value },
+      })
     }
+
     dispatch(SurveyActions.metaUpdated())
-    dispatch(debounceAction(action, taxonomyUuid))
+    dispatch(debounceAction(action, `taxonomy_updated_${taxonomyUuid}`))
   }, [])
 }
