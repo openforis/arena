@@ -35,7 +35,7 @@ export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
       const itemsSize = State.getItemsSize(state)
 
       if (itemsSize > 0) {
-        switch (event.keyCode) {
+        switch (event.key) {
           case KeyboardMap.Enter:
           case KeyboardMap.Space:
             onItemSelect(items[focusedItemIndex])
@@ -51,7 +51,7 @@ export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
             focusItem({
               list,
               index: calculateNewIndexWithOffset({
-                offset: offsetByKey[event.keyCode],
+                offset: offsetByKey[event.key],
                 focusedItemIndex,
                 itemsSize,
               }),

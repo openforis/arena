@@ -8,7 +8,7 @@ export const useOnInputFieldKeyDown = ({ onClose, focusItem }) =>
       const list = State.getList(state)
       const items = State.getItems(state)
       const inputField = State.getInputField(state)
-      switch (event.keyCode) {
+      switch (event.key) {
         case KeyboardMap.Down:
         case KeyboardMap.Tab:
           if (items.length > 0) {
