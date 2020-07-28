@@ -39,9 +39,8 @@ export const { isEqual, isTemporary } = ObjectUtils
 
 // ====== UPDATE
 
-export const { mergeProps, dissocTemporary } = ObjectUtils
+export const { mergeProps } = ObjectUtils
 
-export const assocEntityUuid = (entityUuid) => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
 export const assocCalculations = (calculations) => {
   const calculationUuids = R.pluck(Calculation.keys.uuid)(calculations)
@@ -66,11 +65,6 @@ const _updateCalculations = (fn) => (processingStep) =>
     _updateCalculationsCount
   )(processingStep)
 
-export const dissocTemporaryCalculation = _updateCalculations(
-  // Remove temporary calculation
-  R.reject(Calculation.isTemporary)
-)
-
 export const dissocCalculations = R.dissoc(keys.calculations)
 
 export const dissocCalculation = (calculation) =>
@@ -92,12 +86,3 @@ export const dissocCalculation = (calculation) =>
 
 export const hasEntity = R.pipe(getEntityUuid, R.isNil, R.not)
 export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)
-
-/**
- * A processing step is considered not aggregate when none of its calculations has an aggregate function.
- *
- * @returns {boolean} - True when it's disaggregate, false otherwise.
- */
-export const isNotAggregate = R.pipe(getCalculations, R.none(Calculation.hasAggregateFunction))
-
-export const isAggregate = R.pipe(isNotAggregate, R.not)
