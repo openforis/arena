@@ -12,9 +12,15 @@ import TableHeaderLeft from './TableHeaderLeft'
 import { useLocalState } from './store'
 
 const CategoryList = (props) => {
-  const { canSelect, onAdd, onEdit, onSelect, selectedItemUuid } = props
+  const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
 
-  const { state, setState } = useLocalState({ canSelect, onAdd, onEdit, onSelect, selectedItemUuid })
+  const { state, setState } = useLocalState({
+    canSelect,
+    onCategoryCreated,
+    onCategoryOpen,
+    onSelect,
+    selectedItemUuid,
+  })
 
   const canEdit = useAuthCanEditSurvey()
 
@@ -44,16 +50,16 @@ const CategoryList = (props) => {
 
 CategoryList.propTypes = {
   canSelect: PropTypes.bool,
-  onAdd: PropTypes.func,
-  onEdit: PropTypes.func,
+  onCategoryCreated: PropTypes.func,
+  onCategoryOpen: PropTypes.func,
   onSelect: PropTypes.func,
   selectedItemUuid: PropTypes.string,
 }
 
 CategoryList.defaultProps = {
   canSelect: false,
-  onAdd: null,
-  onEdit: null,
+  onCategoryCreated: null,
+  onCategoryOpen: null,
   onSelect: null,
   selectedItemUuid: null,
 }

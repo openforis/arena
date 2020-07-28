@@ -16,6 +16,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
@@ -25,8 +26,7 @@ const CategorySelector = (props) => {
 
   const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
-  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
-  const [categoryUuidToEdit, setCategoryUuidToEdit] = useState(null)
+  const [categoryToEdit, setCategoryToEdit] = useState(null)
 
   const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
 
@@ -37,7 +37,7 @@ const CategorySelector = (props) => {
         setCategory(categorySelected)
       }
     })()
-  }, [categoryUuid])
+  }, [categoryUuid, showCategoriesPanel])
 
   return (
     <div className="category-selector">
@@ -50,18 +50,7 @@ const CategorySelector = (props) => {
         selection={category}
         onChange={onChange}
       />
-      {showAdd && (
-        <button
-          type="button"
-          className="btn btn-s"
-          style={{ justifySelf: 'center' }}
-          onClick={() => setShowCategoryPanel(true)}
-          aria-disabled={disabled}
-        >
-          <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('common.add')}
-        </button>
-      )}
+      {showAdd && <ButtonMetaItemAdd onAdd={setCategoryToEdit} metaItemType={metaItemTypes.category} />}
       {showManage && (
         <button
           type="button"
@@ -73,7 +62,7 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
-      {showCategoriesPanel && !showCategoryPanel && (
+      {showCategoriesPanel && !categoryToEdit && (
         <PanelRight
           width="100vw"
           onClose={() => setShowCategoriesPanel(false)}
@@ -82,25 +71,22 @@ const CategorySelector = (props) => {
           <CategoryList
             canSelect
             selectedItemUuid={categoryUuid}
-            onAdd={() => setShowCategoryPanel(true)}
             onSelect={onChange}
-            onEdit={(categoryToEditSelected) => {
-              setCategoryUuidToEdit(Category.getUuid(categoryToEditSelected))
-              setShowCategoryPanel(true)
-            }}
+            onCategoryCreated={setCategoryToEdit}
+            onCategoryOpen={setCategoryToEdit}
           />
         </PanelRight>
       )}
-      {showCategoryPanel && (
+      {categoryToEdit && (
         <PanelRight
           width="100vw"
           onClose={() => {
-            setShowCategoryPanel(false)
-            setCategoryUuidToEdit(null)
+            onChange(categoryToEdit)
+            setCategoryToEdit(null)
           }}
           header={i18n.t('categoryEdit.header')}
         >
-          <CategoryDetails categoryUuid={categoryUuidToEdit} onCategoryCreated={onChange} showClose={false} />
+          <CategoryDetails categoryUuid={Category.getUuid(categoryToEdit)} showClose={false} />
         </PanelRight>
       )}
     </div>

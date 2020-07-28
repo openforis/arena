@@ -14,6 +14,7 @@ export const metaItemTypes = {
 
 const creatorsByType = {
   [metaItemTypes.taxonomy]: API.createTaxonomy,
+  [metaItemTypes.category]: API.createCategory,
 }
 
 const ButtonMetaItemAdd = (props) => {

@@ -7,10 +7,6 @@ import { keys } from './keys'
 
 export const getCategory = A.prop(keys.category)
 
-export const getCategoryUuid = A.prop(keys.categoryUuid)
-
-export const isInCategoriesPath = A.prop(keys.inCategoriesPath)
-
 export const getImportSummary = A.prop(keys.importSummary)
 
 export const getItems = ({ levelIndex }) => R.pathOr({}, [keys.items, String(levelIndex)])

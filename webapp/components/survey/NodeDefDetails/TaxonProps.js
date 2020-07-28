@@ -23,7 +23,6 @@ import { State } from './store'
 
 const TaxonProps = (props) => {
   const { state, Actions } = props
-  const [taxonomy, setTaxonomy] = useState({})
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -33,8 +32,8 @@ const TaxonProps = (props) => {
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
+  const [taxonomy, setTaxonomy] = useState({})
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
-  const [showTaxonomyPanel, setShowTaxonomyPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
   const onTaxonomySelect = (taxonomySelected) =>
@@ -49,7 +48,7 @@ const TaxonProps = (props) => {
         setTaxonomy(taxonomySelected)
       }
     })()
-  }, [taxonomyUuid, showTaxonomiesPanel, showTaxonomyPanel])
+  }, [taxonomyUuid, showTaxonomiesPanel])
 
   return (
     <>
@@ -83,7 +82,7 @@ const TaxonProps = (props) => {
       </FormItem>
 
       <div className="taxon-props__panel-right">
-        {showTaxonomiesPanel && (
+        {showTaxonomiesPanel && !taxonomyToEdit && (
           <PanelRight
             width="100vw"
             onClose={() => setShowTaxonomiesPanel(false)}
@@ -99,11 +98,11 @@ const TaxonProps = (props) => {
           </PanelRight>
         )}
 
-        {(showTaxonomyPanel || taxonomyToEdit) && (
+        {taxonomyToEdit && (
           <PanelRight
             width="100vw"
             onClose={() => {
-              setShowTaxonomyPanel(false)
+              onTaxonomySelect(taxonomyToEdit)
               setTaxonomyToEdit(null)
             }}
             header={i18n.t('taxonomy.header')}
