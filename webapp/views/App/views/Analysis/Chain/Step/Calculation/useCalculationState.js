@@ -55,7 +55,7 @@ export default ({ state }) => {
   const calculationUuid = Calculation.getUuid(calculation)
   const validation = Chain.getItemValidationByUuid(calculationUuid)(chain)
   const aggregateFunctionEnabled =
-    Calculation.isQuantitative(calculation) && (Step.getIndex(step) > 0 || NodeDef.isVirtual(entity))
+    Calculation.isQuantitative(calculation) && (!Step.getIndex(step) > 0 || NodeDef.isVirtual(entity))
 
   return {
     validation,
