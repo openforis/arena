@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
 
 import axios from 'axios'
 import * as R from 'ramda'
@@ -9,7 +8,6 @@ import * as A from '@core/arena'
 
 import * as Validation from '@core/validation/validation'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
@@ -53,7 +51,6 @@ const _getStepParam = (step) =>
 
 export const useSave = ({ setState }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
   const surveyId = useSurveyId()
   const lang = useLang()
 
@@ -92,9 +89,7 @@ export const useSave = ({ setState }) => {
       )
 
       AnalysisStorage.removeChainEdit()
-
       dispatch(SurveyActions.chainSave())
-      history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
     } else {
       setState(State.assocChainEdit(chainToSave)(state))
       dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
