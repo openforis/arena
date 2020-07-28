@@ -1,8 +1,9 @@
-import axios from 'axios'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Taxonomy from '@core/survey/taxonomy'
+
+import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
@@ -16,13 +17,11 @@ export const useUpload = ({ setState }) => {
 
   return useCallback(async ({ state, file }) => {
     const taxonomy = State.getTaxonomy(state)
+    const taxonomyUuid = Taxonomy.getUuid(taxonomy)
     const formData = new FormData()
     formData.append('file', file)
 
-    const { data } = await axios.post(
-      `/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/upload`,
-      formData
-    )
+    const { data } = await API.uploadTaxa({ surveyId, taxonomyUuid, formData })
 
     await dispatch(
       JobActions.showJobMonitor({
@@ -32,10 +31,8 @@ export const useUpload = ({ setState }) => {
         },
       })
     )
+    const taxonomyWithTaxa = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
 
-    const {
-      data: { taxonomyWithTaxa },
-    } = await axios.get(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}?draft=true&validate=true`)
     dispatch(SurveyActions.metaUpdated())
     setState(State.assocTaxonomy(taxonomyWithTaxa)(state))
   }, [])
