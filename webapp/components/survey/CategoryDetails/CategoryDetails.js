@@ -9,7 +9,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useInCategoriesPath } from '@webapp/utils/isInPath'
+import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/input'
@@ -33,7 +33,7 @@ const CategoryDetails = (props) => {
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
-  const inCategoriesPath = useInCategoriesPath()
+  const inCategoriesPath = useIsCategoriesRoute()
   const importSummary = State.getImportSummary(state)
 
   const validation = Validation.getValidation(category)

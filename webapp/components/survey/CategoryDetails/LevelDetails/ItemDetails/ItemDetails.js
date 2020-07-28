@@ -62,7 +62,7 @@ const ItemDetails = (props) => {
       role="button"
       tabIndex={0}
     >
-      <ErrorBadge validation={validation} showLabel={false} />
+      <ErrorBadge validation={validation} showLabel={false} showIcon />
       {active ? (
         <>
           <button type="button" className="btn btn-s btn-close" onClick={() => Actions.resetItemActive({ levelIndex })}>
