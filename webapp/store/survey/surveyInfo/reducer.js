@@ -8,7 +8,6 @@ import { SystemActions } from '@webapp/store/system'
 import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
 import { NodeDefsActions } from '../nodeDefs'
-import { CategoriesActions } from '../categories'
 
 import * as SurveyInfoState from './state'
 
@@ -38,10 +37,6 @@ const actionHandlers = {
   [NodeDefsActions.nodeDefUpdate]: SurveyInfoState.markDraft,
 
   // Category
-  [CategoriesActions.categoryCreate]: SurveyInfoState.markDraft,
-  [CategoriesActions.categoryUpdate]: SurveyInfoState.markDraft,
-  [CategoriesActions.categoryDelete]: SurveyInfoState.markDraft,
-
   // Taxonomy
   [SurveyActions.surveyMetaUpdated]: SurveyInfoState.markDraft,
 }
