@@ -253,7 +253,7 @@ export const deleteCategory = async (user, surveyId, categoryUuid, client = db) 
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryDelete, logContent, false, t),
     ])
 
-    return validateCategories(surveyId, t)
+    return null
   })
 
 export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, client = db) =>
