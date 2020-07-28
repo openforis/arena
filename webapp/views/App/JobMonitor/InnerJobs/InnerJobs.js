@@ -13,7 +13,7 @@ const InnerJobs = ({ innerJobs }) => {
 
   return (
     innerJobs.length > 0 && (
-      <div className="job-monitor__inner-jobs">
+      <div className="app-job-monitor__inner-jobs">
         {innerJobs.map((innerJob, i) => (
           <React.Fragment key={`${String(i)}-${JobSerialized.getType(innerJob)}`}>
             <div className="job">
