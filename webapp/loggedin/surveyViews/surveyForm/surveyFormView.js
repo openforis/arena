@@ -22,9 +22,7 @@ import FormPageNavigation from './components/formPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
-import * as SurveyFormState from './surveyFormState'
-
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 const SurveyFormView = (props) => {
   const {

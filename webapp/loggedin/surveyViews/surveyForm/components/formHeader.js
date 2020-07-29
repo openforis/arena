@@ -10,9 +10,8 @@ import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import * as SurveyFormState from '../surveyFormState'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 

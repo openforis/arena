@@ -9,9 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SurveyState } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
-
-import * as SurveyFormState from '../surveyFormState'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 const NavigationButton = (props) => {
   const { surveyCycleKey, nodeDef, label, childDefs, edit, canEditDef, level, active, enabled } = props
