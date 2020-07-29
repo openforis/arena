@@ -1,7 +1,7 @@
 import './nodeDefEntityForm.scss'
 
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
@@ -12,28 +12,20 @@ import * as Node from '@core/record/node'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 import { RecordState } from '@webapp/store/ui/record'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
-import { setFormPageNode, getNodeKeyLabelValues } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
 const NodeDefEntityForm = (props) => {
-  const {
-    nodeDef,
-    nodes,
-    parentNode,
-    selectedNode,
-    edit,
-    entry,
-    entryMultiple,
-    setFormPageNode,
-    getNodeKeyLabelValues,
-  } = props
+  const { nodeDef, nodes, parentNode, selectedNode, edit, entry, entryMultiple } = props
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (entry && NodeDef.isSingle(nodeDef)) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
-      setFormPageNode(nodeDef, nodeUuid)
+      dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
     }
   }, [NodeDef.getUuid(nodeDef)])
 
@@ -45,8 +37,7 @@ const NodeDefEntityForm = (props) => {
         <NodeDefEntityFormNodeSelect
           {...props}
           selectedNode={selectedNode}
-          getNodeKeyLabelValues={getNodeKeyLabelValues}
-          onChange={(selectedNodeUuid) => setFormPageNode(nodeDef, selectedNodeUuid)}
+          onChange={(selectedNodeUuid) => dispatch(SurveyFormActions.setFormPageNode(nodeDef, selectedNodeUuid))}
         />
       )}
 
@@ -88,7 +79,4 @@ const mapStateToProps = (state, props) => {
   return entry ? getEntryProps() : {}
 }
 
-export default connect(mapStateToProps, {
-  setFormPageNode,
-  getNodeKeyLabelValues,
-})(NodeDefEntityForm)
+export default connect(mapStateToProps)(NodeDefEntityForm)

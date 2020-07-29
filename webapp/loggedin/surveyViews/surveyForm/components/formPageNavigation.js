@@ -2,30 +2,21 @@ import './formPageNavigation.scss'
 
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SurveyState } from '@webapp/store/survey'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+
 import * as SurveyFormState from '../surveyFormState'
 
-import { setFormActivePage } from '../actions'
-
 const NavigationButton = (props) => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    label,
-    childDefs,
-    edit,
-    canEditDef,
-    level,
-    active,
-    enabled,
-    setFormActivePage,
-  } = props
+  const { surveyCycleKey, nodeDef, label, childDefs, edit, canEditDef, level, active, enabled } = props
 
+  const dispatch = useDispatch()
   const [showChildren, setShowChildren] = useState(level === 0)
 
   const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
@@ -47,7 +38,7 @@ const NavigationButton = (props) => {
 
         <button
           className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
-          onClick={() => setFormActivePage(nodeDef)}
+          onClick={() => dispatch(SurveyFormActions.setFormActivePage(nodeDef))}
           aria-disabled={!enabled}
         >
           {label}
@@ -87,6 +78,6 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const FormPageNavigation = connect(mapStateToProps, { setFormActivePage })(NavigationButton)
+const FormPageNavigation = connect(mapStateToProps)(NavigationButton)
 
 export default FormPageNavigation

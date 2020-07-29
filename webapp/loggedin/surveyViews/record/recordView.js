@@ -17,7 +17,7 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { SurveyState } from '@webapp/store/survey'
 import SurveyFormView from '../surveyForm/surveyFormView'
-import { resetForm } from '../surveyForm/actions'
+import { SurveyFormActions } from '../../../store/ui/surveyForm'
 
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { UserState } from '@webapp/store/user'
@@ -124,7 +124,7 @@ const mapStateToProps = (state, { match, location }) => {
 const enhance = compose(
   withRouter,
   connect(mapStateToProps, {
-    resetForm,
+    resetForm: SurveyFormActions.resetForm,
     checkInRecord: RecordActions.checkInRecord,
     checkOutRecord: RecordActions.checkOutRecord,
     recordNodesUpdate: RecordActions.recordNodesUpdate,

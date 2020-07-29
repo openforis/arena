@@ -3,7 +3,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import { SystemActions } from '@webapp/store/system'
 
 import { SurveyActions } from '@webapp/store/survey'
-import { formReset } from '../../../loggedin/surveyViews/surveyForm/actions'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 import * as RecordActions from './actions'
 import * as RecordState from './state'
@@ -15,7 +15,7 @@ const actionHandlers = {
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
-  [formReset]: () => ({}),
+  [SurveyFormActions.formReset]: () => ({}),
 
   // Record updates
   [RecordActions.recordCreate]: (state, { record }) => RecordState.assocRecord(record)(state),

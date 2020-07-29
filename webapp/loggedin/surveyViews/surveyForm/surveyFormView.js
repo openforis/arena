@@ -3,7 +3,7 @@ import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
@@ -24,7 +24,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
 import * as SurveyFormState from './surveyFormState'
 
-import { setFormNodeDefAddChildTo, resetForm } from './actions'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 const SurveyFormView = (props) => {
   const {
@@ -40,10 +40,9 @@ const SurveyFormView = (props) => {
     canEditRecord,
     recordUuid,
     parentNode,
-    setFormNodeDefAddChildTo,
-    resetForm,
   } = props
 
+  const dispatch = useDispatch()
   const isSideBarOpened = useIsSidebarOpened()
   const editAllowed = edit && canEditDef
 
@@ -68,14 +67,14 @@ const SurveyFormView = (props) => {
 
   // On cycle update, reset form
   useOnUpdate(() => {
-    resetForm()
+    dispatch(SurveyFormActions.resetForm())
   }, [surveyCycleKey])
 
   useEffect(() => {
     // OnUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
     return () => {
       if (editAllowed) {
-        setFormNodeDefAddChildTo(null)
+        dispatch(SurveyFormActions.setFormNodeDefAddChildTo(null))
       }
     }
   }, [])
@@ -160,5 +159,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const enhance = compose(withRouter, connect(mapStateToProps, { setFormNodeDefAddChildTo, resetForm }))
+const enhance = compose(withRouter, connect(mapStateToProps))
 export default enhance(SurveyFormView)

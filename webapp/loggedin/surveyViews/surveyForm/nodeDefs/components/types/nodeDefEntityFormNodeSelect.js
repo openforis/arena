@@ -8,6 +8,7 @@ import * as Node from '@core/record/node'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useI18n } from '@webapp/store/system'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 const NodeDefEntityFormNodeSelect = (props) => {
   const {
@@ -15,7 +16,6 @@ const NodeDefEntityFormNodeSelect = (props) => {
     nodes,
     parentNode,
     selectedNode,
-    getNodeKeyLabelValues,
     updateNode,
     removeNode,
     onChange,
@@ -39,7 +39,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
         </option>
         {nodes.map((n) => (
           <option key={Node.getUuid(n)} value={Node.getUuid(n)}>
-            {getNodeKeyLabelValues(nodeDef, n)}
+            {dispatch(SurveyFormActions.getNodeKeyLabelValues(nodeDef, n))}
           </option>
         ))}
       </select>

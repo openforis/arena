@@ -15,7 +15,7 @@ import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/survey
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { NodeDefsActions } from '@webapp/store/survey'
-import { setFormNodeDefAddChildTo } from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef, edit, canEditDef } = props
@@ -79,7 +79,7 @@ const NodeDefEditButtons = (props) => {
           <button
             type="button"
             className="btn btn-s btn-transparent"
-            onClick={() => dispatch(setFormNodeDefAddChildTo(nodeDef))}
+            onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
             onMouseDown={(e) => {
               e.stopPropagation()
             }}
