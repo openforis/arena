@@ -1,5 +1,6 @@
 import { ColumnNodeDef } from '@common/model/db'
-import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { Query } from '@common/model/query'
 

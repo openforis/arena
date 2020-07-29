@@ -1,6 +1,6 @@
 import React from 'react'
 
-import SurveyFormView from '../../../loggedin/surveyViews/surveyForm/surveyFormView'
+import SurveyFormView from '@webapp/components/survey/SurveyForm'
 import { useRecordView } from './useRecordView'
 
 const RecordView = () => {

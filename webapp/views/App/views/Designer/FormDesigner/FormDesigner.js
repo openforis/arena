@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import SurveyFormView from '@webapp/loggedin/surveyViews/surveyForm/surveyFormView'
+import SurveyFormView from '@webapp/components/survey/SurveyForm'
 import RecordView from '@webapp/components/survey/Record'
 
 const FormDesigner = () => {

@@ -14,7 +14,7 @@ import { useAuthCanEditRecord } from '@webapp/store/user'
 import { RecordActions } from '@webapp/store/ui/record'
 
 import ErrorBadge from '@webapp/components/errorBadge'
-import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
+import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { useColumn } from './store'
 

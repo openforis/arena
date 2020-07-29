@@ -11,7 +11,7 @@ import * as Node from '@core/record/node'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
+import NodeDefErrorBadge from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefErrorBadge'
 
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'

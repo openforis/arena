@@ -1,5 +1,5 @@
-@import "~@webapp/style/vars";
-@import "../../../surveyFormVars";
+@import 'webapp/style/vars';
+@import '../../../SurveyFormVars';
 
 .survey-form__node-def-entity-table {
   display: grid;
@@ -14,11 +14,11 @@
   align-self: center;
   display: flex;
   align-items: center;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   font-weight: 600;
   text-align: left;
   text-transform: uppercase;
-  font-size: .8rem;
+  font-size: 0.8rem;
 
   .btn-add {
     margin-left: 10px;
@@ -62,7 +62,7 @@
     pointer-events: none;
 
     .message {
-      display: none
+      display: none;
     }
   }
 }
@@ -115,7 +115,6 @@
       border-top: $formBorder;
     }
   }
-
 }
 
 .survey-form__node-def-entity-table-cell-placeholder {
@@ -123,10 +122,10 @@
   align-content: center;
   width: 45px;
   height: 100%;
-  opacity: .7;
+  opacity: 0.7;
   margin: auto;
 
   .progress-bar {
-    height: .5rem;
+    height: 0.5rem;
   }
 }
