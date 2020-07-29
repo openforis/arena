@@ -6,12 +6,10 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
-
 import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
 
-import { RecordActions } from '@webapp/store/ui/record'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 const RecordEntryButtons = () => {

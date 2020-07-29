@@ -4,7 +4,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as RecordState from '../record/recordState'
+import { RecordState } from '@webapp/store/ui/record'
 import * as SurveyFormState from './surveyFormState'
 
 /**

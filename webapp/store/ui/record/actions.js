@@ -9,14 +9,14 @@ import * as NodeRefData from '@core/record/nodeRefData'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import { SurveyState } from '@webapp/store/survey'
-
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { AppSavingActions } from '@webapp/store/app'
+import { SurveyState } from '@webapp/store/survey'
+import { UserState } from '@webapp/store/user'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
-import * as RecordState from '../../../loggedin/surveyViews/record/recordState'
-import { UserState } from '@webapp/store/user'
+
+import * as RecordState from './state'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'

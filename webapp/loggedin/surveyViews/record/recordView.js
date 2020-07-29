@@ -18,9 +18,8 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { SurveyState } from '@webapp/store/survey'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import { resetForm } from '../surveyForm/actions'
-import * as RecordState from './recordState'
 
-import { RecordActions } from '@webapp/store/ui/record'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { UserState } from '@webapp/store/user'
 
 const RecordView = (props) => {

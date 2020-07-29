@@ -6,7 +6,7 @@ import { SurveyActions } from '@webapp/store/survey'
 import { formReset } from '../../../loggedin/surveyViews/surveyForm/actions'
 
 import * as RecordActions from './actions'
-import * as RecordState from '../../../loggedin/surveyViews/record/recordState'
+import * as RecordState from './state'
 
 const actionHandlers = {
   // Reset form
