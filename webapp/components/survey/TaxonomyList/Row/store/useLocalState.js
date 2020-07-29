@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useTaxonomyRow = (props) => {
+export const useLocalState = (props) => {
   const { selectedItemUuid, row: taxonomy, canDelete, onTaxonomySelect, canSelect, initData, onTaxonomyOpen } = props
 
   const [state, setState] = useState(() =>

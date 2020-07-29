@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
+import { useOnUpdate } from '@webapp/components/hooks'
+
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useAutocompleteDialog = ({
+export const useLocalState = ({
   inputField,
   sourceElement,
   items,
@@ -20,20 +22,27 @@ export const useAutocompleteDialog = ({
       items,
       itemLabel,
       itemKey,
+      list,
     })
   )
   const Actions = useActions({ setState, onItemSelect, onClose })
 
-  useEffect(() => {
-    const keyDownListener = Actions.onInputFieldKeyDown({
-      list,
-      state,
-    })
+  useOnUpdate(() => {
+    setState(State.assocItems(items))
+  }, [items])
 
-    const clickListener = Actions.onOutsideClick({
-      list,
-      state,
-    })
+  useOnUpdate(() => {
+    setState(State.assocInputField(inputField))
+  }, [inputField])
+
+  useOnUpdate(() => {
+    setState(State.assocList(list))
+  }, [list])
+
+  useEffect(() => {
+    const keyDownListener = Actions.onInputFieldKeyDown({ state })
+
+    const clickListener = Actions.onOutsideClick({ state })
 
     if (inputField) {
       inputField.addEventListener('keydown', keyDownListener)
@@ -47,7 +56,7 @@ export const useAutocompleteDialog = ({
 
       window.removeEventListener('click', clickListener)
     }
-  }, [State.getInputField(state), list.current])
+  }, [State.getList(state), State.getItems(state), State.getInputField(state)])
 
   return { Actions, state }
 }

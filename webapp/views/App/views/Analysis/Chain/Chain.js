@@ -15,14 +15,14 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
-import { State, useAnalysis } from './store'
+import { State, useLocalState } from './store'
 import StepList from './StepList'
 import Step from './Step'
 import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
   const surveyInfo = useSurveyInfo()
-  const { state, Actions } = useAnalysis()
+  const { state, Actions } = useLocalState()
 
   if (state === null) return null
 

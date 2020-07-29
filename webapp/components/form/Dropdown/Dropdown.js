@@ -8,7 +8,7 @@ import { Input } from '@webapp/components/form/input'
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
 import ItemDialog from './ItemDialog'
-import { useDropdown, State } from './store'
+import { useLocalState, State } from './store'
 
 const Dropdown = (props) => {
   const {
@@ -32,7 +32,7 @@ const Dropdown = (props) => {
   const dropdownRef = useRef(null)
   const inputRef = useRef(null)
 
-  const { state, Actions } = useDropdown({
+  const { state, Actions } = useLocalState({
     autocompleteMinChars,
     disabled,
     itemKey,
@@ -114,7 +114,7 @@ Dropdown.propTypes = {
   disabled: PropTypes.bool,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  items: PropTypes.oneOfType([PropTypes.array.isRequired, PropTypes.func]).isRequired,
+  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,

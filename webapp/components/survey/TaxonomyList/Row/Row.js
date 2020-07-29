@@ -12,10 +12,10 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
-import { State, useTaxonomyRow } from './store'
+import { State, useLocalState } from './store'
 
 const Row = (props) => {
-  const { state, Actions } = useTaxonomyRow(props)
+  const { state, Actions } = useLocalState(props)
 
   const surveyInfo = useSurveyInfo()
   const survey = useSurvey()

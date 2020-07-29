@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import InputChips from '@webapp/components/form/inputChips'
+import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -32,8 +32,8 @@ const NodeDefCodeDropdown = props => {
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}
-          itemKeyProp="uuid"
-          itemLabelFunction={CategoryItem.getLabel(lang)}
+          itemKey="uuid"
+          itemLabel={CategoryItem.getLabel(lang)}
           selection={selectedItems}
           onItemAdd={onItemAdd}
           onItemRemove={onItemRemove}

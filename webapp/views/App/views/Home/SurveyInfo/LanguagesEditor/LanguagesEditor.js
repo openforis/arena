@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
-import InputChips from '@webapp/components/form/inputChips'
+import InputChips from '@webapp/components/form/InputChips'
 
 import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 
