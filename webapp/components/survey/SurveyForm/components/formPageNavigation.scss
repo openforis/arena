@@ -1,8 +1,7 @@
-@import "~@webapp/style/vars";
-@import "../surveyFormVars";
+@import 'webapp/style/vars';
+@import '../SurveyFormVars';
 
 .survey-form__node-def-nav {
-
   button {
     border: none;
     background-color: transparent;
@@ -25,7 +24,7 @@
   }
 
   .btn-node-def {
-    font-size: .85rem;
+    font-size: 0.85rem;
   }
 }
 

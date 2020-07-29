@@ -1,5 +1,5 @@
-@import "~@webapp/style/vars";
-@import "../surveyFormVars";
+@import 'webapp/style/vars';
+@import '../SurveyFormVars';
 
 .survey-form-header {
   display: flex;
@@ -34,14 +34,13 @@
   .error-badge {
     position: relative;
   }
-
 }
 
 .survey-form-header__record-actions-steps {
   border: 1px solid $greyBorder;
 
   > * {
-    margin: 0 .5rem;
-    font-size: .8rem;
+    margin: 0 0.5rem;
+    font-size: 0.8rem;
   }
 }

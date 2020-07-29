@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
-import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import ButtonBar from './ButtonBar'
 import ValidationsProps from './ValidationsProps'
@@ -42,7 +42,7 @@ const NodeDefDetails = () => {
               }
             />
             <div className="attribute-selector">
-              {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
+              {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
             </div>
           </FormItem>
 

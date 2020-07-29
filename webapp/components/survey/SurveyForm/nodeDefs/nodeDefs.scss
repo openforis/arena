@@ -1,5 +1,5 @@
-@import "~@webapp/style/vars";
-@import "../surveyFormVars";
+@import 'webapp/style/vars';
+@import '../SurveyFormVars';
 
 // === page
 .survey-form__node-def-page {
@@ -41,7 +41,7 @@
 
   &.not-applicable {
     background-color: rgba($greyBorder, 0.7);
-    opacity: .6;
+    opacity: 0.6;
   }
 }
 
@@ -53,15 +53,15 @@
   > :nth-child(1).form-label {
     align-self: end;
     justify-self: auto;
-    padding: .5rem 1rem;
+    padding: 0.5rem 1rem;
     font-weight: 600;
     text-align: left;
     text-transform: uppercase;
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   > :nth-child(2) {
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
     align-self: start;
   }
 
@@ -144,7 +144,7 @@
 
       .icon-warning {
         position: absolute;
-        left: -.5rem;
+        left: -0.5rem;
       }
     }
   }

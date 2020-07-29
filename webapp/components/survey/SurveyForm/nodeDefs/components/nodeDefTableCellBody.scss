@@ -1,18 +1,18 @@
-@import "~@webapp/style/vars";
-@import "../../surveyFormVars";
+@import 'webapp/style/vars';
+@import '../../SurveyFormVars';
 
 .survey-form__node-def-table-cell-body-multiple {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   padding-left: 1rem;
-  padding-right: .5rem;
+  padding-right: 0.5rem;
 
   .values-summary {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: .9rem;
+    font-size: 0.9rem;
   }
 
   button {

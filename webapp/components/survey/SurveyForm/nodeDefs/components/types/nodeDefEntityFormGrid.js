@@ -6,7 +6,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import NodeDefSwitch from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefSwitch'
+import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
