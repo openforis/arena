@@ -12,9 +12,7 @@ import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SurveyState } from '@webapp/store/survey'
-import { RecordActions } from '@webapp/store/ui/record'
-
-import * as RecordState from '../../record/recordState'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
 

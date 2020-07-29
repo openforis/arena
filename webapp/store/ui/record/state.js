@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as Record from '@core/record/record'
 
-import * as SurveyViewsState from '../surveyViewsState'
+import * as SurveyViewsState from '../../../loggedin/surveyViews/surveyViewsState'
 
 export const stateKey = 'record'
 

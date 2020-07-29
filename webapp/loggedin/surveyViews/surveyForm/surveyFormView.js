@@ -8,14 +8,15 @@ import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
-import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import { SurveyState } from '@webapp/store/survey'
+import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
-import * as RecordState from '../record/recordState'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { RecordState } from '@webapp/store/ui/record'
+import { SurveyState } from '@webapp/store/survey'
+
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'

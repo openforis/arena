@@ -11,13 +11,13 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
-import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
+import { RecordState } from '@webapp/store/ui/record'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
-const NodeDefEntityForm = props => {
+const NodeDefEntityForm = (props) => {
   const {
     nodeDef,
     nodes,
@@ -46,7 +46,7 @@ const NodeDefEntityForm = props => {
           {...props}
           selectedNode={selectedNode}
           getNodeKeyLabelValues={getNodeKeyLabelValues}
-          onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}
+          onChange={(selectedNodeUuid) => setFormPageNode(nodeDef, selectedNodeUuid)}
         />
       )}
 

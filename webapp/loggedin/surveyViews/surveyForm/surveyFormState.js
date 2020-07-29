@@ -5,8 +5,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
+import { RecordState } from '@webapp/store/ui/record'
 import * as SurveyViewsState from '../surveyViewsState'
-import * as RecordState from '../record/recordState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
