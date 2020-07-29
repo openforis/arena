@@ -5,17 +5,14 @@ import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '@webapp/store/system'
-import { elementOffset } from '@webapp/utils/domUtils'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
-
+import { elementOffset } from '@webapp/utils/domUtils'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef, edit, canEditDef } = props

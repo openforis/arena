@@ -10,11 +10,9 @@ import { useI18n } from '@webapp/store/system'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
-
-import * as SurveyFormState from '../surveyFormState'
 
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props

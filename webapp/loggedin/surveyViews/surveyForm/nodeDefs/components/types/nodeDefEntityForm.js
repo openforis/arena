@@ -4,15 +4,14 @@ import React, { useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
-import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 import { RecordState } from '@webapp/store/ui/record'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+
+import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
 
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'

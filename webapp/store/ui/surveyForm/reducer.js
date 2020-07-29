@@ -10,7 +10,7 @@ import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
-import * as SurveyFormState from '../../../loggedin/surveyViews/surveyForm/surveyFormState'
+import * as SurveyFormState from './state'
 
 const actionHandlers = {
   // Reset form
