@@ -5,7 +5,7 @@ import { useOnUpdate } from '@webapp/components/hooks'
 import { useActions } from './actions'
 import { State } from './state'
 
-export const useDropdown = ({
+export const useLocalState = ({
   autocompleteMinChars,
   disabled,
   itemKey,

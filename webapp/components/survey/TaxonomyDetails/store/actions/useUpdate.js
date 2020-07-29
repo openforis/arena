@@ -1,9 +1,10 @@
-import axios from 'axios'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
+
+import * as API from '@webapp/service/api'
 
 import { useSurveyId, SurveyActions } from '@webapp/store/survey'
 
@@ -15,17 +16,20 @@ export const useUpdate = ({ setState }) => {
 
   return useCallback(({ key, value, state }) => {
     const taxonomy = State.getTaxonomy(state)
+    const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     const taxonomyUpdated = State.assocTaxonomyProp({ key, value })(taxonomy)
     setState(State.assocTaxonomy(taxonomyUpdated)(state))
 
     const action = async () => {
-      await axios.put(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`, {
-        key,
-        value,
+      await API.updateTaxonomy({
+        surveyId,
+        taxonomyUuid,
+        data: { key, value },
       })
     }
+
     dispatch(SurveyActions.metaUpdated())
-    dispatch(debounceAction(action, Taxonomy.getUuid(taxonomy)))
+    dispatch(debounceAction(action, `taxonomy_updated_${taxonomyUuid}`))
   }, [])
 }

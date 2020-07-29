@@ -1,15 +1,16 @@
 import { useCallback } from 'react'
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import { KeyboardKeys } from '@webapp/utils/keyboardKeys'
 import { State } from '../state'
 
 export const useOnInputFieldKeyDown = ({ onClose, focusItem }) =>
   useCallback(
-    ({ list, state }) => (event) => {
+    ({ state }) => (event) => {
+      const list = State.getList(state)
       const items = State.getItems(state)
       const inputField = State.getInputField(state)
-      switch (event.keyCode) {
-        case KeyboardMap.Down:
-        case KeyboardMap.Tab:
+      switch (event.key) {
+        case KeyboardKeys.ArrowDown:
+        case KeyboardKeys.Tab:
           if (items.length > 0) {
             event.preventDefault()
             // Focus first item
@@ -19,7 +20,7 @@ export const useOnInputFieldKeyDown = ({ onClose, focusItem }) =>
           }
 
           break
-        case KeyboardMap.Esc:
+        case KeyboardKeys.Escape:
           onClose()
           inputField.focus()
           break

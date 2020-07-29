@@ -4,7 +4,7 @@ import { useParams } from 'react-router'
 
 import { useActions } from './actions'
 
-export const useTaxonomyDetails = (props) => {
+export const useLocalState = (props) => {
   const { taxonomyUuid } = props
   const { taxonomyUuid: taxonomyUuidParam } = useParams()
   const [state, setState] = useState({})
