@@ -28,15 +28,9 @@ export const fetchViewData = async (params) => {
 
   const survey = await _fetchSurvey(surveyId, cycle)
 
-  return SurveyRdbManager.fetchViewData({
-    survey,
-    cycle,
-    query,
-    columnNodeDefs,
-    offset,
-    limit,
-    streamOutput,
-  })
+  return Query.isModeAggregate(query)
+    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, stream: Boolean(streamOutput) })
+    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput })
 }
 
 /**
@@ -51,8 +45,10 @@ export const fetchViewData = async (params) => {
  */
 export const countTable = async (params) => {
   const { surveyId, cycle, query } = params
-  const survey = await _fetchSurvey(surveyId, cycle)
-  return SurveyRdbManager.countTable({ survey, cycle, query })
-}
 
-export const { countViewDataAgg, fetchViewDataAgg } = SurveyRdbManager
+  const survey = await _fetchSurvey(surveyId, cycle)
+
+  return Query.isModeAggregate(query)
+    ? SurveyRdbManager.countViewDataAgg({ survey, cycle, query })
+    : SurveyRdbManager.countTable({ survey, cycle, query })
+}

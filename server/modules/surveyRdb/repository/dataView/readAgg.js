@@ -1,54 +1,72 @@
 import * as R from 'ramda'
 import pgPromise from 'pg-promise'
 
-import * as Schemata from '@common/model/db/schemata'
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
 import * as Expression from '../../../../../core/expressionParser/expression'
-import { Sort } from '../../../../../common/model/query'
-import { ViewDataNodeDef } from '../../../../../common/model/db'
+import * as Survey from '../../../../../core/survey/survey'
+import { Schemata, ViewDataNodeDef, ColumnNodeDef } from '../../../../../common/model/db'
+import { Sort, Query } from '../../../../../common/model/query'
 
-const _getSelectFieldsMesaures = (measures) => {
+const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
   const fields = []
   const params = {}
-  Object.entries(measures).forEach(([measure, aggFunctions], i) => {
+  Object.entries(measures).forEach(([nodeDefUuidMeasure, aggFunctions], i) => {
     const paramName = `measure_field_${i}`
+    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuidMeasure)(survey)
+    const columnMeasure = new ColumnNodeDef(viewDataNodeDef, nodeDefMeasure).name
+
     aggFunctions.forEach((aggFn) => {
       let field = `$/${paramName}:name/`
       if (aggFn) {
         const paramNameAlias = `${paramName}_alias`
         const fieldAlias = `$/${paramNameAlias}:name/`
-        const measureAlias = `${measure}_${aggFn}`
+        const measureAlias = `${columnMeasure}_${aggFn}`
         field = `${aggFn}(${field}) AS ${fieldAlias}`
         params[paramNameAlias] = measureAlias
       }
       fields.push(field)
-      params[paramName] = measure
+      params[paramName] = columnMeasure
     })
   })
   return { fields, params }
 }
 
-const _getSelectFieldsDimensions = (dimensions) => {
+const _getSelectFieldsDimensions = ({ survey, viewDataNodeDef, dimensions }) => {
   const fields = []
   const params = {}
   dimensions.forEach((dimension, i) => {
     const paramName = `dimension_field_${i}`
     fields.push(`$/${paramName}:name/`)
-    params[paramName] = dimension
+    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(survey)
+    const columnDimension = new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name
+    params[paramName] = columnDimension
   })
   return { fields, params }
 }
 
-const _getSelectQuery = (params) => {
-  const { surveyId, cycle, table, measures, dimensions, filter, sort } = params
+const _getSelectQuery = ({ survey, cycle, query }) => {
+  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+  const measures = Query.getMeasures(query)
+  const dimensions = Query.getDimensions(query)
+  const filter = Query.getFilter(query)
+  const sort = Query.getSort(query)
 
   // SELECT fields measures
-  const { fields: selectFieldsMeasures, params: selectParamsMeasures } = _getSelectFieldsMesaures(measures)
+  const { fields: selectFieldsMeasures, params: selectParamsMeasures } = _getSelectFieldsMesaures({
+    survey,
+    viewDataNodeDef,
+    measures,
+  })
 
   // SELECT fields dimensions
-  const { fields: selectFieldsDimensions, params: selectParamsDimensions } = _getSelectFieldsDimensions(dimensions)
+  const { fields: selectFieldsDimensions, params: selectParamsDimensions } = _getSelectFieldsDimensions({
+    survey,
+    viewDataNodeDef,
+    dimensions,
+  })
 
   // WHERE clause
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
@@ -64,7 +82,7 @@ const _getSelectQuery = (params) => {
     SELECT 
       ${selectFieldsMeasures.concat(selectFieldsDimensions).join(', ')}
     FROM 
-      ${Schemata.getSchemaSurveyRdb(surveyId)}.$/table:name/
+      ${Schemata.getSchemaSurveyRdb(viewDataNodeDef.surveyId)}.$/table:name/
     WHERE 
       ${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/
       ${R.isNil(filterClause) ? '' : `AND ${filterClause}`}
@@ -72,8 +90,9 @@ const _getSelectQuery = (params) => {
     ORDER BY
       ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}${ViewDataNodeDef.columnSet.dateModified} DESC NULLS LAST
   `
+
   const queryParams = {
-    table,
+    table: viewDataNodeDef.name,
     cycle,
     ...selectParamsMeasures,
     ...selectParamsDimensions,
@@ -90,19 +109,17 @@ const _getSelectQuery = (params) => {
  * filtered by the given filter.
  *
  * @param {!object} params - The query parameters.
- * @param {!number} [params.surveyId] - The survey ID.
+ * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
- * @param {!string} [params.table] - The view to select.
- * @param {!object} [params.measures] - The measures object, indexed by column names.
- * @param {boolean} [params.dimensions=[]] - The dimensions to select.
- * @param {object} [params.filter=null] - The filter expression object.
+ * @param {!Query} [params.query] - The query used to filter the rows.
  * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = async (params, client = db) => {
-  const { select, queryParams } = _getSelectQuery(params)
+  const { survey, cycle, query } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query })
 
   return client.one(
     `
@@ -121,15 +138,11 @@ export const countViewDataAgg = async (params, client = db) => {
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
  *
  * @param {!object} params - The query parameters.
- * @param {!number} [params.survey] - The survey.
+ * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
- * @param {!string} [params.table] - The view to select.
- * @param {!object} [params.measures] - The measures object, indexed by column names.
- * @param {boolean} [params.dimensions=[]] - The dimensions to select.
- * @param {object} [params.filter=null] - The filter expression object.
+ * @param {!Query} [params.query] - The query object.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
