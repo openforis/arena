@@ -21,7 +21,7 @@ export const fetchTaxonomy = async ({ surveyId, taxonomyUuid, draft = true, vali
   return taxonomy
 }
 
-// CREATE
+// ==== CREATE
 export const createTaxonomy = async ({ surveyId }) => {
   const {
     data: { taxonomy },
@@ -29,3 +29,10 @@ export const createTaxonomy = async ({ surveyId }) => {
 
   return taxonomy
 }
+
+export const uploadTaxa = async ({ surveyId, taxonomyUuid, formData }) =>
+  axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/upload`, formData)
+
+//  ==== UPDATE
+export const updateTaxonomy = async ({ surveyId, taxonomyUuid, data }) =>
+  axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, data)
