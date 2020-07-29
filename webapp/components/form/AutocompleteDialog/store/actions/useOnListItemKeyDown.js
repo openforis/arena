@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
 
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import { KeyboardKeys } from '@webapp/utils/keyboardKeys'
 
 import { State } from '../state'
 
 const offsetByKey = {
-  [KeyboardMap.PageUp]: -10,
-  [KeyboardMap.PageDown]: 10,
-  [KeyboardMap.Up]: -1,
-  [KeyboardMap.Down]: 1,
+  [KeyboardKeys.PageUp]: -10,
+  [KeyboardKeys.PageDown]: 10,
+  [KeyboardKeys.ArrowUp]: -1,
+  [KeyboardKeys.ArrowDown]: 1,
 }
 
 const calculateNewIndexWithOffset = ({ offset, focusedItemIndex, itemsSize }) => {
@@ -23,10 +23,11 @@ const calculateNewIndexWithOffset = ({ offset, focusedItemIndex, itemsSize }) =>
 
 export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
   useCallback(
-    ({ list, state }) => (event) => {
+    ({ state }) => (event) => {
       event.stopPropagation()
       event.preventDefault()
 
+      const list = State.getList(state)
       const items = State.getItems(state)
       const focusedItemIndex = State.getFocusedItemIndex(state)
       const inputField = State.getInputField(state)
@@ -34,23 +35,23 @@ export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
       const itemsSize = State.getItemsSize(state)
 
       if (itemsSize > 0) {
-        switch (event.keyCode) {
-          case KeyboardMap.Enter:
-          case KeyboardMap.Space:
+        switch (event.key) {
+          case KeyboardKeys.Enter:
+          case KeyboardKeys.Space:
             onItemSelect(items[focusedItemIndex])
             break
-          case KeyboardMap.Esc:
+          case KeyboardKeys.Escape:
             onClose()
             inputField.focus()
             break
-          case KeyboardMap.PageUp:
-          case KeyboardMap.PageDown:
-          case KeyboardMap.Up:
-          case KeyboardMap.Down:
+          case KeyboardKeys.PageUp:
+          case KeyboardKeys.PageDown:
+          case KeyboardKeys.ArrowUp:
+          case KeyboardKeys.ArrowDown:
             focusItem({
               list,
               index: calculateNewIndexWithOffset({
-                offset: offsetByKey[event.keyCode],
+                offset: offsetByKey[event.key],
                 focusedItemIndex,
                 itemsSize,
               }),

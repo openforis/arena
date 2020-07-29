@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 
-import InputChips from '@webapp/components/form/inputChips'
+import InputChips from '@webapp/components/form/InputChips'
 
 import * as Srs from '@core/geo/srs'
 import PropTypes from 'prop-types'
@@ -18,11 +18,11 @@ const SrsEditor = (props) => {
 
   return (
     <InputChips
-      itemsLookupFunction={srsLookupFunction}
-      itemKeyProp={Srs.keys.code}
-      itemLabelFunction={(srsValue) => `${Srs.getName(srsValue)} (EPSG:${Srs.getCode(srsValue)})`}
+      items={srsLookupFunction}
+      itemKey={Srs.keys.code}
+      itemLabel={(srsValue) => `${Srs.getName(srsValue)} (EPSG:${Srs.getCode(srsValue)})`}
       selection={srs}
-      dropdownAutocompleteMinChars={3}
+      autocompleteMinChars={3}
       requiredItems={1}
       validation={validation}
       onChange={setSrs}

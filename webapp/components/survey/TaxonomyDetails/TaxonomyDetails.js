@@ -19,12 +19,12 @@ import Header from './Header'
 import TaxaTableRowHeader from './TaxaTableRowHeader'
 import TaxaTableRow from './TaxaTableRow'
 
-import { State, useTaxonomyDetails } from './store'
+import { State, useLocalState } from './store'
 
 const TaxonomyDetails = (props) => {
   const { showClose } = props
 
-  const { state, Actions } = useTaxonomyDetails(props)
+  const { state, Actions } = useLocalState(props)
 
   const history = useHistory()
 

@@ -8,7 +8,7 @@ import { AnalysisStorage } from '@webapp/service/storage/analysis'
 
 import { useActions } from './actions'
 
-export const useAnalysis = () => {
+export const useLocalState = () => {
   const [state, setState] = useState(null)
 
   const Actions = useActions({ setState })

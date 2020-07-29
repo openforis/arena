@@ -1,2 +1,2 @@
-export { useTaxonomyDetails } from './useTaxonomyDetails'
+export { useLocalState } from './useLocalState'
 export { State } from './state'
