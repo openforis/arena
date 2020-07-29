@@ -8,7 +8,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import { RecordView } from '@webapp/components/survey/Record'
+import RecordView from '@webapp/components/survey/Record'
 
 import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 
