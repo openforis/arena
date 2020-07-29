@@ -11,7 +11,7 @@ import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
 
-import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '@webapp/loggedin/surveyViews/record/actions'
+import { RecordActions } from '@webapp/store/ui/record'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 const RecordEntryButtons = () => {
@@ -41,7 +41,7 @@ const RecordEntryButtons = () => {
                 DialogConfirmActions.showDialogConfirm({
                   key: 'surveyForm.formEntryActions.confirmDemote',
                   params: { name: getStepLabel(stepPrev) },
-                  onOk: () => dispatch(updateRecordStep(RecordStep.getId(stepPrev), history)),
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepPrev), history)),
                 })
               )
             }
@@ -66,7 +66,7 @@ const RecordEntryButtons = () => {
                 DialogConfirmActions.showDialogConfirm({
                   key: 'surveyForm.formEntryActions.confirmPromote',
                   params: { name: getStepLabel(stepNext) },
-                  onOk: () => dispatch(updateRecordStep(RecordStep.getId(stepNext), history)),
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), history)),
                 })
               )
             }
@@ -82,7 +82,7 @@ const RecordEntryButtons = () => {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
               key: 'surveyForm.formEntryActions.confirmDelete',
-              onOk: () => dispatch(deleteRecord(history)),
+              onOk: () => dispatch(RecordActions.deleteRecord(history)),
             })
           )
         }
@@ -104,7 +104,7 @@ const FormEntryActions = (props) => {
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button className="btn-s btn-transparent" onClick={() => dispatch(deleteRecordUuidPreview())}>
+        <button className="btn-s btn-transparent" onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}>
           <span className="icon icon-eye-blocked icon-12px icon-left" />
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>

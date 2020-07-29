@@ -11,7 +11,7 @@ import * as RecordValidation from '@core/record/recordValidation'
 
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
-import { createNodePlaceholder, removeNode, updateNode } from '@webapp/loggedin/surveyViews/record/actions'
+import { RecordActions } from '@webapp/store/ui/record'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
@@ -54,9 +54,9 @@ const ColumnDataEdit = (props) => {
             edit={false}
             renderType={NodeDefLayout.renderType.tableBody}
             canEditRecord={canEditRecord}
-            updateNode={(...args) => dispatch(updateNode(...args))}
-            removeNode={(...args) => dispatch(removeNode(...args))}
-            createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
+            updateNode={(...args) => dispatch(RecordActions.updateNode(...args))}
+            removeNode={(...args) => dispatch(RecordActions.removeNode(...args))}
+            createNodePlaceholder={(...args) => dispatch(RecordActions.createNodePlaceholder(...args))}
             windowed={false}
           />
         </ErrorBadge>

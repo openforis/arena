@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { createRecord } from '@webapp/loggedin/surveyViews/record/actions'
+import { RecordActions } from '@webapp/store/ui/record'
 
 const HeaderLeft = () => {
   const dispatch = useDispatch()
@@ -15,7 +15,7 @@ const HeaderLeft = () => {
   const i18n = useI18n()
 
   return Survey.isPublished(surveyInfo) ? (
-    <button type="button" onClick={() => dispatch(createRecord(history))} className="btn btn-s">
+    <button type="button" onClick={() => dispatch(RecordActions.createRecord(history))} className="btn btn-s">
       <span className="icon icon-plus icon-12px icon-left" />
       {i18n.t('common.new')}
     </button>

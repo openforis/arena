@@ -20,29 +20,11 @@ import SurveyFormView from '../surveyForm/surveyFormView'
 import { resetForm } from '../surveyForm/actions'
 import * as RecordState from './recordState'
 
-import {
-  checkInRecord,
-  checkOutRecord,
-  recordNodesUpdate,
-  nodeValidationsUpdate,
-  nodesUpdateCompleted,
-  recordDeleted,
-  sessionExpired,
-  cycleChanged,
-  applicationError,
-} from './actions'
+import { RecordActions } from '@webapp/store/ui/record'
 import { UserState } from '@webapp/store/user'
 
 const RecordView = (props) => {
-  const {
-    recordLoaded,
-    preview,
-    canEditRecord,
-    surveyCycleKey,
-    sessionExpired,
-    cycleChanged,
-    applicationError,
-  } = props
+  const { recordLoaded, preview, canEditRecord, surveyCycleKey, sessionExpired, cycleChanged, applicationError } = props
 
   const history = useHistory()
   const recordLoadedRef = useRef(false)
@@ -144,15 +126,15 @@ const enhance = compose(
   withRouter,
   connect(mapStateToProps, {
     resetForm,
-    checkInRecord,
-    checkOutRecord,
-    recordNodesUpdate,
-    nodeValidationsUpdate,
-    nodesUpdateCompleted,
-    recordDeleted,
-    sessionExpired,
-    cycleChanged,
-    applicationError,
+    checkInRecord: RecordActions.checkInRecord,
+    checkOutRecord: RecordActions.checkOutRecord,
+    recordNodesUpdate: RecordActions.recordNodesUpdate,
+    nodeValidationsUpdate: RecordActions.nodeValidationsUpdate,
+    nodesUpdateCompleted: RecordActions.nodesUpdateCompleted,
+    recordDeleted: RecordActions.recordDeleted,
+    sessionExpired: RecordActions.sessionExpired,
+    cycleChanged: RecordActions.cycleChanged,
+    applicationError: RecordActions.applicationError,
   })
 )
 

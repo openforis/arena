@@ -11,12 +11,11 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { SurveyState } from '@webapp/store/survey'
 
-
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { AppSavingActions } from '@webapp/store/app'
 
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
-import * as RecordState from './recordState'
+import * as RecordState from '../../../loggedin/surveyViews/record/recordState'
 import { UserState } from '@webapp/store/user'
 
 export const recordCreate = 'survey/record/create'
@@ -88,18 +87,6 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => (dis
 }
 
 // ====== UPDATE
-export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => (dispatch) => {
-  const nodeToUpdate = R.pipe(
-    R.dissoc(Node.keys.placeholder),
-    Node.assocValue(value),
-    Node.mergeMeta(meta),
-    NodeRefData.assocRefData(refData),
-    R.assoc(Node.keys.dirty, true)
-  )(node)
-
-  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
-  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
-}
 
 const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
@@ -117,6 +104,19 @@ const _updateNodeDebounced = (node, file, delay) => {
   }
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
+}
+
+export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => (dispatch) => {
+  const nodeToUpdate = R.pipe(
+    R.dissoc(Node.keys.placeholder),
+    Node.assocValue(value),
+    Node.mergeMeta(meta),
+    NodeRefData.assocRefData(refData),
+    R.assoc(Node.keys.dirty, true)
+  )(node)
+
+  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
 export const updateRecordStep = (step, history) => async (dispatch, getState) => {

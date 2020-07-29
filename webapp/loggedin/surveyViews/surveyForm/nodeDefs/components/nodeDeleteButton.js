@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { removeNode } from '@webapp/loggedin/surveyViews/record/actions'
+import { RecordActions } from '@webapp/store/ui/record'
 
 const NodeDeleteButton = (props) => {
   const { nodeDef, node, disabled, showConfirm } = props
@@ -21,7 +21,7 @@ const NodeDeleteButton = (props) => {
       }}
       aria-disabled={disabled}
       onClick={() => {
-        const performDelete = () => dispatch(removeNode(nodeDef, node))
+        const performDelete = () => dispatch(RecordActions.removeNode(nodeDef, node))
         if (showConfirm) {
           dispatch(
             DialogConfirmActions.showDialogConfirm({

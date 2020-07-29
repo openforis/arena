@@ -7,7 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SystemActions } from '@webapp/store/system'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
-import { recordLoad } from '../record/actions'
+import { RecordActions } from '@webapp/store/ui/record'
 import {
   formActivePageNodeDefUpdate,
   formNodeDefAddChildToUpdate,
@@ -54,7 +54,7 @@ const actionHandlers = {
   },
 
   // Record
-  [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
+  [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
       SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
