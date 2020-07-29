@@ -10,8 +10,9 @@ import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+
 import * as SurveyFormState from '../surveyFormState'
-import { toggleFormPageNavigation } from '../actions'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
@@ -70,11 +71,7 @@ const FormHeader = (props) => {
         )}
       </div>
 
-      {edit && canEditDef ? (
-        <FormEditActions />
-      ) : (
-        <FormEntryActions preview={preview} entry={entry} />
-      )}
+      {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )
 }
@@ -92,6 +89,6 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, {
-  toggleFormPageNavigation,
+  toggleFormPageNavigation: SurveyFormActions.toggleFormPageNavigation,
   createNodeDef: NodeDefsActions.createNodeDef,
 })(FormHeader)

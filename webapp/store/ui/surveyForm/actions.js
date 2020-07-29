@@ -5,7 +5,7 @@ import * as Node from '@core/record/node'
 
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
-import * as SurveyFormState from './surveyFormState'
+import * as SurveyFormState from '../../../loggedin/surveyViews/surveyForm/surveyFormState'
 
 /**
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
