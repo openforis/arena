@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux'
 
-import { RecordReducer, RecordState } from '../../store/ui/record'
+import { RecordReducer, RecordState } from '@webapp/store/ui/record'
+import { SurveyFormReducer } from '@webapp/store/ui/surveyForm'
 import * as SurveyFormState from './surveyForm/surveyFormState'
-
-import surveyForm from './surveyForm/reducer'
 
 export default combineReducers({
   [RecordState.stateKey]: RecordReducer,
-  [SurveyFormState.stateKey]: surveyForm,
+  [SurveyFormState.stateKey]: SurveyFormReducer,
 })
