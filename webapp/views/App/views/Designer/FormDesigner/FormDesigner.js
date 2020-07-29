@@ -5,7 +5,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SurveyFormView from '@webapp/loggedin/surveyViews/surveyForm/surveyFormView'
-import { RecordView } from '@webapp/components/survey/Record'
+import RecordView from '@webapp/components/survey/Record'
 
 const FormDesigner = () => {
   const canEditDef = useAuthCanEditSurvey()
