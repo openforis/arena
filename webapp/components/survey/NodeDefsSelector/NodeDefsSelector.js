@@ -9,7 +9,7 @@ import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -76,7 +76,7 @@ const NodeDefsSelector = (props) => {
                 }}
               >
                 <span>{i18n.t(type)}</span>
-                {NodeDefUiProps.getIconByType(type)}
+                {NodeDefUIProps.getIconByType(type)}
               </button>
             ) : null
           )}

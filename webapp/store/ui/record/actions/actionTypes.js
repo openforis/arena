@@ -1,0 +1,7 @@
+export const recordCreate = 'ui/record/create'
+export const recordLoad = 'ui/record/load'
+export const recordDelete = 'ui/record/delete'
+export const recordUuidPreviewUpdate = 'ui/record/preview/update'
+export const nodesUpdate = 'ui/record/node/update'
+export const nodeDelete = 'ui/record/node/delete'
+export const validationsUpdate = 'ui/record/validation/update'

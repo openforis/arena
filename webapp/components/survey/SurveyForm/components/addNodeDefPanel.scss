@@ -1,0 +1,62 @@
+@import 'webapp/style/vars';
+@import '../SurveyFormVars';
+
+.survey-form__add-node-def-panel {
+  position: relative;
+  display: grid;
+  row-gap: 0.4rem;
+  align-content: start;
+  justify-content: center;
+  grid-template-columns: 0.65fr;
+  padding-top: 3rem;
+  border-top: 1px dashed $greyBorder;
+  border-right: 1px dashed $greyBorder;
+  border-bottom: 1px dashed $greyBorder;
+  background-color: $white;
+
+  .btn-add-node-def {
+    background-color: rgba($green, 0.3);
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+
+    &:hover {
+      background-color: rgba($green, 0.85);
+    }
+  }
+
+  .icon {
+    font-size: 0.8rem !important;
+    opacity: 0.6;
+  }
+
+  .node_def__icon {
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.6;
+    letter-spacing: 0;
+  }
+
+  .icon-text-color {
+    font-size: 0.8rem !important;
+  }
+
+  .add-to-label {
+    font-weight: 600;
+    font-size: 0.7rem;
+    opacity: 0.8;
+
+    .icon {
+      opacity: 0.5;
+    }
+  }
+
+  .btn-toggle {
+    position: absolute;
+    left: 1.3rem;
+
+    .icon {
+      opacity: 1;
+    }
+  }
+}

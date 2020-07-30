@@ -13,8 +13,7 @@ import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-
-import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
@@ -24,7 +23,7 @@ const Designer = () => {
   const canEditDef = useAuthCanEditSurvey()
 
   useEffect(() => {
-    dispatch(resetForm())
+    dispatch(SurveyFormActions.resetForm())
   }, [])
 
   return (

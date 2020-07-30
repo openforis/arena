@@ -1,22 +1,17 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-import SurveyFormView from '@webapp/loggedin/surveyViews/surveyForm/surveyFormView'
-import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
-
-import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
-
+import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import SurveyForm from '@webapp/components/survey/SurveyForm'
+import Record from '@webapp/components/survey/Record'
 
 const FormDesigner = () => {
   const canEditDef = useAuthCanEditSurvey()
   const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
-  return recordPreviewUuid ? (
-    <RecordView canEditDef={canEditDef} />
-  ) : (
-    <SurveyFormView edit draft canEditDef={canEditDef} />
-  )
+  return recordPreviewUuid ? <Record canEditDef={canEditDef} /> : <SurveyForm edit draft canEditDef={canEditDef} />
 }
 
 export default FormDesigner

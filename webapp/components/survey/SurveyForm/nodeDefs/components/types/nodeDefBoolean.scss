@@ -1,0 +1,13 @@
+@import 'webapp/style/vars';
+@import '../../../SurveyFormVars';
+
+.survey-form__node-def-boolean {
+  display: flex;
+  border: $formBorder;
+}
+
+.survey-form__node-def-entity-table-row {
+  .survey-form__node-def-boolean {
+    border: none;
+  }
+}

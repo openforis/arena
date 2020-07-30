@@ -5,7 +5,7 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 const AttributeSelector = (props) => {
   const {
@@ -36,7 +36,7 @@ const AttributeSelector = (props) => {
         disabled={!canSelectAttributes}
       >
         {NodeDef.getLabel(nodeDef, lang)}
-        {NodeDefUiProps.getIconByType(nodeDefType)}
+        {NodeDefUIProps.getIconByType(nodeDefType)}
       </button>
     )
   )

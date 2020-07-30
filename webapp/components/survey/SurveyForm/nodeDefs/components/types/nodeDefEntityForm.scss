@@ -1,0 +1,15 @@
+@import 'webapp/style/vars';
+@import '../../../SurveyFormVars';
+
+.survey-form__node-def-entity-form-header {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 10rem;
+  background-color: $formBgColorGrey;
+
+  .node-select {
+    min-width: 150px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+}

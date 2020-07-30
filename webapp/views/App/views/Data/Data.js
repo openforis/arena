@@ -8,7 +8,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
+import Record from '@webapp/components/survey/Record'
 
 import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 
@@ -39,7 +39,7 @@ const Data = () => {
           },
           // Edit record
           {
-            component: RecordView,
+            component: Record,
             path: `${appModuleUri(dataModules.record)}:recordUuid/`,
             props: { draftDefs },
           },

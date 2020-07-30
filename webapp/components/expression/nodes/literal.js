@@ -8,14 +8,17 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
-import Dropdown from '../../form/Dropdown'
-import { useAsyncGetRequest } from '../../hooks'
 import { useI18n, useLang } from '@webapp/store/system'
+
+import { useAsyncGetRequest } from '../../hooks'
+
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import Dropdown from '@webapp/components/form/Dropdown'
+import { Input } from '@webapp/components/form/input'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
-import { Input } from '../../form/input'
 
 const isValueText = (nodeDef, value) =>
   nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false

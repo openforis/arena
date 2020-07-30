@@ -8,7 +8,7 @@ import * as StringUtils from '@core/stringUtils'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLang } from '@webapp/store/survey'
 
-import NodeDefTableCellHeader from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import { useColumn } from './store'
 

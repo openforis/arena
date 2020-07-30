@@ -1,0 +1,151 @@
+@import 'webapp/style/vars';
+@import '../SurveyFormVars';
+
+// === page
+.survey-form__node-def-page {
+  position: relative;
+  overflow-y: auto;
+  background-color: $white;
+  border-top: $formBorder;
+  border-right: $formBorder;
+  border-bottom: $formBorder;
+}
+
+// page style when form navigation is off
+.survey-form.page-navigation-off {
+  .survey-form__node-def-page {
+    border-left: $formBorder;
+  }
+}
+
+// page style in edit mode
+.survey-form.edit {
+  .survey-form__node-def-page {
+    border-top: $formBorderEdit;
+    border-right: $formBorderEdit;
+    border-bottom: $formBorderEdit;
+  }
+
+  &.page-navigation-off {
+    .survey-form__node-def-page {
+      border-left: $formBorderEdit;
+    }
+  }
+}
+
+// === page item
+.survey-form__node-def-page-item {
+  display: grid;
+  position: relative;
+  height: 100%;
+
+  &.not-applicable {
+    background-color: rgba($greyBorder, 0.7);
+    opacity: 0.6;
+  }
+}
+
+// === form item
+.survey-form__node-def-form-item {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 30px 1fr;
+
+  > :nth-child(1).form-label {
+    align-self: end;
+    justify-self: auto;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  > :nth-child(2) {
+    padding: 0 0.5rem;
+    align-self: start;
+  }
+
+  .form-input {
+    text-overflow: ellipsis;
+    text-align: left;
+    border: $formBorder;
+  }
+
+  .dropdown {
+    grid-template-columns: 1fr 35px;
+    border: $formBorder;
+
+    .form-input {
+      border: none;
+    }
+
+    > :nth-child(2) {
+      justify-self: center;
+    }
+  }
+}
+
+//multiple node def
+.survey-form__node-def-multiple-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+
+  > *:first-child {
+    position: absolute;
+    max-height: 100%;
+    left: 10px;
+    right: 10px;
+    overflow-y: auto;
+  }
+}
+
+// error badge
+.survey-form__node-def-error-badge {
+  padding-left: 0;
+
+  .badge__content {
+    display: flex;
+    align-items: center;
+
+    > *:not(:first-child) {
+      margin-left: 10px;
+    }
+  }
+}
+
+.survey-form__node-def-form-item {
+  .survey-form__node-def-error-badge {
+    padding-bottom: 0;
+    position: relative;
+  }
+}
+
+.survey-form__node-def-text-multiple-container {
+  .survey-form__node-def-error-badge {
+    position: absolute;
+  }
+}
+
+.survey-form__node-def-entity-table-row {
+  .survey-form__node-def-error-badge {
+    padding: 0;
+    height: 100%;
+    width: 100%;
+
+    .badge__content {
+      height: 100%;
+      font-weight: 400;
+
+      > *:first-child {
+        width: 100%;
+        height: 100%;
+      }
+
+      .icon-warning {
+        position: absolute;
+        left: -0.5rem;
+      }
+    }
+  }
+}
