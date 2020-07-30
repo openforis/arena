@@ -1,13 +1,9 @@
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
 import { Query } from '../../../../common/model/query'
-import * as Chain from '../../../../common/analysis/processingChain'
-import * as Step from '../../../../common/analysis/processingStep'
-import * as Calculation from '../../../../common/analysis/processingStepCalculation'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
 
 import * as Survey from '../../../../core/survey/survey'
-import * as NodeDef from '../../../../core/survey/nodeDef'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
