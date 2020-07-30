@@ -8,7 +8,6 @@ import DownloadButton from '@webapp/components/form/downloadButton'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as RecordFile from '@core/record/recordFile'
 import NodeDeleteButton from '../nodeDeleteButton'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
@@ -29,11 +28,10 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
   }
 }
 
-const FileInput = props => {
+const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
 
   const fileName = Node.getFileName(node)
-  const truncatedFileName = RecordFile.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
 
   return (
@@ -41,7 +39,7 @@ const FileInput = props => {
       <UploadButton
         disabled={edit || !canEditRecord || readOnly}
         showLabel={false}
-        onChange={files => handleFileChange(nodeDef, node, files[0], updateNode)}
+        onChange={(files) => handleFileChange(nodeDef, node, files[0], updateNode)}
       />
 
       {fileUploaded && (
@@ -64,7 +62,7 @@ const FileInput = props => {
   )
 }
 
-const MultipleFileInput = props => {
+const MultipleFileInput = (props) => {
   const { nodes } = props
 
   return (
@@ -76,6 +74,6 @@ const MultipleFileInput = props => {
   )
 }
 
-const NodeDefFile = props => (props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />)
+const NodeDefFile = (props) => (props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />)
 
 export default NodeDefFile
