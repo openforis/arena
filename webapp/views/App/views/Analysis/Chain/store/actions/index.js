@@ -52,6 +52,6 @@ export const useActions = ({ setState }) => ({
 
   save: useSave({ setState }),
 
-  addEntityVirtual: useAddEntityVirtual(),
-  addNodeDefAnalysis: useAddNodeDefAnalysis(),
+  addEntityVirtual: useAddEntityVirtual({ setState }),
+  addNodeDefAnalysis: useAddNodeDefAnalysis({ setState }),
 })

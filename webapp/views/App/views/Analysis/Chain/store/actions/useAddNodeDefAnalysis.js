@@ -15,15 +15,16 @@ import { NodeDefsActions, useSurveyInfo, useSurvey } from '@webapp/store/survey'
 
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
-
+import { useUpdateAttribute } from './calculation/useUpdateAttribute'
 import { State } from '../state'
 
-export const useAddNodeDefAnalysis = () => {
+export const useAddNodeDefAnalysis = ({ setState }) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
   const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
+  const updateAttributeCalculation = useUpdateAttribute({ setState })
 
   const nodeDefParent = ({ step }) =>
     A.pipe(Step.getEntityUuid, (entityDefUuid) => Survey.getNodeDefByUuid(entityDefUuid)(survey))(step)
@@ -43,7 +44,8 @@ export const useAddNodeDefAnalysis = () => {
     )
 
     await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-    AnalysisStorage.persistChainEdit(state)
+    const updatedState = updateAttributeCalculation({ attrDef: nodeDef, state })
+    AnalysisStorage.persistChainEdit(updatedState)
     history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
   }, [])
 }

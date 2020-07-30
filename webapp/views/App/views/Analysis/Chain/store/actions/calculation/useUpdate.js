@@ -24,12 +24,12 @@ export const useUpdate = ({ setState }) => {
       calculationValidation
     )(State.getChainEdit(state))
 
-    setState(
-      A.pipe(
-        State.assocChainEdit(chainUpdated),
-        State.assocStepEdit(stepUpdated),
-        State.assocCalculationEdit(calculationUpdated)
-      )(state)
-    )
+    const updatedState = A.pipe(
+      State.assocChainEdit(chainUpdated),
+      State.assocStepEdit(stepUpdated),
+      State.assocCalculationEdit(calculationUpdated)
+    )(state)
+    setState(updatedState)
+    return updatedState
   }, [])
 }

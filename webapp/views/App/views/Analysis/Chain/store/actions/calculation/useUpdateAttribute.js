@@ -11,6 +11,7 @@ export const useUpdateAttribute = ({ setState }) => {
   return useCallback(({ attrDef, state }) => {
     const calculationEdit = State.getCalculationEdit(state)
     const calculationUpdated = Calculation.assocNodeDefUuid(NodeDef.getUuid(attrDef))(calculationEdit)
-    update({ calculationUpdated, state })
+    const updatedState = update({ calculationUpdated, state })
+    return updatedState
   }, [])
 }
