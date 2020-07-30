@@ -2,11 +2,11 @@ import * as R from 'ramda'
 
 import * as Record from '@core/record/record'
 
-import * as SurveyViewsState from '../../../loggedin/surveyViews/surveyViewsState'
+import * as UiState from '../state'
 
 export const stateKey = 'record'
 
-const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
 
 const keys = {
   recordEdit: 'recordEdit',
@@ -27,11 +27,11 @@ export const assocRecord = R.assoc(keys.recordEdit)
 
 export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)
 
-const _updateRecord = fn => recordState =>
-  R.pipe(R.prop(keys.recordEdit), fn, record => R.assoc(keys.recordEdit, record)(recordState))(recordState)
+const _updateRecord = (fn) => (recordState) =>
+  R.pipe(R.prop(keys.recordEdit), fn, (record) => R.assoc(keys.recordEdit, record)(recordState))(recordState)
 
-export const mergeRecordNodes = nodes => _updateRecord(Record.mergeNodes(nodes))
+export const mergeRecordNodes = (nodes) => _updateRecord(Record.mergeNodes(nodes))
 
-export const deleteRecordNode = node => _updateRecord(Record.deleteNode(node))
+export const deleteRecordNode = (node) => _updateRecord(Record.deleteNode(node))
 
-export const mergeRecordNodeValidations = validations => _updateRecord(Record.mergeNodeValidations(validations))
+export const mergeRecordNodeValidations = (validations) => _updateRecord(Record.mergeNodeValidations(validations))
