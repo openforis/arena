@@ -1,19 +1,12 @@
-import * as R from 'ramda'
-
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
-import * as Chain from '../../../../common/analysis/processingChain'
-import * as Step from '../../../../common/analysis/processingStep'
-import * as Calculation from '../../../../common/analysis/processingStepCalculation'
+
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
 
 import * as Survey from '../../../../core/survey/survey'
 import * as NodeDef from '../../../../core/survey/nodeDef'
-import * as PromiseUtils from '../../../../core/promiseUtils'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
-import * as ChainRepository from '../../analysis/repository/chain'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -117,50 +110,3 @@ export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
 export const { populateTable } = DataTableInsertRepository
 
 export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
-
-// eslint-disable-next-line jsdoc/require-description,jsdoc/require-param
-/**
- * @deprecated - Use ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client) and iterate normally.
- */
-const _visitProcessingSteps = async (surveyId, client, visitor) => {
-  const chains = await ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client)
-  await PromiseUtils.each(chains, async (chain) =>
-    PromiseUtils.each(Chain.getProcessingSteps(chain), async (step) => visitor(step, chain))
-  )
-}
-
-// Aggregated entity views
-export const getEntityAggregatedViews = async (survey, client = db) => {
-  const entityAggregatedViewsByUuid = {}
-
-  const surveyId = Survey.getId(survey)
-
-  await _visitProcessingSteps(surveyId, client, async (step, chain) => {
-    if (Step.hasEntity(step, chain)) {
-      const entityUuid = Step.getEntityUuid(step)
-      const calculations = Step.getCalculations(step)
-      calculations.forEach((calculation) => {
-        if (Calculation.hasAggregateFunction(calculation)) {
-          let entityAggregatedView = entityAggregatedViewsByUuid[entityUuid]
-          if (entityAggregatedView) {
-            entityAggregatedView = EntityAggregatedView.addCalculation(calculation)(entityAggregatedView)
-          } else {
-            const entityDef = Survey.getNodeDefByUuid(entityUuid)(survey)
-            const entityAggregatedViewEntityDef = NodeDef.isVirtual(entityDef)
-              ? Survey.getNodeDefParent(entityDef)(survey)
-              : R.pipe(Chain.getStepPrev(step), Step.getEntityUuid, (entityDefUuid) =>
-                  Survey.getNodeDefByUuid(entityDefUuid)(survey)
-                )(chain)
-
-            entityAggregatedView = EntityAggregatedView.newEntityAggregatedView(entityAggregatedViewEntityDef, [
-              calculation,
-            ])
-          }
-
-          entityAggregatedViewsByUuid[entityUuid] = entityAggregatedView
-        }
-      })
-    }
-  })
-  return entityAggregatedViewsByUuid
-}

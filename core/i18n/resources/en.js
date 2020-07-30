@@ -5,6 +5,15 @@ export const enTranslation = {
   common: {
     add: 'Add',
     apply: 'Apply',
+    aggregateFunction: 'Aggregate function',
+    aggregateFunctions: {
+      avg: 'Average',
+      cnt: 'Count',
+      max: 'Maximum',
+      med: 'Median',
+      min: 'Minimum',
+      sum: 'Sum',
+    },
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
@@ -369,15 +378,6 @@ $t(common.cantUndoWarning)`,
     types: {
       quantitative: 'Quantitative',
       categorical: 'Categorical',
-    },
-    aggregateFunction: 'Aggregate function',
-    aggregateFunctions: {
-      avg: 'Average',
-      cnt: 'Count',
-      max: 'Maximum',
-      med: 'Median',
-      min: 'Minimum',
-      sum: 'Sum',
     },
     deleteConfirm: `Delete this calculation step?
     

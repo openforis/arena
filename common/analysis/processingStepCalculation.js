@@ -49,11 +49,8 @@ export const aggregateFn = {
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
 export const getScript = R.prop(keys.script)
 
-export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
-
-export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 
 export const {
   getNodeDefUuid,
@@ -75,4 +72,3 @@ export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, (typeValue) => R.prop(typeValue, nodeDefTypeByType))
 export const getTypeByNodeDef = R.pipe(NodeDef.getType, (nodeDefType) => R.prop(nodeDefType, typeByNodeDefType))
-export const hasAggregateFunction = R.pipe(getAggregateFunction, R.isNil, R.not)
