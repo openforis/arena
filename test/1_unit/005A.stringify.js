@@ -29,7 +29,7 @@ const tests = [
 
   { value: new Set(), valueText: 'new Set()', expected: '' },
 
-  { value: new Set([1, 2, 3]), valueText: 'new Set([1,2,3])', expected: '[1,2,3]' },
+  { value: new Set([1, 2, 3]), valueText: 'new Set([1,2,3])', expected: '{"type":"Set","value":"[1,2,3]"}' },
 
   { value: new Map(), valueText: 'new Map()', expected: '' },
 
@@ -40,7 +40,7 @@ const tests = [
       [3, 'three'],
     ]),
     valueText: "new Map([[1, 'one'],[2, 'two'], [3, 'three']])",
-    expected: '{"1":"one","2":"two","3":"three"}',
+    expected: '{"type":"Map","value":"[[1,\\"one\\"],[2,\\"two\\"],[3,\\"three\\"]]"}',
   },
   {
     value: {
@@ -50,8 +50,8 @@ const tests = [
         [3, 'three'],
       ]),
     },
-    valueText: "{a: {new Map([[1, 'one'],[2, 'two'], [3, 'three']])}}",
-    expected: '{"a":{"1":"one","2":"two","3":"three"}}',
+    valueText: "{a: new Map([[1, 'one'],[2, 'two'], [3, 'three']])}",
+    expected: '{"a":{"type":"Map","value":"[[1,\\"one\\"],[2,\\"two\\"],[3,\\"three\\"]]"}}',
   },
 
   {
@@ -60,13 +60,14 @@ const tests = [
       b: 'b',
       c: new Map([
         [1, 'one'],
-        [2, 'two'],
+        ['2', 'two'],
         [3, 'three'],
       ]),
       d: new Set([1, 2, 3]),
     },
-    valueText: "{a: 1, b: 'b', c: {new Map([[1, 'one'],[2, 'two'], [3, 'three']])}, d: new Set([1,2,3]}",
-    expected: '{"a":1,"b":"b","c":{"1":"one","2":"two","3":"three"},"d":[1,2,3]}',
+    valueText: "{a: 1, b: 'b', c: {new Map([[1, 'one'],['2', 'two'], [3, 'three']])}, d: new Set([1,2,3]}",
+    expected:
+      '{"a":1,"b":"b","c":{"type":"Map","value":"[[1,\\"one\\"],[\\"2\\",\\"two\\"],[3,\\"three\\"]]"},"d":{"type":"Set","value":"[1,2,3]"}}',
   },
   { value: 0, valueText: '0', expected: '0' },
   { value: 10, valueText: '10', expected: '10' },
@@ -77,7 +78,11 @@ const tests = [
 describe('A.stringify', () => {
   tests.forEach(({ value, valueText, expected }) => {
     it(`${valueText} ->  ${expected}`, () => {
-      assert.deepEqual(expected, A.stringify(value))
+      const result = A.stringify(value)
+      assert.deepEqual(String(expected), String(result))
+      if (!A.isEmpty(result)) {
+        assert.deepEqual(value, A.parse(result))
+      }
     })
   })
 })
