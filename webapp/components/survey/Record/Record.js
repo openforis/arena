@@ -1,14 +1,23 @@
 import React from 'react'
 
 import SurveyFormView from '@webapp/components/survey/SurveyForm'
-import { useRecordView } from './useRecordView'
+import { State, useLocalState } from './store'
 
 const Record = () => {
-  const { canEditRecord, preview, recordLoaded } = useRecordView()
+  const { state } = useLocalState()
 
-  return recordLoaded ? (
-    <SurveyFormView draft={preview} preview={preview} edit={false} entry canEditRecord={canEditRecord} />
-  ) : null
+  if (!State.isLoaded(state)) {
+    return null
+  }
+  return (
+    <SurveyFormView
+      draft={State.isPreview(state)}
+      preview={State.isPreview(state)}
+      edit={false}
+      entry
+      canEditRecord={State.isEditable(state)}
+    />
+  )
 }
 
 export default Record

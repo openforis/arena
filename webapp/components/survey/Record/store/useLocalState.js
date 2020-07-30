@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useHistory } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
@@ -15,13 +16,11 @@ import { useAuthCanEditRecord } from '@webapp/store/user'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
-export const useRecordView = () => {
+import { State } from './state'
+
+export const useLocalState = () => {
   const history = useHistory()
   const dispatch = useDispatch()
-  const recordLoadedRef = useRef(false)
-
-  const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
-  const preview = Boolean(recordUuidPreview)
 
   const {
     recordUuid: recordUuidUrlParam,
@@ -29,14 +28,22 @@ export const useRecordView = () => {
     pageNodeDefUuid: pageNodeDefUuidUrlParam,
   } = useParams()
 
+  const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
+  const preview = Boolean(recordUuidPreview)
+
   const recordUuid = recordUuidUrlParam || recordUuidPreview
 
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
-  const record = useSelector(RecordState.getRecord)
-  const recordLoaded = Boolean(record)
 
-  const canEditRecord = useAuthCanEditRecord(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
+  const record = useSelector(RecordState.getRecord)
+  const editable = useAuthCanEditRecord(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
+
+  const [state, setState] = useState(() => State.create({ preview }))
+
+  if (record && !State.isLoaded(state)) {
+    setState(A.pipe(State.assocLoaded(true), State.assocEditable(editable)))
+  }
 
   const componentUnload = () => {
     // Remove web socket listeners
@@ -47,7 +54,7 @@ export const useRecordView = () => {
     AppWebSocket.off(WebSocketEvents.recordSessionExpired)
     AppWebSocket.off(WebSocketEvents.applicationError)
 
-    if (recordLoadedRef.current) {
+    if (State.isLoaded(state)) {
       dispatch(RecordActions.checkOutRecord(recordUuid))
     }
 
@@ -81,10 +88,6 @@ export const useRecordView = () => {
   }
 
   useEffect(() => {
-    recordLoadedRef.current = recordLoaded
-  }, [recordLoaded])
-
-  useEffect(() => {
     componentLoad()
     return componentUnload
   }, [])
@@ -93,9 +96,5 @@ export const useRecordView = () => {
     dispatch(RecordActions.cycleChanged(history))
   }, [surveyCycleKey])
 
-  return {
-    canEditRecord,
-    preview,
-    recordLoaded,
-  }
+  return { state }
 }
