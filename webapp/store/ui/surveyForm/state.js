@@ -6,10 +6,11 @@ import * as Record from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
-import * as SurveyViewsState from '../../../loggedin/surveyViews/surveyViewsState'
+
+import * as UiState from '../state'
 
 export const stateKey = 'surveyForm'
-const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
 const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
@@ -84,7 +85,7 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
 
 export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
 
-export const setShowPageNavigation = (showPageNavigation) => R.assoc(keys.showPageNavigation, showPageNavigation)
+export const setShowPageNavigation = (value) => R.assoc(keys.showPageNavigation, value)
 
 // ====== NodeDef update actions
 
