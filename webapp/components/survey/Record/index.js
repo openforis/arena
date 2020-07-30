@@ -1,1 +1,1 @@
-export { default } from './RecordView'
+export { default } from './Record'
