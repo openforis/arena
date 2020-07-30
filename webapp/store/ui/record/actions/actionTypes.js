@@ -1,0 +1,7 @@
+export const recordCreate = 'survey/record/create'
+export const recordLoad = 'survey/record/load'
+export const recordDelete = 'survey/record/delete'
+export const recordUuidPreviewUpdate = 'survey/record/preview/update'
+export const nodesUpdate = 'survey/record/node/update'
+export const nodeDelete = 'survey/record/node/delete'
+export const validationsUpdate = 'survey/record/validation/update'
