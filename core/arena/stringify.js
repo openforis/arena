@@ -4,7 +4,7 @@ import { isEmpty } from './isEmpty'
 import { mapToObject } from './mapToObject'
 
 /**
- * Stringify any object.
+ * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
  * It handles objects, arrays, Map, Set, String, Number.
  *
  * @param {*} object - The value, object, to stringify.
