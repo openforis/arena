@@ -12,7 +12,7 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
-import { Sort } from '../../../../../common/model/query'
+import { Query, Sort } from '../../../../../common/model/query'
 import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef, TableRecord } from '../../../../../common/model/db'
 import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -25,13 +25,11 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-const _getSelectFields = (params) => {
-  const { survey, nodeDef, columnNodeDefs, nodeDefCols, editMode } = params
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-
+const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode }) => {
   if (columnNodeDefs) {
     return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
   }
+
   if (!R.isEmpty(nodeDefCols)) {
     const selectFields = [
       viewDataNodeDef.columnRecordUuid,
@@ -42,7 +40,7 @@ const _getSelectFields = (params) => {
       ...viewDataNodeDef.columnUuids,
     ]
     if (editMode) {
-      const tableRecord = new TableRecord(Survey.getId(survey))
+      const tableRecord = new TableRecord(viewDataNodeDef.surveyId)
       selectFields.push(
         // Node (every node is transformed into json in a column named with the nodeDefUuid)
         ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
@@ -56,13 +54,10 @@ const _getSelectFields = (params) => {
   return '*'
 }
 
-const _getFromClause = (params) => {
-  const { survey, nodeDef, editMode, nodeDefCols } = params
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-  const { surveyId } = viewDataNodeDef
-
+const _getFromClause = ({ viewDataNodeDef, nodeDefCols, editMode }) => {
   const fromTables = [viewDataNodeDef.nameAliased]
   if (editMode) {
+    const { surveyId } = viewDataNodeDef
     const tableRecord = new TableRecord(surveyId)
     fromTables.push(
       // Node table; one join per column def
@@ -85,28 +80,30 @@ const _getFromClause = (params) => {
   return fromTables.join(' ')
 }
 
-const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (row) => {
-  const rowUpdated = { ...row }
-  if (editMode) {
-    // Node columns (one column for each selected node def)
-    rowUpdated.cols = {}
-    nodeDefCols.forEach((nodeDefCol) => {
-      const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
-      const nodeJson = rowUpdated[nodeDefColUuid]
-      const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
-      const parentUuid = rowUpdated[nodeDefParentColumnUuid]
-      rowUpdated.cols[nodeDefColUuid] = {
-        node: TableNode.dbTransformCallback(nodeJson),
-        parentUuid,
-      }
-      delete rowUpdated[nodeDefColUuid]
-    })
-    // Record column
-    rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
-    // Parent node uuid column
-    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
-    rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
+const _dbTransformCallbackSelect = ({ viewDataNodeDef, nodeDefCols, editMode }) => (row) => {
+  if (!editMode) {
+    return row
   }
+  const rowUpdated = { ...row }
+  // Node columns (one column for each selected node def)
+  rowUpdated.cols = {}
+  nodeDefCols.forEach((nodeDefCol) => {
+    const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
+    const nodeJson = rowUpdated[nodeDefColUuid]
+    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+    const parentUuid = rowUpdated[nodeDefParentColumnUuid]
+    rowUpdated.cols[nodeDefColUuid] = {
+      node: TableNode.dbTransformCallback(nodeJson),
+      parentUuid,
+    }
+    delete rowUpdated[nodeDefColUuid]
+  })
+  // Record column
+  rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
+  // Parent node uuid column
+  const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
+  rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
+
   return rowUpdated
 }
 
@@ -116,43 +113,34 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
- * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
- * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
+ * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {object} [params.filter=null] - The filter expression object.
- * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
- * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {
-  const {
-    survey,
-    cycle,
-    nodeDef,
-    nodeDefCols = [],
-    offset = null,
-    limit = null,
-    filter = null,
-    sort = [],
-    editMode = false,
-    stream = false,
-  } = params
+  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false } = params
+
+  const editMode = Query.isModeRawEdit(query)
+  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const nodeDefCols = Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey)
 
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
-  const selectFields = _getSelectFields(params)
+  const selectFields = _getSelectFields({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode })
 
-  const fromClause = _getFromClause(params)
+  const fromClause = _getFromClause({ viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
+  const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
   // SORT clause
+  const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
 
   const select = `
@@ -179,12 +167,12 @@ export const fetchViewData = async (params, client = db) => {
 
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
-    : client.map(select, queryParams, _dbTransformCallbackSelect(viewDataNodeDef, editMode, nodeDefCols))
+    : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
-export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
+export const runCount = async ({ surveyId, cycle, tableName, filter }, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { clause: filterClause, params: filterParams } = filterExpr ? Expression.toSql(filterExpr) : {}
+  const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
   const countRS = await client.one(
     `
@@ -221,7 +209,7 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
     Expression.operators.comparison.notEq.key
   )
 
-  const whereExpr = R.reduce(
+  const filter = R.reduce(
     (whereExprAcc, nodeDefKey) => {
       const nodeKey = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefKey))(record)
 
@@ -236,7 +224,7 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
     nodeDefKeys
   )
 
-  return runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
+  return runCount({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
 }
 
 export const fetchRecordsCountByKeys = async (

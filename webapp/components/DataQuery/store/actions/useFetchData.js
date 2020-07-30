@@ -7,16 +7,6 @@ import { usePost } from '@webapp/components/hooks'
 export const throttleTime = 250
 export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
-const getBody = ({ cycle, offset, limit, query }) => ({
-  cycle,
-  nodeDefUuidCols: JSON.stringify(Query.getAttributeDefUuids(query)),
-  offset,
-  limit,
-  filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
-  sort: JSON.stringify(Query.getSort(query)),
-  editMode: Query.isModeRawEdit(query),
-})
-
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
@@ -27,7 +17,7 @@ export const useFetchData = ({ setData }) => {
       ({ offset, limit, query }) =>
         post({
           url: getUrl({ surveyId, query }),
-          body: getBody({ cycle, query, limit, offset }),
+          body: { cycle, query, limit, offset },
         }),
       [cycle, surveyId, post]
     ),

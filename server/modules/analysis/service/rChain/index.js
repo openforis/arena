@@ -9,6 +9,7 @@ import * as Chain from '../../../../../common/analysis/processingChain'
 import * as Step from '../../../../../common/analysis/processingStep'
 import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
 import { TableChain, TableCalculation } from '../../../../../common/model/db'
+import { Query } from '../../../../../common/model/query'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
@@ -28,8 +29,8 @@ export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
     SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle),
     AnalysisManager.fetchStep({ surveyId, stepUuid }),
   ])
-  const nodeDef = Survey.getNodeDefByUuid(Step.getEntityUuid(step))(survey)
-  return SurveyRdbManager.fetchViewData({ survey, cycle, nodeDef, columnNodeDefs: true })
+  const query = Query.create({ entityDefUuid: Step.getEntityUuid(step) })
+  return SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs: true })
 }
 
 // ==== UPDATE

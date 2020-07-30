@@ -9,18 +9,13 @@ import { Query } from '@common/model/query'
 const ButtonDownload = (props) => {
   const { disabled, query } = props
   const entityDefUuid = Query.getEntityDefUuid(query)
-  const attributeDefUuids = Query.getAttributeDefUuids(query)
-  const filter = Query.getFilter(query)
-  const sort = Query.getSort(query)
 
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
   const requestParams = {
-    filter: JSON.stringify(filter),
-    sort: JSON.stringify(sort),
-    nodeDefUuidCols: JSON.stringify(attributeDefUuids),
     cycle: surveyCycleKey,
+    query,
   }
 
   const href = `/api/surveyRdb/${surveyId}/${entityDefUuid}/export`
