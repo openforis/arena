@@ -1,6 +1,6 @@
 import React from 'react'
 
-import SurveyFormView from '@webapp/components/survey/SurveyForm'
+import SurveyForm from '@webapp/components/survey/SurveyForm'
 import { State, useLocalState } from './store'
 
 const Record = () => {
@@ -10,7 +10,7 @@ const Record = () => {
     return null
   }
   return (
-    <SurveyFormView
+    <SurveyForm
       draft={State.isPreview(state)}
       preview={State.isPreview(state)}
       edit={false}

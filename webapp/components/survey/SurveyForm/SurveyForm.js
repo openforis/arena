@@ -1,4 +1,4 @@
-import './SurveyFormView.scss'
+import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
@@ -24,7 +24,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-const SurveyFormView = (props) => {
+const SurveyForm = (props) => {
   const {
     surveyInfo,
     surveyCycleKey,
@@ -118,7 +118,7 @@ const SurveyFormView = (props) => {
   ) : null
 }
 
-SurveyFormView.defaultProps = {
+SurveyForm.defaultProps = {
   surveyInfo: null,
   // Current nodeDef page
   nodeDef: null,
@@ -158,4 +158,4 @@ const mapStateToProps = (state, props) => {
 }
 
 const enhance = compose(withRouter, connect(mapStateToProps))
-export default enhance(SurveyFormView)
+export default enhance(SurveyForm)

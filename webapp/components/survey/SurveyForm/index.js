@@ -1,1 +1,1 @@
-export { default } from './SurveyFormView'
+export { default } from './SurveyForm'
