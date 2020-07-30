@@ -19,15 +19,6 @@ const getTypes = (i18n) =>
     }))
   )(Calculation.type)
 
-const getAggregateFns = (i18n) =>
-  R.pipe(
-    R.keys,
-    R.map((fn) => ({
-      key: fn,
-      label: i18n.t(`processingStepCalculation.aggregateFunctions.${fn}`),
-    }))
-  )(Calculation.aggregateFn)
-
 export default ({ state }) => {
   const i18n = useI18n()
   const survey = useSurvey()
@@ -54,15 +45,11 @@ export default ({ state }) => {
 
   const calculationUuid = Calculation.getUuid(calculation)
   const validation = Chain.getItemValidationByUuid(calculationUuid)(chain)
-  const aggregateFunctionEnabled =
-    Calculation.isQuantitative(calculation) && (Step.getIndex(step) > 0 || NodeDef.isVirtual(entity))
 
   return {
     validation,
     attributes,
     attribute,
     types: getTypes(i18n),
-    aggregateFunctionEnabled,
-    aggregateFns: aggregateFunctionEnabled ? getAggregateFns(i18n) : null,
   }
 }
