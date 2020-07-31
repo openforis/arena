@@ -13,16 +13,16 @@ export const stringify = (object) => {
     if (value.constructor === Map)
       return {
         __type: 'Map',
-        __values: JSON.stringify(Array.from(value.entries())),
+        __values: stringify(Array.from(value.entries())),
       }
     if (value.constructor === Set)
       return {
         __type: 'Set',
-        __values: JSON.stringify([...value]),
+        __values: stringify([...value]),
       }
     if (value.constructor === object) {
-      return JSON.stringify(stringify(value))
+      return stringify(value)
     }
-    return isNull(key) ? JSON.stringify(value) : value
+    return isNull(key) ? stringify(value) : value
   })
 }
