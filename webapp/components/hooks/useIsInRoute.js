@@ -3,7 +3,7 @@ import { designerModules, appModuleUri } from '@webapp/app/appModules'
 
 export const useIsInRoute = (path) => {
   const { pathname } = useLocation()
-  return matchPath(pathname, path)
+  return Boolean(matchPath(pathname, path))
 }
 
 export const useIsCategoriesRoute = () =>

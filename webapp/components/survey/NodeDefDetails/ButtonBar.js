@@ -8,7 +8,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
-import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { State } from './store'
 
@@ -24,20 +23,7 @@ const ButtonBar = (props) => {
 
   return (
     <div className="button-bar">
-      <button
-        type="button"
-        className="btn btn-cancel"
-        onClick={() =>
-          dirty
-            ? dispatch(
-                DialogConfirmActions.showDialogConfirm({
-                  key: 'common.cancelConfirm',
-                  onOk: Actions.cancelEdits,
-                })
-              )
-            : Actions.cancelEdits({ state })
-        }
-      >
+      <button type="button" className="btn btn-cancel" onClick={() => Actions.cancelEdits({ state })}>
         {i18n.t(dirty ? 'common.cancel' : 'common.back')}
       </button>
       <button
