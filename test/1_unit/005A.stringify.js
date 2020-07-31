@@ -69,6 +69,33 @@ const tests = [
     expected:
       '{"a":1,"b":"b","c":{"__type":"Map","__values":"[[1,\\"one\\"],[\\"2\\",\\"two\\"],[3,\\"three\\"]]"},"d":{"__type":"Set","__values":"[1,2,3]"}}',
   },
+  {
+    value: {
+      a: 1,
+      b: 'b',
+      n: {
+        b: 'aaaa',
+        aa: {
+          c: 'aaa',
+          map: new Map([
+            ['mapk', 'map'],
+            ['1', 'map'],
+          ]),
+        },
+      },
+      c: new Map([
+        [1, 'one'],
+        ['2', 'two'],
+        [3, 'three'],
+        [3, new Map([[5, 'five']])],
+      ]),
+      d: new Set([1, 2, 3]),
+    },
+    valueText:
+      "{a: 1, b: 'b', n: {b: 'aaaa', map: new Map([['mapk','map'], ['1','map']])}, c: {new Map([[1, 'one'],['2', 'two'], [3, 'three'], [3, new Map([[5, 'five']])}, d: new Set([1,2,3]}",
+    expected:
+      '{"a":1,"b":"b","n":{"b":"aaaa","aa":{"c":"aaa","map":{"__type":"Map","__values":"[[\\"mapk\\",\\"map\\"],[\\"1\\",\\"map\\"]]"}}},"c":{"__type":"Map","__values":"[[1,\\"one\\"],[\\"2\\",\\"two\\"],[3,{\\"__type\\":\\"Map\\",\\"__values\\":\\"[[5,\\\\\\"five\\\\\\"]]\\"}]]"},"d":{"__type":"Set","__values":"[1,2,3]"}}',
+  },
   { value: 0, valueText: '0', expected: '0' },
   { value: 10, valueText: '10', expected: '10' },
   { value: -10, valueText: '-10', expected: '-10' },
