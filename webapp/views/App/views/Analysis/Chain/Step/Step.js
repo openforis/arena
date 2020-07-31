@@ -64,8 +64,8 @@ const StepComponent = (props) => {
               onChange={(entityUuidUpdate) => {
                 Actions.updatePropsStep({
                   props: {
-                    [Step.keysProps.categoryUuid]: null,
                     [Step.keysProps.entityUuid]: entityUuidUpdate,
+                    [Step.keysProps.categoryUuid]: null,
                   },
                   state,
                 })
@@ -103,8 +103,8 @@ const StepComponent = (props) => {
                 onChange={(category) => {
                   Actions.updatePropsStep({
                     props: {
-                      [Step.keysProps.categoryUuid]: Category.getUuid(category),
                       [Step.keysProps.entityUuid]: null,
+                      [Step.keysProps.categoryUuid]: Category.getUuid(category),
                     },
                     state,
                   })
