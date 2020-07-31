@@ -172,7 +172,11 @@ const BasicProps = (props) => {
 BasicProps.propTypes = {
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
-  editingFromDesigner: PropTypes.bool.isRequired,
+  editingFromDesigner: PropTypes.bool,
+}
+
+BasicProps.defaultProps = {
+  editingFromDesigner: null,
 }
 
 export default BasicProps
