@@ -1,5 +1,4 @@
 import { isNull } from './isNull'
-import { isEmpty } from './isEmpty'
 
 /**
  * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -10,17 +9,16 @@ import { isEmpty } from './isEmpty'
  */
 export const stringify = (object) => {
   if (isNull(object)) return null
-  if (isEmpty(object)) return ''
   return JSON.stringify(object, (key, value) => {
     if (value.constructor === Map)
       return {
-        type: 'Map',
-        value: JSON.stringify(Array.from(value.entries())),
+        __type: 'Map',
+        __values: JSON.stringify(Array.from(value.entries())),
       }
     if (value.constructor === Set)
       return {
-        type: 'Set',
-        value: JSON.stringify([...value]),
+        __type: 'Set',
+        __values: JSON.stringify([...value]),
       }
     if (value.constructor === object) {
       return JSON.stringify(stringify(value))
