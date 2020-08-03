@@ -46,6 +46,9 @@ export const propKeys = {
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
 
+  // Decimal
+  maxNumberDecimalDigits: 'maxNumberDecimalDigits',
+
   // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
