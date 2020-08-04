@@ -1,8 +1,8 @@
 import './formPageNavigation.scss'
 
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
-import { useDispatch } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,17 +10,47 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 const NavigationButton = (props) => {
-  const { surveyCycleKey, nodeDef, label, childDefs, edit, canEditDef, level, active, enabled } = props
+  const {
+    surveyCycleKey,
+    nodeDef,
+    label,
+    childDefs,
+    edit,
+    canEditDef,
+    level,
+    active,
+    enabled,
+    isRoot,
+    expandedFormPageNavigation,
+    toggleExpandedFormPageNavigation,
+  } = props
 
   const dispatch = useDispatch()
-  const [showChildren, setShowChildren] = useState(level === 0)
+  const [showChildren, setShowChildren] = useState(expandedFormPageNavigation || level === 0)
 
   const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
+  useOnUpdate(() => {
+    setShowChildren(expandedFormPageNavigation)
+  }, [expandedFormPageNavigation])
 
   return (
     <div className={`survey-form__node-def-nav level${level}`} style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
+      {isRoot && (
+        <div className="display-flex">
+          <button className="btn-xs btn-toggle" onClick={toggleExpandedFormPageNavigation}>
+            <span
+              className="icon icon-play3 icon-12px"
+              className={classNames('icon icon-12px', {
+                'icon-shrink2': expandedFormPageNavigation,
+                'icon-enlarge2': !expandedFormPageNavigation,
+              })}
+            />
+          </button>
+        </div>
+      )}
       <div className="display-flex">
         {outerPageChildDefs.length > 0 ? (
           <button
@@ -73,9 +103,13 @@ const mapStateToProps = (state, props) => {
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
     enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+    isRoot: NodeDef.isRoot(nodeDef),
+    expandedFormPageNavigation: SurveyFormState.expandedPageNavigation(state),
   }
 }
 
-const FormPageNavigation = connect(mapStateToProps)(NavigationButton)
+const FormPageNavigation = connect(mapStateToProps, {
+  toggleExpandedFormPageNavigation: SurveyFormActions.toggleExpandedFormPageNavigation,
+})(NavigationButton)
 
 export default FormPageNavigation

@@ -35,6 +35,9 @@ const actionHandlers = {
   [SurveyFormActions.formShowPageNavigationUpdate]: (state, { showPageNavigation }) =>
     SurveyFormState.setShowPageNavigation(showPageNavigation)(state),
 
+  [SurveyFormActions.formExpandedPageNavigationUpdate]: (state, { expandedPageNavigation }) =>
+    SurveyFormState.setExpandedPageNavigation(expandedPageNavigation)(state),
+
   // Node def actions
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 

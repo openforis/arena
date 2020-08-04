@@ -39,6 +39,14 @@ export const toggleFormPageNavigation = () => (dispatch, getState) => {
   dispatch({ type: formShowPageNavigationUpdate, showPageNavigation })
 }
 
+// Toggle from page navigation expanded
+export const formExpandedPageNavigationUpdate = 'survey/form/expandedPageNavigation/update'
+
+export const toggleExpandedFormPageNavigation = () => (dispatch, getState) => {
+  const expandedPageNavigation = !SurveyFormState.expandedPageNavigation(getState())
+  dispatch({ type: formExpandedPageNavigationUpdate, expandedPageNavigation })
+}
+
 // ==== utils
 
 export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getState) => {
