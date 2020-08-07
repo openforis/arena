@@ -15,8 +15,18 @@ export const fetchItems = async (surveyId, offset = 0, limit = null, client = db
     OFFSET ${offset}
     `,
     [],
-    dbTransformCallback,
+    dbTransformCallback
   )
+
+export const fetchItemsStream = async (surveyId, client = db) => {
+  const select = `
+      SELECT * 
+      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
+      ORDER BY id
+   `
+
+  return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
+}
 
 export const countItems = async (surveyId, client = db) =>
   await client.one(
@@ -25,7 +35,7 @@ export const countItems = async (surveyId, client = db) =>
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
     `,
     [],
-    R.prop('tot'),
+    R.prop('tot')
   )
 
 export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
@@ -36,7 +46,7 @@ export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
       RETURNING *
     `,
     [nodeDefUuid, props],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
@@ -51,5 +61,5 @@ export const updateItem = async (surveyId, itemId, props, resolved, client = db)
       RETURNING *
     `,
     [itemId, props, resolved],
-    dbTransformCallback,
+    dbTransformCallback
   )
