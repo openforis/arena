@@ -12,8 +12,10 @@ import * as Validation from '@core/validation/validation'
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useSurveyId } from '@webapp/store/survey'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
+import DownloadButton from '@webapp/components/form/downloadButton'
 
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
@@ -26,6 +28,7 @@ const CategoryDetails = (props) => {
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
   const history = useHistory()
+  const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
 
@@ -62,6 +65,10 @@ const CategoryDetails = (props) => {
               disabled={Category.isPublished(category)}
             />
           )}
+          <DownloadButton
+            href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/export/`}
+            label={i18n.t('common.csvExport')}
+          />
         </div>
 
         <div className="category__levels">
