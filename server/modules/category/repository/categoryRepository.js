@@ -197,7 +197,7 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1 
-      AND i.parent_uuid ${parentUuid ? `= '${`parentUuid`}'` : 'IS NULL'}
+      AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
     ORDER BY i.id
   `,
     [categoryUuid],
