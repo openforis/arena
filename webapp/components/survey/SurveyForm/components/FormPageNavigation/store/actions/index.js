@@ -4,6 +4,6 @@ import { useSelect } from './useSelect'
 
 export const useActions = ({ setState }) => ({
   toggleShowChildren: useToggleShowChildren({ setState }),
-  toggleExpand: useToggleExpand({ setState }),
+  toggleExpand: useToggleExpand(),
   select: useSelect(),
 })
