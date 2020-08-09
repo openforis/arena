@@ -6,6 +6,7 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as CategoryService from '../service/categoryService'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
 export const init = (app) => {
   // ==== CREATE
@@ -143,6 +144,29 @@ export const init = (app) => {
         const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
 
         res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, parentUuid } = Request.getParams(req)
+
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid)
+
+        const items = ObjectUtils.toUuidIndexedObj(
+          await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
+        )
+        //console.log(items)
+        //res.json({ category, items })
+        const headers = ['code', 'family', 'genus', 'scientific_name']
+        const file = await CSVWriter.writeToFile('aaaa', [['asdas', 'adas']])
+        console.log(file)
       } catch (error) {
         next(error)
       }

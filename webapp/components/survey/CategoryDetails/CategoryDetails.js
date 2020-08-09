@@ -66,7 +66,7 @@ const CategoryDetails = (props) => {
             />
           )}
           <DownloadButton
-            href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/export/`}
+            href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/export/`}
             label={i18n.t('common.csvExport')}
           />
         </div>
