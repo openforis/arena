@@ -1,7 +1,4 @@
 import { isNull } from './isNull'
-import { isEmpty } from './isEmpty'
-
-import { mapToObject } from './mapToObject'
 
 /**
  * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -12,10 +9,20 @@ import { mapToObject } from './mapToObject'
  */
 export const stringify = (object) => {
   if (isNull(object)) return null
-  if (isEmpty(object)) return ''
   return JSON.stringify(object, (key, value) => {
-    if (value.constructor === Map) return mapToObject(value)
-    if (value.constructor === Set) return [...value]
-    return isNull(key) ? JSON.stringify(value) : value
+    if (value.constructor === Map)
+      return {
+        __type: 'Map',
+        __values: stringify(Array.from(value.entries())),
+      }
+    if (value.constructor === Set)
+      return {
+        __type: 'Set',
+        __values: stringify([...value]),
+      }
+    if (value.constructor === object) {
+      return stringify(value)
+    }
+    return isNull(key) ? stringify(value) : value
   })
 }

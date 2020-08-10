@@ -5,15 +5,18 @@ import { useHistory } from 'react-router'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import * as Step from '@common/analysis/processingStep'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { NodeDefsActions, useSurveyInfo } from '@webapp/store/survey'
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
+import { useUpdateProps } from './step/useUpdateProps'
 
-export const useAddEntityVirtual = () => {
+export const useAddEntityVirtual = ({ setState }) => {
   const surveyInfo = useSurveyInfo()
   const dispatch = useDispatch()
   const history = useHistory()
+  const updatePropsStep = useUpdateProps({ setState })
 
   return useCallback(async ({ state }) => {
     const nodeDef = NodeDef.newNodeDef(
@@ -25,8 +28,15 @@ export const useAddEntityVirtual = () => {
       true,
       true
     )
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
     await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-    AnalysisStorage.persistChainEdit(state)
-    history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+    const stateUpdated = updatePropsStep({
+      props: {
+        [Step.keysProps.entityUuid]: nodeDefUuid,
+      },
+      state,
+    })
+    AnalysisStorage.persistChainEdit(stateUpdated)
+    history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
   }, [])
 }
