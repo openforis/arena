@@ -45,7 +45,8 @@ export const create = ({
   [keys.active]: active,
   [keys.outerPageChildDefs]: outerPageChildDefs,
   [keys.showChildren]: expandedFormPageNavigation || level === 0,
-  [keys.enabled]: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+  [keys.enabled]:
+    edit || NodeDef.isRoot(nodeDef) || NodeDef.getUuid(rootNodeDef) === NodeDef.getParentUuid(nodeDef) || parentNode,
   [keys.canEditDef]: canEditDef,
   [keys.surveyCycleKey]: surveyCycleKey,
 })
