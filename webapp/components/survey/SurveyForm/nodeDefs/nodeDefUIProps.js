@@ -28,8 +28,7 @@ const propsUI = {
   [decimal]: {
     icon: <span className="icon-left node_def__icon">1.23</span>,
     inputText: {
-      decimalMask: (nodeDef) =>
-        InputMasks.decimalLimited(16, Number(NodeDef.getProp(NodeDef.propKeys.maxNumberDecimalDigits)(nodeDef) || 6)),
+      mask: InputMasks.decimalLimited(16, 6),
     },
     defaultValue: '',
   },
@@ -134,12 +133,11 @@ const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(pr
 export const getIconByType = getPropByType('icon')
 
 export const getDecimalProps = (inputTextProps) => (nodeDef) => {
+  const maxNumberDecimalDigits = Number(NodeDef.getProp(NodeDef.propKeys.maxNumberDecimalDigits)(nodeDef) || 6)
   const props = {
     ...inputTextProps,
-    mask: inputTextProps.decimalMask(nodeDef),
-    decimalMask: undefined,
+    mask: InputMasks.decimalLimited(16, maxNumberDecimalDigits),
   }
-  delete props.decimalMask
   return props
 }
 
