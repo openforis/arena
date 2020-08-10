@@ -63,7 +63,7 @@ export const init = (app) => {
         const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
         Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-        const headers = ['node_def_uuid', 'id', 'props']
+        const headers = ['node_def_uuid', 'id', 'type', 'expression', 'props', 'resolved']
 
         await db.stream(reportItemsStream, (stream) => {
           stream.pipe(CSVWriter.transformToStream(res, headers))

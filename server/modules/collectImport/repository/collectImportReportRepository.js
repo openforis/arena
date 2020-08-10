@@ -20,8 +20,15 @@ export const fetchItems = async (surveyId, offset = 0, limit = null, client = db
 
 export const fetchItemsStream = async (surveyId, client = db) => {
   const select = `
-      SELECT * 
-      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
+      SELECT 
+      cr.id,
+      cr.node_def_uuid,
+      (cr.props)->>'applyIf' as apply_if,
+      (cr.props)->>'expressionType' as type,
+      (cr.props)->>'expression' as expression,
+      cr.props as props,
+      cr.resolved as resolved
+      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report cr
       ORDER BY id
    `
 
