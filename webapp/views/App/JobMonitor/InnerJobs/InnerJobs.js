@@ -10,7 +10,7 @@ const InnerJobs = ({ innerJobs }) => {
     innerJobs.length > 0 && (
       <div className="app-job-monitor__inner-jobs">
         {innerJobs.map((innerJob, i) => (
-          <InnerJob key={`${String(i)}-${JobSerialized.getType(innerJob)}`} innerJob={innerJob} i={i} />
+          <InnerJob key={`${String(i)}-${JobSerialized.getType(innerJob)}`} innerJob={innerJob} index={i} />
         ))}
       </div>
     )
