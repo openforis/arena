@@ -19,7 +19,7 @@ const InnerJob = ({ innerJob, i }) => {
   }, [JobSerialized.getStatus(innerJob)])
 
   return (
-    <React.Fragment key={`${String(i)}-${JobSerialized.getType(innerJob)}`}>
+    <>
       <div className="job" ref={elementRef}>
         <div className="name">
           {i + 1}. {i18n.t(`jobs.${JobSerialized.getType(innerJob)}`)}
@@ -27,7 +27,7 @@ const InnerJob = ({ innerJob, i }) => {
         <JobProgress job={innerJob} />
       </div>
       <JobErrors job={innerJob} />
-    </React.Fragment>
+    </>
   )
 }
 
