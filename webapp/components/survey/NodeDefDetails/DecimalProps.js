@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { State } from './store'
 
-const CodeProps = (props) => {
+const DecimalProps = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
@@ -28,9 +28,9 @@ const CodeProps = (props) => {
   )
 }
 
-CodeProps.propTypes = {
+DecimalProps.propTypes = {
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
 }
 
-export default CodeProps
+export default DecimalProps
