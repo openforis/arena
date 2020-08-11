@@ -6,7 +6,7 @@ const tests = [
   { value: null, valueText: 'null', expected: null },
   { value: undefined, valueText: 'undefined', expected: null },
 
-  { value: {}, valueText: '{}', expected: '' },
+  { value: {}, valueText: '{}', expected: '{}' },
   {
     value: { a: 1, b: 'b' },
     valueText: "{ a: 1, b: 'b'}",
@@ -18,7 +18,7 @@ const tests = [
     expected: '{"a":1,"b":"lorem","c":{"n":5},"d":[1,3,5]}',
   },
 
-  { value: [], valueText: '[]', expected: '' },
+  { value: [], valueText: '[]', expected: '[]' },
 
   { value: [1, 2, 3], valueText: '[1,2,3]', expected: '[1,2,3]' },
   {
@@ -27,11 +27,11 @@ const tests = [
     expected: '[1,2,{"a":1,"b":"lorem"}]',
   },
 
-  { value: new Set(), valueText: 'new Set()', expected: '' },
+  { value: new Set(), valueText: 'new Set()', expected: '{"__type":"Set","__values":"[]"}' },
 
-  { value: new Set([1, 2, 3]), valueText: 'new Set([1,2,3])', expected: '[1,2,3]' },
+  { value: new Set([1, 2, 3]), valueText: 'new Set([1,2,3])', expected: '{"__type":"Set","__values":"[1,2,3]"}' },
 
-  { value: new Map(), valueText: 'new Map()', expected: '' },
+  { value: new Map(), valueText: 'new Map()', expected: '{"__type":"Map","__values":"[]"}' },
 
   {
     value: new Map([
@@ -40,7 +40,7 @@ const tests = [
       [3, 'three'],
     ]),
     valueText: "new Map([[1, 'one'],[2, 'two'], [3, 'three']])",
-    expected: '{"1":"one","2":"two","3":"three"}',
+    expected: '{"__type":"Map","__values":"[[1,\\"one\\"],[2,\\"two\\"],[3,\\"three\\"]]"}',
   },
   {
     value: {
@@ -50,8 +50,8 @@ const tests = [
         [3, 'three'],
       ]),
     },
-    valueText: "{a: {new Map([[1, 'one'],[2, 'two'], [3, 'three']])}}",
-    expected: '{"a":{"1":"one","2":"two","3":"three"}}',
+    valueText: "{a: new Map([[1, 'one'],[2, 'two'], [3, 'three']])}",
+    expected: '{"a":{"__type":"Map","__values":"[[1,\\"one\\"],[2,\\"two\\"],[3,\\"three\\"]]"}}',
   },
 
   {
@@ -60,24 +60,58 @@ const tests = [
       b: 'b',
       c: new Map([
         [1, 'one'],
-        [2, 'two'],
+        ['2', 'two'],
         [3, 'three'],
       ]),
       d: new Set([1, 2, 3]),
     },
-    valueText: "{a: 1, b: 'b', c: {new Map([[1, 'one'],[2, 'two'], [3, 'three']])}, d: new Set([1,2,3]}",
-    expected: '{"a":1,"b":"b","c":{"1":"one","2":"two","3":"three"},"d":[1,2,3]}',
+    valueText: "{a: 1, b: 'b', c: {new Map([[1, 'one'],['2', 'two'], [3, 'three']])}, d: new Set([1,2,3]}",
+    expected:
+      '{"a":1,"b":"b","c":{"__type":"Map","__values":"[[1,\\"one\\"],[\\"2\\",\\"two\\"],[3,\\"three\\"]]"},"d":{"__type":"Set","__values":"[1,2,3]"}}',
+  },
+  {
+    value: {
+      a: 1,
+      b: 'b',
+      n: {
+        b: 'aaaa',
+        aa: {
+          c: 'aaa',
+          map: new Map([
+            ['mapk', 'map'],
+            ['1', 'map'],
+          ]),
+        },
+      },
+      c: new Map([
+        [1, 'one'],
+        ['2', 'two'],
+        [3, 'three'],
+        [3, new Map([[5, 'five']])],
+      ]),
+      d: new Set([1, 2, 3]),
+    },
+    valueText:
+      "{a: 1, b: 'b', n: {b: 'aaaa', map: new Map([['mapk','map'], ['1','map']])}, c: {new Map([[1, 'one'],['2', 'two'], [3, 'three'], [3, new Map([[5, 'five']])}, d: new Set([1,2,3]}",
+    expected:
+      '{"a":1,"b":"b","n":{"b":"aaaa","aa":{"c":"aaa","map":{"__type":"Map","__values":"[[\\"mapk\\",\\"map\\"],[\\"1\\",\\"map\\"]]"}}},"c":{"__type":"Map","__values":"[[1,\\"one\\"],[\\"2\\",\\"two\\"],[3,{\\"__type\\":\\"Map\\",\\"__values\\":\\"[[5,\\\\\\"five\\\\\\"]]\\"}]]"},"d":{"__type":"Set","__values":"[1,2,3]"}}',
   },
   { value: 0, valueText: '0', expected: '0' },
   { value: 10, valueText: '10', expected: '10' },
   { value: -10, valueText: '-10', expected: '-10' },
   { value: 10.5, valueText: '10.5', expected: '10.5' },
+  { value: 'lorem', valueText: 'lorem', expected: '"lorem"' },
+  { value: 'lorem lorem', valueText: 'lorem lorem', expected: '"lorem lorem"' },
 ]
 
 describe('A.stringify', () => {
   tests.forEach(({ value, valueText, expected }) => {
     it(`${valueText} ->  ${expected}`, () => {
-      assert.deepEqual(expected, A.stringify(value))
+      const result = A.stringify(value)
+      assert.deepEqual(String(expected), String(result))
+      if (!A.isEmpty(result)) {
+        assert.deepEqual(value, A.parse(result))
+      }
     })
   })
 })
