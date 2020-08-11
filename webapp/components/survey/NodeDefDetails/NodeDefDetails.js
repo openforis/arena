@@ -70,7 +70,7 @@ const NodeDefDetails = () => {
                       },
                     },
 
-                    ...(NodeDefUIProps.getValidationsEnabled(nodeDefType)
+                    ...(NodeDefUIProps.getValidationsEnabledByType(nodeDefType)
                       ? [
                           {
                             label: i18n.t('nodeDefEdit.validations'),

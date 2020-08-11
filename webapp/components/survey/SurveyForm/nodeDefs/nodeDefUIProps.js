@@ -1,6 +1,5 @@
 import React from 'react'
 import * as R from 'ramda'
-import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -142,10 +141,7 @@ export const getFormFields = getProp('formFields', ['field'])
 
 export const getDefaultValue = getProp('defaultValue')
 
-export const getValidationsEnabled = (nodeDefType) => {
-  const enabled = getPropByType('validations')(nodeDefType)
-  return !A.isNull(enabled) ? enabled : true
-}
+export const getValidationsEnabledByType = getPropByType('validations', true)
 
 export const getDefaultPropsByType = (type, cycle) => {
   const fn = getPropByType('defaultProps')(type)
