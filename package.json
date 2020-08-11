@@ -127,10 +127,10 @@
     "react-avatar-editor": "^12.0.0-beta.0",
     "react-dom": "^16.13.1",
     "react-grid-layout": "^0.18.3",
+    "react-number-format": "^4.4.1",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
-    "react-text-mask-hoc": "^0.11.0",
     "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
     "redux-debounced": "^0.5.0",
@@ -138,7 +138,6 @@
     "rxjs": "^6.5.5",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "text-mask-addons": "^3.8.0",
     "to-snake-case": "^1.0.0",
     "uuid": "^8.1.0",
     "xml-js": "^1.6.11"
@@ -153,17 +152,16 @@
     "react-avatar-editor": true,
     "react-dom": true,
     "react-grid-layout": true,
+    "react-number-format": true,
     "react-redux": true,
     "react-router-dom": true,
     "react-router": true,
-    "react-text-mask-hoc": true,
     "react-transition-group": true,
     "react": true,
     "redux-debounced": true,
     "redux-thunk": true,
     "redux": true,
-    "socket.io-client": true,
-    "text-mask-addons": true
+    "socket.io-client": true
   },
   "browserslist": [
     "last 2 versions"

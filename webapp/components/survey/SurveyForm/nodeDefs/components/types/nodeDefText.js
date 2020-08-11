@@ -2,7 +2,7 @@ import './nodeDefText.scss'
 
 import React from 'react'
 
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
@@ -14,25 +14,25 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       disabled={edit || !canEditRecord || readOnly}
-      {...NodeDefUIProps.getInputTextProps(nodeDef)}
+      numberFormatProps={NodeDefUIProps.getNumberFormatProps(nodeDef)}
       value={Node.getValue(node, '')}
-      onChange={value => updateNode(nodeDef, node, value)}
+      onChange={(value) => updateNode(nodeDef, node, value)}
     />
   </div>
 )
 
-const MultipleTextInput = props => {
+const MultipleTextInput = (props) => {
   const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
 
   return (
     <div>
       {nodes.map(
-        n =>
+        (n) =>
           (!Node.isPlaceholder(n) || canEditRecord) && (
             <div
               key={Node.getUuid(n)}
               className={`survey-form__node-def-${NodeDef.getType(
-                nodeDef,
+                nodeDef
               )} survey-form__node-def-text-multiple-container`}
             >
               <NodeDefErrorBadge nodeDef={nodeDef} edit={false} parentNode={parentNode} node={n} />
@@ -43,13 +43,13 @@ const MultipleTextInput = props => {
                 <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true} removeNode={removeNode} />
               )}
             </div>
-          ),
+          )
       )}
     </div>
   )
 }
 
-const NodeDefText = props => {
+const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes } = props
 
   return edit ? (

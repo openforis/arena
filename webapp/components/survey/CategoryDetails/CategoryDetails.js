@@ -12,7 +12,7 @@ import * as Validation from '@core/validation/validation'
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { FormItem, Input } from '@webapp/components/form/input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
 import ImportSummary from './ImportSummary'

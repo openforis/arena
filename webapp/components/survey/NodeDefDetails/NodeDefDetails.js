@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 
 import TabBar from '@webapp/components/tabBar'
-import { FormItem, Input } from '@webapp/components/form/input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import ButtonBar from './ButtonBar'

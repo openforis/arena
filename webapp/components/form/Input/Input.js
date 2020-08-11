@@ -2,7 +2,7 @@ import '../form.scss'
 
 import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
-import { TextMask, InputAdapter } from 'react-text-mask-hoc'
+import NumberFormat from 'react-number-format'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
@@ -12,13 +12,11 @@ export const Input = React.forwardRef((props, ref) => {
     disabled,
     id,
     maxLength,
-    mask,
+    numberFormatProps,
     onChange,
     onFocus,
     placeholder,
-    placeholderChar,
     readOnly,
-    showMask,
     validation,
     value,
   } = props
@@ -26,10 +24,9 @@ export const Input = React.forwardRef((props, ref) => {
   const inputRef = useRef(ref)
   const selectionRef = useRef([value.length, value.length])
 
-  const handleChange = (event) => {
-    const input = event.target
-    const newValue = input.value
-    if (value !== newValue) {
+  const handleValueChange = (newValue) => {
+    const input = inputRef.current
+    if (newValue !== value) {
       selectionRef.current = [input.selectionStart, input.selectionEnd]
       if (onChange) {
         onChange(newValue)
@@ -44,24 +41,21 @@ export const Input = React.forwardRef((props, ref) => {
 
   return (
     <ValidationTooltip validation={validation} className="form-input-container">
-      {mask ? (
-        <TextMask
-          ref={inputRef}
-          aria-disabled={disabled}
-          className="form-input"
-          Component={InputAdapter}
-          disabled={disabled}
-          id={id}
-          isControlled
-          mask={mask}
-          onChange={handleChange}
-          onFocus={onFocus}
-          placeholder={placeholder}
-          placeholderChar={placeholderChar}
-          readOnly={readOnly}
-          showMask={showMask}
-          value={value}
-        />
+      {numberFormatProps ? (
+        React.createElement(NumberFormat, {
+          disabled,
+          className: 'form-input',
+          getInputRef: (el) => {
+            inputRef.current = el
+          },
+          id,
+          onValueChange: ({ formattedValue: newValue }) => handleValueChange(newValue),
+          onFocus,
+          placeholder,
+          readOnly,
+          value,
+          ...numberFormatProps,
+        })
       ) : (
         <input
           ref={inputRef}
@@ -70,7 +64,7 @@ export const Input = React.forwardRef((props, ref) => {
           disabled={disabled}
           id={id}
           maxLength={maxLength}
-          onChange={handleChange}
+          onChange={(event) => handleValueChange(event.target.value)}
           onFocus={onFocus}
           placeholder={placeholder}
           readOnly={readOnly}
@@ -91,10 +85,7 @@ Input.propTypes = {
   readOnly: PropTypes.bool,
   validation: PropTypes.object,
   value: PropTypes.string,
-  // Input mask props
-  mask: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.func, PropTypes.bool]),
-  placeholderChar: PropTypes.string,
-  showMask: PropTypes.bool,
+  numberFormatProps: PropTypes.object,
 }
 
 Input.defaultProps = {
@@ -102,13 +93,10 @@ Input.defaultProps = {
   id: null,
   maxLength: null,
   onChange: null,
-  onFocus: null,
+  onFocus: () => {},
   placeholder: null,
   readOnly: false,
   validation: null,
   value: '',
-  // Input mask props
-  mask: false,
-  placeholderChar: '\u2000',
-  showMask: true,
+  numberFormatProps: null,
 }

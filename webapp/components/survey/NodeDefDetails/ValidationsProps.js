@@ -4,8 +4,7 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
 
-import { FormItem, Input } from '@webapp/components/form/input'
-import * as InputMasks from '@webapp/components/form/inputMasks'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -44,7 +43,7 @@ const ValidationsProps = (props) => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.min)
               )(validation)}
-              mask={InputMasks.integer}
+              numberFormatProps={NumberFormats.integer()}
               onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
@@ -56,7 +55,7 @@ const ValidationsProps = (props) => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.max)
               )(validation)}
-              mask={InputMasks.integer}
+              numberFormatProps={NumberFormats.integer()}
               onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
             />
           </FormItem>

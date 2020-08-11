@@ -11,7 +11,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'

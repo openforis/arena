@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as InputMasks from '@webapp/components/form/inputMasks'
+import { NumberFormats } from '@webapp/components/form/Input'
 
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
@@ -19,17 +19,13 @@ const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, fi
 const propsUI = {
   [integer]: {
     icon: <span className="icon-left node_def__icon">123</span>,
-    inputText: {
-      mask: InputMasks.integerLimited(16),
-    },
+    numberFormatProps: NumberFormats.integer(),
     defaultValue: '',
   },
 
   [decimal]: {
     icon: <span className="icon-left node_def__icon">1.23</span>,
-    inputText: {
-      mask: InputMasks.decimalLimited(16, 6),
-    },
+    numberFormatProps: NumberFormats.decimal(),
     defaultValue: '',
   },
 
@@ -46,21 +42,13 @@ const propsUI = {
 
   [date]: {
     icon: <span className="icon icon-calendar icon-left" />,
-    inputText: {
-      mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
-      showMask: true,
-      placeholderChar: '\u2000',
-    },
+    numberFormatProps: NumberFormats.date(),
     defaultValue: '',
   },
 
   [time]: {
     icon: <span className="icon icon-clock icon-left" />,
-    inputText: {
-      mask: [/\d/, /\d/, ':', /\d/, /\d/],
-      showMask: true,
-      placeholderChar: '\u2000',
-    },
+    numberFormatProps: NumberFormats.time(),
     defaultValue: '',
   },
 
@@ -128,11 +116,11 @@ const propsUI = {
 const getPropByType = (prop, defaultValue = null) => (nodeDefType) =>
   R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
+const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 
-export const getInputTextProps = getProp('inputText', { mask: false })
+export const getNumberFormatProps = getProp('numberFormatProps')
 
 export const getComponent = getProp('component', NodeDefText)
 

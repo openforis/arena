@@ -7,7 +7,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
-import { FormItem, Input } from '@webapp/components/form/input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import { useI18n } from '@webapp/store/system'
