@@ -26,7 +26,7 @@ const typeValidatorFns = {
     return DateTimeUtils.isValidDate(year, month, day)
   },
 
-  [nodeDefType.decimal]: (_survey, _nodeDef, _node, value) => NumberUtils.isFloat(value),
+  [nodeDefType.decimal]: (survey, nodeDef, node, value) => validateDecimal(survey, nodeDef, node, value),
 
   [nodeDefType.file]: (_survey, _nodeDef, _node, _value) => true,
 
@@ -40,6 +40,13 @@ const typeValidatorFns = {
     const [hour, minute] = [Node.getTimeHour(node), Node.getTimeMinute(node)]
     return DateTimeUtils.isValidTime(hour, minute)
   },
+}
+
+const validateDecimal = (survey, nodeDef, node, value) => {
+  if (!NumberUtils.isFloat(value)) return false
+  const maxNumberDecimalDigits = Number(NodeDef.getMaxNumberDecimalDigits(nodeDef))
+  const numberDecimalDigits = (Number(value).toString().split('.')[1] || '').length
+  return numberDecimalDigits <= maxNumberDecimalDigits
 }
 
 const validateCode = (survey, _nodeDef, node) => {

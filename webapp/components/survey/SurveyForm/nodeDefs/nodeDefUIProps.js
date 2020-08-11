@@ -135,7 +135,7 @@ export const getIconByType = getPropByType('icon')
 
 export const getDecimalProps = (inputTextProps) => (nodeDef) => ({
   ...inputTextProps,
-  mask: InputMasks.decimalLimited(16, Number(NodeDef.getProp(NodeDef.propKeys.maxNumberDecimalDigits)(nodeDef) || 6)),
+  mask: InputMasks.decimalLimited(16, Number(NodeDef.getMaxNumberDecimalDigits(nodeDef))),
 })
 
 export const getInputTextProps = (nodeDef) => {
