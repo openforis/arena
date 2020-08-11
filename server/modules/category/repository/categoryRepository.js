@@ -157,6 +157,17 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
   return categories || {}
 }
 
+export const fetchCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
+  client.one(
+    `
+      SELECT c.* 
+      FROM ${getSurveyDBSchema(surveyId)}.category c
+      WHERE c.uuid = $1
+    `,
+    [categoryUuid],
+    (def) => dbTransformCallback(def, draft, true)
+  )
+
 export const fetchCategoryAndLevelsByUuid = async (
   surveyId,
   categoryUuid,
@@ -170,6 +181,22 @@ export const fetchCategoryAndLevelsByUuid = async (
     [categoryUuid]
   )
   return A.pipe(R.values, R.head)(categories)
+}
+
+export const fetchLevelsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
+  const items = await client.map(
+    `
+      SELECT l.* 
+      FROM
+       ${getSurveyDBSchema(surveyId)}.category_level l 
+        WHERE l.category_uuid = $1
+     ORDER BY l.index
+    `,
+    [categoryUuid],
+    (def) => dbTransformCallback(def, draft, true)
+  )
+
+  return draft ? items : R.filter((item) => item.published)(items)
 }
 
 export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
