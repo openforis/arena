@@ -101,6 +101,7 @@ const propsUI = {
   [file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left" />,
+    validations: false,
   },
 
   [entity]: {
@@ -127,6 +128,8 @@ export const getComponent = getProp('component', NodeDefText)
 export const getFormFields = getProp('formFields', ['field'])
 
 export const getDefaultValue = getProp('defaultValue')
+
+export const getValidationsEnabledByType = getPropByType('validations', true)
 
 export const getDefaultPropsByType = (type, cycle) => {
   const fn = getPropByType('defaultProps')(type)

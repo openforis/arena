@@ -69,14 +69,19 @@ const NodeDefDetails = () => {
                         Actions,
                       },
                     },
-                    {
-                      label: i18n.t('nodeDefEdit.validations'),
-                      component: ValidationsProps,
-                      props: {
-                        state,
-                        Actions,
-                      },
-                    },
+
+                    ...(NodeDefUIProps.getValidationsEnabledByType(nodeDefType)
+                      ? [
+                          {
+                            label: i18n.t('nodeDefEdit.validations'),
+                            component: ValidationsProps,
+                            props: {
+                              state,
+                              Actions,
+                            },
+                          },
+                        ]
+                      : []),
                   ]),
             ]}
           />
