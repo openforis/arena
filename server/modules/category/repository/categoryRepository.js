@@ -269,30 +269,42 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
 
 export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, headers, languages) => {
   let query = ''
+  // the number od columns per level came from the number of languages and the column for the code
   const numColumnsPerLevel = 1 + languages.length
+  const numLevels = levels.length
+
+  // function to get the level code
   const _getCode = ({ index, header }) => `(c${index}.props || c${index}.props_draft) ->> 'code' as ${header}`
-  const _getLabel = ({ index, header }) =>
-    `((c${index}.props || c${index}.props_draft) -> 'labels') ->> 'en' as ${header}`
+  // function to get the level label
+  const _getLabel = ({ index, header, language }) =>
+    `((c${index}.props || c${index}.props_draft) -> 'labels') ->> '${language}' as ${header}`
+  // function to get the level code or label when they should be empty
   const _getEmpty = ({ header }) => `'' as ${header}`
 
-  const _getValues = ({ index, numLevels }) => {
+  // function to extract the codes and the labels
+  const _getValues = ({ index }) => {
     let values = ''
     for (let i = 0; i < numLevels; i++) {
       if (i <= index) {
-        values += `
-             ${_getCode({ index: i, header: headers[i * numColumnsPerLevel] })},
-             ${_getLabel({ index: i, header: headers[i * numColumnsPerLevel + 1] })}${i < numLevels - 1 ? ',' : ''}
-            `
+        values += `${[
+          _getCode({ index: i, header: headers[i * numColumnsPerLevel] }),
+          ...(languages || []).map((language, languageIndex) =>
+            _getLabel({ index: i, header: headers[i * numColumnsPerLevel + 1 + languageIndex], language })
+          ),
+        ].join(',')}${i < numLevels - 1 ? ',' : ''}`
       } else {
-        values += `
-             ${_getEmpty({ index: i, headers: headers[i * numColumnsPerLevel] })},
-             ${_getEmpty({ index: i, header: headers[i * numColumnsPerLevel + 1] })}${i < numLevels - 1 ? ',' : ''}
-            `
+        values += `${[
+          _getEmpty({ index: i, header: headers[i * numColumnsPerLevel] }),
+          ...(languages || []).map((_, languageIndex) =>
+            _getEmpty({ index: i, header: headers[i * numColumnsPerLevel + 1 + languageIndex] })
+          ),
+        ].join(',')}${i < numLevels - 1 ? ',' : ''}`
       }
     }
     return values
   }
 
+  // function to prepare the joins between category items
   const _getJoins = ({ index }) => {
     let joins = ''
     for (let i = 0; i < index; i++) {
@@ -304,18 +316,19 @@ export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, hea
     return joins
   }
 
+  // loop to build the query
   levels.forEach((level, index) => {
     if (index > 0) query += 'union '
 
     query += `
         select
-          ${_getValues({ index, numLevels: levels.length })}
+          ${_getValues({ index })}
         from
             ${getSurveyDBSchema(surveyId)}.category_item c0
                 
                 left join ${getSurveyDBSchema(surveyId)}.category_level l0
                 on c0.level_uuid = l0.uuid
-            ${index > 0 ? _getJoins({ index, numLevels: levels.length }) : ''}
+            ${index > 0 ? _getJoins({ index }) : ''}
         
         where c0.parent_uuid is null
         and l0.category_uuid = $1
@@ -323,15 +336,14 @@ export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, hea
     `
   })
 
-  const _getColumnsToOrder = ({ numOfLevels }) => {
-    let columns = ``
-    for (let columnIndex = 0; columnIndex < numOfLevels; columnIndex++) {
-      columns += `${columnIndex * 2 + 1}${columnIndex < numOfLevels - 1 ? ',' : ''}`
-    }
-    return columns
-  }
+  // function to create the orderby
+  const _getColumnsToOrder = () =>
+    new Array(levels.length)
+      .fill('')
+      .map((_, i) => i * 2 + 1)
+      .join(',')
 
-  query += `order by ${_getColumnsToOrder({ numOfLevels: levels.length })} nulls first`
+  query += `order by ${_getColumnsToOrder()} nulls first`
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
 }

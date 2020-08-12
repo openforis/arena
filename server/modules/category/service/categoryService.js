@@ -23,12 +23,6 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 }
 
 export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, res) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
-  const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-  const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
-
-  const category = await CategoryManager.fetchCategoryUuid(surveyId, categoryUuid, draft)
-
   const levels = await CategoryManager.fetchLevelsByCategoryUuid(surveyId, categoryUuid, draft)
 
   if (levels.length <= 0) {
@@ -42,11 +36,27 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
     return
   }
 
+  // get survey languages
+  const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
+  const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
+
+  // get category to generate the file name
+  const category = await CategoryManager.fetchCategoryUuid(surveyId, categoryUuid, draft)
+
+  // Function to prepare the csv headers
   const _getHeaders = (levelsInCategory) =>
     levelsInCategory
       .sort((la, lb) => la.index - lb.index)
-      .reduce((headers, l) => [...headers, `${l.props.name}_code`, `${l.props.name}_label_${defaultLang}`], []) //improve getting languages
+      .reduce(
+        (headers, l) => [
+          ...headers,
+          `${l.props.name}_code`,
+          ...(languages || []).map((language) => `${l.props.name}_label_${language}`),
+        ],
+        []
+      )
 
+  // get headers
   const headers = _getHeaders(levels)
 
   const categoriesItemsStream = await CategoryManager.fetchCategoryCodesListStream(
