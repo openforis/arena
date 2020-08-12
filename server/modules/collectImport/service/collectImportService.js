@@ -26,6 +26,7 @@ export const insertReportItem = CollectImportReportManager.insertItem
 // READ
 export const fetchReportItems = CollectImportReportManager.fetchItems
 export const countReportItems = CollectImportReportManager.countItems
+export const fetchReportItemsStream = CollectImportReportManager.fetchItemsStream
 
 // UPDATE
 export const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
