@@ -19,13 +19,13 @@ const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, fi
 const propsUI = {
   [integer]: {
     icon: <span className="icon-left node_def__icon">123</span>,
-    numberFormatProps: NumberFormats.integer(),
+    numberFormat: NumberFormats.integer(),
     defaultValue: '',
   },
 
   [decimal]: {
     icon: <span className="icon-left node_def__icon">1.23</span>,
-    numberFormatProps: NumberFormats.decimal(),
+    numberFormat: NumberFormats.decimal(),
     defaultValue: '',
   },
 
@@ -42,13 +42,13 @@ const propsUI = {
 
   [date]: {
     icon: <span className="icon icon-calendar icon-left" />,
-    numberFormatProps: NumberFormats.date(),
+    numberFormat: NumberFormats.date(),
     defaultValue: '',
   },
 
   [time]: {
     icon: <span className="icon icon-clock icon-left" />,
-    numberFormatProps: NumberFormats.time(),
+    numberFormat: NumberFormats.time(),
     defaultValue: '',
   },
 
@@ -121,7 +121,7 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
-export const getNumberFormatProps = getProp('numberFormatProps')
+export const getNumberFormat = getProp('numberFormat')
 
 export const getComponent = getProp('component', NodeDefText)
 

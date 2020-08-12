@@ -41,7 +41,7 @@ const NodeDefCoordinate = (props) => {
 
   const xInput = (
     <Input
-      numberFormatProps={numberFormat}
+      numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.x}
       onChange={(value) => handleInputChange(node, 'x', value)}
@@ -50,7 +50,7 @@ const NodeDefCoordinate = (props) => {
 
   const yInput = (
     <Input
-      numberFormatProps={numberFormat}
+      numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.y}
       onChange={(value) => handleInputChange(node, 'y', value)}

@@ -14,7 +14,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       disabled={edit || !canEditRecord || readOnly}
-      numberFormatProps={NodeDefUIProps.getNumberFormatProps(nodeDef)}
+      numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
       value={Node.getValue(node, '')}
       onChange={(value) => updateNode(nodeDef, node, value)}
     />

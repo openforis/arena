@@ -43,7 +43,7 @@ const ValidationsProps = (props) => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.min)
               )(validation)}
-              numberFormatProps={NumberFormats.integer()}
+              numberFormat={NumberFormats.integer()}
               onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
@@ -55,7 +55,7 @@ const ValidationsProps = (props) => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.max)
               )(validation)}
-              numberFormatProps={NumberFormats.integer()}
+              numberFormat={NumberFormats.integer()}
               onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
             />
           </FormItem>

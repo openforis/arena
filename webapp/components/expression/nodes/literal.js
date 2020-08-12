@@ -79,7 +79,7 @@ const Literal = (props) => {
     if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))) {
       return (
         <Input
-          numberFormatProps={NodeDefUIProps.getNumberFormatProps(nodeDefCurrent)}
+          numberFormat={NodeDefUIProps.getNumberFormat(nodeDefCurrent)}
           onChange={onChangeValue}
           value={nodeValue}
         />

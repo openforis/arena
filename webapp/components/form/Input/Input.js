@@ -8,18 +8,7 @@ import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
 export const Input = React.forwardRef((props, ref) => {
-  const {
-    disabled,
-    id,
-    maxLength,
-    numberFormatProps,
-    onChange,
-    onFocus,
-    placeholder,
-    readOnly,
-    validation,
-    value,
-  } = props
+  const { disabled, id, maxLength, numberFormat, onChange, onFocus, placeholder, readOnly, validation, value } = props
 
   const inputRef = useRef(ref)
   const selectionRef = useRef([value.length, value.length])
@@ -41,7 +30,7 @@ export const Input = React.forwardRef((props, ref) => {
 
   return (
     <ValidationTooltip validation={validation} className="form-input-container">
-      {numberFormatProps ? (
+      {numberFormat ? (
         React.createElement(NumberFormat, {
           disabled,
           className: 'form-input',
@@ -54,7 +43,7 @@ export const Input = React.forwardRef((props, ref) => {
           placeholder,
           readOnly,
           value,
-          ...numberFormatProps,
+          ...numberFormat,
         })
       ) : (
         <input
@@ -85,7 +74,13 @@ Input.propTypes = {
   readOnly: PropTypes.bool,
   validation: PropTypes.object,
   value: PropTypes.string,
-  numberFormatProps: PropTypes.object,
+  numberFormat: PropTypes.shape({
+    decimalScale: PropTypes.number,
+    decimalSeparator: PropTypes.string,
+    format: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    maxLength: PropTypes.number,
+    placeholder: PropTypes.string,
+  }),
 }
 
 Input.defaultProps = {
@@ -98,5 +93,5 @@ Input.defaultProps = {
   readOnly: false,
   validation: null,
   value: '',
-  numberFormatProps: null,
+  numberFormat: null,
 }

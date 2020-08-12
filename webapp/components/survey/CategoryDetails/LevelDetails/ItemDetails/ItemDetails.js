@@ -88,7 +88,7 @@ const ItemDetails = (props) => {
             <FormItem label={key} key={key}>
               <Input
                 value={CategoryItem.getExtraProp(key)(item)}
-                numberFormatProps={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
+                numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
                 readOnly={readOnly}
                 validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                 onChange={(value) => {
