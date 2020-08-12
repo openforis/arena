@@ -1,13 +1,17 @@
 import * as JobManager from '@server/job/jobManager'
-import * as CategoryManager from '../manager/categoryManager'
-import CategoryImportJob from './categoryImportJob'
-import * as CategoryImportJobParams from './categoryImportJobParams'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+
 import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import { db } from '@server/db/db'
+import * as CategoryImportJobParams from './categoryImportJobParams'
+import CategoryImportJob from './categoryImportJob'
+import * as CategoryManager from '../manager/categoryManager'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -48,10 +52,10 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
     levelsInCategory
       .sort((la, lb) => la.index - lb.index)
       .reduce(
-        (headers, l) => [
+        (headers, level) => [
           ...headers,
-          `${l.props.name}_code`,
-          ...(languages || []).map((language) => `${l.props.name}_label_${language}`),
+          `${CategoryLevel.getName(level)}_code`,
+          ...(languages || []).map((language) => `${CategoryLevel.getName(level)}_label_${language}`),
         ],
         []
       )
@@ -67,7 +71,7 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
     languages
   )
 
-  const fileName = `${category.props.name || 'category'}_code_list_hierarchical.csv`
+  const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
   await db.stream(categoriesItemsStream, (stream) => {
