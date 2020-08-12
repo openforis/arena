@@ -126,6 +126,7 @@ export const {
   fetchCategoryAndLevelsByUuid,
   fetchLevelsByCategoryUuid,
   fetchItemsByCategoryUuid,
+  fetchCategoryCodesListStream,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
 } = CategoryRepository

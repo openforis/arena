@@ -4,11 +4,6 @@ import SystemError from '@core/systemError'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import * as Response from '@server/utils/response'
-import * as R from 'ramda'
-import * as Survey from '@core/survey/survey'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -161,65 +156,7 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
 
-        const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
-        const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-
-        const category = await CategoryService.fetchCategoryUuid(surveyId, categoryUuid, draft)
-
-        const levels = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchLevelsByCategoryUuid(surveyId, categoryUuid, draft)
-        )
-        const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByCategoryUuid(surveyId, categoryUuid, draft)
-        )
-
-        const getParentCode = (item) =>
-          item.parentUuid ? [...getParentCode(items[item.parentUuid]), String(items[item.parentUuid].props.code)] : []
-
-        const itemsAsLevels = Object.values(items).map((item) => ({
-          code: String(item.props.code),
-          label: item.props.labels[defaultLang],
-          parentCode: getParentCode(item),
-          parentUuid: item.parentUuid,
-          levelUuid: item.levelUuid,
-          index: levels[item.levelUuid].index,
-        }))
-
-        const getHeaders = (levelsInCategory) =>
-          Object.values(levelsInCategory)
-            .sort((la, lb) => la.index - lb.index)
-            .reduce((headers, l) => [...headers, `${l.props.name}_code`, `${l.props.name}_label_${defaultLang}`], [])
-
-        const headers = getHeaders(levels)
-
-        const getParents = (item) => item.parentCode.reduce((acc, code) => [...acc, code, ''], [])
-
-        const itemsToRows = (itemsToRow) =>
-          itemsToRow.map((item) => {
-            const row = [...getParents(item), item.code, item.label]
-            const rowObject = headers.reduce((rowObj, header, index) => ({ ...rowObj, [header]: row[index] || '' }), {})
-            return rowObject
-          })
-
-        Response.setContentTypeFile(
-          res,
-          itemsAsLevels.length
-            ? `${category.props.name || 'category'}_code_list_hierarchical.csv`
-            : 'template_code_list_hierarchical.csv',
-          null,
-          Response.contentTypes.csv
-        )
-        await CSVWriter.writeToStream(
-          res,
-          itemsAsLevels.length
-            ? itemsToRows(itemsAsLevels)
-            : [
-                { level_1_code: 1, level_1_en: 'label_1', level_2_code: '', level_2_en: '' },
-                { level_1_code: 1, level_1_en: 'label_1', level_2_code: 1, level_2_en: 'label_1_1' },
-                { level_1_code: 1, level_1_en: 'label_1', level_2_code: 2, level_2_en: 'label_1_2' },
-                { level_1_code: 2, level_1_en: 'label_2', level_2_code: '', level_2_en: '' },
-              ]
-        )
+        await CategoryService.exportCategoryCodeLevels(surveyId, categoryUuid, draft, res)
       } catch (error) {
         next(error)
       }

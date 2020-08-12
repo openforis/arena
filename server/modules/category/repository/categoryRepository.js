@@ -267,6 +267,74 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
+export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, headers, languages) => {
+  let query = ''
+  const numColumnsPerLevel = 1 + languages.length
+  const _getCode = ({ index, header }) => `(c${index}.props || c${index}.props_draft) ->> 'code' as ${header}`
+  const _getLabel = ({ index, header }) =>
+    `((c${index}.props || c${index}.props_draft) -> 'labels') ->> 'en' as ${header}`
+  const _getEmpty = ({ header }) => `'' as ${header}`
+
+  const _getValues = ({ index, numLevels }) => {
+    let values = ''
+    for (let i = 0; i < numLevels; i++) {
+      if (i <= index) {
+        values += `
+             ${_getCode({ index: i, header: headers[i * numColumnsPerLevel] })},
+             ${_getLabel({ index: i, header: headers[i * numColumnsPerLevel + 1] })}${i < numLevels - 1 ? ',' : ''}
+            `
+      } else {
+        values += `
+             ${_getEmpty({ index: i, headers: headers[i * numColumnsPerLevel] })},
+             ${_getEmpty({ index: i, header: headers[i * numColumnsPerLevel + 1] })}${i < numLevels - 1 ? ',' : ''}
+            `
+      }
+    }
+    return values
+  }
+
+  const _getJoins = ({ index }) => {
+    let joins = ''
+    for (let i = 0; i < index; i++) {
+      joins += `
+            left join ${getSurveyDBSchema(surveyId)}.category_item c${i + 1} 
+            on c${i + 1}.parent_uuid = c${i}.uuid
+        `
+    }
+    return joins
+  }
+
+  levels.forEach((level, index) => {
+    if (index > 0) query += 'union '
+
+    query += `
+        select
+          ${_getValues({ index, numLevels: levels.length })}
+        from
+            ${getSurveyDBSchema(surveyId)}.category_item c0
+                
+                left join ${getSurveyDBSchema(surveyId)}.category_level l0
+                on c0.level_uuid = l0.uuid
+            ${index > 0 ? _getJoins({ index, numLevels: levels.length }) : ''}
+        
+        where c0.parent_uuid is null
+        and l0.category_uuid = $1
+        and c${index}.uuid is not null
+    `
+  })
+
+  const _getColumnsToOrder = ({ numOfLevels }) => {
+    let columns = ``
+    for (let columnIndex = 0; columnIndex < numOfLevels; columnIndex++) {
+      columns += `${columnIndex * 2 + 1}${columnIndex < numOfLevels - 1 ? ',' : ''}`
+    }
+    return columns
+  }
+
+  query += `order by ${_getColumnsToOrder({ numOfLevels: levels.length })} nulls first`
+
+  return new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
+}
 // ============== UPDATE
 
 export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
