@@ -6,7 +6,7 @@ import * as Node from '@core/record/node'
 import * as StringUtils from '@core/stringUtils'
 import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
-const NodeDefTaxonInputField = props => {
+const NodeDefTaxonInputField = (props) => {
   const {
     surveyId,
     taxonomyUuid,
@@ -26,12 +26,12 @@ const NodeDefTaxonInputField = props => {
   const inputRef = useRef(null)
   const [autocompleteOpened, setAutocompleteOpened] = useState(false)
 
-  const onChangeInput = value => {
+  const onChangeInput = (value) => {
     onChangeSelectionField(field, value)
     setAutocompleteOpened(!StringUtils.isBlank(value))
   }
 
-  const onItemSelectAutocomplete = taxon => {
+  const onItemSelectAutocomplete = (taxon) => {
     setAutocompleteOpened(false)
     onChangeTaxon(taxon)
   }
@@ -40,7 +40,7 @@ const NodeDefTaxonInputField = props => {
     <React.Fragment>
       <Input
         ref={inputRef}
-        aria-disabled={entryDisabled}
+        disabled={entryDisabled}
         readOnly={edit}
         value={selection[field]}
         onChange={onChangeInput}
