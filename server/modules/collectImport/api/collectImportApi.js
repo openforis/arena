@@ -1,11 +1,20 @@
 import * as Request from '@server/utils/request'
 
 import * as JobUtils from '@server/job/jobUtils'
-import * as CollectImportService from '../service/collectImportService'
 
+import { db } from '@server/db/db'
+import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as Response from '@server/utils/response'
+
+import * as CollectImportService from '../service/collectImportService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-export const init = app => {
+import * as DateUtils from '@core/dateUtils'
+
+import * as Survey from '@core/survey/survey'
+
+export const init = (app) => {
   // CREATE
 
   app.post('/survey/collect-import', async (req, res, next) => {
@@ -36,7 +45,33 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/collect-import/report/export',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, offset, limit, draft = true } = Request.getParams(req)
+
+        const reportItemsStream = await CollectImportService.fetchReportItemsStream(surveyId, offset, limit)
+
+        const survey = await SurveyService.fetchSurveyById(surveyId, draft)
+        const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+
+        const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
+        Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+        const headers = ['node_def_uuid', 'id', 'type', 'expression', 'resolved']
+
+        await db.stream(reportItemsStream, (stream) => {
+          stream.pipe(CSVWriter.transformToStream(res, headers))
+        })
+      } catch (error) {
+        next(error)
+      }
+    }
   )
 
   app.get(
@@ -52,7 +87,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // UPDATE
@@ -71,6 +106,6 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 }
