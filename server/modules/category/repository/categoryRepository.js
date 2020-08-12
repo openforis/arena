@@ -282,6 +282,8 @@ export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, hea
   const _getEmpty = ({ header }) => `'' as ${header}`
 
   // function to extract the codes and the labels
+  // iterate over the numLevels if the level index is greater than the current index the values returned are null,
+  // else return the code and the labels for each language
   const _getValues = ({ index }) => {
     let values = ''
     for (let i = 0; i < numLevels; i++) {
