@@ -1,4 +1,4 @@
-import * as NumberFormats from './NumberFormats'
+import * as NumberFormats from './numberFormats'
 
 export { Input } from './Input'
 export { FormItem } from './FormItem'

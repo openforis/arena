@@ -12,14 +12,15 @@ export const decimal = ({ decimalScale = 6 } = {}) => ({
 const _limit = ({ value, max, min = '00' }) => {
   let valueUpdated = value
   if (value.length === 1 && value[0] > max[0]) {
-    valueUpdated = '0' + value
+    valueUpdated = `0${value}`
   }
 
   if (valueUpdated.length === 2) {
     if (Number(valueUpdated) === 0) {
       return min
-    } else if (valueUpdated > max) {
-      //this can happen when user pastes a number
+    }
+    if (valueUpdated > max) {
+      // this can happen when user pastes a number
       return max
     }
   }
@@ -42,9 +43,9 @@ const _dateFormat = (value) => {
   return parts.join('/')
 }
 
-const _timeFormat = (val) => {
-  const hour = _limit({ value: val.substring(0, 2), max: '23' })
-  const minute = _limit({ value: val.substring(2, 4), max: '59' })
+const _timeFormat = (value) => {
+  const hour = _limit({ value: value.substring(0, 2), max: '23' })
+  const minute = _limit({ value: value.substring(2, 4), max: '59' })
 
   const parts = [hour]
   if (minute.length) {
