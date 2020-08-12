@@ -18,6 +18,7 @@ const keys = {
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // NodeDef (entity) selected to add children to
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
+  expandedPageNavigation: 'expandedPageNavigation',
 }
 
 // ====== nodeDefUuidPage
@@ -86,6 +87,10 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
 export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
 
 export const setShowPageNavigation = (value) => R.assoc(keys.showPageNavigation, value)
+
+export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, false)
+
+export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
 
 // ====== NodeDef update actions
 
