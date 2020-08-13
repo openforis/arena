@@ -20,7 +20,7 @@ const DecimalProps = (props) => {
       <Input
         disabled={false}
         placeholder={i18n.t('nodeDefEdit.decimalProps.maxNumberDecimalDigits')}
-        value={NodeDef.getProp(NodeDef.propKeys.maxNumberDecimalDigits)(nodeDef) || ''}
+        value={NodeDef.getMaxNumberDecimalDigits(nodeDef) || ''}
         type="number"
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxNumberDecimalDigits, value })}
       />

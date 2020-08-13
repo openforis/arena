@@ -110,7 +110,7 @@ export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
-export const getMaxNumberDecimalDigits = getProp(propKeys.maxNumberDecimalDigits, 6)
+export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)

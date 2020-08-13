@@ -44,7 +44,7 @@ const typeValidatorFns = {
 
 const validateDecimal = ({ nodeDef, value }) => {
   if (!NumberUtils.isFloat(value)) return false
-  const maxNumberDecimalDigits = Number(NodeDef.getMaxNumberDecimalDigits(nodeDef))
+  const maxNumberDecimalDigits = NodeDef.getMaxNumberDecimalDigits(nodeDef)
   const numberDecimalDigits = (Number(value).toString().split('.')[1] || '').length
   return numberDecimalDigits <= maxNumberDecimalDigits
 }
