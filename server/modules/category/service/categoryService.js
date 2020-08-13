@@ -63,13 +63,13 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   // get headers
   const headers = _getHeaders(levels)
 
-  const categoriesItemsStream = await CategoryManager.fetchCategoryCodesListStream(
+  const categoriesItemsStream = await CategoryManager.fetchCategoryCodesListStream({
     surveyId,
     categoryUuid,
     levels,
     headers,
-    languages
-  )
+    languages,
+  })
 
   const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)

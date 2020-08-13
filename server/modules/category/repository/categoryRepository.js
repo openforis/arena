@@ -267,43 +267,44 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const fetchCategoryCodesListStream = (surveyId, categoryUuid, levels, headers, languages) => {
+export const fetchCategoryCodesListStream = ({ surveyId, categoryUuid, levels, headers, languages }) => {
   let query = ''
   // the number od columns per level came from the number of languages and the column for the code
   const numColumnsPerLevel = 1 + languages.length
   const numLevels = levels.length
 
-  // function to get the level code
-  const _getCode = ({ index, header }) => `(c${index}.props || c${index}.props_draft) ->> 'code' as ${header}`
-  // function to get the level label
-  const _getLabel = ({ index, header, language }) =>
-    `((c${index}.props || c${index}.props_draft) -> 'labels') ->> '${language}' as ${header}`
   // function to get the level code or label when they should be empty
   const _getEmpty = ({ header }) => `'' as ${header}`
+  // function to get the level code
+  const _getCode = ({ index, header, empty }) =>
+    empty ? _getEmpty({ header }) : `(c${index}.props || c${index}.props_draft) ->> 'code' as ${header}`
+  // function to get the level label
+  const _getLabel = ({ index, header, language, empty }) =>
+    empty
+      ? _getEmpty({ header })
+      : `((c${index}.props || c${index}.props_draft) -> 'labels') ->> '${language}' as ${header}`
 
   // function to extract the codes and the labels
   // iterate over the numLevels if the level index is greater than the current index the values returned are null,
   // else return the code and the labels for each language
   const _getValues = ({ index }) => {
-    let values = ''
+    let fields = []
+
     for (let i = 0; i < numLevels; i++) {
-      if (i <= index) {
-        values += `${[
-          _getCode({ index: i, header: headers[i * numColumnsPerLevel] }),
-          ...(languages || []).map((language, languageIndex) =>
-            _getLabel({ index: i, header: headers[i * numColumnsPerLevel + 1 + languageIndex], language })
-          ),
-        ].join(',')}${i < numLevels - 1 ? ',' : ''}`
-      } else {
-        values += `${[
-          _getEmpty({ index: i, header: headers[i * numColumnsPerLevel] }),
-          ...(languages || []).map((_, languageIndex) =>
-            _getEmpty({ index: i, header: headers[i * numColumnsPerLevel + 1 + languageIndex] })
-          ),
-        ].join(',')}${i < numLevels - 1 ? ',' : ''}`
-      }
+      fields = [
+        ...fields,
+        _getCode({ index: i, header: headers[i * numColumnsPerLevel], empty: i > index }),
+        ...(languages || []).map((language, languageIndex) =>
+          _getLabel({
+            index: i,
+            header: headers[i * numColumnsPerLevel + 1 + languageIndex],
+            language,
+            empty: i > index,
+          })
+        ),
+      ]
     }
-    return values
+    return fields.join(',')
   }
 
   // function to prepare the joins between category items
