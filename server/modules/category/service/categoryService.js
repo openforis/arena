@@ -45,6 +45,7 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   })
 
   const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
+
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
   return db.stream(categoryStream, (stream) => {
