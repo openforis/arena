@@ -2,7 +2,6 @@ import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
@@ -31,47 +30,24 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   const levels = Category.getLevelsArray(category)
 
   if (levels.length <= 0) {
-    Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
-    return await CSVWriter.writeToStream(res, [
-      { level_1_code: 1, level_1_en: 'label_1', level_2_code: '', level_2_en: '' },
-      { level_1_code: 1, level_1_en: 'label_1', level_2_code: 1, level_2_en: 'label_1_1' },
-      { level_1_code: 1, level_1_en: 'label_1', level_2_code: 2, level_2_en: 'label_1_2' },
-      { level_1_code: 2, level_1_en: 'label_2', level_2_code: '', level_2_en: '' },
-    ])
+    return CategoryManager.getCategoryExportTemplate({ res })
   }
 
   // get survey languages
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
 
-  // Function to prepare the csv headers
-  const _getHeaders = (levelsInCategory) =>
-    levelsInCategory
-      .sort((la, lb) => la.index - lb.index)
-      .reduce(
-        (headers, level) => [
-          ...headers,
-          `${CategoryLevel.getName(level)}_code`,
-          ...(languages || []).map((language) => `${CategoryLevel.getName(level)}_label_${language}`),
-        ],
-        []
-      )
-
-  // get headers
-  const headers = _getHeaders(levels)
-
-  const categoryStream = await CategoryManager.getCategoryStream({
+  const { stream: categoryStream, headers } = await CategoryManager.getCategoryStreamAndHeaders({
     surveyId,
     categoryUuid,
     levels,
-    headers,
     languages,
   })
 
   const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-  return await db.stream(categoryStream, (stream) => {
+  return db.stream(categoryStream, (stream) => {
     stream.pipe(CSVWriter.transformToStream(res, headers))
   })
 }

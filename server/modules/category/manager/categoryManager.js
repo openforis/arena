@@ -124,9 +124,10 @@ export const {
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
   fetchItemsByCategoryUuid,
-  getCategoryStream,
+  getCategoryStreamAndHeaders,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
+  getCategoryExportTemplate,
 } = CategoryRepository
 
 // ====== UPDATE

@@ -241,7 +241,9 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const getCategoryStream = ({ surveyId, categoryUuid, levels, headers, languages }) => {
+export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, languages }) => {
+  const headers = CategoryExportRepository.getCategoryExportHeaders({ levels, languages })
+
   const query = CategoryExportRepository.generateCategoryExportQuery({
     surveyId,
     categoryUuid,
@@ -250,8 +252,11 @@ export const getCategoryStream = ({ surveyId, categoryUuid, levels, headers, lan
     languages,
   })
 
-  return new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
+  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
+  return { stream, headers }
 }
+
+export const { getCategoryExportTemplate } = CategoryExportRepository
 // ============== UPDATE
 
 export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>

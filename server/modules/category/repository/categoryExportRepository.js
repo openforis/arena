@@ -1,5 +1,7 @@
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Response from '@server/utils/response'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
 const getEmpty = ({ header }) => `'' as ${header}`
 
@@ -116,4 +118,26 @@ export const generateCategoryExportQuery = ({ surveyId, levels, headers, languag
     .join(',')} nulls first`
 
   return query
+}
+
+export const getCategoryExportHeaders = ({ levels, languages }) =>
+  levels
+    .sort((la, lb) => la.index - lb.index)
+    .reduce(
+      (headers, level) => [
+        ...headers,
+        `${CategoryLevel.getName(level)}_code`,
+        ...(languages || []).map((language) => `${CategoryLevel.getName(level)}_label_${language}`),
+      ],
+      []
+    )
+
+export const getCategoryExportTemplate = async ({ res }) => {
+  Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
+  await CSVWriter.writeToStream(res, [
+    { level_1_code: 1, level_1_en: 'label_1', level_2_code: '', level_2_en: '' },
+    { level_1_code: 1, level_1_en: 'label_1', level_2_code: 1, level_2_en: 'label_1_1' },
+    { level_1_code: 1, level_1_en: 'label_1', level_2_code: 2, level_2_en: 'label_1_2' },
+    { level_1_code: 2, level_1_en: 'label_2', level_2_code: '', level_2_en: '' },
+  ])
 }
