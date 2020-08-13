@@ -65,7 +65,6 @@ export const {
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
-  fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
 
   updateCategoryProp,
