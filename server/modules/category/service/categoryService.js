@@ -37,7 +37,7 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
 
-  const { stream: categoryStream, headers } = await CategoryManager.getCategoryStreamAndHeaders({
+  const { stream: categoryStream, headers } = CategoryManager.getCategoryStreamAndHeaders({
     surveyId,
     categoryUuid,
     levels,
