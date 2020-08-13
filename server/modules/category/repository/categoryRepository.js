@@ -15,6 +15,7 @@ import * as DbUtils from '../../../db/dbUtils'
 import * as Category from '../../../../core/survey/category'
 import * as CategoryLevel from '../../../../core/survey/categoryLevel'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
+import * as CategoryExportRepository from './categoryExportRepository'
 
 // ============== CREATE
 
@@ -241,80 +242,13 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
   )
 
 export const getCategoryStream = ({ surveyId, categoryUuid, levels, headers, languages }) => {
-  let query = ''
-  // the number od columns per level came from the number of languages and the column for the code
-  const numColumnsPerLevel = 1 + languages.length
-  const numLevels = levels.length
-
-  // function to get the level code or label when they should be empty
-  const _getEmpty = ({ header }) => `'' as ${header}`
-  // function to get the level code
-  const _getCode = ({ index, header, empty }) =>
-    empty ? _getEmpty({ header }) : `(c${index}.props || c${index}.props_draft) ->> 'code' as ${header}`
-  // function to get the level label
-  const _getLabel = ({ index, header, language, empty }) =>
-    empty
-      ? _getEmpty({ header })
-      : `((c${index}.props || c${index}.props_draft) -> 'labels') ->> '${language}' as ${header}`
-
-  // function to extract the codes and the labels
-  // iterate over the numLevels if the level index is greater than the current index the values returned are null,
-  // else return the code and the labels for each language
-  const _getValues = ({ index }) => {
-    let fields = []
-
-    for (let i = 0; i < numLevels; i++) {
-      fields = [
-        ...fields,
-        _getCode({ index: i, header: headers[i * numColumnsPerLevel], empty: i > index }),
-        ...(languages || []).map((language, languageIndex) =>
-          _getLabel({
-            index: i,
-            header: headers[i * numColumnsPerLevel + 1 + languageIndex],
-            language,
-            empty: i > index,
-          })
-        ),
-      ]
-    }
-    return fields.join(',')
-  }
-
-  // function to prepare the joins between category items
-  const _getJoins = ({ index }) => {
-    let joins = ''
-    for (let i = 0; i < index; i++) {
-      joins += `
-            left join ${getSurveyDBSchema(surveyId)}.category_item c${i + 1} 
-            on c${i + 1}.parent_uuid = c${i}.uuid
-        `
-    }
-    return joins
-  }
-
-  // loop to build the query
-  levels.forEach((level, index) => {
-    if (index > 0) query += 'union '
-
-    query += `
-        select
-          ${_getValues({ index })}
-        from
-            ${getSurveyDBSchema(surveyId)}.category_item c0
-                
-                left join ${getSurveyDBSchema(surveyId)}.category_level l0
-                on c0.level_uuid = l0.uuid
-            ${index > 0 ? _getJoins({ index }) : ''}
-        
-        where c0.parent_uuid is null
-        and l0.category_uuid = $1
-        and c${index}.uuid is not null
-    `
+  const query = CategoryExportRepository.generateCategoryExportQuery({
+    surveyId,
+    categoryUuid,
+    levels,
+    headers,
+    languages,
   })
-
-  query += `order by ${levels
-    .map((level) => CategoryLevel.getIndex(level) * numColumnsPerLevel + 1)
-    .join(',')} nulls first`
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
 }
