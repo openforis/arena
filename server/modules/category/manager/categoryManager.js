@@ -122,11 +122,9 @@ export const {
   countCategories,
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
-  fetchCategoryUuid,
   fetchCategoryAndLevelsByUuid,
-  fetchLevelsByCategoryUuid,
   fetchItemsByCategoryUuid,
-  fetchCategoryCodesListStream,
+  getCategoryStream,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
 } = CategoryRepository

@@ -27,25 +27,22 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 }
 
 export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, res) => {
-  const levels = await CategoryManager.fetchLevelsByCategoryUuid(surveyId, categoryUuid, draft)
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft)
+  const levels = Category.getLevelsArray(category)
 
   if (levels.length <= 0) {
     Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
-    await CSVWriter.writeToStream(res, [
+    return await CSVWriter.writeToStream(res, [
       { level_1_code: 1, level_1_en: 'label_1', level_2_code: '', level_2_en: '' },
       { level_1_code: 1, level_1_en: 'label_1', level_2_code: 1, level_2_en: 'label_1_1' },
       { level_1_code: 1, level_1_en: 'label_1', level_2_code: 2, level_2_en: 'label_1_2' },
       { level_1_code: 2, level_1_en: 'label_2', level_2_code: '', level_2_en: '' },
     ])
-    return
   }
 
   // get survey languages
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
-
-  // get category to generate the file name
-  const category = await CategoryManager.fetchCategoryUuid(surveyId, categoryUuid, draft)
 
   // Function to prepare the csv headers
   const _getHeaders = (levelsInCategory) =>
@@ -63,7 +60,7 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   // get headers
   const headers = _getHeaders(levels)
 
-  const categoriesItemsStream = await CategoryManager.fetchCategoryCodesListStream({
+  const categoryStream = await CategoryManager.getCategoryStream({
     surveyId,
     categoryUuid,
     levels,
@@ -74,7 +71,7 @@ export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, re
   const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-  await db.stream(categoriesItemsStream, (stream) => {
+  return await db.stream(categoryStream, (stream) => {
     stream.pipe(CSVWriter.transformToStream(res, headers))
   })
 }
@@ -89,12 +86,9 @@ export const {
   countCategories,
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
-  fetchCategoryUuid,
   fetchCategoryAndLevelsByUuid,
-  fetchLevelsByCategoryUuid,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
-  fetchCategoryCodesListStream,
 
   updateCategoryProp,
   updateLevelProp,

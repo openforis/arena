@@ -157,17 +157,6 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
   return categories || {}
 }
 
-export const fetchCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
-  client.one(
-    `
-      SELECT c.* 
-      FROM ${getSurveyDBSchema(surveyId)}.category c
-      WHERE c.uuid = $1
-    `,
-    [categoryUuid],
-    (def) => dbTransformCallback(def, draft, true)
-  )
-
 export const fetchCategoryAndLevelsByUuid = async (
   surveyId,
   categoryUuid,
@@ -181,22 +170,6 @@ export const fetchCategoryAndLevelsByUuid = async (
     [categoryUuid]
   )
   return A.pipe(R.values, R.head)(categories)
-}
-
-export const fetchLevelsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
-  const items = await client.map(
-    `
-      SELECT l.* 
-      FROM
-       ${getSurveyDBSchema(surveyId)}.category_level l 
-        WHERE l.category_uuid = $1
-     ORDER BY l.index
-    `,
-    [categoryUuid],
-    (def) => dbTransformCallback(def, draft, true)
-  )
-
-  return draft ? items : R.filter((item) => item.published)(items)
 }
 
 export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
@@ -267,7 +240,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const fetchCategoryCodesListStream = ({ surveyId, categoryUuid, levels, headers, languages }) => {
+export const getCategoryStream = ({ surveyId, categoryUuid, levels, headers, languages }) => {
   let query = ''
   // the number od columns per level came from the number of languages and the column for the code
   const numColumnsPerLevel = 1 + languages.length
@@ -339,14 +312,9 @@ export const fetchCategoryCodesListStream = ({ surveyId, categoryUuid, levels, h
     `
   })
 
-  // function to create the orderby
-  const _getColumnsToOrder = () =>
-    new Array(levels.length)
-      .fill('')
-      .map((_, i) => i * 2 + 1)
-      .join(',')
-
-  query += `order by ${_getColumnsToOrder()} nulls first`
+  query += `order by ${levels
+    .map((level) => CategoryLevel.getIndex(level) * numColumnsPerLevel + 1)
+    .join(',')} nulls first`
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
 }
