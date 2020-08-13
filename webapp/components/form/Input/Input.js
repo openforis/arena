@@ -1,40 +1,18 @@
 import '../form.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
-
-import * as ObjectUtils from '@core/objectUtils'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
-// TODO improve use of forwarded ref, useRef(ref) does not work, forwarded ref current prop remains undefined
-// solution taken from https://itnext.io/reusing-the-ref-from-forwardref-with-react-hooks-4ce9df693dd
-const useCombinedRefs = (...refs) => {
-  const targetRef = useRef()
-
-  useEffect(() => {
-    refs
-      .filter((ref) => Boolean(ref))
-      .forEach((ref) => {
-        if (typeof ref === 'function') {
-          ref(targetRef.current)
-        } else {
-          // to avoid param-reassign error
-          ObjectUtils.setInPath(['current'], targetRef.current)(ref)
-        }
-      })
-  }, [refs])
-
-  return targetRef
-}
-
 export const Input = React.forwardRef((props, ref) => {
   const { disabled, id, maxLength, numberFormat, onChange, onFocus, placeholder, readOnly, validation, value } = props
 
-  const innerRef = useRef(null)
-  const inputRef = useCombinedRefs(ref, innerRef)
+  // workaround for inputRef: useRef(ref) does not work as expected
+  const inputRefInternal = useRef(null)
+  const inputRef = ref || inputRefInternal
   const selectionRef = useRef([value.length, value.length])
 
   const handleValueChange = (newValue) => {
