@@ -18,7 +18,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
 
 import FormHeader from './components/formHeader'
-import FormPageNavigation from './components/formPageNavigation'
+import FormPageNavigation from './components/FormPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
