@@ -1,44 +1,44 @@
-import './nodeDefCode.scss'
+import './NodeDefCode.scss'
 
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
+
 import * as R from 'ramda'
-import { connect } from 'react-redux'
 
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { I18nState } from '@webapp/store/system'
-import { SurveyState } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
-import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
-import NodeDefCodeDropdown from './nodeDefCodeDropdown'
+import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
+import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 
 const NodeDefCode = (props) => {
-  const {
-    surveyId,
-    surveyCycleKey,
-    nodeDef,
-    categoryUuid,
-    categoryLevelIndex,
-    nodeParentCodeUuid,
-    codeUuidsHierarchy,
-    parentNode,
-    nodes,
-    edit,
-    draft,
-    entryDataQuery,
-    updateNode,
-    removeNode,
-  } = props
+  const { canEditRecord, edit, entryDataQuery, nodeDef, nodes, parentNode, readOnly, removeNode, updateNode } = props
+
+  const survey = useSurvey()
+  const surveyCycleKey = useSurveyCycleKey()
+  const record = useSelector(RecordState.getRecord)
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyId = Survey.getId(survey)
+  const draft = Survey.isDraft(surveyInfo)
+  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const nodeParentCodeUuid = Node.getCategoryItemUuid(nodeParentCode)
+  const codeUuidsHierarchy = nodeParentCode
+    ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
+    : []
 
   const { data: { items = [] } = { items: [] }, dispatch: fetchItems, setState: setItems } = useAsyncGetRequest(
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
@@ -91,54 +91,48 @@ const NodeDefCode = (props) => {
 
   return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
     <NodeDefCodeDropdown
-      {...props}
+      canEditRecord={canEditRecord}
+      edit={edit}
+      entryDataQuery={entryDataQuery}
       items={itemsArray}
-      selectedItems={selectedItems}
+      nodeDef={nodeDef}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
+      readOnly={readOnly}
+      selectedItems={selectedItems}
     />
   ) : (
     <NodeDefCodeCheckbox
-      {...props}
+      canEditRecord={canEditRecord}
+      edit={edit}
       items={itemsArray}
-      selectedItems={selectedItems}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
+      readOnly={readOnly}
+      selectedItems={selectedItems}
     />
   )
 }
 
-const mapStateToProps = (state, props) => {
-  const lang = I18nState.getLang(state)
-
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-
-  const record = RecordState.getRecord(state)
-  const { nodeDef, parentNode } = props
-
-  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-
-  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-
-  const codeUuidsHierarchy = nodeParentCode
-    ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
-    : []
-
-  return {
-    lang,
-
-    surveyId: Survey.getId(survey),
-    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-    draft: Survey.isDraft(surveyInfo),
-
-    parentCodeDefUuid: NodeDef.getParentCodeDefUuid(nodeDef),
-    categoryUuid: category ? Category.getUuid(category) : null,
-    categoryLevelIndex,
-    nodeParentCodeUuid: Node.getCategoryItemUuid(nodeParentCode),
-    codeUuidsHierarchy,
-  }
+NodeDefCode.propTypes = {
+  canEditRecord: PropTypes.bool,
+  edit: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  nodeDef: PropTypes.object.isRequired,
+  nodes: PropTypes.arrayOf(PropTypes.object),
+  parentNode: PropTypes.object,
+  readOnly: PropTypes.bool,
+  removeNode: PropTypes.func.isRequired,
+  updateNode: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps)(NodeDefCode)
+NodeDefCode.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  entryDataQuery: false,
+  nodes: [],
+  parentNode: null,
+  readOnly: false,
+}
+
+export default NodeDefCode
