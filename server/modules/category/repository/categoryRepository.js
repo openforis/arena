@@ -15,6 +15,7 @@ import * as DbUtils from '../../../db/dbUtils'
 import * as Category from '../../../../core/survey/category'
 import * as CategoryLevel from '../../../../core/survey/categoryLevel'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
+import * as CategoryExportRepository from './categoryExportRepository'
 
 // ============== CREATE
 
@@ -189,6 +190,17 @@ export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = f
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
+export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+    FROM ${getSurveyDBSchema(surveyId)}.category_item i
+     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+        ON l.uuid = i.level_uuid
+        AND l.category_uuid = $1`,
+    [categoryUuid],
+    (r) => parseInt(r.count, 10)
+  )
+
 export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
   const items = await client.map(
     `
@@ -240,6 +252,22 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
+export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, languages }) => {
+  const headers = CategoryExportRepository.getCategoryExportHeaders({ levels, languages })
+
+  const query = CategoryExportRepository.generateCategoryExportQuery({
+    surveyId,
+    categoryUuid,
+    levels,
+    headers,
+    languages,
+  })
+
+  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
+  return { stream, headers }
+}
+
+export const { getCategoryExportTemplate } = CategoryExportRepository
 // ============== UPDATE
 
 export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
