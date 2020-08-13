@@ -133,7 +133,20 @@ const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(pr
 
 export const getIconByType = getPropByType('icon')
 
-export const getInputTextProps = getProp('inputText', { mask: false })
+export const getDecimalProps = (inputTextProps) => (nodeDef) => ({
+  ...inputTextProps,
+  mask: InputMasks.decimalLimited(16, NodeDef.getMaxNumberDecimalDigits(nodeDef)),
+})
+
+export const getInputTextProps = (nodeDef) => {
+  const inputTextProps = getProp('inputText', { mask: false })(nodeDef)
+
+  if (NodeDef.isDecimal(nodeDef)) {
+    return getDecimalProps(inputTextProps)(nodeDef)
+  }
+
+  return inputTextProps
+}
 
 export const getComponent = getProp('component', NodeDefText)
 

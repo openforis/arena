@@ -419,6 +419,9 @@ $t(common.cantUndoWarning)`,
       defaultValues: 'Default values',
       relevantIf: 'Relevant if',
     },
+    decimalProps: {
+      maxNumberDecimalDigits: 'Max number of decimal digits',
+    },
     codeProps: {
       category: 'Category',
       displayAs: 'Display As',
