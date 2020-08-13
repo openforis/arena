@@ -25,14 +25,15 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
   return job
 }
 
-export const exportCategoryCodeLevels = async (surveyId, categoryUuid, draft, res) => {
+export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft)
-  const levels = Category.getLevelsArray(category)
+  const numberOfItemsInCategory = await CategoryManager.countItemsByCategoryUuid(surveyId, categoryUuid)
 
-  if (levels.length <= 0) {
+  if (numberOfItemsInCategory <= 0) {
     return CategoryManager.getCategoryExportTemplate({ res })
   }
 
+  const levels = Category.getLevelsArray(category)
   // get survey languages
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)

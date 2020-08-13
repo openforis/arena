@@ -156,7 +156,7 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
 
-        await CategoryService.exportCategoryCodeLevels(surveyId, categoryUuid, draft, res)
+        await CategoryService.exportCategory(surveyId, categoryUuid, draft, res)
       } catch (error) {
         next(error)
       }
