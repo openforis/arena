@@ -4,10 +4,10 @@ import { transform, stringify } from 'csv'
 
 import * as StringUtils from '@core/stringUtils'
 
-const _transformObj = obj =>
+const _transformObj = (obj) =>
   Object.entries(obj).reduce(
     (objAcc, [key, value]) => Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
-    {},
+    {}
   )
 
 export const transformToStream = (stream, columns) => {
@@ -24,7 +24,7 @@ export const writeToStream = (stream, data) =>
     const transformer = transformToStream(stream, R.pipe(R.head, R.keys)(data))
     transformer.on('error', reject).on('finish', resolve)
 
-    data.forEach(row => transformer.write(row))
+    data.forEach((row) => transformer.write(row))
     transformer.end()
   })
 

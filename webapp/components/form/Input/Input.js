@@ -8,17 +8,33 @@ import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
 export const Input = React.forwardRef((props, ref) => {
-  const { disabled, id, maxLength, numberFormat, onChange, onFocus, placeholder, readOnly, validation, value } = props
+  const {
+    disabled,
+    id,
+    maxLength,
+    numberFormat,
+    onChange,
+    onFocus,
+    placeholder,
+    readOnly,
+    type,
+    validation,
+    value,
+  } = props
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
   const inputRef = ref || inputRefInternal
-  const selectionRef = useRef([value.length, value.length])
+  const selectionAllowed = type === 'text'
+  const selectionInitial = selectionAllowed ? [value.length, value.length] : null
+  const selectionRef = useRef(selectionInitial)
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
     if (newValue !== value) {
-      selectionRef.current = [input.selectionStart, input.selectionEnd]
+      if (selectionAllowed) {
+        selectionRef.current = [input.selectionStart, input.selectionEnd]
+      }
       if (onChange) {
         onChange(newValue)
       }
@@ -26,8 +42,10 @@ export const Input = React.forwardRef((props, ref) => {
   }
 
   useOnUpdate(() => {
-    const input = inputRef.current
-    ;[input.selectionStart, input.selectionEnd] = selectionRef.current
+    if (selectionAllowed) {
+      const input = inputRef.current
+      ;[input.selectionStart, input.selectionEnd] = selectionRef.current
+    }
   }, [value])
 
   return (
@@ -44,6 +62,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus,
           placeholder,
           readOnly,
+          type,
           value,
           ...numberFormat,
         })
@@ -59,6 +78,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           placeholder={placeholder}
           readOnly={readOnly}
+          type={type}
           value={value}
         />
       )}
@@ -74,8 +94,9 @@ Input.propTypes = {
   onFocus: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
+  type: PropTypes.oneOf(['text', 'number']),
   validation: PropTypes.object,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   numberFormat: PropTypes.shape({
     decimalScale: PropTypes.number,
     decimalSeparator: PropTypes.string,
@@ -93,6 +114,7 @@ Input.defaultProps = {
   onFocus: () => {},
   placeholder: null,
   readOnly: false,
+  type: 'text',
   validation: null,
   value: '',
   numberFormat: null,

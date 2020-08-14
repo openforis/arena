@@ -21,6 +21,7 @@ import { useBasicProps } from './store'
 
 import CodeProps from '../CodeProps'
 import TaxonProps from '../TaxonProps'
+import DecimalProps from '../DecimalProps'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -65,6 +66,8 @@ const BasicProps = (props) => {
       {NodeDef.isCode(nodeDef) && <CodeProps state={state} Actions={Actions} />}
 
       {NodeDef.isTaxon(nodeDef) && <TaxonProps state={state} Actions={Actions} />}
+
+      {NodeDef.isDecimal(nodeDef) && <DecimalProps state={state} Actions={Actions} />}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>

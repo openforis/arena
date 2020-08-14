@@ -27,7 +27,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
 
-const validateChildren = survey => (propName, nodeDef) => {
+const validateChildren = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const children = Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef))(survey)
     if (R.isEmpty(children)) {
@@ -42,10 +42,10 @@ const countKeyAttributes = (survey, nodeDefEntity) =>
   R.pipe(
     Survey.getNodeDefChildren(nodeDefEntity, NodeDef.isAnalysis(nodeDefEntity)),
     R.filter(NodeDef.isKey),
-    R.length,
+    R.length
   )(survey)
 
-const validateKeyAttributes = survey => (propName, nodeDef) => {
+const validateKeyAttributes = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
@@ -64,7 +64,7 @@ const validateKeyAttributes = survey => (propName, nodeDef) => {
   return null
 }
 
-const validateKey = survey => (propName, nodeDef) => {
+const validateKey = (survey) => (propName, nodeDef) => {
   if (!NodeDef.isEntity(nodeDef) && NodeDef.isKey(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
@@ -91,12 +91,15 @@ const validateVirtualEntityFormula = (survey, nodeDef) =>
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
-const propsValidations = survey => ({
+const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
+  ],
+  [`${keys.props}.${propKeys.maxNumberDecimalDigits}`]: [
+    Validator.validatePositiveNumber(Validation.messageKeys.invalidNumber),
   ],
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
@@ -133,7 +136,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
       [NodeDef.keysPropsAdvanced.applicable]: validationApplicable,
       [NodeDef.keysPropsAdvanced.validations]: validationValidations,
       [NodeDef.keysPropsAdvanced.formula]: validationVirtualEntityFormula,
-    }),
+    })
   )
 }
 
@@ -144,13 +147,13 @@ export const validateNodeDef = async (survey, nodeDef) => {
 
   const validation = R.pipe(
     R.mergeDeepLeft(advancedPropsValidation),
-    Validation.setValid(Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation)),
+    Validation.setValid(Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation))
   )(nodeDefValidation)
 
   return Validation.isValid(validation) ? null : validation
 }
 
-export const validateNodeDefs = async survey => {
+export const validateNodeDefs = async (survey) => {
   const validation = Validation.newInstance()
 
   const nodeDefs = Survey.getNodeDefs(survey)
@@ -181,7 +184,7 @@ export const isValidationValidOrHasOnlyMissingChildrenErrors = (nodeDef, validat
       Validation.getFieldValidations,
       R.keys,
       R.without([keysValidationFields.children, keysValidationFields.keyAttributes]),
-      R.isEmpty,
+      R.isEmpty
     )(validation)
 
     if (hasOnlyChildrenOrKeyAttributesErrors) {

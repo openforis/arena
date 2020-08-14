@@ -120,12 +120,14 @@ export const { createImportSummary, createImportSummaryFromStream } = CategoryIm
 // ====== READ
 export const {
   countCategories,
+  countItemsByCategoryUuid,
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
-  fetchItemsByCategoryUuid,
+  getCategoryStreamAndHeaders,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
+  getCategoryExportTemplate,
 } = CategoryRepository
 
 // ====== UPDATE
