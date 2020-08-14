@@ -25,7 +25,7 @@ const columnDescriptionSuffix = columnProps[CategoryImportSummary.columnTypes.de
 const columnRegExpLabel = new RegExp(`^.*${columnLabelSuffix}(_[a-z]{2})?$`)
 const columnRegExpDescription = new RegExp(`^.*${columnDescriptionSuffix}(_[a-z]{2})?$`)
 
-export const createImportSummaryFromStream = async stream => {
+export const createImportSummaryFromStream = async (stream) => {
   const columnNames = await CSVReader.readHeadersFromStream(stream)
 
   if (R.find(StringUtils.isBlank)(columnNames)) {
@@ -54,14 +54,15 @@ export const createImportSummaryFromStream = async stream => {
     return { name: null, index: -1 }
   }
 
+  const getColumnTypeByName = (columnName) => {
+    if (columnName.endsWith(columnCodeSuffix)) return CategoryImportSummary.columnTypes.code
+    if (columnRegExpLabel.test(columnName)) return CategoryImportSummary.columnTypes.label
+    if (columnRegExpDescription.test(columnName)) return CategoryImportSummary.columnTypes.description
+    return CategoryImportSummary.columnTypes.extra
+  }
+
   const columns = columnNames.reduce((acc, columnName) => {
-    const columnType = columnName.endsWith(columnCodeSuffix)
-      ? CategoryImportSummary.columnTypes.code
-      : columnRegExpLabel.test(columnName)
-      ? CategoryImportSummary.columnTypes.label
-      : columnRegExpDescription.test(columnName)
-      ? CategoryImportSummary.columnTypes.description
-      : CategoryImportSummary.columnTypes.extra
+    const columnType = getColumnTypeByName(columnName)
 
     const level = getOrCreateLevel(columnName, columnType)
 
@@ -83,12 +84,12 @@ export const createImportSummaryFromStream = async stream => {
   return summary
 }
 
-export const createImportSummary = async filePath => ({
+export const createImportSummary = async (filePath) => ({
   ...(await createImportSummaryFromStream(fs.createReadStream(filePath))),
   [CategoryImportSummary.keys.filePath]: filePath,
 })
 
-const _validateSummary = summary => {
+const _validateSummary = (summary) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   let atLeastOneCodeColumn = false
@@ -102,7 +103,7 @@ const _validateSummary = summary => {
       if (
         !CategoryImportSummary.hasColumn(
           CategoryImportSummary.columnTypes.code,
-          CategoryImportSummary.getColumnLevelIndex(column),
+          CategoryImportSummary.getColumnLevelIndex(column)
         )(summary)
       ) {
         const levelName = CategoryImportSummary.getColumnLevelName(column)

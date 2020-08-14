@@ -4,8 +4,8 @@ import SystemError from '@core/systemError'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as CategoryService from '../service/categoryService'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 export const init = (app) => {
   // ==== CREATE
@@ -143,6 +143,20 @@ export const init = (app) => {
         const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
 
         res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+
+        await CategoryService.exportCategory(surveyId, categoryUuid, draft, res)
       } catch (error) {
         next(error)
       }
