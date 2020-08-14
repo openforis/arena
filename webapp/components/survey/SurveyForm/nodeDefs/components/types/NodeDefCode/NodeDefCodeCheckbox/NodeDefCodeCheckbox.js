@@ -1,12 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { useI18n, useLang } from '@webapp/store/system'
-
-import Checkbox from './Checkbox'
 
 const NodeDefCodeCheckbox = (props) => {
   const { canEditRecord, edit, items, onItemAdd, onItemRemove, readOnly, selectedItems } = props
@@ -14,35 +11,33 @@ const NodeDefCodeCheckbox = (props) => {
   const i18n = useI18n()
   const lang = useLang()
 
-  const disabled = A.isEmpty(items)
+  const disabled = edit || !canEditRecord || readOnly
 
   return (
     <div className="survey-form__node-def-code">
       {edit ? (
-        <Checkbox
-          disabled
-          edit
-          item={{
-            uuid: '0',
-            props: {
-              labels: { [lang]: i18n.t('surveyForm.nodeDefCode.buttonCode') },
-            },
-          }}
-        />
+        <button type="button" className="btn btn-s deselectable" aria-disabled disabled>
+          {i18n.t('surveyForm.nodeDefCode.buttonCode')}
+        </button>
       ) : (
-        items.map((item) => (
-          <Checkbox
-            key={CategoryItem.getUuid(item)}
-            canEditRecord={canEditRecord}
-            disabled={disabled}
-            edit={edit}
-            item={item}
-            onItemAdd={onItemAdd}
-            onItemRemove={onItemRemove}
-            readOnly={readOnly}
-            selectedItems={selectedItems}
-          />
-        ))
+        items.map((item) => {
+          const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
+          return (
+            <button
+              key={CategoryItem.getUuid(item)}
+              type="button"
+              className={`btn btn-s deselectable${selected ? ' active' : ''}`}
+              aria-disabled={disabled}
+              disabled={disabled}
+              onClick={() => {
+                if (selected) onItemRemove(item)
+                else onItemAdd(item)
+              }}
+            >
+              {CategoryItem.getLabel(lang)(item)}
+            </button>
+          )
+        })
       )}
     </div>
   )
