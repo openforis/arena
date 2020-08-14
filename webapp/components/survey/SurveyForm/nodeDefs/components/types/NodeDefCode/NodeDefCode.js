@@ -6,8 +6,6 @@ import { useSelector } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { useAsyncGetRequest } from '@webapp/components/hooks'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -16,6 +14,7 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
@@ -40,32 +39,31 @@ const NodeDefCode = (props) => {
     ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
 
-  const { data: { items = [] } = { items: [] }, dispatch: fetchItems, setState: setItems } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    {
-      params: { draft, parentUuid: nodeParentCodeUuid },
-    }
-  )
-  const itemsArray = Object.values(items)
+  const [items, setItems] = useState([])
   const [selectedItems, setSelectedItems] = useState([])
+  const itemsArray = Object.values(items)
 
-  if (!edit) {
-    // Fetch code items on categoryUuid or nodeParentCodeUuid update
-    useEffect(() => {
-      if (categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)) {
-        fetchItems()
-      } else {
-        setItems({ data: { items: [] } })
-      }
-    }, [categoryUuid, nodeParentCodeUuid])
+  // Fetch code items on categoryUuid or nodeParentCodeUuid update
+  useEffect(() => {
+    if (!edit) {
+      ;(async () => {
+        const itemsLoaded =
+          categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)
+            ? await API.fetchCategoryItems({ surveyId, categoryUuid, draft, parentUuid: nodeParentCodeUuid })
+            : []
+        setItems(itemsLoaded)
+      })()
+    }
+  }, [edit, categoryUuid, nodeParentCodeUuid])
 
-    // On items or nodes change, update selectedItems
-    useEffect(() => {
+  // On items or nodes change, update selectedItems
+  useEffect(() => {
+    if (!edit) {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
       const selectedItemsUpdate = itemsArray.filter((item) => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
-    }, [items, nodes])
-  }
+    }
+  }, [edit, items, nodes])
 
   const onItemAdd = (item) => {
     const node =
