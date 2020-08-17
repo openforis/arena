@@ -34,7 +34,7 @@ const LabelsEditor = (props) => {
 
   const language = R.slice(0, MAX_PREVIEW_LANGUAGES, languages)
 
-  const canTogglePreview = languages.length > MAX_PREVIEW_LANGUAGES
+  const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
 
   const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
 
@@ -42,7 +42,7 @@ const LabelsEditor = (props) => {
     <div className={className}>
       <div className="labels-editor-label">
         {showFormLabel && <span className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</span>}
-        {canTogglePreview && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
+        {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
