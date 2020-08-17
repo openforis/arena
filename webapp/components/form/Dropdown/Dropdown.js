@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
 import ItemDialog from './ItemDialog'
