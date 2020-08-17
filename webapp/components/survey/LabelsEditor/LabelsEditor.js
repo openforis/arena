@@ -41,7 +41,7 @@ const LabelsEditor = (props) => {
   return (
     <div className={className}>
       <div className="labels-editor-label">
-        {showFormLabel && <label className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</label>}
+        {showFormLabel && <span className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</span>}
         {canTogglePreview && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
       </div>
       <div className="labels-editor__labels">
