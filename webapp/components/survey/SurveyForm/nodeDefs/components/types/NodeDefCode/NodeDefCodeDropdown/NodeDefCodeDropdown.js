@@ -1,25 +1,29 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
 
+import { useLang } from '@webapp/store/system'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-const NodeDefCodeDropdown = props => {
+const NodeDefCodeDropdown = (props) => {
   const {
-    lang,
-    nodeDef,
-    items,
-    selectedItems,
+    canEditRecord,
     edit,
     entryDataQuery,
-    canEditRecord,
-    readOnly,
+    items,
+    nodeDef,
     onItemAdd,
     onItemRemove,
+    readOnly,
+    selectedItems,
   } = props
+
+  const lang = useLang()
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -46,7 +50,7 @@ const NodeDefCodeDropdown = props => {
           itemKey="uuid"
           itemLabel={CategoryItem.getLabel(lang)}
           selection={R.head(selectedItems)}
-          onChange={item => {
+          onChange={(item) => {
             // NB: onItemRemove is not possible?
             if (item) onItemAdd(item)
             else onItemRemove(item)
@@ -55,6 +59,27 @@ const NodeDefCodeDropdown = props => {
       )}
     </div>
   )
+}
+
+NodeDefCodeDropdown.propTypes = {
+  canEditRecord: PropTypes.bool,
+  edit: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  items: PropTypes.arrayOf(PropTypes.object),
+  nodeDef: PropTypes.object.isRequired,
+  onItemAdd: PropTypes.func.isRequired,
+  onItemRemove: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
+  selectedItems: PropTypes.arrayOf(PropTypes.object),
+}
+
+NodeDefCodeDropdown.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  entryDataQuery: false,
+  items: [],
+  readOnly: false,
+  selectedItems: [],
 }
 
 export default NodeDefCodeDropdown
