@@ -10,7 +10,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { FormItem } from '@webapp/components/form/input'
+import { FormItem } from '@webapp/components/form/Input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './ExpressionProp'
 

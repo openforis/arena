@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
