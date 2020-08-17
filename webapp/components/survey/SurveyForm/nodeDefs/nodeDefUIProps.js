@@ -10,7 +10,7 @@ import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
 import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/nodeDefCode'
+import NodeDefCode from './components/types/NodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 

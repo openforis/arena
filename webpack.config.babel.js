@@ -12,19 +12,22 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 import { uuidv4 } from './core/uuid'
 import * as ProcessUtils from './core/processUtils'
 
-const buildReport = ProcessUtils.ENV.buildReport
+const { buildReport } = ProcessUtils.ENV
+const fontCssFileName = 'woff2.css'
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
+  // eslint-disable-next-line class-methods-use-this
   shouldPickStatChild(child) {
     return child.name.indexOf('mini-css-extract-plugin') !== 0
   }
 
   apply(compiler) {
     compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
-      const children = stats.compilation.children
+      const { children } = stats.compilation
       if (Array.isArray(children)) {
+        // eslint-disable-next-line no-param-reassign
         stats.compilation.children = children.filter((child) => this.shouldPickStatChild(child))
       }
     })
@@ -61,6 +64,7 @@ const plugins = [
       },
     ],
     formats: ['woff2'],
+    filename: fontCssFileName,
   }),
   new CleanUpStatsPlugin(),
 ]
@@ -73,6 +77,7 @@ if (buildReport) {
 const webPackConfig = {
   entry: ['./webapp/Main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
+  devtool: 'source-map',
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
     alias: {
@@ -103,7 +108,27 @@ const webPackConfig = {
           {
             loader: MiniCssExtractPlugin.loader,
           },
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              url: (url) => {
+                // Don't handle /img/ urls
+                if (url.includes('/img/')) {
+                  return false
+                }
+
+                return true
+              },
+              import: (url) => {
+                // Don't handle font css file import
+                if (url.includes(fontCssFileName)) {
+                  return false
+                }
+
+                return true
+              },
+            },
+          },
           'sass-loader',
         ],
       },
@@ -127,10 +152,5 @@ webpack.optimization = {
     new OptimizeCSSAssetsPlugin({}),
   ],
 }
-
-// }
-// else {
-webPackConfig.devtool = 'source-map'
-// }
 
 export default webPackConfig
