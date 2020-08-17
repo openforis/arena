@@ -9,11 +9,12 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
-import { FormItem, Input } from '@webapp/components/form/input'
+
+import { useIsCategoriesRoute } from '@webapp/components/hooks'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
 import DownloadButton from '@webapp/components/form/downloadButton'
 

@@ -11,7 +11,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 
-import { FormItem } from '@webapp/components/form/input'
+import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
