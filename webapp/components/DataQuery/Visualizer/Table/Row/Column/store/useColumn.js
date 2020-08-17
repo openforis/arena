@@ -8,8 +8,10 @@ import { Query } from '@common/model/query'
 export const useColumn = ({ colWidth, query, nodeDef }) => {
   const modeEdit = Query.isModeRawEdit(query)
 
+  let isMeasure = false
   const colNames = []
   if (Query.isModeAggregate(query) && Query.getMeasures(query).has(NodeDef.getUuid(nodeDef))) {
+    isMeasure = true
     // for every measure add a column for each aggregate function
     const aggregateFns = Query.getMeasures(query).get(NodeDef.getUuid(nodeDef))
     aggregateFns.forEach((aggregateFn) => colNames.push(`${ColumnNodeDef.getColName(nodeDef)}_${aggregateFn}`))
@@ -21,5 +23,5 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
   const widthOuter = colWidth * noCols
   const widthInner = `${(1 / noCols) * 100}%`
 
-  return { colNames, modeEdit, noCols, widthInner, widthOuter }
+  return { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter }
 }
