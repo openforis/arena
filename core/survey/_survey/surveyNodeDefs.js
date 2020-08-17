@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as Category from '../category'
-import * as SurveyCategories from './surveyCategories'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -180,37 +179,33 @@ export const getNodeDefCategoryLevelIndex = (nodeDef) => (survey) => {
   return parentCodeNodeDef ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey) : 0
 }
 
-export const getNodeDefCodeCandidateParents = (nodeDef) => (survey) => {
-  const category = SurveyCategories.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-
-  if (category) {
-    const levelsLength = Category.getLevelsArray(category).length
-
-    const candidates = []
-    visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
-      if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
-        const candidatesAncestor = R.pipe(
-          getNodeDefChildren(nodeDefAncestor),
-          R.reject(
-            (n) =>
-              // Reject multiple attributes
-              NodeDef.isMultiple(n) ||
-              // Or different category nodeDef
-              NodeDef.getCategoryUuid(n) !== Category.getUuid(category) ||
-              // Or itself
-              NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef) ||
-              // Or leaves nodeDef
-              getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
-          )
-        )(survey)
-
-        candidates.push(...candidatesAncestor)
-      }
-    })(survey)
-    return candidates
+export const getNodeDefCodeCandidateParents = ({ nodeDef, category }) => (survey) => {
+  if (!category || !nodeDef) {
+    return []
   }
+  const levelsLength = Category.getLevelsArray(category).length
+  const candidates = []
+  visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
+    if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
+      const candidatesAncestor = R.pipe(
+        getNodeDefChildren(nodeDefAncestor),
+        R.reject(
+          (n) =>
+            // Reject multiple attributes
+            NodeDef.isMultiple(n) ||
+            // Or different category nodeDef
+            NodeDef.getCategoryUuid(n) !== NodeDef.getCategoryUuid(nodeDef) ||
+            // Or itself
+            NodeDef.isEqual(n)(nodeDef) ||
+            // Or leaves nodeDef
+            getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
+        )
+      )(survey)
 
-  return []
+      candidates.push(...candidatesAncestor)
+    }
+  })(survey)
+  return candidates
 }
 
 export const canUpdateCategory = (nodeDef) => (survey) =>

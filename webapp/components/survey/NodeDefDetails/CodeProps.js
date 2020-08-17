@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -17,6 +17,17 @@ import * as Validation from '@core/validation/validation'
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
 import { State } from './store'
 
+const displayAsItems = ({ i18n }) => [
+  {
+    key: NodeDefLayout.renderType.checkbox,
+    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
+  },
+  {
+    key: NodeDefLayout.renderType.dropdown,
+    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
+  },
+]
+
 const CodeProps = (props) => {
   const { state, Actions } = props
 
@@ -24,27 +35,18 @@ const CodeProps = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
 
+  const [category, setCategory] = useState(null)
+
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
-  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents(nodeDef)(survey)
+  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
-
-  const displayAsItems = [
-    {
-      key: NodeDefLayout.renderType.checkbox,
-      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
-    },
-    {
-      key: NodeDefLayout.renderType.dropdown,
-      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
-    },
-  ]
 
   const disabled = !canUpdateCategory
 
-  const setCategoryProp = (category) =>
-    Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(category) })
+  const setCategoryProp = (categorySelected) =>
+    Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(categorySelected) })
 
   return (
     <>
@@ -56,6 +58,7 @@ const CodeProps = (props) => {
           editingNodeDef
           analysis={NodeDef.isAnalysis(nodeDef)}
           onChange={setCategoryProp}
+          onCategoryLoad={setCategory}
         />
       </FormItem>
 
@@ -85,7 +88,7 @@ const CodeProps = (props) => {
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
               onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
-              items={displayAsItems}
+              items={displayAsItems({ i18n })}
             />
           </FormItem>
         </>
