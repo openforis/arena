@@ -5,7 +5,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
-import { FormItem, Input } from '@webapp/components/form/input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import DownloadButton from '@webapp/components/form/downloadButton'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
