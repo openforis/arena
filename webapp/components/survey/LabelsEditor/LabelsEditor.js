@@ -2,7 +2,7 @@ import './LabelsEditor.scss'
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs } from '@webapp/store/survey'
@@ -30,9 +30,9 @@ const LabelsEditor = (props) => {
   const i18n = useI18n()
   const [editingLabels, setEditingLabels] = useState(false)
   const surveyLangs = useSurveyLangs()
-  const languages = !R.isEmpty(languagesFromProps) ? languagesFromProps : surveyLangs
+  const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLangs
 
-  const language = R.slice(0, MAX_PREVIEW_LANGUAGES, languages)
+  const language = languages[0]
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
 
@@ -58,11 +58,7 @@ const LabelsEditor = (props) => {
         </ValidationTooltip>
       </div>
       {editingLabels && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setEditingLabels(false)}
-          header={i18n.t(formLabelKey, { count: languages.length })}
-        >
+        <PanelRight onClose={() => setEditingLabels(false)} header={i18n.t(formLabelKey, { count: languages.length })}>
           <div className="labels-editor__labels">
             <ValidationTooltip validation={validation}>
               {languages.map((lang) => (
