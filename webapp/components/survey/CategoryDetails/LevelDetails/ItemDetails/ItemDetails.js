@@ -9,8 +9,7 @@ import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
 import ErrorBadge from '@webapp/components/errorBadge'
-import { FormItem, Input } from '@webapp/components/form/input'
-import * as InputMasks from '@webapp/components/form/inputMasks'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { useI18n } from '@webapp/store/system'
@@ -89,7 +88,7 @@ const ItemDetails = (props) => {
             <FormItem label={key} key={key}>
               <Input
                 value={CategoryItem.getExtraProp(key)(item)}
-                mask={dataType === Category.itemExtraDefDataTypes.number ? InputMasks.decimal : null}
+                numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
                 readOnly={readOnly}
                 validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                 onChange={(value) => {

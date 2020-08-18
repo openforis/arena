@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
@@ -17,7 +18,7 @@ export const useFetchData = ({ setData }) => {
       ({ offset, limit, query }) =>
         post({
           url: getUrl({ surveyId, query }),
-          body: { cycle, query, limit, offset },
+          body: { cycle, query: A.stringify(query), limit, offset },
         }),
       [cycle, surveyId, post]
     ),

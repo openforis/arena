@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { FormItem } from '@webapp/components/form/input'
+import { FormItem } from '@webapp/components/form/Input'
 
 import * as NodeDef from '@core/survey/nodeDef'
 

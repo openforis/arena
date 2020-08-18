@@ -1,3 +1,4 @@
+import * as A from '../../../../core/arena'
 import * as DateUtils from '../../../../core/dateUtils'
 
 import * as Request from '../../../utils/request'
@@ -10,7 +11,9 @@ import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 export const init = (app) => {
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, query, offset, limit } = Request.getParams(req)
+      const { surveyId, cycle, query: queryParam, offset, limit } = Request.getParams(req)
+
+      const query = A.parse(queryParam)
 
       const rows = await SurveyRdbService.fetchViewData({ surveyId, cycle, query, offset, limit })
 
@@ -25,7 +28,9 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, query } = Request.getParams(req)
+        const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+
+        const query = A.parse(queryParam)
 
         const count = await SurveyRdbService.countTable({ surveyId, cycle, query })
 

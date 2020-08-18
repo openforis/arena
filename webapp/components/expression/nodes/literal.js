@@ -14,7 +14,7 @@ import { useAsyncGetRequest } from '../../hooks'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import * as ExpressionParser from '../expressionParser'
@@ -77,15 +77,11 @@ const Literal = (props) => {
       )
     }
     if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))) {
-      const inputTextProps = NodeDefUIProps.getInputTextProps(nodeDefCurrent)
-      const { mask, showMask, placeholderChar } = inputTextProps
       return (
         <Input
-          mask={mask}
-          showMask={showMask}
-          placeholderChar={placeholderChar}
+          numberFormat={NodeDefUIProps.getNumberFormat(nodeDefCurrent)}
+          onChange={onChangeValue}
           value={nodeValue}
-          onChange={(value) => onChangeValue(value)}
         />
       )
     }
@@ -94,7 +90,7 @@ const Literal = (props) => {
         <ButtonGroup
           className="literal-btn-group-boolean"
           selectedItemKey={nodeValue}
-          onChange={(value) => onChangeValue(value)}
+          onChange={onChangeValue}
           items={['true', 'false'].map((value) => ({
             key: value,
             label: i18n.t(`common.${value}`),

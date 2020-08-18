@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const ButtonToggle = ({ open, onClick }) => (
   <button type="button" className="btn-s labels-editor__btn-toggle" onClick={onClick}>
-    <span className={`icon icon-${open ? 'enlarge2' : 'shrink2'} icon-12px`} />
+    <span className={`icon icon-${open ? 'shrink2' : 'enlarge2'} icon-12px`} />
   </button>
 )
 

@@ -27,12 +27,21 @@ export const useLocalState = ({
       selection,
     })
   )
+
   const Actions = useActions({ setState, onBeforeChange, onChange })
 
   // on update selection: call closeDialog to reset input value
   useOnUpdate(() => {
     Actions.closeDialog({ selection, state })
   }, [selection])
+
+  useOnUpdate(() => {
+    setState(State.assocItems(items))
+  }, [items])
+
+  useOnUpdate(() => {
+    setState(State.assocDisabled(disabled))
+  }, [disabled])
 
   return { Actions, state }
 }

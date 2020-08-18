@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
-import { FormItem, Input } from '@webapp/components/form/input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 

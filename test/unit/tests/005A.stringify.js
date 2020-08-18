@@ -11,6 +11,11 @@ const tests = [
     expected: '{"a":1,"b":"b"}',
   },
   {
+    value: { a: 1, b: 'b', c: null },
+    valueText: "{ a: 1, b: 'b', c: null}",
+    expected: '{"a":1,"b":"b","c":null}',
+  },
+  {
     value: { a: 1, b: 'lorem', c: { n: 5 }, d: [1, 3, 5] },
     valueText: "{ a: 1, b: 'lorem', c: { n: 5 }, d: [1, 3, 5] }",
     expected: '{"a":1,"b":"lorem","c":{"n":5},"d":[1,3,5]}',
