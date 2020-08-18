@@ -3,6 +3,7 @@ import './LabelsEditor.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
+import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs } from '@webapp/store/survey'
@@ -29,17 +30,14 @@ const LabelsEditor = (props) => {
 
   const i18n = useI18n()
   const [editingLabels, setEditingLabels] = useState(false)
-  const surveyLangs = useSurveyLangs()
-  const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLangs
-
+  const surveyLanguages = useSurveyLangs()
+  const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages
   const language = languages[0]
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
 
-  const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
-
   return (
-    <div className={className}>
+    <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
       <div className="labels-editor-label">
         {showFormLabel && <span className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</span>}
         {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
