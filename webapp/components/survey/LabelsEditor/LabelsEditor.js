@@ -2,7 +2,8 @@ import './LabelsEditor.scss'
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
+import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs } from '@webapp/store/survey'
@@ -29,20 +30,17 @@ const LabelsEditor = (props) => {
 
   const i18n = useI18n()
   const [editingLabels, setEditingLabels] = useState(false)
-  const surveyLangs = useSurveyLangs()
-  const languages = !R.isEmpty(languagesFromProps) ? languagesFromProps : surveyLangs
+  const surveyLanguages = useSurveyLangs()
+  const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages
+  const language = languages[0]
 
-  const language = R.slice(0, MAX_PREVIEW_LANGUAGES, languages)
-
-  const canTogglePreview = languages.length > MAX_PREVIEW_LANGUAGES
-
-  const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
+  const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
 
   return (
-    <div className={className}>
+    <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
       <div className="labels-editor-label">
         {showFormLabel && <span className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</span>}
-        {canTogglePreview && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
+        {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
@@ -58,11 +56,7 @@ const LabelsEditor = (props) => {
         </ValidationTooltip>
       </div>
       {editingLabels && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setEditingLabels(false)}
-          header={i18n.t(formLabelKey, { count: languages.length })}
-        >
+        <PanelRight onClose={() => setEditingLabels(false)} header={i18n.t(formLabelKey, { count: languages.length })}>
           <div className="labels-editor__labels">
             <ValidationTooltip validation={validation}>
               {languages.map((lang) => (
