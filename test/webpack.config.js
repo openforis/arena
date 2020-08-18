@@ -2,8 +2,12 @@ const path = require('path')
 const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
 
-const getEntry = (type) => glob.sync(path.resolve(__dirname, type, 'tests', '*.js'))
-//.filter((element) => !element.includes('webpack.config.js'))
+const getEntry = (type) =>
+  glob.sync(path.resolve(__dirname, type, 'tests', '*.js')).sort((fileA, fileB) => {
+    const idxA = fileA.substr(0, 3)
+    const idxB = fileB.substr(0, 3)
+    return idxA < idxB
+  })
 
 const getOutput = (type) => ({
   path: path.resolve(__dirname, '..', 'dist', '__tests__'),

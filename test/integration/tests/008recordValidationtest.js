@@ -10,11 +10,11 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { initTestContext, getContextUser } from './config/context'
+import { initTestContext, getContextUser } from '../config/context'
 
-import * as SB from '../utils/surveyBuilder'
-import * as RB from '../utils/recordBuilder'
-import * as RecordUtils from '../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as RB from '../../utils/recordBuilder'
+import * as RecordUtils from '../../utils/recordUtils'
 
 const getContext = () => {
   const survey = global.applicableSurvey

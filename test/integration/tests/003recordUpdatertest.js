@@ -1,4 +1,4 @@
-import * as RecordUpdateManagerTest from './tests/_record/recordUpdateManagerTest'
+import * as RecordUpdateManagerTest from './_record/recordUpdateManagerTest'
 
 describe('RecordUpdateManager Test', () => {
   test('Record creation', RecordUpdateManagerTest.recordCreationTest)

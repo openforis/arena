@@ -1,20 +1,20 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../core/uuid'
-import * as Survey from '../../core/survey/survey'
-import * as Record from '../../core/record/record'
-import * as User from '../../core/user/user'
-import * as ObjectUtils from '../../core/objectUtils'
+import { uuidv4 } from '../../../core/uuid'
+import * as Survey from '../../../core/survey/survey'
+import * as Record from '../../../core/record/record'
+import * as User from '../../../core/user/user'
+import * as ObjectUtils from '../../../core/objectUtils'
 
-import * as ActivityLog from '../../common/activityLog/activityLog'
+import * as ActivityLog from '../../../common/activityLog/activityLog'
 
-import * as ActivityLogRepository from '../../server/modules/activityLog/repository/activityLogRepository'
-import * as SurveyManager from '../../server/modules/survey/manager/surveyManager'
-import * as RecordManager from '../../server/modules/record/manager/recordManager'
-import { getContextUser } from './config/context'
+import * as ActivityLogRepository from '../../../server/modules/activityLog/repository/activityLogRepository'
+import * as SurveyManager from '../../../server/modules/survey/manager/surveyManager'
+import * as RecordManager from '../../../server/modules/record/manager/recordManager'
+import { getContextUser } from '../config/context'
 
-import * as SB from '../utils/surveyBuilder'
-import * as RecordUtils from '../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as RecordUtils from '../../utils/recordUtils'
 
 describe('Activity Log Test', () => {
   test('Activity Log on Survey Creation', async () => {

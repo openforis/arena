@@ -7,7 +7,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
-import { fetchFullContextSurvey } from './config/context'
+import { fetchFullContextSurvey } from '../config/context'
 
 const validateExpression = async (survey, nodeDefName, expression) => {
   const nodeDef = R.pipe(

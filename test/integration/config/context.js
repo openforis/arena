@@ -36,7 +36,7 @@ const createAdminUser = async () =>
 
 /**
  * Initializing test context (user)
- * before executing all tests
+ * before executing all tests.
  */
 export const initTestContext = async () => {
   await createAdminUser()
@@ -56,6 +56,7 @@ export const destroyTestContext = async () => {
     setContextSurvey(null)
     setContextUser(null)
   }
+  await db.$pool.end()
 }
 
 export const fetchFullContextSurvey = async (draft = true, advanced = true) =>

@@ -7,11 +7,11 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { getContextUser } from './config/context'
+import { getContextUser } from '../config/context'
 
-import * as SB from '../utils/surveyBuilder'
-import * as RB from '../utils/recordBuilder'
-import * as RecordUtils from '../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as RB from '../../utils/recordBuilder'
+import * as RecordUtils from '../../utils/recordUtils'
 
 describe('Applicable Test', () => {
   beforeAll(async () => {

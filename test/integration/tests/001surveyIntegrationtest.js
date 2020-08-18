@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 import * as SurveyIntegrationTest from './_survey/surveyTest'
 import * as CategoryTest from './_survey/categoryTest'
 import * as NodeDefTest from './_survey/nodeDefTest'

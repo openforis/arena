@@ -4,9 +4,9 @@ import * as Survey from '@core/survey/survey'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { getContextUser } from './config/context'
+import { getContextUser } from '../config/context'
 
-import * as SB from '../utils/surveyBuilder'
+import * as SB from '../../utils/surveyBuilder'
 
 const expectSchemaToExist = async (schemaName, exists = true) => {
   const result = await db.one(

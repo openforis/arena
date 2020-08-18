@@ -1,5 +1,5 @@
-import * as TaxonomyTests from './tests/_taxonomy/taxonomyTests'
-import * as TaxonomyPublishedTests from './tests/_taxonomy/taxonomyPublishedTests'
+import * as TaxonomyTests from './_taxonomy/taxonomyTests'
+import * as TaxonomyPublishedTests from './_taxonomy/taxonomyPublishedTests'
 
 describe('Taxonomy test', () => {
   test('Taxonomy insert test', TaxonomyTests.taxonomyTests)
