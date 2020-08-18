@@ -16,15 +16,12 @@ export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(NodeDef.isRoot))
 
 export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
-export const getNodeDefsByUuids = (uuids = []) =>
-  R.ifElse(
-    R.always(R.isEmpty(uuids)),
-    R.always([]),
-    R.pipe(
-      getNodeDefsArray,
-      R.filter((nodeDef) => R.includes(NodeDef.getUuid(nodeDef), uuids))
-    )
-  )
+export const getNodeDefsByUuids = (uuids = []) => (survey) => {
+  if (R.isEmpty(uuids)) {
+    return []
+  }
+  return uuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
+}
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
