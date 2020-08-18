@@ -44,18 +44,6 @@ const NodeDefsSelectorAggregate = (props) => {
 
       {nodeDefUuidEntity && (
         <>
-          <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
-            <AttributesSelector
-              onToggleAttribute={onToggleMeasure}
-              lang={lang}
-              filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-              nodeDefUuidEntity={nodeDefUuidEntity}
-              nodeDefUuidsAttributes={[...measures.keys()]}
-              showAncestorsLabel={false}
-              showMultipleAttributes={false}
-            />
-          </ExpansionPanel>
-
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
@@ -63,6 +51,18 @@ const NodeDefsSelectorAggregate = (props) => {
               filterTypes={[NodeDef.nodeDefType.code]}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
+              showAncestorsLabel={false}
+              showMultipleAttributes={false}
+            />
+          </ExpansionPanel>
+
+          <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
+            <AttributesSelector
+              onToggleAttribute={onToggleMeasure}
+              lang={lang}
+              filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
+              nodeDefUuidEntity={nodeDefUuidEntity}
+              nodeDefUuidsAttributes={[...measures.keys()]}
               showAncestorsLabel={false}
               showMultipleAttributes={false}
             />

@@ -19,7 +19,7 @@ import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
+  const { disabled, categoryUuid, validation, showManage, showAdd, onChange, onCategoryLoad } = props
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -35,6 +35,7 @@ const CategorySelector = (props) => {
       if (!A.isEmpty(categoryUuid)) {
         const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
         setCategory(categorySelected)
+        onCategoryLoad(categorySelected)
       }
     })()
   }, [categoryUuid, showCategoriesPanel])
@@ -100,6 +101,7 @@ CategorySelector.propTypes = {
   showManage: PropTypes.bool,
   showAdd: PropTypes.bool,
   onChange: PropTypes.func,
+  onCategoryLoad: PropTypes.func,
 }
 
 CategorySelector.defaultProps = {
@@ -109,6 +111,7 @@ CategorySelector.defaultProps = {
   showManage: true,
   showAdd: true,
   onChange: () => ({}),
+  onCategoryLoad: () => ({}),
 }
 
 export default CategorySelector

@@ -12,8 +12,9 @@ import { Sort, Query } from '../../../../../common/model/query'
 const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
   const fields = []
   const params = {}
-  Object.entries(measures).forEach(([nodeDefUuidMeasure, aggFunctions], i) => {
-    const paramName = `measure_field_${i}`
+  let index = 0
+  measures.forEach((aggFunctions, nodeDefUuidMeasure) => {
+    const paramName = `measure_field_${index}`
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuidMeasure)(survey)
     const columnMeasure = new ColumnNodeDef(viewDataNodeDef, nodeDefMeasure).name
 
@@ -29,6 +30,7 @@ const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
       fields.push(field)
       params[paramName] = columnMeasure
     })
+    index += 1
   })
   return { fields, params }
 }
@@ -149,8 +151,8 @@ export const countViewDataAgg = async (params, client = db) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
-  const { limit, offset, stream } = params
-  const { select, queryParams } = _getSelectQuery(params)
+  const { survey, cycle, query, limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query })
 
   const selectWithLimit = `${select}     
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
