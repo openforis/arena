@@ -137,7 +137,7 @@ export const taxonUpdateTest = async () => {
 
 const _importFile = async (taxonomyName, importFileName) => {
   const { survey } = getContext()
-  await TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
+  return TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
 }
 
 export const taxonomyImportErrorMissingColumnsTest = async () => {
