@@ -23,6 +23,6 @@
     "core",
     "server",
     "webapp",
-    "test_old"
+    "test"
   ]
 }
