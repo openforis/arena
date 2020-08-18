@@ -25,7 +25,9 @@ export const getItemLabel = A.prop(keys.itemLabel)
 export const getReadOnly = A.prop(keys.readOnly)
 
 // ====== UPDATE
+export const assocDisabled = A.assoc(keys.disabled)
 export const assocInputValue = A.assoc(keys.inputValue)
+export const assocItems = A.assoc(keys.items)
 export const assocItemsDialog = A.assoc(keys.itemsDialog)
 export const assocShowDialog = A.assoc(keys.showDialog)
 

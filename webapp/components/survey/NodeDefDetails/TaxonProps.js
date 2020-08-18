@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
 
-import { FormItem } from '@webapp/components/form/input'
+import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 

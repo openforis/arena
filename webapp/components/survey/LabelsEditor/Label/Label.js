@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { Input } from '@webapp/components/form/input'
+import { Input } from '@webapp/components/form/Input'
 
 import Badge from './Badge'
 
