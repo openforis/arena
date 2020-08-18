@@ -13,6 +13,7 @@ export const parse = (string) => {
   if (isNull(string)) return null
   if (isEmpty(string)) return ''
   return JSON.parse(string, (key, value) => {
+    if (isNull(value)) return null
     if (value.__type === 'Map') return new Map(parse(value.__values))
     if (value.__type === 'Set') return new Set(parse(value.__values))
     return value

@@ -2,8 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { ColumnNodeDef } from '@common/model/db'
 import * as StringUtils from '@core/stringUtils'
+
+import { Query } from '@common/model/query'
+import { ColumnNodeDef } from '@common/model/db'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLang } from '@webapp/store/survey'
@@ -24,7 +26,7 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const { colNames, modeEdit, noCols, widthInner, widthOuter } = useColumn({ query, colWidth, nodeDef })
+  const { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter } = useColumn({ query, colWidth, nodeDef })
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -43,6 +45,17 @@ const ColumnHeader = (props) => {
               {i18n.t(getColLabelKey({ colName, nodeDef }))}
             </div>
           ))}
+        </div>
+      )}
+      {isMeasure && (
+        <div className="table__inner-cell">
+          {Query.getMeasures(query)
+            .get(NodeDef.getUuid(nodeDef))
+            .map((aggregateFn) => (
+              <div key={`${NodeDef.getUuid(nodeDef)}_${aggregateFn}`} style={{ width: widthInner }}>
+                {aggregateFn}
+              </div>
+            ))}
         </div>
       )}
     </div>
