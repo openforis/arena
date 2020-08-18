@@ -14,8 +14,11 @@ import { useListenOnNodeUpdates } from './hooks/useListenToNodeUpdates'
 export const useTable = ({ data, query, nodeDefsSelectorVisible, setData }) => {
   const [colWidth, setColWidth] = useState(null)
 
-  const nodeDefCols = useNodeDefsByUuids(Query.getAttributeDefUuids(query))
-  const colNames = nodeDefCols.flatMap((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol))
+  const nodeDefColUuids = Query.isModeAggregate(query)
+    ? [...Query.getDimensions(query).values(), ...Query.getMeasures(query).keys()]
+    : Query.getAttributeDefUuids(query)
+  const nodeDefCols = useNodeDefsByUuids(nodeDefColUuids)
+  const colNames = nodeDefCols.flatMap(ColumnNodeDef.getColNames)
   const colsNumber = Query.isModeRawEdit(query)
     ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
     : colNames.length
