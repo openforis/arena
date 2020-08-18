@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
 
-import { FormItem } from '@webapp/components/form/input'
+import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 const CyclesSelector = (props) => {

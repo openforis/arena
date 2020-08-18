@@ -26,7 +26,7 @@ export default {
   mode: 'development',
   devtool: isProduction ? false : 'source-map',
   externals: [
-    nodeExternals({ whitelist: ['webpack/hot/poll?1000'] }),
+    nodeExternals({ allowlist: ['webpack/hot/poll?1000'] }),
     // 'worker_threads',
   ],
   name: 'server',
