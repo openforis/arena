@@ -67,6 +67,9 @@ const Dropdown = (props) => {
         onChange={async (value) => {
           await Actions.updateInputValue({ value, state })
         }}
+        onBlur={async (e) => {
+          await Actions.blurInputValue({ value: e.target.value, state, selection })
+        }}
         onFocus={async () => Actions.openDialog({ state })}
       />
 
