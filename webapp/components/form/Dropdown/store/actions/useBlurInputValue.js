@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 import * as A from '@core/arena'
 
-import * as Category from '@core/survey/category'
+import { State } from '../state'
 import { getItemsDialog } from './getItemsDialog'
 
 export const useBlurInputValue = ({ onChange }) =>
@@ -13,7 +13,7 @@ export const useBlurInputValue = ({ onChange }) =>
       !A.isEmpty(selection) &&
       (A.isEmpty(value) ||
         A.isEmpty(itemsDialog) ||
-        !itemsDialog.some((itemDialog) => Category.getName(itemDialog) === value))
+        !itemsDialog.some((itemDialog) => State.getItemLabel(state)(itemDialog) === value))
     ) {
       await onChange(null)
     }
