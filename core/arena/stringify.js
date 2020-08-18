@@ -9,7 +9,13 @@ import { isNull } from './isNull'
  */
 export const stringify = (object) => {
   if (isNull(object)) return null
-  return JSON.stringify(object, (key, value) => {
+
+  const replacer = (key, value) => {
+    if (isNull(value)) return null
+
+    if (isNull(key)) {
+      return stringify(value)
+    }
     if (value.constructor === Map)
       return {
         __type: 'Map',
@@ -20,9 +26,7 @@ export const stringify = (object) => {
         __type: 'Set',
         __values: stringify([...value]),
       }
-    if (value.constructor === object) {
-      return stringify(value)
-    }
-    return isNull(key) ? stringify(value) : value
-  })
+    return value
+  }
+  return JSON.stringify(object, replacer)
 }

@@ -1,5 +1,7 @@
 import { useCallback } from 'react'
 
+import * as A from '@core/arena'
+
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
@@ -15,7 +17,7 @@ export const useFetchCount = ({ setCount }) => {
       ({ query }) =>
         post({
           url: `${getUrl({ surveyId, query })}/count`,
-          body: { cycle, query },
+          body: { cycle, query: A.stringify(query) },
         }),
       [cycle, surveyId, post]
     ),
