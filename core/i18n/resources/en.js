@@ -482,6 +482,18 @@ $t(common.cantUndoWarning)`,
       code: '$t(common.code)',
       label: '$t(common.label)',
     },
+    nodeDefBoolean: {
+      answerLabel: {
+        trueFalse: {
+          true: '$t(common.true)',
+          false: '$t(common.false)',
+        },
+        yesNo: {
+          true: 'Yes',
+          false: 'No',
+        },
+      },
+    },
     nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
