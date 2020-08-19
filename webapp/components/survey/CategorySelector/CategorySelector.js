@@ -36,6 +36,8 @@ const CategorySelector = (props) => {
         const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
         setCategory(categorySelected)
         onCategoryLoad(categorySelected)
+      } else {
+        setCategory(null)
       }
     })()
   }, [categoryUuid, showCategoriesPanel])
