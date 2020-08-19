@@ -78,7 +78,7 @@ export default class ColumnNodeDef {
   }
 
   get namesFull() {
-    if (shouldReturnBoolenColumnWithLabel({ nodeDef: this._nodeDef, streamMode: this._streamMode })) {
+    if (shouldReturnBooleanColumnWithLabel({ nodeDef: this._nodeDef, streamMode: this._streamMode })) {
       return `CASE WHEN ${SQL.addAlias(this.table.alias, this.names)}::boolean = True THEN 'Yes' ELSE 'No' END as ${
         this.names
       }`
