@@ -13,5 +13,5 @@ export const useRemoveItem = ({ onChange, onItemRemove }) =>
         onItemRemove(item)
       }
     },
-    []
+    [onChange, onItemRemove]
   )
