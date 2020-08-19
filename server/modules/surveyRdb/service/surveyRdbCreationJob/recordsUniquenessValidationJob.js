@@ -16,10 +16,10 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 const recordValidationUpdateBatchSize = 1000
 
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
+  const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
 
   // Merge new validation with node validation
-  const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, validationNode)
+  const nodeValidationUpdated = R.mergeDeepRight(validationNodeOld, validationNode)
 
   // Replace node validation in record validation
   return R.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
@@ -91,14 +91,17 @@ export default class RecordsUniquenessValidationJob extends Job {
         )
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation
 
-        const validationUpdated = nodesKeyDuplicate.reduce(
-          (validationRecordAccumulator, nodeKeyDuplicate) =>
-            _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
-          validationRecord
-        )
+        const validationRecordUpdated = R.pipe(
+          R.reduce(
+            (validationRecordAccumulator, nodeKeyDuplicate) =>
+              _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+            validationRecord
+          ),
+          Validation.updateCounts
+        )(nodesKeyDuplicate)
 
         // 3. add record validation to batch update
-        await this.addRecordValidationToBatchUpdate(recordUuid, validationUpdated)
+        await this.addRecordValidationToBatchUpdate(recordUuid, validationRecordUpdated)
       })
     }
 
