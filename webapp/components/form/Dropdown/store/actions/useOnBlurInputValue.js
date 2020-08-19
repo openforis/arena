@@ -5,7 +5,7 @@ import * as A from '@core/arena'
 import { State } from '../state'
 import { getItemsDialog } from './getItemsDialog'
 
-export const useBlurInputValue = ({ onChange }) =>
+export const useOnBlurInputValue = ({ onChange }) =>
   useCallback(async ({ value = '', state, selection }) => {
     const itemsDialog = await getItemsDialog({ state, value })
 
