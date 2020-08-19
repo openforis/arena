@@ -25,7 +25,7 @@
     "test:e2e": "run-s build:test:e2e jest:e2e",
     "test:integration": "run-s build:test:integration jest:integration",
     "test:unit": "run-s build:test:unit jest:unit",
-    "test": "run-s test:unit test:integration test:e2e",
+    "test": "run-s test:unit test:e2e",
     "test:docker": "test/run_docker_tests.sh",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
