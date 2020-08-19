@@ -1,38 +1,54 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
+
+import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import * as NodeDef from '@core/survey/nodeDef'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import { useSurveyCycleKey } from '@webapp/store/survey'
+
 import { State } from './store'
 
-const displayAsItems = ({ i18n }) => [
+const booleanAnswerTypes = ({ i18n }) => [
   {
-    key: NodeDefLayout.renderType.checkbox,
-    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
+    key: NodeDef.booleanAnswerLabelsTypes.trueFalse,
+    label: i18n.t('nodeDefEdit.booleanProps.answerLabelsTypes.trueFalse'),
   },
   {
-    key: NodeDefLayout.renderType.dropdown,
-    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
+    key: NodeDef.booleanAnswerLabelsTypes.yesNo,
+    label: i18n.t('nodeDefEdit.booleanProps.answerLabelsTypes.yesNo'),
   },
 ]
 
+const DEFAULT_ANSWER_LABELS_TYPE = NodeDef.booleanAnswerLabelsTypes.trueFalse
 const BooleanProps = (props) => {
   const { state, Actions } = props
 
-  const surveyCycleKey = useSurveyCycleKey()
   const i18n = useI18n()
 
   const nodeDef = State.getNodeDef(state)
 
+  const selectAnswerLabelType = useCallback(
+    (value) => {
+      Actions.setProp({ state, key: NodeDef.propKeys.answerLabelsType, value })
+    },
+    [state]
+  )
+
+  useEffect(() => {
+    if (A.isEmpty(NodeDef.getAnswerLabelsType(nodeDef))) {
+      selectAnswerLabelType(DEFAULT_ANSWER_LABELS_TYPE)
+    }
+  }, [])
+
   return (
-    <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
+    <FormItem label={i18n.t('nodeDefEdit.booleanProps.answerLabels')}>
       <ButtonGroup
-        selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-        onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
-        items={displayAsItems({ i18n })}
+        selectedItemKey={NodeDef.getAnswerLabelsType(nodeDef)}
+        onChange={selectAnswerLabelType}
+        items={booleanAnswerTypes({ i18n })}
       />
     </FormItem>
   )

@@ -422,6 +422,13 @@ $t(common.cantUndoWarning)`,
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
+    booleanProps: {
+      answerLabels: 'Answer labels',
+      answerLabelsTypes: {
+        trueFalse: 'True/False',
+        yesNo: 'Yes/No',
+      },
+    },
     codeProps: {
       category: 'Category',
       displayAs: 'Display As',

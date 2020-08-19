@@ -49,11 +49,19 @@ export const propKeys = {
   // Decimal
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
 
+  // Boolean
+  answerLabelsType: 'answerLabelsType',
+
   // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+}
+
+export const booleanAnswerLabelsTypes = {
+  trueFalse: 'trueFalse',
+  yesNo: 'yesNo',
 }
 
 export const keysPropsAdvanced = {
@@ -111,6 +119,9 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
+
+export const getAnswerLabelsType = getProp(propKeys.answerLabelsType)
+
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
