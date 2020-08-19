@@ -165,7 +165,6 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
 
   let recordUpdated = record
 
-  /* eslint-disable no-await-in-loop */
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
