@@ -1,3 +1,3 @@
-import { closeBrowser } from '../utils/browser'
+import { closeBrowser } from '../utils'
 
 global.afterAll(closeBrowser)
