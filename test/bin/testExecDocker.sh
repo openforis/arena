@@ -16,4 +16,5 @@ docker-compose -f test/docker-compose.yml \
     up \
     --build \
     --abort-on-container-exit \
-    --exit-code-from arena_test
+    --exit-code-from \
+    arena_test
