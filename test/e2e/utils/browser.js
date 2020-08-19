@@ -1,6 +1,6 @@
-const { openBrowser: openBrowserTaiko, closeBrowser: closeBrowserTaiko } = require('taiko')
+const { openBrowser: openBrowserTaiko, closeBrowser: closeBrowserTaiko, goto } = require('taiko')
 
-const headless = Boolean(process.env.HEADLESS_CHROME)
+const headless = process.env.HEADLESS_CHROME === 'true'
 
 export const openBrowser = async () => {
   await openBrowserTaiko({
@@ -17,6 +17,8 @@ export const openBrowser = async () => {
         ]
       : [],
   })
+
+  await goto('localhost:9090')
 }
 
 export const closeBrowser = async () => {

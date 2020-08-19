@@ -1,6 +1,4 @@
-const { closeBrowser, $, evaluate, button, write, link, into, textBox, text } = require('taiko')
-
-const { openBrowser, LoginSuccessful } = require('../fixtures')
+const { $, evaluate, button, write, link, into, textBox, text } = require('taiko')
 
 export const FillSurvey = ({ name, label }) => async () => {
   await write(name, into(textBox({ placeholder: 'Name' })))
@@ -17,14 +15,8 @@ const ClickHeaderUserBtn = ({ buttonLabel }) => async () => {
   await evaluate(link(buttonLabel), (e) => e.click())
 }
 
-describe('Survey creation', () => {
+describe('Survey create', () => {
   describe('The user must be able to create new surveys, edit and delete old ones', () => {
-    beforeAll(async () => {
-      await openBrowser()
-    })
-
-    describe('Successful Login', LoginSuccessful)
-
     describe('With correct data, user is able to create a survey.', () => {
       test('Navigate to "Create Survey"', ClickHeaderUserBtn({ buttonLabel: 'Create Survey' }))
 
@@ -58,10 +50,6 @@ describe('Survey creation', () => {
       })
 
       test('Page contains "Survey 1"', ContainsByText({ textOfElement: 'Survey 1' }))
-    })
-
-    afterAll(async () => {
-      await closeBrowser()
     })
   })
 })
