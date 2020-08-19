@@ -5,6 +5,11 @@
   grid-row-gap: 1.5rem;
   height: 100%;
   align-content: start;
+
+  .labels-editor {
+    grid-template-columns: 150px 400px;
+  }
+  
 }
 
 .calculation__attribute-container {
