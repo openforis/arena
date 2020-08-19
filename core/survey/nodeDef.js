@@ -120,7 +120,7 @@ export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 
-export const getAnswerLabelsType = getProp(propKeys.answerLabelsType)
+export const getAnswerLabelsType = getProp(propKeys.answerLabelsType, booleanAnswerLabelsTypes.trueFalse)
 
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
