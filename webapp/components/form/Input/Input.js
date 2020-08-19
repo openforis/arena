@@ -15,6 +15,7 @@ export const Input = React.forwardRef((props, ref) => {
     numberFormat,
     onChange,
     onFocus,
+    onBlur,
     placeholder,
     readOnly,
     type,
@@ -60,6 +61,7 @@ export const Input = React.forwardRef((props, ref) => {
           id,
           onValueChange: ({ formattedValue: newValue }) => handleValueChange(newValue),
           onFocus,
+          onBlur,
           placeholder,
           readOnly,
           type,
@@ -76,6 +78,7 @@ export const Input = React.forwardRef((props, ref) => {
           maxLength={maxLength}
           onChange={(event) => handleValueChange(event.target.value)}
           onFocus={onFocus}
+          onBlur={onBlur}
           placeholder={placeholder}
           readOnly={readOnly}
           type={type}
@@ -92,6 +95,7 @@ Input.propTypes = {
   maxLength: PropTypes.number,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
   type: PropTypes.oneOf(['text', 'number']),
@@ -112,6 +116,7 @@ Input.defaultProps = {
   maxLength: null,
   onChange: null,
   onFocus: () => {},
+  onBlur: () => {},
   placeholder: null,
   readOnly: false,
   type: 'text',

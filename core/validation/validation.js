@@ -146,6 +146,7 @@ export const updateCounts = (validation) => {
 
 export const setValid = (valid) => ObjectUtils.setInPath([keys.valid], valid)
 export const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
+export const setFieldValidations = (fieldValidations) => ObjectUtils.setInPath([keys.fields], fieldValidations)
 export const setErrors = (errors) => ObjectUtils.setInPath([keys.errors], errors)
 
 export const assocFieldValidation = (field, fieldValidation) =>
