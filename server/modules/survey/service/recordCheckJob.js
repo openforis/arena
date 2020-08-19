@@ -3,7 +3,9 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
@@ -41,7 +43,7 @@ export default class RecordCheckJob extends Job {
         true,
         false,
         true,
-        this.tx,
+        this.tx
       )
 
       // 2. determine new, updated or deleted node defs
@@ -49,7 +51,7 @@ export default class RecordCheckJob extends Job {
       const nodeDefUpdatedUuids = []
       const nodeDefDeletedUuids = []
 
-      Survey.getNodeDefsArray(survey).forEach(def => {
+      Survey.getNodeDefsArray(survey).forEach((def) => {
         const nodeDefUuid = NodeDef.getUuid(def)
         if (NodeDef.isDeleted(def)) {
           nodeDefDeletedUuids.push(nodeDefUuid)
@@ -91,7 +93,7 @@ export default class RecordCheckJob extends Job {
         this.surveyId,
         nodeDefDeletedUuids,
         record,
-        this.tx,
+        this.tx
       )
       record = recordDeletedNodes || record
     }
@@ -102,7 +104,7 @@ export default class RecordCheckJob extends Job {
       nodeDefAddedUuids,
       record,
       this.user,
-      this.tx,
+      this.tx
     )
     record = recordUpdateInsert || record
 
@@ -112,11 +114,15 @@ export default class RecordCheckJob extends Job {
       nodeDefUpdatedUuids,
       record,
       missingNodes,
-      this.tx,
+      this.tx
     )
     record = recordUpdate || record
 
-    // 5. validate nodes
+    // 5. clear record keys validation (record keys validation performed after RDB generation)
+    record = _clearRecordKeysValidation(record)
+
+    // 6. validate nodes
+
     const nodesToValidate = {
       ...missingNodes,
       ...nodesUpdatedDefaultValues,
@@ -175,6 +181,25 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   }
 
   return await RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
+}
+
+const _clearRecordKeysValidation = (record) => {
+  const validationRecord = Record.getValidation(record)
+
+  return R.pipe(
+    Validation.getFieldValidations,
+    Object.entries,
+    R.reduce(
+      (validationAcc, [nodeUuid, validationNode]) =>
+        R.assoc(
+          nodeUuid,
+          Validation.dissocFieldValidation(RecordValidation.keys.recordKeys)(validationNode)
+        )(validationAcc),
+      {}
+    ),
+    (fieldValidationsUpdated) => Validation.setFieldValidations(fieldValidationsUpdated)(validationRecord),
+    (validationRecordUpdated) => Validation.assocValidation(validationRecordUpdated)(record)
+  )(validationRecord)
 }
 
 const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, tx) => {
