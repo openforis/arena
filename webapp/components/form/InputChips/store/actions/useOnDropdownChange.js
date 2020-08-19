@@ -20,5 +20,5 @@ export const useOnDropdownChange = ({ onChange, onItemAdd }) =>
         onItemAdd(item)
       }
     },
-    []
+    [onChange, onItemAdd]
   )
