@@ -42,23 +42,17 @@ const getColNames = (nodeDef) => {
 const extractColName = ({ nodeDef, colName }) =>
   camelize(colName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
 
-const shouldReturnBooleanColumnWithLabel = ({ nodeDef, streamMode }) =>
-  NodeDef.isBoolean(nodeDef) &&
-  NodeDef.getAnswerLabelsType(nodeDef) === NodeDef.booleanAnswerLabelsTypes.yesNo &&
-  streamMode
-
 /**
  * A nodeDef data table column.
  *
  * @typedef {object} module:arena.ColumnNodeDef
  */
 export default class ColumnNodeDef {
-  constructor(table, nodeDef, streamMode = false) {
+  constructor(table, nodeDef) {
     this._table = table
     this._nodeDef = nodeDef
     this._names = getColNames(nodeDef)
     this._types = colTypesByType[NodeDef.getType(nodeDef)]
-    this._streamMode = streamMode
   }
 
   get table() {
@@ -78,11 +72,6 @@ export default class ColumnNodeDef {
   }
 
   get namesFull() {
-    if (shouldReturnBooleanColumnWithLabel({ nodeDef: this._nodeDef, streamMode: this._streamMode })) {
-      return `CASE WHEN ${SQL.addAlias(this.table.alias, this.names)}::boolean = True THEN 'Yes' ELSE 'No' END as ${
-        this.names
-      }`
-    }
     return SQL.addAlias(this.table.alias, this.names)
   }
 

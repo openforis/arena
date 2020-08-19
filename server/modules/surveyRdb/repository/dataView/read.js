@@ -25,6 +25,9 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
+const _isBooleanAndHasLabels = ({ nodeDef }) =>
+  NodeDef.isBoolean(nodeDef) && NodeDef.getAnswerLabelsType(nodeDef) === NodeDef.booleanAnswerLabelsTypes.yesNo
+
 const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
     return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
@@ -35,7 +38,17 @@ const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMo
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol, streamMode).namesFull).flat(),
+      ...nodeDefCols
+        .map((nodeDefCol) => {
+          const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+
+          if (streamMode && _isBooleanAndHasLabels({ nodeDef: columnNodeDef.nodeDef })) {
+            return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
+          }
+
+          return columnNodeDef.namesFull
+        })
+        .flat(),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids,
     ]
