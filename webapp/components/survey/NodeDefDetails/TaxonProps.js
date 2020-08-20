@@ -46,6 +46,8 @@ const TaxonProps = (props) => {
       if (!A.isEmpty(taxonomyUuid)) {
         const taxonomySelected = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
         setTaxonomy(taxonomySelected)
+      } else {
+        setTaxonomy(null)
       }
     })()
   }, [taxonomyUuid, showTaxonomiesPanel])
