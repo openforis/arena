@@ -19,7 +19,7 @@
     "build:test:e2e": "webpack --display-error-details --config test/e2e/config/webpack.config.js",
     "build:test:integration": "webpack --display-error-details --config test/integration/config/webpack.config.js",
     "build:test:unit": "webpack --display-error-details --config test/unit/config/webpack.config.js",
-    "jest:e2e": "jest --silent --testTimeout=10000 dist/__tests__/bundle.e2e.js",
+    "jest:e2e": "jest --silent --testTimeout=20000 dist/__tests__/bundle.e2e.js",
     "jest:integration": "jest --silent dist/__tests__/bundle.integration.js",
     "jest:unit": "jest --silent dist/__tests__/bundle.unit.js",
     "test:e2e": "run-s build:test:e2e jest:e2e",

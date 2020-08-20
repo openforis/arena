@@ -1,18 +1,11 @@
-import { button } from 'taiko'
-
-import {
-  clickElement,
-  writeIntoTextBox,
-  clickHeaderBtnCreateSurvey,
-  clickHeaderBtnMySurveys,
-  expectExists,
-  clickParentElement,
-} from '../utils'
+import { button, click, clickParent, expectExists, writeIntoTextBox } from '../utils/api'
+import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader } from '../utils/ui'
 
 const createSurvey = async ({ name, label }) => {
   await writeIntoTextBox({ text: name, selector: { placeholder: 'Name' } })
   await writeIntoTextBox({ text: label, selector: { placeholder: 'Label' } })
-  await clickElement(button('Create Survey'))
+  await click(button('Create Survey'))
+  await waitForLoader()
 }
 
 const verifyHomeDashboard = async ({ label }) => {
@@ -42,7 +35,7 @@ describe('Survey create', () => {
     await expectExists({ text: 'survey_1' })
     await expectExists({ text: 'survey_2' })
 
-    await clickParentElement('survey_1')
+    await clickParent('survey_1')
 
     await verifyHomeDashboard({ label: 'Survey 1' })
   })

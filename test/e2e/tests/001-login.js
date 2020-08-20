@@ -1,5 +1,5 @@
-import { click } from 'taiko'
-import { clearTextBox, expectExists, waitFor1sec, writeIntoTextBox } from '../utils'
+import { clearTextBox, click, expectExists, writeIntoTextBox } from '../utils/api'
+import { waitForLoader } from '../utils/ui'
 
 const selectorEmail = { placeholder: 'Your email' }
 const selectorPassword = { placeholder: 'Your password' }
@@ -13,8 +13,8 @@ const login = async ({ username, password }) => {
 describe('Login', () => {
   test('Unsuccessful Login', async () => {
     await login({ username: 'test@arena.com', password: 'error' })
-    await waitFor1sec()
 
+    await waitForLoader()
     await expectExists({ text: 'User not found. Make sure email and password are correct' })
   })
 
@@ -23,8 +23,8 @@ describe('Login', () => {
     await clearTextBox({ selector: selectorPassword })
 
     await login({ username: 'test@arena.com', password: 'test' })
-    await waitFor1sec()
 
+    await waitForLoader()
     await expectExists({ selector: '.header' })
   })
 })
