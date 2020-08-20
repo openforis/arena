@@ -13,16 +13,17 @@ import { State } from './store'
 
 const booleanAnswerTypes = ({ i18n }) => [
   {
-    key: NodeDef.booleanAnswerLabelsTypes.trueFalse,
-    label: i18n.t('nodeDefEdit.booleanProps.answerLabelsTypes.trueFalse'),
+    key: NodeDef.booleanLabelValueTypes.trueFalse,
+    label: i18n.t('nodeDefEdit.booleanProps.labelValueTypes.trueFalse'),
   },
   {
-    key: NodeDef.booleanAnswerLabelsTypes.yesNo,
-    label: i18n.t('nodeDefEdit.booleanProps.answerLabelsTypes.yesNo'),
+    key: NodeDef.booleanLabelValueTypes.yesNo,
+    label: i18n.t('nodeDefEdit.booleanProps.labelValueTypes.yesNo'),
   },
 ]
 
-const DEFAULT_ANSWER_LABELS_TYPE = NodeDef.booleanAnswerLabelsTypes.trueFalse
+const DEFAULT_ANSWER_LABELS_TYPE = NodeDef.booleanLabelValueTypes.trueFalse
+
 const BooleanProps = (props) => {
   const { state, Actions } = props
 
@@ -30,24 +31,24 @@ const BooleanProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
 
-  const selectAnswerLabelType = useCallback(
+  const selectLabelValueType = useCallback(
     (value) => {
-      Actions.setProp({ state, key: NodeDef.propKeys.answerLabelsType, value })
+      Actions.setProp({ state, key: NodeDef.propKeys.labelValueType, value })
     },
     [state]
   )
 
   useEffect(() => {
-    if (A.isEmpty(NodeDef.getAnswerLabelsType(nodeDef))) {
-      selectAnswerLabelType(DEFAULT_ANSWER_LABELS_TYPE)
+    if (A.isEmpty(NodeDef.getLabelValueType(nodeDef))) {
+      selectLabelValueType(DEFAULT_ANSWER_LABELS_TYPE)
     }
   }, [])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.booleanProps.answerLabels')}>
+    <FormItem label={i18n.t('nodeDefEdit.booleanProps.labelValue')}>
       <ButtonGroup
-        selectedItemKey={NodeDef.getAnswerLabelsType(nodeDef)}
-        onChange={selectAnswerLabelType}
+        selectedItemKey={NodeDef.getLabelValueType(nodeDef)}
+        onChange={selectLabelValueType}
         items={booleanAnswerTypes({ i18n })}
       />
     </FormItem>

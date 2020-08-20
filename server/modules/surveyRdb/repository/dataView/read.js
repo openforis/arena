@@ -26,7 +26,7 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
 }
 
 const _isBooleanAndHasLabels = ({ nodeDef }) =>
-  NodeDef.isBoolean(nodeDef) && NodeDef.getAnswerLabelsType(nodeDef) === NodeDef.booleanAnswerLabelsTypes.yesNo
+  NodeDef.isBoolean(nodeDef) && NodeDef.getLabelValueType(nodeDef) === NodeDef.booleanLabelValueTypes.yesNo
 
 const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
