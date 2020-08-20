@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { Query } from '@common/model/query'
 
 import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
@@ -21,7 +22,7 @@ const NodeDefsSelectorAggregate = (props) => {
   const onToggleMeasure = (nodeDefUuid) => {
     const measuresUpdate = new Map(measures)
     if (measuresUpdate.has(nodeDefUuid)) measuresUpdate.delete(nodeDefUuid)
-    else measuresUpdate.set(nodeDefUuid, ['SUM'])
+    else measuresUpdate.set(nodeDefUuid, [Query.aggregateFunctions.sum])
 
     onChangeMeasures(measuresUpdate)
   }

@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
@@ -11,6 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyLang } from '@webapp/store/survey'
 
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import PanelRight from '@webapp/components/PanelRight'
 
 import { useColumn } from './store'
 
@@ -26,11 +28,13 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter } = useColumn({
+  const { modeEdit, colNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
     query,
     colWidth,
     nodeDef,
   })
+
+  const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -41,7 +45,11 @@ const ColumnHeader = (props) => {
           <div>
             {NodeDef.getLabel(nodeDef, lang)}
             {isMeasure && (
-              <button type="button" className="btn btn-s btn-transparent btn-aggregates">
+              <button
+                type="button"
+                className="btn btn-s btn-transparent btn-aggregates"
+                onClick={() => setShowAggregateFunctionsPanel(true)}
+              >
                 <span className="icon icon-cog icon-14px" />
               </button>
             )}
@@ -68,6 +76,20 @@ const ColumnHeader = (props) => {
               </div>
             ))}
         </div>
+      )}
+
+      {showAggregateFunctionsPanel && (
+        <PanelRight onClose={() => setShowAggregateFunctionsPanel(false)}>
+          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
+            <button
+              key={aggregateFn}
+              type="button"
+              className={classNames('btn btn-aggregate-fn', { active: aggregateFunctions.indexOf(aggregateFn) >= 0 })}
+            >
+              {i18n.t(`common.${aggregateFn}`)}
+            </button>
+          ))}
+        </PanelRight>
       )}
     </div>
   )

@@ -3,6 +3,15 @@ import * as A from '@core/arena'
 import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
 
+export const aggregateFunctions = {
+  avg: 'avg',
+  cnt: 'cnt',
+  max: 'max',
+  med: 'med',
+  min: 'min',
+  sum: 'sum',
+}
+
 // ====== CREATE
 export const create = ({ entityDefUuid = null } = {}) => ({
   ...defaults,
