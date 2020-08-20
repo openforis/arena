@@ -1,7 +1,4 @@
 ### Custom excluded folders ###
-# Gauge exclusions
-.gauge
-gauge-reports
 ### End of custom excluded folders ###
 
 
