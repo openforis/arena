@@ -7,7 +7,7 @@ export const aggregateFunctions = {
   avg: 'avg',
   cnt: 'cnt',
   max: 'max',
-  // med: 'med',
+  med: 'med',
   min: 'min',
   sum: 'sum',
 }

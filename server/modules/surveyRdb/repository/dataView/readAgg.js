@@ -13,7 +13,7 @@ const sqlFunctionByAggregateFunction = {
   [Query.aggregateFunctions.avg]: 'AVG',
   [Query.aggregateFunctions.cnt]: 'COUNT',
   [Query.aggregateFunctions.max]: 'MAX',
-  // [Query.aggregateFunctions.med]: '',
+  [Query.aggregateFunctions.med]: 'MEDIAN',
   [Query.aggregateFunctions.min]: 'MIN',
   [Query.aggregateFunctions.sum]: 'SUM',
 }
