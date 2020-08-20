@@ -35,6 +35,7 @@ const ColumnHeader = (props) => {
   })
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
@@ -42,10 +43,10 @@ const ColumnHeader = (props) => {
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="width100">
         {modeEdit ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={NodeDef.getLabel(nodeDef, lang)} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} />
         ) : (
           <div>
-            {NodeDef.getLabel(nodeDef, lang)}
+            {nodeDefLabel}
             {isMeasure && (
               <button
                 type="button"
@@ -59,7 +60,7 @@ const ColumnHeader = (props) => {
         )}
       </div>
 
-      {noCols > 1 && !modeEdit && (
+      {noCols > 1 && !modeEdit && !isMeasure && (
         <div className="table__inner-cell">
           {colNames.map((colName) => (
             <div key={colName} style={{ width: widthInner }}>
@@ -72,30 +73,29 @@ const ColumnHeader = (props) => {
         <div className="table__inner-cell">
           {aggregateFunctions.map((aggregateFn) => (
             <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-              {aggregateFn}
+              {i18n.t(`common.${aggregateFn}`)}
             </div>
           ))}
         </div>
       )}
 
       {showAggregateFunctionsPanel && (
-        <PanelRight onClose={() => setShowAggregateFunctionsPanel(false)}>
-          {Object.keys(Query.aggregateFunctions).map((aggregateFunction) => {
-            const active = aggregateFunctions.indexOf(aggregateFunction) >= 0
-
-            return (
-              <button
-                key={aggregateFunction}
-                type="button"
-                className={classNames('btn btn-aggregate-fn deselectable', { active })}
-                onClick={() =>
-                  onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFunction })(query))
-                }
-              >
-                {i18n.t(`common.${aggregateFunction}`)}
-              </button>
-            )
-          })}
+        <PanelRight
+          header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
+          onClose={() => setShowAggregateFunctionsPanel(false)}
+        >
+          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
+            <button
+              key={aggregateFn}
+              type="button"
+              className={classNames('btn btn-aggregate-fn deselectable', {
+                active: aggregateFunctions.indexOf(aggregateFn) >= 0,
+              })}
+              onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
+            >
+              {i18n.t(`common.${aggregateFn}`)}
+            </button>
+          ))}
         </PanelRight>
       )}
     </div>

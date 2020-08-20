@@ -7,7 +7,7 @@ export const aggregateFunctions = {
   avg: 'avg',
   cnt: 'cnt',
   max: 'max',
-  med: 'med',
+  // med: 'med',
   min: 'min',
   sum: 'sum',
 }
@@ -58,15 +58,15 @@ export const toggleModeEdit = (query) => ({
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
 })
 
-export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFunction }) => (query) => {
+export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFn }) => (query) => {
   const measures = getMeasures(query)
   const aggregateFns = measures.get(nodeDefUuid)
+  const aggregateFnIndex = aggregateFns.indexOf(aggregateFn)
   const aggregateFnsUpdated = [...aggregateFns]
-  const aggregateFnIndex = aggregateFns.indexOf(aggregateFunction)
   if (aggregateFnIndex >= 0) {
-    delete aggregateFnsUpdated[aggregateFnIndex]
+    aggregateFnsUpdated.splice(aggregateFnIndex, 1)
   } else {
-    aggregateFnsUpdated.push(aggregateFunction)
+    aggregateFnsUpdated.push(aggregateFn)
   }
   return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
 }

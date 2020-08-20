@@ -9,6 +9,15 @@ import * as Survey from '../../../../../core/survey/survey'
 import { Schemata, ViewDataNodeDef, ColumnNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
 
+const sqlFunctionByAggregateFunction = {
+  [Query.aggregateFunctions.avg]: 'AVG',
+  [Query.aggregateFunctions.cnt]: 'COUNT',
+  [Query.aggregateFunctions.max]: 'MAX',
+  // [Query.aggregateFunctions.med]: '',
+  [Query.aggregateFunctions.min]: 'MIN',
+  [Query.aggregateFunctions.sum]: 'SUM',
+}
+
 const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
   const fields = []
   const params = {}
@@ -19,17 +28,14 @@ const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
     const columnMeasure = new ColumnNodeDef(viewDataNodeDef, nodeDefMeasure).name
 
     aggFunctions.forEach((aggFn) => {
-      let field = `$/${paramName}:name/`
-      if (aggFn) {
-        const paramNameAlias = `${paramName}_alias`
-        const fieldAlias = `$/${paramNameAlias}:name/`
-        const measureAlias = `${columnMeasure}_${aggFn}`
-        field = `${aggFn}(${field}) AS ${fieldAlias}`
-        params[paramNameAlias] = measureAlias
-      }
+      const paramNameAlias = `${paramName}_${aggFn}_alias`
+      const fieldAlias = `$/${paramNameAlias}:name/`
+      const field = `${sqlFunctionByAggregateFunction[aggFn]}($/${paramName}:name/) AS ${fieldAlias}`
+      const measureAlias = `${columnMeasure}_${aggFn}`
+      params[paramNameAlias] = measureAlias
       fields.push(field)
-      params[paramName] = columnMeasure
     })
+    params[paramName] = columnMeasure
     index += 1
   })
   return { fields, params }
