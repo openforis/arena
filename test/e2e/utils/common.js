@@ -1,4 +1,4 @@
-import { $, clear, evaluate, into, text as textTaiko, textBox, write } from 'taiko'
+import { $, clear, evaluate, into, text as textTaiko, textBox, waitFor, write } from 'taiko'
 
 // ====== Click
 export const clickElement = async (element) =>
@@ -15,6 +15,9 @@ export const clickParentElement = async (element) =>
 export const clearTextBox = async ({ selector }) => clear(textBox(selector))
 
 export const writeIntoTextBox = async ({ text, selector }) => write(text, into(textBox(selector)))
+
+// ====== Tests
+export const waitFor1sec = async () => waitFor(1000)
 
 // ====== Tests
 export const expectExists = async ({ text = null, selector = null }) => {
