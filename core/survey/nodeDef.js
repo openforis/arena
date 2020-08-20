@@ -50,7 +50,7 @@ export const propKeys = {
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
 
   // Boolean
-  labelValueType: 'labelValueType',
+  labelValue: 'labelValue',
 
   // Code
   categoryUuid: 'categoryUuid',
@@ -59,7 +59,7 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
 }
 
-export const booleanLabelValueTypes = {
+export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
 }
@@ -120,7 +120,9 @@ export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 
-export const getLabelValueType = getProp(propKeys.labelValueType, booleanLabelValueTypes.trueFalse)
+export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
+export const isBooleanLabelYesNo = (nodeDef) =>
+  isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
 
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)

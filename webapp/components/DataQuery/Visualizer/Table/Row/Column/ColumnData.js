@@ -17,7 +17,7 @@ const getColValue = ({ nodeDef, col, row, i18n }) => {
   if (NodeDef.isBoolean(nodeDef))
     return A.isNull(value)
       ? ''
-      : i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValueType(nodeDef)}.${value}`)
+      : i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`)
   return value
 }
 

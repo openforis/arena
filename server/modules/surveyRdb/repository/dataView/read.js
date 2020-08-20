@@ -25,9 +25,6 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-const _isBooleanAndHasLabels = ({ nodeDef }) =>
-  NodeDef.isBoolean(nodeDef) && NodeDef.getLabelValueType(nodeDef) === NodeDef.booleanLabelValueTypes.yesNo
-
 const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
     return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
@@ -42,7 +39,7 @@ const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMo
         .map((nodeDefCol) => {
           const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
 
-          if (streamMode && _isBooleanAndHasLabels({ nodeDef: columnNodeDef.nodeDef })) {
+          if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
             return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
           }
 

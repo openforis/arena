@@ -92,7 +92,7 @@ const Literal = (props) => {
           onChange={onChangeValue}
           items={['true', 'false'].map((value) => ({
             key: value,
-            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValueType(nodeDefCurrent)}.${value}`),
+            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDefCurrent)}.${value}`),
           }))}
         />
       )

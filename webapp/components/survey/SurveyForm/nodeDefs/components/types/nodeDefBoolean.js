@@ -45,8 +45,8 @@ const NodeDefBoolean = (props) => {
         <Button
           key={value}
           disabled={edit}
-          label={i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValueType(nodeDef)}.${value}`)}
-          l={`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValueType(nodeDef)}.${value}`}
+          label={i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`)}
+          l={`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`}
           value={value}
         />
       ))}

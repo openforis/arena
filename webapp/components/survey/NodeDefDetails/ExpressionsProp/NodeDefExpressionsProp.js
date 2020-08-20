@@ -24,12 +24,12 @@ const NodeDefExpressionsProp = (props) => {
     readOnly,
     isContextParent,
     canBeConstant,
+    isBoolean,
     hideAdvanced,
     mode,
   } = props
 
   const nodeDef = State.getNodeDef(state)
-  const isBoolean = NodeDef.isBoolean(nodeDef)
   const nodeDefValidation = State.getValidation(state)
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
@@ -74,6 +74,7 @@ NodeDefExpressionsProp.propTypes = {
 
   isContextParent: PropTypes.bool,
   canBeConstant: PropTypes.bool,
+  isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
 }
 
@@ -89,6 +90,7 @@ NodeDefExpressionsProp.defaultProps = {
 
   isContextParent: false,
   canBeConstant: false,
+  isBoolean: true,
   hideAdvanced: false,
 }
 

@@ -423,10 +423,10 @@ $t(common.cantUndoWarning)`,
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
     booleanProps: {
-      labelValue: 'Answer labels',
-      labelValueTypes: {
-        trueFalse: 'True/False',
-        yesNo: 'Yes/No',
+      labelValue: 'Label value',
+      labelValues: {
+        trueFalse: '$t(common.true)/$t(common.false)',
+        yesNo: '$t(common.yes)/$t(common.no)',
       },
     },
     codeProps: {
@@ -489,8 +489,8 @@ $t(common.cantUndoWarning)`,
           false: '$t(common.false)',
         },
         yesNo: {
-          true: 'Yes',
-          false: 'No',
+          true: '$t(common.yes)',
+          false: '$t(common.no)',
         },
       },
     },
