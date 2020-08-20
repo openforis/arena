@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -40,9 +41,14 @@ const NodeDefBoolean = (props) => {
 
   return (
     <div className="survey-form__node-def-boolean">
-      <Button disabled={edit} label={i18n.t('common.true')} value="true" />
-
-      <Button disabled={edit} label={i18n.t('common.false')} value="false" />
+      {['true', 'false'].map((value) => (
+        <Button
+          key={value}
+          disabled={edit}
+          label={i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`)}
+          value={value}
+        />
+      ))}
     </div>
   )
 }
