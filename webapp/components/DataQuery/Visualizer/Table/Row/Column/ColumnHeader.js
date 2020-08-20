@@ -26,7 +26,11 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter } = useColumn({ query, colWidth, nodeDef })
+  const { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter } = useColumn({
+    query,
+    colWidth,
+    nodeDef,
+  })
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -34,7 +38,14 @@ const ColumnHeader = (props) => {
         {modeEdit ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={NodeDef.getLabel(nodeDef, lang)} />
         ) : (
-          <div>{NodeDef.getLabel(nodeDef, lang)}</div>
+          <div>
+            {NodeDef.getLabel(nodeDef, lang)}
+            {isMeasure && (
+              <button type="button" className="btn btn-s btn-transparent btn-aggregates">
+                <span className="icon icon-cog icon-14px" />
+              </button>
+            )}
+          </div>
         )}
       </div>
 

@@ -26,6 +26,12 @@ $rowHeaderHeight: 45px;
       display: flex;
       flex-direction: column;
     }
+
+    .btn-aggregates {
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
   }
 
   .table__row,

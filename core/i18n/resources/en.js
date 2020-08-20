@@ -6,6 +6,7 @@ export const enTranslation = {
     add: 'Add',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
+    aggregateFunction_plural: 'Aggregate functions',
     avg: 'Average',
     ascending: 'Ascending',
     back: 'Back',
