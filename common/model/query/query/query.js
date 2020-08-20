@@ -57,3 +57,16 @@ export const toggleModeEdit = (query) => ({
   ...query,
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
 })
+
+export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFunction }) => (query) => {
+  const measures = getMeasures(query)
+  const aggregateFns = measures.get(nodeDefUuid)
+  const aggregateFnsUpdated = [...aggregateFns]
+  const aggregateFnIndex = aggregateFns.indexOf(aggregateFunction)
+  if (aggregateFnIndex >= 0) {
+    delete aggregateFnsUpdated[aggregateFnIndex]
+  } else {
+    aggregateFnsUpdated.push(aggregateFunction)
+  }
+  return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
+}

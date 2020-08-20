@@ -23,7 +23,7 @@ const getColLabelKey = ({ colName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { colWidth, nodeDef, query } = props
+  const { colWidth, nodeDef, onChangeQuery, query } = props
 
   const i18n = useI18n()
   const lang = useSurveyLang()
@@ -33,6 +33,8 @@ const ColumnHeader = (props) => {
     colWidth,
     nodeDef,
   })
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
@@ -68,27 +70,32 @@ const ColumnHeader = (props) => {
       )}
       {isMeasure && (
         <div className="table__inner-cell">
-          {Query.getMeasures(query)
-            .get(NodeDef.getUuid(nodeDef))
-            .map((aggregateFn) => (
-              <div key={`${NodeDef.getUuid(nodeDef)}_${aggregateFn}`} style={{ width: widthInner }}>
-                {aggregateFn}
-              </div>
-            ))}
+          {aggregateFunctions.map((aggregateFn) => (
+            <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
+              {aggregateFn}
+            </div>
+          ))}
         </div>
       )}
 
       {showAggregateFunctionsPanel && (
         <PanelRight onClose={() => setShowAggregateFunctionsPanel(false)}>
-          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
-            <button
-              key={aggregateFn}
-              type="button"
-              className={classNames('btn btn-aggregate-fn', { active: aggregateFunctions.indexOf(aggregateFn) >= 0 })}
-            >
-              {i18n.t(`common.${aggregateFn}`)}
-            </button>
-          ))}
+          {Object.keys(Query.aggregateFunctions).map((aggregateFunction) => {
+            const active = aggregateFunctions.indexOf(aggregateFunction) >= 0
+
+            return (
+              <button
+                key={aggregateFunction}
+                type="button"
+                className={classNames('btn btn-aggregate-fn deselectable', { active })}
+                onClick={() =>
+                  onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFunction })(query))
+                }
+              >
+                {i18n.t(`common.${aggregateFunction}`)}
+              </button>
+            )
+          })}
         </PanelRight>
       )}
     </div>
@@ -98,6 +105,7 @@ const ColumnHeader = (props) => {
 ColumnHeader.propTypes = {
   colWidth: PropTypes.number.isRequired,
   nodeDef: PropTypes.object.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
 }
 
