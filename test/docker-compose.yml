@@ -27,5 +27,4 @@ services:
       HEADLESS_CHROME: 'true'
       TAIKO_BROWSER_PATH: /usr/local/lib/node_modules/chromium/lib/chromium/chrome-linux/chrome
 
-    # Execute tests and migrations when postgres is finished:
-    command: ./test/scripts/test_start.sh
+    command: ./test/bin/testExec.sh

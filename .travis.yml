@@ -13,7 +13,7 @@ before_install:
 script:
   - set -e # exit from first failure
   - docker build -f infra/web/Dockerfile . # Test that everything builds properly
-  - test/run_docker_tests.sh # run tests
+  - test/bin/testExecDocker.sh # run tests
   - docker-compose -f ./infra/web/docker-compose.yml -p of-arena up --no-start
 
 deploy:
