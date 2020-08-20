@@ -45,6 +45,7 @@ const AdvancedProps = (props) => {
             propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant
+            isBoolean={NodeDef.isBoolean(nodeDef)}
           />
         </>
       )}
