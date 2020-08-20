@@ -4,10 +4,6 @@
 
 FROM node:12.16.0 AS test
 
-# add Gauge key
-RUN apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com --recv-keys 023EDB0B
-RUN echo deb http://dl.bintray.com/gauge/gauge-deb stable main | tee -a /etc/apt/sources.list
-
 # Install Chromium dependencies, git and netcat
 RUN apt-get update; \
     apt-get install -y wget unzip fontconfig \
@@ -19,10 +15,7 @@ RUN apt-get update; \
     fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils \
     git netcat; \
     apt-get autoremove; apt-get autoclean;
-# Install Gauge
-RUN npm install -g @getgauge/cli --unsafe-perm
-# Install Gauge plugins
-RUN gauge install js && gauge install html-report && gauge install screenshot
+
 # Install Chromium
 RUN npm install -g chromium --unsafe-perm
 # Install PM2
