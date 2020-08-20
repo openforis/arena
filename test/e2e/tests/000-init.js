@@ -1,5 +1,5 @@
 import 'dotenv/config'
 
-import { openBrowser } from '../utils'
+import { openBrowser } from '../utils/api'
 
 global.beforeAll(openBrowser)
