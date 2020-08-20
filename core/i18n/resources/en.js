@@ -423,6 +423,13 @@ $t(common.cantUndoWarning)`,
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
+    booleanProps: {
+      labelValue: 'Label value',
+      labelValues: {
+        trueFalse: '$t(common.true)/$t(common.false)',
+        yesNo: '$t(common.yes)/$t(common.no)',
+      },
+    },
     codeProps: {
       category: 'Category',
       displayAs: 'Display As',
@@ -475,6 +482,18 @@ $t(common.cantUndoWarning)`,
       buttonCode: 'Button code',
       code: '$t(common.code)',
       label: '$t(common.label)',
+    },
+    nodeDefBoolean: {
+      labelValue: {
+        trueFalse: {
+          true: '$t(common.true)',
+          false: '$t(common.false)',
+        },
+        yesNo: {
+          true: '$t(common.yes)',
+          false: '$t(common.no)',
+        },
+      },
     },
     nodeDefCoordinate: {
       x: 'X',

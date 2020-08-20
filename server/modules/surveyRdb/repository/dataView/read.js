@@ -25,7 +25,7 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode }) => {
+const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
     return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
   }
@@ -35,7 +35,17 @@ const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMo
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).namesFull).flat(),
+      ...nodeDefCols
+        .map((nodeDefCol) => {
+          const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+
+          if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
+            return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
+          }
+
+          return columnNodeDef.namesFull
+        })
+        .flat(),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids,
     ]
@@ -131,7 +141,7 @@ export const fetchViewData = async (params, client = db) => {
 
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
-  const selectFields = _getSelectFields({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode })
+  const selectFields = _getSelectFields({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode: stream })
 
   const fromClause = _getFromClause({ viewDataNodeDef, nodeDefCols, editMode })
 

@@ -10,13 +10,12 @@ import * as StringUtils from '@core/stringUtils'
 import { SurveyState } from '@webapp/store/survey'
 import { useI18n, useLang } from '@webapp/store/system'
 
-import { useAsyncGetRequest } from '../../hooks'
-
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
+import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
 
@@ -93,7 +92,7 @@ const Literal = (props) => {
           onChange={onChangeValue}
           items={['true', 'false'].map((value) => ({
             key: value,
-            label: i18n.t(`common.${value}`),
+            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDefCurrent)}.${value}`),
           }))}
         />
       )
