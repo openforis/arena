@@ -17,6 +17,12 @@ export const useUpload = ({ setState }) => {
 
   const surveyId = useSurveyId()
 
+  const onUploadComplete = async ({ taxonomyUuid, state }) => {
+    const taxonomy = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
+    setState(A.pipe(State.assocTaxonomy(taxonomy), State.assocTaxaVersion(State.getTaxaVersion(state) + 1)))
+    dispatch(SurveyActions.metaUpdated())
+  }
+
   return useCallback(async ({ state, file }) => {
     const taxonomy = State.getTaxonomy(state)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
@@ -28,16 +34,7 @@ export const useUpload = ({ setState }) => {
     await dispatch(
       JobActions.showJobMonitor({
         job: data.job,
-        onComplete: async () => {
-          const taxonomyWithTaxa = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
-          setState(
-            A.pipe(
-              State.assocTaxonomy(taxonomyWithTaxa),
-              State.assocTaxaVersion(State.getTaxaVersion(state) + 1)
-            )(state)
-          )
-          dispatch(SurveyActions.metaUpdated())
-        },
+        onComplete: async () => onUploadComplete({ taxonomyUuid, state }),
       })
     )
   }, [])
