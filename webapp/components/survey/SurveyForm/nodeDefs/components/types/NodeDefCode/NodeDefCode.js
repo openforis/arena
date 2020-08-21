@@ -45,14 +45,26 @@ const NodeDefCode = (props) => {
 
   // Fetch code items on categoryUuid or nodeParentCodeUuid update
   useEffect(() => {
+    let cancelFetchItems = null
     if (!edit) {
-      ;(async () => {
-        const itemsLoaded =
-          categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)
-            ? await API.fetchCategoryItems({ surveyId, categoryUuid, draft, parentUuid: nodeParentCodeUuid })
-            : []
-        setItems(itemsLoaded)
-      })()
+      const { promise: fetchItemsPromise, cancel } =
+        categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)
+          ? API.fetchCategoryItems({ surveyId, categoryUuid, draft, parentUuid: nodeParentCodeUuid })
+          : []
+      cancelFetchItems = cancel
+
+      fetchItemsPromise
+        .then(({ data: { items: itemsLoaded = {} } }) => {
+          setItems(itemsLoaded)
+        })
+        .catch(() => {
+          // canceled
+        })
+    }
+    return () => {
+      if (cancelFetchItems) {
+        cancelFetchItems()
+      }
     }
   }, [edit, categoryUuid, nodeParentCodeUuid])
 
