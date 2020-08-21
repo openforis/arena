@@ -14,10 +14,10 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
+import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 
@@ -34,39 +34,14 @@ const NodeDefCode = (props) => {
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  const nodeParentCodeUuid = Node.getCategoryItemUuid(nodeParentCode)
+  const parentCategoryItemUuid = Node.getCategoryItemUuid(nodeParentCode)
   const codeUuidsHierarchy = nodeParentCode
     ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
 
-  const [items, setItems] = useState([])
-  const [selectedItems, setSelectedItems] = useState([])
+  const { items } = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
   const itemsArray = Object.values(items)
-
-  // Fetch code items on categoryUuid or nodeParentCodeUuid update
-  useEffect(() => {
-    let cancelFetchItems = null
-    if (!edit) {
-      const { promise: fetchItemsPromise, cancel } =
-        categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)
-          ? API.fetchCategoryItems({ surveyId, categoryUuid, draft, parentUuid: nodeParentCodeUuid })
-          : []
-      cancelFetchItems = cancel
-
-      fetchItemsPromise
-        .then(({ data: { items: itemsLoaded = {} } }) => {
-          setItems(itemsLoaded)
-        })
-        .catch(() => {
-          // canceled
-        })
-    }
-    return () => {
-      if (cancelFetchItems) {
-        cancelFetchItems()
-      }
-    }
-  }, [edit, categoryUuid, nodeParentCodeUuid])
+  const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems
   useEffect(() => {

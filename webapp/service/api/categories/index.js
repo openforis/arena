@@ -24,11 +24,11 @@ export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, vali
 
 export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, parentUuid = null }) => {
   const source = axios.CancelToken.source()
-  const promise = axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
+  const request = axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
     params: { draft, parentUuid },
     cancelToken: source.token,
   })
-  return { promise, cancel: source.cancel }
+  return { request, cancel: source.cancel }
 }
 
 // CREATE
