@@ -173,7 +173,7 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "version": "0.3.0",
+  "version": "0.3.1",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
