@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as A from '@core/arena'
+
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as API from '@webapp/service/api'
@@ -26,14 +28,17 @@ export const useUpload = ({ setState }) => {
     await dispatch(
       JobActions.showJobMonitor({
         job: data.job,
-        onComplete: () => {
-          setState(State.assocTaxaVersion(State.getTaxaVersion(state) + 1)(state))
+        onComplete: async () => {
+          const taxonomyWithTaxa = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
+          setState(
+            A.pipe(
+              State.assocTaxonomy(taxonomyWithTaxa),
+              State.assocTaxaVersion(State.getTaxaVersion(state) + 1)
+            )(state)
+          )
+          dispatch(SurveyActions.metaUpdated())
         },
       })
     )
-    const taxonomyWithTaxa = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
-
-    dispatch(SurveyActions.metaUpdated())
-    setState(State.assocTaxonomy(taxonomyWithTaxa)(state))
   }, [])
 }
