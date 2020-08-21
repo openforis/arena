@@ -3,6 +3,15 @@ import * as A from '@core/arena'
 import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
 
+export const aggregateFunctions = {
+  avg: 'avg',
+  cnt: 'cnt',
+  max: 'max',
+  med: 'med',
+  min: 'min',
+  sum: 'sum',
+}
+
 // ====== CREATE
 export const create = ({ entityDefUuid = null } = {}) => ({
   ...defaults,
@@ -48,3 +57,16 @@ export const toggleModeEdit = (query) => ({
   ...query,
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
 })
+
+export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFn }) => (query) => {
+  const measures = getMeasures(query)
+  const aggregateFns = measures.get(nodeDefUuid)
+  const aggregateFnIndex = aggregateFns.indexOf(aggregateFn)
+  const aggregateFnsUpdated = [...aggregateFns]
+  if (aggregateFnIndex >= 0) {
+    aggregateFnsUpdated.splice(aggregateFnIndex, 1)
+  } else {
+    aggregateFnsUpdated.push(aggregateFn)
+  }
+  return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
+}

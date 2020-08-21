@@ -54,6 +54,7 @@ const DataQuery = (props) => {
             dataEmpty={dataEmpty}
             nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             offset={offset}
+            onChangeQuery={onChangeQuery}
             setData={setData}
           />
         )}

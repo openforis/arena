@@ -1,11 +1,5 @@
-### Custom excluded folders ###
-# Distribution folder
-/dist
-
-### End of custom excluded folders ###
-
-# Created by https://www.gitignore.io/api/node,terraform,visualstudiocode,webstorm+all,macos,linux
-# Edit at https://www.gitignore.io/?templates=node,terraform,visualstudiocode,webstorm+all,macos,linux
+# Created by https://www.toptal.com/developers/gitignore/api/node,linux,macos,terraform,webstorm+all,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,linux,macos,terraform,webstorm+all,visualstudiocode
 
 ### Linux ###
 *~
@@ -106,6 +100,12 @@ typings/
 # Optional eslint cache
 .eslintcache
 
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
 # Optional REPL history
 .node_repl_history
 
@@ -122,14 +122,18 @@ typings/
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
-# next.js build output
+# Next.js build output
 .next
 
-# nuxt.js build output
+# Nuxt.js build / generate output
 .nuxt
+dist
 
-# react / gatsby 
-public/
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
 
 # vuepress build output
 .vuepress/dist
@@ -142,6 +146,12 @@ public/
 
 # DynamoDB Local files
 .dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
 
 ### Terraform ###
 # Local .terraform directories
@@ -179,13 +189,14 @@ override.tf.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.code-workspace
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
 
 ### WebStorm+all ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
@@ -215,6 +226,9 @@ override.tf.json
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
 # .idea/modules.xml
 # .idea/*.iml
 # .idea/modules
@@ -270,4 +284,4 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
-# End of https://www.gitignore.io/api/node,terraform,visualstudiocode,webstorm+all,macos,linux
+# End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,terraform,webstorm+all,visualstudiocode
