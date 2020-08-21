@@ -8,7 +8,7 @@ import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {
-  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, setData } = props
+  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
 
   const i18n = useI18n()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, query, nodeDefsSelectorVisible, setData })
@@ -21,7 +21,13 @@ const Table = (props) => {
 
   return (
     <div className="table__rows">
-      <RowHeader colWidth={colWidth} colIndexWidth={colIndexWidth} nodeDefCols={nodeDefCols} query={query} />
+      <RowHeader
+        colWidth={colWidth}
+        colIndexWidth={colIndexWidth}
+        nodeDefCols={nodeDefCols}
+        onChangeQuery={onChangeQuery}
+        query={query}
+      />
 
       <div className="table__data-rows">
         {data.map((row, i) => {
@@ -49,6 +55,7 @@ Table.propTypes = {
   dataEmpty: PropTypes.bool.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
   setData: PropTypes.func.isRequired,
 }
 

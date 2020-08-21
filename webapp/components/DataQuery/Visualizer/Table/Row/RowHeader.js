@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { ColumnHeader } from './Column'
 
 const RowHeader = (props) => {
-  const { colIndexWidth, colWidth, nodeDefCols, query } = props
+  const { colIndexWidth, colWidth, nodeDefCols, onChangeQuery, query } = props
 
   const i18n = useI18n()
 
@@ -17,7 +17,13 @@ const RowHeader = (props) => {
       <div style={{ width: colIndexWidth }}>{i18n.t('dataView.rowNum')}</div>
 
       {nodeDefCols.map((nodeDef) => (
-        <ColumnHeader key={NodeDef.getUuid(nodeDef)} query={query} colWidth={colWidth} nodeDef={nodeDef} />
+        <ColumnHeader
+          key={NodeDef.getUuid(nodeDef)}
+          colWidth={colWidth}
+          nodeDef={nodeDef}
+          onChangeQuery={onChangeQuery}
+          query={query}
+        />
       ))}
     </div>
   )
@@ -27,6 +33,7 @@ RowHeader.propTypes = {
   colIndexWidth: PropTypes.number.isRequired,
   colWidth: PropTypes.number.isRequired,
   nodeDefCols: PropTypes.arrayOf(Object).isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
 }
 

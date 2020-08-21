@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
@@ -11,6 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyLang } from '@webapp/store/survey'
 
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import PanelRight from '@webapp/components/PanelRight'
 
 import { useColumn } from './store'
 
@@ -21,24 +23,44 @@ const getColLabelKey = ({ colName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { colWidth, nodeDef, query } = props
+  const { colWidth, nodeDef, onChangeQuery, query } = props
 
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const { colNames, isMeasure, modeEdit, noCols, widthInner, widthOuter } = useColumn({ query, colWidth, nodeDef })
+  const { modeEdit, colNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
+    query,
+    colWidth,
+    nodeDef,
+  })
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
+
+  const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="width100">
         {modeEdit ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={NodeDef.getLabel(nodeDef, lang)} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} />
         ) : (
-          <div>{NodeDef.getLabel(nodeDef, lang)}</div>
+          <div>
+            {nodeDefLabel}
+            {isMeasure && (
+              <button
+                type="button"
+                className="btn btn-s btn-transparent btn-aggregates"
+                onClick={() => setShowAggregateFunctionsPanel(true)}
+              >
+                <span className="icon icon-cog icon-14px" />
+              </button>
+            )}
+          </div>
         )}
       </div>
 
-      {noCols > 1 && !modeEdit && (
+      {noCols > 1 && !modeEdit && !isMeasure && (
         <div className="table__inner-cell">
           {colNames.map((colName) => (
             <div key={colName} style={{ width: widthInner }}>
@@ -49,14 +71,32 @@ const ColumnHeader = (props) => {
       )}
       {isMeasure && (
         <div className="table__inner-cell">
-          {Query.getMeasures(query)
-            .get(NodeDef.getUuid(nodeDef))
-            .map((aggregateFn) => (
-              <div key={`${NodeDef.getUuid(nodeDef)}_${aggregateFn}`} style={{ width: widthInner }}>
-                {aggregateFn}
-              </div>
-            ))}
+          {aggregateFunctions.map((aggregateFn) => (
+            <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
+              {i18n.t(`common.${aggregateFn}`)}
+            </div>
+          ))}
         </div>
+      )}
+
+      {showAggregateFunctionsPanel && (
+        <PanelRight
+          header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
+          onClose={() => setShowAggregateFunctionsPanel(false)}
+        >
+          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
+            <button
+              key={aggregateFn}
+              type="button"
+              className={classNames('btn btn-aggregate-fn deselectable', {
+                active: aggregateFunctions.indexOf(aggregateFn) >= 0,
+              })}
+              onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
+            >
+              {i18n.t(`common.${aggregateFn}`)}
+            </button>
+          ))}
+        </PanelRight>
       )}
     </div>
   )
@@ -65,6 +105,7 @@ const ColumnHeader = (props) => {
 ColumnHeader.propTypes = {
   colWidth: PropTypes.number.isRequired,
   nodeDef: PropTypes.object.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
 }
 

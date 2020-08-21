@@ -28,9 +28,9 @@ export const useDataQuery = ({ query }) => {
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
   const measures = Query.getMeasures(query)
+  const measuresAggregateFnsSize = Array.from(measures.values()).flat().length
   const filter = Query.getFilter(query)
   const sort = Query.getSort(query)
-
   const Actions = useActions({ setData, setCount })
 
   // on entity def uuid or filter update: reset data
@@ -40,7 +40,7 @@ export const useDataQuery = ({ query }) => {
   useEffect(() => {
     if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
     else Actions.reset()
-  }, [offset, attributeDefUuids, dimensions, measures, mode, sort])
+  }, [offset, attributeDefUuids, dimensions, measures, measuresAggregateFnsSize, mode, sort])
 
   // on filter update: fetch data and count
   useOnUpdate(() => {
