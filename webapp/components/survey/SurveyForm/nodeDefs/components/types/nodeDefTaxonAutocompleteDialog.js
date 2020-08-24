@@ -52,8 +52,8 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
       className="survey-form__node-def-taxon-autocomplete-list"
       items={list}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
-      itemKey={(taxon) => (taxon ? `${Taxon.getUuid(taxon)}_${taxon.vernacularName}` : '')}
-      itemLabel={(taxon) => (taxon ? `${Taxon.getCode(taxon)}-${Taxon.getScientificName(taxon)}` : '')}
+      itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
+      itemLabel={(taxon) => `${Taxon.getCode(taxon)}-${Taxon.getScientificName(taxon)}`}
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}
