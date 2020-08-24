@@ -39,7 +39,7 @@ const NodeDefCode = (props) => {
     ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
 
-  const { items } = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
+  const items = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
   const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
 
