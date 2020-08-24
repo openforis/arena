@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
@@ -21,6 +21,14 @@ const Content = (props) => {
 
   const i18n = useI18n()
 
+  const tableRef = useRef(null)
+
+  useEffect(() => {
+    if (tableRef.current) {
+      tableRef.current.scrollTop = 0
+    }
+  }, [offset, tableRef])
+
   return R.isEmpty(list) ? (
     <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
   ) : (
@@ -28,7 +36,7 @@ const Content = (props) => {
       <div className="table__row-header" style={{ gridTemplateColumns }}>
         {React.createElement(rowHeaderComponent, { props, ...rowProps })}
       </div>
-      <div className="table__rows">
+      <div className="table__rows" ref={tableRef}>
         {list.map((row, i) => {
           const active = isRowActive && isRowActive(row)
           let className = 'table__row'
