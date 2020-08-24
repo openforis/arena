@@ -5,6 +5,8 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Taxon from '@core/survey/taxon'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
@@ -21,12 +23,14 @@ const _getNodeValue = (survey, node) => {
 
   if (NodeDef.isCode(nodeDef)) {
     const itemUuid = Node.getCategoryItemUuid(node)
-    return itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
+    const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
+    return item ? CategoryItem.getCode(item) : null
   }
 
   if (NodeDef.isTaxon(nodeDef)) {
     const taxonUuid = Node.getTaxonUuid(node)
-    return taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : null
+    const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : null
+    return taxon ? Taxon.getCode(taxon) : null
   }
 
   const value = Node.getValue(node)
