@@ -6,6 +6,8 @@ import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyLangs } from '@webapp/store/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { useOnUpdate } from '@webapp/components/hooks'
+
 import { useActions } from './actions/index'
 
 const _isValidationRule = (type) =>
@@ -57,6 +59,10 @@ export const useCollectImportReportItem = ({ row, rowNo }) => {
   const type = useTypeWithIcon({ item: rowItem })
   const nodeDefPath = useNodeDefPath({ item: rowItem, survey })
   const nodeDef = useNodeDef({ item: rowItem, survey })
+
+  useOnUpdate(() => {
+    setRowItem({ rowNo, ...row })
+  }, [row])
 
   return {
     rowNo,
