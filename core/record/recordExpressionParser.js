@@ -47,21 +47,16 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
   const nodeDefUuidCtx = Node.getNodeDefUuid(nodeCtx)
   const nodeDefCtx = Survey.getNodeDefByUuid(nodeDefUuidCtx)(survey)
 
+  // Referenced node is a child of the context node
   if (NodeDef.getParentUuid(nodeDefReferenced) === NodeDef.getUuid(nodeDefCtx)) {
     return nodeCtx
   }
 
   const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
-
-  if (Node.isRoot(nodeCtx) && nodeDefReferencedH.length === 1) {
-    // NodeCtx is root and node referenced is its child
-    return nodeCtx
-  }
-
   const nodeDefCtxH = NodeDef.getMetaHierarchy(nodeDefCtx)
 
   if (R.startsWith(nodeDefReferencedH, nodeDefCtxH)) {
-    // NodeDefReferenced belongs to an ancestor of nodeDefContext
+    // Referenced node is a descendant of an ancestor of the context node
     const nodeCtxH = R.pipe(
       Node.getHierarchy,
       // When nodeDefCtx is entity, expression is type applicableIf (and context always starts from parent)
