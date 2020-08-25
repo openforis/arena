@@ -56,6 +56,7 @@ const BinaryOperand = (props) => {
         canDelete,
         isBoolean,
         level,
+        expressionNodeParent: node,
         node: nodeOperand,
         nodeDefCurrent,
         onChange: (item) => onChange(R.assoc(type, item, node)),
