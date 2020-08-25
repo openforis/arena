@@ -44,24 +44,28 @@ const NodeDefEditButtons = (props) => {
         {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
           <div className="survey-form__node-def-edit-page-props">
             {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
-            <input
-              value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
-              type="number"
-              min="1"
-              max="12"
-              step="1"
-              onChange={(event) => {
-                const value = Number(event.target.value)
-                if (value > 0)
-                  dispatch(
-                    NodeDefsActions.putNodeDefLayoutProp({
-                      nodeDef,
-                      key: NodeDefLayout.keys.columnsNo,
-                      value,
-                    })
-                  )
-              }}
-            />
+            {NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) === NodeDefLayout.renderType.table ? (
+              <span> {NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef).length}</span>
+            ) : (
+              <input
+                value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
+                type="number"
+                min="1"
+                max="12"
+                step="1"
+                onChange={(event) => {
+                  const value = Number(event.target.value)
+                  if (value > 0)
+                    dispatch(
+                      NodeDefsActions.putNodeDefLayoutProp({
+                        nodeDef,
+                        key: NodeDefLayout.keys.columnsNo,
+                        value,
+                      })
+                    )
+                }}
+              />
+            )}
           </div>
         )}
 
