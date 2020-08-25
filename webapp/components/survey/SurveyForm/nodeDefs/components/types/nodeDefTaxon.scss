@@ -9,6 +9,7 @@
 
 .survey-form__node-def-taxon-autocomplete-list .item {
   display: grid;
+  grid-template-columns: .3fr .7fr;
 
   div {
     white-space: nowrap;
