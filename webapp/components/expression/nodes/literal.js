@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 import axios from 'axios'
 
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
+import * as Expression from '@core/expressionParser/expression'
 
 import { SurveyState } from '@webapp/store/survey'
 import { useI18n, useLang } from '@webapp/store/system'
@@ -33,19 +35,32 @@ const loadItems = async (params) => {
   return items
 }
 
+const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
+  if (BinaryOperandType.isLeft(type)) {
+    return nodeDefCurrent
+  }
+  if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
+    const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
+    if (Expression.isIdentifier(nodeLeftOperand)) {
+      const identifierName = A.prop('name', nodeLeftOperand)
+      return Survey.getNodeDefByName(identifierName)(survey)
+    }
+  }
+  return null
+}
+
 const Literal = (props) => {
-  const { node, nodeDefCurrent, onChange, type } = props
+  const { expressionNodeParent, node, nodeDefCurrent, onChange, type } = props
 
   const i18n = useI18n()
   const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
 
-  const literalSearchParams =
-    nodeDefCurrent && BinaryOperandType.isLeft(type)
-      ? ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
-      : null
+  const nodeDef = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type })
+  const literalSearchParams = nodeDef ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
 
-  const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
+  const nodeValue = parseValue(nodeDef, A.propOr(null, 'raw', node))
+  const nodeValueString = nodeValue || ''
 
   const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
     '/api/expression/literal/item',
@@ -55,8 +70,8 @@ const Literal = (props) => {
   )
 
   const onChangeValue = (val) => {
-    const value = val && getValue(nodeDefCurrent, val)
-    onChange(R.pipe(R.assoc('raw', value), R.assoc('value', value))(node))
+    const value = val && getValue(nodeDef, val)
+    onChange(A.pipe(A.assoc('raw', value), A.assoc('value', value))(node))
   }
 
   // on nodeValue update, if literalSearchParams is passed as prop, fetches the selection item for dropdown
@@ -75,16 +90,16 @@ const Literal = (props) => {
         />
       )
     }
-    if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))) {
+    if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef))) {
       return (
         <Input
-          numberFormat={NodeDefUIProps.getNumberFormat(nodeDefCurrent)}
+          numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
           onChange={onChangeValue}
-          value={nodeValue}
+          value={nodeValueString}
         />
       )
     }
-    if (BinaryOperandType.isLeft(type) && NodeDef.isBoolean(nodeDefCurrent)) {
+    if (BinaryOperandType.isLeft(type) && NodeDef.isBoolean(nodeDef)) {
       return (
         <ButtonGroup
           className="literal-btn-group-boolean"
@@ -92,18 +107,21 @@ const Literal = (props) => {
           onChange={onChangeValue}
           items={['true', 'false'].map((value) => ({
             key: value,
-            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDefCurrent)}.${value}`),
+            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
           }))}
         />
       )
     }
-    return <input className="form-input" value={nodeValue} size={25} onChange={(e) => onChangeValue(e.target.value)} />
+    return (
+      <input className="form-input" value={nodeValueString} size={25} onChange={(e) => onChangeValue(e.target.value)} />
+    )
   }
 
   return <div className="literal">{getRenderer()}</div>
 }
 
 Literal.propTypes = {
+  expressionNodeParent: PropTypes.any.isRequired,
   node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,

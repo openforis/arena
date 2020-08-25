@@ -24,7 +24,18 @@ const components = {
 }
 
 const ExpressionNode = (props) => {
-  const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, variables } = props
+  const {
+    canDelete,
+    isBoolean,
+    level,
+    node,
+    expressionNodeParent,
+    nodeDefCurrent,
+    onChange,
+    onDelete,
+    type,
+    variables,
+  } = props
 
   const component = components[R.prop('type', node)]
 
@@ -32,6 +43,7 @@ const ExpressionNode = (props) => {
     canDelete,
     isBoolean,
     level,
+    expressionNodeParent,
     node,
     nodeDefCurrent,
     renderNode: ExpressionNode,
@@ -44,6 +56,7 @@ const ExpressionNode = (props) => {
 
 ExpressionNode.propTypes = {
   // Common props
+  expressionNodeParent: PropTypes.any,
   node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
@@ -63,6 +76,7 @@ ExpressionNode.defaultProps = {
   canDelete: false,
   isBoolean: false,
   level: 0,
+  expressionNodeParent: null,
   nodeDefCurrent: null,
   onDelete: null,
   type: null,
