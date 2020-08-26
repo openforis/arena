@@ -1,5 +1,8 @@
 import * as R from 'ramda'
 
+import * as NodeDef from '@core/survey/nodeDef'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -18,17 +21,19 @@ export const fetchItems = async (surveyId, offset = 0, limit = null, client = db
     dbTransformCallback
   )
 
-export const fetchItemsStream = async (surveyId, client = db) => {
+export const fetchItemsStream = async (surveyId) => {
   const select = `
       SELECT 
-      cr.id,
-      cr.node_def_uuid,
-      (cr.props)->>'applyIf' as apply_if,
-      (cr.props)->>'expressionType' as type,
-      (cr.props)->>'expression' as expression,
-      cr.props as props,
-      cr.resolved as resolved
+        cr.id,
+        cr.node_def_uuid,
+        (nd.props_draft || nd.props)->>'${NodeDef.propKeys.name}' as node_def_name,
+        (cr.props)->>'${CollectImportReportItem.propKeys.applyIf}' as apply_if,
+        (cr.props)->>'${CollectImportReportItem.propKeys.expressionType}' as type,
+        (cr.props)->>'${CollectImportReportItem.propKeys.expression}' as expression,
+        cr.props as props,
+        cr.resolved as resolved
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report cr
+      JOIN ${getSurveyDBSchema(surveyId)}.node_def nd on nd.uuid = cr.node_def_uuid
       ORDER BY id
    `
 
@@ -36,7 +41,7 @@ export const fetchItemsStream = async (surveyId, client = db) => {
 }
 
 export const countItems = async (surveyId, client = db) =>
-  await client.one(
+  client.one(
     `
       SELECT COUNT(*) as tot
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
@@ -46,7 +51,7 @@ export const countItems = async (surveyId, client = db) =>
   )
 
 export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
-  await client.one(
+  client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props)
       VALUES ($1, $2)
@@ -57,7 +62,7 @@ export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
   )
 
 export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
-  await client.one(
+  client.one(
     `
       UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report
       SET 
