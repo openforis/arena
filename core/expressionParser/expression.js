@@ -32,7 +32,7 @@ export const fromString = (string, exprMode = modes.json) => {
       : R.pipe(
           R.replace(/AND/g, '&&'),
           R.replace(/OR/g, '||'),
-          R.replace(/=/g, '=='),
+          R.replace(/=+/g, '=='),
           R.replace(/!==/g, '!='),
           R.replace(/>==/g, '>='),
           R.replace(/<==/g, '<=')
