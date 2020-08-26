@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useHistory } from 'react-router'
@@ -40,8 +40,10 @@ export const useLocalState = () => {
   const editable = useAuthCanEditRecord(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 
   const [state, setState] = useState(() => State.create({ preview }))
+  const loadedRef = useRef(false)
 
   if (record && !State.isLoaded(state)) {
+    loadedRef.current = true
     setState(A.pipe(State.assocLoaded(true), State.assocEditable(editable)))
   }
 
@@ -54,7 +56,7 @@ export const useLocalState = () => {
     AppWebSocket.off(WebSocketEvents.recordSessionExpired)
     AppWebSocket.off(WebSocketEvents.applicationError)
 
-    if (State.isLoaded(state)) {
+    if (loadedRef.current) {
       dispatch(RecordActions.checkOutRecord(recordUuid))
     }
 
