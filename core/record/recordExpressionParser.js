@@ -46,16 +46,17 @@ const _getNodeValue = (survey, node) => {
 const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) => {
   const nodeDefUuidCtx = Node.getNodeDefUuid(nodeCtx)
   const nodeDefCtx = Survey.getNodeDefByUuid(nodeDefUuidCtx)(survey)
-  const nodeDefCtxH = NodeDef.getMetaHierarchy(nodeDefCtx)
-  const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
 
-  if (Node.isRoot(nodeCtx) && nodeDefReferencedH.length === 1) {
-    // NodeCtx is root and node referenced is its child
+  // Referenced node is a child of the context node
+  if (NodeDef.getParentUuid(nodeDefReferenced) === NodeDef.getUuid(nodeDefCtx)) {
     return nodeCtx
   }
 
+  const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
+  const nodeDefCtxH = NodeDef.getMetaHierarchy(nodeDefCtx)
+
   if (R.startsWith(nodeDefReferencedH, nodeDefCtxH)) {
-    // NodeDefReferenced belongs to an ancestor of nodeDefContext
+    // Referenced node is a descendant of an ancestor of the context node
     const nodeCtxH = R.pipe(
       Node.getHierarchy,
       // When nodeDefCtx is entity, expression is type applicableIf (and context always starts from parent)
@@ -72,7 +73,6 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
 const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
   const nodeDefReferenced = Survey.getNodeDefByName(nodeReferencedName)(survey)
-
   const nodeReferencedParent = _getReferencedNodesParent(survey, record, nodeCtx, nodeDefReferenced)
   if (nodeReferencedParent)
     return Record.getNodeChildrenByDefUuid(nodeReferencedParent, NodeDef.getUuid(nodeDefReferenced))(record)

@@ -9,7 +9,7 @@ export const keys = {
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
 }
 
-const propKeys = {
+export const propKeys = {
   expressionType: 'expressionType',
   expression: 'expression',
   applyIf: 'applyIf',
