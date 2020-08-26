@@ -36,14 +36,17 @@ const deleteSocket = (userUuid, socketId) => {
 
 export const notifySocket = (socketId, eventType, message) => {
   const socket = socketsById.get(socketId)
-  socket.emit(eventType, message)
+
+  if (socket) {
+    socket.emit(eventType, message)
+  } else {
+    Logger.error(`notifying socket with ID ${socketId}: socket not found!`)
+  }
 }
 
 export const notifyUser = (userUuid, eventType, message) => {
   const socketIds = socketIdsByUserUuid.get(userUuid)
-  for (const socketId of socketIds) {
-    notifySocket(socketId, eventType, message)
-  }
+  socketIds.forEach((socketId) => notifySocket(socketId, eventType, message))
 }
 
 export const init = (server, sessionMiddleware) => {
@@ -57,12 +60,13 @@ export const init = (server, sessionMiddleware) => {
   io.on(WebSocketEvents.connection, async (socket) => {
     const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
 
-    Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)
+    Logger.debug(`socket connected (ID: ${socket.id} - User UUID: ${userUuid})`)
 
     if (userUuid) {
       addSocket(userUuid, socket)
 
       socket.on(WebSocketEvents.disconnect, () => {
+        Logger.debug(`socket disconnected (ID: ${socket.id} - User UUID: ${userUuid})`)
         deleteSocket(userUuid, socket.id)
       })
     }
