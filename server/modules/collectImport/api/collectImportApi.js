@@ -7,12 +7,10 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as Response from '@server/utils/response'
 
+import * as DateUtils from '@core/dateUtils'
+import * as Survey from '@core/survey/survey'
 import * as CollectImportService from '../service/collectImportService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-
-import * as DateUtils from '@core/dateUtils'
-
-import * as Survey from '@core/survey/survey'
 
 export const init = (app) => {
   // CREATE
@@ -63,7 +61,7 @@ export const init = (app) => {
         const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
         Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-        const headers = ['node_def_uuid', 'id', 'type', 'expression', 'resolved']
+        const headers = ['node_def_uuid', 'node_def_name', 'id', 'type', 'expression', 'resolved']
 
         await db.stream(reportItemsStream, (stream) => {
           stream.pipe(CSVWriter.transformToStream(res, headers))
@@ -102,7 +100,7 @@ export const init = (app) => {
 
         const item = await CollectImportService.updateReportItem(user, surveyId, itemId, {}, resolved)
 
-        return res.json({ item })
+        res.json({ item })
       } catch (error) {
         next(error)
       }

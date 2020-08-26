@@ -25,12 +25,16 @@ export const useFetchLevelItems = ({ setState }) => {
     // Reset level items
     setState(State.dissocItems({ levelIndex }))
 
-    const items = await API.fetchCategoryItems({
+    const { request } = API.fetchCategoryItems({
       surveyId,
       categoryUuid,
       draft: canEdit,
       parentUuid,
     })
+
+    const {
+      data: { items },
+    } = await request
 
     setState(State.assocItems({ levelIndex, items }))
   }, [])
