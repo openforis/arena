@@ -101,13 +101,9 @@ const props = {
 
   [nodeDefType.coordinate]: {
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
-      const [x, y, srsCode] = [
-        Node.getCoordinateX(nodeCol),
-        Node.getCoordinateY(nodeCol),
-        Node.getCoordinateSrs(nodeCol),
-      ]
+      const [x, y, srsId] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
 
-      return () => (GeoUtils.isCoordinateValid(srsCode, x, y) ? Point.newPoint(srsCode, x, y) : null)
+      return () => (GeoUtils.isCoordinateValid(srsId, x, y) ? Point.toString(Point.newPoint({ srsId, x, y })) : null)
     },
   },
 

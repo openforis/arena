@@ -29,7 +29,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
         ...params,
         [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName,
       },
-      'SamplingPointDataImportJob',
+      'SamplingPointDataImportJob'
     )
   }
 
@@ -55,12 +55,12 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   // Start of overridden methods from CategoryImportJob
   async createReadStream() {
     const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
-    return await collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
+    return collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
   }
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
-    return stream ? await CategoryManager.createImportSummaryFromStream(stream) : null
+    return stream ? CategoryManager.createImportSummaryFromStream(stream) : null
   }
 
   extractItemExtraDef() {
@@ -68,16 +68,18 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
       R.omit(R.keys(keysExtra)),
       R.assoc(keysItem.location, {
         [CategoryItem.keysExtraDef.dataType]: Category.itemExtraDefDataTypes.geometryPoint,
-      }),
+      })
     )(super.extractItemExtraDef())
   }
 
   extractItemExtraProps(extra) {
     const { srs_id: srsId, x, y } = extra
 
+    const point = Point.newPoint({ srsId, x, y })
+
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: Point.newPoint(srsId, x, y),
+      [keysItem.location]: Point.toString(point),
     }
 
     return super.extractItemExtraProps(extraUpdated)
