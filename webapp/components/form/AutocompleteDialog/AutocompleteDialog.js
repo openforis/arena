@@ -67,7 +67,7 @@ AutocompleteDialog.propTypes = {
 AutocompleteDialog.defaultProps = {
   items: [],
   itemRenderer: null,
-  itemLabel: null,
+  itemLabel: () => '',
   itemKey: null,
   inputField: null,
   sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
