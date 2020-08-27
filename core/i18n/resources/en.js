@@ -687,6 +687,7 @@ $t(common.cantUndoWarning)`,
       scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
       scientificNameRequired: 'Scientific name is required',
       taxaEmpty: 'Empty taxa',
+      vernacularNamesDuplicate: `Duplicate vernacular name '{{name}}' for language '{{lang}}'`,
     },
 
     taxonomyImportJob: {

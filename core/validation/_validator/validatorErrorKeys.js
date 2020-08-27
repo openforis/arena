@@ -107,6 +107,7 @@ export const ValidatorErrorKeys = {
     scientificNameDuplicate: 'validationErrors.taxonomyEdit.scientificNameDuplicate',
     scientificNameRequired: 'validationErrors.taxonomyEdit.scientificNameRequired',
     taxaEmpty: 'validationErrors.taxonomyEdit.taxaEmpty',
+    vernacularNamesDuplicate: 'validationErrors.taxonomyEdit.vernacularNamesDuplicate',
   },
 
   taxonomyImportJob: {
