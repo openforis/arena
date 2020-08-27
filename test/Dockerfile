@@ -24,7 +24,7 @@ RUN npm install pm2 -g
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
 
-RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
+RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass --unsafe-perm
 
 COPY .git /app/.git
 RUN cd /app; git reset --hard; yarn build:server:dev
