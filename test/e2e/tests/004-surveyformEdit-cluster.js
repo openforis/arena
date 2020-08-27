@@ -1,4 +1,4 @@
-import { button, expectExists, expectExistsExactlyNumberOfTimes } from '../utils/api'
+import { button, click, expectExists, expectExistsExactlyNumberOfTimes, waitFor1sec } from '../utils/api'
 import { clickSidebarBtnSurveyForm } from '../utils/ui'
 
 const verifySurveyFormLoaded = async () => {
@@ -17,5 +17,15 @@ describe('SurveyForm edit cluster', () => {
     await verifySurveyFormLoaded()
 
     await verifyHasOnluRootEntity()
+  })
+
+  test('Publish root_entity error', async () => {
+    await waitFor1sec()
+    await click('Publish')
+    await waitFor1sec()
+    await click('OK')
+    await expectExists({ text: 'Define at least one key attribute' })
+    await expectExists({ text: 'Define at least one child item' })
+    await click('Close')
   })
 })
