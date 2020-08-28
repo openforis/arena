@@ -1,7 +1,7 @@
 export { closeBrowser, openBrowser } from './browser'
 export { button } from './button'
 export { click, clickParent } from './click'
-export { expectExists, expectExistsExactlyNumberOfTimes } from './expect'
+export { expectExists, getElement } from './expect'
 export { link } from './link'
 export { clearTextBox, writeIntoTextBox, hoverTextBox } from './textBox'
 export { toRightOf } from './toRightOf'

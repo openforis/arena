@@ -1,29 +1,20 @@
 import { $, text as textTaiko } from 'taiko'
 
-export const getSelection = async ({ text = null, selector = null, itemSelector = null }) => {
+export const getElement = async ({ text = null, selector = null, itemSelector = null }) => {
   if (!text && !selector && !itemSelector) throw new Error('One between text, selector and itemSelector is required')
-
-  const element = await (itemSelector || (text ? textTaiko(text) : $(selector)))
-
-  return element
+  return itemSelector || (text ? textTaiko(text) : $(selector))
 }
 
-export const expectExists = async ({ text = null, selector = null, itemSelector = null }) => {
-  const element = await getSelection({ text, selector, itemSelector })
+export const expectExists = async ({ text = null, selector = null, itemSelector = null, numberOfItems = -1 }) => {
+  const element = await getElement({ text, selector, itemSelector })
 
-  const exists = await element.exists()
-  await expect(exists).toBeTruthy()
-}
+  if (numberOfItems < 0) {
+    const exists = await element.exists()
+    await expect(exists).toBeTruthy()
+  } else {
+    const items = await element.elements()
+    const _numberOfItems = items.length
 
-export const expectExistsExactlyNumberOfTimes = async ({
-  text = null,
-  selector = null,
-  itemSelector = null,
-  numberOfItems = 0,
-}) => {
-  const element = await getSelection({ text, selector, itemSelector })
-  const items = await element.elements()
-  const _numberOfItems = items.length
-
-  await expect(_numberOfItems).toBe(numberOfItems)
+    await expect(_numberOfItems).toBe(numberOfItems)
+  }
 }
