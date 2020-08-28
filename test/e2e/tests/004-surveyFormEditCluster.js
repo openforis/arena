@@ -1,13 +1,4 @@
-import {
-  button,
-  click,
-  expectExists,
-  waitFor1sec,
-  getElement,
-  clearTextBox,
-  toRightOf,
-  writeIntoTextBox,
-} from '../utils/api'
+import { button, click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
 import { clickSidebarBtnSurveyForm, waitForLoader } from '../utils/ui'
 
 const verifySurveyFormLoaded = async () => {
@@ -49,7 +40,7 @@ const verifyNodeDefInOrder = async ({ items: children }) => {
 
   const items = await elements.elements()
 
-  await expect(items.length).toBe(6)
+  await expect(items.length).toBe(nodeDefItems.length)
 
   await items.map(async (item, index) => {
     const itemText = await item.text()
@@ -67,7 +58,6 @@ describe('SurveyForm edit cluster', () => {
   })
 
   test('Publish root_entity error', async () => {
-    await waitFor1sec()
     await click('Publish')
     await waitForLoader()
     await click('OK')
