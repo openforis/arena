@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
 
 import { useIsDesignerNodeDefRoute, useOnUpdate } from '@webapp/components/hooks'
@@ -20,6 +20,7 @@ export const useNodeDefDetails = () => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const [state, setState] = useState({})
+  const stateRef = useRef(state)
 
   const Actions = useActions({ setState })
 
@@ -27,12 +28,24 @@ export const useNodeDefDetails = () => {
 
   useEffect(() => {
     // Editing a nodeDef
-    if (nodeDefUuid) {
+    if (nodeDefUuid && !State.getNodeDef(state)) {
       const nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
       setState(State.create({ nodeDef: nodeDefSurvey, validation }))
     }
+
+    return () => {
+      // get local state from stateRef to get it up to date in this callback
+      if (State.isDirty(stateRef.current)) {
+        Actions.cancelEdits({ state: stateRef.current, showConfirm: false, goBack: false })
+      }
+    }
   }, [])
+
+  useEffect(() => {
+    // update state ref on local state update
+    stateRef.current = state
+  }, [state])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {

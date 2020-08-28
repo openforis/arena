@@ -11,26 +11,28 @@ export const useCancelEdits = () => {
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const cancelEdits = ({ state }) => async () => {
+  const cancelEdits = ({ state, goBack }) => async () => {
     const nodeDef = State.getNodeDef(state)
     const nodeDefOriginal = State.getNodeDefOriginal(state)
 
     await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
-    history.goBack()
+    if (goBack) {
+      history.goBack()
+    }
   }
 
-  return useCallback(async ({ state }) => {
+  return useCallback(async ({ state, showConfirm = true, goBack = true }) => {
     const dirty = State.isDirty(state)
-    if (dirty) {
+    if (dirty && showConfirm) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: cancelEdits({ state }),
+          onOk: cancelEdits({ state, goBack }),
         })
       )
     } else {
-      await cancelEdits({ state })()
+      await cancelEdits({ state, goBack })()
     }
   }, [])
 }
