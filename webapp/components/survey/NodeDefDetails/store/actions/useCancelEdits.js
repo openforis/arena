@@ -7,7 +7,7 @@ import { NodeDefsActions } from '@webapp/store/survey'
 
 import { State } from '../state'
 
-export const useCancelEdits = () => {
+export const useCancelEdits = ({ setState }) => {
   const history = useHistory()
   const dispatch = useDispatch()
 
@@ -15,22 +15,36 @@ export const useCancelEdits = () => {
     const nodeDef = State.getNodeDef(state)
     const nodeDefOriginal = State.getNodeDefOriginal(state)
 
+    await setState(State.assocNodeDef(nodeDefOriginal))
+
     await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
     history.goBack()
   }
 
-  return useCallback(async ({ state }) => {
-    const dirty = State.isDirty(state)
-    if (dirty) {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'common.cancelConfirm',
-          onOk: cancelEdits({ state }),
-        })
-      )
-    } else {
-      await cancelEdits({ state })()
-    }
-  }, [])
+  return useCallback(
+    ({ state }) =>
+      new Promise((resolve, reject) => {
+        const dirty = State.isDirty(state)
+        if (dirty) {
+          dispatch(
+            DialogConfirmActions.showDialogConfirm({
+              key: 'common.cancelConfirm',
+              onOk: () => {
+                cancelEdits({ state })()
+                resolve(true)
+              },
+              onCancel: () => {
+                resolve(false)
+              },
+            })
+          )
+        } else {
+          cancelEdits({ state })()
+            .then(() => resolve(true))
+            .catch((e) => reject(e))
+        }
+      }),
+    []
+  )
 }
