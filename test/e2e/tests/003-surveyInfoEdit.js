@@ -23,7 +23,6 @@ describe('Survey info edit', () => {
     await expectExists({ text: 'Name is required' })
 
     await clickSidebarBtnHome()
-    await waitFor1sec()
     await verifyHomeDashboard({ label: 'Survey 1' })
   })
 
@@ -45,7 +44,6 @@ describe('Survey info edit', () => {
     await clickSidebarBtnHome()
 
     await verifyHomeDashboard({ label: 'Survey' })
-
     await waitForLoader()
     await clickHomeBtnEditSurveyInfo()
 

@@ -1,9 +1,7 @@
 import { button, click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
 import { clickSidebarBtnSurveyForm, waitForLoader } from '../utils/ui'
 
-const verifySurveyFormLoaded = async () => {
-  await expectExists({ selector: '.survey-form' })
-}
+const verifySurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
 const verifyHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
