@@ -1,31 +1,26 @@
 import { useEffect } from 'react'
 
-import { useI18n } from '@webapp/store/system'
-
 /**
+ * Intercepts the browser back button press and calls the specified callback.
+ * The call to the callback can be can be activated or deactivated using the "active" parameter.
  *
  * @param {!object} params - The parameters.
- * @param {boolean} [params.active] - True if onBack callback should be called on browser back button press
- * and confirm message on page refresh should be shown.
  * @param {!Function} [params.onBack] - Callback to be called when back button is pressed. It should return true when history.back() is called by the callback itself, false othwerwise.
- * @param {string} [params.confirmMessageKey] - Message key of the leave page confirm message.
+ * @param {boolean} [params.active=false] - True if onBack callback should be called on browser back button press and confirm message on page refresh should be shown.
  * @returns {undefined}
  */
-export const useIntersectBack = ({ active = false, onBack, confirmMessageKey = 'common.leavePageConfirmMessage' }) => {
-  const i18n = useI18n()
+export const useInterceptBack = (params) => {
+  const { active = false, onBack } = params
 
   const onBackButtonEvent = async (e) => {
     e.preventDefault()
 
     if (active) {
       const wentBack = await onBack()
-      if (wentBack) {
-        window.onbeforeunload = null
-      } else {
+      if (!wentBack) {
         window.history.pushState(null, null, window.location.pathname)
       }
     } else {
-      window.onbeforeunload = null
       window.history.back()
     }
   }
@@ -36,11 +31,6 @@ export const useIntersectBack = ({ active = false, onBack, confirmMessageKey = '
       window.history.pushState(null, null, window.location.pathname)
     }
     window.addEventListener('popstate', onBackButtonEvent)
-
-    // Show warning popup on page refresh
-    window.onbeforeunload = () => {
-      return active ? i18n.t(confirmMessageKey) : null
-    }
 
     return () => {
       window.removeEventListener('popstate', onBackButtonEvent)

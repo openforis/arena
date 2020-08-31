@@ -15,7 +15,8 @@ export { default as useOnIntersect } from './useOnIntersect'
 export { default as useInterval } from './useInterval'
 export { useHistoryListen } from './useHistoryListen'
 export { useIsInRoute, useIsCategoriesRoute, useIsDesignerNodeDefRoute, useIsTaxonomiesRoute } from './useIsInRoute'
-export { useIntersectBack } from './useIntersectBack'
+export { useInterceptBack } from './useInterceptBack'
+export { usePageUnloadConfirm } from './usePageUnloadConfirm'
 
 // rxjs hooks
 export { usePost } from './usePost'

@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
 
-import { useIsDesignerNodeDefRoute, useOnUpdate, useIntersectBack } from '@webapp/components/hooks'
+import {
+  useIsDesignerNodeDefRoute,
+  useOnUpdate,
+  useInterceptBack,
+  usePageUnloadConfirm,
+} from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 
@@ -25,10 +30,12 @@ export const useNodeDefDetails = () => {
 
   const editingFromDesigner = useIsDesignerNodeDefRoute()
 
-  useIntersectBack({
+  useInterceptBack({
     active: State.isDirty(state),
     onBack: useCallback(() => Actions.cancelEdits({ state }), [state]),
   })
+
+  usePageUnloadConfirm({ active: State.isDirty(state) })
 
   useEffect(() => {
     // Editing a nodeDef

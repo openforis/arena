@@ -23,7 +23,7 @@ export const useCancelEdits = ({ setState }) => {
   }
 
   return useCallback(
-    ({ state }) =>
+    async ({ state }) =>
       new Promise((resolve, reject) => {
         const dirty = State.isDirty(state)
         if (dirty) {
