@@ -1,16 +1,11 @@
 import { button, click, clickParent, expectExists, writeIntoTextBox } from '../utils/api'
-import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader } from '../utils/ui'
+import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader, verifyHomeDashboard } from '../utils/ui'
 
 const createSurvey = async ({ name, label }) => {
   await writeIntoTextBox({ text: name, selector: { placeholder: 'Name' } })
   await writeIntoTextBox({ text: label, selector: { placeholder: 'Label' } })
   await click(button('Create Survey'))
   await waitForLoader()
-}
-
-const verifyHomeDashboard = async ({ label }) => {
-  await expectExists({ selector: '.home-dashboard' })
-  await expectExists({ text: label })
 }
 
 const createAndVerifySurvey = async ({ name, label }) => {

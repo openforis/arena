@@ -1,3 +1,1 @@
-import { toRightOf as toRightOfTaiko } from 'taiko'
-
-export const toRightOf = toRightOfTaiko
+export { toRightOf } from 'taiko'
