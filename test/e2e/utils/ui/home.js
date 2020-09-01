@@ -6,7 +6,7 @@ const _clickHomeBtn = async ({ label }) => {
 
 export const clickHomeBtnEditSurveyInfo = async () => _clickHomeBtn({ label: 'Edit info' })
 
-export const verifyHomeDashboard = async ({ label }) => {
+export const expectHomeDashboard = async ({ label }) => {
   await expectExists({ selector: '.home-dashboard' })
   await expectExists({ text: label })
 }

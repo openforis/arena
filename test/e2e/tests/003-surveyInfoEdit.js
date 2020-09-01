@@ -1,5 +1,5 @@
 import { button, clearTextBox, click, expectExists, writeIntoTextBox, hoverTextBox, toRightOf } from '../utils/api'
-import { clickHomeBtnEditSurveyInfo, waitForLoader, clickSidebarBtnHome, verifyHomeDashboard } from '../utils/ui'
+import { clickHomeBtnEditSurveyInfo, waitForLoader, clickSidebarBtnHome, expectHomeDashboard } from '../utils/ui'
 
 const getElementRightOfLabel = ({ label }) => toRightOf(label)
 
@@ -11,7 +11,6 @@ const selectors = {
 
 describe('Survey info edit', () => {
   test('Survey require name', async () => {
-    await waitForLoader()
     await clickHomeBtnEditSurveyInfo()
 
     await clearTextBox({ selector: selectors.name() })
@@ -23,7 +22,7 @@ describe('Survey info edit', () => {
     await expectExists({ text: 'Name is required' })
 
     await clickSidebarBtnHome()
-    await verifyHomeDashboard({ label: 'Survey 1' })
+    await expectHomeDashboard({ label: 'Survey 1' })
   })
 
   test('Survey info save', async () => {
@@ -43,7 +42,7 @@ describe('Survey info edit', () => {
 
     await clickSidebarBtnHome()
 
-    await verifyHomeDashboard({ label: 'Survey' })
+    await expectHomeDashboard({ label: 'Survey' })
     await waitForLoader()
     await clickHomeBtnEditSurveyInfo()
 

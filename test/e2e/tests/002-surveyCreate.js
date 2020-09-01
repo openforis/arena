@@ -1,5 +1,5 @@
 import { button, click, clickParent, expectExists, writeIntoTextBox } from '../utils/api'
-import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader, verifyHomeDashboard } from '../utils/ui'
+import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader, expectHomeDashboard } from '../utils/ui'
 
 const createSurvey = async ({ name, label }) => {
   await writeIntoTextBox({ text: name, selector: { placeholder: 'Name' } })
@@ -11,7 +11,7 @@ const createSurvey = async ({ name, label }) => {
 const createAndVerifySurvey = async ({ name, label }) => {
   await clickHeaderBtnCreateSurvey()
   await createSurvey({ name, label })
-  await verifyHomeDashboard({ label })
+  await expectHomeDashboard({ label })
 }
 
 describe('Survey create', () => {
@@ -32,6 +32,7 @@ describe('Survey create', () => {
 
     await clickParent('survey_1')
 
-    await verifyHomeDashboard({ label: 'Survey 1' })
+    await expectHomeDashboard({ label: 'Survey 1' })
+    await waitForLoader()
   })
 })
