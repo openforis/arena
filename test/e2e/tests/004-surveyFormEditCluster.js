@@ -1,11 +1,12 @@
-import { button, click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
+import { click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
 import { clickSidebarBtnSurveyForm, waitForLoader } from '../utils/ui'
 
 const verifySurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
 const verifyHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
-  await expectExists({ itemSelector: button(rootEntityName), numberOfItems: 1 })
+  const sel = `//button[text()='${rootEntityName}']`
+  await expectExists({ selector: sel, numberOfItems: 1 })
 }
 
 const addClusterItem = async ({ type, name, label, isKey }) => {
@@ -52,6 +53,8 @@ describe('SurveyForm edit cluster', () => {
 
     await verifySurveyFormLoaded()
 
+    await expectExists({ selector: `//button[text()='root_entity']` })
+
     await verifyHasOnlyRootEntity({ rootEntityName: 'root_entity' })
   })
 
@@ -78,7 +81,7 @@ describe('SurveyForm edit cluster', () => {
     await click('Back')
 
     await verifySurveyFormLoaded()
-    await verifyHasOnlyRootEntity({ rootEntityName: 'cluster' })
+    await verifyHasOnlyRootEntity({ rootEntityName: 'Cluster' })
   })
 
   test.each(nodeDefItems)('Cluster add children %o', async (child) => {

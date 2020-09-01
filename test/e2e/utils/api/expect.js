@@ -1,12 +1,12 @@
 import { $, text as textTaiko } from 'taiko'
 
-export const getElement = async ({ text = null, selector = null, itemSelector = null }) => {
-  if (!text && !selector && !itemSelector) throw new Error('One between text, selector and itemSelector is required')
-  return itemSelector || (text ? textTaiko(text) : $(selector))
+export const getElement = async ({ text = null, selector = null }) => {
+  if (!text && !selector) throw new Error('One between text or selector is required')
+  return text ? textTaiko(text) : $(selector)
 }
 
-export const expectExists = async ({ text = null, selector = null, itemSelector = null, numberOfItems = -1 }) => {
-  const element = await getElement({ text, selector, itemSelector })
+export const expectExists = async ({ text = null, selector = null, numberOfItems = -1 }) => {
+  const element = await getElement({ text, selector })
 
   if (numberOfItems < 0) {
     const exists = await element.exists()
