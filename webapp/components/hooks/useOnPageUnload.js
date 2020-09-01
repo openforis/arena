@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
  * @param {string} [params.confirmMessageKey=common.leavePageConfirmMessage] - Key of the leave page confirm message.
  * @returns {undefined}
  */
-export const usePageUnloadConfirm = (params = {}) => {
+export const useOnPageUnload = (params = {}) => {
   const { active = false, confirmMessageKey = 'common.leavePageConfirmMessage' } = params
 
   const i18n = useI18n()

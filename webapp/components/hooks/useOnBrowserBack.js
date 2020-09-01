@@ -9,11 +9,11 @@ import { useEffect } from 'react'
  * @param {boolean} [params.active=false] - True if onBack callback should be called on browser back button press and confirm message on page refresh should be shown.
  * @returns {undefined}
  */
-export const useInterceptBack = (params) => {
+export const useOnBrowserBack = (params) => {
   const { active = false, onBack } = params
 
-  const onBackButtonEvent = async (e) => {
-    e.preventDefault()
+  const onBackButtonEvent = async (event) => {
+    event.preventDefault()
 
     if (active) {
       const wentBack = await onBack()

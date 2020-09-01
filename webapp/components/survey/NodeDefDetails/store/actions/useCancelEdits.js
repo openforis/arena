@@ -32,7 +32,8 @@ export const useCancelEdits = ({ setState }) => {
               key: 'common.cancelConfirm',
               onOk: () => {
                 cancelEdits({ state })()
-                resolve(true)
+                  .then(() => resolve(true))
+                  .catch((e) => reject(e))
               },
               onCancel: () => {
                 resolve(false)
