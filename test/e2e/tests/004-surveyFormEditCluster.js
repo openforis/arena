@@ -1,9 +1,9 @@
 import { click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
 import { clickSidebarBtnSurveyForm, waitForLoader } from '../utils/ui'
 
-const verifySurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
+const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
-const verifyHasOnlyRootEntity = async ({ rootEntityName }) => {
+const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
   const sel = `//button[text()='${rootEntityName}']`
   await expectExists({ selector: sel, numberOfItems: 1 })
@@ -34,7 +34,7 @@ const nodeDefItems = [
   { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean', isKey: false },
   { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate', isKey: false },
 ]
-const verifyNodeDefInOrder = async ({ items: children }) => {
+const expectNodeDefInOrder = async ({ items: children }) => {
   const elements = await getElement({ selector: '.survey-form__node-def-page-item' })
 
   const items = await elements.elements()
@@ -51,11 +51,11 @@ describe('SurveyForm edit cluster', () => {
   test('SurveyForm cluster', async () => {
     await clickSidebarBtnSurveyForm()
 
-    await verifySurveyFormLoaded()
+    await expectSurveyFormLoaded()
 
     await expectExists({ selector: `//button[text()='root_entity']` })
 
-    await verifyHasOnlyRootEntity({ rootEntityName: 'root_entity' })
+    await expectHasOnlyRootEntity({ rootEntityName: 'root_entity' })
   })
 
   test('Publish root_entity error', async () => {
@@ -80,8 +80,8 @@ describe('SurveyForm edit cluster', () => {
     await waitForLoader()
     await click('Back')
 
-    await verifySurveyFormLoaded()
-    await verifyHasOnlyRootEntity({ rootEntityName: 'Cluster' })
+    await expectSurveyFormLoaded()
+    await expectHasOnlyRootEntity({ rootEntityName: 'Cluster' })
   })
 
   test.each(nodeDefItems)('Cluster add children %o', async (child) => {
@@ -97,7 +97,7 @@ describe('SurveyForm edit cluster', () => {
   })
 
   test('Cluster add children - verify order', async () => {
-    await verifyNodeDefInOrder({
+    await expectNodeDefInOrder({
       items: nodeDefItems,
     })
   })
