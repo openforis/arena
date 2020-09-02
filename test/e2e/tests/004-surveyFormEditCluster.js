@@ -1,5 +1,5 @@
 import { click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
-import { clickSidebarBtnSurveyForm, waitForLoader } from '../utils/ui'
+import { clickSidebarBtnSurveyForm, waitForLoader, addItemToPage } from '../utils/ui'
 
 const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
@@ -7,23 +7,6 @@ const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
   const sel = `//button[text()='${rootEntityName}']`
   await expectExists({ selector: sel, numberOfItems: 1 })
-}
-
-const addClusterItem = async ({ type, name, label, isKey }) => {
-  const pencilIcon = await getElement({ selector: '.icon-pencil2' })
-  await click(await getElement({ selector: '.icon-plus' }), toRightOf(pencilIcon))
-
-  await click(type)
-
-  await writeIntoTextBox({ text: name, selector: toRightOf('Name') })
-  await writeIntoTextBox({ text: label, selector: toRightOf('Label') })
-  if (isKey) {
-    await click(await getElement({ selector: '.btn-checkbox' }), toRightOf('Key'))
-  }
-  await click('Save')
-  await waitForLoader()
-  await click('Back')
-  await waitForLoader()
 }
 
 const nodeDefItems = [
@@ -39,12 +22,16 @@ const expectNodeDefInOrder = async ({ items: children }) => {
 
   const items = await elements.elements()
 
-  await expect(items.length).toBe(nodeDefItems.length)
-
   await items.map(async (item, index) => {
     const itemText = await item.text()
     await expect(itemText.split('\n')[0]).toBe(children[index].label.toUpperCase())
   })
+}
+
+const selectors = {
+  name: () => toRightOf('Name'),
+  label: () => toRightOf('Label'),
+  language: () => toRightOf('Language(s)'),
 }
 
 describe('SurveyForm edit cluster', () => {
@@ -70,11 +57,11 @@ describe('SurveyForm edit cluster', () => {
   test('root_entity rename', async () => {
     await click(await getElement({ selector: '.icon-pencil2' }))
 
-    await clearTextBox({ selector: toRightOf('Name') })
-    await writeIntoTextBox({ text: 'cluster', selector: toRightOf('Name') })
+    await clearTextBox({ selector: selectors.name() })
+    await writeIntoTextBox({ text: 'cluster', selector: selectors.name() })
 
-    await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: 'Cluster', selector: toRightOf('Labels') })
+    await clearTextBox({ selector: selectors.label() })
+    await writeIntoTextBox({ text: 'Cluster', selector: selectors.label() })
 
     await click('Save')
     await waitForLoader()
@@ -85,7 +72,7 @@ describe('SurveyForm edit cluster', () => {
   })
 
   test.each(nodeDefItems)('Cluster add children %o', async (child) => {
-    await addClusterItem(child)
+    await addItemToPage(child)
 
     const elements = await getElement({ selector: '.survey-form__node-def-page-item' })
 

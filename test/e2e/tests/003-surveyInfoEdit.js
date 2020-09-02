@@ -1,17 +1,14 @@
 import { button, clearTextBox, click, expectExists, writeIntoTextBox, hoverTextBox, toRightOf } from '../utils/api'
 import { clickHomeBtnEditSurveyInfo, waitForLoader, clickSidebarBtnHome, expectHomeDashboard } from '../utils/ui'
 
-const getElementRightOfLabel = ({ label }) => toRightOf(label)
-
 const selectors = {
   name: () => ({ id: 'survey-info-name' }),
-  label: () => getElementRightOfLabel({ label: 'Label' }),
-  language: () => getElementRightOfLabel({ label: 'Language(s)' }),
+  label: () => toRightOf('Label'),
+  language: () => toRightOf('Language(s)'),
 }
 
 describe('Survey info edit', () => {
   test('Survey require name', async () => {
-    await waitForLoader()
     await clickHomeBtnEditSurveyInfo()
 
     await clearTextBox({ selector: selectors.name() })
