@@ -1,5 +1,11 @@
 import { click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
-import { clickSidebarBtnSurveyForm, waitForLoader, addItemToPage } from '../utils/ui'
+import {
+  clickSidebarBtnSurveyForm,
+  waitForLoader,
+  addItemToPage,
+  expectItemIsTheLastNodeDef,
+  expectItemsAreInOrderAsNodeDef,
+} from '../utils/ui'
 
 const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
@@ -17,16 +23,6 @@ const nodeDefItems = [
   { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean', isKey: false },
   { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate', isKey: false },
 ]
-const expectNodeDefInOrder = async ({ items: children }) => {
-  const elements = await getElement({ selector: '.survey-form__node-def-page-item' })
-
-  const items = await elements.elements()
-
-  await items.map(async (item, index) => {
-    const itemText = await item.text()
-    await expect(itemText.split('\n')[0]).toBe(children[index].label.toUpperCase())
-  })
-}
 
 const selectors = {
   name: () => toRightOf('Name'),
@@ -73,26 +69,14 @@ describe('SurveyForm edit cluster', () => {
 
   test.each(nodeDefItems)('Cluster add children %o', async (child) => {
     await addItemToPage(child)
-
-    const elements = await getElement({ selector: '.survey-form__node-def-page-item' })
-
-    const items = await elements.elements()
-    const last = items[items.length - 1]
-    const itemText = await last.text()
-
-    await expect(itemText.split('\n')[0]).toBe(child.label.toUpperCase())
+    await expectItemIsTheLastNodeDef({ item: child })
   })
 
-  test('Cluster add children - verify order', async () => {
-    await expectNodeDefInOrder({
-      items: nodeDefItems,
-    })
-  })
+  test('Cluster add children - verify order', async () => expectItemsAreInOrderAsNodeDef({ items: nodeDefItems }))
 
-  test('Cluster add children - verify number of children', async () => {
-    await expectExists({
+  test('Cluster add children - verify number of children', async () =>
+    expectExists({
       selector: '.survey-form__node-def-page-item',
       numberOfItems: nodeDefItems.length,
-    })
-  })
+    }))
 })
