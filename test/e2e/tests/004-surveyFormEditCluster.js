@@ -11,8 +11,7 @@ const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-for
 
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
-  const sel = `//button[text()='${rootEntityName}']`
-  await expectExists({ selector: sel, numberOfItems: 1 })
+  await expectExists({ selector: `//button[text()='${rootEntityName}']`, numberOfItems: 1 })
 }
 
 const nodeDefItems = [
