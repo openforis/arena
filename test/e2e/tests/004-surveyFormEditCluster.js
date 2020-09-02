@@ -16,11 +16,11 @@ const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
 
 const nodeDefItems = [
   { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
-  { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal', isKey: false },
-  { type: 'date', name: 'cluster_date', label: 'Cluster date', isKey: false },
-  { type: 'time', name: 'cluster_time', label: 'Cluster Time', isKey: false },
-  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean', isKey: false },
-  { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate', isKey: false },
+  { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' },
+  { type: 'date', name: 'cluster_date', label: 'Cluster date' },
+  { type: 'time', name: 'cluster_time', label: 'Cluster Time' },
+  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' },
+  { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
 ]
 
 const selectors = {
