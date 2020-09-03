@@ -1,4 +1,6 @@
-import { getElement } from '../api'
+import { expectExists, getElement } from '../api'
+
+export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
 const getNodeDefElementText = async ({ item }) => {
   const itemText = await item.text()

@@ -1,13 +1,13 @@
-import { click, expectExists, getElement, clearTextBox, toRightOf, writeIntoTextBox } from '../utils/api'
+import { click, expectExists, getElement } from '../utils/api'
 import {
   clickSidebarBtnSurveyForm,
   waitForLoader,
   addItemToPage,
   expectItemIsTheLastNodeDef,
   expectItemsAreInOrderAsNodeDef,
+  editPage,
+  expectSurveyFormLoaded,
 } from '../utils/ui'
-
-const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
@@ -22,12 +22,6 @@ const nodeDefItems = [
   { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' },
   { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
 ]
-
-const selectors = {
-  name: () => toRightOf('Name'),
-  label: () => toRightOf('Label'),
-  language: () => toRightOf('Language(s)'),
-}
 
 describe('SurveyForm edit cluster', () => {
   test('SurveyForm cluster', async () => {
@@ -52,15 +46,8 @@ describe('SurveyForm edit cluster', () => {
   test('root_entity rename', async () => {
     await click(await getElement({ selector: '.icon-pencil2' }))
 
-    await clearTextBox({ selector: selectors.name() })
-    await writeIntoTextBox({ text: 'cluster', selector: selectors.name() })
-
-    await clearTextBox({ selector: selectors.label() })
-    await writeIntoTextBox({ text: 'Cluster', selector: selectors.label() })
-
-    await click('Save')
-    await waitForLoader()
-    await click('Back')
+    const pageValues = { name: 'cluster', label: 'Cluster' }
+    await editPage({ values: pageValues })
 
     await expectSurveyFormLoaded()
     await expectHasOnlyRootEntity({ rootEntityName: 'Cluster' })
