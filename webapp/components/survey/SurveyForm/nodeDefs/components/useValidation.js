@@ -3,6 +3,8 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
@@ -26,8 +28,7 @@ export default (props) => {
     if (node) {
       return RecordValidation.getNodeValidation(node)(recordValidation)
     }
-    if (NodeDef.isEntity(nodeDef)) {
-      // Only entities can have children with min/max count validation
+    if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDef))) {
       return RecordValidation.getValidationChildrenCount(
         Node.getUuid(parentNode),
         NodeDef.getUuid(nodeDef)
