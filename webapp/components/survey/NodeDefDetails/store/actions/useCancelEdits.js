@@ -15,7 +15,7 @@ export const useCancelEdits = ({ setState }) => {
     const nodeDef = State.getNodeDef(state)
     const nodeDefOriginal = State.getNodeDefOriginal(state)
 
-    await setState(State.assocNodeDef(nodeDefOriginal))
+    await setState(State.reset)
 
     await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
@@ -25,25 +25,21 @@ export const useCancelEdits = ({ setState }) => {
   return useCallback(
     async ({ state }) =>
       new Promise((resolve, reject) => {
-        const dirty = State.isDirty(state)
-        if (dirty) {
+        const _cancel = () =>
+          cancelEdits({ state })()
+            .then(() => resolve(true))
+            .catch(reject)
+
+        if (State.isDirty(state)) {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
               key: 'common.cancelConfirm',
-              onOk: () => {
-                cancelEdits({ state })()
-                  .then(() => resolve(true))
-                  .catch((e) => reject(e))
-              },
-              onCancel: () => {
-                resolve(false)
-              },
+              onOk: _cancel,
+              onCancel: () => resolve(false),
             })
           )
         } else {
-          cancelEdits({ state })()
-            .then(() => resolve(true))
-            .catch((e) => reject(e))
+          _cancel()
         }
       }),
     []
