@@ -28,7 +28,7 @@ const ModuleLink = (props) => {
   const className = getClassName({ root, active })
 
   return (
-    <Link to={uri} className={className} aria-disabled={disabled || active}>
+    <Link to={uri} className={className} aria-disabled={disabled || active} id={`sidebar_btn_${key}`}>
       {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}
       {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
     </Link>
