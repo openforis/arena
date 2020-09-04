@@ -1,5 +1,11 @@
-import { addSubPage } from '../utils/ui'
+import { addItemToPage, addSubPage, expectItemIsTheLastNodeDef, expectItemsAreInOrderAsNodeDef } from '../utils/ui'
 import { expectExists, expectToBe, getElement, hover } from '../utils/api'
+
+const nodeDefItems = [
+  { type: 'integer', name: 'plot_id', label: 'Plot id', isKey: true },
+  { type: 'text', name: 'plot_text', label: 'Plot text', isKey: false },
+  { type: 'file', name: 'plot_file', label: 'Plot file', isKey: false },
+]
 
 describe('SurveyForm edit Plot', () => {
   test('Plot create', async () => {
@@ -24,4 +30,17 @@ describe('SurveyForm edit Plot', () => {
     await hover(await getElement({ selector: '.survey-form__node-def-error-badge' }))
     await expectExists({ text: 'Define at least one child item' })
   })
+
+  test.each(nodeDefItems)('Plot add children %o', async (child) => {
+    await addItemToPage(child)
+    await expectItemIsTheLastNodeDef({ item: child })
+  })
+
+  test('Plot add children - verify order', async () => expectItemsAreInOrderAsNodeDef({ items: nodeDefItems }))
+
+  test('Plot add children - verify number of children', async () =>
+    expectToBe({
+      selector: '.survey-form__node-def-page-item',
+      numberOfItems: nodeDefItems.length,
+    }))
 })
