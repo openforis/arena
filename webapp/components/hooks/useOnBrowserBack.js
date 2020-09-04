@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useHistory } from 'react-router'
 
 /**
  * Intercepts the browser back button press and calls the specified callback.
@@ -12,23 +13,26 @@ import { useEffect } from 'react'
 export const useOnBrowserBack = (params) => {
   const { active = false, onBack } = params
 
+  const history = useHistory()
+
   const onBackButtonEvent = async (event) => {
     event.preventDefault()
 
     if (active) {
       const wentBack = await onBack()
       if (!wentBack) {
-        window.history.pushState(null, null, window.location.pathname)
+        history.push(history.location.pathname, null)
       }
     } else {
-      window.history.back()
+      history.goBack()
     }
   }
 
   useEffect(() => {
     // Push a "null" state to detect back button press
-    if (window.history.state !== null) {
-      window.history.pushState(null, null, window.location.pathname)
+    const { location } = history
+    if (location.state !== null) {
+      history.push(location.pathname, null)
     }
     window.addEventListener('popstate', onBackButtonEvent)
 
