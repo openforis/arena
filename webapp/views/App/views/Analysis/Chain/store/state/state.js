@@ -1,5 +1,9 @@
 import * as A from '@core/arena'
 
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
+import * as Calculation from '@common/analysis/processingStepCalculation'
+
 export const keys = {
   attributeUuidsOtherChains: 'attributeUuidsOtherChains',
   chain: 'chain',
@@ -26,15 +30,16 @@ export const getAttributeUuidsOtherChains = A.prop(keys.attributeUuidsOtherChain
 
 export const getChain = A.prop(keys.chain)
 export const getChainEdit = A.prop(keys.chainEdit)
-export const isChainDirty = (state) => getChain(state) !== getChainEdit(state)
+export const isChainDirty = (state) => Chain.isTemporary(getChain(state)) || getChain(state) !== getChainEdit(state)
 
 export const getStep = A.prop(keys.step)
 export const getStepEdit = A.prop(keys.stepEdit)
-export const isStepDirty = (state) => getStep(state) !== getStepEdit(state)
+export const isStepDirty = (state) => Step.isTemporary(getStep(state)) || getStep(state) !== getStepEdit(state)
 
 export const getCalculation = A.prop(keys.calculation)
 export const getCalculationEdit = A.prop(keys.calculationEdit)
-export const isCalculationDirty = (state) => getCalculation(state) !== getCalculationEdit(state)
+export const isCalculationDirty = (state) =>
+  Calculation.isTemporary(getCalculation(state)) || getCalculation(state) !== getCalculationEdit(state)
 
 // ==== UPDATE
 export const assocChain = A.assoc(keys.chain)
