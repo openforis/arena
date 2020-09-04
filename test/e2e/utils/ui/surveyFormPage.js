@@ -58,7 +58,7 @@ export const expectCurrentPageIs = async ({ label }) => {
   await expect(await currentPageLabel.text()).toBe(label)
 }
 
-const expectPageExist = async ({ pageLabel, pagesElements, pageIndex }) => {
+const expectPageExists = async ({ pageLabel, pagesElements, pageIndex }) => {
   await expect(await pagesElements[pageIndex].text()).toBe(pageLabel)
 }
 export const expectFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
@@ -69,6 +69,6 @@ export const expectFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
   await expect(pagesElements.length).toBe(pageLabels.length)
 
   await Promise.all([
-    pageLabels.map(async (pageLabel, pageIndex) => expectPageExist({ pageLabel, pagesElements, pageIndex })),
+    pageLabels.map(async (pageLabel, pageIndex) => expectPageExists({ pageLabel, pagesElements, pageIndex })),
   ])
 }
