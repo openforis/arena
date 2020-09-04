@@ -1,4 +1,4 @@
-import { expectExists, getElement } from '../api'
+import { expectExists, expectToBe, getElement } from '../api'
 
 export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
@@ -25,6 +25,11 @@ export const expectItemIsTheLastNodeDef = async ({ item }) => {
 
 export const expectItemsAreInOrderAsNodeDef = async ({ items: nodeDefItems }) => {
   const items = await getNodeDefElements()
+
+  await expectToBe({
+    selector: '.survey-form__node-def-page-item',
+    numberOfItems: items.length,
+  })
 
   await items.map(async (item, index) => {
     const itemText = await getNodeDefElementText({ item })

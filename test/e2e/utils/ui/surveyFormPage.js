@@ -1,4 +1,14 @@
-import { click, getElement, toRightOf, writeIntoTextBox, button, clearTextBox } from '../api'
+import {
+  click,
+  getElement,
+  toRightOf,
+  writeIntoTextBox,
+  button,
+  clearTextBox,
+  expectExists,
+  hover,
+  expectToBe,
+} from '../api'
 import { waitForLoader } from './loader'
 import { expectSurveyFormLoaded } from './surveyForm'
 
@@ -34,4 +44,31 @@ export const addSubPage = async ({ values }) => {
 
   await waitForLoader()
   await editPage({ values })
+}
+
+export const expectEmptyPageHasError = async () => {
+  await expectExists({ selector: '.survey-form__node-def-error-badge' })
+  await hover(await getElement({ selector: '.survey-form__node-def-error-badge' }))
+  await expectExists({ text: 'Define at least one child item' })
+}
+
+export const expectCurrentPageIs = async ({ label }) => {
+  await expectToBe({ selector: '#survey-form-header__label', numberOfItems: 1 })
+  const currentPageLabel = await getElement({ selector: '#survey-form-header__label' })
+  await expect(await currentPageLabel.text()).toBe(label)
+}
+
+const expectPageExist = async ({ pageLabel, pagesElements, pageIndex }) => {
+  await expect(await pagesElements[pageIndex].text()).toBe(pageLabel)
+}
+export const expectFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
+  await expectToBe({ selector: '.btn-node-def', numberOfItems: pageLabels.length })
+  const pagesOnIndex = await getElement({ selector: '.btn-node-def' })
+  const pagesElements = await pagesOnIndex.elements()
+
+  await expect(pagesElements.length).toBe(pageLabels.length)
+
+  await Promise.all([
+    pageLabels.map(async (pageLabel, pageIndex) => expectPageExist({ pageLabel, pagesElements, pageIndex })),
+  ])
 }

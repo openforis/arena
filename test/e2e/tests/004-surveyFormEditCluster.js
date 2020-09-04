@@ -58,11 +58,6 @@ describe('SurveyForm edit cluster', () => {
     await expectItemIsTheLastNodeDef({ item: child })
   })
 
-  test('Cluster add children - verify order', async () => expectItemsAreInOrderAsNodeDef({ items: nodeDefItems }))
-
-  test('Cluster add children - verify number of children', async () =>
-    expectToBe({
-      selector: '.survey-form__node-def-page-item',
-      numberOfItems: nodeDefItems.length,
-    }))
+  test('Cluster add children - verify order and number of children', async () =>
+    expectItemsAreInOrderAsNodeDef({ items: nodeDefItems }))
 })
