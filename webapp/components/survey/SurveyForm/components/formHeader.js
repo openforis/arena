@@ -44,7 +44,7 @@ const FormHeader = (props) => {
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px icon-left`} />
         </button>
 
-        <h5>{nodeDefPageLabel}</h5>
+        <h5 id="survey-form-header__label">{nodeDefPageLabel}</h5>
 
         {edit && canEditDef && (
           <button
