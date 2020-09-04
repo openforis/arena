@@ -1,4 +1,4 @@
-import { click, expectExists, getElement } from '../utils/api'
+import { click, expectExists, expectToBe, getElement } from '../utils/api'
 import {
   clickSidebarBtnSurveyForm,
   waitForLoader,
@@ -10,8 +10,8 @@ import {
 } from '../utils/ui'
 
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
-  await expectExists({ selector: '.btn-node-def', numberOfItems: 1 })
-  await expectExists({ selector: `//button[text()='${rootEntityName}']`, numberOfItems: 1 })
+  await expectToBe({ selector: '.btn-node-def', numberOfItems: 1 })
+  await expectToBe({ selector: `//button[text()='${rootEntityName}']`, numberOfItems: 1 })
 }
 
 const nodeDefItems = [
@@ -61,7 +61,7 @@ describe('SurveyForm edit cluster', () => {
   test('Cluster add children - verify order', async () => expectItemsAreInOrderAsNodeDef({ items: nodeDefItems }))
 
   test('Cluster add children - verify number of children', async () =>
-    expectExists({
+    expectToBe({
       selector: '.survey-form__node-def-page-item',
       numberOfItems: nodeDefItems.length,
     }))
