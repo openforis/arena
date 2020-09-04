@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import path from 'path'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -14,6 +15,8 @@ import * as ProcessUtils from './core/processUtils'
 
 const { buildReport } = ProcessUtils.ENV
 const fontCssFileName = 'woff2.css'
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
@@ -38,6 +41,8 @@ const gitRevisionPlugin = new GitRevisionPlugin()
 
 // ==== init plugins
 const plugins = [
+  isDevelopment && new webpack.HotModuleReplacementPlugin(),
+  isDevelopment && new ReactRefreshWebpackPlugin(),
   gitRevisionPlugin,
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css',
@@ -67,7 +72,7 @@ const plugins = [
     filename: fontCssFileName,
   }),
   new CleanUpStatsPlugin(),
-]
+].filter(Boolean)
 
 if (buildReport) {
   plugins.push(new BundleAnalyzerPlugin())
@@ -93,14 +98,32 @@ const webPackConfig = {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },
+  devServer: {
+    hot: true,
+    proxy: [
+      {
+        // Proxy all server-served routes:
+        context: ['/img', '/app', '/guest', '/auth', '/socket.io'],
+        target: 'http://localhost:9090',
+      },
+    ],
+    compress: false,
+    port: 9000,
+    historyApiFallback: true,
+  },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: 'babel-loader',
-        },
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
+            },
+          },
+        ],
       },
       {
         test: /\.(sa|sc|c)ss$/,
