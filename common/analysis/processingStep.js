@@ -39,7 +39,7 @@ export const { isEqual, isTemporary } = ObjectUtils
 
 // ====== UPDATE
 
-export const { mergeProps } = ObjectUtils
+export const { dissocTemporary, mergeProps } = ObjectUtils
 
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
 export const assocCalculations = (calculations) => {

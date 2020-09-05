@@ -13,15 +13,15 @@ const ButtonBar = (props) => {
 
   const { state, Actions } = props
 
-  const stepEdit = State.getChainEdit(state)
   const chainEdit = State.getChainEdit(state)
+  const stepEdit = State.getStepEdit(state)
   const calculationEdit = State.getCalculationEdit(state)
   const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
   const editingChain = Boolean(State.getChainEdit(state))
   const editingStep = Boolean(State.getStepEdit(state))
   const editingCalculation = Boolean(State.getCalculationEdit(state))
-  const chainDirty = Boolean(State.isChainDirty(state))
+  const dirty = State.isChainDirty(state) || State.isStepDirty(state) || State.isCalculationDirty(state)
 
   return (
     <>
@@ -29,7 +29,7 @@ const ButtonBar = (props) => {
         {editingChain && !editingStep && !editingCalculation && (
           <button type="button" className="btn-s btn-cancel" onClick={() => Actions.dismiss({ state })}>
             <span className="icon icon-cross icon-left icon-10px" />
-            {i18n.t(chainDirty ? 'common.cancel' : 'common.back')}
+            {i18n.t(dirty ? 'common.cancel' : 'common.back')}
           </button>
         )}
 
@@ -37,7 +37,7 @@ const ButtonBar = (props) => {
           type="button"
           className="btn-s btn-primary"
           onClick={() => Actions.save({ state })}
-          aria-disabled={!chainDirty}
+          aria-disabled={!dirty}
         >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
