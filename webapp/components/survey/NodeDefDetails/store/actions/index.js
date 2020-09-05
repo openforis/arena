@@ -9,5 +9,5 @@ export const useActions = ({ setState }) => ({
   setParentUuid: useSetParentUuid({ setState }),
   setLayoutProp: useSetLayoutProp({ setState }),
   saveEdits: useSaveEdits({ setState }),
-  cancelEdits: useCancelEdits(),
+  cancelEdits: useCancelEdits({ setState }),
 })

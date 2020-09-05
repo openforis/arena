@@ -57,6 +57,10 @@ Do you want to cancel them?`,
     label: 'Label',
     label_plural: 'Labels',
     language: 'Language',
+    leavePageConfirmMessage: `There are unsaved changes in the form. 
+
+By confirming, all changes will be lost.
+Do you want to proceed?`,
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
