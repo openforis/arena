@@ -6,7 +6,6 @@ import * as ObjectUtils from '@core/objectUtils'
 export const keys = {
   calculations: 'calculations',
   calculationUuids: 'calculationUuids', // Associated only when processing step is saved
-  calculationsCount: 'calculationsCount',
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
   props: ObjectUtils.keys.props,
@@ -24,7 +23,6 @@ export const keysProps = {
 
 export const getProcessingChainUuid = R.prop(keys.processingChainUuid)
 export const getCalculations = R.propOr([], keys.calculations)
-export const getCalculationsCount = R.pipe(R.propOr(0, keys.calculationsCount), Number)
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
@@ -47,23 +45,11 @@ export const assocCalculations = (calculations) => {
   return R.pipe(R.assoc(keys.calculations, calculations), assocCalculationUuids(calculationUuids))
 }
 
-const assocCalculationsCount = R.assoc(keys.calculationsCount)
-
-const _updateCalculationsCount = (calculationStep) =>
-  R.pipe(getCalculations, R.length, (calculationsCount) => assocCalculationsCount(calculationsCount)(calculationStep))(
-    calculationStep
-  )
-
 export const assocCalculation = (calculation) =>
-  R.pipe(R.assocPath([keys.calculations, Calculation.getIndex(calculation)], calculation), _updateCalculationsCount)
+  R.assocPath([keys.calculations, Calculation.getIndex(calculation)], calculation)
 
 const _updateCalculations = (fn) => (processingStep) =>
-  R.pipe(
-    getCalculations,
-    fn,
-    (calculations) => assocCalculations(calculations)(processingStep),
-    _updateCalculationsCount
-  )(processingStep)
+  R.pipe(getCalculations, fn, (calculations) => assocCalculations(calculations)(processingStep))(processingStep)
 
 export const dissocCalculations = R.dissoc(keys.calculations)
 
