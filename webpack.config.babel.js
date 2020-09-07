@@ -100,11 +100,26 @@ const webPackConfig = {
   },
   devServer: {
     hot: true,
+    index: '',
     proxy: [
       {
         // Proxy all server-served routes:
-        context: ['/img', '/app', '/guest', '/auth', '/socket.io'],
+        context: ['/img', '/api', '/auth', '/socket.io', 'sockjs-node'],
         target: 'http://localhost:9090',
+      },
+      {
+        context: ['/socket.io', 'sockjs-node'],
+        target: 'ws://localhost:9090',
+        ws: true,
+      },
+      // Proxy root to server to mirror the server routes (goes to /app/home currently)
+      {
+        context: '/',
+        target: 'http://localhost:9090',
+        // eslint-disable-next-line consistent-return
+        bypass(req) {
+          return req.path !== '/' ? '/index.html' : undefined
+        },
       },
     ],
     compress: false,
@@ -126,7 +141,7 @@ const webPackConfig = {
         ],
       },
       {
-        test: /\.(sa|sc|c)ss$/,
+        test: /\.(sass|scss|css)$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,

@@ -7,6 +7,8 @@ import { createTerminus } from '@godaddy/terminus'
 
 import * as ProcessUtils from '@core/processUtils'
 
+import morgan from 'morgan'
+
 import * as Log from '@server/log/log'
 import { db } from '@server/db/db'
 import * as authConfig from '@server/modules/auth/config/authConfig'
@@ -30,6 +32,10 @@ export const run = async () => {
   logger.info('server initialization start')
 
   const app = express()
+
+  if (ProcessUtils.ENV.nodeEnv === 'development') {
+    app.use(morgan('dev'))
+  }
 
   // ====== app initializations
   if (ProcessUtils.ENV.useHttps) {
