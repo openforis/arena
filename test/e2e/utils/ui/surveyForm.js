@@ -31,8 +31,10 @@ export const expectItemsAreInOrderAsNodeDef = async ({ items: nodeDefItems }) =>
     numberOfItems: items.length,
   })
 
-  await items.map(async (item, index) => {
-    const itemText = await getNodeDefElementText({ item })
-    await expect(itemText).toBe(nodeDefItems[index].label.toUpperCase())
-  })
+  await Promise.all(
+    items.map(async (item, index) => {
+      const itemText = await getNodeDefElementText({ item })
+      await expect(itemText).toBe(nodeDefItems[index].label.toUpperCase())
+    })
+  )
 }
