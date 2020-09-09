@@ -1,11 +1,11 @@
 import {
   addItemToPage,
-  addSubPage,
+  addSurveyFormSubPage,
   expectItemIsTheLastNodeDef,
   expectItemsAreInOrderAsNodeDef,
   expectEmptyPageHasError,
   expectCurrentPageIs,
-  expectFormHasOnlyAndInOrderThesePages,
+  expectSurveyFormHasOnlyAndInOrderThesePages,
 } from '../utils/ui'
 
 const nodeDefItems = [
@@ -17,8 +17,8 @@ const nodeDefItems = [
 describe('SurveyForm edit Plot', () => {
   test('Plot create', async () => {
     const subPageValues = { name: 'Plot', label: 'Plot', isMultiple: true }
-    await addSubPage({ values: subPageValues })
-    await expectFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
+    await addSurveyFormSubPage({ values: subPageValues })
+    await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
     await expectCurrentPageIs({ label: 'Plot' })
     await expectEmptyPageHasError()
   })

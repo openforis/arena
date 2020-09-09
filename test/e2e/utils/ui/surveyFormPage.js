@@ -19,7 +19,7 @@ const selectors = {
   multiple: () => toRightOf('Multiple'),
 }
 
-export const editPage = async ({ values }) => {
+export const editSurveyFormPage = async ({ values }) => {
   const { name, label, isMultiple = false } = values
 
   await clearTextBox({ selector: selectors.name() })
@@ -39,11 +39,11 @@ export const editPage = async ({ values }) => {
   await expectSurveyFormLoaded()
 }
 
-export const addSubPage = async ({ values }) => {
+export const addSurveyFormSubPage = async ({ values }) => {
   await click(button('Sub page'))
 
   await waitForLoader()
-  await editPage({ values })
+  await editSurveyFormPage({ values })
 }
 
 export const expectEmptyPageHasError = async () => {
@@ -53,15 +53,15 @@ export const expectEmptyPageHasError = async () => {
 }
 
 export const expectCurrentPageIs = async ({ label }) => {
-  await expectToBe({ selector: '#survey-form-header__label', numberOfItems: 1 })
-  const currentPageLabel = await getElement({ selector: '#survey-form-header__label' })
+  await expectToBe({ selector: '#survey-form-page-label', numberOfItems: 1 })
+  const currentPageLabel = await getElement({ selector: '#survey-form-page-label' })
   await expect(await currentPageLabel.text()).toBe(label)
 }
 
-const expectPageExists = async ({ pageLabel, pagesElements, pageIndex }) => {
+const expectSurveyFormPageExists = async ({ pageLabel, pagesElements, pageIndex }) => {
   await expect(await pagesElements[pageIndex].text()).toBe(pageLabel)
 }
-export const expectFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
+export const expectSurveyFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
   await expectToBe({ selector: '.btn-node-def', numberOfItems: pageLabels.length })
   const pagesOnIndex = await getElement({ selector: '.btn-node-def' })
   const pagesElements = await pagesOnIndex.elements()
@@ -69,6 +69,6 @@ export const expectFormHasOnlyAndInOrderThesePages = async ({ pageLabels }) => {
   await expect(pagesElements.length).toBe(pageLabels.length)
 
   await Promise.all([
-    pageLabels.map(async (pageLabel, pageIndex) => expectPageExists({ pageLabel, pagesElements, pageIndex })),
+    pageLabels.map(async (pageLabel, pageIndex) => expectSurveyFormPageExists({ pageLabel, pagesElements, pageIndex })),
   ])
 }

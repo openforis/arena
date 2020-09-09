@@ -6,7 +6,7 @@ export const expectExists = async ({ text = null, selector = null }) => {
   await expect(exists).toBeTruthy()
 }
 
-export const expectToBe = async ({ text = null, selector = null, numberOfItems = 0 }) => {
+export const expectToBe = async ({ text = null, selector = null, numberOfItems = 1 }) => {
   const element = await getElement({ text, selector })
   const items = await element.elements()
   const _numberOfItems = items.length

@@ -5,7 +5,7 @@ import {
   addItemToPage,
   expectItemIsTheLastNodeDef,
   expectItemsAreInOrderAsNodeDef,
-  editPage,
+  editSurveyFormPage,
   expectSurveyFormLoaded,
 } from '../utils/ui'
 
@@ -47,7 +47,7 @@ describe('SurveyForm edit cluster', () => {
     await click(await getElement({ selector: '.icon-pencil2' }))
 
     const pageValues = { name: 'cluster', label: 'Cluster' }
-    await editPage({ values: pageValues })
+    await editSurveyFormPage({ values: pageValues })
 
     await expectSurveyFormLoaded()
     await expectHasOnlyRootEntity({ rootEntityName: 'Cluster' })
