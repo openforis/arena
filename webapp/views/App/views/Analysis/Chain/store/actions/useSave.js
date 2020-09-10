@@ -8,17 +8,17 @@ import * as A from '@core/arena'
 
 import * as Validation from '@core/validation/validation'
 
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
+import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as ChainValidator from '@common/analysis/processingChainValidator'
+
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { AppSavingActions } from '@webapp/store/app'
 import { useLang } from '@webapp/store/system'
-import * as ChainValidator from '@common/analysis/processingChainValidator'
-
-import * as Chain from '@common/analysis/processingChain'
-import * as Step from '@common/analysis/processingStep'
-import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { State } from '../state'
 
@@ -77,14 +77,18 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
+      const chainSaved = Chain.dissocTemporary(chainToSave)
+      const stepSaved = step ? Step.dissocTemporary(step) : null
+      const calculationSaved = calculation ? Calculation.dissocTemporary(calculation) : null
+
       setState(
         A.pipe(
-          State.assocChain(chainToSave),
-          State.assocChainEdit(chainToSave),
-          State.assocStep(step),
-          State.assocStepEdit(step),
-          State.assocCalculation(calculation),
-          State.assocCalculationEdit(calculation)
+          State.assocChain(chainSaved),
+          State.assocChainEdit(chainSaved),
+          State.assocStep(stepSaved),
+          State.assocStepEdit(stepSaved),
+          State.assocCalculation(calculationSaved),
+          State.assocCalculationEdit(calculationSaved)
         )(state)
       )
 
