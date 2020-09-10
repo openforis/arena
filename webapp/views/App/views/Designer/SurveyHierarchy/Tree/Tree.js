@@ -185,14 +185,14 @@ export default class Tree {
 
     grid
       .append('xhtml:a')
-      .on('click', (d) => this.onEntityClick(d.data.uuid))
+      .on('click', (_, d) => this.onEntityClick(d.data.uuid))
       .text((d) => NodeDef.getLabel(d.data, this.lang))
 
     grid
       .append('xhtml:button')
       .attr('class', 'btn')
       .style('display', (d) => (hasChildren(d) ? 'block' : 'none'))
-      .on('click', (d) => this.toggleNode(d))
+      .on('click', (_, d) => this.toggleNode(d))
       .append('xhtml:span')
       .attr('class', 'icon icon-tree icon-12px')
 

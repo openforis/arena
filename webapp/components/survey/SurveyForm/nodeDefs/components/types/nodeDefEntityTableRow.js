@@ -15,7 +15,6 @@ const NodeDefEntityTableRow = (props) => {
   const { edit, nodeDef, nodeDefColumns, node, canEditRecord, canEditDef, renderType, i = 'header', removeNode } = props
 
   const placeholderRef = useRef()
-  const placeholder = placeholderRef.current
   const rowRef = useRef()
   const [dragged, setDragged] = useState(null)
 
@@ -23,6 +22,7 @@ const NodeDefEntityTableRow = (props) => {
 
   const dragStart = (evt) => {
     const { currentTarget, dataTransfer } = evt
+    const placeholder = placeholderRef.current
 
     placeholder.style.width = `${currentTarget.clientWidth}px`
     placeholder.style.height = `${currentTarget.clientHeight}px`
@@ -36,6 +36,7 @@ const NodeDefEntityTableRow = (props) => {
 
   const dragOver = (evt) => {
     evt.preventDefault()
+    const placeholder = placeholderRef.current
 
     dragged.style.display = 'none'
     placeholder.style.display = 'block'
@@ -53,7 +54,9 @@ const NodeDefEntityTableRow = (props) => {
   }
 
   const dragEnd = () => {
-    dragged.style.display = 'block'
+    const placeholder = placeholderRef.current
+    
+    dragged.style.display = 'block'    
     placeholder.style.display = 'none'
 
     placeholder.parentNode.insertBefore(dragged, placeholder)
