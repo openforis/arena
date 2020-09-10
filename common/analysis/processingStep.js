@@ -40,10 +40,7 @@ export const { isEqual, isTemporary } = ObjectUtils
 export const { dissocTemporary, mergeProps } = ObjectUtils
 
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
-export const assocCalculations = (calculations) => {
-  const calculationUuids = R.pluck(Calculation.keys.uuid)(calculations)
-  return R.pipe(R.assoc(keys.calculations, calculations), assocCalculationUuids(calculationUuids))
-}
+export const assocCalculations = R.assoc(keys.calculations)
 
 export const assocCalculation = (calculation) =>
   R.assocPath([keys.calculations, Calculation.getIndex(calculation)], calculation)

@@ -20,7 +20,7 @@ export const useDismiss = ({ setState }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-  const resetCalculation = () => () => {
+  const resetCalculation = () => {
     // dissoc calculation and calculationEdit
     // if calculation is temporal remove from step
     // if this calculation is not temporal back to the original and recalculate validation on chain
@@ -57,16 +57,15 @@ export const useDismiss = ({ setState }) => {
   }
 
   return useCallback(({ state }) => {
-    const calculationDirty = State.isCalculationDirty(state)
-    if (calculationDirty) {
+    if (State.isCalculationDirty(state)) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: resetCalculation({ state }),
+          onOk: resetCalculation,
         })
       )
     } else {
-      resetCalculation({ state })()
+      resetCalculation()
     }
   }, [])
 }
