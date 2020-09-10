@@ -26,7 +26,7 @@ const expectItemsInOrder = async ({ items, expectedItems }) =>
   )
 
 const expectItemsAreInOrder = async ({ items: expectedItems, selector }) => {
-  const items = await getElements(selector)
+  const items = await getElements({ selector })
   await expectToBe({ selector, numberOfItems: items.length })
   await expectItemsInOrder({ items, expectedItems })
 }
