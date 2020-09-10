@@ -33,7 +33,7 @@ export const run = async () => {
 
   const app = express()
 
-  if (ProcessUtils.ENV.nodeEnv === 'development') {
+  if (ProcessUtils.isEnvDevelopment) {
     app.use(morgan('dev'))
   }
 
