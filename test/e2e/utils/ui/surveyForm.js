@@ -1,4 +1,4 @@
-import { expectExists, expectToBe, getElement } from '../api'
+import { expectExists, expectToBe, getElements } from '../api'
 
 export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
@@ -8,14 +8,8 @@ const getNodeDefElementText = async ({ item }) => {
   return text
 }
 
-const getNodeDefElements = async () => {
-  const elements = await getElement({ selector: '.survey-form__node-def-page-item' })
-  const items = await elements.elements()
-  return items
-}
-
 export const expectItemIsTheLastNodeDef = async ({ item }) => {
-  const items = await getNodeDefElements()
+  const items = await getElements({ selector: '.survey-form__node-def-page-item' })
 
   const last = items[items.length - 1]
 
@@ -23,18 +17,28 @@ export const expectItemIsTheLastNodeDef = async ({ item }) => {
   await expect(itemText).toBe(item.label.toUpperCase())
 }
 
-export const expectItemsAreInOrderAsNodeDef = async ({ items: nodeDefItems }) => {
-  const items = await getNodeDefElements()
-
-  await expectToBe({
-    selector: '.survey-form__node-def-page-item',
-    numberOfItems: items.length,
-  })
-
-  await Promise.all(
+const expectItemsInOrder = async ({ items, expectedItems }) =>
+  Promise.all(
     items.map(async (item, index) => {
       const itemText = await getNodeDefElementText({ item })
-      await expect(itemText).toBe(nodeDefItems[index].label.toUpperCase())
+      await expect(itemText).toBe(expectedItems[index].label.toUpperCase())
     })
   )
+
+const expectItemsAreInOrder = async ({ items: expectedItems, selector }) => {
+  const items = await getElements(selector)
+  await expectToBe({ selector, numberOfItems: items.length })
+  await expectItemsInOrder({ items, expectedItems })
 }
+
+export const expectSurveyFormItemsAreInOrder = async ({ items }) =>
+  expectItemsAreInOrder({
+    items,
+    selector: '.survey-form__node-def-page-item',
+  })
+
+export const expectSurveyFormEntityItemsAreInOrder = async ({ items }) =>
+  expectItemsAreInOrder({
+    items,
+    selector: '.survey-form__node-def-entity-table-rows .survey-form__node-def-page-item',
+  })
