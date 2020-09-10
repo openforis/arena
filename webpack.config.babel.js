@@ -41,8 +41,6 @@ const gitRevisionPlugin = new GitRevisionPlugin()
 
 // ==== init plugins
 const plugins = [
-  isDevelopment && new webpack.HotModuleReplacementPlugin(),
-  isDevelopment && new ReactRefreshWebpackPlugin(),
   gitRevisionPlugin,
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css',
@@ -72,7 +70,12 @@ const plugins = [
     filename: fontCssFileName,
   }),
   new CleanUpStatsPlugin(),
-].filter(Boolean)
+]
+
+if (isDevelopment) {
+  plugins.push(new webpack.HotModuleReplacementPlugin())
+  plugins.push(new ReactRefreshWebpackPlugin())
+}
 
 if (buildReport) {
   plugins.push(new BundleAnalyzerPlugin())
@@ -135,7 +138,7 @@ const webPackConfig = {
           {
             loader: 'babel-loader',
             options: {
-              plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
+              plugins: isDevelopment ? [require.resolve('react-refresh/babel')] : [],
             },
           },
         ],
