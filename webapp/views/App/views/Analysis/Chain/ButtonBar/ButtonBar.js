@@ -21,7 +21,7 @@ const ButtonBar = (props) => {
   const editingChain = Boolean(State.getChainEdit(state))
   const editingStep = Boolean(State.getStepEdit(state))
   const editingCalculation = Boolean(State.getCalculationEdit(state))
-  const dirty = State.isChainDirty(state) || State.isStepDirty(state) || State.isCalculationDirty(state)
+  const dirty = State.isDirty(state)
 
   return (
     <>

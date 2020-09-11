@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as A from '@core/arena'
 
 import * as Chain from '@common/analysis/processingChain'
@@ -30,16 +32,19 @@ export const getAttributeUuidsOtherChains = A.prop(keys.attributeUuidsOtherChain
 
 export const getChain = A.prop(keys.chain)
 export const getChainEdit = A.prop(keys.chainEdit)
-export const isChainDirty = (state) => Chain.isTemporary(getChain(state)) || getChain(state) !== getChainEdit(state)
+export const isChainDirty = (state) =>
+  Chain.isTemporary(getChain(state)) || !R.equals(getChain(state))(getChainEdit(state))
 
 export const getStep = A.prop(keys.step)
 export const getStepEdit = A.prop(keys.stepEdit)
-export const isStepDirty = (state) => Step.isTemporary(getStep(state)) || getStep(state) !== getStepEdit(state)
+export const isStepDirty = (state) => Step.isTemporary(getStep(state)) || !R.equals(getStep(state))(getStepEdit(state))
 
 export const getCalculation = A.prop(keys.calculation)
 export const getCalculationEdit = A.prop(keys.calculationEdit)
 export const isCalculationDirty = (state) =>
-  Calculation.isTemporary(getCalculation(state)) || getCalculation(state) !== getCalculationEdit(state)
+  Calculation.isTemporary(getCalculation(state)) || !R.equals(getCalculation(state))(getCalculationEdit(state))
+
+export const isDirty = (state) => isChainDirty(state) || isStepDirty(state) || isCalculationDirty(state)
 
 // ==== UPDATE
 export const assocChain = A.assoc(keys.chain)
