@@ -13,35 +13,39 @@ import { State } from '../../state'
 export const useSelect = ({ setState }) => {
   const dispatch = useDispatch()
 
-  const select = ({ calculation, state }) => () => {
-    const currentCalculation = State.getCalculationEdit(state)
+  const select = ({ calculation }) => {
+    setState((statePrev) => {
+      const stepEditPrev = State.getStepEdit(statePrev)
+      const calculationPrev = State.getCalculation(statePrev)
+      const calculationEditPrev = State.getCalculationEdit(statePrev)
 
-    let stepEdit = State.getStepEdit(state)
-    if (!A.isEmpty(currentCalculation)) {
-      stepEdit = Calculation.isTemporary(currentCalculation)
-        ? Step.dissocCalculation(currentCalculation)(stepEdit)
-        : Step.assocCalculation(State.getCalculation(state))(stepEdit)
-    }
-    setState(
-      A.pipe(
-        State.assocStepEdit(stepEdit),
+      let stepEditUpdated
+      if (A.isEmpty(calculationEditPrev)) {
+        stepEditUpdated = stepEditPrev
+      } else {
+        stepEditUpdated = Calculation.isTemporary(calculationEditPrev)
+          ? Step.dissocCalculation(calculationEditPrev)(stepEditPrev)
+          : Step.assocCalculation(calculationPrev)(stepEditPrev)
+      }
+
+      return A.pipe(
+        State.assocStepEdit(stepEditUpdated),
         State.assocCalculation(calculation),
         State.assocCalculationEdit(calculation)
-      )(state)
-    )
+      )(statePrev)
+    })
   }
 
   return useCallback(({ calculation, state }) => {
-    const calculationDirty = State.isCalculationDirty(state)
-    if (calculationDirty) {
+    if (State.isCalculationDirty(state)) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: select({ calculation, state }),
+          onOk: () => select({ calculation }),
         })
       )
     } else {
-      select({ calculation, state })()
+      select({ calculation })
     }
   }, [])
 }

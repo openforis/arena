@@ -1,17 +1,17 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-
-import { DialogConfirmActions } from '@webapp/store/ui'
+import * as R from 'ramda'
 
 import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
 
 import * as Step from '@common/analysis/processingStep'
 import * as Chain from '@common/analysis/processingChain'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import * as Survey from '@core/survey/survey'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { State } from '../../state'
 
@@ -20,46 +20,52 @@ export const useDismiss = ({ setState }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-  const resetCalculation = ({ state }) => () => {
-    const calculation = State.getCalculation(state)
-    const calculationEdit = State.getCalculationEdit(state)
-    const stepEdit = State.getStepEdit(state)
-
+  const resetCalculation = () => {
     // dissoc calculation and calculationEdit
     // if calculation is temporal remove from step
     // if this calculation is not temporal back to the original and recalculate validation on chain
-    setState(
-      A.pipe(
-        State.assocChainEdit(
-          Calculation.isTemporary(calculationEdit)
-            ? State.getChainEdit(state)
-            : Chain.assocItemValidation(
-                Calculation.getUuid(calculation),
-                ChainValidator.validateCalculation(calculation, surveyDefaultLang)
-              )(State.getChainEdit(state))
+    setState((statePrev) => {
+      const chainEdit = State.getChainEdit(statePrev)
+      const stepEdit = State.getStepEdit(statePrev)
+      const calculation = State.getCalculation(statePrev)
+      const calculationEdit = State.getCalculationEdit(statePrev)
+      const calculationTemporary = Calculation.isTemporary(calculationEdit)
+
+      const stepEditUpdated = calculationTemporary
+        ? Step.dissocCalculation(calculationEdit)(stepEdit)
+        : Step.assocCalculation(calculation)(stepEdit)
+
+      const chainEditUpdated = A.pipe(
+        R.ifElse(
+          R.always(calculationTemporary),
+          A.identity,
+          Chain.assocItemValidation(
+            Calculation.getUuid(calculation),
+            ChainValidator.validateCalculation(calculation, surveyDefaultLang)
+          )
         ),
-        State.assocStepEdit(
-          Calculation.isTemporary(calculationEdit)
-            ? Step.dissocCalculation(calculationEdit)(stepEdit)
-            : Step.assocCalculation(calculation)(stepEdit)
-        ),
+        Chain.assocProcessingStep(stepEditUpdated)
+      )(chainEdit)
+
+      return A.pipe(
+        State.assocChainEdit(chainEditUpdated),
+        State.assocStepEdit(stepEditUpdated),
         State.dissocCalculation,
         State.dissocCalculationEdit
-      )(state)
-    )
+      )(statePrev)
+    })
   }
 
   return useCallback(({ state }) => {
-    const calculationDirty = State.isCalculationDirty(state)
-    if (calculationDirty) {
+    if (State.isCalculationDirty(state)) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: resetCalculation({ state }),
+          onOk: resetCalculation,
         })
       )
     } else {
-      resetCalculation({ state })()
+      resetCalculation()
     }
   }, [])
 }
