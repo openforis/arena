@@ -13,36 +13,37 @@ import { State } from '../../state'
 export const useSelect = ({ setState }) => {
   const dispatch = useDispatch()
 
-  const select = ({ step, state }) => () => {
-    const stepEdit = State.getStepEdit(state)
-    const chainUpdated = State.getChainEdit(state)
+  const select = ({ step }) => {
+    setState((statePrev) => {
+      const chainEditPrev = State.getChainEdit(statePrev)
+      const stepPrev = State.getStep(statePrev)
+      const stepEditPrev = State.getStepEdit(statePrev)
 
-    setState(
-      A.pipe(
-        State.assocChainEdit(
-          !A.isEmpty(stepEdit) && !Step.isTemporary(stepEdit)
-            ? Chain.assocProcessingStep(State.getStep(state))(chainUpdated)
-            : Chain.dissocProcessingStepTemporary(chainUpdated)
-        ),
+      const chainEditUpdated =
+        !A.isEmpty(stepEditPrev) && !Step.isTemporary(stepEditPrev)
+          ? Chain.assocProcessingStep(stepPrev)(chainEditPrev)
+          : Chain.dissocProcessingStepTemporary(chainEditPrev)
+
+      return A.pipe(
+        State.assocChainEdit(chainEditUpdated),
         State.assocStep(step),
         State.assocStepEdit(step),
         State.dissocCalculation,
         State.dissocCalculationEdit
-      )(state)
-    )
+      )(statePrev)
+    })
   }
 
   return useCallback(({ step, state }) => {
-    const stepDirty = State.isStepDirty(state)
-    if (stepDirty) {
+    if (State.isStepDirty(state) || State.isCalculationDirty(state)) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.cancelConfirm',
-          onOk: select({ step, state }),
+          onOk: () => select({ step }),
         })
       )
     } else {
-      select({ step, state })()
+      select({ step })
     }
   }, [])
 }
