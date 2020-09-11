@@ -1,4 +1,6 @@
-import { getElement } from '../api'
+import { expectExists, expectToBe, getElement } from '../api'
+
+export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
 const getNodeDefElementText = async ({ item }) => {
   const itemText = await item.text()
@@ -24,8 +26,15 @@ export const expectItemIsTheLastNodeDef = async ({ item }) => {
 export const expectItemsAreInOrderAsNodeDef = async ({ items: nodeDefItems }) => {
   const items = await getNodeDefElements()
 
-  await items.map(async (item, index) => {
-    const itemText = await getNodeDefElementText({ item })
-    await expect(itemText).toBe(nodeDefItems[index].label.toUpperCase())
+  await expectToBe({
+    selector: '.survey-form__node-def-page-item',
+    numberOfItems: items.length,
   })
+
+  await Promise.all(
+    items.map(async (item, index) => {
+      const itemText = await getNodeDefElementText({ item })
+      await expect(itemText).toBe(nodeDefItems[index].label.toUpperCase())
+    })
+  )
 }
