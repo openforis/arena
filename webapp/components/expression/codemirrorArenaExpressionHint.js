@@ -4,6 +4,8 @@ const functionExamples = {
   min: 'max(3,1) = 1',
   max: 'max(3,1,2) = 3',
   pow: 'pow(2,3) = 2³ = 8',
+  ln: 'ln(10) = 2.302…',
+  log10: 'log10(100) = 2',
 }
 
 const nonIdRegex = /[^\w_]/
