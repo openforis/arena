@@ -31,41 +31,39 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   }, [data])
 
   return ({ newest }) => {
-    ;(async () => {
-      const params = {}
-      const initialized = messages.length > 0
+    const params = {}
+    const initialized = messages.length > 0
 
-      if (initialized) {
-        if (newest) {
-          params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
-        } else {
-          params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
-        }
+    if (initialized) {
+      if (newest) {
+        params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
+      } else {
+        params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
       }
+    }
 
-      const { request, cancel } = API.fetchActivityLogs({ surveyId, params })
-      cancelRequestRef.current = cancel
+    const { request, cancel } = API.fetchActivityLogs({ surveyId, params })
+    cancelRequestRef.current = cancel
 
-      request
-        .then(({ data: { activityLogs } }) => {
-          if (A.isEmpty(activityLogs)) {
-            return null
-          }
+    request
+      .then(({ data: { activityLogs } }) => {
+        if (A.isEmpty(activityLogs)) {
+          return null
+        }
 
-          const highlighted = newest && initialized
+        const highlighted = newest && initialized
 
-          const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-          const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
-          const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
-          if (newMessages) {
-            setData(newMessages)
-          }
-          return newMessages
-        })
-        .catch(() => {
-          // canceled
-        })
-    })()
+        const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+        const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
+        const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
+        if (newMessages) {
+          setData(newMessages)
+        }
+        return newMessages
+      })
+      .catch(() => {
+        // canceled
+      })
   }
 }
 
