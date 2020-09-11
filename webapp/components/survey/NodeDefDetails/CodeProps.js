@@ -19,12 +19,12 @@ import { State } from './store'
 
 const displayAsItems = ({ i18n }) => [
   {
-    key: NodeDefLayout.renderType.checkbox,
-    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
-  },
-  {
     key: NodeDefLayout.renderType.dropdown,
     label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
+  },
+  {
+    key: NodeDefLayout.renderType.checkbox,
+    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
   },
 ]
 
