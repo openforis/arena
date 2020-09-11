@@ -63,7 +63,7 @@ const propsUI = {
     icon: <span className="icon icon-list icon-left" />,
     defaultValue: '',
     defaultProps: (cycle) => ({
-      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox),
+      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.dropdown),
     }),
   },
 
