@@ -3,7 +3,12 @@ export { clickHomeBtnEditSurveyInfo, expectHomeDashboard } from './home'
 export { waitForLoader } from './loader'
 export { addItemToPage } from './nodeDefDetail'
 export { clickSidebarBtnHome, clickSidebarBtnSurveyForm } from './sidebar'
-export { expectItemIsTheLastNodeDef, expectItemsAreInOrderAsNodeDef, expectSurveyFormLoaded } from './surveyForm'
+export {
+  expectItemIsTheLastNodeDef,
+  expectSurveyFormItemsAreInOrder,
+  expectSurveyFormEntityItemsAreInOrder,
+  expectSurveyFormLoaded,
+} from './surveyForm'
 export {
   editSurveyFormPage,
   addSurveyFormSubPage,
