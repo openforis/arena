@@ -8,9 +8,15 @@ const selectors = {
   multiple: () => toRightOf('Multiple'),
 }
 
-export const addItemToPage = async ({ type, name, label, isKey, isMultiple }) => {
-  const pencilIcon = await getElement({ selector: '.icon-pencil2' })
-  await click(await getElement({ selector: '.icon-plus' }), toRightOf(pencilIcon))
+export const addItemToPage = async ({
+  type,
+  name,
+  label,
+  isKey,
+  isMultiple,
+  addButtonSelector = '.survey-form__node-def-edit-buttons .icon-plus',
+}) => {
+  await click(await getElement({ selector: addButtonSelector }))
 
   await click(type)
 
