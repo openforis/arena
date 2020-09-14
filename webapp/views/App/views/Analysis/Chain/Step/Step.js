@@ -42,7 +42,7 @@ const StepComponent = (props) => {
   const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(stepEdit))(chainEdit)
-  const hasCalculationSteps = (Step.getCalculationsCount(stepEdit) || []).length > 0
+  const hasCalculationSteps = Step.getCalculations(stepEdit).length > 0
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(stepEdit)
 
