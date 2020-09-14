@@ -1,10 +1,10 @@
 import * as R from 'ramda'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import * as A from '@core/arena'
 
-import { useInterval } from '@webapp/components/hooks'
+import { useInterval, useRequest } from '@webapp/components/hooks'
 
 import * as API from '@webapp/service/api'
 
@@ -18,52 +18,53 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
-  const [data, setData] = useState([])
-  const cancelRequestRef = useRef(null)
+  const [params, setParams] = useState({})
+  const [newest, setNewest] = useState({})
+  const [hasToFetch, setHasToFetch] = useState(false)
 
-  useEffect(() => {
-    setMessages(data || [])
-    return () => {
-      if (cancelRequestRef.current) {
-        cancelRequestRef.current()
-      }
+  const prepareData = (fetchedData) => {
+    const initialized = messages.length > 0
+    const { activityLogs } = fetchedData
+    if (A.isEmpty(activityLogs)) {
+      return null
     }
-  }, [data])
+    const highlighted = newest && initialized
 
-  return ({ newest }) => {
-    const params = {}
+    const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+    const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
+    const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
+    if (newMessages) {
+      setMessages(newMessages)
+    }
+    return newMessages
+  }
+
+  useRequest({
+    condition: hasToFetch,
+    defaultValue: [],
+    requestFunction: API.fetchActivityLogs,
+    requestArguments: [{ surveyId, params }],
+    prepareData,
+    dependencies: [params],
+  })
+
+  return ({ newest: _newest }) => {
+    const _params = {}
     const initialized = messages.length > 0
 
     if (initialized) {
-      if (newest) {
-        params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
+      if (_newest) {
+        _params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
       } else {
-        params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
+        _params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
       }
     }
 
-    const { request, cancel } = API.fetchActivityLogs({ surveyId, params })
-    cancelRequestRef.current = cancel
-
-    request
-      .then(({ data: { activityLogs } }) => {
-        if (A.isEmpty(activityLogs)) {
-          return null
-        }
-
-        const highlighted = newest && initialized
-
-        const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-        const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
-        const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
-        if (newMessages) {
-          setData(newMessages)
-        }
-        return newMessages
-      })
-      .catch(() => {
-        // canceled
-      })
+    setParams(_params)
+    setNewest(_newest)
+    if (!hasToFetch) {
+      setHasToFetch(true)
+    }
   }
 }
 
