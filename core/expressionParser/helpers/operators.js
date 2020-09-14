@@ -20,6 +20,7 @@ const arithmetic = {
   mul: { key: '*', value: '*' },
   div: { key: '/', value: '/' },
   mod: { key: '%', value: '%' },
+  exp: { key: '**', value: '**' },
 }
 
 const binary = R.mergeLeft(arithmetic, comparison)
@@ -42,6 +43,7 @@ const js2sqlOperators = {
   '*': '*',
   '/': '/',
   '%': '%',
+  '**': '^',
 }
 
 export const operators = {
