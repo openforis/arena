@@ -405,6 +405,8 @@ $t(common.cantUndoWarning)`,
       min: 'Take the minimum of the arguments',
       max: 'Take the maximum of the arguments',
       pow: 'Raise a number X to the power P',
+      ln: 'Take the natural logarithm of x',
+      log10: 'Take the base 10 logarithm of x',
     },
     basicProps: {
       key: 'Key',

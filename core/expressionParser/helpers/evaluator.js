@@ -13,6 +13,9 @@ import { types } from './types'
 const stdlib = {
   pow: [Math.pow, 2], // Arity 2
 
+  ln: [Math.log, 1],
+  log10: [Math.log10, 1],
+
   // arity 1+ (arity 0 allowed by JS)
   min: [Math.min, 1, -1],
   max: [Math.max, 1, -1],
@@ -56,6 +59,7 @@ const arithmeticOperators = {
   '*': (a, b) => a * b,
   '/': (a, b) => a / b,
   '%': (a, b) => a % b,
+  '**': (a, b) => a ** b,
   // Don't allow bitwise operators:
   // '|':   (a, b) => a | b,
   // '^':   (a, b) => a ^ b,
