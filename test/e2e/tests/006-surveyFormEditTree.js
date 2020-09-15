@@ -7,8 +7,8 @@ import {
 
 const nodeDefItems = [
   { type: 'integer', name: 'tree_id', label: 'Tree id', isKey: true },
-  { type: 'text', name: 'tree_text', label: 'Tree text', isKey: false },
-  { type: 'file', name: 'tree_file', label: 'Tree file', isKey: false },
+  { type: 'decimal', name: 'tree_dec_1', label: 'Tree decimal 1', isKey: false },
+  { type: 'decimal', name: 'tree_dec_2', label: 'Tree decimal 2', isKey: false },
 ]
 
 describe('SurveyForm edit Tree', () => {
