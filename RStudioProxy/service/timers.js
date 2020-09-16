@@ -20,14 +20,14 @@ const initTimers = async () => {
   console.log('INSTANCES', instances)
   return Promise.all(
     (instances || []).map(async (instance) => {
-      console.log('NEW_TIMER', instanceId, Object.keys(timeoutsMap).length)
+      console.log('NEW_TIMER', instance, Object.keys(timeoutsMap).length)
       return setTimer({ instanceId: instance })
     })
   )
 }
 
 const timeoutMiddleware = async (req, res, next) => {
-  const instanceId = req.instanceId
+  const { instanceId } = req
 
   if (!areTimersInitialized) {
     console.log('INIT TIMERS')
