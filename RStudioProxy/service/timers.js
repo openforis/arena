@@ -1,58 +1,53 @@
-const { redis } = require("../infrastructure");
+const { redis } = require('../infrastructure')
 
-var timeoutsMap = {};
-var areTimersInitialized = false;
+const timeoutsMap = {}
+let areTimersInitialized = false
 
 const setTimer = async ({ instanceId }) =>
   new Promise((resolve) => {
-    clearTimeout(timeoutsMap[instanceId]);
+    clearTimeout(timeoutsMap[instanceId])
 
     const timer = setTimeout(async () => {
-      console.log("KILL_TIMER", instanceId);
-    }, 10000);
+      console.log('KILL_TIMER', instanceId)
+    }, 10000)
 
-    timeoutsMap[instanceId] = timer;
-    resolve();
-  });
+    timeoutsMap[instanceId] = timer
+    resolve()
+  })
 
 const initTimers = async () => {
-  const instances = await redis.keys();
-  console.log("INSTANCES", instances);
+  const instances = await redis.keys()
+  console.log('INSTANCES', instances)
   return Promise.all(
     (instances || []).map(async (instance) => {
-      console.log("NEW_TIMER", instanceId, Object.keys(timeoutsMap).length);
-      return setTimer({ instanceId: instance });
+      console.log('NEW_TIMER', instanceId, Object.keys(timeoutsMap).length)
+      return setTimer({ instanceId: instance })
     })
-  );
-};
+  )
+}
 
 const timeoutMiddleware = async (req, res, next) => {
-  instanceId = req.instanceId;
+  const instanceId = req.instanceId
 
   if (!areTimersInitialized) {
-    console.log("INIT TIMERS");
-    await initTimers();
-    areTimersInitialized = true;
+    console.log('INIT TIMERS')
+    await initTimers()
+    areTimersInitialized = true
   }
 
   if (instanceId) {
-    await setTimer({ instanceId });
+    await setTimer({ instanceId })
   }
 
-  next();
-};
+  next()
+}
 
 const timmersMiddleware = (req, res, next) => {
-  console.log(
-    "TIMMERS",
-    Object.keys(timeoutsMap),
-    "initialized:",
-    areTimersInitialized
-  );
-  next();
-};
+  console.log('TIMMERS', Object.keys(timeoutsMap), 'initialized:', areTimersInitialized)
+  next()
+}
 
 module.exports = {
   timeoutMiddleware,
   timmersMiddleware,
-};
+}
