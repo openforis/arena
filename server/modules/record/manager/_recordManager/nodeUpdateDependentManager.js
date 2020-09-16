@@ -85,7 +85,10 @@ export const updateSelfAndDependentsDefaultValues = async (survey, record, node,
   const nodeDependentPointersFilterFn = nodePointer => {
     const { nodeCtx, nodeDef } = nodePointer
 
-    return NodeDef.isAttribute(nodeDef) && (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx))
+    return (
+      NodeDef.isAttribute(nodeDef) &&
+      (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx) || NodeDef.isReadOnly(nodeDef))
+    )
   }
 
   const nodePointersToUpdate = Record.getDependentNodePointers(
