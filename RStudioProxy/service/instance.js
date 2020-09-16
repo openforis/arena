@@ -16,7 +16,7 @@ const getInstanceMiddleware = async (req, res, next) => {
   const instanceIdOnReferer = req.headers.referer
     ? getInstanceIdByReferer({
         instances,
-        referer: req.headers.referer || '',
+        referer: req.headers.referer,
       })
     : false
   if (instanceIdOnReferer) {
