@@ -285,3 +285,7 @@ modules.xml
 .idea/sonarlint
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,terraform,webstorm+all,visualstudiocode
+
+
+# RStudioPoolService
+RStudioPoolService/node_modules/
