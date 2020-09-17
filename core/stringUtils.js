@@ -10,11 +10,11 @@ export const trim = R.pipe(R.defaultTo(''), R.trim)
 
 export const leftTrim = R.replace(/^\s+/, '')
 
-export const padStart = (length, padString) => R.pipe(String, s => s.padStart(length, padString))
+export const padStart = (length, padString) => R.pipe(String, (s) => s.padStart(length, padString))
 
 const toLower = R.pipe(trim, R.toLower)
 
-export const truncate = maxLength => text => (text.length > maxLength ? text.slice(0, maxLength) + '...' : text)
+export const truncate = (maxLength) => (text) => (text.length > maxLength ? text.slice(0, maxLength) + '...' : text)
 
 export const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
@@ -29,6 +29,15 @@ export const isNotBlank = R.pipe(isBlank, R.not)
  */
 export const normalizeName = R.pipe(leftTrim, R.toLower, R.replace(/[^a-z0-9]/g, '_'), R.slice(0, 40))
 
-export const capitalizeFirstLetter = text => text.charAt(0).toUpperCase() + text.slice(1)
+export const capitalizeFirstLetter = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 
 export const removeNewLines = R.when(isString, R.pipe(R.split(/\r\n|\r|\n/g), R.join(' ')))
+
+/**
+ * Returns an empty string if the passed value is null or it's an invalid number.
+ *
+ * @param {!any} value
+ * @returns {string} Empty string if the specified value is null or an invalid number.
+ */
+export const nullToEmpty = (value) =>
+  value === null || (value instanceof Number && Number.isNaN(value)) ? '' : String(value)

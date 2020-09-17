@@ -4,6 +4,8 @@ import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
 
+import * as StringUtils from '@core/stringUtils'
+
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
@@ -32,7 +34,8 @@ export const Input = React.forwardRef((props, ref) => {
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
-    if (newValue !== value) {
+    const oldValue = StringUtils.nullToEmpty(value)
+    if (newValue !== oldValue) {
       if (selectionAllowed) {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
       }
