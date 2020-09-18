@@ -4,8 +4,6 @@ import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
 
-import * as StringUtils from '@core/stringUtils'
-
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
@@ -31,17 +29,15 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
+  const valueText = value === null || Number.isNaN(value) ? '' : String(value)
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
-    const oldValue = StringUtils.nullToEmpty(value)
-    if (newValue !== oldValue) {
-      if (selectionAllowed) {
-        selectionRef.current = [input.selectionStart, input.selectionEnd]
-      }
-      if (onChange) {
-        onChange(newValue)
-      }
+    if (selectionAllowed) {
+      selectionRef.current = [input.selectionStart, input.selectionEnd]
+    }
+    if (onChange) {
+      onChange(newValue)
     }
   }
 
@@ -62,7 +58,7 @@ export const Input = React.forwardRef((props, ref) => {
             inputRef.current = el
           },
           id,
-          onValueChange: ({ formattedValue: newValue }) => handleValueChange(newValue),
+          onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
           onFocus,
           onBlur,
           placeholder,

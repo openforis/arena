@@ -32,12 +32,3 @@ export const normalizeName = R.pipe(leftTrim, R.toLower, R.replace(/[^a-z0-9]/g,
 export const capitalizeFirstLetter = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 
 export const removeNewLines = R.when(isString, R.pipe(R.split(/\r\n|\r|\n/g), R.join(' ')))
-
-/**
- * Returns an empty string if the passed value is null or it's an invalid number,
- * otherwise returns the specified value converted to string.
- *
- * @param {!any} value
- * @returns {string} Empty string if the specified value is null or an invalid number or the specified value.
- */
-export const nullToEmpty = (value) => (value === null || Number.isNaN(value) ? '' : String(value))
