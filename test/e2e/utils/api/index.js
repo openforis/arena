@@ -1,3 +1,4 @@
+export { below } from './below'
 export { closeBrowser, openBrowser } from './browser'
 export { button } from './button'
 export { click, clickParent } from './click'

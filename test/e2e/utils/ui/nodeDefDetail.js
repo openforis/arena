@@ -1,4 +1,4 @@
-import { click, getElement, toRightOf, writeIntoTextBox } from '../api'
+import { button, click, getElement, near, toRightOf, writeIntoTextBox } from '../api'
 import { waitForLoader } from './loader'
 
 const selectors = {
@@ -15,6 +15,7 @@ export const addItemToPage = async ({
   isKey,
   isMultiple,
   addButtonSelector = '.survey-form__node-def-edit-buttons .icon-plus',
+  saveAndBack = true,
 }) => {
   await click(await getElement({ selector: addButtonSelector }))
 
@@ -28,8 +29,14 @@ export const addItemToPage = async ({
   if (isMultiple) {
     await click(await getElement({ selector: '.btn-checkbox' }), selectors.multiple())
   }
-  await click('Save')
-  await waitForLoader()
-  await click('Back')
-  await waitForLoader()
+  if (saveAndBack) {
+    await click('Save')
+    await waitForLoader()
+    await click('Back')
+    await waitForLoader()
+  }
+}
+
+export const clickNodeDefCategoryAdd = async () => {
+  await click(button({ text: 'Add' }, near('Category')))
 }

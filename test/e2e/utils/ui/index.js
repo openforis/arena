@@ -1,7 +1,7 @@
 export { clickHeaderBtnMySurveys, clickHeaderBtnCreateSurvey } from './header'
 export { clickHomeBtnEditSurveyInfo, expectHomeDashboard } from './home'
 export { waitForLoader } from './loader'
-export { addItemToPage } from './nodeDefDetail'
+export { addItemToPage, clickNodeDefCategoryAdd } from './nodeDefDetail'
 export { clickSidebarBtnHome, clickSidebarBtnSurveyForm } from './sidebar'
 export {
   expectItemIsTheLastNodeDef,
@@ -16,3 +16,4 @@ export {
   expectCurrentPageIs,
   expectSurveyFormHasOnlyAndInOrderThesePages,
 } from './surveyFormPage'
+export { writeCategoryName, addCategoryLevel, clickCategoryButtonClose } from './categoryDetails'
