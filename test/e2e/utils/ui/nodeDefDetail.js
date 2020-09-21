@@ -1,4 +1,4 @@
-import { button, click, getElement, near, toRightOf, writeIntoTextBox } from '../api'
+import { button, click, getElement, toRightOf, waitFor, writeIntoTextBox } from '../api'
 import { waitForLoader } from './loader'
 
 const selectors = {
@@ -38,5 +38,6 @@ export const addItemToPage = async ({
 }
 
 export const clickNodeDefCategoryAdd = async () => {
-  await click(button({ text: 'Add' }, near('Category')))
+  await click(button({ class: 'btn-add-category' }))
+  await waitFor(1000)
 }

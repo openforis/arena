@@ -16,4 +16,9 @@ export {
   expectCurrentPageIs,
   expectSurveyFormHasOnlyAndInOrderThesePages,
 } from './surveyFormPage'
-export { writeCategoryName, addCategoryLevel, clickCategoryButtonClose } from './categoryDetails'
+export {
+  writeCategoryName,
+  updateCategoryLevelName,
+  addCategoryLevel,
+  clickCategoryButtonClose,
+} from './categoryDetails'

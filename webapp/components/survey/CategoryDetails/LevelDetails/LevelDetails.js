@@ -54,6 +54,7 @@ const LevelDetails = (props) => {
 
       <FormItem label={i18n.t('common.name')}>
         <Input
+          id={`category-level-name-${level.index + 1}`}
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
           onChange={(value) =>
