@@ -4,3 +4,5 @@ export const clearTextBox = async ({ selector }) => clear(textBox(selector))
 export const hoverTextBox = async ({ selector }) => hover(textBox(selector))
 
 export const writeIntoTextBox = async ({ text, selector }) => write(text, into(textBox(selector)))
+
+export { textBox }

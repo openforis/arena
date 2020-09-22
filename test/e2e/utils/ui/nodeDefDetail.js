@@ -1,4 +1,4 @@
-import { button, click, expectExists, getElement, toRightOf, waitFor, writeIntoTextBox } from '../api'
+import { button, click, expectExists, getElement, textBox, toRightOf, waitFor, writeIntoTextBox } from '../api'
 import { waitForLoader } from './loader'
 
 const selectors = {
@@ -50,3 +50,6 @@ export const clickNodeDefCategoryAdd = async () => {
 export const expectNodeDefCategoryIs = async (categoryName) => {
   await expectExists({ text: categoryName, selector: selectors.category() })
 }
+
+export const expectNodeDefCodeParentIsDisabled = async () =>
+  expect(await textBox(toRightOf('Parent Code')).isDisabled()).toBeTruthy()

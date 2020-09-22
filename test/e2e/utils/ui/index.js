@@ -6,6 +6,7 @@ export {
   clickNodeDefCategoryAdd,
   clickNodeDefSaveAndClose,
   expectNodeDefCategoryIs,
+  expectNodeDefCodeParentIsDisabled,
 } from './nodeDefDetail'
 export { clickSidebarBtnHome, clickSidebarBtnSurveyForm } from './sidebar'
 export {
