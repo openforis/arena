@@ -1,4 +1,4 @@
-import { button, click, getElement, toRightOf, waitFor, writeIntoTextBox } from '../api'
+import { button, click, expectExists, getElement, toRightOf, waitFor, writeIntoTextBox } from '../api'
 import { waitForLoader } from './loader'
 
 const selectors = {
@@ -6,6 +6,14 @@ const selectors = {
   label: () => toRightOf('Label'),
   key: () => toRightOf('Key'),
   multiple: () => toRightOf('Multiple'),
+  category: () => toRightOf('Category'),
+}
+
+export const clickNodeDefSaveAndClose = async () => {
+  await click('Save')
+  await waitForLoader()
+  await click('Back')
+  await waitForLoader()
 }
 
 export const addItemToPage = async ({
@@ -30,14 +38,15 @@ export const addItemToPage = async ({
     await click(await getElement({ selector: '.btn-checkbox' }), selectors.multiple())
   }
   if (saveAndBack) {
-    await click('Save')
-    await waitForLoader()
-    await click('Back')
-    await waitForLoader()
+    await clickNodeDefSaveAndClose()
   }
 }
 
 export const clickNodeDefCategoryAdd = async () => {
   await click(button({ class: 'btn-add-category' }))
   await waitFor(1000)
+}
+
+export const expectNodeDefCategoryIs = async (categoryName) => {
+  await expectExists({ text: categoryName, selector: selectors.category() })
 }

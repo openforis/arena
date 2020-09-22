@@ -1,6 +1,4 @@
-import { below, button, click, toRightOf, writeIntoTextBox, waitFor, clearTextBox } from '../api'
-
-const belowLevel = ({ levelIndex }) => below(`Level ${levelIndex + 1}`)
+import { button, click, toRightOf, writeIntoTextBox, waitFor, clearTextBox } from '../api'
 
 const selectors = {
   name: () => toRightOf('Category name'),
@@ -9,9 +7,9 @@ const selectors = {
 }
 
 const selectorsItem = {
-  add: ({ levelIndex }) => button(belowLevel({ levelIndex }), { class: 'btn-add-item' }),
-  code: ({ levelIndex }) => [belowLevel({ levelIndex }), toRightOf('Code')],
-  label: ({ levelIndex }) => [belowLevel({ levelIndex }), toRightOf('Label')],
+  add: ({ levelIndex }) => ({ id: `category-level-${levelIndex}-btn-item-add` }),
+  code: ({ levelIndex, itemIndex }) => ({ id: `category-level-${levelIndex}-item-${itemIndex}-code` }),
+  label: ({ levelIndex, itemIndex }) => ({ id: `category-level-${levelIndex}-item-${itemIndex}-label-en` }),
 }
 
 export const writeCategoryName = async (text) => {
@@ -33,10 +31,10 @@ export const addCategoryLevel = async ({ levelIndex, name }) => {
   await updateCategoryLevelName({ levelIndex, name })
 }
 
-export const addCategoryItem = async ({ levelIndex, code, label }) => {
-  await click(selectorsItem.add({ levelIndex }))
-  await writeIntoTextBox({ text: code, selector: selectorsItem.code({ levelIndex }) })
-  await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex }) })
+export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) => {
+  await click(button(selectorsItem.add({ levelIndex })))
+  await writeIntoTextBox({ text: code, selector: selectorsItem.code({ levelIndex, itemIndex }) })
+  await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })
 }
 
 export const clickCategoryButtonClose = async () => {

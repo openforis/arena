@@ -1,38 +1,47 @@
 import * as NodeDef from '@core/survey/nodeDef'
-import { expectToBe } from '../utils/api'
 
 import {
   addItemToPage,
+  expectItemIsTheLastNodeDef,
+  expectSurveyFormItemsAreInOrder,
   clickNodeDefCategoryAdd,
+  clickNodeDefSaveAndClose,
+  expectNodeDefCategoryIs,
   writeCategoryName,
-  addCategoryLevel,
-  updateCategoryLevelName,
-  clickSidebarBtnSurveyForm,
-  expectSurveyFormLoaded,
-  waitForLoader,
+  clickCategoryButtonClose,
 } from '../utils/ui'
 
+const nodeDefItems = [
+  { type: NodeDef.nodeDefType.integer, name: 'plot_id', label: 'Plot id', isKey: true },
+  { type: NodeDef.nodeDefType.text, name: 'plot_text', label: 'Plot text', isKey: false },
+  { type: NodeDef.nodeDefType.file, name: 'plot_file', label: 'Plot file', isKey: false },
+  { type: NodeDef.nodeDefType.entity, name: 'tree', label: 'Tree', isKey: false },
+  { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false },
+]
+
 describe('SurveyForm edit Plot: add code attribute', () => {
-  test('Code attribute create', async () => {
-    await waitForLoader()
-    await clickSidebarBtnSurveyForm()
-    await expectSurveyFormLoaded()
+  test(
+    'Code attribute create',
+    async () => {
+      const codeValues = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country' }
+      await addItemToPage({ ...codeValues, saveAndBack: false })
 
-    const codeValues = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country' }
-    await addItemToPage({ ...codeValues, saveAndBack: false })
-  })
+      await clickNodeDefCategoryAdd()
 
-  test('Code attribute - create category', async () => {
-    await clickNodeDefCategoryAdd()
-    await writeCategoryName('administrative_unit')
+      // start of category edit
+      await writeCategoryName('administrative_unit')
+      await clickCategoryButtonClose()
+      // end of category edit
 
-    await updateCategoryLevelName({ levelIndex: 0, name: 'country' })
-    await addCategoryLevel({ levelIndex: 1, name: 'region' })
-    await addCategoryLevel({ levelIndex: 2, name: 'district' })
+      await expectNodeDefCategoryIs('administrative_unit')
 
-    await expectToBe({ selector: '.category__level', numberOfItems: 3 })
-  })
+      await clickNodeDefSaveAndClose()
 
-  //     await expectCurrentPageIs({ label: 'Plot' })
-  //   await expectItemIsTheLastNodeDef({ item: codeValues })
+      await expectItemIsTheLastNodeDef({ item: codeValues })
+      await expectSurveyFormItemsAreInOrder({ items: nodeDefItems })
+    },
+    30 * 1000
+  )
+
+  test('Plot fill form code attribute', async () => {})
 })
