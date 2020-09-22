@@ -34,7 +34,7 @@ const LevelDetails = (props) => {
   const validation = Category.getLevelValidation(levelIndex)(category)
 
   return (
-    <div className="category__level">
+    <div className={`category__level category__level-${level.index}`}>
       <div className="category__level-header">
         <h4 className="label">
           <ErrorBadge validation={validation} showLabel={false} showIcon />
@@ -54,7 +54,7 @@ const LevelDetails = (props) => {
 
       <FormItem label={i18n.t('common.name')}>
         <Input
-          id={`category-level-name-${level.index + 1}`}
+          id={`category-level-${levelIndex}-name`}
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
           onChange={(value) =>
@@ -68,6 +68,7 @@ const LevelDetails = (props) => {
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
         {!readOnly && (
           <button
+            id={`category-level-${levelIndex}-btn-item-add`}
             type="button"
             className="btn btn-s btn-add-item"
             aria-disabled={!canAddItem}
@@ -80,8 +81,15 @@ const LevelDetails = (props) => {
       </div>
 
       <div className="category__level-items">
-        {items.map((item) => (
-          <ItemDetails key={CategoryItem.getUuid(item)} level={level} item={item} state={state} setState={setState} />
+        {items.map((item, index) => (
+          <ItemDetails
+            key={CategoryItem.getUuid(item)}
+            level={level}
+            index={index}
+            item={item}
+            state={state}
+            setState={setState}
+          />
         ))}
       </div>
     </div>

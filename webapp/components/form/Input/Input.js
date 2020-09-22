@@ -9,6 +9,7 @@ import ValidationTooltip from '../../validationTooltip'
 
 export const Input = React.forwardRef((props, ref) => {
   const {
+    className: classNameProps,
     disabled,
     id,
     maxLength,
@@ -29,6 +30,7 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
+  const className = `form-input ${classNameProps || ''}`
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
@@ -54,7 +56,7 @@ export const Input = React.forwardRef((props, ref) => {
       {numberFormat ? (
         React.createElement(NumberFormat, {
           disabled,
-          className: 'form-input',
+          className,
           getInputRef: (el) => {
             inputRef.current = el
           },
@@ -72,7 +74,7 @@ export const Input = React.forwardRef((props, ref) => {
         <input
           ref={inputRef}
           aria-disabled={disabled}
-          className="form-input"
+          className={className}
           disabled={disabled}
           id={id}
           maxLength={maxLength}
@@ -91,6 +93,7 @@ export const Input = React.forwardRef((props, ref) => {
 
 Input.propTypes = {
   disabled: PropTypes.bool,
+  className: PropTypes.string,
   id: PropTypes.string,
   maxLength: PropTypes.number,
   onChange: PropTypes.func,
@@ -111,6 +114,7 @@ Input.propTypes = {
 }
 
 Input.defaultProps = {
+  className: null,
   disabled: false,
   id: null,
   maxLength: null,

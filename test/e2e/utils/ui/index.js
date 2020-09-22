@@ -8,7 +8,7 @@ export {
   expectNodeDefCategoryIs,
   expectNodeDefCodeParentIsDisabled,
 } from './nodeDefDetail'
-export { clickSidebarBtnHome, clickSidebarBtnSurveyForm } from './sidebar'
+export { clickSidebarBtnHome, clickSidebarBtnSurveyForm, clickSidebarBtnDesignerCategories } from './sidebar'
 export {
   expectItemIsTheLastNodeDef,
   expectSurveyFormItemsAreInOrder,
@@ -27,5 +27,8 @@ export {
   updateCategoryLevelName,
   addCategoryLevel,
   addCategoryItem,
+  clickCategoryItem,
+  clickCategoryItemBtnClose,
   clickCategoryButtonClose,
+  clickCategoryButtonDone,
 } from './categoryDetails'
