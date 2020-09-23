@@ -1,4 +1,4 @@
-import { expectExists, expectToBe, getElements } from '../api'
+import { expectExists, expectToBe, getElement, getElements } from '../api'
 
 export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
 
@@ -31,11 +31,11 @@ const expectItemsAreInOrder = async ({ items: expectedItems, selector }) => {
   await expectItemsInOrder({ items, expectedItems })
 }
 
-export const expectSurveyFormItemsAreInOrder = async ({ items }) =>
-  expectItemsAreInOrder({
-    items,
-    selector: '.survey-form__node-def-page-item',
-  })
+export const expectSurveyFormItemsAreInOrder = async ({ items }) => {
+  const grid = await getElement({ selector: '.survey-form__node-def-page .react-grid-layout' })
+  const nodeDefNamesAttribute = await grid.attribute('data-child-def-names-ordered')
+  await expect(nodeDefNamesAttribute.split(',')).toStrictEqual(items.map((item) => item.name))
+}
 
 export const expectSurveyFormEntityItemsAreInOrder = async ({ items }) =>
   expectItemsAreInOrder({

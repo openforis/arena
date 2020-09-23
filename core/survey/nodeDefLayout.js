@@ -49,6 +49,13 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
+export const getLayoutChildrenItemIdsOrdered = (cycle) =>
+  R.pipe(
+    _getPropLayout(cycle, keys.layoutChildren, []),
+    R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]),
+    R.map(R.prop('i'))
+  )
+
 export const getColumnsNo = (cycle) => _getPropLayout(cycle, keys.columnsNo, 3)
 
 export const getPageUuid = (cycle) => _getPropLayout(cycle, keys.pageUuid)
