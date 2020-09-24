@@ -4,4 +4,4 @@ export { fetchCategories, fetchCategory, createCategory, fetchCategoryItems, del
 export { fetchTaxonomies, fetchTaxonomy, createTaxonomy, uploadTaxa, updateTaxonomy } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 
-export { cancelableRequest } from './cancelableRequest'
+export { cancelableGetRequest } from './cancelableRequest'

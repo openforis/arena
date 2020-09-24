@@ -1,7 +1,7 @@
-import { cancelableRequest } from '../cancelableRequest'
+import { cancelableGetRequest } from '../cancelableRequest'
 
 export const fetchActivityLogs = ({ surveyId, params = {} }) =>
-  cancelableRequest({
+  cancelableGetRequest({
     url: `/api/survey/${surveyId}/activity-log`,
-    config: { params },
+    data: params,
   })

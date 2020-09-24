@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const cancelableRequest = ({ method = 'get', url, config = {} }) => {
+const cancelableRequest = ({ method, url, config = {} }) => {
   const source = axios.CancelToken.source()
   const request = axios({
     ...config,
@@ -11,3 +11,6 @@ export const cancelableRequest = ({ method = 'get', url, config = {} }) => {
 
   return { request, cancel: source.cancel }
 }
+
+export const cancelableGetRequest = ({ url, data = {} }) =>
+  cancelableRequest({ method: 'get', url, config: { params: data } })

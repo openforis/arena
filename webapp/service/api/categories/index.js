@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as Category from '@core/survey/category'
-import { cancelableRequest } from '../cancelableRequest'
+import { cancelableGetRequest } from '../cancelableRequest'
 
 export const fetchCategories = async ({ surveyId, draft = true, validate = false, search = '' }) => {
   const {
@@ -24,9 +24,9 @@ export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, vali
 }
 
 export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, parentUuid = null }) =>
-  cancelableRequest({
+  cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    config: { params: { draft, parentUuid } },
+    data: { draft, parentUuid },
   })
 
 // CREATE
