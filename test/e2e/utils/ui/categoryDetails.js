@@ -12,11 +12,12 @@ const selectorsItem = {
   label: ({ levelIndex, itemIndex }) => ({ id: `category-level-${levelIndex}-item-${itemIndex}-label-en` }),
 }
 
+const waitForCategoryValidation = async () => waitFor(500)
+
 export const writeCategoryName = async (text) => {
   await writeIntoTextBox({ text, selector: selectors.name() })
+  await waitForCategoryValidation()
 }
-
-const waitForCategoryValidation = async () => waitFor(500)
 
 export const updateCategoryLevelName = async ({ levelIndex, name }) => {
   await clearTextBox({ selector: selectors.levelName({ levelIndex }) })
