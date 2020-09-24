@@ -31,4 +31,6 @@ export {
   clickCategoryItemBtnClose,
   clickCategoryButtonClose,
   clickCategoryButtonDone,
+  expectCategoryItemsInLevel,
+  expectCategoryItemsInLevelEmpty,
 } from './categoryDetails'

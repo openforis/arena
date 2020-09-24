@@ -34,7 +34,7 @@ const LevelDetails = (props) => {
   const validation = Category.getLevelValidation(levelIndex)(category)
 
   return (
-    <div className={`category__level category__level-${level.index}`}>
+    <div id={`category-level-${levelIndex}`} className="category__level">
       <div className="category__level-header">
         <h4 className="label">
           <ErrorBadge validation={validation} showLabel={false} showIcon />
