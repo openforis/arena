@@ -4,7 +4,7 @@ export { waitForLoader } from './loader'
 export {
   addItemToPage,
   clickNodeDefCategoryAdd,
-  clickNodeDefSaveAndClose,
+  clickNodeDefSaveAndBack,
   expectNodeDefCategoryIs,
   expectNodeDefCodeParentIsDisabled,
 } from './nodeDefDetail'

@@ -6,7 +6,7 @@ import {
   expectItemIsTheLastNodeDef,
   expectSurveyFormItemsAreInOrder,
   clickNodeDefCategoryAdd,
-  clickNodeDefSaveAndClose,
+  clickNodeDefSaveAndBack,
   expectNodeDefCategoryIs,
   expectNodeDefCodeParentIsDisabled,
   writeCategoryName,
@@ -34,20 +34,21 @@ describe('SurveyForm edit Plot: code attribute', () => {
     await addItemToPage({ ...nodeDefCode, saveAndBack: false })
 
     await clickNodeDefCategoryAdd()
+    const categoryName = 'administrative_unit'
 
     // start of category edit
-    await writeCategoryName('administrative_unit')
+    await writeCategoryName(categoryName)
     await clickCategoryButtonClose()
     // end of category edit
 
-    await expectNodeDefCategoryIs('administrative_unit')
+    await expectNodeDefCategoryIs(categoryName)
     await expectNodeDefCodeParentIsDisabled()
 
-    await clickNodeDefSaveAndClose()
+    await clickNodeDefSaveAndBack()
 
     await expectItemIsTheLastNodeDef({ item: nodeDefCode })
     await expectSurveyFormItemsAreInOrder({ items: nodeDefItems })
-  }, 30000)
+  })
 
   test('Re-order country', async () => {
     // move Country to right of Plot ID

@@ -33,8 +33,10 @@ const expectItemsAreInOrder = async ({ items: expectedItems, selector }) => {
 
 export const expectSurveyFormItemsAreInOrder = async ({ items }) => {
   const grid = await getElement({ selector: '.survey-form__node-def-page .react-grid-layout' })
-  const nodeDefNamesAttribute = await grid.attribute('data-child-def-names-ordered')
-  await expect(nodeDefNamesAttribute.split(',')).toStrictEqual(items.map((item) => item.name))
+  const nodeDefNamesOrderedAttribute = await grid.attribute('data-child-def-names-ordered')
+  const nodeDefNamesOrdered = nodeDefNamesOrderedAttribute.split(',')
+  const nodeDefNamesExpected = items.map((item) => item.name)
+  await expect(nodeDefNamesOrdered).toStrictEqual(nodeDefNamesExpected)
 }
 
 export const expectSurveyFormEntityItemsAreInOrder = async ({ items }) =>
