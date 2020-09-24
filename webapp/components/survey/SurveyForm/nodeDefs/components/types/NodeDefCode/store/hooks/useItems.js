@@ -1,6 +1,6 @@
 import * as API from '@webapp/service/api'
 
-import { useRequest } from '../../../../../../../../hooks/useRequest'
+import { useRequest } from '@webapp/components/hooks'
 
 export const useItems = ({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId }) => {
   const { items } = useRequest({
