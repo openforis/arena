@@ -6,11 +6,12 @@
     "yarn": ">=1.16.0"
   },
   "scripts": {
+    "build-dev": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.babel.js",
     "build-prod-report": "cross-env NODE_ENV=production BUILD_REPORT=true webpack --display-error-details -p --config webpack.config.babel.js",
     "build-prod": "cross-env NODE_ENV=production webpack --display-error-details -p --config webpack.config.babel.js",
     "build:server:dev": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js",
     "build:server:prod": "cross-env NODE_ENV=production webpack --display-error-details --config webpack.config.server.babel.js",
-    "build:watch": "webpack --display-error-details --config webpack.config.babel.js --watch",
+    "build:watch": "npm run build-dev --watch",
     "client:dev-server": "NODE_ENV=development webpack-dev-server",
     "build": "webpack --display-error-details -p --config webpack.config.babel.js",
     "clean": "rimraf dist/** ./node_modules/.cache/",

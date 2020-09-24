@@ -9,7 +9,7 @@ const selectors = {
   category: () => toRightOf('Category'),
 }
 
-export const clickNodeDefSaveAndClose = async () => {
+export const clickNodeDefSaveAndBack = async () => {
   await click('Save')
   await waitForLoader()
   await click('Back')
@@ -38,7 +38,7 @@ export const addItemToPage = async ({
     await click(await getElement({ selector: '.btn-checkbox' }), selectors.multiple())
   }
   if (saveAndBack) {
-    await clickNodeDefSaveAndClose()
+    await clickNodeDefSaveAndBack()
   }
 }
 
