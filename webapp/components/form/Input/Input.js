@@ -29,16 +29,15 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
+  const valueText = value === null || Number.isNaN(value) ? '' : String(value)
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
-    if (newValue !== value) {
-      if (selectionAllowed) {
-        selectionRef.current = [input.selectionStart, input.selectionEnd]
-      }
-      if (onChange) {
-        onChange(newValue)
-      }
+    if (selectionAllowed) {
+      selectionRef.current = [input.selectionStart, input.selectionEnd]
+    }
+    if (onChange) {
+      onChange(newValue)
     }
   }
 
@@ -59,7 +58,7 @@ export const Input = React.forwardRef((props, ref) => {
             inputRef.current = el
           },
           id,
-          onValueChange: ({ formattedValue: newValue }) => handleValueChange(newValue),
+          onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
           onFocus,
           onBlur,
           placeholder,
