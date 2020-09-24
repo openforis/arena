@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
+import * as A from '@core/arena'
 import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
@@ -20,7 +22,7 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
-  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
 
   const canEditDef = useAuthCanEditSurvey()
@@ -33,14 +35,13 @@ const NodeDefEntityFormGrid = (props) => {
     }, 200)
   }, [])
 
-  let childDefNamesOrdered = null
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  let childNames = null
   if (ProcessUtils.isEnvDevelopment) {
     // ordered child def names used in tests
-    const layoutChildrenItemIdsOrdered = NodeDefLayout.getLayoutChildrenItemIdsOrdered(surveyCycleKey)(nodeDef)
-    childDefNamesOrdered = layoutChildrenItemIdsOrdered.map((childDefUuid) => {
-      const childDef = childDefs.find((def) => NodeDef.getUuid(def) === childDefUuid)
-      return NodeDef.getName(childDef)
-    })
+    const childUuids = NodeDefLayout.getLayoutChildrenItemIdsOrdered(surveyCycleKey)(nodeDef)
+    childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName)(survey))
   }
 
   const onChangeLayout = (layout) => {
@@ -54,7 +55,7 @@ const NodeDefEntityFormGrid = (props) => {
   const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   return nodeDefsInnerPage.length > 0 ? (
-    <div className="survey-form__node-def-entity-form-grid-wrapper" data-child-def-names-ordered={childDefNamesOrdered}>
+    <div className="survey-form__node-def-entity-form-grid-wrapper" data-child-names={childNames}>
       <ResponsiveGridLayout
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         autoSize={false}
