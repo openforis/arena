@@ -40,7 +40,7 @@ const NodeDefEntityFormGrid = (props) => {
   let childNames = null
   if (ProcessUtils.isEnvDevelopment) {
     // ordered child def names used in tests
-    const childUuids = NodeDefLayout.getLayoutChildrenItemIdsOrdered(surveyCycleKey)(nodeDef)
+    const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
     childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName)(survey))
   }
 
