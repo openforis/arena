@@ -17,6 +17,7 @@ export { useHistoryListen } from './useHistoryListen'
 export { useIsInRoute, useIsCategoriesRoute, useIsDesignerNodeDefRoute, useIsTaxonomiesRoute } from './useIsInRoute'
 export { useOnBrowserBack } from './useOnBrowserBack'
 export { useOnPageUnload } from './useOnPageUnload'
+export { useRequest } from './useRequest'
 
 // rxjs hooks
 export { usePost } from './usePost'
