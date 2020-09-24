@@ -17,6 +17,7 @@ export const useRequest = ({
   dependencies = [],
   requestFunction,
   requestArguments,
+  prepareData = (data) => data,
 }) => {
   const [data, setData] = useState(defaultValue)
   const cancelRequestRef = useRef(null)
@@ -28,7 +29,7 @@ export const useRequest = ({
 
       request
         .then(({ data: dataResponse }) => {
-          setData(dataResponse)
+          setData(prepareData(dataResponse))
         })
         .catch(() => {
           // canceled
