@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -33,22 +33,15 @@ const NodeDefEntityFormGrid = (props) => {
     }, 200)
   }, [])
 
-  const onGridChange = useCallback(
-    (gridElement) => {
-      if (!gridElement || !ProcessUtils.isEnvDevelopment) {
-        return
-      }
-      // ordered child def names used in tests
-      const layoutChildrenItemIdsOrdered = NodeDefLayout.getLayoutChildrenItemIdsOrdered(surveyCycleKey)(nodeDef)
-      const childDefNamesOrdered = layoutChildrenItemIdsOrdered.map((childDefUuid) => {
-        const childDef = childDefs.find((def) => NodeDef.getUuid(def) === childDefUuid)
-        return NodeDef.getName(childDef)
-      })
-      /* eslint-disable no-param-reassign */
-      gridElement.dataset.childDefNamesOrdered = childDefNamesOrdered
-    },
-    [surveyCycleKey, nodeDef, childDefs]
-  )
+  let childDefNamesOrdered = null
+  if (ProcessUtils.isEnvDevelopment) {
+    // ordered child def names used in tests
+    const layoutChildrenItemIdsOrdered = NodeDefLayout.getLayoutChildrenItemIdsOrdered(surveyCycleKey)(nodeDef)
+    childDefNamesOrdered = layoutChildrenItemIdsOrdered.map((childDefUuid) => {
+      const childDef = childDefs.find((def) => NodeDef.getUuid(def) === childDefUuid)
+      return NodeDef.getName(childDef)
+    })
+  }
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
@@ -61,42 +54,43 @@ const NodeDefEntityFormGrid = (props) => {
   const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   return nodeDefsInnerPage.length > 0 ? (
-    <ResponsiveGridLayout
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      autoSize={false}
-      rowHeight={70}
-      cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
-      layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
-      containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
-      margin={[5, 5]}
-      isDraggable={edit && canEditDef}
-      isResizable={edit && canEditDef}
-      compactType={null}
-      useCSSTransforms={true}
-      preventCollision={true}
-      className={mounted ? 'mounted' : ''}
-      onDragStop={onChangeLayout}
-      onResizeStop={onChangeLayout}
-      innerRef={onGridChange}
-    >
-      {nodeDefsInnerPage.map((childDef) => (
-        <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}>
-          <NodeDefSwitch
-            edit={edit}
-            entry={entry}
-            preview={preview}
-            recordUuid={recordUuid}
-            surveyInfo={surveyInfo}
-            surveyCycleKey={surveyCycleKey}
-            nodeDef={childDef}
-            parentNode={node}
-            canEditDef={canEditDef}
-            canEditRecord={canEditRecord}
-            canAddNode={canAddNode}
-          />
-        </div>
-      ))}
-    </ResponsiveGridLayout>
+    <div className="survey-form__node-def-entity-form-grid-wrapper" data-child-def-names-ordered={childDefNamesOrdered}>
+      <ResponsiveGridLayout
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        autoSize={false}
+        rowHeight={70}
+        cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
+        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
+        containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
+        margin={[5, 5]}
+        isDraggable={edit && canEditDef}
+        isResizable={edit && canEditDef}
+        compactType={null}
+        useCSSTransforms={true}
+        preventCollision={true}
+        className={mounted ? 'mounted' : ''}
+        onDragStop={onChangeLayout}
+        onResizeStop={onChangeLayout}
+      >
+        {nodeDefsInnerPage.map((childDef) => (
+          <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}>
+            <NodeDefSwitch
+              edit={edit}
+              entry={entry}
+              preview={preview}
+              recordUuid={recordUuid}
+              surveyInfo={surveyInfo}
+              surveyCycleKey={surveyCycleKey}
+              nodeDef={childDef}
+              parentNode={node}
+              canEditDef={canEditDef}
+              canEditRecord={canEditRecord}
+              canAddNode={canAddNode}
+            />
+          </div>
+        ))}
+      </ResponsiveGridLayout>
+    </div>
   ) : null
 }
 
