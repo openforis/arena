@@ -1,7 +1,13 @@
 export { clickHeaderBtnMySurveys, clickHeaderBtnCreateSurvey } from './header'
 export { clickHomeBtnEditSurveyInfo, expectHomeDashboard } from './home'
 export { waitForLoader } from './loader'
-export { addItemToPage } from './nodeDefDetail'
+export {
+  addItemToPage,
+  clickNodeDefCategoryAdd,
+  clickNodeDefSaveAndBack,
+  expectNodeDefCategoryIs,
+  expectNodeDefCodeParentIsDisabled,
+} from './nodeDefDetail'
 export { clickSidebarBtnHome, clickSidebarBtnSurveyForm } from './sidebar'
 export {
   expectItemIsTheLastNodeDef,
@@ -16,3 +22,10 @@ export {
   expectCurrentPageIs,
   expectSurveyFormHasOnlyAndInOrderThesePages,
 } from './surveyFormPage'
+export {
+  writeCategoryName,
+  updateCategoryLevelName,
+  addCategoryLevel,
+  addCategoryItem,
+  clickCategoryButtonClose,
+} from './categoryDetails'

@@ -49,6 +49,19 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
+/**
+ * Returns the uuids of the layout children items, ordered from top to bottom according to the grid layout props (y and x).
+ *
+ * @param {!string} cycle - The survey cycle key.
+ * @returns {Array} - Array of child item uuids, ordered from top to bottom.
+ */
+export const getLayoutChildrenUuids = (cycle) =>
+  R.pipe(
+    _getPropLayout(cycle, keys.layoutChildren, []),
+    R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]),
+    R.map(R.prop('i'))
+  )
+
 export const getColumnsNo = (cycle) => _getPropLayout(cycle, keys.columnsNo, 3)
 
 export const getPageUuid = (cycle) => _getPropLayout(cycle, keys.pageUuid)
