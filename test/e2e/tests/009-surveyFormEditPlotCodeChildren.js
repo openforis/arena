@@ -15,7 +15,9 @@ import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormItemNamesAreInOrder, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { getElement } from '../utils/api'
 
-describe('SurveyForm edit: plot code children', () => {
+const categoryName = 'administrative_unit'
+
+describe('SurveyForm edit: Plot code children', () => {
   test('Plot add code attribute "region"', async () => {
     await waitForLoader()
 
@@ -25,7 +27,7 @@ describe('SurveyForm edit: plot code children', () => {
     await click('Plot')
     await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'region', label: 'Region', saveAndBack: false })
 
-    await selectNodeDefCategory({ category: 'administrative_unit' })
+    await selectNodeDefCategory({ category: categoryName })
 
     await expectNodeDefCodeParentEnabled()
 
@@ -40,11 +42,37 @@ describe('SurveyForm edit: plot code children', () => {
     })
   }, 30000)
 
-  test('Plot re-order region', async () => {
+  test('Plot re-order "region"', async () => {
     await dragAndDrop(await getElement({ text: 'REGION' }), { up: 250, right: 300 })
 
     await expectSurveyFormItemNamesAreInOrder({
       itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree'],
+    })
+  })
+
+  test('Plot add code attribute "province"', async () => {
+    await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'province', label: 'Province', saveAndBack: false })
+
+    await selectNodeDefCategory({ category: categoryName })
+
+    await expectNodeDefCodeParentEnabled()
+
+    await expectNodeDefCodeParentItems({ items: ['country', 'region'] })
+
+    await selectNodeDefCodeParent({ nodeDefName: 'region' })
+
+    await clickNodeDefSaveAndBack()
+
+    await expectSurveyFormItemNamesAreInOrder({
+      itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree', 'province'],
+    })
+  })
+
+  test('Plot re-order "province"', async () => {
+    await dragAndDrop(await getElement({ text: 'PROVINCE' }), { up: 150, right: 300 })
+
+    await expectSurveyFormItemNamesAreInOrder({
+      itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'province', 'tree'],
     })
   })
 })
