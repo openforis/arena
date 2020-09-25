@@ -1,3 +1,5 @@
+import './TableRow.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -37,10 +39,10 @@ const TableRow = (props) => {
       <div>{Category.getName(category)}</div>
       {canEdit && (
         <>
-          <div>
+          <div className="category-row__badge-container">
             <ErrorBadge validation={Category.getValidation(category)} />
           </div>
-          <div>
+          <div className="category-row__badge-container">
             <WarningBadge show={unused} label={i18n.t('itemsTable.unused')} />
           </div>
         </>

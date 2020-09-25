@@ -1,17 +1,15 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { dragAndDrop, getElement } from '../utils/api'
+import { clickCategoryButtonClose, writeCategoryName } from '../utils/ui/categoryDetails'
 import {
   addItemToPage,
-  expectItemIsTheLastNodeDef,
-  expectSurveyFormItemsAreInOrder,
   clickNodeDefCategoryAdd,
   clickNodeDefSaveAndBack,
   expectNodeDefCategoryIs,
   expectNodeDefCodeParentIsDisabled,
-  writeCategoryName,
-  clickCategoryButtonClose,
-} from '../utils/ui'
+} from '../utils/ui/nodeDefDetail'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } from '../utils/ui/surveyForm'
 
 const nodeDefCode = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false }
 

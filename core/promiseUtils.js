@@ -29,7 +29,7 @@ export const resolveGenerator = handleGeneratorNext([])
 export const each = async (iterable, callback) => {
   function* generator() {
     for (let i = 0; i < iterable.length; i += 1) {
-      yield callback(iterable[i])
+      yield callback(iterable[i], i)
     }
   }
 

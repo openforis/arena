@@ -1,12 +1,11 @@
+import { addItemToPage } from '../utils/ui/nodeDefDetail'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } from '../utils/ui/surveyForm'
 import {
-  addItemToPage,
   addSurveyFormSubPage,
-  expectItemIsTheLastNodeDef,
-  expectSurveyFormItemsAreInOrder,
   expectEmptyPageHasError,
   expectCurrentPageIs,
   expectSurveyFormHasOnlyAndInOrderThesePages,
-} from '../utils/ui'
+} from '../utils/ui/surveyFormPage'
 
 const nodeDefItems = [
   { type: 'integer', name: 'plot_id', label: 'Plot id', isKey: true },

@@ -1,5 +1,5 @@
 import { clearTextBox, click, expectExists, writeIntoTextBox } from '../utils/api'
-import { waitForLoader } from '../utils/ui'
+import { waitForLoader } from '../utils/ui/loader'
 
 const selectorEmail = { placeholder: 'Your email' }
 const selectorPassword = { placeholder: 'Your password' }

@@ -6,11 +6,12 @@ import { Input } from '@webapp/components/form/Input'
 
 import Badge from './Badge'
 
-const Label = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
+const Label = ({ inputFieldIdPrefix, labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
   <div className="labels-editor__label">
     {showLanguageBadge && <Badge lang={lang} compact={compactLanguage} />}
 
     <Input
+      id={inputFieldIdPrefix ? `${inputFieldIdPrefix}-${lang}` : null}
       value={R.propOr('', lang, labels)}
       onChange={(value) => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
       readOnly={readOnly}
@@ -19,6 +20,7 @@ const Label = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLan
 )
 
 Label.propTypes = {
+  inputFieldIdPrefix: PropTypes.string,
   labels: PropTypes.object,
   lang: PropTypes.string,
   onChange: PropTypes.func,
@@ -28,6 +30,7 @@ Label.propTypes = {
 }
 
 Label.defaultProps = {
+  inputFieldIdPrefix: null,
   labels: {},
   lang: '',
   onChange: null,

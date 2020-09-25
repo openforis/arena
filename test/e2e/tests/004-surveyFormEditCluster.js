@@ -1,13 +1,13 @@
 import { click, expectExists, expectToBe, getElement } from '../utils/api'
+import { waitForLoader } from '../utils/ui/loader'
+import { addItemToPage } from '../utils/ui/nodeDefDetail'
+import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import {
-  clickSidebarBtnSurveyForm,
-  waitForLoader,
-  addItemToPage,
   expectItemIsTheLastNodeDef,
   expectSurveyFormItemsAreInOrder,
-  editSurveyFormPage,
   expectSurveyFormLoaded,
-} from '../utils/ui'
+} from '../utils/ui/surveyForm'
+import { editSurveyFormPage } from '../utils/ui/surveyFormPage'
 
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectToBe({ selector: '.btn-node-def', numberOfItems: 1 })

@@ -1,9 +1,6 @@
-import {
-  addItemToPage,
-  expectItemIsTheLastNodeDef,
-  expectCurrentPageIs,
-  expectSurveyFormEntityItemsAreInOrder,
-} from '../utils/ui'
+import { addItemToPage } from '../utils/ui/nodeDefDetail'
+import { expectItemIsTheLastNodeDef, expectSurveyFormEntityItemsAreInOrder } from '../utils/ui/surveyForm'
+import { expectCurrentPageIs } from '../utils/ui/surveyFormPage'
 
 const nodeDefItems = [
   { type: 'integer', name: 'tree_id', label: 'Tree id', isKey: true },

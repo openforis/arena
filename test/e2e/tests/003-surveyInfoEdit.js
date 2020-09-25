@@ -1,5 +1,8 @@
 import { button, clearTextBox, click, expectExists, writeIntoTextBox, hoverTextBox, toRightOf } from '../utils/api'
-import { clickHomeBtnEditSurveyInfo, waitForLoader, clickSidebarBtnHome, expectHomeDashboard } from '../utils/ui'
+
+import { clickHomeBtnEditSurveyInfo, expectHomeDashboard } from '../utils/ui/home'
+import { waitForLoader } from '../utils/ui/loader'
+import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 
 const selectors = {
   name: () => ({ id: 'survey-info-name' }),
