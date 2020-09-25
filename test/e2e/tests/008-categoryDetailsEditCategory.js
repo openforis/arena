@@ -4,17 +4,17 @@ import * as StringUtils from '@core/stringUtils'
 import { click, expectExists, expectToBe, toRightOf } from '../utils/api'
 
 import {
-  addCategoryLevel,
   addCategoryItem,
-  updateCategoryLevelName,
-  waitForLoader,
-  clickSidebarBtnDesignerCategories,
+  addCategoryLevel,
   clickCategoryButtonDone,
   clickCategoryItem,
   clickCategoryItemBtnClose,
+  updateCategoryLevelName,
   expectCategoryItemsInLevel,
   expectCategoryItemsInLevelEmpty,
-} from '../utils/ui'
+} from '../utils/ui/categoryDetails'
+import { waitForLoader } from '../utils/ui/loader'
+import { clickSidebarBtnDesignerCategories } from '../utils/ui/sidebar'
 
 const categoryName = 'administrative_unit'
 const levels = ['country', 'region', 'district']

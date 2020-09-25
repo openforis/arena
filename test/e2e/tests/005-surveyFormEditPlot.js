@@ -1,12 +1,11 @@
-import {
-  addItemToPage,
+const { addItemToPage } = require('../utils/ui/nodeDefDetail')
+const { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } = require('../utils/ui/surveyForm')
+const {
   addSurveyFormSubPage,
-  expectItemIsTheLastNodeDef,
-  expectSurveyFormItemsAreInOrder,
   expectEmptyPageHasError,
   expectCurrentPageIs,
   expectSurveyFormHasOnlyAndInOrderThesePages,
-} from '../utils/ui'
+} = require('../utils/ui/surveyFormPage')
 
 const nodeDefItems = [
   { type: 'integer', name: 'plot_id', label: 'Plot id', isKey: true },

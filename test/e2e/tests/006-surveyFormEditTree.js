@@ -1,9 +1,6 @@
-import {
-  addItemToPage,
-  expectItemIsTheLastNodeDef,
-  expectCurrentPageIs,
-  expectSurveyFormEntityItemsAreInOrder,
-} from '../utils/ui'
+const { addItemToPage } = require('../utils/ui/nodeDefDetail')
+const { expectItemIsTheLastNodeDef, expectSurveyFormEntityItemsAreInOrder } = require('../utils/ui/surveyForm')
+const { expectCurrentPageIs } = require('../utils/ui/surveyFormPage')
 
 const nodeDefItems = [
   { type: 'integer', name: 'tree_id', label: 'Tree id', isKey: true },

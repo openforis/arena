@@ -1,5 +1,6 @@
 import { click, clickParent, getElement, writeIntoTextBox } from '../utils/api'
-import { clickHeaderBtnMySurveys, waitForLoader } from '../utils/ui'
+import { clickHeaderBtnMySurveys } from '../utils/ui/header'
+import { waitForLoader } from '../utils/ui/loader'
 
 const deleteSurvey = async ({ name, label }) => {
   await waitForLoader()
