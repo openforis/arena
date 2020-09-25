@@ -1,7 +1,6 @@
-import { click, dragAndDrop } from 'taiko'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { click, dragAndDrop, getElement } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import {
   addItemToPage,
@@ -13,7 +12,6 @@ import {
 } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormItemNamesAreInOrder, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
-import { getElement } from '../utils/api'
 
 const categoryName = 'administrative_unit'
 
