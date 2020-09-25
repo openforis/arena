@@ -1,4 +1,4 @@
-import { click } from 'taiko'
+import { click, dragAndDrop } from 'taiko'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -13,6 +13,7 @@ import {
 } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormItemNamesAreInOrder, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
+import { getElement } from '../utils/api'
 
 describe('SurveyForm edit: plot code children', () => {
   test('Plot add code attribute "region"', async () => {
@@ -38,4 +39,12 @@ describe('SurveyForm edit: plot code children', () => {
       itemNames: ['plot_id', 'country', 'plot_text', 'plot_file', 'tree', 'region'],
     })
   }, 30000)
+
+  test('Plot re-order region', async () => {
+    await dragAndDrop(await getElement({ text: 'REGION' }), { up: 250, right: 300 })
+
+    await expectSurveyFormItemNamesAreInOrder({
+      itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree'],
+    })
+  })
 })
