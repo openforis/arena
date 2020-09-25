@@ -27,7 +27,7 @@ const CategoryList = (props) => {
   const gridTemplateColumns = [
     '50px', // index
     '1fr', // name
-    ...(canEdit ? ['repeat(2, 80px)'] : []), // error and warning badges
+    ...(canEdit ? ['repeat(2, 85px)'] : []), // error and warning badges
     ...(canSelect ? ['80px'] : []), // select button
     ...(canEdit ? ['repeat(2, 75px)'] : []), // edit and delete buttons
   ].join(' ')
