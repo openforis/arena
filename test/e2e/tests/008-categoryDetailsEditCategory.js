@@ -16,11 +16,8 @@ import {
   expectCategoryItemsInLevelEmpty,
 } from '../utils/ui'
 
-const levelNames = {
-  0: 'country',
-  1: 'region',
-  2: 'district',
-}
+const categoryName = 'administrative_unit'
+const levels = ['country', 'region', 'district']
 const itemsPerLevel = 5
 const itemInsertTime = 5 * 1000 // 5 sec
 
@@ -29,15 +26,12 @@ const _getItemCode = ({ index, codePrefix = '' }) => codePrefix + StringUtils.pa
 const _createItems = ({ levelIndex, codePrefix = '' }) =>
   new Array(itemsPerLevel).fill().map((_, index) => {
     const code = _getItemCode({ index, codePrefix })
-    const label = StringUtils.capitalizeFirstLetter(`${levelNames[levelIndex]} ${code}`)
+    const label = StringUtils.capitalizeFirstLetter(`${levels[levelIndex]} ${code}`)
     return { code, label }
   })
 
-const _addChildrenItems = async ({ codePrefix, levelIndex }) => {
-  const itemsChildren = _createItems({
-    codePrefix,
-    levelIndex,
-  })
+const _addChildItems = async ({ codePrefix, levelIndex }) => {
+  const itemsChildren = _createItems({ codePrefix, levelIndex })
   await PromiseUtils.each(itemsChildren, async (itemChild, itemIndex) =>
     addCategoryItem({
       levelIndex,
@@ -53,17 +47,17 @@ describe('Categories: edit existing category', () => {
   test('CategoryList: navigate to categories', async () => {
     await waitForLoader()
     await clickSidebarBtnDesignerCategories()
-    // Expect to have an invalid category
-    await expectExists({ text: 'Invalid' })
+    // Expect ${categoryName} to be invalid
+    await expectExists({ text: 'Invalid', relativeSelectors: [toRightOf(categoryName)] })
   })
 
   test('CategoryDetails: add levels', async () => {
-    await click('edit', toRightOf('administrative_unit'))
+    await click('edit', toRightOf(categoryName))
 
     // start of category edit
-    await updateCategoryLevelName({ levelIndex: 0, name: levelNames[0] })
-    await addCategoryLevel({ levelIndex: 1, name: levelNames[1] })
-    await addCategoryLevel({ levelIndex: 2, name: levelNames[2] })
+    await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
+    await addCategoryLevel({ levelIndex: 1, name: levels[1] })
+    await addCategoryLevel({ levelIndex: 2, name: levels[2] })
 
     await expectToBe({ selector: '.category__level', numberOfItems: 3 })
   })
@@ -76,7 +70,7 @@ describe('Categories: edit existing category', () => {
 
       await expectCategoryItemsInLevel({ levelIndex: 0, numberOfItems: 1 })
 
-      await _addChildrenItems({ levelIndex: 1 })
+      await _addChildItems({ levelIndex: 1 })
     },
     itemInsertTime * (1 + itemsPerLevel)
   )
@@ -87,7 +81,7 @@ describe('Categories: edit existing category', () => {
       const itemsParent = _createItems({ levelIndex: 1 })
       await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
         await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
-        await _addChildrenItems({ codePrefix: itemParent.code, levelIndex: 2 })
+        await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
       })
     },
     itemInsertTime * itemsPerLevel ** 2
