@@ -1,4 +1,4 @@
-const { openBrowser: openBrowserTaiko, closeBrowser: closeBrowserTaiko, goto } = require('taiko')
+import { openBrowser as openBrowserTaiko, closeBrowser as closeBrowserTaiko, goto } from 'taiko'
 
 const headless = process.env.HEADLESS_CHROME === 'true'
 
