@@ -13,7 +13,7 @@ import {
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormItemNamesAreInOrder, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 
-const categoryName = 'administrative_unit'
+const category = 'administrative_unit'
 
 describe('SurveyForm edit: Plot code children', () => {
   test('Plot add code attribute "region"', async () => {
@@ -25,7 +25,7 @@ describe('SurveyForm edit: Plot code children', () => {
     await click('Plot')
     await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'region', label: 'Region', saveAndBack: false })
 
-    await selectNodeDefCategory({ category: categoryName })
+    await selectNodeDefCategory({ category })
 
     await expectNodeDefCodeParentEnabled()
 
@@ -51,7 +51,7 @@ describe('SurveyForm edit: Plot code children', () => {
   test('Plot add code attribute "province"', async () => {
     await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'province', label: 'Province', saveAndBack: false })
 
-    await selectNodeDefCategory({ category: categoryName })
+    await selectNodeDefCategory({ category })
 
     await expectNodeDefCodeParentEnabled()
 
