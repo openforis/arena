@@ -1,4 +1,6 @@
-import { openBrowser as openBrowserTaiko, closeBrowser as closeBrowserTaiko, goto } from 'taiko'
+import { openBrowser as openBrowserTaiko, goto } from 'taiko'
+
+export { closeBrowser, reload } from 'taiko'
 
 const headless = process.env.HEADLESS_CHROME === 'true'
 
@@ -19,8 +21,4 @@ export const openBrowser = async () => {
   })
 
   await goto('localhost:9090')
-}
-
-export const closeBrowser = async () => {
-  await closeBrowserTaiko()
 }
