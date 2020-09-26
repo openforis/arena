@@ -1,5 +1,5 @@
 export { below } from './below'
-export { closeBrowser, openBrowser } from './browser'
+export { closeBrowser, openBrowser, reload } from './browser'
 export { button } from './button'
 export { click, clickParent } from './click'
 export { dragAndDrop } from './dragAndDrop'

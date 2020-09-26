@@ -7,6 +7,7 @@ const selectors = {
   key: () => toRightOf('Key'),
   multiple: () => toRightOf('Multiple'),
   category: () => toRightOf('Category'),
+  parentCode: () => toRightOf('Parent Code'),
 }
 
 export const clickNodeDefSaveAndBack = async () => {
@@ -47,9 +48,33 @@ export const clickNodeDefCategoryAdd = async () => {
   await waitFor(1000)
 }
 
-export const expectNodeDefCategoryIs = async (categoryName) => {
-  await expectExists({ text: categoryName, selector: selectors.category() })
+export const expectNodeDefCategoryIs = async (categoryName) => expectExists({ text: categoryName })
+
+const _openNodeDefCategoryDropdown = async () => click(textBox(selectors.category()))
+
+export const selectNodeDefCategory = async ({ category }) => {
+  await _openNodeDefCategoryDropdown()
+  await click(category)
 }
 
-export const expectNodeDefCodeParentIsDisabled = async () =>
-  expect(await textBox(toRightOf('Parent Code')).isDisabled()).toBeTruthy()
+const _openNodeDefCodeParentDropdown = async () => click(textBox(selectors.parentCode()))
+const _closeNodeDefCodeParentDropdown = async () => click('Parent code')
+
+export const expectNodeDefCodeParentItems = async ({ items: itemsExpected }) => {
+  await _openNodeDefCodeParentDropdown()
+  const items = await (await getElement({ selector: `.autocomplete-list div` })).elements()
+  const itemLabels = await Promise.all(items.map((item) => item.text()))
+  await expect(itemLabels).toStrictEqual(itemsExpected)
+  await _closeNodeDefCodeParentDropdown()
+}
+
+export const selectNodeDefCodeParent = async ({ nodeDefName }) => {
+  await _openNodeDefCodeParentDropdown()
+  await click(nodeDefName)
+}
+
+const _isNodeDefCodeParentDisabled = async () => textBox(selectors.parentCode()).isDisabled()
+
+export const expectNodeDefCodeParentDisabled = async () => expect(await _isNodeDefCodeParentDisabled()).toBeTruthy()
+
+export const expectNodeDefCodeParentEnabled = async () => expect(await _isNodeDefCodeParentDisabled()).toBeFalsy()

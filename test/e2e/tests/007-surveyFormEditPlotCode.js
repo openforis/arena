@@ -7,7 +7,7 @@ import {
   clickNodeDefCategoryAdd,
   clickNodeDefSaveAndBack,
   expectNodeDefCategoryIs,
-  expectNodeDefCodeParentIsDisabled,
+  expectNodeDefCodeParentDisabled,
 } from '../utils/ui/nodeDefDetail'
 import { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } from '../utils/ui/surveyForm'
 
@@ -40,7 +40,7 @@ describe('SurveyForm edit Plot: code attribute', () => {
     // end of category edit
 
     await expectNodeDefCategoryIs(categoryName)
-    await expectNodeDefCodeParentIsDisabled()
+    await expectNodeDefCodeParentDisabled()
 
     await clickNodeDefSaveAndBack()
 
@@ -50,7 +50,7 @@ describe('SurveyForm edit Plot: code attribute', () => {
 
   test('Re-order country', async () => {
     // move Country to right of Plot ID
-    await dragAndDrop(await getElement({ text: 'COUNTRY' }), { up: 350, right: 300 })
+    await dragAndDrop(await getElement({ text: 'COUNTRY' }), { up: 300, right: 300 })
 
     await expectSurveyFormItemsAreInOrder({ items: nodeItemsReOrdered })
   })
