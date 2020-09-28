@@ -43,6 +43,17 @@ export const addItemToPage = async ({
   }
 }
 
+export const addNodeDefToTable = async ({ type, name, label, isKey, isMultiple, saveAndBack = true }) =>
+  addItemToPage({
+    type,
+    name,
+    label,
+    isKey,
+    isMultiple,
+    saveAndBack,
+    addButtonSelector: '.survey-form__node-def-page-item .icon-plus',
+  })
+
 export const clickNodeDefCategoryAdd = async () => {
   await click(button({ class: 'btn-add-category' }))
   await waitFor(1000)
@@ -78,3 +89,8 @@ const _isNodeDefCodeParentDisabled = async () => textBox(selectors.parentCode())
 export const expectNodeDefCodeParentDisabled = async () => expect(await _isNodeDefCodeParentDisabled()).toBeTruthy()
 
 export const expectNodeDefCodeParentEnabled = async () => expect(await _isNodeDefCodeParentDisabled()).toBeFalsy()
+
+export const clickNodeDefTaxonomyAdd = async () => {
+  await click(button({ class: 'btn-add-taxonomy' }))
+  await waitFor(1000)
+}
