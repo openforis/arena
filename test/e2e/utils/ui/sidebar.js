@@ -12,3 +12,5 @@ const _clickDesignerModule = async ({ moduleLabel }) => {
 export const clickSidebarBtnSurveyForm = async () => _clickDesignerModule({ moduleLabel: 'FORM DESIGNER' })
 
 export const clickSidebarBtnDesignerCategories = async () => _clickDesignerModule({ moduleLabel: 'CATEGORIES' })
+
+export const clickSidebarBtnDesignerTaxonomies = async () => _clickDesignerModule({ moduleLabel: 'TAXONOMIES' })
