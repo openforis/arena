@@ -1,3 +1,4 @@
+import { textBox } from './textBox'
 import { getElement } from './getElement'
 
 export const expectExists = async ({ text = null, selector = null, relativeSelectors = [] }) => {
@@ -17,4 +18,12 @@ export const expectToBe = async ({ text = null, selector = null, relativeSelecto
   const items = await element.elements()
   const _numberOfItems = items.length
   await expect(_numberOfItems).toBe(numberOfItems)
+}
+
+export const expectInputTextToBe = async ({ expectedText, selector = null, relativeSelectors = [] }) => {
+  const inputField = textBox(selector, ...relativeSelectors)
+  const exists = await inputField.exists()
+  await expect(exists).toBeTruthy()
+  const text = await inputField.value()
+  await expect(text).toBe(expectedText)
 }
