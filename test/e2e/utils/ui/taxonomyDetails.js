@@ -17,3 +17,5 @@ export const selectTaxonomyFileToImport = async ({ fileName }) =>
 export const expectTaxonomyTaxaEmpty = async () => expectExists({ selector: '.table__empty-rows' })
 
 export const clickTaxonomyButtonClose = async () => click(selectors.close())
+
+export const closeTaxonomyEditor = async () => click('Done')
