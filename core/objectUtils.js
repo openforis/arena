@@ -39,11 +39,18 @@ export const isPropTrue = (prop) => R.pipe(getProp(prop), R.equals(true))
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 
+const _getText = ({ propKey, lang }) => R.pipe(getProp(propKey, {}), R.prop(lang))
+const _getTextWithDefault = ({ propKey, lang, defaultLang }) => (obj) => {
+  const text = _getText({ propKey, lang })(obj)
+  return !text && Boolean(defaultLang) && lang !== defaultLang ? _getText({ propKey, lang: defaultLang })(obj) : text
+}
 export const getLabels = getProp(keysProps.labels, {})
-export const getLabel = (lang, defaultTo = null) => R.pipe(getLabels, R.propOr(defaultTo, lang))
+export const getLabel = (lang, defaultLang = null) =>
+  _getTextWithDefault({ propKey: keysProps.labels, lang, defaultLang })
 
 export const getDescriptions = getProp(keysProps.descriptions, {})
-export const getDescription = (lang, defaultTo = null) => R.pipe(getDescriptions, R.propOr(defaultTo, lang))
+export const getDescription = (lang, defaultLang = null) =>
+  _getTextWithDefault({ propKey: keysProps.descriptions, lang, defaultLang })
 
 export const getDate = (prop) => R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))
 export const getDateCreated = getDate(keys.dateCreated)
