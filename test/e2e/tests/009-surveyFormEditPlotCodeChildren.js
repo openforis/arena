@@ -11,7 +11,7 @@ import {
   selectNodeDefCodeParent,
 } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
-import { expectSurveyFormItemNamesAreInOrder } from '../utils/ui/surveyForm'
+import { expectSurveyFormItemNames } from '../utils/ui/surveyForm'
 
 const category = 'administrative_unit'
 
@@ -37,7 +37,7 @@ describe('SurveyForm edit: Plot code children', () => {
 
     await clickNodeDefSaveAndBack()
 
-    await expectSurveyFormItemNamesAreInOrder({
+    await expectSurveyFormItemNames({
       itemNames: ['plot_id', 'country', 'plot_text', 'plot_file', 'tree', 'region'],
     })
   }, 30000)
@@ -45,7 +45,7 @@ describe('SurveyForm edit: Plot code children', () => {
   test('Plot re-order "region"', async () => {
     await dragAndDrop(await getElement({ text: 'REGION' }), { up: 250, right: 300 })
 
-    await expectSurveyFormItemNamesAreInOrder({
+    await expectSurveyFormItemNames({
       itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree'],
     })
   })
@@ -63,7 +63,7 @@ describe('SurveyForm edit: Plot code children', () => {
 
     await clickNodeDefSaveAndBack()
 
-    await expectSurveyFormItemNamesAreInOrder({
+    await expectSurveyFormItemNames({
       itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree', 'province'],
     })
   })
@@ -77,7 +77,7 @@ describe('SurveyForm edit: Plot code children', () => {
 
     await _goToPlotPage()
 
-    await expectSurveyFormItemNamesAreInOrder({
+    await expectSurveyFormItemNames({
       itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'province', 'tree'],
     })
   })
