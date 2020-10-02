@@ -9,7 +9,7 @@ import {
   expectNodeDefCategoryIs,
   expectNodeDefCodeParentDisabled,
 } from '../utils/ui/nodeDefDetail'
-import { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } from '../utils/ui/surveyForm'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItems } from '../utils/ui/surveyForm'
 
 const nodeDefCode = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false }
 
@@ -45,13 +45,13 @@ describe('SurveyForm edit Plot: code attribute', () => {
     await clickNodeDefSaveAndBack()
 
     await expectItemIsTheLastNodeDef({ item: nodeDefCode })
-    await expectSurveyFormItemsAreInOrder({ items: nodeDefItems })
+    await expectSurveyFormItems({ items: nodeDefItems })
   })
 
   test('Re-order country', async () => {
     // move Country to right of Plot ID
     await dragAndDrop(await getElement({ text: 'COUNTRY' }), { up: 300, right: 300 })
 
-    await expectSurveyFormItemsAreInOrder({ items: nodeItemsReOrdered })
+    await expectSurveyFormItems({ items: nodeItemsReOrdered })
   })
 })

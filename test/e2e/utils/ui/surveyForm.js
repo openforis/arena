@@ -1,6 +1,18 @@
-import { expectExists, expectToBe, getElement, getElements } from '../api'
+import { expectExists, getElement, getElements } from '../api'
 
-export const expectSurveyFormLoaded = async () => expectExists({ selector: '.survey-form' })
+const dataAttributes = {
+  nodeDefName: 'data-node-def-name',
+  childNames: 'data-child-names',
+}
+
+const selectors = {
+  surveyForm: '.survey-form',
+  nodeDefPageItem: '.survey-form__node-def-page-item',
+  entityWrapper: (entityName) =>
+    `.survey-form__node-def-entity-wrapper${entityName ? `[${dataAttributes.nodeDefName}='${entityName}']` : ''}`,
+}
+
+export const expectSurveyFormLoaded = async () => expectExists({ selector: selectors.surveyForm })
 
 const getNodeDefElementText = async ({ item }) => {
   const itemText = await item.text()
@@ -9,7 +21,7 @@ const getNodeDefElementText = async ({ item }) => {
 }
 
 export const expectItemIsTheLastNodeDef = async ({ item }) => {
-  const items = await getElements({ selector: '.survey-form__node-def-page-item' })
+  const items = await getElements({ selector: selectors.nodeDefPageItem })
 
   const last = items[items.length - 1]
 
@@ -17,34 +29,15 @@ export const expectItemIsTheLastNodeDef = async ({ item }) => {
   await expect(itemText).toBe(item.label.toUpperCase())
 }
 
-const expectItemsInOrder = async ({ items, expectedItems }) =>
-  Promise.all(
-    items.map(async (item, index) => {
-      const itemText = await getNodeDefElementText({ item })
-      await expect(itemText).toBe(expectedItems[index].label.toUpperCase())
-    })
-  )
+const getSurveyFormEntityWrapper = async ({ entityName = null }) =>
+  getElement({ selector: selectors.entityWrapper(entityName) })
 
-const expectItemsAreInOrder = async ({ items: expectedItems, selector }) => {
-  const items = await getElements({ selector })
-  await expectToBe({ selector, numberOfItems: items.length })
-  await expectItemsInOrder({ items, expectedItems })
-}
-
-export const expectSurveyFormItemNamesAreInOrder = async ({ itemNames: itemNamesExpected }) => {
-  const gridWrapper = await getElement({ selector: '.survey-form__node-def-entity-form-grid-wrapper' })
-  const nodeDefNamesOrderedAttribute = await gridWrapper.attribute('data-child-names')
+export const expectSurveyFormItemNames = async ({ entityName = null, itemNames: itemNamesExpected }) => {
+  const wrapper = await getSurveyFormEntityWrapper({ entityName })
+  const nodeDefNamesOrderedAttribute = await wrapper.attribute(dataAttributes.childNames)
   const nodeDefNamesOrdered = nodeDefNamesOrderedAttribute.split(',')
   await expect(nodeDefNamesOrdered).toStrictEqual(itemNamesExpected)
 }
 
-export const expectSurveyFormItemsAreInOrder = async ({ items }) => {
-  const itemNames = items.map((item) => item.name)
-  await expectSurveyFormItemNamesAreInOrder({ itemNames })
-}
-
-export const expectSurveyFormEntityItemsAreInOrder = async ({ items }) =>
-  expectItemsAreInOrder({
-    items,
-    selector: '.survey-form__node-def-entity-table-rows .survey-form__node-def-page-item',
-  })
+export const expectSurveyFormItems = async ({ entityName = null, items }) =>
+  expectSurveyFormItemNames({ entityName, itemNames: items.map((item) => item.name) })
