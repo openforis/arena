@@ -50,17 +50,20 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
 /**
- * Returns the uuids of the layout children items, ordered from top to bottom according to the grid layout props (y and x).
+ * Returns the uuids of the layout children items.
+ * If the render type is form, they will be ordered from top to bottom according to the grid layout props (y and x),
+ * othwerwise they will be in the order they are defined in the 'layoutChildren' prop.
  *
  * @param {!string} cycle - The survey cycle key.
  * @returns {Array} - Array of child item uuids, ordered from top to bottom.
  */
-export const getLayoutChildrenUuids = (cycle) =>
-  R.pipe(
-    _getPropLayout(cycle, keys.layoutChildren, []),
-    R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]),
-    R.map(R.prop('i'))
-  )
+export const getLayoutChildrenUuids = (cycle) => (nodeDef) => {
+  const nodeDefRenderType = getRenderType(cycle)(nodeDef)
+  const layoutChildren = getLayoutChildren(cycle)(nodeDef)
+  return nodeDefRenderType === renderType.table
+    ? layoutChildren
+    : R.pipe(R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]), R.map(R.prop('i')))(layoutChildren)
+}
 
 export const getColumnsNo = (cycle) => _getPropLayout(cycle, keys.columnsNo, 3)
 

@@ -4,7 +4,7 @@ import { addItemToPage } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import {
   expectItemIsTheLastNodeDef,
-  expectSurveyFormItemsAreInOrder,
+  expectSurveyFormItems,
   expectSurveyFormLoaded,
 } from '../utils/ui/surveyForm'
 import { editSurveyFormPage } from '../utils/ui/surveyFormPage'
@@ -59,5 +59,5 @@ describe('SurveyForm edit cluster', () => {
   })
 
   test('Cluster add children - verify order and number of children', async () =>
-    expectSurveyFormItemsAreInOrder({ items: nodeDefItems }))
+    expectSurveyFormItems({ items: nodeDefItems }))
 })
