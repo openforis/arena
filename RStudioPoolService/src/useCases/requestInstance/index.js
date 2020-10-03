@@ -21,6 +21,7 @@ const requestInstance = async ({ userId = false } = {}) => {
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()
+  console.log("BBBB", freeInstances)
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstances] = freeInstances
     assignedInstance = freeInstance
@@ -31,10 +32,13 @@ const requestInstance = async ({ userId = false } = {}) => {
   } else {
     assignedInstance = await InstanceManager.createNewInstance()
   }
+  console.log("assignedInstance", assignedInstance)
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
   const instanceId = InstanceModel.getId(assignedInstance)
   await InstanceManager.saveInstance(assignedInstance)
+
+  console.log("instanceId", instanceId)
 
   const response = {
     statusCode: 200,
