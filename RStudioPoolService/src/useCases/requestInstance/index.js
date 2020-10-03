@@ -8,7 +8,14 @@ const MIN_FREE_INSTANCES = 1
 PUT/POST
 body { data: userId }
 */
-const requestInstance = async ({ userId = 'USER_ID' }) => {
+const requestInstance = async ({ userId = false } = {}) => {
+  if (!userId) {
+    const response = {
+      statusCode: 403,
+      body: JSON.stringify({}),
+    }
+    return response
+  }
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()
