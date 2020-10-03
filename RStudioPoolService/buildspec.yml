@@ -23,3 +23,8 @@ phases:
   post_build:
     commands:
       - sam deploy --template-file template-export.yml --stack-name r-studio-pool-service --capabilities CAPABILITY_IAM
+artifacts:
+  type: zip
+  files:
+    - template.yml
+    - template-export.yml
