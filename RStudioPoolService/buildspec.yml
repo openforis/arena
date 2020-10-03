@@ -15,11 +15,14 @@ phases:
       - npm prune --production
   build:
     commands:
+      - echo Build started on `date`
+      - echo Entered the build phase ...
       # Use AWS SAM to package the application by using AWS CloudFormation
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+  post_build:
+    commands:
+      - sam deploy --template-file template-export.yml --stack-name r-studio-pool-service --capabilities CAPABILITY_IAM
 artifacts:
   type: zip
   files:
     - template-export.yml
-
-
