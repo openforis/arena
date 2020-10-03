@@ -18,8 +18,8 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Entered the build phase ...
-      # Use AWS SAM to package the application by using AWS CloudFormation
-      - aws cloudformation package --template template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-81qiwpvg6puh --output-template template-export.yml
+      # Use AWS SAM to package the application by using AWS CloudFormation - sam package command is an alias for the aws cloudformation
+      - sam package --template template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-81qiwpvg6puh --output-template template-export.yml
   post_build:
     commands:
       - sam deploy --template-file template-export.yml --stack-name r-studio-pool-service --capabilities CAPABILITY_IAM
