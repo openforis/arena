@@ -18,6 +18,7 @@ const getInstances = async () => {
 
 const getFreeInstances = async () => {
   const instances = await getInstances()
+  console.log("instances", instances)
   return (instances || []).filter(InstanceModel.isFree)
 }
 
