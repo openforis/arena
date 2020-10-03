@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: RStudioPoolService
+Transform:
+- AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  RStudioPoolFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/checkStatus.checkStatusHandler
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: A Lambda function that returns a static string.
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      CodeUri: RStudioPoolFunction
