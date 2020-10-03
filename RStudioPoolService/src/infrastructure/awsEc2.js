@@ -9,8 +9,9 @@ const createInstance = async (newInstanceConfig) => {
 
   // function to create this new instance
   const instance = await ec2.runInstances(params).promise()
-  console.log("instance", instance)
-  return instance
+  const instanceCreated = instance.Instances[0]
+  console.log("instanceCreated", instanceCreated)
+  return instanceCreated
 }
 
 const terminateInstance = async ({ instanceId }) => {
