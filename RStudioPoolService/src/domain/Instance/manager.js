@@ -1,5 +1,5 @@
 const { redis, awsEc2 } = require('../../infrastructure')
-const { Model: InstanceModel } = require('./model')
+const InstanceModel = require('./model')
 
 const getInstancesKeys = async () => redis.keys()
 const getInstance = async ({ instanceId }) => {
@@ -18,7 +18,7 @@ const getInstances = async () => {
 
 const getFreeInstances = async () => {
   const instances = await getInstances()
-  console.log("instances", instances)
+  console.log('instances', instances)
   return (instances || []).filter(InstanceModel.isFree)
 }
 

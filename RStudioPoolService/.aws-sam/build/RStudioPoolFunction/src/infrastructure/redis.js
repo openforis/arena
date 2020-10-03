@@ -1,7 +1,7 @@
 const Redis = require('ioredis')
 
-//const HOST = '172.16.123.1'
-const HOST = 'redis-rstudio-service.lserka.ng.0001.euc1.cache.amazonaws.com'
+const HOST = '172.16.123.1'
+//const HOST = 'redis-rstudio-service.lserka.ng.0001.euc1.cache.amazonaws.com'
 const PORT = 6379
 const redisConfig = { host: HOST, port: PORT }
 
