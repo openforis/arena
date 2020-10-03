@@ -13,7 +13,7 @@ describe('Test for hello-from-lambda', function () {
             if you change from `const message = 'Hello from Lambda!';` to `const message = 'Hello World!';` in hello-from-lambda.js
             you should change the following line to `const expectedResult = 'Hello World!';`
         */
-    const expectedResult = '{"statusCode": 403, "body": "{}"}'
+    const expectedResult = '{"statusCode":403,"body":"{}"}'
 
     // Compare the result with the expected result
     expect(JSON.stringify(result)).toEqual(expectedResult)
