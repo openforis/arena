@@ -17,6 +17,7 @@ const requestInstance = async ({ userId = false } = {}) => {
     }
     return response
   }
+  console.log("AAAAA")
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()

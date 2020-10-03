@@ -9,6 +9,7 @@ PUT/POST
 body { data: userId }
 */
 const requestInstance = async ({ userId = false } = {}) => {
+  console.log("requestInstance")
   if (!userId) {
     const response = {
       statusCode: 403,
@@ -16,6 +17,7 @@ const requestInstance = async ({ userId = false } = {}) => {
     }
     return response
   }
+  console.log("AAAAA")
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()

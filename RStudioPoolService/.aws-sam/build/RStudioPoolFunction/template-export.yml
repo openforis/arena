@@ -9,17 +9,11 @@ Resources:
   RStudioPoolFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/rstudioPoolService.handler
+      Handler: src/handlers/checkStatus.checkStatusHandler
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100
       Description: A Lambda function that returns a static string.
       Policies:
       - AWSLambdaBasicExecutionRole
-      Events:
-        RStudioPoolService:
-          Type: Api
-          Properties:
-            Path: /
-            Method: POST
-      CodeUri: RStudioPoolFunction
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-81qiwpvg6puh/aece144c8ca1702a2dcd92931a288dcb
