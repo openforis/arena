@@ -4,15 +4,19 @@ const SECURTY_GROUP = 'sg-0718fb65b156ac691'
 const INSTANCE_PROFILE = 'ec2-admin'
 const KEY_NAME = 'LambdaInstance'
 
-const getId = (instance) => instance.instanceId || instance.intanceId || instance.id
+const getId = (instance) => instance.instanceId
 const getUrl = (instance) => instance.url
 const getUserId = (instance) => instance.userId
+const getKeyName = (instance) => instance.keyName
 
 const isFree = (instance) => !getUserId(instance)
 
 const setUserId = ({ userId }) => (instance) => ({ ...instance, userId })
 
-const parsedInstanceFrom = ({ instance, from }) => ({ ...instance })
+const parsedInstanceFrom = ({ instance, from }) => {
+  const { InstanceId, PublicDnsName, KeyName } = instance
+  return { instanceId: InstanceId, url: PublicDnsName, keyName: KeyName }
+}
 
 const getNewInstanceConfig = () => ({
   ImageId: 'ami-0130bec6e5047f596', // this iam can be found right to the name of the instance when a new instance is launched by hand, this id is unique by region
