@@ -2,15 +2,13 @@ const EC2 = require('aws-sdk/clients/ec2')
 
 const createInstance = async (newInstanceConfig) => {
   const ec2 = new EC2()
-  console.log("newInstanceConfig", newInstanceConfig)
-  console.log("ec2", ec2)
   const params = {
     ...newInstanceConfig,
     UserData: new Buffer.from(newInstanceConfig.UserData).toString('base64'),
   }
 
   // function to create this new instance
-  const instance = await ec2.runInstances(params).promise();
+  const instance = await ec2.runInstances(params).promise()
   console.log("instance", instance)
   return instance
 }

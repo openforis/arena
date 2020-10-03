@@ -1,7 +1,7 @@
 const { redis, awsEc2 } = require('../../infrastructure')
 const InstanceModel = require('./model')
 
-const getInstancesKeys = async () => [] //redis.keys()
+const getInstancesKeys = async () => redis.keys()
 const getInstance = async ({ instanceId }) => {
   const instance = await redis.get(instanceId)
   if (instance) {
