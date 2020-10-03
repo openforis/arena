@@ -9,7 +9,7 @@ PUT/POST
 body { data: userId }
 */
 const requestInstance = async ({ userId = false } = {}) => {
-  console.log("requestInstance")
+  console.log('requestInstance')
   if (!userId) {
     const response = {
       statusCode: 403,
@@ -17,11 +17,9 @@ const requestInstance = async ({ userId = false } = {}) => {
     }
     return response
   }
-  console.log("AAAAA")
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()
-  console.log("BBBB", freeInstances)
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstances] = freeInstances
     assignedInstance = freeInstance
@@ -32,13 +30,12 @@ const requestInstance = async ({ userId = false } = {}) => {
   } else {
     assignedInstance = await InstanceManager.createNewInstance()
   }
-  console.log("assignedInstance", assignedInstance)
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
   const instanceId = InstanceModel.getId(assignedInstance)
   await InstanceManager.saveInstance(assignedInstance)
 
-  console.log("instanceId", instanceId)
+  console.log('instanceIdAA', instanceId)
 
   const response = {
     statusCode: 200,

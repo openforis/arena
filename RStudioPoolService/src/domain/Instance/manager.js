@@ -1,7 +1,7 @@
 const { redis, awsEc2 } = require('../../infrastructure')
 const InstanceModel = require('./model')
 
-const getInstancesKeys = async () => redis.keys()
+const getInstancesKeys = async () => [] //redis.keys()
 const getInstance = async ({ instanceId }) => {
   const instance = await redis.get(instanceId)
   if (instance) {
@@ -18,14 +18,14 @@ const getInstances = async () => {
 
 const getFreeInstances = async () => {
   const instances = await getInstances()
-  console.log('instances', instances)
   return (instances || []).filter(InstanceModel.isFree)
 }
 
-const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance), JSON.parse(instance))
+const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
 
 const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanceConfig()) => {
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
+  console.log('createdInstance', createdInstance)
   return InstanceModel.parsedInstanceFrom({
     instance: createdInstance,
     from: 'AWS',

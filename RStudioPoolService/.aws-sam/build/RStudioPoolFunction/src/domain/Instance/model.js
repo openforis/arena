@@ -4,7 +4,7 @@ const SECURTY_GROUP = 'SECURTY_GROUP'
 const INSTANCE_PROFILE = 'ec2-admin'
 const KEY_NAME = 'KEY_NAME'
 
-const getId = (instance) => instance.id
+const getId = (instance) => instance.instanceId || instance.intanceId || instance.id
 const getUrl = (instance) => instance.url
 const getUserId = (instance) => instance.userId
 

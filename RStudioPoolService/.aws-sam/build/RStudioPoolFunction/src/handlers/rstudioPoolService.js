@@ -16,13 +16,13 @@ exports.handler = async (event = {}) => {
   const { payload = {} } = bodyParsed
   const commandHandler = getCommandHandler(bodyParsed)
 
+  let response = {
+    statusCode: 400,
+    body: JSON.stringify({ status: event }),
+  }
   console.log('payload', payload, commandHandler)
   if (commandHandler) {
-    return commandHandler(payload)
-  }
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ status: event }),
+    response = commandHandler(payload)
   }
   return response
 }
