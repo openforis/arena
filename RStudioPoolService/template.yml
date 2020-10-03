@@ -29,7 +29,7 @@ Resources:
       Handler: src/handlers/rstudioPoolService.handler
       Runtime: nodejs12.x
       MemorySize: 128
-      Timeout: 100
+      Timeout: 10
       Description: A Lambda function that returns a static string.
       Role: 'arn:aws:iam::407725983764:role/lambda-ec2-iam-full-access'
       Events:
