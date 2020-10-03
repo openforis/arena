@@ -10,8 +10,8 @@ const createInstance = async (newInstanceConfig) => {
   }
 
   // function to create this new instance
-  const instance = await ec2.runInstances(params).promise()
-
+  const instance = await ec2.runInstances(params).promise();
+  console.log("instance", instance)
   return instance
 }
 
