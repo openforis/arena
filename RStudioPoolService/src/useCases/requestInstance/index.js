@@ -20,6 +20,7 @@ const requestInstance = async ({ userId = false } = {}) => {
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()
+  console.log("freeInstances", freeInstances)
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstances] = freeInstances
     assignedInstance = freeInstance
