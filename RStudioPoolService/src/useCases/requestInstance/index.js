@@ -9,6 +9,7 @@ PUT/POST
 body { data: userId }
 */
 const requestInstance = async ({ userId = false } = {}) => {
+  console.log("requestInstance")
   if (!userId) {
     const response = {
       statusCode: 403,

@@ -16,6 +16,7 @@ exports.handler = async (event) => {
   const { payload = {} } = body
   const commandHandler = getCommandHandler(bodyParsed)
 
+  console.log("payload",payload, commandHandler)
   if (commandHandler) {
     return commandHandler(payload)
   }
