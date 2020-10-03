@@ -29,6 +29,7 @@ const requestInstance = async ({ userId = false } = {}) => {
       await InstanceManager.createNewInstance()
     }
   } else {
+    console.log("assignedInstance", assignedInstance)
     assignedInstance = await InstanceManager.createNewInstance()
   }
 

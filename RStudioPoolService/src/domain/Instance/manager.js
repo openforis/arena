@@ -26,7 +26,7 @@ const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance)
 const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanceConfig()) => {
   console.log("CREATE", newInstanceConfig)
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
-  console.log('createdInstance', createdInstance)
+  console.log('createdInstance')
   return InstanceModel.parsedInstanceFrom({
     instance: createdInstance,
     from: 'AWS',
