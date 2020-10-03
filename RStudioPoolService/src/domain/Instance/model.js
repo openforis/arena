@@ -2,7 +2,7 @@ const REGION = 'eu-central-1'
 const ACCOUNT = '407725983764.dkr.ecr.eu-central-1.amazonaws.com'
 const SECURTY_GROUP = 'sg-0718fb65b156ac691'
 const INSTANCE_PROFILE = 'ec2-admin'
-const KEY_NAME = 'KEY_NAME'
+const KEY_NAME = 'LambdaInstance'
 
 const getId = (instance) => instance.instanceId || instance.intanceId || instance.id
 const getUrl = (instance) => instance.url
