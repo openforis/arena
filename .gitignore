@@ -289,3 +289,4 @@ modules.xml
 
 # RStudioPoolService
 RStudioPoolService/node_modules/
+RStudioPoolService/.aws-sam/

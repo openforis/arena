@@ -9,7 +9,7 @@ const checkStatus = async ({ userId } = {}) => {
   if (!instance) {
     response = {
       statusCode: 400,
-      body: JSON.stringify(),
+      body: JSON.stringify({}),
     }
   } else {
     response = {

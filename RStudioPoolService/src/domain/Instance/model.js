@@ -12,7 +12,7 @@ const isFree = (instance) => !getUserId(instance)
 
 const setUserId = ({ userId }) => (instance) => ({ ...instance, userId })
 
-const parsedInstanceFrom = ({ instance, from }) => {
+const parsedInstanceFrom = ({ instance }) => {
   const { InstanceId, PublicDnsName, KeyName, Tags } = instance
   return {
     instanceId: InstanceId,

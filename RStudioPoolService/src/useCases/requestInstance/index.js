@@ -22,7 +22,7 @@ const requestInstance = async ({ userId = false } = {}) => {
     return response
   }
 
-  const userInstance = await InstanceManager.getUserInstance({ userId })
+  const userInstance = await InstanceManager.getInstanceByUserId({ userId })
   if (userInstance) {
     return generateResponse(userInstance)
   }
