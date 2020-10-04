@@ -23,7 +23,7 @@ const getInstances = async () => {
   return instances*/
 
   const instancesAws = await awsEc2.getInstances()
-  console.log("instancesAws", instancesAws)
+  console.log('instancesAws', instancesAws)
   const instances = (instancesAws || []).map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
   console.log('instancesUp', instances)
   return instances
@@ -40,7 +40,7 @@ const saveInstance = async (instance) => {
   await redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
 }
 
-const createNewInstance = async ({ userId } = {}) => {
+const createNewInstance = async ({ userId = false } = {}) => {
   const newInstanceConfig = InstanceModel.getNewInstanceConfig({ userId })
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
 
