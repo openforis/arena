@@ -13,8 +13,13 @@ const isFree = (instance) => !getUserId(instance)
 const setUserId = ({ userId }) => (instance) => ({ ...instance, userId })
 
 const parsedInstanceFrom = ({ instance, from }) => {
-  const { InstanceId, PublicDnsName, KeyName } = instance
-  return { instanceId: InstanceId, url: PublicDnsName, keyName: KeyName }
+  const { InstanceId, PublicDnsName, KeyName, Tags } = instance
+  return {
+    instanceId: InstanceId,
+    url: PublicDnsName,
+    keyName: KeyName,
+    ...(Tags || []).reduce((tags, tag) => ({ ...tags, [tag.Key]: tag.Value }), {}),
+  }
 }
 
 const getNewInstanceConfig = ({ userId } = {}) => ({
