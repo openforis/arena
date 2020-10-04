@@ -21,16 +21,21 @@ const getFreeInstances = async () => {
   return (instances || []).filter(InstanceModel.isFree)
 }
 
-const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
+const saveInstance = async (instance) => {
+  console.log('SAVE', InstanceModel.getId(instance), JSON.stringify(instance))
+  await redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
+}
 
 const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanceConfig()) => {
-  console.log("CREATE", newInstanceConfig)
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
-  console.log('createdInstance')
-  return InstanceModel.parsedInstanceFrom({
+
+  const instance = InstanceModel.parsedInstanceFrom({
     instance: createdInstance,
     from: 'AWS',
   })
+  console.log('createdInstance', instance)
+  saveInstance(instance)
+  return instance
 }
 
 const terminateInstance = async ({ instanceId }) => {
