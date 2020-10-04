@@ -42,14 +42,10 @@ const assignInstance = async ({ instanceId, userId }) => {
         Key: 'Purpose',
         Value: 'RStudio',
       },
-      ...(userId
-        ? [
-            {
-              Key: 'userId',
-              Value: userId,
-            },
-          ]
-        : []),
+      {
+        Key: 'userId',
+        Value: userId || 'FREE',
+      },
     ],
   }
   await ec2.createTags(params).promise()
