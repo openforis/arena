@@ -35,7 +35,7 @@ const requestInstance = async ({ userId = false } = {}) => {
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
   const instanceId = InstanceModel.getId(assignedInstance)
-  await InstanceManager.saveInstance(assignedInstance)
+  //await InstanceManager.saveInstance(assignedInstance)
   await InstanceManager.assignInstance({ instance: assignedInstance, userId })
 
   console.log('instanceIdAA', instanceId)
