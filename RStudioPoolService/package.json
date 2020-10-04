@@ -3,10 +3,7 @@
     "description": "replaced-by-user-input",
     "version": "0.0.1",
     "private": true,
-    "dependencies": {
-        "aws-sdk": "^2.754.0",
-        "ioredis": "^4.17.3"
-    },
+    "dependencies": {},
     "devDependencies": {
         "jest": "^24.7.1"
     },

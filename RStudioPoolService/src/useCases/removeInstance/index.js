@@ -7,8 +7,9 @@ const { Manager: InstanceManager } = Instance
   body: { instanceId: 'XXXX' }
 */
 
-const removeInstance = async ({ instanceId }) => {
-  await InstanceManager.terminateInstance({ instanceId })
+const removeInstance = async ({ userId }) => {
+
+  await InstanceManager.terminateInstance({ userId })
 
   const response = {
     statusCode: 200,

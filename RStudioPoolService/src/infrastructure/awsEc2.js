@@ -10,7 +10,6 @@ const createInstance = async (newInstanceConfig) => {
   // function to create this new instance
   const instance = await ec2.runInstances(params).promise()
   const instanceCreated = instance.Instances[0]
-  console.log('instanceCreated', instanceCreated)
   return instanceCreated
 }
 
@@ -30,12 +29,9 @@ const getInstances = async () => {
       },
     ],
   }
-  console.log('params', params)
   const reservations = await ec2.describeInstances(params).promise()
-  console.log('reservations', reservations)
   const { Reservations } = reservations
   const instances = Reservations.reduce((acc, reservation) => [...acc, ...(reservation.Instances || [])], [])
-
   return instances
 }
 

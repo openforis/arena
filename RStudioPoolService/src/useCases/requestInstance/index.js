@@ -27,9 +27,9 @@ const requestInstance = async ({ userId = false } = {}) => {
     return generateResponse(userInstance)
   }
 
-  const freeInstances = await InstanceManager.getFreeInstances()
   let assignedInstance = false
   let remainFreeInstances = 0
+  const freeInstances = await InstanceManager.getFreeInstances()
 
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstancesList] = freeInstances
@@ -38,6 +38,7 @@ const requestInstance = async ({ userId = false } = {}) => {
   } else {
     assignedInstance = await InstanceManager.createNewInstance({ userId })
   }
+
   if (remainFreeInstances < MIN_FREE_INSTANCES) {
     await InstanceManager.createNewInstance()
   }
