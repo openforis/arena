@@ -23,6 +23,7 @@ const getInstances = async () => {
   return instances*/
 
   const instancesAws = await awsEc2.getInstances()
+  console.log("instancesAws", instancesAws)
   const instances = (instancesAws || []).map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
   console.log('instancesUp', instances)
   return instances

@@ -16,7 +16,7 @@ const createInstance = async (newInstanceConfig) => {
 
 const terminateInstance = async ({ instanceId }) => {
   const ec2 = new EC2()
-  return ec2.terminateInstances({ InstanceIds: [instanceId] })
+  return ec2.terminateInstances({ InstanceIds: [instanceId] }).promise()
 }
 
 const getInstances = async () => {
@@ -24,7 +24,9 @@ const getInstances = async () => {
   const params = {
     Filters: [{ Name: 'tag:Purpose', Values: ['RStudio'] }],
   }
+  console.log('params', params)
   const reservations = await ec2.describeInstances(params).promise()
+  console.log('reservations', reservations)
   const { Reservations } = reservations
   const instances = Reservations.reduce((acc, reservation) => [...acc, ...(reservation.Instances || [])], [])
 
