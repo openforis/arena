@@ -4,12 +4,16 @@ const { Model: InstanceModel, Manager: InstanceManager } = Instance
 
 const MIN_FREE_INSTANCES = 1
 
-/*
-PUT/POST
-body { data: userId }
-*/
+const generateResponse = (instance) => {
+  const instanceId = InstanceModel.getId(instance)
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({ instanceId }),
+  }
+  return response
+}
+
 const requestInstance = async ({ userId = false } = {}) => {
-  console.log('requestInstance')
   if (!userId) {
     const response = {
       statusCode: 403,
@@ -17,31 +21,32 @@ const requestInstance = async ({ userId = false } = {}) => {
     }
     return response
   }
+
+  const userInstance = await InstanceManager.getUserInstance({ userId })
+  if (userInstance) {
+    return generateResponse(userInstance)
+  }
+
   let assignedInstance = false
-
+  let remainFreeInstances = 0
   const freeInstances = await InstanceManager.getFreeInstances()
-  if (freeInstances.length > 0) {
-    const [freeInstance, ...remainFreeInstances] = freeInstances
-    assignedInstance = freeInstance
 
-    if (remainFreeInstances.length < MIN_FREE_INSTANCES) {
-      await InstanceManager.createNewInstance()
-    }
+  if (freeInstances.length > 0) {
+    const [freeInstance, ...remainFreeInstancesList] = freeInstances
+    assignedInstance = freeInstance
+    remainFreeInstances = remainFreeInstancesList.length
   } else {
-    assignedInstance = await InstanceManager.createNewInstance()
+    assignedInstance = await InstanceManager.createNewInstance({ userId })
+  }
+
+  if (remainFreeInstances < MIN_FREE_INSTANCES) {
+    await InstanceManager.createNewInstance()
   }
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
-  const instanceId = InstanceModel.getId(assignedInstance)
-  await InstanceManager.saveInstance(assignedInstance)
+  await InstanceManager.assignInstance({ instance: assignedInstance, userId })
 
-  console.log('instanceIdAA', instanceId)
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ instanceId }),
-  }
-  return response
+  return generateResponse(assignedInstance)
 }
 
 module.exports = requestInstance

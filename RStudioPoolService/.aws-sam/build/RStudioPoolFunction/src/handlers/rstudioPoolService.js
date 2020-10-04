@@ -20,7 +20,6 @@ exports.handler = async (event = {}) => {
     statusCode: 400,
     body: JSON.stringify({ status: event }),
   }
-  console.log('payload', payload, commandHandler)
   if (commandHandler) {
     response = commandHandler(payload)
   }

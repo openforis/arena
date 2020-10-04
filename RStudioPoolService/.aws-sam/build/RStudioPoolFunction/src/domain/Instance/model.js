@@ -1,20 +1,28 @@
 const REGION = 'eu-central-1'
-const ACCOUNT = 'XXX'
-const SECURTY_GROUP = 'SECURTY_GROUP'
+const ACCOUNT = '407725983764.dkr.ecr.eu-central-1.amazonaws.com'
+const SECURTY_GROUP = 'sg-0718fb65b156ac691'
 const INSTANCE_PROFILE = 'ec2-admin'
-const KEY_NAME = 'KEY_NAME'
+const KEY_NAME = 'LambdaInstance'
 
-const getId = (instance) => instance.instanceId || instance.intanceId || instance.id
+const getId = (instance) => instance.instanceId
 const getUrl = (instance) => instance.url
-const getUserId = (instance) => instance.userId
+const getUserId = (instance) => instance.userId || false
 
 const isFree = (instance) => !getUserId(instance)
 
 const setUserId = ({ userId }) => (instance) => ({ ...instance, userId })
 
-const parsedInstanceFrom = ({ instance, from }) => ({ ...instance })
+const parsedInstanceFrom = ({ instance, from }) => {
+  const { InstanceId, PublicDnsName, KeyName, Tags } = instance
+  return {
+    instanceId: InstanceId,
+    url: PublicDnsName,
+    keyName: KeyName,
+    ...(Tags || []).reduce((tags, tag) => ({ ...tags, [tag.Key]: tag.Value }), {}),
+  }
+}
 
-const getNewInstanceConfig = () => ({
+const getNewInstanceConfig = ({ userId = false } = {}) => ({
   ImageId: 'ami-0130bec6e5047f596', // this iam can be found right to the name of the instance when a new instance is launched by hand, this id is unique by region
   InstanceType: 't2.micro', // size of the instance
   KeyName: KEY_NAME,
@@ -38,6 +46,25 @@ const getNewInstanceConfig = () => ({
     docker pull ${ACCOUNT}/rstudio
     sudo docker run -d -p 8787:8787 -e DISABLE_AUTH=true ${ACCOUNT}/rstudio
  `,
+  TagSpecifications: [
+    {
+      ResourceType: 'instance',
+      Tags: [
+        {
+          Key: 'Purpose',
+          Value: 'RStudio',
+        },
+        ...(userId
+          ? [
+              {
+                Key: 'userId',
+                Value: userId,
+              },
+            ]
+          : []),
+      ],
+    },
+  ],
 })
 
 const Instance = {

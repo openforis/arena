@@ -29,14 +29,18 @@ Resources:
       Handler: src/handlers/rstudioPoolService.handler
       Runtime: nodejs12.x
       MemorySize: 128
-      Timeout: 100
+      Timeout: 10
       Description: A Lambda function that returns a static string.
-      Policies:
-        # Give Lambda basic execution Permission to the helloFromLambda
-        - AWSLambdaBasicExecutionRole
+      Role: 'arn:aws:iam::407725983764:role/lambda-ec2-iam-full-access'
       Events:
         RStudioPoolService:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /
             Method: POST
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-b1b579d3
+        SubnetIds:
+          - subnet-38e6fc75
+          - subnet-c2ea32a8

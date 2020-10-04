@@ -1,19 +1,15 @@
-const { redis, awsEc2 } = require('../../infrastructure')
+const { awsEc2 } = require('../../infrastructure')
 const InstanceModel = require('./model')
 
-const getInstancesKeys = async () => redis.keys()
-const getInstance = async ({ instanceId }) => {
-  const instance = await redis.get(instanceId)
-  if (instance) {
-    return JSON.parse(instance)
-  }
-  return false
-}
-
 const getInstances = async () => {
-  const instancesKeys = await getInstancesKeys()
-  const instances = await Promise.all((instancesKeys || []).map(async (instanceId) => getInstance({ instanceId })))
+  const instancesAws = await awsEc2.getInstances()
+  const instances = (instancesAws || []).map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
   return instances
+}
+const getInstanceByUserId = async ({ userId }) => {
+  const instances = await getInstances()
+  const instanceByUserId = instances.find((instance) => InstanceModel.getUserId(instance) === userId)
+  return instanceByUserId
 }
 
 const getFreeInstances = async () => {
@@ -21,28 +17,42 @@ const getFreeInstances = async () => {
   return (instances || []).filter(InstanceModel.isFree)
 }
 
-const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
+const getUserInstance = async ({ userId = false } = {}) => {
+  if (!userId) return false
+  const instances = await getInstances()
+  const userInstance = instances.find((instance) => InstanceModel.getUserId(instance) === userId)
+  return userInstance
+}
 
-const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanceConfig()) => {
+const createNewInstance = async ({ userId = false } = {}) => {
+  const newInstanceConfig = InstanceModel.getNewInstanceConfig({ userId })
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
-  console.log('createdInstance', createdInstance)
-  return InstanceModel.parsedInstanceFrom({
+
+  const instance = InstanceModel.parsedInstanceFrom({
     instance: createdInstance,
     from: 'AWS',
   })
+  return instance
 }
 
-const terminateInstance = async ({ instanceId }) => {
+const terminateInstance = async ({ userId }) => {
+  const instance = await getInstanceByUserId({ userId })
+  if (!instance) return
+  const instanceId = InstanceModel.getId(instance)
   await awsEc2.terminateInstance({ instanceId })
-  await redis.remove(instanceId)
+}
+
+const assignInstance = async ({ instance, userId }) => {
+  const instanceId = InstanceModel.getId(instance)
+  await awsEc2.assignInstance({ instanceId, userId })
 }
 
 const InstanceManager = {
-  getInstancesKeys,
-  getInstance,
+  getInstanceByUserId,
   getInstances,
   getFreeInstances,
-  saveInstance,
+  getUserInstance,
+  assignInstance,
   createNewInstance,
   terminateInstance,
 }

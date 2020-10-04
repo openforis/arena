@@ -2,21 +2,20 @@ const { Instance } = require('../../domain')
 
 const { Manager: InstanceManager } = Instance
 
-/*
-  GET /
-  GET /:id
-*/
-const checkStatus = async ({ instanceId = false } = {}) => {
-  let responseData = {}
-  if (instanceId) {
-    responseData = InstanceManager.getInstance({ instanceId })
-  } else {
-    responseData = InstanceManager.getInstances({ instanceId })
-  }
+const checkStatus = async ({ userId } = {}) => {
+  const instance = await InstanceManager.getInstanceByUserId({ userId })
 
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify(responseData),
+  let response = {}
+  if (!instance) {
+    response = {
+      statusCode: 400,
+      body: JSON.stringify(),
+    }
+  } else {
+    response = {
+      statusCode: 200,
+      body: JSON.stringify({ instance }),
+    }
   }
   return response
 }
