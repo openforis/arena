@@ -13,13 +13,18 @@ const getInstance = async ({ instanceId }) => {
 }
 
 const getInstances = async () => {
-  const instancesKeys = await getInstancesKeys()
+  /*const instancesKeys = await getInstancesKeys()
   const instancesAws = ((await awsEc2.getInstances()) || []).map((instance) =>
     InstanceModel.parsedInstanceFrom({ instance })
   )
   console.log('instancesKeys', instancesKeys)
   console.log('instancesUp', instancesAws)
   const instances = await Promise.all((instancesKeys || []).map(async (instanceId) => getInstance({ instanceId })))
+  return instances*/
+
+  const instancesAws = await awsEc2.getInstances()
+  const instances = (instancesAws || []).map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
+  console.log('instancesUp', instances)
   return instances
 }
 
