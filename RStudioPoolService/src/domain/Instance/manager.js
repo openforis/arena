@@ -12,6 +12,7 @@ const getInstance = async ({ instanceId }) => {
 
 const getInstances = async () => {
   const instancesKeys = await getInstancesKeys()
+  console.log("instancesKeys", instancesKeys)
   const instances = await Promise.all((instancesKeys || []).map(async (instanceId) => getInstance({ instanceId })))
   return instances
 }
