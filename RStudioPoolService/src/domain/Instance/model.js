@@ -52,11 +52,13 @@ const getNewInstanceConfig = ({ userId = false } = {}) => ({
       Value: 'RStudio',
     },
     ...(userId
-      ? {
-          Key: 'userId',
-          Value: userId,
-        }
-      : {}),
+      ? [
+          {
+            Key: 'userId',
+            Value: userId,
+          },
+        ]
+      : []),
   ],
 })
 
