@@ -16,8 +16,8 @@ while ! nc -z $PGHOST $PGPORT; do sleep 1; done;
 cp test/db/migrations/*.js server/db/migration/public/migrations
 cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
 
-# Build and start Arena
-npm run build:server:prod; npm run build-prod;
+# Build and start Arena in dev environment
+npm run build:server:dev; npm run build-dev;
 ln -s dist/server.js .
 exec pm2-runtime server.js &
 

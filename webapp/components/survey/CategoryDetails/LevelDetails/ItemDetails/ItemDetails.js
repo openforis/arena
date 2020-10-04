@@ -19,7 +19,7 @@ import { useSurveyLang } from '@webapp/store/survey'
 import { State, useActions } from '../../store'
 
 const ItemDetails = (props) => {
-  const { level, item, state, setState } = props
+  const { level, index, item, state, setState } = props
 
   const elemRef = useRef(null)
 
@@ -52,8 +52,11 @@ const ItemDetails = (props) => {
     }
   }, [active])
 
+  const prefixId = `category-level-${levelIndex}-item-${index}`
+
   return (
     <div
+      id={prefixId}
       className={`category__item ${active ? 'active' : ''}`}
       onKeyDown={setActive}
       onClick={setActive}
@@ -64,12 +67,18 @@ const ItemDetails = (props) => {
       <ErrorBadge validation={validation} showLabel={false} showIcon />
       {active ? (
         <>
-          <button type="button" className="btn btn-s btn-close" onClick={() => Actions.resetItemActive({ levelIndex })}>
+          <button
+            id={`${prefixId}-btn-close`}
+            type="button"
+            className="btn btn-s btn-close"
+            onClick={() => Actions.resetItemActive({ levelIndex })}
+          >
             <span className="icon icon-arrow-up icon-12px" />
           </button>
 
           <FormItem label={i18n.t('common.code')}>
             <Input
+              id={`${prefixId}-code`}
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
@@ -79,6 +88,7 @@ const ItemDetails = (props) => {
           </FormItem>
 
           <LabelsEditor
+            inputFieldIdPrefix={`${prefixId}-label`}
             labels={CategoryItem.getLabels(item)}
             onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
             readOnly={readOnly}
@@ -126,6 +136,7 @@ const ItemDetails = (props) => {
 
 ItemDetails.propTypes = {
   level: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
   item: PropTypes.object.isRequired,
   state: PropTypes.object.isRequired,
   setState: PropTypes.func.isRequired,

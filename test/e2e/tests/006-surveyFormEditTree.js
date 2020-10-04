@@ -1,9 +1,6 @@
-import {
-  addItemToPage,
-  expectItemIsTheLastNodeDef,
-  expectCurrentPageIs,
-  expectSurveyFormEntityItemsAreInOrder,
-} from '../utils/ui'
+import { addItemToPage } from '../utils/ui/nodeDefDetail'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItemNames } from '../utils/ui/surveyForm'
+import { expectCurrentPageIs } from '../utils/ui/surveyFormPage'
 
 const nodeDefItems = [
   { type: 'integer', name: 'tree_id', label: 'Tree id', isKey: true },
@@ -25,5 +22,8 @@ describe('SurveyForm edit Tree', () => {
   })
 
   test('Tree add children - verify number and order of children', async () =>
-    expectSurveyFormEntityItemsAreInOrder({ items: nodeDefItems }))
+    expectSurveyFormItemNames({
+      entityName: 'tree',
+      itemNames: ['tree_id', 'tree_dec_1', 'tree_dec_2'],
+    }))
 })
