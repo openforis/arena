@@ -10,9 +10,9 @@ const checkStatus = async ({ instanceId = false } = {}) => {
   let responseData = {}
   console.log("check status", instanceId)
   if (instanceId) {
-    responseData = InstanceManager.getInstance({ instanceId })
+    responseData = await InstanceManager.getInstance({ instanceId })
   } else {
-    responseData = InstanceManager.getInstances({ instanceId })
+    responseData = await InstanceManager.getInstances({ instanceId })
   }
 
   const response = {
