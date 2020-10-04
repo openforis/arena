@@ -3,9 +3,9 @@ const InstanceModel = require('./model')
 
 const getInstancesKeys = async () => redis.keys()
 const getInstance = async ({ instanceId }) => {
-  console.log("getInstance", instanceId)
+  console.log('getInstance', instanceId)
   const instance = await redis.get(instanceId)
-  console.log("getInstance", instance)
+  console.log('getInstance', instance)
   if (instance) {
     return JSON.parse(instance)
   }
@@ -14,14 +14,16 @@ const getInstance = async ({ instanceId }) => {
 
 const getInstances = async () => {
   const instancesKeys = await getInstancesKeys()
-  console.log("instancesKeys", instancesKeys)
+  const instancesAws = await awsEc2.getInstances().map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
+  console.log('instancesKeys', instancesKeys)
+  console.log('instancesUp', instancesAws)
   const instances = await Promise.all((instancesKeys || []).map(async (instanceId) => getInstance({ instanceId })))
   return instances
 }
 
 const getFreeInstances = async () => {
   const instances = await getInstances()
-  console.log("instances", instances)
+  console.log('instances', instances)
   return (instances || []).filter(InstanceModel.isFree)
 }
 

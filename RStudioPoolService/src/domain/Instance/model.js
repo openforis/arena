@@ -7,7 +7,6 @@ const KEY_NAME = 'LambdaInstance'
 const getId = (instance) => instance.instanceId
 const getUrl = (instance) => instance.url
 const getUserId = (instance) => instance.userId
-const getKeyName = (instance) => instance.keyName
 
 const isFree = (instance) => !getUserId(instance)
 
@@ -42,6 +41,12 @@ const getNewInstanceConfig = () => ({
     docker pull ${ACCOUNT}/rstudio
     sudo docker run -d -p 8787:8787 -e DISABLE_AUTH=true ${ACCOUNT}/rstudio
  `,
+  Tags: [
+    {
+      Key: 'Purpose',
+      Value: 'RStudio',
+    },
+  ],
 })
 
 const Instance = {

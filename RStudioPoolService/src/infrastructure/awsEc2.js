@@ -10,7 +10,7 @@ const createInstance = async (newInstanceConfig) => {
   // function to create this new instance
   const instance = await ec2.runInstances(params).promise()
   const instanceCreated = instance.Instances[0]
-  console.log("instanceCreated", instanceCreated)
+  console.log('instanceCreated', instanceCreated)
   return instanceCreated
 }
 
@@ -19,7 +19,20 @@ const terminateInstance = async ({ instanceId }) => {
   return ec2.terminateInstances({ InstanceIds: [instanceId] })
 }
 
+const getInstances = async () => {
+  const ec2 = new EC2()
+  const params = {
+    Filters: [{ Name: 'tag:Purpose', Values: ['RStudio'] }],
+  }
+  const reservations = await ec2.describeInstances(params).promise()
+  const { Reservations } = reservations
+  const instances = Reservations.reduce((acc, reservation) => [...acc, ...(reservation.Instances || [])], [])
+
+  return instances
+}
+
 module.exports = {
+  getInstances,
   createInstance,
   terminateInstance,
 }
