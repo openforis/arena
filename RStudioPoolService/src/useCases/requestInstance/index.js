@@ -4,11 +4,6 @@ const { Model: InstanceModel, Manager: InstanceManager } = Instance
 
 const MIN_FREE_INSTANCES = 1
 
-/*
-PUT/POST
-body { data: userId }
-*/
-
 const generateResponse = (instance) => {
   const instanceId = InstanceModel.getId(instance)
   const response = {
@@ -26,27 +21,25 @@ const requestInstance = async ({ userId = false } = {}) => {
     }
     return response
   }
-  let assignedInstance = false
 
   const userInstance = await InstanceManager.getUserInstance({ userId })
   if (userInstance) {
-    console.log('userInstance', userInstance)
     return generateResponse(userInstance)
   }
 
   const freeInstances = await InstanceManager.getFreeInstances()
-  console.log('freeInstances', freeInstances)
-  if (freeInstances.length > 0) {
-    const [freeInstance, ...remainFreeInstances] = freeInstances
-    console.log(freeInstance, remainFreeInstances)
-    assignedInstance = freeInstance
+  let assignedInstance = false
+  let remainFreeInstances = 0
 
-    if (remainFreeInstances.length < MIN_FREE_INSTANCES) {
-      await InstanceManager.createNewInstance()
-    }
+  if (freeInstances.length > 0) {
+    const [freeInstance, ...remainFreeInstancesList] = freeInstances
+    assignedInstance = freeInstance
+    remainFreeInstances = remainFreeInstancesList.length
   } else {
     assignedInstance = await InstanceManager.createNewInstance({ userId })
-    console.log('assignedInstance', assignedInstance)
+  }
+  if (remainFreeInstances < MIN_FREE_INSTANCES) {
+    await InstanceManager.createNewInstance()
   }
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
