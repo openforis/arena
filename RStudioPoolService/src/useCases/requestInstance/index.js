@@ -38,10 +38,11 @@ const requestInstance = async ({ userId = false } = {}) => {
   console.log('freeInstances', freeInstances)
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstances] = freeInstances
+    console.log(freeInstance, remainFreeInstances)
     assignedInstance = freeInstance
 
     if (remainFreeInstances.length < MIN_FREE_INSTANCES) {
-      await InstanceManager.createNewInstance({ userId })
+      await InstanceManager.createNewInstance()
     }
   } else {
     assignedInstance = await InstanceManager.createNewInstance({ userId })
