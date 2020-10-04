@@ -39,10 +39,7 @@ const getUserInstance = async ({ userId = false } = {}) => {
   return userInstance
 }
 
-const saveInstance = async (instance) => {
-  console.log('SAVE', InstanceModel.getId(instance), JSON.stringify(instance))
-  await redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
-}
+const saveInstance = async (instance) => redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
 
 const createNewInstance = async ({ userId = false } = {}) => {
   const newInstanceConfig = InstanceModel.getNewInstanceConfig({ userId })
@@ -54,7 +51,7 @@ const createNewInstance = async ({ userId = false } = {}) => {
     from: 'AWS',
   })
   console.log('createdInstance', instance)
-  await saveInstance(instance)
+  //await saveInstance(instance)
   return instance
 }
 
