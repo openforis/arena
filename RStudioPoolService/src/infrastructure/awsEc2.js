@@ -31,8 +31,29 @@ const getInstances = async () => {
   return instances
 }
 
+const assignInstance = async ({ instanceId, userId }) => {
+  const ec2 = new EC2()
+  const params = {
+    Resources: [instanceId],
+    Tags: [
+      {
+        Key: 'Purpose',
+        Value: 'RStudio',
+      },
+      ...(userId
+        ? {
+            Key: 'Owner',
+            Value: userId,
+          }
+        : {}),
+    ],
+  }
+  await ec2.createTags(params).promise()
+}
+
 module.exports = {
   getInstances,
   createInstance,
   terminateInstance,
+  assignInstance,
 }

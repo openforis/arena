@@ -32,7 +32,8 @@ const saveInstance = async (instance) => {
   await redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
 }
 
-const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanceConfig()) => {
+const createNewInstance = async ({ userId } = {}) => {
+  const newInstanceConfig = InstanceModel.getNewInstanceConfig({ userId })
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
 
   const instance = InstanceModel.parsedInstanceFrom({
@@ -40,7 +41,7 @@ const createNewInstance = async (newInstanceConfig = InstanceModel.getNewInstanc
     from: 'AWS',
   })
   console.log('createdInstance', instance)
-  saveInstance(instance)
+  await saveInstance(instance)
   return instance
 }
 
@@ -49,12 +50,18 @@ const terminateInstance = async ({ instanceId }) => {
   await redis.remove(instanceId)
 }
 
+const assignInstance = async ({ instance, userId }) => {
+  const instanceId = InstanceModel.getId(instance)
+  await awsEc2.assignInstance({ instanceId, userId })
+}
+
 const InstanceManager = {
   getInstancesKeys,
   getInstance,
   getInstances,
   getFreeInstances,
   saveInstance,
+  assignInstance,
   createNewInstance,
   terminateInstance,
 }

@@ -20,22 +20,23 @@ const requestInstance = async ({ userId = false } = {}) => {
   let assignedInstance = false
 
   const freeInstances = await InstanceManager.getFreeInstances()
-  console.log("freeInstances", freeInstances)
+  console.log('freeInstances', freeInstances)
   if (freeInstances.length > 0) {
     const [freeInstance, ...remainFreeInstances] = freeInstances
     assignedInstance = freeInstance
 
     if (remainFreeInstances.length < MIN_FREE_INSTANCES) {
-      await InstanceManager.createNewInstance()
+      await InstanceManager.createNewInstance({ userId })
     }
   } else {
-    assignedInstance = await InstanceManager.createNewInstance()
-    console.log("assignedInstance", assignedInstance)
+    assignedInstance = await InstanceManager.createNewInstance({ userId })
+    console.log('assignedInstance', assignedInstance)
   }
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
   const instanceId = InstanceModel.getId(assignedInstance)
   await InstanceManager.saveInstance(assignedInstance)
+  await InstanceManager.assignInstance({ instance: assignedInstance, userId })
 
   console.log('instanceIdAA', instanceId)
 
