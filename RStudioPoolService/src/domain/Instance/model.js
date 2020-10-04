@@ -46,19 +46,24 @@ const getNewInstanceConfig = ({ userId = false } = {}) => ({
     docker pull ${ACCOUNT}/rstudio
     sudo docker run -d -p 8787:8787 -e DISABLE_AUTH=true ${ACCOUNT}/rstudio
  `,
-  Tags: [
+  TagSpecifications: [
     {
-      Key: 'Purpose',
-      Value: 'RStudio',
+      ResourceType: 'instance',
+      Tags: [
+        {
+          Key: 'Purpose',
+          Value: 'RStudio',
+        },
+        ...(userId
+          ? [
+              {
+                Key: 'userId',
+                Value: userId,
+              },
+            ]
+          : []),
+      ],
     },
-    ...(userId
-      ? [
-          {
-            Key: 'userId',
-            Value: userId,
-          },
-        ]
-      : []),
   ],
 })
 
