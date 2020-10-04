@@ -3,7 +3,9 @@ const InstanceModel = require('./model')
 
 const getInstancesKeys = async () => redis.keys()
 const getInstance = async ({ instanceId }) => {
+  console.log("getInstance", instanceId)
   const instance = await redis.get(instanceId)
+  console.log("getInstance", instance)
   if (instance) {
     return JSON.parse(instance)
   }

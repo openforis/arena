@@ -8,6 +8,7 @@ const { Manager: InstanceManager } = Instance
 */
 const checkStatus = async ({ instanceId = false } = {}) => {
   let responseData = {}
+  console.log("check status", instanceId)
   if (instanceId) {
     responseData = InstanceManager.getInstance({ instanceId })
   } else {
