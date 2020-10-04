@@ -6,7 +6,7 @@ const KEY_NAME = 'LambdaInstance'
 
 const getId = (instance) => instance.instanceId
 const getUrl = (instance) => instance.url
-const getUserId = (instance) => instance.userId
+const getUserId = (instance) => instance.userId || false
 
 const isFree = (instance) => !getUserId(instance)
 
@@ -51,10 +51,14 @@ const getNewInstanceConfig = ({ userId = false } = {}) => ({
       Key: 'Purpose',
       Value: 'RStudio',
     },
-    {
-      Key: 'userId',
-      Value: userId || 'FREE',
-    },
+    ...(userId
+      ? [
+          {
+            Key: 'userId',
+            Value: userId,
+          },
+        ]
+      : []),
   ],
 })
 

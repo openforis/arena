@@ -8,8 +8,17 @@ const MIN_FREE_INSTANCES = 1
 PUT/POST
 body { data: userId }
 */
+
+const generateResponse = (instance) => {
+  const instanceId = InstanceModel.getId(instance)
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({ instanceId }),
+  }
+  return response
+}
+
 const requestInstance = async ({ userId = false } = {}) => {
-  console.log('requestInstance')
   if (!userId) {
     const response = {
       statusCode: 403,
@@ -18,6 +27,12 @@ const requestInstance = async ({ userId = false } = {}) => {
     return response
   }
   let assignedInstance = false
+
+  const userInstance = await InstanceManager.getUserInstance({ userId })
+  if (userInstance) {
+    console.log('userInstance', userInstance)
+    return generateResponse(userInstance)
+  }
 
   const freeInstances = await InstanceManager.getFreeInstances()
   console.log('freeInstances', freeInstances)
@@ -34,17 +49,9 @@ const requestInstance = async ({ userId = false } = {}) => {
   }
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
-  const instanceId = InstanceModel.getId(assignedInstance)
-  //await InstanceManager.saveInstance(assignedInstance)
   await InstanceManager.assignInstance({ instance: assignedInstance, userId })
 
-  console.log('instanceIdAA', instanceId)
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ instanceId }),
-  }
-  return response
+  return generateResponse(assignedInstance)
 }
 
 module.exports = requestInstance

@@ -22,7 +22,13 @@ const terminateInstance = async ({ instanceId }) => {
 const getInstances = async () => {
   const ec2 = new EC2()
   const params = {
-    Filters: [{ Name: 'tag:Purpose', Values: ['RStudio'] }],
+    Filters: [
+      { Name: 'tag:Purpose', Values: ['RStudio'] },
+      {
+        Name: 'instance-state-name',
+        Values: ['pending', 'running'],
+      },
+    ],
   }
   console.log('params', params)
   const reservations = await ec2.describeInstances(params).promise()

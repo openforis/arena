@@ -35,6 +35,12 @@ const getFreeInstances = async () => {
   return (instances || []).filter(InstanceModel.isFree)
 }
 
+const getUserInstance = async ({ userId = false } = {}) => {
+  const instances = await getInstances()
+  const userInstance = instances.find((instance) => InstanceModel.getUserId(instance) === userId)
+  return userInstance
+}
+
 const saveInstance = async (instance) => {
   console.log('SAVE', InstanceModel.getId(instance), JSON.stringify(instance))
   await redis.set(InstanceModel.getId(instance), JSON.stringify(instance))
@@ -68,6 +74,7 @@ const InstanceManager = {
   getInstance,
   getInstances,
   getFreeInstances,
+  getUserInstance,
   saveInstance,
   assignInstance,
   createNewInstance,
