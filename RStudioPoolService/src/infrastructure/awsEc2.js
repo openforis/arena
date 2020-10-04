@@ -42,7 +42,7 @@ const assignInstance = async ({ instanceId, userId }) => {
       },
       ...(userId
         ? {
-            Key: 'Owner',
+            Key: 'userId',
             Value: userId,
           }
         : {}),

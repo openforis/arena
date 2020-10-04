@@ -22,7 +22,7 @@ const parsedInstanceFrom = ({ instance, from }) => {
   }
 }
 
-const getNewInstanceConfig = ({ userId } = {}) => ({
+const getNewInstanceConfig = ({ userId = false } = {}) => ({
   ImageId: 'ami-0130bec6e5047f596', // this iam can be found right to the name of the instance when a new instance is launched by hand, this id is unique by region
   InstanceType: 't2.micro', // size of the instance
   KeyName: KEY_NAME,
@@ -53,7 +53,7 @@ const getNewInstanceConfig = ({ userId } = {}) => ({
     },
     ...(userId
       ? {
-          Key: 'Owner',
+          Key: 'userId',
           Value: userId,
         }
       : {}),
