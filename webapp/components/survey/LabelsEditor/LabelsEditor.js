@@ -26,6 +26,7 @@ const LabelsEditor = (props) => {
     readOnly,
     compactLanguage,
     validation,
+    inputFieldIdPrefix,
   } = props
 
   const i18n = useI18n()
@@ -46,6 +47,7 @@ const LabelsEditor = (props) => {
         <ValidationTooltip validation={validation}>
           <Label
             key={language}
+            inputFieldIdPrefix={inputFieldIdPrefix}
             lang={language}
             labels={labels}
             onChange={onChange}
@@ -62,6 +64,7 @@ const LabelsEditor = (props) => {
               {languages.map((lang) => (
                 <Label
                   key={lang}
+                  inputFieldIdPrefix={inputFieldIdPrefix}
                   lang={lang}
                   labels={labels}
                   onChange={onChange}
@@ -79,6 +82,7 @@ const LabelsEditor = (props) => {
 }
 
 LabelsEditor.propTypes = {
+  inputFieldIdPrefix: PropTypes.string,
   languages: PropTypes.array,
   labels: PropTypes.object,
   showFormLabel: PropTypes.bool,
@@ -90,6 +94,7 @@ LabelsEditor.propTypes = {
 }
 
 LabelsEditor.defaultProps = {
+  inputFieldIdPrefix: null,
   languages: [],
   labels: {},
   showFormLabel: true,

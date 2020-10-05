@@ -1,5 +1,7 @@
 import { button, click, clickParent, expectExists, writeIntoTextBox } from '../utils/api'
-import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys, waitForLoader, expectHomeDashboard } from '../utils/ui'
+import { waitForLoader } from '../utils/ui/loader'
+import { expectHomeDashboard } from '../utils/ui/home'
+import { clickHeaderBtnCreateSurvey, clickHeaderBtnMySurveys } from '../utils/ui/header'
 
 const createSurvey = async ({ name, label }) => {
   await writeIntoTextBox({ text: name, selector: { placeholder: 'Name' } })

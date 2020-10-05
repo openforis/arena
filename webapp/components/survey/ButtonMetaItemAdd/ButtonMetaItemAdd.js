@@ -33,7 +33,7 @@ const ButtonMetaItemAdd = (props) => {
   }, [])
 
   return (
-    <button type="button" onClick={add} className="btn btn-s">
+    <button type="button" onClick={add} className={`btn btn-s btn-add-${metaItemType}`}>
       <span className="icon icon-plus icon-12px icon-left" />
       {i18n.t('common.add')}
     </button>

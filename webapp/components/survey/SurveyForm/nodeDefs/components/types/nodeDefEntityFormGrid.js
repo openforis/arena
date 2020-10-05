@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
@@ -19,7 +20,7 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
-  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
 
   const canEditDef = useAuthCanEditSurvey()
@@ -32,6 +33,8 @@ const NodeDefEntityFormGrid = (props) => {
     }, 200)
   }, [])
 
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
       dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: layout }))
@@ -40,9 +43,9 @@ const NodeDefEntityFormGrid = (props) => {
 
   const columns = NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)
   const rdgLayout = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
-  const innerPageChildren = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
+  const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
 
-  return innerPageChildren.length > 0 ? (
+  return nodeDefsInnerPage.length > 0 ? (
     <ResponsiveGridLayout
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       autoSize={false}
@@ -60,7 +63,7 @@ const NodeDefEntityFormGrid = (props) => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >
-      {innerPageChildren.map((childDef) => (
+      {nodeDefsInnerPage.map((childDef) => (
         <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}>
           <NodeDefSwitch
             edit={edit}

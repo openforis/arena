@@ -4,7 +4,11 @@ const _clickSidebarBtn = async ({ id }) => click(link({ id }))
 
 export const clickSidebarBtnHome = async () => _clickSidebarBtn({ id: 'sidebar_btn_home' })
 
-export const clickSidebarBtnSurveyForm = async () => {
+const _clickDesignerModule = async ({ moduleLabel }) => {
   await _clickSidebarBtn({ id: 'sidebar_btn_designer' })
-  await click('FORM DESIGNER')
+  await click(moduleLabel)
 }
+
+export const clickSidebarBtnSurveyForm = async () => _clickDesignerModule({ moduleLabel: 'FORM DESIGNER' })
+
+export const clickSidebarBtnDesignerCategories = async () => _clickDesignerModule({ moduleLabel: 'CATEGORIES' })
