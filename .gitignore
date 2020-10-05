@@ -290,3 +290,8 @@ modules.xml
 # RStudioPoolService
 RStudioPoolService/node_modules/
 RStudioPoolService/.aws-sam/
+
+# RStudioProxy
+RStudioProxy/node_modules/
+RStudioProxy/yarn.lock
+
