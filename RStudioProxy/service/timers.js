@@ -1,53 +1,44 @@
-const { redis } = require('../infrastructure')
+const { TIMEOUT_RSTUDIO } = require('../config')
+const { getInstances, killInstance } = require('./instance')
 
 const timeoutsMap = {}
 let areTimersInitialized = false
 
-const setTimer = async ({ instanceId }) =>
+const setTimer = async ({ userId }) =>
   new Promise((resolve) => {
-    clearTimeout(timeoutsMap[instanceId])
+    clearTimeout(timeoutsMap[userId])
 
-    const timer = setTimeout(async () => {
-      console.log('KILL_TIMER', instanceId)
-    }, 10000)
+    const timer = setTimeout(async () => killInstance({ userId }), TIMEOUT_RSTUDIO)
 
-    timeoutsMap[instanceId] = timer
+    timeoutsMap[userId] = timer
     resolve()
   })
 
 const initTimers = async () => {
-  const instances = await redis.keys()
-  console.log('INSTANCES', instances)
+  const instances = await getInstances()
   return Promise.all(
     (instances || []).map(async (instance) => {
-      console.log('NEW_TIMER', instance, Object.keys(timeoutsMap).length)
-      return setTimer({ instanceId: instance })
+      const { userId } = instance
+      return setTimer({ userId })
     })
   )
 }
 
 const timeoutMiddleware = async (req, res, next) => {
   const { instanceId } = req
-
+  const userId = instanceId
   if (!areTimersInitialized) {
-    console.log('INIT TIMERS')
     await initTimers()
     areTimersInitialized = true
   }
 
-  if (instanceId) {
-    await setTimer({ instanceId })
+  if (userId) {
+    await setTimer({ userId })
   }
 
-  next()
-}
-
-const timmersMiddleware = (req, res, next) => {
-  console.log('TIMMERS', Object.keys(timeoutsMap), 'initialized:', areTimersInitialized)
   next()
 }
 
 module.exports = {
   timeoutMiddleware,
-  timmersMiddleware,
 }
