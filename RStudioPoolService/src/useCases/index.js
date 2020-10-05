@@ -10,11 +10,11 @@ module.exports = {
 
 /*
  {
-  COMMAND -> REQUEST, CREATE, GET_STATUS, DELETE
+  COMMAND -> REQUEST_RSTUDIO, CREATE, GET_STATUS, DELETE
   PAYLOAD
  }
 
- REQUEST
+ REQUEST_RSTUDIO
  { userId } -> { instanceId}
 
  CREATE
@@ -22,8 +22,8 @@ module.exports = {
 
  GET_STATUS
  {} -> all the status
- { instanceId } -> instanceInfo
+ { userId } -> instanceInfo
 
  DELETE
- { instanceId } -> OK
+ { userId } -> OK
  */
