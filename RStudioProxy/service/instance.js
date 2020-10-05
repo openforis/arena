@@ -1,4 +1,12 @@
 const { redis } = require('../infrastructure')
+const axios = require('axios')
+
+const getInstancesKeys = async () => {
+  const instances = await axios.post('https://808vq2o8gk.execute-api.eu-central-1.amazonaws.com/Prod/', {
+    command: 'GET_STATUS'
+  })
+  console.log(instances)
+}
 
 const getInstanceIdByReferer = ({ instances, referer }) =>
   instances.find((instanceKey) => {
@@ -7,6 +15,8 @@ const getInstanceIdByReferer = ({ instances, referer }) =>
   })
 
 const getInstanceMiddleware = async (req, res, next) => {
+  const ins = await getInstancesKeys()
+  console.log(ins)
   const instances = await redis.keys()
   let instanceId = false
 
