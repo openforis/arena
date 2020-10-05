@@ -1,5 +1,7 @@
 const { commands } = require('../infrastructure')
 
+const FIELD_TO_IDENTIFY_INSTANCE = 'userId'
+
 const getInstances = async () => {
   const { data } = await commands.sendCommand({ command: commands.instanceCommands.getStatus() })
   const { instances } = data
@@ -9,14 +11,13 @@ const getInstances = async () => {
 const killInstance = async ({ userId }) =>
   commands.sendCommand({ command: commands.instanceCommands.delete({ userId }) })
 
-const getInstancesUserIds = ({ instances }) => {
-  const instancesUserIds = instances.filter((instance) => !!instance.userId).map((instance) => instance.userId)
-  return instancesUserIds
-}
+const getInstancesIds = ({ instances }) =>
+  instances
+    .filter((instance) => !!instance[FIELD_TO_IDENTIFY_INSTANCE])
+    .map((instance) => instance[FIELD_TO_IDENTIFY_INSTANCE])
 
-const getInstancesByUserId = ({ instances }) => {
-  return instances.reduce((acc, instance) => ({ ...acc, [instance.userId]: { ...instance } }), {})
-}
+const getInstancesById = ({ instances }) =>
+  instances.reduce((acc, instance) => ({ ...acc, [instance[FIELD_TO_IDENTIFY_INSTANCE]]: { ...instance } }), {})
 
 const getInstanceIdByReferer = ({ instances, referer }) =>
   instances.find((instanceKey) => {
@@ -26,18 +27,18 @@ const getInstanceIdByReferer = ({ instances, referer }) =>
 
 const getInstanceMiddleware = async (req, res, next) => {
   const instances = await getInstances()
-  const instancesUserIds = getInstancesUserIds({ instances })
-  const instancesByUserId = getInstancesByUserId({ instances })
+  const instancesIds = getInstancesIds({ instances })
+  const instancesById = getInstancesById({ instances })
 
   let instanceId = false
 
-  if (instancesUserIds.includes(req.originalUrl.replace('/', ''))) {
+  if (instancesIds.includes(req.originalUrl.replace('/', ''))) {
     instanceId = req.originalUrl.replace('/', '')
   }
 
   const instanceIdOnReferer = req.headers.referer
     ? getInstanceIdByReferer({
-        instances: instancesUserIds,
+        instances: instancesIds,
         referer: req.headers.referer,
       })
     : false
@@ -48,7 +49,7 @@ const getInstanceMiddleware = async (req, res, next) => {
   let instance = false
 
   if (instanceId) {
-    instance = instancesByUserId[instanceId]
+    instance = instancesById[instanceId]
   }
 
   if (instanceId && instance) {
@@ -61,6 +62,5 @@ const getInstanceMiddleware = async (req, res, next) => {
 module.exports = {
   getInstanceMiddleware,
   getInstances,
-  getInstancesUserIds,
   killInstance,
 }
