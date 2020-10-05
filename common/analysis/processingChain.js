@@ -67,13 +67,18 @@ export const newProcessingChain = (props = {}) => ({
   [Calculation.keys.temporary]: true,
 })
 
-export const newProcessingStep = (processingChain, props = {}) => ({
-  [Step.keys.uuid]: uuidv4(),
-  [Step.keys.processingChainUuid]: getUuid(processingChain),
-  [Step.keys.index]: getProcessingSteps(processingChain).length,
-  [Step.keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
+export const newProcessingStep = (chain, props = {}) => {
+  const index = getProcessingSteps(chain).length
+  const step = {
+    [Step.keys.uuid]: uuidv4(),
+    [Step.keys.processingChainUuid]: getUuid(chain),
+    [Step.keys.index]: index,
+    [Step.keys.props]: props,
+    [Calculation.keys.temporary]: true,
+  }
+  const previousStep = getStepByIdx(index - 1)(chain)
+  return Step.initializeVariablesPreviousStep({ previousStep })(step)
+}
 
 export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
   [Calculation.keys.uuid]: uuidv4(),
