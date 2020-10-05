@@ -16,7 +16,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 import { State } from '../../store'
 
 const VariablesPreviousStep = (props) => {
-  const { state } = props
+  const { state, Actions } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -44,7 +44,14 @@ const VariablesPreviousStep = (props) => {
                 <div key={nodeDefUuid} className="table__row">
                   <div>{nodeDefLabel}</div>
                   <div>
-                    <Checkbox checked={StepVariable.getInclude(variablePrevStep)} />
+                    <Checkbox
+                      checked={StepVariable.getInclude(variablePrevStep)}
+                      onChange={(checked) =>
+                        Actions.updatePreviousStepVariable({
+                          variable: StepVariable.assocInclude(checked)(variablePrevStep),
+                        })
+                      }
+                    />
                   </div>
                   <div>{StepVariable.getAggregate(variablePrevStep)}</div>
                 </div>
@@ -59,6 +66,7 @@ const VariablesPreviousStep = (props) => {
 
 VariablesPreviousStep.propTypes = {
   state: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
 }
 
 export default VariablesPreviousStep

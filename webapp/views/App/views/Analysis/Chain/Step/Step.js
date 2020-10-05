@@ -116,7 +116,7 @@ const StepComponent = (props) => {
         )}
         <CalculationList state={state} Actions={Actions} />
 
-        <VariablesPreviousStep state={state} />
+        {!editingCalculation && <VariablesPreviousStep state={state} Actions={Actions} />}
       </div>
 
       <Calculation state={state} Actions={Actions} />

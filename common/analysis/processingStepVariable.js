@@ -13,7 +13,7 @@ export const newProcessingStepVariable = ({ uuid }) => ({
 })
 
 // ===== READ
-export const { getUuid } = ObjectUtils
+export const { getUuid, isEqual } = ObjectUtils
 export const getInclude = A.propOr(false, keys.include)
 export const getAggregate = A.prop(keys.aggregate)
 

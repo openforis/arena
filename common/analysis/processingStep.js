@@ -83,6 +83,12 @@ export const initializeVariablesPreviousStep = ({ previousStep }) => (step) => {
   return step
 }
 
+export const assocVariablePreviousStep = (variable) => (step) => {
+  const variablesPrevStep = getVariablesPreviousStep(step)
+  const index = variablesPrevStep.findIndex(StepVariable.isEqual(variable))
+  return R.assocPath([keys.props, keysProps.variablesPreviousStep, index], variable)(step)
+}
+
 // ===== UTILS
 
 export const hasEntity = R.pipe(getEntityUuid, R.isNil, R.not)
