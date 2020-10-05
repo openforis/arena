@@ -1,5 +1,5 @@
-const redis = require('./redis')
+const commands = require('./commands')
 
 module.exports = {
-  redis,
+  commands,
 }

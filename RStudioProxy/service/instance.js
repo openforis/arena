@@ -1,11 +1,21 @@
-const { redis } = require('../infrastructure')
-const axios = require('axios')
+const { commands } = require('../infrastructure')
 
-const getInstancesKeys = async () => {
-  const instances = await axios.post('https://808vq2o8gk.execute-api.eu-central-1.amazonaws.com/Prod/', {
-    command: 'GET_STATUS'
-  })
-  console.log(instances)
+const getInstances = async () => {
+  const { data } = await commands.sendCommand({ command: commands.instanceCommands.getStatus() })
+  const { instances } = data
+  return instances
+}
+
+const killInstance = async ({ userId }) =>
+  commands.sendCommand({ command: commands.instanceCommands.delete({ userId }) })
+
+const getInstancesUserIds = ({ instances }) => {
+  const instancesUserIds = instances.filter((instance) => !!instance.userId).map((instance) => instance.userId)
+  return instancesUserIds
+}
+
+const getInstancesByUserId = ({ instances }) => {
+  return instances.reduce((acc, instance) => ({ ...acc, [instance.userId]: { ...instance } }), {})
 }
 
 const getInstanceIdByReferer = ({ instances, referer }) =>
@@ -15,17 +25,19 @@ const getInstanceIdByReferer = ({ instances, referer }) =>
   })
 
 const getInstanceMiddleware = async (req, res, next) => {
-  const ins = await getInstancesKeys()
-  console.log(ins)
-  const instances = await redis.keys()
+  const instances = await getInstances()
+  const instancesUserIds = getInstancesUserIds({ instances })
+  const instancesByUserId = getInstancesByUserId({ instances })
+
   let instanceId = false
 
-  if (instances.includes(req.originalUrl)) {
-    instanceId = req.originalUrl
+  if (instancesUserIds.includes(req.originalUrl.replace('/', ''))) {
+    instanceId = req.originalUrl.replace('/', '')
   }
+
   const instanceIdOnReferer = req.headers.referer
     ? getInstanceIdByReferer({
-        instances,
+        instances: instancesUserIds,
         referer: req.headers.referer,
       })
     : false
@@ -36,7 +48,7 @@ const getInstanceMiddleware = async (req, res, next) => {
   let instance = false
 
   if (instanceId) {
-    instance = await redis.get(instanceId)
+    instance = instancesByUserId[instanceId]
   }
 
   if (instanceId && instance) {
@@ -48,4 +60,7 @@ const getInstanceMiddleware = async (req, res, next) => {
 
 module.exports = {
   getInstanceMiddleware,
+  getInstances,
+  getInstancesUserIds,
+  killInstance,
 }
