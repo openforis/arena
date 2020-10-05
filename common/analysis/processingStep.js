@@ -17,6 +17,7 @@ export const keysProps = {
   entityUuid: 'entityUuid', // OR
   categoryUuid: 'categoryUuid', // OR
   virtual: 'virtual', // True|false
+  variablesPreviousStep: 'variablesPreviousStep', // Array of calculation variables of previous step (sorted by calculations)
 }
 
 // ====== READ
@@ -26,6 +27,7 @@ export const getCalculations = R.propOr([], keys.calculations)
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
+export const getVariablesPreviousStep = ObjectUtils.getProp(keysProps.variablesPreviousStep, [])
 export const { getIndex, getUuid, getProps, getPropsDiff } = ObjectUtils
 /**
  * Returns the uuids of all associated calculations.
@@ -64,6 +66,9 @@ export const dissocCalculation = (calculation) =>
       )
     )
   )
+
+export const assocVariablesPreviousStep = (variablesPreviousStep) =>
+  ObjectUtils.setProp(keysProps.variablesPreviousStep, variablesPreviousStep)
 
 // ===== UTILS
 

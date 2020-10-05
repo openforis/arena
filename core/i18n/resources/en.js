@@ -374,6 +374,12 @@ $t(common.cantUndoWarning)`,
     category: 'Category',
     calculationSteps: 'Calculation Steps',
     virtualEntity: 'Virtual Entity',
+    variablesPreviousStep: {
+      title: 'Variables previous step',
+      variableName: 'Variable name',
+      include: 'Include',
+      aggregate: 'Aggregate',
+    },
   },
 
   processingStepCalculation: {

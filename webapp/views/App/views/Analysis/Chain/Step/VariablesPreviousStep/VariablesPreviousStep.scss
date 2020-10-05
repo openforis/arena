@@ -1,0 +1,9 @@
+.processing-step__variables-previous-step-table {
+  height: 300px;
+  width: 580px;
+
+  .table__row-header,
+  .table__row {
+    grid-template-columns: 200px 80px 300px;
+  }
+}

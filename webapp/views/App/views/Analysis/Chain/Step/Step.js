@@ -21,6 +21,7 @@ import { State } from '../store'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
 import Calculation from './Calculation'
+import VariablesPreviousStep from './VariablesPreviousStep'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -114,6 +115,8 @@ const StepComponent = (props) => {
           </>
         )}
         <CalculationList state={state} Actions={Actions} />
+
+        <VariablesPreviousStep state={state} />
       </div>
 
       <Calculation state={state} Actions={Actions} />
