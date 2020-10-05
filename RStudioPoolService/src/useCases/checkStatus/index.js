@@ -12,7 +12,7 @@ const checkStatus = async ({ userId } = {}) => {
     responseData = { instances }
   }
 
-  response = {
+  const response = {
     statusCode: 200,
     body: JSON.stringify(responseData),
   }
