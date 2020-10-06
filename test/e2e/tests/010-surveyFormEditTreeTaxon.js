@@ -18,7 +18,7 @@ describe('SurveyForm edit: Tree taxon', () => {
     await clickNodeDefTaxonomyAdd()
 
     // start of taxonomy edit
-    await writeTaxonomyName(taxonomyName)
+    await writeTaxonomyName({ text: taxonomyName })
     await clickTaxonomyButtonClose()
     // end of taxonomy edit
 
