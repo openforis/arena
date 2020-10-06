@@ -2,7 +2,7 @@ const { Instance } = require('../../domain')
 
 const { Model: InstanceModel, Manager: InstanceManager } = Instance
 
-const MIN_FREE_INSTANCES = 1
+const MIN_FREE_INSTANCES = 3
 
 const generateResponse = (instance) => {
   const instanceId = InstanceModel.getId(instance)
@@ -40,7 +40,9 @@ const requestInstance = async ({ userId = false } = {}) => {
   }
 
   if (remainFreeInstances < MIN_FREE_INSTANCES) {
-    await InstanceManager.createNewInstance()
+    await Promise.all(
+      new Array(MIN_FREE_INSTANCES - remainFreeInstances).fill('.').map(async () => InstanceManager.createNewInstance())
+    )
   }
 
   assignedInstance = InstanceModel.setUserId({ userId })(assignedInstance)
