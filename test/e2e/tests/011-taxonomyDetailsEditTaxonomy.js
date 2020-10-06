@@ -49,8 +49,8 @@ describe('Taxonomies: edit existing taxonomy', () => {
 
   test('TaxonomiesDetails: import taxa to existing taxonomy', async () => {
     await editTaxonomy({ taxonomyName })
-    await expectTaxonomyNameIs({ name: taxonomyName })
-    await expectTaxonomyDescriptionIs({ description: 'Tree Species List' })
+    await expectTaxonomyNameIs({ text: taxonomyName })
+    await expectTaxonomyDescriptionIs({ text: 'Tree Species List' })
     await expectTaxonomyTaxaEmpty()
 
     await selectTaxonomyFileToImport({ fileName: 'taxonomies/species list valid.csv' })

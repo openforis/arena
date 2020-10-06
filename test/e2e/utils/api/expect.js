@@ -20,10 +20,10 @@ export const expectToBe = async ({ text = null, selector = null, relativeSelecto
   await expect(_numberOfItems).toBe(numberOfItems)
 }
 
-export const expectInputTextToBe = async ({ expectedText, selector = null, relativeSelectors = [] }) => {
+export const expectInputTextToBe = async ({ text, selector = null, relativeSelectors = [] }) => {
   const inputField = textBox(selector, ...relativeSelectors)
   const exists = await inputField.exists()
   await expect(exists).toBeTruthy()
-  const text = await inputField.value()
-  await expect(text).toBe(expectedText)
+  const inputFieldValue = await inputField.value()
+  await expect(inputFieldValue).toBe(text)
 }

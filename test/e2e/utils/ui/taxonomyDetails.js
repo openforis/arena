@@ -17,11 +17,10 @@ export const writeTaxonomyDescription = async ({ text }) =>
 export const selectTaxonomyFileToImport = async ({ fileName }) =>
   fileSelect({ inputFileId: 'taxonomy-upload-input', fileName })
 
-export const expectTaxonomyNameIs = async ({ name }) =>
-  expectInputTextToBe({ expectedText: name, selector: selectors.name() })
+export const expectTaxonomyNameIs = async ({ text }) => expectInputTextToBe({ text, selector: selectors.name() })
 
-export const expectTaxonomyDescriptionIs = async ({ description }) =>
-  expectInputTextToBe({ expectedText: description, selector: selectors.description() })
+export const expectTaxonomyDescriptionIs = async ({ text }) =>
+  expectInputTextToBe({ text, selector: selectors.description() })
 
 export const expectTaxonomyTaxaEmpty = async () => expectExists({ selector: selectors.tableTaxaEmptyRows() })
 
