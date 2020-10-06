@@ -14,10 +14,11 @@ const setTimer = async ({ userId }) =>
     resolve()
   })
 
+const isAssigned = (instance) => !!instance.userId
 const initTimers = async () => {
   const instances = await getInstances()
   return Promise.all(
-    (instances || []).map(async (instance) => {
+    (instances || []).filter(isAssigned).map(async (instance) => {
       const { userId } = instance
       return setTimer({ userId })
     })
