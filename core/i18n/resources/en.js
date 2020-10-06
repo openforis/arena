@@ -602,6 +602,9 @@ $t(common.cantUndoWarning)`,
       processingStep: {
         entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',
+        variablesPrevStep: {
+          aggregateFunctionNotSpecified: 'Aggregate function not specified',
+        },
       },
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
