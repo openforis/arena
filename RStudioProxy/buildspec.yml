@@ -20,6 +20,7 @@ phases:
       # Remove all dependencies not needed for the Lambda deployment package (the packages from devDependencies in package.json)
       #- npm prune --production
       - echo pre build
+      - eb init --platform "Node.js 12" --region eu-central-1 --keyname "LambdaInstance" RStudioProxy_b
   build:
     commands:
       - ls
@@ -30,7 +31,7 @@ phases:
   post_build:
     commands:
       - ls
-      - eb deploy
+      - eb deploy rstudioproxy-default-env
 artifacts:
   files:
     - '**/*'
