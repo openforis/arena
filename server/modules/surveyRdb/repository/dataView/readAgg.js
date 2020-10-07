@@ -6,109 +6,52 @@ import * as dbUtils from '../../../../db/dbUtils'
 
 import * as Expression from '../../../../../core/expressionParser/expression'
 import * as Survey from '../../../../../core/survey/survey'
-import { Schemata, ViewDataNodeDef, ColumnNodeDef } from '../../../../../common/model/db'
+import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
-
-const sqlFunctionByAggregateFunction = {
-  [Query.aggregateFunctions.avg]: 'AVG',
-  [Query.aggregateFunctions.cnt]: 'COUNT',
-  [Query.aggregateFunctions.max]: 'MAX',
-  [Query.aggregateFunctions.med]: 'MEDIAN',
-  [Query.aggregateFunctions.min]: 'MIN',
-  [Query.aggregateFunctions.sum]: 'SUM',
-}
-
-const _getSelectFieldsMesaures = ({ survey, viewDataNodeDef, measures }) => {
-  const fields = []
-  const params = {}
-  let index = 0
-  measures.forEach((aggFunctions, nodeDefUuidMeasure) => {
-    const paramName = `measure_field_${index}`
-    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuidMeasure)(survey)
-    const columnMeasure = new ColumnNodeDef(viewDataNodeDef, nodeDefMeasure).name
-
-    aggFunctions.forEach((aggFn) => {
-      const paramNameAlias = `${paramName}_${aggFn}_alias`
-      const fieldAlias = `$/${paramNameAlias}:name/`
-      const field = `${sqlFunctionByAggregateFunction[aggFn]}($/${paramName}:name/) AS ${fieldAlias}`
-      const measureAlias = `${columnMeasure}_${aggFn}`
-      params[paramNameAlias] = measureAlias
-      fields.push(field)
-    })
-    params[paramName] = columnMeasure
-    index += 1
-  })
-  return { fields, params }
-}
-
-const _getSelectFieldsDimensions = ({ survey, viewDataNodeDef, dimensions }) => {
-  const fields = []
-  const params = {}
-  dimensions.forEach((dimension, i) => {
-    const paramName = `dimension_field_${i}`
-    fields.push(`$/${paramName}:name/`)
-    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(survey)
-    const columnDimension = new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name
-    params[paramName] = columnDimension
-  })
-  return { fields, params }
-}
+import SqlSelectAggBuilder from './sqlSelectAggBuilder'
 
 const _getSelectQuery = ({ survey, cycle, query }) => {
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const queryBuilder = new SqlSelectAggBuilder({ survey, viewDataNodeDef })
+
+  // SELECT measures
   const measures = Query.getMeasures(query)
+  Array.from(measures.entries()).forEach(([nodeDefUuid, aggFunctions], index) =>
+    queryBuilder.selectMeasure({ aggFunctions, nodeDefUuid, index })
+  )
+
+  // SELECT dimensions
   const dimensions = Query.getDimensions(query)
-  const filter = Query.getFilter(query)
-  const sort = Query.getSort(query)
+  dimensions.forEach((dimension, index) => queryBuilder.selectDimension({ dimension, index }))
 
-  // SELECT fields measures
-  const { fields: selectFieldsMeasures, params: selectParamsMeasures } = _getSelectFieldsMesaures({
-    survey,
-    viewDataNodeDef,
-    measures,
-  })
-
-  // SELECT fields dimensions
-  const { fields: selectFieldsDimensions, params: selectParamsDimensions } = _getSelectFieldsDimensions({
-    survey,
-    viewDataNodeDef,
-    dimensions,
-  })
+  // FROM clause
+  queryBuilder.from(`${Schemata.getSchemaSurveyRdb(viewDataNodeDef.surveyId)}.$/table:name/`)
+  queryBuilder.addParams({ table: viewDataNodeDef.name })
 
   // WHERE clause
+  queryBuilder.where(`${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/`)
+  queryBuilder.addParams({ cycle })
+
+  const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
+  if (filterClause) {
+    queryBuilder.where(` AND ${filterClause}`)
+    queryBuilder.addParams(filterParams)
+  }
 
   // GROUP clause
   // always group by data_modified (used in sort)
-  const groupFields = [ViewDataNodeDef.columnSet.dateModified, ...selectFieldsDimensions]
+  queryBuilder.groupBy(ViewDataNodeDef.columnSet.dateModified)
 
-  // SORT clause
+  // ORDER BY clause
+  const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
+  queryBuilder.orderBy(...sortClause)
+  queryBuilder.addParams(sortParams)
 
-  const select = `
-    SELECT 
-      ${selectFieldsMeasures.concat(selectFieldsDimensions).join(', ')}
-    FROM 
-      ${Schemata.getSchemaSurveyRdb(viewDataNodeDef.surveyId)}.$/table:name/
-    WHERE 
-      ${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/
-      ${R.isNil(filterClause) ? '' : `AND ${filterClause}`}
-    GROUP BY ${groupFields.join(', ')}
-    ORDER BY
-      ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}${ViewDataNodeDef.columnSet.dateModified} DESC NULLS LAST
-  `
-
-  const queryParams = {
-    table: viewDataNodeDef.name,
-    cycle,
-    ...selectParamsMeasures,
-    ...selectParamsDimensions,
-    ...filterParams,
-    ...sortParams,
-  }
-
-  return { select, queryParams }
+  return { select: queryBuilder.build(), queryParams: queryBuilder.params }
 }
 
 /**
@@ -120,7 +63,6 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
- * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<number>} - The count of rows.
