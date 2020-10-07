@@ -44,6 +44,7 @@ const Header = (props) => {
         </FormItem>
 
         <LabelsEditor
+          inputFieldIdPrefix="taxonomy-description"
           formLabelKey="common.description"
           labels={Taxonomy.getDescriptions(taxonomy)}
           onChange={(descriptions) =>
@@ -55,6 +56,7 @@ const Header = (props) => {
       <div className="button-bar">
         {canEdit && (
           <UploadButton
+            inputFieldId="taxonomy-upload-input"
             label={i18n.t('common.csvImport')}
             accept=".csv"
             onChange={([file]) => Actions.upload({ state, file })}
