@@ -16,5 +16,5 @@ app.use('', instance.getInstanceMiddleware, timers.timeoutMiddleware, createProx
 
 // Start the Proxy
 app.listen(PORT, () => {
-  console.log(`Starting Proxy at ${PORT}`)
+  console.log(`Starting Proxy at: ${PORT}`)
 })
