@@ -9,6 +9,7 @@ phases:
       - cd RStudioProxy
       # Install all dependencies (including dependencies for running tests)
       - npm install
+      - pip install --upgrade awsebcli awscli
       - echo "API_BASE IS $API_BASE"
   pre_build:
     commands:
