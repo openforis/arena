@@ -21,9 +21,9 @@ module.exports = {
  { numberOfInstances } -> OK
 
  GET_STATUS
- {} -> all the status
- { userId } -> instanceInfo
+ {} -> all the occupiedInstancesIds
+ { instanceId } -> instanceInfo
 
  DELETE
- { userId } -> OK
+ { instanceId } -> OK
  */

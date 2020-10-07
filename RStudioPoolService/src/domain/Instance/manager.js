@@ -19,6 +19,13 @@ const getInstanceByUserId = async ({ userId = false } = {}) => {
   return userInstance
 }
 
+const getInstanceById = async ({ instanceId = false } = {}) => {
+  if (!instanceId) return false
+  const instances = await getInstances()
+  const instanceById = instances.find((instance) => InstanceModel.getId(instance) === instanceId)
+  return instanceById
+}
+
 const createNewInstance = async ({ userId = false } = {}) => {
   const newInstanceConfig = InstanceModel.getNewInstanceConfig({ userId })
   const createdInstance = await awsEc2.createInstance(newInstanceConfig)
@@ -27,10 +34,9 @@ const createNewInstance = async ({ userId = false } = {}) => {
   return instance
 }
 
-const terminateInstance = async ({ userId }) => {
-  const instance = await getInstanceByUserId({ userId })
+const terminateInstance = async ({ instanceId }) => {
+  const instance = await getInstanceById({ instanceId })
   if (!instance) return
-  const instanceId = InstanceModel.getId(instance)
   await awsEc2.terminateInstance({ instanceId })
 }
 
@@ -41,6 +47,7 @@ const assignInstance = async ({ instance, userId }) => {
 
 const InstanceManager = {
   getInstanceByUserId,
+  getInstanceById,
   getInstances,
   getFreeInstances,
   assignInstance,

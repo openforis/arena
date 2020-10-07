@@ -1,14 +1,16 @@
 const { Instance } = require('../../domain')
 
-const { Manager: InstanceManager } = Instance
+const { Manager: InstanceManager, Model: InstanceModel } = Instance
 
-const checkStatus = async ({ userId } = {}) => {
+const checkStatus = async ({ instanceId } = {}) => {
   let responseData = {}
-  if (userId) {
-    const instance = await InstanceManager.getInstanceByUserId({ userId })
+  if (instanceId) {
+    const instance = await InstanceManager.getInstanceById({ instanceId })
     responseData = { instance }
   } else {
-    const instances = await InstanceManager.getInstances()
+    let instances = await InstanceManager.getInstances()
+    instances = instances.filter((instance) => !!InstanceModel.getUserId(instance)).map(InstanceModel.getId)
+
     responseData = { instances }
   }
 
