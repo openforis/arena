@@ -11,7 +11,6 @@ class SqlSelectBuilder extends SqlBuilder {
     this._offset = null
     this._limit = null
     this._orderBy = []
-    this._queryParams = {}
   }
 
   select(...fields) {
@@ -29,8 +28,8 @@ class SqlSelectBuilder extends SqlBuilder {
     return this
   }
 
-  groupBy(...groupByFields) {
-    this._groupBy.push(...groupByFields)
+  groupBy(...fields) {
+    this._groupBy.push(...fields)
     return this
   }
 
@@ -44,18 +43,9 @@ class SqlSelectBuilder extends SqlBuilder {
     return this
   }
 
-  orderBy(...orderByFields) {
-    this._orderBy.push(...orderByFields)
+  orderBy(...fields) {
+    this._orderBy.push(...fields)
     return this
-  }
-
-  addParams(params) {
-    Object.assign(this._queryParams, params)
-    return this
-  }
-
-  get params() {
-    return { ...this._queryParams }
   }
 
   build() {

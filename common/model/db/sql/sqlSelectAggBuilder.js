@@ -1,7 +1,7 @@
-import * as Survey from '../../../../../core/survey/survey'
-import { ColumnNodeDef } from '../../../../../common/model/db'
-import { Query } from '../../../../../common/model/query'
-import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
+import * as Survey from '../../../../core/survey/survey'
+import { ColumnNodeDef } from '..'
+import { Query } from '../../query'
+import SqlSelectBuilder from './sqlSelectBuilder'
 
 const sqlFunctionByAggregateFunction = {
   [Query.aggregateFunctions.avg]: 'AVG',

@@ -8,7 +8,7 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as Survey from '../../../../../core/survey/survey'
 import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
-import SqlSelectAggBuilder from './sqlSelectAggBuilder'
+import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
 
 const _getSelectQuery = ({ survey, cycle, query }) => {
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -48,9 +48,10 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   // ORDER BY clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  queryBuilder.orderBy(sortClause)
-  queryBuilder.addParams(sortParams)
-
+  if (!R.isEmpty(sortParams)) {
+    queryBuilder.orderBy(sortClause)
+    queryBuilder.addParams(sortParams)
+  }
   return { select: queryBuilder.build(), queryParams: queryBuilder.params }
 }
 
