@@ -1,6 +1,6 @@
 const { commands } = require('../infrastructure')
 
-const FIELD_TO_IDENTIFY_INSTANCE = 'userId'
+const FIELD_TO_IDENTIFY_INSTANCE = 'instanceId'
 
 const getInstances = async () => {
   const { data } = await commands.sendCommand({ command: commands.instanceCommands.getStatus() })
@@ -8,8 +8,8 @@ const getInstances = async () => {
   return instances
 }
 
-const killInstance = async ({ userId }) =>
-  commands.sendCommand({ command: commands.instanceCommands.delete({ userId }) })
+const killInstance = async ({ instanceId }) =>
+  commands.sendCommand({ command: commands.instanceCommands.delete({ instanceId }) })
 
 const getInstancesIds = ({ instances }) =>
   instances

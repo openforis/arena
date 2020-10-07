@@ -1,40 +1,40 @@
-const { TIMEOUT_RSTUDIO } = require('../config')
+const { TIMEOUT_INSTANCE } = require('../config')
 const { getInstances, killInstance } = require('./instance')
 
 const timeoutsMap = {}
 let areTimersInitialized = false
 
-const setTimer = async ({ userId }) =>
+const setTimer = async ({ instanceId }) =>
   new Promise((resolve) => {
-    clearTimeout(timeoutsMap[userId])
+    clearTimeout(timeoutsMap[instanceId])
 
-    const timer = setTimeout(async () => killInstance({ userId }), TIMEOUT_RSTUDIO)
+    const timer = setTimeout(async () => killInstance({ instanceId }), TIMEOUT_INSTANCE)
 
-    timeoutsMap[userId] = timer
+    timeoutsMap[instanceId] = timer
     resolve()
   })
 
 const isAssigned = (instance) => !!instance.userId
+
 const initTimers = async () => {
   const instances = await getInstances()
   return Promise.all(
     (instances || []).filter(isAssigned).map(async (instance) => {
-      const { userId } = instance
-      return setTimer({ userId })
+      const { instanceId } = instance
+      return setTimer({ instanceId })
     })
   )
 }
 
 const timeoutMiddleware = async (req, res, next) => {
   const { instanceId } = req
-  const userId = instanceId
   if (!areTimersInitialized) {
     await initTimers()
     areTimersInitialized = true
   }
 
-  if (userId) {
-    await setTimer({ userId })
+  if (instanceId) {
+    await setTimer({ instanceId })
   }
 
   next()
