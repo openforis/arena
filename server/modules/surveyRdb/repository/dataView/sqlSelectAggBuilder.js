@@ -13,15 +13,14 @@ const sqlFunctionByAggregateFunction = {
 }
 
 class SqlSelectAggBuilder extends SqlSelectBuilder {
-  constructor({ survey, viewDataNodeDef }) {
+  constructor({ viewDataNodeDef }) {
     super()
-    this._survey = survey
     this._viewDataNodeDef = viewDataNodeDef
   }
 
   selectMeasure({ aggFunctions, nodeDefUuid, index }) {
     const paramName = `measure_field_${index}`
-    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(this._survey)
+    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(this._viewDataNodeDef.survey)
     const columnMeasure = new ColumnNodeDef(this._viewDataNodeDef, nodeDefMeasure).name
 
     aggFunctions.forEach((aggFn) => {
@@ -41,10 +40,8 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     const selectField = `$/${paramName}:name/`
     this.select(selectField)
     this.groupBy(selectField)
-    // fields.push(`$/${paramName}:name/`)
-    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(this._survey)
+    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(this._viewDataNodeDef.survey)
     const columnDimension = new ColumnNodeDef(this._viewDataNodeDef, nodeDefDimension).name
-    // params[paramName] = columnDimension
     this.addParams({ [paramName]: columnDimension })
     return this
   }

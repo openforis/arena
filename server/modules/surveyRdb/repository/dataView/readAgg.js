@@ -14,7 +14,7 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
-  const queryBuilder = new SqlSelectAggBuilder({ survey, viewDataNodeDef })
+  const queryBuilder = new SqlSelectAggBuilder({ viewDataNodeDef })
 
   // SELECT measures
   const measures = Query.getMeasures(query)
@@ -48,7 +48,7 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   // ORDER BY clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  queryBuilder.orderBy(...sortClause)
+  queryBuilder.orderBy(sortClause)
   queryBuilder.addParams(sortParams)
 
   return { select: queryBuilder.build(), queryParams: queryBuilder.params }

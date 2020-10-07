@@ -15,7 +15,7 @@ class SqlSelectBuilder extends SqlBuilder {
   }
 
   select(...fields) {
-    this._select.push(fields)
+    this._select.push(...fields)
     return this
   }
 
@@ -67,14 +67,14 @@ class SqlSelectBuilder extends SqlBuilder {
     if (!A.isEmpty(this._groupBy)) {
       parts.push(`GROUP BY ${this._groupBy.join(', ')}`)
     }
+    if (!A.isEmpty(this._orderBy)) {
+      parts.push(`ORDER BY ${this._orderBy.join(', ')}`)
+    }
     if (this._offset) {
       parts.push(`OFFSET ${this._offset}`)
     }
     if (this._limit) {
       parts.push(`LIMIT ${this._limit}`)
-    }
-    if (!A.isEmpty(this._orderBy)) {
-      parts.push(`ORDER BY ${this._orderBy.join(', ')}`)
     }
     return parts.join(' ')
   }
