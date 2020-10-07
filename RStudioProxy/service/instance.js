@@ -22,7 +22,7 @@ const getInstanceIdByReferer = ({ instancesIds, referer }) =>
   })
 
 const getInstanceMiddleware = async (req, res, next) => {
-  const instancesIds = getInstancesIds()
+  const instancesIds = await getInstancesIds()
 
   let instanceId = false
 
