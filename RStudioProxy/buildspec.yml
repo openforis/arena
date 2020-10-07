@@ -21,12 +21,14 @@ phases:
       - echo pre build
   build:
     commands:
+      - ls
       - echo Build started on `date`
       - echo Entered the build phase ...
       # Use AWS SAM to package the application by using AWS CloudFormation - sam package command is an alias for the aws cloudformation
       #- sam package --template template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-81qiwpvg6puh --output-template-file template-export.yml
   post_build:
     commands:
+      - ls
       - eb deploy
 artifacts:
   files:
