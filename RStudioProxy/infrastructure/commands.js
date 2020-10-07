@@ -5,8 +5,9 @@ const { SERVICE_URL } = require('../config')
 const sendCommand = async ({ command }) => axios.post(SERVICE_URL, command)
 
 const instanceCommands = {
-  delete: ({ userId }) => ({ command: 'DELETE', payload: { userId } }),
+  delete: ({ instanceId }) => ({ command: 'DELETE', payload: { instanceId } }),
   getStatus: () => ({ command: 'GET_STATUS' }),
+  getInstanceStatus: ({ instanceId }) => ({ command: 'GET_STATUS', payload: { instanceId } }),
 }
 
 module.exports = {

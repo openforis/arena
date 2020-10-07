@@ -1,5 +1,5 @@
 const { TIMEOUT_INSTANCE } = require('../config')
-const { getInstances, killInstance } = require('./instance')
+const { getInstancesIds, killInstance } = require('./instance')
 
 const timeoutsMap = {}
 let areTimersInitialized = false
@@ -17,10 +17,9 @@ const setTimer = async ({ instanceId }) =>
 const isAssigned = (instance) => !!instance.userId
 
 const initTimers = async () => {
-  const instances = await getInstances()
+  const instancesIds = await getInstancesIds()
   return Promise.all(
-    (instances || []).filter(isAssigned).map(async (instance) => {
-      const { instanceId } = instance
+    (instancesIds || []).filter(isAssigned).map(async (instanceId) => {
       return setTimer({ instanceId })
     })
   )
