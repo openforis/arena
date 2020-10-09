@@ -102,7 +102,9 @@ export const assocVariablePreviousStep = (variable) => (step) => {
 export const dissocVariablePreviousStepByUuid = (variableUuid) => (step) => {
   const variables = getVariablesPreviousStep(step)
   const variableIndex = variables.findIndex((variable) => StepVariable.getUuid(variable) === variableUuid)
-  return variableIndex >= 0 ? assocVariablesPreviousStep(variables.splice(variableIndex, 1))(step) : step
+  const variablesUpdated = [...variables]
+  variablesUpdated.splice(variableIndex, 1)
+  return variableIndex >= 0 ? assocVariablesPreviousStep(variablesUpdated)(step) : step
 }
 
 // ===== UTILS

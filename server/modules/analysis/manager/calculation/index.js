@@ -5,6 +5,7 @@ import * as Chain from '../../../../../common/analysis/processingChain'
 import * as Step from '../../../../../common/analysis/processingStep'
 import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
 import * as ChainValidator from '../../../../../common/analysis/processingChainValidator'
+import * as ChainController from '../../../../../common/analysis/processingChainController'
 import { TableCalculation, TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 
@@ -85,9 +86,27 @@ export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationU
     const type = ActivityLog.type.processingStepCalculationDelete
     await ActivityLogRepository.insert(user, surveyId, type, content, false, tx)
 
-    // Update step validation
+    // Reload chain including steps and calculations
     const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, tx)
-    const stepValidation = await ChainValidator.validateStep(Chain.getStepByIdx(Step.getIndex(step))(chain))
+    const stepDb = Chain.getStepByIdx(Step.getIndex(step))(chain)
+    // Update next step variables prev step (if updated)
+    const { stepNextUpdated } = ChainController.deleteCalculation({ chain, step: stepDb, calculation })
+    if (stepNextUpdated) {
+      await StepRepository.updateStep(
+        {
+          surveyId,
+          stepUuid: Step.getUuid(stepNextUpdated),
+          fields: {
+            [Step.keys.props]: {
+              [Step.keysProps.variablesPreviousStep]: Step.getVariablesPreviousStep(stepNextUpdated),
+            },
+          },
+        },
+        tx
+      )
+    }
+    // Update step validation
+    const stepValidation = await ChainValidator.validateStep(stepDb)
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
     // Update processing_chain validation
     const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }

@@ -30,18 +30,14 @@ export const useDelete = ({ setState }) => {
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    const { chain: chainEditUpdated, step: stepEditUpdated } = ChainController.deleteCalculation({
-      chain,
-      step,
-      calculation,
-    })
+    const { chain: chainUpdated, step: stepUpdated } = ChainController.deleteCalculation({ chain, step, calculation })
 
     setState(
       A.pipe(
-        State.assocChain(chainEditUpdated),
-        State.assocChainEdit(chainEditUpdated),
-        State.assocStep(stepEditUpdated),
-        State.assocStepEdit(stepEditUpdated),
+        State.assocChain(chainUpdated),
+        State.assocChainEdit(chainUpdated),
+        State.assocStep(stepUpdated),
+        State.assocStepEdit(stepUpdated),
         State.dissocCalculation,
         State.dissocCalculationEdit
       )(state)
