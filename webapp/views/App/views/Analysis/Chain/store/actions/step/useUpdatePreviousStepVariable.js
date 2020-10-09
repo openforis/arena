@@ -11,4 +11,4 @@ export const useUpdatePreviousStepVariable = ({ setState }) =>
       const stepEditUpdated = Step.assocVariablePreviousStep(variable)(stepEdit)
       return State.assocStepEdit(stepEditUpdated)(statePrev)
     })
-  })
+  }, [])
