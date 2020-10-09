@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n, useLang } from '@webapp/store/system'
-import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -17,9 +17,7 @@ import { State, useLocalState } from './store'
 const Row = (props) => {
   const { state, Actions } = useLocalState(props)
 
-  const surveyInfo = useSurveyInfo()
   const survey = useSurvey()
-  const defaultLang = Survey.getDefaultLanguage(surveyInfo)
   const lang = useLang()
   const i18n = useI18n()
 
@@ -31,7 +29,7 @@ const Row = (props) => {
   return (
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
-      <div>{Taxonomy.getDescription(lang, defaultLang)(taxonomy)}</div>
+      <div>{Taxonomy.getDescription(lang)(taxonomy)}</div>
       <div className="taxonomy-row__badge-container">
         <ErrorBadge validation={taxonomy.validation} />
       </div>

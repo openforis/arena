@@ -1,5 +1,5 @@
 import { addItemToPage } from '../utils/ui/nodeDefDetail'
-import { expectItemIsTheLastNodeDef, expectSurveyFormItemsAreInOrder } from '../utils/ui/surveyForm'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItems } from '../utils/ui/surveyForm'
 import {
   addSurveyFormSubPage,
   expectEmptyPageHasError,
@@ -28,5 +28,5 @@ describe('SurveyForm edit Plot', () => {
   })
 
   test('Plot add children - verify number and order of children', async () =>
-    expectSurveyFormItemsAreInOrder({ items: nodeDefItems }))
+    expectSurveyFormItems({ items: nodeDefItems }))
 })
