@@ -10,6 +10,7 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as ChainController from '@common/analysis/processingChainController'
 
 import { State } from '../../state'
 
@@ -19,23 +20,28 @@ export const useDelete = ({ setState }) => {
   const { chainUuid } = useParams()
 
   const deleteCalculation = ({ state }) => async () => {
-    const calculationToDelete = State.getCalculationEdit(state)
-    const calculationUuid = Calculation.getUuid(calculationToDelete)
-    const stepEdit = State.getStepEdit(state)
+    const chain = State.getChainEdit(state)
+    const step = State.getStepEdit(state)
+    const calculation = State.getCalculationEdit(state)
+    const calculationUuid = Calculation.getUuid(calculation)
 
-    if (chainUuid && !Calculation.isTemporary(calculationToDelete)) {
-      await axios.delete(
-        `/api/survey/${surveyId}/processing-step/${Step.getUuid(stepEdit)}/calculation/${calculationUuid}`
-      )
+    if (chainUuid && !Calculation.isTemporary(calculation)) {
+      await axios.delete(`/api/survey/${surveyId}/processing-step/${Step.getUuid(step)}/calculation/${calculationUuid}`)
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    const stepWithOutCalculation = Step.dissocCalculation(calculationToDelete)(State.getStepEdit(state))
+    const { chain: chainEditUpdated, step: stepEditUpdated } = ChainController.deleteCalculation({
+      chain,
+      step,
+      calculation,
+    })
 
     setState(
       A.pipe(
-        State.assocStep(stepWithOutCalculation),
-        State.assocStepEdit(stepWithOutCalculation),
+        State.assocChain(chainEditUpdated),
+        State.assocChainEdit(chainEditUpdated),
+        State.assocStep(stepEditUpdated),
+        State.assocStepEdit(stepEditUpdated),
         State.dissocCalculation,
         State.dissocCalculationEdit
       )(state)

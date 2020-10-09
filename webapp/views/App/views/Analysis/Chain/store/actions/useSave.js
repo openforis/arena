@@ -12,6 +12,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
+import * as ChainController from '@common/analysis/processingChainController'
 
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 import { NotificationActions } from '@webapp/store/ui'
@@ -77,10 +78,23 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
-      const chainSaved = Chain.dissocTemporary(chainToSave)
-      const stepSaved = step ? Step.dissocTemporary(step) : null
-      const calculationSaved = calculation ? Calculation.dissocTemporary(calculation) : null
+      let chainSaved = Chain.dissocTemporary(chainToSave)
+      let stepSaved = null
+      let calculationSaved = null
+      if (step) {
+        stepSaved = Step.dissocTemporary(step)
+        if (calculation) {
+          calculationSaved = Calculation.dissocTemporary(calculation)
 
+          const { chain: chainUpdated, step: stepUpdated } = ChainController.assocCalculation({
+            chain: chainSaved,
+            step: stepSaved,
+            calculation: calculationSaved,
+          })
+          chainSaved = chainUpdated
+          stepSaved = stepUpdated
+        }
+      }
       setState(
         A.pipe(
           State.assocChain(chainSaved),

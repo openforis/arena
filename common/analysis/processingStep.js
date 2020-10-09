@@ -31,6 +31,12 @@ export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 export const getVariablesPreviousStep = ObjectUtils.getProp(keysProps.variablesPreviousStep, [])
+export const hasVariablePreviousStep = (variableUuid) =>
+  R.pipe(
+    getVariablesPreviousStep,
+    R.find((variable) => StepVariable.getUuid(variable) === variableUuid),
+    Boolean
+  )
 export const { getIndex, getUuid, getProps, getPropsDiff } = ObjectUtils
 /**
  * Returns the uuids of all associated calculations.
@@ -85,8 +91,18 @@ export const initializeVariablesPreviousStep = ({ previousStep }) => (step) => {
 
 export const assocVariablePreviousStep = (variable) => (step) => {
   const variablesPrevStep = getVariablesPreviousStep(step)
-  const index = variablesPrevStep.findIndex(StepVariable.isEqual(variable))
+  let index = variablesPrevStep.findIndex(StepVariable.isEqual(variable))
+  if (index < 0) {
+    // new variable
+    index = variablesPrevStep.length
+  }
   return R.assocPath([keys.props, keysProps.variablesPreviousStep, index], variable)(step)
+}
+
+export const dissocVariablePreviousStepByUuid = (variableUuid) => (step) => {
+  const variables = getVariablesPreviousStep(step)
+  const variableIndex = variables.findIndex((variable) => StepVariable.getUuid(variable) === variableUuid)
+  return variableIndex >= 0 ? assocVariablesPreviousStep(variables.splice(variableIndex, 1))(step) : step
 }
 
 // ===== UTILS

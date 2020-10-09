@@ -35,8 +35,8 @@ const StepComponent = (props) => {
 
   const chainEdit = State.getChainEdit(state)
   const stepEdit = State.getStepEdit(state)
-  const editingStep = Boolean(State.getStepEdit(state))
-  const editingCalculation = Boolean(State.getCalculationEdit(state))
+  const editingStep = State.isEditingStep(state)
+  const editingCalculation = State.isEditingCalculation(state)
 
   const i18n = useI18n()
 
