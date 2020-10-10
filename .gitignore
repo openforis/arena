@@ -295,4 +295,5 @@ RStudioPoolService/.env
 # RStudioProxy
 RStudioProxy/node_modules/
 RStudioProxy/yarn.lock
+RStudioProxy/.elasticbeanstalk
 
