@@ -2,7 +2,6 @@ version: 0.2
 
 env:
   variables:
-    API_BASE: $API_BASE
     MIN_FREE_INSTANCES: $MIN_FREE_INSTANCES
     MAX_INSTANCES: $MAX_INSTANCES
     IMAGE_ID: $IMAGE_ID
@@ -23,7 +22,6 @@ phases:
     commands:
       # Discover and run unit tests in the '__tests__' directory
       - printenv > .env
-      - cat .env
       - npm run test
       # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
       - rm -rf ./__tests__
