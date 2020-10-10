@@ -2,13 +2,7 @@ const { Instance } = require('../../domain')
 
 const { Manager: InstanceManager } = Instance
 
-/*
-  DELETE
-  body: { instanceId: 'XXXX' }
-*/
-
 const removeInstance = async ({ instanceId }) => {
-
   await InstanceManager.terminateInstance({ instanceId })
 
   const response = {

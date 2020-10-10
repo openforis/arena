@@ -1,8 +1,4 @@
-const REGION = 'eu-central-1'
-const ACCOUNT = '407725983764.dkr.ecr.eu-central-1.amazonaws.com'
-const SECURTY_GROUP = 'sg-0718fb65b156ac691'
-const INSTANCE_PROFILE = 'ec2-admin'
-const KEY_NAME = 'LambdaInstance'
+const { IMAGE_ID, IMAGE_TYPE, REGION, ACCOUNT, SECURITY_GROUP, INSTANCE_PROFILE, KEY_NAME } = require('../../../config')
 
 const getId = (instance) => instance.instanceId
 const getUrl = (instance) => instance.url
@@ -22,13 +18,36 @@ const parsedInstanceFrom = ({ instance }) => {
   }
 }
 
+const getInstanceTags = ({ userId }) => [
+  {
+    Key: 'Purpose',
+    Value: 'RStudio',
+  },
+  ...(userId
+    ? [
+        {
+          Key: 'userId',
+          Value: userId,
+        },
+      ]
+    : []),
+]
+
+const getFilters = () => [
+  { Name: 'tag:Purpose', Values: ['RStudio'] },
+  {
+    Name: 'instance-state-name',
+    Values: ['pending', 'running'],
+  },
+]
+
 const getNewInstanceConfig = ({ userId = false } = {}) => ({
-  ImageId: 'ami-0130bec6e5047f596', // this iam can be found right to the name of the instance when a new instance is launched by hand, this id is unique by region
-  InstanceType: 't2.micro', // size of the instance
+  ImageId: IMAGE_ID, // this iam can be found right to the name of the instance when a new instance is launched by hand, this id is unique by region
+  InstanceType: IMAGE_TYPE, // size of the instance
   KeyName: KEY_NAME,
   MaxCount: 1,
   MinCount: 1,
-  SecurityGroupIds: [SECURTY_GROUP], // security group created on step 3
+  SecurityGroupIds: [SECURITY_GROUP],
   IamInstanceProfile: {
     Name: INSTANCE_PROFILE,
   },
@@ -49,20 +68,7 @@ const getNewInstanceConfig = ({ userId = false } = {}) => ({
   TagSpecifications: [
     {
       ResourceType: 'instance',
-      Tags: [
-        {
-          Key: 'Purpose',
-          Value: 'RStudio',
-        },
-        ...(userId
-          ? [
-              {
-                Key: 'userId',
-                Value: userId,
-              },
-            ]
-          : []),
-      ],
+      Tags: [...getInstanceTags({ userId })],
     },
   ],
 })
@@ -75,6 +81,8 @@ const Instance = {
   setUserId,
   parsedInstanceFrom,
   getNewInstanceConfig,
+  getInstanceTags,
+  getFilters,
 }
 
 module.exports = Instance

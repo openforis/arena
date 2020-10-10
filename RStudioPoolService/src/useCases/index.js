@@ -7,23 +7,3 @@ module.exports = {
   checkStatus,
   removeInstance,
 }
-
-/*
- {
-  COMMAND -> REQUEST_RSTUDIO, CREATE, GET_STATUS, DELETE
-  PAYLOAD
- }
-
- REQUEST_RSTUDIO
- { userId } -> { instanceId}
-
- CREATE
- { numberOfInstances } -> OK
-
- GET_STATUS
- {} -> all the occupiedInstancesIds
- { instanceId } -> instanceInfo
-
- DELETE
- { instanceId } -> OK
- */

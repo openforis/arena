@@ -4,7 +4,7 @@ const createInstance = async (newInstanceConfig) => {
   const ec2 = new EC2()
   const params = {
     ...newInstanceConfig,
-    UserData: new Buffer.from(newInstanceConfig.UserData).toString('base64'),
+    ...(newInstanceConfig.UserData ? { UserData: new Buffer.from(newInstanceConfig.UserData).toString('base64') } : {}),
   }
 
   // function to create this new instance
@@ -18,16 +18,10 @@ const terminateInstance = async ({ instanceId }) => {
   return ec2.terminateInstances({ InstanceIds: [instanceId] }).promise()
 }
 
-const getInstances = async () => {
+const getInstances = async ({ filters }) => {
   const ec2 = new EC2()
   const params = {
-    Filters: [
-      { Name: 'tag:Purpose', Values: ['RStudio'] },
-      {
-        Name: 'instance-state-name',
-        Values: ['pending', 'running'],
-      },
-    ],
+    Filters: [...filters],
   }
   const reservations = await ec2.describeInstances(params).promise()
   const { Reservations } = reservations
@@ -35,24 +29,11 @@ const getInstances = async () => {
   return instances
 }
 
-const assignInstance = async ({ instanceId, userId }) => {
+const assignTagsToInstance = async ({ instanceId, tags }) => {
   const ec2 = new EC2()
   const params = {
     Resources: [instanceId],
-    Tags: [
-      {
-        Key: 'Purpose',
-        Value: 'RStudio',
-      },
-      ...(userId
-        ? [
-            {
-              Key: 'userId',
-              Value: userId,
-            },
-          ]
-        : []),
-    ],
+    Tags: [...tags],
   }
   await ec2.createTags(params).promise()
 }
@@ -61,5 +42,5 @@ module.exports = {
   getInstances,
   createInstance,
   terminateInstance,
-  assignInstance,
+  assignTagsToInstance,
 }

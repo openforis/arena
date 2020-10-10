@@ -2,7 +2,7 @@ const { awsEc2 } = require('../../infrastructure')
 const InstanceModel = require('./model')
 
 const getInstances = async () => {
-  const instancesAws = await awsEc2.getInstances()
+  const instancesAws = await awsEc2.getInstances({ filters: InstanceModel.getFilters() })
   const instances = (instancesAws || []).map((instance) => InstanceModel.parsedInstanceFrom({ instance }))
   return instances
 }
@@ -42,7 +42,7 @@ const terminateInstance = async ({ instanceId }) => {
 
 const assignInstance = async ({ instance, userId }) => {
   const instanceId = InstanceModel.getId(instance)
-  await awsEc2.assignInstance({ instanceId, userId })
+  await awsEc2.assignTagsToInstance({ instanceId, tags: InstanceModel.getInstanceTags({ userId }) })
 }
 
 const InstanceManager = {

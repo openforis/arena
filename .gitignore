@@ -290,6 +290,7 @@ modules.xml
 # RStudioPoolService
 RStudioPoolService/node_modules/
 RStudioPoolService/.aws-sam/
+RStudioPoolService/.env
 
 # RStudioProxy
 RStudioProxy/node_modules/
