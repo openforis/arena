@@ -13,7 +13,6 @@ const generateResponse = (instance) => {
 }
 
 const requestInstance = async ({ userId = false } = {}) => {
-  console.log({MIN_FREE_INSTANCES})
   if (!userId) {
     const response = {
       statusCode: 403,
