@@ -10,7 +10,7 @@ phases:
   pre_build:
     commands:
       - echo pre build, init the environment
-      - eb init --platform "Node.js 12" --region eu-central-1 --keyname "LambdaInstance" RStudioProxy
+      - eb init --platform "Node.js 12" --region eu-central-1 --keyname "LambdaInstance" RStudioProxy_b
   build:
     commands:
       - echo Entered the build phase ...
