@@ -1,8 +1,5 @@
 version: 0.2
 
-env:
-  variables:
-    API_BASE: $API_BASE
 phases:
   install:
     commands:
@@ -10,27 +7,15 @@ phases:
       # Install all dependencies (including dependencies for running tests)
       - npm install
       - pip install --upgrade awsebcli awscli
-      - echo "API_BASE IS $API_BASE"
   pre_build:
     commands:
-      # Discover and run unit tests in the '__tests__' directory
-      #- npm run test
-      # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
-      #- rm -rf ./__tests__
-      # Remove all dependencies not needed for the Lambda deployment package (the packages from devDependencies in package.json)
-      #- npm prune --production
-      - echo pre build
-      - eb init --platform "Node.js 12" --region eu-central-1 --keyname "LambdaInstance" RStudioProxy_b
+      - echo pre build, init the environment
+      - eb init --platform "Node.js 12" --region eu-central-1 --keyname "LambdaInstance" RStudioProxy
   build:
     commands:
-      - ls
-      - echo Build started on `date`
       - echo Entered the build phase ...
-      # Use AWS SAM to package the application by using AWS CloudFormation - sam package command is an alias for the aws cloudformation
-      #- sam package --template template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-81qiwpvg6puh --output-template-file template-export.yml
   post_build:
     commands:
-      - ls
       - eb deploy rstudioproxy-default-env
 artifacts:
   files:
