@@ -1,4 +1,4 @@
-const { commands } = require('../infrastructure')
+const { commands } = require('../../infrastructure')
 
 const getInstance = async ({ instanceId }) => {
   const { data } = await commands.sendCommand({ command: commands.instanceCommands.getInstanceStatus({ instanceId }) })
@@ -21,40 +21,12 @@ const getInstanceIdByReferer = ({ instancesIds, referer }) =>
     return regex.test(referer)
   })
 
-const getInstanceMiddleware = async (req, res, next) => {
-  const instancesIds = await getInstancesIds()
-
-  let instanceId = false
-
-  if (instancesIds.includes(req.originalUrl.replace('/', ''))) {
-    instanceId = req.originalUrl.replace('/', '')
-  }
-
-  const instanceIdOnReferer = req.headers.referer
-    ? getInstanceIdByReferer({
-        instancesIds,
-        referer: req.headers.referer,
-      })
-    : false
-  if (instanceIdOnReferer) {
-    instanceId = instanceIdOnReferer
-  }
-
-  let instance = false
-
-  if (instanceId) {
-    instance = await getInstance({ instanceId })
-  }
-
-  if (instanceId && instance) {
-    req.instance = instance
-    req.instanceId = instanceId
-  }
-  next()
-}
+const isAssigned = (instance) => !!instance.userId
 
 module.exports = {
-  getInstanceMiddleware,
+  getInstance,
   getInstancesIds,
   killInstance,
+  getInstanceIdByReferer,
+  isAssigned,
 }

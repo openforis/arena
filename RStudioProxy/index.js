@@ -1,18 +1,16 @@
 const express = require('express')
 const morgan = require('morgan')
 
-const { createProxyMiddleware } = require('http-proxy-middleware')
-
 const { PORT } = require('./config')
 
-const { instance, proxy, timers } = require('./service')
+const { Instance, Timer, Proxy } = require('./domain')
 
 // Create Express Server
 const app = express()
 
 app.use(morgan('dev'))
 
-app.use('', instance.getInstanceMiddleware, timers.timeoutMiddleware, createProxyMiddleware(proxy.config))
+app.use('', Instance.Service.getInstanceMiddleware, Timer.Service.timersMiddleware, Proxy.Service.proxyMiddleware)
 
 // Start the Proxy
 app.listen(PORT, () => {
