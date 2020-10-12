@@ -4,13 +4,13 @@ import * as Chain from './processingChain'
 import * as Step from './processingStep'
 import * as Calculation from './processingStepCalculation'
 
-export const newProcessingChain = ({ props = {} }) => ({
+export const newChain = ({ props = {} }) => ({
   [Chain.keys.uuid]: uuidv4(),
   [Chain.keys.props]: props,
   [Calculation.keys.temporary]: true,
 })
 
-export const newProcessingStep = ({ chain, props = {} }) => {
+export const newStep = ({ chain, props = {} }) => {
   const index = Chain.getProcessingSteps(chain).length
   const step = {
     [Step.keys.uuid]: uuidv4(),
@@ -23,7 +23,7 @@ export const newProcessingStep = ({ chain, props = {} }) => {
   return Step.initializeVariablesPreviousStep({ previousStep })(step)
 }
 
-export const newProcessingStepCalculation = ({ step, nodeDefUuid = null, props = {} }) => ({
+export const newCalculation = ({ step, nodeDefUuid = null, props = {} }) => ({
   [Calculation.keys.uuid]: uuidv4(),
   [Calculation.keys.processingStepUuid]: Step.getUuid(step),
   [Calculation.keys.index]: Step.getCalculations(step).length,

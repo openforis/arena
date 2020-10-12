@@ -10,7 +10,7 @@ import { State } from '../../state'
 export const useCreate = ({ setState }) => {
   return useCallback(({ state }) => {
     const step = State.getStepEdit(state)
-    const calculation = ChainFactory.newProcessingStepCalculation({ step })
+    const calculation = ChainFactory.newCalculation({ step })
     const stepWithCalculation = Step.assocCalculation(calculation)(step)
     const chainWithStep = Chain.assocProcessingStep(stepWithCalculation)(State.getChainEdit(state))
 

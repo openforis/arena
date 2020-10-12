@@ -37,7 +37,7 @@ export const useInit = ({ setState }) => {
       chainCurrent = data
     } else {
       // create
-      chainCurrent = ChainFactory.newProcessingChain({
+      chainCurrent = ChainFactory.newChain({
         props: { [Chain.keysProps.cycles]: [surveyCycleKey] },
       })
     }

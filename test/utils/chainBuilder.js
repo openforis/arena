@@ -22,7 +22,7 @@ class CalculationBuilder {
   build(survey, step) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-    return ChainFactory.newProcessingStepCalculation({
+    return ChainFactory.newCalculation({
       step,
       nodeDefUuid: NodeDef.getUuid(nodeDef),
       props: {
@@ -52,7 +52,7 @@ class StepBuilder {
   }
 
   build(survey, chain) {
-    const step = ChainFactory.newProcessingStep({
+    const step = ChainFactory.newStep({
       chain,
       props: {
         [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
@@ -73,7 +73,7 @@ class ChainBuilder {
 
   build() {
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(this.survey)
-    const chain = ChainFactory.newProcessingChain({
+    const chain = ChainFactory.newChain({
       props: { [Chain.keysProps.labels]: { [defaultLang]: this.label } },
     })
     const steps = this.stepBuilders.map((builder) => builder.build(this.survey, chain))

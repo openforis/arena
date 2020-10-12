@@ -9,7 +9,7 @@ import { State } from '../../state'
 export const useCreate = ({ setState }) => {
   return useCallback(({ state }) => {
     const chain = State.getChainEdit(state)
-    const step = ChainFactory.newProcessingStep({ chain })
+    const step = ChainFactory.newStep({ chain })
     const chainWithStep = Chain.assocProcessingStep(step)(chain)
 
     setState(A.pipe(State.assocChainEdit(chainWithStep), State.assocStepEdit(step))(state))
