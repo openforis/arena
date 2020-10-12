@@ -6,6 +6,7 @@ import * as A from '@core/arena'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 
+import * as ChainFactory from '@common/analysis/chainFactory'
 import * as Chain from '@common/analysis/processingChain'
 
 import { State } from '../../state'
@@ -36,8 +37,8 @@ export const useInit = ({ setState }) => {
       chainCurrent = data
     } else {
       // create
-      chainCurrent = Chain.newProcessingChain({
-        [Chain.keysProps.cycles]: [surveyCycleKey],
+      chainCurrent = ChainFactory.newProcessingChain({
+        props: { [Chain.keysProps.cycles]: [surveyCycleKey] },
       })
     }
 

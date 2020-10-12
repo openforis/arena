@@ -2,11 +2,9 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
-import { uuidv4 } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
 
 import * as Step from './processingStep'
-import * as Calculation from './processingStepCalculation'
 
 export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
@@ -60,34 +58,6 @@ export const getStepPrev = (step) => getStepByIdx(Step.getIndex(step) - 1)
 export const getStepNext = (step) => getStepByIdx(Step.getIndex(step) + 1)
 
 // ====== CREATE
-
-export const newProcessingChain = (props = {}) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
-
-export const newProcessingStep = (chain, props = {}) => {
-  const index = getProcessingSteps(chain).length
-  const step = {
-    [Step.keys.uuid]: uuidv4(),
-    [Step.keys.processingChainUuid]: getUuid(chain),
-    [Step.keys.index]: index,
-    [Step.keys.props]: props,
-    [Calculation.keys.temporary]: true,
-  }
-  const previousStep = getStepByIdx(index - 1)(chain)
-  return Step.initializeVariablesPreviousStep({ previousStep })(step)
-}
-
-export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
-  [Calculation.keys.uuid]: uuidv4(),
-  [Calculation.keys.processingStepUuid]: Step.getUuid(processingStep),
-  [Calculation.keys.index]: Step.getCalculations(processingStep).length,
-  [Calculation.keys.nodeDefUuid]: nodeDefUuid,
-  [Calculation.keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
 
 // ====== CHECK
 

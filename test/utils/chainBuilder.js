@@ -3,6 +3,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ChainFactory from '@common/analysis/chainFactory'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
@@ -21,11 +22,15 @@ class CalculationBuilder {
   build(survey, step) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-    return Chain.newProcessingStepCalculation(step, NodeDef.getUuid(nodeDef), {
-      [Calculation.keysProps.labels]: { [defaultLang]: this._label },
-      [Calculation.keysProps.type]: Calculation.getTypeByNodeDef(nodeDef),
-      [Calculation.keysProps.aggregateFn]: this._aggregateFn,
-      [Calculation.keysProps.formula]: this._formula,
+    return ChainFactory.newProcessingStepCalculation({
+      step,
+      nodeDefUuid: NodeDef.getUuid(nodeDef),
+      props: {
+        [Calculation.keysProps.labels]: { [defaultLang]: this._label },
+        [Calculation.keysProps.type]: Calculation.getTypeByNodeDef(nodeDef),
+        [Calculation.keysProps.aggregateFn]: this._aggregateFn,
+        [Calculation.keysProps.formula]: this._formula,
+      },
     })
   }
 
@@ -47,8 +52,11 @@ class StepBuilder {
   }
 
   build(survey, chain) {
-    const step = Chain.newProcessingStep(chain, {
-      [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
+    const step = ChainFactory.newProcessingStep({
+      chain,
+      props: {
+        [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
+      },
     })
     const calculations = this.calculationBuilders.map((builder) => builder.build(survey, step))
     return Step.assocCalculations(calculations)(step)
@@ -65,8 +73,8 @@ class ChainBuilder {
 
   build() {
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(this.survey)
-    const chain = Chain.newProcessingChain({
-      [Chain.keysProps.labels]: { [defaultLang]: this.label },
+    const chain = ChainFactory.newProcessingChain({
+      props: { [Chain.keysProps.labels]: { [defaultLang]: this.label } },
     })
     const steps = this.stepBuilders.map((builder) => builder.build(this.survey, chain))
     return Chain.assocProcessingSteps(steps)(chain)
