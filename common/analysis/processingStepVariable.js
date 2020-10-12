@@ -1,16 +1,11 @@
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   uuid: ObjectUtils.keys.uuid,
   include: 'include',
   aggregate: 'aggregate',
 }
-
-// ===== CREATE
-export const newProcessingStepVariable = ({ uuid }) => ({
-  [keys.uuid]: uuid,
-})
 
 // ===== READ
 export const { getUuid, isEqual } = ObjectUtils

@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ChainFactory from '@common/analysis/chainFactory'
+import * as ChainController from '@common/analysis/chainController'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
@@ -22,7 +23,7 @@ class CalculationBuilder {
   build(survey, step) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-    return ChainFactory.newCalculation({
+    return ChainFactory.createCalculation({
       step,
       nodeDefUuid: NodeDef.getUuid(nodeDef),
       props: {
@@ -52,7 +53,7 @@ class StepBuilder {
   }
 
   build(survey, chain) {
-    const step = ChainFactory.newStep({
+    const step = ChainFactory.createStep({
       chain,
       props: {
         [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
@@ -73,11 +74,11 @@ class ChainBuilder {
 
   build() {
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(this.survey)
-    const chain = ChainFactory.newChain({
+    const chain = ChainFactory.createChain({
       props: { [Chain.keysProps.labels]: { [defaultLang]: this.label } },
     })
     const steps = this.stepBuilders.map((builder) => builder.build(this.survey, chain))
-    return Chain.assocProcessingSteps(steps)(chain)
+    return ChainController.assocSteps({ chain, steps })
   }
 
   async buildAndStore(client = DB.client) {

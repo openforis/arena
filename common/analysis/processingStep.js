@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as StepVariable from '@common/analysis/processingStepVariable'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
@@ -78,16 +77,6 @@ export const dissocCalculation = (calculation) =>
 
 export const assocVariablesPreviousStep = (variablesPreviousStep) =>
   ObjectUtils.setProp(keysProps.variablesPreviousStep, variablesPreviousStep)
-
-export const initializeVariablesPreviousStep = ({ previousStep }) => (step) => {
-  if (previousStep && A.isEmpty(getVariablesPreviousStep(step))) {
-    const variablesPreviousStep = getCalculations(previousStep).map((calculation) =>
-      StepVariable.newProcessingStepVariable({ uuid: Calculation.getNodeDefUuid(calculation) })
-    )
-    return assocVariablesPreviousStep(variablesPreviousStep)(step)
-  }
-  return step
-}
 
 export const assocVariablePreviousStep = (variable) => (step) => {
   const variablesPrevStep = getVariablesPreviousStep(step)

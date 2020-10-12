@@ -16,13 +16,14 @@ export const useUpdate = ({ setState }) => {
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
   return useCallback(({ calculationUpdated, state }) => {
-    const stepEdit = State.getStepEdit(state)
-    const stepUpdated = Step.assocCalculation(calculationUpdated)(stepEdit)
+    const chain = State.getChainEdit(state)
+    const step = State.getStepEdit(state)
+    const stepUpdated = Step.assocCalculation(calculationUpdated)(step)
     const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
     const chainUpdated = Chain.assocItemValidation(
       Calculation.getUuid(calculationUpdated),
       calculationValidation
-    )(State.getChainEdit(state))
+    )(chain)
 
     const updatedState = A.pipe(
       State.assocChainEdit(chainUpdated),

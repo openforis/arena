@@ -10,7 +10,7 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
-import * as ChainController from '@common/analysis/processingChainController'
+import * as ChainController from '@common/analysis/chainController'
 
 import { State } from '../../state'
 

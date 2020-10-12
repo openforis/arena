@@ -7,7 +7,7 @@ import * as Survey from '../../../../core/survey/survey'
 import * as Chain from '../../../../common/analysis/processingChain'
 import * as Step from '../../../../common/analysis/processingStep'
 import * as ChainValidator from '../../../../common/analysis/processingChainValidator'
-import * as ChainController from '../../../../common/analysis/processingChainController'
+import * as ChainController from '../../../../common/analysis/chainController'
 
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../../survey/repository/surveyRepository'

@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 
 import * as Step from '@common/analysis/processingStep'
 import * as Chain from '@common/analysis/processingChain'
+import * as ChainController from '@common/analysis/chainController'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
@@ -44,7 +45,7 @@ export const useDismiss = ({ setState }) => {
             ChainValidator.validateCalculation(calculation, surveyDefaultLang)
           )
         ),
-        Chain.assocProcessingStep(stepEditUpdated)
+        (chainEditEdpdated) => ChainController.assocStep({ chain: chainEditEdpdated, step: stepEditUpdated })
       )(chainEdit)
 
       return A.pipe(

@@ -5,7 +5,7 @@ import * as Chain from '../../../../../common/analysis/processingChain'
 import * as Step from '../../../../../common/analysis/processingStep'
 import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
 import * as ChainValidator from '../../../../../common/analysis/processingChainValidator'
-import * as ChainController from '../../../../../common/analysis/processingChainController'
+import * as ChainController from '../../../../../common/analysis/chainController'
 import { TableCalculation, TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 

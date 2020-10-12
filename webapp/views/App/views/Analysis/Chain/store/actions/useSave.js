@@ -12,7 +12,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
-import * as ChainController from '@common/analysis/processingChainController'
+import * as ChainController from '@common/analysis/chainController'
 
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 import { NotificationActions } from '@webapp/store/ui'
@@ -70,7 +70,7 @@ export const useSave = ({ setState }) => {
     const [chainToSave, chainValidation] = await _getChainAndValidation(params)(chain)
     if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
       const data = {
-        chain: Chain.dissocProcessingSteps(chainToSave),
+        chain: ChainController.dissocSteps({ chain: chainToSave }),
         step: !R.isEmpty(step) ? _getStepParam(step) : null,
         calculation: !R.isEmpty(calculation) ? calculation : null,
       }
@@ -78,7 +78,7 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
-      let chainSaved = Chain.dissocTemporary(chainToSave)
+      let chainSaved = ChainController.dissocTemporary({ chain: chainToSave })
       let stepSaved = null
       let calculationSaved = null
       if (step) {
