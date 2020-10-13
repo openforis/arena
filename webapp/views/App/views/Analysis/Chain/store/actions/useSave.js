@@ -79,29 +79,28 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
-      let { chain: chainSaved } = ChainController.dissocTemporary({ chain: chainToSave })
-      let stepSaved = null
-      let calculationSaved = null
-      if (step) {
-        stepSaved = R.prop('step', ChainController.dissocTemporary({ step }))
-        if (calculation) {
-          calculationSaved = R.prop('calculation', ChainController.dissocTemporary({ calculation }))
-
-          const { chain: chainUpdated, step: stepUpdated } = ChainController.assocCalculation({
-            chain: chainSaved,
-            step: stepSaved,
-            calculation: calculationSaved,
-          })
-          chainSaved = chainUpdated
-          stepSaved = stepUpdated
-        }
+      const { chain: chainSaved, step: stepSaved, calculation: calculationSaved } = ChainController.dissocTemporary({
+        chain: chainToSave,
+        step,
+        calculation,
+      })
+      let chainUpdated = chainSaved
+      let stepUpdated = stepSaved
+      if (step && calculation) {
+        const { chain: chainWithCalculation, step: stepWithCalculation } = ChainController.assocCalculation({
+          chain: chainSaved,
+          step: stepSaved,
+          calculation: calculationSaved,
+        })
+        chainUpdated = chainWithCalculation
+        stepUpdated = stepWithCalculation
       }
       setState(
         A.pipe(
-          State.assocChain(chainSaved),
-          State.assocChainEdit(chainSaved),
-          State.assocStep(stepSaved),
-          State.assocStepEdit(stepSaved),
+          State.assocChain(chainUpdated),
+          State.assocChainEdit(chainUpdated),
+          State.assocStep(stepUpdated),
+          State.assocStepEdit(stepUpdated),
           State.assocCalculation(calculationSaved),
           State.assocCalculationEdit(calculationSaved)
         )(state)

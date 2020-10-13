@@ -3,8 +3,8 @@ import * as R from 'ramda'
 import * as Step from '@common/analysis/processingStep'
 import * as StepVariable from '@common/analysis/processingStepVariable'
 import * as Calculation from '@common/analysis/processingStepCalculation'
-
 import * as ObjectUtils from '@core/objectUtils'
+import * as CalculationUpdate from './calculationUpdate'
 
 export const mergeProps = ({ step, props }) => ({ step: ObjectUtils.mergeProps(props)(step) })
 
@@ -31,7 +31,11 @@ export const dissocCalculation = ({ step, calculation }) =>
       R.map(
         R.when(
           (calc) => Calculation.getIndex(calc) > Calculation.getIndex(calculation),
-          (calc) => Calculation.assocIndex(Calculation.getIndex(calc) - 1)(calc)
+          (calc) =>
+            R.prop(
+              'calculation',
+              CalculationUpdate.assocIndex({ calculation: calc, index: Calculation.getIndex(calc) - 1 })
+            )
         )
       )
     ),
@@ -42,7 +46,9 @@ export const dissocCalculations = ({ step }) => ({ step: R.dissoc(Step.keys.calc
 export const moveCalculation = ({ step, indexFrom, indexTo }) => {
   const calculations = Step.getCalculations(step)
   const calculationsMoved = R.move(indexFrom, indexTo, calculations)
-  const calculationsUpdate = calculationsMoved.map((calculation, idx) => Calculation.assocIndex(idx)(calculation))
+  const calculationsUpdate = calculationsMoved.map((calculation, index) =>
+    R.prop('calculation', CalculationUpdate.assocIndex({ calculation, index }))
+  )
   return _assocCalculations({ step, calculations: calculationsUpdate })
 }
 

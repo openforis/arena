@@ -16,12 +16,12 @@ export const assocCalculation = ({ chain, step, calculation }) => {
     // add variable previous step to next step
     const variableUuid = Calculation.getNodeDefUuid(calculation)
     if (!Step.hasVariablePreviousStep(variableUuid)(stepNext)) {
-      const variablePreviousStep = ChainFactory.createStepVariable({ uuid: variableUuid })
+      const variable = ChainFactory.createStepVariable({ uuid: variableUuid })
       stepNextUpdated = A.prop(
         'step',
         StepUpdate.assocVariablePreviousStep({
           step: stepNext,
-          variables: variablePreviousStep,
+          variable,
         })
       )
       chainUpdated = A.prop('chain', ChainUpdate.assocStep({ chain: chainUpdated, step: stepNextUpdated }))

@@ -10,7 +10,7 @@ export const useMoveCalculation = ({ setState }) =>
       setState((statePrev) => {
         const step = State.getStepEdit(statePrev)
         const { step: stepUpdated } = ChainController.moveCalculation({ step, indexFrom, indexTo })
-        State.assocStepEdit(stepUpdated)(statePrev)
+        return State.assocStepEdit(stepUpdated)(statePrev)
       }),
     []
   )

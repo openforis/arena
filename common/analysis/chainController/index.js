@@ -21,3 +21,5 @@ export {
   dissocCalculations,
   moveCalculation,
 } from './stepUpdate'
+
+export { assocProp as assocCalculationProp, assocNodeDefUuid as assocCalculationNodeDefUuid } from './calculationUpdate'
