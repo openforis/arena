@@ -1,5 +1,8 @@
+export { createStep, createCalculation } from './create'
+
 export { assocCalculation } from './assocCalculation'
 export { deleteCalculation } from './deleteCalculation'
+export { mergeStepProps } from './mergeStepProps'
 
 export {
   assocProp,
@@ -10,3 +13,11 @@ export {
   dissocSteps,
   dissocTemporary,
 } from './chainUpdate'
+
+export {
+  assocCalculationUuids,
+  assocVariablePreviousStep,
+  dissocCalculation,
+  dissocCalculations,
+  moveCalculation,
+} from './stepUpdate'

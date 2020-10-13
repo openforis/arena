@@ -20,10 +20,10 @@ class CalculationBuilder {
     this._formula = null
   }
 
-  build(survey, step) {
+  build({ survey, chain, step }) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-    return ChainFactory.createCalculation({
+    const calculation = ChainFactory.createCalculation({
       step,
       nodeDefUuid: NodeDef.getUuid(nodeDef),
       props: {
@@ -33,6 +33,7 @@ class CalculationBuilder {
         [Calculation.keysProps.formula]: this._formula,
       },
     })
+    return ChainController.assocCalculation({ chain, step, calculation })
   }
 
   aggregateFn(fn) {
@@ -59,8 +60,10 @@ class StepBuilder {
         [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
       },
     })
-    const calculations = this.calculationBuilders.map((builder) => builder.build(survey, step))
-    return Step.assocCalculations(calculations)(step)
+    return this.calculationBuilders.reduce((stepUpdated, calculationBuilder) => {
+      const { step: stepWithCalculation } = calculationBuilder.build({ survey, chain, step: stepUpdated })
+      return stepWithCalculation
+    }, step)
   }
 }
 
@@ -85,7 +88,7 @@ class ChainBuilder {
     const { user, survey } = this
     // eslint-disable-next-line no-return-await
     return await client.tx(async (t) => {
-      const chain = this.build()
+      const { chain } = this.build()
       const surveyId = Survey.getId(survey)
       const steps = Chain.getProcessingSteps(chain)
       if (R.isEmpty(steps)) {

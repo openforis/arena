@@ -18,8 +18,12 @@ export const useUpdateProps = ({ setState }) =>
           [Step.keysProps.entityUuid]: null,
           ...props,
         }
-        const stepUpdated = Step.mergeProps(newProps)(step)
-        const chainUpdated = ChainController.assocStep({ chain, step: stepUpdated })
+        const { chain: chainUpdated, step: stepUpdated } = ChainController.mergeStepProps({
+          chain,
+          step,
+          props: newProps,
+        })
+
         return A.pipe(State.assocChainEdit(chainUpdated), State.assocStepEdit(stepUpdated))(statePrev)
       }),
     []

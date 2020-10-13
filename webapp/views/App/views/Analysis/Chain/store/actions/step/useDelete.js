@@ -28,31 +28,23 @@ export const useDelete = ({ setState }) => {
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    const chainUpdated = ChainController.dissocStep({ chain, step })
+    const { chain: chainUpdated } = ChainController.dissocStep({ chain, step })
 
     setState(
-      A.pipe(
-        State.assocChain(chainUpdated),
-        State.assocChainEdit(chainUpdated),
-        State.dissocStep,
-        State.dissocStepEdit
-      )(state)
+      A.pipe(State.assocChain(chainUpdated), State.assocChainEdit(chainUpdated), State.dissocStep, State.dissocStepEdit)
     )
 
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 
-  return useCallback(async ({ state }) => {
-    const stepDirty = State.isStepDirty(state)
-    if (stepDirty) {
+  return useCallback(
+    ({ state }) =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'processingStepView.deleteConfirm',
           onOk: deleteStep({ state }),
         })
-      )
-    } else {
-      await deleteStep({ state })()
-    }
-  }, [])
+      ),
+    []
+  )
 }

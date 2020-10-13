@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as StepVariable from '@common/analysis/processingStepVariable'
-import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -44,57 +43,6 @@ export const { getIndex, getUuid, getProps, getPropsDiff } = ObjectUtils
 export const getCalculationUuids = R.propOr([], keys.calculationUuids)
 
 export const { isEqual, isTemporary } = ObjectUtils
-
-// ====== UPDATE
-
-export const { dissocTemporary, mergeProps } = ObjectUtils
-
-export const assocCalculationUuids = R.assoc(keys.calculationUuids)
-export const assocCalculations = R.assoc(keys.calculations)
-
-export const assocCalculation = (calculation) =>
-  R.assocPath([keys.calculations, Calculation.getIndex(calculation)], calculation)
-
-const _updateCalculations = (fn) => (processingStep) =>
-  R.pipe(getCalculations, fn, (calculations) => assocCalculations(calculations)(processingStep))(processingStep)
-
-export const dissocCalculations = R.dissoc(keys.calculations)
-
-export const dissocCalculation = (calculation) =>
-  _updateCalculations(
-    R.pipe(
-      // Remove calculation
-      R.reject(Calculation.isEqual(calculation)),
-      // Update indexes of next calculations
-      R.map(
-        R.when(
-          (calc) => Calculation.getIndex(calc) > Calculation.getIndex(calculation),
-          (calc) => Calculation.assocIndex(Calculation.getIndex(calc) - 1)(calc)
-        )
-      )
-    )
-  )
-
-export const assocVariablesPreviousStep = (variablesPreviousStep) =>
-  ObjectUtils.setProp(keysProps.variablesPreviousStep, variablesPreviousStep)
-
-export const assocVariablePreviousStep = (variable) => (step) => {
-  const variablesPrevStep = getVariablesPreviousStep(step)
-  let index = variablesPrevStep.findIndex(StepVariable.isEqual(variable))
-  if (index < 0) {
-    // new variable
-    index = variablesPrevStep.length
-  }
-  return R.assocPath([keys.props, keysProps.variablesPreviousStep, index], variable)(step)
-}
-
-export const dissocVariablePreviousStepByUuid = (variableUuid) => (step) => {
-  const variables = getVariablesPreviousStep(step)
-  const variableIndex = variables.findIndex((variable) => StepVariable.getUuid(variable) === variableUuid)
-  const variablesUpdated = [...variables]
-  variablesUpdated.splice(variableIndex, 1)
-  return variableIndex >= 0 ? assocVariablesPreviousStep(variablesUpdated)(step) : step
-}
 
 // ===== UTILS
 

@@ -5,7 +5,6 @@ import * as R from 'ramda'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import * as Step from '@common/analysis/processingStep'
 import * as Chain from '@common/analysis/processingChain'
 import * as ChainController from '@common/analysis/chainController'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
@@ -32,11 +31,11 @@ export const useDismiss = ({ setState }) => {
       const calculationEdit = State.getCalculationEdit(statePrev)
       const calculationTemporary = Calculation.isTemporary(calculationEdit)
 
-      const stepEditUpdated = calculationTemporary
-        ? Step.dissocCalculation(calculationEdit)(stepEdit)
-        : Step.assocCalculation(calculation)(stepEdit)
+      const { step: stepEditUpdated } = calculationTemporary
+        ? ChainController.dissocCalculation({ step: stepEdit, calculation: calculationEdit })
+        : ChainController.assocCalculation({ chain: chainEdit, step: stepEdit, calculation })
 
-      const chainEditUpdated = A.pipe(
+      const { chain: chainEditUpdated } = A.pipe(
         R.ifElse(
           R.always(calculationTemporary),
           A.identity,

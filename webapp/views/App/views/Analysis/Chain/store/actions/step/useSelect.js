@@ -19,7 +19,7 @@ export const useSelect = ({ setState }) => {
       const stepPrev = State.getStep(statePrev)
       const stepEditPrev = State.getStepEdit(statePrev)
 
-      const chainEditUpdated =
+      const { chain: chainEditUpdated } =
         !A.isEmpty(stepEditPrev) && !Step.isTemporary(stepEditPrev)
           ? ChainController.assocStep({ chain: chainEditPrev, step: stepPrev })
           : ChainController.dissocStepTemporary({ chain: chainEditPrev })

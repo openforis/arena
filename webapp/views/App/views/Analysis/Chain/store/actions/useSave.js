@@ -45,8 +45,9 @@ const _getStepParam = (step) =>
     R.pipe(
       Step.getCalculations,
       R.map(Calculation.getUuid),
-      (calculationUuids) => Step.assocCalculationUuids(calculationUuids)(step),
-      Step.dissocCalculations
+      (calculationUuids) => ChainController.assocCalculationUuids({ step, calculationUuids }),
+      ChainController.dissocCalculations,
+      R.prop('step')
     )
   )(step)
 
@@ -70,7 +71,7 @@ export const useSave = ({ setState }) => {
     const [chainToSave, chainValidation] = await _getChainAndValidation(params)(chain)
     if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
       const data = {
-        chain: ChainController.dissocSteps({ chain: chainToSave }),
+        chain: R.prop('chain', ChainController.dissocSteps({ chain: chainToSave })),
         step: !R.isEmpty(step) ? _getStepParam(step) : null,
         calculation: !R.isEmpty(calculation) ? calculation : null,
       }
@@ -78,13 +79,13 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
-      let chainSaved = ChainController.dissocTemporary({ chain: chainToSave })
+      let { chain: chainSaved } = ChainController.dissocTemporary({ chain: chainToSave })
       let stepSaved = null
       let calculationSaved = null
       if (step) {
-        stepSaved = Step.dissocTemporary(step)
+        stepSaved = R.prop('step', ChainController.dissocTemporary({ step }))
         if (calculation) {
-          calculationSaved = Calculation.dissocTemporary(calculation)
+          calculationSaved = R.prop('calculation', ChainController.dissocTemporary({ calculation }))
 
           const { chain: chainUpdated, step: stepUpdated } = ChainController.assocCalculation({
             chain: chainSaved,

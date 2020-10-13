@@ -46,17 +46,14 @@ export const useDelete = ({ setState }) => {
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepCalculation.deleteComplete' }))
   }
 
-  return useCallback(async ({ state }) => {
-    const stepDirty = State.isStepDirty(state)
-    if (stepDirty) {
+  return useCallback(
+    ({ state }) =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'processingStepView.deleteConfirm',
           onOk: deleteCalculation({ state }),
         })
-      )
-    } else {
-      await deleteCalculation({ state })()
-    }
-  }, [])
+      ),
+    []
+  )
 }

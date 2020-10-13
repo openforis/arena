@@ -8,9 +8,9 @@ export const useUpdateChain = ({ setState }) =>
   useCallback(
     ({ name, value }) =>
       setState((statePrev) => {
-        const chain = State.getChainEdit(statePrev)
-        const chainUpdated = ChainController.assocProp({ chain, name, value })
-        return State.assocChainEdit(chainUpdated)(statePrev)
+        const chainEdit = State.getChainEdit(statePrev)
+        const { chain: chainEditUpdated } = ChainController.assocProp({ chain: chainEdit, key: name, value })
+        return State.assocChainEdit(chainEditUpdated)(statePrev)
       }),
     []
   )

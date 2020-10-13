@@ -18,14 +18,9 @@ export const useDismiss = ({ setState }) => {
       const chainEdit = State.getChainEdit(statePrev)
       const step = State.getStep(statePrev)
       const stepEdit = State.getStepEdit(statePrev)
-      let chainEditUpdated
-      if (Step.isTemporary(stepEdit)) {
-        chainEditUpdated = chain
-      } else {
-        chainEditUpdated = ChainController.dissocStepTemporary({ chain: chainEdit })
-        chainEditUpdated = ChainController.assocStep({ chain: chainEditUpdated, step })
-      }
-
+      const { chain: chainEditUpdated } = Step.isTemporary(stepEdit)
+        ? { chain }
+        : ChainController.assocStep({ chain: chainEdit, step })
       return A.pipe(State.assocChainEdit(chainEditUpdated), State.dissocStep, State.dissocStepEdit)(statePrev)
     })
 
