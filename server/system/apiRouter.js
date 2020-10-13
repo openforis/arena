@@ -13,6 +13,7 @@ import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
 import * as analysisApi from '@server/modules/analysis/api'
 import * as jobApi from '@server/job/jobApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
+import * as rstudioApi from '@server/modules/rstudio/api/rstudioApi'
 
 export const router = expressRouter()
 
@@ -38,3 +39,5 @@ analysisApi.init(router)
 jobApi.init(router)
 
 expressionApi.init(router)
+
+rstudioApi.init(router)

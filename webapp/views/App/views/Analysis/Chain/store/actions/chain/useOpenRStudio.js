@@ -10,7 +10,14 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../../state'
 
-const _getRStudioUrl = () => {
+const _getRStudioUrl = async () => {
+  const { data = {} } = await axios.post('/api/rstudio')
+  const { instanceId = false } = data
+
+  if (instanceId && ProcessUtils.ENV.rStudioProxyServerURL) {
+    return `${ProcessUtils.ENV.rStudioProxyServerURL}${instanceId}`
+  }
+
   if (ProcessUtils.ENV.rStudioServerURL) {
     return ProcessUtils.ENV.rStudioServerURL
   }
@@ -25,15 +32,19 @@ export const useOpenRStudio = () => {
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
-  return useCallback(async ({ state }) => {
-    dispatch(LoaderActions.showLoader())
+  return useCallback(
+    async ({ state }) => {
+      dispatch(LoaderActions.showLoader())
 
-    const config = { params: { surveyCycleKey } }
-    const chainUuid = Chain.getUuid(State.getChain(state))
-    await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}/script`, config)
+      const config = { params: { surveyCycleKey } }
+      const chainUuid = Chain.getUuid(State.getChain(state))
+      await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}/script`, config)
 
-    dispatch(LoaderActions.hideLoader())
+      dispatch(LoaderActions.hideLoader())
 
-    window.open(_getRStudioUrl(), 'rstudio')
-  }, [])
+      const rStudioUrl = await _getRStudioUrl()
+      window.open(rStudioUrl, 'rstudio')
+    },
+    [dispatch, surveyId, surveyCycleKey]
+  )
 }
