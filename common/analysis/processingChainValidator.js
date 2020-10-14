@@ -8,7 +8,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepVariable from '@common/analysis/processingStepVariable'
+import * as StepVariable from '@common/analysis/stepVariable'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 export const keys = {
@@ -35,11 +35,8 @@ export const validateChain = async (chain, defaultLang) =>
 const _validateStepVariablesPrevStep = (step) => {
   const validation = Validation.newInstance()
   const variablesPreviousStep = ProcessingStep.getVariablesPreviousStep(step)
-  variablesPreviousStep.forEach((variable, index) => {
-    if (
-      ProcessingStepVariable.getInclude(variable) &&
-      StringUtils.isBlank(ProcessingStepVariable.getAggregate(variable))
-    ) {
+  Object.values(variablesPreviousStep).forEach((variable, index) => {
+    if (StringUtils.isBlank(StepVariable.getAggregate(variable))) {
       R.pipe(
         Validation.setValid(false),
         Validation.setField(

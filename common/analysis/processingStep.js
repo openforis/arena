@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import * as StepVariable from '@common/analysis/processingStepVariable'
+import * as StepVariable from '@common/analysis/stepVariable'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -28,7 +28,7 @@ export const getCalculations = R.propOr([], keys.calculations)
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
-export const getVariablesPreviousStep = ObjectUtils.getProp(keysProps.variablesPreviousStep, [])
+export const getVariablesPreviousStep = ObjectUtils.getProp(keysProps.variablesPreviousStep, {})
 export const hasVariablePreviousStep = (variableUuid) =>
   R.pipe(
     getVariablesPreviousStep,

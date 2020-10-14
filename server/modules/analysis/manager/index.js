@@ -7,7 +7,6 @@ import * as Survey from '../../../../core/survey/survey'
 import * as Chain from '../../../../common/analysis/processingChain'
 import * as Step from '../../../../common/analysis/processingStep'
 import * as ChainValidator from '../../../../common/analysis/processingChainValidator'
-import * as ChainController from '../../../../common/analysis/chainController'
 
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../../survey/repository/surveyRepository'
@@ -56,15 +55,7 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
     ])
     const stepDb = step ? Chain.getStepByIdx(Step.getIndex(step))(chainDb) : null
 
-    // 3. Update next step (if adding calculation)
-    if (calculation) {
-      const { stepNext } = ChainController.assocCalculation({ chain: chainDb, step: stepDb, calculation })
-      if (stepNext) {
-        await persistStep({ user, surveyId, step: stepNext }, tx)
-      }
-    }
-
-    // 4. Validate chain / step / calculation
+    // 3. Validate chain / step / calculation
     const lang = Survey.getDefaultLanguage(surveyInfo)
     const calculationValidation = calculation ? await ChainValidator.validateCalculation(calculation, lang) : null
     const stepValidation = stepDb ? await ChainValidator.validateStep(stepDb) : null

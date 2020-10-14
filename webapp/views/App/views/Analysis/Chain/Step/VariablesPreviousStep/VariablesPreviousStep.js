@@ -8,9 +8,7 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-import * as Chain from '@common/analysis/processingChain'
-import * as Step from '@common/analysis/processingStep'
-import * as StepVariable from '@common/analysis/processingStepVariable'
+import * as StepVariable from '@common/analysis/stepVariable'
 
 import Checkbox from '@webapp/components/form/checkbox'
 import ValidationTooltip from '@webapp/components/validationTooltip'
@@ -18,7 +16,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import { State } from '../../store'
+import { useVariablesPreviousStep } from './useVariablesPreviousStep'
 
 const VariablesPreviousStep = (props) => {
   const { state, Actions } = props
@@ -26,13 +24,7 @@ const VariablesPreviousStep = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const chainEdit = State.getChainEdit(state)
-  const stepEdit = State.getStepEdit(state)
-  const variablesPrevStep = Step.getVariablesPreviousStep(stepEdit)
-  const validation = A.pipe(
-    Chain.getItemValidationByUuid(Step.getUuid(stepEdit)),
-    Validation.getFieldValidation(Step.keysProps.variablesPreviousStep)
-  )(chainEdit)
+  const { variablesPrevStep, validation } = useVariablesPreviousStep({ state })
 
   return variablesPrevStep.length ? (
     <div className="form-item">
@@ -50,21 +42,17 @@ const VariablesPreviousStep = (props) => {
           </div>
           <div className="table__rows">
             {variablesPrevStep.map((variablePrevStep) => {
-              const nodeDefUuid = StepVariable.getUuid(variablePrevStep)
-              const nodeDefLabel = A.pipe(Survey.getNodeDefByUuid(nodeDefUuid), (nodeDef) =>
+              const variableUuid = StepVariable.getUuid(variablePrevStep)
+              const nodeDefLabel = A.pipe(Survey.getNodeDefByUuid(variableUuid), (nodeDef) =>
                 NodeDef.getLabel(nodeDef, i18n.lang)
               )(survey)
               return (
-                <div key={nodeDefUuid} className="table__row">
+                <div key={variableUuid} className="table__row">
                   <div>{nodeDefLabel}</div>
                   <div>
                     <Checkbox
                       checked={StepVariable.getInclude(variablePrevStep)}
-                      onChange={(checked) =>
-                        Actions.updatePreviousStepVariable({
-                          variable: StepVariable.assocInclude(checked)(variablePrevStep),
-                        })
-                      }
+                      onChange={(include) => Actions.togglePreviousStepVariable({ variableUuid, include })}
                     />
                   </div>
                   <div>{StepVariable.getAggregate(variablePrevStep)}</div>

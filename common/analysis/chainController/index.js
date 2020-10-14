@@ -17,6 +17,7 @@ export {
 export {
   assocCalculationUuids,
   assocVariablePreviousStep,
+  dissocVariablePreviousStep,
   dissocCalculation,
   dissocCalculations,
   moveCalculation,

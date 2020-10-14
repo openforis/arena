@@ -2,7 +2,7 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Chain from './processingChain'
 import * as Step from './processingStep'
-import * as StepVariable from './processingStepVariable'
+import * as StepVariable from './stepVariable'
 import * as Calculation from './processingStepCalculation'
 
 export const createChain = ({ props = {} }) => ({
@@ -19,8 +19,8 @@ export const createStep = ({ chain, props = {} }) => ({
   [Calculation.keys.temporary]: true,
 })
 
-export const createStepVariable = ({ uuid }) => ({
-  [StepVariable.keys.uuid]: uuid,
+export const createStepVariable = ({ variableUuid }) => ({
+  [StepVariable.keys.uuid]: variableUuid,
 })
 
 export const createCalculation = ({ step, nodeDefUuid = null, props = {} }) => ({

@@ -5,7 +5,6 @@ import * as Chain from '../../../../../common/analysis/processingChain'
 import * as Step from '../../../../../common/analysis/processingStep'
 import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
 import * as ChainValidator from '../../../../../common/analysis/processingChainValidator'
-import * as ChainController from '../../../../../common/analysis/chainController'
 import { TableCalculation, TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 
@@ -89,22 +88,6 @@ export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationU
     // Reload chain including steps and calculations
     const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, tx)
     const stepDb = Chain.getStepByIdx(Step.getIndex(step))(chain)
-    // Update next step variables prev step (if updated)
-    const { stepNextUpdated } = ChainController.deleteCalculation({ chain, step: stepDb, calculation })
-    if (stepNextUpdated) {
-      await StepRepository.updateStep(
-        {
-          surveyId,
-          stepUuid: Step.getUuid(stepNextUpdated),
-          fields: {
-            [Step.keys.props]: {
-              [Step.keysProps.variablesPreviousStep]: Step.getVariablesPreviousStep(stepNextUpdated),
-            },
-          },
-        },
-        tx
-      )
-    }
     // Update step validation
     const stepValidation = await ChainValidator.validateStep(stepDb)
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
