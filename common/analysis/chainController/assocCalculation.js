@@ -30,6 +30,6 @@ export const assocCalculation = ({ chain, step, calculation }) => {
   return {
     chain: chainUpdated,
     step: stepUpdated,
-    stepNextUpdated,
+    stepNext: stepNextUpdated,
   }
 }

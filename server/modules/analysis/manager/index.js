@@ -58,9 +58,9 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
 
     // 3. Update next step (if adding calculation)
     if (calculation) {
-      const { stepNextUpdated } = ChainController.assocCalculation({ chain: chainDb, step: stepDb, calculation })
-      if (stepNextUpdated) {
-        await persistStep({ user, surveyId, step: stepNextUpdated }, tx)
+      const { stepNext } = ChainController.assocCalculation({ chain: chainDb, step: stepDb, calculation })
+      if (stepNext) {
+        await persistStep({ user, surveyId, step: stepNext }, tx)
       }
     }
 
