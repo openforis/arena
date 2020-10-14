@@ -11,11 +11,19 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const userUuid = User.getUuid(user)
 
-      const { data } = await axios.post(ProcessUtils.ENV.rStudioPoolServerURL, {
-        command: 'REQUEST_RSTUDIO',
-        payload: { userId: userUuid },
-      })
-
+      const { data } = await axios.post(
+        ProcessUtils.ENV.rStudioPoolServerURL,
+        {
+          command: 'REQUEST_RSTUDIO',
+          payload: { userId: userUuid },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: ProcessUtils.ENV.rStudioPoolServiceKey,
+          },
+        }
+      )
       res.json(data)
     } catch (error) {
       next(error)

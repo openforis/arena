@@ -5,22 +5,22 @@ import { useDispatch } from 'react-redux'
 import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/processingChain'
 
+import * as User from '@core/user/user'
+
 import { LoaderActions } from '@webapp/store/ui'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
 import { State } from '../../state'
 
-const _getRStudioUrl = async () => {
+const _getRStudioUrl = async ({ userUuid }) => {
   const { data = {} } = await axios.post('/api/rstudio')
   const { instanceId = false } = data
 
   if (instanceId && ProcessUtils.ENV.rStudioProxyServerURL) {
-    return `${ProcessUtils.ENV.rStudioProxyServerURL}${instanceId}`
+    return `${ProcessUtils.ENV.rStudioProxyServerURL}${instanceId}_${userUuid}`
   }
 
-  if (ProcessUtils.ENV.rStudioServerURL) {
-    return ProcessUtils.ENV.rStudioServerURL
-  }
   if (ProcessUtils.isEnvDevelopment) {
     return 'http://localhost:8787'
   }
@@ -31,6 +31,8 @@ export const useOpenRStudio = () => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
+  const user = useUser()
+  const userUuid = User.getUuid(user)
 
   return useCallback(
     async ({ state }) => {
@@ -42,9 +44,9 @@ export const useOpenRStudio = () => {
 
       dispatch(LoaderActions.hideLoader())
 
-      const rStudioUrl = await _getRStudioUrl()
+      const rStudioUrl = await _getRStudioUrl({ userUuid })
       window.open(rStudioUrl, 'rstudio')
     },
-    [dispatch, surveyId, surveyCycleKey]
+    [dispatch, surveyId, surveyCycleKey, userUuid]
   )
 }

@@ -43,6 +43,7 @@ const ENV = {
   // RStudio Server
   rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
   rStudioProxyServerURL: process.env.RSTUDIO_PROXY_SERVER_URL,
+  rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
 }
 
 module.exports = {
