@@ -12,6 +12,7 @@ import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
 import { useDismiss as useDismissStep } from './step/useDismiss'
 import { useDelete as useDeleteStep } from './step/useDelete'
 import { useTogglePreviousStepVariable } from './step/useTogglePreviousStepVariable'
+import { useUpdatePreviousStepVariable } from './step/useUpdatePreviousStepVariable'
 
 import { useMoveCalculation } from './useMoveCalculation'
 
@@ -39,9 +40,10 @@ export const useActions = ({ setState }) => ({
   updatePropsStep: useUpdatePropsStep({ setState }),
   dismissStep: useDismissStep({ setState }),
   deleteStep: useDeleteStep({ setState }),
+  togglePreviousStepVariable: useTogglePreviousStepVariable({ setState }),
+  updatePreviousStepVariable: useUpdatePreviousStepVariable({ setState }),
 
   moveCalculation: useMoveCalculation({ setState }),
-  togglePreviousStepVariable: useTogglePreviousStepVariable({ setState }),
 
   createCalculation: useCreateCalculation({ setState }),
   selectCalculation: useSelectCalculation({ setState }),

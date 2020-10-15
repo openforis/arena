@@ -17,7 +17,7 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = (props) => {
-  const { canBeConstant, expr, mode, nodeDefUuidContext, nodeDefUuidCurrent, onChange, query } = props
+  const { canBeConstant, expr, mode, onlyAdvanced, nodeDefUuidContext, nodeDefUuidCurrent, onChange, query } = props
 
   const survey = useSurvey()
   const lang = useLang()
@@ -25,7 +25,7 @@ export const useExpressionEditorPopupState = (props) => {
   // An encoding trick. Newlines can only appear in a textarea,
   // so denote advanced mode expressions as anything that contains a newline.
   // The editing component ensures that all intermediate values will contain one.
-  const initialAdvanced = /\n/.test(query)
+  const initialAdvanced = onlyAdvanced || /\n/.test(query)
   const [advanced, setAdvancedEditor] = useState(initialAdvanced)
   const [state, setState] = useState(initialState)
   const [expressionCanBeApplied, setExpressionCanBeApplied] = useState(false)

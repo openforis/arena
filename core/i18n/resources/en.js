@@ -379,6 +379,7 @@ $t(common.cantUndoWarning)`,
       variableName: 'Variable name',
       include: 'Include',
       aggregate: 'Aggregate',
+      aggregateFunctionOfVariable: `Aggregate function of variable '{{variableLabel}}'`,
     },
   },
 

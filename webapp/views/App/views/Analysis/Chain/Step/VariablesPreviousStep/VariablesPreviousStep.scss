@@ -1,9 +1,14 @@
+.processing-step__variables-previous-step-form-item.form-item {
+  grid-template-columns: 150px 1fr;
+}
+
 .processing-step__variables-previous-step-table {
   height: 300px;
-  width: 580px;
+  width: 100%;
 
   .table__row-header,
   .table__row {
-    grid-template-columns: 200px 80px 300px;
+    grid-template-columns: 200px 80px 1fr 30px;
+    column-gap: 1rem;
   }
 }
