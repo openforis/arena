@@ -1,4 +1,5 @@
-export { createAndAssocStep, createAndAssocCalculation } from './create'
+export { createAndAssocStep } from './createAndAssocStep'
+export { createAndAssocCalculation } from './createAndAssocCalculation'
 
 export { assocCalculation } from './assocCalculation'
 export { deleteCalculation } from './deleteCalculation'
