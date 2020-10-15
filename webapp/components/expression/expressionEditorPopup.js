@@ -76,6 +76,7 @@ const ExpressionEditorPopup = (props) => {
             setExpressionCanBeApplied={setExpressionCanBeApplied}
             updateDraftQuery={updateDraftQuery}
             variables={variables}
+            mode={mode}
           />
         ) : (
           <BasicExpressionEditorPopup

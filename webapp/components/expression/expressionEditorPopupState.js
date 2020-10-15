@@ -59,7 +59,7 @@ export const useExpressionEditorPopupState = (props) => {
   }
 
   const updateDraftQuery = (queryDraft) => {
-    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft)
+    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
     const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
     setState((prevState) => ({
