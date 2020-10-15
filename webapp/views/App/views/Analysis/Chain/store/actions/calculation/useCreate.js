@@ -11,7 +11,7 @@ export const useCreate = ({ setState }) =>
       setState((statePrev) => {
         const chain = State.getChainEdit(statePrev)
         const step = State.getStepEdit(statePrev)
-        const { chain: chainUpdated, step: stepUpdated, calculation } = ChainController.createCalculation({
+        const { chain: chainUpdated, step: stepUpdated, calculation } = ChainController.createAndAssocCalculation({
           chain,
           step,
         })

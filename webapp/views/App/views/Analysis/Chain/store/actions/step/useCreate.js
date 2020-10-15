@@ -10,7 +10,7 @@ export const useCreate = ({ setState }) =>
     () =>
       setState((statePrev) => {
         const chain = State.getChainEdit(statePrev)
-        const { chain: chainUpdated, step } = ChainController.createStep({ chain })
+        const { chain: chainUpdated, step } = ChainController.createAndAssocStep({ chain })
         return A.pipe(State.assocChainEdit(chainUpdated), State.assocStepEdit(step))(statePrev)
       }),
     []
