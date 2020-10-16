@@ -12,6 +12,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
+import * as ChainController from '@common/analysis/chainController'
 
 import { AnalysisStorage } from '@webapp/service/storage/analysis'
 import { NotificationActions } from '@webapp/store/ui'
@@ -44,8 +45,9 @@ const _getStepParam = (step) =>
     R.pipe(
       Step.getCalculations,
       R.map(Calculation.getUuid),
-      (calculationUuids) => Step.assocCalculationUuids(calculationUuids)(step),
-      Step.dissocCalculations
+      (calculationUuids) => ChainController.assocCalculationUuids({ step, calculationUuids }),
+      ChainController.dissocCalculations,
+      R.prop('step')
     )
   )(step)
 
@@ -69,7 +71,7 @@ export const useSave = ({ setState }) => {
     const [chainToSave, chainValidation] = await _getChainAndValidation(params)(chain)
     if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
       const data = {
-        chain: Chain.dissocProcessingSteps(chainToSave),
+        chain: R.prop('chain', ChainController.dissocSteps({ chain: chainToSave })),
         step: !R.isEmpty(step) ? _getStepParam(step) : null,
         calculation: !R.isEmpty(calculation) ? calculation : null,
       }
@@ -77,16 +79,28 @@ export const useSave = ({ setState }) => {
 
       dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
 
-      const chainSaved = Chain.dissocTemporary(chainToSave)
-      const stepSaved = step ? Step.dissocTemporary(step) : null
-      const calculationSaved = calculation ? Calculation.dissocTemporary(calculation) : null
-
+      const { chain: chainSaved, step: stepSaved, calculation: calculationSaved } = ChainController.dissocTemporary({
+        chain: chainToSave,
+        step,
+        calculation,
+      })
+      let chainUpdated = chainSaved
+      let stepUpdated = stepSaved
+      if (step && calculation) {
+        const { chain: chainWithCalculation, step: stepWithCalculation } = ChainController.assocCalculation({
+          chain: chainSaved,
+          step: stepSaved,
+          calculation: calculationSaved,
+        })
+        chainUpdated = chainWithCalculation
+        stepUpdated = stepWithCalculation
+      }
       setState(
         A.pipe(
-          State.assocChain(chainSaved),
-          State.assocChainEdit(chainSaved),
-          State.assocStep(stepSaved),
-          State.assocStepEdit(stepSaved),
+          State.assocChain(chainUpdated),
+          State.assocChainEdit(chainUpdated),
+          State.assocStep(stepUpdated),
+          State.assocStepEdit(stepUpdated),
           State.assocCalculation(calculationSaved),
           State.assocCalculationEdit(calculationSaved)
         )(state)

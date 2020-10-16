@@ -8,7 +8,7 @@ import * as A from '@core/arena'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-import * as Chain from '@common/analysis/processingChain'
+import * as ChainController from '@common/analysis/chainController'
 import * as Step from '@common/analysis/processingStep'
 
 import { State } from '../../state'
@@ -19,37 +19,32 @@ export const useDelete = ({ setState }) => {
   const { chainUuid } = useParams()
 
   const deleteStep = ({ state }) => async () => {
-    const stepToDelete = State.getStepEdit(state)
-    const stepUuid = Step.getUuid(stepToDelete)
+    const chain = State.getChainEdit(state)
+    const step = State.getStepEdit(state)
+    const stepUuid = Step.getUuid(step)
 
-    if (chainUuid && !Step.isTemporary(stepToDelete)) {
+    if (chainUuid && !Step.isTemporary(step)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${stepUuid}`)
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    const newChain = A.pipe(
-      Chain.dissocProcessingStep(stepToDelete),
-      Chain.dissocProcessingStepTemporary
-    )(State.getChainEdit(State))
+    const { chain: chainUpdated } = ChainController.dissocStep({ chain, step })
 
     setState(
-      A.pipe(State.assocChain(newChain), State.assocChainEdit(newChain), State.dissocStep, State.dissocStepEdit)(state)
+      A.pipe(State.assocChain(chainUpdated), State.assocChainEdit(chainUpdated), State.dissocStep, State.dissocStepEdit)
     )
 
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 
-  return useCallback(async ({ state }) => {
-    const stepDirty = State.isStepDirty(state)
-    if (stepDirty) {
+  return useCallback(
+    ({ state }) =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'processingStepView.deleteConfirm',
           onOk: deleteStep({ state }),
         })
-      )
-    } else {
-      await deleteStep({ state })()
-    }
-  }, [])
+      ),
+    []
+  )
 }
