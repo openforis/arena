@@ -13,12 +13,24 @@ import { useUser } from '@webapp/store/user'
 
 import { State } from '../../state'
 
-const _getRStudioUrl = async ({ userUuid }) => {
+const _getRStudioPoolUrl = async ({ userUuid }) => {
   const { data = {} } = await axios.post('/api/rstudio')
   const { instanceId = false } = data
 
   if (instanceId && ProcessUtils.ENV.rStudioProxyServerURL) {
     return `${ProcessUtils.ENV.rStudioProxyServerURL}${instanceId}_${userUuid}`
+  }
+  return false
+}
+const _getRStudioUrl = async ({ userUuid }) => {
+  if (ProcessUtils.ENV.rStudioServerUrl) {
+    return ProcessUtils.ENV.rStudioServerUrl
+  }
+
+  const rStudioPoolUrl = await _getRStudioPoolUrl({ userUuid })
+
+  if (rStudioPoolUrl) {
+    return rStudioPoolUrl
   }
 
   if (ProcessUtils.isEnvDevelopment) {
