@@ -380,6 +380,7 @@ $t(common.cantUndoWarning)`,
       include: 'Include',
       aggregate: 'Aggregate',
       aggregateFunctionOfVariable: `Aggregate function of variable '{{variableLabel}}'`,
+      deleteConfirm: 'Remove the variable and its aggregate function?',
     },
   },
 

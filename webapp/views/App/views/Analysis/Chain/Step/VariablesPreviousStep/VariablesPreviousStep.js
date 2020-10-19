@@ -55,9 +55,9 @@ const VariablesPreviousStep = (props) => {
             <div>{i18n.t('processingStepView.variablesPreviousStep.aggregate')}</div>
           </div>
           <div className="table__rows">
-            {variables.map((variablePrevStep) => {
-              const variableUuid = StepVariable.getUuid(variablePrevStep)
-              const variableLabel = getVariableLabel(variablePrevStep)
+            {variables.map((variable) => {
+              const variableUuid = StepVariable.getUuid(variable)
+              const variableLabel = getVariableLabel(variable)
               return (
                 <div
                   key={variableUuid}
@@ -66,17 +66,17 @@ const VariablesPreviousStep = (props) => {
                   <div>{variableLabel}</div>
                   <div>
                     <Checkbox
-                      checked={StepVariable.getInclude(variablePrevStep)}
-                      onChange={(include) => Actions.togglePreviousStepVariable({ variableUuid, include })}
+                      checked={StepVariable.getInclude(variable)}
+                      onChange={(include) => Actions.togglePreviousStepVariable({ variable, include })}
                     />
                   </div>
-                  <div>{StepVariable.getAggregate(variablePrevStep)}</div>
+                  <div>{StepVariable.getAggregate(variable)}</div>
                   <div>
                     <button
                       type="button"
                       className="btn btn-s btn-edit"
-                      aria-disabled={!StepVariable.getInclude(variablePrevStep)}
-                      onClick={() => setVariableEdit(variablePrevStep)}
+                      aria-disabled={!StepVariable.getInclude(variable)}
+                      onClick={() => setVariableEdit(variable)}
                     >
                       <span className="icon icon-pencil2 icon-14px" />
                     </button>
