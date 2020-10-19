@@ -33,9 +33,6 @@ const _getRStudioUrl = async ({ userUuid }) => {
     return rStudioPoolUrl
   }
 
-  if (ProcessUtils.isEnvDevelopment) {
-    return 'http://localhost:8787'
-  }
   return `${window.location.origin}/rstudio/`
 }
 
