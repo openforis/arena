@@ -29,8 +29,14 @@ export const useVariablesPreviousStep = ({ state }) => {
   })
 
   const setVariableEdit = (variableEditNew) => {
-    // highlight last edited variable when edit completes
-    setVariableHighlightedUuid(variableEdit ? StepVariable.getUuid(variableEdit) : null)
+    if (variableEdit) {
+      // highlight last edited variable when edit completes
+      setVariableHighlightedUuid(StepVariable.getUuid(variableEdit))
+      // reset higlighted variable after 4 sec (animation duration)
+      setTimeout(() => setVariableHighlightedUuid(null), 4000)
+    } else {
+      setVariableHighlightedUuid(null)
+    }
     setVariableEditState(variableEditNew)
   }
 
