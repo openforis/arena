@@ -11,7 +11,8 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { State } from '../../store'
 
 export const useVariablesPreviousStep = ({ state }) => {
-  const [variableEdit, setVariableEdit] = useState(null)
+  const [variableEdit, setVariableEditState] = useState(null)
+  const [variableHighlightedUuid, setVariableHighlightedUuid] = useState(null)
 
   const chain = State.getChainEdit(state)
   const step = State.getStepEdit(state)
@@ -19,7 +20,7 @@ export const useVariablesPreviousStep = ({ state }) => {
   const stepPrevEntityDefUuid = Step.getEntityUuid(stepPrev)
   const variablesPrevStepIncluded = Step.getVariablesPreviousStep(step)
 
-  const variablesPrevStep = Step.getCalculations(stepPrev).map((calculation) => {
+  const variables = Step.getCalculations(stepPrev).map((calculation) => {
     const variableUuid = Calculation.getNodeDefUuid(calculation)
     const variablePrevStep = variablesPrevStepIncluded[variableUuid]
     return variablePrevStep
@@ -27,10 +28,23 @@ export const useVariablesPreviousStep = ({ state }) => {
       : ChainFactory.createStepVariable({ variableUuid })
   })
 
+  const setVariableEdit = (variableEditNew) => {
+    // highlight last edited variable when edit completes
+    setVariableHighlightedUuid(variableEdit ? StepVariable.getUuid(variableEdit) : null)
+    setVariableEditState(variableEditNew)
+  }
+
   const validation = A.pipe(
     Chain.getItemValidationByUuid(Step.getUuid(step)),
     Validation.getFieldValidation(Step.keysProps.variablesPreviousStep)
   )(chain)
 
-  return { variablesPrevStep, validation, variableEdit, setVariableEdit, stepPrevEntityDefUuid }
+  return {
+    variables,
+    variableHighlightedUuid,
+    validation,
+    variableEdit,
+    setVariableEdit,
+    stepPrevEntityDefUuid,
+  }
 }

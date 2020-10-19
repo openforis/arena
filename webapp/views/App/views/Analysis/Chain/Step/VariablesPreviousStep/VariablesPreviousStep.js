@@ -2,7 +2,7 @@ import './VariablesPreviousStep.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import classNames from 'classnames'
 
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
@@ -27,7 +27,8 @@ const VariablesPreviousStep = (props) => {
   const survey = useSurvey()
 
   const {
-    variablesPrevStep,
+    variables,
+    variableHighlightedUuid,
     validation,
     variableEdit,
     setVariableEdit,
@@ -39,10 +40,10 @@ const VariablesPreviousStep = (props) => {
     return A.pipe(Survey.getNodeDefByUuid(variableUuid), (nodeDef) => NodeDef.getLabel(nodeDef, i18n.lang))(survey)
   }
 
-  return variablesPrevStep.length ? (
+  return variables.length ? (
     <div className="processing-step__variables-previous-step-form-item form-item">
       <ValidationTooltip validation={validation} showKeys>
-        <div className={classnames('form-label', { error: !Validation.isValid(validation) })}>
+        <div className={classNames('form-label', { error: !Validation.isValid(validation) })}>
           {i18n.t('processingStepView.variablesPreviousStep.title')}
         </div>
       </ValidationTooltip>
@@ -54,11 +55,14 @@ const VariablesPreviousStep = (props) => {
             <div>{i18n.t('processingStepView.variablesPreviousStep.aggregate')}</div>
           </div>
           <div className="table__rows">
-            {variablesPrevStep.map((variablePrevStep) => {
+            {variables.map((variablePrevStep) => {
               const variableUuid = StepVariable.getUuid(variablePrevStep)
               const variableLabel = getVariableLabel(variablePrevStep)
               return (
-                <div key={variableUuid} className="table__row">
+                <div
+                  key={variableUuid}
+                  className={classNames('table__row', { highlighted: variableUuid === variableHighlightedUuid })}
+                >
                   <div>{variableLabel}</div>
                   <div>
                     <Checkbox
