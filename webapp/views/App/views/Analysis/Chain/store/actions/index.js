@@ -12,6 +12,8 @@ import { useUpdateProps as useUpdatePropsStep } from './step/useUpdateProps'
 import { useDismiss as useDismissStep } from './step/useDismiss'
 import { useDelete as useDeleteStep } from './step/useDelete'
 import { useTogglePreviousStepVariable } from './step/useTogglePreviousStepVariable'
+import { useOpenEditor as useOpenStepVariableEditor } from './stepVariable/useOpenEditor'
+import { useDismissEditor as useDismissStepVariableEditor } from './stepVariable/useDismissEditor'
 import { useUpdatePreviousStepVariable } from './step/useUpdatePreviousStepVariable'
 
 import { useMoveCalculation } from './useMoveCalculation'
@@ -41,6 +43,8 @@ export const useActions = ({ setState }) => ({
   dismissStep: useDismissStep({ setState }),
   deleteStep: useDeleteStep({ setState }),
   togglePreviousStepVariable: useTogglePreviousStepVariable({ setState }),
+  openStepVariableEditor: useOpenStepVariableEditor({ setState }),
+  dismissStepVariableEditor: useDismissStepVariableEditor({ setState }),
   updatePreviousStepVariable: useUpdatePreviousStepVariable({ setState }),
 
   moveCalculation: useMoveCalculation({ setState }),
