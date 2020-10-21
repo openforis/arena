@@ -2,6 +2,10 @@
 @import '~codemirror/addon/hint/show-hint';
 @import 'webapp/style/vars';
 
+.CodeMirror-hints {
+  z-index: 20;
+}
+
 .expression-editor-popup {
   display: grid;
   grid-template-rows: auto 1fr auto;

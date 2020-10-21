@@ -6,12 +6,11 @@ import * as Chain from '../../../../../common/analysis/processingChain'
 
 const transformCallback = (row) => {
   /* eslint-disable-next-line camelcase */
-  const { date_created, date_modified, props, ...rest } = DB.mergeProps()(row)
+  const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
 
   return {
     [ObjectUtils.keys.dateCreated]: date_created,
     [ObjectUtils.keys.dateModified]: date_modified,
-    [ObjectUtils.keys.props]: props,
     ...rest,
   }
 }
