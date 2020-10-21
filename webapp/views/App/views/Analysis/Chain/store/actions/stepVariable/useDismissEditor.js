@@ -21,4 +21,4 @@ export const useDismissEditor = ({ setState }) =>
       }
       return State.dissocVariablePrevStepUuidHighlighted(stateUpdated)
     })
-  })
+  }, [])
