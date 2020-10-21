@@ -1,4 +1,5 @@
 @import 'webapp/style/vars';
+@import 'webapp/style/animate';
 
 .processing-step__variables-previous-step-form-item.form-item {
   grid-template-columns: 150px 1fr;
@@ -17,17 +18,5 @@
       animation-name: animate-highlight;
       animation-duration: 4s;
     }
-  }
-}
-
-@keyframes animate-highlight {
-  0% {
-    background-color: inherit;
-  }
-  30% {
-    background-color: rgba($yellow, 0.7);
-  }
-  100% {
-    background-color: inherit;
   }
 }
