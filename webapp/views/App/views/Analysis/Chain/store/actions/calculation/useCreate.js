@@ -1,24 +1,26 @@
 import { useCallback } from 'react'
 import * as A from '@core/arena'
 
-import * as Chain from '@common/analysis/processingChain'
-import * as Step from '@common/analysis/processingStep'
+import * as ChainController from '@common/analysis/chainController'
 
 import { State } from '../../state'
 
-export const useCreate = ({ setState }) => {
-  return useCallback(({ state }) => {
-    const step = State.getStepEdit(state)
-    const calculation = Chain.newProcessingStepCalculation(step)
-    const stepWithCalculation = Step.assocCalculation(calculation)(step)
-    const chainWithStep = Chain.assocProcessingStep(stepWithCalculation)(State.getChainEdit(state))
+export const useCreate = ({ setState }) =>
+  useCallback(
+    () =>
+      setState((statePrev) => {
+        const chain = State.getChainEdit(statePrev)
+        const step = State.getStepEdit(statePrev)
+        const { chain: chainUpdated, step: stepUpdated, calculation } = ChainController.createAndAssocCalculation({
+          chain,
+          step,
+        })
 
-    setState(
-      A.pipe(
-        State.assocChainEdit(chainWithStep),
-        State.assocStepEdit(stepWithCalculation),
-        State.assocCalculationEdit(calculation)
-      )(state)
-    )
-  }, [])
-}
+        return A.pipe(
+          State.assocChainEdit(chainUpdated),
+          State.assocStepEdit(stepUpdated),
+          State.assocCalculationEdit(calculation)
+        )(statePrev)
+      }),
+    []
+  )

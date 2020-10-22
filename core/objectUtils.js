@@ -93,7 +93,7 @@ export const setInPath = (pathArray, value, includeEmpty = true) => (obj) => {
   return obj
 }
 
-export const dissocTemporary = R.dissoc(keys.temporary)
+export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
 // ====== UTILS / uuid
 export const toIndexedObj = (array, propName) =>

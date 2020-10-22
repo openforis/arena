@@ -1,12 +1,16 @@
 import { useCallback } from 'react'
 
-import * as A from '@core/arena'
-import * as Chain from '@common/analysis/processingChain'
+import * as ChainController from '@common/analysis/chainController'
 
 import { State } from '../../state'
 
 export const useUpdateChain = ({ setState }) =>
-  useCallback(({ name, value, state }) => {
-    const chainEdit = A.pipe(State.getChainEdit, Chain.assocProp(name, value))(state)
-    setState(State.assocChainEdit(chainEdit)(state))
-  }, [])
+  useCallback(
+    ({ name, value }) =>
+      setState((statePrev) => {
+        const chainEdit = State.getChainEdit(statePrev)
+        const { chain: chainEditUpdated } = ChainController.assocProp({ chain: chainEdit, key: name, value })
+        return State.assocChainEdit(chainEditUpdated)(statePrev)
+      }),
+    []
+  )

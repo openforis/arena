@@ -85,9 +85,11 @@ export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationU
     const type = ActivityLog.type.processingStepCalculationDelete
     await ActivityLogRepository.insert(user, surveyId, type, content, false, tx)
 
-    // Update step validation
+    // Reload chain including steps and calculations
     const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, tx)
-    const stepValidation = await ChainValidator.validateStep(Chain.getStepByIdx(Step.getIndex(step))(chain))
+    const stepDb = Chain.getStepByIdx(Step.getIndex(step))(chain)
+    // Update step validation
+    const stepValidation = await ChainValidator.validateStep(stepDb)
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
     // Update processing_chain validation
     const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }

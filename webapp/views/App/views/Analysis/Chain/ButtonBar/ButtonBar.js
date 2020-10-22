@@ -18,50 +18,49 @@ const ButtonBar = (props) => {
   const calculationEdit = State.getCalculationEdit(state)
   const stepNext = Chain.getStepNext(stepEdit)(chainEdit)
 
-  const editingChain = Boolean(State.getChainEdit(state))
-  const editingStep = Boolean(State.getStepEdit(state))
-  const editingCalculation = Boolean(State.getCalculationEdit(state))
+  const editingChain = State.isEditingChain(state)
+  const editingStep = State.isEditingStep(state)
+  const editingCalculation = State.isEditingCalculation(state)
   const dirty = State.isDirty(state)
 
   return (
-    <>
-      <div className="button-bar">
-        {editingChain && !editingStep && !editingCalculation && (
-          <button type="button" className="btn-s btn-cancel" onClick={() => Actions.dismiss({ state })}>
-            <span className="icon icon-cross icon-left icon-10px" />
-            {i18n.t(dirty ? 'common.cancel' : 'common.back')}
-          </button>
-        )}
+    <div className="button-bar">
+      {editingChain && !editingStep && !editingCalculation && (
+        <button type="button" className="btn-s btn-cancel" onClick={() => Actions.dismiss({ state })}>
+          <span className="icon icon-cross icon-left icon-10px" />
+          {i18n.t(dirty ? 'common.cancel' : 'common.back')}
+        </button>
+      )}
 
-        <button
-          type="button"
-          className="btn-s btn-primary"
-          onClick={() => Actions.save({ state })}
-          aria-disabled={!dirty}
-        >
-          <span className="icon icon-floppy-disk icon-left icon-12px" />
-          {i18n.t('common.save')}
-        </button>
-        <button
-          type="button"
-          className="btn-s btn-danger btn-delete"
-          aria-disabled={
-            (editingCalculation && Calculation.isTemporary(calculationEdit)) ||
-            (editingStep && (Step.isTemporary(stepEdit) || Boolean(stepNext))) ||
-            (editingChain && Chain.isTemporary(chainEdit))
-          }
-          onClick={() => {
-            let deleteAction = Actions.delete
-            if (editingStep) deleteAction = Actions.deleteStep
-            if (editingCalculation) deleteAction = Actions.deleteCalculation
-            deleteAction({ state })
-          }}
-        >
-          <span className="icon icon-bin icon-left icon-12px" />
-          {i18n.t('common.delete')}
-        </button>
-      </div>
-    </>
+      <button
+        type="button"
+        className="btn-s btn-primary"
+        onClick={() => Actions.save({ state })}
+        aria-disabled={!dirty}
+      >
+        <span className="icon icon-floppy-disk icon-left icon-12px" />
+        {i18n.t('common.save')}
+      </button>
+      <button
+        type="button"
+        className="btn-s btn-danger btn-delete"
+        aria-disabled={
+          (editingCalculation && Calculation.isTemporary(calculationEdit)) ||
+          (editingStep && !editingCalculation && (Step.isTemporary(stepEdit) || Boolean(stepNext))) ||
+          (editingChain && !editingStep && !editingCalculation && Chain.isTemporary(chainEdit))
+        }
+        onClick={() => {
+          let deleteAction
+          if (editingCalculation) deleteAction = Actions.deleteCalculation
+          else if (editingStep) deleteAction = Actions.deleteStep
+          else deleteAction = Actions.delete
+          deleteAction({ state })
+        }}
+      >
+        <span className="icon icon-bin icon-left icon-12px" />
+        {i18n.t('common.delete')}
+      </button>
+    </div>
   )
 }
 
