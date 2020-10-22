@@ -8,6 +8,7 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  zip: 'application/zip',
 }
 
 export const sendOk = (res) => res.json({ status: status.ok })
@@ -33,12 +34,6 @@ export const sendErr = (res, err) => {
   }
 }
 
-export const sendFile = (res, name, content, size) => {
-  setContentTypeFile(res, name, size)
-  res.write(content, 'binary')
-  res.end(null, 'binary')
-}
-
 export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
@@ -48,4 +43,10 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   if (contentType) {
     res.set('Content-Type', contentType)
   }
+}
+
+export const sendFile = (res, name, content, size) => {
+  setContentTypeFile(res, name, size)
+  res.write(content, 'binary')
+  res.end(null, 'binary')
 }

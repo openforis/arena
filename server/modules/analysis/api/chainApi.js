@@ -1,8 +1,16 @@
+import { uuidv4 } from '@core/uuid'
+import fs from 'fs'
+import { ncp } from 'ncp'
+
+import Archiver from 'archiver'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as AnalysisService from '../service'
+
+const copyFolder = (source, target) => ncp(source, target)
 
 export const init = (app) => {
   // ====== READ - Chains
@@ -162,12 +170,36 @@ export const init = (app) => {
         const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
 
-        await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
-
-        Response.sendOk(res)
+        const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
+        const folderToken = uuidv4()
+        await copyFolder(rChain._dir, `/tmp/${surveyId}_${chainUuid}_${folderToken}/`)
+        res.json({ folderToken, serverUrl })
       } catch (error) {
         next(error)
       }
     }
   )
+
+  // === Download R SCRIPTS
+  app.get('/download/survey/:surveyId/processing-chain/:chainUuid/script', async (req, res, next) => {
+    try {
+      const { surveyId, chainUuid, folderToken } = Request.getParams(req)
+      const dir = `/tmp/${surveyId}_${chainUuid}_${folderToken}/`
+      if (fs.existsSync(dir)) {
+        Response.setContentTypeFile(res, 'aaa.zip', null, Response.contentTypes.zip)
+
+        const zip = Archiver('zip')
+        zip.pipe(res)
+        zip.directory(dir, false)
+        zip.finalize()
+        res.on('finish', () => {
+          fs.rmdirSync(dir, { recursive: true })
+        })
+      } else {
+        Response.sendErr(res, 'File not found')
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
 }
