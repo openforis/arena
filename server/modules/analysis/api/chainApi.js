@@ -74,6 +74,23 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/processing-chains/variables-prev-steps',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, entityUuid } = Request.getParams(req)
+
+        const params = { surveyId, entityUuid }
+        const variablesPrevSteps = await AnalysisService.fetchVariablesPrevSteps(params)
+
+        res.json(variablesPrevSteps)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== UPDATE - Chain
 
   app.put(

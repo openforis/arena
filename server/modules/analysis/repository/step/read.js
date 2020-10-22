@@ -1,6 +1,7 @@
 import * as DB from '../../../../db'
 
 import { TableStep } from '../../../../../common/model/db'
+import * as Step from '../../../../../common/analysis/processingStep'
 
 /**
  * Fetches all processing steps by the given survey id.
@@ -64,4 +65,21 @@ export const fetchStep = async (params, client = DB.client) => {
     byUuid ? [stepUuid] : [chainUuid, stepIndex],
     DB.mergeProps()
   )
+}
+
+export const fetchVariablesPrevSteps = async (params, client = DB.client) => {
+  const { surveyId, entityUuid } = params
+
+  const tableStep = new TableStep(surveyId)
+  const steps = await client.map(
+    `${tableStep.getSelect({ entityUuid })}
+    ORDER BY ${tableStep.columnIndex}`,
+    [],
+    DB.mergeProps()
+  )
+
+  return steps.reduce((variablesAcc, step) => {
+    variablesAcc.push(...Object.values(Step.getVariablesPreviousStep(step)))
+    return variablesAcc
+  }, [])
 }

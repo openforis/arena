@@ -29,7 +29,7 @@ export {
 } from './chain'
 
 // ====== Step
-export { fetchSteps, fetchStep, deleteStep } from './step'
+export { fetchSteps, fetchStep, fetchVariablesPrevSteps, deleteStep } from './step'
 
 // ====== Calculation
 export { fetchCalculationAttributeUuids, updateCalculation, deleteCalculation } from './calculation'

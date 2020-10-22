@@ -5,6 +5,8 @@ export {
   fetchChain,
   // ======  READ - Calculations
   fetchCalculationAttributeUuids,
+  // ======  READ - Variables Previous Steps
+  fetchVariablesPrevSteps,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain
