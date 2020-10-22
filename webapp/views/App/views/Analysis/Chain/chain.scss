@@ -25,3 +25,13 @@
     grid-template-columns: 0.2fr 0.8fr;
   }
 }
+
+.RStudioCode-container {
+  position: absolute;
+  background: white;
+  padding: 16px;
+  z-index: 9;
+  bottom: 100px;
+  background: #ffffff;
+  border: 1px solid black;
+}

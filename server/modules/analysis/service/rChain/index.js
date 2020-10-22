@@ -18,10 +18,8 @@ import * as AnalysisManager from '../../manager'
 import RChain from './rChain'
 import RStep from './rStep'
 
-export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) => {
-  const rChain = new RChain(surveyId, cycle, chainUuid, serverUrl)
-  await rChain.init()
-}
+export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
+  new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 
 // ==== READ
 export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
