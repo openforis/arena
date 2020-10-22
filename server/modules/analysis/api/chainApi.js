@@ -176,12 +176,12 @@ export const init = (app) => {
   )
 
   // === Download R SCRIPTS
-  app.get('/download/survey/:surveyId/processing-chain/:chainUuid/script', async (req, res, next) => {
+  app.get('/download/survey/:surveyId/processing-chain/:chainUuid/script', (req, res, next) => {
     try {
       const { surveyId, chainUuid, folderToken } = Request.getParams(req)
       const dir = `/tmp/${surveyId}_${chainUuid}_${folderToken}/`
       const name = `${chainUuid}.zip`
-      await Response.sendZipFile(res, dir, name)
+      Response.sendZipFile(res, dir, name)
     } catch (error) {
       next(error)
     }
