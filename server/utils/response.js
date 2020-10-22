@@ -1,3 +1,6 @@
+import Archiver from 'archiver'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
 import SystemError from '@core/systemError'
 import UnauthorizedError from './unauthorizedError'
 
@@ -49,4 +52,20 @@ export const sendFile = (res, name, content, size) => {
   setContentTypeFile(res, name, size)
   res.write(content, 'binary')
   res.end(null, 'binary')
+}
+
+export const sendZipFile = (res, dir, name) => {
+  if (FileUtils.existsDir(dir)) {
+    setContentTypeFile(res, name, null, Response.contentTypes.zip)
+
+    const zip = Archiver('zip')
+    zip.pipe(res)
+    zip.directory(dir, false)
+    zip.finalize()
+    res.on('finish', async () => {
+      await FileUtils.rmdir(dir)
+    })
+  } else {
+    sendErr(res, 'File not found')
+  }
 }

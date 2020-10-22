@@ -1,16 +1,11 @@
 import { uuidv4 } from '@core/uuid'
-import fs from 'fs'
-import { ncp } from 'ncp'
-
-import Archiver from 'archiver'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as AnalysisService from '../service'
-
-const copyFolder = (source, target) => ncp(source, target)
 
 export const init = (app) => {
   // ====== READ - Chains
@@ -172,7 +167,7 @@ export const init = (app) => {
 
         const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
         const folderToken = uuidv4()
-        await copyFolder(rChain._dir, `/tmp/${surveyId}_${chainUuid}_${folderToken}/`)
+        await FileUtils.copyDir({ source: rChain._dir, destination: `/tmp/${surveyId}_${chainUuid}_${folderToken}/` })
         res.json({ folderToken, serverUrl })
       } catch (error) {
         next(error)
@@ -185,19 +180,8 @@ export const init = (app) => {
     try {
       const { surveyId, chainUuid, folderToken } = Request.getParams(req)
       const dir = `/tmp/${surveyId}_${chainUuid}_${folderToken}/`
-      if (fs.existsSync(dir)) {
-        Response.setContentTypeFile(res, 'aaa.zip', null, Response.contentTypes.zip)
-
-        const zip = Archiver('zip')
-        zip.pipe(res)
-        zip.directory(dir, false)
-        zip.finalize()
-        res.on('finish', () => {
-          fs.rmdirSync(dir, { recursive: true })
-        })
-      } else {
-        Response.sendErr(res, 'File not found')
-      }
+      const name = `${chainUuid}.zip`
+      await Response.sendZipFile(res, dir, name)
     } catch (error) {
       next(error)
     }
