@@ -125,7 +125,7 @@ ExpressionProp.propTypes = {
   nodeDefUuidCurrent: PropTypes.string,
   validation: PropTypes.object,
 
-  expression: PropTypes.string,
+  expression: PropTypes.object,
   applyIf: PropTypes.bool,
   severity: PropTypes.bool,
   showLabels: PropTypes.bool,
