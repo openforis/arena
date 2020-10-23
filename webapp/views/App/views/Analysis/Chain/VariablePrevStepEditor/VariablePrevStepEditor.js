@@ -14,6 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
+import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
 
 import { State } from '../store'
 
@@ -41,7 +42,7 @@ const VariablePrevStepEditor = (props) => {
       query={StepVariable.getAggregate(prevStepVariableEdit)}
       nodeDefUuidContext={stepPrevEntityDefUuid}
       mode={Expression.modes.sql}
-      onlyAdvanced
+      type={[ExpressionEditorType.advanced]}
       onChange={(query) => {
         const variableUpdated = StepVariable.assocAggregate(query)(prevStepVariableEdit)
         Actions.updatePreviousStepVariable({ variable: variableUpdated })
