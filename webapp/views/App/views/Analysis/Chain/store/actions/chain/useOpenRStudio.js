@@ -43,7 +43,7 @@ const _getRStudioUrl = async ({ userUuid }) => {
 const _getTStudioCode = ({ surveyId, chainUuid, folderToken, serverUrl }) =>
   `url <- '${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/download/survey/${surveyId}/processing-chain/${chainUuid}/script?surveyCycleKey=0&folderToken=${folderToken}';download.file(url,"./${folderToken}.zip");unzip("./${folderToken}.zip",exdir=".");file.remove("./${folderToken}.zip")`
+  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/download?surveyCycleKey=0&folderToken=${folderToken}';download.file(url,"./${folderToken}.zip");unzip("./${folderToken}.zip",exdir=".");file.remove("./${folderToken}.zip")`
 
 const _copyRStudioCode = ({ rStudioCode }) => {
   const input = document.body.appendChild(document.createElement('input'))

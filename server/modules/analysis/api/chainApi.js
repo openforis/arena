@@ -176,7 +176,7 @@ export const init = (app) => {
   )
 
   // === Download R SCRIPTS
-  app.get('/download/survey/:surveyId/processing-chain/:chainUuid/script', (req, res, next) => {
+  app.get('/survey/:surveyId/processing-chain/:chainUuid/script/download', (req, res, next) => {
     try {
       const { surveyId, chainUuid, folderToken } = Request.getParams(req)
       const dir = `/tmp/${surveyId}_${chainUuid}_${folderToken}/`
