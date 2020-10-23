@@ -125,7 +125,7 @@ ExpressionProp.propTypes = {
   nodeDefUuidCurrent: PropTypes.string,
   validation: PropTypes.object,
 
-  expression: PropTypes.object,
+  expression: PropTypes.object.isRequired,
   applyIf: PropTypes.bool,
   severity: PropTypes.bool,
   showLabels: PropTypes.bool,
@@ -146,7 +146,6 @@ ExpressionProp.defaultProps = {
   nodeDefUuidCurrent: null,
   validation: null,
 
-  expression: '',
   applyIf: true, // Show apply if expression editor
   severity: false, // Show severity (error/warning) button group
   showLabels: false, // Show error message labels editor
