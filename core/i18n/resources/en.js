@@ -419,9 +419,9 @@ $t(common.cantUndoWarning)`,
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
       // SQL functions
-      avg: 'Returns the total sum of a numeric variable',
+      avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
-      sum: 'Returns the average value of a numeric variable',
+      sum: 'Returns the total sum of a numeric variable',
     },
     basicProps: {
       key: 'Key',
