@@ -1,8 +1,8 @@
 import { uuidv4 } from '@core/uuid'
 
-let rstudioCodeTokens = {}
+const rstudioCodeTokens = {}
 const EXPIRATION_RSTUDIO_TOKEN = 60 * 60 * 1000
-export const saveRStudioToken = ({ chainUuid }) => {
+export const generateRStudioToken = ({ chainUuid }) => {
   const token = uuidv4()
   rstudioCodeTokens[token] = { chainUuid, createdAt: new Date().getTime() }
   return token

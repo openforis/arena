@@ -162,7 +162,7 @@ export const init = (app) => {
         const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
         await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
-        const token = AnalysisService.saveRStudioToken({ chainUuid })
+        const token = AnalysisService.generateRStudioToken({ chainUuid })
         res.json({ token, serverUrl })
       } catch (error) {
         next(error)
