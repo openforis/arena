@@ -7,6 +7,7 @@ import * as Chain from '@common/analysis/processingChain'
 
 import * as User from '@core/user/user'
 
+import { copyToClipboard } from '@webapp/utils/domUtils'
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
@@ -40,19 +41,16 @@ const _getRStudioUrl = async ({ userUuid }) => {
   return `${window.location.origin}/rstudio/`
 }
 
-const _getTStudioCode = ({ surveyId, chainUuid, folderToken, serverUrl }) =>
+/*
+  ProcessUtils.ENV.rStudioDownloadServerUrl is needed because when you are into localhost you need to connect RStudio to the local server through a tunnel.
+  The address of this tunnel should be set into the env vars. In production the serverURL comes from the server.
+ */
+const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl }) =>
   `url <- '${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/download?surveyCycleKey=0&folderToken=${folderToken}';download.file(url,"./${folderToken}.zip");unzip("./${folderToken}.zip",exdir=".");file.remove("./${folderToken}.zip")`
+  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}';download.file(url,"./${token}.zip");unzip("./${token}.zip",exdir=".");file.remove("./${token}.zip")`
 
-const _copyRStudioCode = ({ rStudioCode }) => {
-  const input = document.body.appendChild(document.createElement('input'))
-  input.value = rStudioCode
-  input.focus()
-  input.select()
-  document.execCommand('copy')
-  input.remove()
-}
+const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
 export const useOpenRStudio = () => {
   const dispatch = useDispatch()
@@ -71,9 +69,9 @@ export const useOpenRStudio = () => {
 
       const rStudioUrl = await _getRStudioUrl({ userUuid })
 
-      const { folderToken, serverUrl } = data
+      const { token, serverUrl } = data
 
-      const rStudioCode = _getTStudioCode({ surveyId, chainUuid, folderToken, serverUrl })
+      const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl })
 
       dispatch(LoaderActions.hideLoader())
       dispatch(

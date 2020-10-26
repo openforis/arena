@@ -1,8 +1,5 @@
-import { uuidv4 } from '@core/uuid'
-
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as AnalysisService from '../service'
@@ -164,11 +161,9 @@ export const init = (app) => {
       try {
         const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
-
-        const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
-        const folderToken = uuidv4()
-        await FileUtils.copyDir({ source: rChain._dir, destination: `/tmp/${surveyId}_${chainUuid}_${folderToken}/` })
-        res.json({ folderToken, serverUrl })
+        await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
+        const token = AnalysisService.saveRStudioToken({ chainUuid })
+        res.json({ token, serverUrl })
       } catch (error) {
         next(error)
       }
@@ -176,12 +171,14 @@ export const init = (app) => {
   )
 
   // === Download R SCRIPTS
-  app.get('/survey/:surveyId/processing-chain/:chainUuid/script/download', (req, res, next) => {
+  app.get('/survey/:surveyId/processing-chain/:chainUuid/script/public', async (req, res, next) => {
     try {
-      const { surveyId, chainUuid, folderToken } = Request.getParams(req)
-      const dir = `/tmp/${surveyId}_${chainUuid}_${folderToken}/`
+      const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
+      if (!AnalysisService.checkRStudioToken({ token, chainUuid })) Response.sendErr()
+      const serverUrl = Request.getServerUrl(req)
+      const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
       const name = `${chainUuid}.zip`
-      Response.sendZipFile(res, dir, name)
+      Response.sendZipFile(res, rChain._dir, name)
     } catch (error) {
       next(error)
     }
