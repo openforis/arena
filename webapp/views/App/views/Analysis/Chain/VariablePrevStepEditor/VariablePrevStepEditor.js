@@ -46,7 +46,6 @@ const VariablePrevStepEditor = (props) => {
       onChange={(query) => {
         const variableUpdated = StepVariable.assocAggregate(query)(prevStepVariableEdit)
         Actions.updatePreviousStepVariable({ variable: variableUpdated })
-        Actions.dismissStepVariableEditor()
       }}
       onClose={Actions.dismissStepVariableEditor}
     />
