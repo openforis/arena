@@ -40,7 +40,7 @@ const CalculationList = (props) => {
           <ValidationTooltip validation={calculationsValidation}>
             {i18n.t('processingStepView.calculationSteps')}
           </ValidationTooltip>
-          <button type="button" className="btn-s btn-transparent" onClick={() => Actions.createCalculation({ state })}>
+          <button type="button" className="btn-s btn-transparent" onClick={Actions.createCalculation}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>

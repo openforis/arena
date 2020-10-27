@@ -27,7 +27,7 @@ const ChainComponent = () => {
   if (state === null) return null
 
   const chainEdit = State.getChainEdit(state)
-  const editingStep = Boolean(State.getStepEdit(state))
+  const editingStep = State.isEditingStep(state)
 
   const validation = Chain.getValidation(chainEdit)
 
