@@ -58,8 +58,10 @@ export const sendZipFile = (res, dir, name) => {
   if (FileUtils.existsDir(dir)) {
     setContentTypeFile(res, name, null, contentTypes.zip)
 
-    Archiver('zip').pipe(res).directory(dir, false).finalize()
-
+    const zip = Archiver('zip')
+    zip.pipe(res)
+    zip.directory(dir, false)
+    zip.finalize()
     res.on('finish', async () => {
       await FileUtils.rmdir(dir)
     })
