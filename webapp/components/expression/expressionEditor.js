@@ -18,7 +18,7 @@ const ExpressionEditor = (props) => {
     canBeConstant,
     isBoolean,
     onChange,
-    type,
+    types,
   } = props
 
   const [edit, setEdit] = useState(false)
@@ -41,7 +41,7 @@ const ExpressionEditor = (props) => {
           isBoolean={isBoolean}
           onClose={() => setEdit(false)}
           onChange={applyChange}
-          type={type}
+          types={types}
         />
       ) : (
         <div className="expression-editor__query-container">
@@ -60,7 +60,7 @@ ExpressionEditor.propTypes = {
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
-  type: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
+  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
@@ -72,7 +72,7 @@ ExpressionEditor.defaultProps = {
   nodeDefUuidContext: '',
   nodeDefUuidCurrent: null,
   mode: Expression.modes.json,
-  type: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
+  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   isContextParent: false,
   canBeConstant: false,
   isBoolean: true,

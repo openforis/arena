@@ -42,7 +42,7 @@ const VariablePrevStepEditor = (props) => {
       query={StepVariable.getAggregate(prevStepVariableEdit)}
       nodeDefUuidContext={stepPrevEntityDefUuid}
       mode={Expression.modes.sql}
-      type={[ExpressionEditorType.advanced]}
+      types={[ExpressionEditorType.advanced]}
       onChange={(query) => {
         const variableUpdated = StepVariable.assocAggregate(query)(prevStepVariableEdit)
         Actions.updatePreviousStepVariable({ variable: variableUpdated })

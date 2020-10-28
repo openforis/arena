@@ -48,7 +48,7 @@ const ExpressionProp = (props) => {
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
 
-  const expressionEditorType = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
+  const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
     <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
@@ -75,7 +75,7 @@ const ExpressionProp = (props) => {
             isContextParent={isContextParent}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
-            type={expressionEditorType}
+            types={expressionEditorTypes}
             mode={mode}
           />
         </div>
@@ -91,7 +91,7 @@ const ExpressionProp = (props) => {
               onChange={(expr) => onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))}
               isContextParent={isContextParent}
               canBeConstant={false}
-              type={expressionEditorType}
+              types={expressionEditorTypes}
             />
           </div>
         )}

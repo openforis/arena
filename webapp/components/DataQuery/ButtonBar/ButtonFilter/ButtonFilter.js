@@ -33,7 +33,7 @@ const ButtonFilter = (props) => {
           nodeDefUuidContext={entityDefUuid}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
-          type={[ExpressionEditorType.basic]}
+          types={[ExpressionEditorType.basic]}
           onChange={(_, expr) => {
             onChangeQuery(Query.assocFilter(expr))
             Actions.closePanels()

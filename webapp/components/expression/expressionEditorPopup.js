@@ -20,7 +20,7 @@ const ExpressionEditorPopup = (props) => {
   const {
     canBeConstant,
     expr,
-    type,
+    types,
     isBoolean,
     mode,
     nodeDefUuidContext,
@@ -48,7 +48,7 @@ const ExpressionEditorPopup = (props) => {
     canBeConstant,
     expr,
     mode,
-    type,
+    type: types,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
     onChange,
@@ -60,7 +60,7 @@ const ExpressionEditorPopup = (props) => {
   return (
     <PanelRight onClose={onClose} width="1020px" header={header}>
       <div className="expression-editor-popup">
-        {type.includes(ExpressionEditorType.basic) && type.includes(ExpressionEditorType.advanced) && (
+        {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
           <button
             type="button"
             className="expression-editor-popup__toggle-advanced btn-s"
@@ -115,7 +115,7 @@ const ExpressionEditorPopup = (props) => {
 ExpressionEditorPopup.propTypes = {
   canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
   expr: PropTypes.object, // AST expression
-  type: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
+  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   // NOTE: One of the two above is passed on component creation
@@ -130,7 +130,7 @@ ExpressionEditorPopup.propTypes = {
 ExpressionEditorPopup.defaultProps = {
   canBeConstant: false,
   expr: null,
-  type: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
+  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   isBoolean: true,
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
