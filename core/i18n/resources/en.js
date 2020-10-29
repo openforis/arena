@@ -11,6 +11,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
 Do you want to cancel them?`,
@@ -364,6 +365,13 @@ $t(common.cantUndoWarning)`,
     processingSteps: 'Processing steps',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
+    copyRStudioCode: `#### You are about to open an RStudio Server ####
+
+###### Once RStudio Server is opened, copy the code below to import the chain code.  ######
+ 
+{{rStudioCode}}
+
+`,
   },
 
   processingStepView: {
