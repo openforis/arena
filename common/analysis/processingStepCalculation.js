@@ -64,11 +64,6 @@ export const {
   isTemporary,
 } = ObjectUtils
 
-// ====== UPDATE
-export const { assocIndex, dissocTemporary } = ObjectUtils
-export const assocProp = ObjectUtils.setProp
-export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
-
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, (typeValue) => R.prop(typeValue, nodeDefTypeByType))
 export const getTypeByNodeDef = R.pipe(NodeDef.getType, (nodeDefType) => R.prop(nodeDefType, typeByNodeDefType))

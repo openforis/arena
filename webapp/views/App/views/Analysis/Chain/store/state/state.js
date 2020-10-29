@@ -46,6 +46,10 @@ export const isCalculationDirty = (state) =>
 
 export const isDirty = (state) => isChainDirty(state) || isStepDirty(state) || isCalculationDirty(state)
 
+export const isEditingCalculation = (state) => Boolean(getCalculationEdit(state))
+export const isEditingStep = (state) => Boolean(getStepEdit(state))
+export const isEditingChain = (state) => Boolean(getChainEdit(state))
+
 // ==== UPDATE
 export const assocChain = A.assoc(keys.chain)
 export const assocChainEdit = A.assoc(keys.chainEdit)

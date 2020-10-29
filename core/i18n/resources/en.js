@@ -374,6 +374,12 @@ $t(common.cantUndoWarning)`,
     category: 'Category',
     calculationSteps: 'Calculation Steps',
     virtualEntity: 'Virtual Entity',
+    variablesPreviousStep: {
+      title: 'Variables previous step',
+      variableName: 'Variable name',
+      include: 'Include',
+      aggregate: 'Aggregate',
+    },
   },
 
   processingStepCalculation: {
@@ -596,6 +602,9 @@ $t(common.cantUndoWarning)`,
       processingStep: {
         entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',
+        variablesPrevStep: {
+          aggregateFunctionNotSpecified: 'Aggregate function not specified',
+        },
       },
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
