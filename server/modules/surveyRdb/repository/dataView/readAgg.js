@@ -11,7 +11,10 @@ import { Sort, Query } from '../../../../../common/model/query'
 import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
 
 const _getSelectQuery = ({ survey, cycle, query }) => {
-  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const filter = Query.getFilter(query)
+
+  const nodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
   const queryBuilder = new SqlSelectAggBuilder({ viewDataNodeDef })
@@ -19,7 +22,7 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   // SELECT measures
   const measures = Query.getMeasures(query)
   Array.from(measures.entries()).forEach(([nodeDefUuid, aggFunctions], index) =>
-    queryBuilder.selectMeasure({ aggFunctions, nodeDefUuid, index })
+    queryBuilder.selectMeasure({ aggFunctions, nodeDefUuid, index, cycle, filter: Query.getFilter(query) })
   )
 
   // SELECT dimensions
@@ -34,7 +37,6 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   queryBuilder.where(`${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/`)
   queryBuilder.addParams({ cycle })
 
-  const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (filterClause) {
     queryBuilder.where(` AND ${filterClause}`)

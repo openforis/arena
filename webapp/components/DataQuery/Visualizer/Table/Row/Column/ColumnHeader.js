@@ -28,7 +28,16 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const { modeEdit, colNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
+  const {
+    modeEdit,
+    colNames,
+    isMeasure,
+    aggregateFunctions,
+    customAggregateFunction,
+    noCols,
+    widthInner,
+    widthOuter,
+  } = useColumn({
     query,
     colWidth,
     nodeDef,
@@ -47,7 +56,7 @@ const ColumnHeader = (props) => {
         ) : (
           <div>
             {nodeDefLabel}
-            {isMeasure && (
+            {isMeasure && !customAggregateFunction && (
               <button
                 type="button"
                 className="btn btn-s btn-transparent btn-aggregates"
@@ -71,11 +80,17 @@ const ColumnHeader = (props) => {
       )}
       {isMeasure && (
         <div className="table__inner-cell">
-          {aggregateFunctions.map((aggregateFn) => (
-            <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-              {i18n.t(`common.${aggregateFn}`)}
+          {customAggregateFunction ? (
+            <div key={`${nodeDefUuid}_agg_fn`} style={{ width: widthInner }}>
+              {customAggregateFunction}
             </div>
-          ))}
+          ) : (
+            aggregateFunctions.map((aggregateFn) => (
+              <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
+                {i18n.t(`common.${aggregateFn}`)}
+              </div>
+            ))
+          )}
         </div>
       )}
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
@@ -35,8 +36,14 @@ const NodeDefsSelectorAggregate = (props) => {
     if (measuresUpdate.has(nodeDefUuid)) {
       measuresUpdate.delete(nodeDefUuid)
     } else {
+      let aggregateFn
       const variablePrevStep = variablesPrevSteps.find((variable) => StepVariable.getUuid(variable) === nodeDefUuid)
-      const aggregateFn = variablePrevStep ? StepVariable.getAggregate(variablePrevStep) : Query.aggregateFunctions.sum
+      if (variablePrevStep) {
+        const expr = Expression.fromString(StepVariable.getAggregate(variablePrevStep))
+        aggregateFn = Expression.toSql(expr)
+      } else {
+        aggregateFn = Query.aggregateFunctions.sum
+      }
       measuresUpdate.set(nodeDefUuid, [aggregateFn])
     }
     onChangeMeasures(measuresUpdate)
@@ -83,22 +90,24 @@ const NodeDefsSelectorAggregate = (props) => {
               showMultipleAttributes={false}
             />
           </ExpansionPanel>
-          <ExpansionPanel buttonLabel="common.measurePrevSteps" buttonLabelParams={{ count: 2 }}>
-            {variablesPrevSteps.map((variablePrevStep) => {
-              const variableNodeDefUuid = StepVariable.getUuid(variablePrevStep)
-              const childDef = Survey.getNodeDefByUuid(variableNodeDefUuid)(survey)
-              return (
-                <AttributeSelector
-                  key={variableNodeDefUuid}
-                  lang={lang}
-                  nodeDef={childDef}
-                  nodeDefUuidsAttributes={[...measures.keys()]}
-                  nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}
-                  onToggleAttribute={onToggleMeasure}
-                />
-              )
-            })}
-          </ExpansionPanel>
+          {variablesPrevSteps.length && (
+            <ExpansionPanel buttonLabel="common.measurePrevSteps" buttonLabelParams={{ count: 2 }}>
+              {variablesPrevSteps.map((variablePrevStep) => {
+                const variableNodeDefUuid = StepVariable.getUuid(variablePrevStep)
+                const childDef = Survey.getNodeDefByUuid(variableNodeDefUuid)(survey)
+                return (
+                  <AttributeSelector
+                    key={variableNodeDefUuid}
+                    lang={lang}
+                    nodeDef={childDef}
+                    nodeDefUuidsAttributes={[...measures.keys()]}
+                    nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}
+                    onToggleAttribute={onToggleMeasure}
+                  />
+                )
+              })}
+            </ExpansionPanel>
+          )}
         </>
       )}
     </div>
