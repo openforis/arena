@@ -8,7 +8,7 @@ export const keys = {
   calculations: 'calculations',
   calculationUuids: 'calculationUuids', // Associated only when processing step is saved
   index: ObjectUtils.keys.index,
-  processingChainUuid: 'processingChainUuid',
+  processingChainUuid: 'processing_chain_uuid',
   props: ObjectUtils.keys.props,
   temporary: ObjectUtils.keys.temporary,
   uuid: ObjectUtils.keys.uuid,

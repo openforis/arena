@@ -14,7 +14,7 @@ export const useVariablesPreviousStep = ({ state }) => {
   const stepPrev = Chain.getStepPrev(step)(chain)
   const variablesPrevStepIncluded = Step.getVariablesPreviousStep(step)
 
-  const variablesPrevStep = Step.getCalculations(stepPrev).map((calculation) => {
+  const variables = Step.getCalculations(stepPrev).map((calculation) => {
     const variableUuid = Calculation.getNodeDefUuid(calculation)
     const variablePrevStep = variablesPrevStepIncluded[variableUuid]
     return variablePrevStep
@@ -22,10 +22,16 @@ export const useVariablesPreviousStep = ({ state }) => {
       : ChainFactory.createStepVariable({ variableUuid })
   })
 
+  const variableHighlightedUuid = State.getVariablePrevStepUuidHighlighted(state)
+
   const validation = A.pipe(
     Chain.getItemValidationByUuid(Step.getUuid(step)),
     Validation.getFieldValidation(Step.keysProps.variablesPreviousStep)
   )(chain)
 
-  return { variablesPrevStep, validation }
+  return {
+    variables,
+    validation,
+    variableHighlightedUuid,
+  }
 }

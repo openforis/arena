@@ -2,7 +2,7 @@ import './VariablesPreviousStep.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import classNames from 'classnames'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -24,12 +24,17 @@ const VariablesPreviousStep = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const { variablesPrevStep, validation } = useVariablesPreviousStep({ state })
+  const { variables, validation, variableHighlightedUuid } = useVariablesPreviousStep({ state })
 
-  return variablesPrevStep.length ? (
-    <div className="form-item">
+  const getVariableLabel = (variable) => {
+    const variableUuid = StepVariable.getUuid(variable)
+    return A.pipe(Survey.getNodeDefByUuid(variableUuid), (nodeDef) => NodeDef.getLabel(nodeDef, i18n.lang))(survey)
+  }
+
+  return variables.length ? (
+    <div className="processing-step__variables-previous-step-form-item form-item">
       <ValidationTooltip validation={validation} showKeys>
-        <div className={classnames('form-label', { error: !Validation.isValid(validation) })}>
+        <div className={classNames('form-label', { error: !Validation.isValid(validation) })}>
           {i18n.t('processingStepView.variablesPreviousStep.title')}
         </div>
       </ValidationTooltip>
@@ -41,21 +46,32 @@ const VariablesPreviousStep = (props) => {
             <div>{i18n.t('processingStepView.variablesPreviousStep.aggregate')}</div>
           </div>
           <div className="table__rows">
-            {variablesPrevStep.map((variablePrevStep) => {
-              const variableUuid = StepVariable.getUuid(variablePrevStep)
-              const nodeDefLabel = A.pipe(Survey.getNodeDefByUuid(variableUuid), (nodeDef) =>
-                NodeDef.getLabel(nodeDef, i18n.lang)
-              )(survey)
+            {variables.map((variable) => {
+              const variableUuid = StepVariable.getUuid(variable)
+              const variableLabel = getVariableLabel(variable)
               return (
-                <div key={variableUuid} className="table__row">
-                  <div>{nodeDefLabel}</div>
+                <div
+                  key={variableUuid}
+                  className={classNames('table__row', { highlighted: variableUuid === variableHighlightedUuid })}
+                >
+                  <div>{variableLabel}</div>
                   <div>
                     <Checkbox
-                      checked={StepVariable.getInclude(variablePrevStep)}
-                      onChange={(include) => Actions.togglePreviousStepVariable({ variableUuid, include })}
+                      checked={StepVariable.getInclude(variable)}
+                      onChange={(include) => Actions.togglePreviousStepVariable({ variable, include })}
                     />
                   </div>
-                  <div>{StepVariable.getAggregate(variablePrevStep)}</div>
+                  <div>{StepVariable.getAggregate(variable)}</div>
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-s btn-edit"
+                      aria-disabled={!StepVariable.getInclude(variable)}
+                      onClick={() => Actions.openStepVariableEditor({ variable })}
+                    >
+                      <span className="icon icon-pencil2 icon-14px" />
+                    </button>
+                  </div>
                 </div>
               )
             })}
