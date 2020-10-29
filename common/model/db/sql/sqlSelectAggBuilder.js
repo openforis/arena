@@ -15,7 +15,20 @@ const sqlFunctionByAggregateFunction = {
   [Query.aggregateFunctions.sum]: 'SUM',
 }
 
-const getCustomAggregateMeasureField = ({ survey, cycle, nodeDefMeasure, aggFnClause, filter }) => {
+/**
+ * Get the custom aggregate measure with a sub-select from the view associated to the node def related to the measure.
+ *
+ * @param {!object} params - The parameters object.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!NodeDef} [params.nodeDefMeasure] - The node definition associated to the measure.
+ * @param {!string} [params.aggFnClause] - The custom aggregate function query part.
+ * @param {!Expression} [params.filter] - The query filter expression.
+ *
+ * @returns {string} - The sub-select query string (with named parameters).
+ */
+const getCustomAggregateMeasureField = (params) => {
+  const { survey, cycle, nodeDefMeasure, aggFnClause, filter } = params
   const entityDefPrevStep = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDefMeasure))(survey)
   const viewDataNodeDefPrevStep = new ViewDataNodeDef(survey, entityDefPrevStep)
   const subselectBuilder = new SqlSelectBuilder()
