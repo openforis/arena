@@ -1,4 +1,5 @@
 @import 'webapp/style/vars';
+@import 'webapp/style/animate';
 
 .activity-log {
   grid-row: 1/4;
@@ -71,17 +72,5 @@
     justify-self: right;
     padding-right: 5px;
     color: $blueDark;
-  }
-}
-
-@keyframes animate-highlight {
-  0% {
-    background-color: inherit;
-  }
-  30% {
-    background-color: rgba($yellow, 0.7);
-  }
-  100% {
-    background-color: inherit;
   }
 }

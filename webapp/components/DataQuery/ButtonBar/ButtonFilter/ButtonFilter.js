@@ -6,6 +6,7 @@ import { Query } from '@common/model/query'
 
 import Tooltip from '@webapp/components/tooltip'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
+import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
 
 import { State } from '../store'
 
@@ -32,7 +33,7 @@ const ButtonFilter = (props) => {
           nodeDefUuidContext={entityDefUuid}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
-          hideAdvanced
+          types={[ExpressionEditorType.basic]}
           onChange={(_, expr) => {
             onChangeQuery(Query.assocFilter(expr))
             Actions.closePanels()
