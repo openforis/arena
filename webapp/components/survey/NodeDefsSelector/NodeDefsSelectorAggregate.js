@@ -90,7 +90,7 @@ const NodeDefsSelectorAggregate = (props) => {
               showMultipleAttributes={false}
             />
           </ExpansionPanel>
-          {variablesPrevSteps.length && (
+          {variablesPrevSteps.length > 0 && (
             <ExpansionPanel buttonLabel="common.measurePrevSteps" buttonLabelParams={{ count: 2 }}>
               {variablesPrevSteps.map((variablePrevStep) => {
                 const variableNodeDefUuid = StepVariable.getUuid(variablePrevStep)
