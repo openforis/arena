@@ -22,7 +22,7 @@ export const fetchSteps = async (params, client = DB.client) => {
     `${tableStep.getSelect({ chainUuid, entityUuid, includeScript, includeCalculations })}
     ORDER BY ${tableStep.columnIndex}`,
     [],
-    DB.transformCallback
+    DB.mergeProps()
   )
 }
 
@@ -62,6 +62,6 @@ export const fetchStep = async (params, client = DB.client) => {
   return client.oneOrNone(
     tableStep.getSelect({ ...paramsSelect, includeCalculations, includeScript }),
     byUuid ? [stepUuid] : [chainUuid, stepIndex],
-    DB.transformCallback
+    DB.mergeProps()
   )
 }

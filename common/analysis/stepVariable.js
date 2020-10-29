@@ -13,5 +13,4 @@ export const getInclude = A.propOr(false, keys.include)
 export const getAggregate = A.prop(keys.aggregate)
 
 // ===== UPDATE
-export const assocInclude = A.assoc(keys.include)
 export const assocAggregate = A.assoc(keys.aggregate)

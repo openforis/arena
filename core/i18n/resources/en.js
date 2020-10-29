@@ -11,6 +11,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
 Do you want to cancel them?`,
@@ -364,6 +365,13 @@ $t(common.cantUndoWarning)`,
     processingSteps: 'Processing steps',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
+    copyRStudioCode: `#### You are about to open an RStudio Server ####
+
+###### Once RStudio Server is opened, copy the code below to import the chain code.  ######
+ 
+{{rStudioCode}}
+
+`,
   },
 
   processingStepView: {
@@ -379,6 +387,8 @@ $t(common.cantUndoWarning)`,
       variableName: 'Variable name',
       include: 'Include',
       aggregate: 'Aggregate',
+      aggregateFunctionOfVariable: `Aggregate function of variable '{{variableLabel}}'`,
+      deleteConfirm: 'Remove the variable and its aggregate function?',
     },
   },
 
@@ -405,7 +415,10 @@ $t(common.cantUndoWarning)`,
     advanced: 'Advanced',
     validations: 'Validations',
     function: 'Function',
-    editorHelp: 'Valid expressions are a subset of Javascript.',
+    editorHelp: {
+      json: 'Valid expressions are a subset of Javascript.',
+      sql: 'Only valid SQL expressions are allowed.',
+    },
     editorCompletionHelp: '- Show the available variables and functions that can be used',
     functionDescriptions: {
       min: 'Take the minimum of the arguments',
@@ -413,6 +426,10 @@ $t(common.cantUndoWarning)`,
       pow: 'Raise a number X to the power P',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
+      // SQL functions
+      avg: 'Returns the average value of a numeric variable',
+      count: 'Returns the number of rows that matches a specified criterion',
+      sum: 'Returns the total sum of a numeric variable',
     },
     basicProps: {
       key: 'Key',

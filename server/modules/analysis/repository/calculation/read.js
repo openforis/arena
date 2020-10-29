@@ -24,7 +24,7 @@ export const fetchCalculation = async (params, client = DB.client) => {
   return client.oneOrNone(
     tableCalculation.getSelect({ surveyId, calculationUuid: '$1', includeScript }),
     [calculationUuid],
-    DB.transformCallback
+    DB.mergeProps()
   )
 }
 /**

@@ -11,12 +11,12 @@ export const keys = {
   dateExecuted: 'dateExecuted',
   dateModified: ObjectUtils.keys.dateModified,
   props: ObjectUtils.keys.props,
-  statusExec: 'statusExec',
+  statusExec: 'status_exec',
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
   validation: ObjectUtils.keys.validation,
-  scriptCommon: 'scriptCommon',
-  processingSteps: 'processingSteps',
+  scriptCommon: 'script_common',
+  processingSteps: 'processing_steps',
 }
 
 export const keysProps = {

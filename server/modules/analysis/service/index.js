@@ -18,3 +18,4 @@ export {
 } from '../manager'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
+export { generateRStudioToken, checkRStudioToken } from './rStudio'

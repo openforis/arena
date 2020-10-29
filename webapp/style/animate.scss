@@ -1,0 +1,11 @@
+@keyframes animate-highlight {
+  0% {
+    background-color: inherit;
+  }
+  30% {
+    background-color: rgba($yellow, 0.7);
+  }
+  100% {
+    background-color: inherit;
+  }
+}

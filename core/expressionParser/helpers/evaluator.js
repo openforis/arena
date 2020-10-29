@@ -11,7 +11,7 @@ import { types } from './types'
 //
 // stdlib: { [fn]: [Function, min_arity, max_arity? (-1 for infinite)] }
 const stdlib = {
-  pow: [Math.pow, 2], // Arity 2
+  pow: [(base, exponent) => base ** exponent, 2], // Arity 2
 
   ln: [Math.log, 1],
   log10: [Math.log10, 1],
@@ -19,16 +19,20 @@ const stdlib = {
   // arity 1+ (arity 0 allowed by JS)
   min: [Math.min, 1, -1],
   max: [Math.max, 1, -1],
+
+  avg: [R.identity, 1, 1],
+  count: [R.identity, 1, 1],
+  sum: [R.identity, 1, 1],
 }
 
 const unaryOperators = {
   // Only accept bools and nulls as input.
   // Otherwise return null
-  '!': x => (R.is(Boolean, x) || R.isNil(x) ? !x : null),
+  '!': (x) => (R.is(Boolean, x) || R.isNil(x) ? !x : null),
 
   // Negation: Only accept normal finite numbers, otherwise return null
   // NOTE: Under JS semantics, we would have -"123" -> -123
-  '-': x => (R.is(Number, x) && !isNaN(x) && isFinite(x) ? -x : null),
+  '-': (x) => (R.is(Number, x) && !Number.isNaN(x) && Number.isFinite(x) ? -x : null),
 
   // Don't allow the unary + operator now. Define semantics for it first.
   // Under JS semantics, "+" coerces a string to a number.
@@ -116,7 +120,7 @@ const binaryEval = (expr, ctx) => {
 }
 
 // Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
-const memberEval = _ => {
+const memberEval = () => {
   throw new SystemError('invalidSyntax')
 }
 
@@ -158,7 +162,7 @@ const callEval = (expr, ctx) => {
     })
   }
 
-  const args = exprArgs.map(arg => evalExpression(arg, ctx))
+  const args = exprArgs.map((arg) => evalExpression(arg, ctx))
 
   // Currently there are no side effects from function evaluation so it's
   // safe to call the function even when we're just parsing the expression
@@ -166,15 +170,15 @@ const callEval = (expr, ctx) => {
   return R.apply(fn, args)
 }
 
-const literalEval = (expr, _ctx) => R.prop('value')(expr)
+const literalEval = (expr) => R.prop('value')(expr)
 
 // "this" is a remnant of the JS that's not allowed in our simplified expression syntax.
 // We still have to handle "this" since the JSEP parser will produce these nodes.
-const thisEval = (expr, _ctx) => {
+const thisEval = (expr) => {
   throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
-const identifierEval = (expr, _ctx) => {
+const identifierEval = (expr) => {
   throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 
@@ -206,11 +210,11 @@ export const evalExpression = (expr, ctx) => {
   return fn(expr, ctx)
 }
 
-export const getExpressionIdentifiers = expr => {
+export const getExpressionIdentifiers = (expr) => {
   const identifiers = []
   const functions = {
-    [types.Identifier]: (expr, _ctx) => {
-      identifiers.push(R.prop('name')(expr))
+    [types.Identifier]: (exp) => {
+      identifiers.push(R.prop('name')(exp))
     },
   }
 
