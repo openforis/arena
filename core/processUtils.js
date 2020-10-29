@@ -41,7 +41,11 @@ const ENV = {
   // SERVER
   useHttps: process.env.USE_HTTPS === 'true',
   // RStudio Server
-  rStudioServerURL: process.env.RSTUDIO_SERVER_URL,
+  rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,
+  rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
+  rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
+  rStudioProxyServerURL: process.env.RSTUDIO_PROXY_SERVER_URL,
+  rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
 }
 
 module.exports = {
