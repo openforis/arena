@@ -1,3 +1,6 @@
+import Archiver from 'archiver'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
 import SystemError from '@core/systemError'
 import UnauthorizedError from './unauthorizedError'
 
@@ -8,6 +11,7 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  zip: 'application/zip',
 }
 
 export const sendOk = (res) => res.json({ status: status.ok })
@@ -33,12 +37,6 @@ export const sendErr = (res, err) => {
   }
 }
 
-export const sendFile = (res, name, content, size) => {
-  setContentTypeFile(res, name, size)
-  res.write(content, 'binary')
-  res.end(null, 'binary')
-}
-
 export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
@@ -47,5 +45,27 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
 
   if (contentType) {
     res.set('Content-Type', contentType)
+  }
+}
+
+export const sendFile = (res, name, content, size) => {
+  setContentTypeFile(res, name, size)
+  res.write(content, 'binary')
+  res.end(null, 'binary')
+}
+
+export const sendZipFile = (res, dir, name) => {
+  if (FileUtils.existsDir(dir)) {
+    setContentTypeFile(res, name, null, contentTypes.zip)
+
+    const zip = Archiver('zip')
+    zip.pipe(res)
+    zip.directory(dir, false)
+    zip.finalize()
+    res.on('finish', async () => {
+      await FileUtils.rmdir(dir)
+    })
+  } else {
+    sendErr(res, 'File not found')
   }
 }

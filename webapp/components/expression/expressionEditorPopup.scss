@@ -3,7 +3,7 @@
 @import 'webapp/style/vars';
 
 .CodeMirror-hints {
-  z-index: 20;
+  z-index: $zIndex20Dropdown;
 }
 
 .expression-editor-popup {

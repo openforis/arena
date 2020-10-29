@@ -178,13 +178,26 @@ export const init = (app) => {
       try {
         const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
-
         await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
-
-        Response.sendOk(res)
+        const token = AnalysisService.generateRStudioToken({ chainUuid })
+        res.json({ token, serverUrl })
       } catch (error) {
         next(error)
       }
     }
   )
+
+  // === Download R SCRIPTS
+  app.get('/survey/:surveyId/processing-chain/:chainUuid/script/public', async (req, res, next) => {
+    try {
+      const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
+      if (!AnalysisService.checkRStudioToken({ token, chainUuid })) Response.sendErr()
+      const serverUrl = Request.getServerUrl(req)
+      const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
+      const name = `${chainUuid}.zip`
+      Response.sendZipFile(res, rChain._dir, name)
+    } catch (error) {
+      next(error)
+    }
+  })
 }

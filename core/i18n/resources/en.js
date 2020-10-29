@@ -11,6 +11,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
 Do you want to cancel them?`,
@@ -366,6 +367,13 @@ $t(common.cantUndoWarning)`,
     processingSteps: 'Processing steps',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
+    copyRStudioCode: `#### You are about to open an RStudio Server ####
+
+###### Once RStudio Server is opened, copy the code below to import the chain code.  ######
+ 
+{{rStudioCode}}
+
+`,
   },
 
   processingStepView: {
@@ -421,9 +429,9 @@ $t(common.cantUndoWarning)`,
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
       // SQL functions
-      avg: 'Returns the total sum of a numeric variable',
+      avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
-      sum: 'Returns the average value of a numeric variable',
+      sum: 'Returns the total sum of a numeric variable',
     },
     basicProps: {
       key: 'Key',

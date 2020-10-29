@@ -35,3 +35,12 @@ export const isElementInViewport = (el) => {
 export const dispatchWindowResize = () => {
   window.dispatchEvent(new Event('resize'))
 }
+
+export const copyToClipboard = (text) => {
+  const input = document.body.appendChild(document.createElement('input'))
+  input.value = text
+  input.focus()
+  input.select()
+  document.execCommand('copy')
+  input.remove()
+}

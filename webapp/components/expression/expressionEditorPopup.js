@@ -14,13 +14,13 @@ import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
+import { ExpressionEditorType } from './expressionEditorType'
 
 const ExpressionEditorPopup = (props) => {
   const {
     canBeConstant,
     expr,
-    hideAdvanced,
-    onlyAdvanced,
+    types,
     isBoolean,
     mode,
     nodeDefUuidContext,
@@ -48,7 +48,7 @@ const ExpressionEditorPopup = (props) => {
     canBeConstant,
     expr,
     mode,
-    onlyAdvanced,
+    type: types,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
     onChange,
@@ -60,7 +60,7 @@ const ExpressionEditorPopup = (props) => {
   return (
     <PanelRight onClose={onClose} width="1020px" header={header}>
       <div className="expression-editor-popup">
-        {!hideAdvanced && !onlyAdvanced && (
+        {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
           <button
             type="button"
             className="expression-editor-popup__toggle-advanced btn-s"
@@ -115,10 +115,9 @@ const ExpressionEditorPopup = (props) => {
 ExpressionEditorPopup.propTypes = {
   canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
   expr: PropTypes.object, // AST expression
-  hideAdvanced: PropTypes.bool, // True if only basic mode is allowed
-  onlyAdvanced: PropTypes.bool, // True if only advanced mode is allowed
+  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
-  mode: PropTypes.string,
+  mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   // NOTE: One of the two above is passed on component creation
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
@@ -131,8 +130,7 @@ ExpressionEditorPopup.propTypes = {
 ExpressionEditorPopup.defaultProps = {
   canBeConstant: false,
   expr: null,
-  hideAdvanced: false,
-  onlyAdvanced: false,
+  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   isBoolean: true,
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
