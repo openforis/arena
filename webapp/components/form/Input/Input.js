@@ -105,13 +105,6 @@ Input.propTypes = {
   type: PropTypes.oneOf(['text', 'number']),
   validation: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  numberFormat: PropTypes.shape({
-    decimalScale: PropTypes.number,
-    decimalSeparator: PropTypes.string,
-    format: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-    maxLength: PropTypes.number,
-    placeholder: PropTypes.string,
-  }),
   nodeDef: PropTypes.object,
 }
 
@@ -127,6 +120,5 @@ Input.defaultProps = {
   type: 'text',
   validation: null,
   value: '',
-  numberFormat: null,
   nodeDef: null,
 }
