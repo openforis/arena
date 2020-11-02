@@ -26,5 +26,5 @@ const applyTransformFn = (fn) => (s) => {
 
 export const transform = ({ textTransform }) => {
   const transformFunction = transformFunctions[textTransform]
-  return applyTransformFn(transformFunction) || identity
+  return transformFunction ? applyTransformFn(transformFunction) : identity
 }
