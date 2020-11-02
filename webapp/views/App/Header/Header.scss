@@ -42,6 +42,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    .small{
+      font-size: 0.6rem;
+    }
   }
 
   .progress-bar {
