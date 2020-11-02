@@ -36,6 +36,7 @@
 .panel-right__content {
   position: relative;
   background-color: darken($greyAppBg, 1%);
+  overflow: auto;
 }
 
 @keyframes panel-enter {

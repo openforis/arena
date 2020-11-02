@@ -262,7 +262,7 @@ export const fetchRecordsCountByKeys = async (
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
   const schemaRdb = SchemaRdb.getName(surveyId)
-  const schema = Schemata.getSchemaSurvey(survey)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
   const rootTableAlias = 'r'
 
