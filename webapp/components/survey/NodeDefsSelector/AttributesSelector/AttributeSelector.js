@@ -43,14 +43,20 @@ const AttributeSelector = (props) => {
 }
 
 AttributeSelector.propTypes = {
-  canSelectAttributes: PropTypes.bool.isRequired,
-  filterTypes: PropTypes.array.isRequired,
+  canSelectAttributes: PropTypes.bool,
+  filterTypes: PropTypes.array,
   lang: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefContext: PropTypes.object.isRequired,
   nodeDefUuidsAttributes: PropTypes.array.isRequired,
   onToggleAttribute: PropTypes.func.isRequired,
-  showMultipleAttributes: PropTypes.bool.isRequired,
+  showMultipleAttributes: PropTypes.bool,
+}
+
+AttributeSelector.defaultProps = {
+  canSelectAttributes: true,
+  filterTypes: [],
+  showMultipleAttributes: true,
 }
 
 export default AttributeSelector

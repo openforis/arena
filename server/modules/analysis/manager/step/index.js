@@ -24,7 +24,7 @@ const _insertStep = async ({ user, surveyId, step }, client) => {
 }
 
 // ====== READ
-export const { fetchSteps, fetchStep } = StepRepository
+export const { fetchSteps, fetchStep, fetchVariablesPrevSteps } = StepRepository
 
 // ====== UPDATE
 const _updateStep = async ({ user, surveyId, step, stepDb }, client) => {

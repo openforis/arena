@@ -8,9 +8,12 @@ import { useLang } from '@webapp/store/system'
 import { useNodeDefByUuid, useSurvey } from '@webapp/store/survey'
 
 const getVariables = ({ survey, entityDef, attributeDefUuids, lang }) =>
-  ExpressionVariables.getVariables(survey, entityDef, null, Expression.modes.sql, lang).filter((variable) =>
-    attributeDefUuids.includes(variable.uuid)
-  )
+  ExpressionVariables.getVariables({
+    survey,
+    nodeDefContext: entityDef,
+    mode: Expression.modes.sql,
+    lang,
+  }).filter((variable) => attributeDefUuids.includes(variable.uuid))
 
 export const useSortEditor = ({ query }) => {
   const sort = Query.getSort(query)
