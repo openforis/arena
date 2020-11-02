@@ -24,7 +24,7 @@ const applyTransformFn = (fn) => (s) => {
   return fn(s)
 }
 
-export const transform = ({ textTransform }) => {
-  const transformFunction = transformFunctions[textTransform]
-  return transformFunction ? applyTransformFn(transformFunction) : identity
+export const transform = ({ transformFunction }) => {
+  const _transformFunction = transformFunctions[transformFunction]
+  return _transformFunction ? applyTransformFn(_transformFunction) : identity
 }

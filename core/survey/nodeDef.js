@@ -133,7 +133,8 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
-export const getTextTransformFunction = (nodeDef) => TextUtils.transform({ textTransform: getTextTransform(nodeDef) })
+export const getTextTransformFunction = (nodeDef) =>
+  TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 
