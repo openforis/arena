@@ -287,7 +287,7 @@ export default class RecordsImportJob extends Job {
       JSON.stringify(value),
       {
         ...Node.getMeta(node),
-        [Node.metaKeys.childApplicability]: {}, // I think that is here were we should add the applicability but maybe we depend on other values that are not there and we need the id
+        [Node.metaKeys.childApplicability]: {},
       },
     ]
 
