@@ -4,8 +4,6 @@ import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
 
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
@@ -22,11 +20,9 @@ export const Input = React.forwardRef((props, ref) => {
     type,
     validation,
     value,
-    nodeDef,
+    numberFormat,
+    textTransformFunction,
   } = props
-
-  const numberFormat = NodeDefUIProps.getNumberFormat(nodeDef)
-  const textTransformFunction = NodeDefUIProps.getTextTransformFunction(nodeDef)
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
@@ -105,7 +101,14 @@ Input.propTypes = {
   type: PropTypes.oneOf(['text', 'number']),
   validation: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  nodeDef: PropTypes.object,
+  numberFormat: PropTypes.shape({
+    decimalScale: PropTypes.number,
+    decimalSeparator: PropTypes.string,
+    format: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    maxLength: PropTypes.number,
+    placeholder: PropTypes.string,
+  }),
+  textTransformFunction: PropTypes.func,
 }
 
 Input.defaultProps = {
@@ -120,5 +123,6 @@ Input.defaultProps = {
   type: 'text',
   validation: null,
   value: '',
-  nodeDef: null,
+  numberFormat: null,
+  textTransformFunction: (s) => s,
 }

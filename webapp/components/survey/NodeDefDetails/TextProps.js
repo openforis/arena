@@ -14,7 +14,7 @@ import { State } from './store'
 const textTransformTypes = ({ i18n }) =>
   Object.keys(NodeDef.textTransformValues).map((labelKey) => ({
     key: labelKey,
-    label: i18n.t(`nodeDefEdit.textProps.labelValues.${labelKey}`),
+    label: i18n.t(`nodeDefEdit.textProps.textTransformTypes.${labelKey}`),
   }))
 
 const TextProps = (props) => {
@@ -38,7 +38,7 @@ const TextProps = (props) => {
   }, [])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.textProps.labelValue')}>
+    <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
       <ButtonGroup
         selectedItemKey={NodeDef.getTextTransform(nodeDef)}
         onChange={selectLabelValue}

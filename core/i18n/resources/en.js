@@ -453,8 +453,8 @@ $t(common.cantUndoWarning)`,
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
     textProps: {
-      labelValue: 'Text transform',
-      labelValues: {
+      textTransform: 'Text transform',
+      textTransformTypes: {
         none: 'none',
         capitalize: 'capitalize',
         uppercase: 'uppercase',
