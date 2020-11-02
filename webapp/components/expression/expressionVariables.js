@@ -1,16 +1,14 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import { sqlTypes } from '@common/surveyRdb/sqlTypes'
+import { types as sqlTypes } from '@common/model/db/sql'
 
 import * as Expression from '@core/expressionParser/expression'
 
 // TODO: match all nodeDefTypes and throw an error if unknown:
 const toSqlType = (nodeDef) => {
   if (NodeDef.isInteger(nodeDef)) {
-    return sqlTypes.integer
+    return sqlTypes.bigint
   }
   if (NodeDef.isDecimal(nodeDef)) {
     return sqlTypes.decimal
@@ -42,47 +40,49 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, lang) =>
-  R.pipe(
-    Survey.getNodeDefChildren(nodeDefContext, Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)),
-    R.map((childDef) => {
-      if (!Expression.isValidExpressionType(childDef)) {
-        return null
-      }
+const getChildDefVariables = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang }) => {
+  const variables = []
+  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
+  const stack = []
 
-      if (
+  stack.push(...Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey))
+
+  while (stack.length > 0) {
+    const childDef = stack.pop()
+
+    if (NodeDef.isSingleEntity(childDef)) {
+      stack.push(...Survey.getNodeDefChildren(childDef, includeAnalysis)(survey))
+    } else if (Expression.isValidExpressionType(childDef)) {
+      // exclude nodes that reference the current one
+      const referenceCurrentNode =
         Boolean(nodeDefCurrent) &&
         Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
-      ) {
-        // Exclude nodes that reference the current one
-        return null
+
+      if (!referenceCurrentNode) {
+        if (mode === Expression.modes.sql) {
+          variables.push(...getSqlVariables(childDef, lang))
+        }
+
+        if (mode === Expression.modes.json) {
+          variables.push(...getJsVariables(childDef))
+        }
       }
+    }
+  }
+  return variables
+}
 
-      if (mode === Expression.modes.sql) {
-        return getSqlVariables(childDef, lang)
-      }
-
-      if (mode === Expression.modes.json) {
-        return getJsVariables(childDef)
-      }
-
-      return null
-    }),
-    R.flatten,
-    R.reject(R.isNil)
-  )(survey)
-
-export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, langPreferred) => {
-  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
+export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurrent, mode, lang: langPreferred }) => {
+  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
   const variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
     if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
-      const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, lang)
+      const childVariables = getChildDefVariables({ survey, nodeDefContext: nodeDef, nodeDefCurrent, mode, lang })
       variables.push(...childVariables)
     }
-  })(surveyWithDependencies)
+  })(survey)
 
   // Show current node def variable in the first position
   const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)

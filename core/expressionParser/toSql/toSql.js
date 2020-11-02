@@ -9,6 +9,9 @@ const stdlib2sql = {
   pow: 'pow',
   min: 'least',
   max: 'greatest',
+  count: 'count',
+  sum: 'sum',
+  avg: 'avg',
 }
 
 const logicalOrTemplate = `CASE
