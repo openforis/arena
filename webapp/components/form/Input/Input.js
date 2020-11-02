@@ -12,7 +12,6 @@ export const Input = React.forwardRef((props, ref) => {
     disabled,
     id,
     maxLength,
-    numberFormat,
     onChange,
     onFocus,
     onBlur,
@@ -21,6 +20,8 @@ export const Input = React.forwardRef((props, ref) => {
     type,
     validation,
     value,
+    numberFormat,
+    textTransformFunction,
   } = props
 
   // workaround for inputRef: useRef(ref) does not work as expected
@@ -37,7 +38,7 @@ export const Input = React.forwardRef((props, ref) => {
       selectionRef.current = [input.selectionStart, input.selectionEnd]
     }
     if (onChange) {
-      onChange(newValue)
+      onChange(textTransformFunction(newValue))
     }
   }
 
@@ -107,6 +108,7 @@ Input.propTypes = {
     maxLength: PropTypes.number,
     placeholder: PropTypes.string,
   }),
+  textTransformFunction: PropTypes.func,
 }
 
 Input.defaultProps = {
@@ -122,4 +124,5 @@ Input.defaultProps = {
   validation: null,
   value: '',
   numberFormat: null,
+  textTransformFunction: (s) => s,
 }
