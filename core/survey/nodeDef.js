@@ -3,6 +3,9 @@ import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+
+import * as textUtils from '@webapp/utils/textUtils'
+
 import * as NodeDefValidations from './nodeDefValidations'
 
 // ======== NODE DEF PROPERTIES
@@ -46,6 +49,9 @@ export const propKeys = {
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
 
+  // Text
+  textTransform: 'textTransform',
+
   // Decimal
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
 
@@ -58,6 +64,8 @@ export const propKeys = {
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
 }
+
+export const { textTransformValues } = textUtils
 
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
@@ -101,6 +109,7 @@ export const isAttribute = R.pipe(isEntity, R.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 
+export const isText = isType(nodeDefType.text)
 export const isBoolean = isType(nodeDefType.boolean)
 export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
@@ -117,6 +126,9 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
+
+export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
+export const getTextTransformFunction = (nodeDef) => textUtils.transform({ textTransform: getTextTransform(nodeDef) })
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 

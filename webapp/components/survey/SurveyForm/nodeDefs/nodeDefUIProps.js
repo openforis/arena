@@ -121,6 +121,8 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
+export const { getTextTransformFunction } = NodeDef
+
 export const getNumberFormat = (nodeDef) =>
   NodeDef.isDecimal(nodeDef)
     ? NumberFormats.decimal({ decimalScale: NodeDef.getMaxNumberDecimalDigits(nodeDef) })

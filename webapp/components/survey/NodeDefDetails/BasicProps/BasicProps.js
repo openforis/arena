@@ -19,6 +19,7 @@ import { NodeDefExpressionsProp } from '../ExpressionsProp'
 
 import { useBasicProps } from './store'
 
+import TextProps from '../TextProps'
 import CodeProps from '../CodeProps'
 import TaxonProps from '../TaxonProps'
 import DecimalProps from '../DecimalProps'
@@ -63,6 +64,8 @@ const BasicProps = (props) => {
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
+
+      {NodeDef.isText(nodeDef) && <TextProps state={state} Actions={Actions} />}
 
       {NodeDef.isCode(nodeDef) && <CodeProps state={state} Actions={Actions} />}
 

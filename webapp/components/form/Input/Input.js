@@ -4,6 +4,8 @@ import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
 
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
@@ -12,7 +14,6 @@ export const Input = React.forwardRef((props, ref) => {
     disabled,
     id,
     maxLength,
-    numberFormat,
     onChange,
     onFocus,
     onBlur,
@@ -21,7 +22,11 @@ export const Input = React.forwardRef((props, ref) => {
     type,
     validation,
     value,
+    nodeDef,
   } = props
+
+  const numberFormat = NodeDefUIProps.getNumberFormat(nodeDef)
+  const textTransformFunction = NodeDefUIProps.getTextTransformFunction(nodeDef)
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
@@ -37,7 +42,7 @@ export const Input = React.forwardRef((props, ref) => {
       selectionRef.current = [input.selectionStart, input.selectionEnd]
     }
     if (onChange) {
-      onChange(newValue)
+      onChange(textTransformFunction(newValue))
     }
   }
 
@@ -107,6 +112,7 @@ Input.propTypes = {
     maxLength: PropTypes.number,
     placeholder: PropTypes.string,
   }),
+  nodeDef: PropTypes.object,
 }
 
 Input.defaultProps = {
@@ -122,4 +128,5 @@ Input.defaultProps = {
   validation: null,
   value: '',
   numberFormat: null,
+  nodeDef: null,
 }

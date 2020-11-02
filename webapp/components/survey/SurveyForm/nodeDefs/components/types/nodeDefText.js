@@ -8,13 +8,11 @@ import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import * as NodeDefUIProps from '../../nodeDefUIProps'
-
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       disabled={edit || !canEditRecord || readOnly}
-      numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
+      nodeDef={nodeDef}
       value={Node.getValue(node, '')}
       onChange={(value) => updateNode(nodeDef, node, value)}
     />
