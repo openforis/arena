@@ -105,7 +105,7 @@ export const useExpressionEditorPopupState = (props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, lang)
+  const variables = ExpressionVariables.getVariables({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
 
   return {
     ...state,
