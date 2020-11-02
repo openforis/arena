@@ -1,6 +1,8 @@
 import * as DB from '../../../../db'
 
 import { TableStep } from '../../../../../common/model/db'
+import * as Step from '../../../../../common/analysis/processingStep'
+import * as StepVariable from '../../../../../common/analysis/stepVariable'
 
 /**
  * Fetches all processing steps by the given survey id.
@@ -64,4 +66,32 @@ export const fetchStep = async (params, client = DB.client) => {
     byUuid ? [stepUuid] : [chainUuid, stepIndex],
     DB.mergeProps()
   )
+}
+
+/**
+ * Fetches a processing step by the given survey id and
+ * one between step uuid or chainUuid-stepIndex.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {string} [params.entityUuid=null] - The entity def uuid to filter by.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<StepVariable | null>} - The result promise.
+ */
+export const fetchVariablesPrevSteps = async (params, client = DB.client) => {
+  const { surveyId, entityUuid } = params
+
+  const tableStep = new TableStep(surveyId)
+  const steps = await client.map(
+    `${tableStep.getSelect({ entityUuid })}
+    ORDER BY ${tableStep.columnIndex}`,
+    [],
+    DB.mergeProps()
+  )
+
+  return steps.reduce((variablesAcc, step) => {
+    variablesAcc.push(...Object.values(Step.getVariablesPreviousStep(step)))
+    return variablesAcc
+  }, [])
 }
