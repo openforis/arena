@@ -49,7 +49,7 @@ export default class RecordsImportJob extends Job {
       true,
       false,
       false,
-      tx,
+      tx
     )
 
     const entryNames = this.getEntryNames()
@@ -167,7 +167,7 @@ export default class RecordsImportJob extends Job {
               collectNodeDef,
               collectNode,
               field,
-              this.tx,
+              this.tx
             )
           : {}
         const { value = null, meta = {} } = valueAndMeta || {}
@@ -184,7 +184,7 @@ export default class RecordsImportJob extends Job {
             collectNodeDefPath,
             collectNode,
             nodeToInsert,
-            recordValidation,
+            recordValidation
           )
           queue.enqueueItems(nodesToInsert)
         } else {
@@ -248,7 +248,7 @@ export default class RecordsImportJob extends Job {
             RecordValidation.setValidationCount(
               nodeUuid,
               NodeDef.getUuid(nodeDefChild),
-              validationCount,
+              validationCount
             )(recordValidation)
             Validation.setValid(false)(recordValidation)
           }
