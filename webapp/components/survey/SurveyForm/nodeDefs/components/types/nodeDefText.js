@@ -16,7 +16,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
     <Input
       disabled={edit || !canEditRecord || readOnly}
       numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
-      textTransformFunction={NodeDefUIProps.getTextTransformFunction(nodeDef)}
+      textTransformFunction={NodeDef.getTextTransformFunction(nodeDef)}
       value={Node.getValue(node, '')}
       onChange={(value) => updateNode(nodeDef, node, value)}
     />

@@ -4,7 +4,7 @@ import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import * as textUtils from '@webapp/utils/textUtils'
+import * as TextUtils from '@webapp/utils/textUtils'
 
 import * as NodeDefValidations from './nodeDefValidations'
 
@@ -65,7 +65,12 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
 }
 
-export const { textTransformValues } = textUtils
+export const textTransformValues = {
+  [TextUtils.textTransformValues.none]: TextUtils.textTransformValues.none,
+  [TextUtils.textTransformValues.lowercase]: TextUtils.textTransformValues.lowercase,
+  [TextUtils.textTransformValues.uppercase]: TextUtils.textTransformValues.uppercase,
+  [TextUtils.textTransformValues.capitalize]: TextUtils.textTransformValues.capitalize,
+}
 
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
@@ -128,7 +133,7 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
-export const getTextTransformFunction = (nodeDef) => textUtils.transform({ textTransform: getTextTransform(nodeDef) })
+export const getTextTransformFunction = (nodeDef) => TextUtils.transform({ textTransform: getTextTransform(nodeDef) })
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
 
