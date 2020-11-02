@@ -9,9 +9,10 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
-import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as RecordValidator from '@core/record/recordValidator'
+import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
@@ -49,7 +50,7 @@ export default class RecordsImportJob extends Job {
       true,
       false,
       false,
-      tx,
+      tx
     )
 
     const entryNames = this.getEntryNames()
@@ -131,6 +132,7 @@ export default class RecordsImportJob extends Job {
 
     const recordUuid = Record.getUuid(record)
     const recordValidation = Record.getValidation(record)
+    let recordUpdated = { ...record }
 
     const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
     const collectRootEntityDefPath = `/${collectRootEntityName}`
@@ -167,7 +169,7 @@ export default class RecordsImportJob extends Job {
               collectNodeDef,
               collectNode,
               field,
-              this.tx,
+              this.tx
             )
           : {}
         const { value = null, meta = {} } = valueAndMeta || {}
@@ -175,6 +177,7 @@ export default class RecordsImportJob extends Job {
         nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
 
         await this._insertNode(nodeDef, nodeToInsert)
+        recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
 
         if (NodeDef.isEntity(nodeDef)) {
           // Create child nodes to insert
@@ -184,7 +187,7 @@ export default class RecordsImportJob extends Job {
             collectNodeDefPath,
             collectNode,
             nodeToInsert,
-            recordValidation,
+            recordValidation
           )
           queue.enqueueItems(nodesToInsert)
         } else {
@@ -196,6 +199,8 @@ export default class RecordsImportJob extends Job {
         }
       }
     }
+
+    await this._updateRelevance(survey, recordUpdated)
 
     return recordValidation
   }
@@ -248,7 +253,7 @@ export default class RecordsImportJob extends Job {
             RecordValidation.setValidationCount(
               nodeUuid,
               NodeDef.getUuid(nodeDefChild),
-              validationCount,
+              validationCount
             )(recordValidation)
             Validation.setValid(false)(recordValidation)
           }
@@ -292,6 +297,48 @@ export default class RecordsImportJob extends Job {
     ]
 
     await this.batchPersister.addItem(nodeValueInsert, this.tx)
+  }
+
+  /**
+   * Evaluates all record entities children applicability and stores the updated nodes.
+   *
+   * @param {!Survey} survey
+   * @param {!Record} record
+   * @returns {Promise<null>} - The result promise.
+   */
+  async _updateRelevance(survey, record) {
+    await this.batchPersister.flush(this.tx)
+
+    const stack = []
+    stack.push(Record.getRootNode(record))
+
+    while (stack.length > 0) {
+      const node = stack.pop()
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      if (NodeDef.isEntity(nodeDef)) {
+        const childrenApplicability = {}
+        const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+        nodeDefChildren.forEach((childDef) => {
+          if (!R.isEmpty(NodeDef.getApplicable(childDef))) {
+            const childDefUuid = NodeDef.getUuid(childDef)
+            const exprEval = RecordExpressionParser.evalApplicableExpression(
+              survey,
+              record,
+              node,
+              NodeDef.getApplicable(childDef)
+            )
+            const applicable = R.propOr(false, 'value', exprEval)
+            childrenApplicability[childDefUuid] = applicable
+
+            if (applicable) {
+              stack.push(...Record.getNodeChildrenByDefUuid(node, childDefUuid)(record))
+            }
+          }
+        })
+        const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
+        await RecordManager.updateNode(this.user, survey, record, nodeUpdated, true, this.tx)
+      }
+    }
   }
 
   async nodesBatchInsertHandler(nodeValues, tx) {

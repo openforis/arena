@@ -35,9 +35,9 @@ export const initNewRecord = async (
   record,
   nodesUpdateListener = null,
   nodesValidationListener = null,
-  client = db,
+  client = db
 ) =>
-  await client.tx(async t => {
+  await client.tx(async (t) => {
     const rootNodeDef = Survey.getNodeDefRoot(survey)
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
@@ -48,7 +48,7 @@ export const initNewRecord = async (
 // ==== UPDATE
 
 export const updateRecordStep = async (user, survey, record, stepId, system = false, client = db) => {
-  await client.tx(async t => {
+  await client.tx(async (t) => {
     // Check if the step exists and that is't adjacent to the current one
     const currentStepId = Record.getStep(record)
     const stepCurrent = RecordStep.getStep(currentStepId)
@@ -70,7 +70,7 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
             [ActivityLog.keysContent.stepTo]: stepId,
           },
           system,
-          t,
+          t
         ),
       ])
     } else {
@@ -81,14 +81,14 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
 
 // ==== DELETE
 export const deleteRecord = async (user, survey, uuid) =>
-  await db.tx(async t => {
+  await db.tx(async (t) => {
     const rootDef = Survey.getNodeDefRoot(survey)
     const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(
       survey,
       NodeDef.getUuid(rootDef),
       uuid,
       null,
-      t,
+      t
     )
     const logContent = {
       [ActivityLog.keysContent.uuid]: uuid,
@@ -102,13 +102,13 @@ export const deleteRecord = async (user, survey, uuid) =>
   })
 
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
-  await db.tx(async t => {
+  await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
     await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
-  await db.tx(async t => {
+  await db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
       await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
@@ -125,8 +125,10 @@ export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
  * ======
  */
 
-export const insertNode = NodeUpdateManager.insertNode
+// inserts/updates a node skipping record uniqueness validation
+export const { insertNode, updateNode } = NodeUpdateManager
 
+// inserts/updates a node and validate records uniqueness
 export const persistNode = async (
   user,
   survey,
@@ -135,7 +137,7 @@ export const persistNode = async (
   nodesUpdateListener = null,
   nodesValidationListener = null,
   system = false,
-  t = db,
+  t = db
 ) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
@@ -145,7 +147,7 @@ export const persistNode = async (
     (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, system, t),
     nodesUpdateListener,
     nodesValidationListener,
-    t,
+    t
   )
 
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
@@ -157,7 +159,7 @@ export const deleteNode = async (
   nodeUuid,
   nodesUpdateListener = null,
   nodesValidationListener = null,
-  t = db,
+  t = db
 ) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
@@ -167,7 +169,7 @@ export const deleteNode = async (
     (user, survey, record, node, t) => NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
     nodesUpdateListener,
     nodesValidationListener,
-    t,
+    t
   )
 
 export const deleteNodesByNodeDefUuids = NodeUpdateManager.deleteNodesByNodeDefUuids
@@ -180,9 +182,9 @@ const _updateNodeAndValidateRecordUniqueness = async (
   nodesUpdateFn,
   nodesUpdateListener = null,
   nodesValidationListener = null,
-  t = db,
+  t = db
 ) =>
-  await t.tx(async t => {
+  await t.tx(async (t) => {
     await _beforeNodeUpdate(user, survey, record, node, t)
 
     const nodesUpdated = await nodesUpdateFn(user, survey, record, node, t)
@@ -192,7 +194,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
       nodesUpdated,
       nodesUpdateListener,
       nodesValidationListener,
-      t,
+      t
     )
     await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
 
@@ -216,7 +218,7 @@ const _onNodesUpdate = async (
   { record, nodes: updatedNodes },
   nodesUpdateListener,
   nodesValidationListener,
-  t,
+  t
 ) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
@@ -245,7 +247,7 @@ const _onNodesUpdate = async (
     record,
     updatedNodesAndDependents,
     true,
-    t,
+    t
   )
   if (nodesValidationListener) {
     nodesValidationListener(validations)
@@ -256,7 +258,7 @@ const _onNodesUpdate = async (
   // 4. update survey rdb
   if (!Record.isPreview(record)) {
     const nodeDefs = ObjectUtils.toUuidIndexedObj(
-      Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey),
+      Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
     await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
 
@@ -273,7 +275,7 @@ const _onNodesUpdate = async (
 const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
   if (!Record.isPreview(record)) {
     // Check if root key has been modified
-    const rootKeyModified = R.any(node => {
+    const rootKeyModified = R.any((node) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       return Survey.isNodeDefRootKey(nodeDef)(survey)
     })(Object.values(nodes))
