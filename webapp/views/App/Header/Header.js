@@ -51,8 +51,8 @@ const Header = () => {
           ) : (
             <>
               <div className="header__survey__title">
-                <span>{Survey.getLabel(surveyInfo, lang)}</span>
-                <span className="small">{Survey.getName(surveyInfo)}</span>
+                <span className="header__survey__title__label">{Survey.getLabel(surveyInfo, lang)}</span>
+                <span className="header__survey__title__name">{Survey.getName(surveyInfo)}</span>
               </div>
               <CycleSelector
                 surveyInfo={surveyInfo}

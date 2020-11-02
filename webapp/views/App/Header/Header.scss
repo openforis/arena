@@ -37,12 +37,17 @@
     }
   }
 
-  &__title{
+  &__title {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    .small{
+
+    &__label {
+      font-size: 0.9rem;
+    }
+
+    &__name {
       font-size: 0.6rem;
     }
   }
