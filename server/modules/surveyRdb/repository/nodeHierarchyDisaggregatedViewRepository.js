@@ -16,6 +16,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
     CREATE VIEW ${NodeHierarchyDisaggregatedView.getNameWithSchema(surveyId)} AS
       (
         SELECT
+          n.record_uuid   AS ${columns.recordUuid},
           h.*,
           n.id            AS ${columns.nodeAncestorId},
           n.node_def_uuid AS ${columns.nodeDefAncestorUuid}
@@ -36,6 +37,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
         -- Union with root nodes  
         UNION ALL
         SELECT
+          n.record_uuid     AS ${columns.recordUuid},
           n.id              AS ${columns.nodeId},
           n.uuid            AS ${columns.nodeUuid},
           n.node_def_uuid   AS ${columns.nodeDefUuid},
@@ -47,8 +49,8 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
         WHERE
           n.parent_uuid IS NULL
         ORDER BY
-          ${columns.nodeId},
-          ${columns.nodeDefAncestorUuid}
+          ${columns.nodeAncestorId},
+          ${columns.nodeId}
       )
   `)
 }
