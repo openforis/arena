@@ -66,6 +66,7 @@ export const Input = React.forwardRef((props, ref) => {
           readOnly,
           type,
           value,
+          title: value,
           ...numberFormat,
         })
       ) : (
@@ -83,6 +84,7 @@ export const Input = React.forwardRef((props, ref) => {
           readOnly={readOnly}
           type={type}
           value={value}
+          title={value}
         />
       )}
     </ValidationTooltip>
