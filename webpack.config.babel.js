@@ -53,7 +53,6 @@ const plugins = [
     process: {
       env: {
         NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
-        RSTUDIO_PROXY_SERVER_URL: JSON.stringify(process.env.RSTUDIO_PROXY_SERVER_URL),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
         APPLICATION_VERSION: JSON.stringify(gitRevisionPlugin.version()),
         GIT_COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
