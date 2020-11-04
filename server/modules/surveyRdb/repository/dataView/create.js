@@ -54,6 +54,7 @@ export const createDataView = async ({ survey, nodeDef, steps }, client) => {
   const selectFields = viewDataNodeDef.virtual
     ? ['*']
     : [
+        `${tableData.columnId} AS ${viewDataNodeDef.columnIdName}`,
         tableData.columnRecordUuid,
         tableData.columnRecordCycle,
         tableData.columnDateCreated,

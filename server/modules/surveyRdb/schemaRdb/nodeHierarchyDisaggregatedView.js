@@ -7,8 +7,9 @@ export const columns = {
   nodeAncestorId: 'node_ancestor_id',
   nodeAncestorUuid: 'node_ancestor_uuid',
   nodeDefAncestorUuid: 'node_def_ancestor_uuid',
+  recordUuid: 'record_uuid',
 }
 
 export const name = '_node_hierarchy_disaggregated'
 
-export const getNameWithSchema = surveyId => `${SchemaRdb.getName(surveyId)}.${name}`
+export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${name}`
