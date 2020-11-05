@@ -9,7 +9,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Expression from '@core/expressionParser/expression'
 import * as ObjectUtils from '@core/objectUtils'
-
+import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
 const contextByDependencyTypeFns = {
@@ -47,30 +47,48 @@ const errorKeyByDependencyType = {
   [Survey.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
 }
 
-const _getNodeValue = nodeDef => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
+const _getNodeValue = (nodeDef) => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
 const _getReachableNodeDefs = (survey, nodeDefContext) => {
   const reachableNodeDefs = []
-  const visitorFn = nodeDef => {
-    const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
-    reachableNodeDefs.unshift(...nodeDefChildren)
+
+  const queue = new Queue()
+  const visitedUuids = []
+
+  queue.enqueue(NodeDef.isEntity(nodeDefContext) ? nodeDefContext : Survey.getNodeDefParent(nodeDefContext)(survey))
+
+  while (!queue.isEmpty()) {
+    const entityDefCurrent = queue.dequeue()
+    const entityDefCurrentUuid = NodeDef.getUuid(entityDefCurrent)
+    const entityDefCurrentChildren = Survey.getNodeDefChildren(entityDefCurrent)(survey)
+
+    reachableNodeDefs.push(...entityDefCurrentChildren)
+
+    // visit nodes inside single entities
+    queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
+
+    // avoid visiting 2 times the same entity definition when traversing single entities
+    if (!visitedUuids.includes(entityDefCurrentUuid)) {
+      const entityDefCurrentParent = Survey.getNodeDefParent(entityDefCurrent)(survey)
+      if (entityDefCurrentParent) {
+        queue.enqueue(entityDefCurrentParent)
+      }
+    }
+    visitedUuids.push(entityDefCurrentUuid)
   }
-
-  Survey.visitAncestorsAndSelf(nodeDefContext, visitorFn)(survey)
-
   return reachableNodeDefs
 }
 
-const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr, _ctx) => {
+const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr) => {
   const nodeDefContext = contextByDependencyTypeFns[dependencyType](survey, nodeDefCurrent)
   const selfReferenceAllowed = selfReferenceAllowedByDependencyType[dependencyType]
 
   const reachableNodeDefs = _getReachableNodeDefs(survey, nodeDefContext)
 
   const nodeName = R.prop('name')(expr)
-  const def = reachableNodeDefs.find(x => NodeDef.getName(x) === nodeName)
+  const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === nodeName)
 
   if (!def) {
     throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, {
@@ -116,7 +134,7 @@ const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
   const expr = R.pathOr(null, propName.split('.'), item)
-  return expr ? await _validateNodeDefExpr(survey, nodeDef, dependencyType, expr) : null
+  return expr ? _validateNodeDefExpr(survey, nodeDef, dependencyType, expr) : null
 }
 
 const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName, nodeDefExpression) => {
@@ -130,10 +148,10 @@ const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName
 
 const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
   R.any(
-    nodeDefExpr =>
+    (nodeDefExpr) =>
       !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
       NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
-      NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression),
+      NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
     ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
     : null
@@ -152,7 +170,7 @@ const _validateExpression = async (survey, nodeDef, dependencyType, nodeDefExpre
       ...(validateApplyIfUniqueness
         ? [
             Validator.validateItemPropUniqueness(Validation.messageKeys.nodeDefEdit.applyIfDuplicate)(
-              nodeDefExpressions,
+              nodeDefExpressions
             ),
             _validateOnlyLastApplyIfEmpty(nodeDefExpressions, index),
           ]
@@ -173,8 +191,8 @@ export const validate = async (survey, nodeDef, dependencyType) => {
 
   const validations = await Promise.all(
     nodeDefExpressions.map((nodeDefExpression, index) =>
-      _validateExpression(survey, nodeDef, dependencyType, nodeDefExpressions, index),
-    ),
+      _validateExpression(survey, nodeDef, dependencyType, nodeDefExpressions, index)
+    )
   )
 
   validations.forEach((validation, index) => {
