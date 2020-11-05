@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, SurveyState } from '@webapp/store/survey'
+import { useLang } from '@webapp/store/system'
+import { useSurvey } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -15,12 +17,14 @@ import { State } from './state'
 
 export const useLocalState = (props) => {
   const survey = useSurvey()
+  const lang = useLang()
   const rootNodeDef = Survey.getNodeDefRoot(survey)
-  const { edit, nodeDef = rootNodeDef, level, surveyCycleKey, canEditDef } = props
+  const { edit, nodeDef = rootNodeDef, level, surveyCycleKey, canEditDef, itemLabel = NodeDef.getName } = props
   const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
   const parentNode = useSelector(SurveyFormState.getFormPageParentNode(nodeDef))
   const expandedFormPageNavigation = useSelector(SurveyFormState.expandedPageNavigation)
-  const label = useSelector(SurveyState.getNodeDefLabel(nodeDef))
+  const label = itemLabel(nodeDef, lang)
+
   const active = useSelector(SurveyFormState.isNodeDefFormActivePage(nodeDef))
 
   const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
@@ -39,6 +43,7 @@ export const useLocalState = (props) => {
       outerPageChildDefs,
       canEditDef,
       surveyCycleKey,
+      itemLabel,
     })
   )
 
