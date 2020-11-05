@@ -9,7 +9,7 @@ const PanelRight = (props) => {
   const toggleExpanded = () => setExpanded(!expanded)
 
   return (
-    <div className="panel-right" style={{ width: `min(${expanded ? '100vw' : width}, 100vw)` }}>
+    <div className="panel-right" style={{ width: expanded ? '100vw' : `min(${width}, 100vw)` }}>
       <div className="panel-right__header">
         <button type="button" className="btn btn-transparent btn-close" onClick={onClose}>
           <span className="icon icon-cross icon-12px" />
