@@ -17,10 +17,10 @@ import { State } from '../../state'
 const _getRStudioPoolUrl = async ({ userUuid }) => {
   try {
     const { data = {} } = await axios.post('/api/rstudio')
-    const { instanceId = false } = data
+    const { instanceId = false, rStudioProxyUrl = false } = data
 
-    if (instanceId && ProcessUtils.ENV.rStudioProxyServerURL) {
-      return `${ProcessUtils.ENV.rStudioProxyServerURL}${instanceId}_${userUuid}`
+    if (instanceId && rStudioProxyUrl) {
+      return `${rStudioProxyUrl}${instanceId}_${userUuid}`
     }
     return false
   } catch (err) {
