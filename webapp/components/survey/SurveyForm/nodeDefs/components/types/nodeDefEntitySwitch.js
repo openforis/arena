@@ -1,3 +1,5 @@
+import './nodeDefEntitySwitch.scss'
+
 import React from 'react'
 
 import * as A from '@core/arena'
@@ -35,7 +37,7 @@ const NodeDefEntitySwitch = (props) => {
 
   return (
     <div
-      className={`survey-form__node-def-entity-wrapper`}
+      className="survey-form__node-def-entity-wrapper"
       data-node-def-name={nodeDefName}
       data-child-names={childNames}
     >
