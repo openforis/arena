@@ -8,21 +8,20 @@ import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
-import { useOnUpdate } from '@webapp/components/hooks'
-
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/FormPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
-
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 const SurveyForm = (props) => {
   const {
@@ -96,6 +95,7 @@ const SurveyForm = (props) => {
             entry={entry}
             canEditDef={canEditDef}
             level={0}
+            itemLabel={NodeDef.getName}
           />
         )}
 
