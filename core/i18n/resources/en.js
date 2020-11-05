@@ -9,6 +9,8 @@ export const enTranslation = {
     aggregateFunction_plural: 'Aggregate functions',
     avg: 'Average',
     ascending: 'Ascending',
+    byLabel: 'By Label',
+    byName: 'by_name',
     back: 'Back',
     cancel: 'Cancel',
     copy: 'Copy',

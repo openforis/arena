@@ -20,17 +20,21 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
+  const [showByName, setShowByName] = useState(false)
   const treeRef = useRef(null)
 
   useEffect(() => {
     const treeElement = treeRef.current
-    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
+    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid, showByName))
   }, [lang])
 
   useEffect(() => {
     return () => tree && tree.disconnect()
   }, [tree])
 
+  const toggleByName = () => {
+    setShowByName(!showByName)
+  }
   return (
     <div className="survey-hierarchy">
       <div className="survey-hierarchy__tree" ref={treeRef} />
@@ -45,8 +49,12 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
+          itemLabel={showByName ? NodeDef.getName : NodeDef.getLabel}
         />
       </div>
+      <button type="button" className="survey-hierarchy__label-selector" onClick={toggleByName}>
+        {i18n.t(`common.${showByName ? 'byName' : 'byLabel'}`)}
+      </button>
     </div>
   )
 }
