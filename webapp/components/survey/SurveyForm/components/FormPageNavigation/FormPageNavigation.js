@@ -12,6 +12,7 @@ import { State, useLocalState, useActions } from './store'
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
   const Actions = useActions({ setState })
+
   const { itemLabelFunction } = props
 
   const level = State.getLevel(state)
