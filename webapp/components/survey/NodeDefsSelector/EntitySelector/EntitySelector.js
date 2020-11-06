@@ -9,11 +9,11 @@ import * as StringUtils from '@core/stringUtils'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const getDropdownItems = (hierarchy, lang, itemLabel) => {
+const getDropdownItems = (hierarchy, lang, itemLabelFunction) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    const label = itemLabel(nodeDef, lang)
+    const label = itemLabelFunction(nodeDef, lang)
     entities.push({
       key: NodeDef.getUuid(nodeDef),
       value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
@@ -26,9 +26,9 @@ const getDropdownItems = (hierarchy, lang, itemLabel) => {
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, itemLabel } = props
+  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, itemLabelFunction } = props
 
-  const dropdownItems = getDropdownItems(hierarchy, lang, itemLabel)
+  const dropdownItems = getDropdownItems(hierarchy, lang, itemLabelFunction)
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
@@ -49,13 +49,13 @@ EntitySelector.propTypes = {
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
-  itemLabel: PropTypes.func,
+  itemLabelFunction: PropTypes.func,
 }
 
 EntitySelector.defaultProps = {
   nodeDefUuidEntity: null,
   validation: null,
-  itemLabel: NodeDef.getLabel,
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default EntitySelector

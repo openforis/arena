@@ -49,7 +49,7 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
-          itemLabel={showByName ? NodeDef.getName : NodeDef.getLabel}
+          itemLabelFunction={showByName ? NodeDef.getName : NodeDef.getLabel}
         />
       </div>
       <button type="button" className="survey-hierarchy__label-selector" onClick={toggleByName}>
