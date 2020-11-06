@@ -8,7 +8,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
+import { useLabelFunctionSelector } from '@webapp/components/hooks'
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {
@@ -20,21 +22,19 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
-  const [showByName, setShowByName] = useState(false)
+
   const treeRef = useRef(null)
+  const { LabelSelector, itemLabelFunction } = useLabelFunctionSelector()
 
   useEffect(() => {
     const treeElement = treeRef.current
-    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid, showByName))
+    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
   }, [lang])
 
   useEffect(() => {
     return () => tree && tree.disconnect()
   }, [tree])
 
-  const toggleByName = () => {
-    setShowByName(!showByName)
-  }
   return (
     <div className="survey-hierarchy">
       <div className="survey-hierarchy__tree" ref={treeRef} />
@@ -49,12 +49,12 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
-          itemLabelFunction={showByName ? NodeDef.getName : NodeDef.getLabel}
+          itemLabelFunction={itemLabelFunction}
         />
       </div>
-      <button type="button" className="survey-hierarchy__label-selector" onClick={toggleByName}>
-        {i18n.t(`common.${showByName ? 'byName' : 'byLabel'}`)}
-      </button>
+      <div className="survey-hierarchy__label-selector">
+        <LabelSelector />
+      </div>
     </div>
   )
 }
