@@ -24,7 +24,7 @@ const SurveyHierarchy = () => {
   const [tree, setTree] = useState(null)
 
   const treeRef = useRef(null)
-  const { LabelSelector, itemLabelFunction } = useLabelFunctionSelector()
+  const { ItemLabelFunctionSelector, itemLabelFunction } = useLabelFunctionSelector()
 
   useEffect(() => {
     const treeElement = treeRef.current
@@ -53,7 +53,7 @@ const SurveyHierarchy = () => {
         />
       </div>
       <div className="survey-hierarchy__label-selector">
-        <LabelSelector />
+        <ItemLabelFunctionSelector />
       </div>
     </div>
   )

@@ -29,7 +29,7 @@ export const useLabelFunctionSelector = () => {
   }
 
   return {
-    LabelSelector: () => (
+    ItemLabelFunctionSelector: () => (
       <ButtonGroup
         selectedItemKey={showByName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
         onChange={toggleByName}
