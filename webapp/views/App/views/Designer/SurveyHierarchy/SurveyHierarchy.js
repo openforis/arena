@@ -8,7 +8,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
+import { useLabelFunctionSelector } from '@webapp/components/hooks'
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {
@@ -20,7 +22,9 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
+
   const treeRef = useRef(null)
+  const { ItemLabelFunctionSelector, itemLabelFunction } = useLabelFunctionSelector()
 
   useEffect(() => {
     const treeElement = treeRef.current
@@ -45,7 +49,11 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
+          itemLabelFunction={itemLabelFunction}
         />
+      </div>
+      <div className="survey-hierarchy__label-selector">
+        <ItemLabelFunctionSelector />
       </div>
     </div>
   )
