@@ -8,7 +8,6 @@ import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
