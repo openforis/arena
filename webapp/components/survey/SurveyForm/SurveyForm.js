@@ -95,7 +95,7 @@ const SurveyForm = (props) => {
             entry={entry}
             canEditDef={canEditDef}
             level={0}
-            itemLabel={NodeDef.getName}
+            itemLabelFunction={NodeDef.getName}
           />
         )}
 

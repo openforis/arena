@@ -12,7 +12,7 @@ import { State, useLocalState, useActions } from './store'
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
   const Actions = useActions({ setState })
-  const { itemLabel } = props
+  const { itemLabelFunction } = props
 
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
@@ -73,7 +73,7 @@ const FormPageNavigation = (props) => {
             nodeDef={child}
             edit={edit}
             canEditDef={canEditDef}
-            itemLabel={itemLabel}
+            itemLabelFunction={itemLabelFunction}
           />
         ))}
     </div>
@@ -81,11 +81,11 @@ const FormPageNavigation = (props) => {
 }
 
 FormPageNavigation.propTypes = {
-  itemLabel: PropTypes.func,
+  itemLabelFunction: PropTypes.func,
 }
 
 FormPageNavigation.defaultProps = {
-  itemLabel: NodeDef.getLabel,
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default FormPageNavigation
