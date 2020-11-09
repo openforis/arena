@@ -23,7 +23,7 @@ const getColLabelKey = ({ colName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { colWidth, nodeDef, onChangeQuery, query } = props
+  const { colWidth, nodeDef, onChangeQuery, query, itemLabelFunction } = props
 
   const i18n = useI18n()
   const lang = useSurveyLang()
@@ -44,7 +44,7 @@ const ColumnHeader = (props) => {
   })
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
+  const nodeDefLabel = itemLabelFunction(nodeDef, lang)
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
@@ -122,6 +122,10 @@ ColumnHeader.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
+  itemLabelFunction: PropTypes.func,
 }
 
+ColumnHeader.defaultProps = {
+  itemLabelFunction: NodeDef.getLabel,
+}
 export default ColumnHeader

@@ -27,6 +27,7 @@ const NodeDefEntityTableRows = (props) => {
     recordUuid,
     surveyCycleKey,
     surveyInfo,
+    itemLabelFunction
   } = props
 
   const survey = useSelector(SurveyState.getSurvey)
@@ -135,6 +136,7 @@ const NodeDefEntityTableRows = (props) => {
       renderType={renderType}
       surveyCycleKey={surveyCycleKey}
       surveyInfo={surveyInfo}
+      itemLabelFunction={itemLabelFunction}
     />
   )
 
@@ -171,7 +173,9 @@ NodeDefEntityTableRows.propTypes = {
   recordUuid: PropTypes.string,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.any.isRequired,
+  itemLabelFunction: PropTypes.func,
 }
+
 
 NodeDefEntityTableRows.defaultProps = {
   canEditDef: false,
@@ -182,6 +186,7 @@ NodeDefEntityTableRows.defaultProps = {
   parentNode: null,
   preview: false,
   recordUuid: null,
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default NodeDefEntityTableRows

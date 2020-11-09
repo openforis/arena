@@ -53,7 +53,18 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
+    const {
+      surveyCycleKey,
+      nodeDef,
+      edit,
+      canEditDef,
+      renderType,
+      applicable,
+      itemLabelFunction,
+      label: labelFromProps,
+    } = this.props
+
+    const label = itemLabelFunction ? itemLabelFunction(nodeDef, 'en') : labelFromProps
 
     const className =
       'survey-form__node-def-page' +

@@ -28,12 +28,13 @@ export const create = ({
   parentNode,
   childDefs,
   level,
-  label,
+  lang,
   active,
   expandedFormPageNavigation,
   outerPageChildDefs,
   canEditDef,
   surveyCycleKey,
+  itemLabelFunction,
 }) => ({
   [keys.nodeDef]: nodeDef,
   [keys.rootNodeDef]: rootNodeDef,
@@ -41,7 +42,7 @@ export const create = ({
   [keys.parentNode]: parentNode,
   [keys.childDefs]: childDefs,
   [keys.level]: level,
-  [keys.label]: label,
+  [keys.label]: itemLabelFunction(nodeDef, lang),
   [keys.active]: active,
   [keys.outerPageChildDefs]: outerPageChildDefs,
   [keys.showChildren]: expandedFormPageNavigation || level === 0,
@@ -75,3 +76,4 @@ export const assocActive = (active) => A.assoc(keys.active, active)
 export const assocShowChildren = (showChildren) => A.assoc(keys.showChildren, showChildren)
 export const assocExpandedFormPageNavigation = (expandedFormPageNavigation) =>
   A.assoc(keys.expandedFormPageNavigation, expandedFormPageNavigation)
+export const assocLabel = A.assoc(keys.label)

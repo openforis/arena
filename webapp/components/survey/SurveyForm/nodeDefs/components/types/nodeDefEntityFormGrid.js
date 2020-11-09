@@ -16,7 +16,18 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const NodeDefEntityFormGrid = (props) => {
-  const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
+  const {
+    nodeDef,
+    childDefs,
+    recordUuid,
+    node,
+    edit,
+    entry,
+    preview,
+    canEditRecord,
+    canAddNode,
+    itemLabelFunction,
+  } = props
 
   const dispatch = useDispatch()
 
@@ -77,6 +88,7 @@ const NodeDefEntityFormGrid = (props) => {
             canEditDef={canEditDef}
             canEditRecord={canEditRecord}
             canAddNode={canAddNode}
+            itemLabelFunction={itemLabelFunction}
           />
         </div>
       ))}
@@ -95,6 +107,7 @@ NodeDefEntityFormGrid.propTypes = {
   preview: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   canAddNode: PropTypes.bool,
+  itemLabelFunction: PropTypes.func,
 }
 
 NodeDefEntityFormGrid.defaultProps = {
@@ -106,6 +119,7 @@ NodeDefEntityFormGrid.defaultProps = {
   preview: false,
   canEditRecord: false,
   canAddNode: false,
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default NodeDefEntityFormGrid

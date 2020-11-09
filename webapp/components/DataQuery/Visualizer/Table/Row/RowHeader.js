@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { ColumnHeader } from './Column'
 
 const RowHeader = (props) => {
-  const { colIndexWidth, colWidth, nodeDefCols, onChangeQuery, query } = props
+  const { colIndexWidth, colWidth, nodeDefCols, onChangeQuery, query, itemLabelFunction } = props
 
   const i18n = useI18n()
 
@@ -23,6 +23,7 @@ const RowHeader = (props) => {
           nodeDef={nodeDef}
           onChangeQuery={onChangeQuery}
           query={query}
+          itemLabelFunction={itemLabelFunction}
         />
       ))}
     </div>
@@ -35,6 +36,11 @@ RowHeader.propTypes = {
   nodeDefCols: PropTypes.arrayOf(Object).isRequired,
   onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
+  itemLabelFunction: PropTypes.func,
+}
+
+RowHeader.defaultProps = {
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default RowHeader
