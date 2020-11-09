@@ -27,6 +27,7 @@ const FormHeader = (props) => {
     showPageNavigation,
     toggleFormPageNavigation,
     createNodeDef,
+    ItemLabelFunctionSelector,
   } = props
 
   const i18n = useI18n()
@@ -70,6 +71,7 @@ const FormHeader = (props) => {
         )}
       </div>
 
+      <div className="survey-form-header__options">{ItemLabelFunctionSelector && <ItemLabelFunctionSelector />}</div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )

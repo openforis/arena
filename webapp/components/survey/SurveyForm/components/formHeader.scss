@@ -35,6 +35,11 @@
     position: relative;
   }
 }
+.survey-form-header__options {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
 
 .survey-form-header__record-actions-steps {
   border: 1px solid $greyBorder;

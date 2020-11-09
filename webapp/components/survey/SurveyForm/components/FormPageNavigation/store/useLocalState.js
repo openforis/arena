@@ -23,10 +23,7 @@ export const useLocalState = (props) => {
   const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
   const parentNode = useSelector(SurveyFormState.getFormPageParentNode(nodeDef))
   const expandedFormPageNavigation = useSelector(SurveyFormState.expandedPageNavigation)
-  const label = itemLabelFunction(nodeDef, lang)
-
   const active = useSelector(SurveyFormState.isNodeDefFormActivePage(nodeDef))
-
   const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   const [state, setState] = useState(() =>
@@ -37,13 +34,13 @@ export const useLocalState = (props) => {
       parentNode,
       childDefs,
       level,
-      label,
       active,
       expandedFormPageNavigation,
       outerPageChildDefs,
       canEditDef,
       surveyCycleKey,
       itemLabelFunction,
+      lang,
     })
   )
 
@@ -59,6 +56,10 @@ export const useLocalState = (props) => {
   useOnUpdate(() => {
     setState(State.assocActive(active))
   }, [active])
+
+  useOnUpdate(() => {
+    setState(State.assocLabel(itemLabelFunction(nodeDef, lang)))
+  }, [itemLabelFunction])
 
   return {
     state,

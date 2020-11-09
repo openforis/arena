@@ -2,13 +2,15 @@ import './table.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { useI18n } from '@webapp/store/system'
 
 import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {
-  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
+  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, onChangeQuery, setData, itemLabelFunction } = props
 
   const i18n = useI18n()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, query, nodeDefsSelectorVisible, setData })
@@ -27,6 +29,7 @@ const Table = (props) => {
         nodeDefCols={nodeDefCols}
         onChangeQuery={onChangeQuery}
         query={query}
+        itemLabelFunction={itemLabelFunction}
       />
 
       <div className="table__data-rows">
@@ -57,6 +60,11 @@ Table.propTypes = {
   offset: PropTypes.number.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
   setData: PropTypes.func.isRequired,
+  itemLabelFunction: PropTypes.func,
+}
+
+Table.defaultProps = {
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default Table
