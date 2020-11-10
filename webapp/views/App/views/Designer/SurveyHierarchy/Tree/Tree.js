@@ -289,4 +289,11 @@ export default class Tree {
       .filter((d) => d.data.uuid === uuid)
       .classed('highlight', true)
   }
+
+  changeLabelFunction(itemLabelFunction) {
+    this.svg
+      .selectAll('.node-grid')
+      .selectAll('a')
+      .text((d) => itemLabelFunction(d.data, this.lang))
+  }
 }
