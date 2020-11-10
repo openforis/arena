@@ -39,7 +39,12 @@ const UserEdit = () => {
   const i18n = useI18n()
   const validation = User.getValidation(userToUpdate)
 
-  const titleItems = ['mr', 'ms', 'preferNotToSay']
+  const titleItems = [
+    { itemKey: 'mr', key: 'mr', value: i18n.t('user.title.mr') },
+    { itemKey: 'ms', key: 'ms', value: i18n.t('user.title.ms') },
+    { itemKey: 'preferNotToSay', key: 'preferNotToSay', value: i18n.t('user.title.preferNotToSay') },
+  ]
+
   const onUpdateTitle = (value) => {
     const currentProps = User.getProps(userToUpdate)
     return onUpdate({ name: User.keys.props, value: User.assocPropsTitle(value)(currentProps) })
@@ -61,10 +66,10 @@ const UserEdit = () => {
 
       <FormItem label={i18n.t('common.title')}>
         <Dropdown
-          itemLabel={(title) => i18n.t(`common.${title}`)}
           onChange={onUpdateTitle}
           items={titleItems}
-          selection={User.getPropsTitle(User.getProps(userToUpdate))}
+          selection={User.getPropsTitle(userToUpdate)}
+          itemKey={User.keysProps.itemKey}
         />
       </FormItem>
 

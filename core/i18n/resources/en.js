@@ -73,9 +73,6 @@ Do you want to proceed?`,
     measurePrevSteps: 'Measure Previous Steps',
     measurePrevSteps_plural: 'Measures Previous Steps',
     min: 'Minimum',
-    mr: 'Mr',
-    ms: 'Ms',
-    preferNotToSay: 'Prefer not to say',
     name: 'Name',
     new: 'New',
     no: 'No',
@@ -360,6 +357,14 @@ Do you want to proceed?`,
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  user: {
+    title: {
+      mr: 'Mr',
+      ms: 'Ms',
+      preferNotToSay: 'Prefer not to say',
+    },
   },
 
   processingChainView: {
