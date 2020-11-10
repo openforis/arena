@@ -25,6 +25,7 @@ export const nodeDefType = {
 }
 
 export const keys = {
+  id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
@@ -92,7 +93,7 @@ export const maxKeyAttributes = 3
 
 // ==== READ
 
-export const { getLabels, getParentUuid, getProp, getProps, getUuid, isEqual, isTemporary } = ObjectUtils
+export const { getLabels, getParentUuid, getProp, getProps, getUuid, getId, isEqual, isTemporary } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')

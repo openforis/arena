@@ -114,6 +114,9 @@ export default class NodeDefsImportJob extends Job {
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const { surveyId, defaultLanguage } = this.context
 
+    const nodeDefsUpdated = {}
+    const nodeDefsInserted = {}
+
     // 1. determine basic props
     const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
@@ -154,9 +157,12 @@ export default class NodeDefsImportJob extends Job {
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
     const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
 
-    let nodeDef = (
+    Object.assign(
+      nodeDefsUpdated,
       await NodeDefManager.insertNodeDef(this.user, surveyId, Survey.cycleOneKey, nodeDefParam, true, this.tx)
-    )[nodeDefUuid]
+    )
+
+    let nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 2a. increment processed items before recursive call to insertNodeDef
     this.incrementProcessedItems()
@@ -183,13 +189,20 @@ export default class NodeDefsImportJob extends Job {
       }
 
       // 3b. add specify text attribute def
-      await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
+      const {
+        nodeDefsUpdated: qualifierNodeDefsUpdaetd,
+        nodeDefsInserted: qualifierNodeDefsInserted,
+      } = await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
+
+      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdaetd)
+      Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
 
     // 4. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(nodeDefUuid, type, collectNodeDef)
 
-    nodeDef = (
+    Object.assign(
+      nodeDefsUpdated,
       await NodeDefManager.updateNodeDefProps(
         this.user,
         surveyId,
@@ -200,7 +213,8 @@ export default class NodeDefsImportJob extends Job {
         true,
         this.tx
       )
-    )[nodeDefUuid]
+    )
+    nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 5. store nodeDef in cache
     let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
@@ -214,9 +228,11 @@ export default class NodeDefsImportJob extends Job {
       ...(field ? { field } : {}),
     })
 
-    this.nodeDefs[nodeDefUuid] = nodeDef
+    nodeDefsInserted[nodeDefUuid] = nodeDef
 
-    return nodeDef
+    Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
+
+    return nodeDefsInserted
   }
 
   async insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout) {
@@ -230,10 +246,11 @@ export default class NodeDefsImportJob extends Job {
         for (const childDefField of childDefFields) {
           const { type: childType, field = null } = childDefField
 
-          const childDef = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
-
+          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
+          // sort inserted node defs by id
+          const insertedUuids = R.pipe(R.values, R.sortBy(NodeDef.getId), R.map(NodeDef.getUuid))(nodeDefsInserted)
           if (tableLayout) {
-            childrenUuids.push(NodeDef.getUuid(childDef))
+            childrenUuids.push(...insertedUuids)
           }
         }
       }
@@ -437,6 +454,9 @@ export default class NodeDefsImportJob extends Job {
       qualifiableItemCodesByCategoryAndLevel
     )
 
+    const nodeDefsUpdated = {} //all updated and inserted node defs
+    const nodeDefsInserted = {} // only newly inserted node defs
+
     for (const itemCode of qualifiableItemCodes) {
       const nodeDefName = NodeDef.getName(nodeDef)
       const props = {
@@ -454,20 +474,19 @@ export default class NodeDefsImportJob extends Job {
         [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
+      const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
+        this.user,
+        this.surveyId,
+        Survey.cycleOneKey,
+        qualifierNodeDefParam,
+        true,
+        this.tx
+      )
       const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
-      const qualifierNodeDef = (
-        await NodeDefManager.insertNodeDef(
-          this.user,
-          this.surveyId,
-          Survey.cycleOneKey,
-          qualifierNodeDefParam,
-          true,
-          this.tx
-        )
-      )[qualifierNodeDefUuid]
-
-      this.nodeDefs[qualifierNodeDefUuid] = qualifierNodeDef
+      nodeDefsInserted[qualifierNodeDefUuid] = qualifierNodeDefAndOthersUpdated[qualifierNodeDefUuid]
+      Object.assign(nodeDefsUpdated, R.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
     }
+    return { nodeDefsInserted, nodeDefsUpdated }
   }
 
   _calculateTotal() {
