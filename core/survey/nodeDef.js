@@ -63,6 +63,10 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+
+  // File
+  maxFileSize: 'maxFileSize',
+  fileType: 'fileType',
 }
 
 export const textTransformValues = {
@@ -75,6 +79,13 @@ export const textTransformValues = {
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const fileTypeValues = {
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+  other: 'other',
 }
 
 export const keysPropsAdvanced = {
@@ -137,6 +148,11 @@ export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
+
+// File
+export const isNumberOfFilesEnabled = isMultiple
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize)(nodeDef))
+export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
 export const isBooleanLabelYesNo = (nodeDef) =>
