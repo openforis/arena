@@ -10,14 +10,13 @@ import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import ProfilePictureEditor from './ProfilePictureEditor'
 
 import { useEditUser } from './store'
-import Dropdown from '@webapp/components/form/Dropdown'
-import * as AuthGroup from '@core/auth/authGroup'
 
 const UserEdit = () => {
   const {
@@ -43,7 +42,7 @@ const UserEdit = () => {
   const titleItems = ['mr', 'ms', 'preferNotToSay']
   const onUpdateTitle = (value) => {
     const currentProps = User.getProps(userToUpdate)
-    onUpdate({ name: User.keys.props, value: User.assocPropsTitle(value)(currentProps) })
+    return onUpdate({ name: User.keys.props, value: User.assocPropsTitle(value)(currentProps) })
   }
 
   if (!ready) return null
