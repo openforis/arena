@@ -6,7 +6,7 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const selectFields = ['uuid', 'name', 'email', 'prefs', 'status']
+const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // In sql queries, user table must be surrounded by "" e.g. "user"
@@ -106,17 +106,18 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async (uuid, name, email, profilePicture, client = db) =>
+export const updateUser = async (uuid, name, email, profilePicture, props, client = db) =>
   await client.one(
     `
     UPDATE "user" u
     SET
     name = $1,
     email = $2,
-    profile_picture = COALESCE($3, profile_picture)
+    profile_picture = COALESCE($3, profile_picture),
+    props = props || $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, email, profilePicture, uuid],
+    [name, email, profilePicture, uuid, props],
     camelize,
   )
 

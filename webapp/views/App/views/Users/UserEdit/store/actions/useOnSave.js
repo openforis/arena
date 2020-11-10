@@ -34,6 +34,9 @@ export const useOnSave = ({ userToUpdate }) => {
           formData.append(User.keys.name, User.getName(userToUpdate))
           formData.append(User.keys.email, User.getEmail(userToUpdate))
           formData.append(User.keys.groupUuid, User.getGroupUuid(userToUpdate))
+
+          formData.append(User.keys.props, JSON.stringify(User.getProps(userToUpdate)))
+
           if (profilePicture) {
             formData.append('file', profilePicture)
           }

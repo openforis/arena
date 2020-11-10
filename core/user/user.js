@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
+import * as UserProps from './_user/userProps'
 import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
@@ -14,6 +15,7 @@ export { userStatus } from './_user/userStatus'
 export const nameMaxLength = 128
 
 export const { keysPrefs } = UserPrefs
+export const { keysProps } = UserProps
 
 // ====== READ
 export const { isEqual } = ObjectUtils
@@ -24,6 +26,7 @@ export const getGroupUuid = R.prop(keys.groupUuid)
 export const getLang = R.propOr('en', keys.lang)
 export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
+export const getProps = R.propOr({}, keys.props)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
@@ -75,3 +78,7 @@ export const { assocPrefSurveyCycle } = UserPrefs
 export const { assocPrefSurveyCurrentAndCycle } = UserPrefs
 
 export const { deletePrefSurvey } = UserPrefs
+
+// PROPS
+export const { getPropsTitle } = UserProps
+export const { assocPropsTitle } = UserProps
