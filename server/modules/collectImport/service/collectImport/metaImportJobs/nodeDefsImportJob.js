@@ -470,8 +470,13 @@ export default class NodeDefsImportJob extends Job {
         )(nodeDef),
       }
 
+      const applicableIfExpr = NodeDef.isSingle(nodeDef)
+        ? `${nodeDefName} == "${itemCode}"`
+        : `includes(${nodeDefName}, "${itemCode}")
+        `
+
       const propsAdvanced = {
-        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
+        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(applicableIfExpr)],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
       const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
