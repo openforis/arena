@@ -114,10 +114,10 @@ export const updateUser = async (uuid, name, email, profilePicture, props, clien
     name = $1,
     email = $2,
     profile_picture = COALESCE($3, profile_picture),
-    props = props || $5::jsonb
+    props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, email, profilePicture, uuid, props],
+    [name, email, profilePicture, uuid, JSON.parse(props)],
     camelize,
   )
 
