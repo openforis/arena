@@ -57,11 +57,7 @@ export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 
 const _updateAuthGroups = (updateFn) => (user) =>
-  R.pipe(
-    getAuthGroups, 
-    updateFn, 
-    (authGroups) => assocAuthGroups(authGroups)(user)
-  )(user)
+  R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups)(user))(user)
 
 export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGroup))
 
@@ -80,5 +76,4 @@ export const { assocPrefSurveyCurrentAndCycle } = UserPrefs
 export const { deletePrefSurvey } = UserPrefs
 
 // PROPS
-export const { getPropsTitle } = UserProps
-export const { assocPropsTitle } = UserProps
+export const Props = UserProps

@@ -47,7 +47,7 @@ const UserEdit = () => {
 
   const onUpdateTitle = (value) => {
     const currentProps = User.getProps(userToUpdate)
-    return onUpdate({ name: User.keys.props, value: User.assocPropsTitle(value)(currentProps) })
+    return onUpdate({ name: User.keys.props, value: User.Props.assocTitle(value)(currentProps) })
   }
 
   if (!ready) return null
@@ -68,7 +68,7 @@ const UserEdit = () => {
         <Dropdown
           onChange={onUpdateTitle}
           items={titleItems}
-          selection={User.getPropsTitle(userToUpdate)}
+          selection={User.Props.getTitle(userToUpdate)}
           itemKey={User.keysProps.itemKey}
         />
       </FormItem>

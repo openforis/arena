@@ -8,7 +8,7 @@ export const keysProps = {
 }
 
 // ====== READ
-export const getPropsTitle = R.pipe(R.prop(keysProps.props), R.propOr('', keysProps.title))
+export const getTitle = R.pipe(R.prop(keysProps.props), R.propOr('', keysProps.title))
 
 // ====== UPDATE
-export const assocPropsTitle = R.assoc(keysProps.title)
+export const assocTitle = R.assoc(keysProps.title)
