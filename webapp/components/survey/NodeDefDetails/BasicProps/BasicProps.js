@@ -24,6 +24,7 @@ import CodeProps from '../CodeProps'
 import TaxonProps from '../TaxonProps'
 import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
+import FileProps from '../FileProps'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -94,6 +95,8 @@ const BasicProps = (props) => {
           />
         </FormItem>
       )}
+
+      {NodeDef.isFile(nodeDef) && <FileProps state={state} Actions={Actions} />}
 
       {displayAsEnabled && editingFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
