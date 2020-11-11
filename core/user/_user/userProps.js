@@ -1,14 +1,20 @@
 import * as R from 'ramda'
+import * as ObjectUtils from '@core/objectUtils'
+
+import { keys as userKeys } from './userKeys'
+
+export const { mergeProps } = ObjectUtils
 
 export const keysProps = {
-  props: 'props',
   title: 'title',
-  // This key is used in Dropdown itemKey //2020
-  itemKey: 'itemKey',
 }
 
 // ====== READ
-export const getTitle = R.pipe(R.prop(keysProps.props), R.propOr('', keysProps.title))
+export const getProps = R.prop(userKeys.props)
+export const getTitle = R.pipe(getProps, R.propOr('', keysProps.title))
 
 // ====== UPDATE
-export const assocTitle = R.assoc(keysProps.title)
+export const assocProps = R.assoc(userKeys.props)
+export const assocProp = (key) => (value) => (user) => assocProps(R.pipe(getProps, R.assoc(key, value))(user))(user)
+
+export const assocTitle = assocProp(keysProps.title)

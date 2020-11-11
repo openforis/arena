@@ -33,8 +33,10 @@ export const { getValidation } = Validation
 
 // ====== UPDATE
 export const assocProp = R.assoc
+export const assocEmail = R.assoc(keys.email)
 export const { assocValidation } = Validation
 export const assocGroupUuid = R.assoc(keys.groupUuid)
+export const assocName = R.assoc(keys.name)
 export const assocInvitationExpired = R.assoc(keys.invitationExpired)
 
 // ====== CHECK
@@ -76,4 +78,4 @@ export const { assocPrefSurveyCurrentAndCycle } = UserPrefs
 export const { deletePrefSurvey } = UserPrefs
 
 // PROPS
-export const Props = UserProps
+export const { getTitle, assocTitle } = UserProps

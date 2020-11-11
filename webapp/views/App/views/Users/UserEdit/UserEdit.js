@@ -10,9 +10,9 @@ import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
 
 import DropdownUserGroup from '../DropdownUserGroup'
+import DropdownUserTitle from '../DropdownUserTitle'
 
 import ProfilePictureEditor from './ProfilePictureEditor'
 
@@ -39,17 +39,6 @@ const UserEdit = () => {
   const i18n = useI18n()
   const validation = User.getValidation(userToUpdate)
 
-  const titleItems = [
-    { itemKey: 'mr', key: 'mr', value: i18n.t('user.title.mr') },
-    { itemKey: 'ms', key: 'ms', value: i18n.t('user.title.ms') },
-    { itemKey: 'preferNotToSay', key: 'preferNotToSay', value: i18n.t('user.title.preferNotToSay') },
-  ]
-
-  const onUpdateTitle = (value) => {
-    const currentProps = User.getProps(userToUpdate)
-    return onUpdate({ name: User.keys.props, value: User.Props.assocTitle(value)(currentProps) })
-  }
-
   if (!ready) return null
 
   return (
@@ -65,12 +54,7 @@ const UserEdit = () => {
       )}
 
       <FormItem label={i18n.t('common.title')}>
-        <Dropdown
-          onChange={onUpdateTitle}
-          items={titleItems}
-          selection={User.Props.getTitle(userToUpdate)}
-          itemKey={User.keysProps.itemKey}
-        />
+        <DropdownUserTitle user={userToUpdate} onChange={onUpdate} />
       </FormItem>
 
       <FormItem label={i18n.t('common.name')}>
@@ -80,7 +64,7 @@ const UserEdit = () => {
           value={User.getName(userToUpdate)}
           validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
           maxLength={User.nameMaxLength}
-          onChange={(value) => onUpdate({ name: User.keys.name, value })}
+          onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
         />
       </FormItem>
 
@@ -90,7 +74,7 @@ const UserEdit = () => {
           placeholder={i18n.t('common.email')}
           value={User.getEmail(userToUpdate)}
           validation={Validation.getFieldValidation(User.keys.email)(validation)}
-          onChange={(value) => onUpdate({ name: User.keys.email, value })}
+          onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>
@@ -99,7 +83,7 @@ const UserEdit = () => {
           disabled={!canEditGroup}
           validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
           groupUuid={User.getGroupUuid(userToUpdate)}
-          onChange={(value) => onUpdate({ name: User.keys.groupUuid, value })}
+          onChange={(value) => onUpdate(User.assocGroupUuid(value)(userToUpdate))}
         />
       </FormItem>
 
