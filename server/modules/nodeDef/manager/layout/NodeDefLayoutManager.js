@@ -82,7 +82,7 @@ const _updateLayoutChildren = ({ nodeDef, cycle, updateFn }) => {
  * @returns {Promise<object>} - The updated parent node definition, returned as an object index by UUID.
  * */
 export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], cyclesDeleted = [] }, client = db) => {
-  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
+  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef) || NodeDefLayout.hasPage(nodeDef)) return {}
 
   let nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
     surveyId,
@@ -91,6 +91,7 @@ export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], 
     false,
     client
   )
+
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   cyclesAdded.forEach((cycle) => {
