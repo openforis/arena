@@ -101,7 +101,7 @@ const propsUI = {
   [file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left" />,
-    validations: false,
+    validations: true,
   },
 
   [entity]: {

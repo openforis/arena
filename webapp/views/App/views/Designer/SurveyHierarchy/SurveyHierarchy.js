@@ -32,8 +32,12 @@ const SurveyHierarchy = () => {
   }, [lang])
 
   useEffect(() => {
-    return () => tree && tree.disconnect()
+    return () => tree?.disconnect()
   }, [tree])
+
+  useEffect(() => {
+    tree?.changeLabelFunction(itemLabelFunction)
+  }, [itemLabelFunction, tree])
 
   return (
     <div className="survey-hierarchy">

@@ -465,6 +465,17 @@ $t(common.cantUndoWarning)`,
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
+    fileProps: {
+      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
+      maxFileSize: 'Max. file size (Mb)',
+      fileType: 'File type',
+      fileTypes: {
+        image: 'Image',
+        video: 'Video',
+        audio: 'Audio',
+        other: 'Other',
+      },
+    },
     textProps: {
       textTransform: 'Text transform',
       textTransformTypes: {
