@@ -21,7 +21,7 @@ export const fetchItems = async (surveyId, offset = 0, limit = null, client = db
     dbTransformCallback
   )
 
-export const fetchItemsStream = async (surveyId) => {
+export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
   const select = `
       SELECT 
         cr.id,
@@ -30,6 +30,7 @@ export const fetchItemsStream = async (surveyId) => {
         (cr.props)->>'${CollectImportReportItem.propKeys.expressionType}' as type,
         (cr.props)->>'${CollectImportReportItem.propKeys.expression}' as expression,
         (cr.props)->>'${CollectImportReportItem.propKeys.applyIf}' as apply_if,
+        (cr.props)#>>'{${CollectImportReportItem.propKeys.messages},${messageLangCode}}' as message,
         cr.props as props,
         cr.resolved as resolved
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report cr

@@ -51,17 +51,28 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, offset, limit, draft = true } = Request.getParams(req)
-
-        const reportItemsStream = await CollectImportService.fetchReportItemsStream(surveyId, offset, limit)
+        const { surveyId, draft = true } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById(surveyId, draft)
-        const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const surveyName = Survey.getName(surveyInfo)
+        const messageLangCode = Survey.getDefaultLanguage(surveyInfo)
+
+        const reportItemsStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
+
+        const headers = [
+          'id',
+          'node_def_uuid',
+          'node_def_name',
+          'type',
+          'expression',
+          'apply_if',
+          'message',
+          'resolved',
+        ]
 
         const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
         Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
-
-        const headers = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'apply_if', 'resolved']
 
         await db.stream(reportItemsStream, (stream) => stream.pipe(CSVWriter.transformToStream(res, headers)))
       } catch (error) {
