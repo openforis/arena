@@ -14,10 +14,10 @@ export const fetchItems = async (surveyId, offset = 0, limit = null, client = db
       SELECT * 
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
       ORDER BY id
-       LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}
+      LIMIT ${limit ? '$/limit/' : 'ALL'}
+      OFFSET $/offset/
     `,
-    [],
+    { limit, offset },
     dbTransformCallback
   )
 
@@ -27,9 +27,9 @@ export const fetchItemsStream = async (surveyId) => {
         cr.id,
         cr.node_def_uuid,
         (nd.props_draft || nd.props)->>'${NodeDef.propKeys.name}' as node_def_name,
-        (cr.props)->>'${CollectImportReportItem.propKeys.applyIf}' as apply_if,
         (cr.props)->>'${CollectImportReportItem.propKeys.expressionType}' as type,
         (cr.props)->>'${CollectImportReportItem.propKeys.expression}' as expression,
+        (cr.props)->>'${CollectImportReportItem.propKeys.applyIf}' as apply_if,
         cr.props as props,
         cr.resolved as resolved
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report cr
