@@ -9,6 +9,8 @@ export const keysProps = {
   title: 'title',
 }
 
+export const titleKeys = ['mr', 'ms', 'preferNotToSay']
+
 // ====== READ
 export const getProps = R.prop(userKeys.props)
 export const getTitle = R.pipe(getProps, R.propOr('', keysProps.title))

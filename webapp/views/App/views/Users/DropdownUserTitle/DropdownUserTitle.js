@@ -7,7 +7,7 @@ import * as User from '@core/user/user'
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const titleItems = ['mr', 'ms', 'preferNotToSay'].map((key) => ({ key }))
+const titleItems = User.titleKeys.map((key) => ({ key }))
 
 const DropdownUserTitle = (props) => {
   const { user, onChange } = props
