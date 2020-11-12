@@ -8,7 +8,7 @@ export const keys = {
   authGroups: ObjectUtils.keys.authGroups,
   hasProfilePicture: 'hasProfilePicture',
   prefs: 'prefs',
-  props: 'props',
+  props: ObjectUtils.keys.props,
   status: 'status',
   validation: ObjectUtils.keys.validation,
   groupUuid: 'groupUuid', // Used only when editing user survey group
