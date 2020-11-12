@@ -32,6 +32,20 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
+const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) => {
+  const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+
+  if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
+    return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
+  }
+
+  if (streamMode && NodeDef.isDate(columnNodeDef.nodeDef)) {
+    return `TO_CHAR(${columnNodeDef.namesFull}, 'dd/mm/yyyy') as ${columnNodeDef.name}`
+  }
+
+  return columnNodeDef.namesFull
+}
+
 const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
     queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
@@ -43,17 +57,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols
-        .map((nodeDefCol) => {
-          const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-
-          if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
-            return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
-          }
-
-          return columnNodeDef.namesFull
-        })
-        .flat(),
+      ...nodeDefCols.map(_selectsByNodeDefType({ viewDataNodeDef, streamMode })).flat(),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
