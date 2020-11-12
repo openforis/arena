@@ -82,60 +82,81 @@ const _updateLayoutChildren = ({ nodeDef, cycle, updateFn }) => {
  * @returns {Promise<object>} - The updated parent node definition, returned as an object index by UUID.
  * */
 export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], cyclesDeleted = [] }, client = db) => {
-  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef) || NodeDefLayout.hasPage(nodeDef)) return {}
+  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
 
-  let nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
+  const nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
     surveyId,
     NodeDef.getParentUuid(nodeDef),
     true,
     false,
     client
   )
+  let nodeDefParentUpdated = nodeDefParent
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  cyclesAdded.forEach((cycle) => {
-    nodeDefParent = _updateLayoutChildren({
-      nodeDef: nodeDefParent,
-      cycle,
-      updateFn: (layoutChildren) => {
-        if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
-          // Add or node def to children (render as table)
-          return R.append(nodeDefUuid)(layoutChildren)
-        }
-        // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
-        const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutChildren)
-        // New node def height depends on its type
-        const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
-        return R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildren)
-      },
-    })
-  })
+  // update layout in added cycles
+  nodeDefParentUpdated = cyclesAdded.reduce(
+    (nodeDefParentAcc, cycle) =>
+      _updateLayoutChildren({
+        nodeDef: nodeDefParentAcc,
+        cycle,
+        updateFn: (layoutChildren) => {
+          if (NodeDefLayout.isRenderTable(cycle)(nodeDefParentAcc)) {
+            // Add or node def to children (render as table)
+            return R.append(nodeDefUuid)(layoutChildren)
+          }
+          if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
+            // Node def displayed in its own page, node def parent layout must not be changed
+            return layoutChildren
+          }
+          // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
+          const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutChildren)
+          // New node def height depends on its type
+          const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
+          return R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildren)
+        },
+      }),
+    nodeDefParentUpdated
+  )
 
-  cyclesDeleted.forEach((cycle) => {
-    nodeDefParent = _updateLayoutChildren({
-      nodeDef: nodeDefParent,
-      cycle,
-      updateFn: (layoutChildren) => {
-        if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
-          // Remove node def from children (render as table)
-          return R.without([nodeDefUuid])(layoutChildren)
-        }
-        // Remove node def from children (render as form)
-        return R.reject(R.propEq('i', nodeDefUuid), layoutChildren)
-      },
-    })
-  })
+  // update layout of removed cycles
+  nodeDefParentUpdated = cyclesDeleted.reduce(
+    (nodeDefParentAcc, cycle) =>
+      _updateLayoutChildren({
+        nodeDef: nodeDefParentAcc,
+        cycle,
+        updateFn: (layoutChildren) => {
+          if (NodeDefLayout.isRenderTable(cycle)(nodeDefParentAcc)) {
+            // Remove node def from children (render as table)
+            return R.without([nodeDefUuid])(layoutChildren)
+          }
+          if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
+            // Node def displayed in its own page, node def parent layout must not be changed
+            return layoutChildren
+          }
+          // Remove node def from children (render as form)
+          return R.reject(R.propEq('i', nodeDefUuid), layoutChildren)
+        },
+      }),
+    nodeDefParentUpdated
+  )
 
-  // Update parent node def layout
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+  // Update parent node def layout in DB (if changed)
+  const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
+  const nodeDefParentLayoutUpdated = NodeDefLayout.getLayout(nodeDefParentUpdated)
 
+  if (R.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
+    // no changes applied
+    return nodeDefParent
+  }
+  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParentUpdated)
   return {
     [nodeDefParentUuid]: await NodeDefRepository.updateNodeDefProps(
       surveyId,
       nodeDefParentUuid,
-      NodeDef.getParentUuid(nodeDefParent),
-      { [NodeDefLayout.keys.layout]: NodeDefLayout.getLayout(nodeDefParent) },
+      NodeDef.getParentUuid(nodeDefParentUpdated),
+      { [NodeDefLayout.keys.layout]: nodeDefParentLayoutUpdated },
       {},
       client
     ),
