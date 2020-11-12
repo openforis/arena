@@ -106,7 +106,7 @@ Do you want to proceed?`,
     selected: 'Selected',
     srs: 'SRS',
     sum: 'Sum',
-    title: 'Title',
+
     to: 'To',
     true: 'True',
     type: 'Type',
@@ -360,7 +360,8 @@ Do you want to proceed?`,
   },
 
   user: {
-    title: {
+    title: 'Title',
+    titleValues: {
       mr: 'Mr',
       ms: 'Ms',
       preferNotToSay: 'Prefer not to say',

@@ -18,23 +18,18 @@ const DropdownUserTitle = (props) => {
 
   return (
     <Dropdown
-      placeholder={i18n.t('common.title')}
-      onChange={(title) => onChange(User.assocTitle(title.key)(user))}
+      placeholder={i18n.t('user.title')}
+      onChange={(item) => onChange(User.assocTitle(item.key)(user))}
       items={titleItems}
-      itemLabel={(title) => i18n.t(`user.title.${title.key}`)}
+      itemLabel={(item) => i18n.t(`user.titleValues.${item.key}`)}
       selection={itemSelected}
     />
   )
 }
 
-DropdownUserTitle.defaultProps = {
-  user: {},
-  onChange: null,
-}
-
 DropdownUserTitle.propTypes = {
-  user: PropTypes.any,
-  onChange: PropTypes.func,
+  user: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
 }
 
 export default DropdownUserTitle

@@ -53,7 +53,7 @@ const UserEdit = () => {
         <ProfilePicture userUuid={userUuid} />
       )}
 
-      <FormItem label={i18n.t('common.title')}>
+      <FormItem label={i18n.t('user.title')}>
         <DropdownUserTitle user={userToUpdate} onChange={onUpdate} />
       </FormItem>
 
