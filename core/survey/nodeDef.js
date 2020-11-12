@@ -25,6 +25,7 @@ export const nodeDefType = {
 }
 
 export const keys = {
+  id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
@@ -63,6 +64,10 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+
+  // File
+  maxFileSize: 'maxFileSize',
+  fileType: 'fileType',
 }
 
 export const textTransformValues = {
@@ -75,6 +80,13 @@ export const textTransformValues = {
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const fileTypeValues = {
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+  other: 'other',
 }
 
 export const keysPropsAdvanced = {
@@ -92,7 +104,7 @@ export const maxKeyAttributes = 3
 
 // ==== READ
 
-export const { getLabels, getParentUuid, getProp, getProps, getUuid, isEqual, isTemporary } = ObjectUtils
+export const { getLabels, getParentUuid, getProp, getProps, getUuid, getId, isEqual, isTemporary } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
@@ -137,6 +149,11 @@ export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
+
+// File
+export const isNumberOfFilesEnabled = isMultiple
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize)(nodeDef))
+export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
 export const isBooleanLabelYesNo = (nodeDef) =>
