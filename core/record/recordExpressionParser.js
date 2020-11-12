@@ -14,7 +14,7 @@ import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
-const _getNodeValue = (survey, node) => {
+const _getNodeValue = (survey) => (node) => {
   if (Node.isValueBlank(node)) {
     return null
   }
@@ -42,6 +42,8 @@ const _getNodeValue = (survey, node) => {
   }
   return value
 }
+
+const _getNodeValues = (survey) => (nodes) => nodes.map(_getNodeValue(survey))
 
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
   if (NodeDef.isRoot(nodeDefCtx)) {
@@ -104,8 +106,7 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
-const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
-  const nodeDefReferenced = Survey.getNodeDefByName(nodeReferencedName)(survey)
+const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
   const nodeReferencedParent = _getReferencedNodesParent(survey, record, nodeCtx, nodeDefReferenced)
 
   if (nodeReferencedParent)
@@ -116,16 +117,15 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
 
 const _identifierEval = (survey, record) => (expr, { node }) => {
   const nodeName = R.prop('name')(expr)
-  const referencedNodes = _getReferencedNodes(survey, record, node, nodeName)
+  const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
+  const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
 
-  if (referencedNodes.length !== 1) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, {
-      name: nodeName,
-      multiple: referencedNodes.length > 1,
-    })
+  const single = NodeDef.isSingle(nodeDefReferenced)
+  if (single && (referencedNodes.length === 0 || referencedNodes.length > 1)) {
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
   }
 
-  return _getNodeValue(survey, referencedNodes[0])
+  return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
 }
 
 export const evalNodeQuery = (survey, record, node, query) => {

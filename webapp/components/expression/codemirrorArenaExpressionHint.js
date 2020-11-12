@@ -8,6 +8,7 @@ const functionExamples = {
     pow: 'pow(2,3) = 2³ = 8',
     ln: 'ln(10) = 2.302…',
     log10: 'log10(100) = 2',
+    includes: `includes(multiple_attribute_name, 'value') = true/false`,
   },
   [Expression.modes.sql]: {
     avg: 'avg(variable_name)',

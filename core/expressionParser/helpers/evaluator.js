@@ -19,6 +19,7 @@ const stdlib = {
   // arity 1+ (arity 0 allowed by JS)
   min: [Math.min, 1, -1],
   max: [Math.max, 1, -1],
+  includes: [(items, value) => Array.isArray(items) && items.includes(String(value)), 2, 2],
 
   avg: [R.identity, 1, 1],
   count: [R.identity, 1, 1],
