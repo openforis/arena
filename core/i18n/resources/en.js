@@ -596,6 +596,13 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  categoryList: {
+    types: {
+      flat: 'Flat',
+      hierarchical: 'Hierarchical',
+    },
+  },
+
   categoryEdit: {
     header: 'Category',
     addLevel: 'Add level',
