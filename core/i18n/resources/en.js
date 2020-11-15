@@ -106,6 +106,7 @@ Do you want to proceed?`,
     selected: 'Selected',
     srs: 'SRS',
     sum: 'Sum',
+
     to: 'To',
     true: 'True',
     type: 'Type',
@@ -358,6 +359,15 @@ Do you want to proceed?`,
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
+  user: {
+    title: 'Title',
+    titleValues: {
+      mr: 'Mr',
+      ms: 'Ms',
+      preferNotToSay: 'Prefer not to say',
+    },
+  },
+
   processingChainView: {
     formLabel: 'Processing chain label',
     dateExecuted: 'Date executed',
@@ -583,6 +593,13 @@ $t(common.cantUndoWarning)`,
       family: 'Family',
       genus: 'Genus',
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+    },
+  },
+
+  categoryList: {
+    types: {
+      flat: 'Flat',
+      hierarchical: 'Hierarchical',
     },
   },
 

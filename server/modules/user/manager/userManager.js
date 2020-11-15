@@ -121,7 +121,8 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
     const name = User.getName(userToUpdate)
     const email = User.getEmail(userToUpdate)
-    return await UserRepository.updateUser(userUuid, name, email, profilePicture, t)
+    const props = User.getProps(userToUpdate)
+    return await UserRepository.updateUser(userUuid, name, email, profilePicture, props, t)
   })
 
 export const updateUser = _userFetcher(_updateUser)

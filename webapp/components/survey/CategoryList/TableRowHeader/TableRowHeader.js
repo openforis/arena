@@ -18,6 +18,7 @@ const TableRowHeader = (props) => {
     <>
       <div>#</div>
       <div>{i18n.t('common.name')}</div>
+      <div>{i18n.t('common.type')}</div>
       {canEdit && (
         <>
           <div /> {/* Error badge */}

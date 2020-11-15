@@ -14,6 +14,7 @@ export const keys = {
   props: 'props',
   items: 'items',
   published: 'published',
+  levelsCount: 'levelsCount', // populated only on fetch
 }
 
 export const keysProps = {
@@ -34,13 +35,16 @@ export const itemExtraDefDataTypes = {
 // ====== READ
 export const { getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
-export const getValidation = Validation.getValidation
+export const { getValidation } = Validation
 
 const getLevels = R.propOr({}, keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
 
 export const getLevelByUuid = (uuid) => R.pipe(getLevelsArray, R.find(R.propEq('uuid', uuid)))
 export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
+
+export const getLevelsCount = (category) =>
+  Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
 
 export const isPublished = R.propOr(false, keys.published)
 
