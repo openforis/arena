@@ -106,6 +106,7 @@ Do you want to proceed?`,
     selected: 'Selected',
     srs: 'SRS',
     sum: 'Sum',
+
     to: 'To',
     true: 'True',
     type: 'Type',
@@ -356,6 +357,15 @@ Do you want to proceed?`,
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  user: {
+    title: 'Title',
+    titleValues: {
+      mr: 'Mr',
+      ms: 'Ms',
+      preferNotToSay: 'Prefer not to say',
+    },
   },
 
   processingChainView: {
