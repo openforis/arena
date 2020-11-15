@@ -40,7 +40,7 @@ const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) 
   }
 
   if (streamMode && NodeDef.isDate(columnNodeDef.nodeDef)) {
-    return `TO_CHAR(${columnNodeDef.namesFull}, 'dd/mm/yyyy') as ${columnNodeDef.name}`
+    return `TO_CHAR(${columnNodeDef.namesFull}, 'yyyy-mm-dd') as ${columnNodeDef.name}`
   }
 
   return columnNodeDef.namesFull
