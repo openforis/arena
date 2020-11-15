@@ -37,6 +37,7 @@ const TableRow = (props) => {
     <>
       <div>{position}</div>
       <div>{Category.getName(category)}</div>
+      <div>{i18n.t(`categoryList.types.${Category.getLevelsCount(category) > 1 ? 'hierarchical' : 'flat'}`)}</div>
       {canEdit && (
         <>
           <div className="category-row__badge-container">
