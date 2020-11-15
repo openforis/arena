@@ -13,6 +13,8 @@ const keys = {
   list: 'list',
 }
 
+const MAX_HEIGHT_AUTOCOMPLETE_DIAOLOG = 200
+
 // ====== READ
 export const getInputField = A.prop(keys.inputField)
 export const getSourceElement = A.prop(keys.sourceElement)
@@ -24,12 +26,19 @@ export const getList = A.prop(keys.list)
 
 export const getItemsSize = (state) => getItems(state).length
 
+const _calculateVerticalPosition = ({ top: elementTop, height: elementHeight }) => {
+  const top = elementTop + elementHeight
+  const windowScreenY = window.innerHeight
+
+  return top + MAX_HEIGHT_AUTOCOMPLETE_DIAOLOG > windowScreenY ? { bottom: windowScreenY - elementTop } : { top }
+}
 export const calculatePosition = (state) => {
   const { top, left, height, width } = elementOffset(getSourceElement(state) || getInputField(state))
   return {
-    top: top + height,
+    ..._calculateVerticalPosition({ top, height }),
     left,
     width,
+    maxHeight: MAX_HEIGHT_AUTOCOMPLETE_DIAOLOG,
   }
 }
 
