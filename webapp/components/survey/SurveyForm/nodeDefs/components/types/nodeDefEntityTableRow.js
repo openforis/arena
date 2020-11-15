@@ -14,6 +14,8 @@ import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 const NodeDefEntityTableRow = (props) => {
   const { edit, nodeDef, nodeDefColumns, node, canEditRecord, canEditDef, renderType, i = 'header', removeNode } = props
 
+  const draggable = edit && canEditDef
+
   const placeholderRef = useRef()
   const rowRef = useRef()
   const [dragged, setDragged] = useState(null)
@@ -21,6 +23,9 @@ const NodeDefEntityTableRow = (props) => {
   const dispatch = useDispatch()
 
   const dragStart = (evt) => {
+    if (!draggable) {
+      return
+    }
     const { currentTarget, dataTransfer } = evt
     const placeholder = placeholderRef.current
 
@@ -35,6 +40,9 @@ const NodeDefEntityTableRow = (props) => {
   }
 
   const dragOver = (evt) => {
+    if (!draggable) {
+      return
+    }
     evt.preventDefault()
     const placeholder = placeholderRef.current
 
@@ -54,9 +62,12 @@ const NodeDefEntityTableRow = (props) => {
   }
 
   const dragEnd = () => {
+    if (!draggable) {
+      return
+    }
     const placeholder = placeholderRef.current
-    
-    dragged.style.display = 'block'    
+
+    dragged.style.display = 'block'
     placeholder.style.display = 'none'
 
     placeholder.parentNode.insertBefore(dragged, placeholder)
@@ -81,7 +92,7 @@ const NodeDefEntityTableRow = (props) => {
           {...props}
           nodeDef={nodeDefChild}
           parentNode={node}
-          canEditDef={canEditDef}
+          draggable={draggable}
           renderType={renderType}
           onDragStart={dragStart}
           onDragOver={dragOver}
