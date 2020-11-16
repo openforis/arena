@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
-import NodeDefDisplayTypeSelector from '@webapp/components/survey/NodeDefDisplayTypeSelector'
+import DisplayTypeSelector from '@webapp/components/survey/DisplayTypeSelector'
 
 import Tree from './Tree'
 
@@ -61,7 +61,7 @@ const SurveyHierarchy = () => {
         />
       </div>
       <div className="survey-hierarchy__label-selector">
-        <NodeDefDisplayTypeSelector nodeDefDisplayType={nodeDefDisplayType} onChange={toggleLabelFunction} />
+        <DisplayTypeSelector displayType={nodeDefDisplayType} onChange={toggleLabelFunction} />
       </div>
     </div>
   )
