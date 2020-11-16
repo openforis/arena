@@ -1,13 +1,13 @@
-import { button, clearTextBox, click, expectExists, writeIntoTextBox, hoverTextBox, toRightOf } from '../utils/api'
+import { button, clearTextBox, click, expectExists, writeIntoTextBox, hoverTextBox } from '../utils/api'
 
 import { clickHomeBtnEditSurveyInfo, expectHomeDashboard } from '../utils/ui/home'
 import { waitForLoader } from '../utils/ui/loader'
 import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 
 const selectors = {
-  name: () => ({ id: 'survey-info-name' }),
-  label: () => toRightOf('Label'),
-  language: () => toRightOf('Language(s)'),
+  name: () => ({ id: 'survey-name' }),
+  label: () => ({ id: 'survey-label-en' }),
+  language: () => ({ id: 'survey-language' }),
 }
 
 describe('Survey info edit', () => {
