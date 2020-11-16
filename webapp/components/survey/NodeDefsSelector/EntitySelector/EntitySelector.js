@@ -1,11 +1,14 @@
 import './EntitySelector.scss'
 import React from 'react'
+import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
+
+import { SurveyFormState } from '@webapp/store/ui'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
@@ -26,8 +29,9 @@ const getDropdownItems = (hierarchy, lang, itemLabelFunction) => {
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, itemLabelFunction } = props
+  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange } = props
 
+  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
   const dropdownItems = getDropdownItems(hierarchy, lang, itemLabelFunction)
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
@@ -49,13 +53,11 @@ EntitySelector.propTypes = {
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
-  itemLabelFunction: PropTypes.func,
 }
 
 EntitySelector.defaultProps = {
   nodeDefUuidEntity: null,
   validation: null,
-  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default EntitySelector

@@ -16,13 +16,15 @@ import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
 
+import { I18nState } from '@webapp/store/system'
+import { SurveyFormState } from '@webapp/store/ui'
+
 // Edit actions
 // Entry actions
 import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefFormItem from './components/NodeDefFormItem'
-import { I18nState } from '@webapp/store/system'
 
 class NodeDefSwitch extends React.Component {
   constructor(props) {
@@ -54,19 +56,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const {
-      surveyCycleKey,
-      nodeDef,
-      edit,
-      canEditDef,
-      renderType,
-      applicable,
-      itemLabelFunction,
-      label: labelFromProps,
-      lang,
-    } = this.props
-
-    const label = itemLabelFunction ? itemLabelFunction(nodeDef, lang) : labelFromProps
+    const { surveyCycleKey, nodeDef, edit, canEditDef, renderType, applicable, label } = this.props
 
     const className =
       'survey-form__node-def-page' +
@@ -104,7 +94,7 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-  const label = SurveyState.getNodeDefLabel(nodeDef)(state)
+  const label = SurveyFormState.getNodeDefLabel(state)(nodeDef)
   const lang = I18nState.getLang(state)
 
   const mapEntryProps = () => {

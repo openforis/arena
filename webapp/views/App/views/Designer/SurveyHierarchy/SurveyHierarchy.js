@@ -1,12 +1,14 @@
 import './SurveyHierarchy.scss'
 
 import React, { useEffect, useState, useRef } from 'react'
+import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { SurveyFormState } from '@webapp/store/ui'
 
 import { useLabelFunctionSelector } from '@webapp/components/hooks'
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
@@ -16,6 +18,7 @@ import Tree from './Tree'
 const SurveyHierarchy = () => {
   const i18n = useI18n()
   const survey = useSurvey()
+  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
 
   const { lang } = i18n
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
@@ -24,7 +27,7 @@ const SurveyHierarchy = () => {
   const [tree, setTree] = useState(null)
 
   const treeRef = useRef(null)
-  const { ItemLabelFunctionSelector, itemLabelFunction } = useLabelFunctionSelector()
+  const { ItemLabelFunctionSelector } = useLabelFunctionSelector()
 
   useEffect(() => {
     const treeElement = treeRef.current
@@ -53,7 +56,6 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
-          itemLabelFunction={itemLabelFunction}
         />
       </div>
       <div className="survey-hierarchy__label-selector">

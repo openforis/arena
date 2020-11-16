@@ -15,6 +15,8 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 import PanelRight from '@webapp/components/PanelRight'
 
 import { useColumn } from './store'
+import { useSelector } from 'react-redux'
+import { SurveyFormState } from '@webapp/store/ui'
 
 const getColLabelKey = ({ colName, nodeDef }) => {
   const col = ColumnNodeDef.extractColName({ nodeDef, colName })
@@ -23,10 +25,11 @@ const getColLabelKey = ({ colName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { colWidth, nodeDef, onChangeQuery, query, itemLabelFunction } = props
+  const { colWidth, nodeDef, onChangeQuery, query } = props
 
   const i18n = useI18n()
   const lang = useSurveyLang()
+  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
 
   const {
     modeEdit,
@@ -122,10 +125,6 @@ ColumnHeader.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
-  itemLabelFunction: PropTypes.func,
 }
 
-ColumnHeader.defaultProps = {
-  itemLabelFunction: NodeDef.getLabel,
-}
 export default ColumnHeader

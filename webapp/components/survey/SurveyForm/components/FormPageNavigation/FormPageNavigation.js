@@ -1,7 +1,8 @@
 import './FormPageNavigation.scss'
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
+import { SurveyFormState } from '@webapp/store/ui'
 
 import classNames from 'classnames'
 
@@ -12,8 +13,7 @@ import { State, useLocalState, useActions } from './store'
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
   const Actions = useActions({ setState })
-
-  const { itemLabelFunction } = props
+  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
 
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
@@ -23,7 +23,7 @@ const FormPageNavigation = (props) => {
   const active = State.isActive(state)
   const enabled = State.isEnabled(state)
   const edit = State.isEdit(state)
-  const label = State.getLabel(state)
+  const label = itemLabelFunction(State.getNodeDef(state))
   const canEditDef = State.canEditDef(state)
   const surveyCycleKey = State.getSurveyCycleKey(state)
 
@@ -74,19 +74,10 @@ const FormPageNavigation = (props) => {
             nodeDef={child}
             edit={edit}
             canEditDef={canEditDef}
-            itemLabelFunction={itemLabelFunction}
           />
         ))}
     </div>
   )
-}
-
-FormPageNavigation.propTypes = {
-  itemLabelFunction: PropTypes.func,
-}
-
-FormPageNavigation.defaultProps = {
-  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default FormPageNavigation

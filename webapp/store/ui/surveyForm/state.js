@@ -8,6 +8,8 @@ import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../record/state'
 
 import * as UiState from '../state'
+import { I18nState } from '@webapp/store/system'
+import { getSurveyInfo } from '@webapp/store/survey/state'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
@@ -97,6 +99,14 @@ export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNav
 export const nodeDefLabelFunction = getStateProp(keys.nodeDefLabelFunction, NodeDef.getLabel)
 
 export const setNodeDefLabelFunction = (value) => R.assoc(keys.nodeDefLabelFunction, NodeDef[value])
+
+export const getNodeDefLabel = (state) => (nodeDef) => {
+  const surveyInfo = getSurveyInfo(state)
+  const langApp = I18nState.getLang(state)
+  const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
+  const _nodeDefLabelFunction = nodeDefLabelFunction(state)
+  return _nodeDefLabelFunction(nodeDef, langSurvey)
+}
 
 // ====== NodeDef update actions
 

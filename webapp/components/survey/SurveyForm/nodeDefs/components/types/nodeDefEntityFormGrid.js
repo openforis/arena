@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
+import NodeDefSwitch from '../../nodeDefSwitch'
 
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
@@ -16,18 +16,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const NodeDefEntityFormGrid = (props) => {
-  const {
-    nodeDef,
-    childDefs,
-    recordUuid,
-    node,
-    edit,
-    entry,
-    preview,
-    canEditRecord,
-    canAddNode,
-    itemLabelFunction,
-  } = props
+  const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
   const dispatch = useDispatch()
 
@@ -88,7 +77,6 @@ const NodeDefEntityFormGrid = (props) => {
             canEditDef={canEditDef}
             canEditRecord={canEditRecord}
             canAddNode={canAddNode}
-            itemLabelFunction={itemLabelFunction}
           />
         </div>
       ))}
@@ -107,7 +95,6 @@ NodeDefEntityFormGrid.propTypes = {
   preview: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   canAddNode: PropTypes.bool,
-  itemLabelFunction: PropTypes.func,
 }
 
 NodeDefEntityFormGrid.defaultProps = {
@@ -119,7 +106,6 @@ NodeDefEntityFormGrid.defaultProps = {
   preview: false,
   canEditRecord: false,
   canAddNode: false,
-  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default NodeDefEntityFormGrid
