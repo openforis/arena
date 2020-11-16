@@ -122,18 +122,21 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
 export const fetchCategoriesBySurveyId = async (
   { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = null },
   client = db
-) =>
-  client.map(
+) => {
+  const schema = getSurveyDBSchema(surveyId)
+  const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft, 'c.')
+  return client.map(
     `SELECT 
-      id,
-      uuid,
-      props,
-      props_draft,
-      published
-      ${includeValidation ? ', validation' : ''}
-    FROM ${getSurveyDBSchema(surveyId)}.category
-    ${search ? `WHERE ${DbUtils.getPropColCombined(Category.keysProps.name, draft)} ILIKE $/search/` : ''} 
-    ORDER BY ${DbUtils.getPropColCombined(Category.keysProps.name, draft)}
+      c.id,
+      c.uuid,
+      c.props,
+      c.props_draft,
+      c.published,
+      (SELECT COUNT(*) FROM ${schema}.category_level l WHERE l.category_uuid = c.uuid) AS levels_count
+      ${includeValidation ? ', c.validation' : ''}
+    FROM ${schema}.category c
+    ${search ? `WHERE ${nameColumn} ILIKE $/search/` : ''} 
+    ORDER BY ${nameColumn}
     LIMIT ${limit ? `$/limit/` : 'ALL'}
     ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
@@ -143,6 +146,7 @@ export const fetchCategoriesBySurveyId = async (
     },
     (row) => DB.transformCallback(row, draft, true)
   )
+}
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
   { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },

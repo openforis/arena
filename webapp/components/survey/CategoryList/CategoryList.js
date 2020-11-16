@@ -27,24 +27,23 @@ const CategoryList = (props) => {
   const gridTemplateColumns = [
     '50px', // index
     '1fr', // name
+    '100px', // type
     ...(canEdit ? ['repeat(2, 85px)'] : []), // error and warning badges
     ...(canSelect ? ['80px'] : []), // select button
     ...(canEdit ? ['repeat(2, 75px)'] : []), // edit and delete buttons
   ].join(' ')
 
   return (
-    <>
-      <Table
-        module="categories"
-        restParams={{ draft: canEdit, validate: canEdit }}
-        gridTemplateColumns={gridTemplateColumns}
-        headerLeftComponent={TableHeaderLeft}
-        rowHeaderComponent={TableRowHeader}
-        rowComponent={TableRow}
-        headerProps={{ state }}
-        rowProps={{ state, setState }}
-      />
-    </>
+    <Table
+      module="categories"
+      restParams={{ draft: canEdit, validate: canEdit }}
+      gridTemplateColumns={gridTemplateColumns}
+      headerLeftComponent={TableHeaderLeft}
+      rowHeaderComponent={TableRowHeader}
+      rowComponent={TableRow}
+      headerProps={{ state }}
+      rowProps={{ state, setState }}
+    />
   )
 }
 

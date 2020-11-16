@@ -128,6 +128,7 @@ export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultip
 
 export const isText = isType(nodeDefType.text)
 export const isBoolean = isType(nodeDefType.boolean)
+export const isDate = isType(nodeDefType.date)
 export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
 export const isDecimal = isType(nodeDefType.decimal)

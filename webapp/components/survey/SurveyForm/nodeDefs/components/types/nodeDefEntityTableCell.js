@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import ProgressBar from '@webapp/components/progressBar'
 
@@ -7,8 +8,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
-const NodeDefEntityTableCell = props => {
-  const { nodeDef, parentNode, canEditDef, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
+const NodeDefEntityTableCell = (props) => {
+  const { nodeDef, parentNode, draggable, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const { length } = NodeDefUiProps.getFormFields(nodeDef)
@@ -18,30 +19,28 @@ const NodeDefEntityTableCell = props => {
   const isHeader = renderType === NodeDefLayout.renderType.tableHeader
   const [visible, setVisible] = useState(isHeader || !windowed)
 
-  if (!isHeader && windowed) {
-    useEffect(() => {
-      if (gridSize) {
-        const el = elementRef.current
+  useEffect(() => {
+    if (isHeader || !windowed || !gridSize) {
+      return
+    }
+    const el = elementRef.current
 
-        const elemtTop = el.offsetParent.offsetTop
-        const elemBottom = elemtTop + el.offsetHeight
-        const elemLeft = el.offsetLeft
-        const elemRight = elemLeft + el.offsetWidth
+    const elemtTop = el.offsetParent.offsetTop
+    const elemBottom = elemtTop + el.offsetHeight
+    const elemLeft = el.offsetLeft
+    const elemRight = elemLeft + el.offsetWidth
 
-        const gridTop = gridSize.top
-        const gridBottom = gridSize.height + gridTop
-        const gridLeft = gridSize.left
-        const gridRight = gridSize.width + gridLeft
+    const { top: gridTop, height: gridHeight, left: gridLeft, width: gridWidth } = gridSize
+    const gridBottom = gridHeight + gridTop
+    const gridRight = gridWidth + gridLeft
 
-        const elemVisible =
-          elemtTop <= gridBottom &&
-          elemBottom >= gridTop && // Vertical visibility
-          elemLeft <= gridRight &&
-          elemRight >= gridLeft // Horizontal visibility
-        setVisible(elemVisible)
-      }
-    }, [gridSize])
-  }
+    const elemVisible =
+      elemtTop <= gridBottom &&
+      elemBottom >= gridTop && // Vertical visibility
+      elemLeft <= gridRight &&
+      elemRight >= gridLeft // Horizontal visibility
+    setVisible(elemVisible)
+  }, [gridSize])
 
   return (
     <div
@@ -49,8 +48,8 @@ const NodeDefEntityTableCell = props => {
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
       style={{ width: 160 * length + 'px' }}
-      onMouseDown={e => e.stopPropagation()}
-      draggable={canEditDef}
+      onMouseDown={(e) => e.stopPropagation()}
+      draggable={draggable}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
@@ -66,9 +65,27 @@ const NodeDefEntityTableCell = props => {
   )
 }
 
+NodeDefEntityTableCell.propTypes = {
+  draggable: PropTypes.bool.isRequired, // true if the drag&drop is enabled
+  nodeDef: PropTypes.object.isRequired,
+  parentNode: PropTypes.object,
+  renderType: PropTypes.oneOf([NodeDefLayout.renderType.tableHeader, NodeDefLayout.renderType.tableBody]).isRequired,
+  gridSize: PropTypes.shape({
+    top: PropTypes.number,
+    left: PropTypes.number,
+    height: PropTypes.number,
+    width: PropTypes.number,
+  }), // Coordinates of the grid size where it's contained
+  windowed: PropTypes.bool, // Used to load component only when visible in parent grid
+  onDragStart: PropTypes.func.isRequired,
+  onDragOver: PropTypes.func.isRequired,
+  onDragEnd: PropTypes.func.isRequired,
+}
+
 NodeDefEntityTableCell.defaultProps = {
-  gridSize: {}, // Coordinates of the grid size where it's contained
-  windowed: true, // Used to load component only when visible in parent grid
+  parentNode: null,
+  gridSize: {},
+  windowed: true,
 }
 
 export default NodeDefEntityTableCell

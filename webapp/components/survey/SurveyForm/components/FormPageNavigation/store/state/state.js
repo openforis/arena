@@ -16,6 +16,7 @@ const keys = {
   expandedFormPageNavigation: 'expandedFormPageNavigation',
   canEditDef: 'canEditDef',
   surveyCycleKey: 'surveyCycleKey',
+  outerPageChildDefs: 'outerPageChildDefs',
 }
 
 // ===== CREATE
@@ -71,3 +72,4 @@ export const assocActive = (active) => A.assoc(keys.active, active)
 export const assocShowChildren = (showChildren) => A.assoc(keys.showChildren, showChildren)
 export const assocExpandedFormPageNavigation = (expandedFormPageNavigation) =>
   A.assoc(keys.expandedFormPageNavigation, expandedFormPageNavigation)
+export const assocOuterPageChildDefs = (outerPageChildDefs) => A.assoc(keys.outerPageChildDefs, outerPageChildDefs)
