@@ -10,8 +10,8 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui'
 
-import { useLabelFunctionSelector } from '@webapp/components/hooks'
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import ItemLabelFunctionSelector from '@webapp/components/survey/ItemLabelFunctionSelector'
 
 import Tree from './Tree'
 
@@ -27,7 +27,6 @@ const SurveyHierarchy = () => {
   const [tree, setTree] = useState(null)
 
   const treeRef = useRef(null)
-  const { ItemLabelFunctionSelector } = useLabelFunctionSelector()
 
   useEffect(() => {
     const treeElement = treeRef.current

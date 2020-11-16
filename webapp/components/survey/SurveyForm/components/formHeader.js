@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import { useLabelFunctionSelector } from '@webapp/components/hooks'
+import ItemLabelFunctionSelector from '@webapp/components/survey/ItemLabelFunctionSelector'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
@@ -30,8 +30,6 @@ const FormHeader = (props) => {
     toggleFormPageNavigation,
     createNodeDef,
   } = props
-
-  const { ItemLabelFunctionSelector } = useLabelFunctionSelector()
 
   const i18n = useI18n()
   const history = useHistory()
@@ -74,7 +72,9 @@ const FormHeader = (props) => {
         )}
       </div>
 
-      <div className="survey-form-header__options">{ItemLabelFunctionSelector && <ItemLabelFunctionSelector />}</div>
+      <div className="survey-form-header__options">
+        <ItemLabelFunctionSelector />
+      </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )

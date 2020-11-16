@@ -21,26 +21,23 @@ const labelTypes = ({ i18n }) => [
   },
 ]
 
-export const useLabelFunctionSelector = () => {
+const ItemLabelFunctionSelector = () => {
   const i18n = useI18n()
-
   const dispatch = useDispatch()
 
   const nodeDefLabelFunction = useSelector(SurveyFormState.nodeDefLabelFunction)
 
-  const toggleByName = () => {
+  const toggleLabelFunction = () => {
     dispatch(SurveyFormActions.toggleNodeDefLabelFunction())
   }
 
-  return {
-    ItemLabelFunctionSelector: () => (
-      <ButtonGroup
-        selectedItemKey={nodeDefLabelFunction === NodeDef.getName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
-        onChange={toggleByName}
-        items={labelTypes({ i18n })}
-      />
-    ),
-    toggleByName,
-    itemLabelFunction: nodeDefLabelFunction,
-  }
+  return (
+    <ButtonGroup
+      selectedItemKey={nodeDefLabelFunction === NodeDef.getName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
+      onChange={toggleLabelFunction}
+      items={labelTypes({ i18n })}
+    />
+  )
 }
+
+export default ItemLabelFunctionSelector
