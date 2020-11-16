@@ -12,6 +12,8 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
+import { useLabelFunctionSelector } from '@webapp/components/hooks'
+
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
@@ -27,8 +29,9 @@ const FormHeader = (props) => {
     showPageNavigation,
     toggleFormPageNavigation,
     createNodeDef,
-    ItemLabelFunctionSelector,
   } = props
+
+  const { ItemLabelFunctionSelector } = useLabelFunctionSelector()
 
   const i18n = useI18n()
   const history = useHistory()

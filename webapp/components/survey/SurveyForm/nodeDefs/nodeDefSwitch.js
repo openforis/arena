@@ -16,7 +16,6 @@ import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
 
-import { I18nState } from '@webapp/store/system'
 import { SurveyFormState } from '@webapp/store/ui'
 
 // Edit actions
@@ -95,7 +94,6 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
   const label = SurveyFormState.getNodeDefLabel(state)(nodeDef)
-  const lang = I18nState.getLang(state)
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isRoot(nodeDef)
@@ -130,7 +128,6 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     label,
-    lang,
     applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
     ...(entry ? mapEntryProps() : {}),
   }

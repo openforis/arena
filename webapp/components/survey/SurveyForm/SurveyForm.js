@@ -15,7 +15,7 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
-import { useLabelFunctionSelector, useOnUpdate } from '@webapp/components/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/FormPageNavigation'
@@ -40,7 +40,6 @@ const SurveyForm = (props) => {
 
   const dispatch = useDispatch()
   const isSideBarOpened = useIsSidebarOpened()
-  const { ItemLabelFunctionSelector, itemLabelFunction } = useLabelFunctionSelector()
   const editAllowed = edit && canEditDef
 
   let className = editAllowed ? ' edit' : ''
@@ -84,7 +83,6 @@ const SurveyForm = (props) => {
         entry={entry && canEditRecord}
         preview={preview}
         canEditDef={canEditDef}
-        ItemLabelFunctionSelector={ItemLabelFunctionSelector}
       />
 
       <div className={`survey-form${className}`}>
@@ -96,7 +94,6 @@ const SurveyForm = (props) => {
             entry={entry}
             canEditDef={canEditDef}
             level={0}
-            itemLabelFunction={itemLabelFunction}
           />
         )}
 
@@ -111,7 +108,6 @@ const SurveyForm = (props) => {
           parentNode={parentNode}
           canEditDef={canEditDef}
           canEditRecord={canEditRecord}
-          itemLabelFunction={itemLabelFunction}
         />
 
         {editAllowed && hasNodeDefAddChildTo && <AddNodeDefPanel />}
