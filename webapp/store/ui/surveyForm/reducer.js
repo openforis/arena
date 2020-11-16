@@ -7,9 +7,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SystemActions } from '@webapp/store/system'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
-import { RecordActions } from '@webapp/store/ui/record'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { RecordActions } from '../record'
 
+import * as SurveyFormActions from './actions'
 import * as SurveyFormState from './state'
 
 const actionHandlers = {
@@ -38,6 +38,8 @@ const actionHandlers = {
   [SurveyFormActions.formExpandedPageNavigationUpdate]: (state, { expandedPageNavigation }) =>
     SurveyFormState.setExpandedPageNavigation(expandedPageNavigation)(state),
 
+  [SurveyFormActions.formToggleNodeDefLabelFunction]: (state, { nodeDefLabelFunction }) =>
+    SurveyFormState.setNodeDefLabelFunction(nodeDefLabelFunction)(state),
   // Node def actions
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 

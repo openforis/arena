@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
+import { useDispatch, useSelector } from 'react-redux'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
 
 const labelTypesKeys = {
   byName: 'byName',
@@ -22,22 +24,23 @@ const labelTypes = ({ i18n }) => [
 export const useLabelFunctionSelector = () => {
   const i18n = useI18n()
 
-  const [showByName, setShowByName] = useState(false)
+  const dispatch = useDispatch()
+
+  const nodeDefLabelFunction = useSelector(SurveyFormState.nodeDefLabelFunction)
 
   const toggleByName = () => {
-    setShowByName(!showByName)
+    dispatch(SurveyFormActions.toggleNodeDefLabelFunction())
   }
 
   return {
     ItemLabelFunctionSelector: () => (
       <ButtonGroup
-        selectedItemKey={showByName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
+        selectedItemKey={nodeDefLabelFunction === NodeDef.getName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
         onChange={toggleByName}
         items={labelTypes({ i18n })}
       />
     ),
-    showByName,
     toggleByName,
-    itemLabelFunction: showByName ? NodeDef.getName : NodeDef.getLabel,
+    itemLabelFunction: nodeDefLabelFunction,
   }
 }

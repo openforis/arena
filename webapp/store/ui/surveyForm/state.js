@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
-import { RecordState } from '@webapp/store/ui/record'
+import * as RecordState from '../record/state'
 
 import * as UiState from '../state'
 
@@ -19,6 +19,7 @@ const keys = {
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
   expandedPageNavigation: 'expandedPageNavigation',
+  nodeDefLabelFunction: 'nodeDefLabelFunction', // NodeDef label function
 }
 
 // ====== nodeDefUuidPage
@@ -91,6 +92,11 @@ export const setShowPageNavigation = (value) => R.assoc(keys.showPageNavigation,
 export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, false)
 
 export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
+
+// ============ Form nodeDef label Function
+export const nodeDefLabelFunction = getStateProp(keys.nodeDefLabelFunction, NodeDef.getLabel)
+
+export const setNodeDefLabelFunction = (value) => R.assoc(keys.nodeDefLabelFunction, NodeDef[value])
 
 // ====== NodeDef update actions
 

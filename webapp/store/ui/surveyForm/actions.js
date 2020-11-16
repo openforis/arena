@@ -8,12 +8,12 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { I18nState } from '@webapp/store/system'
-import { SurveyState } from '@webapp/store/survey'
-import { RecordState } from '@webapp/store/ui/record'
+import { SurveyState } from '../../survey'
+import * as RecordState from '../record/state'
 import * as SurveyFormState from './state'
 
 /**
- * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
+ * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT.
  */
 
 export const formReset = 'survey/form/reset'
@@ -44,12 +44,23 @@ export const toggleFormPageNavigation = () => (dispatch, getState) => {
   dispatch({ type: formShowPageNavigationUpdate, showPageNavigation })
 }
 
-// Toggle from page navigation expanded
+// Toggle form page navigation expanded
 export const formExpandedPageNavigationUpdate = 'survey/form/expandedPageNavigation/update'
 
 export const toggleExpandedFormPageNavigation = () => (dispatch, getState) => {
   const expandedPageNavigation = !SurveyFormState.expandedPageNavigation(getState())
   dispatch({ type: formExpandedPageNavigationUpdate, expandedPageNavigation })
+}
+
+// toggle form nodeDef label function
+export const formToggleNodeDefLabelFunction = 'survey/form/toggleNodeDefLabelFunction/update'
+export const toggleNodeDefLabelFunction = () => (dispatch, getState) => {
+  const nodeDefLabelFunction = SurveyFormState.nodeDefLabelFunction(getState())
+
+  dispatch({
+    type: formToggleNodeDefLabelFunction,
+    nodeDefLabelFunction: nodeDefLabelFunction === NodeDef.getLabel ? 'getName' : 'getLabel',
+  })
 }
 
 // ==== utils
