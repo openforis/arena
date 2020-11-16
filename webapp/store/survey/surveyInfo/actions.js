@@ -2,8 +2,8 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { LoaderActions } from '../../ui/loader'
-import { NotificationActions } from '../../ui/notification'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+
 import * as SurveyActions from '../actions'
 import * as SurveyState from '../state'
 

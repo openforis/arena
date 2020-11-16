@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as RecordState from '../record/state'
+import { RecordState } from '@webapp/store/ui/record'
 
 import * as UiState from '../state'
 import { I18nState } from '@webapp/store/system'
@@ -100,7 +100,7 @@ export const getNodeDefDisplayType = getStateProp(keys.nodeDefDisplayType, NodeD
 
 export const setNodeDefDisplayType = (value) => R.assoc(keys.nodeDefDisplayType, value)
 
-export const getNodeDefLabel = (state) => (nodeDef) => {
+export const getNodeDefDisplayLabel = (state) => (nodeDef) => {
   const surveyInfo = getSurveyInfo(state)
   const langApp = I18nState.getLang(state)
   const langSurvey = Survey.getLanguage(langApp)(surveyInfo)

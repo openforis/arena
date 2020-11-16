@@ -9,9 +9,8 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { DialogConfirmActions } from '../../ui/dialogConfirm'
-import { NotificationActions } from '../../ui/notification'
-import { I18nState } from '../../system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { I18nState } from '@webapp/store/system'
 
 import * as SurveyState from '../state'
 
