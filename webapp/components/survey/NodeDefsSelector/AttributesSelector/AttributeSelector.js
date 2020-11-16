@@ -1,11 +1,9 @@
 import './AttributeSelector.scss'
 import React from 'react'
-import { useSelector } from 'react-redux'
 import * as PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { SurveyFormState } from '@webapp/store/ui'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
@@ -19,13 +17,13 @@ const AttributeSelector = (props) => {
     nodeDefContext,
     onToggleAttribute,
     showMultipleAttributes,
+    itemLabelFunction,
   } = props
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
-  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
   const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
@@ -54,12 +52,14 @@ AttributeSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.array.isRequired,
   onToggleAttribute: PropTypes.func.isRequired,
   showMultipleAttributes: PropTypes.bool,
+  itemLabelFunction: PropTypes.func,
 }
 
 AttributeSelector.defaultProps = {
   canSelectAttributes: true,
   filterTypes: [],
   showMultipleAttributes: true,
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default AttributeSelector

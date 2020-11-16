@@ -1,43 +1,31 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
-
-import ButtonGroup from '@webapp/components/form/buttonGroup'
-import { useDispatch, useSelector } from 'react-redux'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
 
 const labelTypesKeys = {
   byName: 'byName',
   byLabel: 'byLabel',
 }
-const labelTypes = ({ i18n }) => [
-  {
-    key: labelTypesKeys.byName,
-    label: i18n.t(`common.${labelTypesKeys.byName}`),
-  },
-  {
-    key: labelTypesKeys.byLabel,
-    label: i18n.t(`common.${labelTypesKeys.byLabel}`),
-  },
-]
 
-const ItemLabelFunctionSelector = () => {
+const ItemLabelFunctionSelector = ({ onChange, itemLabelFunction }) => {
   const i18n = useI18n()
-  const dispatch = useDispatch()
-
-  const nodeDefLabelFunction = useSelector(SurveyFormState.nodeDefLabelFunction)
-
-  const toggleLabelFunction = () => {
-    dispatch(SurveyFormActions.toggleNodeDefLabelFunction())
-  }
 
   return (
-    <ButtonGroup
-      selectedItemKey={nodeDefLabelFunction === NodeDef.getName ? labelTypesKeys.byName : labelTypesKeys.byLabel}
-      onChange={toggleLabelFunction}
-      items={labelTypes({ i18n })}
-    />
+    <button type="button" onClick={onChange}>
+      {i18n.t(`common.${itemLabelFunction === NodeDef.getName ? labelTypesKeys.byName : labelTypesKeys.byLabel}`)}
+    </button>
   )
+}
+
+ItemLabelFunctionSelector.propTypes = {
+  onChange: PropTypes.func,
+  itemLabelFunction: PropTypes.func,
+}
+
+ItemLabelFunctionSelector.defaultProps = {
+  onChange: () => {},
+  itemLabelFunction: NodeDef.getLabel,
 }
 
 export default ItemLabelFunctionSelector

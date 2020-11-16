@@ -98,7 +98,7 @@ export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNav
 // ============ Form nodeDef label Function
 export const nodeDefLabelFunction = getStateProp(keys.nodeDefLabelFunction, NodeDef.getLabel)
 
-export const setNodeDefLabelFunction = (value) => R.assoc(keys.nodeDefLabelFunction, NodeDef[value])
+export const setNodeDefLabelFunction = (value) => R.assoc(keys.nodeDefLabelFunction, value)
 
 export const getNodeDefLabel = (state) => (nodeDef) => {
   const surveyInfo = getSurveyInfo(state)

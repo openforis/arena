@@ -1,7 +1,7 @@
 import './formHeader.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -33,6 +33,12 @@ const FormHeader = (props) => {
 
   const i18n = useI18n()
   const history = useHistory()
+  const dispatch = useDispatch()
+  const itemLabelFunction = useSelector(SurveyFormState.nodeDefLabelFunction)
+
+  const toggleLabelFunction = () => {
+    dispatch(SurveyFormActions.toggleNodeDefLabelFunction())
+  }
 
   return (
     <div className="survey-form-header">
@@ -73,7 +79,7 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        <ItemLabelFunctionSelector />
+        <ItemLabelFunctionSelector itemLabelFunction={itemLabelFunction} onChange={toggleLabelFunction} />
       </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>

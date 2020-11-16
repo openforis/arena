@@ -59,7 +59,7 @@ export const toggleNodeDefLabelFunction = () => (dispatch, getState) => {
 
   dispatch({
     type: formToggleNodeDefLabelFunction,
-    nodeDefLabelFunction: nodeDefLabelFunction === NodeDef.getLabel ? 'getName' : 'getLabel',
+    nodeDefLabelFunction: nodeDefLabelFunction === NodeDef.getLabel ? NodeDef.getName : NodeDef.getLabel,
   })
 }
 
