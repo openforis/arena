@@ -55,6 +55,10 @@ export const useLocalState = (props) => {
     setState(State.assocActive(active))
   }, [active])
 
+  useOnUpdate(() => {
+    setState(State.assocParentNode(parentNode))
+  }, [parentNode])
+
   return {
     state,
     setState,
