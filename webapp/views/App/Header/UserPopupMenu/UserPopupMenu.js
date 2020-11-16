@@ -28,7 +28,7 @@ const UserPopupMenu = (props) => {
 
   useEffect(() => {
     const onClickListener = (e) => {
-      if (clickedOutside(elementRef.current, e)) {
+      if (elementRef.current && clickedOutside(elementRef.current, e)) {
         onClose()
       }
     }
