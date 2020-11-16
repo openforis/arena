@@ -9,7 +9,7 @@ import InputChips from '@webapp/components/form/InputChips'
 import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 
 const LanguagesEditor = (props) => {
-  const { languages, setLanguages, readOnly } = props
+  const { idInput, languages, setLanguages, readOnly } = props
 
   const selection = languages.map((lang) => ({
     key: lang,
@@ -20,9 +20,12 @@ const LanguagesEditor = (props) => {
 
   return (
     <div className="form-item">
-      <label className="form-label">{i18n.t('languagesEditor.languages')}</label>
+      <label className="form-label" htmlFor={idInput}>
+        {i18n.t('languagesEditor.languages')}
+      </label>
 
       <InputChips
+        idInput={idInput}
         items={appLanguages}
         selection={selection}
         onChange={(items) => {
@@ -36,9 +39,14 @@ const LanguagesEditor = (props) => {
 }
 
 LanguagesEditor.propTypes = {
+  idInput: PropTypes.string,
   languages: PropTypes.array.isRequired,
   setLanguages: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
+}
+
+LanguagesEditor.defaultProps = {
+  idInput: null,
 }
 
 export default LanguagesEditor

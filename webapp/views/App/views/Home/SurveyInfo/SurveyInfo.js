@@ -49,7 +49,7 @@ const SurveyInfo = () => {
             {i18n.t('common.name')}
           </label>
           <Input
-            id="survey-info-name"
+            id="survey-name"
             value={name}
             validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
@@ -57,9 +57,16 @@ const SurveyInfo = () => {
           />
         </div>
 
-        <LabelsEditor readOnly={readOnly} languages={languages} labels={labels} onChange={setLabels} />
+        <LabelsEditor
+          inputFieldIdPrefix="survey-label"
+          readOnly={readOnly}
+          languages={languages}
+          labels={labels}
+          onChange={setLabels}
+        />
 
         <LabelsEditor
+          inputFieldIdPrefix="survey-description"
           readOnly={readOnly}
           formLabelKey="common.description"
           languages={languages}
@@ -67,7 +74,12 @@ const SurveyInfo = () => {
           onChange={setDescriptions}
         />
 
-        <LanguagesEditor readOnly={readOnly} languages={languages} setLanguages={setLanguages} />
+        <LanguagesEditor
+          idInput="survey-language"
+          readOnly={readOnly}
+          languages={languages}
+          setLanguages={setLanguages}
+        />
 
         <div className="form-item">
           <label className="form-label" htmlFor="survey-info-srs">
