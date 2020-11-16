@@ -24,7 +24,7 @@ const NodeDefsSelector = (props) => {
     showMultipleAttributes,
     onChangeAttributes,
     onChangeEntity,
-    itemLabelFunction,
+    nodeDefDisplayType,
   } = props
 
   const i18n = useI18n()
@@ -48,7 +48,7 @@ const NodeDefsSelector = (props) => {
         lang={lang}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
-        itemLabelFunction={itemLabelFunction}
+        nodeDefDisplayType={nodeDefDisplayType}
       />
 
       <button
@@ -95,7 +95,7 @@ const NodeDefsSelector = (props) => {
           canSelectAttributes={canSelectAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
-          itemLabelFunction={itemLabelFunction}
+          nodeDefDisplayType={nodeDefDisplayType}
         />
       )}
     </div>
@@ -111,7 +111,7 @@ NodeDefsSelector.propTypes = {
   showMultipleAttributes: PropTypes.bool,
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
-  itemLabelFunction: PropTypes.func,
+  nodeDefDisplayType: PropTypes.func,
 }
 
 NodeDefsSelector.defaultProps = {
@@ -123,7 +123,7 @@ NodeDefsSelector.defaultProps = {
   showMultipleAttributes: true,
   onChangeEntity: () => {},
   onChangeAttributes: () => {},
-  itemLabelFunction: NodeDef.getLabel(),
+  nodeDefDisplayType: NodeDef.getLabel(),
 }
 
 export default NodeDefsSelector

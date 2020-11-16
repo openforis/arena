@@ -17,7 +17,7 @@ const AttributeSelector = (props) => {
     nodeDefContext,
     onToggleAttribute,
     showMultipleAttributes,
-    itemLabelFunction,
+    nodeDefDisplayType,
   } = props
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
@@ -36,7 +36,7 @@ const AttributeSelector = (props) => {
         onClick={() => onToggleAttribute(nodeDefUuid)}
         disabled={!canSelectAttributes}
       >
-        {itemLabelFunction(nodeDef, lang)}
+        {nodeDefDisplayType(nodeDef, lang)}
         {NodeDefUIProps.getIconByType(nodeDefType)}
       </button>
     )
@@ -52,14 +52,14 @@ AttributeSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.array.isRequired,
   onToggleAttribute: PropTypes.func.isRequired,
   showMultipleAttributes: PropTypes.bool,
-  itemLabelFunction: PropTypes.func,
+  nodeDefDisplayType: PropTypes.func,
 }
 
 AttributeSelector.defaultProps = {
   canSelectAttributes: true,
   filterTypes: [],
   showMultipleAttributes: true,
-  itemLabelFunction: NodeDef.getLabel,
+  nodeDefDisplayType: NodeDef.getLabel,
 }
 
 export default AttributeSelector

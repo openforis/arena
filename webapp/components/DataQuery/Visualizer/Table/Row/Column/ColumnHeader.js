@@ -29,7 +29,7 @@ const ColumnHeader = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyLang()
-  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
+  const getNodeDefLabel = useSelector(SurveyFormState.getNodeDefLabel)
 
   const {
     modeEdit,
@@ -47,7 +47,7 @@ const ColumnHeader = (props) => {
   })
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefLabel = itemLabelFunction(nodeDef, lang)
+  const nodeDefLabel = getNodeDefLabel(nodeDef, lang)
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 

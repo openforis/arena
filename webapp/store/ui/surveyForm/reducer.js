@@ -38,8 +38,8 @@ const actionHandlers = {
   [SurveyFormActions.formExpandedPageNavigationUpdate]: (state, { expandedPageNavigation }) =>
     SurveyFormState.setExpandedPageNavigation(expandedPageNavigation)(state),
 
-  [SurveyFormActions.formToggleNodeDefLabelFunction]: (state, { nodeDefLabelFunction }) =>
-    SurveyFormState.setNodeDefLabelFunction(nodeDefLabelFunction)(state),
+  [SurveyFormActions.formUpdateNodeDefDisplayType]: (state, { nodeDefDisplayType }) =>
+    SurveyFormState.setNodeDefDisplayType(nodeDefDisplayType)(state),
   // Node def actions
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 

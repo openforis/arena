@@ -13,7 +13,7 @@ import { State, useLocalState, useActions } from './store'
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
   const Actions = useActions({ setState })
-  const itemLabelFunction = useSelector(SurveyFormState.getNodeDefLabel)
+  const getNodeDefLabel = useSelector(SurveyFormState.getNodeDefLabel)
 
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
@@ -23,7 +23,7 @@ const FormPageNavigation = (props) => {
   const active = State.isActive(state)
   const enabled = State.isEnabled(state)
   const edit = State.isEdit(state)
-  const label = itemLabelFunction(State.getNodeDef(state))
+  const label = getNodeDefLabel(State.getNodeDef(state))
   const canEditDef = State.canEditDef(state)
   const surveyCycleKey = State.getSurveyCycleKey(state)
 

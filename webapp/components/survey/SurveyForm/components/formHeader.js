@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import ItemLabelFunctionSelector from '@webapp/components/survey/ItemLabelFunctionSelector'
+import NodeDefDisplayTypeSelector from '@webapp/components/survey/NodeDefDisplayTypeSelector'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
@@ -34,10 +34,10 @@ const FormHeader = (props) => {
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
-  const itemLabelFunction = useSelector(SurveyFormState.nodeDefLabelFunction)
+  const nodeDefDisplayType = useSelector(SurveyFormState.getNodeDefDisplayType)
 
-  const toggleLabelFunction = () => {
-    dispatch(SurveyFormActions.toggleNodeDefLabelFunction())
+  const updateNodeDefDisplayType = () => {
+    dispatch(SurveyFormActions.updateNodeDefDisplayType())
   }
 
   return (
@@ -79,7 +79,7 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        <ItemLabelFunctionSelector itemLabelFunction={itemLabelFunction} onChange={toggleLabelFunction} />
+        <NodeDefDisplayTypeSelector nodeDefDisplayType={nodeDefDisplayType} onChange={updateNodeDefDisplayType} />
       </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>

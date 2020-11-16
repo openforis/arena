@@ -22,7 +22,7 @@ const AttributesSelector = (props) => {
     showAncestorsLabel,
     showLabel,
     showMultipleAttributes,
-    itemLabelFunction,
+    nodeDefDisplayType,
   } = props
 
   const survey = useSurvey()
@@ -50,7 +50,7 @@ const AttributesSelector = (props) => {
             nodeDefContext={nodeDefContext}
             onToggleAttribute={onToggleAttribute}
             showMultipleAttributes={showMultipleAttributes}
-            itemLabelFunction={itemLabelFunction}
+            nodeDefDisplayType={nodeDefDisplayType}
           />
         ))}
       </ExpansionPanel>
@@ -66,7 +66,7 @@ const AttributesSelector = (props) => {
           showLabel={showAncestorsLabel}
           showAncestorsLabel={showAncestorsLabel}
           showMultipleAttributes={showMultipleAttributes}
-          itemLabelFunction={itemLabelFunction}
+          nodeDefDisplayType={nodeDefDisplayType}
         />
       )}
     </div>
@@ -84,7 +84,7 @@ AttributesSelector.propTypes = {
   showLabel: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
-  itemLabelFunction: PropTypes.func,
+  nodeDefDisplayType: PropTypes.func,
 }
 
 AttributesSelector.defaultProps = {
@@ -96,7 +96,7 @@ AttributesSelector.defaultProps = {
   showAncestorsLabel: true,
   showLabel: false,
   showMultipleAttributes: true,
-  itemLabelFunction: NodeDef.getLabel,
+  nodeDefDisplayType: NodeDef.getLabel,
 }
 
 export default AttributesSelector
