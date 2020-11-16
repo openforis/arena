@@ -31,6 +31,7 @@ export default class Tree {
 
     this.rootG = null
     this.resizeObserver = null
+    this.itemLabelFunction = NodeDef.getLabel
 
     this.initSvg()
   }
@@ -186,7 +187,7 @@ export default class Tree {
     grid
       .append('xhtml:a')
       .on('click', (_, d) => this.onEntityClick(d.data.uuid))
-      .text((d) => NodeDef.getLabel(d.data, this.lang))
+      .text((d) => this.itemLabelFunction(d.data, this.lang))
 
     grid
       .append('xhtml:button')
@@ -295,5 +296,6 @@ export default class Tree {
       .selectAll('.node-grid')
       .selectAll('a')
       .text((d) => itemLabelFunction(d.data, this.lang))
+    this.itemLabelFunction = itemLabelFunction
   }
 }
