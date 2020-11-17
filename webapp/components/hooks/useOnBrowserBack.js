@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useHistory } from 'react-router'
 
 /**
@@ -13,6 +13,14 @@ import { useHistory } from 'react-router'
 export const useOnBrowserBack = (params) => {
   const { active = false, onBack } = params
 
+  // use a ref to know if the temporary location has been set to avoid going back too many times
+  const tempLocationSetRef = useRef(false)
+
+  const pushTempLocation = (history) => {
+    history.push(history.location.pathname, null)
+    tempLocationSetRef.current = true
+  }
+
   const history = useHistory()
 
   const onBackButtonEvent = async (event) => {
@@ -21,18 +29,17 @@ export const useOnBrowserBack = (params) => {
     if (active) {
       const wentBack = await onBack()
       if (!wentBack) {
-        history.push(history.location.pathname, null)
+        pushTempLocation(history)
       }
-    } else {
+    } else if (tempLocationSetRef.current) {
+      tempLocationSetRef.current = false
       history.goBack()
     }
   }
 
   useEffect(() => {
-    // Push a "null" state to detect back button press
-    const { location } = history
-    if (location.state !== null) {
-      history.push(location.pathname, null)
+    if (!tempLocationSetRef.current) {
+      pushTempLocation(history)
     }
     window.addEventListener('popstate', onBackButtonEvent)
 

@@ -10,6 +10,7 @@ import Chip from './Chip'
 
 const InputChips = (props) => {
   const {
+    idInput,
     items,
     itemKey,
     itemLabel,
@@ -47,6 +48,7 @@ const InputChips = (props) => {
 
       {!readOnly && (
         <Dropdown
+          idInput={idInput}
           items={Actions.rejectSelectedItems({ selection, state, items })}
           itemKey={State.getItemKey(state)}
           itemLabel={State.getItemLabel(state)}
@@ -63,6 +65,8 @@ const InputChips = (props) => {
 }
 
 InputChips.propTypes = {
+  idInput: PropTypes.string,
+
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -80,6 +84,8 @@ InputChips.propTypes = {
 }
 
 InputChips.defaultProps = {
+  idInput: null,
+
   itemLabel: 'value',
   itemKey: 'key',
   selection: [],
