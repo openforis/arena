@@ -93,9 +93,9 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-  const nodeDefdisplayType = SurveyFormState.getNodeDefDisplayType(state)
+  const nodeDefLabelType = SurveyFormState.getNodeDefLabelType(state)
   const lang = SurveyState.getSurveyDefaultLang(state)
-  const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefdisplayType })
+  const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isRoot(nodeDef)

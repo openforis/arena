@@ -53,14 +53,14 @@ export const toggleExpandedFormPageNavigation = () => (dispatch, getState) => {
 }
 
 // toggle form nodeDef label function
-export const formUpdateNodeDefDisplayType = 'survey/form/updateNodeDefDisplayType/update'
-export const updateNodeDefDisplayType = () => (dispatch, getState) => {
-  const nodeDefDisplayType = SurveyFormState.getNodeDefDisplayType(getState())
+export const formUpdateNodeDefLabelType = 'survey/form/updateNodeDefLabelType/update'
+export const updateNodeDefLabelType = () => (dispatch, getState) => {
+  const nodeDefLabelType = SurveyFormState.getNodeDefLabelType(getState())
 
   dispatch({
-    type: formUpdateNodeDefDisplayType,
-    nodeDefDisplayType:
-      nodeDefDisplayType === NodeDef.NodeDefLabelTypes.label
+    type: formUpdateNodeDefLabelType,
+    nodeDefLabelType:
+      nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
         ? NodeDef.NodeDefLabelTypes.name
         : NodeDef.NodeDefLabelTypes.label,
   })

@@ -34,7 +34,7 @@ export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurve
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
 
 export const useNodeDefLabelByType = (nodeDef) =>
-  NodeDef.getLabelWithType({ nodeDef, type: useSelector(SurveyFormState.getNodeDefDisplayType), lang: useSurveyLang() })
+  NodeDef.getLabelWithType({ nodeDef, type: useSelector(SurveyFormState.getNodeDefLabelType), lang: useSurveyLang() })
 
 // ==== Categories
 export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())

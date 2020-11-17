@@ -5,14 +5,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 
-const NodeDefLabelSwitch = ({ onChange, displayType }) => {
+const NodeDefLabelSwitch = ({ onChange, labelType }) => {
   const i18n = useI18n()
 
   return (
     <button type="button" onClick={onChange}>
       {i18n.t(
         `displayBy.${
-          displayType === NodeDef.NodeDefLabelTypes.label
+          labelType === NodeDef.NodeDefLabelTypes.label
             ? NodeDef.NodeDefLabelTypes.name
             : NodeDef.NodeDefLabelTypes.label
         }`
@@ -23,12 +23,12 @@ const NodeDefLabelSwitch = ({ onChange, displayType }) => {
 
 NodeDefLabelSwitch.propTypes = {
   onChange: PropTypes.func,
-  displayType: PropTypes.func,
+  labelType: PropTypes.func,
 }
 
 NodeDefLabelSwitch.defaultProps = {
   onChange: () => {},
-  displayType: NodeDef.NodeDefLabelTypes.label,
+  labelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default NodeDefLabelSwitch

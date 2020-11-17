@@ -21,7 +21,7 @@ const keys = {
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
   expandedPageNavigation: 'expandedPageNavigation',
-  nodeDefDisplayType: 'nodeDefDisplayType', // NodeDef label function
+  nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
 }
 
 // ====== nodeDefUuidPage
@@ -96,9 +96,9 @@ export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, 
 export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
 
 // ============ Form nodeDef label Function
-export const getNodeDefDisplayType = getStateProp(keys.nodeDefDisplayType, NodeDef.NodeDefLabelTypes.label)
+export const getNodeDefLabelType = getStateProp(keys.nodeDefLabelType, NodeDef.NodeDefLabelTypes.label)
 
-export const setNodeDefDisplayType = (value) => R.assoc(keys.nodeDefDisplayType, value)
+export const setNodeDefLabelType = (value) => R.assoc(keys.nodeDefLabelType, value)
 
 // ====== NodeDef update actions
 

@@ -34,10 +34,10 @@ const FormHeader = (props) => {
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
-  const nodeDefDisplayType = useSelector(SurveyFormState.getNodeDefDisplayType)
+  const nodeDefLabelType = useSelector(SurveyFormState.getNodeDefLabelType)
 
-  const updateNodeDefDisplayType = () => {
-    dispatch(SurveyFormActions.updateNodeDefDisplayType())
+  const updateNodeDefLabelType = () => {
+    dispatch(SurveyFormActions.updateNodeDefLabelType())
   }
 
   return (
@@ -79,7 +79,7 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        <NodeDefLabelSwitch displayType={nodeDefDisplayType} onChange={updateNodeDefDisplayType} />
+        <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={updateNodeDefLabelType} />
       </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>

@@ -22,7 +22,7 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
-  const [nodeDefDisplayType, setNodeDefDisplayType] = useState(NodeDef.NodeDefLabelTypes.label)
+  const [nodeDefLabelType, setNodeDefLabelType] = useState(NodeDef.NodeDefLabelTypes.label)
 
   const treeRef = useRef(null)
 
@@ -36,12 +36,12 @@ const SurveyHierarchy = () => {
   }, [tree])
 
   useEffect(() => {
-    tree?.changeNodeDefDisplayType(nodeDefDisplayType)
-  }, [nodeDefDisplayType, tree])
+    tree?.changeNodeDefLabelType(nodeDefLabelType)
+  }, [nodeDefLabelType, tree])
 
   const toggleLabelFunction = () => {
-    setNodeDefDisplayType(
-      nodeDefDisplayType === NodeDef.NodeDefLabelTypes.label
+    setNodeDefLabelType(
+      nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
         ? NodeDef.NodeDefLabelTypes.name
         : NodeDef.NodeDefLabelTypes.label
     )
@@ -61,11 +61,11 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
-          nodeDefDisplayType={nodeDefDisplayType}
+          nodeDefLabelType={nodeDefLabelType}
         />
       </div>
       <div className="survey-hierarchy__label-selector">
-        <NodeDefLabelSwitch displayType={nodeDefDisplayType} onChange={toggleLabelFunction} />
+        <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
       </div>
     </div>
   )
