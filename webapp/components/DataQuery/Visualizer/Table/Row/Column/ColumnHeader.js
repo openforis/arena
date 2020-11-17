@@ -44,7 +44,7 @@ const ColumnHeader = (props) => {
   })
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefLabel = NodeDef.getLabelWithType({ nodeDef, lang })
+  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 

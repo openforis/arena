@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
+import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 

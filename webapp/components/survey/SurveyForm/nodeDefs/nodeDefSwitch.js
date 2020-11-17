@@ -55,7 +55,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const { surveyCycleKey, nodeDef, edit, canEditDef, renderType, applicable, label } = this.props
+    const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
 
     const className =
       'survey-form__node-def-page' +
@@ -93,7 +93,9 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-  const label = SurveyFormState.getNodeDefDisplayLabel(state)(nodeDef)
+  const nodeDefdisplayType = SurveyFormState.getNodeDefDisplayType(state)
+  const lang = SurveyState.getSurveyDefaultLang(state)
+  const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefdisplayType })
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isRoot(nodeDef)

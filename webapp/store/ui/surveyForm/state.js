@@ -100,14 +100,6 @@ export const getNodeDefDisplayType = getStateProp(keys.nodeDefDisplayType, NodeD
 
 export const setNodeDefDisplayType = (value) => R.assoc(keys.nodeDefDisplayType, value)
 
-export const getNodeDefDisplayLabel = (state) => (nodeDef) => {
-  const surveyInfo = getSurveyInfo(state)
-  const langApp = I18nState.getLang(state)
-  const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
-  const nodeDefDisplayType = getNodeDefDisplayType(state)
-  return NodeDef.getLabelWithType({ nodeDef, lang: langSurvey, type: nodeDefDisplayType })
-}
-
 // ====== NodeDef update actions
 
 // On nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
