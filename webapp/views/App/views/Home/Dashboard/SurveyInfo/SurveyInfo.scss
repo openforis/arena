@@ -1,7 +1,29 @@
 @import 'webapp/style/vars';
 
 .home-dashboard__survey-info {
-  padding: 2rem;
+  padding: 1rem 2rem 1rem 1rem;
+
+  header h3 {
+    position: relative;
+    max-height: 55px;
+    overflow: hidden;
+    padding-right: 1rem; /* space for ellipsis */
+  }
+
+  header h3::before {
+    position: absolute;
+    content: '...';
+    bottom: -5px;
+    right: 0;
+  }
+
+  header h3::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 1rem;
+    height: 1rem;
+  }
 
   .survey-status {
     font-size: 0.7rem;
