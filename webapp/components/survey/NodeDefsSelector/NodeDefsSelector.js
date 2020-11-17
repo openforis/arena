@@ -111,7 +111,7 @@ NodeDefsSelector.propTypes = {
   showMultipleAttributes: PropTypes.bool,
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
-  nodeDefDisplayType: PropTypes.func,
+  nodeDefDisplayType: PropTypes.string,
 }
 
 NodeDefsSelector.defaultProps = {
@@ -123,7 +123,7 @@ NodeDefsSelector.defaultProps = {
   showMultipleAttributes: true,
   onChangeEntity: () => {},
   onChangeAttributes: () => {},
-  nodeDefDisplayType: NodeDef.getLabel(),
+  nodeDefDisplayType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default NodeDefsSelector

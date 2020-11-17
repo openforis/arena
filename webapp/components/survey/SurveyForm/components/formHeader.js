@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import NodeDefDisplayTypeSelector from '@webapp/components/survey/DisplayTypeSelector'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
@@ -79,7 +79,7 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        <NodeDefDisplayTypeSelector displayType={nodeDefDisplayType} onChange={updateNodeDefDisplayType} />
+        <NodeDefLabelSwitch displayType={nodeDefDisplayType} onChange={updateNodeDefDisplayType} />
       </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>

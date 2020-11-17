@@ -59,7 +59,10 @@ export const updateNodeDefDisplayType = () => (dispatch, getState) => {
 
   dispatch({
     type: formUpdateNodeDefDisplayType,
-    nodeDefDisplayType: nodeDefDisplayType === NodeDef.getLabel ? NodeDef.getName : NodeDef.getLabel,
+    nodeDefDisplayType:
+      nodeDefDisplayType === NodeDef.NodeDefLabelTypes.label
+        ? NodeDef.NodeDefLabelTypes.name
+        : NodeDef.NodeDefLabelTypes.label,
   })
 }
 

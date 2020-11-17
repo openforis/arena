@@ -84,7 +84,7 @@ AttributesSelector.propTypes = {
   showLabel: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
-  nodeDefDisplayType: PropTypes.func,
+  nodeDefDisplayType: PropTypes.string,
 }
 
 AttributesSelector.defaultProps = {
@@ -96,7 +96,7 @@ AttributesSelector.defaultProps = {
   showAncestorsLabel: true,
   showLabel: false,
   showMultipleAttributes: true,
-  nodeDefDisplayType: NodeDef.getLabel,
+  nodeDefDisplayType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default AttributesSelector

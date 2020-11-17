@@ -96,7 +96,7 @@ export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, 
 export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
 
 // ============ Form nodeDef label Function
-export const getNodeDefDisplayType = getStateProp(keys.nodeDefDisplayType, NodeDef.getLabel)
+export const getNodeDefDisplayType = getStateProp(keys.nodeDefDisplayType, NodeDef.NodeDefLabelTypes.label)
 
 export const setNodeDefDisplayType = (value) => R.assoc(keys.nodeDefDisplayType, value)
 
@@ -105,7 +105,7 @@ export const getNodeDefDisplayLabel = (state) => (nodeDef) => {
   const langApp = I18nState.getLang(state)
   const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
   const nodeDefDisplayType = getNodeDefDisplayType(state)
-  return nodeDefDisplayType(nodeDef, langSurvey)
+  return NodeDef.getLabelWithType({ nodeDef, lang: langSurvey, type: nodeDefDisplayType })
 }
 
 // ====== NodeDef update actions

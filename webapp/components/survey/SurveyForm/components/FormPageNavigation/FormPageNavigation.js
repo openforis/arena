@@ -8,12 +8,16 @@ import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { getLabelWithType } from '@core/survey/nodeDef'
+import { useLang } from '@webapp/store/system'
+
 import { State, useLocalState, useActions } from './store'
 
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
+  const lang = useLang()
   const Actions = useActions({ setState })
-  const getNodeDefDisplayLabel = useSelector(SurveyFormState.getNodeDefDisplayLabel)
+  const nodeDefDisplayType = useSelector(SurveyFormState.getNodeDefDisplayType)
 
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
@@ -23,7 +27,8 @@ const FormPageNavigation = (props) => {
   const active = State.isActive(state)
   const enabled = State.isEnabled(state)
   const edit = State.isEdit(state)
-  const label = getNodeDefDisplayLabel(State.getNodeDef(state))
+
+  const label = getLabelWithType({ nodeDef: State.getNodeDef(state), lang, type: nodeDefDisplayType })
   const canEditDef = State.canEditDef(state)
   const surveyCycleKey = State.getSurveyCycleKey(state)
 

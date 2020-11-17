@@ -13,7 +13,7 @@ const getDropdownItems = (hierarchy, lang, nodeDefDisplayType) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    const label = nodeDefDisplayType(nodeDef, lang)
+    const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefDisplayType })
     entities.push({
       key: NodeDef.getUuid(nodeDef),
       value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
@@ -49,13 +49,13 @@ EntitySelector.propTypes = {
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
-  nodeDefDisplayType: PropTypes.func,
+  nodeDefDisplayType: PropTypes.string,
 }
 
 EntitySelector.defaultProps = {
   nodeDefUuidEntity: null,
   validation: null,
-  nodeDefDisplayType: NodeDef.getLabel,
+  nodeDefDisplayType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default EntitySelector

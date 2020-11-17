@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
-import DisplayTypeSelector from '@webapp/components/survey/DisplayTypeSelector'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import Tree from './Tree'
 
@@ -22,7 +22,7 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
-  const [[nodeDefDisplayType], setNodeDefDisplayType] = useState([NodeDef.getLabel])
+  const [nodeDefDisplayType, setNodeDefDisplayType] = useState(NodeDef.NodeDefLabelTypes.label)
 
   const treeRef = useRef(null)
 
@@ -40,7 +40,11 @@ const SurveyHierarchy = () => {
   }, [nodeDefDisplayType, tree])
 
   const toggleLabelFunction = () => {
-    setNodeDefDisplayType([nodeDefDisplayType === NodeDef.getLabel ? NodeDef.getName : NodeDef.getLabel])
+    setNodeDefDisplayType(
+      nodeDefDisplayType === NodeDef.NodeDefLabelTypes.label
+        ? NodeDef.NodeDefLabelTypes.name
+        : NodeDef.NodeDefLabelTypes.label
+    )
   }
 
   return (
@@ -61,7 +65,7 @@ const SurveyHierarchy = () => {
         />
       </div>
       <div className="survey-hierarchy__label-selector">
-        <DisplayTypeSelector displayType={nodeDefDisplayType} onChange={toggleLabelFunction} />
+        <NodeDefLabelSwitch displayType={nodeDefDisplayType} onChange={toggleLabelFunction} />
       </div>
     </div>
   )
