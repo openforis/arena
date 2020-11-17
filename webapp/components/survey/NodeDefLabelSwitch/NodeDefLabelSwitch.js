@@ -23,7 +23,7 @@ const NodeDefLabelSwitch = ({ onChange, labelType }) => {
 
 NodeDefLabelSwitch.propTypes = {
   onChange: PropTypes.func,
-  labelType: PropTypes.func,
+  labelType: PropTypes.string,
 }
 
 NodeDefLabelSwitch.defaultProps = {
