@@ -57,6 +57,10 @@ export const useLocalState = (props) => {
   }, [active])
 
   useOnUpdate(() => {
+    setState(State.assocParentNode(parentNode))
+  }, [parentNode])
+
+  useOnUpdate(() => {
     setState(
       State.assocOuterPageChildDefs(
         NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(Survey.getNodeDefChildren(nodeDef)(survey))
