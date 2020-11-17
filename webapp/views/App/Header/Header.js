@@ -50,9 +50,8 @@ const Header = () => {
             <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
           ) : (
             <>
-              <div className="header__survey__title">
-                <span className="header__survey__title__label">{Survey.getLabel(surveyInfo, lang)}</span>
-                <span className="header__survey__title__name">{Survey.getName(surveyInfo)}</span>
+              <div className="header__survey-title">
+                {Survey.getName(surveyInfo)} - {Survey.getLabel(surveyInfo, lang)}
               </div>
               <CycleSelector
                 surveyInfo={surveyInfo}

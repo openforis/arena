@@ -37,21 +37,6 @@
     }
   }
 
-  &__title {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    &__label {
-      font-size: 0.9rem;
-    }
-
-    &__name {
-      font-size: 0.6rem;
-    }
-  }
-
   .progress-bar {
     width: 80px;
     height: 8px;
@@ -60,6 +45,13 @@
   .btn-publish {
     margin-left: 15px;
   }
+}
+
+.header__survey-title {
+  max-width: 50vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header__btn-user {
