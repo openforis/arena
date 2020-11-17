@@ -70,7 +70,11 @@ const Header = () => {
 
       <button
         className="header__btn-user"
-        onClick={toggleShowUserPopup}
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          toggleShowUserPopup()
+        }}
         onKeyDown={toggleShowUserPopup}
         tabIndex="0"
         type="button"

@@ -17,12 +17,13 @@ export const useLocalState = (props) => {
   const survey = useSurvey()
   const rootNodeDef = Survey.getNodeDefRoot(survey)
   const { edit, nodeDef = rootNodeDef, level, surveyCycleKey, canEditDef } = props
-  const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
+
   const parentNode = useSelector(SurveyFormState.getFormPageParentNode(nodeDef))
   const expandedFormPageNavigation = useSelector(SurveyFormState.expandedPageNavigation)
   const label = useSelector(SurveyState.getNodeDefLabel(nodeDef))
   const active = useSelector(SurveyFormState.isNodeDefFormActivePage(nodeDef))
 
+  const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
   const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   const [state, setState] = useState(() =>
@@ -58,6 +59,14 @@ export const useLocalState = (props) => {
   useOnUpdate(() => {
     setState(State.assocParentNode(parentNode))
   }, [parentNode])
+
+  useOnUpdate(() => {
+    setState(
+      State.assocOuterPageChildDefs(
+        NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(Survey.getNodeDefChildren(nodeDef)(survey))
+      )
+    )
+  }, [nodeDef, survey, surveyCycleKey])
 
   return {
     state,
