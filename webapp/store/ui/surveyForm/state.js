@@ -8,8 +8,6 @@ import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
 import * as UiState from '../state'
-import { I18nState } from '@webapp/store/system'
-import { getSurveyInfo } from '@webapp/store/survey/state'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
