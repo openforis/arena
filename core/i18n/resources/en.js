@@ -102,9 +102,10 @@ Do you want to proceed?`,
     saved: 'Saved!',
     select: 'Select',
     selected: 'Selected',
+    showLabels: 'Show labels',
+    showNames: 'Show names',
     srs: 'SRS',
     sum: 'Sum',
-
     to: 'To',
     true: 'True',
     type: 'Type',
@@ -150,11 +151,6 @@ Do you want to proceed?`,
     taxon: 'Taxon',
     file: 'File',
     entity: 'Entity',
-  },
-
-  displayBy: {
-    label: 'By label',
-    name: 'By name',
   },
 
   // ====== App modules and views

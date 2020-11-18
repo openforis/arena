@@ -1,19 +1,19 @@
 import './FormPageNavigation.scss'
-
 import React from 'react'
 import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useNodeDefLabelByType } from '@webapp/store/survey'
+import { useNodeDefLabel } from '@webapp/store/survey'
+import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
 
-import { State, useLocalState, useActions } from './store'
+import { State, useActions, useLocalState } from './store'
 
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
 
+  const label = useNodeDefLabel(State.getNodeDef(state), useNodeDefLabelType())
   const Actions = useActions({ setState })
-
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
   const isRoot = State.isRoot(state)
@@ -22,8 +22,6 @@ const FormPageNavigation = (props) => {
   const active = State.isActive(state)
   const enabled = State.isEnabled(state)
   const edit = State.isEdit(state)
-
-  const label = useNodeDefLabelByType(State.getNodeDef(state))
 
   const canEditDef = State.canEditDef(state)
   const surveyCycleKey = State.getSurveyCycleKey(state)
