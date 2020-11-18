@@ -35,6 +35,7 @@ const AttributeSelector = (props) => {
         className={`btn btn-s deselectable attribute-selector${isActive ? ' active' : ''}`}
         onClick={() => onToggleAttribute(nodeDefUuid)}
         disabled={!canSelectAttributes}
+        title={NodeDef.getLabelWithType({ nodeDef, lang, type: NodeDef.NodeDefLabelTypes.name })}
       >
         {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
         {NodeDefUIProps.getIconByType(nodeDefType)}
