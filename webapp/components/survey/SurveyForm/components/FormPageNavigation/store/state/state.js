@@ -43,8 +43,6 @@ export const create = ({
   [keys.active]: active,
   [keys.outerPageChildDefs]: outerPageChildDefs,
   [keys.showChildren]: expandedFormPageNavigation || level === 0,
-  [keys.enabled]:
-    edit || NodeDef.isRoot(nodeDef) || NodeDef.getUuid(rootNodeDef) === NodeDef.getParentUuid(nodeDef) || parentNode,
   [keys.canEditDef]: canEditDef,
   [keys.surveyCycleKey]: surveyCycleKey,
 })
@@ -52,6 +50,7 @@ export const create = ({
 // ===== READ
 
 export const getNodeDef = A.prop(keys.nodeDef)
+const getRootNodeDef = A.prop(keys.rootNodeDef)
 export const isEdit = A.prop(keys.edit)
 export const getLevel = A.prop(keys.level)
 export const getParentNode = A.prop(keys.parentNode)
@@ -64,7 +63,19 @@ export const getSurveyCycleKey = A.prop(keys.surveyCycleKey)
 
 export const isRoot = (state) => NodeDef.isRoot(getNodeDef(state))
 
-export const isEnabled = A.prop(keys.enabled)
+export const isEnabled = (state) => {
+  const edit = isEdit(state)
+  const nodeDef = getNodeDef(state)
+  const rootNodeDef = getRootNodeDef(state)
+  const parentNode = getParentNode(state)
+
+  return (
+    edit ||
+    NodeDef.isRoot(nodeDef) ||
+    NodeDef.getUuid(rootNodeDef) === NodeDef.getParentUuid(nodeDef) ||
+    Boolean(parentNode)
+  )
+}
 
 // ===== UPDATE
 
@@ -72,4 +83,5 @@ export const assocActive = (active) => A.assoc(keys.active, active)
 export const assocShowChildren = (showChildren) => A.assoc(keys.showChildren, showChildren)
 export const assocExpandedFormPageNavigation = (expandedFormPageNavigation) =>
   A.assoc(keys.expandedFormPageNavigation, expandedFormPageNavigation)
+export const assocParentNode = (parentNode) => A.assoc(keys.parentNode, parentNode)
 export const assocOuterPageChildDefs = (outerPageChildDefs) => A.assoc(keys.outerPageChildDefs, outerPageChildDefs)
