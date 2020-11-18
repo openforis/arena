@@ -9,7 +9,6 @@ const keys = {
   parentNode: 'parentNode',
   childDefs: 'childDefs',
   level: 'level',
-  label: 'label',
   active: 'active',
   isRoot: 'isRoot',
   enabled: 'enabled',
@@ -29,7 +28,6 @@ export const create = ({
   parentNode,
   childDefs,
   level,
-  label,
   active,
   expandedFormPageNavigation,
   outerPageChildDefs,
@@ -42,7 +40,6 @@ export const create = ({
   [keys.parentNode]: parentNode,
   [keys.childDefs]: childDefs,
   [keys.level]: level,
-  [keys.label]: label,
   [keys.active]: active,
   [keys.outerPageChildDefs]: outerPageChildDefs,
   [keys.showChildren]: expandedFormPageNavigation || level === 0,
@@ -61,7 +58,6 @@ export const getOuterPageChildDefs = A.prop(keys.outerPageChildDefs)
 export const getExpandedFormPageNavigation = A.prop(keys.expandedFormPageNavigation)
 export const getShowChildren = A.prop(keys.showChildren)
 export const isActive = A.prop(keys.active)
-export const getLabel = A.prop(keys.label)
 export const canEditDef = A.prop(keys.canEditDef)
 export const getSurveyCycleKey = A.prop(keys.surveyCycleKey)
 
