@@ -16,6 +16,7 @@ const Dropdown = (props) => {
     autocompleteMinChars,
     className,
     disabled,
+    idInput,
     itemLabel,
     itemKey,
     items,
@@ -58,6 +59,7 @@ const Dropdown = (props) => {
       }}
     >
       <Input
+        id={idInput}
         ref={inputRef}
         placeholder={placeholder}
         value={State.getInputValue(state) || ''}
@@ -115,6 +117,7 @@ Dropdown.propTypes = {
   autocompleteMinChars: PropTypes.number,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  idInput: PropTypes.string,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
@@ -133,6 +136,7 @@ Dropdown.defaultProps = {
   autocompleteMinChars: 0,
   className: '',
   disabled: false,
+  idInput: null,
   itemKey: 'key',
   itemLabel: 'value',
   onBeforeChange: null,

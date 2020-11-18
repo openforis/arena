@@ -1,7 +1,7 @@
 import './formHeader.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,6 +11,8 @@ import { uuidv4 } from '@core/uuid'
 import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
@@ -31,6 +33,12 @@ const FormHeader = (props) => {
 
   const i18n = useI18n()
   const history = useHistory()
+  const dispatch = useDispatch()
+  const nodeDefLabelType = useSelector(SurveyFormState.getNodeDefLabelType)
+
+  const updateNodeDefLabelType = () => {
+    dispatch(SurveyFormActions.updateNodeDefLabelType())
+  }
 
   return (
     <div className="survey-form-header">
@@ -70,6 +78,9 @@ const FormHeader = (props) => {
         )}
       </div>
 
+      <div className="survey-form-header__options">
+        <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={updateNodeDefLabelType} />
+      </div>
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )

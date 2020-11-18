@@ -41,6 +41,11 @@ export const keys = {
   virtual: 'virtual', // Virtual Entity
 }
 
+export const NodeDefLabelTypes = {
+  name: 'name',
+  label: 'label',
+}
+
 export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -128,6 +133,7 @@ export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultip
 
 export const isText = isType(nodeDefType.text)
 export const isBoolean = isType(nodeDefType.boolean)
+export const isDate = isType(nodeDefType.date)
 export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
 export const isDecimal = isType(nodeDefType.decimal)
@@ -168,10 +174,15 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang) => {
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
   let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  const name = getName(nodeDef)
+  if (type === NodeDefLabelTypes.name) {
+    return name
+  }
+
   if (StringUtils.isBlank(label)) {
-    label = getName(nodeDef)
+    label = name
   }
 
   if (isVirtual(nodeDef)) {
@@ -184,6 +195,7 @@ export const getLabel = (nodeDef, lang) => {
 
   return label
 }
+export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
 

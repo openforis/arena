@@ -18,7 +18,6 @@ export { useIsInRoute, useIsCategoriesRoute, useIsDesignerNodeDefRoute, useIsTax
 export { useOnBrowserBack } from './useOnBrowserBack'
 export { useOnPageUnload } from './useOnPageUnload'
 export { useRequest } from './useRequest'
-export { useLabelFunctionSelector } from './useLabelFunctionSelector'
 
 // rxjs hooks
 export { usePost } from './usePost'

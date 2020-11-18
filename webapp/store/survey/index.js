@@ -26,4 +26,5 @@ export {
   useNodeDefsByUuids,
   useCategoryByUuid,
   useNodeDefRootKeys,
+  useNodeDefLabelByType,
 } from './hooks'
