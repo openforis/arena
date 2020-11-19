@@ -25,7 +25,7 @@ NodeDefLabelSwitch.propTypes = {
 }
 
 NodeDefLabelSwitch.defaultProps = {
-  className: 'className',
+  className: '',
 }
 
 export default NodeDefLabelSwitch
