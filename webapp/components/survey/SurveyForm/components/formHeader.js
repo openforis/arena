@@ -40,20 +40,18 @@ const FormHeader = (props) => {
       <div className="survey-form-header__label-container">
         <button
           type="button"
-          className="btn-s survey-form-header__btn-page-toggle"
+          className="btn-s btn-transparent"
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
           title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}
         >
           <span className="icon icon-stack icon-12px icon-left" />
-          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px icon-left`} />
+          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
         </button>
-
-        <h5 id="survey-form-page-label">{nodeDefPageLabel}</h5>
 
         {edit && canEditDef && (
           <button
             type="button"
-            className="btn-s btn-transparent btn-add-sub-page"
+            className="btn-s btn-transparent"
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
@@ -65,10 +63,12 @@ const FormHeader = (props) => {
               dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, history))
             }}
           >
-            <span className="icon icon-plus icon-10px icon-left" />
+            <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('surveyForm.subPage')}
           </button>
         )}
+
+        <h5 id="survey-form-page-label">{nodeDefPageLabel}</h5>
       </div>
 
       <div className="survey-form-header__options">
