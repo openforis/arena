@@ -33,7 +33,7 @@ const FormHeader = (props) => {
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
   const showPageNavigation = useShowPageNavigation()
-  const path = usePath()
+  const path = usePath(entry)
 
   return (
     <div className="survey-form-header">
@@ -68,9 +68,11 @@ const FormHeader = (props) => {
           </button>
         )}
 
-        <div className="survey-form-header__path" id="survey-form-page-label">
-          {path}
-        </div>
+        <div
+          className="survey-form-header__path"
+          id="survey-form-page-label"
+          dangerouslySetInnerHTML={{ __html: path }}
+        />
       </div>
 
       <div className="survey-form-header__options">
