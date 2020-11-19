@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import * as Validation from '../../../core/validation/validation'
 import { mergeProps } from './mergeProps'
 
 const _assocPublishedDraft = (row) => ({
@@ -10,21 +9,22 @@ const _assocPublishedDraft = (row) => ({
   draft: !R.isEmpty(row.props_draft),
 })
 
+const _camelize = ({ skippedProps = [] }) => (obj) =>
+  Object.entries(obj).reduce((accObj, [propName, value]) => {
+    const propNameCamelCase = camelize(propName)
+    const valueTransformed = skippedProps.includes(propName) || !(value instanceof Object) ? value : camelize(value)
+    return { ...accObj, [propNameCamelCase]: valueTransformed }
+  }, {})
+
 export const transformCallback = (row, draft = false, assocPublishedDraft = false) => {
   if (R.isNil(row)) {
     return null
   }
 
-  const validation = R.ifElse(Validation.hasValidation, Validation.getValidation, R.always(null))(row)
-
   return R.pipe(
     // Assoc published and draft properties based on props
     (rowCurrent) => (assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
-    // Dissoc validation before camelize (if any)
-    R.unless(R.always(R.isNil(validation)), Validation.dissocValidation),
-    camelize,
-    mergeProps({ draft }),
-    // Assoc validation (if any)
-    R.unless(R.always(R.isNil(validation)), Validation.assocValidation(validation))
+    _camelize({ skippedProps: ['validation', 'props', 'props_draft'] }),
+    mergeProps({ draft })
   )(row)
 }
