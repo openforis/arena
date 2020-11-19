@@ -7,50 +7,48 @@ import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('WebSocket')
 
-const socketByClientId = new Map() // Map(<[socketClientId]:socket>)
-const socketClientIdsByUserUuid = new Map() // Map(<[userUuid]>:Set(socketClientIds))
+const socketsById = new Map() // Map(<[socketId]:socket>)
+const socketIdsByUserUuid = new Map() // Map(<[userUuid]>:Set(socketIds))
 
 const addSocket = (userUuid, socket) => {
-  const socketClientId = socket.client.id
-  socketByClientId.set(socketClientId, socket)
+  const socketId = socket.id
+  socketsById.set(socketId, socket)
 
-  if (!socketClientIdsByUserUuid.has(userUuid)) {
-    socketClientIdsByUserUuid.set(userUuid, new Set())
+  if (!socketIdsByUserUuid.has(userUuid)) {
+    socketIdsByUserUuid.set(userUuid, new Set())
   }
 
-  socketClientIdsByUserUuid.get(userUuid).add(socketClientId)
+  socketIdsByUserUuid.get(userUuid).add(socketId)
 }
 
-const deleteSocket = (userUuid, socketClientId) => {
-  socketByClientId.delete(socketClientId)
+const deleteSocket = (userUuid, socketId) => {
+  socketsById.delete(socketId)
 
-  const userSocketClientIds = socketClientIdsByUserUuid.get(userUuid)
-  userSocketClientIds.delete(socketClientId)
+  const userSocketIds = socketIdsByUserUuid.get(userUuid)
+  userSocketIds.delete(socketId)
 
-  if (userSocketClientIds.size === 0) {
-    socketClientIdsByUserUuid.delete(userUuid)
+  if (userSocketIds.size === 0) {
+    socketIdsByUserUuid.delete(userUuid)
   }
 }
 
-export const notifySocket = (socketClientId, eventType, message) => {
-  const socket = socketByClientId.get(socketClientId)
-  Logger.debug(`notifying socket with client ID ${socketClientId}`)
+export const notifySocket = (socketId, eventType, message) => {
+  const socket = socketsById.get(socketId)
 
   if (socket) {
-    Logger.debug(`notifying socket with ID ${socket.id}`)
     socket.emit(eventType, message)
   } else {
-    Logger.error(`socket with client ID ${socketClientId} not found!`)
+    Logger.error(`socket with ID ${socketId} not found!`)
   }
 }
 
 export const notifyUser = (userUuid, eventType, message) => {
-  const socketClientIds = socketClientIdsByUserUuid.get(userUuid)
-  socketClientIds.forEach((socketClientId) => notifySocket(socketClientId, eventType, message))
+  const socketIds = socketIdsByUserUuid.get(userUuid)
+  socketIds.forEach((socketId) => notifySocket(socketId, eventType, message))
 }
 
 export const init = (server, sessionMiddleware) => {
-  socketIoServer(server, { cookie: true })
+  socketIoServer(server)
     .use((socket, next) => {
       // Wrap the sessionMiddleware to get the user uuid
       sessionMiddleware(socket.request, {}, next)
@@ -58,9 +56,9 @@ export const init = (server, sessionMiddleware) => {
     .on(WebSocketEvents.connection, async (socket) => {
       const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
 
-      const socketClientId = socket.client.id
+      const socketId = socket.id
 
-      const socketDetails = `ID: ${socket.id} - Client ID: ${socketClientId} - User UUID: ${userUuid}`
+      const socketDetails = `ID: ${socketId} - User UUID: ${userUuid}`
 
       Logger.debug(`socket connected (${socketDetails})`)
 
@@ -69,7 +67,7 @@ export const init = (server, sessionMiddleware) => {
 
         socket.on(WebSocketEvents.disconnect, () => {
           Logger.debug(`socket disconnected (${socketDetails})`)
-          deleteSocket(userUuid, socketClientId)
+          deleteSocket(userUuid, socketId)
         })
       }
     })
