@@ -3,13 +3,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useNodeDefLabel, useSurveyCycleKey } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import {
   SurveyFormActions,
   useNodeDefLabelType,
@@ -19,8 +18,9 @@ import {
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
-import FormEntryActions from './formEntryActions'
-import FormEditActions from './formEditActions'
+import FormEntryActions from '../components/formEntryActions'
+import FormEditActions from '../components/formEditActions'
+import { usePath } from './usePath'
 
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef } = props
@@ -32,8 +32,8 @@ const FormHeader = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
-  const nodeDefPageLabel = useNodeDefLabel(nodeDefPage, nodeDefLabelType)
   const showPageNavigation = useShowPageNavigation()
+  const path = usePath()
 
   return (
     <div className="survey-form-header">
@@ -68,7 +68,9 @@ const FormHeader = (props) => {
           </button>
         )}
 
-        <h5 id="survey-form-page-label">{nodeDefPageLabel}</h5>
+        <div className="survey-form-header__path" id="survey-form-page-label">
+          {path}
+        </div>
       </div>
 
       <div className="survey-form-header__options">

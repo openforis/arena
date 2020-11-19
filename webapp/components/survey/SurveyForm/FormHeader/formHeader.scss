@@ -1,5 +1,5 @@
 @import 'webapp/style/vars';
-@import '../SurveyFormVars';
+@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
 
 .survey-form-header {
   display: flex;
@@ -10,15 +10,23 @@
 
 .survey-form-header__label-container {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 
   button {
-    border: 1px solid $grey;
+    border: 1px solid $greyBorder;
+    padding: 0.4rem 0.5rem;
 
     &:not(:first-of-type) {
       border-left: unset;
     }
   }
+}
+
+.survey-form-header__path {
+  margin-left: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-x: auto;
 }
 
 .survey-form-header__actions {
