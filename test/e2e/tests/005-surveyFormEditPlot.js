@@ -15,10 +15,10 @@ const nodeDefItems = [
 
 describe('SurveyForm edit Plot', () => {
   test('Plot create', async () => {
-    const subPageValues = { name: 'Plot', label: 'Plot', isMultiple: true }
+    const subPageValues = { name: 'plot', label: 'Plot', isMultiple: true }
     await addSurveyFormSubPage({ values: subPageValues })
     await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
-    await expectCurrentPageIs({ label: 'Plot' })
+    await expectCurrentPageIs({ name: 'plot' })
     await expectEmptyPageHasError()
   })
 

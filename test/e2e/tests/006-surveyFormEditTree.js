@@ -13,7 +13,7 @@ describe('SurveyForm edit Tree', () => {
     const treeValues = { type: 'entity', name: 'tree', label: 'Tree' }
     await addItemToPage(treeValues)
     await expectItemIsTheLastNodeDef({ item: treeValues })
-    await expectCurrentPageIs({ label: 'Plot' })
+    await expectCurrentPageIs({ name: 'plot' })
   })
 
   test.each(nodeDefItems)('Tree add children %o', async (child) => {

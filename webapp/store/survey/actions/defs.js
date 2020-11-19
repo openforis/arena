@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { LoaderActions } from '@webapp/store/ui'
+import { LoaderActions } from '@webapp/store/ui/loader'
 
 import * as SurveyState from '../state'
 import * as SurveyStatusState from '../status/state'
