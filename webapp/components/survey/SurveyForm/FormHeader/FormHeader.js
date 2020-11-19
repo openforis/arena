@@ -70,6 +70,7 @@ const FormHeader = (props) => {
 
         <div
           className="survey-form-header__path"
+          data-nodedef-name={NodeDef.getName(nodeDefPage)}
           id="survey-form-page-label"
           dangerouslySetInnerHTML={{ __html: path }}
         />
