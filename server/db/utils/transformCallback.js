@@ -1,30 +1,21 @@
-import * as R from 'ramda'
-import * as camelize from 'camelize'
-
+import * as A from '../../../core/arena'
 import { mergeProps } from './mergeProps'
 
 const _assocPublishedDraft = (row) => ({
   ...row,
-  published: !R.isEmpty(row.props),
-  draft: !R.isEmpty(row.props_draft),
+  published: !A.isEmpty(row.props),
+  draft: !A.isEmpty(row.props_draft),
 })
 
-const _camelize = ({ skippedProps = [] }) => (obj) =>
-  Object.entries(obj).reduce((accObj, [propName, value]) => {
-    const propNameCamelCase = camelize(propName)
-    const valueTransformed = skippedProps.includes(propName) || !(value instanceof Object) ? value : camelize(value)
-    return { ...accObj, [propNameCamelCase]: valueTransformed }
-  }, {})
-
 export const transformCallback = (row, draft = false, assocPublishedDraft = false) => {
-  if (R.isNil(row)) {
+  if (A.isNull(row)) {
     return null
   }
 
-  return R.pipe(
+  return A.pipe(
     // Assoc published and draft properties based on props
     (rowCurrent) => (assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
-    _camelize({ skippedProps: ['validation', 'props', 'props_draft'] }),
+    A.camelize({ skip: ['validation', 'props', 'props_draft'] }),
     mergeProps({ draft })
   )(row)
 }
