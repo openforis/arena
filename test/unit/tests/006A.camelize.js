@@ -23,6 +23,22 @@ const tests = [
     object: { first_prop: 1, second_prop: 2, third_prop: { third_prop_a: 11, third_prop_b: 12 } },
     expected: { firstProp: 1, secondProp: 2, thirdProp: { thirdPropA: 11, thirdPropB: 12 } },
   },
+  {
+    object: {
+      first_prop: 1,
+      second_prop: [
+        { arr_prop_1: 11, arr_prop_2: 12 },
+        { arr_prop_1: 21, arr_prop_2: 22 },
+      ],
+    },
+    expected: {
+      firstProp: 1,
+      secondProp: [
+        { arrProp1: 11, arrProp2: 12 },
+        { arrProp1: 21, arrProp2: 22 },
+      ],
+    },
+  },
   // complex objects (skip keys)
   {
     object: { first_prop: 1, second_prop: 2, third_prop: { third_prop_a: 11, third_prop_b: 12 } },

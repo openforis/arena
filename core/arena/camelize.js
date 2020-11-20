@@ -5,7 +5,7 @@ const _walk = ({ object, skip = [] }) => {
     return object
   }
   if (Array.isArray(object)) {
-    return object.map(_walk)
+    return object.map((item) => _walk({ object: item }))
   }
   return Object.entries(object).reduce((objAcc, [key, value]) => {
     const skipped = skip.includes(key)
