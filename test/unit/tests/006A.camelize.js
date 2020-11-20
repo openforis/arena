@@ -50,7 +50,7 @@ const tests = [
 describe('A.camelize', () => {
   tests.forEach(({ object, expected, skip = [] }) => {
     it(`${JSON.stringify(object)} ->  ${JSON.stringify(expected)}`, () => {
-      const valueCamelized = A.camelize({ skip })(object)
+      const valueCamelized = A.camelizePartial({ skip }, object)
       expect(valueCamelized).toEqual(expected)
     })
   })
