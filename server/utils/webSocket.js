@@ -7,8 +7,6 @@ import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('WebSocket')
 
-const io = socketIoServer()
-
 const socketsById = new Map() // Map(<[socketId]:socket>)
 const socketIdsByUserUuid = new Map() // Map(<[userUuid]>:Set(socketIds))
 
@@ -40,7 +38,7 @@ export const notifySocket = (socketId, eventType, message) => {
   if (socket) {
     socket.emit(eventType, message)
   } else {
-    Logger.error(`notifying socket with ID ${socketId}: socket not found!`)
+    Logger.error(`socket with ID ${socketId} not found!`)
   }
 }
 
@@ -50,25 +48,27 @@ export const notifyUser = (userUuid, eventType, message) => {
 }
 
 export const init = (server, sessionMiddleware) => {
-  io.attach(server)
+  socketIoServer(server)
+    .use((socket, next) => {
+      // Wrap the sessionMiddleware to get the user uuid
+      sessionMiddleware(socket.request, {}, next)
+    })
+    .on(WebSocketEvents.connection, async (socket) => {
+      const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
 
-  io.use((socket, next) => {
-    // Wrap the sessionMiddleware to get the user uuid
-    sessionMiddleware(socket.request, {}, next)
-  })
+      const socketId = socket.id
 
-  io.on(WebSocketEvents.connection, async (socket) => {
-    const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
+      const socketDetails = `ID: ${socketId} - User UUID: ${userUuid}`
 
-    Logger.debug(`socket connected (ID: ${socket.id} - User UUID: ${userUuid})`)
+      Logger.debug(`socket connected (${socketDetails})`)
 
-    if (userUuid) {
-      addSocket(userUuid, socket)
+      if (userUuid) {
+        addSocket(userUuid, socket)
 
-      socket.on(WebSocketEvents.disconnect, () => {
-        Logger.debug(`socket disconnected (ID: ${socket.id} - User UUID: ${userUuid})`)
-        deleteSocket(userUuid, socket.id)
-      })
-    }
-  })
+        socket.on(WebSocketEvents.disconnect, () => {
+          Logger.debug(`socket disconnected (${socketDetails})`)
+          deleteSocket(userUuid, socketId)
+        })
+      }
+    })
 }

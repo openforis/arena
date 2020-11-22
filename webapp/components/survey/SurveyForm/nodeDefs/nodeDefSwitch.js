@@ -16,7 +16,7 @@ import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
 
-import { SurveyFormState } from '@webapp/store/ui'
+import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 // Edit actions
 // Entry actions

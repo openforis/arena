@@ -7,7 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { SystemActions } from '@webapp/store/system'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
-import { RecordActions } from '../record'
+import * as RecordActions from '../record/actions'
 
 import * as SurveyFormActions from './actions'
 import * as SurveyFormState from './state'
