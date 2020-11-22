@@ -63,8 +63,9 @@ export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
     }, state)
   )(formPageNodeUuidByNodeDefUuid)
 
-export const getFormPageNodeUuid = (nodeDef) =>
-  R.pipe(getStateProp(keys.nodeDefUuidPageNodeUuid), R.prop(NodeDef.getUuid(nodeDef)))
+export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
+
+export const getFormPageNodeUuid = (nodeDef) => R.pipe(getPagesUuidMap, R.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)

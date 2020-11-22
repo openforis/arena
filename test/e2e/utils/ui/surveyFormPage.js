@@ -52,10 +52,10 @@ export const expectEmptyPageHasError = async () => {
   await expectExists({ text: 'Define at least one child item' })
 }
 
-export const expectCurrentPageIs = async ({ label }) => {
+export const expectCurrentPageIs = async ({ name }) => {
   await expectToBe({ selector: '#survey-form-page-label', numberOfItems: 1 })
   const currentPageLabel = await getElement({ selector: '#survey-form-page-label' })
-  await expect(await currentPageLabel.text()).toBe(label)
+  await expect(await currentPageLabel.attribute('data-nodedef-name')).toBe(name)
 }
 
 const expectSurveyFormPageExists = async ({ pageLabel, pagesElements, pageIndex }) => {

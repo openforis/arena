@@ -1,4 +1,6 @@
 export { assoc } from './assoc'
+export { camelize } from './camelize'
+export { camelizePartial } from './camelizePartial'
 export { dissoc } from './dissoc'
 export { identity } from './identity'
 export { isEmpty } from './isEmpty'

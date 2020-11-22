@@ -35,11 +35,11 @@ export const getUser = R.prop('user')
 export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
-// Cookies
+// Headers
 
-const getCookie = (name) => R.path(['cookies', name])
+const getHeader = (name) => R.path(['headers', name])
 
-export const getSocketId = getCookie('io')
+export const getSocketId = getHeader('socketid')
 
 // HTTPS
 

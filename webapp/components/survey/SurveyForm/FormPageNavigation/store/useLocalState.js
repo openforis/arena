@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useSurvey, SurveyState } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 import { useOnUpdate } from '@webapp/components/hooks'
-
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as A from '@core/arena'
 
 import { State } from './state'
 
@@ -20,7 +19,6 @@ export const useLocalState = (props) => {
 
   const parentNode = useSelector(SurveyFormState.getFormPageParentNode(nodeDef))
   const expandedFormPageNavigation = useSelector(SurveyFormState.expandedPageNavigation)
-  const label = useSelector(SurveyState.getNodeDefLabel(nodeDef))
   const active = useSelector(SurveyFormState.isNodeDefFormActivePage(nodeDef))
 
   const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
@@ -34,7 +32,6 @@ export const useLocalState = (props) => {
       parentNode,
       childDefs,
       level,
-      label,
       active,
       expandedFormPageNavigation,
       outerPageChildDefs,

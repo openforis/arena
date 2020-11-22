@@ -1,27 +1,34 @@
 @import 'webapp/style/vars';
-@import '../SurveyFormVars';
+@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
 
 .survey-form-header {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
   height: $formHeaderHeight;
 }
 
 .survey-form-header__label-container {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 
-  .btn-add-sub-page {
-    margin-left: 2rem;
-    border: 1px dashed $greyBorder;
+  button {
+    border: 1px solid $greyBorder;
+    padding: 0.4rem 0.5rem;
+    display: flex;
+    align-items: center;
+
+    &:not(:first-of-type) {
+      border-left: unset;
+    }
   }
 }
 
-.survey-form-header__btn-page-toggle {
-  border: 1px solid $greyBorder;
-  padding: 5px 5px 5px 9px;
-  margin-right: 15px;
+.survey-form-header__path {
+  margin-left: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-x: auto;
 }
 
 .survey-form-header__actions {
