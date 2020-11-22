@@ -1,11 +1,11 @@
 @import url('/woff2.css');
-@import "./vars";
-@import "./layoutMixins";
-@import "./formBase";
-@import "./ico";
-@import "./table";
-@import "./layout";
-@import "./reactTransitions";
+@import './vars';
+@import './layoutMixins';
+@import './formBase';
+@import './ico';
+@import './table';
+@import './layout';
+@import './reactTransitions';
 
 * {
   box-sizing: border-box;
@@ -15,7 +15,8 @@
   display: none;
 }
 
-body, html {
+body,
+html {
   height: 100%;
   overflow: hidden;
   font: 14px/1.6 $fontFamily;
@@ -69,8 +70,8 @@ body {
 }
 
 .badge-of {
-  padding: .15rem .3rem;
-  font-size: .6rem;
+  padding: 0.15rem 0.3rem;
+  font-size: 0.6rem;
   background-color: $blueLight;
   font-weight: 600;
 }
@@ -83,10 +84,10 @@ body {
 .badge {
   position: absolute;
   z-index: $zIndex5Badge;
-  padding: .4rem .5rem;
+  padding: 0.4rem 0.5rem;
   display: grid;
   align-items: center;
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 

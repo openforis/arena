@@ -106,6 +106,7 @@ export const useExpressionEditorPopupState = (props) => {
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
   const variables = ExpressionVariables.getVariables({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
+  const variablesGroupedByParentUuid = ExpressionVariables.getVariablesGroupedByParentUuid({ variables, survey })
 
   return {
     ...state,
@@ -118,6 +119,6 @@ export const useExpressionEditorPopupState = (props) => {
     setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
-    variables,
+    variables: variablesGroupedByParentUuid,
   }
 }

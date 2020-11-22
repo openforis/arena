@@ -1,9 +1,23 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Dropdown from '@webapp/components/form/Dropdown'
+import Select from '@webapp/components/form/Select'
 
-const Identifier = ({ node, variables, onChange }) => (
+const Identifier = ({ node, variables, onChange }) => {
+  return (
+    <Select
+      options={variables}
+      itemLabel="label"
+      itemKey="value"
+      value={R.find(R.propEq('value', node.name), variables)}
+      onChange={(item) => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
+    />
+  )
+}
+
+export default Identifier
+
+/*
   <Dropdown
     items={variables}
     selection={R.find(R.propEq('value', node.name), variables)}
@@ -11,6 +25,5 @@ const Identifier = ({ node, variables, onChange }) => (
     itemKey="value"
     onChange={item => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
   />
-)
-
-export default Identifier
+  
+ */
