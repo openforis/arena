@@ -35,6 +35,7 @@ const ExpressionNode = (props) => {
     onDelete,
     type,
     variables,
+    variablesGroupedByParentUuid,
   } = props
 
   const component = components[R.prop('type', node)]
@@ -51,6 +52,7 @@ const ExpressionNode = (props) => {
     onDelete,
     type,
     variables,
+    variablesGroupedByParentUuid,
   })
 }
 
@@ -62,6 +64,7 @@ ExpressionNode.propTypes = {
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
   variables: PropTypes.array,
+  variablesGroupedByParentUuid: PropTypes.array,
   // Binary
   canDelete: PropTypes.bool,
   isBoolean: PropTypes.bool,
@@ -81,6 +84,7 @@ ExpressionNode.defaultProps = {
   onDelete: null,
   type: null,
   variables: null,
+  variablesGroupedByParentUuid: null,
 }
 
 export default ExpressionNode

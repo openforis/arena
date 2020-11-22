@@ -119,6 +119,7 @@ export const useExpressionEditorPopupState = (props) => {
     setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
-    variables: variablesGroupedByParentUuid,
+    variables,
+    variablesGroupedByParentUuid,
   }
 }

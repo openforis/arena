@@ -1,12 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
+import PropTypes from 'prop-types'
 
 import Select from '@webapp/components/form/Select'
 
-const Identifier = ({ node, variables, onChange }) => {
+const Identifier = ({ node, variables, variablesGroupedByParentUuid, onChange }) => {
   return (
     <Select
-      options={variables}
+      options={variablesGroupedByParentUuid}
       itemLabel="label"
       itemKey="value"
       value={R.find(R.propEq('value', node.name), variables)}
@@ -15,15 +16,18 @@ const Identifier = ({ node, variables, onChange }) => {
   )
 }
 
-export default Identifier
+Identifier.propTypes = {
+  // Common props
+  node: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  // Identifier / Member / Call
+  variables: PropTypes.array,
+  variablesGroupedByParentUuid: PropTypes.array,
+}
 
-/*
-  <Dropdown
-    items={variables}
-    selection={R.find(R.propEq('value', node.name), variables)}
-    itemLabel="label"
-    itemKey="value"
-    onChange={item => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
-  />
-  
- */
+Identifier.defaultProps = {
+  variables: null,
+  variablesGroupedByParentUuid: null,
+}
+
+export default Identifier

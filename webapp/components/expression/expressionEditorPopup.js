@@ -44,6 +44,7 @@ const ExpressionEditorPopup = (props) => {
     updateDraftExpr,
     updateDraftQuery,
     variables,
+    variablesGroupedByParentUuid,
   } = useExpressionEditorPopupState({
     canBeConstant,
     expr,
@@ -88,6 +89,7 @@ const ExpressionEditorPopup = (props) => {
             queryDraft={queryDraft}
             updateDraftExpr={updateDraftExpr}
             variables={variables}
+            variablesGroupedByParentUuid={variablesGroupedByParentUuid}
           />
         )}
 

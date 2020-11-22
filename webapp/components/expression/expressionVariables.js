@@ -89,9 +89,11 @@ export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam
   const variablesGrouped = Object.keys(variablesGroupedByParentUuid)
     .map((parentUuid) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
-      return { parentUuid, label: NodeDef.getName(parentNodeDef) }
+      return { parentUuid, label: NodeDef.getName(parentNodeDef), id: Number(NodeDef.getId(parentNodeDef)) }
     })
+    .sort((groupA, groupB) => (groupA.id > groupB.id ? 1 : -1))
     .map(({ parentUuid, label }) => ({ label, options: variablesGroupedByParentUuid[parentUuid] }))
+
   return variablesGrouped
 }
 
@@ -99,7 +101,7 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  const variables = []
+  let variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
     if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
       const childVariables = getChildDefVariables({ survey, nodeDefContext: nodeDef, nodeDefCurrent, mode, lang })
@@ -108,9 +110,16 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
     }
   })(survey)
 
+  const variablesUuids = []
+  variables = variables.filter((variable) => {
+    if (variablesUuids.includes(variable.uuid)) return false
+    variablesUuids.push(variable.uuid)
+    return true
+  })
+
   // Show current node def variable in the first position
   const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
-  variables.sort((varA, varB) => {
+  variables = variables.sort((varA, varB) => {
     if (varA.uuid === nodeDefCurrentUuid) {
       return -1
     }
