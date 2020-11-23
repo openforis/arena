@@ -14,7 +14,6 @@ export const Select = ({
   options,
   value,
   onChange,
-  ...props
 }) => {
   return (
     <ReactSelect
@@ -27,7 +26,6 @@ export const Select = ({
       theme={baseTheme}
       components={{ ...defaultComponents, ...overrideComponents }}
       styles={{ ...baseStyles, ...style }}
-      {...props}
     />
   )
 }
