@@ -28,6 +28,7 @@ export default class TaxonCSVParser {
     this.taxonomyUuid = taxonomyUuid
     this.vernacularLanguageCodes = vernacularLanguageCodes
 
+    this.processedRow = 0
     this.rowsByField = {
       [Taxon.propKeys.code]: {}, // Maps codes to csv file rows
       [Taxon.propKeys.scientificName]: {}, // Maps scientific names to csv file rows
@@ -51,7 +52,11 @@ export default class TaxonCSVParser {
       _parseVernacularNames(vernacularNamesByLang)
     )
 
-    return this._validateTaxon(taxon)
+    const validation = await this._validateTaxon(taxon)
+
+    this.processedRow += 1
+
+    return { ...taxon, validation }
   }
 
   async _validateTaxon(taxon) {
@@ -71,10 +76,7 @@ export default class TaxonCSVParser {
       )
     }
 
-    return {
-      ...taxon,
-      validation,
-    }
+    return validation
   }
 
   _addValueToIndex(field, value, errorKeyDuplicate, validation) {
@@ -87,13 +89,13 @@ export default class TaxonCSVParser {
           Validation.newInstance(false, {}, [
             {
               key: errorKeyDuplicate,
-              params: { row: this.processed + 1, duplicateRow },
+              params: { row: this.processedRow + 1, duplicateRow },
             },
           ])
         )
       )(validation)
     } else {
-      this.rowsByField[field][value] = this.processed + 1
+      this.rowsByField[field][value] = this.processedRow + 1
     }
   }
 }
