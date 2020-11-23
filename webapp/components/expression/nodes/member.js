@@ -5,20 +5,13 @@ import * as Expression from '@core/expressionParser/expression'
 
 import Identifier from './identifier'
 
-const Member = ({ node, variables, variablesGroupedByParentUuid, onChange }) => {
+const Member = ({ node, variables, onChange }) => {
   const nodeIdentifier = {
     type: Expression.types.Identifier,
     name: Expression.toString(node),
   }
 
-  return (
-    <Identifier
-      node={nodeIdentifier}
-      variables={variables}
-      variablesGroupedByParentUuid={variablesGroupedByParentUuid}
-      onChange={onChange}
-    />
-  )
+  return <Identifier node={nodeIdentifier} variables={variables} onChange={onChange} />
 }
 
 Member.propTypes = {
@@ -27,12 +20,10 @@ Member.propTypes = {
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
   variables: PropTypes.array,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 Member.defaultProps = {
   variables: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default Member

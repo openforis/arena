@@ -34,6 +34,7 @@ const ExpressionEditor = (props) => {
         <ExpressionEditorPopup
           query={query}
           nodeDefUuidContext={nodeDefUuidContext}
+          x
           nodeDefUuidCurrent={nodeDefUuidCurrent}
           mode={mode}
           isContextParent={isContextParent}

@@ -101,7 +101,7 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  let variables = []
+  const variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
     if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
       const childVariables = getChildDefVariables({ survey, nodeDefContext: nodeDef, nodeDefCurrent, mode, lang })
@@ -110,16 +110,9 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
     }
   })(survey)
 
-  const variablesUuids = []
-  variables = variables.filter((variable) => {
-    if (variablesUuids.includes(variable.uuid)) return false
-    variablesUuids.push(variable.uuid)
-    return true
-  })
-
   // Show current node def variable in the first position
   const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
-  variables = variables.sort((varA, varB) => {
+  variables.sort((varA, varB) => {
     if (varA.uuid === nodeDefCurrentUuid) {
       return -1
     }

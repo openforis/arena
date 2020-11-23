@@ -18,7 +18,17 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = (props) => {
-  const { canBeConstant, expr, mode, type, nodeDefUuidContext, nodeDefUuidCurrent, onChange, query } = props
+  const {
+    canBeConstant,
+    expr,
+    mode,
+    type,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    onChange,
+    query,
+    isGrouped = true,
+  } = props
 
   const survey = useSurvey()
   const lang = useLang()
@@ -119,7 +129,6 @@ export const useExpressionEditorPopupState = (props) => {
     setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
-    variables,
-    variablesGroupedByParentUuid,
+    variables: isGrouped ? variablesGroupedByParentUuid : variables,
   }
 }

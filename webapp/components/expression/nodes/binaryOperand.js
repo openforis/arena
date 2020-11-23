@@ -15,19 +15,7 @@ BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
 BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 
 const BinaryOperand = (props) => {
-  const {
-    canDelete,
-    isBoolean,
-    level,
-    node,
-    nodeDefCurrent,
-    onChange,
-    onDelete,
-    type,
-    renderNode,
-    variables,
-    variablesGroupedByParentUuid,
-  } = props
+  const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
 
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
@@ -75,7 +63,6 @@ const BinaryOperand = (props) => {
         onDelete,
         type,
         variables,
-        variablesGroupedByParentUuid,
       })}
     </>
   )
@@ -93,7 +80,6 @@ BinaryOperand.propTypes = {
   level: PropTypes.number,
   onDelete: PropTypes.func,
   variables: PropTypes.array,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 BinaryOperand.defaultProps = {
@@ -103,7 +89,6 @@ BinaryOperand.defaultProps = {
   nodeDefCurrent: null,
   onDelete: null,
   variables: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default BinaryOperand

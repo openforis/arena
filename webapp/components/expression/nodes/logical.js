@@ -7,17 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 import { useI18n } from '@webapp/store/system'
 
 const Logical = (props) => {
-  const {
-    canDelete,
-    node,
-    nodeDefCurrent,
-    isBoolean,
-    level,
-    onChange,
-    renderNode,
-    variables,
-    variablesGroupedByParentUuid,
-  } = props
+  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, renderNode, variables } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
 
@@ -33,7 +23,6 @@ const Logical = (props) => {
       isBoolean,
       level,
       variables,
-      variablesGroupedByParentUuid,
     })
 
   return (
@@ -87,7 +76,6 @@ Logical.propTypes = {
   isBoolean: PropTypes.bool,
   level: PropTypes.number,
   variables: PropTypes.array,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 Logical.defaultProps = {
@@ -96,7 +84,6 @@ Logical.defaultProps = {
   level: 0,
   nodeDefCurrent: null,
   variables: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default Logical

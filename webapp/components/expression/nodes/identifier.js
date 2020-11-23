@@ -2,15 +2,25 @@ import React from 'react'
 import * as R from 'ramda'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
+
 import Select from '@webapp/components/form/Select'
 
-const Identifier = ({ node, variables, variablesGroupedByParentUuid, onChange }) => {
+const findValue = ({ variables, node }) => {
+  let value = null
+  value = R.find(R.propEq('value', node.name), variables)
+  if (!A.isEmpty(value)) return value
+  const _flatVariables = variables.reduce((flat, group) => [...(flat || []), ...(group.options || [])], [])
+  return R.find(R.propEq('value', node.name), _flatVariables)
+}
+
+const Identifier = ({ node, variables, onChange }) => {
   return (
     <Select
-      options={variablesGroupedByParentUuid}
+      options={variables}
       itemLabel="label"
       itemKey="value"
-      value={R.find(R.propEq('value', node.name), variables)}
+      value={findValue({ variables, node })}
       onChange={(item) => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
     />
   )
@@ -22,12 +32,10 @@ Identifier.propTypes = {
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
   variables: PropTypes.array,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 Identifier.defaultProps = {
   variables: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default Identifier

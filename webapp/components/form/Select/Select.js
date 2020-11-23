@@ -8,7 +8,7 @@ import { defaultComponents, baseStyles, baseTheme } from './config'
 import { adaptSelection } from './utils'
 
 export const Select = ({
-  customStyle = {},
+  style = {},
   className: customClassName,
   components: overrideComponents,
   options,
@@ -17,25 +17,23 @@ export const Select = ({
   ...props
 }) => {
   return (
-    <>
-      <ReactSelect
-        className={customClassName}
-        classNamePrefix="select"
-        options={options}
-        onChange={onChange}
-        value={adaptSelection(value)}
-        isSearchable
-        theme={baseTheme}
-        components={{ ...defaultComponents, ...overrideComponents }}
-        styles={{ ...baseStyles, ...customStyle }}
-        {...props}
-      />
-    </>
+    <ReactSelect
+      className={customClassName}
+      classNamePrefix="select"
+      options={options}
+      onChange={onChange}
+      value={adaptSelection(value)}
+      isSearchable
+      theme={baseTheme}
+      components={{ ...defaultComponents, ...overrideComponents }}
+      styles={{ ...baseStyles, ...style }}
+      {...props}
+    />
   )
 }
 
 Select.propTypes = {
-  customStyle: PropTypes.object,
+  style: PropTypes.object,
   className: PropTypes.string,
   components: PropTypes.object,
   options: PropTypes.array,
@@ -44,7 +42,7 @@ Select.propTypes = {
 }
 
 Select.defaultProps = {
-  customStyle: {},
+  style: {},
   className: '',
   components: {},
   options: [],

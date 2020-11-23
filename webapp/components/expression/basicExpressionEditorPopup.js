@@ -8,16 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
 
 const BasicExpressionEditorPopup = (props) => {
-  const {
-    nodeDefCurrent,
-    isBoolean,
-    variables,
-    variablesGroupedByParentUuid,
-    updateDraftExpr,
-    queryDraft,
-    exprDraft,
-    exprDraftValid,
-  } = props
+  const { nodeDefCurrent, isBoolean, variables, updateDraftExpr, queryDraft, exprDraft, exprDraftValid } = props
 
   const i18n = useI18n()
 
@@ -37,7 +28,6 @@ const BasicExpressionEditorPopup = (props) => {
             nodeDefCurrent={nodeDefCurrent}
             onChange={updateDraftExpr}
             variables={variables}
-            variablesGroupedByParentUuid={variablesGroupedByParentUuid}
           />
         )}
       </div>
@@ -53,7 +43,6 @@ BasicExpressionEditorPopup.propTypes = {
   queryDraft: PropTypes.string,
   updateDraftExpr: PropTypes.func.isRequired,
   variables: PropTypes.arrayOf(Object).isRequired,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 BasicExpressionEditorPopup.defaultProps = {
@@ -62,7 +51,6 @@ BasicExpressionEditorPopup.defaultProps = {
   isBoolean: true, // True if expression returns a boolean condition
   nodeDefCurrent: null,
   queryDraft: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default BasicExpressionEditorPopup

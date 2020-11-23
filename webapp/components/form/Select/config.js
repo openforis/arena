@@ -67,6 +67,10 @@ export const baseStyles = {
     margin: 0,
     fontSize: '0.9rem',
   }),
+  groupHeading: (provided) => ({
+    ...provided,
+    textTransform: 'lowercase',
+  }),
 }
 
 export const baseTheme = (theme) => ({

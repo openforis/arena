@@ -5,19 +5,7 @@ import * as R from 'ramda'
 import EditButtons from './editButtons'
 
 const Group = (props) => {
-  const {
-    canDelete,
-    node,
-    nodeDefCurrent,
-    isBoolean,
-    level,
-    onChange,
-    onDelete,
-    renderNode,
-    type,
-    variables,
-    variablesGroupedByParentUuid,
-  } = props
+  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, type, variables } = props
 
   const { argument } = node
 
@@ -34,7 +22,6 @@ const Group = (props) => {
         onDelete,
         type,
         variables,
-        variablesGroupedByParentUuid,
       })}
       <div className="footer">
         <h3>)</h3>
@@ -56,7 +43,6 @@ Group.propTypes = {
   isBoolean: PropTypes.bool,
   type: PropTypes.string,
   variables: PropTypes.array,
-  variablesGroupedByParentUuid: PropTypes.array,
 }
 
 Group.defaultProps = {
@@ -67,7 +53,6 @@ Group.defaultProps = {
   onDelete: null,
   type: null,
   variables: null,
-  variablesGroupedByParentUuid: null,
 }
 
 export default Group
