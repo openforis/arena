@@ -8,6 +8,21 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
 
+const _parseVernacularNames = (vernacularNamesByLang) =>
+  Object.entries(vernacularNamesByLang).reduce(
+    (accVernacularNames, [langCode, nameOriginal]) =>
+      R.ifElse(
+        StringUtils.isBlank,
+        R.always(accVernacularNames),
+        R.pipe(
+          R.split(TaxonVernacularName.NAMES_SEPARATOR),
+          R.map((name) => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
+          R.ifElse(R.isEmpty, R.always(accVernacularNames), (names) => R.assoc(langCode, names)(accVernacularNames))
+        )
+      )(nameOriginal),
+    {}
+  )
+
 export default class TaxonCSVParser {
   constructor(taxonomyUuid, vernacularLanguageCodes) {
     this.taxonomyUuid = taxonomyUuid
@@ -20,7 +35,12 @@ export default class TaxonCSVParser {
   }
 
   async parseTaxon(row) {
-    const { family, genus, scientific_name: scientificName, code, ...vernacularNamesByLang } = row
+    const { family: familyRow, genus: genusRow, scientific_name: scientificName, code, ...vernacularNamesByLang } = row
+
+    const family = familyRow || 'no_data'
+
+    // the genus is always the first word of the scientific name
+    const genus = scientificName ? scientificName.split(' ')[0] : null
 
     const taxon = Taxon.newTaxon(
       this.taxonomyUuid,
@@ -28,10 +48,10 @@ export default class TaxonCSVParser {
       family,
       genus,
       scientificName,
-      this._parseVernacularNames(vernacularNamesByLang),
+      _parseVernacularNames(vernacularNamesByLang)
     )
 
-    return await this._validateTaxon(taxon)
+    return this._validateTaxon(taxon)
   }
 
   async _validateTaxon(taxon) {
@@ -47,7 +67,7 @@ export default class TaxonCSVParser {
         Taxon.propKeys.scientificName,
         scientificName,
         Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
-        validation,
+        validation
       )
     }
 
@@ -69,27 +89,11 @@ export default class TaxonCSVParser {
               key: errorKeyDuplicate,
               params: { row: this.processed + 1, duplicateRow },
             },
-          ]),
-        ),
+          ])
+        )
       )(validation)
     } else {
       this.rowsByField[field][value] = this.processed + 1
     }
-  }
-
-  _parseVernacularNames(vernacularNamesByLang) {
-    return Object.entries(vernacularNamesByLang).reduce(
-      (accVernacularNames, [langCode, nameOriginal]) =>
-        R.ifElse(
-          StringUtils.isBlank,
-          R.always(accVernacularNames),
-          R.pipe(
-            R.split(TaxonVernacularName.NAMES_SEPARATOR),
-            R.map(name => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
-            R.ifElse(R.isEmpty, R.always(accVernacularNames), names => R.assoc(langCode, names)(accVernacularNames)),
-          ),
-        )(nameOriginal),
-      {},
-    )
   }
 }
