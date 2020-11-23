@@ -27,7 +27,7 @@ export const useExpressionEditorPopupState = (props) => {
     nodeDefUuidCurrent,
     onChange,
     query,
-    isGrouped = true,
+    isGroupedByParentEntity = true,
   } = props
 
   const survey = useSurvey()
@@ -115,8 +115,14 @@ export const useExpressionEditorPopupState = (props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
-  const variablesGroupedByParentUuid = ExpressionVariables.getVariablesGroupedByParentUuid({ variables, survey })
+  const variables = ExpressionVariables.getVariables({
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    lang,
+    isGroupedByParentEntity,
+  })
 
   return {
     ...state,
@@ -129,6 +135,6 @@ export const useExpressionEditorPopupState = (props) => {
     setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
-    variables: isGrouped ? variablesGroupedByParentUuid : variables,
+    variables,
   }
 }

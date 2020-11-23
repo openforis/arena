@@ -97,7 +97,14 @@ export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam
   return variablesGrouped
 }
 
-export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurrent, mode, lang: langPreferred }) => {
+export const getVariables = ({
+  survey: surveyParam,
+  nodeDefContext,
+  nodeDefCurrent,
+  mode,
+  lang: langPreferred,
+  isGroupedByParentEntity,
+}) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
@@ -121,6 +128,10 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
     }
     return varA.label.localeCompare(varB.label)
   })
+
+  if (isGroupedByParentEntity) {
+    return getVariablesGroupedByParentUuid({ variables, survey })
+  }
 
   return variables
 }
