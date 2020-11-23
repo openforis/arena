@@ -20,6 +20,10 @@
   grid-template-columns: 0.1fr 0.7fr 0.2fr;
   position: relative;
 
+  .form-item {
+    height: inherit;
+  }
+
   .labels-editor.with-label {
     grid-template-columns: 0.3fr 0.65fr;
     grid-column-gap: 0.5rem;
