@@ -106,8 +106,8 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async (uuid, name, email, profilePicture, props, client = db) =>
-  await client.one(
+export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
+  client.one(
     `
     UPDATE "user" u
     SET
@@ -117,7 +117,7 @@ export const updateUser = async (uuid, name, email, profilePicture, props, clien
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, email, profilePicture, uuid, props || {}],
+    [name, email, profilePicture, userUuid, User.newProps({ ...props })],
     camelize
   )
 

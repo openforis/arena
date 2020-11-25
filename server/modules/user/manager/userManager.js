@@ -109,8 +109,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemA
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
-  if (user && (await passwordCompareFn(password, user.password)))
-    return await _initializeUser(R.dissoc('password', user))
+  if (user && (await passwordCompareFn(password, user.password))) return _initializeUser(R.dissoc('password', user))
 
   return null
 }
@@ -118,7 +117,7 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 // ==== UPDATE
 
 const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
-  await client.tx(async (t) => {
+  client.tx(async (t) => {
     const userUuid = User.getUuid(userToUpdate)
     const groupUuid = User.getGroupUuid(userToUpdate)
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
@@ -136,7 +135,16 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     const name = User.getName(userToUpdate)
     const email = User.getEmail(userToUpdate)
     const props = User.getProps(userToUpdate)
-    return await UserRepository.updateUser(userUuid, name, email, profilePicture, props, t)
+    return UserRepository.updateUser(
+      {
+        userUuid,
+        name,
+        email,
+        profilePicture,
+        props,
+      },
+      t
+    )
   })
 
 export const updateUser = _userFetcher(_updateUser)

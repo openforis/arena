@@ -44,9 +44,7 @@ export const validateEmail = async (obj) =>
 
 export const validateResetPasswordObj = async (obj) =>
   Validator.validate(obj, {
-    [`${User.keys.props}.${User.keysProps.title}`]: [
-      Validator.validateRequired(Validation.messageKeys.user.titleRequired),
-    ],
+    [User.keysProps.title]: [Validator.validateRequired(Validation.messageKeys.user.titleRequired)],
     name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
     password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
     passwordConfirm: [_validatePasswordConfirm],

@@ -32,7 +32,7 @@ export const useResetPassword = () => {
 
   const onSubmit = () => {
     ;(async () => {
-      const validation = await LoginValidator.validateResetPasswordObj({ name, props, password, passwordConfirm })
+      const validation = await LoginValidator.validateResetPasswordObj({ name, title, password, passwordConfirm })
       if (Validation.isValid(validation)) {
         dispatchPostResetPassword()
       } else {
