@@ -27,7 +27,7 @@ export const useExpressionEditorPopupState = (props) => {
     nodeDefUuidCurrent,
     onChange,
     query,
-    isGroupedByParentEntity = true,
+    groupByParent = true,
   } = props
 
   const survey = useSurvey()
@@ -121,7 +121,7 @@ export const useExpressionEditorPopupState = (props) => {
     nodeDefCurrent,
     mode,
     lang,
-    isGroupedByParentEntity,
+    groupByParent,
   })
 
   return {

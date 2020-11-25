@@ -7,24 +7,21 @@ import * as A from '@core/arena'
 import Select from '@webapp/components/form/Select'
 
 const findValue = ({ variables, node }) => {
-  let value = null
-  value = R.find(R.propEq('value', node.name), variables)
+  const value = R.find(R.propEq('value', node.name), variables)
   if (!A.isEmpty(value)) return value
-  const _flatVariables = variables.reduce((flat, group) => [...(flat || []), ...(group.options || [])], [])
-  return R.find(R.propEq('value', node.name), _flatVariables)
+  const options = variables.reduce((optionsAggregator, group) => [...optionsAggregator, ...(group.options || [])], [])
+  return R.find(R.propEq('value', node.name), options)
 }
 
-const Identifier = ({ node, variables, onChange }) => {
-  return (
-    <Select
-      options={variables}
-      itemLabel="label"
-      itemKey="value"
-      value={findValue({ variables, node })}
-      onChange={(item) => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
-    />
-  )
-}
+const Identifier = ({ node, variables, onChange }) => (
+  <Select
+    options={variables}
+    itemLabel="label"
+    itemKey="value"
+    value={findValue({ variables, node })}
+    onChange={(item) => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
+  />
+)
 
 Identifier.propTypes = {
   // Common props
