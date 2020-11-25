@@ -10,7 +10,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 const titleItems = User.titleKeys.map((key) => ({ key }))
 
 const DropdownUserTitle = (props) => {
-  const { user, onChange } = props
+  const { user, onChange, validation } = props
   const titleSelected = User.getTitle(user)
   const itemSelected = A.isEmpty(titleSelected) ? undefined : { key: titleSelected }
 
@@ -23,13 +23,19 @@ const DropdownUserTitle = (props) => {
       items={titleItems}
       itemLabel={(item) => i18n.t(`user.titleValues.${item.key}`)}
       selection={itemSelected}
+      validation={validation}
     />
   )
 }
 
 DropdownUserTitle.propTypes = {
   user: PropTypes.any.isRequired,
+  validation: PropTypes.any,
   onChange: PropTypes.func.isRequired,
+}
+
+DropdownUserTitle.defaultProps = {
+  validation: {},
 }
 
 export default DropdownUserTitle

@@ -4,6 +4,8 @@ import React from 'react'
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
 
+import DropdownUserTitle from '@webapp/views/App/views/Users/DropdownUserTitle'
+
 import { useResetPassword } from './store/hooks'
 
 const ResetPassword = () => {
@@ -12,6 +14,7 @@ const ResetPassword = () => {
   const {
     state: { user, error },
     onChangeUser,
+    onChangeUserTitle,
     onSubmit,
   } = useResetPassword()
 
@@ -20,6 +23,8 @@ const ResetPassword = () => {
   return (
     <>
       <input value={user.email} readOnly type="text" name="email" />
+
+      <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
 
       <input defaultValue={user.name} onChange={onChangeUser} name="name" placeholder={i18n.t('loginView.yourName')} />
 

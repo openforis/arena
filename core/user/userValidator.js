@@ -16,6 +16,9 @@ export const validateEmail = (propName, item) => {
 
 export const validateUser = async (user) =>
   Validator.validate(user, {
+    [`${User.keys.props}.${User.keysProps.title}`]: [
+      Validator.validateRequired(Validation.messageKeys.user.titleRequired),
+    ],
     [User.keys.name]: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
     [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
     [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],

@@ -4,6 +4,7 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as UserValidator from '@core/user/userValidator'
+import * as User from '@core/user/user'
 
 const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
 const passwordStrengthRe = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d).{8,}$/)
@@ -43,6 +44,9 @@ export const validateEmail = async (obj) =>
 
 export const validateResetPasswordObj = async (obj) =>
   Validator.validate(obj, {
+    [`${User.keys.props}.${User.keysProps.title}`]: [
+      Validator.validateRequired(Validation.messageKeys.user.titleRequired),
+    ],
     name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
     password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
     passwordConfirm: [_validatePasswordConfirm],

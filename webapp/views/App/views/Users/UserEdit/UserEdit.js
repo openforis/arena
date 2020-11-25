@@ -54,7 +54,11 @@ const UserEdit = () => {
       )}
 
       <FormItem label={i18n.t('user.title')}>
-        <DropdownUserTitle user={userToUpdate} onChange={onUpdate} />
+        <DropdownUserTitle
+          user={userToUpdate}
+          onChange={onUpdate}
+          validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
+        />
       </FormItem>
 
       <FormItem label={i18n.t('common.name')}>
