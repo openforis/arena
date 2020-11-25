@@ -19,7 +19,7 @@ const DropdownUserTitle = (props) => {
   return (
     <Dropdown
       placeholder={i18n.t('user.title')}
-      onChange={(item) => onChange(User.assocTitle(item.key)(user))}
+      onChange={(item) => onChange(User.assocTitle(item?.key)(user))}
       items={titleItems}
       itemLabel={(item) => i18n.t(`user.titleValues.${item.key}`)}
       selection={itemSelected}

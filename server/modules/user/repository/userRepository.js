@@ -2,8 +2,6 @@ import { db } from '@server/db/db'
 
 import * as camelize from 'camelize'
 
-import * as A from '@core/arena'
-
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
@@ -15,13 +13,13 @@ const selectFieldsCommaSep = selectFields.map((f) => `u.${f}`).join(',')
 
 // CREATE
 
-export const insertUser = async (surveyId, surveyCycleKey, email, password, status, client = db) =>
-  await client.one(
+export const insertUser = async ({ surveyId, surveyCycleKey, email, password, status, title }, client = db) =>
+  client.one(
     `
-    INSERT INTO "user" AS u (email, password, status, prefs)
-    VALUES ($1, $2, $3, $4::jsonb)
+    INSERT INTO "user" AS u (email, password, status, prefs, props)
+    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
-    [email, password, status, User.newPrefs(surveyId, surveyCycleKey)],
+    [email, password, status, User.newPrefs(surveyId, surveyCycleKey), User.newProps({ title })],
     camelize
   )
 
@@ -97,7 +95,7 @@ export const fetchUserAndPasswordByEmail = async (email, client = db) =>
   )
 
 export const fetchUserProfilePicture = async (uuid, client = db) =>
-  await client.one(
+  client.one(
     `
     SELECT profile_picture
     FROM "user"
@@ -119,25 +117,25 @@ export const updateUser = async (uuid, name, email, profilePicture, props, clien
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, email, profilePicture, uuid, A.parse(props)],
+    [name, email, profilePicture, uuid, props || {}],
     camelize
   )
 
-export const updateNamePasswordAndStatus = async (userUuid, name, password, status, client = db) =>
-  await client.one(
+export const updateNamePasswordAndStatus = async ({ userUuid, name, password, status, title }, client = db) =>
+  client.one(
     `
     UPDATE "user" u
-    SET name = $1, password = $2, status = $3
+    SET name = $1, password = $2, status = $3, props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, password, status, userUuid],
+    [name, password, status, userUuid, User.newProps({ title })],
     camelize
   )
 
 // ==== PREFS
 
 export const updateUserPrefs = async (user, client = db) =>
-  await client.one(
+  client.one(
     `
     UPDATE "user" u
     SET prefs = prefs || $1::jsonb

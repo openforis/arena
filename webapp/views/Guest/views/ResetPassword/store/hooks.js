@@ -17,14 +17,15 @@ export const useResetPassword = () => {
   const { uuid } = useParams()
   const history = useHistory()
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { name, password, passwordConfirm, props } = state.user
+  const { name, password, passwordConfirm, props = {} } = state.user
+  const { title } = props
 
   const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
   const {
     data: { result: resetComplete = false } = {},
     dispatch: dispatchPostResetPassword,
-  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, props, password })
+  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, title, password })
 
   const onChangeUser = (event) => actions.updateUser(event)(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)

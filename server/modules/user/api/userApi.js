@@ -137,29 +137,11 @@ export const init = (app) => {
 
   // ==== UPDATE
 
-  app.put('/user/accept-invitation', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { name, password } = Request.getParams(req)
-
-      await UserService.acceptInvitation(User.getUuid(user), name, password)
-
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   const _updateUser = async (req, res) => {
     const body = Request.getBody(req)
     const { user: userToUpdateString } = body
-    let userToUpdate = A.parse(userToUpdateString)
+    const userToUpdate = A.parse(userToUpdateString)
     const validation = await UserValidator.validateUser(userToUpdate)
-
-    userToUpdate = {
-      ...userToUpdate,
-      props: A.stringify(userToUpdate.props),
-    }
 
     if (!Validation.isValid(validation)) {
       throw new SystemError('appErrors.userInvalid')
