@@ -10,9 +10,9 @@ import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import DropdownUserGroup from '../DropdownUserGroup'
-import DropdownUserTitle from '../DropdownUserTitle'
 
 import ProfilePictureEditor from './ProfilePictureEditor'
 

@@ -4,7 +4,7 @@ import React from 'react'
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
 
-import DropdownUserTitle from '@webapp/views/App/views/Users/DropdownUserTitle'
+import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import { useResetPassword } from './store/hooks'
 
