@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -75,6 +77,20 @@ const getChildDefVariables = ({ survey, nodeDefContext, nodeDefCurrent, mode, la
   return variables
 }
 
+export const getParentsInOrder = ({ parent, survey, includeMultiples = false }) => {
+  const _node = !A.isNull(parent) ? parent : Survey.getNodeDefRoot(survey)
+  const _stack = []
+  if (NodeDef.isMultiple(_node) && !includeMultiples) return _stack
+  const children = Survey.getNodeDefChildren(_node)(survey)
+  if (children.length > 0) {
+    _stack.push(_node)
+    children.forEach((child) => {
+      _stack.push(...getParentsInOrder({ parent: child, survey }))
+    })
+  }
+  return _stack
+}
+
 export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
 
@@ -85,13 +101,19 @@ export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam
     }),
     {}
   )
+  const surveyParentsInOrder = getParentsInOrder({ survey })
+  const surveyParentsUuidInOrder = surveyParentsInOrder.map(NodeDef.getUuid)
 
   const variablesGrouped = Object.keys(variablesGroupedByParentUuid)
     .map((parentUuid) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
-      return { parentUuid, label: NodeDef.getName(parentNodeDef), id: Number(NodeDef.getId(parentNodeDef)) }
+      return {
+        parentUuid,
+        label: NodeDef.getName(parentNodeDef),
+        index: Number(surveyParentsUuidInOrder.indexOf(NodeDef.getUuid(parentNodeDef))),
+      }
     })
-    .sort((groupA, groupB) => (groupA.id > groupB.id ? 1 : -1))
+    .sort((groupA, groupB) => (groupA.index > groupB.index ? 1 : -1))
     .map(({ parentUuid, label }) => ({ label, options: variablesGroupedByParentUuid[parentUuid] }))
 
   return variablesGrouped

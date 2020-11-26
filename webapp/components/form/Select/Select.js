@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import './Select.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
