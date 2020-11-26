@@ -26,7 +26,7 @@ export const expectItemIsTheLastNodeDef = async ({ item }) => {
   const last = items[items.length - 1]
 
   const itemText = await getNodeDefElementText({ item: last })
-  await expect(itemText).toBe(item.label.toUpperCase())
+  await expect(itemText).toBe(item.label)
 }
 
 const getSurveyFormEntityWrapper = async ({ entityName = null }) =>
