@@ -17,24 +17,26 @@ export const useResetPassword = () => {
   const { uuid } = useParams()
   const history = useHistory()
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { name, password, passwordConfirm } = state.user
+  const { name, password, passwordConfirm, props = {} } = state.user
+  const { title } = props
 
   const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
   const {
     data: { result: resetComplete = false } = {},
     dispatch: dispatchPostResetPassword,
-  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, password })
+  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, title, password })
 
   const onChangeUser = (event) => actions.updateUser(event)(dispatch)
+  const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)
 
   const onSubmit = () => {
     ;(async () => {
-      const validation = await LoginValidator.validateResetPasswordObj({ name, password, passwordConfirm })
+      const validation = await LoginValidator.validateResetPasswordObj({ name, title, password, passwordConfirm })
       if (Validation.isValid(validation)) {
         dispatchPostResetPassword()
       } else {
-        const error = LoginValidator.getFirstError(validation, ['name', 'password', 'passwordConfirm'])
+        const error = LoginValidator.getFirstError(validation, ['name', 'title', 'password', 'passwordConfirm'])
         actions.updateError(error)(dispatch)
       }
     })()
@@ -56,6 +58,7 @@ export const useResetPassword = () => {
   return {
     state,
     onChangeUser,
+    onChangeUserTitle,
     onSubmit,
   }
 }

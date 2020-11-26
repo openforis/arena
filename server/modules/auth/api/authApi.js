@@ -28,8 +28,8 @@ const sendUserSurvey = async (res, user, surveyId) => {
     Logger.error(`error loading survey with id ${surveyId}: ${error.toString()}`)
     // Survey not found with user pref
     // removing user pref
-    user = User.deletePrefSurvey(surveyId)(user)
-    sendResponse(res, await UserService.updateUserPrefs(user))
+    const _user = User.deletePrefSurvey(surveyId)(user)
+    sendResponse(res, await UserService.updateUserPrefs(_user))
   }
 }
 
@@ -41,14 +41,14 @@ const sendUser = async (res, user) => {
 }
 
 const authenticationSuccessful = (req, res, next, user) =>
-  req.logIn(user, err => {
+  req.logIn(user, (err) => {
     if (err) next(err)
     else {
       req.session.save(() => sendUser(res, user))
     }
   })
 
-export const init = app => {
+export const init = (app) => {
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
@@ -110,8 +110,8 @@ export const init = app => {
 
   app.put('/auth/reset-password/:uuid', async (req, res, next) => {
     try {
-      const { uuid, name, password } = Request.getParams(req)
-      await UserService.resetPassword(uuid, name, password)
+      const { uuid, name, password, title } = Request.getParams(req)
+      await UserService.resetPassword({ uuid, name, password, title })
       res.json({ result: true })
     } catch (error) {
       next(error)

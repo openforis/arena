@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 
@@ -11,7 +13,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const _checkSelf = req => {
+const _checkSelf = (req) => {
   const { userUuid } = Request.getParams(req)
   const user = Request.getUser(req)
   if (userUuid !== User.getUuid(user)) {
@@ -19,7 +21,7 @@ const _checkSelf = req => {
   }
 }
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
@@ -57,7 +59,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ==== READ
@@ -135,22 +137,10 @@ export const init = app => {
 
   // ==== UPDATE
 
-  app.put('/user/accept-invitation', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { name, password } = Request.getParams(req)
-
-      await UserService.acceptInvitation(User.getUuid(user), name, password)
-
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   const _updateUser = async (req, res) => {
-    const userToUpdate = Request.getBody(req)
-
+    const body = Request.getBody(req)
+    const { user: userToUpdateString } = body
+    const userToUpdate = A.parse(userToUpdateString)
     const validation = await UserValidator.validateUser(userToUpdate)
 
     if (!Validation.isValid(validation)) {
