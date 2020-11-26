@@ -58,7 +58,11 @@ const LabelsEditor = (props) => {
         </ValidationTooltip>
       </div>
       {editingLabels && (
-        <PanelRight onClose={() => setEditingLabels(false)} header={i18n.t(formLabelKey, { count: languages.length })}>
+        <PanelRight
+          width="100vw"
+          onClose={() => setEditingLabels(false)}
+          header={i18n.t(formLabelKey, { count: languages.length })}
+        >
           <div className="labels-editor__labels">
             <ValidationTooltip validation={validation}>
               {languages.map((lang) => (
