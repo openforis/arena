@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { keys as userKeys } from './userKeys'
@@ -10,6 +11,11 @@ export const keysProps = {
 }
 
 export const titleKeys = ['mr', 'ms', 'preferNotToSay']
+
+// ====== CREATE
+export const newProps = ({ title }) => ({
+  ...(!A.isEmpty(title) ? { title } : {}),
+})
 
 // ====== READ
 export const getProps = R.prop(userKeys.props)

@@ -772,6 +772,7 @@ $t(common.cantUndoWarning)`,
       emailNotFound: 'Email not found',
       groupRequired: 'Group is required',
       nameRequired: 'Name is required',
+      titleRequired: 'Title is required',
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
       passwordUnsafe:

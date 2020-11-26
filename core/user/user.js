@@ -78,4 +78,4 @@ export const { assocPrefSurveyCurrentAndCycle } = UserPrefs
 export const { deletePrefSurvey } = UserPrefs
 
 // PROPS
-export const { getTitle, assocTitle, titleKeys } = UserProps
+export const { getTitle, assocTitle, titleKeys, newProps } = UserProps
