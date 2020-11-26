@@ -10,9 +10,9 @@ import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import DropdownUserGroup from '../DropdownUserGroup'
-import DropdownUserTitle from '../DropdownUserTitle'
 
 import ProfilePictureEditor from './ProfilePictureEditor'
 
@@ -54,7 +54,11 @@ const UserEdit = () => {
       )}
 
       <FormItem label={i18n.t('user.title')}>
-        <DropdownUserTitle user={userToUpdate} onChange={onUpdate} />
+        <DropdownUserTitle
+          user={userToUpdate}
+          onChange={onUpdate}
+          validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
+        />
       </FormItem>
 
       <FormItem label={i18n.t('common.name')}>
