@@ -79,16 +79,16 @@ const getChildDefVariables = ({ survey, nodeDefContext, nodeDefCurrent, mode, la
 
 export const getParentsInOrder = ({ parent, survey, includeMultiples = false }) => {
   const _node = !A.isNull(parent) ? parent : Survey.getNodeDefRoot(survey)
-  const _stack = []
-  if (NodeDef.isMultiple(_node) && !includeMultiples) return _stack
+  if (NodeDef.isMultiple(_node) && !includeMultiples) return []
+  const parents = []
   const children = Survey.getNodeDefChildren(_node)(survey)
   if (children.length > 0) {
-    _stack.push(_node)
+    parents.push(_node)
     children.forEach((child) => {
-      _stack.push(...getParentsInOrder({ parent: child, survey }))
+      parents.push(...getParentsInOrder({ parent: child, survey }))
     })
   }
-  return _stack
+  return parents
 }
 
 export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam }) => {
