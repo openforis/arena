@@ -1,0 +1,54 @@
+@import './vars';
+
+:root {
+  --fontFamily: #{$fontFamily};
+
+  --headerHeight: #{$headerHeight};
+
+  /* Colors */
+  --red: #{$red};
+  --pink: #{$pink};
+  --green: #{$green};
+  --greenLight: #{$greenLight};
+  --yellow: #{$yellow};
+
+  --grey: #{$grey};
+  --greyAppBg: #{$greyAppBg};
+  --greyBorder: #{$greyBorder};
+  --blue: #{$blue};
+  --blueLight: #{$blueLight};
+  --blueLightFocus: #{$blueLightFocus};
+  --blueLightActive: #{$blueLightActive};
+  --blueDark: #{$blueDark};
+  --orange: #{$orange};
+  --orangeLight: #{$orangeLight};
+  --black: #{$black};
+  --yellowHighlight: #{$yellowHighlight};
+  --white: #{$white};
+
+  //z-indexes
+
+  --zIndex1App: #{$zIndex1App};
+  --zIndex5Badge: #{$zIndex5Badge};
+  --zIndex6Tooltip: #{$zIndex6Tooltip};
+  --zIndex10TopOfApp: #{$zIndex10TopOfApp};
+  --zIndex15UserMenu: #{$zIndex15UserMenu};
+  --zIndex18PanelRight: #{$zIndex18PanelRight};
+  --zIndex19AppModal: #{$zIndex19AppModal};
+  --zIndex20Dropdown: #{$zIndex20Dropdown};
+  --zIndex80AppNotification: #{$zIndex80AppNotification};
+  --zIndex90AppError: #{$zIndex90AppError};
+  /* Policy: everything is below app loader to stop user action */
+  --zIndex190AppLoader: #{$zIndex190AppLoader};
+
+  --shadow1: #{$shadow1};
+  --shadow2: #{$shadow2};
+  --shadow3: #{$shadow3};
+
+  // table
+  --tableRowHeight: #{$tableRowHeight};
+  --tableRowBorder: #{$tableRowBorder};
+
+  // profile picture
+  --profilePictureBorder: #{$profilePictureBorder};
+}

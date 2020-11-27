@@ -22,6 +22,7 @@ const getJsVariables = (nodeDef) => [
     label: NodeDef.getName(nodeDef),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
+    parentUuid: NodeDef.getParentUuid(nodeDef),
   },
 ]
 
@@ -37,6 +38,7 @@ const getSqlVariables = (nodeDef, lang) => {
     label: getLabel(col),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
+    parentUuid: NodeDef.getParentUuid(nodeDef),
   }))
 }
 
@@ -69,10 +71,43 @@ const getChildDefVariables = ({ survey, nodeDefContext, nodeDefCurrent, mode, la
       }
     }
   }
+
   return variables
 }
 
-export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurrent, mode, lang: langPreferred }) => {
+export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam }) => {
+  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
+
+  const variablesGroupedByParentUuid = (variables || []).reduce(
+    (byParentUuid, variable) => ({
+      ...byParentUuid,
+      [variable.parentUuid]: [...(byParentUuid[variable.parentUuid] || []), variable],
+    }),
+    {}
+  )
+
+  const variablesGrouped = Object.keys(variablesGroupedByParentUuid)
+    .map((parentUuid) => {
+      const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
+      return {
+        parentUuid,
+        label: NodeDef.getName(parentNodeDef),
+      }
+    })
+    .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
+    .map(({ parentUuid, label }) => ({ label, options: variablesGroupedByParentUuid[parentUuid] }))
+
+  return variablesGrouped
+}
+
+export const getVariables = ({
+  survey: surveyParam,
+  nodeDefContext,
+  nodeDefCurrent,
+  mode,
+  lang: langPreferred,
+  groupByParent,
+}) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
@@ -80,6 +115,7 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
   Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
     if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
       const childVariables = getChildDefVariables({ survey, nodeDefContext: nodeDef, nodeDefCurrent, mode, lang })
+
       variables.push(...childVariables)
     }
   })(survey)
@@ -95,6 +131,10 @@ export const getVariables = ({ survey: surveyParam, nodeDefContext, nodeDefCurre
     }
     return varA.label.localeCompare(varB.label)
   })
+
+  if (groupByParent) {
+    return getVariablesGroupedByParentUuid({ variables, survey })
+  }
 
   return variables
 }
