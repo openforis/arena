@@ -27,15 +27,9 @@ export const {
 } = UserResetPasswordRepository
 
 // ==== CREATE
-export const insertUser = async (user, surveyId, surveyCycleKey, email, password, status, groupUuid, client = db) =>
-  await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, email, password, status, t)
-    await addUserToGroup(user, surveyId, groupUuid, newUser, t)
-    return newUser
-  })
 
 export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
-  await client.tx(async t => {
+  client.tx(async (t) => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     const group = await AuthGroupRepository.fetchGroupByUuid(groupUuid, t)
 
@@ -49,9 +43,29 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
           [ActivityLog.keysContent.groupUuid]: groupUuid,
         },
         false,
-        t,
+        t
       )
     }
+  })
+
+export const insertUser = async (
+  { user, surveyId, surveyCycleKey, email, password, status, groupUuid, title },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const newUser = await UserRepository.insertUser(
+      {
+        surveyId,
+        surveyCycleKey,
+        email,
+        password,
+        status,
+        title,
+      },
+      t
+    )
+    await addUserToGroup(user, surveyId, groupUuid, newUser, t)
+    return newUser
   })
 
 export const generateResetPasswordUuid = async (email, client = db) => {
@@ -65,7 +79,7 @@ export const generateResetPasswordUuid = async (email, client = db) => {
 }
 // ==== READ
 
-const _initializeUser = async user => {
+const _initializeUser = async (user) => {
   // Assoc auth groups
   let userUpdated = User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
   if (User.isInvited(userUpdated)) {
@@ -77,7 +91,7 @@ const _initializeUser = async user => {
   return userUpdated
 }
 
-const _userFetcher = fetchFn => async (...args) => {
+const _userFetcher = (fetchFn) => async (...args) => {
   const user = await fetchFn(...args)
   return user ? await _initializeUser(user) : null
 }
@@ -87,7 +101,7 @@ export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
-  await client.tx(async t => {
+  await client.tx(async (t) => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
     return await Promise.all(users.map(_initializeUser))
   })
@@ -95,8 +109,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemA
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
-  if (user && (await passwordCompareFn(password, user.password)))
-    return await _initializeUser(R.dissoc('password', user))
+  if (user && (await passwordCompareFn(password, user.password))) return _initializeUser(R.dissoc('password', user))
 
   return null
 }
@@ -104,7 +117,7 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 // ==== UPDATE
 
 const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
-  await client.tx(async t => {
+  client.tx(async (t) => {
     const userUuid = User.getUuid(userToUpdate)
     const groupUuid = User.getGroupUuid(userToUpdate)
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
@@ -122,12 +135,21 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     const name = User.getName(userToUpdate)
     const email = User.getEmail(userToUpdate)
     const props = User.getProps(userToUpdate)
-    return await UserRepository.updateUser(userUuid, name, email, profilePicture, props, t)
+    return UserRepository.updateUser(
+      {
+        userUuid,
+        name,
+        email,
+        profilePicture,
+        props,
+      },
+      t
+    )
   })
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUserPrefs = async user => ({
+export const updateUserPrefs = async (user) => ({
   ...(await UserRepository.updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
@@ -136,7 +158,7 @@ export const updateUserPrefs = async user => ({
 
 export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await client.tx(
-    async t =>
+    async (t) =>
       await Promise.all([
         AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
         ActivityLogRepository.insert(
@@ -145,7 +167,7 @@ export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) 
           ActivityLog.type.userRemove,
           { [ActivityLog.keysContent.uuid]: userUuidToRemove },
           false,
-          t,
+          t
         ),
-      ]),
+      ])
   )

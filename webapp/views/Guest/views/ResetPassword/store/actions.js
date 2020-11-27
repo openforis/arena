@@ -12,6 +12,12 @@ export const updateUser = (event) => (dispatch) =>
     payload: { [event.target.name]: event.target.value },
   })
 
+export const updateUserTitle = (userWithTitle) => (dispatch) =>
+  dispatch({
+    type: actionTypes.USER_UPDATE,
+    payload: { ...userWithTitle },
+  })
+
 export const updateError = (error) => (dispatch) =>
   dispatch({
     type: actionTypes.ERROR_UPDATE,

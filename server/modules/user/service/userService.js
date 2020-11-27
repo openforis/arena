@@ -33,7 +33,7 @@ const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) =
 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   const authGroups = User.getAuthGroups(userToInvite)
-  const hasRoleInSurvey = authGroups.some(g => AuthGroup.getSurveyUuid(g) === surveyUuid)
+  const hasRoleInSurvey = authGroups.some((g) => AuthGroup.getSurveyUuid(g) === surveyUuid)
 
   if (!User.hasAccepted(userToInvite)) {
     throw new SystemError('appErrors.userHasPendingInvitation', { email: User.getEmail(userToInvite) })
@@ -50,7 +50,7 @@ export const inviteUser = async (
   surveyCycleKey,
   userToInviteParam,
   urlServer,
-  repeatInvitation = false,
+  repeatInvitation = false
 ) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
@@ -82,7 +82,7 @@ export const inviteUser = async (
 
   if (userToInvite) {
     // User to invite already exists
-    await db.tx(async t => {
+    await db.tx(async (t) => {
       if (repeatInvitation) {
         // Generate reset password and send email again
         await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
@@ -97,9 +97,20 @@ export const inviteUser = async (
     })
   } else {
     // User to invite does not exist
-    await db.tx(async t => {
+    await db.tx(async (t) => {
       // Add user to db
-      await UserManager.insertUser(user, surveyId, surveyCycleKey, email, null, User.userStatus.INVITED, groupUuid, t)
+      await UserManager.insertUser(
+        {
+          user,
+          surveyId,
+          surveyCycleKey,
+          email,
+          password: null,
+          status: User.userStatus.INVITED,
+          groupUuid,
+        },
+        t
+      )
       // Generate reset password and send email
       await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
     })
@@ -113,7 +124,7 @@ export const inviteUser = async (
  */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
-    return await db.tx(async t => {
+    return await db.tx(async (t) => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
@@ -143,7 +154,7 @@ export const countUsersBySurveyId = async (user, surveyId) => {
 export const fetchUserByUuid = UserManager.fetchUserByUuid
 export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
 
-export const findResetPasswordUserByUuid = async resetPasswordUuid => {
+export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
   return userUuid ? await UserManager.fetchUserByUuid(userUuid) : null
 }
@@ -181,22 +192,14 @@ export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
   return await UserManager.updateUser(user, surveyId, userToUpdateParam, profilePicture)
 }
 
-export const acceptInvitation = async (userUuid, name, password) => {
-  const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-  await UserManager.updateNamePasswordAndStatus(userUuid, name, passwordEncrypted, User.userStatus.ACCEPTED)
-}
-
-export const resetPassword = async (resetPasswordUuid, name, password) => {
+export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, title }) => {
   const user = await findResetPasswordUserByUuid(resetPasswordUuid)
   if (user) {
     const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-    await db.tx(async t => {
+    await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
-        User.getUuid(user),
-        name,
-        passwordEncrypted,
-        User.userStatus.ACCEPTED,
-        t,
+        { userUuid: User.getUuid(user), name, password: passwordEncrypted, status: User.userStatus.ACCEPTED, title },
+        t
       )
       await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)
     })
@@ -206,9 +209,7 @@ export const resetPassword = async (resetPasswordUuid, name, password) => {
 }
 
 // DELETE
-export const deleteUser = UserManager.deleteUser
-
-export const deleteUserResetPasswordExpired = UserManager.deleteUserResetPasswordExpired
+export const { deleteUser, deleteUserResetPasswordExpired } = UserManager
 
 // ==== User prefs
-export const updateUserPrefs = UserManager.updateUserPrefs
+export const { updateUserPrefs } = UserManager
