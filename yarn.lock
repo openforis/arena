@@ -11464,9 +11464,9 @@ react-input-autosize@^2.2.2:
     prop-types "^15.5.8"
 
 react-input-date@^1.0.2:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/react-input-date/-/react-input-date-1.0.7.tgz#bfa0d40b3df64fd473a8882b641ed05c27cdd1be"
-  integrity sha512-Td6Fnedt/6dfrN3j/Etv99kjnY/D3HTd59mteccEoDD5eysal+7seWNX3lAdprXWoAn6uaCPS1toTtqrl3FH0A==
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/react-input-date/-/react-input-date-1.0.9.tgz#9c6a25cf28b9c7799299cf8a609ffb598f33c50e"
+  integrity sha512-bM6xSX1d48J2tH45eAgAxSNNOvK31EojoedRUtkhKTe5sv6R7My9S2xACBmqM1lDeUIxaHpmOozpXqTHCX196w==
   dependencies:
     "@emotion/react" "^11.1.1"
     "@emotion/styled" "^11.0.0"
