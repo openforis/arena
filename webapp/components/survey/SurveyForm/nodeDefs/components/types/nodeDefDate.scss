@@ -1,0 +1,41 @@
+@import 'webapp/style/vars';
+@import '../../../SurveyFormVars';
+
+.survey-form__node-def-date {
+  display: flex;
+  border: $formBorder;
+  border: 1px solid $greyBorder;
+  justify-content: center;
+
+  .date-input-container {
+    padding: .5rem 1rem;
+    margin: auto;
+  }
+
+  .label-container {
+    display: none;
+  }
+
+  .input-container {
+    .date-input {
+      font-size: 0.9rem;
+      line-height: 1;
+      color: $black;
+      padding: 0;
+      box-shadow: none;
+
+
+      &::placeholder {
+        color: $black;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .separator {
+    font-size: 0.9rem;
+    line-height: 1;
+    color: $black;
+    margin: auto;
+  }
+}
