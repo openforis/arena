@@ -98,9 +98,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
   return variables
 }
 
-export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam }) => {
-  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
-
+const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
   const variablesGroupedByParentUuid = (variables || []).reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
@@ -109,18 +107,15 @@ export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam
     {}
   )
 
-  const variablesGrouped = Object.keys(variablesGroupedByParentUuid)
-    .map((parentUuid) => {
+  return Object.entries(variablesGroupedByParentUuid)
+    .map(([parentUuid, variablesParent]) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
       return {
-        parentUuid,
         label: NodeDef.getName(parentNodeDef),
+        options: variablesParent,
       }
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
-    .map(({ parentUuid, label }) => ({ label, options: variablesGroupedByParentUuid[parentUuid] }))
-
-  return variablesGrouped
 }
 
 export const getVariables = ({
