@@ -20,7 +20,7 @@ const SrsEditor = (props) => {
     <InputChips
       items={srsLookupFunction}
       itemKey={Srs.keys.code}
-      itemLabel={(srsValue) => `${Srs.getName(srsValue)} (EPSG:${Srs.getCode(srsValue)})`}
+      itemLabel={Srs.getNameAndCode}
       selection={srs}
       autocompleteMinChars={3}
       requiredItems={1}
