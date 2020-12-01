@@ -13,6 +13,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Srs from '@core/geo/srs'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
@@ -62,7 +63,7 @@ const NodeDefCoordinate = (props) => {
       readOnly={entryDisabled}
       items={surveySrs}
       itemKey="code"
-      itemLabel="name"
+      itemLabel={Srs.getNameAndCode}
       selection={selectedSrs}
       onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}
     />
