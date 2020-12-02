@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -34,7 +35,9 @@ export const useRequest = ({
         })
         .catch((err) => {
           // canceled
-          handleError?.(err)
+          if (err && !axios.isCancel(err)) {
+            handleError?.(err)
+          }
         })
     }
     return () => {
