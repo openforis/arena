@@ -333,8 +333,8 @@ const DateInput = React.forwardRef(
 DateInput.propTypes = {
   format: PropTypes.string,
   separator: PropTypes.string,
-  placeholders: PropTypes.array,
-  labels: PropTypes.array,
+  placeholders: PropTypes.object,
+  labels: PropTypes.object,
   showLabel: PropTypes.bool,
 
   disabled: PropTypes.bool,

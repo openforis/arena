@@ -79,7 +79,7 @@ const Input = React.forwardRef(
     const handleKeyDown = (e) => {
       if (
         shouldManageZero &&
-        e.key === 0 &&
+        e.key === '0' &&
         (e.target.value === '' ||
           (ref.current.selectionStart === 0 && ref.current.selectionEnd === e.target.value.length))
       ) {
@@ -87,14 +87,15 @@ const Input = React.forwardRef(
       }
 
       if (zeroTyped) {
-        if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(e.key)) {
-          const nextValue = `${e.target.value}${String.fromCharCode(e.key)}`
+        if (['1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(e.key)) {
+          // 1.2.3.... keys
+          const nextValue = `${e.target.value}${e.key}`
           if (nextValue !== '' && nextValue.length <= 2) {
             moveNext({ itemIndex, [dateKey]: nextValue })
             e.stopPropagation()
             e.preventDefault()
           }
-        } else if (e.key !== 0) {
+        } else if (e.key !== '0') {
           setZeroTyped(false)
         }
       }
@@ -187,8 +188,8 @@ const Input = React.forwardRef(
 
 Input.propTypes = {
   disabled: PropTypes.bool,
-  placeholders: PropTypes.array.isRequired,
-  labels: PropTypes.array.isRequired,
+  placeholders: PropTypes.object.isRequired,
+  labels: PropTypes.object.isRequired,
 
   date: PropTypes.string.isRequired,
   format: PropTypes.string.isRequired,
