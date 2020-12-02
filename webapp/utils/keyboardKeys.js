@@ -4,6 +4,7 @@ export const KeyboardKeys = {
   ArrowUp: 'ArrowUp',
   ArrowRight: 'ArrowRight',
   ArrowDown: 'ArrowDown',
+  Backspace: 'Backspace',
   Tab: 'Tab',
   Escape: 'Escape',
   PageUp: 'PageUp',

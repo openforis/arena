@@ -1,18 +1,16 @@
 import './nodeDefDate.scss'
 
-import React, { useRef } from 'react'
+import React from 'react'
 
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 
-import DateInput from 'react-input-date'
+import DateInput from '@webapp/components/form/DateInput'
 
 const NodeDefDate = (props) => {
   const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
-
-  const inputField = useRef()
 
   const node = entry ? nodes[0] : null
 
@@ -27,19 +25,7 @@ const NodeDefDate = (props) => {
 
   return (
     <div className="survey-form__node-def-date">
-      <DateInput
-        ref={inputField}
-        disabled={edit || !canEditRecord || readOnly}
-        format="DDMMYYYY"
-        separator="/"
-        placeholders={{
-          day: 'dd',
-          month: 'mm',
-          year: 'yyyy',
-        }}
-        onChange={handleChangeDateInput}
-        date={nodeValue}
-      />
+      <DateInput disabled={edit || !canEditRecord || readOnly} onChange={handleChangeDateInput} value={nodeValue} />
     </div>
   )
 }
