@@ -1,3 +1,4 @@
+import { $ } from 'taiko'
 import { button, click, expectExists, getElement, textBox, toRightOf, waitFor, writeIntoTextBox } from '../api'
 import { waitForLoader } from './loader'
 
@@ -8,6 +9,20 @@ const selectors = {
   multiple: () => toRightOf('Multiple'),
   category: () => toRightOf('Category'),
   parentCode: () => toRightOf('Parent Code'),
+}
+
+const selectorsAdvanced = {
+  defaultValuePlaceholderEditBtn: () =>
+    $(
+      '.node-def-edit__expression.placeholder .expression-editor__query-container .btn-edit',
+      toRightOf('Default values')
+    ),
+  relevantIfPlaceholderEditBtn: () =>
+    $('.node-def-edit__expression.placeholder .expression-editor__query-container .btn-edit', toRightOf('Relevant if')),
+}
+
+const selectorsExpressionEditor = {
+  constantValue: () => toRightOf('Const'),
 }
 
 export const clickNodeDefSaveAndBack = async () => {
@@ -93,4 +108,20 @@ export const expectNodeDefCodeParentEnabled = async () => expect(await _isNodeDe
 export const clickNodeDefTaxonomyAdd = async () => {
   await click(button({ class: 'btn-add-taxonomy' }))
   await waitFor(1000)
+}
+
+export const addNodeDefDefaultValue = async ({ constant }) => {
+  await click('Advanced')
+
+  await click(selectorsAdvanced.defaultValuePlaceholderEditBtn())
+
+  await writeIntoTextBox({ text: constant, selector: selectorsExpressionEditor.constantValue() })
+
+  await click('Apply')
+}
+
+export const setNodeDefRelevantIf = async () => {
+  await click('Advanced')
+
+  await click(selectorsAdvanced.relevantIfPlaceholderEditBtn())
 }
