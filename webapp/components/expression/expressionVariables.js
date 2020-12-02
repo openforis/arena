@@ -42,42 +42,63 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang }) => {
-  const variables = []
-  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
-  const stack = []
+const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) => {
+  if (Expression.isValidExpressionType(childDef)) {
+    // exclude nodes that reference the current one
+    const referenceCurrentNode =
+      Boolean(nodeDefCurrent) &&
+      Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
 
-  stack.push(...Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey))
+    if (!referenceCurrentNode) {
+      if (mode === Expression.modes.sql) {
+        return getSqlVariables(childDef, lang)
+      }
 
-  while (stack.length > 0) {
-    const childDef = stack.pop()
-
-    if (NodeDef.isSingleEntity(childDef)) {
-      stack.push(...Survey.getNodeDefChildren(childDef, includeAnalysis)(survey))
-    } else if (Expression.isValidExpressionType(childDef)) {
-      // exclude nodes that reference the current one
-      const referenceCurrentNode =
-        Boolean(nodeDefCurrent) &&
-        Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
-
-      if (!referenceCurrentNode) {
-        if (mode === Expression.modes.sql) {
-          variables.push(...getSqlVariables(childDef, lang))
-        }
-
-        if (mode === Expression.modes.json) {
-          variables.push(...getJsVariables(childDef))
-        }
+      if (mode === Expression.modes.json) {
+        return getJsVariables(childDef)
       }
     }
   }
+  return []
+}
 
+const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang }) => {
+  const variables = []
+
+  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
+  const stack = []
+  const entitiesVisitedByUuid = {}
+
+  // visit nodeDefContext and its ancestors following the hierarchy
+  stack.push(nodeDefContext)
+
+  while (stack.length > 0) {
+    const nodeDef = stack.pop()
+
+    entitiesVisitedByUuid[NodeDef.getUuid(nodeDef)] = true
+
+    if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
+      // get variables from every child def
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
+      nodeDefChildren.forEach((childDef) => {
+        variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
+
+        // if the child def is a single entity, include variables from the descendants of that entity
+        if (NodeDef.isSingleEntity(childDef) && !entitiesVisitedByUuid[NodeDef.getUuid(childDef)]) {
+          stack.push(childDef)
+        }
+      })
+    }
+    // add parent to stack only if not visited yet
+    const parent = Survey.getNodeDefParent(nodeDef)(survey)
+    if (parent && !entitiesVisitedByUuid[NodeDef.getUuid(parent)]) {
+      stack.push(parent)
+    }
+  }
   return variables
 }
 
-export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam }) => {
-  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
-
+const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
   const variablesGroupedByParentUuid = (variables || []).reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
@@ -86,18 +107,15 @@ export const getVariablesGroupedByParentUuid = ({ variables, survey: surveyParam
     {}
   )
 
-  const variablesGrouped = Object.keys(variablesGroupedByParentUuid)
-    .map((parentUuid) => {
+  return Object.entries(variablesGroupedByParentUuid)
+    .map(([parentUuid, variablesParent]) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
       return {
-        parentUuid,
         label: NodeDef.getName(parentNodeDef),
+        options: variablesParent,
       }
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
-    .map(({ parentUuid, label }) => ({ label, options: variablesGroupedByParentUuid[parentUuid] }))
-
-  return variablesGrouped
 }
 
 export const getVariables = ({
@@ -111,14 +129,7 @@ export const getVariables = ({
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  const variables = []
-  Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
-    if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
-      const childVariables = getChildDefVariables({ survey, nodeDefContext: nodeDef, nodeDefCurrent, mode, lang })
-
-      variables.push(...childVariables)
-    }
-  })(survey)
+  const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
 
   // Show current node def variable in the first position
   const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
