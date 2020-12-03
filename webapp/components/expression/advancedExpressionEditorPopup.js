@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror/lib/codemirror'
 import 'codemirror/addon/hint/show-hint'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
@@ -36,9 +37,13 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const [validation, setValidation] = useState({})
 
-  const variablesOtherNodeDefs = variables.filter((v) => v.uuid !== NodeDef.getUuid(nodeDefCurrent))
+  // exclude variable related to current node def
+  const variablesOtherNodeDefs = variables.map((group) => ({
+    ...group,
+    options: group.options.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
+  }))
 
-  const variablesIds = variablesOtherNodeDefs.map((x) => x.value)
+  const variablesIds = variablesOtherNodeDefs.map(A.prop('options')).flat().map(A.prop('value'))
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
@@ -93,7 +98,7 @@ AdvancedExpressionEditorPopup.propTypes = {
   query: PropTypes.string, // String representing the expression
   setExpressionCanBeApplied: PropTypes.func.isRequired,
   updateDraftQuery: PropTypes.func.isRequired,
-  variables: PropTypes.arrayOf(Object).isRequired,
+  variables: PropTypes.arrayOf(Object).isRequired, // variables grouped by parent entity
   mode: PropTypes.string,
 }
 
