@@ -1,5 +1,16 @@
-import { $ } from 'taiko'
-import { button, click, expectExists, getElement, textBox, toRightOf, waitFor, writeIntoTextBox } from '../api'
+import {
+  $,
+  button,
+  click,
+  expectExists,
+  getElement,
+  textBox,
+  toRightOf,
+  waitFor,
+  within,
+  writeIntoTextBox,
+} from '../api'
+import { writeIntoEl } from '../api/textBox'
 import { waitForLoader } from './loader'
 
 const selectors = {
@@ -17,12 +28,16 @@ const selectorsAdvanced = {
       '.node-def-edit__expression.placeholder .expression-editor__query-container .btn-edit',
       toRightOf('Default values')
     ),
+  defaultValueExpression: ({ position }) =>
+    $(`.node-def-edit__expressions .node-def-edit__expression:nth-child(${position})`, toRightOf('Default values')),
   relevantIfPlaceholderEditBtn: () =>
     $('.node-def-edit__expression.placeholder .expression-editor__query-container .btn-edit', toRightOf('Relevant if')),
+  relevantIfExpression: () => $('.node-def-edit__expressions .node-def-edit__expression', toRightOf('Relevant if')),
 }
 
 const selectorsExpressionEditor = {
   constantValue: () => toRightOf('Const'),
+  advancedExpressionInput: () => '.CodeMirror',
 }
 
 export const clickNodeDefSaveAndBack = async () => {
@@ -120,8 +135,33 @@ export const addNodeDefDefaultValue = async ({ constant }) => {
   await click('Apply')
 }
 
-export const setNodeDefRelevantIf = async () => {
+const _expectExpressionIs = async ({ expressionContainer, expression }) => {
+  const expressionEl = await getElement({
+    text: expression,
+    relativeSelectors: [within(expressionContainer)],
+  })
+  const exists = await expressionEl.exists()
+  await expect(exists).toBeTruthy()
+}
+
+export const expectNodeDefDefaultValue = async ({ expression, position = 1 }) => {
+  const expressionContainer = await selectorsAdvanced.defaultValueExpression({ position })
+  await _expectExpressionIs({ expressionContainer, expression })
+}
+
+export const setNodeDefRelevantIf = async ({ expression }) => {
   await click('Advanced')
 
   await click(selectorsAdvanced.relevantIfPlaceholderEditBtn())
+
+  await click('Advanced')
+
+  await writeIntoEl({ text: expression, selector: selectorsExpressionEditor.advancedExpressionInput() })
+
+  await click('Apply')
+}
+
+export const expectNodeDefRelevantIf = async ({ expression }) => {
+  const expressionContainer = await selectorsAdvanced.relevantIfExpression()
+  await _expectExpressionIs({ expressionContainer, expression })
 }
