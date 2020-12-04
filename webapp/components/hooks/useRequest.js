@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -18,6 +19,7 @@ export const useRequest = ({
   requestFunction,
   requestArguments,
   prepareData = (data) => data,
+  handleError = null,
 }) => {
   const [data, setData] = useState(defaultValue)
   const cancelRequestRef = useRef(null)
@@ -31,8 +33,11 @@ export const useRequest = ({
         .then(({ data: dataResponse }) => {
           setData(prepareData(dataResponse))
         })
-        .catch(() => {
+        .catch((err) => {
           // canceled
+          if (err && !axios.isCancel(err)) {
+            handleError?.(err)
+          }
         })
     }
     return () => {
