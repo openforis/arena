@@ -19,11 +19,6 @@ const DateInput = (props) => {
       disabled={disabled}
       format="DDMMYYYY"
       separator="/"
-      placeholders={{
-        day: 'dd',
-        month: 'mm',
-        year: 'yyyy',
-      }}
       onChange={onChange}
       date={value || DateUtils.format(new Date(), 'dd/MM/yyyy')}
     />
