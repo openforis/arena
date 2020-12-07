@@ -21,6 +21,7 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   const [params, setParams] = useState({})
   const [newest, setNewest] = useState({})
   const [hasToFetch, setHasToFetch] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
   const prepareData = (fetchedData) => {
     const initialized = messages.length > 0
@@ -39,12 +40,17 @@ export const useFetchMessages = ({ messages, setMessages }) => {
     return newMessages
   }
 
+  const handleError = () => {
+    setHasError(true)
+  }
+
   useRequest({
-    condition: hasToFetch,
+    condition: hasToFetch && !hasError,
     defaultValue: [],
     requestFunction: API.fetchActivityLogs,
     requestArguments: [{ surveyId, params }],
     prepareData,
+    handleError,
     dependencies: [params],
   })
 
