@@ -14,7 +14,7 @@ const transformCallback = (row) => {
     ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
     /* eslint-disable-next-line camelcase */
     ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
-    ...(rest || {}),
+    ...rest,
   }
 }
 
