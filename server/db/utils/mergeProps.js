@@ -4,5 +4,5 @@ export const mergeProps = ({ draft = false } = {}) => (row) => {
   }
   const { props = {}, props_draft: propsDraft = {}, ...rest } = row
   const propsUpdate = draft ? { ...(props || {}), ...(propsDraft || {}) } : props
-  return { ...rest, props: propsUpdate }
+  return { ...(rest || {}), props: propsUpdate }
 }

@@ -34,7 +34,7 @@ describe('Analysis create chain', () => {
   test('Add new chain', async () => {
     await click('New')
     await clearTextBox({ selector: toRightOf('Processing chain label') })
-    await writeIntoTextBox({ text: 'Processing chain', selector: toRightOf('Processing chain label') })
+    await writeIntoTextBox({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
     await clearTextBox({ selector: toRightOf('Description') })
     await writeIntoTextBox({ text: 'Processing description', selector: toRightOf('Description') })
   })
@@ -48,22 +48,22 @@ describe('Analysis create chain', () => {
   test('Add new calculation', async () => {
     await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Calculation steps'))
     await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: 'Calculation label', selector: above('Quantitative') })
+    await writeIntoTextBox({ text: 'Tree volume', selector: above('Quantitative') })
   })
 
   test('Add new calculation attribute', async () => {
     await click('Add', toRightOf('Attribute'))
 
     await clearTextBox({ selector: toRightOf('Name') })
-    await writeIntoTextBox({ text: 'attribute_name', selector: toRightOf('Name') })
+    await writeIntoTextBox({ text: 'tree_volume', selector: toRightOf('Name') })
     await expectExists({ text: 'DECIMAL' })
     await expectExists({ selector: '.icon-checkbox-checked', relativeSelectors: [toRightOf('Analysis')] })
 
     await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: 'Attribute label', selector: toRightOf('Labels') })
+    await writeIntoTextBox({ text: 'Tree volume', selector: toRightOf('Labels') })
 
     await clearTextBox({ selector: toRightOf('Descriptions') })
-    await writeIntoTextBox({ text: 'Attribute description', selector: toRightOf('Descriptions') })
+    await writeIntoTextBox({ text: 'Tree volume description', selector: toRightOf('Descriptions') })
 
     await click('Save')
 
@@ -73,11 +73,11 @@ describe('Analysis create chain', () => {
   })
 
   test('Check values after Add new calculation attribute', async () => {
-    await expectExists({ text: 'Processing chain', selector: toRightOf('Processing chain label') })
+    await expectExists({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
     await expectExists({ text: 'Tree', selector: toRightOf('1') })
-    await expectExists({ text: 'Calculation label (Attribute label (C))' })
-    await expectExists({ text: 'Calculation label', selector: toRightOf('Labels') })
-    await expectExists({ text: 'Attribute label (C)', selector: toRightOf('Attribute') })
+    await expectExists({ text: 'Tree volume (Tree volume (C))' })
+    await expectExists({ text: 'Tree volume', selector: toRightOf('Labels') })
+    await expectExists({ text: 'Tree volume (C)', selector: toRightOf('Attribute') })
   })
 
   test('Save calculation', async () => {
