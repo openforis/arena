@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import Calendar from 'react-calendar'
 
+import { useI18n } from '@webapp/store/system'
 import { KeyboardKeys } from '@webapp/utils/keyboardKeys'
 
 import 'react-calendar/dist/Calendar.css'
@@ -68,6 +69,8 @@ const DateInput = React.forwardRef(
     },
     ref
   ) => {
+    const i18n = useI18n()
+
     const dateInputContainer = useRef(null)
     const calendarContainer = useRef(null)
     const [dateInputContainerRef, setDateInputContainerRef] = useState(null)
@@ -313,16 +316,12 @@ const DateInput = React.forwardRef(
             showLabel,
           })}
         </div>
-        {error && (
-          <div className="error-container">
-            <small>Invalid date</small>
-          </div>
-        )}
-        {warning && (
-          <div className="error-container">
-            <small>Incomplete date</small>
-          </div>
-        )}
+        {error ||
+          (warning && (
+            <div className="error-container">
+              <small>{i18n.t('validationErrors.invalidDate')}</small>
+            </div>
+          ))}
 
         {withCalendar && isCalendarOpen && renderCalendar()}
       </div>
