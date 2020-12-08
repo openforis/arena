@@ -13,6 +13,6 @@ export const useUpdateProp = ({ setState }) => {
     const calculation = State.getCalculationEdit(state)
     const { calculation: calculationUpdated } = ChainController.assocCalculationProp({ calculation, prop, value })
 
-    update({ calculationUpdated })
+    update({ calculationUpdated, state })
   }, [])
 }
