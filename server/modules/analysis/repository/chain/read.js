@@ -9,9 +9,11 @@ const transformCallback = (row) => {
   const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
 
   return {
-    [ObjectUtils.keys.dateCreated]: date_created,
-    [ObjectUtils.keys.dateModified]: date_modified,
-    ...rest,
+    /* eslint-disable-next-line camelcase */
+    ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
+    /* eslint-disable-next-line camelcase */
+    ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
+    ...(rest || {}),
   }
 }
 
