@@ -13,7 +13,7 @@ import {
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 
-describe('Analysis create chain', () => {
+describe('Analysis create chain.', () => {
   test("Chain can't be created until survey is published", async () => {
     await clickSidebarBtnAnalysisProcessingChains()
     await expectExists({ text: 'This section is available only when survey is published' })
