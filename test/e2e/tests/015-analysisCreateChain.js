@@ -1,4 +1,4 @@
-import { clickSidebarBtnAnalysisProcessingChains, clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
+import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
 import {
   clearTextBox,
   click,
@@ -24,14 +24,8 @@ describe('Analysis create chain.', () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitFor(5000)
-    await click('Close')
-  })
-
-  test('Chain is empty', async () => {
-    await clickSidebarBtnSurveyForm()
-    await clickSidebarBtnAnalysisProcessingChains()
-    await expectExists({ text: 'No items' })
+    await waitFor('close')
+    await click('close')
   })
 
   test('Add new chain', async () => {
