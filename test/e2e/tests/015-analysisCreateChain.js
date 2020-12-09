@@ -1,4 +1,4 @@
-import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
+import { clickSidebarBtnAnalysisProcessingChains, clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import {
   clearTextBox,
   click,
@@ -29,6 +29,9 @@ describe('Analysis create chain.', () => {
   })
 
   test('Add new chain', async () => {
+    await clickSidebarBtnSurveyForm()
+    await clickSidebarBtnAnalysisProcessingChains()
+    await waitForLoader()
     await click('New')
     await clearTextBox({ selector: toRightOf('Processing chain label') })
     await writeIntoTextBox({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
