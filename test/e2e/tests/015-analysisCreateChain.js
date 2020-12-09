@@ -66,9 +66,7 @@ describe('Analysis create chain.', () => {
     await writeIntoTextBox({ text: 'Tree volume description', selector: toRightOf('Descriptions') })
 
     await click('Save')
-
     await waitForLoader()
-
     await click('Back')
   })
 
