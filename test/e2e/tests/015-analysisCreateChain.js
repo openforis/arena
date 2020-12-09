@@ -1,4 +1,4 @@
-import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
+import { clickSidebarBtnAnalysisProcessingChains, clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import {
   clearTextBox,
   click,
@@ -10,6 +10,7 @@ import {
   textBox,
   above,
   below,
+  waitFor,
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 
@@ -19,15 +20,17 @@ describe('Analysis create chain.', () => {
     await expectExists({ text: 'This section is available only when survey is published' })
   })
 
-  test('Publish root_entity error', async () => {
+  test('Publish chain', async () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitForLoader()
+    await waitFor(5000)
     await click('Close')
   })
 
   test('Chain is empty', async () => {
+    await clickSidebarBtnSurveyForm()
+    await clickSidebarBtnAnalysisProcessingChains()
     await expectExists({ text: 'No items' })
   })
 
