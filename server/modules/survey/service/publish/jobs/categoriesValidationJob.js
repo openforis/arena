@@ -20,12 +20,9 @@ export default class CategoriesValidationJob extends Job {
 
     this.total = categoriesArr.length
 
-    this.logDebug(`categoriesArr ${categoriesArr.length} ${this.total}`)
-
     categoriesArr.forEach((category) => {
       const validation = Validation.getValidation(category)
       if (!Validation.isValid(validation)) {
-        this.logDebug(`${Category.getName(category)}`)
         this.addError(Validation.getFieldValidations(validation), Category.getName(category))
       }
       this.incrementProcessedItems()

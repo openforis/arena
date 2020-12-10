@@ -20,7 +20,7 @@ export default class SurveyPublishJob extends Job {
   constructor(params) {
     super(SurveyPublishJob.type, params, [
       new NodeDefsValidationJob(),
-      //new CategoriesValidationJob(),
+      new CategoriesValidationJob(),
       new TaxonomiesValidationJob(),
       new SurveyInfoValidationJob(),
       new CyclesDeletedCheckJob(),
