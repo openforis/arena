@@ -62,13 +62,14 @@ jobs:
     - run: yarn build-dev
     - run: ln -s dist/server.js .
     - name: run server
-      run: node server.js
+      run: exec pm2-runtime server.js &
       env:
         PGHOST: localhost
         PGPORT: 5444
         PGDATABASE: of-arena-test
         PGUSER: arena
         PGPASSWORD: arena
+        SESSION_ID_COOKIE_SECRET: my-cookie-secret-key:  
 
     - run: while ! nc -z localhost 9090; do sleep 10; done;
     - name: run migrations and tests
