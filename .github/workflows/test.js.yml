@@ -61,7 +61,15 @@ jobs:
     - run: yarn build:server:dev
     - run: yarn build-dev
     - run: ln -s dist/server.js .
-    - run: exec pm2-runtime server.js &
+    - name: run server
+      run: exec pm2-runtime server.js &
+      env:
+        PGHOST: localhost
+        PGPORT: 5444
+        PGDATABASE: arena_test
+        PGUSER: arena
+        PGPASSWORD: arena
+
     - run: while ! nc -z localhost 9090; do sleep 10; done;
     - run: yarn server:migrate
     - run: yarn test
