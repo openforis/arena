@@ -69,7 +69,7 @@ jobs:
         PGDATABASE: of-arena-test
         PGUSER: arena
         PGPASSWORD: arena
-        SESSION_ID_COOKIE_SECRET: my-cookie-secret-key:  
+        SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
 
     - run: while ! nc -z localhost 9090; do sleep 10; done;
     - name: run migrations and tests
