@@ -80,9 +80,10 @@ export default class Job {
         await this._setStatusSucceeded()
       }
     } catch (error) {
+      this.logError(`${error.stack || error}`)
+
       if (this.isRunning()) {
         // Error found, change status only if not changed already
-        this.logError(`${error.stack || error}`)
         this.addError({
           error: {
             valid: false,
@@ -145,6 +146,8 @@ export default class Job {
     if (!errorKey) {
       errorKey = String(this.processed + 1)
     }
+
+    this.logDebug(`- ${error}, ${errorKey} inner jobs found`)
 
     this.errors[errorKey] = error
   }
