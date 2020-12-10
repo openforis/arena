@@ -53,5 +53,10 @@ jobs:
                       libasound2 \
                       libdbus-glib-1-2 \
                       libxt6
+    - run: cp test/db/migrations/*.js server/db/migration/public/migrations
+    - run: cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
     - run: yarn
+    - run: yarn build:server:dev
+    - run: yarn build-dev
+    - run: ln -s dist/server.js .
     - run: yarn test
