@@ -82,4 +82,4 @@ jobs:
     - name: run tests
       run: yarn test
       env:
-        HEADLESS_CHROME: 'false'
+        HEADLESS_CHROME: 'true'
