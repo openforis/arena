@@ -80,3 +80,4 @@ jobs:
         PGUSER: arena
         PGPASSWORD: arena
         HEADLESS_CHROME: 'true'
+        SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
