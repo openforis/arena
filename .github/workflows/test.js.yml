@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_USER: arena
           POSTGRES_PASSWORD: arena
-          POSTGRES_DB: arena
+          POSTGRES_DB: of-arena-test
         ports:
           - 5444:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -66,7 +66,7 @@ jobs:
       env:
         PGHOST: localhost
         PGPORT: 5444
-        PGDATABASE: arena_test
+        PGDATABASE: of-arena-test
         PGUSER: arena
         PGPASSWORD: arena
 
