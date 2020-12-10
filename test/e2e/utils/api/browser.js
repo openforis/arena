@@ -2,7 +2,7 @@ import { openBrowser as openBrowserTaiko, goto } from 'taiko'
 
 export { closeBrowser, reload } from 'taiko'
 
-const headless = true // process.env.HEADLESS_CHROME === 'true'
+const headless = process.env.HEADLESS_CHROME === 'true'
 
 export const openBrowser = async () => {
   await openBrowserTaiko({
