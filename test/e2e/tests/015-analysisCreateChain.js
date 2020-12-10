@@ -29,8 +29,6 @@ describe('Analysis create chain.', () => {
   })
 
   test('Add new chain', async () => {
-    await clickSidebarBtnSurveyForm()
-    await clickSidebarBtnAnalysisProcessingChains()
     await waitForLoader()
     await click('New')
     await clearTextBox({ selector: toRightOf('Processing chain label') })
