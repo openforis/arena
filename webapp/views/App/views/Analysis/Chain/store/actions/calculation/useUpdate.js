@@ -15,25 +15,24 @@ export const useUpdate = ({ setState }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-  return useCallback(
-    ({ calculationUpdated }) =>
-      setState((statePrev) => {
-        const chain = State.getChainEdit(statePrev)
-        const step = State.getStepEdit(statePrev)
+  return useCallback(({ calculationUpdated, state }) => {
+    const chain = State.getChainEdit(state)
+    const step = State.getStepEdit(state)
 
-        const { step: stepUpdated } = ChainController.assocCalculation({ chain, step, calculation: calculationUpdated })
-        const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
-        const chainUpdated = Chain.assocItemValidation(
-          Calculation.getUuid(calculationUpdated),
-          calculationValidation
-        )(chain)
+    const { step: stepUpdated } = ChainController.assocCalculation({ chain, step, calculation: calculationUpdated })
+    const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
+    const chainUpdated = Chain.assocItemValidation(
+      Calculation.getUuid(calculationUpdated),
+      calculationValidation
+    )(chain)
 
-        return A.pipe(
-          State.assocChainEdit(chainUpdated),
-          State.assocStepEdit(stepUpdated),
-          State.assocCalculationEdit(calculationUpdated)
-        )(statePrev)
-      }),
-    []
-  )
+    const stateUpdated = A.pipe(
+      State.assocChainEdit(chainUpdated),
+      State.assocStepEdit(stepUpdated),
+      State.assocCalculationEdit(calculationUpdated)
+    )(state)
+
+    setState(stateUpdated)
+    return stateUpdated
+  }, [])
 }

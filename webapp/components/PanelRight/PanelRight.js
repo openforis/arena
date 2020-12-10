@@ -1,11 +1,12 @@
 import './panelRight.scss'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
 const PanelRight = (props) => {
   const { children, header, onClose, width } = props
 
-  return (
+  return ReactDOM.createPortal(
     <div className="panel-right" style={{ width: `min(${width}, 100vw)` }}>
       <div className="panel-right__header">
         <button type="button" className="btn btn-transparent btn-close" onClick={onClose}>
@@ -14,7 +15,8 @@ const PanelRight = (props) => {
         <div>{header}</div>
       </div>
       <div className="panel-right__content">{React.Children.toArray(children)}</div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
