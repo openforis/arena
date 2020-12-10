@@ -9,7 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
+    services:
+      image: postgis/postgis:12-3.0
+      env:
+      - POSTGRES_USER=arena
+      - POSTGRES_PASSWORD=arena
+      - POSTGRES_DB=arena
+      ports:
+      - 5444:5432
+          
     steps:
     - uses: actions/checkout@v2
 
