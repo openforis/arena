@@ -11,13 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      image: postgis/postgis:12-3.0
-      env:
-      - POSTGRES_USER=arena
-      - POSTGRES_PASSWORD=arena
-      - POSTGRES_DB=arena
-      ports:
-      - 5444:5432
+      postgres:
+        image: postgis/postgis:12-3.0
+        env:
+          POSTGRES_USER=arena
+          POSTGRES_PASSWORD=arena
+          POSTGRES_DB=arena
+        ports:
+          - 5444:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 
           
     steps:
     - uses: actions/checkout@v2
