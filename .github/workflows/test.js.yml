@@ -62,7 +62,7 @@ jobs:
     - run: yarn build-dev
     - run: ln -s dist/server.js .
     - name: run server
-      run: node dist/server.js
+      run: node server.js
       env:
         PGHOST: localhost
         PGPORT: 5444
