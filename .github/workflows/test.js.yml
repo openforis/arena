@@ -79,4 +79,7 @@ jobs:
         PGDATABASE: of-arena-test
         PGUSER: arena
         PGPASSWORD: arena
-    - run: yarn test
+    - name: run tests
+      run: yarn test
+      env:
+        HEADLESS_CHROME: 'false'
