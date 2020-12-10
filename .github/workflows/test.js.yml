@@ -71,15 +71,12 @@ jobs:
         PGPASSWORD: arena
 
     - run: while ! nc -z localhost 9090; do sleep 10; done;
-    - name: migrate
-      run: yarn server:migrate
+    - name: run migrations and tests
+      run: yarn run npm-run-all server:migrate test
       env:
         PGHOST: localhost
         PGPORT: 5444
         PGDATABASE: of-arena-test
         PGUSER: arena
         PGPASSWORD: arena
-    - name: run tests
-      run: yarn test
-      env:
         HEADLESS_CHROME: 'true'
