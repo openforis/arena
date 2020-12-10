@@ -53,10 +53,15 @@ jobs:
                       libasound2 \
                       libdbus-glib-1-2 \
                       libxt6
+    - run: npm install -g chromium --unsafe-perm
+    - run: npm install pm2 -g
     - run: cp test/db/migrations/*.js server/db/migration/public/migrations
     - run: cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
     - run: yarn
     - run: yarn build:server:dev
     - run: yarn build-dev
     - run: ln -s dist/server.js .
+    - run: exec pm2-runtime server.js &
+    - run: while ! nc -z localhost 9090; do sleep 10; done;
+    - run: yarn server:migrate
     - run: yarn test
