@@ -15,6 +15,6 @@ export const useUpdateAttribute = ({ setState }) => {
       calculation,
       nodeDefUuid: NodeDef.getUuid(attrDef),
     })
-    return update({ calculationUpdated })
+    return update({ calculationUpdated, state })
   }, [])
 }

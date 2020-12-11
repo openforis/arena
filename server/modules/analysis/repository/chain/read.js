@@ -5,12 +5,15 @@ import { TableChain } from '../../../../../common/model/db'
 import * as Chain from '../../../../../common/analysis/processingChain'
 
 const transformCallback = (row) => {
+  if (!row) return {}
   /* eslint-disable-next-line camelcase */
   const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
 
   return {
-    [ObjectUtils.keys.dateCreated]: date_created,
-    [ObjectUtils.keys.dateModified]: date_modified,
+    /* eslint-disable-next-line camelcase */
+    ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
+    /* eslint-disable-next-line camelcase */
+    ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
     ...rest,
   }
 }
