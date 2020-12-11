@@ -303,10 +303,15 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.12.3.tgz#a305415ebe7a6c7023b40b5122a0662d928334cd"
   integrity sha512-kFsOS0IbsuhO5ojF8Hc8z/8vEIOkylVBrjiZUbLTE3XFe0Qi+uu6HjzQixkFaqr0ZPAMZcBVxEwmsnsLPZ2Xsw==
 
-"@babel/parser@^7.1.0", "@babel/parser@^7.10.4", "@babel/parser@^7.12.3", "@babel/parser@^7.12.5", "@babel/parser@^7.7.0", "@babel/parser@^7.9.4":
+"@babel/parser@^7.1.0", "@babel/parser@^7.10.4", "@babel/parser@^7.12.3", "@babel/parser@^7.12.5", "@babel/parser@^7.7.0":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.12.5.tgz#b4af32ddd473c0bfa643bd7ff0728b8e71b81ea0"
   integrity sha512-FVM6RZQ0mn2KCf1VUED7KepYeUWoVShczewOCfm3nzoBybaih51h+sYVVGthW9M6lPByEPTQf+xm27PBdlpwmQ==
+
+"@babel/parser@^7.12.7":
+  version "7.12.10"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.12.10.tgz#824600d59e96aea26a5a2af5a9d812af05c3ae81"
+  integrity sha512-PJdRPwyoOqFAWfLytxrWwGrAxghCgh/yTNCYciOz8QgjflA7aZhECPZAa2VUedKg2+QMWkI0L9lynh2SNmNEgA==
 
 "@babel/plugin-proposal-async-generator-functions@^7.12.1":
   version "7.12.1"
@@ -4679,6 +4684,13 @@ debug@^3.1.0, debug@^3.1.1, debug@^3.2.5, debug@^3.2.6:
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
   dependencies:
     ms "^2.1.1"
+
+debug@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
+  integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
+  dependencies:
+    ms "2.1.2"
 
 debug@~4.1.0:
   version "4.1.1"
@@ -13251,15 +13263,15 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-taiko@^1.0.23:
-  version "1.0.28"
-  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.0.28.tgz#cb5d1e7d85f7a0b37691d87f9f5afa9474652e7a"
-  integrity sha512-il4qbMyEF1q7zqWP4FgP3LxMHIFOSuKiqjeM+QI7UEtB8nUobRVQ0ZLiZhoPMRd8qo7kfvdPG2AamPFD3t4A6g==
+taiko@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.1.0.tgz#71d8f2cc59a5ebc690f0f797ca73bdf961c4e3c3"
+  integrity sha512-gGpqaKCGMDuAQ4Yl1yP9XFpTo5k2Ub1S16qEKQSNpX4HRA6HWEbjEzQl+u/rhb/7/tyIiAeDfjWClWzmTGnJsg==
   dependencies:
-    "@babel/parser" "^7.9.4"
+    "@babel/parser" "^7.12.7"
     chrome-remote-interface "^0.28.1"
     commander "^6.0.0"
-    debug "^4.1.1"
+    debug "^4.3.1"
     documentation "^13.0.2"
     extract-zip "^2.0.0"
     fs-extra "^9.0.0"

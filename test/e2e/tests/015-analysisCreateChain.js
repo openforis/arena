@@ -24,8 +24,8 @@ describe('Analysis create chain.', () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitFor('close')
-    await click('close')
+    await waitFor(5000)
+    await click('Close')
   })
 
   test('Add new chain', async () => {

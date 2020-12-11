@@ -83,7 +83,7 @@
     "sass-loader": "^10.0.2",
     "skeleton-loader": "^2.0.0",
     "style-loader": "^2.0.0",
-    "taiko": "^1.0.23",
+    "taiko": "^1.1.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.44.2",
     "webpack-bundle-analyzer": "^3.9.0",
