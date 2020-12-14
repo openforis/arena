@@ -45,13 +45,6 @@ describe('Analysis create chain.', () => {
     await click('Close')
   })
 
-  test('Survey should be published', async () => {
-    await reload()
-    await waitFor(2000)
-    await clickSidebarBtnAnalysisProcessingChains()
-    await expectExists({ text: 'This section is available only when survey is published' })
-  })
-
   test('Add new chain', async () => {
     await reload()
     await waitFor(2000)
