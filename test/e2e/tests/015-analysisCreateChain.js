@@ -1,3 +1,4 @@
+import { $ } from 'taiko'
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
 import {
   clearTextBox,
@@ -25,7 +26,13 @@ describe('Analysis create chain.', () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitFor(7000)
+    await waitFor(5000)
+    const errors = await $('.validation-field-message__text').elements()
+    await errors.forEach(async (error) => {
+      const errText = await error.text()
+      console.log(errText)
+    })
+    await waitFor(1000)
     await click('Close')
   })
 
