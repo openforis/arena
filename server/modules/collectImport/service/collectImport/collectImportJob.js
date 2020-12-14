@@ -1,13 +1,13 @@
 import Job from '@server/job/job'
 
-import * as SurveyManager from '../../../survey/manager/surveyManager'
-
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 
+import * as SurveyManager from '../../../survey/manager/surveyManager'
+
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
-import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
+// import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
@@ -18,7 +18,7 @@ export default class CollectImportJob extends Job {
     super(CollectImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new SurveyCreatorJob(),
-      new CategoriesImportJob(),
+      /* new CategoriesImportJob(), */
       new TaxonomiesImportJob(),
       new SamplingPointDataImportJob(),
       new NodeDefsImportJob(),
