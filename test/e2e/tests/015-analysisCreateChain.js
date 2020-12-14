@@ -11,6 +11,7 @@ import {
   above,
   below,
   waitFor,
+  reload,
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 
@@ -24,12 +25,13 @@ describe('Analysis create chain.', () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitFor(5000)
+    await waitFor(7000)
     await click('Close')
   })
 
   test('Add new chain', async () => {
-    await waitForLoader()
+    await reload()
+    await waitFor(2000)
     await click('New')
     await clearTextBox({ selector: toRightOf('Processing chain label') })
     await writeIntoTextBox({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
