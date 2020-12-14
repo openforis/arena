@@ -28,10 +28,7 @@ describe('Analysis create chain.', () => {
     await click('Ok')
     await waitFor(5000)
     const errors = await $('.validation-field-message__text').elements()
-
-    await expect(errors.length()).toBe(5)
-
-
+    
     await errors.forEach(async (error) => {
       const errText = await error.text()
       await expect(errText).toBe('aaa')
