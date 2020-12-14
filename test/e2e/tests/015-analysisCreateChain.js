@@ -26,12 +26,20 @@ describe('Analysis create chain.', () => {
     await waitForLoader()
     await click('Ok')
     await waitFor(7000)
-    await click('Clllose')
+    await click('Close')
+  })
+
+  test('Survey should be published', async () => {
+    await reload()
+    await waitFor(2000)
+    await clickSidebarBtnAnalysisProcessingChains()
+    await expectExists({ text: 'This section is available only when survey is published' })
   })
 
   test('Add new chain', async () => {
     await reload()
     await waitFor(2000)
+    await clickSidebarBtnAnalysisProcessingChains()
     await click('New')
     await clearTextBox({ selector: toRightOf('Processing chain label') })
     await writeIntoTextBox({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
