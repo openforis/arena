@@ -32,7 +32,7 @@ describe('Analysis create chain.', () => {
 
     await errors.forEach(async (error) => {
       const errText = await error.text()
-      await expect(errText).toBe('aaa')
+      await expect(errText).toBe('aaa-errors')
       console.log(errText)
     })
     const items = await $('.item').elements()
