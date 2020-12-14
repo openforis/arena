@@ -20,14 +20,18 @@ export default class CategoriesValidationJob extends Job {
 
     this.total = categoriesArr.length
 
+    let errors = ''
     categoriesArr.forEach((category) => {
       const validation = Validation.getValidation(category)
-      if (!Validation.isValid(validation) && false) {
-        this.addError(Validation.getFieldValidations(validation), Category.getName(category))
+      if (!Validation.isValid(validation)) {
+        errors = errors + Validation.getFieldValidations(validation)
       }
       this.incrementProcessedItems()
     })
 
+    if (errors !== '') {
+      this.addError(errors, 'aaaa')
+    }
     if (this.hasErrors()) {
       await this.setStatusFailed()
     }
