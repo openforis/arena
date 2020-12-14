@@ -27,7 +27,7 @@ describe('Analysis create chain.', () => {
     await waitForLoader()
     await click('Ok')
     await waitFor(5000)
-    const items = await $('.item').elements()
+    /*const items = await $('.item').elements()
     await items.forEach(async (error) => {
       const errText = await error.text()
       await expect(errText).toBe('aas-asdsadaaa')
@@ -41,7 +41,7 @@ describe('Analysis create chain.', () => {
       await expect(errText).toBe('aaa')
       console.log(errText)
     })
-    await waitFor(1000)
+    await waitFor(1000)*/
     await click('Close')
   })
 
