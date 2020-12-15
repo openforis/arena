@@ -49,14 +49,6 @@ const _addChildItems = async ({ codePrefix, levelIndex }) => {
     })
   }, true)
 
-  /*await PromiseUtils.each(itemsChildren, async (itemChild, itemIndex) =>
-    addCategoryItem({
-      levelIndex,
-      itemIndex,
-      code: itemChild.code,
-      label: itemChild.label,
-    })
-  )*/
   await expectCategoryItemsInLevel({ levelIndex, numberOfItems: itemsPerLevel })
 }
 
@@ -64,11 +56,6 @@ const addCategoryChildItems = async ({ itemParent, indexParent }) => {
   await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
   await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
 }
-
-/*await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
-       await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
-       await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-     })*/
 
 describe('Categories: edit existing category', () => {
   test('CategoryList: navigate to categories', async () => {
