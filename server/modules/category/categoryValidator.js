@@ -120,6 +120,9 @@ const validateItems = async (category, itemsByParentUuid) => {
   // Keep track of already visited items: if not leaf, they will be validated only when already visited
   const visitedUuids = new Set()
 
+  console.log("itemsByParentUuid", itemsByParentUuid)
+  console.log("category", category)
+
   const addItemsToStack = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
@@ -212,6 +215,9 @@ const validateCategoryProps = async (categories, category) =>
 
 export const validateCategory = async (categories, category, items) => {
   const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
+
+  console.log("AAA category", category)
+  console.log("AAA itemsByParentUuid", itemsByParentUuid)
 
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category, itemsByParentUuid)

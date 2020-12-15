@@ -11,11 +11,13 @@ export default class CategoriesValidationJob extends Job {
   }
 
   async execute() {
+    console.log("EXXXEcuteaaaaaaa")
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(
       { surveyId: this.surveyId, draft: true, includeValidation: true },
       this.tx
     )
 
+    console.log("EXXXEcute", categories)
     const categoriesArr = Object.values(categories)
 
     this.total = categoriesArr.length
