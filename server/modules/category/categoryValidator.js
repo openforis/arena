@@ -62,11 +62,11 @@ const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
 
 // TO FIX - RAMIRO ^
 const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
-  /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
-    validateItemCodeUniqueness(siblingsAndSelfByCode),
-  ], */
+  //  validateItemCodeUniqueness(siblingsAndSelfByCode),
+  ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
 
