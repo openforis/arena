@@ -66,14 +66,14 @@ const itemValidators = (
   itemChildren
   // siblingsAndSelfByCode
 ) => ({
-  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
-    () => null,
-    Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
-  ],
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [() => null],
   /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
-    /* Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
+    /* ,
+    Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsAndSelfByCode),
+    
+   
   ], */
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
@@ -158,6 +158,7 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
+      console.log('item', item)
       /* eslint-disable no-await-in-loop */
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren /* , siblingsAndSelfByCode */))
     }
