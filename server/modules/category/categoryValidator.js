@@ -139,12 +139,15 @@ const validateItems = async (category, itemsByParentUuid) => {
   const itemsFirstLevel = getItemChildren(null)(itemsByParentUuid)
   addItemsToStack(itemsFirstLevel)
 
+  console.log('itemsFirstLevel', itemsFirstLevel)
   while (!R.isEmpty(stack)) {
-    const { item /* , siblingsAndSelfByCode */ } = stack[stack.length - 1] // Do not pop item: it can be visited again
+    const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // Do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
     const visited = visitedUuids.has(itemUuid)
+
+    console.log('AAAAAAAitem', item)
 
     let validation = null
 
@@ -152,7 +155,7 @@ const validateItems = async (category, itemsByParentUuid) => {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
       console.log('item', item)
       /* eslint-disable no-await-in-loop */
-      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren /* , siblingsAndSelfByCode */))
+      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
     validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
