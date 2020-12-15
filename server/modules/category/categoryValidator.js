@@ -153,10 +153,8 @@ const validateItems = async (category, itemsByParentUuid) => {
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
-    validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
+    // validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
 
-    // RAMIRO
-    // validation = R.pipe(R.defaultTo(Validation.newInstance()), Validation.setValid(true))(validation)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
       stack.pop() // It won't be visited again, remove it from stack
@@ -186,7 +184,7 @@ const validateItems = async (category, itemsByParentUuid) => {
     visitedUuids.add(itemUuid)
   }
 
-  const valid = true // R.isEmpty(itemsValidationsByUuid)
+  const valid = R.isEmpty(itemsValidationsByUuid)
 
   return valid
     ? null
