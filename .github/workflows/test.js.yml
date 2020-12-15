@@ -83,4 +83,4 @@ jobs:
         HEADLESS_CHROME: 'true'
         SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
     - name: logs
-      run: exec pm2-runtime logs
+      run: exec pm2 logs
