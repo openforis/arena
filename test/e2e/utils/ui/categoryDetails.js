@@ -9,12 +9,13 @@ import {
   toRightOf,
   waitFor1sec,
   writeIntoTextBox,
+  waitFor
 } from '../api'
 
 const selectors = {
   name: () => toRightOf('Category name'),
-  levelName: ({ levelIndex }) => ({ id: `category-level-${levelIndex}-name` }),
-  itemAdd: ({ levelIndex }) => ({ id: `category-level-${levelIndex}-btn-item-add` }),
+  levelName: ({ levelIndex }) => `#category-level-${levelIndex}-name`,
+  itemAdd: ({ levelIndex }) => `#category-level-${levelIndex}-btn-item-add`,
   itemsInLevel: ({ levelIndex }) => `#category-level-${levelIndex} .category__item`,
   close: () => button({ class: 'btn-close' }),
   done: () => button('Done'),
@@ -24,8 +25,8 @@ const _itemId = ({ levelIndex, itemIndex }) => `category-level-${levelIndex}-ite
 
 const selectorsItem = {
   item: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}`,
-  code: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-code` }),
-  label: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-label-en` }),
+  code: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-code`,
+  label: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-label-en`,
   itemBtnClose: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-btn-close`,
 }
 
@@ -43,12 +44,14 @@ export const updateCategoryLevelName = async ({ levelIndex, name }) => {
 
 export const addCategoryLevel = async ({ levelIndex, name }) => {
   await click('Add level')
+  await waitFor(1000)
   await updateCategoryLevelName({ levelIndex, name })
 }
 
 export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) => {
-  await click(button(selectors.itemAdd({ levelIndex })))
-  await waitFor1sec()
+  await expectExists({ selector: selectors.itemAdd({ levelIndex }) })
+  await click(button(getElement({ selector: selectors.itemAdd({ levelIndex }) })))
+  await waitFor(1000)
   await expectExists({ selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: code, selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })

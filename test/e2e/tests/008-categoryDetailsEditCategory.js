@@ -97,9 +97,9 @@ describe('Categories: edit existing category', () => {
 
       await expectCategoryItemsInLevel({ levelIndex: 0, numberOfItems: 1 })
 
-      await _addChildItems({ levelIndex: 1 })
+      await _addChildItems({ codePrefix: '', levelIndex: 1 })
     },
-    itemInsertTime * (1 + itemsPerLevel)
+    itemInsertTime * (1 + itemsPerLevel) + 5000
   )
 
   test(
