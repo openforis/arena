@@ -60,7 +60,7 @@ const _addChildItems = async ({ codePrefix, levelIndex }) => {
   await expectCategoryItemsInLevel({ levelIndex, numberOfItems: itemsPerLevel })
 }
 
-const addCategogoryChildItems = async ({ itemParent, indexParent }) => {
+const addCategoryChildItems = async ({ itemParent, indexParent }) => {
   await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
   await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
 }
@@ -97,7 +97,7 @@ describe('Categories: edit existing category', () => {
 
       await expectCategoryItemsInLevel({ levelIndex: 0, numberOfItems: 1 })
 
-      await _addChildItems({ codePrefix: '', levelIndex: 1 })
+      await _addChildItems({ levelIndex: 1 })
     },
     itemInsertTime * (1 + itemsPerLevel) + 5000
   )
@@ -109,7 +109,7 @@ describe('Categories: edit existing category', () => {
 
       await itemsParent.reduce(async (promise, itemParent, indexParent) => {
         await promise
-        return addCategogoryChildItems({ itemParent, indexParent })
+        return addCategoryChildItems({ itemParent, indexParent })
       }, true)
 
       /*await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
@@ -117,7 +117,7 @@ describe('Categories: edit existing category', () => {
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
       })*/
 
-      /*const addCategogoryChildItems = async ({ itemParent, indexParent }) => {
+      /*const addCategoryChildItems = async ({ itemParent, indexParent }) => {
         await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
       }*/
