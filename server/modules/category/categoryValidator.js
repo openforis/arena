@@ -156,7 +156,7 @@ const validateItems = async (category, itemsByParentUuid) => {
     validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
 
     // RAMIRO
-    validation = R.pipe(R.defaultTo(Validation.newInstance()), Validation.setValid(true))(validation)
+    // validation = R.pipe(R.defaultTo(Validation.newInstance()), Validation.setValid(true))(validation)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
       stack.pop() // It won't be visited again, remove it from stack
