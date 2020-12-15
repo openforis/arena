@@ -1,7 +1,7 @@
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import { clearTextBox, click, expectExists, expectToBe, toRightOf, writeIntoTextBox } from '../utils/api'
+import { click, expectExists, expectToBe, toRightOf } from '../utils/api'
 
 import {
   addCategoryItem,
@@ -81,8 +81,8 @@ describe('Categories: edit existing category', () => {
   test('CategoryDetails: add levels', async () => {
     await click('edit', toRightOf(categoryName))
 
+    // start of category edit
     await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
-
     await addCategoryLevel({ levelIndex: 1, name: levels[1] })
     await addCategoryLevel({ levelIndex: 2, name: levels[2] })
 
@@ -99,7 +99,7 @@ describe('Categories: edit existing category', () => {
 
       await _addChildItems({ levelIndex: 1 })
     },
-    itemInsertTime * (1 + itemsPerLevel) + 5000
+    itemInsertTime * (1 + itemsPerLevel)
   )
 
   test(
@@ -122,7 +122,7 @@ describe('Categories: edit existing category', () => {
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
       }*/
     },
-    itemInsertTime * itemsPerLevel ** 2 + 1000
+    itemInsertTime * itemsPerLevel ** 2
   )
 
   test('CategoryDetails: select items', async () => {
