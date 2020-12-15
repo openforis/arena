@@ -38,20 +38,21 @@ export const writeCategoryName = async (text) => {
 }
 
 export const updateCategoryLevelName = async ({ levelIndex, name }) => {
+  await expectExists({ selector: selectors.levelName({ levelIndex }) })
   await clearTextBox({ selector: selectors.levelName({ levelIndex }) })
   await writeIntoTextBox({ text: name, selector: selectors.levelName({ levelIndex }) })
 }
 
 export const addCategoryLevel = async ({ levelIndex, name }) => {
   await click('Add level')
-  await waitFor(1000)
+  await waitFor(500)
   await updateCategoryLevelName({ levelIndex, name })
 }
 
 export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) => {
   await expectExists({ selector: selectors.itemAdd({ levelIndex }) })
   await click(button(getElement({ selector: selectors.itemAdd({ levelIndex }) })))
-  await waitFor(1000)
+  await waitFor(500)
   await expectExists({ selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: code, selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })
