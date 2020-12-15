@@ -12,9 +12,7 @@ const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 
 export const validateRequired = (errorKey) => (propName, obj) => {
-  console.log('propName', propName)
   const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
-  console.log('propValue', value, R.isEmpty(value))
   return R.isEmpty(value) ? { key: errorKey } : null
 }
 
