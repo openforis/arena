@@ -51,22 +51,26 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
+/* const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
   const isUnique = R.pipe(R.prop(CategoryItem.getCode(item)), R.length, R.equals(1))(siblingsAndSelfByCode)
 
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
-}
+} */
 
 const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
   !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
 
 // TO FIX - RAMIRO ^
-const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
-  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
+const itemValidators = (
+  isLeaf,
+  itemChildren
+  // siblingsAndSelfByCode
+) => ({
+  /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     /* Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
-    Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword), */
+    Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsAndSelfByCode),
-  ],
+  ], */
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
 
