@@ -81,13 +81,9 @@ describe('Categories: edit existing category', () => {
   test('CategoryDetails: add levels - level 0', async () => {
     await click('edit', toRightOf(categoryName))
 
-    // start of category edit
-    await expectExists({ selector: `#category-level-0-name` })
-    await clearTextBox({ selector: `#category-level-0-name` })
 
-    await writeIntoTextBox({ text: levels[0], selector: `#category-level-0-name` })
     
-    //await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
+    await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
   })
 
   test('CategoryDetails: add levels - level 1', async () => {

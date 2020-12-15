@@ -9,12 +9,14 @@ import {
   toRightOf,
   waitFor1sec,
   writeIntoTextBox,
-  waitFor
+  waitFor,
 } from '../api'
 
 const selectors = {
   name: () => toRightOf('Category name'),
-  levelName: ({ levelIndex }) => `#category-level-${levelIndex}-name`,
+  levelName: ({ levelIndex }) => ({
+    id: `category-level-${levelIndex}-name`,
+  }),
   itemAdd: ({ levelIndex }) => `#category-level-${levelIndex}-btn-item-add`,
   itemsInLevel: ({ levelIndex }) => `#category-level-${levelIndex} .category__item`,
   close: () => button({ class: 'btn-close' }),
