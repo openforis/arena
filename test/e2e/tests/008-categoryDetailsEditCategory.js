@@ -1,7 +1,7 @@
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import { click, expectExists, expectToBe, toRightOf } from '../utils/api'
+import { clearTextBox, click, expectExists, expectToBe, toRightOf, writeIntoTextBox } from '../utils/api'
 
 import {
   addCategoryItem,
@@ -82,7 +82,12 @@ describe('Categories: edit existing category', () => {
     await click('edit', toRightOf(categoryName))
 
     // start of category edit
-    await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
+    await expectExists({ selector: `#category-level-0-name` })
+    await clearTextBox({ selector: `#category-level-0-name` })
+
+    await writeIntoTextBox({ text: levels[0], selector: `#category-level-0-name` })
+    
+    //await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
   })
 
   test('CategoryDetails: add levels - level 1', async () => {
