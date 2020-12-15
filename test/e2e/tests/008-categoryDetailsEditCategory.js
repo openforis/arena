@@ -78,23 +78,14 @@ describe('Categories: edit existing category', () => {
     await expectExists({ text: 'Invalid', relativeSelectors: [toRightOf(categoryName)] })
   })
 
-  test('CategoryDetails: add levels - level 0', async () => {
+  test('CategoryDetails: add levels', async () => {
     await click('edit', toRightOf(categoryName))
 
-
-    
     await updateCategoryLevelName({ levelIndex: 0, name: levels[0] })
-  })
 
-  test('CategoryDetails: add levels - level 1', async () => {
     await addCategoryLevel({ levelIndex: 1, name: levels[1] })
-  })
+    await addCategoryLevel({ levelIndex: 2, name: levels[2] })
 
-  test('CategoryDetails: add levels - level 2', async () => {
-    await addCategoryLevel({ levelIndex: 1, name: levels[1] })
-  })
-
-  test('CategoryDetails: add levels check number of items', async () => {
     await expectToBe({ selector: '.category__level', numberOfItems: 3 })
   })
 

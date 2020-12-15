@@ -10,6 +10,8 @@ import {
   waitFor1sec,
   writeIntoTextBox,
   waitFor,
+  expectInputTextToBe,
+  expectInputTextExists,
 } from '../api'
 
 const selectors = {
@@ -27,8 +29,8 @@ const _itemId = ({ levelIndex, itemIndex }) => `category-level-${levelIndex}-ite
 
 const selectorsItem = {
   item: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}`,
-  code: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-code`,
-  label: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-label-en`,
+  code: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-code` }),
+  label: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-label-en` }),
   itemBtnClose: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-btn-close`,
 }
 
@@ -40,7 +42,7 @@ export const writeCategoryName = async (text) => {
 }
 
 export const updateCategoryLevelName = async ({ levelIndex, name }) => {
-  await expectExists({ selector: selectors.levelName({ levelIndex }) })
+  await expectInputTextExists({ selector: selectors.levelName({ levelIndex }) })
   await clearTextBox({ selector: selectors.levelName({ levelIndex }) })
   await writeIntoTextBox({ text: name, selector: selectors.levelName({ levelIndex }) })
 }
@@ -52,12 +54,14 @@ export const addCategoryLevel = async ({ levelIndex, name }) => {
 }
 
 export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) => {
-  await expectExists({ selector: selectors.itemAdd({ levelIndex }) })
+  await expectInputTextExists({ selector: selectors.itemAdd({ levelIndex }) })
   await click(button(getElement({ selector: selectors.itemAdd({ levelIndex }) })))
   await waitFor(500)
   await expectExists({ selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: code, selector: selectorsItem.code({ levelIndex, itemIndex }) })
+  await expectInputTextToBe({ text: String(code), selector: selectorsItem.code({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })
+  await expectInputTextToBe({ text: String(label), selector: selectorsItem.label({ levelIndex, itemIndex }) })
 }
 
 export const clickCategoryItem = async ({ levelIndex, itemIndex }) =>
