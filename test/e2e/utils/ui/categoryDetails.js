@@ -55,7 +55,7 @@ export const addCategoryLevel = async ({ levelIndex, name }) => {
 
 export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) => {
   await expectExists({ selector: selectors.itemAdd({ levelIndex }) })
-  await click(button(getElement({ selector: selectors.itemAdd({ levelIndex }) })))
+  await click(getElement({ selector: selectors.itemAdd({ levelIndex }) }))
   await waitFor(200)
   await expectInputTextToBe({ text: String(label), selector: selectorsItem.label({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })
