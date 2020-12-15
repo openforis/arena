@@ -17,9 +17,9 @@ export default class CategoriesValidationJob extends Job {
       this.tx
     )
 
-    console.log("EXXXEcute", categories)
+    console.log("EXXXEcute", categories, JSON.stringify(categories))
     const categoriesArr = Object.values(categories)
-
+    
     this.total = categoriesArr.length
 
     categoriesArr.forEach((category) => {
