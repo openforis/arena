@@ -60,7 +60,6 @@ const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) 
 const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
   !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
 
-// TO FIX - RAMIRO ^
 const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
@@ -209,9 +208,6 @@ const validateCategoryProps = async (categories, category) =>
 
 export const validateCategory = async (categories, category, items) => {
   const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
-
-  console.log('AAA category', JSON.stringify(category))
-  console.log('AAA itemsByParentUuid', JSON.stringify(itemsByParentUuid))
 
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category, itemsByParentUuid)

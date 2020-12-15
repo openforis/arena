@@ -25,7 +25,6 @@ import * as CategoryRepository from '../repository/categoryRepository'
 const _validateCategoryFromCategories = async (surveyId, categories, categoryUuid, client = db) => {
   const category = R.prop(categoryUuid, categories)
   const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, categoryUuid, true, client)
-  console.log("_validateCategoryFromCategories", items)
   const validation = await CategoryValidator.validateCategory(R.values(categories), category, items)
   await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
   return Validation.assocValidation(validation)(category)
