@@ -30,18 +30,45 @@ const _createItems = ({ levelIndex, codePrefix = '' }) =>
     return { code, label }
   })
 
+/*const doSequencial = async ({ items, getFunction, getParams }) =>
+  items.reduce(async (promise, item) => {
+    await promise
+    return getFunction(item)(getParams(item))
+  }, true)*/
+
 const _addChildItems = async ({ codePrefix, levelIndex }) => {
   const itemsChildren = _createItems({ codePrefix, levelIndex })
-  await PromiseUtils.each(itemsChildren, async (itemChild, itemIndex) =>
+
+  await itemsChildren.reduce(async (promise, itemChild, itemIndex) => {
+    await promise
+    return addCategoryItem({
+      levelIndex,
+      itemIndex,
+      code: itemChild.code,
+      label: itemChild.label,
+    })
+  }, true)
+
+  /*await PromiseUtils.each(itemsChildren, async (itemChild, itemIndex) =>
     addCategoryItem({
       levelIndex,
       itemIndex,
       code: itemChild.code,
       label: itemChild.label,
     })
-  )
+  )*/
   await expectCategoryItemsInLevel({ levelIndex, numberOfItems: itemsPerLevel })
 }
+
+const addCategogoryChildItems = async ({ itemParent, indexParent }) => {
+  await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
+  await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
+}
+
+/*await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
+       await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
+       await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
+     })*/
 
 describe('Categories: edit existing category', () => {
   test('CategoryList: navigate to categories', async () => {
@@ -79,12 +106,23 @@ describe('Categories: edit existing category', () => {
     'CategoryDetails: add items in 3rd level',
     async () => {
       const itemsParent = _createItems({ levelIndex: 1 })
-      await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
+
+      await itemsParent.reduce(async (promise, itemParent, indexParent) => {
+        await promise
+        return addCategogoryChildItems({ itemParent, indexParent })
+      }, true)
+
+      /*await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
         await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-      })
+      })*/
+
+      /*const addCategogoryChildItems = async ({ itemParent, indexParent }) => {
+        await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
+        await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
+      }*/
     },
-    itemInsertTime * itemsPerLevel ** 2
+    itemInsertTime * itemsPerLevel ** 2 + 1000
   )
 
   test('CategoryDetails: select items', async () => {
