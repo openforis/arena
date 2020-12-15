@@ -66,9 +66,7 @@ const itemValidators = (
   itemChildren
   // siblingsAndSelfByCode
 ) => ({
-  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
-    Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
-  ],
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [null],
   /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     /* Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
