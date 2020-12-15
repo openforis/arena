@@ -51,23 +51,24 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-/* const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
+/*const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
   const isUnique = R.pipe(R.prop(CategoryItem.getCode(item)), R.length, R.equals(1))(siblingsAndSelfByCode)
 
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
-}
+}*/
 
 const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
   !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
-*/
-/* const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
-  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
+
+// TO FIX - RAMIRO ^
+const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
+  /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsAndSelfByCode),
-  ],
+  ], */
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
-}) */
+})
 
 const _extraPropValidators = {
   [Category.itemExtraDefDataTypes.number]: (key, extra) =>
@@ -139,7 +140,7 @@ const validateItems = async (category, itemsByParentUuid) => {
   addItemsToStack(itemsFirstLevel)
 
   while (!R.isEmpty(stack)) {
-    const { item /* , siblingsAndSelfByCode */ } = stack[stack.length - 1] // Do not pop item: it can be visited again
+    const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // Do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
@@ -147,11 +148,11 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     let validation = null
 
-    /* if (isLeaf || visited || R.isEmpty(itemChildren)) {
+    if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
-      /* eslint-disable no-await-in-loop 
+      /* eslint-disable no-await-in-loop */
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
-    } */
+    }
 
     validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
 
