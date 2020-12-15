@@ -66,6 +66,7 @@ const itemValidators = (
   itemChildren
   // siblingsAndSelfByCode
 ) => ({
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [],
   /* [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     /* Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
@@ -144,7 +145,7 @@ const validateItems = async (category, itemsByParentUuid) => {
   addItemsToStack(itemsFirstLevel)
 
   while (!R.isEmpty(stack)) {
-    const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // Do not pop item: it can be visited again
+    const { item /* , siblingsAndSelfByCode */ } = stack[stack.length - 1] // Do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
@@ -155,7 +156,7 @@ const validateItems = async (category, itemsByParentUuid) => {
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
       /* eslint-disable no-await-in-loop */
-      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
+      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren /* , siblingsAndSelfByCode */))
     }
 
     validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
