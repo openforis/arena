@@ -68,6 +68,7 @@ export const run = async () => {
   const arenaDist = path.resolve('../../', __dirname, 'dist')
   const dist = arenaDist // ProcessUtils.ENV.arenaDist
 
+  logger.info('dist', dist)
   const arenaRoot = path.resolve('../../', __dirname) // ProcessUtils.ENV.arenaRoot
 
   const imgDir = `${arenaRoot}/web-resources/img`
