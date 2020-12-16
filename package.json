@@ -33,7 +33,8 @@
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js --watch",
-    "watch": "npm run build:server:dev && npm-run-all --parallel client:dev-server dev:server:nodemon watch:server"
+    "watch": "npm run build:server:dev && npm-run-all --parallel client:dev-server dev:server:nodemon watch:server",
+    "start": "node dist/server.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
