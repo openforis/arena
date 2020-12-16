@@ -20,8 +20,6 @@ const ENV = {
   buildReport: process.env.BUILD_REPORT === 'true',
   // APP VERSION
   applicationVersion: process.env.APPLICATION_VERSION,
-  gitCommitHash: process.env.GIT_COMMIT_HASH,
-  gitBranch: process.env.GIT_BRANCH,
   // DB
   dbUrl,
   pgUser,
