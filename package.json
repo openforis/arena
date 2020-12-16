@@ -13,7 +13,7 @@
     "build:server:prod": "cross-env NODE_ENV=production webpack --display-error-details  --config webpack.config.server.babel.js",
     "build:watch": "npm run build-dev --watch",
     "client:dev-server": "NODE_ENV=development webpack-dev-server",
-    "build": "webpack --display-error-details -p --config webpack.config.babel.js",
+    "build": "run-s build:server:prod build-prod",
     "clean": "rimraf dist/** ./node_modules/.cache/",
     "create-migration": "./server/db/migration/create-migration.sh",
     "dev:server": "npm run build:server:dev && npm-run-all --parallel dev:server:nodemon watch:server",
