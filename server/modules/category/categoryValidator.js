@@ -149,7 +149,6 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
-      console.log('item', item)
       /* eslint-disable no-await-in-loop */
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }

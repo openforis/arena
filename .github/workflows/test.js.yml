@@ -82,5 +82,3 @@ jobs:
         PGPASSWORD: arena
         HEADLESS_CHROME: 'true'
         SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
-    - name: logs
-      run: exec pm2 logs --lines 1000
