@@ -19,9 +19,6 @@ jobs:
         with:
           node-version: '14.15.0'
 
-      - run: yarn
-      - run: yarn test
-
       - name: Get the version
         id: app_version
         run: echo ::set-output name=APP_VERSION::$(git describe --always --tags)
