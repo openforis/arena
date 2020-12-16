@@ -12,8 +12,8 @@ export default class CategoriesValidationJob extends Job {
 
   async execute() {
     console.log('EXXXEcuteaaaaaaa')
-    const validated = await CategoryManager.validateCategories(this.surveyId, this.tx)
-    console.log('EXXXEcutbbbbb', JSON.stringify(validated))
+    // const validated = await CategoryManager.validateCategories(this.surveyId, this.tx)
+    // console.log('EXXXEcutbbbbb', JSON.stringify(validated))
 
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(
       { surveyId: this.surveyId, draft: true, includeValidation: true },
