@@ -24,6 +24,7 @@ describe('Taxonomies: edit existing taxonomy', () => {
   test('TaxonomyList: navigate to taxonomy editor', async () => {
     await reload()
     await waitForLoader()
+    await waitFor(2000)
     await clickSidebarBtnDesignerTaxonomies()
     await expectTaxonomyIsInvalid({ taxonomyName })
     await editTaxonomy({ taxonomyName })
