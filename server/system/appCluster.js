@@ -63,13 +63,13 @@ export const run = async () => {
 
   app.use(compression({ threshold: 512 }))
 
-  const arenaDist = path.resolve('../../', __dirname, 'dist')
+  app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
+
+  const arenaDist = path.resolve(__dirname, '../../', 'dist')
   const dist = arenaDist // ProcessUtils.ENV.arenaDist
 
   logger.info('dist', dist)
-  const arenaRoot = path.resolve('../../', __dirname) // ProcessUtils.ENV.arenaRoot
-
-  app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
+  const arenaRoot = path.resolve(__dirname, '../../') // ProcessUtils.ENV.arenaRoot
 
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/', express.static(dist))
