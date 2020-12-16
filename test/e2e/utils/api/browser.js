@@ -20,5 +20,5 @@ export const openBrowser = async () => {
       : [],
   })
 
-  await goto('localhost:9090')
+  await goto('localhost:9000')
 }
