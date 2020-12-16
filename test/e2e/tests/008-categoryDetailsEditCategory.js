@@ -30,24 +30,23 @@ const _createItems = ({ levelIndex, codePrefix = '' }) =>
     return { code, label }
   })
 
-/*const doSequencial = async ({ items, getFunction, getParams }) =>
+/* const doSequencial = async ({ items, getFunction, getParams }) =>
   items.reduce(async (promise, item) => {
     await promise
     return getFunction(item)(getParams(item))
-  }, true)*/
+  }, true) */
 
 const _addChildItems = async ({ codePrefix, levelIndex }) => {
   const itemsChildren = _createItems({ codePrefix, levelIndex })
 
-  await itemsChildren.reduce(async (promise, itemChild, itemIndex) => {
-    await promise
-    return addCategoryItem({
+  await PromiseUtils.each(itemsChildren, async (itemChild, itemIndex) =>
+    addCategoryItem({
       levelIndex,
       itemIndex,
       code: itemChild.code,
       label: itemChild.label,
     })
-  }, true)
+  )
 
   await expectCategoryItemsInLevel({ levelIndex, numberOfItems: itemsPerLevel })
 }
@@ -94,20 +93,19 @@ describe('Categories: edit existing category', () => {
     async () => {
       const itemsParent = _createItems({ levelIndex: 1 })
 
-      await itemsParent.reduce(async (promise, itemParent, indexParent) => {
-        await promise
-        return addCategoryChildItems({ itemParent, indexParent })
-      }, true)
+      await PromiseUtils.each(itemsParent, async (itemParent, indexParent) =>
+        addCategoryChildItems({ itemParent, indexParent })
+      )
 
-      /*await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
+      /* await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
         await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-      })*/
+      }) */
 
-      /*const addCategoryChildItems = async ({ itemParent, indexParent }) => {
+      /* const addCategoryChildItems = async ({ itemParent, indexParent }) => {
         await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
         await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-      }*/
+      } */
     },
     itemInsertTime * itemsPerLevel ** 2
   )
