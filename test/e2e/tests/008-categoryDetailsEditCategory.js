@@ -30,12 +30,6 @@ const _createItems = ({ levelIndex, codePrefix = '' }) =>
     return { code, label }
   })
 
-/* const doSequencial = async ({ items, getFunction, getParams }) =>
-  items.reduce(async (promise, item) => {
-    await promise
-    return getFunction(item)(getParams(item))
-  }, true) */
-
 const _addChildItems = async ({ codePrefix, levelIndex }) => {
   const itemsChildren = _createItems({ codePrefix, levelIndex })
 
@@ -96,16 +90,6 @@ describe('Categories: edit existing category', () => {
       await PromiseUtils.each(itemsParent, async (itemParent, indexParent) =>
         addCategoryChildItems({ itemParent, indexParent })
       )
-
-      /* await PromiseUtils.each(itemsParent, async (itemParent, indexParent) => {
-        await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
-        await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-      }) */
-
-      /* const addCategoryChildItems = async ({ itemParent, indexParent }) => {
-        await clickCategoryItem({ levelIndex: 1, itemIndex: indexParent })
-        await _addChildItems({ codePrefix: itemParent.code, levelIndex: 2 })
-      } */
     },
     itemInsertTime * itemsPerLevel ** 2
   )
