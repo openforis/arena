@@ -1,6 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { click, dragAndDrop, getElement, reload, waitFor1sec } from '../utils/api'
+import { click, dragAndDrop, expectExists, getElement, reload, waitFor1sec } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import {
   addItemToPage,
@@ -69,9 +69,12 @@ describe('SurveyForm edit: Plot code children', () => {
   })
 
   test('Plot re-order "province"', async () => {
+    await expectExists({ text: 'PROVINCE' })
     await dragAndDrop(await getElement({ text: 'PROVINCE' }), { up: 150, right: 300 })
     await waitForLoader()
+  })
 
+  test('check order', async () => {
     await reload()
     await waitFor1sec()
 
