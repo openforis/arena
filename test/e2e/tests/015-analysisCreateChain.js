@@ -26,7 +26,7 @@ describe('Analysis create chain.', () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
-    await waitFor(3000)
+    await waitFor(6000)
 
     await click('Close')
   })

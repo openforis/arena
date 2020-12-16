@@ -28,7 +28,6 @@ const selectorsItem = {
   item: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}`,
   codeId: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-code`,
   code: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-code` }),
-  labelId: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-label-en`,
   label: ({ levelIndex, itemIndex }) => ({ id: `${_itemId({ levelIndex, itemIndex })}-label-en` }),
   itemBtnClose: ({ levelIndex, itemIndex }) => `#${_itemId({ levelIndex, itemIndex })}-btn-close`,
 }
@@ -66,7 +65,6 @@ export const addCategoryItem = async ({ levelIndex, itemIndex, code, label }) =>
 
   await waitFor(200)
 
-  await expectExists({ selector: selectorsItem.labelId({ levelIndex, itemIndex }) })
   await expectInputTextToBe({ text: '', selector: selectorsItem.label({ levelIndex, itemIndex }) })
   await writeIntoTextBox({ text: label, selector: selectorsItem.label({ levelIndex, itemIndex }) })
   await expectInputTextToBe({ text: String(label), selector: selectorsItem.label({ levelIndex, itemIndex }) })
