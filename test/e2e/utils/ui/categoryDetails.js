@@ -43,6 +43,7 @@ export const updateCategoryLevelName = async ({ levelIndex, name }) => {
   await expectInputTextExists({ selector: selectors.levelName({ levelIndex }) })
   await clearTextBox({ selector: selectors.levelName({ levelIndex }) })
   await waitFor(500)
+
   await writeIntoTextBox({ text: name, selector: selectors.levelName({ levelIndex }) })
 }
 
