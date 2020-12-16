@@ -46,14 +46,13 @@ class CleanUpStatsPlugin {
 
 // ==== init plugins
 const plugins = [
-  gitRevisionPlugin,
+  ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css',
   }),
   new HtmlWebpackPlugin({
     template: './web-resources/index.html',
   }),
-  ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
     process: {
