@@ -31,4 +31,4 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP_NAME_DEVELOPMENT}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
         env:
-          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION
+          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}
