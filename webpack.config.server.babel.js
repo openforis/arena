@@ -67,4 +67,5 @@ export default {
     __filename: true,
     __dirname: true,
   },
+  stats: 'errors-only',
 }
