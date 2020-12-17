@@ -1,3 +1,5 @@
+import path from 'path'
+
 import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
@@ -6,7 +8,7 @@ import * as Response from '@server/utils/response'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
-import * as ProcessUtils from '@core/processUtils'
+// import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -127,7 +129,7 @@ export const init = (app) => {
         res.end(profilePicture, 'binary')
       } else {
         res.sendFile(`${__dirname}/avatar.png`, {
-          root: ProcessUtils.ENV.arenaRoot,
+          root: path.resolve(__dirname, '../../'),
         })
       }
     } catch (error) {
