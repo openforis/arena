@@ -75,10 +75,10 @@ const DateInput = React.forwardRef(
     const calendarContainer = useRef(null)
     const [dateInputContainerRef, setDateInputContainerRef] = useState(null)
     const [localDate, setDate] = useState('')
-    const [elRefs, setElRefs] = React.useState([])
+    const [elRefs, setElRefs] = useState([])
     const [error, setError] = useState(false)
     const [warning, setWarning] = useState(false)
-    const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
     const dateKeys = dateKeysByFormat[format]
 
