@@ -79,7 +79,7 @@ describe('Categories: edit existing category', () => {
 
       await _addChildItems({ levelIndex: 1 })
     },
-    itemInsertTime * (1 + itemsPerLevel)
+    30000 + itemInsertTime * (1 + itemsPerLevel)
   )
 
   test(
@@ -91,7 +91,7 @@ describe('Categories: edit existing category', () => {
         addCategoryChildItems({ itemParent, indexParent })
       )
     },
-    itemInsertTime * itemsPerLevel ** 2
+    30000 + itemInsertTime * itemsPerLevel ** 2
   )
 
   test('CategoryDetails: select items', async () => {

@@ -1,6 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { above, click, clickParent, dropDown } from '../utils/api'
+import { above, click, clickParent, dropDown, waitFor } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormLoaded } from '../utils/ui/surveyForm'
@@ -86,12 +86,14 @@ const plots = [
 
 describe('SurveyForm Preview', () => {
   test('Select survey 1', async () => {
-    await waitForLoader()
+    await waitFor(2000)
     await clickHeaderBtnMySurveys()
     await clickParent('Survey')
 
+    await waitFor(1000)
     await waitForLoader()
 
+    await waitFor(2000)
     await clickSidebarBtnSurveyForm()
 
     await expectSurveyFormLoaded()
