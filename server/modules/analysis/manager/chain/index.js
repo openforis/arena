@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as DB from '../../../../db'
 
 import * as Chain from '../../../../../common/analysis/processingChain'
@@ -60,7 +61,7 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
 // ====== PERSIST
 export const persistChain = async ({ user, surveyId, chain }, client) => {
   const chainDb = await ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain) }, client)
-  return chainDb
+  return !A.isEmpty(chainDb)
     ? _updateChain({ user, surveyId, chain, chainDb }, client)
     : _insertChain({ user, surveyId, chain }, client)
 }
