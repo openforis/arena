@@ -65,7 +65,10 @@ export const run = async () => {
   app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
   const dist = ProcessUtils.ENV.arenaDist
-  const imgDir = `${ProcessUtils.ENV.arenaRoot}/web-resources/img`
+
+  const { arenaRoot } = ProcessUtils.ENV
+
+  const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/', express.static(dist))
   app.use('/app*', express.static(dist))
   app.use('/img/', express.static(imgDir))

@@ -2,11 +2,7 @@ import { click, expectExists, expectToBe, getElement } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import { addItemToPage } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
-import {
-  expectItemIsTheLastNodeDef,
-  expectSurveyFormItems,
-  expectSurveyFormLoaded,
-} from '../utils/ui/surveyForm'
+import { expectItemIsTheLastNodeDef, expectSurveyFormItems, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { editSurveyFormPage } from '../utils/ui/surveyFormPage'
 
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {

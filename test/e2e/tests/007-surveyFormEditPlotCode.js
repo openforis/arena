@@ -50,7 +50,7 @@ describe('SurveyForm edit Plot: code attribute', () => {
 
   test('Re-order country', async () => {
     // move Country to right of Plot ID
-    await dragAndDrop(await getElement({ text: 'COUNTRY' }), { up: 300, right: 300 })
+    await dragAndDrop(await getElement({ text: 'Country' }), { up: 300, right: 300 })
 
     await expectSurveyFormItems({ items: nodeItemsReOrdered })
   })

@@ -4,14 +4,16 @@ import nodeExternals from 'webpack-node-externals'
 import mainConfig from './webpack.config.babel'
 
 const nodeEnv = process.env.NODE_ENV
+const arenaRoot = process.env.ARENA_ROOT || __dirname
+const arenaDist = process.env.ARENA_DIST || path.resolve(__dirname, 'dist')
 const isProduction = nodeEnv === 'production'
 
 // Common plugins
 const plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(nodeEnv),
-    'process.env.ARENA_ROOT': JSON.stringify(__dirname),
-    'process.env.ARENA_DIST': JSON.stringify(path.resolve(__dirname, 'dist')),
+    'process.env.ARENA_ROOT': JSON.stringify(arenaRoot),
+    'process.env.ARENA_DIST': JSON.stringify(arenaDist),
   }),
   new webpack.NamedModulesPlugin(),
   ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
@@ -67,4 +69,5 @@ export default {
     __filename: true,
     __dirname: true,
   },
+  stats: 'errors-only',
 }

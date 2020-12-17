@@ -1,6 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { click, dragAndDrop, getElement, reload, waitFor1sec } from '../utils/api'
+import { click, dragAndDrop, expectExists, getElement, reload, waitFor1sec } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import {
   addItemToPage,
@@ -17,6 +17,7 @@ const category = 'administrative_unit'
 
 const _goToPlotPage = async () => {
   await waitForLoader()
+  await waitFor1sec()
   await clickSidebarBtnSurveyForm()
   await click('Plot')
 }
@@ -43,7 +44,7 @@ describe('SurveyForm edit: Plot code children', () => {
   }, 30000)
 
   test('Plot re-order "region"', async () => {
-    await dragAndDrop(await getElement({ text: 'REGION' }), { up: 250, right: 300 })
+    await dragAndDrop(await getElement({ text: 'Region' }), { up: 250, right: 300 })
 
     await expectSurveyFormItemNames({
       itemNames: ['plot_id', 'country', 'plot_text', 'region', 'plot_file', 'tree'],
@@ -69,9 +70,12 @@ describe('SurveyForm edit: Plot code children', () => {
   })
 
   test('Plot re-order "province"', async () => {
-    await dragAndDrop(await getElement({ text: 'PROVINCE' }), { up: 150, right: 300 })
+    await expectExists({ text: 'Province' })
+    await dragAndDrop(await getElement({ text: 'Province' }), { up: 150, right: 300 })
     await waitForLoader()
+  })
 
+  test('check order', async () => {
     await reload()
     await waitFor1sec()
 

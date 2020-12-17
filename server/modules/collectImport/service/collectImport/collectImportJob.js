@@ -1,9 +1,9 @@
 import Job from '@server/job/job'
 
-import * as SurveyManager from '../../../survey/manager/surveyManager'
-
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
+
+import * as SurveyManager from '../../../survey/manager/surveyManager'
 
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'

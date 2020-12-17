@@ -13,7 +13,6 @@ const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propNa
 
 export const validateRequired = (errorKey) => (propName, obj) => {
   const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
-
   return R.isEmpty(value) ? { key: errorKey } : null
 }
 
