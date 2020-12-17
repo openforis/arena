@@ -3,7 +3,7 @@ name: Deploy to development
 on:
   push:
     branches:
-      - 'ci/deploy-heroku'
+      - 'master'
 
 jobs:
   build:
