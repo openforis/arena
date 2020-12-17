@@ -1,0 +1,34 @@
+name: Deploy to development
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0' # fetch all tags, default 1
+
+      - name: Use Node.js 14.15.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.15.0'
+
+      - name: Get the version
+        id: app_version
+        run: echo ::set-output name=APP_VERSION::$(git describe --always --tags)
+
+      - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
+
+      - uses: akhileshns/heroku-deploy@v3.6.8 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME_DEVELOPMENT}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+        env:
+          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}
