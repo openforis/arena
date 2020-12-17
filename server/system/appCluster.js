@@ -7,7 +7,6 @@ import { createTerminus } from '@godaddy/terminus'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import path from 'path'
 import morgan from 'morgan'
 
 import * as Log from '@server/log/log'
@@ -65,11 +64,10 @@ export const run = async () => {
 
   app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
-  const arenaDist = path.resolve(__dirname, '../../', 'dist')
-  const dist = arenaDist // ProcessUtils.ENV.arenaDist
+  const dist = ProcessUtils.ENV.arenaDist
 
   logger.info('dist', dist)
-  const arenaRoot = path.resolve(__dirname, '../../') // ProcessUtils.ENV.arenaRoot
+  const { arenaRoot } = ProcessUtils.ENV
 
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/', express.static(dist))
