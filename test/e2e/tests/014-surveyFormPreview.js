@@ -108,16 +108,16 @@ describe('SurveyForm Preview', () => {
 
   test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }))
 
-  test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }))
+  test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }), 40000)
 
-  test('Enter Plot 2 values', async () => enterValuesPlot({ items: plots[1] }))
+  test('Enter Plot 2 values', async () => enterValuesPlot({ items: plots[1] }), 40000)
 
   test('Check Cluster values', async () => {
     await click('Cluster')
     await checkValuesCluster({ items: ClusterItems })
-  })
+  }, 40000)
 
-  test('Check Plot 1 values', async () => checkValuesPlot({ id: 1, items: plots[0] }))
+  test('Check Plot 1 values', async () => checkValuesPlot({ id: 1, items: plots[0] }), 40000)
 
-  test('Check Plot 2 values', async () => checkValuesPlot({ id: 2, items: plots[1] }))
+  test('Check Plot 2 values', async () => checkValuesPlot({ id: 2, items: plots[1] }), 40000)
 })
