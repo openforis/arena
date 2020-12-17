@@ -66,7 +66,6 @@ export const run = async () => {
 
   const dist = ProcessUtils.ENV.arenaDist
 
-  logger.info('dist', dist)
   const { arenaRoot } = ProcessUtils.ENV
 
   const imgDir = `${arenaRoot}/web-resources/img`
@@ -84,8 +83,6 @@ export const run = async () => {
 
   // ====== server
   const server = app.listen(ProcessUtils.ENV.arenaPort, () => {
-    logger.info(ProcessUtils.ENV)
-    logger.info(express.static(ProcessUtils.ENV.arenaDist))
     logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.arenaPort}`)
   })
 
