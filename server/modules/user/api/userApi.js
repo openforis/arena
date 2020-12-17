@@ -1,5 +1,3 @@
-import path from 'path'
-
 import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
@@ -128,9 +126,7 @@ export const init = (app) => {
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
-        res.sendFile(`${__dirname}/avatar.png`, {
-          root: path.resolve(__dirname, '../../'),
-        })
+        res.sendFile(`${__dirname}/avatar.png`)
       }
     } catch (error) {
       next(error)
