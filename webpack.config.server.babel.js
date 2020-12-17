@@ -4,8 +4,8 @@ import nodeExternals from 'webpack-node-externals'
 import mainConfig from './webpack.config.babel'
 
 const nodeEnv = process.env.NODE_ENV
-const arenaRoot = process.env.ARENA_ROOT
-const arenaDist = process.env.ARENA_DIST
+const arenaRoot = process.env.ARENA_ROOT || __dirname
+const arenaDist = process.env.ARENA_DIST || path.resolve(__dirname, 'dist')
 const isProduction = nodeEnv === 'production'
 
 // Common plugins
