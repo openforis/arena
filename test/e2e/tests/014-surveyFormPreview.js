@@ -42,7 +42,7 @@ const checkValuesPlot = async ({ id, items }) => {
 const ClusterItems = [
   { type: NodeDef.nodeDefType.integer, value: 1, label: 'Cluster id' },
   { type: NodeDef.nodeDefType.decimal, value: 10, label: 'Cluster decimal' },
-  { type: NodeDef.nodeDefType.date, value: '20/11/2020', label: 'Cluster date' },
+  // { type: NodeDef.nodeDefType.date, value: '20/11/2020', label: 'Cluster date' },
   { type: NodeDef.nodeDefType.time, value: '10:30', label: 'Cluster time' },
   { type: NodeDef.nodeDefType.boolean, value: 'true', label: 'Cluster boolean' },
   {
