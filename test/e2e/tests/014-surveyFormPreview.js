@@ -118,6 +118,7 @@ describe('SurveyForm Preview', () => {
 
   test('Check Cluster values', async () => {
     await click('Cluster')
+    await waitFor(500)
     await checkValuesCluster({ items: ClusterItems })
   }, 40000)
 
