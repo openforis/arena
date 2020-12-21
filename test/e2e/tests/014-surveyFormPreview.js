@@ -28,14 +28,18 @@ const checkValuesSequencial = async ({ items }) =>
 const enterValuesCluster = enterValuesSequencial
 const enterValuesPlot = async ({ items }) => {
   await click('Plot')
+  await waitFor(500)
   await click('Add')
+  await waitFor(500)
   await enterValuesSequencial({ items })
 }
 
 const checkValuesCluster = checkValuesSequencial
 const checkValuesPlot = async ({ id, items }) => {
   await click('Plot')
+  await waitFor(300)
   await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
+  await waitFor(300)
   await checkValuesSequencial({ items })
 }
 
