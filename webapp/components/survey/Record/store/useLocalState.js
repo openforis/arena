@@ -14,7 +14,7 @@ import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
-import { useOnUpdate } from '@webapp/components/hooks'
+import { useOnUpdate, useQuery } from '@webapp/components/hooks'
 
 import { State } from './state'
 
@@ -22,11 +22,9 @@ export const useLocalState = () => {
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const {
-    recordUuid: recordUuidUrlParam,
-    pageNodeUuid: pageNodeUuidUrlParam,
-    pageNodeDefUuid: pageNodeDefUuidUrlParam,
-  } = useParams()
+  const { recordUuid: recordUuidUrlParam } = useParams()
+
+  const { pageNodeUuid: pageNodeUuidUrlParam, pageNodeDefUuid: pageNodeDefUuidUrlParam } = useQuery()
 
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
   const preview = Boolean(recordUuidPreview)
