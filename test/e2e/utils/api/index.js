@@ -1,5 +1,4 @@
 export { above } from './above'
-export { $ } from './$'
 export { below } from './below'
 export { closeBrowser, openBrowser, reload } from './browser'
 export { button } from './button'
