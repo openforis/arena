@@ -36,12 +36,12 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
       LEFT OUTER JOIN
         ${NodeKeysView.getNameWithSchema(surveyId)} k_h
       ON
-        k_h.${NodeKeysView.columns.nodeId} = h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorId}
+        k_h.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}
         -- Join to get keys for itself if it's an entity
       LEFT OUTER JOIN
         ${NodeKeysView.getNameWithSchema(surveyId)} k_s
       ON
-        k_s.${NodeKeysView.columns.nodeId} = h.${NodeHierarchyDisaggregatedView.columns.nodeId}
+        k_s.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeUuid}
       GROUP BY
         1,2,3,4,5
     )`)
