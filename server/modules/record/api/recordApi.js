@@ -17,7 +17,7 @@ import {
   requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
     try {
@@ -104,7 +104,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
