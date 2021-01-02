@@ -1,9 +1,10 @@
-import { $, click, getElement, toRightOf, within, writeIntoTextBox } from '../api'
+import { $, click, getElement, toRightOf, within, writeIntoTextBox, above, waitFor1sec, below } from '../api'
 import { writeIntoEl } from '../api/textBox'
 
 const selectorsAdvanced = {
   // common
-  expressionsContainer: ({ toRightOfLabel }) => $('.node-def-edit__expressions', toRightOf(toRightOfLabel)),
+  expressionsContainer: ({ toRightOfLabel, relativeSelectors = [] }) =>
+    $('.node-def-edit__expressions', toRightOf(toRightOfLabel), ...relativeSelectors),
   expressionContainer: ({ parentSelector, position }) =>
     $(`.node-def-edit__expression:nth-child(${position})`, within(parentSelector)),
   expressionPlaceholder: ({ parentSelector }) => $('.node-def-edit__expression.placeholder', within(parentSelector)),
@@ -14,13 +15,26 @@ const selectorsAdvanced = {
     ),
 
   // default values
-  defaultValueExpressions: () => selectorsAdvanced.expressionsContainer({ toRightOfLabel: 'Default values' }),
+  defaultValueExpressions: () =>
+    selectorsAdvanced.expressionsContainer({
+      toRightOfLabel: 'Default values',
+      relativeSelectors: [above('Relevant if')],
+    }),
   defaultValuePlaceholderExpressionEditBtn: () =>
     selectorsAdvanced.expressionPlaceholderEditBtn({
       parentSelector: selectorsAdvanced.defaultValueExpressions(),
     }),
   defaultValueExpression: ({ position }) =>
     selectorsAdvanced.expressionContainer({ parentSelector: selectorsAdvanced.defaultValueExpressions(), position }),
+
+  defaultValueApplyIf: ({ expression }) =>
+    $('.btn-edit', toRightOf('Apply if'), toRightOf('Default values'), below(expression)),
+
+  defaultValueApplyIfExpression: ({ expression }) =>
+    selectorsAdvanced.expressionsContainer({
+      toRightOfLabel: 'Default values',
+      relativeSelectors: [below(expression)],
+    }),
 
   // relevant if
   relevantIfExpressions: () => selectorsAdvanced.expressionsContainer({ toRightOfLabel: 'Relevant if' }),
@@ -41,6 +55,17 @@ export const addNodeDefDefaultValue = async ({ constant }) => {
   await click(selectorsAdvanced.defaultValuePlaceholderExpressionEditBtn())
 
   await writeIntoTextBox({ text: constant, selector: selectorsExpressionEditor.constantValue() })
+
+  await click('Apply')
+}
+
+export const addNodeDefBooleanDefaultValue = async ({ defaultValue }) => {
+  await click('Advanced')
+
+  await click(selectorsAdvanced.defaultValuePlaceholderExpressionEditBtn())
+
+  await waitFor1sec()
+  await click(defaultValue)
 
   await click('Apply')
 }
@@ -74,4 +99,22 @@ export const setNodeDefRelevantIf = async ({ expression }) => {
 export const expectNodeDefRelevantIf = async ({ expression }) => {
   const expressionContainer = await selectorsAdvanced.relevantIfExpression()
   await _expectExpressionIs({ expressionContainer, expression })
+}
+
+export const setNodeDefDefaultValueApplyIf = async ({ expression, applyIf }) => {
+  await click('Advanced')
+
+  await click(selectorsAdvanced.defaultValueApplyIf({ expression }))
+
+  await click('Advanced')
+  await waitFor1sec()
+
+  await writeIntoEl({ text: applyIf, selector: selectorsExpressionEditor.advancedExpressionInput() })
+
+  await click('Apply')
+}
+
+export const expectNodeDefDefaultValueApplyIfIf = async ({ expression, applyIf }) => {
+  const expressionContainer = await selectorsAdvanced.defaultValueApplyIfExpression({ expression })
+  await _expectExpressionIs({ expressionContainer, expression: applyIf })
 }

@@ -16,3 +16,4 @@ export { clearTextBox, writeIntoTextBox, hoverTextBox, textBox } from './textBox
 export { toRightOf } from './toRightOf'
 export { waitFor, waitFor1sec } from './wait'
 export { within } from './within'
+export { $ } from './$'
