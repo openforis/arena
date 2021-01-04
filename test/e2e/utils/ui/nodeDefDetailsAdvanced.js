@@ -114,7 +114,10 @@ export const setNodeDefDefaultValueApplyIf = async ({ expression, applyIf }) => 
   await click('Apply')
 }
 
-export const expectNodeDefDefaultValueApplyIfIf = async ({ expression, applyIf }) => {
-  const expressionContainer = await selectorsAdvanced.defaultValueApplyIfExpression({ expression })
-  await _expectExpressionIs({ expressionContainer, expression: applyIf })
+export const expectNodeDefDefaultValueApplyIfIf = async ({ applyIf }) => {
+  const expressionEl = await getElement({
+    text: applyIf,
+  })
+  const exists = await expressionEl.exists()
+  await expect(exists).toBeTruthy()
 }

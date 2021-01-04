@@ -41,14 +41,17 @@ describe('SurveyForm edit expressions', () => {
   test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster boolean' })
 
+    await click('Advanced')
+
     await addNodeDefBooleanDefaultValue({ defaultValue: 'True' })
     const expression = 'true'
     await expectNodeDefDefaultValue({ expression })
 
     const applyIf = `cluster_decimal > '5'`
+    const expressionText = '"true"'
 
-    await setNodeDefDefaultValueApplyIf({ expression, applyIf })
-    await expectNodeDefDefaultValueApplyIfIf({ expression, applyIf })
+    await setNodeDefDefaultValueApplyIf({ expression: expressionText, applyIf })
+    await expectNodeDefDefaultValueApplyIfIf({ expression: expressionText, applyIf })
 
     await clickNodeDefSaveAndBack()
   })

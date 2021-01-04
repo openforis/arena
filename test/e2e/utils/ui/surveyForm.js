@@ -44,4 +44,11 @@ export const expectSurveyFormItemNames = async ({ entityName = null, itemNames: 
 export const expectSurveyFormItems = async ({ entityName = null, items }) =>
   expectSurveyFormItemNames({ entityName, itemNames: items.map((item) => item.name) })
 
-export const editNodeDef = async ({ nodeDefLabel }) => click(selectors.nodeDefEditButton({ nodeDefLabel }))
+export const editNodeDef = async ({ nodeDefLabel }) => {
+  await click(
+    await getElement({
+      selector: '.icon-pencil2',
+      relativeSelectors: [toRightOf(nodeDefLabel)],
+    })
+  )
+}
