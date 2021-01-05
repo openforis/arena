@@ -15,7 +15,9 @@ export { join, sep } from 'path'
 
 // ====== FILE
 
-export const readFile = async (filePath) => promises.readFile(filePath, { encoding: 'utf8' })
+export const readFile = async (path) => promises.readFile(path, { encoding: 'utf8' })
+
+export const writeFile = async (path, data = '') => promises.writeFile(path, data)
 
 export const appendFile = async (path, data = '') => promises.appendFile(path, data)
 
