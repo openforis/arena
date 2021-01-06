@@ -47,7 +47,7 @@ export const exportSurvey = async ({ surveyId, res }) => {
     categoriesUuids.map(async (categoryUuid) => {
       const itemsData = await CategoryService.fetchItemsByCategoryUuid(surveyId, categoryUuid)
       await FileUtils.writeFile(
-        FileUtils.join(categoriesPathDir, `${categoryUuid.uuid}.json`),
+        FileUtils.join(categoriesPathDir, `${categoryUuid}.json`),
         JSON.stringify(itemsData, null, 2)
       )
     })
