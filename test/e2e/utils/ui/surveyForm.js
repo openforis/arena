@@ -1,4 +1,4 @@
-import { expectExists, getElement, getElements } from '../api'
+import { click, expectExists, getElement, getElements, link, toRightOf } from '../api'
 
 const dataAttributes = {
   nodeDefName: 'data-node-def-name',
@@ -10,6 +10,8 @@ const selectors = {
   nodeDefPageItem: '.survey-form__node-def-page-item',
   entityWrapper: (entityName) =>
     `.survey-form__node-def-entity-wrapper${entityName ? `[${dataAttributes.nodeDefName}='${entityName}']` : ''}`,
+  nodeDefEditButton: ({ nodeDefLabel }) =>
+    link({ class: 'survey-form__node-def-edit-button' }, toRightOf(nodeDefLabel)),
 }
 
 export const expectSurveyFormLoaded = async () => expectExists({ selector: selectors.surveyForm })
@@ -41,3 +43,12 @@ export const expectSurveyFormItemNames = async ({ entityName = null, itemNames: 
 
 export const expectSurveyFormItems = async ({ entityName = null, items }) =>
   expectSurveyFormItemNames({ entityName, itemNames: items.map((item) => item.name) })
+
+export const editNodeDef = async ({ nodeDefLabel }) => {
+  await click(
+    await getElement({
+      selector: '.icon-pencil2',
+      relativeSelectors: [toRightOf(nodeDefLabel)],
+    })
+  )
+}
