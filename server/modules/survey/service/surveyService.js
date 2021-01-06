@@ -104,7 +104,7 @@ export const exportSurvey = async ({ surveyId, res }) => {
     })
   )
 
-  await Response.sendZipFile(res, pathPrefix, `${prefix}.zip`)
+  Response.sendZipFile(res, pathPrefix, `${prefix}.zip`)
 }
 
 export const {
