@@ -5,6 +5,7 @@ import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyServi
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as RecordService from '@server/modules/record/service/recordService'
 import * as AnalysisService from '@server/modules/analysis/service'
+import * as FileService from '@server/modules/record/service/fileService'
 
 import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../manager/surveyManager'
@@ -90,6 +91,18 @@ export const exportSurvey = async ({ surveyId, res }) => {
       files.push({
         data: JSON.stringify(chainData, null, 2),
         name: FileUtils.join(chainsPathDir, `${chain.uuid}.json`),
+      })
+    })
+  )
+
+  // Files
+  const filesData = await FileService.fetchFilesBySurveyId(surveyId)
+  const filesPathDir = FileUtils.join(prefix, 'files')
+  await Promise.all(
+    filesData.map(async (fileData) => {
+      files.push({
+        data: JSON.stringify(fileData, null, 2),
+        name: FileUtils.join(filesPathDir, `${fileData.uuid}.json`),
       })
     })
   )
