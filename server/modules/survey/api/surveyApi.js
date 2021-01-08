@@ -82,6 +82,16 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      await SurveyService.exportSurvey({ surveyId, res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
