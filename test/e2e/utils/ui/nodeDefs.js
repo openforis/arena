@@ -11,6 +11,8 @@ import {
   expectExists,
   within,
   button,
+  waitFor,
+  dropDown,
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => writeIntoTextBox({ text: value, selector: below(label) })
@@ -85,4 +87,57 @@ export const NodeDefsUtils = {
       })
     },
   },
+}
+
+const getEnterFunction = ({ type }) => NodeDefsUtils[type].enterValue
+const getEnterParams = ({ type, ...values }) => ({ ...values })
+const getCheckFunction = ({ type }) => NodeDefsUtils[type].expectValue
+const getCheckParams = ({ type, ...values }) => ({ ...values })
+
+const doSequencial = async ({ items, getFunction, getParams }) =>
+  items.reduce(async (promise, item) => {
+    await promise
+    return getFunction(item)(getParams(item))
+  }, true)
+
+const enterValuesSequencial = async ({ items }) =>
+  doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
+
+const checkValuesSequencial = async ({ items }) =>
+  doSequencial({ items, getFunction: getCheckFunction, getParams: getCheckParams })
+
+export const enterValuesCluster = enterValuesSequencial
+export const enterValuesPlot = async ({ items }) => {
+  await click('Plot')
+  await waitFor(500)
+  await click('Add')
+  await waitFor(500)
+  await enterValuesSequencial({ items })
+}
+
+export const checkValuesCluster = checkValuesSequencial
+export const checkValuesPlot = async ({ id, items }) => {
+  await click('Plot')
+  await waitFor(300)
+  await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
+  await waitFor(300)
+  await checkValuesSequencial({ items })
+}
+
+export const insertRecord = async (record) => {
+  await click('New')
+  await waitFor(500)
+  const { cluster, plots } = record
+  await enterValuesCluster({ items: cluster })
+  await enterValuesPlot({ items: plots[0] })
+  await enterValuesPlot({ items: plots[1] })
+}
+
+export const checkRecord = async (record, position) => {
+  const { cluster, plots } = record
+  await click(await getElement({ selector: `.table__row:nth-child(${position})` }))
+  await waitFor(500)
+  await checkValuesCluster({ items: cluster })
+  await checkValuesPlot({ id: 1, items: plots[0] })
+  await checkValuesPlot({ id: 2, items: plots[1] })
 }

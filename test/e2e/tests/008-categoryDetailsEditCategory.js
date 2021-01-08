@@ -19,7 +19,7 @@ import { clickSidebarBtnDesignerCategories } from '../utils/ui/sidebar'
 const categoryName = 'administrative_unit'
 const levels = ['country', 'region', 'district']
 const itemsPerLevel = 5
-const itemInsertTime = 5 * 1000 // 5 sec
+const itemInsertTime = 7 * 1000 // 5 sec
 
 const _getItemCode = ({ index, codePrefix = '' }) => codePrefix + StringUtils.padStart(2, '0')(String(index + 1))
 
