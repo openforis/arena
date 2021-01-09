@@ -1,4 +1,3 @@
-/* eslint-disable jsdoc/require-description-complete-sentence */
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -43,7 +42,6 @@ export const initNewRecord = async (
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    /* eslint-disable-next-line no-use-before-define */
     return persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
   })
 
@@ -83,7 +81,7 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
 
 // ==== DELETE
 export const deleteRecord = async (user, survey, uuid) =>
-  db.tx(async (t) => {
+  await db.tx(async (t) => {
     const rootDef = Survey.getNodeDefRoot(survey)
     const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(
       survey,
@@ -104,13 +102,13 @@ export const deleteRecord = async (user, survey, uuid) =>
   })
 
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
-  db.tx(async (t) => {
+  await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
     await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
-  db.tx(async (t) => {
+  await db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
       await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
@@ -119,7 +117,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
     return recordUuids.length
   })
 
-export const { deleteRecordsByCycles } = RecordRepository
+export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
 
 /**
  * ======
@@ -127,7 +125,7 @@ export const { deleteRecordsByCycles } = RecordRepository
  * ======
  */
 
-const _beforeNodeUpdate = async ({ survey, record, node, t }) => {
+const _beforeNodeUpdate = async (user, survey, record, node, t) => {
   if (!Record.isPreview(record)) {
     // Check if record key will be modified
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
@@ -146,7 +144,6 @@ const _onNodesUpdate = async (
   nodesValidationListener,
   t
 ) => {
-  let _record = record
   // 1. update record and notify
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedNodes)
@@ -156,12 +153,12 @@ const _onNodesUpdate = async (
   const {
     record: recordUpdatedDependentNodes,
     nodes: updatedDependentNodes,
-  } = await NodeUpdateManager.updateNodesDependents(survey, _record, updatedNodes, t)
+  } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }
 
-  _record = recordUpdatedDependentNodes
+  record = recordUpdatedDependentNodes
 
   const updatedNodesAndDependents = {
     ...updatedNodes,
@@ -171,7 +168,7 @@ const _onNodesUpdate = async (
   // 3. update node validations
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(
     survey,
-    _record,
+    record,
     updatedNodesAndDependents,
     true,
     t
@@ -180,27 +177,21 @@ const _onNodesUpdate = async (
     nodesValidationListener(validations)
   }
 
-  _record = Record.mergeNodeValidations(validations)(_record)
+  record = Record.mergeNodeValidations(validations)(record)
 
   // 4. update survey rdb
   if (!Record.isPreview(record)) {
     const nodeDefs = ObjectUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
-    await DataTableUpdateRepository.updateTable(
-      survey,
-      Record.getCycle(_record),
-      nodeDefs,
-      updatedNodesAndDependents,
-      t
-    )
+    await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
 
     // Merge updated nodes with existing ones (remove created/updated flags nodes)
-    _record = Record.mergeNodes(updatedNodesAndDependents)(_record)
+    record = Record.mergeNodes(updatedNodesAndDependents)(record)
   }
 
   return {
-    record: _record,
+    record,
     updatedNodesAndDependents,
   }
 }
@@ -224,33 +215,6 @@ const _afterNodesUpdate = async ({ survey, record, nodes, t }) => {
 export const { insertNode, updateNode } = NodeUpdateManager
 
 // inserts/updates a node and validate records uniqueness
-const _updateNodeAndValidateRecordUniqueness = async (
-  user,
-  survey,
-  record,
-  node,
-  nodesUpdateFn,
-  nodesUpdateListener = null,
-  nodesValidationListener = null,
-  t = db
-) =>
-  t.tx(async (_t) => {
-    await _beforeNodeUpdate({ user, survey, record, node, t: _t })
-
-    const nodesUpdated = await nodesUpdateFn(user, survey, record, node, _t)
-
-    const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
-      survey,
-      nodesUpdated,
-      nodesUpdateListener,
-      nodesValidationListener,
-      t
-    )
-    await _afterNodesUpdate({ user, survey, record: updatedRecord, nodes: updatedNodesAndDependents, t: _t })
-
-    return updatedRecord
-  })
-
 export const persistNode = async (
   user,
   survey,
@@ -261,18 +225,18 @@ export const persistNode = async (
   system = false,
   t = db
 ) =>
-  _updateNodeAndValidateRecordUniqueness(
+  await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
     node,
-    (_user, _survey, _record, _node, _t) => NodeUpdateManager.persistNode(_user, _survey, _record, _node, system, _t),
+    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, system, t),
     nodesUpdateListener,
     nodesValidationListener,
     t
   )
 
-export const { updateNodesDependents } = NodeUpdateManager
+export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
 
 export const deleteNode = async (
   user,
@@ -283,16 +247,42 @@ export const deleteNode = async (
   nodesValidationListener = null,
   t = db
 ) =>
-  _updateNodeAndValidateRecordUniqueness(
+  await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
     Record.getNodeByUuid(nodeUuid)(record),
-    (_user, _survey, _record, node, _t) =>
-      NodeUpdateManager.deleteNode(_user, _survey, _record, Node.getUuid(node), _t),
+    (user, survey, record, node, t) => NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
     nodesUpdateListener,
     nodesValidationListener,
     t
   )
 
-export const { deleteNodesByNodeDefUuids } = NodeUpdateManager
+export const deleteNodesByNodeDefUuids = NodeUpdateManager.deleteNodesByNodeDefUuids
+
+const _updateNodeAndValidateRecordUniqueness = async (
+  user,
+  survey,
+  record,
+  node,
+  nodesUpdateFn,
+  nodesUpdateListener = null,
+  nodesValidationListener = null,
+  t = db
+) =>
+  await t.tx(async (t) => {
+    await _beforeNodeUpdate(user, survey, record, node, t)
+
+    const nodesUpdated = await nodesUpdateFn(user, survey, record, node, t)
+
+    const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
+      survey,
+      nodesUpdated,
+      nodesUpdateListener,
+      nodesValidationListener,
+      t
+    )
+    await _afterNodesUpdate({ user, survey, record: updatedRecord, nodes: updatedNodesAndDependents, t })
+
+    return updatedRecord
+  })
