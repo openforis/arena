@@ -57,7 +57,7 @@ const validateTaxon = (survey, nodeDef, node) => {
 const typeValidatorFns = {
   [nodeDefType.boolean]: (_survey, _nodeDef, _node, value) => R.includes(value, ['true', 'false']),
 
-  [nodeDefType.code]: (survey, nodeDef, node) => validateCode(survey, nodeDef, node),
+  [nodeDefType.code]: (survey, node) => validateCode(survey, node),
 
   [nodeDefType.coordinate]: (_survey, _nodeDef, node) =>
     GeoUtils.isCoordinateValid(Node.getCoordinateSrs(node), Node.getCoordinateX(node), Node.getCoordinateY(node)),

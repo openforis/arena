@@ -98,7 +98,7 @@ export const validateAttribute = async (survey, record, attribute) => {
       attribute,
       {
         [Node.keys.value]: [
-          _validateRequired(survey, nodeDef),
+          _validateRequired(nodeDef),
           AttributeTypeValidator.validateValueType(survey, nodeDef),
           _validateNodeValidations(survey, record, nodeDef),
           AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef),
