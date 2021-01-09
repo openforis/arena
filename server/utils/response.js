@@ -69,3 +69,13 @@ export const sendZipFile = (res, dir, name) => {
     sendErr(res, 'File not found')
   }
 }
+
+export const sendFilesAsZip = (res, zipName, files) => {
+  setContentTypeFile(res, zipName, null, contentTypes.zip)
+  const zip = Archiver('zip')
+  zip.pipe(res)
+  files.forEach(({ data, name }) => {
+    zip.append(data, { name })
+  })
+  zip.finalize()
+}
