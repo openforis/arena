@@ -37,12 +37,12 @@ export const initNewRecord = async (
   nodesValidationListener = null,
   client = db
 ) =>
-  client.tx(async (t) => {
+  await client.tx(async (t) => {
     const rootNodeDef = Survey.getNodeDefRoot(survey)
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
+    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
   })
 
 // ==== UPDATE
@@ -125,92 +125,6 @@ export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
  * ======
  */
 
-const _beforeNodeUpdate = async (user, survey, record, node, t) => {
-  if (!Record.isPreview(record)) {
-    // Check if record key will be modified
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-
-    if (Survey.isNodeDefRootKey(nodeDef)(survey)) {
-      // Validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, true, t)
-    }
-  }
-}
-
-const _onNodesUpdate = async (
-  survey,
-  { record, nodes: updatedNodes },
-  nodesUpdateListener,
-  nodesValidationListener,
-  t
-) => {
-  // 1. update record and notify
-  if (nodesUpdateListener) {
-    nodesUpdateListener(updatedNodes)
-  }
-
-  // 2. update dependent nodes
-  const {
-    record: recordUpdatedDependentNodes,
-    nodes: updatedDependentNodes,
-  } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
-  if (nodesUpdateListener) {
-    nodesUpdateListener(updatedDependentNodes)
-  }
-
-  record = recordUpdatedDependentNodes
-
-  const updatedNodesAndDependents = {
-    ...updatedNodes,
-    ...updatedDependentNodes,
-  }
-
-  // 3. update node validations
-  const validations = await RecordValidationManager.validateNodesAndPersistValidation(
-    survey,
-    record,
-    updatedNodesAndDependents,
-    true,
-    t
-  )
-  if (nodesValidationListener) {
-    nodesValidationListener(validations)
-  }
-
-  record = Record.mergeNodeValidations(validations)(record)
-
-  // 4. update survey rdb
-  if (!Record.isPreview(record)) {
-    const nodeDefs = ObjectUtils.toUuidIndexedObj(
-      Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
-    )
-    await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
-
-    // Merge updated nodes with existing ones (remove created/updated flags nodes)
-    record = Record.mergeNodes(updatedNodesAndDependents)(record)
-  }
-
-  return {
-    record,
-    updatedNodesAndDependents,
-  }
-}
-
-const _afterNodesUpdate = async ({ survey, record, nodes, t }) => {
-  if (!Record.isPreview(record)) {
-    // Check if root key has been modified
-    const rootKeyModified = R.any((node) => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      return Survey.isNodeDefRootKey(nodeDef)(survey)
-    })(Object.values(nodes))
-
-    if (rootKeyModified) {
-      // Validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, false, t)
-    }
-  }
-}
-
 // inserts/updates a node skipping record uniqueness validation
 export const { insertNode, updateNode } = NodeUpdateManager
 
@@ -282,7 +196,93 @@ const _updateNodeAndValidateRecordUniqueness = async (
       nodesValidationListener,
       t
     )
-    await _afterNodesUpdate({ user, survey, record: updatedRecord, nodes: updatedNodesAndDependents, t })
+    await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
 
     return updatedRecord
   })
+
+const _beforeNodeUpdate = async (user, survey, record, node, t) => {
+  if (!Record.isPreview(record)) {
+    // Check if record key will be modified
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+    if (Survey.isNodeDefRootKey(nodeDef)(survey)) {
+      // Validate record uniqueness of records with same record keys
+      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, true, t)
+    }
+  }
+}
+
+const _onNodesUpdate = async (
+  survey,
+  { record, nodes: updatedNodes },
+  nodesUpdateListener,
+  nodesValidationListener,
+  t
+) => {
+  // 1. update record and notify
+  if (nodesUpdateListener) {
+    nodesUpdateListener(updatedNodes)
+  }
+
+  // 2. update dependent nodes
+  const {
+    record: recordUpdatedDependentNodes,
+    nodes: updatedDependentNodes,
+  } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
+  if (nodesUpdateListener) {
+    nodesUpdateListener(updatedDependentNodes)
+  }
+
+  record = recordUpdatedDependentNodes
+
+  const updatedNodesAndDependents = {
+    ...updatedNodes,
+    ...updatedDependentNodes,
+  }
+
+  // 3. update node validations
+  const validations = await RecordValidationManager.validateNodesAndPersistValidation(
+    survey,
+    record,
+    updatedNodesAndDependents,
+    true,
+    t
+  )
+  if (nodesValidationListener) {
+    nodesValidationListener(validations)
+  }
+
+  record = Record.mergeNodeValidations(validations)(record)
+
+  // 4. update survey rdb
+  if (!Record.isPreview(record)) {
+    const nodeDefs = ObjectUtils.toUuidIndexedObj(
+      Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
+    )
+    await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
+
+    // Merge updated nodes with existing ones (remove created/updated flags nodes)
+    record = Record.mergeNodes(updatedNodesAndDependents)(record)
+  }
+
+  return {
+    record,
+    updatedNodesAndDependents,
+  }
+}
+
+const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
+  if (!Record.isPreview(record)) {
+    // Check if root key has been modified
+    const rootKeyModified = R.any((node) => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      return Survey.isNodeDefRootKey(nodeDef)(survey)
+    })(Object.values(nodes))
+
+    if (rootKeyModified) {
+      // Validate record uniqueness of records with same record keys
+      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, false, t)
+    }
+  }
+}
