@@ -5,7 +5,7 @@ import { expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { expectSurveyFormHasOnlyAndInOrderThesePages } from '../utils/ui/surveyFormPage'
 import { clickHeaderBtnMySurveys } from '../utils/ui/header'
 import { enterValuesCluster, enterValuesPlot, checkValuesCluster, checkValuesPlot } from '../utils/ui/nodeDefs'
-import { records } from '../resources/records/recorsData'
+import { records } from '../resources/records/recordsData'
 
 const { cluster: ClusterItems, plots } = records[0]
 

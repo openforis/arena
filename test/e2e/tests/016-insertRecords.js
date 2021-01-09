@@ -1,5 +1,5 @@
 import { waitFor } from '../utils/api'
-import { records } from '../resources/records/recorsData'
+import { records } from '../resources/records/recordsData'
 
 import { insertRecord, checkRecord } from '../utils/ui/nodeDefs'
 import { clickSiderbarBtnDataRecords } from '../utils/ui/sidebar'
