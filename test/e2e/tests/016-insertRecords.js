@@ -12,7 +12,7 @@ describe('Survey insert records', () => {
       await waitFor(200)
       await insertRecord(record)
     },
-    120000
+    60000 * records.length
   )
 
   test.each(records.reverse().map((record, idx) => [record, idx + 1]))(
@@ -22,6 +22,6 @@ describe('Survey insert records', () => {
       await waitFor(500)
       await checkRecord(record, index)
     },
-    120000
+    60000 * records.length
   )
 })
