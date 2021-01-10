@@ -1,4 +1,4 @@
-import { click, waitFor } from '../utils/api'
+import { click, expectExists, reload, waitFor } from '../utils/api'
 import { records } from '../resources/records/recordsData'
 
 import { insertRecord, checkRecord, enterValuesCluster, enterValuesPlot } from '../utils/ui/nodeDefs'
@@ -6,9 +6,10 @@ import { clickSiderbarBtnDataRecords } from '../utils/ui/sidebar'
 
 describe('Survey insert records', () => {
   test('Insert record one', async () => {
+    await reload()
     const record = records[0]
     await clickSiderbarBtnDataRecords()
-    await waitFor(500)
+    await waitFor(5000)
   }, 90000)
 
   test('Insert record one cluster', async () => {
