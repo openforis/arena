@@ -56,7 +56,7 @@ export const addNodeDefToTable = async ({ type, name, label, isKey, isMultiple, 
 
 export const clickNodeDefCategoryAdd = async () => {
   await click(button({ class: 'btn-add-category' }))
-  await waitFor(1000)
+  await waitFor(2000)
 }
 
 export const expectNodeDefCategoryIs = async (categoryName) => expectExists({ text: categoryName })
@@ -92,5 +92,5 @@ export const expectNodeDefCodeParentEnabled = async () => expect(await _isNodeDe
 
 export const clickNodeDefTaxonomyAdd = async () => {
   await click(button({ class: 'btn-add-taxonomy' }))
-  await waitFor(1000)
+  await waitFor(2000)
 }

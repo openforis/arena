@@ -15,7 +15,7 @@ describe('SurveyForm Preview', () => {
     await clickHeaderBtnMySurveys()
     await clickParent('Survey')
 
-    await waitFor(1000)
+    await waitFor(2000)
     await waitForLoader()
 
     await waitFor(2000)

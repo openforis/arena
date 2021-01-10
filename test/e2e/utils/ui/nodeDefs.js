@@ -16,7 +16,7 @@ import {
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
-  await waitFor(1000)
+  await waitFor(2000)
   await writeIntoTextBox({ text: value, selector: below(label) })
 }
 
@@ -121,9 +121,9 @@ export const enterValuesPlot = async ({ items }) => {
 export const checkValuesCluster = checkValuesSequencial
 export const checkValuesPlot = async ({ id, items }) => {
   await click('Plot')
-  await waitFor(300)
+  await waitFor(500)
   await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
-  await waitFor(300)
+  await waitFor(500)
   await checkValuesSequencial({ items })
 }
 
@@ -132,9 +132,7 @@ export const insertRecord = async (record) => {
   await waitFor(500)
   const { cluster, plots } = record
   await enterValuesCluster({ items: cluster })
-  await waitFor(500)
   await enterValuesPlot({ items: plots[0] })
-  await waitFor(500)
   await enterValuesPlot({ items: plots[1] })
 }
 
@@ -143,9 +141,6 @@ export const checkRecord = async (record, position) => {
   await click(await getElement({ selector: `.table__row:nth-child(${position})` }))
   await waitFor(500)
   await checkValuesCluster({ items: cluster })
-  await waitFor(500)
   await checkValuesPlot({ id: 1, items: plots[0] })
-  await waitFor(500)
   await checkValuesPlot({ id: 2, items: plots[1] })
-  await waitFor(500)
 }
