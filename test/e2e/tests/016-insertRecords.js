@@ -7,6 +7,7 @@ import { clickSiderbarBtnDataRecords } from '../utils/ui/sidebar'
 describe('Survey insert records', () => {
   test('Insert record one', async () => {
     await reload()
+    await waitFor(2000)
     const record = records[0]
     await clickSiderbarBtnDataRecords()
     await waitFor(5000)
