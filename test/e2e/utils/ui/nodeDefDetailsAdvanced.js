@@ -62,6 +62,7 @@ export const addNodeDefDefaultValue = async ({ constant }) => {
 export const addNodeDefBooleanDefaultValue = async ({ defaultValue }) => {
   await click('Advanced')
 
+  await waitFor1sec()
   await click(selectorsAdvanced.defaultValuePlaceholderExpressionEditBtn())
 
   await waitFor1sec()
@@ -89,7 +90,9 @@ export const setNodeDefRelevantIf = async ({ expression }) => {
 
   await click(selectorsAdvanced.relevantIfPlaceholderEditBtn())
 
+  await waitFor1sec()
   await click('Advanced')
+  await waitFor1sec()
 
   await writeIntoEl({ text: expression, selector: selectorsExpressionEditor.advancedExpressionInput() })
 
@@ -105,7 +108,7 @@ export const setNodeDefDefaultValueApplyIf = async ({ expression, applyIf }) => 
   await click('Advanced')
 
   await click(selectorsAdvanced.defaultValueApplyIf({ expression }))
-
+  await waitFor1sec()
   await click('Advanced')
   await waitFor1sec()
 

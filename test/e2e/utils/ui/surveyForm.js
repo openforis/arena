@@ -1,4 +1,4 @@
-import { click, expectExists, getElement, getElements, link, toRightOf, waitFor } from '../api'
+import { click, expectExists, getElement, getElements, link, toRightOf } from '../api'
 
 const dataAttributes = {
   nodeDefName: 'data-node-def-name',
@@ -45,7 +45,6 @@ export const expectSurveyFormItems = async ({ entityName = null, items }) =>
   expectSurveyFormItemNames({ entityName, itemNames: items.map((item) => item.name) })
 
 export const editNodeDef = async ({ nodeDefLabel }) => {
-  await waitFor(300)
   await click(
     await getElement({
       selector: '.icon-pencil2',

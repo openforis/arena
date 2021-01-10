@@ -9,10 +9,10 @@ describe('Survey insert records', () => {
     'Enter record',
     async (record) => {
       await clickSiderbarBtnDataRecords()
-      await waitFor(200)
+      await waitFor(500)
       await insertRecord(record)
     },
-    120000 * records.length
+    15000000 * records.length
   )
 
   test.each(records.reverse().map((record, idx) => [record, idx + 1]))(
@@ -22,6 +22,6 @@ describe('Survey insert records', () => {
       await waitFor(500)
       await checkRecord(record, index)
     },
-    120000 * records.length
+    15000000 * records.length
   )
 })

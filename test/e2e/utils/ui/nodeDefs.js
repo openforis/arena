@@ -15,7 +15,10 @@ import {
   dropDown,
 } from '../api'
 
-const enterNodeDefValueBase = async ({ value, label }) => writeIntoTextBox({ text: value, selector: below(label) })
+const enterNodeDefValueBase = async ({ value, label }) => {
+  await waitFor(1000)
+  await writeIntoTextBox({ text: value, selector: below(label) })
+}
 
 const expectNodeDefBase = async ({ value: text, label, relativeSelectors = [] }) =>
   expectInputTextToBe({
@@ -129,7 +132,9 @@ export const insertRecord = async (record) => {
   await waitFor(500)
   const { cluster, plots } = record
   await enterValuesCluster({ items: cluster })
+  await waitFor(500)
   await enterValuesPlot({ items: plots[0] })
+  await waitFor(500)
   await enterValuesPlot({ items: plots[1] })
 }
 
@@ -138,6 +143,9 @@ export const checkRecord = async (record, position) => {
   await click(await getElement({ selector: `.table__row:nth-child(${position})` }))
   await waitFor(500)
   await checkValuesCluster({ items: cluster })
+  await waitFor(500)
   await checkValuesPlot({ id: 1, items: plots[0] })
+  await waitFor(500)
   await checkValuesPlot({ id: 2, items: plots[1] })
+  await waitFor(500)
 }

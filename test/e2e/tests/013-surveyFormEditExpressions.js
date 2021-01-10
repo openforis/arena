@@ -1,4 +1,4 @@
-import { click } from '../utils/api'
+import { click, waitFor1sec } from '../utils/api'
 import { editNodeDef } from '../utils/ui/surveyForm'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { clickNodeDefSaveAndBack } from '../utils/ui/nodeDefDetail'
@@ -38,15 +38,16 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
   })
 
-  test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5', async () => {
+  test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5 a', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster boolean' })
+    await waitFor1sec()
 
     await click('Advanced')
 
     await addNodeDefBooleanDefaultValue({ defaultValue: 'True' })
+    await waitFor1sec()
     const expression = 'true'
     await expectNodeDefDefaultValue({ expression })
-
     const applyIf = `cluster_decimal > '5'`
     const expressionText = '"true"'
 
@@ -54,5 +55,6 @@ describe('SurveyForm edit expressions', () => {
     await expectNodeDefDefaultValueApplyIfIf({ expression: expressionText, applyIf })
 
     await clickNodeDefSaveAndBack()
-  })
+    await waitFor1sec()
+  }, 60000)
 })
