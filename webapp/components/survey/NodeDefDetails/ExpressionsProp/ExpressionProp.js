@@ -16,6 +16,8 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
+    qualifier,
+    index,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
     validation,
@@ -68,6 +70,9 @@ const ExpressionProp = (props) => {
           <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
 
           <ExpressionEditor
+            index={index}
+            placeholder={isPlaceholder}
+            qualifier={`${qualifier}-expression`}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCurrent={nodeDefUuidCurrent}
             query={NodeDefExpression.getExpression(expression)}
@@ -85,6 +90,9 @@ const ExpressionProp = (props) => {
             <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
             <ExpressionEditor
+              index={index}
+              placeholder={isPlaceholder}
+              qualifier={`${qualifier}-applyIf`}
               nodeDefUuidContext={nodeDefUuidContext}
               nodeDefUuidCurrent={nodeDefUuidCurrent}
               query={NodeDefExpression.getApplyIf(expression)}
@@ -121,6 +129,9 @@ const ExpressionProp = (props) => {
 }
 
 ExpressionProp.propTypes = {
+  index: PropTypes.number.isRequired, // used to generate test ids
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+
   nodeDefUuidContext: PropTypes.string,
   nodeDefUuidCurrent: PropTypes.string,
   validation: PropTypes.object,

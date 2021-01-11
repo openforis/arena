@@ -8,7 +8,7 @@ import {
   expectNodeDefRelevantIf,
   setNodeDefRelevantIf,
   setNodeDefDefaultValueApplyIf,
-  expectNodeDefDefaultValueApplyIfIf,
+  expectNodeDefDefaultValueApplyIf,
   addNodeDefBooleanDefaultValue,
 } from '../utils/ui/nodeDefDetailsAdvanced'
 
@@ -38,7 +38,7 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
   })
 
-  test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5 a', async () => {
+  test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster boolean' })
     await waitFor1sec()
 
@@ -46,13 +46,17 @@ describe('SurveyForm edit expressions', () => {
 
     await addNodeDefBooleanDefaultValue({ defaultValue: 'True' })
     await waitFor1sec()
-    const expression = 'true'
-    await expectNodeDefDefaultValue({ expression })
+    await expectNodeDefDefaultValue({ expression: `"true"` })
     const applyIf = `cluster_decimal > '5'`
-    const expressionText = '"true"'
 
-    await setNodeDefDefaultValueApplyIf({ expression: expressionText, applyIf })
-    await expectNodeDefDefaultValueApplyIfIf({ expression: expressionText, applyIf })
+    await setNodeDefDefaultValueApplyIf({ applyIf })
+    await expectNodeDefDefaultValueApplyIf({ applyIf })
+  }, 60000)
+
+  test('add Default Value to "cluster_boolean" as "false" otherwise', async () => {
+    await addNodeDefBooleanDefaultValue({ defaultValue: 'False' })
+    await waitFor1sec()
+    await expectNodeDefDefaultValue({ index: 1, expression: `"false"` })
 
     await clickNodeDefSaveAndBack()
     await waitFor1sec()

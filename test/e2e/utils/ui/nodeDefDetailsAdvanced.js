@@ -1,47 +1,36 @@
-import { $, click, getElement, toRightOf, within, writeIntoTextBox, above, waitFor1sec, below } from '../api'
+import { $, click, toRightOf, writeIntoTextBox, waitFor1sec } from '../api'
 import { writeIntoEl } from '../api/textBox'
 
+const expressionEditorElId = ({ index = 0, qualifier, type, elType }) =>
+  `#expression-editor-${index}-${qualifier}-${type}-${elType}`
+
 const selectorsAdvanced = {
-  // common
-  expressionsContainer: ({ toRightOfLabel, relativeSelectors = [] }) =>
-    $('.node-def-edit__expressions', toRightOf(toRightOfLabel), ...relativeSelectors),
-  expressionContainer: ({ parentSelector, position }) =>
-    $(`.node-def-edit__expression:nth-child(${position})`, within(parentSelector)),
-  expressionPlaceholder: ({ parentSelector }) => $('.node-def-edit__expression.placeholder', within(parentSelector)),
-  expressionPlaceholderEditBtn: ({ parentSelector }) =>
-    $(
-      '.expression-item:nth-child(1) .expression-editor__query-container .btn-edit',
-      within(selectorsAdvanced.expressionPlaceholder({ parentSelector }))
-    ),
-
   // default values
-  defaultValueExpressions: () =>
-    selectorsAdvanced.expressionsContainer({
-      toRightOfLabel: 'Default values',
-      relativeSelectors: [above('Relevant if')],
-    }),
+  defaultValueExpressionEditBtn: ({ index }) =>
+    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'expression', elType: 'edit-btn' })),
   defaultValuePlaceholderExpressionEditBtn: () =>
-    selectorsAdvanced.expressionPlaceholderEditBtn({
-      parentSelector: selectorsAdvanced.defaultValueExpressions(),
-    }),
-  defaultValueExpression: ({ position }) =>
-    selectorsAdvanced.expressionContainer({ parentSelector: selectorsAdvanced.defaultValueExpressions(), position }),
-
-  defaultValueApplyIf: ({ expression }) =>
-    $('.btn-edit', toRightOf('Apply if'), toRightOf('Default values'), below(expression)),
-
-  defaultValueApplyIfExpression: ({ expression }) =>
-    selectorsAdvanced.expressionsContainer({
-      toRightOfLabel: 'Default values',
-      relativeSelectors: [below(expression)],
-    }),
+    $(
+      expressionEditorElId({
+        index: 'placeholder',
+        qualifier: 'default-values',
+        type: 'expression',
+        elType: 'edit-btn',
+      })
+    ),
+  defaultValueExpressionQuery: ({ index }) =>
+    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'expression', elType: 'query' })),
+  defaultValueApplyIfEditBtn: ({ index }) =>
+    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'applyIf', elType: 'edit-btn' })),
+  defaultValueApplyIfQuery: ({ index }) =>
+    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'applyIf', elType: 'query' })),
 
   // relevant if
-  relevantIfExpressions: () => selectorsAdvanced.expressionsContainer({ toRightOfLabel: 'Relevant if' }),
   relevantIfPlaceholderEditBtn: () =>
-    selectorsAdvanced.expressionPlaceholderEditBtn({ parentSelector: selectorsAdvanced.relevantIfExpressions() }),
-  relevantIfExpression: () =>
-    selectorsAdvanced.expressionContainer({ parentSelector: selectorsAdvanced.relevantIfExpressions(), position: 1 }),
+    $(expressionEditorElId({ index: 'placeholder', qualifier: 'relevant-if', type: 'expression', elType: 'edit-btn' })),
+  relevantIfEditBtn: () =>
+    $(expressionEditorElId({ index: '0', qualifier: 'relevant-if', type: 'expression', elType: 'edit-btn' })),
+  relevantIfExpressionQuery: () =>
+    $(expressionEditorElId({ qualifier: 'relevant-if', type: 'expression', elType: 'query' })),
 }
 
 const selectorsExpressionEditor = {
@@ -71,24 +60,24 @@ export const addNodeDefBooleanDefaultValue = async ({ defaultValue }) => {
   await click('Apply')
 }
 
-const _expectExpressionIs = async ({ expressionContainer, expression }) => {
-  const expressionEl = await getElement({
-    text: expression,
-    relativeSelectors: [within(expressionContainer)],
-  })
-  const exists = await expressionEl.exists()
-  await expect(exists).toBeTruthy()
+const _expectContainerTextToBe = async ({ container, text }) => {
+  await expect(container.exists()).toBeTruthy()
+  const containerText = await container.text()
+  await expect(containerText).toBe(text)
 }
 
-export const expectNodeDefDefaultValue = async ({ expression, position = 1 }) => {
-  const expressionContainer = await selectorsAdvanced.defaultValueExpression({ position })
-  await _expectExpressionIs({ expressionContainer, expression })
+export const expectNodeDefDefaultValue = async ({ expression, index = 0 }) => {
+  const container = await selectorsAdvanced.defaultValueExpressionQuery({ index })
+  await _expectContainerTextToBe({ container, text: expression })
 }
 
-export const setNodeDefRelevantIf = async ({ expression }) => {
+export const setNodeDefRelevantIf = async ({ expression, placeholder = true }) => {
   await click('Advanced')
 
-  await click(selectorsAdvanced.relevantIfPlaceholderEditBtn())
+  const editBtnSelector = placeholder
+    ? selectorsAdvanced.relevantIfPlaceholderEditBtn()
+    : selectorsAdvanced.relevantIfEditBtn()
+  await click(editBtnSelector)
 
   await waitFor1sec()
   await click('Advanced')
@@ -100,14 +89,14 @@ export const setNodeDefRelevantIf = async ({ expression }) => {
 }
 
 export const expectNodeDefRelevantIf = async ({ expression }) => {
-  const expressionContainer = await selectorsAdvanced.relevantIfExpression()
-  await _expectExpressionIs({ expressionContainer, expression })
+  const container = await selectorsAdvanced.relevantIfExpressionQuery()
+  await _expectContainerTextToBe({ container, text: expression })
 }
 
-export const setNodeDefDefaultValueApplyIf = async ({ expression, applyIf }) => {
+export const setNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
   await click('Advanced')
 
-  await click(selectorsAdvanced.defaultValueApplyIf({ expression }))
+  await click(selectorsAdvanced.defaultValueApplyIfEditBtn({ index }))
   await waitFor1sec()
   await click('Advanced')
   await waitFor1sec()
@@ -117,10 +106,7 @@ export const setNodeDefDefaultValueApplyIf = async ({ expression, applyIf }) => 
   await click('Apply')
 }
 
-export const expectNodeDefDefaultValueApplyIfIf = async ({ applyIf }) => {
-  const expressionEl = await getElement({
-    text: applyIf,
-  })
-  const exists = await expressionEl.exists()
-  await expect(exists).toBeTruthy()
+export const expectNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
+  const container = await selectorsAdvanced.defaultValueApplyIfQuery({ index })
+  await _expectContainerTextToBe({ container, text: applyIf })
 }
