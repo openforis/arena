@@ -1,92 +1,13 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
-import { above, click, clickParent, dropDown, waitFor } from '../utils/api'
+import { click, clickParent, waitFor } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { expectSurveyFormHasOnlyAndInOrderThesePages } from '../utils/ui/surveyFormPage'
 import { clickHeaderBtnMySurveys } from '../utils/ui/header'
-import { NodeDefsUtils } from '../utils/ui/nodeDefs'
+import { enterValuesCluster, enterValuesPlot, checkValuesCluster, checkValuesPlot } from '../utils/ui/nodeDefs'
+import { records } from '../resources/records/recordsData'
 
-const getEnterFunction = ({ type }) => NodeDefsUtils[type].enterValue
-const getEnterParams = ({ type, ...values }) => ({ ...values })
-const getCheckFunction = ({ type }) => NodeDefsUtils[type].expectValue
-const getCheckParams = ({ type, ...values }) => ({ ...values })
-
-const doSequencial = async ({ items, getFunction, getParams }) =>
-  items.reduce(async (promise, item) => {
-    await promise
-    return getFunction(item)(getParams(item))
-  }, true)
-
-const enterValuesSequencial = async ({ items }) =>
-  doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
-
-const checkValuesSequencial = async ({ items }) =>
-  doSequencial({ items, getFunction: getCheckFunction, getParams: getCheckParams })
-
-const enterValuesCluster = enterValuesSequencial
-const enterValuesPlot = async ({ items }) => {
-  await click('Plot')
-  await waitFor(500)
-  await click('Add')
-  await waitFor(500)
-  await enterValuesSequencial({ items })
-}
-
-const checkValuesCluster = checkValuesSequencial
-const checkValuesPlot = async ({ id, items }) => {
-  await click('Plot')
-  await waitFor(300)
-  await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
-  await waitFor(300)
-  await checkValuesSequencial({ items })
-}
-
-const ClusterItems = [
-  { type: NodeDef.nodeDefType.integer, value: 1, label: 'Cluster id' },
-  { type: NodeDef.nodeDefType.decimal, value: 10, label: 'Cluster decimal' },
-  // { type: NodeDef.nodeDefType.date, value: '20/11/2020', label: 'Cluster date' },
-  { type: NodeDef.nodeDefType.time, value: '10:30', label: 'Cluster time' },
-  { type: NodeDef.nodeDefType.boolean, value: 'true', label: 'Cluster boolean' },
-  {
-    type: NodeDef.nodeDefType.coordinate,
-    x: 10,
-    y: 15,
-    srs: 'GCS WGS 1984 (EPSG:4326)',
-    label: 'Cluster coordinate',
-  },
-]
-
-const countryRelativeSelectors = () => above('Region')
-const plots = [
-  [
-    { type: NodeDef.nodeDefType.integer, value: 1, label: 'Plot id' },
-    { type: NodeDef.nodeDefType.text, value: 'text', label: 'Plot text' },
-
-    {
-      type: NodeDef.nodeDefType.code,
-      value: 'Country',
-      label: 'Country',
-      relativeSelectors: [countryRelativeSelectors],
-    },
-    { type: NodeDef.nodeDefType.code, value: 'Region 01', label: 'Region' },
-    { type: NodeDef.nodeDefType.code, value: 'District 0102', label: 'Province' },
-  ],
-  [
-    { type: NodeDef.nodeDefType.integer, value: 2, label: 'Plot id' },
-    { type: NodeDef.nodeDefType.text, value: 'text', label: 'Plot text' },
-
-    {
-      type: NodeDef.nodeDefType.code,
-      value: 'Country',
-      label: 'Country',
-      relativeSelectors: [countryRelativeSelectors],
-    },
-    { type: NodeDef.nodeDefType.code, value: 'Region 02', label: 'Region' },
-    { type: NodeDef.nodeDefType.code, value: 'District 0203', label: 'Province' },
-  ],
-]
+const { cluster: ClusterItems, plots } = records[0]
 
 describe('SurveyForm Preview', () => {
   test('Select survey 1', async () => {
@@ -94,7 +15,7 @@ describe('SurveyForm Preview', () => {
     await clickHeaderBtnMySurveys()
     await clickParent('Survey')
 
-    await waitFor(1000)
+    await waitFor(2000)
     await waitForLoader()
 
     await waitFor(2000)
