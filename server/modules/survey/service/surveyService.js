@@ -1,3 +1,5 @@
+import * as Survey from '@core/survey/survey'
+
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -22,10 +24,12 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const exportSurvey = async ({ surveyId, res }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, null, true)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyName = Survey.getName(surveyInfo)
 
   const files = []
-  const prefix = `survey_${surveyId}`
+  const prefix = `survey_${surveyName}`
 
   // Survey
   files.push({ data: JSON.stringify(survey, null, 2), name: FileUtils.join(prefix, `survey.json`) })
