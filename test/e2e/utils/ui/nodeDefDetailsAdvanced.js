@@ -1,37 +1,7 @@
-import { $, click, toRightOf, writeIntoTextBox, waitFor1sec } from '../api'
+import { click, toRightOf, writeIntoTextBox, waitFor1sec } from '../api'
 import { writeIntoEl } from '../api/textBox'
 
-const expressionEditorElId = ({ index = 0, qualifier, type, elType }) =>
-  `#expression-editor-${index}-${qualifier}-${type}-${elType}`
-
-const selectorsAdvanced = {
-  // default values
-  defaultValueExpressionEditBtn: ({ index }) =>
-    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'expression', elType: 'edit-btn' })),
-  defaultValuePlaceholderExpressionEditBtn: () =>
-    $(
-      expressionEditorElId({
-        index: 'placeholder',
-        qualifier: 'default-values',
-        type: 'expression',
-        elType: 'edit-btn',
-      })
-    ),
-  defaultValueExpressionQuery: ({ index }) =>
-    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'expression', elType: 'query' })),
-  defaultValueApplyIfEditBtn: ({ index }) =>
-    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'applyIf', elType: 'edit-btn' })),
-  defaultValueApplyIfQuery: ({ index }) =>
-    $(expressionEditorElId({ index, qualifier: 'default-values', type: 'applyIf', elType: 'query' })),
-
-  // relevant if
-  relevantIfPlaceholderEditBtn: () =>
-    $(expressionEditorElId({ index: 'placeholder', qualifier: 'relevant-if', type: 'expression', elType: 'edit-btn' })),
-  relevantIfEditBtn: () =>
-    $(expressionEditorElId({ index: '0', qualifier: 'relevant-if', type: 'expression', elType: 'edit-btn' })),
-  relevantIfExpressionQuery: () =>
-    $(expressionEditorElId({ qualifier: 'relevant-if', type: 'expression', elType: 'query' })),
-}
+import { nodeDefDetailsSelectorsAdvanced as selectorsAdv } from './nodeDefDetailsAdvancedSelectors'
 
 const selectorsExpressionEditor = {
   constantValue: () => toRightOf('Const'),
@@ -41,7 +11,7 @@ const selectorsExpressionEditor = {
 export const addNodeDefDefaultValue = async ({ constant }) => {
   await click('Advanced')
 
-  await click(selectorsAdvanced.defaultValuePlaceholderExpressionEditBtn())
+  await click(selectorsAdv.defaultValuePlaceholderExpressionEditBtn())
 
   await writeIntoTextBox({ text: constant, selector: selectorsExpressionEditor.constantValue() })
 
@@ -52,7 +22,7 @@ export const addNodeDefBooleanDefaultValue = async ({ defaultValue }) => {
   await click('Advanced')
 
   await waitFor1sec()
-  await click(selectorsAdvanced.defaultValuePlaceholderExpressionEditBtn())
+  await click(selectorsAdv.defaultValuePlaceholderExpressionEditBtn())
 
   await waitFor1sec()
   await click(defaultValue)
@@ -67,16 +37,14 @@ const _expectContainerTextToBe = async ({ container, text }) => {
 }
 
 export const expectNodeDefDefaultValue = async ({ expression, index = 0 }) => {
-  const container = await selectorsAdvanced.defaultValueExpressionQuery({ index })
+  const container = await selectorsAdv.defaultValueExpressionQuery({ index })
   await _expectContainerTextToBe({ container, text: expression })
 }
 
 export const setNodeDefRelevantIf = async ({ expression, placeholder = true }) => {
   await click('Advanced')
 
-  const editBtnSelector = placeholder
-    ? selectorsAdvanced.relevantIfPlaceholderEditBtn()
-    : selectorsAdvanced.relevantIfEditBtn()
+  const editBtnSelector = placeholder ? selectorsAdv.relevantIfPlaceholderEditBtn() : selectorsAdv.relevantIfEditBtn()
   await click(editBtnSelector)
 
   await waitFor1sec()
@@ -89,14 +57,14 @@ export const setNodeDefRelevantIf = async ({ expression, placeholder = true }) =
 }
 
 export const expectNodeDefRelevantIf = async ({ expression }) => {
-  const container = await selectorsAdvanced.relevantIfExpressionQuery()
+  const container = await selectorsAdv.relevantIfExpressionQuery()
   await _expectContainerTextToBe({ container, text: expression })
 }
 
 export const setNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
   await click('Advanced')
 
-  await click(selectorsAdvanced.defaultValueApplyIfEditBtn({ index }))
+  await click(selectorsAdv.defaultValueApplyIfEditBtn({ index }))
   await waitFor1sec()
   await click('Advanced')
   await waitFor1sec()
@@ -107,6 +75,6 @@ export const setNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
 }
 
 export const expectNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
-  const container = await selectorsAdvanced.defaultValueApplyIfQuery({ index })
+  const container = await selectorsAdv.defaultValueApplyIfQuery({ index })
   await _expectContainerTextToBe({ container, text: applyIf })
 }
