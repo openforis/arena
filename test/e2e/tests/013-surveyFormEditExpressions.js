@@ -18,7 +18,7 @@ describe('SurveyForm edit expressions', () => {
     await click('Cluster')
   })
 
-  test('add Default Value to "Cluster decimal"', async () => {
+  test('add Default Value "0" to "Cluster decimal"', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster decimal' })
     await addNodeDefDefaultValue({ constant: '0' })
 
@@ -27,16 +27,16 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
   })
 
-  test('add "Relevant if" to "Cluster date"', async () => {
+  test('add "Relevant if cluster_decimal > 0" to "Cluster date"', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster date' })
 
-    const expression = `cluster_decimal > '0'`
-
-    await setNodeDefRelevantIf({ expression })
-    await expectNodeDefRelevantIf({ expression })
+    await setNodeDefRelevantIf({
+      binaryExpression: { left: { identifier: 'cluster_decimal' }, operator: '>', right: { constant: '0' } },
+    })
+    await expectNodeDefRelevantIf({ expression: `cluster_decimal > 0` })
 
     await clickNodeDefSaveAndBack()
-  })
+  }, 60000)
 
   test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster boolean' })
@@ -47,10 +47,10 @@ describe('SurveyForm edit expressions', () => {
     await addNodeDefBooleanDefaultValue({ defaultValue: 'True' })
     await waitFor1sec()
     await expectNodeDefDefaultValue({ expression: `"true"` })
-    const applyIf = `cluster_decimal > '5'`
 
-    await setNodeDefDefaultValueApplyIf({ applyIf })
-    await expectNodeDefDefaultValueApplyIf({ applyIf })
+    const applyIf = `cluster_decimal > '5'`
+    await setNodeDefDefaultValueApplyIf({ expression: applyIf })
+    await expectNodeDefDefaultValueApplyIf({ expression: applyIf })
   }, 60000)
 
   test('add Default Value to "cluster_boolean" as "false" otherwise', async () => {

@@ -1,19 +1,14 @@
-import { click, toRightOf, writeIntoTextBox, waitFor1sec } from '../api'
-import { writeIntoEl } from '../api/textBox'
+import { click, waitFor1sec } from '../api'
+import { setBinaryLeftConst, setExpression } from './expressionEditor'
 
 import { nodeDefDetailsSelectorsAdvanced as selectorsAdv } from './nodeDefDetailsAdvancedSelectors'
-
-const selectorsExpressionEditor = {
-  constantValue: () => toRightOf('Const'),
-  advancedExpressionInput: () => '.CodeMirror',
-}
 
 export const addNodeDefDefaultValue = async ({ constant }) => {
   await click('Advanced')
 
   await click(selectorsAdv.defaultValuePlaceholderExpressionEditBtn())
 
-  await writeIntoTextBox({ text: constant, selector: selectorsExpressionEditor.constantValue() })
+  await setBinaryLeftConst({ value: constant })
 
   await click('Apply')
 }
@@ -41,17 +36,15 @@ export const expectNodeDefDefaultValue = async ({ expression, index = 0 }) => {
   await _expectContainerTextToBe({ container, text: expression })
 }
 
-export const setNodeDefRelevantIf = async ({ expression, placeholder = true }) => {
+export const setNodeDefRelevantIf = async ({ binaryExpression, expression, placeholder = true }) => {
   await click('Advanced')
 
   const editBtnSelector = placeholder ? selectorsAdv.relevantIfPlaceholderEditBtn() : selectorsAdv.relevantIfEditBtn()
   await click(editBtnSelector)
 
   await waitFor1sec()
-  await click('Advanced')
-  await waitFor1sec()
 
-  await writeIntoEl({ text: expression, selector: selectorsExpressionEditor.advancedExpressionInput() })
+  await setExpression({ binaryExpression, expression })
 
   await click('Apply')
 }
@@ -61,20 +54,18 @@ export const expectNodeDefRelevantIf = async ({ expression }) => {
   await _expectContainerTextToBe({ container, text: expression })
 }
 
-export const setNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
+export const setNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }) => {
   await click('Advanced')
 
   await click(selectorsAdv.defaultValueApplyIfEditBtn({ index }))
   await waitFor1sec()
-  await click('Advanced')
-  await waitFor1sec()
 
-  await writeIntoEl({ text: applyIf, selector: selectorsExpressionEditor.advancedExpressionInput() })
+  await setExpression({ expression })
 
   await click('Apply')
 }
 
-export const expectNodeDefDefaultValueApplyIf = async ({ applyIf, index = 0 }) => {
+export const expectNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }) => {
   const container = await selectorsAdv.defaultValueApplyIfQuery({ index })
-  await _expectContainerTextToBe({ container, text: applyIf })
+  await _expectContainerTextToBe({ container, text: expression })
 }

@@ -15,6 +15,7 @@ const findValue = ({ variables, node }) => {
 
 const Identifier = ({ node, variables, onChange }) => (
   <Select
+    className="identifier"
     options={variables}
     itemLabel="label"
     itemKey="value"
