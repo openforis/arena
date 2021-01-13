@@ -59,7 +59,7 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     taxonomies.map(async (taxonomy) => {
-      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomy.uuid)
+      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomy.uuid, true)
       files.push({
         data: JSON.stringify(taxaData, null, 2),
         name: FileUtils.join(taxonomiesPathDir, `${taxonomy.uuid}.json`),
@@ -75,7 +75,8 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     records.map(async (record) => {
-      const recordData = await RecordService.fetchRecordByUuid(surveyId, record.uuid)
+      const recordData = await RecordService.fetchRecordAndNodesByUuid(surveyId, record.uuid, true)
+
       files.push({
         data: JSON.stringify(recordData, null, 2),
         name: FileUtils.join(recordsPathDir, `${record.uuid}.json`),
@@ -91,7 +92,12 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     chains.map(async (chain) => {
-      const chainData = await AnalysisService.fetchChain({ surveyId, chainUuid: chain.uuid })
+      const chainData = await AnalysisService.fetchChain({
+        surveyId,
+        chainUuid: chain.uuid,
+        includeStepsAndCalculations: true,
+        includeScript: true,
+      })
       files.push({
         data: JSON.stringify(chainData, null, 2),
         name: FileUtils.join(chainsPathDir, `${chain.uuid}.json`),

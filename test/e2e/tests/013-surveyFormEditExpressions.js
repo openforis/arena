@@ -48,7 +48,7 @@ describe('SurveyForm edit expressions', () => {
     await waitFor1sec()
     const expression = 'true'
     await expectNodeDefDefaultValue({ expression })
-    const applyIf = `cluster_decimal > '5'`
+    const applyIf = "cluster_decimal > '5'"
     const expressionText = '"true"'
 
     await setNodeDefDefaultValueApplyIf({ expression: expressionText, applyIf })
