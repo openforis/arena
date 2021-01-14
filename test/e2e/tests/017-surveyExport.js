@@ -132,7 +132,7 @@ const findNodeWithSameValueAsMockNode = ({ nodes, mockNode, parentUuid, survey }
     return nodeHasSameValueAsMockNode({ node: _node, mockNode, survey })
   })
 
-const checkRecordFileAndContent = async ({ recordUuid, mockRecord, surveyNodeDefsToTest, survey }) => {
+const checkRecordFileAndContent = async ({ recordUuid, mockRecords, surveyNodeDefsToTest, survey }) => {
   const record = await checkFileAndGetContent({
     filePath: path.join(surveyExtractedPath, 'records', `${recordUuid}.json`),
   })
@@ -140,6 +140,14 @@ const checkRecordFileAndContent = async ({ recordUuid, mockRecord, surveyNodeDef
   await expect(Record.getUuid(record)).toBe(recordUuid)
 
   const { clusterNodeDef, clusterNodeDefDefChildren, plotNodeDef, plotNodeDefChildren } = surveyNodeDefsToTest
+
+  const clusteIdNodeDef = clusterNodeDefDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Cluster id')
+
+  const [clusterIdNode] = Record.getNodesByDefUuid(NodeDef.getUuid(clusteIdNodeDef))(record)
+
+  const mockRecord = mockRecords.find(
+    (_mockRecord) => String(_mockRecord.cluster[0].value) === String(Node.getValue(clusterIdNode))
+  )
 
   // check record
   // check record -> root[cluster]
@@ -476,10 +484,9 @@ describe('Survey export', () => {
 
     const surveyNodeDefsToTest = getSurveyNodedefsToTest({ survey })
 
-    const mockRecords = recordsMockData
-    await recordsUuids.reduce(async (promise, recordUuid, index) => {
+    await recordsUuids.reduce(async (promise, recordUuid) => {
       await promise
-      return checkRecordFileAndContent({ recordUuid, mockRecord: mockRecords[index], surveyNodeDefsToTest, survey })
+      return checkRecordFileAndContent({ recordUuid, mockRecords: recordsMockData, surveyNodeDefsToTest, survey })
     }, true)
   })
 
