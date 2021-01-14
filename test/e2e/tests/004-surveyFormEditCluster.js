@@ -14,7 +14,7 @@ const nodeDefItems = [
   { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
   { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' },
   { type: 'date', name: 'cluster_date', label: 'Cluster date' },
-  { type: 'time', name: 'cluster_time', label: 'Cluster Time' },
+  { type: 'time', name: 'cluster_time', label: 'Cluster time' },
   { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' },
   { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
 ]

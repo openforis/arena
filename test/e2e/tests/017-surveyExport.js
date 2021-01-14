@@ -13,6 +13,9 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
@@ -21,6 +24,8 @@ import { waitFor, reload, click } from '../utils/api'
 
 import { expectHomeDashboard } from '../utils/ui/home'
 import { clickSidebarBtnHome } from '../utils/ui/sidebar'
+
+import { records as recordsMockData } from '../resources/records/recordsData'
 
 const downloadPath = path.resolve(__dirname, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
@@ -32,8 +37,8 @@ const ClusterNodeDefItems = [
   { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
   { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' }, // propsAdvanced.defaultValues, expression "0", apply if null
   { type: 'date', name: 'cluster_date', label: 'Cluster date' }, // "applyIf": "", "expression": "cluster_decimal > '0'\n"
-  { type: 'time', name: 'cluster_time', label: 'Cluster Time' },
-  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' }, //"applyIf": "cluster_decimal > '5'\n", "expression": "\"true\""
+  { type: 'time', name: 'cluster_time', label: 'Cluster time' },
+  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' }, // "applyIf": "cluster_decimal > '5'\n", "expression": "\"true\""
   { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
   { type: 'entity', name: 'plot', label: 'Plot' },
 ]
@@ -71,6 +76,116 @@ const checkNode = async ({ node, expectedNode }) => {
   await expect(NodeDef.isAnalysis(node)).toBe(expectedNode.isAnalysis || false)
 }
 
+const getSurveyNodedefsToTest = () => {
+  const contentSurvey = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
+  const survey = JSON.parse(contentSurvey)
+  const root = Survey.getNodeDefRoot(survey)
+  const clusterNodeDefDefChildren = Survey.getNodeDefChildren(root, includeAnalysis)(survey)
+  const plotNodeDef = clusterNodeDefDefChildren.find(
+    (nodeDef) => NodeDef.isMultiple(nodeDef) && NodeDef.getName(nodeDef) === 'plot'
+  )
+  const plotNodeDefChildren = Survey.getNodeDefChildren(plotNodeDef, includeAnalysis)(survey)
+  const treeNodeDef = plotNodeDefChildren.find((node) => NodeDef.getName(node) === 'tree')
+  const treeNodeDefChildren = Survey.getNodeDefChildren(treeNodeDef, includeAnalysis)(survey)
+
+  return {
+    clusterNodeDef: root,
+    clusterNodeDefDefChildren,
+    plotNodeDef,
+    plotNodeDefChildren,
+    treeNodeDef,
+    treeNodeDefChildren,
+  }
+}
+
+const checkFileAndGetContent = async ({ filePath }) => {
+  await expect(fs.existsSync(filePath)).toBeTruthy()
+  const content = fs.readFileSync(filePath, 'utf8')
+  return JSON.parse(content)
+}
+const getSurvey = () => {
+  const contentSurvey = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
+  const survey = JSON.parse(contentSurvey)
+  return survey
+}
+
+const nodeHasSameValueAsMockNode = ({ node, mockNode, survey }) => {
+  if (
+    mockNode.type === NodeDef.nodeDefType.coordinate &&
+    Node.getCoordinateX(node) === String(mockNode.value.x) &&
+    Node.getCoordinateY(node) === String(mockNode.value.y) &&
+    `GCS WGS 1984 (EPSG:${Node.getCoordinateSrs(node)})` === String(mockNode.value.srs)
+  ) {
+    return true
+  }
+  if (
+    mockNode.type === NodeDef.nodeDefType.code &&
+    CategoryItem.getLabel('en')(Survey.getCategoryItemByUuid(Node.getCategoryItemUuid(node))(survey)) === mockNode.value
+  ) {
+    return true
+  }
+  return Node.getValue(node) === String(mockNode.value)
+}
+const findNodeWithSameValueAsMockNode = ({ nodes, mockNode, parentUuid, survey }) =>
+  nodes.find((_node) => {
+    if (parentUuid && Node.getParentUuid(_node) !== parentUuid) return false
+    return nodeHasSameValueAsMockNode({ node: _node, mockNode, survey })
+  })
+
+const checkRecordFileAndContent = async ({ recordUuid, mockRecord, surveyNodeDefsToTest, survey }) => {
+  const record = await checkFileAndGetContent({
+    filePath: path.join(surveyExtractedPath, 'records', `${recordUuid}.json`),
+  })
+
+  await expect(Record.getUuid(record)).toBe(recordUuid)
+
+  const { clusterNodeDef, clusterNodeDefDefChildren, plotNodeDef, plotNodeDefChildren } = surveyNodeDefsToTest
+
+  // check record
+  // check record -> root[cluster]
+  const clusterNodeDefUuid = NodeDef.getUuid(clusterNodeDef)
+  const clusterNode = Record.getNodesByDefUuid(clusterNodeDefUuid)(record)
+  await expect(clusterNode).toBeTruthy()
+
+  await Promise.all(
+    mockRecord.cluster.map(async (mockNode) => {
+      const nodeNodeDef = clusterNodeDefDefChildren.find(
+        (nodeDef) => NodeDef.getLabel(nodeDef, 'en') === mockNode.label
+      )
+      const [node] = Record.getNodesByDefUuid(NodeDef.getUuid(nodeNodeDef))(record)
+
+      await expect(nodeHasSameValueAsMockNode({ node, mockNode, survey })).toBe(true)
+    })
+  )
+
+  // Check record -> plots
+  const plotsNodes = Record.getNodesByDefUuid(NodeDef.getUuid(plotNodeDef))(record)
+  await expect(plotsNodes.length).toBe(mockRecord.plots.length)
+
+  await Promise.all(
+    mockRecord.plots.map(async (mockPlot) => {
+      const plotIdNodeDef = plotNodeDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Plot id')
+      const plotIdNodes = Record.getNodesByDefUuid(NodeDef.getUuid(plotIdNodeDef))(record)
+      const plotIdNode = plotIdNodes.find(
+        (_plotIdNode) => String(Node.getValue(_plotIdNode)) === String(mockPlot[0].value)
+      )
+      const plotUuid = Node.getParentUuid(plotIdNode)
+
+      await Promise.all(
+        mockPlot.map(async (mockNode) => {
+          const nodeNodeDef = plotNodeDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === mockNode.label)
+          const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeNodeDef))(record)
+          await expect(nodes.length).toBe(mockRecord.plots.length)
+
+          const node = findNodeWithSameValueAsMockNode({ nodes, mockNode, parentUuid: plotUuid, survey })
+
+          await expect(node).toBeTruthy()
+        })
+      )
+    })
+  )
+}
+
 describe('Survey export', () => {
   test('Survey require name', async () => {
     await reload()
@@ -98,22 +213,17 @@ describe('Survey export', () => {
 
   test('Check survey.json', async () => {
     await expect(fs.existsSync(path.join(surveyExtractedPath, 'survey.json'))).toBeTruthy()
-    const content = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
-    const survey = JSON.parse(content)
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const surveyName = Survey.getName(surveyInfo)
-    await expect(surveyName).toBe('survey')
-    const labels = Survey.getLabels(surveyInfo)
-    await expect(labels).toMatchObject({
+    const survey = getSurvey()
+    await expect(Survey.getName(Survey.getSurveyInfo(survey))).toBe('survey')
+    await expect(Survey.getLabels(Survey.getSurveyInfo(survey))).toMatchObject({
       en: 'Survey',
     })
-    const languages = Survey.getLanguages(surveyInfo)
+    const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
     await expect(languages.sort()).toEqual(['en', 'fr'].sort())
   })
 
   test('Check survey.json nodeDefs', async () => {
-    const content = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
-    const survey = JSON.parse(content)
+    const survey = getSurvey()
 
     const root = Survey.getNodeDefRoot(survey)
 
@@ -196,28 +306,22 @@ describe('Survey export', () => {
     await expect(countryLevel).toBeTruthy()
     await expect(CategoryLevel.getName(countryLevel)).toBe('country')
     await expect(CategoryLevel.getIndex(countryLevel)).toBe(0)
-    const countryLevelUuid = CategoryLevel.getUuid(countryLevel)
 
     // check regionLevel
     const regionLevel = levels.find((category) => CategoryLevel.getName(category) === 'region')
     await expect(regionLevel).toBeTruthy()
     await expect(CategoryLevel.getName(regionLevel)).toBe('region')
     await expect(CategoryLevel.getIndex(regionLevel)).toBe(1)
-    const regionLevelUuid = CategoryLevel.getUuid(regionLevel)
 
     // check districtLevel
     const districtLevel = levels.find((category) => CategoryLevel.getName(category) === 'district')
     await expect(districtLevel).toBeTruthy()
     await expect(CategoryLevel.getName(districtLevel)).toBe('district')
     await expect(CategoryLevel.getIndex(districtLevel)).toBe(2)
-    const districtLevelUuid = CategoryLevel.getUuid(districtLevel)
 
-    // check administrative unit file
-    const administrativeUnitContent = fs.readFileSync(
-      path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`),
-      'utf8'
-    )
-    const administrativeUnitItems = JSON.parse(administrativeUnitContent)
+    const administrativeUnitItems = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`),
+    })
 
     // check items countryLevel
     const itemsCountryLevel = administrativeUnitItems.filter(
@@ -272,9 +376,7 @@ describe('Survey export', () => {
   })
 
   test('Check chains', async () => {
-    await expect(fs.existsSync(path.join(surveyExtractedPath, 'chains'))).toBeTruthy()
-    const content = fs.readFileSync(path.join(surveyExtractedPath, 'chains', 'chains.json'), 'utf8')
-    const chains = JSON.parse(content)
+    const chains = await checkFileAndGetContent({ filePath: path.join(surveyExtractedPath, 'chains', 'chains.json') })
 
     const chainsAsArray = Object.values(chains)
 
@@ -304,9 +406,10 @@ describe('Survey export', () => {
   })
 
   test('Check taxonomies', async () => {
-    await expect(fs.existsSync(path.join(surveyExtractedPath, 'taxonomies'))).toBeTruthy()
-    const content = fs.readFileSync(path.join(surveyExtractedPath, 'taxonomies', 'taxonomies.json'), 'utf8')
-    const taxonomies = JSON.parse(content)
+    const taxonomies = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'taxonomies', 'taxonomies.json'),
+    })
+
     const taxonomiesAsArray = Object.values(taxonomies)
 
     await expect(taxonomiesAsArray.length).toBe(1)
@@ -315,13 +418,9 @@ describe('Survey export', () => {
     await expect(Taxonomy.getName(taxonomiesAsArray[0])).toBe('tree_species')
     await expect(Taxonomy.getDescription('en')(taxonomiesAsArray[0])).toBe('Tree Species List')
 
-    await expect(fs.existsSync(path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`))).toBeTruthy()
-
-    const taxonomyContent = fs.readFileSync(
-      path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`),
-      'utf8'
-    )
-    const taxonomy = JSON.parse(taxonomyContent)
+    const taxonomy = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`),
+    })
 
     const taxonomyMockData = fs.readFileSync(
       path.resolve(__dirname, '..', 'resources', 'taxonomies', 'species list valid with predefined.csv')
@@ -348,10 +447,10 @@ describe('Survey export', () => {
 
         const vernacularNamesByLang = Taxon.getVernacularNames(taxon)
 
-        await expect(TaxonVernacularName.getName(vernacularNamesByLang?.eng?.[0]) || '').toBe(
+        await expect((vernacularNamesByLang?.eng || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
           taxonomyMockDataParsedByCode[code].eng || ''
         )
-        await expect(TaxonVernacularName.getName(vernacularNamesByLang?.swa?.[0]) || '').toBe(
+        await expect((vernacularNamesByLang?.swa || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
           taxonomyMockDataParsedByCode[code].swa || ''
         )
       })()
@@ -359,7 +458,25 @@ describe('Survey export', () => {
   })
 
   test('Check records', async () => {
-    await expect(fs.existsSync(path.join(surveyExtractedPath, 'records'))).toBeTruthy()
+    const records = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'records', 'records.json'),
+    })
+
+    const recordsAsArray = Object.values(records)
+
+    await expect(recordsAsArray.length).toBe(5)
+
+    const survey = getSurvey()
+
+    const recordsUuids = recordsAsArray.map((record) => Record.getUuid(record))
+
+    const surveyNodeDefsToTest = getSurveyNodedefsToTest({ survey })
+
+    const mockRecords = recordsMockData.reverse()
+    await recordsUuids.reduce(async (promise, recordUuid, index) => {
+      await promise
+      return checkRecordFileAndContent({ recordUuid, mockRecord: mockRecords[index], surveyNodeDefsToTest, survey })
+    }, true)
   })
 
   test('Check files', async () => {
