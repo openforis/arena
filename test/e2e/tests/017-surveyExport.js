@@ -30,7 +30,7 @@ import { records as recordsMockData } from '../resources/records/recordsData'
 const downloadPath = path.resolve(__dirname, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
 const extractedPath = path.resolve(downloadPath, 'extracted')
-const surveyExtractedPath = path.join(extractedPath, 'survey_survey')
+const surveyExtractedPath = path.resolve(extractedPath, 'survey_survey')
 
 const includeAnalysis = true
 const ClusterNodeDefItems = [
@@ -154,7 +154,11 @@ const checkRecordFileAndContent = async ({ recordUuid, mockRecord, surveyNodeDef
       )
       const [node] = Record.getNodesByDefUuid(NodeDef.getUuid(nodeNodeDef))(record)
 
-      await expect(nodeHasSameValueAsMockNode({ node, mockNode, survey })).toBe(true)
+      if (nodeHasSameValueAsMockNode({ node, mockNode, survey })) {
+        await expect(nodeHasSameValueAsMockNode({ node, mockNode, survey })).toBe(true)
+      } else {
+        await expect(mockNode).toBe(node)
+      }
     })
   )
 
@@ -472,7 +476,7 @@ describe('Survey export', () => {
 
     const surveyNodeDefsToTest = getSurveyNodedefsToTest({ survey })
 
-    const mockRecords = recordsMockData.reverse()
+    const mockRecords = recordsMockData
     await recordsUuids.reduce(async (promise, recordUuid, index) => {
       await promise
       return checkRecordFileAndContent({ recordUuid, mockRecord: mockRecords[index], surveyNodeDefsToTest, survey })
@@ -485,15 +489,15 @@ describe('Survey export', () => {
 
   test('Remove files', async () => {
     if (fs.existsSync(surveyZipPath)) {
-      fs.unlinkSync(surveyZipPath)
+      fs.rmdirSync(surveyZipPath, { recursive: true })
     }
 
-    await expect(surveyZipPath).not.toBeTruthy()
+    await expect(fs.existsSync(surveyZipPath)).not.toBeTruthy()
 
     if (fs.existsSync(path.join(downloadPath, 'extracted'))) {
-      fs.unlinkSync(path.join(downloadPath, 'extracted'))
+      fs.rmdirSync(path.join(downloadPath, 'extracted'), { recursive: true })
     }
 
-    await expect(path.join(downloadPath, 'extracted')).not.toBeTruthy()
+    await expect(fs.existsSync(path.join(downloadPath, 'extracted'))).not.toBeTruthy()
   })
 })
