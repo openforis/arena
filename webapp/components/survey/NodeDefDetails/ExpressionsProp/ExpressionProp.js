@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -53,10 +52,11 @@ const ExpressionProp = (props) => {
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
-    <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
+    <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && (
           <button
+            id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             type="button"
             className="btn btn-s btn-transparent btn-delete"
             aria-disabled={readOnly}

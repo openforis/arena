@@ -10,6 +10,9 @@ import {
   setNodeDefDefaultValueApplyIf,
   expectNodeDefDefaultValueApplyIf,
   addNodeDefBooleanDefaultValue,
+  deleteNodeDefDefaultValue,
+  expectNodeDefDefaultValuesInvalid,
+  expectNodeDefDefaultValuesValid,
 } from '../utils/ui/nodeDefDetailsAdvanced'
 
 describe('SurveyForm edit expressions', () => {
@@ -24,8 +27,20 @@ describe('SurveyForm edit expressions', () => {
 
     await expectNodeDefDefaultValue({ expression: '0' })
 
-    await clickNodeDefSaveAndBack()
+    await expectNodeDefDefaultValuesValid()
   })
+
+  test('add another Default Value to "cluster_boolean" without Apply If (error)', async () => {
+    await addNodeDefDefaultValue({ constant: '1' })
+
+    await expectNodeDefDefaultValuesInvalid()
+
+    await deleteNodeDefDefaultValue()
+
+    await expectNodeDefDefaultValuesValid()
+
+    await clickNodeDefSaveAndBack()
+  }, 60000)
 
   test('add "Relevant if cluster_decimal > 0" to "Cluster date"', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster date' })

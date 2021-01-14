@@ -9,14 +9,22 @@ const expressionQualifier = {
 const expressionEditorEl = ({ index = 0, qualifier, type, elType }) =>
   $(`#expression-editor-${index}-${qualifier}-${type}-${elType}`)
 
-export const nodeDefDetailsSelectorsAdvanced = {
+export const nodeDefDetailsAdvancedElements = {
   // default values
+  defaultValuesTooltip: () => $('.node-def-edit__expressions-default-values-tooltip'),
   defaultValueExpressionEditBtn: ({ index }) =>
     expressionEditorEl({
       index,
       qualifier: expressionQualifier.defaultValues,
       type: NodeDefExpression.keys.expression,
       elType: 'edit-btn',
+    }),
+  defaultValueExpressionDeleteBtn: ({ index }) =>
+    expressionEditorEl({
+      index,
+      qualifier: expressionQualifier.defaultValues,
+      type: NodeDefExpression.keys.expression,
+      elType: 'btn-delete',
     }),
   defaultValuePlaceholderExpressionEditBtn: () =>
     expressionEditorEl({

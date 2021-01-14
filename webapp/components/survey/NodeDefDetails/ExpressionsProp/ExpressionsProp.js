@@ -47,7 +47,11 @@ const ExpressionsProp = (props) => {
 
   return (
     <FormItem label={label}>
-      <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
+      <ValidationTooltip
+        validation={validation}
+        showKeys={false}
+        className={`node-def-edit__expressions-${qualifier}-tooltip`}
+      >
         <div className="node-def-edit__expressions">
           {values.map((value, i) => (
             <ExpressionProp
