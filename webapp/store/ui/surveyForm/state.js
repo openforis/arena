@@ -19,6 +19,7 @@ const keys = {
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
   expandedPageNavigation: 'expandedPageNavigation',
+  nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
 }
 
 // ====== nodeDefUuidPage
@@ -62,8 +63,9 @@ export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
     }, state)
   )(formPageNodeUuidByNodeDefUuid)
 
-export const getFormPageNodeUuid = (nodeDef) =>
-  R.pipe(getStateProp(keys.nodeDefUuidPageNodeUuid), R.prop(NodeDef.getUuid(nodeDef)))
+export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
+
+export const getFormPageNodeUuid = (nodeDef) => R.pipe(getPagesUuidMap, R.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)
@@ -91,6 +93,11 @@ export const setShowPageNavigation = (value) => R.assoc(keys.showPageNavigation,
 export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, false)
 
 export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
+
+// ============ Form nodeDef label Function
+export const getNodeDefLabelType = getStateProp(keys.nodeDefLabelType, NodeDef.NodeDefLabelTypes.label)
+
+export const setNodeDefLabelType = (value) => R.assoc(keys.nodeDefLabelType, value)
 
 // ====== NodeDef update actions
 

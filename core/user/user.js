@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
+import * as UserProps from './_user/userProps'
 import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
@@ -14,6 +15,7 @@ export { userStatus } from './_user/userStatus'
 export const nameMaxLength = 128
 
 export const { keysPrefs } = UserPrefs
+export const { keysProps } = UserProps
 
 // ====== READ
 export const { isEqual } = ObjectUtils
@@ -24,14 +26,17 @@ export const getGroupUuid = R.prop(keys.groupUuid)
 export const getLang = R.propOr('en', keys.lang)
 export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
+export const getProps = R.propOr({}, keys.props)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 
 // ====== UPDATE
 export const assocProp = R.assoc
+export const assocEmail = R.assoc(keys.email)
 export const { assocValidation } = Validation
 export const assocGroupUuid = R.assoc(keys.groupUuid)
+export const assocName = R.assoc(keys.name)
 export const assocInvitationExpired = R.assoc(keys.invitationExpired)
 
 // ====== CHECK
@@ -54,11 +59,7 @@ export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 
 const _updateAuthGroups = (updateFn) => (user) =>
-  R.pipe(
-    getAuthGroups, 
-    updateFn, 
-    (authGroups) => assocAuthGroups(authGroups)(user)
-  )(user)
+  R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups)(user))(user)
 
 export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGroup))
 
@@ -75,3 +76,6 @@ export const { assocPrefSurveyCycle } = UserPrefs
 export const { assocPrefSurveyCurrentAndCycle } = UserPrefs
 
 export const { deletePrefSurvey } = UserPrefs
+
+// PROPS
+export const { getTitle, assocTitle, titleKeys, newProps } = UserProps

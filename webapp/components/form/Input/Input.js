@@ -12,7 +12,6 @@ export const Input = React.forwardRef((props, ref) => {
     disabled,
     id,
     maxLength,
-    numberFormat,
     onChange,
     onFocus,
     onBlur,
@@ -21,6 +20,8 @@ export const Input = React.forwardRef((props, ref) => {
     type,
     validation,
     value,
+    numberFormat,
+    textTransformFunction,
   } = props
 
   // workaround for inputRef: useRef(ref) does not work as expected
@@ -29,16 +30,15 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
+  const valueText = value === null || Number.isNaN(value) ? '' : String(value)
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
-    if (newValue !== value) {
-      if (selectionAllowed) {
-        selectionRef.current = [input.selectionStart, input.selectionEnd]
-      }
-      if (onChange) {
-        onChange(newValue)
-      }
+    if (selectionAllowed) {
+      selectionRef.current = [input.selectionStart, input.selectionEnd]
+    }
+    if (onChange) {
+      onChange(textTransformFunction(newValue))
     }
   }
 
@@ -59,13 +59,14 @@ export const Input = React.forwardRef((props, ref) => {
             inputRef.current = el
           },
           id,
-          onValueChange: ({ formattedValue: newValue }) => handleValueChange(newValue),
+          onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
           onFocus,
           onBlur,
           placeholder,
           readOnly,
           type,
           value,
+          title: value,
           ...numberFormat,
         })
       ) : (
@@ -83,6 +84,7 @@ export const Input = React.forwardRef((props, ref) => {
           readOnly={readOnly}
           type={type}
           value={value}
+          title={value}
         />
       )}
     </ValidationTooltip>
@@ -108,6 +110,7 @@ Input.propTypes = {
     maxLength: PropTypes.number,
     placeholder: PropTypes.string,
   }),
+  textTransformFunction: PropTypes.func,
 }
 
 Input.defaultProps = {
@@ -123,4 +126,5 @@ Input.defaultProps = {
   validation: null,
   value: '',
   numberFormat: null,
+  textTransformFunction: (s) => s,
 }

@@ -13,8 +13,15 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { Query, Sort } from '../../../../../common/model/query'
-import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef, TableRecord } from '../../../../../common/model/db'
-import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
+import {
+  ViewDataNodeDef,
+  TableNode,
+  TableResultNode,
+  ColumnNodeDef,
+  TableRecord,
+  Schemata,
+} from '../../../../../common/model/db'
+import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
 
 import * as DataCol from '../../schemaRdb/dataCol'
 import * as DataTable from '../../schemaRdb/dataTable'
@@ -25,51 +32,52 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-const _getSelectFields = ({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
-  if (columnNodeDefs) {
-    return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
+const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) => {
+  const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+
+  if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
+    return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
   }
 
-  if (!R.isEmpty(nodeDefCols)) {
-    const selectFields = [
+  if (streamMode && NodeDef.isDate(columnNodeDef.nodeDef)) {
+    return `TO_CHAR(${columnNodeDef.namesFull}, 'yyyy-mm-dd') as ${columnNodeDef.name}`
+  }
+
+  return columnNodeDef.namesFull
+}
+
+const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
+  if (columnNodeDefs) {
+    queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
+  } else if (R.isEmpty(nodeDefCols)) {
+    queryBuilder.select('*')
+  } else {
+    queryBuilder.select(
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols
-        .map((nodeDefCol) => {
-          const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-
-          if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
-            return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
-          }
-
-          return columnNodeDef.namesFull
-        })
-        .flat(),
+      ...nodeDefCols.map(_selectsByNodeDefType({ viewDataNodeDef, streamMode })).flat(),
       // Add ancestor uuid columns
-      ...viewDataNodeDef.columnUuids,
-    ]
+      ...viewDataNodeDef.columnUuids
+    )
     if (editMode) {
       const tableRecord = new TableRecord(viewDataNodeDef.surveyId)
-      selectFields.push(
+      queryBuilder.select(
         // Node (every node is transformed into json in a column named with the nodeDefUuid)
         ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
         // Record table fields
         `row_to_json(${tableRecord.getColumn('*')}) AS record`
       )
     }
-    return selectFields.join(', ')
   }
-
-  return '*'
 }
 
-const _getFromClause = ({ viewDataNodeDef, nodeDefCols, editMode }) => {
-  const fromTables = [viewDataNodeDef.nameAliased]
+const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode }) => {
+  queryBuilder.from(viewDataNodeDef.nameAliased)
   if (editMode) {
     const { surveyId } = viewDataNodeDef
     const tableRecord = new TableRecord(surveyId)
-    fromTables.push(
+    queryBuilder.from(
       // Node table; one join per column def
       ...nodeDefCols.map((nodeDefCol, idx) => {
         const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
@@ -87,7 +95,6 @@ const _getFromClause = ({ viewDataNodeDef, nodeDefCols, editMode }) => {
       `
     )
   }
-  return fromTables.join(' ')
 }
 
 const _dbTransformCallbackSelect = ({ viewDataNodeDef, nodeDefCols, editMode }) => (row) => {
@@ -141,39 +148,48 @@ export const fetchViewData = async (params, client = db) => {
 
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
-  const selectFields = _getSelectFields({ viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode: stream })
+  const queryBuilder = new SqlSelectBuilder()
 
-  const fromClause = _getFromClause({ viewDataNodeDef, nodeDefCols, editMode })
+  _prepareSelectFields({
+    queryBuilder,
+    viewDataNodeDef,
+    columnNodeDefs,
+    nodeDefCols,
+    editMode,
+    streamMode: stream,
+  })
+
+  _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
+  queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+  queryBuilder.addParams({ cycle })
+
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
+  if (!R.isNil(filterClause)) {
+    queryBuilder.where(`AND ${filterClause}`)
+    queryBuilder.addParams(filterParams)
+  }
 
   // SORT clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-
-  const select = `
-    SELECT 
-        ${selectFields}
-    FROM 
-        ${fromClause}
-    WHERE 
-      ${viewDataNodeDef.columnRecordCycle} = $/cycle/
-      ${R.isNil(filterClause) ? '' : `AND ${filterClause}`}
-    ORDER BY 
-        ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}${viewDataNodeDef.columnDateModified} DESC NULLS LAST
-    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}
-  `
-
-  const queryParams = {
-    cycle,
-    ...filterParams,
-    ...sortParams,
-    limit,
-    offset,
+  if (!R.isEmpty(sortParams)) {
+    queryBuilder.orderBy(sortClause)
+    queryBuilder.addParams(sortParams)
   }
+  if (!R.isNil(limit)) {
+    queryBuilder.limit('$/limit/')
+    queryBuilder.addParams({ limit })
+  }
+  if (!R.isNil(offset)) {
+    queryBuilder.offset('$/offset/')
+    queryBuilder.addParams({ offset })
+  }
+
+  const select = queryBuilder.build()
+  const queryParams = queryBuilder.params
 
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
@@ -249,7 +265,7 @@ export const fetchRecordsCountByKeys = async (
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
   const schemaRdb = SchemaRdb.getName(surveyId)
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
   const rootTableAlias = 'r'
 

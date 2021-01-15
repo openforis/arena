@@ -38,6 +38,7 @@ const AdvancedProps = (props) => {
           </FormItem>
 
           <NodeDefExpressionsProp
+            qualifier="default-values"
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
@@ -51,6 +52,7 @@ const AdvancedProps = (props) => {
       )}
 
       <NodeDefExpressionsProp
+        qualifier="relevant-if"
         state={state}
         Actions={Actions}
         label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}
@@ -60,7 +62,6 @@ const AdvancedProps = (props) => {
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent
-        hideAdvanced
       />
     </div>
   )

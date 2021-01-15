@@ -19,7 +19,7 @@ import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 // ==== CREATE
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
-  await client.tx(async t => {
+  client.tx(async (t) => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
       await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
@@ -29,24 +29,23 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
   })
 
 export const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) => {
-  const activities = nodeValues.map(nodeValues => {
+  const activities = nodeValues.map((nodeValuesRow) => {
     const node = NodeRepository.tableColumns.reduce(
-      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
-      {},
+      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValuesRow[index] }),
+      {}
     )
     return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)
   })
 
-  await client.tx(
-    async t =>
-      await Promise.all([
-        NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-        ActivityLogRepository.insertMany(user, surveyId, activities, t),
-      ]),
+  await client.tx(async (t) =>
+    Promise.all([
+      NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
+      ActivityLogRepository.insertMany(user, surveyId, activities, t),
+    ])
   )
 }
 
-export const insertNode = RecordUpdateManager.insertNode
+export const { insertNode } = RecordUpdateManager
 
 // ==== READ
 
@@ -59,7 +58,7 @@ export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, lim
     surveyId,
     NodeDef.getUuid(nodeDefRoot),
     nodeDefsDraft,
-    client,
+    client
   )
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
@@ -69,7 +68,7 @@ export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, lim
     nodeDefKeys,
     offset,
     limit,
-    client,
+    client
   )
 
   return {
@@ -100,6 +99,7 @@ export {
   initNewRecord,
   updateRecordStep,
   persistNode,
+  updateNode,
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 

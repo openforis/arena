@@ -6,8 +6,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 export const keys = {
   index: ObjectUtils.keys.index,
   uuid: ObjectUtils.keys.uuid,
-  nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
-  processingStepUuid: 'processingStepUuid',
+  nodeDefUuid: 'node_def_uuid',
+  processingStepUuid: 'processing_step_uuid',
   props: ObjectUtils.keys.props,
   script: 'script',
   temporary: ObjectUtils.keys.temporary,
@@ -46,28 +46,14 @@ export const aggregateFn = {
 
 // ====== READ
 
+export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
 export const getScript = R.prop(keys.script)
 
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
 
-export const {
-  getNodeDefUuid,
-  getLabels,
-  getLabel,
-  getIndex,
-  getUuid,
-  getProps,
-  getPropsDiff,
-  isEqual,
-  isTemporary,
-} = ObjectUtils
-
-// ====== UPDATE
-export const { assocIndex, dissocTemporary } = ObjectUtils
-export const assocProp = ObjectUtils.setProp
-export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
+export const { getLabels, getLabel, getIndex, getUuid, getProps, getPropsDiff, isEqual, isTemporary } = ObjectUtils
 
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, (typeValue) => R.prop(typeValue, nodeDefTypeByType))

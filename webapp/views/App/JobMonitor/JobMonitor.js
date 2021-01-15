@@ -42,14 +42,16 @@ const JobMonitor = () => {
             {i18n.t('common.cancel')}
           </button>
 
-          <button
-            type="button"
-            className="btn modal-footer__item"
-            onClick={() => dispatch(JobActions.hideJobMonitor())}
-            aria-disabled={!JobSerialized.isEnded(job)}
-          >
-            {i18n.t('common.close')}
-          </button>
+          {JobSerialized.isEnded(job) && (
+            <button
+              type="button"
+              className="btn modal-footer__item"
+              onClick={() => dispatch(JobActions.hideJobMonitor())}
+              aria-disabled={!JobSerialized.isEnded(job)}
+            >
+              {i18n.t('common.close')}
+            </button>
+          )}
         </ModalFooter>
       </Modal>
     )

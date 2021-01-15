@@ -2,6 +2,8 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
+import * as A from '@core/arena'
+
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
@@ -30,10 +32,16 @@ export const useOnSave = ({ userToUpdate }) => {
           dispatch(LoaderActions.showLoader())
 
           const formData = new FormData()
-          formData.append(User.keys.uuid, User.getUuid(userToUpdate))
-          formData.append(User.keys.name, User.getName(userToUpdate))
-          formData.append(User.keys.email, User.getEmail(userToUpdate))
-          formData.append(User.keys.groupUuid, User.getGroupUuid(userToUpdate))
+          const userData = {
+            [User.keys.uuid]: User.getUuid(userToUpdate),
+            [User.keys.name]: User.getName(userToUpdate),
+            [User.keys.email]: User.getEmail(userToUpdate),
+            [User.keys.groupUuid]: User.getGroupUuid(userToUpdate),
+            [User.keys.props]: User.getProps(userToUpdate),
+          }
+
+          formData.append('user', A.stringify(userData))
+
           if (profilePicture) {
             formData.append('file', profilePicture)
           }

@@ -21,7 +21,6 @@
 .header__survey {
   display: flex;
   align-items: center;
-  text-transform: uppercase;
   font-size: 0.9rem;
   font-weight: 600;
   color: lighten($black, 20%);
@@ -45,6 +44,13 @@
   .btn-publish {
     margin-left: 15px;
   }
+}
+
+.header__survey-title {
+  max-width: 50vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header__btn-user {

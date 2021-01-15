@@ -16,7 +16,14 @@ import * as ProcessUtils from './core/processUtils'
 const { buildReport } = ProcessUtils.ENV
 const fontCssFileName = 'woff2.css'
 
+const config = {
+  mode: process.env.NODE_ENV || 'development',
+  path: path.resolve(__dirname, 'dist'),
+}
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
+
+const gitRevisionPlugin = config.mode === 'production' ? null : new GitRevisionPlugin()
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
@@ -37,11 +44,9 @@ class CleanUpStatsPlugin {
   }
 }
 
-const gitRevisionPlugin = new GitRevisionPlugin()
-
 // ==== init plugins
 const plugins = [
-  gitRevisionPlugin,
+  ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css',
   }),
@@ -53,9 +58,10 @@ const plugins = [
     process: {
       env: {
         NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
-        APPLICATION_VERSION: JSON.stringify(gitRevisionPlugin.version()),
-        GIT_COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
-        GIT_BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
+        RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
+        APPLICATION_VERSION: gitRevisionPlugin
+          ? JSON.stringify(gitRevisionPlugin.version())
+          : JSON.stringify(process.env.APP_VERSION),
       },
     },
   }),

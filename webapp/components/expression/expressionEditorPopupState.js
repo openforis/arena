@@ -8,6 +8,7 @@ import { useSurvey } from '@webapp/store/survey'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
+import { ExpressionEditorType } from './expressionEditorType'
 
 const initialState = {
   query: '',
@@ -17,7 +18,17 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = (props) => {
-  const { canBeConstant, expr, mode, nodeDefUuidContext, nodeDefUuidCurrent, onChange, query } = props
+  const {
+    canBeConstant,
+    expr,
+    mode,
+    type,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    onChange,
+    query,
+    groupByParent = true,
+  } = props
 
   const survey = useSurvey()
   const lang = useLang()
@@ -25,7 +36,7 @@ export const useExpressionEditorPopupState = (props) => {
   // An encoding trick. Newlines can only appear in a textarea,
   // so denote advanced mode expressions as anything that contains a newline.
   // The editing component ensures that all intermediate values will contain one.
-  const initialAdvanced = /\n/.test(query)
+  const initialAdvanced = (type.length === 1 && type[0] === ExpressionEditorType.advanced) || /\n/.test(query)
   const [advanced, setAdvancedEditor] = useState(initialAdvanced)
   const [state, setState] = useState(initialState)
   const [expressionCanBeApplied, setExpressionCanBeApplied] = useState(false)
@@ -59,7 +70,7 @@ export const useExpressionEditorPopupState = (props) => {
   }
 
   const updateDraftQuery = (queryDraft) => {
-    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft)
+    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
     const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
     setState((prevState) => ({
@@ -104,7 +115,14 @@ export const useExpressionEditorPopupState = (props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, lang)
+  const variables = ExpressionVariables.getVariables({
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    lang,
+    groupByParent,
+  })
 
   return {
     ...state,

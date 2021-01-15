@@ -3,6 +3,9 @@ import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+
+import * as TextUtils from '@webapp/utils/textUtils'
+
 import * as NodeDefValidations from './nodeDefValidations'
 
 // ======== NODE DEF PROPERTIES
@@ -22,6 +25,7 @@ export const nodeDefType = {
 }
 
 export const keys = {
+  id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
@@ -37,6 +41,11 @@ export const keys = {
   virtual: 'virtual', // Virtual Entity
 }
 
+export const NodeDefLabelTypes = {
+  name: 'name',
+  label: 'label',
+}
+
 export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -45,6 +54,9 @@ export const propKeys = {
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
+
+  // Text
+  textTransform: 'textTransform',
 
   // Decimal
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
@@ -57,11 +69,29 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+
+  // File
+  maxFileSize: 'maxFileSize',
+  fileType: 'fileType',
+}
+
+export const textTransformValues = {
+  [TextUtils.textTransformValues.none]: TextUtils.textTransformValues.none,
+  [TextUtils.textTransformValues.lowercase]: TextUtils.textTransformValues.lowercase,
+  [TextUtils.textTransformValues.uppercase]: TextUtils.textTransformValues.uppercase,
+  [TextUtils.textTransformValues.capitalize]: TextUtils.textTransformValues.capitalize,
 }
 
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const fileTypeValues = {
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+  other: 'other',
 }
 
 export const keysPropsAdvanced = {
@@ -79,7 +109,7 @@ export const maxKeyAttributes = 3
 
 // ==== READ
 
-export const { getLabels, getParentUuid, getProp, getProps, getUuid, isEqual, isTemporary } = ObjectUtils
+export const { getLabels, getParentUuid, getProp, getProps, getUuid, getId, isEqual, isTemporary } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
@@ -101,7 +131,9 @@ export const isAttribute = R.pipe(isEntity, R.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 
+export const isText = isType(nodeDefType.text)
 export const isBoolean = isType(nodeDefType.boolean)
+export const isDate = isType(nodeDefType.date)
 export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
 export const isDecimal = isType(nodeDefType.decimal)
@@ -118,7 +150,16 @@ export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 
+export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
+export const getTextTransformFunction = (nodeDef) =>
+  TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+
 export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
+
+// File
+export const isNumberOfFilesEnabled = isMultiple
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize)(nodeDef))
+export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
 export const isBooleanLabelYesNo = (nodeDef) =>
@@ -133,10 +174,15 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang) => {
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
   let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  const name = getName(nodeDef)
+  if (type === NodeDefLabelTypes.name) {
+    return name
+  }
+
   if (StringUtils.isBlank(label)) {
-    label = getName(nodeDef)
+    label = name
   }
 
   if (isVirtual(nodeDef)) {
@@ -149,6 +195,7 @@ export const getLabel = (nodeDef, lang) => {
 
   return label
 }
+export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
 

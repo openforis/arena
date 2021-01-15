@@ -1,6 +1,6 @@
 ############################################################
 
-ARG node_version=12.16.0
+ARG node_version=14.15.0
 
 FROM node:${node_version} AS base
 RUN apt update
@@ -35,7 +35,7 @@ COPY --from=base /app/infra/nginx/rstudio_pass /etc/nginx/rstudio_pass
 # Build Arena
 RUN apt update
 RUN apt install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt install -y nodejs git
 RUN npm install pm2 -g
 COPY --from=base /app /app

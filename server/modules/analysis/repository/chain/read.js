@@ -1,7 +1,22 @@
 import * as DB from '../../../../db'
 
+import * as ObjectUtils from '../../../../../core/objectUtils'
 import { TableChain } from '../../../../../common/model/db'
 import * as Chain from '../../../../../common/analysis/processingChain'
+
+const transformCallback = (row) => {
+  if (!row) return {}
+  /* eslint-disable-next-line camelcase */
+  const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
+
+  return {
+    /* eslint-disable-next-line camelcase */
+    ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
+    /* eslint-disable-next-line camelcase */
+    ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
+    ...rest,
+  }
+}
 
 /**
  * Count the processing chains by the given survey id and the optional survey cycle.
@@ -51,7 +66,7 @@ export const fetchChains = async (params, client = DB.client) => {
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],
-    DB.transformCallback
+    transformCallback
   )
 }
 
@@ -75,6 +90,6 @@ export const fetchChain = async (params, client = DB.client) => {
   return client.oneOrNone(
     tableChain.getSelect({ surveyId, chainUuid, includeScript, includeStepsAndCalculations }),
     [],
-    DB.transformCallback
+    transformCallback
   )
 }

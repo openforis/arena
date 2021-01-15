@@ -19,6 +19,7 @@ import { State, useLocalState } from './store'
 import StepList from './StepList'
 import Step from './Step'
 import ButtonBar from './ButtonBar'
+import VariablePrevStepEditor from './VariablePrevStepEditor'
 
 const ChainComponent = () => {
   const surveyInfo = useSurveyInfo()
@@ -27,50 +28,54 @@ const ChainComponent = () => {
   if (state === null) return null
 
   const chainEdit = State.getChainEdit(state)
-  const editingStep = Boolean(State.getStepEdit(state))
+  const editingStep = State.isEditingStep(state)
 
   const validation = Chain.getValidation(chainEdit)
 
   return (
-    <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio
-        onClick={() => Actions.openRStudio({ state })}
-        disabled={Survey.isDraft(surveyInfo) || State.isChainDirty(state)}
-      />
-
-      <div className="form">
-        <LabelsEditor
-          labels={Chain.getLabels(chainEdit)}
-          formLabelKey="processingChainView.formLabel"
-          readOnly={editingStep}
-          validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => Actions.updateChain({ name: Chain.keysProps.labels, value: labels, state })}
+    <>
+      <div className={`chain ${editingStep ? 'show-step' : ''}`}>
+        <ButtonRStudio
+          onClick={() => Actions.openRStudio({ state })}
+          disabled={Survey.isDraft(surveyInfo) || State.isChainDirty(state)}
         />
 
-        {!editingStep && (
-          <>
-            <LabelsEditor
-              formLabelKey="common.description"
-              labels={Chain.getDescriptions(chainEdit)}
-              onChange={(descriptions) =>
-                Actions.updateChain({ name: Chain.keysProps.descriptions, value: descriptions, state })
-              }
-            />
+        <div className="form">
+          <LabelsEditor
+            labels={Chain.getLabels(chainEdit)}
+            formLabelKey="processingChainView.formLabel"
+            readOnly={editingStep}
+            validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
+            onChange={(labels) => Actions.updateChain({ name: Chain.keysProps.labels, value: labels, state })}
+          />
 
-            <CyclesSelector
-              cyclesKeysSelected={Chain.getCycles(chainEdit)}
-              onChange={(cycles) => Actions.updateCycles({ cycles, state })}
-            />
-          </>
-        )}
+          {!editingStep && (
+            <>
+              <LabelsEditor
+                formLabelKey="common.description"
+                labels={Chain.getDescriptions(chainEdit)}
+                onChange={(descriptions) =>
+                  Actions.updateChain({ name: Chain.keysProps.descriptions, value: descriptions, state })
+                }
+              />
 
-        <StepList state={state} Actions={Actions} />
+              <CyclesSelector
+                cyclesKeysSelected={Chain.getCycles(chainEdit)}
+                onChange={(cycles) => Actions.updateCycles({ cycles, state })}
+              />
+            </>
+          )}
+
+          <StepList state={state} Actions={Actions} />
+        </div>
+
+        <Step state={state} Actions={Actions} />
+
+        <ButtonBar state={state} Actions={Actions} />
       </div>
 
-      <Step state={state} Actions={Actions} />
-
-      <ButtonBar state={state} Actions={Actions} />
-    </div>
+      <VariablePrevStepEditor state={state} Actions={Actions} />
+    </>
   )
 }
 

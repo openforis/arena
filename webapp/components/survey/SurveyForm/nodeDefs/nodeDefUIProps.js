@@ -13,6 +13,7 @@ import NodeDefCoordinate from './components/types/nodeDefCoordinate'
 import NodeDefCode from './components/types/NodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
+import NodeDefDate from './components/types/nodeDefDate'
 
 const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
 
@@ -41,8 +42,8 @@ const propsUI = {
   },
 
   [date]: {
+    component: NodeDefDate,
     icon: <span className="icon icon-calendar icon-left" />,
-    numberFormat: NumberFormats.date(),
     defaultValue: '',
   },
 
@@ -101,7 +102,7 @@ const propsUI = {
   [file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left" />,
-    validations: false,
+    validations: true,
   },
 
   [entity]: {

@@ -1,0 +1,58 @@
+@import 'webapp/style/vars';
+@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
+
+.survey-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: $formHeaderHeight;
+}
+
+.survey-form-header__label-container {
+  display: flex;
+  align-items: center;
+
+  button {
+    border: 1px solid $greyBorder;
+    padding: 0.4rem 0.5rem;
+    display: flex;
+    align-items: center;
+
+    &:not(:first-of-type) {
+      border-left: unset;
+    }
+  }
+}
+
+.survey-form-header__path {
+  margin-left: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-x: auto;
+}
+
+.survey-form-header__actions {
+  display: flex;
+
+  > *:not(:last-child) {
+    margin: 0 1rem;
+  }
+
+  .error-badge {
+    position: relative;
+  }
+}
+.survey-form-header__options {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.survey-form-header__record-actions-steps {
+  border: 1px solid $greyBorder;
+
+  > * {
+    margin: 0 0.5rem;
+    font-size: 0.8rem;
+  }
+}

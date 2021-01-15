@@ -31,6 +31,7 @@ export default class Tree {
 
     this.rootG = null
     this.resizeObserver = null
+    this.nodeDefLabelType = NodeDef.NodeDefLabelTypes.label
 
     this.initSvg()
   }
@@ -186,7 +187,7 @@ export default class Tree {
     grid
       .append('xhtml:a')
       .on('click', (_, d) => this.onEntityClick(d.data.uuid))
-      .text((d) => NodeDef.getLabel(d.data, this.lang))
+      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
 
     grid
       .append('xhtml:button')
@@ -288,5 +289,13 @@ export default class Tree {
       // Add 'higlight' class to the selected node-grid element
       .filter((d) => d.data.uuid === uuid)
       .classed('highlight', true)
+  }
+
+  changeNodeDefLabelType(nodeDefLabelType) {
+    this.svg
+      .selectAll('.node-grid')
+      .selectAll('a')
+      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: nodeDefLabelType }))
+    this.nodeDefLabelType = nodeDefLabelType
   }
 }

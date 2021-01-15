@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
 
-import * as Step from '@common/analysis/processingStep'
+import * as ChainController from '@common/analysis/chainController'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
@@ -15,6 +15,7 @@ export const useSelect = ({ setState }) => {
 
   const select = ({ calculation }) => {
     setState((statePrev) => {
+      const chain = State.getChainEdit(statePrev)
       const stepEditPrev = State.getStepEdit(statePrev)
       const calculationPrev = State.getCalculation(statePrev)
       const calculationEditPrev = State.getCalculationEdit(statePrev)
@@ -23,9 +24,10 @@ export const useSelect = ({ setState }) => {
       if (A.isEmpty(calculationEditPrev)) {
         stepEditUpdated = stepEditPrev
       } else {
-        stepEditUpdated = Calculation.isTemporary(calculationEditPrev)
-          ? Step.dissocCalculation(calculationEditPrev)(stepEditPrev)
-          : Step.assocCalculation(calculationPrev)(stepEditPrev)
+        const { step: stepEditUpdatedWithCalculation } = Calculation.isTemporary(calculationEditPrev)
+          ? ChainController.dissocCalculation({ chain, step: stepEditPrev, calculation: calculationEditPrev })
+          : ChainController.assocCalculation({ chain, step: stepEditPrev, calculation: calculationPrev })
+        stepEditUpdated = stepEditUpdatedWithCalculation
       }
 
       return A.pipe(

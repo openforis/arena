@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror/lib/codemirror'
 import 'codemirror/addon/hint/show-hint'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
@@ -12,9 +13,9 @@ import { useI18n } from '@webapp/store/system'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
-const validateExpression = (variablesIds, exprString) => {
+const validateExpression = ({ variablesIds, exprString, mode }) => {
   try {
-    const expr = Expression.fromString(exprString)
+    const expr = Expression.fromString(exprString, mode)
     const ids = getExpressionIdentifiers(expr)
     const unknownIds = ids.filter((id) => !variablesIds.includes(id))
 
@@ -29,16 +30,20 @@ const validateExpression = (variablesIds, exprString) => {
 }
 
 const AdvancedExpressionEditorPopup = (props) => {
-  const { nodeDefCurrent, query, setExpressionCanBeApplied, variables, updateDraftQuery } = props
+  const { nodeDefCurrent, query, mode, setExpressionCanBeApplied, variables, updateDraftQuery } = props
 
   const inputRef = useRef()
   const i18n = useI18n()
 
   const [validation, setValidation] = useState({})
 
-  const variablesOtherNodeDefs = variables.filter((v) => v.uuid !== NodeDef.getUuid(nodeDefCurrent))
+  // exclude variable related to current node def
+  const variablesOtherNodeDefs = variables.map((group) => ({
+    ...group,
+    options: group.options.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
+  }))
 
-  const variablesIds = variablesOtherNodeDefs.map((x) => x.value)
+  const variablesIds = variablesOtherNodeDefs.map(A.prop('options')).flat().map(A.prop('value'))
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
@@ -46,7 +51,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(null, i18n, variablesOtherNodeDefs) },
+      hintOptions: { hint: arenaExpressionHint.bind(null, mode, i18n, variablesOtherNodeDefs) },
     })
     editor.setSize('100%', 'auto')
 
@@ -54,10 +59,13 @@ const AdvancedExpressionEditorPopup = (props) => {
 
     editor.on('change', (cm) => {
       const value = cm.getValue()
-      const newValidation = value.trim() === '' ? {} : validateExpression(variablesIds, value)
+      const valueTrimmed = value.trim()
+      const newValidation = valueTrimmed === '' ? {} : validateExpression({ variablesIds, exprString: value, mode })
       setValidation(newValidation)
       setExpressionCanBeApplied(query !== value && !newValidation.error)
-      if (!newValidation.error) updateDraftQuery(value.trim())
+      if (!newValidation.error) {
+        updateDraftQuery(valueTrimmed)
+      }
     })
 
     return () => editor.toTextArea()
@@ -76,7 +84,7 @@ const AdvancedExpressionEditorPopup = (props) => {
         <textarea ref={inputRef} />
       </div>
       <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
+        <p>{i18n.t(`nodeDefEdit.editorHelp.${mode}`)}</p>
         <p>
           <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
         </p>
@@ -90,12 +98,14 @@ AdvancedExpressionEditorPopup.propTypes = {
   query: PropTypes.string, // String representing the expression
   setExpressionCanBeApplied: PropTypes.func.isRequired,
   updateDraftQuery: PropTypes.func.isRequired,
-  variables: PropTypes.arrayOf(Object).isRequired,
+  variables: PropTypes.arrayOf(Object).isRequired, // variables grouped by parent entity
+  mode: PropTypes.string,
 }
 
 AdvancedExpressionEditorPopup.defaultProps = {
   nodeDefCurrent: null,
   query: '',
+  mode: Expression.modes.json,
 }
 
 export default AdvancedExpressionEditorPopup

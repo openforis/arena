@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -11,6 +12,18 @@ const Member = ({ node, variables, onChange }) => {
   }
 
   return <Identifier node={nodeIdentifier} variables={variables} onChange={onChange} />
+}
+
+Member.propTypes = {
+  // Common props
+  node: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  // Identifier / Member / Call
+  variables: PropTypes.array,
+}
+
+Member.defaultProps = {
+  variables: null,
 }
 
 export default Member

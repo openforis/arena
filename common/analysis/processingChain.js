@@ -2,23 +2,21 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
-import { uuidv4 } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
 
 import * as Step from './processingStep'
-import * as Calculation from './processingStepCalculation'
 
 export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
   dateModified: ObjectUtils.keys.dateModified,
   props: ObjectUtils.keys.props,
-  statusExec: 'statusExec',
+  statusExec: 'status_exec',
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
   validation: ObjectUtils.keys.validation,
-  scriptCommon: 'scriptCommon',
-  processingSteps: 'processingSteps',
+  scriptCommon: 'script_common',
+  processingSteps: 'processing_steps',
 }
 
 export const keysProps = {
@@ -59,57 +57,11 @@ export const getStepByIdx = (stepIdx) =>
 export const getStepPrev = (step) => getStepByIdx(Step.getIndex(step) - 1)
 export const getStepNext = (step) => getStepByIdx(Step.getIndex(step) + 1)
 
-// ====== CREATE
-
-export const newProcessingChain = (props = {}) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
-
-export const newProcessingStep = (processingChain, props = {}) => ({
-  [Step.keys.uuid]: uuidv4(),
-  [Step.keys.processingChainUuid]: getUuid(processingChain),
-  [Step.keys.index]: getProcessingSteps(processingChain).length,
-  [Step.keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
-
-export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
-  [Calculation.keys.uuid]: uuidv4(),
-  [Calculation.keys.processingStepUuid]: Step.getUuid(processingStep),
-  [Calculation.keys.index]: Step.getCalculations(processingStep).length,
-  [Calculation.keys.nodeDefUuid]: nodeDefUuid,
-  [Calculation.keys.props]: props,
-  [Calculation.keys.temporary]: true,
-})
-
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
   DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
-
-// ====== UPDATE
-export const assocProp = ObjectUtils.setProp
-
-export const { dissocTemporary } = ObjectUtils
-
-export const dissocProcessingSteps = R.dissoc(keys.processingSteps)
-
-export const assocProcessingSteps = R.assoc(keys.processingSteps)
-
-export const assocProcessingStep = (step) => R.assocPath([keys.processingSteps, Step.getIndex(step)], step)
-
-export const dissocProcessingStepTemporary = (chain) => ({
-  ...chain,
-  [keys.processingSteps]: getProcessingSteps(chain).filter((processingStep) => !Step.isTemporary(processingStep)),
-})
-
-export const dissocProcessingStep = (step) => (chain) => ({
-  ...chain,
-  [keys.processingSteps]: getProcessingSteps(chain).filter((processingStep) => !Step.isEqual(processingStep)(step)),
-})
 
 // ====== VALIDATION
 // The validation object contains the validation of chain, steps, calculations, index by uuids

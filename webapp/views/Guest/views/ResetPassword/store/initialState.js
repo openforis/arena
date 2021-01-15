@@ -4,6 +4,9 @@ export default {
     name: '',
     password: '',
     passwordConfirm: '',
+    props: {
+      title: null,
+    },
   },
   error: null,
 }

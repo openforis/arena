@@ -66,7 +66,7 @@ const NodeDefEditButtons = (props) => {
         )}
 
         <Link
-          className="btn btn-s btn-transparent"
+          className="btn btn-s btn-transparent survey-form__node-def-edit-button"
           to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
           <span className="icon icon-pencil2 icon-12px" />

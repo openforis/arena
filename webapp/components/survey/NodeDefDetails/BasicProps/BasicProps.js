@@ -19,10 +19,12 @@ import { NodeDefExpressionsProp } from '../ExpressionsProp'
 
 import { useBasicProps } from './store'
 
+import TextProps from '../TextProps'
 import CodeProps from '../CodeProps'
 import TaxonProps from '../TaxonProps'
 import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
+import FileProps from '../FileProps'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -64,6 +66,8 @@ const BasicProps = (props) => {
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
 
+      {NodeDef.isText(nodeDef) && <TextProps state={state} Actions={Actions} />}
+
       {NodeDef.isCode(nodeDef) && <CodeProps state={state} Actions={Actions} />}
 
       {NodeDef.isTaxon(nodeDef) && <TaxonProps state={state} Actions={Actions} />}
@@ -91,6 +95,8 @@ const BasicProps = (props) => {
           />
         </FormItem>
       )}
+
+      {NodeDef.isFile(nodeDef) && <FileProps state={state} Actions={Actions} />}
 
       {displayAsEnabled && editingFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
@@ -159,6 +165,7 @@ const BasicProps = (props) => {
             />
           </FormItem>
           <NodeDefExpressionsProp
+            qualifier="formula"
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.basicProps.formula')}

@@ -38,7 +38,11 @@
   display: grid;
   position: relative;
   height: 100%;
+}
 
+// === page / page item - not applicable
+.survey-form__node-def-page,
+.survey-form__node-def-page-item {
   &.not-applicable {
     background-color: rgba($greyBorder, 0.7);
     opacity: 0.6;
@@ -56,7 +60,6 @@
     padding: 0.5rem 1rem;
     font-weight: 600;
     text-align: left;
-    text-transform: uppercase;
     font-size: 0.8rem;
   }
 

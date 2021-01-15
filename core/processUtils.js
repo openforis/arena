@@ -13,15 +13,13 @@ const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch
 const ENV = {
   arenaRoot: process.env.ARENA_ROOT,
   arenaDist: process.env.ARENA_DIST,
-  arenaPort: process.env.ARENA_PORT || '9090',
+  arenaPort: process.env.PORT || process.env.ARENA_PORT || '9090',
   nodeEnv: process.env.NODE_ENV || environments.development,
   debug: Boolean(process.env.DEBUG),
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
   buildReport: process.env.BUILD_REPORT === 'true',
   // APP VERSION
   applicationVersion: process.env.APPLICATION_VERSION,
-  gitCommitHash: process.env.GIT_COMMIT_HASH,
-  gitBranch: process.env.GIT_BRANCH,
   // DB
   dbUrl,
   pgUser,
@@ -41,7 +39,10 @@ const ENV = {
   // SERVER
   useHttps: process.env.USE_HTTPS === 'true',
   // RStudio Server
-  rStudioServerURL: process.env.RSTUDIO_SERVER_URL,
+  rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,
+  rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
+  rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
+  rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
 }
 
 module.exports = {

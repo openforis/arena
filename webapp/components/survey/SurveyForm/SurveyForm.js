@@ -11,18 +11,16 @@ import * as Record from '@core/record/record'
 
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
-import { useOnUpdate } from '@webapp/components/hooks'
-
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
+import { useOnUpdate } from '@webapp/components/hooks'
 
-import FormHeader from './components/formHeader'
-import FormPageNavigation from './components/FormPageNavigation'
+import FormHeader from './FormHeader'
+import FormPageNavigation from './FormPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
-
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 const SurveyForm = (props) => {
   const {
@@ -79,13 +77,7 @@ const SurveyForm = (props) => {
 
   return nodeDef ? (
     <div>
-      <FormHeader
-        surveyCycleKey={surveyCycleKey}
-        edit={edit}
-        entry={entry && canEditRecord}
-        preview={preview}
-        canEditDef={canEditDef}
-      />
+      <FormHeader edit={edit} entry={entry && canEditRecord} preview={preview} canEditDef={canEditDef} />
 
       <div className={`survey-form${className}`}>
         {showPageNavigation && (

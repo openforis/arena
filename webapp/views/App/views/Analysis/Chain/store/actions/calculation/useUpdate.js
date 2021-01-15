@@ -3,9 +3,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 
 import * as A from '@core/arena'
 
+import * as ChainController from '@common/analysis/chainController'
 import * as Chain from '@common/analysis/processingChain'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
-import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Survey from '@core/survey/survey'
 
@@ -16,20 +16,23 @@ export const useUpdate = ({ setState }) => {
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
   return useCallback(({ calculationUpdated, state }) => {
-    const stepEdit = State.getStepEdit(state)
-    const stepUpdated = Step.assocCalculation(calculationUpdated)(stepEdit)
+    const chain = State.getChainEdit(state)
+    const step = State.getStepEdit(state)
+
+    const { step: stepUpdated } = ChainController.assocCalculation({ chain, step, calculation: calculationUpdated })
     const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
     const chainUpdated = Chain.assocItemValidation(
       Calculation.getUuid(calculationUpdated),
       calculationValidation
-    )(State.getChainEdit(state))
+    )(chain)
 
-    const updatedState = A.pipe(
+    const stateUpdated = A.pipe(
       State.assocChainEdit(chainUpdated),
       State.assocStepEdit(stepUpdated),
       State.assocCalculationEdit(calculationUpdated)
     )(state)
-    setState(updatedState)
-    return updatedState
+
+    setState(stateUpdated)
+    return stateUpdated
   }, [])
 }

@@ -72,6 +72,7 @@ const ValidationsProps = (props) => {
       )}
       {NodeDef.isAttribute(nodeDef) && (
         <ExpressionsProp
+          qualifier="validations"
           label={i18n.t('nodeDefEdit.validationsProps.expressions')}
           readOnly={readOnly}
           applyIf

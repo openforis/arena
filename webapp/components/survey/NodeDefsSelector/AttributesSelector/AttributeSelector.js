@@ -17,6 +17,7 @@ const AttributeSelector = (props) => {
     nodeDefContext,
     onToggleAttribute,
     showMultipleAttributes,
+    nodeDefLabelType,
   } = props
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
@@ -34,8 +35,9 @@ const AttributeSelector = (props) => {
         className={`btn btn-s deselectable attribute-selector${isActive ? ' active' : ''}`}
         onClick={() => onToggleAttribute(nodeDefUuid)}
         disabled={!canSelectAttributes}
+        title={NodeDef.getName(nodeDef)}
       >
-        {NodeDef.getLabel(nodeDef, lang)}
+        {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
         {NodeDefUIProps.getIconByType(nodeDefType)}
       </button>
     )
@@ -43,14 +45,22 @@ const AttributeSelector = (props) => {
 }
 
 AttributeSelector.propTypes = {
-  canSelectAttributes: PropTypes.bool.isRequired,
-  filterTypes: PropTypes.array.isRequired,
+  canSelectAttributes: PropTypes.bool,
+  filterTypes: PropTypes.array,
   lang: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefContext: PropTypes.object.isRequired,
   nodeDefUuidsAttributes: PropTypes.array.isRequired,
   onToggleAttribute: PropTypes.func.isRequired,
-  showMultipleAttributes: PropTypes.bool.isRequired,
+  showMultipleAttributes: PropTypes.bool,
+  nodeDefLabelType: PropTypes.string,
+}
+
+AttributeSelector.defaultProps = {
+  canSelectAttributes: true,
+  filterTypes: [],
+  showMultipleAttributes: true,
+  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default AttributeSelector

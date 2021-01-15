@@ -11,6 +11,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
 Do you want to cancel them?`,
@@ -67,6 +68,8 @@ Do you want to proceed?`,
     message_plural: 'Messages',
     measure: 'Measure',
     measure_plural: 'Measures',
+    measurePrevSteps: 'Measure Previous Steps',
+    measurePrevSteps_plural: 'Measures Previous Steps',
     min: 'Minimum',
     name: 'Name',
     new: 'New',
@@ -99,6 +102,8 @@ Do you want to proceed?`,
     saved: 'Saved!',
     select: 'Select',
     selected: 'Selected',
+    showLabels: 'Show labels',
+    showNames: 'Show names',
     srs: 'SRS',
     sum: 'Sum',
     to: 'To',
@@ -353,6 +358,15 @@ Do you want to proceed?`,
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
+  user: {
+    title: 'Title',
+    titleValues: {
+      mr: 'Mr',
+      ms: 'Ms',
+      preferNotToSay: 'Prefer not to say',
+    },
+  },
+
   processingChainView: {
     formLabel: 'Processing chain label',
     dateExecuted: 'Date executed',
@@ -364,6 +378,13 @@ $t(common.cantUndoWarning)`,
     processingSteps: 'Processing steps',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
+    copyRStudioCode: `#### You are about to open an RStudio Server ####
+
+###### Once RStudio Server is opened, copy the code below to import the chain code.  ######
+ 
+{{rStudioCode}}
+
+`,
   },
 
   processingStepView: {
@@ -374,6 +395,14 @@ $t(common.cantUndoWarning)`,
     category: 'Category',
     calculationSteps: 'Calculation Steps',
     virtualEntity: 'Virtual Entity',
+    variablesPreviousStep: {
+      title: 'Variables previous step',
+      variableName: 'Variable name',
+      include: 'Include',
+      aggregate: 'Aggregate',
+      aggregateFunctionOfVariable: `Aggregate function of variable '{{variableLabel}}'`,
+      deleteConfirm: 'Remove the variable and its aggregate function?',
+    },
   },
 
   processingStepCalculation: {
@@ -399,7 +428,10 @@ $t(common.cantUndoWarning)`,
     advanced: 'Advanced',
     validations: 'Validations',
     function: 'Function',
-    editorHelp: 'Valid expressions are a subset of Javascript.',
+    editorHelp: {
+      json: 'Valid expressions are a subset of Javascript.',
+      sql: 'Only valid SQL expressions are allowed.',
+    },
     editorCompletionHelp: '- Show the available variables and functions that can be used',
     functionDescriptions: {
       min: 'Take the minimum of the arguments',
@@ -407,6 +439,10 @@ $t(common.cantUndoWarning)`,
       pow: 'Raise a number X to the power P',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
+      // SQL functions
+      avg: 'Returns the average value of a numeric variable',
+      count: 'Returns the number of rows that matches a specified criterion',
+      sum: 'Returns the total sum of a numeric variable',
     },
     basicProps: {
       key: 'Key',
@@ -428,6 +464,26 @@ $t(common.cantUndoWarning)`,
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
+    },
+    fileProps: {
+      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
+      maxFileSize: 'Max. file size (Mb)',
+      fileType: 'File type',
+      fileTypes: {
+        image: 'Image',
+        video: 'Video',
+        audio: 'Audio',
+        other: 'Other',
+      },
+    },
+    textProps: {
+      textTransform: 'Text transform',
+      textTransformTypes: {
+        none: 'none',
+        capitalize: 'capitalize',
+        uppercase: 'uppercase',
+        lowercase: 'lowercase',
+      },
     },
     booleanProps: {
       labelValue: 'Label value',
@@ -539,6 +595,13 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  categoryList: {
+    types: {
+      flat: 'Flat',
+      hierarchical: 'Hierarchical',
+    },
+  },
+
   categoryEdit: {
     header: 'Category',
     addLevel: 'Add level',
@@ -596,6 +659,9 @@ $t(common.cantUndoWarning)`,
       processingStep: {
         entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',
+        variablesPrevStep: {
+          aggregateFunctionNotSpecified: 'Aggregate function not specified',
+        },
       },
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
@@ -706,6 +772,7 @@ $t(common.cantUndoWarning)`,
       emailNotFound: 'Email not found',
       groupRequired: 'Group is required',
       nameRequired: 'Name is required',
+      titleRequired: 'Title is required',
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
       passwordUnsafe:

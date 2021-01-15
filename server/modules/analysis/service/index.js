@@ -5,6 +5,8 @@ export {
   fetchChain,
   // ======  READ - Calculations
   fetchCalculationAttributeUuids,
+  // ======  READ - Variables Previous Steps
+  fetchVariablesPrevSteps,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain
@@ -18,3 +20,4 @@ export {
 } from '../manager'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
+export { generateRStudioToken, checkRStudioToken } from './rStudio'

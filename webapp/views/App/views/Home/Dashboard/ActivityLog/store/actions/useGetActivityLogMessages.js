@@ -1,9 +1,12 @@
-import axios from 'axios'
 import * as R from 'ramda'
+
+import { useState } from 'react'
 
 import * as A from '@core/arena'
 
-import { useInterval } from '@webapp/components/hooks'
+import { useInterval, useRequest } from '@webapp/components/hooks'
+
+import * as API from '@webapp/service/api'
 
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -15,38 +18,59 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
+  const [params, setParams] = useState({})
+  const [newest, setNewest] = useState({})
+  const [hasToFetch, setHasToFetch] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
-  return ({ newest }) => {
-    ;(async () => {
-      const params = {}
-      const initialized = messages.length > 0
+  const prepareData = (fetchedData) => {
+    const initialized = messages.length > 0
+    const { activityLogs } = fetchedData
+    if (A.isEmpty(activityLogs)) {
+      return null
+    }
+    const highlighted = newest && initialized
 
-      if (initialized) {
-        if (newest) {
-          params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
-        } else {
-          params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
-        }
+    const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+    const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
+    const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
+    if (newMessages) {
+      setMessages(newMessages)
+    }
+    return newMessages
+  }
+
+  const handleError = () => {
+    setHasError(true)
+  }
+
+  useRequest({
+    condition: hasToFetch && !hasError,
+    defaultValue: [],
+    requestFunction: API.fetchActivityLogs,
+    requestArguments: [{ surveyId, params }],
+    prepareData,
+    handleError,
+    dependencies: [params],
+  })
+
+  return ({ newest: _newest }) => {
+    const _params = {}
+    const initialized = messages.length > 0
+
+    if (initialized) {
+      if (_newest) {
+        _params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
+      } else {
+        _params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
       }
+    }
 
-      const {
-        data: { activityLogs },
-      } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params })
-
-      if (A.isEmpty(activityLogs)) {
-        return null
-      }
-
-      const highlighted = newest && initialized
-
-      const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-      const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
-      const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
-      if (newMessages) {
-        setMessages(newMessages)
-      }
-      return newMessages
-    })()
+    setParams(_params)
+    setNewest(_newest)
+    if (!hasToFetch) {
+      setHasToFetch(true)
+    }
   }
 }
 

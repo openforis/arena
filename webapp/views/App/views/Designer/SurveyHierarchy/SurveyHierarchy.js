@@ -9,6 +9,8 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {
@@ -20,6 +22,8 @@ const SurveyHierarchy = () => {
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
+  const [nodeDefLabelType, setNodeDefLabelType] = useState(NodeDef.NodeDefLabelTypes.label)
+
   const treeRef = useRef(null)
 
   useEffect(() => {
@@ -28,8 +32,20 @@ const SurveyHierarchy = () => {
   }, [lang])
 
   useEffect(() => {
-    return () => tree && tree.disconnect()
+    return () => tree?.disconnect()
   }, [tree])
+
+  useEffect(() => {
+    tree?.changeNodeDefLabelType(nodeDefLabelType)
+  }, [nodeDefLabelType, tree])
+
+  const toggleLabelFunction = () => {
+    setNodeDefLabelType(
+      nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
+        ? NodeDef.NodeDefLabelTypes.name
+        : NodeDef.NodeDefLabelTypes.label
+    )
+  }
 
   return (
     <div className="survey-hierarchy">
@@ -45,7 +61,11 @@ const SurveyHierarchy = () => {
           }}
           canSelectAttributes={false}
           showAncestors={false}
+          nodeDefLabelType={nodeDefLabelType}
         />
+      </div>
+      <div className="survey-hierarchy__label-selector">
+        <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
       </div>
     </div>
   )

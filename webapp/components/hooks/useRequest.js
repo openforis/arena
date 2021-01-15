@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -7,7 +8,7 @@ import { useEffect, useRef, useState } from 'react'
  * @param {boolean} [params.condition=true] - Wheter to execute the request on dependencies update.
  * @param {object} [params.defaultValue=null] - The default value returned.
  * @param {Array} [params.dependencies=[]] - Effect dependencies (the request will be performed again when they change).
- * @param {funcion} [params.requestFunction] - The request function.
+ * @param {Function} [params.requestFunction] - The request function.
  * @param {Array} [params.requestArguments=[]] - The request arguments.
  * @returns {object} - The content of response.
  */
@@ -17,6 +18,8 @@ export const useRequest = ({
   dependencies = [],
   requestFunction,
   requestArguments,
+  prepareData = (data) => data,
+  handleError = null,
 }) => {
   const [data, setData] = useState(defaultValue)
   const cancelRequestRef = useRef(null)
@@ -28,10 +31,13 @@ export const useRequest = ({
 
       request
         .then(({ data: dataResponse }) => {
-          setData(dataResponse)
+          setData(prepareData(dataResponse))
         })
-        .catch(() => {
+        .catch((err) => {
           // canceled
+          if (err && !axios.isCancel(err)) {
+            handleError?.(err)
+          }
         })
     }
     return () => {

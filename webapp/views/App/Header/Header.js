@@ -50,7 +50,9 @@ const Header = () => {
             <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
           ) : (
             <>
-              <div>{Survey.getLabel(surveyInfo, lang)}</div>
+              <div className="header__survey-title">
+                {Survey.getName(surveyInfo)} - {Survey.getLabel(surveyInfo, lang)}
+              </div>
               <CycleSelector
                 surveyInfo={surveyInfo}
                 surveyCycleKey={surveyCycleKey}
@@ -67,7 +69,11 @@ const Header = () => {
 
       <button
         className="header__btn-user"
-        onClick={toggleShowUserPopup}
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          toggleShowUserPopup()
+        }}
         onKeyDown={toggleShowUserPopup}
         tabIndex="0"
         type="button"

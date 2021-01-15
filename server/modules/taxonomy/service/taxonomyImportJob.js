@@ -16,7 +16,7 @@ import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import TaxonCSVParser from './taxonCSVParser'
 
-const requiredColumns = ['code', 'family', 'genus', 'scientific_name']
+const requiredColumns = ['code', 'scientific_name']
 
 export default class TaxonomyImportJob extends Job {
   constructor(params) {
@@ -44,7 +44,7 @@ export default class TaxonomyImportJob extends Job {
       ActivityLog.type.taxonomyTaxaImport,
       { uuid: taxonomyUuid },
       false,
-      tx,
+      tx
     )
 
     // 1. load taxonomy
@@ -62,11 +62,11 @@ export default class TaxonomyImportJob extends Job {
 
     this.csvReader = CSVReader.createReaderFromFile(
       this.filePath,
-      async headers => await this._onHeaders(headers),
-      async row => await this._onRow(row),
-      total => {
+      async (headers) => this._onHeaders(headers),
+      async (row) => this._onRow(row),
+      (total) => {
         this.total = total
-      },
+      }
     )
     await this.csvReader.start()
 
@@ -101,7 +101,7 @@ export default class TaxonomyImportJob extends Job {
         this.surveyId,
         this.taxonomy,
         this.vernacularLanguageCodes,
-        this.tx,
+        this.tx
       )
       await this.taxonomyImportManager.init()
       this.taxonCSVParser = new TaxonCSVParser(this.taxonomyUuid, this.vernacularLanguageCodes)

@@ -38,6 +38,7 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
   return record
 }
 
+export const fetchRecordsUuidAndCycle = RecordManager.fetchRecordsUuidAndCycle
 export const fetchRecordByUuid = RecordManager.fetchRecordByUuid
 export const countRecordsBySurveyId = RecordManager.countRecordsBySurveyId
 export const fetchRecordsSummaryBySurveyId = RecordManager.fetchRecordsSummaryBySurveyId
