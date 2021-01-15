@@ -1,5 +1,3 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { dragAndDrop, getElement } from '../utils/api'
 import { clickCategoryButtonClose, writeCategoryName } from '../utils/ui/categoryDetails'
 import {
@@ -10,16 +8,9 @@ import {
   expectNodeDefCodeParentDisabled,
 } from '../utils/ui/nodeDefDetail'
 import { expectItemIsTheLastNodeDef, expectSurveyFormItems } from '../utils/ui/surveyForm'
+import { treeNodeDef, basePlotNodeDefItems, countryNodeDef } from '../resources/nodeDefs/nodeDefs'
 
-const nodeDefCode = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false }
-
-const nodeDefItems = [
-  { type: NodeDef.nodeDefType.integer, name: 'plot_id', label: 'Plot id', isKey: true },
-  { type: NodeDef.nodeDefType.text, name: 'plot_text', label: 'Plot text', isKey: false },
-  { type: NodeDef.nodeDefType.file, name: 'plot_file', label: 'Plot file', isKey: false },
-  { type: NodeDef.nodeDefType.entity, name: 'tree', label: 'Tree', isKey: false },
-  nodeDefCode,
-]
+const nodeDefItems = [...basePlotNodeDefItems, treeNodeDef, countryNodeDef]
 
 const nodeItemsReOrdered = [
   nodeDefItems[0],
@@ -29,7 +20,7 @@ const nodeItemsReOrdered = [
 
 describe('SurveyForm edit Plot: code attribute', () => {
   test('Add code attribute "country"', async () => {
-    await addItemToPage({ ...nodeDefCode, saveAndBack: false })
+    await addItemToPage({ ...countryNodeDef, saveAndBack: false })
 
     await clickNodeDefCategoryAdd()
     const categoryName = 'administrative_unit'
@@ -44,7 +35,7 @@ describe('SurveyForm edit Plot: code attribute', () => {
 
     await clickNodeDefSaveAndBack()
 
-    await expectItemIsTheLastNodeDef({ item: nodeDefCode })
+    await expectItemIsTheLastNodeDef({ item: countryNodeDef })
     await expectSurveyFormItems({ items: nodeDefItems })
   })
 

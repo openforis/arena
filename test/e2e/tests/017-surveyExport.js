@@ -26,6 +26,7 @@ import { expectHomeDashboard } from '../utils/ui/home'
 import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 
 import { records as recordsMockData } from '../resources/records/recordsData'
+import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../resources/nodeDefs/nodeDefs'
 
 const downloadPath = path.resolve(__dirname, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
@@ -33,40 +34,6 @@ const extractedPath = path.resolve(downloadPath, 'extracted')
 const surveyExtractedPath = path.resolve(extractedPath, 'survey_survey')
 
 const includeAnalysis = true
-const ClusterNodeDefItems = [
-  { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
-  { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' }, // propsAdvanced.defaultValues, expression "0", apply if null
-  { type: 'date', name: 'cluster_date', label: 'Cluster date' }, // "applyIf": "", "expression": "cluster_decimal > '0'\n"
-  { type: 'time', name: 'cluster_time', label: 'Cluster time' },
-  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' }, // "applyIf": "cluster_decimal > '5'\n", "expression": "\"true\""
-  { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
-  { type: 'entity', name: 'plot', label: 'Plot' },
-]
-
-const PlotNodeDefItems = [
-  { type: NodeDef.nodeDefType.integer, name: 'plot_id', label: 'Plot id', isKey: true },
-  { type: NodeDef.nodeDefType.text, name: 'plot_text', label: 'Plot text', isKey: false },
-  { type: NodeDef.nodeDefType.file, name: 'plot_file', label: 'Plot file', isKey: false },
-  { type: NodeDef.nodeDefType.entity, name: 'tree', label: 'Tree', isKey: false }, // "multiple":true,"renderType":"table"
-  { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false },
-  { type: NodeDef.nodeDefType.code, name: 'region', label: 'Region', isKey: false },
-  { type: NodeDef.nodeDefType.code, name: 'province', label: 'Province', isKey: false },
-]
-
-const TreeNodeDefItems = [
-  { type: 'integer', name: 'tree_id', label: 'Tree id', isKey: true },
-  { type: 'decimal', name: 'tree_dec_1', label: 'Tree decimal 1', isKey: false },
-  { type: 'decimal', name: 'tree_dec_2', label: 'Tree decimal 2', isKey: false },
-  { type: 'taxon', name: 'tree_species', label: 'Tree Species', isKey: false },
-  {
-    type: 'decimal',
-    name: 'tree_volume',
-    label: 'Tree volume label (C)',
-    isKey: false,
-    isAnalysis: true,
-    descriptions: 'Tree volume description',
-  },
-]
 
 const checkNode = async ({ node, expectedNode }) => {
   await expect(NodeDef.getName(node)).toBe(expectedNode.name)
@@ -76,7 +43,7 @@ const checkNode = async ({ node, expectedNode }) => {
   await expect(NodeDef.isAnalysis(node)).toBe(expectedNode.isAnalysis || false)
 }
 
-const getSurveyNodedefsToTest = () => {
+const getSurveyNodeDefsToTest = () => {
   const contentSurvey = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
   const survey = JSON.parse(contentSurvey)
   const root = Survey.getNodeDefRoot(survey)
@@ -141,9 +108,9 @@ const checkRecordFileAndContent = async ({ recordUuid, mockRecords, surveyNodeDe
 
   const { clusterNodeDef, clusterNodeDefDefChildren, plotNodeDef, plotNodeDefChildren } = surveyNodeDefsToTest
 
-  const clusteIdNodeDef = clusterNodeDefDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Cluster id')
+  const clusterIdNodeDef = clusterNodeDefDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Cluster id')
 
-  const [clusterIdNode] = Record.getNodesByDefUuid(NodeDef.getUuid(clusteIdNodeDef))(record)
+  const [clusterIdNode] = Record.getNodesByDefUuid(NodeDef.getUuid(clusterIdNodeDef))(record)
 
   const mockRecord = mockRecords.find(
     (_mockRecord) => String(_mockRecord.cluster[0].value) === String(Node.getValue(clusterIdNode))
@@ -196,6 +163,14 @@ const checkRecordFileAndContent = async ({ recordUuid, mockRecords, surveyNodeDe
       )
     })
   )
+}
+
+const checkLevelAndReturnLevel = async ({ levels, categoryName, index }) => {
+  const level = levels.find((category) => CategoryLevel.getName(category) === categoryName)
+  await expect(level).toBeTruthy()
+  await expect(CategoryLevel.getName(level)).toBe(categoryName)
+  await expect(CategoryLevel.getIndex(level)).toBe(index)
+  return level
 }
 
 describe('Survey export', () => {
@@ -259,7 +234,6 @@ describe('Survey export', () => {
     await expect(plotNodeDef).toBeTruthy()
 
     const plotNodeDefChildren = Survey.getNodeDefChildren(plotNodeDef, includeAnalysis)(survey)
-
     await plotNodeDefChildren.reduce(async (promise, item, index) => {
       await promise
       return checkNode({ node: item, expectedNode: PlotNodeDefItems[index] })
@@ -313,23 +287,11 @@ describe('Survey export', () => {
     await expect(levels.length).toBe(3)
     await expect(Category.getLevelsCount(administrativeUnitCategory)).toBe(3)
 
-    // check countryLevel
-    const countryLevel = levels.find((category) => CategoryLevel.getName(category) === 'country')
-    await expect(countryLevel).toBeTruthy()
-    await expect(CategoryLevel.getName(countryLevel)).toBe('country')
-    await expect(CategoryLevel.getIndex(countryLevel)).toBe(0)
-
-    // check regionLevel
-    const regionLevel = levels.find((category) => CategoryLevel.getName(category) === 'region')
-    await expect(regionLevel).toBeTruthy()
-    await expect(CategoryLevel.getName(regionLevel)).toBe('region')
-    await expect(CategoryLevel.getIndex(regionLevel)).toBe(1)
-
-    // check districtLevel
-    const districtLevel = levels.find((category) => CategoryLevel.getName(category) === 'district')
-    await expect(districtLevel).toBeTruthy()
-    await expect(CategoryLevel.getName(districtLevel)).toBe('district')
-    await expect(CategoryLevel.getIndex(districtLevel)).toBe(2)
+    const [countryLevel, regionLevel, districtLevel] = await Promise.all(
+      ['country', 'region', 'district'].map(async (categoryName, index) =>
+        checkLevelAndReturnLevel({ levels, categoryName, index })
+      )
+    )
 
     const administrativeUnitItems = await checkFileAndGetContent({
       filePath: path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`),
@@ -482,7 +444,7 @@ describe('Survey export', () => {
 
     const recordsUuids = recordsAsArray.map((record) => Record.getUuid(record))
 
-    const surveyNodeDefsToTest = getSurveyNodedefsToTest({ survey })
+    const surveyNodeDefsToTest = getSurveyNodeDefsToTest()
 
     await recordsUuids.reduce(async (promise, recordUuid) => {
       await promise

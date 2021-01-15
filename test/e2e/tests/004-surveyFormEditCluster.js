@@ -5,19 +5,14 @@ import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectItemIsTheLastNodeDef, expectSurveyFormItems, expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { editSurveyFormPage } from '../utils/ui/surveyFormPage'
 
+import { baseClusterNodeDefItems } from '../resources/nodeDefs/nodeDefs'
+
 const expectHasOnlyRootEntity = async ({ rootEntityName }) => {
   await expectToBe({ selector: '.btn-node-def', numberOfItems: 1 })
   await expectToBe({ selector: `//button[text()='${rootEntityName}']`, numberOfItems: 1 })
 }
 
-const nodeDefItems = [
-  { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
-  { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' },
-  { type: 'date', name: 'cluster_date', label: 'Cluster date' },
-  { type: 'time', name: 'cluster_time', label: 'Cluster time' },
-  { type: 'boolean', name: 'cluster_boolean', label: 'Cluster boolean' },
-  { type: 'coordinate', name: 'cluster_coordinate', label: 'Cluster coordinate' },
-]
+const nodeDefItems = baseClusterNodeDefItems
 
 describe('SurveyForm edit cluster', () => {
   test('SurveyForm cluster', async () => {

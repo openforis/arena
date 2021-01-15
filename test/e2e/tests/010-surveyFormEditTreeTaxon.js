@@ -1,17 +1,14 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { addNodeDefToTable, clickNodeDefSaveAndBack, clickNodeDefTaxonomyAdd } from '../utils/ui/nodeDefDetail'
 import { expectSurveyFormItemNames } from '../utils/ui/surveyForm'
 import { clickTaxonomyButtonClose, writeTaxonomyName } from '../utils/ui/taxonomyDetails'
+import { treeSpeciesNodeDef } from '../resources/nodeDefs/nodeDefs'
 
 const taxonomyName = 'tree_species'
 
 describe('SurveyForm edit: Tree taxon', () => {
   test('Tree: add taxon attribute "tree_species"', async () => {
     await addNodeDefToTable({
-      type: NodeDef.nodeDefType.taxon,
-      name: 'tree_species',
-      label: 'Tree Species',
+      ...treeSpeciesNodeDef,
       saveAndBack: false,
     })
 
