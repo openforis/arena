@@ -28,7 +28,7 @@ import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 import { records as recordsMockData } from '../resources/records/recordsData'
 import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../resources/nodeDefs/nodeDefs'
 
-const basePath = '/tmp'
+const basePath = __dirname
 const downloadPath = path.resolve(basePath, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
 const extractedPath = path.resolve(downloadPath, 'extracted')
