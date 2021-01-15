@@ -29,7 +29,7 @@ import { records as recordsMockData } from '../resources/records/recordsData'
 import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../resources/nodeDefs/nodeDefs'
 
 const basePath = process.env.GITHUB_WORKSPACE || __dirname
-const downloadPath = path.resolve(basePath, 'data', 'downloaded')
+const downloadPath = basePath //path.resolve(basePath, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
 const extractedPath = path.resolve(downloadPath, 'extracted')
 const surveyExtractedPath = path.resolve(extractedPath, 'survey_survey')
