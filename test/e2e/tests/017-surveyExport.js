@@ -181,7 +181,7 @@ describe('Survey export', () => {
 
     await client().send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath,
+      downloadPath: process.env.GITHUB_WORKSPACE,
     })
 
     await clickSidebarBtnHome()
@@ -190,7 +190,7 @@ describe('Survey export', () => {
     await click('Export', toLeftOf('Delete'))
     await waitFor(15000)
 
-    fs.readdirSync(downloadPath).forEach((file) => {
+    fs.readdirSync(process.env.GITHUB_WORKSPACE).forEach((file) => {
       console.log(file)
     })
 
