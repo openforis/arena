@@ -70,7 +70,7 @@ jobs:
 
     - run: while ! nc -z localhost 9090; do sleep 10; done;
     - name: run migrations and tests
-      run: yarn run npm-run-all server:migrate test
+      run: sudo yarn run npm-run-all server:migrate test
       env:
         PGHOST: localhost
         PGPORT: 5444
