@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -16,6 +15,8 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
+    qualifier,
+    index,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
     validation,
@@ -51,10 +52,11 @@ const ExpressionProp = (props) => {
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
-    <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
+    <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && (
           <button
+            id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             type="button"
             className="btn btn-s btn-transparent btn-delete"
             aria-disabled={readOnly}
@@ -68,6 +70,9 @@ const ExpressionProp = (props) => {
           <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
 
           <ExpressionEditor
+            index={index}
+            placeholder={isPlaceholder}
+            qualifier={`${qualifier}-expression`}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCurrent={nodeDefUuidCurrent}
             query={NodeDefExpression.getExpression(expression)}
@@ -85,6 +90,9 @@ const ExpressionProp = (props) => {
             <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
             <ExpressionEditor
+              index={index}
+              placeholder={isPlaceholder}
+              qualifier={`${qualifier}-applyIf`}
               nodeDefUuidContext={nodeDefUuidContext}
               nodeDefUuidCurrent={nodeDefUuidCurrent}
               query={NodeDefExpression.getApplyIf(expression)}
@@ -121,6 +129,9 @@ const ExpressionProp = (props) => {
 }
 
 ExpressionProp.propTypes = {
+  index: PropTypes.number.isRequired, // used to generate test ids
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+
   nodeDefUuidContext: PropTypes.string,
   nodeDefUuidCurrent: PropTypes.string,
   validation: PropTypes.object,

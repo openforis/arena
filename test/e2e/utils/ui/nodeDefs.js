@@ -17,7 +17,7 @@ import {
 
 const enterNodeDefValueBase = async ({ value, label }) => {
   await waitFor(2000)
-  await writeIntoTextBox({ text: value, selector: below(label) })
+  await writeIntoTextBox({ text: value, selector: below(label), clearBefore: true })
 }
 
 const expectNodeDefBase = async ({ value: text, label, relativeSelectors = [] }) =>
@@ -75,8 +75,8 @@ export const NodeDefsUtils = {
   [NodeDef.nodeDefType.coordinate]: {
     ...NodeDefBase,
     enterValue: async ({ x, y, srs, label }) => {
-      await writeIntoTextBox({ text: x, selector: toRightOf('X', below(label)) })
-      await writeIntoTextBox({ text: y, selector: toRightOf('Y', below(label)) })
+      await writeIntoTextBox({ text: x, selector: toRightOf('X', below(label)), clearBefore: true })
+      await writeIntoTextBox({ text: y, selector: toRightOf('Y', below(label)), clearBefore: true })
 
       await click(textBox(toRightOf('SRS', below(label))))
       await click(srs)

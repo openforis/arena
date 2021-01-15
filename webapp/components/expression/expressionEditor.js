@@ -10,6 +10,9 @@ import { ExpressionEditorType } from './expressionEditorType'
 
 const ExpressionEditor = (props) => {
   const {
+    index,
+    qualifier,
+    placeholder,
     query,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
@@ -28,10 +31,13 @@ const ExpressionEditor = (props) => {
     setEdit(false)
   }
 
+  const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
+
   return (
     <div className="expression-editor">
       {edit ? (
         <ExpressionEditorPopup
+          qualifier={qualifier}
           query={query}
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={nodeDefUuidCurrent}
@@ -45,8 +51,17 @@ const ExpressionEditor = (props) => {
         />
       ) : (
         <div className="expression-editor__query-container">
-          {!R.isEmpty(query) && <div className="query">{query}</div>}
-          <button type="button" className="btn btn-s btn-edit" onClick={() => setEdit(true)}>
+          {!R.isEmpty(query) && (
+            <div className="query" id={`${idPrefix}-query`}>
+              {query}
+            </div>
+          )}
+          <button
+            type="button"
+            className="btn btn-s btn-edit"
+            id={`${idPrefix}-edit-btn`}
+            onClick={() => setEdit(true)}
+          >
             <span className="icon icon-pencil2 icon-14px" />
           </button>
         </div>
@@ -56,6 +71,9 @@ const ExpressionEditor = (props) => {
 }
 
 ExpressionEditor.propTypes = {
+  index: PropTypes.number, // used when rendering multiple expression editor elements
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+  placeholder: PropTypes.bool, // true if the element is a placeholder
   query: PropTypes.string, // String representing the expression
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
@@ -68,6 +86,8 @@ ExpressionEditor.propTypes = {
 }
 
 ExpressionEditor.defaultProps = {
+  index: 0,
+  placeholder: false,
   query: '',
   nodeDefUuidContext: '',
   nodeDefUuidCurrent: null,

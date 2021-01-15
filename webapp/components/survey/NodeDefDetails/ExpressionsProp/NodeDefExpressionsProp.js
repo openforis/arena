@@ -13,6 +13,7 @@ import { State } from '../store'
 
 const NodeDefExpressionsProp = (props) => {
   const {
+    qualifier,
     state,
     Actions,
     nodeDefUuidContext,
@@ -39,6 +40,7 @@ const NodeDefExpressionsProp = (props) => {
 
   return (
     <ExpressionsProp
+      qualifier={qualifier}
       label={label}
       readOnly={readOnly}
       applyIf={applyIf}
@@ -59,6 +61,8 @@ const NodeDefExpressionsProp = (props) => {
 }
 
 NodeDefExpressionsProp.propTypes = {
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
 
