@@ -1,6 +1,7 @@
 import './ExpressionsProp.scss'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
@@ -15,7 +16,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {
-  const { values, label, validation, multiple, onChange } = props
+  const { qualifier, values, label, validation, multiple, onChange } = props
 
   const dispatch = useDispatch()
 
@@ -46,12 +47,18 @@ const ExpressionsProp = (props) => {
 
   return (
     <FormItem label={label}>
-      <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
+      <ValidationTooltip
+        validation={validation}
+        showKeys={false}
+        className={`node-def-edit__expressions-${qualifier}-tooltip`}
+      >
         <div className="node-def-edit__expressions">
           {values.map((value, i) => (
             <ExpressionProp
               key={i}
               {...props}
+              qualifier={qualifier}
+              index={i}
               expression={value}
               validation={Validation.getFieldValidation(i)(validation)}
               onDelete={onDelete}
@@ -62,6 +69,8 @@ const ExpressionsProp = (props) => {
           {(multiple || R.isEmpty(values)) && (
             <ExpressionProp
               {...props}
+              qualifier={qualifier}
+              index={values.length}
               expression={NodeDefExpression.createExpressionPlaceholder()}
               validation={{}}
               onDelete={onDelete}
@@ -74,6 +83,15 @@ const ExpressionsProp = (props) => {
   )
 }
 
+ExpressionsProp.propTypes = {
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+  values: PropTypes.array, // Array of expressions
+  label: PropTypes.string,
+  validation: PropTypes.object,
+  multiple: PropTypes.bool,
+  onChange: PropTypes.func.isRequired,
+}
+
 ExpressionsProp.defaultProps = {
   label: '',
   applyIf: true,
@@ -84,7 +102,6 @@ ExpressionsProp.defaultProps = {
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
-  // Array of expressions
   values: [],
 
   validation: null,

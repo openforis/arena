@@ -23,10 +23,12 @@ const BinaryOperand = (props) => {
   const i18n = useI18n()
 
   return (
-    <>
+    <div className={`binary-${type}`}>
       <button
         type="button"
-        className={`btn btn-s btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        className={`btn btn-s btn-switch-operand btn-switch-operand-var${
+          !Expression.isLiteral(nodeOperand) ? ' active' : ''
+        }`}
         onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
       >
         {i18n.t('expressionEditor.var')}
@@ -34,7 +36,9 @@ const BinaryOperand = (props) => {
 
       <button
         type="button"
-        className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        className={`btn btn-s btn-switch-operand btn-switch-operand-const${
+          Expression.isLiteral(nodeOperand) ? ' active' : ''
+        }`}
         aria-disabled={isLeft && isBoolean && !NodeDef.isBoolean(nodeDefCurrent)}
         onClick={() => {
           const nodeUpdate =
@@ -64,7 +68,7 @@ const BinaryOperand = (props) => {
         type,
         variables,
       })}
-    </>
+    </div>
   )
 }
 
