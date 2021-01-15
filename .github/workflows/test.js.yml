@@ -59,7 +59,7 @@ jobs:
     - run: sudo yarn build-dev
     - run: sudo ln -s dist/server.js .
     - name: run server
-      run: sudo exec pm2-runtime server.js &
+      run: exec pm2-runtime server.js &
       env:
         PGHOST: localhost
         PGPORT: 5444
