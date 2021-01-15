@@ -1,7 +1,10 @@
-import { click, evaluate, waitFor1sec } from '../api'
+import { click, expectExists, waitFor1sec } from '../api'
 import { setBinaryLeftConst, setExpression } from './expressionEditor'
 
-import { nodeDefDetailsAdvancedElements as elements } from './nodeDefDetailsAdvancedSelectors'
+import {
+  nodeDefDetailsAdvancedElements as elements,
+  nodeDefDetailsAdvancedSelectors as selectors,
+} from './nodeDefDetailsAdvancedSelectors'
 
 export const addNodeDefDefaultValue = async ({ constant }) => {
   await click('Advanced')
@@ -76,20 +79,7 @@ export const expectNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }
   await _expectContainerTextToBe({ container, text: expression })
 }
 
-const _getElementClassName = async ({ element }) => evaluate(element, (el) => el.getAttribute('class'))
-
-const _expectElementToHaveClass = async ({ element, className: classNameExpected }) => {
-  const className = await _getElementClassName({ element })
-  await expect(className.split(' ').includes(classNameExpected)).toBeTruthy()
-}
-
-const _expectElementNotToHaveClass = async ({ element, className: classNameExpected }) => {
-  const className = await _getElementClassName({ element })
-  await expect(className.split(' ').includes(classNameExpected)).toBeFalsy()
-}
-
 export const expectNodeDefDefaultValuesInvalid = async () =>
-  _expectElementToHaveClass({ element: elements.defaultValuesTooltip(), className: 'tooltip-error' })
+  expectExists({ selector: selectors.defaultValuesTooltip({ error: true }) })
 
-export const expectNodeDefDefaultValuesValid = async () =>
-  _expectElementNotToHaveClass({ element: elements.defaultValuesTooltip(), className: 'tooltip-error' })
+export const expectNodeDefDefaultValuesValid = async () => expectExists({ selector: selectors.defaultValuesTooltip() })

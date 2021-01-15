@@ -35,7 +35,10 @@ describe('SurveyForm edit expressions', () => {
 
     await expectNodeDefDefaultValuesInvalid()
 
+    // delete the first default value
     await deleteNodeDefDefaultValue()
+    // expect the "new" default value to be the first one
+    await expectNodeDefDefaultValue({ expression: '1' })
 
     await expectNodeDefDefaultValuesValid()
 

@@ -9,9 +9,15 @@ const expressionQualifier = {
 const expressionEditorEl = ({ index = 0, qualifier, type, elType }) =>
   $(`#expression-editor-${index}-${qualifier}-${type}-${elType}`)
 
+export const nodeDefDetailsAdvancedSelectors = {
+  defaultValuesTooltip: ({ error = false } = {}) =>
+    `.node-def-edit__expressions-default-values-tooltip${error ? '.tooltip-error' : ''}`,
+}
+
 export const nodeDefDetailsAdvancedElements = {
   // default values
-  defaultValuesTooltip: () => $('.node-def-edit__expressions-default-values-tooltip'),
+  defaultValuesTooltip: ({ error = false } = {}) =>
+    $(`.node-def-edit__expressions-default-values-tooltip${error ? '.tooltip-error' : ''}`),
   defaultValueExpressionEditBtn: ({ index }) =>
     expressionEditorEl({
       index,
