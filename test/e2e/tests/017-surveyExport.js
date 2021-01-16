@@ -3,7 +3,6 @@
 import path from 'path'
 import fs from 'fs'
 import axios from 'axios'
-import * as R from 'ramda'
 import { client, toLeftOf, intercept } from 'taiko'
 import extract from 'extract-zip'
 import csvParseSync from 'csv-parse/lib/sync'
@@ -194,7 +193,7 @@ describe('Survey export', () => {
     await expectHomeDashboard({ label: 'Survey' })
 
     await intercept(new RegExp(/api\/survey\/[0-9]+\/export/), async (request) => {
-      const responseAuth = await axios.post('http://localhost:9000/auth/login', {
+      const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {
         email: 'test@arena.com',
         password: 'test',
       })
@@ -203,20 +202,21 @@ describe('Survey export', () => {
       const response = await axios({
         url: request.request.url,
         method: 'GET',
-        responseType: 'blob',
+        responseType: 'arraybuffer',
         headers: {
           Cookie: headers['set-cookie'],
         },
       })
-      const contentDisposition = R.path(['headers', 'content-disposition'], response)
-      const fileName = contentDisposition.slice('attachment; filename='.length)
-      fs.writeFileSync(path.join(downloadPath, fileName), response.data)
+
+      fs.writeFileSync(surveyZipPath, response.data)
+
+      await expect(surveyZipPath).toBeTruthy()
+      request.continue({})
     })
 
     await click('Export', toLeftOf('Delete'))
-    await waitFor(15000)
+    await waitFor(5000)
 
-    await expect(path.join(downloadPath, 'survey_survey.zip')).toBeTruthy()
     await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
   }, 150000)
 
