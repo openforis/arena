@@ -35,7 +35,7 @@ import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../reso
 axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const basePath = process.env.GITHUB_WORKSPACE || __dirname
-const downloadPath = basePath //path.resolve(basePath, 'data', 'downloaded')
+const downloadPath = basePath
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
 const extractedPath = path.join(downloadPath, 'extracted')
 const surveyExtractedPath = path.join(extractedPath, 'survey_survey')
@@ -207,15 +207,7 @@ describe('Survey export', () => {
         },
       })
 
-      fs.readdirSync(downloadPath).forEach((file) => {
-        console.log('a', file)
-      })
-
       fs.writeFileSync(surveyZipPath, response.data)
-
-      fs.readdirSync(downloadPath).forEach((file) => {
-        console.log(file)
-      })
 
       await expect(surveyZipPath).toBeTruthy()
       await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
