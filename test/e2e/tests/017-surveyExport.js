@@ -211,6 +211,10 @@ describe('Survey export', () => {
       fs.writeFileSync(surveyZipPath, response.data)
 
       await expect(surveyZipPath).toBeTruthy()
+      await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
+      fs.readdirSync(basePath).forEach((file) => {
+        console.log(file)
+      })
       request.continue({})
     })
 
