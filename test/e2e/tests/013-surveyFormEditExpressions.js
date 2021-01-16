@@ -1,4 +1,4 @@
-import { click, waitFor1sec, waitFor } from '../utils/api'
+import { click, waitFor1sec } from '../utils/api'
 import { editNodeDef } from '../utils/ui/surveyForm'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { clickNodeDefSaveAndBack } from '../utils/ui/nodeDefDetail'

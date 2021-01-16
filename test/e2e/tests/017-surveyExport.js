@@ -1,6 +1,10 @@
+/* @jest-environment node */
+
 import path from 'path'
 import fs from 'fs'
-import { client, toLeftOf } from 'taiko'
+import axios from 'axios'
+import * as R from 'ramda'
+import { client, toLeftOf, intercept } from 'taiko'
 import extract from 'extract-zip'
 import csvParseSync from 'csv-parse/lib/sync'
 
@@ -28,8 +32,10 @@ import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 import { records as recordsMockData } from '../resources/records/recordsData'
 import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../resources/nodeDefs/nodeDefs'
 
+axios.defaults.adapter = require('axios/lib/adapters/http')
+
 const basePath = process.env.GITHUB_WORKSPACE || __dirname
-const downloadPath = basePath //path.resolve(basePath, 'data', 'downloaded')
+const downloadPath = path.resolve(basePath, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
 const extractedPath = path.resolve(downloadPath, 'extracted')
 const surveyExtractedPath = path.resolve(extractedPath, 'survey_survey')
@@ -179,8 +185,6 @@ describe('Survey export', () => {
     await reload()
     await waitFor(5000)
 
-    fs.mkdirSync(path.join(downloadPath, 'aaaa'))
-
     await client().send('Page.setDownloadBehavior', {
       behavior: 'allow',
       downloadPath,
@@ -189,18 +193,34 @@ describe('Survey export', () => {
     await clickSidebarBtnHome()
     await expectHomeDashboard({ label: 'Survey' })
 
+    await intercept(new RegExp(/api\/survey\/[0-9]+\/export/), async (request) => {
+      const responseAuth = await axios.post('http://localhost:9000/auth/login', {
+        email: 'test@arena.com',
+        password: 'test',
+      })
+      const { headers } = responseAuth
+
+      const response = await axios({
+        url: request.request.url,
+        method: 'GET',
+        responseType: 'blob',
+        headers: {
+          Cookie: headers['set-cookie'],
+        },
+      })
+      const contentDisposition = R.path(['headers', 'content-disposition'], response)
+      const fileName = contentDisposition.slice('attachment; filename='.length)
+      fs.writeFileSync(path.join(downloadPath, fileName), response.data)
+    })
+
     await click('Export', toLeftOf('Delete'))
     await waitFor(15000)
-
-    fs.readdirSync(downloadPath).forEach((file) => {
-      console.log(file)
-    })
 
     await expect(path.join(downloadPath, 'survey_survey.zip')).toBeTruthy()
     await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
   }, 150000)
 
-  /*test('Unzip file', async () => {
+  test('Unzip file', async () => {
     await extract(surveyZipPath, { dir: extractedPath })
     await expect(fs.existsSync(extractedPath)).toBeTruthy()
     await expect(fs.existsSync(surveyExtractedPath)).toBeTruthy()
@@ -462,7 +482,7 @@ describe('Survey export', () => {
 
   test('Check files', async () => {
     await expect(true).toBeTruthy()
-  })*/
+  })
 
   test('Remove files', async () => {
     if (fs.existsSync(surveyZipPath)) {
