@@ -1,9 +1,10 @@
-/* @jest-environment node */
+/*
+ * @jest-environment node
+ */
 
 import path from 'path'
 import fs from 'fs'
 import axios from 'axios'
-import { client, toLeftOf, intercept } from 'taiko'
 import extract from 'extract-zip'
 import csvParseSync from 'csv-parse/lib/sync'
 
@@ -23,7 +24,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { waitFor, reload, click } from '../utils/api'
+import { waitFor, reload, click, expectExists, toLeftOf, intercept } from '../utils/api'
 
 import { expectHomeDashboard } from '../utils/ui/home'
 import { clickSidebarBtnHome } from '../utils/ui/sidebar'
@@ -180,19 +181,17 @@ const checkLevelAndReturnLevel = async ({ levels, categoryName, index }) => {
 }
 
 describe('Survey export', () => {
-  test('Survey require name', async () => {
+  test('Download survey zip', async () => {
     await reload()
     await waitFor(5000)
 
-    await client().send('Page.setDownloadBehavior', {
-      behavior: 'allow',
-      downloadPath,
-    })
-
     await clickSidebarBtnHome()
     await expectHomeDashboard({ label: 'Survey' })
+    await waitFor(5000)
 
-    await intercept(new RegExp(/api\/survey\/[0-9]+\/export/), async (request) => {
+    const fetchAndSaveSurvey = async (
+      request = { request: { request: { url: 'http://localhost:9000/api/survey/1/export' } } }
+    ) => {
       const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {
         email: 'test@arena.com',
         password: 'test',
@@ -210,18 +209,19 @@ describe('Survey export', () => {
 
       fs.writeFileSync(surveyZipPath, response.data)
 
-      await expect(surveyZipPath).toBeTruthy()
-      await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
-      fs.readdirSync(basePath).forEach((file) => {
+      fs.readdirSync(downloadPath).forEach((file) => {
         console.log(file)
       })
+
+      await expect(surveyZipPath).toBeTruthy()
+      await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
       request.continue({})
-    })
+    }
 
+    await intercept(new RegExp(/export/), async (request) => fetchAndSaveSurvey(request))
+
+    await expectExists({ text: 'Export' })
     await click('Export', toLeftOf('Delete'))
-    await waitFor(5000)
-
-    await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
   }, 150000)
 
   test('Unzip file', async () => {
