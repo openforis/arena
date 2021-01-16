@@ -35,10 +35,10 @@ import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../reso
 axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const basePath = process.env.GITHUB_WORKSPACE || __dirname
-const downloadPath = path.resolve(basePath, 'data', 'downloaded')
+const downloadPath = basePath //path.resolve(basePath, 'data', 'downloaded')
 const surveyZipPath = path.join(downloadPath, 'survey_survey.zip')
-const extractedPath = path.resolve(downloadPath, 'extracted')
-const surveyExtractedPath = path.resolve(extractedPath, 'survey_survey')
+const extractedPath = path.join(downloadPath, 'extracted')
+const surveyExtractedPath = path.join(extractedPath, 'survey_survey')
 
 const includeAnalysis = true
 
@@ -205,6 +205,10 @@ describe('Survey export', () => {
         headers: {
           Cookie: headers['set-cookie'],
         },
+      })
+
+      fs.readdirSync(downloadPath).forEach((file) => {
+        console.log('a', file)
       })
 
       fs.writeFileSync(surveyZipPath, response.data)
