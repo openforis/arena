@@ -76,7 +76,6 @@ const ValidationsProps = (props) => {
           label={i18n.t('nodeDefEdit.validationsProps.expressions')}
           readOnly={readOnly}
           applyIf
-          hideAdvanced
           showLabels
           severity
           values={NodeDefValidations.getExpressions(nodeDefValidations)}
@@ -89,6 +88,7 @@ const ValidationsProps = (props) => {
           }
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
+          excludeCurrentNodeDef={false}
         />
       )}
     </div>

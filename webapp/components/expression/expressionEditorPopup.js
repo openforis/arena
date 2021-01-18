@@ -25,6 +25,7 @@ const ExpressionEditorPopup = (props) => {
     mode,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
+    excludeCurrentNodeDef,
     onChange,
     onClose,
     query,
@@ -72,6 +73,7 @@ const ExpressionEditorPopup = (props) => {
         {advanced ? (
           <AdvancedExpressionEditorPopup
             nodeDefCurrent={nodeDefCurrent}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
             query={query}
             setExpressionCanBeApplied={setExpressionCanBeApplied}
             updateDraftQuery={updateDraftQuery}
@@ -84,6 +86,7 @@ const ExpressionEditorPopup = (props) => {
             exprDraftValid={exprDraftValid}
             isBoolean={isBoolean}
             nodeDefCurrent={nodeDefCurrent}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
             query={query}
             queryDraft={queryDraft}
             updateDraftExpr={updateDraftExpr}
@@ -114,8 +117,9 @@ const ExpressionEditorPopup = (props) => {
 
 ExpressionEditorPopup.propTypes = {
   canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
+  excludeCurrentNodeDef: PropTypes.bool,
   expr: PropTypes.object, // AST expression
-  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
+  header: PropTypes.node,
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   // NOTE: One of the two above is passed on component creation
@@ -124,13 +128,14 @@ ExpressionEditorPopup.propTypes = {
   onChange: PropTypes.func,
   onClose: PropTypes.func,
   query: PropTypes.string, // String representing the expression
-  header: PropTypes.node,
+  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
 }
 
 ExpressionEditorPopup.defaultProps = {
   canBeConstant: false,
+  excludeCurrentNodeDef: true,
   expr: null,
-  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
+  header: '',
   isBoolean: true,
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
@@ -138,7 +143,7 @@ ExpressionEditorPopup.defaultProps = {
   onChange: () => {},
   onClose: () => {},
   query: '',
-  header: '',
+  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
 }
 
 export default ExpressionEditorPopup
