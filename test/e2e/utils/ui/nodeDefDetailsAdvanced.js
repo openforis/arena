@@ -45,24 +45,6 @@ export const expectNodeDefDefaultValue = async ({ expression, index = 0 }) => {
   await _expectContainerTextToBe({ container, text: expression })
 }
 
-export const setNodeDefRelevantIf = async ({ binaryExpression, expression, placeholder = true }) => {
-  await click('Advanced')
-
-  const editBtnSelector = placeholder ? elements.relevantIfPlaceholderEditBtn() : elements.relevantIfEditBtn()
-  await click(editBtnSelector)
-
-  await waitFor1sec()
-
-  await setExpression({ binaryExpression, expression })
-
-  await click('Apply')
-}
-
-export const expectNodeDefRelevantIf = async ({ expression }) => {
-  const container = await elements.relevantIfExpressionQuery()
-  await _expectContainerTextToBe({ container, text: expression })
-}
-
 export const setNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }) => {
   await click('Advanced')
 
@@ -70,8 +52,6 @@ export const setNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }) =
   await waitFor1sec()
 
   await setExpression({ expression })
-
-  await click('Apply')
 }
 
 export const expectNodeDefDefaultValueApplyIf = async ({ expression, index = 0 }) => {
@@ -83,3 +63,53 @@ export const expectNodeDefDefaultValuesInvalid = async () =>
   expectExists({ selector: selectors.defaultValuesTooltip({ error: true }) })
 
 export const expectNodeDefDefaultValuesValid = async () => expectExists({ selector: selectors.defaultValuesTooltip() })
+
+export const setNodeDefRelevantIf = async ({ binaryExpression, expression, placeholder = true }) => {
+  await click('Advanced')
+
+  const editBtnSelector = placeholder ? elements.relevantIfPlaceholderEditBtn() : elements.relevantIfEditBtn()
+  await click(editBtnSelector)
+
+  await waitFor1sec()
+
+  await setExpression({ binaryExpression, expression })
+}
+
+export const expectNodeDefRelevantIf = async ({ expression }) => {
+  const container = await elements.relevantIfExpressionQuery()
+  await _expectContainerTextToBe({ container, text: expression })
+}
+
+export const expectNodeDefValidtionExpressionsCount = async ({ count: countExpected }) => {
+  const expressionItems = await elements.validationsExpressionItems()
+  const count = (await expressionItems.elements()).length
+  await expect(count).toBe(countExpected)
+}
+
+export const addNodeDefValidation = async ({ expression, binaryExpression }) => {
+  await click(elements.validationExpressionPlaceholderEditBtn())
+  await waitFor1sec()
+  await setExpression({ expression, binaryExpression })
+}
+
+export const expectNodeDefValidation = async ({ expression, index = 0 }) => {
+  const container = await elements.validationExpressionQuery({ index })
+  await _expectContainerTextToBe({ container, text: expression })
+}
+
+export const setNodeDefValidationApplyIf = async ({ expression, binaryExpression, index = 0 }) => {
+  await click(elements.validationApplyIfEditBtn({ index }))
+  await waitFor1sec()
+  await setExpression({ expression, binaryExpression })
+}
+
+export const expectNodeDefValidationApplyIf = async ({ expression, index = 0 }) => {
+  const container = await elements.validationApplyIfQuery({ index })
+  await _expectContainerTextToBe({ container, text: expression })
+}
+
+export const deleteNodeDefValidation = async ({ index = 0 } = {}) => {
+  await click(elements.validationDeleteBtn({ index }))
+  await waitFor1sec()
+  await click('Ok')
+}

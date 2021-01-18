@@ -13,4 +13,5 @@ export const setExpression = async ({ binaryExpression, expression }) => {
     await waitFor1sec()
     await setAdvancedExpression({ expression })
   }
+  await click('Apply')
 }
