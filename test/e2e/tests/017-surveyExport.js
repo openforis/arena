@@ -32,6 +32,7 @@ import { clickSidebarBtnHome } from '../utils/ui/sidebar'
 import { records as recordsMockData } from '../resources/records/recordsData'
 import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../resources/nodeDefs/nodeDefs'
 
+// https://stackoverflow.com/questions/42677387/jest-returns-network-error-when-doing-an-authenticated-request-with-axios
 axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const basePath = process.env.GITHUB_WORKSPACE || __dirname

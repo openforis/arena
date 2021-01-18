@@ -5,7 +5,8 @@ export const hoverTextBox = async ({ selector }) => hover(textBox(selector))
 
 export const writeIntoTextBox = async ({ text, selector, clearBefore = false }) => {
   if (clearBefore) {
-    await clearTextBox({ selector })
+    // await clearTextBox({ selector })
+    // clear is replaced by this select in order to replace default values
     await evaluate(textBox(selector), (element) => element.select())
   }
 
