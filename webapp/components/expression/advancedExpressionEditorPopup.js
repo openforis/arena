@@ -30,20 +30,29 @@ const validateExpression = ({ variablesIds, exprString, mode }) => {
 }
 
 const AdvancedExpressionEditorPopup = (props) => {
-  const { nodeDefCurrent, query, mode, setExpressionCanBeApplied, variables, updateDraftQuery } = props
+  const {
+    query,
+    mode,
+    setExpressionCanBeApplied,
+    variables,
+    nodeDefCurrent,
+    excludeCurrentNodeDef,
+    updateDraftQuery,
+  } = props
 
   const inputRef = useRef()
   const i18n = useI18n()
 
   const [validation, setValidation] = useState({})
 
-  // exclude variable related to current node def
-  const variablesOtherNodeDefs = variables.map((group) => ({
-    ...group,
-    options: group.options.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
-  }))
+  const variablesVisible = excludeCurrentNodeDef
+    ? variables.map((group) => ({
+        ...group,
+        options: group.options.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
+      }))
+    : variables
 
-  const variablesIds = variablesOtherNodeDefs.map(A.prop('options')).flat().map(A.prop('value'))
+  const variablesIds = variablesVisible.map(A.prop('options')).flat().map(A.prop('value'))
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
@@ -51,7 +60,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(null, mode, i18n, variablesOtherNodeDefs) },
+      hintOptions: { hint: arenaExpressionHint.bind(null, mode, i18n, variablesVisible) },
     })
     editor.setSize('100%', 'auto')
 
@@ -94,18 +103,20 @@ const AdvancedExpressionEditorPopup = (props) => {
 }
 
 AdvancedExpressionEditorPopup.propTypes = {
+  excludeCurrentNodeDef: PropTypes.bool,
+  mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
   setExpressionCanBeApplied: PropTypes.func.isRequired,
   updateDraftQuery: PropTypes.func.isRequired,
   variables: PropTypes.arrayOf(Object).isRequired, // variables grouped by parent entity
-  mode: PropTypes.string,
 }
 
 AdvancedExpressionEditorPopup.defaultProps = {
+  excludeCurrentNodeDef: true,
+  mode: Expression.modes.json,
   nodeDefCurrent: null,
   query: '',
-  mode: Expression.modes.json,
 }
 
 export default AdvancedExpressionEditorPopup
