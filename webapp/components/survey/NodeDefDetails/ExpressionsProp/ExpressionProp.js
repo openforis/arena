@@ -53,7 +53,7 @@ const ExpressionProp = (props) => {
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
-    <ValidationTooltip validation={validation} showKeys={false} className="node-def-edit__expression">
+    <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && (
           <button
