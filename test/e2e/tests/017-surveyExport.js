@@ -5,8 +5,9 @@
 import path from 'path'
 import fs from 'fs'
 import axios from 'axios'
-import extract from 'extract-zip'
-import csvParseSync from 'csv-parse/lib/sync'
+
+import { exportZip } from '@server/utils/file/fileZip'
+import { CSVReaderSync } from '@server/utils/file/csvReader'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -181,6 +182,31 @@ const checkLevelAndReturnLevel = async ({ levels, categoryName, index }) => {
   return level
 }
 
+const fetchAndSaveSurvey = async (
+  request = { request: { request: { url: 'http://localhost:9000/api/survey/1/export' } } }
+) => {
+  const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {
+    email: 'test@arena.com',
+    password: 'test',
+  })
+  const { headers } = responseAuth
+
+  const response = await axios({
+    url: request.request.url,
+    method: 'GET',
+    responseType: 'arraybuffer',
+    headers: {
+      Cookie: headers['set-cookie'],
+    },
+  })
+
+  fs.writeFileSync(surveyZipPath, response.data)
+
+  await expect(surveyZipPath).toBeTruthy()
+  await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
+  request.continue({})
+}
+
 describe('Survey export', () => {
   test('Download survey zip', async () => {
     await reload()
@@ -190,31 +216,6 @@ describe('Survey export', () => {
     await expectHomeDashboard({ label: 'Survey' })
     await waitFor(5000)
 
-    const fetchAndSaveSurvey = async (
-      request = { request: { request: { url: 'http://localhost:9000/api/survey/1/export' } } }
-    ) => {
-      const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {
-        email: 'test@arena.com',
-        password: 'test',
-      })
-      const { headers } = responseAuth
-
-      const response = await axios({
-        url: request.request.url,
-        method: 'GET',
-        responseType: 'arraybuffer',
-        headers: {
-          Cookie: headers['set-cookie'],
-        },
-      })
-
-      fs.writeFileSync(surveyZipPath, response.data)
-
-      await expect(surveyZipPath).toBeTruthy()
-      await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
-      request.continue({})
-    }
-
     await intercept(new RegExp(/export/), async (request) => fetchAndSaveSurvey(request))
 
     await expectExists({ text: 'Export' })
@@ -222,7 +223,7 @@ describe('Survey export', () => {
   }, 150000)
 
   test('Unzip file', async () => {
-    await extract(surveyZipPath, { dir: extractedPath })
+    await exportZip(surveyZipPath, extractedPath)
     await expect(fs.existsSync(extractedPath)).toBeTruthy()
     await expect(fs.existsSync(surveyExtractedPath)).toBeTruthy()
   })
@@ -428,7 +429,7 @@ describe('Survey export', () => {
     const taxonomyMockData = fs.readFileSync(
       path.resolve(__dirname, '..', 'resources', 'taxonomies', 'species list valid with predefined.csv')
     )
-    const taxonomyMockDataParsed = csvParseSync(taxonomyMockData, { columns: true, skip_empty_lines: true })
+    const taxonomyMockDataParsed = CSVReaderSync(taxonomyMockData, { columns: true, skip_empty_lines: true })
 
     const taxonomyMockDataParsedByCode = taxonomyMockDataParsed.reduce(
       (acc, taxon) => ({ ...acc, [taxon.code]: { ...taxon } }),

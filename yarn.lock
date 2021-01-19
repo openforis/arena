@@ -3255,10 +3255,10 @@ chownr@^2.0.0:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-2.0.0.tgz#15bfbe53d2eab4cf70f18a8cd68ebe5b3cb1dece"
   integrity sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==
 
-chrome-remote-interface@^0.28.1:
-  version "0.28.2"
-  resolved "https://registry.yarnpkg.com/chrome-remote-interface/-/chrome-remote-interface-0.28.2.tgz#6be3554d2c227ff07eb74baa7e5d4911da12a5a6"
-  integrity sha512-F7mjof7rWvRNsJqhVXuiFU/HWySCxTA9tzpLxUJxVfdLkljwFJ1aMp08AnwXRmmP7r12/doTDOMwaNhFCJsacw==
+chrome-remote-interface@^0.29.0:
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/chrome-remote-interface/-/chrome-remote-interface-0.29.0.tgz#4f9089f37aa2281e0e8b2d5bf03749f56f1cc85f"
+  integrity sha512-/XJCFa03p7fxZJt/Zn7eFlS6KWkghEUDRmj9hqnlUg98HYvrH+yoPMoh3IyM5M9bWs7k0noynXanhBzKrdjOoA==
   dependencies:
     commander "2.11.x"
     ws "^7.2.0"
@@ -3516,10 +3516,15 @@ commander@^4.0.1, commander@^4.1.1:
   resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.1.tgz#9fd602bd936294e9e9ef46a3f4d6964044b18068"
   integrity sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
 
-commander@^6.0.0, commander@^6.2.0:
+commander@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.0.tgz#b990bfb8ac030aedc6d11bc04d1488ffef56db75"
   integrity sha512-zP4jEKbe8SHzKJYQmq8Y9gYjtO/POJLgIdKgV7B9qNmABVFVc+ctqSX6iXh4mCpJfRBOabiZ2YKPg8ciDw6C+Q==
+
+commander@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-7.0.0.tgz#3e2bbfd8bb6724760980988fb5b22b7ee6b71ab2"
+  integrity sha512-ovx/7NkTrnPuIV8sqk/GjUIIM1+iUQeqA3ye2VNpq9sVoiZsooObWlQy+OPWGI17GDaEoybuAGJm6U8yC077BA==
 
 comment-parser@^0.7.6:
   version "0.7.6"
@@ -4261,11 +4266,6 @@ csv-generate@^3.2.4:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-3.3.0.tgz#0e25658f1bb9806d94fec7b270896a35c7eedf1a"
   integrity sha512-EXSru4QwEWKwM7wwsJbhrZC+mHEJrhQFoXlohHs80CAU8Qhlv9gaw1sjzNiC3Hr3oUx5skDmEiAlz+tnKWV0RA==
-
-csv-parse@^4.14.2:
-  version "4.14.2"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.14.2.tgz#c1329cff95a99b8773a92c4e62f8bff114b34726"
-  integrity sha512-YE2xlTKtM035/94llhgsp9qFQxGi47EkQJ1pZ+mLT/98GpIsbjkMGAb7Rmu9hNxVfYFOLf10hP+rPVqnoccLgw==
 
 csv-parse@^4.8.8:
   version "4.14.1"
@@ -5993,7 +5993,7 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-zip@^2.0.0, extract-zip@^2.0.1:
+extract-zip@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/extract-zip/-/extract-zip-2.0.1.tgz#663dca56fe46df890d5f131ef4a06d22bb8ba13a"
   integrity sha512-GDhU9ntwuKyGXdZBUgTIe+vXnWj0fppUEtMDL0+idd5Sta8TGpHssn/eusA9mrPr9qNDym6SxAYZjNvCn/9RBg==
@@ -13304,14 +13304,14 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-taiko@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.1.0.tgz#71d8f2cc59a5ebc690f0f797ca73bdf961c4e3c3"
-  integrity sha512-gGpqaKCGMDuAQ4Yl1yP9XFpTo5k2Ub1S16qEKQSNpX4HRA6HWEbjEzQl+u/rhb/7/tyIiAeDfjWClWzmTGnJsg==
+taiko@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.1.4.tgz#94e599aaa608d7f2ab200f11f9cdb5b6ec52ae9b"
+  integrity sha512-1k9TZokhdSyh7Weazovrn6UAlTVhk+02EvtQzNdsiEIbKOTFEqLi19jt6EP9vQhM8V5uNwPWC0lipKjIJngi/g==
   dependencies:
     "@babel/parser" "^7.12.7"
-    chrome-remote-interface "^0.28.1"
-    commander "^6.0.0"
+    chrome-remote-interface "^0.29.0"
+    commander "^7.0.0"
     debug "^4.3.1"
     documentation "^13.0.2"
     extract-zip "^2.0.0"
