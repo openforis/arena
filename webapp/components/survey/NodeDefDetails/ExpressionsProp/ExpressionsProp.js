@@ -16,7 +16,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {
-  const { qualifier, values, label, validation, multiple, onChange } = props
+  const { excludeCurrentNodeDef, label, multiple, onChange, qualifier, validation, values } = props
 
   const dispatch = useDispatch()
 
@@ -57,6 +57,7 @@ const ExpressionsProp = (props) => {
             <ExpressionProp
               key={i}
               {...props}
+              excludeCurrentNodeDef={excludeCurrentNodeDef}
               qualifier={qualifier}
               index={i}
               expression={value}
@@ -69,6 +70,7 @@ const ExpressionsProp = (props) => {
           {(multiple || R.isEmpty(values)) && (
             <ExpressionProp
               {...props}
+              excludeCurrentNodeDef={excludeCurrentNodeDef}
               qualifier={qualifier}
               index={values.length}
               expression={NodeDefExpression.createExpressionPlaceholder()}
@@ -89,6 +91,7 @@ ExpressionsProp.propTypes = {
   label: PropTypes.string,
   validation: PropTypes.object,
   multiple: PropTypes.bool,
+  excludeCurrentNodeDef: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
 }
 
@@ -102,6 +105,7 @@ ExpressionsProp.defaultProps = {
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
+  excludeCurrentNodeDef: true,
   values: [],
 
   validation: null,
