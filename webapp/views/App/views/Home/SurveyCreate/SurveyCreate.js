@@ -63,10 +63,16 @@ const SurveyCreate = () => {
 
       <div className="home-survey-create__collect-import">
         <UploadButton
+          label={i18n.t('homeView.surveyCreate.importFromArena')}
+          accept=".zip"
+          onChange={(files) => onImport.Arena({ file: files[0] })}
+        />
+
+        <UploadButton
           label={i18n.t('homeView.surveyCreate.importFromCollect')}
           accept=".collect,.collect-backup"
           maxSize={1000}
-          onChange={(files) => onImport({ file: files[0] })}
+          onChange={(files) => onImport.Collect({ file: files[0] })}
         />
       </div>
     </div>
