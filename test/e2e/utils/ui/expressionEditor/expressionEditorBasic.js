@@ -19,6 +19,16 @@ const _selectBinaryLeftIdentifier = async ({ identifier }) => {
   await click(identifier, below(elements.binaryLeftIdentifier()))
 }
 
+const _writeBinaryLeftConst = async ({ value }) => {
+  await click(elements.binaryLeftBtnConst())
+  await writeIntoEl({ text: value, element: elements.binaryLeftLiteral() })
+}
+
+const _selectBinaryLeftBoolean = async ({ value }) => {
+  await click(elements.binaryLeftBtnConst())
+  await click(value)
+}
+
 const _selectOperator = async ({ operator }) => {
   await click(elements.binaryOperator())
   await click(operator, within(elements.binaryOperatorDropdownList()))
@@ -35,20 +45,34 @@ const _writeBinaryRightConst = async ({ value }) => {
   await writeIntoEl({ text: value, element: elements.binaryRightLiteral() })
 }
 
+const _selectBinaryRightBoolean = async ({ value }) => {
+  await click(elements.binaryRightBtnConst())
+  await click(value)
+}
+
 export const setBinaryExpression = async ({ binaryExpression }) => {
-  const { left, operator, right } = binaryExpression
-  const { identifier: leftIdentifier } = left
-  const { identifier: rightIdentifier, constant: rightConstant } = right
+  const { left, operator, right = {} } = binaryExpression
+  const { identifier: leftIdentifier, constant: leftConstant, constantBoolean: leftConstantBoolean } = left
+  const { identifier: rightIdentifier, constant: rightConstant, constantBoolean: rightConstantBoolean } = right
 
-  if (leftIdentifier) {
+  if (leftConstant) {
+    await _writeBinaryLeftConst({ value: leftConstant })
+  } else if (leftIdentifier) {
     await _selectBinaryLeftIdentifier({ identifier: leftIdentifier })
+  } else if (leftConstantBoolean) {
+    await _selectBinaryLeftBoolean({ value: leftConstantBoolean })
   }
-  await _selectOperator({ operator })
 
-  if (rightIdentifier) {
-    await _selectBinaryRightIdentifier({ identifier: rightIdentifier })
-  } else if (rightConstant) {
+  if (operator) {
+    await _selectOperator({ operator })
+  }
+
+  if (rightConstant) {
     await _writeBinaryRightConst({ value: rightConstant })
+  } else if (rightIdentifier) {
+    await _selectBinaryRightIdentifier({ identifier: rightIdentifier })
+  } else if (rightConstantBoolean) {
+    await _selectBinaryRightBoolean({ value: leftConstantBoolean })
   }
 }
 

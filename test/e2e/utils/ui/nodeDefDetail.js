@@ -17,6 +17,8 @@ export const clickNodeDefSaveAndBack = async () => {
   await waitForLoader()
 }
 
+export const expectNodeDefUnchanged = async () => expectExists({ text: 'Back' })
+
 export const addItemToPage = async ({
   type,
   name,
