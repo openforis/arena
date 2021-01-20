@@ -9,11 +9,12 @@ import * as Survey from '@core/survey/survey'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import DownloadButton from '@webapp/components/form/downloadButton'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
 
@@ -25,6 +26,9 @@ const SurveyInfo = () => {
   const history = useHistory()
 
   const surveyInfo = useSurveyInfo()
+
+  const surveyId = useSurveyId()
+
   const canEditDef = useAuthCanEditSurvey()
 
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
@@ -47,6 +51,12 @@ const SurveyInfo = () => {
           </Link>
 
           {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
+
+          <DownloadButton
+            className="btn-transparent"
+            href={`/api/survey/${surveyId}/export/`}
+            label={i18n.t('common.export')}
+          />
 
           {canEditDef && (
             <button className="btn-s btn-transparent" type="button" onClick={() => setShowDeleteDialog(true)}>

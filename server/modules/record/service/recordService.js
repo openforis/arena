@@ -40,6 +40,7 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
 
 export const fetchRecordsUuidAndCycle = RecordManager.fetchRecordsUuidAndCycle
 export const fetchRecordByUuid = RecordManager.fetchRecordByUuid
+export const fetchRecordAndNodesByUuid = RecordManager.fetchRecordAndNodesByUuid
 export const countRecordsBySurveyId = RecordManager.countRecordsBySurveyId
 export const fetchRecordsSummaryBySurveyId = RecordManager.fetchRecordsSummaryBySurveyId
 export const fetchRecordCreatedCountsByDates = RecordManager.fetchRecordCreatedCountsByDates
@@ -59,7 +60,7 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
 
   // Notify other users viewing or editing the record it has been deleted
   const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
-  socketIds.forEach(socketIdCurrent => {
+  socketIds.forEach((socketIdCurrent) => {
     if (socketIdCurrent !== socketId) {
       WebSocket.notifyUser(socketIdCurrent, WebSocketEvents.recordDelete, recordUuid)
     }
@@ -70,7 +71,7 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
   const counts = await Promise.all(
-    surveyIds.map(surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)),
+    surveyIds.map((surveyId) => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours))
   )
   return R.sum(counts)
 }
@@ -137,7 +138,7 @@ export const persistNode = async (socketId, user, surveyId, node, file) => {
       file.size,
       fs.readFileSync(file.tempFilePath),
       recordUuid,
-      Node.getUuid(node),
+      Node.getUuid(node)
     )
     await FileManager.insertFile(surveyId, fileObj)
   }

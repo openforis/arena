@@ -1,5 +1,3 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { click, dragAndDrop, expectExists, getElement, reload, waitFor1sec } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import {
@@ -12,6 +10,7 @@ import {
 } from '../utils/ui/nodeDefDetail'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormItemNames } from '../utils/ui/surveyForm'
+import { regionNodeDef, provinceNodeDef } from '../resources/nodeDefs/nodeDefs'
 
 const category = 'administrative_unit'
 
@@ -26,7 +25,7 @@ describe('SurveyForm edit: Plot code children', () => {
   test('Plot add code attribute "region"', async () => {
     await _goToPlotPage()
 
-    await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'region', label: 'Region', saveAndBack: false })
+    await addItemToPage({ ...regionNodeDef, saveAndBack: false })
 
     await selectNodeDefCategory({ category })
 
@@ -52,7 +51,7 @@ describe('SurveyForm edit: Plot code children', () => {
   })
 
   test('Plot add code attribute "province"', async () => {
-    await addItemToPage({ type: NodeDef.nodeDefType.code, name: 'province', label: 'Province', saveAndBack: false })
+    await addItemToPage({ ...provinceNodeDef, saveAndBack: false })
 
     await selectNodeDefCategory({ category })
 

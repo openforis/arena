@@ -14,6 +14,11 @@ const Cluster = ({ clusterId, clusterDecimal, clusterTime, clusterBoolean, clust
     x: clusterCoordinate.x,
     y: clusterCoordinate.y,
     srs: clusterCoordinate.srs,
+    value: {
+      x: clusterCoordinate.x,
+      y: clusterCoordinate.y,
+      srs: clusterCoordinate.srs,
+    },
     label: 'Cluster coordinate',
   },
 ]
