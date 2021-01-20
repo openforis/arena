@@ -1,6 +1,10 @@
 import * as fs from 'fs'
 import { parse as csvParser } from 'csv'
 
+// the next library is imported from 'csv' https://www.npmjs.com/package/csv
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import csvParseSync from 'csv-parse/lib/sync'
+
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 
@@ -17,7 +21,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
        * Executes the specified function fn in a try catch.
        * Calls "reject" if the execution throws an error.
        */
-      const _tryOrCancel = async fnPromise => {
+      const _tryOrCancel = async (fnPromise) => {
         try {
           await fnPromise
         } catch (error) {
@@ -26,14 +30,14 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         }
       }
 
-      const _indexRowByHeaders = row =>
+      const _indexRowByHeaders = (row) =>
         headers
           ? headers.reduce(
               (accRow, header, index) =>
                 Object.assign(accRow, {
                   [header]: StringUtils.trim(row[index]),
                 }),
-              {},
+              {}
             )
           : row
 
@@ -56,7 +60,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         })()
       }
 
-      const onData = data => {
+      const onData = (data) => {
         if (jobStatus.canceled) return resolve()
 
         // Skip first row (headers)
@@ -70,11 +74,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         else processQueue()
       }
 
-      stream
-        .pipe(csvParser())
-        .on('data', onData)
-        .on('end', onEnd)
-        .on('error', reject)
+      stream.pipe(csvParser()).on('data', onData).on('end', onEnd).on('error', reject)
     })
 
   const cancel = () => {
@@ -88,10 +88,10 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
 export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
   createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
 
-export const readHeadersFromStream = async stream => {
+export const readHeadersFromStream = async (stream) => {
   let result = []
 
-  const reader = createReaderFromStream(stream, headers => {
+  const reader = createReaderFromStream(stream, (headers) => {
     reader.cancel()
     result = headers
   })
@@ -99,3 +99,5 @@ export const readHeadersFromStream = async stream => {
 
   return result
 }
+
+export const CSVReaderSync = csvParseSync

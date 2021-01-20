@@ -1,3 +1,5 @@
+import * as Survey from '@core/survey/survey'
+
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -22,10 +24,12 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const exportSurvey = async ({ surveyId, res }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, null, true)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyName = Survey.getName(surveyInfo)
 
   const files = []
-  const prefix = `survey_${surveyId}`
+  const prefix = `survey_${surveyName}`
 
   // Survey
   files.push({ data: JSON.stringify(survey, null, 2), name: FileUtils.join(prefix, `survey.json`) })
@@ -55,7 +59,7 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     taxonomies.map(async (taxonomy) => {
-      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomy.uuid)
+      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomy.uuid, true)
       files.push({
         data: JSON.stringify(taxaData, null, 2),
         name: FileUtils.join(taxonomiesPathDir, `${taxonomy.uuid}.json`),
@@ -71,7 +75,8 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     records.map(async (record) => {
-      const recordData = await RecordService.fetchRecordByUuid(surveyId, record.uuid)
+      const recordData = await RecordService.fetchRecordAndNodesByUuid(surveyId, record.uuid, true)
+
       files.push({
         data: JSON.stringify(recordData, null, 2),
         name: FileUtils.join(recordsPathDir, `${record.uuid}.json`),
@@ -87,7 +92,12 @@ export const exportSurvey = async ({ surveyId, res }) => {
 
   await Promise.all(
     chains.map(async (chain) => {
-      const chainData = await AnalysisService.fetchChain({ surveyId, chainUuid: chain.uuid })
+      const chainData = await AnalysisService.fetchChain({
+        surveyId,
+        chainUuid: chain.uuid,
+        includeStepsAndCalculations: true,
+        includeScript: true,
+      })
       files.push({
         data: JSON.stringify(chainData, null, 2),
         name: FileUtils.join(chainsPathDir, `${chain.uuid}.json`),

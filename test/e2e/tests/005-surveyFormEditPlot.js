@@ -7,15 +7,13 @@ import {
   expectSurveyFormHasOnlyAndInOrderThesePages,
 } from '../utils/ui/surveyFormPage'
 
-const nodeDefItems = [
-  { type: 'integer', name: 'plot_id', label: 'Plot id', isKey: true },
-  { type: 'text', name: 'plot_text', label: 'Plot text', isKey: false },
-  { type: 'file', name: 'plot_file', label: 'Plot file', isKey: false },
-]
+import { basePlotNodeDefItems, plotNodeDef } from '../resources/nodeDefs/nodeDefs'
+
+const nodeDefItems = basePlotNodeDefItems
 
 describe('SurveyForm edit Plot', () => {
   test('Plot create', async () => {
-    const subPageValues = { name: 'plot', label: 'Plot', isMultiple: true }
+    const subPageValues = plotNodeDef
     await addSurveyFormSubPage({ values: subPageValues })
     await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
     await expectCurrentPageIs({ name: 'plot' })
