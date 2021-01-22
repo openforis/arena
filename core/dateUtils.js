@@ -26,6 +26,12 @@ export {
   subYears,
 } from 'date-fns'
 
+export const formats = {
+  dateDefault: 'dd/MM/yyyy',
+  dateISO: 'yyyy-MM-dd',
+  datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
+}
+
 const normalizeDateTimeValue = (length) => (value) =>
   R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
 
@@ -101,9 +107,18 @@ export const isValidDateInFormat = (dateStr, format) => {
 
 export const formatDate = (day, month, year) =>
   `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
+export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
+export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
+export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo }) => {
+  if (!dateStr) {
+    return null
+  }
+  const dateParsed = parse(dateStr, formatFrom)
+  return format(dateParsed, formatTo)
+}
 
-export const nowFormatDefault = () => format(Date.now(), 'yyyy-MM-dd_HH-mm-ss')
+export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)
