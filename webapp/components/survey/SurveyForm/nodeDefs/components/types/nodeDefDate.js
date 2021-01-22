@@ -5,7 +5,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
-import * as DateUtils from '@core/dateUtils'
 
 import DateInput from '@webapp/components/form/DateInput'
 
@@ -14,13 +13,10 @@ const NodeDefDate = (props) => {
 
   const node = entry ? nodes[0] : null
 
-  const nodeValue = Node.getValue(node, DateUtils.format(new Date(), 'dd/MM/yyyy'))
+  const nodeValue = Node.getValue(node, null)
 
   const handleChangeDateInput = (newDate) => {
-    const newDateSplited = newDate.split('/')
-    if (newDateSplited.length === 3) {
-      updateNode(nodeDef, node, newDate)
-    }
+    updateNode(nodeDef, node, newDate)
   }
 
   return (
