@@ -6,7 +6,7 @@ import path from 'path'
 import fs from 'fs'
 import axios from 'axios'
 
-import { exportZip } from '@server/utils/file/fileZip'
+import { extractZip } from '@server/utils/file/fileZip'
 import { CSVReaderSync } from '@server/utils/file/csvReader'
 
 import * as Survey from '@core/survey/survey'
@@ -223,7 +223,7 @@ describe('Survey export', () => {
   }, 150000)
 
   test('Unzip file', async () => {
-    await exportZip(surveyZipPath, extractedPath)
+    await extractZip(surveyZipPath, extractedPath)
     await expect(fs.existsSync(extractedPath)).toBeTruthy()
     await expect(fs.existsSync(surveyExtractedPath)).toBeTruthy()
   })
@@ -487,12 +487,6 @@ describe('Survey export', () => {
   })
 
   test('Remove files', async () => {
-    if (fs.existsSync(surveyZipPath)) {
-      fs.rmdirSync(surveyZipPath, { recursive: true })
-    }
-
-    await expect(fs.existsSync(surveyZipPath)).not.toBeTruthy()
-
     if (fs.existsSync(path.join(downloadPath, 'extracted'))) {
       fs.rmdirSync(path.join(downloadPath, 'extracted'), { recursive: true })
     }

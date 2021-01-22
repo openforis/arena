@@ -1,16 +1,8 @@
 import * as Request from '@server/utils/request'
 
-/*import * as JobUtils from '@server/job/jobUtils'
+import * as JobUtils from '@server/job/jobUtils'
 
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as Response from '@server/utils/response'
-
-import * as DateUtils from '@core/dateUtils'
-import * as Survey from '@core/survey/survey'
-import * as CollectImportService from '../service/collectImportService'
-import * as AuthMiddleware from '../../auth/authApiMiddleware'*/
+import * as ArenaImportService from '../service/arenaImportService'
 
 export const init = (app) => {
   // CREATE
@@ -20,11 +12,10 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const file = Request.getFile(req)
 
-      //const job = CollectImportService.startCollectImportJob(user, file.tempFilePath)
+      const job = ArenaImportService.startArenaImportJob(user, file.tempFilePath)
 
       res.json({
-        job: file.tempFilePath,
-        //JobUtils.jobToJSON(job)
+        job: JobUtils.jobToJSON(job),
       })
     } catch (error) {
       next(error)

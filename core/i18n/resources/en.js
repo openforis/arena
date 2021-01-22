@@ -813,6 +813,8 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    // import arena survey
+    ArenaSurveyReaderJob: 'Arena Survey Reader',
   },
 
   // ====== App Errors

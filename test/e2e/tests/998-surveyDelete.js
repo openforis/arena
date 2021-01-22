@@ -1,21 +1,4 @@
-import { click, clickParent, getElement, writeIntoTextBox } from '../utils/api'
-import { clickHeaderBtnMySurveys } from '../utils/ui/header'
-import { waitForLoader } from '../utils/ui/loader'
-
-const deleteSurvey = async ({ name, label }) => {
-  await waitForLoader()
-  await clickHeaderBtnMySurveys()
-  await clickParent(label)
-
-  await waitForLoader()
-  await click('Delete')
-
-  await waitForLoader()
-  await writeIntoTextBox({ text: name, selector: { class: 'confirm-name' } })
-  await click(await getElement({ selector: '.btn-danger' }))
-
-  await waitForLoader()
-}
+import { deleteSurvey } from '../utils/ui/deleteSurvey'
 
 describe('Survey delete', () => {
   test('delete a survey with name "survey_2" and label "Survey 2"', async () => {

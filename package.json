@@ -120,7 +120,6 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.10",
     "express-session": "^1.17.0",
-    "extract-zip": "^2.0.1",
     "file-saver": "^2.0.2",
     "i18next": "^19.7.0",
     "is-valid-coordinates": "^1.0.0",
