@@ -814,6 +814,7 @@ $t(common.cantUndoWarning)`,
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
     // import arena survey
+    ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',
   },
 
