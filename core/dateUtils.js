@@ -105,8 +105,6 @@ export const isValidDateInFormat = (dateStr, format) => {
   return !isNaN(parsed.getTime())
 }
 
-export const formatDate = (day, month, year) =>
-  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
 export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
