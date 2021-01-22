@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
 
 import Job from '@server/job/job'
@@ -27,9 +26,10 @@ export default class SurveyCreatorJob extends Job {
     const label = Survey.getLabel(surveyInfo, defaultLanguage)
 
     const descriptions = Survey.getDescriptions(surveyInfo)
+    const ownerUuid = Survey.getOwnerUuid(surveyInfo)
 
     const newSurveyInfo = Survey.newSurvey({
-      ownerUuid: User.getUuid(this.user),
+      [Survey.infoKeys.ownerUuid]: ownerUuid,
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.languages]: languages,
       [Survey.infoKeys.descriptions]: descriptions,

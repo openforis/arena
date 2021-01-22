@@ -31,7 +31,7 @@ describe('SurveyForm Preview', () => {
     await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
   })
 
-  test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }), 40000)
+  test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }), 50000)
 
   test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }), 40000)
 
