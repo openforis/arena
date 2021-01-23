@@ -27,7 +27,9 @@ describe('SurveyForm Preview', () => {
   })
 
   test('Open preview', async () => {
+    await waitFor(3000)
     await click('Preview')
+    await waitFor(3000)
     await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
     await waitFor(3000)
   })
