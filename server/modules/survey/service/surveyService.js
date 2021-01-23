@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -8,6 +9,8 @@ import * as CategoryService from '@server/modules/category/service/categoryServi
 import * as RecordService from '@server/modules/record/service/recordService'
 import * as AnalysisService from '@server/modules/analysis/service'
 import * as FileService from '@server/modules/record/service/fileService'
+import * as UserService from '@server/modules/user/service/userService'
+import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 
 import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../manager/surveyManager'
@@ -23,7 +26,7 @@ export const startPublishJob = (user, surveyId) => {
   return job
 }
 
-export const exportSurvey = async ({ surveyId, res }) => {
+export const exportSurvey = async ({ surveyId, res, user }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, null, true)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)
@@ -116,6 +119,39 @@ export const exportSurvey = async ({ surveyId, res }) => {
       })
     })
   )
+
+  // Users
+  const usersPathDir = FileUtils.join(prefix, 'users')
+  const usersPathFile = FileUtils.join(usersPathDir, 'users.json')
+  const usersProfilePicturePathDir = FileUtils.join(usersPathDir, 'profilepictures')
+
+  const users = await UserService.fetchUsersBySurveyId(user, surveyId)
+  files.push({ data: JSON.stringify(users, null, 2), name: usersPathFile })
+  await Promise.all(
+    users.map(async (_user) => {
+      const userData = await UserService.fetchUserByUuid(User.getUuid(_user))
+
+      files.push({
+        data: JSON.stringify(userData, null, 2),
+        name: FileUtils.join(usersPathDir, `${User.getUuid(_user)}.json`),
+      })
+
+      if (User.hasProfilePicture(userData)) {
+        const userProfilePicture = await UserService.fetchUserProfilePicture(User.getUuid(userData))
+        files.push({
+          data: userProfilePicture,
+          name: FileUtils.join(usersProfilePicturePathDir, `${User.getUuid(userData)}`), // the file is stored in binary
+        })
+      }
+    })
+  )
+
+  // Activity Log
+  const activityLogPathDir = FileUtils.join(prefix, 'activitylog')
+  const activityLogPathFile = FileUtils.join(activityLogPathDir, 'activitylog.json')
+
+  const activityLog = await ActivityLogService.fetch({ user, surveyId, limit: 'ALL' })
+  files.push({ data: JSON.stringify(activityLog, null, 2), name: activityLogPathFile })
 
   Response.sendFilesAsZip(res, `${prefix}.zip`, files)
 }

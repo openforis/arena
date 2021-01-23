@@ -19,7 +19,7 @@ export const init = (app) => {
       const { surveyId, idGreaterThan, idLessThan } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const activityLogs = await ActivityLogService.fetch(user, surveyId, idGreaterThan, idLessThan)
+      const activityLogs = await ActivityLogService.fetch({ user, surveyId, idGreaterThan, idLessThan })
 
       res.json({ activityLogs })
     } catch (error) {
