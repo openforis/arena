@@ -20,10 +20,12 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as User from '@core/user/user'
 
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { waitFor, reload, click, expectExists, toLeftOf, intercept } from '../utils/api'
 
@@ -484,6 +486,32 @@ describe('Survey export', () => {
 
   test('Check files', async () => {
     await expect(true).toBeTruthy()
+  })
+
+  test('Check activityLog', async () => {
+    const activityLog = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'activitylog', 'activitylog.json'),
+    })
+
+    const activitiesAsArray = Object.values(activityLog)
+
+    await expect(activitiesAsArray.length).toBeGreaterThan(1)
+
+    const [lastActivity] = activitiesAsArray.reverse()
+    await expect(ActivityLog.getType(lastActivity)).toBe(ActivityLog.type.surveyCreate)
+  })
+
+  test('Check users', async () => {
+    const users = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'users', 'users.json'),
+    })
+
+    const usersAsArray = Object.values(users)
+
+    await expect(usersAsArray.length).toBe(2)
+
+    const tester = usersAsArray.find((_user) => User.getEmail(_user) === 'test@arena.com')
+    await expect(tester).toBeTruthy()
   })
 
   test('Remove files', async () => {
