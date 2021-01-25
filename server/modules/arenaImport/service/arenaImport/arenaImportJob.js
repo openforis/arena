@@ -5,10 +5,12 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import AarenaSurveyReaderJob from './metaImportJobs/arenaSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
+// import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
+import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 
 export default class ArenaImportJob extends Job {
   constructor(params) {
-    super(ArenaImportJob.type, params, [new AarenaSurveyReaderJob(), new SurveyCreatorJob()])
+    super(ArenaImportJob.type, params, [new AarenaSurveyReaderJob(), new SurveyCreatorJob(), new TaxonomiesImportJob()])
   }
 
   async beforeSuccess() {

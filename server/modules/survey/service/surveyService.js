@@ -57,7 +57,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   // Taxonomy
   const taxonomiesPathDir = FileUtils.join(prefix, 'taxonomies')
   const taxonomiesPathFile = FileUtils.join(taxonomiesPathDir, 'taxonomies.json')
-  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId })
+  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true })
   files.push({ data: JSON.stringify(taxonomies, null, 2), name: taxonomiesPathFile })
 
   await Promise.all(
