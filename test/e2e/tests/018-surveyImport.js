@@ -7,16 +7,16 @@ import { extractZip } from '@server/utils/file/fileZip'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
-import { click, expectExists, fileSelect, getElement, intercept, reload, toLeftOf, waitFor } from '../utils/api'
-import { expectHomeDashboard } from '../utils/ui/home'
-import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
-import { clickHeaderBtnCreateSurvey } from '../utils/ui/header'
-import { deleteSurvey } from '../utils/ui/deleteSurvey'
 import * as Chain from '@common/analysis/processingChain'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { CSVReaderSync } from '@server/utils/file/csvReader'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import { click, expectExists, fileSelect, getElement, intercept, reload, toLeftOf, waitFor } from '../utils/api'
+import { expectHomeDashboard } from '../utils/ui/home'
+import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
+import { clickHeaderBtnCreateSurvey } from '../utils/ui/header'
+import { deleteSurvey } from '../utils/ui/deleteSurvey'
 
 /*
 
@@ -31,7 +31,7 @@ let surveyZipPath = ''
 let extractedPath = ''
 let surveyExtractedPath = ''
 
-const includeAnalysis = true
+// const includeAnalysis = true
 
 const checkFileAndGetContent = async ({ filePath }) => {
   await expect(fs.existsSync(filePath)).toBeTruthy()
@@ -147,19 +147,19 @@ describe('Survey import', () => {
 
     const usersAsArray = Object.values(users)
 
-    await expect(usersAsArray.length).toBe(2)
+    await expect(usersAsArray.length).toBe(1)
 
     const tester = usersAsArray.find((_user) => User.getEmail(_user) === 'test@arena.com')
     await expect(tester).toBeTruthy()
   })
 
-  /*test('Remove files', async () => {
+  /* test('Remove files', async () => {
     if (fs.existsSync(path.join(downloadPath, 'extracted'))) {
       fs.rmdirSync(path.join(downloadPath, 'extracted'), { recursive: true })
     }
 
     await expect(fs.existsSync(path.join(downloadPath, 'extracted'))).not.toBeTruthy()
-  })*/
+  }) */
 
   test('Check taxonomies', async () => {
     const taxonomies = await checkFileAndGetContent({

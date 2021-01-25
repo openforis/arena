@@ -508,7 +508,7 @@ describe('Survey export', () => {
 
     const usersAsArray = Object.values(users)
 
-    await expect(usersAsArray.length).toBe(2)
+    await expect(usersAsArray.length).toBe(1)
 
     const tester = usersAsArray.find((_user) => User.getEmail(_user) === 'test@arena.com')
     await expect(tester).toBeTruthy()
