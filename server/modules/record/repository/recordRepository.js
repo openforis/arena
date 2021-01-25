@@ -14,7 +14,7 @@ import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositor
 
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
+const dbTransformCallback = (surveyId, includeValidationFields = true) => (record) => {
   const validation = Record.getValidation(record)
   return R.pipe(
     R.dissoc(Validation.keys.validation),
@@ -27,15 +27,15 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
         : {
             ...Validation.newInstance(Validation.isValid(validation)),
             [Validation.keys.counts]: Validation.getCounts(validation),
-          },
-    ),
+          }
+    )
   )(record)
 }
 
 // ============== CREATE
 
 export const insertRecord = async (surveyId, record, client = db) =>
-  await client.one(
+  client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
     (owner_uuid, uuid, step, cycle, preview, date_created)
@@ -51,19 +51,19 @@ export const insertRecord = async (surveyId, record, client = db) =>
       Record.getDateCreated(record) || new Date(),
       surveyId,
     ],
-    dbTransformCallback(surveyId),
+    dbTransformCallback(surveyId)
   )
 
 // ============== READ
 
 export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
-  await client.one(
+  client.one(
     `
       SELECT count(*) 
       FROM ${getSurveyDBSchema(surveyId)}.record 
       WHERE preview = FALSE AND cycle = $1
     `,
-    [cycle],
+    [cycle]
   )
 
 export const fetchRecordsSummaryBySurveyId = async (
@@ -73,17 +73,17 @@ export const fetchRecordsSummaryBySurveyId = async (
   nodeDefKeys,
   offset = 0,
   limit = null,
-  client = db,
+  client = db
 ) => {
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColName = NodeDefTable.getColName
   const getNodeDefKeyColAlias = NodeDef.getName
   const nodeDefKeysSelect = nodeDefKeys
     .map(
-      nodeDefKey =>
-        `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`,
+      (nodeDefKey) =>
+        `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
     )
-    .join(',')
+    .join(', ')
 
   const recordsSelect = `
     SELECT 
@@ -95,19 +95,18 @@ export const fetchRecordsSummaryBySurveyId = async (
     FROM ${getSurveyDBSchema(surveyId)}.record r
     WHERE r.preview = FALSE AND r.cycle = $2
     ORDER BY r.date_created DESC
-    LIMIT ${limit ? limit : 'ALL'}
+    LIMIT ${limit || 'ALL'}
     OFFSET ${offset}
   `
 
-  return await client.map(
+  return client.map(
     `
     WITH r AS (${recordsSelect})
     SELECT 
       r.*,
       s.uuid AS survey_uuid,
       n.date_modified,
-      u.name as owner_name,
-      ${nodeDefKeysSelect}
+      u.name as owner_name${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
     FROM  r
     -- GET SURVEY UUID
     JOIN survey s
@@ -132,28 +131,28 @@ export const fetchRecordsSummaryBySurveyId = async (
     ORDER BY r.date_created DESC
   `,
     [surveyId, cycle],
-    dbTransformCallback(surveyId, false),
+    dbTransformCallback(surveyId, false)
   )
 }
 
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
-  await client.one(
+  client.one(
     `SELECT 
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
     [recordUuid, surveyId],
-    dbTransformCallback(surveyId),
+    dbTransformCallback(surveyId)
   )
 
 export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
-  await client.any(`
+  client.any(`
     SELECT uuid, cycle 
     FROM ${getSurveyDBSchema(surveyId)}.record 
     WHERE preview = FALSE
   `)
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
-  await client.any(
+  client.any(
     `
     SELECT
       COUNT(r.uuid),
@@ -171,53 +170,53 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
     ORDER BY
       date_trunc('day', r.date_created)
   `,
-    [from, to, cycle],
+    [from, to, cycle]
   )
 
 // ============== UPDATE
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
-  await client.one(
+  client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.record 
      SET validation = $1::jsonb
      WHERE uuid = $2
     RETURNING ${recordSelectFields}`,
-    [validation, recordUuid],
+    [validation, recordUuid]
   )
 
 export const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
-  await client.none(
+  client.none(
     `
       UPDATE ${getSurveyDBSchema(surveyId)}.record
       SET step = $1
       WHERE uuid = $2`,
-    [step, recordUuid],
+    [step, recordUuid]
   )
 
 export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
-  await client.none(
+  client.none(
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'record',
       { name: 'uuid', cast: 'uuid' },
       [{ name: 'validation', cast: 'jsonb' }],
-      recordUuidAndValidationValues,
-    ),
+      recordUuidAndValidationValues
+    )
   )
 
 // ============== DELETE
 
 export const deleteRecord = async (surveyId, recordUuid, client = db) =>
-  await client.query(
+  client.query(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE uuid = $1
     `,
-    [recordUuid],
+    [recordUuid]
   )
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, client = db) =>
-  await client.map(
+  client.map(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE preview = $1
@@ -225,16 +224,16 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, c
     RETURNING uuid
     `,
     [true],
-    R.prop('uuid'),
+    R.prop('uuid')
   )
 
 export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
-  await client.map(
+  client.map(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE cycle IN ($1:csv)
     RETURNING uuid
   `,
     [cycles],
-    R.prop('uuid'),
+    R.prop('uuid')
   )
