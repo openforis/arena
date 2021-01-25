@@ -1,11 +1,80 @@
-import { expectExists, fileSelect, getElement, reload, waitFor } from '../utils/api'
+import fs from 'fs'
+import path from 'path'
+import axios from 'axios'
+
+import { extractZip } from '@server/utils/file/fileZip'
+
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+
+import { click, expectExists, fileSelect, getElement, intercept, reload, toLeftOf, waitFor } from '../utils/api'
 import { expectHomeDashboard } from '../utils/ui/home'
 import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
 import { clickHeaderBtnCreateSurvey } from '../utils/ui/header'
 import { deleteSurvey } from '../utils/ui/deleteSurvey'
+import * as Chain from '@common/analysis/processingChain'
+import * as Taxonomy from '@core/survey/taxonomy'
+import { CSVReaderSync } from '@server/utils/file/csvReader'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+
+/*
+
+
+ */
+// https://stackoverflow.com/questions/42677387/jest-returns-network-error-when-doing-an-authenticated-request-with-axios
+axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const basePath = process.env.GITHUB_WORKSPACE || __dirname
 const downloadPath = basePath
+let surveyZipPath = ''
+let extractedPath = ''
+let surveyExtractedPath = ''
+
+const includeAnalysis = true
+
+const checkFileAndGetContent = async ({ filePath }) => {
+  await expect(fs.existsSync(filePath)).toBeTruthy()
+  const content = fs.readFileSync(filePath, 'utf8')
+  return JSON.parse(content)
+}
+
+const getSurvey = () => {
+  const contentSurvey = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
+  const survey = JSON.parse(contentSurvey)
+  return survey
+}
+
+const fetchAndSaveSurvey = async (
+  request = { request: { request: { url: 'http://localhost:9000/api/survey/1/export' } } }
+) => {
+  const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {
+    email: 'test@arena.com',
+    password: 'test',
+  })
+  const { headers } = responseAuth
+
+  const response = await axios({
+    url: request.request.url,
+    method: 'GET',
+    responseType: 'arraybuffer',
+    headers: {
+      Cookie: headers['set-cookie'],
+    },
+  })
+
+  fs.writeFileSync(surveyZipPath, response.data)
+
+  await expect(surveyZipPath).toBeTruthy()
+  await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
+  request.continue({})
+}
+
+/*
+
+
+
+ */
 const fileZipName = 'survey_survey.zip'
 // const surveyZipPath = path.join(downloadPath, fileZipName)
 
@@ -42,6 +111,107 @@ describe('Survey import', () => {
 
     await expectExists({ text: 'SURVEY' })
   }, 30000)
+
+  test('Export survey imported', async () => {
+    surveyZipPath = path.join(downloadPath, `survey_${surveyName}.zip`)
+    extractedPath = path.join(downloadPath, 'extracted')
+    surveyExtractedPath = path.join(extractedPath, `survey_${surveyName}`)
+
+    await intercept(new RegExp(/export/), async (request) => fetchAndSaveSurvey(request))
+
+    await expectExists({ text: 'Export' })
+    await click('Export', toLeftOf('Delete'))
+  })
+
+  test('Unzip file', async () => {
+    await extractZip(surveyZipPath, extractedPath)
+    await expect(fs.existsSync(extractedPath)).toBeTruthy()
+    await expect(fs.existsSync(surveyExtractedPath)).toBeTruthy()
+  })
+
+  test('Check survey.json', async () => {
+    await expect(fs.existsSync(path.join(surveyExtractedPath, 'survey.json'))).toBeTruthy()
+    const survey = getSurvey()
+    await expect(Survey.getName(Survey.getSurveyInfo(survey))).toBe(surveyName)
+    await expect(Survey.getLabels(Survey.getSurveyInfo(survey))).toMatchObject({
+      en: 'Survey',
+    })
+    const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
+    await expect(languages.sort()).toEqual(['en', 'fr'].sort())
+  })
+
+  test('Check users in imported survey', async () => {
+    const users = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'users', 'users.json'),
+    })
+
+    const usersAsArray = Object.values(users)
+
+    await expect(usersAsArray.length).toBe(2)
+
+    const tester = usersAsArray.find((_user) => User.getEmail(_user) === 'test@arena.com')
+    await expect(tester).toBeTruthy()
+  })
+
+  /*test('Remove files', async () => {
+    if (fs.existsSync(path.join(downloadPath, 'extracted'))) {
+      fs.rmdirSync(path.join(downloadPath, 'extracted'), { recursive: true })
+    }
+
+    await expect(fs.existsSync(path.join(downloadPath, 'extracted'))).not.toBeTruthy()
+  })*/
+
+  test('Check taxonomies', async () => {
+    const taxonomies = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'taxonomies', 'taxonomies.json'),
+    })
+
+    const taxonomiesAsArray = Object.values(taxonomies)
+
+    await expect(taxonomiesAsArray.length).toBe(1)
+
+    const taxonomyUuid = Chain.getUuid(taxonomiesAsArray[0])
+    await expect(Taxonomy.getName(taxonomiesAsArray[0])).toBe('tree_species')
+    await expect(Taxonomy.getDescription('en')(taxonomiesAsArray[0])).toBe('Tree Species List')
+
+    const taxonomy = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`),
+    })
+
+    const taxonomyMockData = fs.readFileSync(
+      path.resolve(__dirname, '..', 'resources', 'taxonomies', 'species list valid with predefined.csv')
+    )
+    const taxonomyMockDataParsed = CSVReaderSync(taxonomyMockData, { columns: true, skip_empty_lines: true })
+
+    const taxonomyMockDataParsedByCode = taxonomyMockDataParsed.reduce(
+      (acc, taxon) => ({ ...acc, [taxon.code]: { ...taxon } }),
+      {}
+    )
+    const taxonomyTaxaByCode = taxonomy.reduce((acc, taxon) => ({ ...acc, [Taxon.getCode(taxon)]: { ...taxon } }), {})
+
+    await expect(Object.keys(taxonomyMockDataParsedByCode).sort()).toEqual(Object.keys(taxonomyTaxaByCode).sort())
+
+    await taxonomy.reduce(async (promise, taxon) => {
+      await promise
+      return (async () => {
+        const code = Taxon.getCode(taxon)
+        await expect(code).toBe(taxonomyMockDataParsedByCode[code].code)
+        await expect(Taxon.getGenus(taxon)).toBe(taxonomyMockDataParsedByCode[code].genus)
+        await expect(Taxon.getFamily(taxon)).toBe(taxonomyMockDataParsedByCode[code].family)
+
+        await expect(Taxon.getScientificName(taxon)).toBe(taxonomyMockDataParsedByCode[code].scientific_name)
+
+        const vernacularNamesByLang = Taxon.getVernacularNames(taxon)
+
+        await expect((vernacularNamesByLang?.eng || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
+          taxonomyMockDataParsedByCode[code].eng || ''
+        )
+        await expect((vernacularNamesByLang?.swa || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
+          taxonomyMockDataParsedByCode[code].swa || ''
+        )
+      })()
+    }, true)
+  })
 
   test('delete a survey with name "survey" and label "Survey"', async () => {
     await deleteSurvey({ name: surveyName, label: 'Survey', needsToFind: false })
