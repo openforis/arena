@@ -30,7 +30,7 @@ export default class CategoriesImportJob extends Job {
 
     const categoriesArray = Object.values(categories || {})
     await Promise.all(
-      (categoriesArray || []).map(async (category) =>
+      categoriesArray.map(async (category) =>
         insertCategory({ category, user: this.user, surveyId, arenaSurveyFileZip })
       )
     )
