@@ -4,6 +4,7 @@ export const getPath = (pattern) => (entries) => entries.find((entry) => new Reg
 
 export const getPathByUuid = (uuid, extension = 'json') => (entries) =>
   entries.find((entry) => new RegExp(`${uuid}.${extension}$`).test(entry))
+
 // Survey
 export const getSurveyPath = getPath('survey.json$')
 

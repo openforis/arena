@@ -13,6 +13,7 @@ import { CSVReaderSync } from '@server/utils/file/csvReader'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import { click, expectExists, fileSelect, getElement, intercept, reload, toLeftOf, waitFor } from '../utils/api'
+
 import { expectHomeDashboard } from '../utils/ui/home'
 import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
 import { clickHeaderBtnCreateSurvey } from '../utils/ui/header'
@@ -75,6 +76,7 @@ const fetchAndSaveSurvey = async (
 
 
  */
+
 const fileZipName = 'survey_survey.zip'
 // const surveyZipPath = path.join(downloadPath, fileZipName)
 

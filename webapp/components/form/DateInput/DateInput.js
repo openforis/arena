@@ -1,10 +1,7 @@
 import './DateInput.scss'
 
 import React, { useRef } from 'react'
-
 import PropTypes from 'prop-types'
-
-import * as DateUtils from '@core/dateUtils'
 
 import ReactDateInput from './ReactDateInput'
 
@@ -20,7 +17,7 @@ const DateInput = (props) => {
       format="DDMMYYYY"
       separator="/"
       onChange={onChange}
-      date={value || DateUtils.format(new Date(), 'dd/MM/yyyy')}
+      date={value}
     />
   )
 }

@@ -31,9 +31,11 @@ export default class ArenaImportJob extends Job {
     }
 
     if (!this.isSucceeded() && surveyId) {
-      await FileUtils.rmdir(filePath)
       await SurveyManager.dropSurveySchema(surveyId)
     }
+
+    await FileUtils.rmdir(filePath)
+
   }
 }
 
