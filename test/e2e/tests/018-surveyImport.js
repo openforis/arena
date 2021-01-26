@@ -12,6 +12,10 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { CSVReaderSync } from '@server/utils/file/csvReader'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+
 import { click, expectExists, fileSelect, getElement, intercept, reload, toLeftOf, waitFor } from '../utils/api'
 
 import { expectHomeDashboard } from '../utils/ui/home'
@@ -69,6 +73,14 @@ const fetchAndSaveSurvey = async (
   await expect(surveyZipPath).toBeTruthy()
   await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
   request.continue({})
+}
+
+const checkLevelAndReturnLevel = async ({ levels, categoryName, index }) => {
+  const level = levels.find((category) => CategoryLevel.getName(category) === categoryName)
+  await expect(level).toBeTruthy()
+  await expect(CategoryLevel.getName(level)).toBe(categoryName)
+  await expect(CategoryLevel.getIndex(level)).toBe(index)
+  return level
 }
 
 /*
@@ -211,6 +223,92 @@ describe('Survey import', () => {
         await expect((vernacularNamesByLang?.swa || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
           taxonomyMockDataParsedByCode[code].swa || ''
         )
+      })()
+    }, true)
+  })
+
+  test('Check categories', async () => {
+    await expect(fs.existsSync(path.join(surveyExtractedPath, 'categories'))).toBeTruthy()
+
+    const content = fs.readFileSync(path.join(surveyExtractedPath, 'categories', 'categories.json'), 'utf8')
+    const categories = JSON.parse(content)
+    const categoriesAsArray = Object.values(categories)
+
+    await expect(categoriesAsArray.length).toBe(1)
+
+    const administrativeUnitCategory = categoriesAsArray.find(
+      (category) => Category.getName(category) === 'administrative_unit'
+    )
+
+    const administrativeUnitUuid = Category.getUuid(administrativeUnitCategory)
+
+    await expect(
+      fs.existsSync(path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`))
+    ).toBeTruthy()
+
+    const levels = Category.getLevelsArray(administrativeUnitCategory)
+
+    await expect(levels.length).toBe(3)
+    await expect(Category.getLevelsCount(administrativeUnitCategory)).toBe(3)
+
+    const [countryLevel, regionLevel, districtLevel] = await Promise.all(
+      ['country', 'region', 'district'].map(async (categoryName, index) =>
+        checkLevelAndReturnLevel({ levels, categoryName, index })
+      )
+    )
+
+    const administrativeUnitItems = await checkFileAndGetContent({
+      filePath: path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`),
+    })
+
+    // check items countryLevel
+    const itemsCountryLevel = administrativeUnitItems.filter(
+      (item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(countryLevel)
+    )
+    await expect(itemsCountryLevel.length).toBe(1)
+
+    await itemsCountryLevel.reduce(async (promise, item) => {
+      await promise
+      return (async () => {
+        await expect(CategoryItem.getParentUuid(item)).toBe(null)
+        await expect(CategoryItem.getCode(item)).toBe('00')
+        await expect(CategoryItem.getLabel('en')(item)).toBe('Country')
+      })()
+    }, true)
+
+    // check items itemsRegionLevel
+    const itemsRegionLevel = administrativeUnitItems.filter(
+      (item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(regionLevel)
+    )
+    await expect(itemsRegionLevel.length).toBe(5)
+
+    await itemsRegionLevel.reduce(async (promise, item, index) => {
+      await promise
+      return (async () => {
+        await expect(CategoryItem.getParentUuid(item)).toBe(CategoryItem.getUuid(itemsCountryLevel[0]))
+        await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(regionLevel))
+        const code = `0${index + 1}`
+        await expect(CategoryItem.getCode(item)).toBe(`${code}`)
+        await expect(CategoryItem.getLabel('en')(item)).toBe(`Region ${code}`)
+      })()
+    }, true)
+
+    // check items itemsDistrictLevel
+    const itemsDistrictLevel = administrativeUnitItems.filter(
+      (item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(districtLevel)
+    )
+    await expect(itemsDistrictLevel.length).toBe(25)
+
+    await itemsDistrictLevel.reduce(async (promise, item, index) => {
+      await promise
+      return (async () => {
+        await expect(CategoryItem.getParentUuid(item)).toBe(
+          CategoryItem.getUuid(itemsRegionLevel[Math.floor(index / 5)])
+        )
+        await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(districtLevel))
+        const code = `0${Math.floor(index / 5) + 1}0${(index % 5) + 1}`
+        await expect(CategoryItem.getCode(item)).toBe(code)
+        await expect(CategoryItem.getLabel('en')(item)).toBe(`District ${code}`)
       })()
     }, true)
   })

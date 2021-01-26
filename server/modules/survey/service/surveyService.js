@@ -40,13 +40,13 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   // Categories
   const categoriesPathDir = FileUtils.join(prefix, 'categories')
   const categoriesPathFile = FileUtils.join(categoriesPathDir, 'categories.json')
-  const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({ surveyId })
+  const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true })
   const categoriesUuids = Object.keys(categories || {})
   files.push({ data: JSON.stringify(categories, null, 2), name: categoriesPathFile })
 
   await Promise.all(
     categoriesUuids.map(async (categoryUuid) => {
-      const itemsData = await CategoryService.fetchItemsByCategoryUuid(surveyId, categoryUuid)
+      const itemsData = await CategoryService.fetchItemsByCategoryUuid(surveyId, categoryUuid, true)
       files.push({
         data: JSON.stringify(itemsData, null, 2),
         name: FileUtils.join(categoriesPathDir, `${categoryUuid}.json`),

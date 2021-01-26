@@ -26,3 +26,16 @@ export const getTaxa = async (streamZipFile, uuid) => {
   const arenaTaxa = await streamZipFile.getEntryData(taxaPath)
   return JSON.parse(arenaTaxa)
 }
+
+// Categories
+export const getCategoriesPath = getPath('categories.json$')
+export const getCategories = async (streamZipFile) => {
+  const categoriesPath = getCategoriesPath(getPaths(streamZipFile))
+  const arenaCategories = await streamZipFile.getEntryData(categoriesPath)
+  return JSON.parse(arenaCategories)
+}
+export const getCategoryItems = async (streamZipFile, categoryUuid) => {
+  const itemsPath = getPathByUuid(categoryUuid)(getPaths(streamZipFile))
+  const items = await streamZipFile.getEntryData(itemsPath)
+  return JSON.parse(items)
+}
