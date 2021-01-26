@@ -74,10 +74,10 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   )(user)
 }
 
-export const fetch = async (user, surveyId, idGreaterThan, idLessThan) => {
+export const fetch = async ({ user, surveyId, idGreaterThan, idLessThan, limit }) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
   const activityTypes = await _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
-  return ActivityLogRepository.fetch(surveyInfo, activityTypes, idGreaterThan, idLessThan)
+  return ActivityLogRepository.fetch({ surveyInfo, activityTypes, idGreaterThan, idLessThan, limit })
 }
 
 export const { insert } = ActivityLogRepository

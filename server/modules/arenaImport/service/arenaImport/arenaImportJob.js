@@ -33,6 +33,7 @@ export default class ArenaImportJob extends Job {
     }
 
     await FileUtils.rmdir(filePath)
+
   }
 }
 

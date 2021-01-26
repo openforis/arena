@@ -86,7 +86,9 @@ export const init = (app) => {
     try {
       const { surveyId } = Request.getParams(req)
 
-      await SurveyService.exportSurvey({ surveyId, res })
+      const user = Request.getUser(req)
+
+      await SurveyService.exportSurvey({ surveyId, user, res })
     } catch (error) {
       next(error)
     }
