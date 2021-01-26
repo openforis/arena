@@ -488,6 +488,7 @@ describe('Survey export', () => {
     await expect(true).toBeTruthy()
   })
 
+
   test('Check activityLog', async () => {
     const activityLog = await checkFileAndGetContent({
       filePath: path.join(surveyExtractedPath, 'activitylog', 'activitylog.json'),
@@ -508,7 +509,7 @@ describe('Survey export', () => {
 
     const usersAsArray = Object.values(users)
 
-    await expect(usersAsArray.length).toBe(2)
+    await expect(usersAsArray.length).toBe(1)
 
     const tester = usersAsArray.find((_user) => User.getEmail(_user) === 'test@arena.com')
     await expect(tester).toBeTruthy()

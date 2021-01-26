@@ -47,6 +47,9 @@ const LABELS = {
 }
 
 const getDateValue = ({ date, format, separator }) => {
+  if (date === null) {
+    return new Date()
+  }
   const { day, month, year } = extractInfoFromDate({ date, format, separator })
   return new Date(year, month - 1, day)
 }
@@ -74,7 +77,7 @@ const DateInput = React.forwardRef(
     const dateInputContainer = useRef(null)
     const calendarContainer = useRef(null)
     const [dateInputContainerRef, setDateInputContainerRef] = useState(null)
-    const [localDate, setDate] = useState('')
+    const [localDate, setDate] = useState(null)
     const [elRefs, setElRefs] = useState([])
     const [error, setError] = useState(false)
     const [warning, setWarning] = useState(false)
@@ -110,7 +113,7 @@ const DateInput = React.forwardRef(
     useEffect(() => {
       if (date) {
         setDate(date)
-        handleValidateDate({ date })
+        handleValidateDate({ newDate: date })
       }
     }, [date])
 
@@ -199,8 +202,13 @@ const DateInput = React.forwardRef(
         }
       }
       setDate(newDate)
-      onChange(newDate)
-      handleValidateDate({ date: newDate })
+      const { isValid, isIncomplete } = validateDate({
+        date: newDate,
+        format,
+        separator,
+      })
+      onChange(!isValid || isIncomplete ? null : newDate)
+      handleValidateDate({ newDate })
     }
 
     const moveBack = ({ itemIndex }) => {

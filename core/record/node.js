@@ -57,11 +57,11 @@ export const valuePropKeys = {
   vernacularName: 'vernacularName',
 }
 
-/**
- * ======
- * READ
- * ======
- */
+//
+// ======
+// READ
+// ======
+//
 
 export const { getUuid } = ObjectUtils
 
@@ -107,11 +107,11 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 // Code metadata
 export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
 
-/**
- * ======
- * CREATE
- * ======
- */
+//
+// ======
+// CREATE
+// ======
+//
 
 export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
   [keys.uuid]: uuidv4(),
@@ -129,12 +129,11 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
   [keys.placeholder]: true,
 })
 
-/**
- * ======
- * UPDATE
- * ======
- */
-
+//
+// ======
+// UPDATE
+// ======
+//
 export const assocValue = R.assoc(keys.value)
 export const assocMeta = R.assoc(keys.meta)
 export const { assocValidation } = Validation
@@ -142,11 +141,12 @@ export const { assocValidation } = Validation
 export const mergeMeta = (meta) => (node) =>
   R.pipe(getMeta, R.mergeLeft(meta), (metaUpdated) => R.assoc(keys.meta, metaUpdated)(node))(node)
 
-/**
- * ======
- * UTILS
- * ======
- */
+//
+// ======
+// UTILS
+// ======
+//
+
 export const isValueBlank = (node) => {
   const value = getValue(node, null)
 
@@ -163,29 +163,31 @@ export const isValueBlank = (node) => {
 
 // ====== Node Value extractor
 
-// date
-export const getDateYear = R.pipe(R.partialRight(getValue, ['//']), R.split('/'), R.prop(2), StringUtils.trim)
-export const getDateMonth = R.pipe(R.partialRight(getValue, ['//']), R.split('/'), R.prop(1), StringUtils.trim)
-export const getDateDay = R.pipe(R.partialRight(getValue, ['//']), R.split('/'), R.prop(0), StringUtils.trim)
-
-// Time
-export const getTimeHour = R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(0), StringUtils.trim)
-export const getTimeMinute = R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(1), StringUtils.trim)
+// Code
+export const getCategoryItemUuid = getValueProp(valuePropKeys.itemUuid)
 
 // Coordinate
 export const getCoordinateX = getValueProp(valuePropKeys.x)
 export const getCoordinateY = getValueProp(valuePropKeys.y)
 export const getCoordinateSrs = (node, defaultValue = null) => getValueProp(valuePropKeys.srs, defaultValue)(node)
 
+// Date
+const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim)
+export const getDateYear = _getDatePart(0)
+export const getDateMonth = _getDatePart(1)
+export const getDateDay = _getDatePart(2)
+
 // File
 export const getFileName = getValueProp(valuePropKeys.fileName, '')
 export const getFileUuid = getValueProp(valuePropKeys.fileUuid, '')
-
-// Code
-export const getCategoryItemUuid = getValueProp(valuePropKeys.itemUuid)
 
 // Taxon
 export const getTaxonUuid = getValueProp(valuePropKeys.taxonUuid)
 export const getVernacularNameUuid = getValueProp(valuePropKeys.vernacularNameUuid)
 export const getScientificName = getValueProp(valuePropKeys.scientificName, '')
 export const getVernacularName = getValueProp(valuePropKeys.vernacularName, '')
+
+// Time
+const _getTimePart = (index) => R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim)
+export const getTimeHour = _getTimePart(0)
+export const getTimeMinute = _getTimePart(1)
