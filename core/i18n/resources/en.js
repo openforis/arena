@@ -224,6 +224,7 @@ Do you want to proceed?`,
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
+      importFromArena: 'Import from Arena',
     },
     collectImportReport: {
       expression: 'Expression',
@@ -812,6 +813,9 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    // import arena survey
+    ArenaImportJob: 'Arena import',
+    ArenaSurveyReaderJob: 'Arena Survey Reader',
   },
 
   // ====== App Errors

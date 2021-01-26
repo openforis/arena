@@ -16,7 +16,7 @@ import {
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
-  await waitFor(2000)
+  await waitFor(3000)
   await writeIntoTextBox({ text: value, selector: below(label), clearBefore: true })
 }
 

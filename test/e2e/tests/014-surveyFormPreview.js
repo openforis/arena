@@ -11,14 +11,14 @@ const { cluster: ClusterItems, plots } = records[0]
 
 describe('SurveyForm Preview', () => {
   test('Select survey 1', async () => {
-    await waitFor(2000)
+    await waitFor(3000)
     await clickHeaderBtnMySurveys()
     await clickParent('Survey')
 
-    await waitFor(2000)
+    await waitFor(3000)
     await waitForLoader()
 
-    await waitFor(2000)
+    await waitFor(3000)
     await clickSidebarBtnSurveyForm()
 
     await expectSurveyFormLoaded()
@@ -27,11 +27,14 @@ describe('SurveyForm Preview', () => {
   })
 
   test('Open preview', async () => {
+    await waitFor(3000)
     await click('Preview')
+    await waitFor(3000)
     await expectSurveyFormHasOnlyAndInOrderThesePages({ pageLabels: ['Cluster', 'Plot'] })
+    await waitFor(3000)
   })
 
-  test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }), 40000)
+  test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }), 50000)
 
   test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }), 40000)
 
@@ -39,7 +42,7 @@ describe('SurveyForm Preview', () => {
 
   test('Check Cluster values', async () => {
     await click('Cluster')
-    await waitFor(500)
+    await waitFor(1000)
     await checkValuesCluster({ items: ClusterItems })
   }, 40000)
 

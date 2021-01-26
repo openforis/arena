@@ -8,6 +8,7 @@ import * as categoryApi from '@server/modules/category/api/categoryApi'
 import * as taxonomyApi from '@server/modules/taxonomy/api/taxonomyApi'
 import * as geoApi from '@server/modules/geo/api/geoApi'
 import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
+import * as arenaImportApi from '@server/modules/arenaImport/api/arenaImportApi'
 import * as recordApi from '@server/modules/record/api/recordApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
 import * as analysisApi from '@server/modules/analysis/api'
@@ -29,6 +30,7 @@ taxonomyApi.init(router)
 geoApi.init(router)
 
 collectImportApi.init(router)
+arenaImportApi.init(router)
 
 recordApi.init(router)
 

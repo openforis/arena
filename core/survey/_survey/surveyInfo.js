@@ -43,6 +43,8 @@ export const getUuid = ObjectUtils.getUuid
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 
+export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
+
 export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
@@ -57,7 +59,7 @@ export const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
 export const getLabels = ObjectUtils.getProp(keys.labels, {})
 
-export const getDefaultLabel = surveyInfo => {
+export const getDefaultLabel = (surveyInfo) => {
   const labels = getLabels(surveyInfo)
   const lang = getDefaultLanguage(surveyInfo)
   return R.prop(lang, labels)
@@ -72,7 +74,7 @@ export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
 export const getDefaultSRS = R.pipe(getSRS, R.head)
 
-export const getStatus = surveyInfo =>
+export const getStatus = (surveyInfo) =>
   isPublished(surveyInfo) && isDraft(surveyInfo)
     ? 'PUBLISHED-DRAFT'
     : isPublished(surveyInfo)
@@ -95,12 +97,12 @@ export const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
 
 export const hasCollectReportIssues = R.pipe(
   getCollectReport,
-  R.propSatisfies(total => total > 0, collectReportKeys.issuesTotal),
+  R.propSatisfies((total) => total > 0, collectReportKeys.issuesTotal)
 )
 
 export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
-export const getLanguage = preferredLang => surveyInfo =>
+export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
 
 // ====== UPDATE
@@ -108,14 +110,14 @@ export const markDraft = R.assoc(keys.draft, true)
 
 // ====== UTILS
 
-export const isValid = surveyInfo => surveyInfo && surveyInfo.id
+export const isValid = (surveyInfo) => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
 export const getAuthGroups = ObjectUtils.getAuthGroups
 
-const _getAuthGroupByName = name => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
+const _getAuthGroupByName = (name) => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
 
 export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
-export const isAuthGroupAdmin = group => surveyInfo => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
+export const isAuthGroupAdmin = (group) => (surveyInfo) => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
