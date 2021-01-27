@@ -46,7 +46,7 @@ const Plot = ({ plotId, plotText, plotCountry, plotRegion, plotProvince }) => [
 export const recordInitial = {
   cluster: Cluster({
     clusterDecimal: 1,
-    clusterDate: '27/01/2021',
+    clusterDate: '2021-01-27',
     clusterBoolean: 'false',
   }),
 }
@@ -56,6 +56,7 @@ export const records = [
     cluster: Cluster({
       clusterId: 1,
       clusterDecimal: 10,
+      clusterDate: '2021-01-01',
       clusterTime: '10:30',
       clusterBoolean: 'true',
       clusterCoordinate: { x: 10, y: 15, srs: 'GCS WGS 1984 (EPSG:4326)' },
@@ -81,6 +82,7 @@ export const records = [
     cluster: Cluster({
       clusterId: 2,
       clusterDecimal: 20,
+      clusterDate: '2021-01-01',
       clusterTime: '12:30',
       clusterBoolean: 'true',
       clusterCoordinate: { x: 10, y: 15, srs: 'GCS WGS 1984 (EPSG:4326)' },
@@ -106,6 +108,7 @@ export const records = [
     cluster: Cluster({
       clusterId: 3,
       clusterDecimal: 30,
+      clusterDate: '2021-01-01',
       clusterTime: '13:30',
       clusterBoolean: 'true',
       clusterCoordinate: { x: 10, y: 15, srs: 'GCS WGS 1984 (EPSG:4326)' },
@@ -131,6 +134,7 @@ export const records = [
     cluster: Cluster({
       clusterId: 4,
       clusterDecimal: 40,
+      clusterDate: '2021-01-01',
       clusterTime: '14:30',
       clusterBoolean: 'true',
       clusterCoordinate: { x: 10, y: 15, srs: 'GCS WGS 1984 (EPSG:4326)' },
@@ -156,6 +160,7 @@ export const records = [
     cluster: Cluster({
       clusterId: 5,
       clusterDecimal: 50,
+      clusterDate: '2021-01-01',
       clusterTime: '15:30',
       clusterBoolean: 'true',
       clusterCoordinate: { x: 10, y: 15, srs: 'GCS WGS 1984 (EPSG:4326)' },

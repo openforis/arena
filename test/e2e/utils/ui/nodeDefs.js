@@ -48,7 +48,7 @@ export const NodeDefsUtils = {
   [NodeDef.nodeDefType.date]: {
     ...NodeDefBase,
     enterValue: async ({ value, label }) => {
-      const [day, month, year] = value.split('/')
+      const [year, month, day] = value.split('-')
       await writeIntoTextBox({
         text: day,
         selector: { class: 'input-day' },
@@ -71,7 +71,7 @@ export const NodeDefsUtils = {
       await pressEsc()
     },
     expectValue: async ({ value, label }) => {
-      const [day, month, year] = value.split('/')
+      const [year, month, day] = value.split('-')
       await expectInputTextToBe({ text: day, selector: { class: 'input-day' }, relativeSelectors: [below(label)] })
       await expectInputTextToBe({ text: month, selector: { class: 'input-month' }, relativeSelectors: [below(label)] })
       await expectInputTextToBe({ text: year, selector: { class: 'input-year' }, relativeSelectors: [below(label)] })

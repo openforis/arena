@@ -55,7 +55,7 @@ describe('SurveyForm Preview', () => {
   test('Check relevance applied', async () => {
     const clusterDateLabel = 'Cluster date'
 
-    // cluster_date relevant at the beginning (cluster_decimal = 1)
+    // cluster_date relevant at the beginning (cluster_decimal = 10)
     await expectIsRelevant({ label: clusterDateLabel })
 
     const clusterDecimalItem = (value) => ({ label: 'Cluster Decimal', type: NodeDef.nodeDefType.decimal, value })
@@ -72,38 +72,43 @@ describe('SurveyForm Preview', () => {
   test('Check validation rules applied (decimal)', async () => {
     const clusterDecimalLabel = 'Cluster decimal'
 
-    // cluster_decimal valid at the beginning (cluster_decimal = 1)
+    // cluster_id = 1 => cluster_decimal should be < 10
+    // cluster_decimal valid (cluster_decimal = 1)
     await expectIsValid({ label: clusterDecimalLabel })
 
     const clusterDecimalItem = (value) => ({ label: clusterDecimalLabel, type: NodeDef.nodeDefType.decimal, value })
 
-    // cluster_decimal = 11 => invalid (it should be < 10)
+    // cluster_decimal = 11 => invalid
     await enterValuesCluster({ items: [clusterDecimalItem(11)] })
     await expectIsInvalid({ label: clusterDecimalLabel })
 
-    // cluster_decimal = 2 => valid
-    await enterValuesCluster({ items: [clusterDecimalItem(2)] })
+    // cluster_decimal = 9 => valid
+    await enterValuesCluster({ items: [clusterDecimalItem(9)] })
     await expectIsValid({ label: clusterDecimalLabel })
+
+    // cluster_decimal = 10 => invalid
+    await enterValuesCluster({ items: [clusterDecimalItem(10)] })
+    await expectIsInvalid({ label: clusterDecimalLabel })
   }, 30000)
 
   test('Check validation rules applied (date)', async () => {
     const clusterDateLabel = 'Cluster date'
 
-    // cluster_date valid at the beginning (cluster_date = 27/01/2021, it should be >= 01/01/2021)
+    // cluster_date valid at the beginning (cluster_date = 2021-01-27, it should be >= 2021-01-01)
     await expectIsValid({ label: clusterDateLabel })
 
     const clusterDateItem = (value) => ({ label: clusterDateLabel, type: NodeDef.nodeDefType.date, value })
 
-    // cluster_date = '20/05/2020' => invalid
-    await enterValuesCluster({ items: [clusterDateItem('20/05/2020')] })
+    // cluster_date = '2020-05-20' => invalid
+    await enterValuesCluster({ items: [clusterDateItem('2020-05-20')] })
     await expectIsInvalid({ label: clusterDateLabel })
 
-    // cluster_date = '31/12/2020' => invalid
-    await enterValuesCluster({ items: [clusterDateItem('31/12/2020')] })
+    // cluster_date = '2020-12-31' => invalid
+    await enterValuesCluster({ items: [clusterDateItem('2020-12-31')] })
     await expectIsInvalid({ label: clusterDateLabel })
 
-    // cluster_date = '01/01/2021 => valid
-    await enterValuesCluster({ items: [clusterDateItem('01/01/2021')] })
+    // cluster_date = '2021-01-01 => valid
+    await enterValuesCluster({ items: [clusterDateItem('2021-01-01')] })
     await expectIsValid({ label: clusterDateLabel })
   }, 30000)
 
