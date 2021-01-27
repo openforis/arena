@@ -1,6 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { click, clickParent, waitFor, waitFor1sec } from '../utils/api'
+import { click, clickParent, waitFor } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormLoaded } from '../utils/ui/surveyForm'
@@ -13,6 +13,8 @@ import {
   checkValuesPlot,
   expectIsRelevant,
   expectIsNotRelevant,
+  expectIsValid,
+  expectIsInvalid,
 } from '../utils/ui/nodeDefs'
 import { records, recordInitial } from '../resources/records/recordsData'
 
@@ -52,19 +54,36 @@ describe('SurveyForm Preview', () => {
 
   test('Check relevance applied', async () => {
     const clusterDateLabel = 'Cluster date'
+
     // cluster_date relevant at the beginning (cluster_decimal = 1)
     await expectIsRelevant({ label: clusterDateLabel })
 
     const clusterDecimalItem = (value) => ({ label: 'Cluster Decimal', type: NodeDef.nodeDefType.decimal, value })
+
     // cluster_decimal = 0 => cluster_date not relevant
     await enterValuesCluster({ items: [clusterDecimalItem(0)] })
-    await waitFor1sec()
     await expectIsNotRelevant({ label: clusterDateLabel })
 
     // cluster_decimal = 1 => cluster_date relevant
     await enterValuesCluster({ items: [clusterDecimalItem(1)] })
-    await waitFor1sec()
     await expectIsRelevant({ label: clusterDateLabel })
+  }, 50000)
+
+  test('Check validation rules applied', async () => {
+    const clusterDecimalLabel = 'Cluster decimal'
+
+    // cluster_decimal valid at the beginning (cluster_decimal = 1)
+    await expectIsValid({ label: clusterDecimalLabel })
+
+    const clusterDecimalItem = (value) => ({ label: clusterDecimalLabel, type: NodeDef.nodeDefType.decimal, value })
+
+    // cluster_decimal = 11 => invalid (it should be < 10)
+    await enterValuesCluster({ items: [clusterDecimalItem(11)] })
+    await expectIsInvalid({ label: clusterDecimalLabel })
+
+    // cluster_decimal = 2 => valid
+    await enterValuesCluster({ items: [clusterDecimalItem(2)] })
+    await expectIsValid({ label: clusterDecimalLabel })
   }, 50000)
 
   test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }), 40000)

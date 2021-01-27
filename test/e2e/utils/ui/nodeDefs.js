@@ -16,6 +16,7 @@ import {
   expectNotExists,
   near,
   pressEsc,
+  waitFor1sec,
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
@@ -135,8 +136,11 @@ const doSequencial = async ({ items, getFunction, getParams }) =>
     return getFunction(item)(getParams(item))
   }, true)
 
-const enterValuesSequencial = async ({ items }) =>
-  doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
+const enterValuesSequencial = async ({ items }) => {
+  await doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
+  // wait for relevance/validation feedback
+  await waitFor1sec()
+}
 
 const checkValuesSequencial = async ({ items }) =>
   doSequencial({ items, getFunction: getCheckFunction, getParams: getCheckParams })
@@ -182,3 +186,9 @@ export const expectIsRelevant = async ({ label }) =>
 
 export const expectIsNotRelevant = async ({ label }) =>
   expectExists({ selector: '.not-applicable', relativeSelectors: [near(label)] })
+
+export const expectIsValid = async ({ label }) =>
+  expectNotExists({ selector: '.error', relativeSelectors: [near(label)] })
+
+export const expectIsInvalid = async ({ label }) =>
+  expectExists({ selector: '.error', relativeSelectors: [near(label)] })
