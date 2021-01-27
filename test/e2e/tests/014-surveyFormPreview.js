@@ -67,9 +67,9 @@ describe('SurveyForm Preview', () => {
     // cluster_decimal = 1 => cluster_date relevant
     await enterValuesCluster({ items: [clusterDecimalItem(1)] })
     await expectIsRelevant({ label: clusterDateLabel })
-  }, 50000)
+  }, 30000)
 
-  test('Check validation rules applied', async () => {
+  test('Check validation rules applied (decimal)', async () => {
     const clusterDecimalLabel = 'Cluster decimal'
 
     // cluster_decimal valid at the beginning (cluster_decimal = 1)
@@ -84,7 +84,28 @@ describe('SurveyForm Preview', () => {
     // cluster_decimal = 2 => valid
     await enterValuesCluster({ items: [clusterDecimalItem(2)] })
     await expectIsValid({ label: clusterDecimalLabel })
-  }, 50000)
+  }, 30000)
+
+  test('Check validation rules applied (date)', async () => {
+    const clusterDateLabel = 'Cluster date'
+
+    // cluster_date valid at the beginning (cluster_date = 27/01/2021, it should be >= 01/01/2021)
+    await expectIsValid({ label: clusterDateLabel })
+
+    const clusterDateItem = (value) => ({ label: clusterDateLabel, type: NodeDef.nodeDefType.date, value })
+
+    // cluster_date = '20/05/2020' => invalid
+    await enterValuesCluster({ items: [clusterDateItem('20/05/2020')] })
+    await expectIsInvalid({ label: clusterDateLabel })
+
+    // cluster_date = '31/12/2020' => invalid
+    await enterValuesCluster({ items: [clusterDateItem('31/12/2020')] })
+    await expectIsInvalid({ label: clusterDateLabel })
+
+    // cluster_date = '01/01/2021 => valid
+    await enterValuesCluster({ items: [clusterDateItem('01/01/2021')] })
+    await expectIsValid({ label: clusterDateLabel })
+  }, 30000)
 
   test('Enter Plot 1 values', async () => enterValuesPlot({ items: plots[0] }), 40000)
 
