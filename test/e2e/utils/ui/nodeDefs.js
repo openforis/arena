@@ -8,11 +8,14 @@ import {
   textBox,
   expectInputTextToBe,
   getElement,
-  expectExists,
   within,
   button,
   waitFor,
   dropDown,
+  expectExists,
+  expectNotExists,
+  near,
+  pressEsc,
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
@@ -43,6 +46,35 @@ export const NodeDefsUtils = {
   },
   [NodeDef.nodeDefType.date]: {
     ...NodeDefBase,
+    enterValue: async ({ value, label }) => {
+      const [day, month, year] = value.split('/')
+      await writeIntoTextBox({
+        text: day,
+        selector: { class: 'input-day' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      await writeIntoTextBox({
+        text: month,
+        selector: { class: 'input-month' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      await writeIntoTextBox({
+        text: year,
+        selector: { class: 'input-year' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      // close calendar
+      await pressEsc()
+    },
+    expectValue: async ({ value, label }) => {
+      const [day, month, year] = value.split('/')
+      await expectInputTextToBe({ text: day, selector: { class: 'input-day' }, relativeSelectors: [below(label)] })
+      await expectInputTextToBe({ text: month, selector: { class: 'input-month' }, relativeSelectors: [below(label)] })
+      await expectInputTextToBe({ text: year, selector: { class: 'input-year' }, relativeSelectors: [below(label)] })
+    },
   },
   [NodeDef.nodeDefType.time]: {
     ...NodeDefBase,
@@ -144,3 +176,9 @@ export const checkRecord = async (record, position) => {
   await checkValuesPlot({ id: 1, items: plots[0] })
   await checkValuesPlot({ id: 2, items: plots[1] })
 }
+
+export const expectIsRelevant = async ({ label }) =>
+  expectNotExists({ selector: '.not-applicable', relativeSelectors: [near(label)] })
+
+export const expectIsNotRelevant = async ({ label }) =>
+  expectExists({ selector: '.not-applicable', relativeSelectors: [near(label)] })
