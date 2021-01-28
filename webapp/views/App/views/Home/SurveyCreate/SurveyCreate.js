@@ -72,6 +72,13 @@ const SurveyCreate = () => {
         </div>
 
         <UploadButton
+          inputFieldId="import-from-arena"
+          label={i18n.t('homeView.surveyCreate.importFromArena')}
+          accept=".zip"
+          onChange={(files) => onImport.Arena({ file: files[0] })}
+        />
+
+        <UploadButton
           label={i18n.t('homeView.surveyCreate.importFromCollect')}
           accept=".collect,.collect-backup"
           maxSize={1000}
