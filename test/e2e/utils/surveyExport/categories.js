@@ -51,7 +51,7 @@ const checkItemsRegionLevel = async ({ regionLevel, itemsCountryLevel, itemsRegi
 }
 
 // District level
-const checkItemDiscrictLevel = async ({ item, index, itemsRegionLevel, districtLevel }) => {
+const checkItemDistrictLevel = async ({ item, index, itemsRegionLevel, districtLevel }) => {
   await expect(CategoryItem.getParentUuid(item)).toBe(CategoryItem.getUuid(itemsRegionLevel[Math.floor(index / 5)]))
   await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(districtLevel))
   const code = `0${Math.floor(index / 5) + 1}0${(index % 5) + 1}`
@@ -66,7 +66,7 @@ const checkItemsDistrictLevel = async ({ itemsDistrictLevel, itemsRegionLevel, d
   await expect(itemsDistrictLevel.length).toBe(25)
 
   await PromiseUtils.each(itemsDistrictLevel, async (item, index) =>
-    checkItemDiscrictLevel({ item, index, itemsRegionLevel, districtLevel })
+    checkItemDistrictLevel({ item, index, itemsRegionLevel, districtLevel })
   )
 }
 
