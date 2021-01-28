@@ -7,10 +7,10 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import { checkFileAndGetContent } from './utils'
 
-const checkLevelAndReturnLevel = async ({ levels, categoryName, index }) => {
-  const level = levels.find((category) => CategoryLevel.getName(category) === categoryName)
+const checkLevelAndReturnLevel = async ({ levels, levelName, index }) => {
+  const level = levels.find((_level) => CategoryLevel.getName(_level) === levelName)
   await expect(level).toBeTruthy()
-  await expect(CategoryLevel.getName(level)).toBe(categoryName)
+  await expect(CategoryLevel.getName(level)).toBe(levelName)
   await expect(CategoryLevel.getIndex(level)).toBe(index)
   return level
 }
@@ -95,8 +95,8 @@ export const checkCategories = async ({ surveyExtractedPath }) => {
   await expect(Category.getLevelsCount(administrativeUnitCategory)).toBe(3)
 
   const [countryLevel, regionLevel, districtLevel] = await Promise.all(
-    ['country', 'region', 'district'].map(async (categoryName, index) =>
-      checkLevelAndReturnLevel({ levels, categoryName, index })
+    ['country', 'region', 'district'].map(async (levelName, index) =>
+      checkLevelAndReturnLevel({ levels, levelName, index })
     )
   )
 
