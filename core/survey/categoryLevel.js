@@ -22,3 +22,4 @@ export const getCategoryUuid = R.prop(keys.categoryUuid)
 
 // UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
+export const assocCategoryUuid = (categoryUuid) => R.assoc(keys.categoryUuid, categoryUuid)
