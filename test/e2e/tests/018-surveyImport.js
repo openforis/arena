@@ -8,7 +8,8 @@ import {
   checkUsers,
   checkTaxonomies,
   checkCategories,
-  removeFiles,
+  checkNodeDefs,
+  checkRecords,
 } from '../utils/surveyExport'
 import { expectHomeDashboard } from '../utils/ui/home'
 import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
@@ -73,7 +74,11 @@ describe('Survey import', () => {
 
   test('Check categories', async () => checkCategories({ surveyExtractedPath }))
 
-  test('Remove files', async () => removeFiles({ downloadPath }))
+  test('Check survey.json nodeDefs', async () => checkNodeDefs({ surveyExtractedPath }))
+
+  test('Check records', async () => checkRecords({ surveyExtractedPath }))
+
+  // test('Remove files', async () => removeFiles({ downloadPath }))
 
   test('delete a survey with name "survey" and label "Survey"', async () => {
     await deleteSurvey({ name: surveyName, label: 'Survey', needsToFind: false })

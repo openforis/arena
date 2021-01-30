@@ -98,7 +98,7 @@ export const taxaInsertTest = async () => {
     }),
   ]
 
-  await TaxonomyManager.insertTaxa(user, surveyId, taxa)
+  await TaxonomyManager.insertTaxa({ user, surveyId, taxa })
 
   const taxaCount = await TaxonomyManager.countTaxaByTaxonomyUuid(Survey.getId(survey), taxonomyUuid, true)
   expect(taxaCount).toBe(5)

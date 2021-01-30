@@ -3,15 +3,21 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 const insertCategory = async ({ category, user, surveyId, arenaSurveyFileZip }) => {
   const categoryWithLevels = Category.assocLevelsArray(
     Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(Category.getUuid(category)))
   )(category)
 
-  const categoryInserted = await CategoryService.insertCategory(user, surveyId, categoryWithLevels)
+  const categoryInserted = await CategoryService.insertCategory({
+    user,
+    surveyId,
+    category: categoryWithLevels,
+    addLogs: false,
+  })
   const items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, Category.getUuid(categoryInserted))
-  await CategoryService.insertItems(user, surveyId, items)
+  await CategoryService.insertItemsInBatch(surveyId, items)
 }
 
 /**
@@ -34,6 +40,8 @@ export default class CategoriesImportJob extends Job {
         insertCategory({ category, user: this.user, surveyId, arenaSurveyFileZip })
       )
     )
+
+    await CategoryManager.validateCategories(surveyId)
 
     this.setContext({ categories })
   }

@@ -73,7 +73,10 @@ export default class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
     })
-    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, true, tx)
+    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(
+      { user: this.user, surveyId, taxonomy: taxonomyParam, system: true },
+      tx
+    )
     const taxonomyUuid = Taxonomy.getUuid(this.taxonomyCurrent)
 
     // 3. parse CSV file
@@ -83,11 +86,11 @@ export default class TaxonomiesImportJob extends Job {
 
     await CSVReader.createReaderFromStream(
       speciesFileStream,
-      headers => this.onHeaders(headers),
-      async row => await this.onRow(speciesFileName, taxonomyUuid, row),
-      total => {
+      (headers) => this.onHeaders(headers),
+      async (row) => this.onRow(speciesFileName, taxonomyUuid, row),
+      (total) => {
         this.total = totalPrevious + total
-      },
+      }
     ).start()
 
     if (this.hasErrors()) {
@@ -105,7 +108,7 @@ export default class TaxonomiesImportJob extends Job {
       this.surveyId,
       this.taxonomyCurrent,
       this.vernacularLangCodes,
-      this.tx,
+      this.tx
     )
     await this.taxonomyImportManager.init()
 
@@ -124,11 +127,11 @@ export default class TaxonomiesImportJob extends Job {
           R.pipe(
             R.prop(lang),
             R.split(/[,/]/),
-            R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
-            R.ifElse(R.isEmpty, R.always(accVernacularNames), names => R.assoc(lang, names)(accVernacularNames)),
+            R.map((name) => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
+            R.ifElse(R.isEmpty, R.always(accVernacularNames), (names) => R.assoc(lang, names)(accVernacularNames))
           )(row),
         {},
-        this.vernacularLangCodes,
+        this.vernacularLangCodes
       )
 
       const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
@@ -168,7 +171,7 @@ export default class TaxonomiesImportJob extends Job {
             ],
           },
         },
-        speciesFileName,
+        speciesFileName
       )
     } else {
       this.rowsByCode[code] = this.currentRow
@@ -193,7 +196,7 @@ export default class TaxonomiesImportJob extends Job {
             ],
           },
         },
-        speciesFileName,
+        speciesFileName
       )
     } else {
       this.rowsByScientificName[scientificName] = this.currentRow

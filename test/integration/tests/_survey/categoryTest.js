@@ -11,7 +11,7 @@ export const createCategoryTest = async () => {
   const user = getContextUser()
 
   const categoryReq = Category.newCategory({ name: 'category_test' })
-  const category = await CategoryManager.insertCategory(user, surveyId, categoryReq)
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
 
   /* eslint-disable no-unused-expressions */
   expect(Category.getUuid(category)).toBeDefined()
@@ -38,7 +38,7 @@ export const createCategoryLevelTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const levelReq = Category.newLevel(category)
-  const { level } = await CategoryManager.insertLevel(user, surveyId, levelReq)
+  const { level } = await CategoryManager.insertLevel({ user, surveyId, level: levelReq })
 
   expect(CategoryLevel.getName(level)).toBe(CategoryLevel.getName(levelReq))
 

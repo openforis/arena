@@ -22,7 +22,7 @@ export default class TaxonomyImportManager {
     this.tx = tx
 
     this.batchPersisterInsert = new BatchPersister(async (items) =>
-      TaxonomyManager.insertTaxa(this.user, this.surveyId, items, this.tx)
+      TaxonomyManager.insertTaxa({ user: this.user, surveyId: this.surveyId, taxa: items }, this.tx)
     )
     this.batchPersisterUpdate = new BatchPersister(async (items) =>
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)

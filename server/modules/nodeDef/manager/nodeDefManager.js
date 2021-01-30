@@ -22,13 +22,18 @@ export {
 
 // ======= CREATE
 
-export const insertNodeDef = async (user, surveyId, cycle, nodeDefParam, system = false, client = db) =>
+export const insertNodeDef = async (
+  { user, surveyId, cycle, nodeDef: nodeDefParam, system = false, addLogs = true },
+  client = db
+) =>
   client.tx(async (t) => {
     const [nodeDef, nodeDefsParentUpdated] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef: nodeDefParam, cyclesAdded: [cycle] }, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t),
+      ...(addLogs
+        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)]
+        : []),
     ])
     return {
       ...nodeDefsParentUpdated,

@@ -29,6 +29,13 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
   return pgp.helpers.insert(valuesIndexedByCol, columnSet)
 }
 
+export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
+  const columnSet = new pgp.helpers.ColumnSet(cols, {
+    table: { schema, table },
+  })
+  return pgp.helpers.insert(itemsValues, columnSet)
+}
+
 /**
  * Creates a multi-items update query.
  *
@@ -94,6 +101,6 @@ export const formatQuery = pgp.as.format
 
 // USERS (ROLES)
 export const createUser = async (name, password, client = db) =>
-  await client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
+  client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
 
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)

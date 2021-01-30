@@ -80,4 +80,4 @@ export const fetch = async ({ user, surveyId, idGreaterThan, idLessThan, limit }
   return ActivityLogRepository.fetch({ surveyInfo, activityTypes, idGreaterThan, idLessThan, limit })
 }
 
-export const { insert } = ActivityLogRepository
+export const { insert, insertManyBatch } = ActivityLogRepository

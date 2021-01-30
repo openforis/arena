@@ -15,7 +15,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const categoryReq = Request.getBody(req)
 
-      const category = await CategoryService.insertCategory(user, surveyId, categoryReq)
+      const category = await CategoryService.insertCategory({ user, surveyId, category: categoryReq })
       res.json({ category })
     } catch (error) {
       next(error)
@@ -72,7 +72,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const level = Request.getBody(req)
 
-        const { category } = await CategoryService.insertLevel(user, surveyId, level)
+        const { category } = await CategoryService.insertLevel({ user, surveyId, level })
 
         res.json({ category })
       } catch (error) {

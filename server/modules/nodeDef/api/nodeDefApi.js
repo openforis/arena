@@ -17,7 +17,7 @@ const sendRespNodeDefsAndValidation = async (
   draft = true,
   advanced = true,
   validate = true,
-  nodeDefsUpdated = null,
+  nodeDefsUpdated = null
 ) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
 
@@ -29,9 +29,9 @@ const sendRespNodeDefsAndValidation = async (
 }
 
 const sendRespNodeDefsUpdated = async (res, surveyId, cycle, nodeDefsUpdated) =>
-  await sendRespNodeDefsAndValidation(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
+  sendRespNodeDefsAndValidation(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -40,7 +40,7 @@ export const init = app => {
       const { surveyId } = Request.getParams(req)
       const { surveyCycleKey, nodeDef } = Request.getBody(req)
 
-      const nodeDefsUpdated = await NodeDefService.insertNodeDef(user, surveyId, surveyCycleKey, nodeDef)
+      const nodeDefsUpdated = await NodeDefService.insertNodeDef({ user, surveyId, cycle: surveyCycleKey, nodeDef })
 
       await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated))
     } catch (error) {
@@ -79,7 +79,7 @@ export const init = app => {
           nodeDefUuid,
           parentUuid,
           props,
-          propsAdvanced,
+          propsAdvanced
         )
         delete nodeDefsUpdated[nodeDefUuid]
 
@@ -87,7 +87,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ==== DELETE
@@ -106,6 +106,6 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 }

@@ -8,6 +8,7 @@ export const type = {
   surveyPropUpdate: 'surveyPropUpdate',
   surveyPublish: 'surveyPublish',
   surveyCollectImport: 'surveyCollectImport',
+  surveyArenaImport: 'surveyArenaImport',
 
   // NodeDef
   nodeDefCreate: 'nodeDefCreate',

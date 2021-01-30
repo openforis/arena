@@ -73,6 +73,7 @@ export default class Tree {
 
   resizeObserverCallback() {
     const svgEl = document.querySelectorAll('.survey-hierarchy__svg')[0]
+    if (!svgEl) return
     const treeEl = document.querySelectorAll('.survey-hierarchy__tree')[0]
     const treeElSize = elementOffset(treeEl)
 

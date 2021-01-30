@@ -56,7 +56,7 @@ const validateSurveyInfo = async (surveyInfo) =>
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
+  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false, addLogs = true } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
@@ -66,7 +66,9 @@ export const insertSurvey = async (params, client = db) => {
     await migrateSurveySchema(surveyId)
 
     // Log survey create activity
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
+    if (addLogs) {
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
+    }
 
     if (createRootEntityDef) {
       // Insert root entity def
@@ -84,7 +86,10 @@ export const insertSurvey = async (params, client = db) => {
           ),
         }
       )
-      await NodeDefManager.insertNodeDef(user, surveyId, Survey.cycleOneKey, rootEntityDef, true, t)
+      await NodeDefManager.insertNodeDef(
+        { user, surveyId, cycle: Survey.cycleOneKey, nodeDef: rootEntityDef, system: true },
+        t
+      )
     }
 
     // Update user prefs

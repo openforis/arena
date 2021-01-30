@@ -82,6 +82,7 @@ export {
   fetchRecordsUuidAndCycle,
   countRecordsBySurveyId,
   fetchRecordCreatedCountsByDates,
+  insertRecordsInBatch,
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
@@ -91,7 +92,7 @@ export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = tr
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } from '../repository/nodeRepository'
 
 // ==== UPDATE
 
