@@ -5,6 +5,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
+
 const insertCategory = async ({ category, user, surveyId, arenaSurveyFileZip }) => {
   const categoryWithLevels = Category.assocLevelsArray(
     Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(Category.getUuid(category)))
@@ -42,7 +43,6 @@ export default class CategoriesImportJob extends Job {
     )
 
     await CategoryManager.validateCategories(surveyId)
-
     this.setContext({ categories })
   }
 }

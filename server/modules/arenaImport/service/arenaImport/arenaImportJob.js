@@ -10,6 +10,7 @@ import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
 import RecordsImportJob from './metaImportJobs/recordsImportJob'
 
+
 export default class ArenaImportJob extends Job {
   constructor(params) {
     super(ArenaImportJob.type, params, [

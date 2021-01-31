@@ -60,3 +60,4 @@ export const getActivities = async (streamZipFile) => {
   const activities = await streamZipFile.getEntryData(activitiesPath)
   return JSON.parse(activities)
 }
+
