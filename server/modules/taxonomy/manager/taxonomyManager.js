@@ -165,7 +165,7 @@ export const {
   fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid,
   fetchTaxaWithVernacularNames,
-} = TaxonomyRepository.fetchTaxonByUuid
+} = TaxonomyRepository
 
 export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
   const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)

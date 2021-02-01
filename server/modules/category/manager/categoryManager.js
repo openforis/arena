@@ -335,7 +335,7 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
     await Promise.all([
       CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
-      ...levelsNew.map((level) => insertLevel(user, surveyId, level, true, t)),
+      ...levelsNew.map((level) => insertLevel({ user, surveyId, level, system: true }, t)),
       markSurveyDraft(surveyId, t),
     ])
     return Category.assocLevelsArray(levelsNew)(category)
