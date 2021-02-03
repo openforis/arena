@@ -26,5 +26,7 @@ services:
       SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
       HEADLESS_CHROME: 'true'
       TAIKO_BROWSER_PATH: /usr/local/lib/node_modules/chromium/lib/chromium/chrome-linux/chrome
+      ADMIN_EMAIL: openforis.arena@gmail.com
+      SENDGRID_API_KEY: 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
 
     command: ./test/bin/testExec.sh
