@@ -90,7 +90,7 @@ export default class UsersImportJob extends Job {
     users.push(this.user)
 
     await Promise.all(
-      (users || []).map(async (user) =>
+      users.map(async (user) =>
         insertUser(
           {
             user,
