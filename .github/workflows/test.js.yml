@@ -79,3 +79,5 @@ jobs:
         PGPASSWORD: arena
         HEADLESS_CHROME: 'true'
         SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+        ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+        SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
