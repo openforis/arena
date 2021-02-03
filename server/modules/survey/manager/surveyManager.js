@@ -56,7 +56,7 @@ const validateSurveyInfo = async (surveyInfo) =>
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false, addLogs = true } = params
+  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
@@ -66,9 +66,7 @@ export const insertSurvey = async (params, client = db) => {
     await migrateSurveySchema(surveyId)
 
     // Log survey create activity
-    if (addLogs) {
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
-    }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
 
     if (createRootEntityDef) {
       // Insert root entity def
@@ -116,6 +114,39 @@ export const insertSurvey = async (params, client = db) => {
   return assocSurveyInfo(survey)
 }
 
+export const importSurvey = async (params, client = db) => {
+  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
+  const survey = await client.tx(async (t) => {
+    // Insert survey into db
+    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
+    // Create survey data schema
+    await migrateSurveySchema(surveyId)
+
+    // Update user prefs
+    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+    await UserRepository.updateUserPrefs(userUpdated, t)
+
+    // Create default groups for this survey
+    surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+
+    // Add user to survey admins group (if not system admin)
+    if (!User.isSystemAdmin(user)) {
+      await UserManager.addUserToGroup(
+        user,
+        surveyId,
+        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
+        User.getUuid(user),
+        t
+      )
+    }
+
+    return surveyInfo
+  })
+
+  return assocSurveyInfo(survey)
+}
 // ====== READ
 export const { fetchAllSurveyIds } = SurveyRepository
 

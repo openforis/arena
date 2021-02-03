@@ -129,7 +129,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   files.push({ data: JSON.stringify(users, null, 2), name: usersPathFile })
   await Promise.all(
     users.map(async (_user) => {
-      const userData = await UserService.fetchUserByUuid(User.getUuid(_user))
+      const userData = await UserService.fetchUserByUuidWithPassword(User.getUuid(_user))
 
       files.push({
         data: JSON.stringify(userData, null, 2),

@@ -18,6 +18,7 @@ export {
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
   deleteNodeDefsAnalysisUnused,
+  insertNodeDefsBatch,
 } from '../repository/nodeDefRepository'
 
 // ======= CREATE

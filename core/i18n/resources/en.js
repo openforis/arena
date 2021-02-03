@@ -816,6 +816,7 @@ $t(common.cantUndoWarning)`,
     // import arena survey
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',
+    UsersImportJob: 'Users Import',
   },
 
   // ====== App Errors

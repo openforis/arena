@@ -10,7 +10,7 @@ import {
   checkCategories,
   checkNodeDefs,
   checkRecords,
-  removeFiles
+  removeFiles,
 } from '../utils/surveyExport'
 import { expectHomeDashboard } from '../utils/ui/home'
 import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'

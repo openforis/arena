@@ -19,6 +19,7 @@ export default class RecordsImportJob extends Job {
       records.map(async (record) => ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(record)))
     )
 
+    if (recordsToInsert.length <= 0) return
     await RecordManager.insertRecordsInBatch({ user: this.user, surveyId, records: recordsToInsert })
 
     const nodesToInsert = []
@@ -30,7 +31,8 @@ export default class RecordsImportJob extends Job {
       })
     })
 
-    await RecordManager.insertNodesInBatch(surveyId, nodesToInsert)
+    if (nodesToInsert.length <= 0) return
+    await RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodesToInsert })
   }
 }
 

@@ -48,9 +48,10 @@ export const insertMany = async (user, surveyId, activities, client = db) =>
   )
 
 export const insertManyBatch = async (user, surveyId, activities, client = db) =>
+  activities.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
-      `${getSurveyDBSchema(surveyId)}`,
+      getSurveyDBSchema(surveyId),
       tableName,
       tableColumns,
       activities.map((activity) => ({

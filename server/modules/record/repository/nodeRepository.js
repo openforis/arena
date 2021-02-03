@@ -97,7 +97,8 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumns, nodeValues))
 
-export const insertNodesInBatch = async (surveyId, nodeValues, client = db) =>
+export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client = db) =>
+  nodeValues.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),

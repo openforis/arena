@@ -61,3 +61,15 @@ export const getActivities = async (streamZipFile) => {
   return JSON.parse(activities)
 }
 
+// Users
+export const getUsersPath = getPath('users.json$')
+export const getUsers = async (streamZipFile) => {
+  const usersPath = getUsersPath(getPaths(streamZipFile))
+  const users = await streamZipFile.getEntryData(usersPath)
+  return JSON.parse(users)
+}
+export const getUser = async (streamZipFile, uuid) => {
+  const userPath = getPathByUuid(uuid)(getPaths(streamZipFile))
+  const user = await streamZipFile.getEntryData(userPath)
+  return JSON.parse(user)
+}

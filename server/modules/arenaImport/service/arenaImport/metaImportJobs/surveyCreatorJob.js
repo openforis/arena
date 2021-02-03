@@ -36,8 +36,8 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.label]: label,
     })
 
-    const survey = await SurveyManager.insertSurvey(
-      { user: this.user, surveyInfo: newSurveyInfo, createRootEntityDef: false, system: true, addLogs: false },
+    const survey = await SurveyManager.importSurvey(
+      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfo) },
       this.tx
     )
 

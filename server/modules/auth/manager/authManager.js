@@ -1,1 +1,1 @@
-export { fetchGroupByUuid } from '../repository/authGroupRepository'
+export { fetchGroupByUuid, updateUserGroup, fetchSurveyGroups } from '../repository/authGroupRepository'

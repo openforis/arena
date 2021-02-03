@@ -9,7 +9,7 @@ import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
 import RecordsImportJob from './metaImportJobs/recordsImportJob'
-
+import UsersImportJob from './metaImportJobs/usersImportJob'
 
 export default class ArenaImportJob extends Job {
   constructor(params) {
@@ -20,7 +20,7 @@ export default class ArenaImportJob extends Job {
       new CategoriesImportJob(),
       new NodeDefsImportJob(),
       new RecordsImportJob(),
-      // users and files
+      new UsersImportJob(),
     ])
   }
 

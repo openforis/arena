@@ -151,8 +151,7 @@ export const countUsersBySurveyId = async (user, surveyId) => {
   return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
 }
 
-export const fetchUserByUuid = UserManager.fetchUserByUuid
-export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
+export const { fetchUserByUuid, fetchUserByUuidWithPassword, fetchUserProfilePicture } = UserManager
 
 export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
