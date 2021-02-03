@@ -24,9 +24,6 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser }, 
   const arenaSurveyUuid = Survey.getUuid(Survey.getSurveyInfo(arenaSurvey))
 
   if (_user) {
-    if (User.getStatus(_user) !== User.userStatus.ACCEPTED) {
-      return
-    }
     if (User.isSystemAdmin(_user)) {
       return
     }
