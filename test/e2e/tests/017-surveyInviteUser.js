@@ -26,7 +26,7 @@ describe('Invite user', () => {
   })
 
   test('Has two users', async () => {
-    await waitFor(5000)
+    await waitFor(10000)
     await expectToBe({ selector: '.users-list__cell-profile-picture', numberOfItems: 2 })
     await expectToBe({ text: 'test@arena.com' })
     await expectToBe({ text: 'testtwo@arena.com' })
