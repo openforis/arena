@@ -24,7 +24,7 @@ const _checkSelf = (req) => {
 export const init = (app) => {
   // ==== CREATE
 
-  app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/users/invite', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
 
