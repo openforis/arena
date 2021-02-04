@@ -39,3 +39,37 @@ export const getCategoryItems = async (streamZipFile, categoryUuid) => {
   const items = await streamZipFile.getEntryData(itemsPath)
   return JSON.parse(items)
 }
+
+// Records
+export const getRecordsPath = getPath('records.json$')
+export const getRecords = async (streamZipFile) => {
+  const recordsPath = getRecordsPath(getPaths(streamZipFile))
+  const records = await streamZipFile.getEntryData(recordsPath)
+  return JSON.parse(records)
+}
+export const getRecord = async (streamZipFile, uuid) => {
+  const recordPath = getPathByUuid(uuid)(getPaths(streamZipFile))
+  const record = await streamZipFile.getEntryData(recordPath)
+  return JSON.parse(record)
+}
+
+// Activities
+export const getActivitiesPath = getPath('activitylog.json$')
+export const getActivities = async (streamZipFile) => {
+  const activitiesPath = getActivitiesPath(getPaths(streamZipFile))
+  const activities = await streamZipFile.getEntryData(activitiesPath)
+  return JSON.parse(activities)
+}
+
+// Users
+export const getUsersPath = getPath('users.json$')
+export const getUsers = async (streamZipFile) => {
+  const usersPath = getUsersPath(getPaths(streamZipFile))
+  const users = await streamZipFile.getEntryData(usersPath)
+  return JSON.parse(users)
+}
+export const getUser = async (streamZipFile, uuid) => {
+  const userPath = getPathByUuid(uuid)(getPaths(streamZipFile))
+  const user = await streamZipFile.getEntryData(userPath)
+  return JSON.parse(user)
+}

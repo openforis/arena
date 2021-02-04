@@ -8,6 +8,8 @@ import {
   checkUsers,
   checkTaxonomies,
   checkCategories,
+  checkNodeDefs,
+  checkRecords,
   removeFiles,
 } from '../utils/surveyExport'
 import { expectHomeDashboard } from '../utils/ui/home'
@@ -72,6 +74,10 @@ describe('Survey import', () => {
   test('Check taxonomies', async () => checkTaxonomies({ surveyExtractedPath }))
 
   test('Check categories', async () => checkCategories({ surveyExtractedPath }))
+
+  test('Check survey.json nodeDefs', async () => checkNodeDefs({ surveyExtractedPath }))
+
+  test('Check records', async () => checkRecords({ surveyExtractedPath }))
 
   test('Remove files', async () => removeFiles({ downloadPath }))
 

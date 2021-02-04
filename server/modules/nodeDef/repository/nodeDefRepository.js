@@ -50,6 +50,20 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
     (def) => dbTransformCallback(def, true, true) // Always loading draft when creating or updating a nodeDef
   )
 
+export const insertNodeDefsBatch = async ({ surveyId, nodeDefs }, client = db) =>
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      getSurveyDBSchema(surveyId),
+      'node_def',
+      ['parent_uuid', 'uuid', 'type', 'props_draft', 'props_advanced_draft', 'meta', 'analysis', 'virtual'],
+      nodeDefs.map((nodeDef) => ({
+        ...nodeDef,
+        parent_uuid: NodeDef.getParentUuid(nodeDef),
+        props_draft: NodeDef.getProps(nodeDef),
+        props_advanced_draft: NodeDef.getPropsAdvanced(nodeDef),
+      }))
+    )
+  )
 // ============== READ
 
 export const fetchNodeDefsBySurveyId = async (

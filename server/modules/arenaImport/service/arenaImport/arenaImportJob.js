@@ -3,18 +3,24 @@ import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import AarenaSurveyReaderJob from './metaImportJobs/arenaSurveyReaderJob'
+import ArenaSurveyReaderJob from './metaImportJobs/arenaSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
+import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
+import RecordsImportJob from './metaImportJobs/recordsImportJob'
+import UsersImportJob from './metaImportJobs/usersImportJob'
 
 export default class ArenaImportJob extends Job {
   constructor(params) {
     super(ArenaImportJob.type, params, [
-      new AarenaSurveyReaderJob(),
+      new ArenaSurveyReaderJob(),
       new SurveyCreatorJob(),
+      new UsersImportJob(),
       new TaxonomiesImportJob(),
       new CategoriesImportJob(),
+      new NodeDefsImportJob(),
+      new RecordsImportJob(),
     ])
   }
 

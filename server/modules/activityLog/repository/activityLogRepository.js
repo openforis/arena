@@ -14,8 +14,18 @@ import * as DbUtils from '@server/db/dbUtils'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
+export const tableName = 'activity_log'
+
+export const tableColumns = [
+  ActivityLog.keys.type,
+  'user_uuid',
+  ActivityLog.keys.content,
+  ActivityLog.keys.system,
+  'date_created',
+] // Used for activity_logs values batch insert
+
 // ===== CREATE
-export const insert = async (user, surveyId, type, content, system, client) =>
+export const insert = async (user, surveyId, type, content, system, client = db) =>
   client.none(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
@@ -23,7 +33,7 @@ export const insert = async (user, surveyId, type, content, system, client) =>
     [type, User.getUuid(user), content || {}, system]
   )
 
-export const insertMany = async (user, surveyId, activities, client) =>
+export const insertMany = async (user, surveyId, activities, client = db) =>
   client.batch(
     activities.map((activity) =>
       insert(
@@ -34,6 +44,22 @@ export const insertMany = async (user, surveyId, activities, client) =>
         ActivityLog.isSystem(activity),
         client
       )
+    )
+  )
+
+export const insertManyBatch = async (user, surveyId, activities, client = db) =>
+  activities.length > 0 &&
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      getSurveyDBSchema(surveyId),
+      tableName,
+      tableColumns,
+      activities.map((activity) => ({
+        ...activity,
+        user_uuid: User.getUuid(user),
+        date_created: ActivityLog.getDateCreated(activity),
+        [ActivityLog.keys.system]: ActivityLog.isSystem(activity),
+      }))
     )
   )
 

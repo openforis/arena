@@ -176,6 +176,8 @@ const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split
 export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
+export const getDateCreated = R.prop(keys.dateCreated)
+export const getDateModified = R.prop(keys.dateModified)
 
 // File
 export const getFileName = getValueProp(valuePropKeys.fileName, '')

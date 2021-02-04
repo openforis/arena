@@ -62,6 +62,8 @@ export const {
   insertItem,
   insertItems,
 
+  insertItemsInBatch,
+
   countCategories,
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,

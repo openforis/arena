@@ -81,13 +81,16 @@ export default class CategoriesImportJob extends Job {
     const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(collectCodeList)
     if (!R.isEmpty(hierarchyLevels)) {
       const levels = hierarchyLevels.map((hierarchyLevel, index) =>
-        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index),
+        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index)
       )
       categoryToCreate = Category.assocLevelsArray(levels)(categoryToCreate)
     }
 
     // Insert category and levels
-    return await CategoryManager.insertCategory(this.user, this.surveyId, categoryToCreate, true, this.tx)
+    return CategoryManager.insertCategory(
+      { user: this.user, surveyId: this.surveyId, category: categoryToCreate, system: true },
+      this.tx
+    )
   }
 
   async insertItems(category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
@@ -117,12 +120,12 @@ export default class CategoriesImportJob extends Job {
         this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
           R.pathOr([], [Category.getName(category), String(levelIndex)]),
           R.ifElse(R.includes(code), R.identity, R.append(code)),
-          codes =>
+          (codes) =>
             R.assocPath(
               [Category.getName(category), String(levelIndex)],
               codes,
-              this.qualifiableItemCodesByCategoryAndLevel,
-            ),
+              this.qualifiableItemCodesByCategoryAndLevel
+            )
         )(this.qualifiableItemCodesByCategoryAndLevel)
       }
 

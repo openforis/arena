@@ -62,7 +62,7 @@ export const importFile = async (user, surveyId, taxonomyName, importFileName) =
     taxonomy = taxonomyExisting
   } else {
     taxonomy = Taxonomy.newTaxonomy({ [Taxonomy.keysProps.name]: taxonomyName })
-    await TaxonomyManager.insertTaxonomy(user, surveyId, taxonomy)
+    await TaxonomyManager.insertTaxonomy({ user, surveyId, taxonomy })
   }
 
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)

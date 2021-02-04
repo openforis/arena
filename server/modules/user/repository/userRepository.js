@@ -13,6 +13,16 @@ const selectFieldsCommaSep = selectFields.map((f) => `u.${f}`).join(',')
 
 // CREATE
 
+export const importNewUser = async ({ surveyId, surveyCycleKey, uuid, email, password, status, title }, client = db) =>
+  client.one(
+    `
+    INSERT INTO "user" AS u (uuid, email, password, status, prefs, props)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+    RETURNING ${selectFieldsCommaSep}`,
+    [uuid, email, password, status, User.newPrefs(surveyId, surveyCycleKey), User.newProps({ title })],
+    camelize
+  )
+
 export const insertUser = async ({ surveyId, surveyCycleKey, email, password, status, title }, client = db) =>
   client.one(
     `
@@ -64,8 +74,18 @@ export const fetchUsersBySurveyId = async (
     camelize
   )
 
+export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
+  client.one(
+    `
+    SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture, u.password
+    FROM "user" u
+    WHERE u.uuid = $1`,
+    [uuid],
+    camelize
+  )
+
 export const fetchUserByUuid = async (uuid, client = db) =>
-  await client.one(
+  client.one(
     `
     SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
@@ -75,7 +95,7 @@ export const fetchUserByUuid = async (uuid, client = db) =>
   )
 
 export const fetchUserByEmail = async (email, client = db) =>
-  await client.oneOrNone(
+  client.oneOrNone(
     `
     SELECT ${selectFieldsCommaSep}
     FROM "user" u

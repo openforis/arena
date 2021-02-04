@@ -3,9 +3,8 @@ import * as DateUtils from '@core/dateUtils'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-// import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
-// import * as ActivityLog from '../../../../../../common/activityLog/activityLog'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
@@ -13,7 +12,7 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey } = this.context
+    const { arenaSurvey, arenaSurveyFileZip } = this.context
 
     const surveyInfo = Survey.getSurveyInfo(arenaSurvey)
     const surveyName = Survey.getName(surveyInfo)
@@ -37,14 +36,16 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.label]: label,
     })
 
-    const survey = await SurveyManager.insertSurvey(
-      { user: this.user, surveyInfo: newSurveyInfo, createRootEntityDef: false, system: true },
+    const survey = await SurveyManager.importSurvey(
+      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfo) },
       this.tx
     )
 
     const surveyId = Survey.getId(survey)
 
-    // await ActivityLogManager.insert(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
+    const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip)
+
+    await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }

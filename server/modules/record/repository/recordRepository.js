@@ -12,6 +12,16 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
+const tableColumns = [
+  Record.keys.uuid,
+  Record.keys.step,
+  Record.keys.cycle,
+  Record.keys.preview,
+  'owner_uuid',
+  'date_created',
+]
+const tableName = 'record'
+
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => (record) => {
@@ -54,6 +64,20 @@ export const insertRecord = async (surveyId, record, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+export const insertRecordsInBatch = async ({ surveyId, records }, client = db) => {
+  await client.none(
+    DbUtils.insertAllQueryBatch(
+      `${getSurveyDBSchema(surveyId)}`,
+      tableName,
+      tableColumns,
+      records.map((record) => ({
+        ...record,
+        owner_uuid: Record.getOwnerUuid(record),
+        date_created: Record.getDateCreated(record),
+      }))
+    )
+  )
+}
 // ============== READ
 
 export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
