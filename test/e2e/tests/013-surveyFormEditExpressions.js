@@ -103,6 +103,24 @@ describe('SurveyForm edit expressions', () => {
     await waitFor1sec()
   }, 60000)
 
+  test('add Default Value "2021-01-27" to "Cluster date"', async () => {
+    await editNodeDef({ nodeDefLabel: 'Cluster date' })
+
+    await click('Advanced')
+
+    const qualifier = qualifiers.defaultValues
+
+    await addNodeDefExpression({
+      qualifier,
+      expression: { binaryExpression: { left: { constant: '2021-01-27' } } },
+      expressionText: '"2021-01-27"',
+    })
+
+    await expectNodeDefExpressionsValid({ qualifier })
+    await clickNodeDefSaveAndBack()
+    await waitFor1sec()
+  })
+
   // Validations
 
   test('add Validation to "cluster_decimal": cluster_decimal < 10 if cluster_id = 1', async () => {
@@ -195,6 +213,22 @@ describe('SurveyForm edit expressions', () => {
         expression: applyIfExpression,
       },
       applyIfText: applyIfExpression,
+    })
+
+    await clickNodeDefSaveAndBack()
+  }, 60000)
+
+  test('add Validation to "cluster_date": cluster_date >= "2021-01-01"', async () => {
+    await editNodeDef({ nodeDefLabel: 'Cluster date' })
+
+    await click('Validations')
+
+    await addNodeDefExpression({
+      qualifier: qualifiers.validations,
+      expression: {
+        binaryExpression: { left: { identifier: 'cluster_date' }, operator: '>=', right: { constant: '2021-01-01' } },
+      },
+      expressionText: 'cluster_date >= "2021-01-01"',
     })
 
     await clickNodeDefSaveAndBack()
