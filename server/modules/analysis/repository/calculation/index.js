@@ -1,4 +1,4 @@
-export { insertCalculation } from './create'
+export { insertCalculation, insertCalculationsInBatch } from './create'
 
 export { fetchCalculation, fetchCalculationAttributeUuids } from './read'
 

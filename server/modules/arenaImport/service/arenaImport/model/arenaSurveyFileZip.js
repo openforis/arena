@@ -73,3 +73,27 @@ export const getUser = async (streamZipFile, uuid) => {
   const user = await streamZipFile.getEntryData(userPath)
   return JSON.parse(user)
 }
+export const getProfilePicturePathByUuid = (uuid) => (entries) =>
+  entries.find((entry) => new RegExp(`profilepictures/${uuid}`).test(entry))
+
+export const getUserProfilePicture = async (streamZipFile, uuid) => {
+  const profilePicturePath = getProfilePicturePathByUuid(uuid)(getPaths(streamZipFile))
+  if (profilePicturePath) {
+    const profilePicture = await streamZipFile.getEntryData(profilePicturePath)
+    return profilePicture
+  }
+  return false
+}
+
+// Chains
+export const getChainsPath = getPath('chains.json$')
+export const getChains = async (streamZipFile) => {
+  const chainsPath = getChainsPath(getPaths(streamZipFile))
+  const chains = await streamZipFile.getEntryData(chainsPath)
+  return JSON.parse(chains)
+}
+export const getChain = async (streamZipFile, uuid) => {
+  const chainPath = getPathByUuid(uuid)(getPaths(streamZipFile))
+  const chain = await streamZipFile.getEntryData(chainPath)
+  return JSON.parse(chain)
+}

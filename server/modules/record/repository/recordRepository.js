@@ -64,7 +64,7 @@ export const insertRecord = async (surveyId, record, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const insertRecordsInBatch = async ({ surveyId, records }, client = db) => {
+export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) => {
   await client.none(
     DbUtils.insertAllQueryBatch(
       `${getSurveyDBSchema(surveyId)}`,
@@ -72,7 +72,7 @@ export const insertRecordsInBatch = async ({ surveyId, records }, client = db) =
       tableColumns,
       records.map((record) => ({
         ...record,
-        owner_uuid: Record.getOwnerUuid(record),
+        owner_uuid: userUuid || Record.getOwnerUuid(record),
         date_created: Record.getDateCreated(record),
       }))
     )
