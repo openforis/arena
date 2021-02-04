@@ -16,11 +16,11 @@ export default class ArenaImportJob extends Job {
     super(ArenaImportJob.type, params, [
       new ArenaSurveyReaderJob(),
       new SurveyCreatorJob(),
+      new UsersImportJob(),
       new TaxonomiesImportJob(),
       new CategoriesImportJob(),
       new NodeDefsImportJob(),
       new RecordsImportJob(),
-      new UsersImportJob(),
     ])
   }
 
