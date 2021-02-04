@@ -61,7 +61,6 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser }, 
         client
       )
 
-      // add profile picture if needed
     }
   }
 }
