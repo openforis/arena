@@ -36,7 +36,7 @@ export const insertStepsInBatch = async (params, client = DB.client) => {
   return client.none(
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
-      'processing_step',
+      TableStep.tableName,
       Object.values(TableStep.columnSet),
       steps
     )

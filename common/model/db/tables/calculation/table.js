@@ -11,12 +11,13 @@ const columnSet = {
   script: 'script',
 }
 
+const tableName = 'processing_step_calculation'
 /**
  * @typedef {module:arena.TableSurvey} module:arena.TableCalculation
  */
 export default class TableCalculation extends TableSurvey {
   constructor(surveyId) {
-    super(surveyId, 'processing_step_calculation', columnSet)
+    super(surveyId, tableName, columnSet)
     this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.script))
     this.getSelect = getSelect.bind(this)
   }
@@ -43,3 +44,4 @@ export default class TableCalculation extends TableSurvey {
 }
 
 TableCalculation.columnSet = columnSet
+TableCalculation.tableName = tableName
