@@ -1,21 +1,23 @@
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
 import {
-  $,
   below,
   clearTextBox,
   click,
   expectExists,
+  expectToBe,
   reload,
   textBox,
   toRightOf,
   waitFor,
-  waitFor1sec,
   writeIntoTextBox,
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
 import {
   addCalculationStep,
   addProcessingStep,
+  closeCalculation,
+  closeStep,
+  deleteItem,
   expectStepAddButtonDisabled,
   expectStepCategorySelectorNotExists,
   selectProcessingStepCategory,
@@ -80,9 +82,8 @@ describe('Analysis create chain.', () => {
   })
 
   test('Add new step (with category)', async () => {
-    await click($('.btn-close-calculation'))
-    await waitFor1sec()
-    await click($('.btn-close-step'))
+    await closeCalculation()
+    await closeStep()
 
     await addProcessingStep()
     await selectProcessingStepCategory({ name: 'administrative_unit' })
@@ -97,15 +98,29 @@ describe('Analysis create chain.', () => {
   }, 30000)
 
   test('Expect cannot add new processing steps', async () => {
-    await click($('.btn-close-calculation'))
-    await waitFor1sec()
-    await click($('.btn-close-step'))
+    await closeCalculation()
+    await closeStep()
 
     await expectStepAddButtonDisabled()
 
     await click('Tree')
     await expectStepCategorySelectorNotExists()
+
+    await closeStep()
   }, 30000)
+
+  test('Delete step', async () => {
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 2 })
+
+    await click('administrative_unit')
+
+    await deleteItem()
+
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
+
+    await click('Save')
+    await waitForLoader()
+  })
 
   test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()

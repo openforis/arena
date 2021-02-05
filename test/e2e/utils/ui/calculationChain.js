@@ -10,6 +10,7 @@ import {
   textBox,
   above,
   expectNotExists,
+  waitFor1sec,
 } from '../api'
 import { waitForLoader } from './loader'
 
@@ -20,6 +21,8 @@ const selectors = {
 const elements = {
   stepAddBtn: () => $('.btn-add-step'),
   stepCategory: () => textBox(toRightOf('Category')),
+  calculationCloseBtn: () => $('.btn-close-calculation'),
+  stepCloseBtn: () => $('.btn-close-step'),
 }
 
 export const addProcessingStep = async () => click(elements.stepAddBtn())
@@ -53,6 +56,16 @@ export const addCalculationStep = async ({ label, attribute }) => {
     await waitForLoader()
     await click('Back')
   }
+}
+
+export const closeStep = async () => click(elements.stepCloseBtn())
+
+export const closeCalculation = async () => click(elements.calculationCloseBtn())
+
+export const deleteItem = async () => {
+  await click('Delete')
+  await waitFor1sec()
+  await click('Ok')
 }
 
 export const expectStepAddButtonDisabled = async () => {
