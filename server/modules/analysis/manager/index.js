@@ -74,8 +74,8 @@ export const importChain = async ({ user, surveyId, chain }, client = DB.client)
 
     if (steps.length <= 0) return
     await insertStepsInBatch({ user, surveyId, steps }, tx)
-    const calculations = []
-    steps.forEach((step) => (Step.getCalculations(step) || []).forEach((calculation) => calculations.push(calculation)))
+    const calculations = steps.flatMap(Step.getCalculations)
+
     if (calculations.length <= 0) return
     await insertCalculationsInBatch({ user, surveyId, calculations }, tx)
   })
