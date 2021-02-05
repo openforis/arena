@@ -1,19 +1,25 @@
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
 import {
+  $,
+  below,
   clearTextBox,
   click,
   expectExists,
-  getElement,
-  writeIntoTextBox,
-  toRightOf,
-  button,
-  textBox,
-  above,
-  below,
-  waitFor,
   reload,
+  textBox,
+  toRightOf,
+  waitFor,
+  waitFor1sec,
+  writeIntoTextBox,
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
+import {
+  addCalculationStep,
+  addProcessingStep,
+  expectStepAddButtonDisabled,
+  expectStepCategorySelectorNotExists,
+  selectProcessingStepCategory,
+} from '../utils/ui/calculationChain'
 
 const chainData = { label: 'Chain 1', description: 'Processing description' }
 const calculationData = { label: 'Tree volume' }
@@ -29,7 +35,7 @@ describe('Analysis create chain.', () => {
     await expectExists({ text: 'This section is available only when survey is published' })
   })
 
-  test('Publish chain', async () => {
+  test('Publish survey', async () => {
     await click('Publish')
     await waitForLoader()
     await click('Ok')
@@ -50,35 +56,14 @@ describe('Analysis create chain.', () => {
   })
 
   test('Add new step', async () => {
-    await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Processing steps'))
+    await addProcessingStep()
     await click(textBox(toRightOf('Entity')))
     await click('Tree')
   })
 
   test('Add new calculation', async () => {
-    await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Calculation steps'))
-    await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: calculationData.label, selector: above('Quantitative') })
-  })
-
-  test('Add new calculation attribute', async () => {
-    await click('Add', toRightOf('Attribute'))
-
-    await clearTextBox({ selector: toRightOf('Name') })
-    await writeIntoTextBox({ text: calculationAttributeData.name, selector: toRightOf('Name') })
-    await expectExists({ text: 'DECIMAL' })
-    await expectExists({ selector: '.icon-checkbox-checked', relativeSelectors: [toRightOf('Analysis')] })
-
-    await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: calculationAttributeData.label, selector: toRightOf('Labels') })
-
-    await clearTextBox({ selector: toRightOf('Descriptions') })
-    await writeIntoTextBox({ text: calculationAttributeData.description, selector: toRightOf('Descriptions') })
-
-    await click('Save')
-    await waitForLoader()
-    await click('Back')
-  })
+    await addCalculationStep({ label: calculationData.label, attribute: calculationAttributeData })
+  }, 30000)
 
   test('Check values after Add new calculation attribute', async () => {
     await expectExists({ text: chainData.label, selector: toRightOf('Processing chain label') })
@@ -92,6 +77,37 @@ describe('Analysis create chain.', () => {
     await click('Save')
     await waitForLoader()
     await expectExists({ text: 'Saved!' })
+  })
+
+  test('Add new step (with category)', async () => {
+    await click($('.btn-close-calculation'))
+    await waitFor1sec()
+    await click($('.btn-close-step'))
+
+    await addProcessingStep()
+    await selectProcessingStepCategory({ name: 'administrative_unit' })
+
+    await addCalculationStep({
+      label: calculationData.label,
+      attribute: { name: 'another_output_variable', label: 'Another output variable' },
+    })
+
+    await click('Save')
+    await waitForLoader()
+  }, 30000)
+
+  test('Expect cannot add new processing steps', async () => {
+    await click($('.btn-close-calculation'))
+    await waitFor1sec()
+    await click($('.btn-close-step'))
+
+    await expectStepAddButtonDisabled()
+
+    await click('Tree')
+    await expectStepCategorySelectorNotExists()
+  }, 30000)
+
+  test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()
     await expectExists({ text: 'Processing chain', selector: below('Label') })
   })

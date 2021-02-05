@@ -54,7 +54,11 @@ const StepComponent = (props) => {
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={() => Actions.dismissStep({ state })}>
+            <button
+              type="button"
+              className="btn-s btn-close btn-close-step"
+              onClick={() => Actions.dismissStep({ state })}
+            >
               <span className="icon icon-10px icon-cross" />
             </button>
 
