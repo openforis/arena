@@ -8,12 +8,14 @@ const columnSet = {
   index: 'index',
   props: Table.columnSetCommon.props,
 }
+
+const tableName = 'processing_step'
 /**
  * @typedef {module:arena.TableSurvey} module:arena.TableStep
  */
 export default class TableStep extends TableSurvey {
   constructor(surveyId) {
-    super(surveyId, 'processing_step', columnSet)
+    super(surveyId, tableName, columnSet)
     this.getSelect = getSelect.bind(this)
   }
 
@@ -27,3 +29,4 @@ export default class TableStep extends TableSurvey {
 }
 
 TableStep.columnSet = columnSet
+TableStep.tableName = tableName

@@ -6,10 +6,11 @@ import * as Survey from '@core/survey/survey'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as AuthGroupManager from '@server/modules/auth/manager/authManager'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
-const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser }, client) => {
+const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser, arenaSurveyFileZip }, client) => {
   let _user = false
   try {
     _user = await UserManager.fetchUserByUuid(User.getUuid(user), client)
@@ -47,7 +48,7 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser }, 
     )
 
     if (newGroup) {
-      await UserManager.importNewUser(
+      const userCreated = await UserManager.importNewUser(
         {
           surveyId,
           uuid: User.getUuid(user),
@@ -57,10 +58,25 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser }, 
           groupUuid: AuthGroup.getUuid(newGroup),
           title: User.getTitle(user),
           user: currentUser,
+          name: User.getName(user),
         },
         client
       )
 
+      const profilePicture = await ArenaSurveyFileZip.getUserProfilePicture(arenaSurveyFileZip, User.getUuid(user))
+
+      if (profilePicture) {
+        await UserRepository.updateUser(
+          {
+            userUuid: User.getUuid(user),
+            profilePicture,
+            name: User.getName(user),
+            email: User.getEmail(user),
+          },
+          client
+        )
+      }
+      await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(newGroup), User.getUuid(userCreated), client)
     }
   }
 }

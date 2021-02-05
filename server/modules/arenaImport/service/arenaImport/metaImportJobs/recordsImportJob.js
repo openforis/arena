@@ -1,4 +1,5 @@
 import Job from '@server/job/job'
+import * as User from '@core/user/user'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
@@ -20,7 +21,12 @@ export default class RecordsImportJob extends Job {
     )
 
     if (recordsToInsert.length <= 0) return
-    await RecordManager.insertRecordsInBatch({ user: this.user, surveyId, records: recordsToInsert })
+    await RecordManager.insertRecordsInBatch({
+      user: this.user,
+      surveyId,
+      records: recordsToInsert,
+      userUuid: User.getUuid(this.user),
+    })
 
     const nodesToInsert = []
     recordsToInsert.forEach((record) => {

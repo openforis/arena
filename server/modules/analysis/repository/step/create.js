@@ -1,3 +1,6 @@
+import * as DbUtils from '@server/db/dbUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+
 import * as DB from '../../../../db'
 
 import * as Step from '../../../../../common/analysis/processingStep'
@@ -25,5 +28,17 @@ export const insertStep = async (params, client = DB.client) => {
     RETURNING *`,
     [Step.getUuid(step), Step.getProcessingChainUuid(step), Step.getIndex(step), Step.getProps(step)],
     DB.transformCallback
+  )
+}
+
+export const insertStepsInBatch = async (params, client = DB.client) => {
+  const { surveyId, steps } = params
+  return client.none(
+    DbUtils.insertAllQueryBatch(
+      getSurveyDBSchema(surveyId),
+      TableStep.tableName,
+      Object.values(TableStep.columnSet),
+      steps
+    )
   )
 }

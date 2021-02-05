@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as DateUtils from '@core/dateUtils'
+import * as User from '@core/user/user'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -25,15 +26,15 @@ export default class SurveyCreatorJob extends Job {
     const label = Survey.getLabel(surveyInfo, defaultLanguage)
 
     const descriptions = Survey.getDescriptions(surveyInfo)
-    const ownerUuid = Survey.getOwnerUuid(surveyInfo)
 
     const newSurveyInfo = Survey.newSurvey({
-      [Survey.infoKeys.ownerUuid]: ownerUuid,
+      [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.languages]: languages,
       [Survey.infoKeys.descriptions]: descriptions,
       [Survey.infoKeys.labels]: labels,
       [Survey.infoKeys.label]: label,
+      [Survey.infoKeys.published]: Survey.isPublished(surveyInfo),
     })
 
     const survey = await SurveyManager.importSurvey(

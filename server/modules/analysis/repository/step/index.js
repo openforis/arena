@@ -1,4 +1,4 @@
-export { insertStep } from './create'
+export { insertStep, insertStepsInBatch } from './create'
 
 export { fetchSteps, fetchStep, fetchVariablesPrevSteps } from './read'
 
