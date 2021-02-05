@@ -20,12 +20,18 @@ const surveySelectFields = (alias = '') => {
 export const insertSurvey = async (survey, client = db) =>
   await client.one(
     `
-      INSERT INTO survey (uuid, props_draft, owner_uuid)
-      VALUES ($1, $2, $3)
+      INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft )
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING ${surveySelectFields()}
     `,
-    [Survey.getUuid(survey), survey.props, survey.ownerUuid],
-    def => dbTransformCallback(def, true),
+    [
+      Survey.getUuid(survey),
+      survey.props,
+      survey.ownerUuid,
+      Survey.isPublished(survey) || false,
+      Survey.isDraft(survey) || true,
+    ],
+    (def) => dbTransformCallback(def, true)
   )
 
 // ============== READ
@@ -57,7 +63,7 @@ export const fetchUserSurveys = async (user, offset = 0, limit = null, client = 
     OFFSET ${offset}
   `,
     [User.getUuid(user)],
-    def => dbTransformCallback(def, true),
+    (def) => dbTransformCallback(def, true)
   )
 }
 
@@ -78,7 +84,7 @@ export const countUserSurveys = async (user, client = db) => {
         : ''
     }
     `,
-    [User.getUuid(user)],
+    [User.getUuid(user)]
   )
 }
 
@@ -86,19 +92,19 @@ export const fetchSurveysByName = async (surveyName, client = db) =>
   await client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
-    def => dbTransformCallback(def),
+    (def) => dbTransformCallback(def)
   )
 
 export const fetchSurveyById = async (surveyId, draft = false, client = db) =>
-  await client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], def =>
-    dbTransformCallback(def, draft),
+  await client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
+    dbTransformCallback(def, draft)
   )
 
 export const fetchDependencies = async (surveyId, client = db) =>
   await client.oneOrNone(
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
-    R.prop('dependencies'),
+    R.prop('dependencies')
   )
 
 // ============== UPDATE
@@ -114,7 +120,7 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     RETURNING ${surveySelectFields()}
   `,
     [JSON.stringify(prop), surveyId],
-    def => dbTransformCallback(def, true),
+    (def) => dbTransformCallback(def, true)
   )
 }
 
@@ -131,7 +137,7 @@ export const publishSurveyProps = async (surveyId, client = db) =>
     WHERE
         id = $1
     `,
-    [surveyId],
+    [surveyId]
   )
 
 export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
@@ -145,7 +151,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
     WHERE id = $2
     RETURNING ${surveySelectFields()}
     `,
-    [meta, surveyId],
+    [meta, surveyId]
   )
 }
 
@@ -156,9 +162,9 @@ export const deleteSurvey = async (id, client = db) =>
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = R.pipe(
     R.map(
-      langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`,
+      (langCode) => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`
     ),
-    R.join(' '),
+    R.join(' ')
   )(langCodes)
 
   await client.none(
@@ -167,7 +173,7 @@ export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = 
     SET props = props ${propsUpdateCond}
     WHERE id = $1
   `,
-    [id],
+    [id]
   )
 }
 

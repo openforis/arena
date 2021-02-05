@@ -29,7 +29,7 @@ const _insertCalculation = async ({ user, surveyId, chainUuid, calculation }, cl
 export const { fetchCalculationAttributeUuids } = CalculationRepository
 
 // ====== UPDATE
-export const { updateCalculation } = CalculationRepository
+export const { updateCalculation, insertCalculationsInBatch } = CalculationRepository
 
 const _updateCalculation = async ({ user, surveyId, chainUuid, calculation, calculationDb }, client) => {
   const nodeDefUuid = Calculation.getNodeDefUuid(calculation)

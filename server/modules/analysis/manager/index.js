@@ -13,8 +13,8 @@ import * as SurveyRepository from '../../survey/repository/surveyRepository'
 import * as ChainRepository from '../repository/chain'
 
 import { persistChain } from './chain'
-import { persistStep, updateCalculationIndexes } from './step'
-import { persistCalculation } from './calculation'
+import { persistStep, updateCalculationIndexes, insertStepsInBatch } from './step'
+import { persistCalculation, insertCalculationsInBatch } from './calculation'
 
 // ====== Chain
 export {
@@ -65,4 +65,17 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
       // Throw error to rollback transaction
       throw new SystemError('appErrors.processingChainCannotBeSaved')
     }
+  })
+
+export const importChain = async ({ user, surveyId, chain }, client = DB.client) =>
+  client.tx(async (tx) => {
+    await persistChain({ user, surveyId, chain }, tx)
+    const steps = Chain.getProcessingSteps(chain)
+
+    if (steps.length <= 0) return
+    await insertStepsInBatch({ user, surveyId, steps }, tx)
+    const calculations = steps.flatMap(Step.getCalculations)
+
+    if (calculations.length <= 0) return
+    await insertCalculationsInBatch({ user, surveyId, calculations }, tx)
   })

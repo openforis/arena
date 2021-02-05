@@ -11,6 +11,7 @@ import {
   checkNodeDefs,
   checkRecords,
   removeFiles,
+  checkChains,
 } from '../utils/surveyExport'
 import { expectHomeDashboard } from '../utils/ui/home'
 import { closeJobMonitor, expectExistsJobMonitorSucceeded } from '../utils/ui/jobMonitor'
@@ -78,6 +79,8 @@ describe('Survey import', () => {
   test('Check survey.json nodeDefs', async () => checkNodeDefs({ surveyExtractedPath }))
 
   test('Check records', async () => checkRecords({ surveyExtractedPath }))
+
+  test('Check chains', async () => checkChains({ surveyExtractedPath }))
 
   test('Remove files', async () => removeFiles({ downloadPath }))
 
