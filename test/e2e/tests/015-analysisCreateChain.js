@@ -1,7 +1,6 @@
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
 import {
   below,
-  clearTextBox,
   click,
   expectExists,
   expectToBe,
@@ -51,9 +50,7 @@ describe('Analysis create chain.', () => {
     await waitFor(2000)
     await clickSidebarBtnAnalysisProcessingChains()
     await click('New')
-    await clearTextBox({ selector: toRightOf('Processing chain label') })
     await writeIntoTextBox({ text: chainData.label, selector: toRightOf('Processing chain label') })
-    await clearTextBox({ selector: toRightOf('Description') })
     await writeIntoTextBox({ text: chainData.description, selector: toRightOf('Description') })
   })
 
@@ -109,12 +106,12 @@ describe('Analysis create chain.', () => {
     await closeStep()
   }, 30000)
 
-  test('Delete step', async () => {
+  test('Delete processing step', async () => {
     await expectToBe({ selector: '.chain-list-item', numberOfItems: 2 })
 
     await click('administrative_unit')
 
-    // delete calculation
+    // delete calculation step
     await click('Tree volume (Another output variable (C))')
 
     await deleteItem()
@@ -128,5 +125,20 @@ describe('Analysis create chain.', () => {
   test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()
     await expectExists({ text: 'Processing chain', selector: below('Label') })
+  })
+
+  test('Chain reload', async () => {
+    // reload page
+    await reload()
+    await waitFor(2000)
+
+    // select chain
+    await click(chainData.label)
+
+    await expectExists({ text: chainData.label, selector: toRightOf('Processing chain label') })
+    await expectExists({ text: 'Tree', selector: toRightOf('1') })
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
+
+    await clickSidebarBtnAnalysisProcessingChains()
   })
 })
