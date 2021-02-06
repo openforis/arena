@@ -114,12 +114,15 @@ describe('Analysis create chain.', () => {
 
     await click('administrative_unit')
 
+    // delete calculation
+    await click('Tree volume (Another output variable (C))')
+
+    await deleteItem()
+
+    // delete step
     await deleteItem()
 
     await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
-
-    await click('Save')
-    await waitForLoader()
   })
 
   test('Expect exists chain in chains list', async () => {
