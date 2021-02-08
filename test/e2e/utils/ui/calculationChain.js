@@ -9,14 +9,8 @@ import {
   button,
   textBox,
   above,
-  expectNotExists,
-  waitFor1sec,
 } from '../api'
 import { waitForLoader } from './loader'
-
-const selectors = {
-  categorySelector: '.category-selector',
-}
 
 const elements = {
   stepAddBtn: () => $('.btn-add-step'),
@@ -26,11 +20,6 @@ const elements = {
 }
 
 export const addProcessingStep = async () => click(elements.stepAddBtn())
-
-export const selectProcessingStepCategory = async ({ name }) => {
-  await click(elements.stepCategory())
-  await click(name)
-}
 
 export const addCalculationStep = async ({ label, attribute }) => {
   await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Calculation steps'))
@@ -57,20 +46,3 @@ export const addCalculationStep = async ({ label, attribute }) => {
     await click('Back')
   }
 }
-
-export const closeStep = async () => click(elements.stepCloseBtn())
-
-export const closeCalculation = async () => click(elements.calculationCloseBtn())
-
-export const deleteItem = async () => {
-  await click('Delete')
-  await waitFor1sec()
-  await click('Ok')
-}
-
-export const expectStepAddButtonDisabled = async () => {
-  const disabled = await elements.stepAddBtn().isDisabled()
-  await expect(disabled).toBeTruthy()
-}
-
-export const expectStepCategorySelectorNotExists = async () => expectNotExists({ selector: selectors.categorySelector })

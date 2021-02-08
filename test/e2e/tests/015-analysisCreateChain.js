@@ -11,16 +11,7 @@ import {
   writeIntoTextBox,
 } from '../utils/api'
 import { waitForLoader } from '../utils/ui/loader'
-import {
-  addCalculationStep,
-  addProcessingStep,
-  closeCalculation,
-  closeStep,
-  deleteItem,
-  expectStepAddButtonDisabled,
-  expectStepCategorySelectorNotExists,
-  selectProcessingStepCategory,
-} from '../utils/ui/calculationChain'
+import { addCalculationStep, addProcessingStep } from '../utils/ui/calculationChain'
 
 const chainData = { label: 'Chain 1', description: 'Processing description' }
 const calculationData = { label: 'Tree volume' }
@@ -76,50 +67,6 @@ describe('Analysis create chain.', () => {
     await click('Save')
     await waitForLoader()
     await expectExists({ text: 'Saved!' })
-  })
-
-  test('Add new step (with category)', async () => {
-    await closeCalculation()
-    await closeStep()
-
-    await addProcessingStep()
-    await selectProcessingStepCategory({ name: 'administrative_unit' })
-
-    await addCalculationStep({
-      label: calculationData.label,
-      attribute: { name: 'another_output_variable', label: 'Another output variable' },
-    })
-
-    await click('Save')
-    await waitForLoader()
-  }, 30000)
-
-  test('Expect cannot add new processing steps', async () => {
-    await closeCalculation()
-    await closeStep()
-
-    await expectStepAddButtonDisabled()
-
-    await click('Tree')
-    await expectStepCategorySelectorNotExists()
-
-    await closeStep()
-  }, 30000)
-
-  test('Delete processing step', async () => {
-    await expectToBe({ selector: '.chain-list-item', numberOfItems: 2 })
-
-    await click('administrative_unit')
-
-    // delete calculation step
-    await click('Tree volume (Another output variable (C))')
-
-    await deleteItem()
-
-    // delete step
-    await deleteItem()
-
-    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
   })
 
   test('Expect exists chain in chains list', async () => {
