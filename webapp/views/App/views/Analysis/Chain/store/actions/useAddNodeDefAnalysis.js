@@ -2,6 +2,8 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
+import * as A from '@core/arena'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
@@ -24,10 +26,8 @@ export const useAddNodeDefAnalysis = ({ setState }) => {
   const surveyInfo = useSurveyInfo()
   const updateAttributeCalculation = useUpdateAttribute({ setState })
 
-  const nodeDefParent = ({ step }) => {
-    const entityDefUuid = Step.getEntityUuid(step)
-    return entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : Survey.getNodeDefRoot(survey)
-  }
+  const nodeDefParent = ({ step }) =>
+    A.pipe(Step.getEntityUuid, (entityDefUuid) => Survey.getNodeDefByUuid(entityDefUuid)(survey))(step)
 
   return useCallback(async ({ state }) => {
     const step = State.getStepEdit(state)

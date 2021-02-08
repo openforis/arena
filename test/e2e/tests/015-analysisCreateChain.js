@@ -1,17 +1,17 @@
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
+import { click, expectExists, expectToBe, reload, toRightOf, waitFor, writeIntoTextBox } from '../utils/api'
 import {
-  below,
-  click,
-  expectExists,
-  expectToBe,
-  reload,
-  textBox,
-  toRightOf,
-  waitFor,
-  writeIntoTextBox,
-} from '../utils/api'
-import { waitForLoader } from '../utils/ui/loader'
-import { addCalculationStep, addProcessingStep } from '../utils/ui/calculationChain'
+  addCalculationStep,
+  addCalculationAttribute,
+  addProcessingStep,
+  closeCalculation,
+  closeStep,
+  deleteItem,
+  expectStepAddButtonDisabled,
+  expectStepCategorySelectorNotExists,
+  publishSurvey,
+  save,
+} from '../utils/ui/calculationChain'
 
 const chainData = { label: 'Chain 1', description: 'Processing description' }
 const calculationData = { label: 'Tree volume' }
@@ -28,12 +28,7 @@ describe('Analysis create chain.', () => {
   })
 
   test('Publish survey', async () => {
-    await click('Publish')
-    await waitForLoader()
-    await click('Ok')
-    await waitFor(5000)
-
-    await click('Close')
+    await publishSurvey()
   })
 
   test('Add new chain', async () => {
@@ -46,13 +41,12 @@ describe('Analysis create chain.', () => {
   })
 
   test('Add new step', async () => {
-    await addProcessingStep()
-    await click(textBox(toRightOf('Entity')))
-    await click('Tree')
+    await addProcessingStep({ entity: 'Tree' })
   })
 
   test('Add new calculation', async () => {
-    await addCalculationStep({ label: calculationData.label, attribute: calculationAttributeData })
+    await addCalculationStep({ label: calculationData.label })
+    await addCalculationAttribute({ attribute: calculationAttributeData })
   }, 30000)
 
   test('Check values after Add new calculation attribute', async () => {
@@ -64,14 +58,44 @@ describe('Analysis create chain.', () => {
   })
 
   test('Save calculation', async () => {
-    await click('Save')
-    await waitForLoader()
-    await expectExists({ text: 'Saved!' })
+    await save()
+  })
+
+  test('Add new step (with category)', async () => {
+    await closeCalculation()
+    await closeStep()
+
+    await addProcessingStep({ category: 'administrative_unit' })
+
+    await save()
+  }, 30000)
+
+  test('Expect cannot add new processing steps', async () => {
+    await closeStep()
+
+    await expectStepAddButtonDisabled()
+
+    await click('Tree')
+    await expectStepCategorySelectorNotExists()
+
+    await closeStep()
+  }, 30000)
+
+  test('Delete processing step', async () => {
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 2 })
+
+    await click('administrative_unit')
+
+    await deleteItem()
+
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
   })
 
   test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()
-    await expectExists({ text: 'Processing chain', selector: below('Label') })
+    await expectExists({ text: chainData.label })
+
+    await publishSurvey()
   })
 
   test('Chain reload', async () => {
