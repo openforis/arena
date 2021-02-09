@@ -21,6 +21,8 @@ const stdlib = {
   max: [Math.max, 1, -1],
   includes: [(items, value) => Array.isArray(items) && items.includes(String(value)), 2, 2],
 
+  now: [() => new Date(), 0],
+
   avg: [R.identity, 1, 1],
   count: [R.identity, 1, 1],
   sum: [R.identity, 1, 1],
