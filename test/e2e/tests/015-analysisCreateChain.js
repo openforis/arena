@@ -94,8 +94,6 @@ describe('Analysis create chain.', () => {
   test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()
     await expectExists({ text: chainData.label })
-
-    await publishSurvey()
   })
 
   test('Chain reload', async () => {
@@ -111,5 +109,9 @@ describe('Analysis create chain.', () => {
     await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
 
     await clickSidebarBtnAnalysisProcessingChains()
+  })
+
+  test('Publish survey after chain creation', async () => {
+    await publishSurvey()
   })
 })
