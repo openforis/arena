@@ -20,6 +20,7 @@ Do you want to cancel them?`,
     close: 'Close',
     cnt: 'Count',
     code: 'Code',
+    cloneFrom: 'Clone from',
     childrenEmpty: 'Define at least one child item',
     export: 'Export',
     csvExport: 'CSV Export',
@@ -817,6 +818,10 @@ $t(common.cantUndoWarning)`,
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',
     UsersImportJob: 'Users Import',
+    // clone survey
+    SurveyCloneJob: 'Clone survey',
+    CloneSurveyJob: 'Clone survey',
+    CloneTablesJob: 'Clone survey tables',
   },
 
   // ====== App Errors

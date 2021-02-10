@@ -8,11 +8,11 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
 
   return () => {
     ;(async () => {
-      const { name, label, lang } = newSurvey
+      const { name, label, lang, cloneFrom = false } = newSurvey
 
       const {
         data: { survey, validation },
-      } = await axios.post('/api/survey', { name, label, lang })
+      } = await axios.post('/api/survey', { name, label, lang, cloneFrom })
 
       if (survey) {
         dispatch(SurveyActions.createSurvey({ survey }))
