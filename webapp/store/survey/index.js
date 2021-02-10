@@ -24,7 +24,6 @@ export {
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
   useNodeDefsByUuids,
-  useCategoryByUuid,
   useNodeDefLabel,
   useNodeDefRootKeys,
 } from './hooks'

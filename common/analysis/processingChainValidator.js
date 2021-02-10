@@ -54,11 +54,13 @@ const _validateStepVariablesPrevStep = (step) => {
 }
 
 export const validateStep = async (step) => {
-  const validation = await Validator.validate(step, {
-    [ProcessingStep.keys.calculations]: [
+  const propsValidations = {}
+  if (ProcessingStep.hasEntity(step)) {
+    propsValidations[ProcessingStep.keys.calculations] = [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStep.calculationsRequired),
-    ],
-  })
+    ]
+  }
+  const validation = await Validator.validate(step, propsValidations)
 
   // one of entity or category is required
   if (!ProcessingStep.getEntityUuid(step) && !ProcessingStep.getCategoryUuid(step)) {

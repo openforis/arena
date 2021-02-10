@@ -33,8 +33,9 @@ const StepList = (props) => {
           </ValidationTooltip>
           <button
             type="button"
-            className="btn-s btn-transparent"
+            className="btn-s btn-transparent btn-add-step"
             onClick={() => Actions.createStep({ state })}
+            disabled={lastStepHasCategory}
             aria-disabled={lastStepHasCategory}
           >
             <span className="icon icon-plus icon-14px" />

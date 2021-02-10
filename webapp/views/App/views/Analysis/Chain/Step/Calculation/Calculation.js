@@ -35,7 +35,11 @@ const CalculationComponent = (props) => {
 
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
-      <button type="button" className="btn-s btn-close" onClick={() => Actions.dismissCalculation({ state })}>
+      <button
+        type="button"
+        className="btn-s btn-close btn-close-calculation"
+        onClick={() => Actions.dismissCalculation({ state })}
+      >
         <span className="icon icon-10px icon-cross" />
       </button>
 
