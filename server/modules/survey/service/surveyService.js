@@ -13,6 +13,7 @@ import * as UserService from '@server/modules/user/service/userService'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 
 import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
 import * as SurveyManager from '../manager/surveyManager'
 
 import SurveyPublishJob from './publish/surveyPublishJob'
@@ -160,7 +161,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
 export const cloneSurvey = ({ user, surveyInfo, surveyId }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfo })
   JobManager.executeJobThread(job)
-  return job
+  return JobUtils.jobToJSON(job)
 }
 
 export const {
