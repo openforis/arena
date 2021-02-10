@@ -44,14 +44,14 @@ const Plot = ({ plotId, plotText, plotCountry, plotRegion, plotProvince }) => [
   { type: NodeDef.nodeDefType.code, value: plotProvince, label: 'Province' },
 ]
 
-export const recordInitial = {
+export const recordInitial = () => ({
   cluster: Cluster({
     clusterDecimal: 1,
     clusterDate: DateUtils.formatDateISO(new Date()),
     clusterTime: DateUtils.format(new Date(), DateUtils.formats.timeStorage),
     clusterBoolean: 'false',
   }),
-}
+})
 
 export const records = [
   {
