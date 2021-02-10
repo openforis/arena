@@ -30,7 +30,7 @@ export const formats = {
   dateDefault: 'dd/MM/yyyy',
   dateISO: 'yyyy-MM-dd',
   datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
-  timeDefault: 'HH:mm',
+  timeStorage: 'HH:mm',
 }
 
 const normalizeDateTimeValue = (length) => (value) =>

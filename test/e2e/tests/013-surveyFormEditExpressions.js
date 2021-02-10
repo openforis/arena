@@ -56,6 +56,21 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
   }, 60000)
 
+  test('add Default Value "now()" to cluster_date', async () => {
+    await editNodeDef({ nodeDefLabel: 'Cluster date' })
+
+    await click('Advanced')
+
+    const qualifier = qualifiers.defaultValues
+    await addNodeDefExpression({
+      qualifier,
+      expression: { expression: 'now()' },
+      expressionText: `now()`,
+    })
+
+    await clickNodeDefSaveAndBack()
+  })
+
   test('add "Relevant if cluster_decimal > 0" to "Cluster date"', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster date' })
 
@@ -73,6 +88,21 @@ describe('SurveyForm edit expressions', () => {
 
     await clickNodeDefSaveAndBack()
   }, 60000)
+
+  test('add Default Value to cluster_time', async () => {
+    await editNodeDef({ nodeDefLabel: 'Cluster time' })
+
+    await click('Advanced')
+
+    const qualifier = qualifiers.defaultValues
+    await addNodeDefExpression({
+      qualifier,
+      expression: { expression: 'now()' },
+      expressionText: `now()`,
+    })
+
+    await clickNodeDefSaveAndBack()
+  })
 
   test('add Default Value to "cluster_boolean" as "true" if "cluster_decimal" value is > 5, "false" otherwise', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster boolean' })
@@ -102,24 +132,6 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
     await waitFor1sec()
   }, 60000)
-
-  test('add Default Value "2021-01-27" to "Cluster date"', async () => {
-    await editNodeDef({ nodeDefLabel: 'Cluster date' })
-
-    await click('Advanced')
-
-    const qualifier = qualifiers.defaultValues
-
-    await addNodeDefExpression({
-      qualifier,
-      expression: { binaryExpression: { left: { constant: '2021-01-27' } } },
-      expressionText: '"2021-01-27"',
-    })
-
-    await expectNodeDefExpressionsValid({ qualifier })
-    await clickNodeDefSaveAndBack()
-    await waitFor1sec()
-  })
 
   // Validations
 
@@ -218,7 +230,7 @@ describe('SurveyForm edit expressions', () => {
     await clickNodeDefSaveAndBack()
   }, 60000)
 
-  test('add Validation to "cluster_date": cluster_date >= "2021-01-01"', async () => {
+  test('add Validation to "cluster_date": cluster_date >= "2021-01-01" and cluster_date <= now()', async () => {
     await editNodeDef({ nodeDefLabel: 'Cluster date' })
 
     await click('Validations')
@@ -229,6 +241,12 @@ describe('SurveyForm edit expressions', () => {
         binaryExpression: { left: { identifier: 'cluster_date' }, operator: '>=', right: { constant: '2021-01-01' } },
       },
       expressionText: 'cluster_date >= "2021-01-01"',
+    })
+
+    await addNodeDefExpression({
+      qualifier: qualifiers.validations,
+      expression: { expression: 'cluster_date <= now()' },
+      expressionText: 'cluster_date <= now()',
     })
 
     await clickNodeDefSaveAndBack()

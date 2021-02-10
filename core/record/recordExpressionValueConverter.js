@@ -71,8 +71,8 @@ const _valueExprToValueNodeFns = {
   [NodeDef.nodeDefType.time]: ({ valueExpr }) =>
     _toDateTime({
       valueExpr,
-      format: DateUtils.formats.timeDefault,
-      formatsFrom: [DateUtils.formats.datetimeDefault, DateUtils.formats.timeDefault],
+      format: DateUtils.formats.timeStorage,
+      formatsFrom: [DateUtils.formats.datetimeDefault, DateUtils.formats.timeStorage],
     }),
 }
 
