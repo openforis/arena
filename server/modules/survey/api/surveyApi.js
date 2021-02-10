@@ -35,6 +35,7 @@ export const init = (app) => {
         if (cloneFrom) {
           const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfo, user, res })
           res.json({ job })
+          return
         }
         survey = await SurveyService.insertSurvey({ user, surveyInfo })
 

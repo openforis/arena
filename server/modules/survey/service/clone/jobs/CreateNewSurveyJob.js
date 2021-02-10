@@ -24,8 +24,8 @@ export default class CreateNewSurveyJob extends Job {
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(user),
       [Survey.infoKeys.name]: Survey.getName(surveyInfoData) || `clone_${Survey.getName(clonedSurveyInfo)}`,
-      [Survey.infoKeys.languages]: Survey.getLanguages(surveyInfoData) || Survey.getLanguages(clonedSurveyInfo),
-      [Survey.infoKeys.descriptions]: Survey.getLabels(surveyInfoData) || Survey.getLabels(clonedSurveyInfo),
+      [Survey.infoKeys.languages]: Survey.getLanguages(clonedSurveyInfo),
+      [Survey.infoKeys.labels]: Survey.getLabels(surveyInfoData) || Survey.getLabels(clonedSurveyInfo),
     })
 
     const surveyInfo = await SurveyRepository.insertSurvey(newSurveyInfo, this.tx)
