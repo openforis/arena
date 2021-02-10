@@ -32,6 +32,3 @@ export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyLang(), type)
-
-// ==== Categories
-export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())

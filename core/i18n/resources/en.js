@@ -416,6 +416,7 @@ $t(common.cantUndoWarning)`,
     deleteConfirm: `Delete this calculation step?
     
 $t(common.cantUndoWarning)`,
+    deleteComplete: 'Processing step calculation deleted',
   },
 
   itemsTable: {

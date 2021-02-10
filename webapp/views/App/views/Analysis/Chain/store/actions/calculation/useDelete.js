@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import axios from 'axios'
-import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
@@ -8,6 +7,7 @@ import * as A from '@core/arena'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
+import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainController from '@common/analysis/chainController'
@@ -17,10 +17,10 @@ import { State } from '../../state'
 export const useDelete = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
-  const { chainUuid } = useParams()
 
   const deleteCalculation = ({ state }) => async () => {
     const chain = State.getChainEdit(state)
+    const chainUuid = Chain.getUuid(chain)
     const step = State.getStepEdit(state)
     const calculation = State.getCalculationEdit(state)
     const calculationUuid = Calculation.getUuid(calculation)
