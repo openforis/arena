@@ -100,21 +100,6 @@ export const init = (app) => {
     }
   })
 
-  // ==== CLONE
-
-  app.post('/survey/:surveyId/clone', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-
-      const user = Request.getUser(req)
-
-      const survey = await SurveyService.cloneSurvey({ surveyId, user, res })
-      return res.json(survey)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   // ==== UPDATE
 
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {

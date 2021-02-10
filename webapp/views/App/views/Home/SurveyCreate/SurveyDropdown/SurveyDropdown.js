@@ -19,7 +19,7 @@ const SurveyDropdown = (props) => {
     })()
   }, [])
 
-  const selectedItem = surveys.find((s) => String(Survey.getIdSurveyInfo(s)) === String(selection))
+  const selectedItem = surveys.find((survey) => String(Survey.getIdSurveyInfo(survey)) === String(selection))
 
   return (
     <Dropdown

@@ -37,7 +37,6 @@ export default class CreateNewSurveyJob extends Job {
 
     const authGroups = Survey.getAuthGroups(surveyInfo)
 
-    // Create default groups for this survey
     surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, this.tx)
 
     if (!User.isSystemAdmin(user)) {
