@@ -54,7 +54,11 @@ const StepComponent = (props) => {
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={() => Actions.dismissStep({ state })}>
+            <button
+              type="button"
+              className="btn-s btn-close btn-close-step"
+              onClick={() => Actions.dismissStep({ state })}
+            >
               <span className="icon icon-10px icon-cross" />
             </button>
 
@@ -93,25 +97,27 @@ const StepComponent = (props) => {
               </button>
             </EntitySelector>
 
-            <div className="form-item processing-step__category-selector-form-item">
-              <div className="form-label chain-list__label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
-              <CategorySelector
-                disabled={disabledEntityOrCategory}
-                categoryUuid={Step.getCategoryUuid(stepEdit)}
-                validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
-                showManage={false}
-                showAdd={false}
-                onChange={(category) => {
-                  Actions.updatePropsStep({
-                    props: {
-                      [Step.keysProps.entityUuid]: null,
-                      [Step.keysProps.categoryUuid]: Category.getUuid(category),
-                    },
-                    state,
-                  })
-                }}
-              />
-            </div>
+            {stepNext === null && (
+              <div className="form-item processing-step__category-selector-form-item">
+                <div className="form-label chain-list__label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
+                <CategorySelector
+                  disabled={disabledEntityOrCategory}
+                  categoryUuid={Step.getCategoryUuid(stepEdit)}
+                  validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
+                  showManage={false}
+                  showAdd={false}
+                  onChange={(category) => {
+                    Actions.updatePropsStep({
+                      props: {
+                        [Step.keysProps.entityUuid]: null,
+                        [Step.keysProps.categoryUuid]: Category.getUuid(category),
+                      },
+                      state,
+                    })
+                  }}
+                />
+              </div>
+            )}
           </>
         )}
         <CalculationList state={state} Actions={Actions} />
