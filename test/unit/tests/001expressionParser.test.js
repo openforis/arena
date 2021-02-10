@@ -2,6 +2,19 @@ import * as Expression from '@core/expressionParser/expression'
 
 import * as DateUtils from '@core/dateUtils'
 
+const _datesEqualCompareFn = (result, resultExpected) =>
+  result !== null &&
+  DateUtils.convertDate({
+    dateStr: result,
+    formatFrom: DateUtils.formats.datetimeDefault,
+    formatTo: DateUtils.formats.dateISO,
+  }) ===
+    DateUtils.convertDate({
+      dateStr: resultExpected,
+      formatFrom: DateUtils.formats.datetimeDefault,
+      formatTo: DateUtils.formats.dateISO,
+    })
+
 /**
  * Query test objects.
  * Every query object has the following properties:
@@ -22,12 +35,7 @@ const queries = [
   { q: 'ln(2)', r: 0.6931471805599453 },
   { q: 'log10(10)', r: 1 },
   { q: 'log10(100) == 2', r: true },
-  {
-    q: 'now()',
-    r: new Date(),
-    c: (result, resultExpected) =>
-      result !== null && DateUtils.formatDateISO(result) === DateUtils.formatDateISO(resultExpected),
-  },
+  { q: 'now()', r: DateUtils.nowFormatDefault(), c: _datesEqualCompareFn },
 ]
 
 describe('ExpressionParser test', () => {
