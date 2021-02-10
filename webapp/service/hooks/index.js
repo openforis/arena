@@ -1,1 +1,1 @@
-export { useFetchCategoryByUuid } from './useFetchCategoryByUuid'
+export { useFetchCategoryByUuid } from './categories'
