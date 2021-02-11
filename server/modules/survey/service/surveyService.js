@@ -13,9 +13,11 @@ import * as UserService from '@server/modules/user/service/userService'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 
 import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
 import * as SurveyManager from '../manager/surveyManager'
 
 import SurveyPublishJob from './publish/surveyPublishJob'
+import SurveyCloneJob from './clone/surveyCloneJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -154,6 +156,12 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   files.push({ data: JSON.stringify(activityLog, null, 2), name: activityLogPathFile })
 
   Response.sendFilesAsZip(res, `${prefix}.zip`, files)
+}
+
+export const cloneSurvey = ({ user, surveyInfo, surveyId }) => {
+  const job = new SurveyCloneJob({ user, surveyId, surveyInfo })
+  JobManager.executeJobThread(job)
+  return JobUtils.jobToJSON(job)
 }
 
 export const {

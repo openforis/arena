@@ -21,7 +21,7 @@ export const init = (app) => {
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validation.isValid(validation)) {
-        const { name, label, lang } = surveyReq
+        const { name, label, lang, cloneFrom } = surveyReq
 
         const surveyInfo = Survey.newSurvey({
           ownerUuid: User.getUuid(user),
@@ -29,6 +29,12 @@ export const init = (app) => {
           label,
           languages: [lang],
         })
+
+        if (cloneFrom) {
+          const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfo, user, res })
+          res.json({ job })
+          return
+        }
         const survey = await SurveyService.insertSurvey({ user, surveyInfo })
 
         res.json({ survey })

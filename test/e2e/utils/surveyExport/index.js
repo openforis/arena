@@ -17,7 +17,7 @@ export { checkTaxonomies } from './taxonomies'
 export { checkNodeDefs } from './nodeDefs'
 
 // Records
-export { checkRecords } from './records'
+export { checkRecords, checkRecordsEmpty } from './records'
 
 // Chains
 export { checkChains } from './chains'
