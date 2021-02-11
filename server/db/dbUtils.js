@@ -13,6 +13,9 @@ export const selectDate = (field, fieldAlias = null) =>
 
 export const now = "timezone('UTC', now())"
 
+export const cloneTable = ({ source, destination }) =>
+  `INSERT INTO  ${destination} OVERRIDING SYSTEM VALUE (SELECT * FROM ${source}) on conflict do nothing`
+
 export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },

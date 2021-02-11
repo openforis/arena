@@ -121,3 +121,5 @@ const _getAuthGroupByName = (name) => R.pipe(getAuthGroups, R.find(R.propEq(Auth
 export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
 export const isAuthGroupAdmin = (group) => (surveyInfo) => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
+
+export const assocAuthGroups = R.assoc(keys.authGroups)
