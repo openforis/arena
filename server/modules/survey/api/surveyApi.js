@@ -30,14 +30,12 @@ export const init = (app) => {
           languages: [lang],
         })
 
-        let survey = null
-
         if (cloneFrom) {
           const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfo, user, res })
           res.json({ job })
           return
         }
-        survey = await SurveyService.insertSurvey({ user, surveyInfo })
+        const survey = await SurveyService.insertSurvey({ user, surveyInfo })
 
         res.json({ survey })
       } else {
