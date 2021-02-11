@@ -1,4 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
+import * as DateUtils from '@core/dateUtils'
 import { above } from '../../utils/api'
 
 const countryRelativeSelectors = () => above('Region')
@@ -43,13 +44,14 @@ const Plot = ({ plotId, plotText, plotCountry, plotRegion, plotProvince }) => [
   { type: NodeDef.nodeDefType.code, value: plotProvince, label: 'Province' },
 ]
 
-export const recordInitial = {
+export const recordInitial = () => ({
   cluster: Cluster({
     clusterDecimal: 1,
-    clusterDate: '2021-01-27',
+    clusterDate: DateUtils.formatDateISO(new Date()),
+    clusterTime: DateUtils.format(new Date(), DateUtils.formats.timeStorage),
     clusterBoolean: 'false',
   }),
-}
+})
 
 export const records = [
   {

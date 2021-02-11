@@ -9,6 +9,7 @@ const functionExamples = {
     ln: 'ln(10) = 2.302…',
     log10: 'log10(100) = 2',
     includes: `includes(multiple_attribute_name, 'value') = true/false`,
+    now: 'now()',
   },
   [Expression.modes.sql]: {
     avg: 'avg(variable_name)',

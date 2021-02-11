@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import SystemError from '@core/systemError'
+import * as DateUtils from '@core/dateUtils'
 import { types } from './types'
 
 // Built-in functions that can be called, i.e. the standard library.
@@ -20,6 +21,8 @@ const stdlib = {
   min: [Math.min, 1, -1],
   max: [Math.max, 1, -1],
   includes: [(items, value) => Array.isArray(items) && items.includes(String(value)), 2, 2],
+
+  now: [() => DateUtils.nowFormatDefault(), 0],
 
   avg: [R.identity, 1, 1],
   count: [R.identity, 1, 1],

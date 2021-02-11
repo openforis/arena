@@ -443,6 +443,7 @@ $t(common.cantUndoWarning)`,
       pow: 'Raise a number X to the power P',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
+      now: 'Returns the current date or time',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
