@@ -95,11 +95,9 @@ describe('SurveyForm edit expressions', () => {
     await click('Advanced')
 
     const qualifier = qualifiers.defaultValues
-    await addNodeDefExpression({
-      qualifier,
-      expression: { expression: 'now()' },
-      expressionText: `now()`,
-    })
+    const expression = 'now()'
+
+    await addNodeDefExpression({ qualifier, expression: { expression }, expressionText: expression })
 
     await clickNodeDefSaveAndBack()
   })
@@ -251,4 +249,20 @@ describe('SurveyForm edit expressions', () => {
 
     await clickNodeDefSaveAndBack()
   }, 60000)
+
+  // Plot attributes
+  test('add "Relevant if !isEmpty(plot_id)" to "Plot text"', async () => {
+    await click('Plot')
+
+    await editNodeDef({ nodeDefLabel: 'Plot text' })
+
+    await click('Advanced')
+
+    const qualifier = qualifiers.relevantIf
+    const expression = '!isEmpty(plot_id)'
+
+    await addNodeDefExpression({ qualifier, expression: { expression }, expressionText: expression })
+
+    await clickNodeDefSaveAndBack()
+  }, 30000)
 })
