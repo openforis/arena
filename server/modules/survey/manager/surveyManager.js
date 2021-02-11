@@ -84,10 +84,7 @@ export const insertSurvey = async (params, client = db) => {
           ),
         }
       )
-      await NodeDefManager.insertNodeDef(
-        { user, surveyId, cycle: Survey.cycleOneKey, nodeDef: rootEntityDef, system: true },
-        t
-      )
+      await NodeDefManager.insertNodeDef({ user, surveyId, nodeDef: rootEntityDef, system: true }, t)
     }
 
     // Update user prefs
@@ -274,4 +271,4 @@ export const deleteSurvey = async (surveyId) =>
     ])
   })
 
-export const { dropSurveySchema } = SurveyRepository
+export const { dropSurveySchema, cloneTables } = SurveyRepository

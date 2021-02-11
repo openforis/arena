@@ -132,6 +132,14 @@ const checkRecordFileAndContent = async ({
   )
 }
 
+export const checkRecordsEmpty = async ({ surveyExtractedPath }) => {
+  const records = await checkFileAndGetContent({
+    filePath: path.join(surveyExtractedPath, 'records', 'records.json'),
+  })
+
+  await expect(records.length).toBe(0)
+}
+
 export const checkRecords = async ({ surveyExtractedPath }) => {
   const records = await checkFileAndGetContent({
     filePath: path.join(surveyExtractedPath, 'records', 'records.json'),

@@ -3,6 +3,8 @@ import './SurveyCreate.scss'
 import React from 'react'
 import { useHistory } from 'react-router'
 
+import * as A from '@core/arena'
+
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -17,6 +19,7 @@ import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useCreateSurvey } from './store'
+import SurveyDropdown from './SurveyDropdown'
 
 const SurveyCreate = () => {
   const surveyInfo = useSurveyInfo()
@@ -24,7 +27,7 @@ const SurveyCreate = () => {
   const history = useHistory()
 
   const { newSurvey, onUpdate, onCreate, onImport } = useCreateSurvey()
-  const { name, label, lang, validation } = newSurvey
+  const { name, label, lang, validation, cloneFrom } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -54,7 +57,11 @@ const SurveyCreate = () => {
           selection={lang}
           validation={Validation.getFieldValidation('lang')(validation)}
           onChange={(value) => onUpdate({ name: 'lang', value })}
+          disabled={!A.isEmpty(cloneFrom)}
         />
+      </div>
+      <div>
+        <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
       </div>
       <button type="button" className="btn" onClick={onCreate}>
         <span className="icon icon-plus icon-left icon-12px" />
@@ -62,15 +69,6 @@ const SurveyCreate = () => {
       </button>
 
       <div className="home-survey-create__collect-import">
-        <div style={{ display: 'none' }}>
-          <UploadButton
-            inputFieldId="import-from-arena"
-            label={i18n.t('homeView.surveyCreate.importFromArena')}
-            accept=".zip"
-            onChange={(files) => onImport.Arena({ file: files[0] })}
-          />
-        </div>
-
         <UploadButton
           inputFieldId="import-from-arena"
           label={i18n.t('homeView.surveyCreate.importFromArena')}
