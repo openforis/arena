@@ -3,6 +3,8 @@ import './SurveyCreate.scss'
 import React from 'react'
 import { useHistory } from 'react-router'
 
+import * as A from '@core/arena'
+
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -55,6 +57,7 @@ const SurveyCreate = () => {
           selection={lang}
           validation={Validation.getFieldValidation('lang')(validation)}
           onChange={(value) => onUpdate({ name: 'lang', value })}
+          disabled={!A.isEmpty(cloneFrom)}
         />
       </div>
       <div>

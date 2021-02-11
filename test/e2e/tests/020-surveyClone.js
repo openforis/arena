@@ -26,8 +26,6 @@ let extractedPath = ''
 let surveyExtractedPath = ''
 let surveyName = null
 
-// ${name}-import-yyyy-MM-dd_hh-mm-ss
-
 const cloneSurvey = async ({ name, label, cloneFrom }) => {
   await writeIntoTextBox({ text: name, selector: { placeholder: 'Name' } })
   await writeIntoTextBox({ text: label, selector: { placeholder: 'Label' } })
