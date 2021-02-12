@@ -46,7 +46,7 @@ describe('SurveyForm Preview', () => {
   })
 
   test('Expect default values are set', async () => {
-    const { cluster } = recordInitial
+    const { cluster } = recordInitial()
     await checkValuesCluster({ items: cluster })
   }, 20000)
 

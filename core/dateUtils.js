@@ -30,6 +30,7 @@ export const formats = {
   dateDefault: 'dd/MM/yyyy',
   dateISO: 'yyyy-MM-dd',
   datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
+  timeStorage: 'HH:mm',
 }
 
 const normalizeDateTimeValue = (length) => (value) =>
@@ -112,7 +113,7 @@ export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
 export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
 export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo }) => {
-  if (!dateStr) {
+  if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
     return null
   }
   const dateParsed = parse(dateStr, formatFrom)
