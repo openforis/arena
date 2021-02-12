@@ -1,5 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as StringUtils from '@core/stringUtils'
+
 import {
   click,
   writeIntoTextBox,
@@ -17,11 +19,17 @@ import {
   near,
   pressEsc,
   waitFor1sec,
+  clearTextBox,
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
   await waitFor(3000)
-  await writeIntoTextBox({ text: value, selector: below(label), clearBefore: true })
+  const selector = below(label)
+  if (StringUtils.isNotBlank(value)) {
+    await writeIntoTextBox({ text: value, selector, clearBefore: true })
+  } else {
+    await clearTextBox({ selector })
+  }
 }
 
 const expectNodeDefBase = async ({ value: text, label, relativeSelectors = [] }) =>
@@ -136,7 +144,7 @@ const doSequencial = async ({ items, getFunction, getParams }) =>
     return getFunction(item)(getParams(item))
   }, true)
 
-const enterValuesSequencial = async ({ items }) => {
+export const enterValuesSequencial = async ({ items }) => {
   await doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
   // wait for relevance/validation feedback
   await waitFor1sec()
@@ -155,11 +163,18 @@ export const enterValuesPlot = async ({ items }) => {
 }
 
 export const checkValuesCluster = checkValuesSequencial
-export const checkValuesPlot = async ({ id, items }) => {
+
+export const navigateToPlotForm = async ({ plotId = null } = {}) => {
   await click('Plot')
   await waitFor(500)
-  await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
-  await waitFor(500)
+  if (plotId) {
+    await dropDown({ class: 'node-select' }).select(`Plot id - ${plotId}`)
+    await waitFor(500)
+  }
+}
+
+export const checkValuesPlot = async ({ id, items }) => {
+  await navigateToPlotForm({ plotId: id })
   await checkValuesSequencial({ items })
 }
 

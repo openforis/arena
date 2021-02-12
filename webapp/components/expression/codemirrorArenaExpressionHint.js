@@ -3,6 +3,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 const functionExamples = {
   [Expression.modes.json]: {
+    isEmpty: `isEmpty(attribute_name) = true/false`,
     min: 'max(3,1) = 1',
     max: 'max(3,1,2) = 3',
     pow: 'pow(2,3) = 2³ = 8',

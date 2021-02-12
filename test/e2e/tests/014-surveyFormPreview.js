@@ -9,12 +9,14 @@ import { clickHeaderBtnMySurveys } from '../utils/ui/header'
 import {
   enterValuesCluster,
   enterValuesPlot,
+  enterValuesSequencial,
   checkValuesCluster,
   checkValuesPlot,
   expectIsRelevant,
   expectIsNotRelevant,
   expectIsValid,
   expectIsInvalid,
+  navigateToPlotForm,
 } from '../utils/ui/nodeDefs'
 import { records, recordInitial } from '../resources/records/recordsData'
 
@@ -52,7 +54,7 @@ describe('SurveyForm Preview', () => {
 
   test('Enter Cluster nodes', async () => enterValuesCluster({ items: ClusterItems }), 50000)
 
-  test('Check relevance applied', async () => {
+  test('Check relevance applied (at Cluster level)', async () => {
     const clusterDateLabel = 'Cluster date'
 
     // cluster_date relevant at the beginning (cluster_decimal = 10)
@@ -125,4 +127,30 @@ describe('SurveyForm Preview', () => {
   test('Check Plot 1 values', async () => checkValuesPlot({ id: 1, items: plots[0] }), 40000)
 
   test('Check Plot 2 values', async () => checkValuesPlot({ id: 2, items: plots[1] }), 40000)
+
+  test('Check relevance applied (at Plot level)', async () => {
+    await navigateToPlotForm()
+    await click('Add')
+
+    const plotIdLabel = 'Plot id'
+    const plotTextLabel = 'Plot text'
+
+    // plot_text not relevant at the beginning
+    await expectIsNotRelevant({ label: plotTextLabel })
+
+    const plotIdItem = (value) => ({ label: plotIdLabel, type: NodeDef.nodeDefType.integer, value })
+
+    // plot_id = 1 => plot_text relevant
+    await enterValuesSequencial({ items: [plotIdItem(1)] })
+    await waitFor(2000)
+    await expectIsRelevant({ label: plotTextLabel })
+
+    // plot_id = '' => plot_text not relevant
+    await enterValuesSequencial({ items: [plotIdItem(null)] })
+    await expectIsNotRelevant({ label: plotTextLabel })
+
+    // plot_id = 2 => plot_text relevant
+    await enterValuesSequencial({ items: [plotIdItem(2)] })
+    await expectIsRelevant({ label: plotTextLabel })
+  }, 30000)
 })

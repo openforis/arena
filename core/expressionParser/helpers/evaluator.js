@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
 import SystemError from '@core/systemError'
-import * as DateUtils from '@core/dateUtils'
+
 import { types } from './types'
+import * as Functions from './functions'
 
 // Built-in functions that can be called, i.e. the standard library.
 // Nothing outside of this set may be used.
@@ -12,7 +13,9 @@ import { types } from './types'
 //
 // stdlib: { [fn]: [Function, min_arity, max_arity? (-1 for infinite)] }
 const stdlib = {
-  pow: [(base, exponent) => base ** exponent, 2], // Arity 2
+  isEmpty: [Functions.isEmpty, 1, 1],
+
+  pow: [Functions.pow, 2], // Arity 2
 
   ln: [Math.log, 1],
   log10: [Math.log10, 1],
@@ -20,9 +23,9 @@ const stdlib = {
   // arity 1+ (arity 0 allowed by JS)
   min: [Math.min, 1, -1],
   max: [Math.max, 1, -1],
-  includes: [(items, value) => Array.isArray(items) && items.includes(String(value)), 2, 2],
+  includes: [Functions.includes, 2, 2],
 
-  now: [() => DateUtils.nowFormatDefault(), 0],
+  now: [Functions.now, 0, 0],
 
   avg: [R.identity, 1, 1],
   count: [R.identity, 1, 1],
