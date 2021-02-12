@@ -132,9 +132,27 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
   }
 }
 
+const _memberEval = (expr, ctx) => {
+  const { object, property } = expr
+
+  const objectEval = Expression.evalExpr({ expr: object, ctx })
+
+  if (objectEval && !R.isEmpty(objectEval)) {
+    const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+    if (R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
+      // property is the index of a multiple node
+      return objectEval[propertyEval]
+    } else {
+      return propertyEval
+    }
+  }
+  return null
+}
+
 export const evalNodeQuery = (survey, record, node, query) => {
   const functions = {
     [Expression.types.Identifier]: _identifierEval(survey, record),
+    [Expression.types.MemberExpression]: _memberEval,
   }
 
   return Expression.evalString(query, { node, functions })

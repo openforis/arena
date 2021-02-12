@@ -128,8 +128,10 @@ const binaryEval = (expr, ctx) => {
 
 const memberEval = (expr, ctx) => {
   const { object, property } = expr
+
   const objectEval = evalExpression(object, ctx)
   const propertyEval = evalExpression(property, ctx)
+
   return !R.isNil(objectEval) && !R.isNil(propertyEval) && R.is(Array, objectEval) && objectEval.length > propertyEval
     ? objectEval[propertyEval]
     : null

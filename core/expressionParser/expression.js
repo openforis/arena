@@ -41,7 +41,9 @@ export const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
+
+export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
 
 export const { isValid } = ExpressionUtils
 export const { getExpressionIdentifiers } = Evaluator
