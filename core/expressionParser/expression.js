@@ -51,8 +51,7 @@ export const { getExpressionIdentifiers } = Evaluator
 const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
-export const isValidExpressionType = (nodeDef) =>
-  !NodeDef.isEntity(nodeDef) && !NodeDef.isCoordinate(nodeDef) && !NodeDef.isFile(nodeDef)
+export const isValidExpressionType = (nodeDef) => !NodeDef.isCoordinate(nodeDef) && !NodeDef.isFile(nodeDef)
 
 export const isLiteral = isType(types.Literal)
 export const isCompound = isType(types.Compound)

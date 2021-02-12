@@ -126,9 +126,13 @@ const binaryEval = (expr, ctx) => {
   return isValid ? fn(leftResult, rightResult) : null
 }
 
-// Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
-const memberEval = () => {
-  throw new SystemError('invalidSyntax')
+const memberEval = (expr, ctx) => {
+  const { object, property } = expr
+  const objectEval = evalExpression(object, ctx)
+  const propertyEval = evalExpression(property, ctx)
+  return !R.isNil(objectEval) && !R.isNil(propertyEval) && R.is(Array, objectEval) && objectEval.length > propertyEval
+    ? objectEval[propertyEval]
+    : null
 }
 
 const callEval = (expr, ctx) => {

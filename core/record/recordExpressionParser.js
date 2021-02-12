@@ -125,7 +125,11 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
     throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
   }
 
-  return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
+  if (NodeDef.isAttribute(nodeDefReferenced)) {
+    return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
+  } else {
+    return single ? referencedNodes[0] : referencedNodes
+  }
 }
 
 export const evalNodeQuery = (survey, record, node, query) => {
