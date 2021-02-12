@@ -24,7 +24,8 @@ describe('RecordExpressionParser Test', () => {
         'cluster',
         SB.attribute('tree_height', NodeDef.nodeDefType.integer),
         SB.attribute('dbh', NodeDef.nodeDefType.integer),
-        SB.attribute('visit_date', NodeDef.nodeDefType.date)
+        SB.attribute('visit_date', NodeDef.nodeDefType.date),
+        SB.attribute('remarks', NodeDef.nodeDefType.text)
       )
     ).build()
 
@@ -35,7 +36,8 @@ describe('RecordExpressionParser Test', () => {
         'cluster',
         RB.attribute('tree_height', 12),
         RB.attribute('dbh', 18),
-        RB.attribute('visit_date', '2021-01-01')
+        RB.attribute('visit_date', '2021-01-01'),
+        RB.attribute('remarks', '')
       )
     ).build()
 
@@ -93,6 +95,10 @@ describe('RecordExpressionParser Test', () => {
     { q: '(dbh * 0.5) >= pow(tree_height, 3)', r: false },
     // visit_date must be before current date
     { q: 'visit_date <= now()', r: true },
+    // tree_height is not empty
+    { q: 'isEmpty(tree_height)', r: false },
+    // remarks is empty
+    { q: 'isEmpty(remarks)', r: true },
   ]
 
   queries.forEach(({ q, r }) => {

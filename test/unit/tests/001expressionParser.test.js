@@ -36,6 +36,10 @@ const queries = [
   { q: 'log10(10)', r: 1 },
   { q: 'log10(100) == 2', r: true },
   { q: 'now()', r: DateUtils.nowFormatDefault(), c: _datesEqualCompareFn },
+  { q: `isEmpty('test')`, r: false },
+  { q: `isEmpty('')`, r: true },
+  { q: 'isEmpty(1)', r: false },
+  { q: 'isEmpty(0)', r: false },
 ]
 
 describe('ExpressionParser test', () => {
