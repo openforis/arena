@@ -28,7 +28,9 @@ const NodeDefDate = (props) => {
       formatFrom: dateFormat.display,
       formatTo: dateFormat.storage,
     })
-    updateNode(nodeDef, node, newDateFormatted)
+    if (DateUtils.isValidDateInFormat(newDateFormatted, dateFormat.storage)) {
+      updateNode(nodeDef, node, newDateFormatted)
+    }
   }
 
   return (
