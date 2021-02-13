@@ -24,10 +24,12 @@ describe('Check validation report', () => {
     await checkValidationReportErrors({ expectedErrors })
   })
 
-  test('Add 2 as plot id into the empty Plot id and add a new error', async () => {
+  test('Add 2 as plot id into the empty Plot id', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.integer, value: 2, label: 'Plot id' }]
     await enterValuesIntoValidationError({ errorIndex: 0, items: valuesToEnter })
+  })
 
+  test('Expect 4 errors', async () => {
     const expectedErrors = [
       {
         path: 'Cluster[5] / Plot[2] / Plot id',
