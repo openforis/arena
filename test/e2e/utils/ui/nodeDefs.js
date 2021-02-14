@@ -170,8 +170,10 @@ export const navigateToPlotForm = async ({ plotId = null } = {}) => {
   await waitFor(500)
   if (plotId) {
     await dropDown({ class: 'node-select' }).select(`Plot id - ${plotId}`)
-    await waitFor(500)
+  } else {
+    await dropDown({ class: 'node-select' }).select(`Plot id -`)
   }
+  await waitFor(500)
 }
 
 export const checkValuesPlot = async ({ id, items }) => {

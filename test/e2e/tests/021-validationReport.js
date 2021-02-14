@@ -22,12 +22,12 @@ describe('Check validation report', () => {
       },
     ]
     await checkValidationReportErrors({ expectedErrors })
-  })
+  }, 40000)
 
   test('Add 2 as plot id into the empty Plot id', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.integer, value: 2, label: 'Plot id' }]
     await enterValuesIntoValidationError({ errorIndex: 0, items: valuesToEnter })
-  })
+  }, 40000)
 
   test('Expect 4 errors', async () => {
     const expectedErrors = [
@@ -49,12 +49,12 @@ describe('Check validation report', () => {
       },
     ]
     await checkValidationReportErrors({ expectedErrors })
-  })
+  }, 40000)
 
   test('Click second row and enter 3 intro plot id value', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.integer, value: 3, label: 'Plot id' }]
     await enterValuesIntoValidationError({ errorIndex: 1, items: valuesToEnter })
-  })
+  }, 40000)
 
   test('Validation report and expect 2 rows', async () => {
     const expectedErrors = [
@@ -68,12 +68,12 @@ describe('Check validation report', () => {
       },
     ]
     await checkValidationReportErrors({ expectedErrors })
-  })
+  }, 40000)
 
   test('Click second row and enter 11 to fix error', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.decimal, value: 11, label: 'Cluster decimal' }]
     await enterValuesIntoValidationError({ errorIndex: 1, items: valuesToEnter })
-  })
+  }, 40000)
 
   test('Validation report and expect 1 rows', async () => {
     const expectedErrors = [
@@ -83,5 +83,5 @@ describe('Check validation report', () => {
       },
     ]
     await checkValidationReportErrors({ expectedErrors })
-  })
+  }, 40000)
 })

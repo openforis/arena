@@ -9,9 +9,9 @@ import { enterValuesSequential } from './nodeDefs'
 export const getValidationReportErrors = async () => {
   await reload()
 
-  await waitFor(3000)
+  await waitFor(5000)
   await clickSiderbarBtnDataValidationReport()
-  await waitFor(3000)
+  await waitFor(5000)
 
   const { rows, elements } = await getTableRowsAsObjects({
     rowSelector: '.table__row',
