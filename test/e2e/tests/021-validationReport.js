@@ -9,16 +9,16 @@ describe('Check validation report', () => {
   test('Open Validation report and expect 3 rows', async () => {
     const expectedErrors = [
       {
-        path: 'Cluster[5] / Plot[] / Plot id',
-        message: 'Required value',
-      },
-      {
         path: 'Cluster[1] / Cluster decimal',
         message: 'cluster_decimal < 10',
       },
       {
         path: 'Cluster[2] / Cluster decimal',
         message: 'cluster_decimal < 20',
+      },
+      {
+        path: 'Cluster[5] / Plot[] / Plot id',
+        message: 'Required value',
       },
     ]
     await checkValidationReportErrors({ expectedErrors })
@@ -26,19 +26,11 @@ describe('Check validation report', () => {
 
   test('Add 2 as plot id into the empty Plot id', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.integer, value: 2, label: 'Plot id' }]
-    await enterValuesIntoValidationError({ errorIndex: 0, items: valuesToEnter })
+    await enterValuesIntoValidationError({ errorIndex: 2, items: valuesToEnter })
   }, 40000)
 
   test('Expect 4 errors', async () => {
     const expectedErrors = [
-      {
-        path: 'Cluster[5] / Plot[2] / Plot id',
-        message: 'Duplicate entity key',
-      },
-      {
-        path: 'Cluster[5] / Plot[2] / Plot id',
-        message: 'Duplicate entity key',
-      },
       {
         path: 'Cluster[1] / Cluster decimal',
         message: 'cluster_decimal < 10',
@@ -47,13 +39,21 @@ describe('Check validation report', () => {
         path: 'Cluster[2] / Cluster decimal',
         message: 'cluster_decimal < 20',
       },
+      {
+        path: 'Cluster[5] / Plot[2] / Plot id',
+        message: 'Duplicate entity key',
+      },
+      {
+        path: 'Cluster[5] / Plot[2] / Plot id',
+        message: 'Duplicate entity key',
+      },
     ]
     await checkValidationReportErrors({ expectedErrors })
   }, 40000)
 
   test('Click second row and enter 3 intro plot id value', async () => {
     const valuesToEnter = [{ type: NodeDef.nodeDefType.integer, value: 3, label: 'Plot id' }]
-    await enterValuesIntoValidationError({ errorIndex: 1, items: valuesToEnter })
+    await enterValuesIntoValidationError({ errorIndex: 3, items: valuesToEnter })
   }, 40000)
 
   test('Validation report and expect 2 rows', async () => {
