@@ -165,19 +165,22 @@ export const enterValuesPlot = async ({ items }) => {
 
 export const checkValuesCluster = checkValuesSequential
 
-export const navigateToPlotForm = async ({ plotId = null } = {}) => {
+export const navigateToPlotForm = async ({ plotId = null, openPlot = false } = {}) => {
   await click('Plot')
   await waitFor(500)
   if (plotId) {
     await dropDown({ class: 'node-select' }).select(`Plot id - ${plotId}`)
-  } else {
+  }
+  if (openPlot && !plotId) {
     await dropDown({ class: 'node-select' }).select(`Plot id -`)
   }
   await waitFor(500)
 }
 
-export const checkValuesPlot = async ({ id, items }) => {
-  await navigateToPlotForm({ plotId: id })
+export const checkValuesPlot = async ({ items }) => {
+  const plotIdItem = items.find((item) => item.label === 'Plot id')
+  const plotId = plotIdItem?.value
+  await navigateToPlotForm({ plotId: plotId || false, openPlot: true })
   await checkValuesSequential({ items })
 }
 
@@ -194,7 +197,7 @@ export const checkRecord = async (record, position) => {
   await click(await getElement({ selector: `.table__row:nth-child(${position})` }))
   await waitFor(500)
   await checkValuesCluster({ items: cluster })
-  await PromiseUtils.each(plots, async (plot, idx) => checkValuesPlot({ id: idx, items: plot }))
+  await PromiseUtils.each(plots, async (plot) => checkValuesPlot({ items: plot }))
 }
 
 export const expectIsRelevant = async ({ label }) =>
