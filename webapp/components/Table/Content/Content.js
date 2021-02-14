@@ -10,6 +10,7 @@ const Content = (props) => {
     gridTemplateColumns,
     isRowActive,
     list,
+    module,
     noItemsLabelKey,
     offset,
     onRowClick,
@@ -50,6 +51,7 @@ const Content = (props) => {
               key={String(i)}
               onClick={() => onRowClick && onRowClick(row)}
               className={className}
+              id={`${module}_${i}`}
               style={{ gridTemplateColumns }}
             >
               {React.createElement(rowComponent, {
@@ -73,6 +75,7 @@ Content.propTypes = {
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
   list: PropTypes.array.isRequired,
+  module: PropTypes.string.isRequired,
   noItemsLabelKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,

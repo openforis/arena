@@ -69,6 +69,7 @@ const Header = () => {
 
       <button
         className="header__btn-user"
+        id="user-btn"
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()

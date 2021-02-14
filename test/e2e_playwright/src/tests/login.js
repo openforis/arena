@@ -1,4 +1,4 @@
-import { user } from '../mock/user'
+import { user } from '../../mock/user'
 
 export default () =>
   describe('Login', () => {
@@ -32,8 +32,10 @@ export default () =>
       await page.fill('input[name="password"]', user.password)
 
       // Click text="Login"
-      await Promise.all([page.waitForResponse('**/auth/login'), page.click('text="Login"')])
-      await page.waitForTimeout(1000)
+      await Promise.all([
+        page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/dashboard/' } */),
+        page.click('text="Login"'),
+      ])
 
       const header = await page.$('.header')
       await expect(header).not.toBe(null)
