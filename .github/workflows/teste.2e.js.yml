@@ -1,0 +1,62 @@
+name: Run test
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:12-3.0
+        env:
+          POSTGRES_USER: arena
+          POSTGRES_PASSWORD: arena
+          POSTGRES_DB: of-arena-test
+        ports:
+          - 5444:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Playwright github action
+        uses: microsoft/playwright-github-action@v1
+      - name: Use Node.js 14.15.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.15.0'
+      - run: npm install pm2 -g
+      - run: cp test/db/migrations/*.js server/db/migration/public/migrations
+      - run: cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
+      - run: yarn
+      - run: yarn build:server:dev
+      - run: yarn build-dev
+      - run: ln -s dist/server.js .
+      - name: run server
+        run: exec pm2-runtime server.js &
+        env:
+          PGHOST: localhost
+          PGPORT: 5444
+          PGDATABASE: of-arena-test
+          PGUSER: arena
+          PGPASSWORD: arena
+          SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+
+      - run: while ! nc -z localhost 9090; do sleep 10; done;
+      - name: run migrations
+        run: yarn server:migrate
+        env:
+          PGHOST: localhost
+          PGPORT: 5444
+          PGDATABASE: of-arena-test
+          PGUSER: arena
+          PGPASSWORD: arena
+          HEADLESS_CHROME: 'true'
+          SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+      - name: run tests
+        run: yarn test:e2e:playwright
