@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
+      - name: Install pm2
+        run: npm install pm2 -g
       - name: Copy db migrations
         run: cp -r test/db/migrations/** server/db/migration/public/migrations
       - name: Yarn
@@ -31,7 +33,9 @@ jobs:
       - name: Build
         run: yarn build
       - name: Run server
-        run: yarn start
+        run: |
+          ln -s dist/server.js .
+          exec pm2-runtime server.js &
         env:
           PGHOST: localhost
           PGPORT: 5444
@@ -43,5 +47,17 @@ jobs:
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;
+      - name: Run db migrations
+        run: yarn server:migrate
+        env:
+          PGHOST: localhost
+          PGPORT: 5444
+          PGDATABASE: of-arena-test
+          PGUSER: arena
+          PGPASSWORD: arena
+          HEADLESS_CHROME: 'true'
+          SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Run tests
         run: yarn test:e2e:playwright
