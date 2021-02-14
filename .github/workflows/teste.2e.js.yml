@@ -20,21 +20,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Playwright github action
+      - name: Use Playwright
         uses: microsoft/playwright-github-action@v1
       - name: Use Node.js 14.15.0
         uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
-      - run: npm install pm2 -g
-      - run: cp test/db/migrations/*.js server/db/migration/public/migrations
-      - run: cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
-      - run: yarn
-      - run: yarn build:server:dev
-      - run: yarn build-dev
-      - run: ln -s dist/server.js .
-      - name: run server
-        run: exec pm2-runtime server.js &
+      - name: Install pm2
+        run: yarn global add pm2
+      - name: Copy db migrations
+        run: cp -r test/db/migrations/** server/db/migration/public/migrations
+      - name: Yarn
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Run server
+        run: |
+          ln -s dist/server.js .
+          exec pm2-runtime server.js &
         env:
           PGHOST: localhost
           PGPORT: 5444
@@ -44,9 +47,9 @@ jobs:
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-
-      - run: while ! nc -z localhost 9090; do sleep 10; done;
-      - name: run migrations
+      - name: Wait for server to start
+        run: while ! nc -z localhost 9090; do sleep 10; done;
+      - name: Run db migrations
         run: yarn server:migrate
         env:
           PGHOST: localhost
