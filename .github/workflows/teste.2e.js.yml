@@ -20,23 +20,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Playwright
-        uses: microsoft/playwright-github-action@v1
-      - name: Use Node.js 14.15.0
-        uses: actions/setup-node@v1
+      - uses: microsoft/playwright-github-action@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
       - name: Install pm2
-        run: yarn global add pm2
+        run: npm install pm2 -g
       - name: Copy db migrations
         run: cp -r test/db/migrations/** server/db/migration/public/migrations
       - name: Yarn
         run: yarn
       - name: Build
         run: yarn build
-      - run: ln -s dist/server.js .
       - name: Run server
-        run: exec pm2-runtime server.js &
+        run: |
+          ln -s dist/server.js .
+          exec pm2-runtime server.js &
         env:
           PGHOST: localhost
           PGPORT: 5444
