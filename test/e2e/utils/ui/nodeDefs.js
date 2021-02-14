@@ -179,7 +179,10 @@ export const navigateToPlotForm = async ({ plotId = null, openPlot = false } = {
 
 export const checkValuesPlot = async ({ items }) => {
   const plotIdItem = items.find((item) => item.label === 'Plot id')
-  const plotId = plotIdItem?.value
+  let plotId = false
+  if (plotIdItem) {
+    plotId = plotIdItem.value
+  }
   await navigateToPlotForm({ plotId: plotId || false, openPlot: true })
   await checkValuesSequential({ items })
 }
