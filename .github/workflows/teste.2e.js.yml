@@ -34,10 +34,9 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build
+      - run: ln -s dist/server.js .
       - name: Run server
-        run: |
-          ln -s dist/server.js .
-          exec pm2-runtime server.js &
+        run: exec pm2-runtime server.js &
         env:
           PGHOST: localhost
           PGPORT: 5444
@@ -48,7 +47,7 @@ jobs:
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Wait for server to start
-        run: while ! nc -z localhost 9090; do sleep 10; done;
+        run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run db migrations
         run: yarn server:migrate
         env:
@@ -61,5 +60,5 @@ jobs:
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-      - name: run tests
+      - name: Run tests
         run: yarn test:e2e:playwright
