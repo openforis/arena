@@ -88,6 +88,12 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr) => {
   const reachableNodeDefs = _getReachableNodeDefs(survey, nodeDefContext)
 
   const nodeName = R.prop('name')(expr)
+
+  if (Expression.isNodeProperty(nodeName)) {
+    // simulate node property getter
+    return {}
+  }
+
   const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === nodeName)
 
   if (!def) {

@@ -17,6 +17,12 @@ export const modes = {
   sql: 'sql',
 }
 
+export const nodeProperties = {
+  length: 'length',
+}
+
+export const getName = R.prop('name')
+
 export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
 
@@ -80,3 +86,7 @@ export const newBinary = (left, right, operator = '') => ({
   left,
   right,
 })
+
+// node properties
+
+export const isNodeProperty = (value) => Object.values(nodeProperties).includes(value)

@@ -17,7 +17,7 @@ const validateExpression = ({ variablesIds, exprString, mode }) => {
   try {
     const expr = Expression.fromString(exprString, mode)
     const ids = getExpressionIdentifiers(expr)
-    const unknownIds = ids.filter((id) => !variablesIds.includes(id))
+    const unknownIds = ids.filter((id) => !variablesIds.includes(id) && !Expression.isNodeProperty(id))
 
     if (unknownIds.length > 0)
       return { error: 'identifierError', message: `Unknown variable: ${unknownIds.join(', ')}` }

@@ -43,8 +43,6 @@ const _getNodeValue = (survey) => (node) => {
   return value
 }
 
-const _getNodeValues = (survey) => (nodes) => nodes.map(_getNodeValue(survey))
-
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
   if (NodeDef.isRoot(nodeDefCtx)) {
     return Record.getRootNode(record)
@@ -115,8 +113,18 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
   return []
 }
 
+const _nodePropertyEvaluators = {
+  [Expression.nodeProperties.length]: ({ node }) => {
+    if (R.is(Array)(node)) {
+      return node.length
+    }
+    throw new SystemError(Validation.messageKeys.expressions.cannotGetLengthOfSingleNodes)
+  },
+}
+
 const _identifierEval = (survey, record) => (expr, { node }) => {
   const nodeName = R.prop('name')(expr)
+
   const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
 
@@ -126,10 +134,10 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
   }
 
   if (NodeDef.isAttribute(nodeDefReferenced)) {
-    return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
-  } else {
-    return single ? referencedNodes[0] : referencedNodes
+    const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
+    return single ? values[0] : values
   }
+  return single ? referencedNodes[0] : referencedNodes
 }
 
 const _memberEval = (expr, ctx) => {
@@ -138,12 +146,18 @@ const _memberEval = (expr, ctx) => {
   const objectEval = Expression.evalExpr({ expr: object, ctx })
 
   if (objectEval && !R.isEmpty(objectEval)) {
-    const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
-    if (R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
+    if (Expression.isIdentifier(property)) {
+      const propertyName = Expression.getName(property)
+      if (Expression.isNodeProperty(propertyName)) {
+        const propertyEvaluator = _nodePropertyEvaluators[propertyName]
+        return propertyEvaluator({ node: objectEval })
+      }
+    } else if (Expression.isLiteral(property)) {
       // property is the index of a multiple node
-      return objectEval[propertyEval]
-    } else {
-      return propertyEval
+      const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+      if (R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
+        return objectEval[propertyEval]
+      }
     }
   }
   return null
