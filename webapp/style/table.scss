@@ -5,7 +5,7 @@ $tableHeaderHeight: 30px;
 .table {
   overflow: hidden;
   position: relative;
-  display: contents;
+  display: unset;
 }
 
 .table__header {
