@@ -8,26 +8,10 @@ import 'codemirror/addon/hint/show-hint'
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
 import { useI18n } from '@webapp/store/system'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
-
-const validateExpression = ({ variablesIds, exprString, mode }) => {
-  try {
-    const expr = Expression.fromString(exprString, mode)
-    const ids = getExpressionIdentifiers(expr)
-    const unknownIds = ids.filter((id) => !variablesIds.includes(id) && !Expression.isNodeProperty(id))
-
-    if (unknownIds.length > 0)
-      return { error: 'identifierError', message: `Unknown variable: ${unknownIds.join(', ')}` }
-
-    const canBeConstant = true // Name the param
-    return { ok: Expression.isValid(expr, canBeConstant) }
-  } catch (error) {
-    return { error: 'syntaxError', message: error.message }
-  }
-}
+import * as ExpressionValidator from './expressionValidator'
 
 const AdvancedExpressionEditorPopup = (props) => {
   const {
@@ -69,7 +53,15 @@ const AdvancedExpressionEditorPopup = (props) => {
     editor.on('change', (cm) => {
       const value = cm.getValue()
       const valueTrimmed = value.trim()
-      const newValidation = valueTrimmed === '' ? {} : validateExpression({ variablesIds, exprString: value, mode })
+      const newValidation =
+        valueTrimmed === ''
+          ? {}
+          : ExpressionValidator.validateExpression({
+              variablesGrouped: variablesVisible,
+              variablesIds,
+              exprString: value,
+              mode,
+            })
       setValidation(newValidation)
       setExpressionCanBeApplied(query !== value && !newValidation.error)
       if (!newValidation.error) {

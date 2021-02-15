@@ -123,7 +123,7 @@ const _nodePropertyEvaluators = {
 }
 
 const _identifierEval = (survey, record) => (expr, { node }) => {
-  const nodeName = R.prop('name')(expr)
+  const nodeName = Expression.getName(expr)
 
   const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
