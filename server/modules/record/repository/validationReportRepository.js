@@ -45,7 +45,7 @@ const query = (surveyId) =>
       h.record_uuid = r.uuid 
       AND r.cycle = $/cycle/
       AND NOT r.preview
-    ORDER BY h.node_id, r.uuid`
+    ORDER BY r.date_created, h.node_id`
 
 export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
   client.map(
