@@ -81,8 +81,9 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   return reachableNodeDefs
 }
 
-const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr) => {
-  const nodeDefContext = contextByDependencyTypeFns[dependencyType](survey, nodeDefCurrent)
+const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr, ctx) => {
+  const { node: nodeDefContext } = ctx
+
   const selfReferenceAllowed = selfReferenceAllowedByDependencyType[dependencyType]
 
   const reachableNodeDefs = _getReachableNodeDefs(survey, nodeDefContext)
@@ -117,17 +118,32 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr) => {
     throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: nodeName })
   }
 
-  return _getNodeValue(def)
+  return NodeDef.isEntity(def) ? def : _getNodeValue(def)
+}
+
+const _memberEval = (expr, ctx) => {
+  const { object, property } = expr
+
+  const objectEval = Expression.evalExpr({ expr: object, ctx })
+  if (R.isNil(objectEval)) {
+    return null
+  }
+  const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+  if (Expression.isLiteral(property)) {
+    // simulate access to element at index, but return only the node def
+    return objectEval
+  }
+  return propertyEval
 }
 
 const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
   const functions = {
     [Expression.types.Identifier]: _identifierEval(survey, nodeDef, dependencyType),
+    [Expression.types.MemberExpression]: _memberEval,
   }
-
   try {
-    // NB: `node` not needed here
-    await Expression.evalString(expr, { functions })
+    const nodeDefContext = contextByDependencyTypeFns[dependencyType](survey, nodeDef)
+    await Expression.evalString(expr, { functions, node: nodeDefContext })
     return null
   } catch (error) {
     const details = R.is(SystemError, error) ? `$t(${error.key})` : error.toString()

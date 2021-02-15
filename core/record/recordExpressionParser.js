@@ -149,16 +149,21 @@ const _memberEval = (expr, ctx) => {
     if (Expression.isIdentifier(property)) {
       const propertyName = Expression.getName(property)
       if (Expression.isNodeProperty(propertyName)) {
+        // property is the property of node
         const propertyEvaluator = _nodePropertyEvaluators[propertyName]
         return propertyEvaluator({ node: objectEval })
       }
-    } else if (Expression.isLiteral(property)) {
-      // property is the index of a multiple node
-      const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
-      if (R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
-        return objectEval[propertyEval]
-      }
     }
+    // evaluate property moving the context node to the evaluated object
+    const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+
+    if (Expression.isLiteral(property) && R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
+      // property is the index of a multiple node
+      return objectEval[propertyEval]
+    }
+
+    // property is a child of the "object" node
+    return propertyEval
   }
   return null
 }

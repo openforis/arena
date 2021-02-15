@@ -25,7 +25,8 @@ describe('RecordExpressionParser Test', () => {
         SB.attribute('tree_height', NodeDef.nodeDefType.integer),
         SB.attribute('dbh', NodeDef.nodeDefType.integer),
         SB.attribute('visit_date', NodeDef.nodeDefType.date),
-        SB.attribute('remarks', NodeDef.nodeDefType.text)
+        SB.attribute('remarks', NodeDef.nodeDefType.text),
+        SB.entity('plot', SB.attribute('plot_id').key(), SB.attribute('plot_multiple_number').multiple()).multiple()
       )
     ).build()
 
@@ -37,7 +38,15 @@ describe('RecordExpressionParser Test', () => {
         RB.attribute('tree_height', 12),
         RB.attribute('dbh', 18),
         RB.attribute('visit_date', '2021-01-01'),
-        RB.attribute('remarks', '')
+        RB.attribute('remarks', ''),
+        RB.entity(
+          'plot',
+          RB.attribute('plot_id', 1),
+          RB.attribute('plot_multiple_number', 10),
+          RB.attribute('plot_multiple_number', 20)
+        ),
+        RB.entity('plot', RB.attribute('plot_id', 2)),
+        RB.entity('plot', RB.attribute('plot_id', 3), RB.attribute('plot_multiple_number', 30))
       )
     ).build()
 
@@ -99,6 +108,17 @@ describe('RecordExpressionParser Test', () => {
     { q: 'isEmpty(tree_height)', r: false },
     // remarks is empty
     { q: 'isEmpty(remarks)', r: true },
+    // plot count is 3
+    { q: 'plot.length', r: 3 },
+    // access multiple entities with index
+    { q: 'plot[0].plot_id', r: 1 },
+    { q: 'plot[1].plot_id', r: 2 },
+    { q: 'plot[2].plot_id', r: 3 },
+    { q: 'plot[4].plot_id', r: null },
+    // plot_multiple_number counts
+    { q: 'plot[0].plot_multiple_number.length', r: 2 },
+    { q: 'plot[1].plot_multiple_number.length', r: null },
+    { q: 'plot[2].plot_multiple_number.length', r: 1 },
   ]
 
   queries.forEach(({ q, r }) => {

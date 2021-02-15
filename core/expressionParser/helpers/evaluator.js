@@ -130,11 +130,14 @@ const memberEval = (expr, ctx) => {
   const { object, property } = expr
 
   const objectEval = evalExpression(object, ctx)
-  const propertyEval = evalExpression(property, ctx)
-
-  return !R.isNil(objectEval) && !R.isNil(propertyEval) && R.is(Array, objectEval) && objectEval.length > propertyEval
-    ? objectEval[propertyEval]
-    : null
+  if (R.isNil(objectEval)) {
+    return null
+  }
+  const propertyEval = evalExpression(property, { ...ctx, node: objectEval })
+  if (R.is(Array, objectEval) && property.type === types.Literal && objectEval.length > propertyEval) {
+    return objectEval[propertyEval]
+  }
+  return propertyEval
 }
 
 const callEval = (expr, ctx) => {
