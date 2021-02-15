@@ -1,4 +1,4 @@
-import { user } from '../../mock/user'
+import { user } from '../mock/user'
 
 export default () =>
   describe('Login', () => {
