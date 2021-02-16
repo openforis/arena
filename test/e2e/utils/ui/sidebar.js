@@ -24,5 +24,6 @@ export const clickSidebarBtnAnalysisProcessingChains = async () =>
   _clickAnalysisModule({ moduleLabel: 'PROCESSING CHAINS' })
 
 export const clickSiderbarBtnDataRecords = async () => _clickDataModule({ moduleLabel: 'RECORDS' })
+export const clickSiderbarBtnDataValidationReport = async () => _clickDataModule({ moduleLabel: 'VALIDATION REPORT' })
 
 export const clickSidebarBtnUsersList = async () => _clickUsersModule({ moduleLabel: 'USER LIST' })
