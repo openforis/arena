@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
+
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import useValidation from './useValidation'
@@ -16,6 +18,7 @@ const NodeDefErrorBadge = (props) => {
       showLabel={false}
       showKeys={false}
       className="error-badge-inverse survey-form__node-def-error-badge"
+      id={`node-def-error-badge-${NodeDef.getName(nodeDef)}`}
     >
       {children}
     </ErrorBadge>

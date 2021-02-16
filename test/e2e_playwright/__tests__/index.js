@@ -1,6 +1,7 @@
 import login from '../src/tests/login'
 import surveyCreate from '../src/tests/surveyCreate'
 import surveyEditInfo from '../src/tests/surveyEditInfo'
+import surveyFormEditNodeDefs from '../src/tests/surveyFormEditNodeDefs'
 import surveyDelete from '../src/tests/surveyDelete'
 
 beforeAll(async () => {
@@ -11,5 +12,6 @@ describe('E2E Tests', () => {
   login()
   surveyCreate()
   surveyEditInfo()
+  surveyFormEditNodeDefs()
   surveyDelete()
 })

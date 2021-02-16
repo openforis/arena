@@ -22,6 +22,7 @@ const ButtonPublishSurvey = (props) => {
       type="button"
       aria-disabled={disabled}
       className={`btn btn-s btn-publish ${className || ''}`}
+      id="publish-btn"
       onClick={() =>
         dispatch(
           DialogConfirmActions.showDialogConfirm({

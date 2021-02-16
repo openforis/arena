@@ -6,7 +6,7 @@ import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import Tooltip from './tooltip'
 
 const ValidationTooltip = (props) => {
-  const { validation, className, showKeys, children } = props
+  const { validation, className, showKeys, children, id } = props
 
   const isValid = Validation.isValid(validation)
 
@@ -17,13 +17,14 @@ const ValidationTooltip = (props) => {
   const showContent = Validation.isWarning(validation) || Validation.isError(validation)
 
   return (
-    <Tooltip type={type} messageComponent={content} className={className} showContent={showContent}>
+    <Tooltip type={type} messageComponent={content} className={className} showContent={showContent} id={id}>
       {children}
     </Tooltip>
   )
 }
 
 ValidationTooltip.defaultProps = {
+  id: null,
   validation: null,
   className: '',
   showKeys: false,
