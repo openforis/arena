@@ -15,7 +15,7 @@ const getNodeValues = (nodeDef, nodes, lang) => {
   const getNodeValue = (node) => {
     if (NodeDef.isCode(nodeDef)) {
       const item = NodeRefData.getCategoryItem(node)
-      return CategoryItem.getLabel(lang)(item) || CategoryItem.getCode(item)
+      return CategoryItem.getLabel(lang)(item)
     }
 
     if (NodeDef.isFile(nodeDef)) {
