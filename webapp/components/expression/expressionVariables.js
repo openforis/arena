@@ -42,6 +42,17 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
+const getVariablesByMode = ({ nodeDef, lang, mode }) => {
+  if (mode === Expression.modes.sql) {
+    return getSqlVariables(nodeDef, lang)
+  }
+
+  if (mode === Expression.modes.json) {
+    return getJsVariables(nodeDef)
+  }
+  return []
+}
+
 const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) => {
   if (Expression.isValidExpressionType(childDef)) {
     // exclude nodes that reference the current one
@@ -50,13 +61,7 @@ const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) 
       Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
 
     if (!referenceCurrentNode) {
-      if (mode === Expression.modes.sql) {
-        return getSqlVariables(childDef, lang)
-      }
-
-      if (mode === Expression.modes.json) {
-        return getJsVariables(childDef)
-      }
+      return getVariablesByMode({ nodeDef: childDef, lang, mode })
     }
   }
   return []
@@ -118,6 +123,16 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
 }
 
+const getVariablesWithThis = ({ variables, nodeDefCurrent, lang, mode }) => {
+  const _variables = variables
+  _variables.unshift({
+    label: '$this',
+
+    options: [...getVariablesByMode({ nodeDef: nodeDefCurrent, lang, mode })],
+  })
+  return _variables
+}
+
 export const getVariables = ({
   survey: surveyParam,
   nodeDefContext,
@@ -129,7 +144,12 @@ export const getVariables = ({
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
+  let variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
+
+  if (groupByParent) {
+    variables = getVariablesGroupedByParentUuid({ variables, survey })
+    return getVariablesWithThis({ variables, lang, nodeDefCurrent, mode })
+  }
 
   // Show current node def variable in the first position
   const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
@@ -142,10 +162,6 @@ export const getVariables = ({
     }
     return varA.label.localeCompare(varB.label)
   })
-
-  if (groupByParent) {
-    return getVariablesGroupedByParentUuid({ variables, survey })
-  }
 
   return variables
 }
