@@ -4,7 +4,11 @@ import { records } from '../resources/records/recordsData'
 import { insertRecord, checkRecord } from '../utils/ui/nodeDefs'
 import { clickSiderbarBtnDataRecords } from '../utils/ui/sidebar'
 
+import { selectSurvey } from '../utils/ui/survey'
+
 describe('Survey insert records', () => {
+  test('Select survey', async () => selectSurvey())
+
   test('Open records', async () => {
     await reload()
     await waitFor(2000)
