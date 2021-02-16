@@ -1,15 +1,13 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { click, clickParent, waitFor } from '../utils/api'
-import { waitForLoader } from '../utils/ui/loader'
+import { click, waitFor } from '../utils/api'
 import { clickSidebarBtnSurveyForm } from '../utils/ui/sidebar'
 import { expectSurveyFormLoaded } from '../utils/ui/surveyForm'
 import { expectSurveyFormHasOnlyAndInOrderThesePages } from '../utils/ui/surveyFormPage'
-import { clickHeaderBtnMySurveys } from '../utils/ui/header'
 import {
   enterValuesCluster,
   enterValuesPlot,
-  enterValuesSequencial,
+  enterValuesSequential,
   checkValuesCluster,
   checkValuesPlot,
   expectIsRelevant,
@@ -19,19 +17,13 @@ import {
   navigateToPlotForm,
 } from '../utils/ui/nodeDefs'
 import { records, recordInitial } from '../resources/records/recordsData'
+import { selectSurvey } from '../utils/ui/survey'
 
 const { cluster: ClusterItems, plots } = records[0]
 
 describe('SurveyForm Preview', () => {
   test('Select survey', async () => {
-    await waitFor(3000)
-    await clickHeaderBtnMySurveys()
-    await clickParent('Survey')
-
-    await waitFor(3000)
-    await waitForLoader()
-
-    await waitFor(3000)
+    await selectSurvey()
     await clickSidebarBtnSurveyForm()
 
     await expectSurveyFormLoaded()
@@ -141,16 +133,16 @@ describe('SurveyForm Preview', () => {
     const plotIdItem = (value) => ({ label: plotIdLabel, type: NodeDef.nodeDefType.integer, value })
 
     // plot_id = 1 => plot_text relevant
-    await enterValuesSequencial({ items: [plotIdItem(1)] })
+    await enterValuesSequential({ items: [plotIdItem(1)] })
     await waitFor(2000)
     await expectIsRelevant({ label: plotTextLabel })
 
     // plot_id = '' => plot_text not relevant
-    await enterValuesSequencial({ items: [plotIdItem(null)] })
+    await enterValuesSequential({ items: [plotIdItem(null)] })
     await expectIsNotRelevant({ label: plotTextLabel })
 
     // plot_id = 2 => plot_text relevant
-    await enterValuesSequencial({ items: [plotIdItem(2)] })
+    await enterValuesSequential({ items: [plotIdItem(2)] })
     await expectIsRelevant({ label: plotTextLabel })
   }, 30000)
 })

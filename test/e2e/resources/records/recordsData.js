@@ -44,6 +44,8 @@ const Plot = ({ plotId, plotText, plotCountry, plotRegion, plotProvince }) => [
   { type: NodeDef.nodeDefType.code, value: plotProvince, label: 'Province' },
 ]
 
+const emptyPlot = []
+
 export const recordInitial = () => ({
   cluster: Cluster({
     clusterDecimal: 1,
@@ -182,6 +184,7 @@ export const records = [
         plotRegion: '(02) Region 02',
         plotProvince: '(0203) District 0203',
       }),
+      emptyPlot,
     ],
   },
 ]
