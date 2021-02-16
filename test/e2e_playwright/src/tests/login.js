@@ -3,14 +3,8 @@ import { user } from '../mock/user'
 export default () =>
   describe('Login', () => {
     it('Login Unsuccessful', async () => {
-      // Click input[name="email"]
-      await page.click('input[name="email"]')
-
       // Fill input[name="email"]
       await page.fill('input[name="email"]', user.email)
-
-      // Press Tab
-      await page.press('input[name="email"]', 'Tab')
 
       // Fill input[name="password"]
       await page.fill('input[name="password"]', 'fsdfdsafdsa')
@@ -22,12 +16,6 @@ export default () =>
     })
 
     it('Login Successful', async () => {
-      // Click input[name="password"]
-      await page.click('input[name="password"]')
-
-      // Press ArrowRight with modifiers
-      await page.press('input[name="password"]', 'Meta+ArrowRight')
-
       // Fill input[name="password"]
       await page.fill('input[name="password"]', user.password)
 

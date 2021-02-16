@@ -1,3 +1,5 @@
+const defaults = { lang: 'en' }
+
 export const Selectors = {
   header: {
     createSurvey: 'text="Create Survey"',
@@ -9,10 +11,19 @@ export const Selectors = {
     editInfo: 'text="Edit info"',
   },
   modal: {
-    modal: '.modal',
+    close: 'text="Close"',
     itemError: '.item-error',
+    modal: '.modal',
+    ok: 'text="Ok"',
   },
-  navigation: {
+  nodeDefDetails: {
+    nodeDefDescriptions: (lang = defaults.lang) => `#node-def-descriptions-${lang}`,
+    nodeDefLabels: (lang = defaults.lang) => `#node-def-labels-${lang}`,
+    nodeDefName: '#node-def-name',
+    nodeDefKey: '#node-def-key',
+    save: 'text="Save"',
+  },
+  sidebar: {
     analysis: '#sidebar_btn_analysis',
     home: '#sidebar_btn_home',
     data: '#sidebar_btn_data',
@@ -33,6 +44,8 @@ export const Selectors = {
     userList: '#sidebar_btn_userList',
   },
   surveyForm: {
+    nodeDefAddChildBtn: (name) => `#node-def-add-child-${name}-btn`,
+    nodeDefEditBtn: (name) => `#node-def-edit-${name}-btn`,
     nodeDefErrorBadge: (name) => `#node-def-error-badge-${name}`,
   },
   surveyList: {

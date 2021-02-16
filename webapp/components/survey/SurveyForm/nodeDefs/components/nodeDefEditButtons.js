@@ -66,6 +66,7 @@ const NodeDefEditButtons = (props) => {
         )}
 
         <Link
+          id={`node-def-edit-${NodeDef.getName(nodeDef)}-btn`}
           className="btn btn-s btn-transparent survey-form__node-def-edit-button"
           to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
@@ -75,6 +76,7 @@ const NodeDefEditButtons = (props) => {
         {NodeDef.isEntity(nodeDef) && (
           <button
             type="button"
+            id={`node-def-add-child-${NodeDef.getName(nodeDef)}-btn`}
             className="btn btn-s btn-transparent"
             onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
             onMouseDown={(e) => {

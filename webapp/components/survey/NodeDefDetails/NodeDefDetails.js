@@ -35,6 +35,7 @@ const NodeDefDetails = () => {
         <div className="node-def-edit__container">
           <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
             <Input
+              id="node-def-name"
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>

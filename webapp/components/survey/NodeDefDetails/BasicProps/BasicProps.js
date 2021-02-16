@@ -56,12 +56,14 @@ const BasicProps = (props) => {
       )}
 
       <LabelsEditor
+        inputFieldIdPrefix="node-def-labels"
         labels={NodeDef.getLabels(nodeDef)}
         onChange={(labels) => Actions.setProp({ state, key: NodeDef.propKeys.labels, value: labels })}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
+        inputFieldIdPrefix="node-def-descriptions"
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
@@ -79,6 +81,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
+            id="node-def-key"
             checked={NodeDef.isKey(nodeDef)}
             disabled={keyEditDisabled}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}

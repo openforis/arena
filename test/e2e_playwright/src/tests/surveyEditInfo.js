@@ -30,7 +30,7 @@ export default () =>
       await page.click('text="Save"')
 
       // Click a[id="sidebar_btn_home"]
-      await page.click(Selectors.navigation.home)
+      await page.click(Selectors.sidebar.home)
       expect(page.url()).toBe('http://localhost:9090/app/home/dashboard/')
 
       // Click text="Edit info"
