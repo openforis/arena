@@ -7,11 +7,13 @@ import 'codemirror/addon/hint/show-hint'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
+
 import { useI18n } from '@webapp/store/system'
+import { useSurvey } from '@webapp/store/survey'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
-import * as ExpressionValidator from './expressionValidator'
 
 const AdvancedExpressionEditorPopup = (props) => {
   const {
@@ -26,8 +28,9 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const inputRef = useRef()
   const i18n = useI18n()
+  const survey = useSurvey()
 
-  const [validation, setValidation] = useState({})
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const variablesVisible = excludeCurrentNodeDef
     ? variables.map((group) => ({
@@ -51,20 +54,22 @@ const AdvancedExpressionEditorPopup = (props) => {
     editor.setValue(query)
 
     editor.on('change', (cm) => {
-      const value = cm.getValue()
-      const valueTrimmed = value.trim()
-      const newValidation =
+      const exprString = cm.getValue()
+      const valueTrimmed = exprString.trim()
+      const newErrorMessage =
         valueTrimmed === ''
-          ? {}
-          : ExpressionValidator.validateExpression({
-              variablesGrouped: variablesVisible,
-              variablesIds,
-              exprString: value,
-              mode,
+          ? null
+          : NodeDefExpressionValidator.validate({
+              survey,
+              nodeDef: nodeDefCurrent,
+              exprString,
+              isContextParent: false,
+              selfReferenceAllowed: excludeCurrentNodeDef,
             })
-      setValidation(newValidation)
-      setExpressionCanBeApplied(query !== value && !newValidation.error)
-      if (!newValidation.error) {
+      setErrorMessage(newErrorMessage)
+      const valid = !newErrorMessage
+      setExpressionCanBeApplied(query !== exprString && valid)
+      if (valid) {
         updateDraftQuery(valueTrimmed)
       }
     })
@@ -74,9 +79,9 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   return (
     <>
-      {validation.error ? (
+      {errorMessage ? (
         <div className="expression-editor__query-container">
-          <div className="query invalid">{validation.message}</div>
+          <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>
         </div>
       ) : (
         <div style={{ height: '34px' }} />
