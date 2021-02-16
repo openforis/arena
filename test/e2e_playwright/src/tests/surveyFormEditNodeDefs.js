@@ -17,10 +17,10 @@ export default () =>
       await expect(page).toHaveText('Define at least one child item')
 
       await page.click(Selectors.header.publishBtn)
-      await page.waitForTimeout(1000)
+      await page.waitForSelector(Selectors.modal.modal)
       await page.click('text="Ok"')
 
-      await page.waitForTimeout(1000)
+      await page.waitForSelector(Selectors.modal.itemError)
 
       await expect(page).toHaveText('Define at least one key attribute')
       await expect(page).toHaveText('Define at least one child item')

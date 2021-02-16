@@ -6,7 +6,7 @@
     "yarn": "^1.16.0"
   },
   "scripts": {
-    "build-dev": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.babel.js",
+    "build-dev": "cross-env NODE_ENV=development webpack --display-error-details --mode development --config webpack.config.babel.js",
     "build-prod-report": "cross-env NODE_ENV=production BUILD_REPORT=true webpack --display-error-details -p --config webpack.config.babel.js",
     "build-prod": "cross-env NODE_ENV=production webpack --display-error-details -p --config webpack.config.babel.js",
     "build:server:dev": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js",
@@ -31,6 +31,7 @@
     "test:docker": "test/bin/testExecDocker.sh",
     "test:e2e:playwright": "jest test/e2e_playwright",
     "test:e2e:generate": "npx playwright --load-storage=test/e2e_playwright/resources/auth.json codegen http://localhost:9090",
+    "test:e2e:watch": "cross-env PWDEBUG=1 jest test/e2e_playwright",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",

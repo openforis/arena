@@ -8,6 +8,10 @@ export const Selectors = {
   dashboard: {
     editInfo: 'text="Edit info"',
   },
+  modal: {
+    modal: '.modal',
+    itemError: '.item-error',
+  },
   navigation: {
     analysis: '#sidebar_btn_analysis',
     home: '#sidebar_btn_home',
