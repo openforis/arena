@@ -47,7 +47,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(null, mode, i18n, variablesVisible) },
+      hintOptions: { hint: arenaExpressionHint({ mode, i18n, survey, nodeDefCurrent }) },
     })
     editor.setSize('100%', 'auto')
 

@@ -1,5 +1,9 @@
 import CodeMirror from 'codemirror/lib/codemirror'
+
+import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
+
+import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
@@ -19,13 +23,22 @@ const functionExamples = {
   },
 }
 
-const nonIdRegex = /[^\w_]/
-const getWordStart = (value, end) => {
+const _findCharIndex = ({ value, end, matchingRegEx }) => {
   for (let i = end; i >= 0; i -= 1) {
-    if (nonIdRegex.test(value[i])) return i + 1
+    if (matchingRegEx.test(value[i])) return i + 1
   }
-
   return 0
+}
+
+const nonIdRegex = /[^\w_]/
+const getVariableNameStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: nonIdRegex })
+
+const variablesSeparatorRegex = /[\s\-+*/&|]/
+const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: variablesSeparatorRegex })
+
+const getAbsolutePathPart = (pathPart) => {
+  const match = pathPart.match(/([\w_]+)(\[\d+\])?/)
+  return match ? match[1] : ''
 }
 
 const getVariableCompletion = ({ group, variable, token }) => {
@@ -92,15 +105,56 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
   return completions
 }
 
-export const arenaExpressionHint = (mode, i18n, variablesGroupedByParentEntity, editor) => {
+export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {
   const cur = editor.getCursor()
   const token = editor.getTokenAt(cur)
-  token.start = getWordStart(token.string, cur.ch)
+
+  token.start = getVariableNameStart({ value: token.string, end: cur.ch })
   token.line = cur.line
+
+  const variablePath = token.string.slice(getVariablePathStart({ value: token.string, end: cur.ch }), cur.ch)
 
   if (token.end > cur.ch) {
     token.end = cur.ch
     token.string = token.string.slice(0, cur.ch - token.start)
+  }
+
+  const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+  const nodeDefPathParts = variablePath.split('.')
+
+  let nodeDefContext = nodeDefContextParent
+  let variablesGroupedByParentEntity = []
+  const { lang } = i18n
+  const groupByParent = true
+
+  if (nodeDefPathParts.length > 1) {
+    // get a nodeDef for every path part and use it as context node def
+    for (let i = 0; i < nodeDefPathParts.length - 1 && nodeDefContext; i += 1) {
+      const pathPart = nodeDefPathParts[i]
+      const childName = getAbsolutePathPart(pathPart)
+      nodeDefContext = Survey.getNodeDefChildByName(nodeDefContext, childName)(survey)
+    }
+
+    if (nodeDefContext) {
+      variablesGroupedByParentEntity = ExpressionVariables.getVariablesChildren({
+        survey,
+        nodeDefContext,
+        nodeDefCurrent,
+        mode,
+        lang,
+        groupByParent,
+      })
+    }
+  } else {
+    // get variables from context node and its ancestors
+    variablesGroupedByParentEntity = ExpressionVariables.getVariables({
+      survey,
+      nodeDefContext,
+      nodeDefCurrent,
+      mode,
+      lang,
+      groupByParent,
+    })
   }
 
   return {

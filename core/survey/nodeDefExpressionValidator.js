@@ -75,7 +75,7 @@ const _identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (e
     throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: nodeName })
   }
 
-  return NodeDef.isEntity(def) ? def : _getNodeValue(def)
+  return NodeDef.isEntity(def) || NodeDef.isMultiple(def) ? def : _getNodeValue(def)
 }
 
 const _memberPropertyEval = ({ survey, nodeDefContext, property }) => {
