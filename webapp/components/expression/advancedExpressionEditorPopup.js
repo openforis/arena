@@ -23,6 +23,7 @@ const AdvancedExpressionEditorPopup = (props) => {
     variables,
     nodeDefCurrent,
     excludeCurrentNodeDef,
+    isContextParent,
     updateDraftQuery,
   } = props
 
@@ -63,8 +64,8 @@ const AdvancedExpressionEditorPopup = (props) => {
               survey,
               nodeDefCurrent,
               exprString,
-              isContextParent: false,
-              selfReferenceAllowed: excludeCurrentNodeDef,
+              isContextParent,
+              selfReferenceAllowed: !excludeCurrentNodeDef,
             })
       setErrorMessage(newErrorMessage)
       const valid = !newErrorMessage
@@ -101,6 +102,7 @@ const AdvancedExpressionEditorPopup = (props) => {
 
 AdvancedExpressionEditorPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
+  isContextParent: PropTypes.bool,
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
@@ -111,6 +113,7 @@ AdvancedExpressionEditorPopup.propTypes = {
 
 AdvancedExpressionEditorPopup.defaultProps = {
   excludeCurrentNodeDef: true,
+  isContextParent: false,
   mode: Expression.modes.json,
   nodeDefCurrent: null,
   query: '',
