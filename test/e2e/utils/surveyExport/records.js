@@ -113,7 +113,7 @@ const checkRecordFileAndContent = async ({
       const plotIdNodeDef = plotNodeDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Plot id')
       const plotIdNodes = Record.getNodesByDefUuid(NodeDef.getUuid(plotIdNodeDef))(record)
       const plotIdNode = plotIdNodes.find(
-        (_plotIdNode) => String(Node.getValue(_plotIdNode)) === String(mockPlot[0].value)
+        (_plotIdNode) => mockPlot && mockPlot[0] && String(Node.getValue(_plotIdNode)) === String(mockPlot[0].value)
       )
       const plotUuid = Node.getParentUuid(plotIdNode)
 
