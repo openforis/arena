@@ -61,7 +61,7 @@ const AdvancedExpressionEditorPopup = (props) => {
           ? null
           : NodeDefExpressionValidator.validate({
               survey,
-              nodeDef: nodeDefCurrent,
+              nodeDefCurrent,
               exprString,
               isContextParent: false,
               selfReferenceAllowed: excludeCurrentNodeDef,
