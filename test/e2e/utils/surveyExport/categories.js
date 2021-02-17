@@ -19,7 +19,7 @@ const checkLevelAndReturnLevel = async ({ levels, levelName, index }) => {
 const checkItemCountryLevel = async ({ item }) => {
   await expect(CategoryItem.getParentUuid(item)).toBe(null)
   await expect(CategoryItem.getCode(item)).toBe('00')
-  await expect(CategoryItem.getLabel('en')(item)).toBe('Country')
+  await expect(CategoryItem.getLabel('en')(item)).toBe('(00) Country')
 }
 const getItemsCountryLevel = ({ administrativeUnitItems, countryLevel }) =>
   administrativeUnitItems.filter((item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(countryLevel))
@@ -35,7 +35,7 @@ const checkItemRegionLevel = async ({ item, index, regionLevel, parentUuid }) =>
   await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(regionLevel))
   const code = `0${index + 1}`
   await expect(CategoryItem.getCode(item)).toBe(`${code}`)
-  await expect(CategoryItem.getLabel('en')(item)).toBe(`Region ${code}`)
+  await expect(CategoryItem.getLabel('en')(item)).toBe(`(${code}) Region ${code}`)
 }
 
 const getItemsRegionLevel = ({ regionLevel, administrativeUnitItems }) =>
@@ -56,7 +56,7 @@ const checkItemDistrictLevel = async ({ item, index, itemsRegionLevel, districtL
   await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(districtLevel))
   const code = `0${Math.floor(index / 5) + 1}0${(index % 5) + 1}`
   await expect(CategoryItem.getCode(item)).toBe(code)
-  await expect(CategoryItem.getLabel('en')(item)).toBe(`District ${code}`)
+  await expect(CategoryItem.getLabel('en')(item)).toBe(`(${code}) District ${code}`)
 }
 
 const getItemsDistrictLevel = ({ districtLevel, administrativeUnitItems }) =>

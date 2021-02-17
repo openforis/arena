@@ -33,17 +33,18 @@
 
         -webkit-font-smoothing: antialiased;
         line-height: unset;
+        text-align: center;
 
-        width: calc(2.2ch);
+        width: calc(3.2ch);
 
         &.input-month {
           &.empty {
-            width: calc(2.7ch);
+            width: calc(3.7ch);
           }
         }
 
         &.input-year {
-          width: calc(4ch);
+          width: calc(5ch);
         }
 
         &::placeholder {
