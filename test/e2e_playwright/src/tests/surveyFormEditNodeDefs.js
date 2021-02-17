@@ -1,6 +1,8 @@
 import { Selectors } from '../selectors'
 import { cluster } from '../mock/nodeDefs'
 
+const clusterAttributeKeys = Object.keys(cluster.children).filter((key) => cluster.children[key].type !== 'entity')
+
 const editNodeDef = async (nodeDef) => {
   await page.fill(Selectors.nodeDefDetails.nodeDefName, nodeDef.name)
   await page.fill(Selectors.nodeDefDetails.nodeDefLabels(), nodeDef.label)
@@ -30,7 +32,9 @@ export default () =>
 
       await expect(page).toHaveText('Define at least one key attribute')
       await expect(page).toHaveText('Define at least one child item')
+    })
 
+    it('Survey Publish with errors', async () => {
       await page.click(Selectors.header.publishBtn)
       await page.waitForSelector(Selectors.modal.modal)
       await page.click(Selectors.modal.ok)
@@ -47,16 +51,14 @@ export default () =>
       await editNodeDef(cluster)
     })
 
-    it.each(Object.values(cluster.children).filter((child) => child.type !== 'entity'))(
-      'Cluster child %o edit',
-      async (child) => {
-        await page.click(Selectors.surveyForm.nodeDefAddChildBtn(cluster.name))
-        await page.click(`text="${child.type}"`)
-        await editNodeDef(child)
-      }
-    )
+    it.each(clusterAttributeKeys)('Cluster child %o edit', async (key) => {
+      const child = cluster.children[key]
+      await page.click(Selectors.surveyForm.nodeDefAddChildBtn(cluster.name))
+      await page.click(`text="${child.type}"`)
+      await editNodeDef(child)
+    })
 
-    it('Survey Publish success', async () => {
+    it('Survey Publish without errors', async () => {
       await page.click(Selectors.header.publishBtn)
       await page.waitForSelector(Selectors.modal.modal)
       await page.click(Selectors.modal.ok)
