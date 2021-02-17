@@ -11,9 +11,10 @@ const editNodeDef = async (nodeDef) => {
   // Click text="Save"
   await Promise.all([page.waitForResponse('**/api/survey/**'), page.click(Selectors.nodeDefDetails.save)])
   // Click text="Back"
-  await Promise.all([page.waitForNavigation(), page.click('text="Back"')])
-  await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
+  await Promise.all([page.waitForNavigation(), page.click(Selectors.nodeDefDetails.back)])
+  await page.waitForSelector(Selectors.surveyForm.surveyForm)
 
+  await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
   await expect(page).toHaveText(nodeDef.label)
 }
 

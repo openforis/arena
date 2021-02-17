@@ -17,6 +17,7 @@ export const Selectors = {
     ok: 'text="Ok"',
   },
   nodeDefDetails: {
+    back: 'text="Back"',
     nodeDefDescriptions: (lang = defaults.lang) => `#node-def-descriptions-${lang}`,
     nodeDefLabels: (lang = defaults.lang) => `#node-def-labels-${lang}`,
     nodeDefName: '#node-def-name',
@@ -47,6 +48,7 @@ export const Selectors = {
     nodeDefAddChildBtn: (name) => `#node-def-add-child-${name}-btn`,
     nodeDefEditBtn: (name) => `#node-def-edit-${name}-btn`,
     nodeDefErrorBadge: (name) => `#node-def-error-badge-${name}`,
+    surveyForm: '.survey-form',
   },
   surveyList: {
     surveyRow: (rowIdx) => `#surveys_${rowIdx}`,
