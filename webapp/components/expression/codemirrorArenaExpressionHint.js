@@ -105,19 +105,29 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
   return completions
 }
 
+/* eslint-disable no-param-reassign */
+const _prepareTokenForCompletion = ({ token, cursorPosition, cursorLine }) => {
+  token.start = getVariableNameStart({ value: token.string, end: cursorPosition })
+  token.line = cursorLine
+
+  if (token.end > cursorPosition) {
+    token.end = cursorPosition
+    token.string = token.string.slice(0, cursorPosition - token.start)
+  }
+}
+
 export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {
   const cur = editor.getCursor()
   const token = editor.getTokenAt(cur)
 
-  token.start = getVariableNameStart({ value: token.string, end: cur.ch })
-  token.line = cur.line
+  const { ch: cursorPosition, line: cursorLine } = cur
 
-  const variablePath = token.string.slice(getVariablePathStart({ value: token.string, end: cur.ch }), cur.ch)
+  const variablePath = token.string.slice(
+    getVariablePathStart({ value: token.string, end: cursorPosition }),
+    cursorPosition
+  )
 
-  if (token.end > cur.ch) {
-    token.end = cur.ch
-    token.string = token.string.slice(0, cur.ch - token.start)
-  }
+  _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
 
   const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
   const nodeDefPathParts = variablePath.split('.')

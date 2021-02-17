@@ -8,10 +8,9 @@ import * as Expression from '@core/expressionParser/expression'
 import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
-const _getNodeValue = (nodeDef) => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
+import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
 
-const _isNodePropertyAllowed = ({ nodeDefContext, propertyName }) =>
-  propertyName === 'length' && NodeDef.isMultiple(nodeDefContext)
+const _getNodeValue = (nodeDef) => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
@@ -81,7 +80,7 @@ const _identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (e
 const _memberPropertyEval = ({ survey, nodeDefContext, property }) => {
   const propertyName = Expression.getName(property)
 
-  if (_isNodePropertyAllowed({ nodeDefContext, propertyName })) {
+  if (NodeNativeProperties.isNativePropertyAllowed({ nodeDef: nodeDefContext, propertyName })) {
     // simulate node property getter
     return {}
   }

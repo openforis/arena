@@ -14,6 +14,8 @@ import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
+import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
+
 const _getNodeValue = (survey) => (node) => {
   if (Node.isValueBlank(node)) {
     return null
@@ -113,15 +115,6 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
   return []
 }
 
-const _nodePropertyEvaluators = {
-  [Expression.nodeProperties.length]: ({ node }) => {
-    if (R.is(Array)(node)) {
-      return node.length
-    }
-    throw new SystemError(Validation.messageKeys.expressions.cannotGetLengthOfSingleNodes)
-  },
-}
-
 const _identifierEval = (survey, record) => (expr, { node }) => {
   const nodeName = Expression.getName(expr)
 
@@ -148,10 +141,9 @@ const _memberEval = (expr, ctx) => {
   if (objectEval && !R.isEmpty(objectEval)) {
     if (Expression.isIdentifier(property)) {
       const propertyName = Expression.getName(property)
-      if (Expression.isNodeProperty(propertyName)) {
-        // property is the property of node
-        const propertyEvaluator = _nodePropertyEvaluators[propertyName]
-        return propertyEvaluator({ node: objectEval })
+      if (NodeNativeProperties.isNativeProperty(propertyName)) {
+        // property is a native property of the node
+        return NodeNativeProperties.evalProperty({ node: objectEval, propertyName })
       }
     }
     // evaluate property moving the context node to the evaluated object
