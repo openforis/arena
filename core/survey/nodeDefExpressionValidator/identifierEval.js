@@ -1,14 +1,11 @@
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import Queue from '@core/queue'
 import SystemError from '@core/systemError'
-
-import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
 
 const _getNodeValue = (nodeDef) => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
 
@@ -44,7 +41,7 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   return reachableNodeDefs
 }
 
-const _identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (expr, ctx) => {
+export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (expr, ctx) => {
   const { node: nodeDefContext } = ctx
 
   const nodeName = R.prop('name')(expr)
@@ -75,60 +72,4 @@ const _identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (e
   }
 
   return NodeDef.isEntity(def) || NodeDef.isMultiple(def) ? def : _getNodeValue(def)
-}
-
-const _memberPropertyEval = ({ survey, nodeDefContext, property }) => {
-  const propertyName = Expression.getName(property)
-
-  if (NodeNativeProperties.isNativePropertyAllowed({ nodeDef: nodeDefContext, propertyName })) {
-    // simulate node property getter
-    return {}
-  }
-
-  const childDef = Survey.getNodeDefChildByName(nodeDefContext, propertyName)(survey)
-  if (!childDef) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: propertyName })
-  }
-  return childDef
-}
-
-const _memberEval = ({ survey }) => (expr, ctx) => {
-  const { object, property } = expr
-
-  const objectEval = Expression.evalExpr({ expr: object, ctx })
-  if (R.isNil(objectEval)) {
-    return null
-  }
-  if (Expression.isIdentifier(property)) {
-    return _memberPropertyEval({ survey, nodeDefContext: objectEval, property })
-  }
-  if (Expression.isLiteral(property)) {
-    // simulate access to element at index, but return only the node def
-    return objectEval
-  }
-  return Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
-}
-
-export const validate = ({
-  survey,
-  nodeDefCurrent,
-  exprString,
-  isContextParent = false,
-  selfReferenceAllowed = false,
-}) => {
-  const functions = {
-    [Expression.types.Identifier]: _identifierEval({ survey, nodeDefCurrent, selfReferenceAllowed }),
-    [Expression.types.MemberExpression]: _memberEval({ survey }),
-  }
-  try {
-    const nodeDefContext = isContextParent ? Survey.getNodeDefParent(nodeDefCurrent)(survey) : nodeDefCurrent
-    Expression.evalString(exprString, { functions, node: nodeDefContext })
-    return null
-  } catch (error) {
-    const details = R.is(SystemError, error) ? `$t(${error.key})` : error.toString()
-    return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, {
-      details,
-      ...error.params,
-    })
-  }
 }
