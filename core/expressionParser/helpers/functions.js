@@ -1,10 +1,29 @@
-import * as A from '@core/arena'
-import * as DateUtils from '@core/dateUtils'
+export const functionNames = {
+  avg: 'avg',
+  count: 'count',
+  includes: 'includes',
+  index: 'index',
+  isEmpty: 'isEmpty',
+  ln: 'ln',
+  log10: 'log10',
+  max: 'max',
+  min: 'min',
+  now: 'now',
+  pow: 'pow',
+  sum: 'sum',
+}
 
-export const includes = (items, value) => Array.isArray(items) && items.includes(String(value))
-
-export const isEmpty = (value) => A.isEmpty(value) || (value instanceof Number && Number.isNaN(value))
-
-export const now = () => DateUtils.nowFormatDefault()
-
-export const pow = (base, exponent) => base ** exponent
+export const functions = {
+  [functionNames.avg]: { minArity: 1, maxArity: 1 },
+  [functionNames.count]: { minArity: 1, maxArity: 1 },
+  [functionNames.includes]: { minArity: 2, maxArity: 2 },
+  [functionNames.index]: { minArity: 0, maxArity: 0 },
+  [functionNames.isEmpty]: { minArity: 1, maxArity: 1 },
+  [functionNames.ln]: { minArity: 1 },
+  [functionNames.log10]: { minArity: 1 },
+  [functionNames.max]: { minArity: 1, maxArity: -1 },
+  [functionNames.min]: { minArity: 1, maxArity: -1 },
+  [functionNames.now]: { minArity: 0, maxArity: 0 },
+  [functionNames.pow]: { minArity: 2 },
+  [functionNames.sum]: { minArity: 1, maxArity: 1 },
+}

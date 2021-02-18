@@ -7,19 +7,20 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
-    isEmpty: `isEmpty(attribute_name) = true/false`,
-    min: 'max(3,1) = 1',
-    max: 'max(3,1,2) = 3',
-    pow: 'pow(2,3) = 2³ = 8',
-    ln: 'ln(10) = 2.302…',
-    log10: 'log10(100) = 2',
-    includes: `includes(multiple_attribute_name, 'value') = true/false`,
-    now: 'now()',
+    [Expression.functionNames.index]: `index()`,
+    [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
+    [Expression.functionNames.min]: 'min(3,1) = 1',
+    [Expression.functionNames.max]: 'max(3,1,2) = 3',
+    [Expression.functionNames.pow]: 'pow(2,3) = 2³ = 8',
+    [Expression.functionNames.ln]: 'ln(10) = 2.302…',
+    [Expression.functionNames.log10]: 'log10(100) = 2',
+    [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
+    [Expression.functionNames.now]: 'now()',
   },
   [Expression.modes.sql]: {
-    avg: 'avg(variable_name)',
-    count: 'count(variable_name)',
-    sum: 'sum(variable_name)',
+    [Expression.functionNames.avg]: 'avg(variable_name)',
+    [Expression.functionNames.count]: 'count(variable_name)',
+    [Expression.functionNames.sum]: 'sum(variable_name)',
   },
 }
 

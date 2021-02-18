@@ -15,6 +15,7 @@ import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
+import * as RecordExpressionFunctions from './recordEpressionFunctions'
 
 const _getNodeValue = (survey) => (node) => {
   if (Node.isValueBlank(node)) {
@@ -161,12 +162,13 @@ const _memberEval = (expr, ctx) => {
 }
 
 export const evalNodeQuery = (survey, record, node, query) => {
-  const functions = {
+  const expressionTypeEvaluators = {
     [Expression.types.Identifier]: _identifierEval(survey, record),
     [Expression.types.MemberExpression]: _memberEval,
   }
+  const functions = RecordExpressionFunctions.recordExpressionFunctions({ survey, record, node })
 
-  return Expression.evalString(query, { node, functions })
+  return Expression.evalString(query, { node, expressionTypeEvaluators, functions })
 }
 
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
