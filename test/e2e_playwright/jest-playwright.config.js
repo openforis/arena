@@ -6,5 +6,14 @@ module.exports = {
   exitOnPageError: false, // GitHub currently throws errors
   launchOptions: {
     headless,
+    slowMo: headless ? 0 : 500,
+  },
+  contextOptions: {
+    geolocation: {
+      latitude: 41.890221,
+      longitude: 12.492348,
+    },
+    locale: 'it-IT',
+    timezoneId: 'Europe/Rome',
   },
 }
