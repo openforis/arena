@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
@@ -18,7 +19,7 @@ const NodeDefErrorBadge = (props) => {
       showLabel={false}
       showKeys={false}
       className="error-badge-inverse survey-form__node-def-error-badge"
-      id={`node-def-error-badge-${NodeDef.getName(nodeDef)}`}
+      id={DataTestId.surveyForm.nodeDefErrorBadge(NodeDef.getName(nodeDef))}
     >
       {children}
     </ErrorBadge>

@@ -48,10 +48,10 @@ const Content = (props) => {
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
             <div
               role="button"
+              data-testid={`${module}_${i}`}
               key={String(i)}
               onClick={() => onRowClick && onRowClick(row)}
               className={className}
-              id={`${module}_${i}`}
               style={{ gridTemplateColumns }}
             >
               {React.createElement(rowComponent, {

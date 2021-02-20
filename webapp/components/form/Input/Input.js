@@ -75,6 +75,7 @@ export const Input = React.forwardRef((props, ref) => {
           aria-disabled={disabled}
           className="form-input"
           disabled={disabled}
+          data-testid={id}
           id={id}
           maxLength={maxLength}
           onChange={(event) => handleValueChange(event.target.value)}

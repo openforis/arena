@@ -7,6 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { FormItem } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
@@ -56,14 +57,14 @@ const BasicProps = (props) => {
       )}
 
       <LabelsEditor
-        inputFieldIdPrefix="node-def-labels"
+        inputFieldIdPrefix={DataTestId.nodeDefDetails.nodeDefLabels('')}
         labels={NodeDef.getLabels(nodeDef)}
         onChange={(labels) => Actions.setProp({ state, key: NodeDef.propKeys.labels, value: labels })}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
-        inputFieldIdPrefix="node-def-descriptions"
+        inputFieldIdPrefix={DataTestId.nodeDefDetails.nodeDefDescriptions('')}
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
@@ -81,7 +82,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
-            id="node-def-key"
+            id={DataTestId.nodeDefDetails.nodeDefKey}
             checked={NodeDef.isKey(nodeDef)}
             disabled={keyEditDisabled}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}

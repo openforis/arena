@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -35,7 +36,7 @@ const NodeDefDetails = () => {
         <div className="node-def-edit__container">
           <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
             <Input
-              id="node-def-name"
+              id={DataTestId.nodeDefDetails.nodeDefName}
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>

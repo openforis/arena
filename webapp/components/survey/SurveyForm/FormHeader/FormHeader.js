@@ -15,6 +15,7 @@ import {
   useNodeDefPage,
   useShowPageNavigation,
 } from '@webapp/store/ui/surveyForm'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
@@ -52,7 +53,7 @@ const FormHeader = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            id="add-sub-page-btn"
+            data-testid={DataTestId.surveyForm.addSubPageBtn}
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(

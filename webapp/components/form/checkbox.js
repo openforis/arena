@@ -10,7 +10,7 @@ class Checkbox extends React.Component {
         <ValidationTooltip validation={validation}>
           <button
             type="button"
-            id={id}
+            data-testid={id}
             className="btn btn-s btn-transparent btn-checkbox"
             onClick={() => onChange(!checked)}
             aria-disabled={disabled}

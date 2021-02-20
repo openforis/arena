@@ -6,7 +6,7 @@ module.exports = {
   exitOnPageError: false, // GitHub currently throws errors
   launchOptions: {
     headless,
-    slowMo: headless ? 0 : 500,
+    slowMo: headless ? null : 500,
   },
   contextOptions: {
     geolocation: {

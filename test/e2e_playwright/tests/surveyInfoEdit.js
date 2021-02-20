@@ -1,47 +1,41 @@
-import { DataTestId } from '../../../webapp/utils/dataTestId'
+import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { gotoHome, gotoSurveyInfo } from './_navigation'
+
+const surveyName = getSelector(DataTestId.surveyInfo.surveyName, 'input')
+const surveyLabel = getSelector(DataTestId.surveyInfo.surveyLabel(), 'input')
+const surveyDescription = getSelector(DataTestId.surveyInfo.surveyDescription(), 'input')
+const surveyLanguage = getSelector(DataTestId.surveyInfo.surveyLanguage, 'input')
+const saveBtn = getSelector(DataTestId.surveyInfo.saveBtn, 'button')
 
 export default () =>
-  describe('Survey Edit info', () => {
-    test('Edit name required', async () => {
-      await page.goto('http://localhost:9090/app/home/dashboard/')
+  describe('Survey info edit', () => {
+    gotoSurveyInfo()
 
-      await page.click(DataTestId.dashboard.editInfo)
-      expect(page.url()).toBe('http://localhost:9090/app/home/surveyInfo/')
+    test('Verify name required', async () => {
+      await page.fill(surveyName, '')
+      await page.click(saveBtn)
 
-      // Fill input[type="text"]
-      await page.fill('input[id="survey-name"]', '')
-
-      // Click text="Save"
-      await page.click('text="Save"')
-
-      await page.hover('input[id="survey-name"]')
+      await page.hover(surveyName)
       await expect(page).toHaveText('Name is required')
     })
 
-    test('Edit info', async () => {
-      // Fill input[type="text"]
-      await page.fill('input[id="survey-name"]', 'survey')
-      await page.fill('input[id="survey-label-en"]', 'My Survey')
-      await page.fill('input[id="survey-description-en"]', 'This is a survey description')
-      await page.fill('input[id="survey-language"]', 'fr')
-      // Click //div[normalize-space(.)='French' and normalize-space(@role)='button']
-      await page.click("//div[normalize-space(.)='French' and normalize-space(@role)='button']")
-      // Click text="Save"
-      await page.click('text="Save"')
+    test('Edit survey info', async () => {
+      await page.fill(surveyName, 'survey')
+      await page.fill(surveyLabel, 'My Survey')
+      await page.fill(surveyDescription, 'This is a survey description')
+      await page.fill(surveyLanguage, 'fr')
+      await page.click(getSelector(DataTestId.dropdown.dropDownItem('fr')))
 
-      // Click a[id="sidebar_btn_home"]
-      await page.click(DataTestId.sidebar.home)
-      expect(page.url()).toBe('http://localhost:9090/app/home/dashboard/')
+      await page.click(saveBtn)
+    })
 
-      // Click text="Edit info"
-      await page.click(DataTestId.dashboard.editInfo)
-      expect(page.url()).toBe('http://localhost:9090/app/home/surveyInfo/')
+    gotoHome()
+    gotoSurveyInfo()
 
-      await expect(await page.getAttribute('input[id="survey-name"]', 'value')).toBe('survey')
-      await expect(await page.getAttribute('input[id="survey-label-en"]', 'value')).toBe('My Survey')
-      await expect(await page.getAttribute('input[id="survey-description-en"]', 'value')).toBe(
-        'This is a survey description'
-      )
+    test('Verify survey info', async () => {
+      await expect(await page.getAttribute(surveyName, 'value')).toBe('survey')
+      await expect(await page.getAttribute(surveyLabel, 'value')).toBe('My Survey')
+      await expect(await page.getAttribute(surveyDescription, 'value')).toBe('This is a survey description')
       await expect(page).toHaveText('English')
       await expect(page).toHaveText('French')
     })

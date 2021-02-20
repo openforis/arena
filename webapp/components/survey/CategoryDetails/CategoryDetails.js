@@ -12,6 +12,7 @@ import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -49,7 +50,7 @@ const CategoryDetails = (props) => {
         <div className="category__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
-              id="category-name"
+              data-testid={DataTestId.categoryDetails.categoryName}
               value={Category.getName(category)}
               validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
               onChange={(value) =>

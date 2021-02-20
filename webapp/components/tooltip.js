@@ -52,7 +52,7 @@ class Tooltip extends React.Component {
     return (
       <div
         className={tooltipClass}
-        id={id}
+        data-testid={id}
         onMouseEnter={() => this.mouseEnter()}
         onMouseLeave={() => this.mouseLeave()}
         ref={this.tooltipRef}

@@ -1,9 +1,8 @@
-import { DataTestId } from '../../../../webapp/utils/dataTestId'
+import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { getAtomicAttributeKeys } from '../../mock/nodeDefs'
 
 // const editCode = async (nodeDef) => {
 //   await page.click(DataTestId.nodeDefDetails.save)
-//   await expect(page).toHaveSelector(DataTestId.notification.error)
 //   // await page.fill(DataTestId.nodeDefDetails.nodeDefCategory, nodeDef.category.substring(0, 3))
 //
 //   // await page.click(`div[id="${DataTestId.nodeDefDetails.nodeDefCategorySelector.substring(1)}"]/div/button`)
@@ -22,15 +21,18 @@ import { getAtomicAttributeKeys } from '../../mock/nodeDefs'
 // }
 
 export const editNodeDef = async (nodeDef) => {
-  await page.fill(DataTestId.nodeDefDetails.nodeDefName, nodeDef.name)
-  await page.fill(DataTestId.nodeDefDetails.nodeDefLabels(), nodeDef.label)
-  if (nodeDef.key) await page.click(DataTestId.nodeDefDetails.nodeDefKey)
+  await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
+  await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
+  if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
 
   // Click text="Save"
-  await Promise.all([page.waitForResponse('**/api/survey/**'), page.click(DataTestId.nodeDefDetails.save)])
+  await Promise.all([
+    page.waitForResponse('**/api/survey/**'),
+    page.click(getSelector(DataTestId.nodeDefDetails.saveBtn, 'button')),
+  ])
   // Click text="Back"
-  await Promise.all([page.waitForNavigation(), page.click(DataTestId.nodeDefDetails.back)])
-  await page.waitForSelector(DataTestId.surveyForm.surveyForm)
+  await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button'))])
+  await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
 
   await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
   await expect(page).toHaveText(nodeDef.label)
@@ -39,7 +41,7 @@ export const editNodeDef = async (nodeDef) => {
 export const editAtomicChildren = (nodeDef) =>
   test.each(getAtomicAttributeKeys(nodeDef))(`${nodeDef.label} child %o edit`, async (key) => {
     const child = nodeDef.children[key]
-    await page.click(DataTestId.surveyForm.nodeDefAddChildBtn(nodeDef.name))
+    await page.click(getSelector(DataTestId.surveyForm.nodeDefAddChildBtn(nodeDef.name), 'button'))
     await Promise.all([page.waitForNavigation(), page.click(`text="${child.type}"`)])
     await editNodeDef(child)
   })
