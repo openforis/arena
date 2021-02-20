@@ -2,7 +2,7 @@ import { user } from '../mock/user'
 
 export default () =>
   describe('Login', () => {
-    it('Login Unsuccessful', async () => {
+    test('Login Unsuccessful', async () => {
       // Fill input[name="email"]
       await page.fill('input[name="email"]', user.email)
 
@@ -15,7 +15,7 @@ export default () =>
       await expect(page).toHaveText('.guest-errors', 'User not found. Make sure email and password are correct')
     })
 
-    it('Login Successful', async () => {
+    test('Login Successful', async () => {
       // Fill input[name="password"]
       await page.fill('input[name="password"]', user.password)
 

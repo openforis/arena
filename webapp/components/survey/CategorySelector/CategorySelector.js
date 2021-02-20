@@ -43,8 +43,9 @@ const CategorySelector = (props) => {
   }, [categoryUuid, showCategoriesPanel])
 
   return (
-    <div className="category-selector">
+    <div id="node-def-category-selector" className="category-selector">
       <Dropdown
+        idInput="node-def-category"
         disabled={disabled}
         items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
@@ -53,7 +54,9 @@ const CategorySelector = (props) => {
         selection={category}
         onChange={onChange}
       />
-      {showAdd && <ButtonMetaItemAdd onAdd={setCategoryToEdit} metaItemType={metaItemTypes.category} />}
+      {showAdd && (
+        <ButtonMetaItemAdd id="node-def-category-add" onAdd={setCategoryToEdit} metaItemType={metaItemTypes.category} />
+      )}
       {showManage && (
         <button
           type="button"

@@ -73,6 +73,7 @@ const CodeProps = (props) => {
             >
               <Dropdown
                 disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
+                idInput="node-def-code-parent"
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
                 itemKey="uuid"

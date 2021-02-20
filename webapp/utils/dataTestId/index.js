@@ -1,6 +1,12 @@
 const defaults = { lang: 'en' }
 
-export const Selectors = {
+export const DataTestId = {
+  categoryDetails: {
+    categoryName: '#category-name',
+  },
+  dropdown: {
+    toggleBtn: (id) => `${id}-toggle-btn`,
+  },
   header: {
     createSurvey: 'text="Create Survey"',
     mySurveys: 'text="My Surveys"',
@@ -20,11 +26,23 @@ export const Selectors = {
     back: 'text="Back"',
     nodeDefDescriptions: (lang = defaults.lang) => `#node-def-descriptions-${lang}`,
     nodeDefLabels: (lang = defaults.lang) => `#node-def-labels-${lang}`,
+    nodeDefCategory: 'input[id="node-def-category"]',
+    nodeDefCategoryAdd: '#node-def-category-add',
+    nodeDefCategorySelector: 'div[id="node-def-category-selector"]',
+    nodeDefCodeParent: '#node-node-code-parent',
     nodeDefName: '#node-def-name',
     nodeDefKey: '#node-def-key',
     save: 'text="Save"',
   },
+  notification: {
+    error: '.notification.error',
+  },
+  panelRight: {
+    close: '#panel-right-close',
+  },
   sidebar: {
+    module: (module) => `sidebar-module-${module}`,
+    moduleBtn: (module) => `sidebar-modulebtn-${module}`,
     analysis: '#sidebar_btn_analysis',
     home: '#sidebar_btn_home',
     data: '#sidebar_btn_data',
@@ -45,6 +63,7 @@ export const Selectors = {
     userList: '#sidebar_btn_userList',
   },
   surveyForm: {
+    addSubPageBtn: '#add-sub-page-btn',
     nodeDefAddChildBtn: (name) => `#node-def-add-child-${name}-btn`,
     nodeDefEditBtn: (name) => `#node-def-edit-${name}-btn`,
     nodeDefErrorBadge: (name) => `#node-def-error-badge-${name}`,
@@ -53,4 +72,7 @@ export const Selectors = {
   surveyList: {
     surveyRow: (rowIdx) => `#surveys_${rowIdx}`,
   },
+
+  // utils
+  getSelector: (id, tag = '') => `${tag}[data-testid="${id}"]`,
 }

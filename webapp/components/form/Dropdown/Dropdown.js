@@ -78,6 +78,7 @@ const Dropdown = (props) => {
       <button
         type="button"
         className="btn-s btn-transparent btn-toggle"
+        data-testid={idInput ? `${idInput}-toggle-btn` : null}
         onClick={async (event) => {
           event.preventDefault()
           event.stopPropagation()

@@ -52,6 +52,7 @@ const FormHeader = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
+            id="add-sub-page-btn"
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(

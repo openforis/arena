@@ -9,7 +9,7 @@ const PanelRight = (props) => {
   return ReactDOM.createPortal(
     <div className="panel-right" style={{ width: `min(${width}, 100vw)` }}>
       <div className="panel-right__header">
-        <button type="button" className="btn btn-transparent btn-close" onClick={onClose}>
+        <button id="panel-right-close" type="button" className="btn btn-transparent btn-close" onClick={onClose}>
           <span className="icon icon-cross icon-12px" />
         </button>
         <div>{header}</div>

@@ -49,6 +49,7 @@ const CategoryDetails = (props) => {
         <div className="category__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
+              id="category-name"
               value={Category.getName(category)}
               validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
               onChange={(value) =>

@@ -1,8 +1,11 @@
-import login from '../src/tests/login'
-import surveyCreate from '../src/tests/surveyCreate'
-import surveyEditInfo from '../src/tests/surveyEditInfo'
-// import surveyFormEditNodeDefs from '../src/tests/surveyFormEditNodeDefs'
-import surveyDelete from '../src/tests/surveyDelete'
+import login from '../tests/login'
+
+import surveyCreate from '../tests/surveyCreate'
+import surveyInfoEdit from '../tests/surveyInfoEdit'
+
+import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
+
+import surveyDelete from '../tests/surveyDelete'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -10,8 +13,17 @@ beforeAll(async () => {
 
 describe('E2E Tests', () => {
   login()
+  /**
+   * Survey create and info edit.
+   */
   surveyCreate()
-  surveyEditInfo()
-  // surveyFormEditNodeDefs()
+  surveyInfoEdit()
+  /**
+   * Designer.
+   */
+  nodeDefAtomicEdit()
+  /**
+   * Survey delete.
+   */
   surveyDelete()
 })

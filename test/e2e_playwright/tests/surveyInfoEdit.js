@@ -1,11 +1,11 @@
-import { Selectors } from '../selectors'
+import { DataTestId } from '../../../webapp/utils/dataTestId'
 
 export default () =>
   describe('Survey Edit info', () => {
-    it('Edit name required', async () => {
+    test('Edit name required', async () => {
       await page.goto('http://localhost:9090/app/home/dashboard/')
 
-      await page.click(Selectors.dashboard.editInfo)
+      await page.click(DataTestId.dashboard.editInfo)
       expect(page.url()).toBe('http://localhost:9090/app/home/surveyInfo/')
 
       // Fill input[type="text"]
@@ -18,7 +18,7 @@ export default () =>
       await expect(page).toHaveText('Name is required')
     })
 
-    it('Edit info', async () => {
+    test('Edit info', async () => {
       // Fill input[type="text"]
       await page.fill('input[id="survey-name"]', 'survey')
       await page.fill('input[id="survey-label-en"]', 'My Survey')
@@ -30,11 +30,11 @@ export default () =>
       await page.click('text="Save"')
 
       // Click a[id="sidebar_btn_home"]
-      await page.click(Selectors.sidebar.home)
+      await page.click(DataTestId.sidebar.home)
       expect(page.url()).toBe('http://localhost:9090/app/home/dashboard/')
 
       // Click text="Edit info"
-      await page.click(Selectors.dashboard.editInfo)
+      await page.click(DataTestId.dashboard.editInfo)
       expect(page.url()).toBe('http://localhost:9090/app/home/surveyInfo/')
 
       await expect(await page.getAttribute('input[id="survey-name"]', 'value')).toBe('survey')
