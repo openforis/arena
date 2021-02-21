@@ -1,47 +1,44 @@
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
-import { getAtomicAttributeKeys } from '../../mock/nodeDefs'
+import { categories } from '../../mock/categories'
 
-// const editCode = async (nodeDef) => {
-//   await page.click(DataTestId.nodeDefDetails.save)
-//   // await page.fill(DataTestId.nodeDefDetails.nodeDefCategory, nodeDef.category.substring(0, 3))
-//
-//   // await page.click(`div[id="${DataTestId.nodeDefDetails.nodeDefCategorySelector.substring(1)}"]/div/button`)
-//   await page.click(`button[data-testid="dropdown-toggle-btn"]`)
-//
-//   if (await page.$('div[role="button"]')) {
-//     await page.click('div[role="button"]')
-//   } else {
-//     await page.click(DataTestId.nodeDefDetails.nodeDefCategoryAdd)
-//     await expect(page).toHaveText('Category name')
-//
-//     const category = categories[nodeDef.category]
-//     await page.fill(DataTestId.categoryDetails.categoryName, category.name)
-//     await page.click(DataTestId.panelRight.close)
-//   }
-// }
+const editCodeDetails = async (nodeDef) => {
+  const category = categories[nodeDef.category]
+  // select category
+  await page.click(getSelector(DataTestId.dropdown.toggleBtn(DataTestId.categorySelector.category), 'button'))
+  await page.click(getSelector(DataTestId.dropdown.dropDownItem(category.uuid)))
 
-export const editNodeDef = async (nodeDef) => {
-  await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
-  await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
-  if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
-
-  // Click text="Save"
-  await Promise.all([
-    page.waitForResponse('**/api/survey/**'),
-    page.click(getSelector(DataTestId.nodeDefDetails.saveBtn, 'button')),
-  ])
-  // Click text="Back"
-  await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button'))])
-  await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
-
-  await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
-  await expect(page).toHaveText(nodeDef.label)
+  if (nodeDef.parent) {
+    // select parent
+    await page.click(getSelector(DataTestId.dropdown.toggleBtn(DataTestId.nodeDefDetails.nodeDefCodeParent), 'button'))
+    await page.click(`text="${nodeDef.parent}"`)
+  } else {
+    const codeParent = await page.$(getSelector(DataTestId.nodeDefDetails.nodeDefCodeParent, 'input'))
+    await expect(await codeParent.isDisabled()).toBeTruthy()
+  }
 }
 
-export const editAtomicChildren = (nodeDef) =>
-  test.each(getAtomicAttributeKeys(nodeDef))(`${nodeDef.label} child %o edit`, async (key) => {
-    const child = nodeDef.children[key]
-    await page.click(getSelector(DataTestId.surveyForm.nodeDefAddChildBtn(nodeDef.name), 'button'))
-    await Promise.all([page.waitForNavigation(), page.click(`text="${child.type}"`)])
-    await editNodeDef(child)
+const editFnTypes = {
+  code: editCodeDetails,
+}
+
+export const editNodeDefDetails = (nodeDef) =>
+  test(`${nodeDef.label} edit details`, async () => {
+    await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
+    await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
+    if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
+
+    const editFnType = editFnTypes[nodeDef.type]
+    if (editFnType) await editFnType(nodeDef)
+
+    // Save
+    await Promise.all([
+      page.waitForResponse('**/api/survey/**'),
+      page.click(getSelector(DataTestId.nodeDefDetails.saveBtn, 'button')),
+    ])
+    // Back
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button'))])
+    await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
+
+    await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
+    await expect(page).toHaveText(nodeDef.label)
   })

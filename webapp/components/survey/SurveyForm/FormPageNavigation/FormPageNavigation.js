@@ -6,13 +6,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useNodeDefLabel } from '@webapp/store/survey'
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State, useActions, useLocalState } from './store'
 
 const FormPageNavigation = (props) => {
   const { state, setState } = useLocalState(props)
 
-  const label = useNodeDefLabel(State.getNodeDef(state), useNodeDefLabelType())
+  const nodeDef = State.getNodeDef(state)
+  const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
   const Actions = useActions({ setState })
   const level = State.getLevel(state)
   const expandedFormPageNavigation = State.getExpandedFormPageNavigation(state)
@@ -57,6 +59,7 @@ const FormPageNavigation = (props) => {
         <button
           type="button"
           className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
+          data-testid={DataTestId.surveyForm.surveyFormPage(NodeDef.getName(nodeDef))}
           onClick={() => Actions.select({ state })}
           aria-disabled={!enabled}
         >

@@ -42,7 +42,7 @@ const CategorySelector = (props) => {
   }, [categoryUuid, showCategoriesPanel])
 
   return (
-    <div id={DataTestId.categorySelector.categorySelector} className="category-selector">
+    <div className="category-selector">
       <Dropdown
         idInput={DataTestId.categorySelector.category}
         disabled={disabled}

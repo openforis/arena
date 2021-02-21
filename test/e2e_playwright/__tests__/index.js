@@ -4,6 +4,7 @@ import surveyCreate from '../tests/surveyCreate'
 import surveyInfoEdit from '../tests/surveyInfoEdit'
 
 import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
+import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 
 import surveyDelete from '../tests/surveyDelete'
 
@@ -22,6 +23,7 @@ describe('E2E Tests', () => {
    * Designer.
    */
   nodeDefAtomicEdit()
+  nodeDefCodeAndCategoryEdit()
   /**
    * Survey delete.
    */

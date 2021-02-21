@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 
+import { DataTestId } from '@webapp/utils/dataTestId'
+
 import { Input } from '@webapp/components/form/Input'
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
@@ -78,7 +80,7 @@ const Dropdown = (props) => {
       <button
         type="button"
         className="btn-s btn-transparent btn-toggle"
-        data-testid={idInput ? `${idInput}-toggle-btn` : null}
+        data-testid={idInput ? DataTestId.dropdown.toggleBtn(idInput) : null}
         onClick={async (event) => {
           event.preventDefault()
           event.stopPropagation()

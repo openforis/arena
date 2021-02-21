@@ -6,11 +6,23 @@ const _withLang = (key) => (lang = defaults.lang) => `${key}${lang && lang.lengt
 
 export const DataTestId = {
   categoryDetails: {
+    addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',
+    // TODO remove category prefix below after removing taiko
+    level: (idx) => `level-${idx}`,
+    levelItemAddBtn: (idx) => `level-${idx}-item-add-btn`,
+    levelDeleteBtn: (idx) => `level-${idx}-delete-btn`,
+    levelErrorBadge: (idx) => `level-${idx}-error-badge`,
+    levelName: (idx) => `category-level-${idx}-name`,
+    item: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}`,
+    itemCloseBtn: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-close-btn`,
+    itemDeleteBtn: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-delete-btn`,
+    itemErrorBadge: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-error-badge`,
+    itemCode: (levelIdx, itemIdx) => `category-level-${levelIdx}-item-${itemIdx}-code`,
+    itemLabel: (levelIdx, itemIdx) => _withLang(`category-level-${levelIdx}-item-${itemIdx}-label`),
   },
   categorySelector: {
-    category: 'category-selector',
-    categorySelector: 'category-selector-category',
+    category: 'category-selector-category',
     addCategoryBtn: 'category-selector-add-btn',
   },
   dashboard: {
@@ -68,6 +80,7 @@ export const DataTestId = {
     nodeDefEditBtn: (name) => `node-def-edit-${name}-btn`,
     nodeDefErrorBadge: (name) => `node-def-error-badge-${name}`,
     surveyForm: 'survey-form',
+    surveyFormPage: (nodeDefName) => `survey-form-${nodeDefName}-page`,
   },
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',

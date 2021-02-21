@@ -2,6 +2,7 @@ export const categories = {
   administrative_unit: {
     name: 'administrative_unit',
     label: 'Administrative Unit ',
+    uuid: null,
     levels: [
       {
         name: 'country',
@@ -9,7 +10,7 @@ export const categories = {
       },
       {
         name: 'region',
-        codes: 3,
+        codes: 2,
       },
       {
         name: 'province',

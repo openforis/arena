@@ -1,8 +1,8 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormDesigner } from './_navigation'
-import { editAtomicChildren, editNodeDef } from './_nodeDefDetails'
 import { publishWithErrors, publishWithoutErrors } from './_publish'
+import { editNodeDef, addNodeDef, addNodeDefAtomicChildren, addNodeDefSubPage } from './_surveyForm'
 
 export default () =>
   describe('NodeDef atomic edit', () => {
@@ -18,35 +18,16 @@ export default () =>
     publishWithErrors('Define at least one key attribute', 'Define at least one child item')
 
     // ====== cluster edit
-    test('Cluster edit', async () => {
-      await Promise.all([
-        page.waitForNavigation(),
-        page.click(getSelector(DataTestId.surveyForm.nodeDefEditBtn('root_entity'), 'a')),
-      ])
-      await editNodeDef(cluster)
-    })
-
-    editAtomicChildren(cluster)
+    editNodeDef('root_entity', cluster)
+    addNodeDefAtomicChildren(cluster)
 
     // ====== plot edit
-    test('Plot edit', async () => {
-      await Promise.all([
-        page.waitForNavigation(),
-        page.click(getSelector(DataTestId.surveyForm.addSubPageBtn, 'button')),
-      ])
-      await editNodeDef(plot)
-    })
-
-    editAtomicChildren(plot)
+    addNodeDefSubPage(cluster, plot)
+    addNodeDefAtomicChildren(plot)
 
     // ====== tree edit
-    test('Tree edit', async () => {
-      await page.click(getSelector(DataTestId.surveyForm.nodeDefAddChildBtn(plot.name, 'button')))
-      await Promise.all([page.waitForNavigation(), page.click(`text="${tree.type}"`)])
-      await editNodeDef(tree)
-    })
-
-    editAtomicChildren(tree)
+    addNodeDef(plot, tree)
+    addNodeDefAtomicChildren(tree)
 
     publishWithoutErrors()
   })
