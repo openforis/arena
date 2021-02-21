@@ -1,6 +1,7 @@
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { editNodeDefDetails } from '../_nodeDefDetails'
-import { getAtomicAttributeKeys } from '../../mock/nodeDefs'
+import { getAtomicAttributeKeys, tree } from '../../mock/nodeDefs'
+import { dragAndDrop } from '../utils/dragDrop'
 
 // ==== add
 export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
@@ -10,6 +11,20 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   })
 
   if (editDetails) editNodeDefDetails(nodeDefChild)
+
+  if (nodeDefChild.type === 'entity') {
+    test(`Expand ${nodeDefChild.name} table`, async () => {
+      // expand table by 3 columns and 4 rows
+      const entityEl = await page.$(getSelector(tree.name))
+      const entityBBox = await entityEl.boundingBox()
+      await dragAndDrop(
+        entityBBox.x + entityBBox.width - 5,
+        entityBBox.y + entityBBox.height - 5,
+        entityBBox.x + entityBBox.width * 3,
+        entityBBox.y + entityBBox.height * 4
+      )
+    })
+  }
 }
 
 export const addNodeDefAtomicChildren = (nodeDefParent) => {

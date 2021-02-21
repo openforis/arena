@@ -118,6 +118,7 @@ const NodeDefEntityTableRows = (props) => {
 
   const createRow = (renderType, node = null, key = undefined, i = undefined) => (
     <NodeDefEntityTableRow
+      data-testid={renderType === NodeDefLayout.renderType.tableHeader ? NodeDef.getName(nodeDef) : null}
       key={key}
       canEditDef={canEditDef}
       canEditRecord={canEditRecord}

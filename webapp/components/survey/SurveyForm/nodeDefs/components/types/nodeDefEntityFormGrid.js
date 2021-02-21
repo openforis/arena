@@ -64,7 +64,7 @@ const NodeDefEntityFormGrid = (props) => {
       onResizeStop={onChangeLayout}
     >
       {nodeDefsInnerPage.map((childDef) => (
-        <div key={NodeDef.getUuid(childDef)} id={NodeDef.getName(childDef)}>
+        <div key={NodeDef.getUuid(childDef)} data-testid={NodeDef.getName(childDef)}>
           <NodeDefSwitch
             edit={edit}
             entry={entry}
