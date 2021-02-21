@@ -7,14 +7,13 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
+import { useSurveyId } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
-
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
@@ -65,12 +64,17 @@ const TaxonProps = (props) => {
             items={itemsLookupFunction}
             itemKey="uuid"
             itemLabel={Taxonomy.getName}
+            idInput={DataTestId.nodeDefDetails.taxonomySelector}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
-          <ButtonMetaItemAdd onAdd={setTaxonomyToEdit} metaItemType={metaItemTypes.taxonomy} />
+          <ButtonMetaItemAdd
+            id={DataTestId.nodeDefDetails.taxonomySelectorAddBtn}
+            onAdd={setTaxonomyToEdit}
+            metaItemType={metaItemTypes.taxonomy}
+          />
           <button
             type="button"
             className="btn btn-s"

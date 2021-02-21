@@ -59,7 +59,7 @@ const FormPageNavigation = (props) => {
         <button
           type="button"
           className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
-          data-testid={DataTestId.surveyForm.surveyFormPage(NodeDef.getName(nodeDef))}
+          data-testid={DataTestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef))}
           onClick={() => Actions.select({ state })}
           aria-disabled={!enabled}
         >

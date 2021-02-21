@@ -2,6 +2,7 @@ import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { editNodeDefDetails } from '../_nodeDefDetails'
 import { getAtomicAttributeKeys } from '../../mock/nodeDefs'
 
+// ==== add
 export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
     await page.click(getSelector(DataTestId.surveyForm.nodeDefAddChildBtn(nodeDefParent.name), 'button'))
@@ -29,6 +30,7 @@ export const addNodeDefSubPage = (nodeDefParent, nodeDefChild) => {
   editNodeDefDetails(nodeDefChild)
 }
 
+// ==== edit
 export const editNodeDef = (formName, nodeDef) => {
   test(`${nodeDef.label} edit`, async () => {
     await Promise.all([
@@ -38,4 +40,11 @@ export const editNodeDef = (formName, nodeDef) => {
   })
 
   editNodeDefDetails(nodeDef)
+}
+
+// ==== form navigation
+export const gotoFormPage = (nodeDef) => {
+  test(`Goto form page ${nodeDef.name}`, async () => {
+    await page.click(getSelector(DataTestId.surveyForm.pageLinkBtn(nodeDef.name), 'button'))
+  })
 }

@@ -1,4 +1,5 @@
 import { categories } from './categories'
+import { taxonomies } from './taxonomies'
 
 const nodeDefCompositeTypes = ['entity', 'code', 'taxon']
 
@@ -13,6 +14,11 @@ const createCode = (name, label, category, parent = null, key = false) => ({
   ...createAttribute(name, label, 'code', key),
   category,
   parent,
+})
+
+const createTaxon = (name, label, taxonomy) => ({
+  ...createAttribute(name, label, 'taxon'),
+  taxonomy,
 })
 
 const createEntity = (name, label, children = null) => ({
@@ -50,7 +56,7 @@ export const cluster = createEntity('cluster', 'Cluster', {
       tree_id: createAttribute('tree_id', 'Tree id', 'integer', true),
       tree_dec_1: createAttribute('tree_dec_1', 'Tree decimal 1', 'decimal'),
       tree_dec_2: createAttribute('tree_dec_2', 'Tree decimal 2', 'decimal'),
-      tree_species: createAttribute('tree_species', 'Tree Species', 'taxon'),
+      tree_species: createTaxon('tree_species', 'Tree Species', taxonomies.species_list.name),
     }),
   }),
 })

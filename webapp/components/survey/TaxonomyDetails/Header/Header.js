@@ -14,6 +14,7 @@ import UploadButton from '@webapp/components/form/uploadButton'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State } from '../store'
 
@@ -34,6 +35,7 @@ const Header = (props) => {
       <div>
         <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
           <Input
+            id={DataTestId.taxonomyDetails.taxonomyName}
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation(Taxonomy.keysProps.name)(validation)}
             onChange={(value) =>
@@ -44,7 +46,7 @@ const Header = (props) => {
         </FormItem>
 
         <LabelsEditor
-          inputFieldIdPrefix="taxonomy-description"
+          inputFieldIdPrefix={DataTestId.taxonomyDetails.taxonomyDescription('')}
           formLabelKey="common.description"
           labels={Taxonomy.getDescriptions(taxonomy)}
           onChange={(descriptions) =>

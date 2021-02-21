@@ -23,7 +23,9 @@ export default () =>
         page.click(getSelector(DataTestId.categorySelector.addCategoryBtn, 'button')),
       ])
       const json = await response.json()
-      category.uuid = json.category.uuid
+      const categoryUuid = json.category.uuid
+      await expect(categoryUuid).not.toBeNull()
+      category.uuid = categoryUuid
     })
 
     editCategoryProps(category)

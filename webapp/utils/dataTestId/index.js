@@ -58,6 +58,8 @@ export const DataTestId = {
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
     saveBtn: 'node-def-save-btn',
+    taxonomySelector: 'taxonomy-selector',
+    taxonomySelectorAddBtn: 'taxonomy-selector-add-btn',
   },
   panelRight: {
     closeBtn: 'panel-right-close-btn',
@@ -79,8 +81,8 @@ export const DataTestId = {
     nodeDefAddChildBtn: (name) => `node-def-add-child-${name}-btn`,
     nodeDefEditBtn: (name) => `node-def-edit-${name}-btn`,
     nodeDefErrorBadge: (name) => `node-def-error-badge-${name}`,
+    pageLinkBtn: (nodeDefName) => `page-link-${nodeDefName}-btn`,
     surveyForm: 'survey-form',
-    surveyFormPage: (nodeDefName) => `survey-form-${nodeDefName}-page`,
   },
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',
@@ -91,5 +93,11 @@ export const DataTestId = {
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
+  },
+  taxonomyDetails: {
+    doneEditBtn: 'taxonomy-done-edit-btn',
+    taxonomyName: 'taxonomy-name',
+    taxonomyDescription: _withLang('taxonomy-description'),
+    uploadInput: 'taxonomy-upload-input',
   },
 }
