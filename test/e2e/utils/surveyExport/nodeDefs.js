@@ -1,8 +1,5 @@
 import * as R from 'ramda'
 
-// TOFIX
-import * as Survey from '@core/survey/survey'
-
 import PromiseUtils from '../PromiseUtils'
 
 import { getSurvey } from './utils'
@@ -28,6 +25,45 @@ const getLabel = ({ nodeDef, lang }) => {
   return label
 }
 
+const isRoot = (nodeDef) => R.isNil(nodeDef.parentUuid)
+
+export const getNodeDefsArray = (survey) => Object.values(survey.nodeDefs)
+
+export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(isRoot))
+
+export const getNodeDefByUuid = (uuid) => R.pipe(R.propOr({}, 'nodeDefs'), R.propOr(null, uuid))
+
+export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)
+
+const getNodeDefChildren = (nodeDef, _includeAnalysis = false) => (survey) => {
+  const children = []
+  if (nodeDef.virtual) {
+    // If nodeDef is virtual, get children from its source
+    const entitySource = getNodeDefSource(nodeDef)(survey)
+    children.push(...getNodeDefChildren(entitySource, _includeAnalysis)(survey))
+  }
+
+  const { uuid: nodeDefUuid } = nodeDef
+  children.push(
+    ...R.pipe(
+      getNodeDefsArray,
+      R.filter((nodeDefCurrent) => {
+        if (nodeDefCurrent.analysis && !_includeAnalysis) {
+          return false
+        }
+        if (nodeDefCurrent.virtual) {
+          // Include virtual entities having their source as a child of the given entity
+          const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
+          return entitySource.parentUuid === nodeDefUuid
+        }
+        // "natural" child
+        return nodeDefCurrent.parentUuid === nodeDefUuid
+      })
+    )(survey)
+  )
+  return children
+}
+
 const checkNode = async ({ node, expectedNode }) => {
   const { props: nodeProps, type, analysis } = node
   const { name, key = false } = nodeProps
@@ -41,14 +77,14 @@ const checkNode = async ({ node, expectedNode }) => {
 export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   const survey = getSurvey({ surveyExtractedPath })
 
-  const root = Survey.getNodeDefRoot(survey)
+  const root = getNodeDefRoot(survey)
 
   // Check cluster
   await expect(R.isNil(root.parentUuid)).toBe(true)
   await expect(root.props.name).toBe('cluster')
   await expect(root.props.labels.en).toBe('Cluster')
 
-  const clusterDefChildren = Survey.getNodeDefChildren(root, includeAnalysis)(survey)
+  const clusterDefChildren = getNodeDefChildren(root, includeAnalysis)(survey)
 
   await PromiseUtils.each(clusterDefChildren, async (item, index) =>
     checkNode({ node: item, expectedNode: ClusterNodeDefItems[index] })
@@ -59,7 +95,7 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
 
   await expect(plotNodeDef).toBeTruthy()
 
-  const plotNodeDefChildren = Survey.getNodeDefChildren(plotNodeDef, includeAnalysis)(survey)
+  const plotNodeDefChildren = getNodeDefChildren(plotNodeDef, includeAnalysis)(survey)
 
   await PromiseUtils.each(plotNodeDefChildren, async (item, index) =>
     checkNode({ node: item, expectedNode: PlotNodeDefItems[index] })
@@ -81,7 +117,7 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   // Check tree
   const treeNodeDef = plotNodeDefChildren.find((node) => node.props.name === 'tree')
   await expect(treeNodeDef).toBeTruthy()
-  const treeNodeDefChildren = Survey.getNodeDefChildren(treeNodeDef, includeAnalysis)(survey)
+  const treeNodeDefChildren = getNodeDefChildren(treeNodeDef, includeAnalysis)(survey)
 
   await PromiseUtils.each(treeNodeDefChildren, async (item, index) =>
     checkNode({ node: item, expectedNode: TreeNodeDefItems[index] })
