@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
+// TOFIX
 import * as Survey from '@core/survey/survey'
 
-import * as PromiseUtils from '@core/promiseUtils'
+import * as PromiseUtils from '../PromiseUtils'
 
 import { getSurvey } from './utils'
 

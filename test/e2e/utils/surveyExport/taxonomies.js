@@ -1,15 +1,11 @@
 import fs from 'fs'
 import path from 'path'
+import csvParseSync from 'csv-parse/lib/sync'
 
-import { CSVReaderSync } from '@server/utils/file/csvReader'
-import * as PromiseUtils from '@core/promiseUtils'
-
-import * as Chain from '@common/analysis/processingChain'
-
+import * as PromiseUtils from '../PromiseUtils'
 import { checkFileAndGetContent } from './utils'
 
 // Taxonomies
-
 export const checkTaxon = async ({ taxon, taxonomyMockDataParsedByCode }) => {
   const { code, genus, family, scientificName } = taxon.props
   await expect(code).toBe(taxonomyMockDataParsedByCode[code].code)
@@ -35,7 +31,7 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
   // If we add more taxonomies this should be refactorized
   await expect(taxonomies.length).toBe(1)
 
-  const taxonomyUuid = Chain.getUuid(taxonomies[0])
+  const { uuid: taxonomyUuid } = taxonomies[0]
   await expect(taxonomies[0].name).toBe('tree_species')
   await expect(taxonomies[0].descriptions.en).toBe('Tree Species List')
 
@@ -46,7 +42,7 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
   const taxonomyMockData = fs.readFileSync(
     path.resolve(__dirname, '..', '..', 'resources', 'taxonomies', 'species list valid with predefined.csv')
   )
-  const taxonomyMockDataParsed = CSVReaderSync(taxonomyMockData, { columns: true, skip_empty_lines: true })
+  const taxonomyMockDataParsed = csvParseSync(taxonomyMockData, { columns: true, skip_empty_lines: true })
 
   const taxonomyMockDataParsedByCode = taxonomyMockDataParsed.reduce(
     (acc, taxon) => ({ ...acc, [taxon.code]: { ...taxon } }),

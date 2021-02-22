@@ -1,14 +1,14 @@
 import path from 'path'
 import fs from 'fs'
 
-import * as PromiseUtils from '@core/promiseUtils'
-
+// TOFIX
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Survey from '@core/survey/survey'
 
+import * as PromiseUtils from '../PromiseUtils'
 import { getSurvey, checkFileAndGetContent } from './utils'
 
 import { records as recordsMockData } from '../../resources/records/recordsData'
