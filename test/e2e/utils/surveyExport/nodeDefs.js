@@ -1,5 +1,6 @@
+import * as R from 'ramda'
+
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import * as PromiseUtils from '@core/promiseUtils'
 
@@ -10,11 +11,13 @@ import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../../r
 const includeAnalysis = true
 
 const checkNode = async ({ node, expectedNode }) => {
-  await expect(NodeDef.getName(node)).toBe(expectedNode.name)
-  await expect(NodeDef.getLabel(node, 'en')).toBe(expectedNode.label)
-  await expect(NodeDef.getType(node)).toBe(expectedNode.type)
-  await expect(NodeDef.isKey(node)).toBe(expectedNode.isKey || false)
-  await expect(NodeDef.isAnalysis(node)).toBe(expectedNode.isAnalysis || false)
+  const { props: nodeProps, type, analysis } = node
+  const { name, labels, key } = nodeProps
+  await expect(name).toBe(expectedNode.name)
+  await expect(labels.en).toBe(expectedNode.label)
+  await expect(type).toBe(expectedNode.type)
+  await expect(key).toBe(expectedNode.isKey || false)
+  await expect(analysis).toBe(expectedNode.isAnalysis || false)
 }
 
 export const checkNodeDefs = async ({ surveyExtractedPath }) => {
@@ -23,9 +26,10 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   const root = Survey.getNodeDefRoot(survey)
 
   // Check cluster
-  await expect(NodeDef.isRoot(root)).toBe(true)
-  await expect(NodeDef.getName(root)).toBe('cluster')
-  await expect(NodeDef.getLabel(root, 'en')).toBe('Cluster')
+
+  await expect(R.isNil(root.parentUuid)).toBe(true)
+  await expect(root.props.name).toBe('cluster')
+  await expect(root.props.labels.en).toBe('Cluster')
 
   const clusterDefChildren = Survey.getNodeDefChildren(root, includeAnalysis)(survey)
 
@@ -34,9 +38,7 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   )
 
   // Check plot
-  const plotNodeDef = clusterDefChildren.find(
-    (nodeDef) => NodeDef.isMultiple(nodeDef) && NodeDef.getName(nodeDef) === 'plot'
-  )
+  const plotNodeDef = clusterDefChildren.find((nodeDef) => nodeDef.props.multiple && nodeDef.props.name === 'plot')
 
   await expect(plotNodeDef).toBeTruthy()
 
@@ -47,20 +49,20 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   )
 
   // Check Country - Region - Province hierarchy
-  const countryNode = plotNodeDefChildren.find((node) => NodeDef.getName(node) === 'country')
-  const regionNode = plotNodeDefChildren.find((node) => NodeDef.getName(node) === 'region')
-  const provinceNode = plotNodeDefChildren.find((node) => NodeDef.getName(node) === 'province')
+  const countryNode = plotNodeDefChildren.find((node) => node.props.name === 'country')
+  const regionNode = plotNodeDefChildren.find((node) => node.props.name === 'region')
+  const provinceNode = plotNodeDefChildren.find((node) => node.props.name === 'province')
 
-  await expect(NodeDef.getParentCodeDefUuid(provinceNode)).toBe(NodeDef.getUuid(regionNode))
-  await expect(NodeDef.getParentCodeDefUuid(regionNode)).toBe(NodeDef.getUuid(countryNode))
-  await expect(NodeDef.getParentCodeDefUuid(countryNode)).toBe(null)
+  await expect(provinceNode.props.parentCodeDefUuid).toBe(regionNode.uuid)
+  await expect(regionNode.props.parentCodeDefUuid).toBe(countryNode.uuid)
+  await expect(countryNode.props.parentCodeDefUuid).toBe(null)
 
-  await expect(NodeDef.getCategoryUuid(countryNode)).toBeTruthy()
-  await expect(NodeDef.getCategoryUuid(countryNode)).toBe(NodeDef.getCategoryUuid(regionNode))
-  await expect(NodeDef.getCategoryUuid(regionNode)).toBe(NodeDef.getCategoryUuid(provinceNode))
+  await expect(countryNode.props.categoryUuid).toBeTruthy()
+  await expect(countryNode.props.categoryUuid).toBe(regionNode.props.categoryUuid)
+  await expect(regionNode.props.categoryUuid).toBe(provinceNode.props.categoryUuid)
 
   // Check tree
-  const treeNodeDef = plotNodeDefChildren.find((node) => NodeDef.getName(node) === 'tree')
+  const treeNodeDef = plotNodeDefChildren.find((node) => node.props.name === 'tree')
   await expect(treeNodeDef).toBeTruthy()
   const treeNodeDefChildren = Survey.getNodeDefChildren(treeNodeDef, includeAnalysis)(survey)
 

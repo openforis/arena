@@ -4,10 +4,6 @@ import path from 'path'
 import { CSVReaderSync } from '@server/utils/file/csvReader'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-
 import * as Chain from '@common/analysis/processingChain'
 
 import { checkFileAndGetContent } from './utils'
@@ -15,21 +11,20 @@ import { checkFileAndGetContent } from './utils'
 // Taxonomies
 
 export const checkTaxon = async ({ taxon, taxonomyMockDataParsedByCode }) => {
-  const code = Taxon.getCode(taxon)
+  const { code, genus, family, scientificName } = taxon.props
   await expect(code).toBe(taxonomyMockDataParsedByCode[code].code)
-  await expect(Taxon.getGenus(taxon)).toBe(taxonomyMockDataParsedByCode[code].genus)
-  await expect(Taxon.getFamily(taxon)).toBe(taxonomyMockDataParsedByCode[code].family)
+  await expect(genus).toBe(taxonomyMockDataParsedByCode[code].genus)
+  await expect(family).toBe(taxonomyMockDataParsedByCode[code].family)
+  await expect(scientificName).toBe(taxonomyMockDataParsedByCode[code].scientific_name)
 
-  await expect(Taxon.getScientificName(taxon)).toBe(taxonomyMockDataParsedByCode[code].scientific_name)
+  const vernacularNamesByLang = taxon.vernacularNames
 
-  const vernacularNamesByLang = Taxon.getVernacularNames(taxon)
-
-  await expect((vernacularNamesByLang?.eng || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
-    taxonomyMockDataParsedByCode[code].eng || ''
-  )
-  await expect((vernacularNamesByLang?.swa || []).map(TaxonVernacularName.getName).join(' / ') || '').toBe(
-    taxonomyMockDataParsedByCode[code].swa || ''
-  )
+  await expect(
+    (vernacularNamesByLang?.eng || []).map((vernacularName) => vernacularName.vernacularName).join(' / ') || ''
+  ).toBe(taxonomyMockDataParsedByCode[code].eng || '')
+  await expect(
+    (vernacularNamesByLang?.swa || []).map((vernacularName) => vernacularName.vernacularName).join(' / ') || ''
+  ).toBe(taxonomyMockDataParsedByCode[code].swa || '')
 }
 
 export const checkTaxonomies = async ({ surveyExtractedPath }) => {
@@ -41,8 +36,8 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
   await expect(taxonomies.length).toBe(1)
 
   const taxonomyUuid = Chain.getUuid(taxonomies[0])
-  await expect(Taxonomy.getName(taxonomies[0])).toBe('tree_species')
-  await expect(Taxonomy.getDescription('en')(taxonomies[0])).toBe('Tree Species List')
+  await expect(taxonomies[0].name).toBe('tree_species')
+  await expect(taxonomies[0].descriptions.en).toBe('Tree Species List')
 
   const taxonomy = await checkFileAndGetContent({
     filePath: path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`),
@@ -57,7 +52,7 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
     (acc, taxon) => ({ ...acc, [taxon.code]: { ...taxon } }),
     {}
   )
-  const taxonomyTaxaByCode = taxonomy.reduce((acc, taxon) => ({ ...acc, [Taxon.getCode(taxon)]: { ...taxon } }), {})
+  const taxonomyTaxaByCode = taxonomy.reduce((acc, taxon) => ({ ...acc, [taxon.props.code]: { ...taxon } }), {})
 
   await expect(Object.keys(taxonomyMockDataParsedByCode).sort()).toEqual(Object.keys(taxonomyTaxaByCode).sort())
   await PromiseUtils.each(taxonomy, async (taxon) => checkTaxon({ taxon, taxonomyMockDataParsedByCode }))

@@ -1,4 +1,3 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
 import { above } from '../../utils/api'
 
@@ -12,13 +11,13 @@ const Cluster = ({
   clusterBoolean = '',
   clusterCoordinate = { x: '', y: '', srs: '' },
 }) => [
-  { type: NodeDef.nodeDefType.integer, value: clusterId, label: 'Cluster id' },
-  { type: NodeDef.nodeDefType.decimal, value: clusterDecimal, label: 'Cluster decimal' },
-  { type: NodeDef.nodeDefType.date, value: clusterDate, label: 'Cluster date' },
-  { type: NodeDef.nodeDefType.time, value: clusterTime, label: 'Cluster time' },
-  { type: NodeDef.nodeDefType.boolean, value: clusterBoolean, label: 'Cluster boolean' },
+  { type: 'integer', value: clusterId, label: 'Cluster id' },
+  { type: 'decimal', value: clusterDecimal, label: 'Cluster decimal' },
+  { type: 'date', value: clusterDate, label: 'Cluster date' },
+  { type: 'time', value: clusterTime, label: 'Cluster time' },
+  { type: 'boolean', value: clusterBoolean, label: 'Cluster boolean' },
   {
-    type: NodeDef.nodeDefType.coordinate,
+    type: 'coordinate',
     x: clusterCoordinate.x,
     y: clusterCoordinate.y,
     srs: clusterCoordinate.srs,
@@ -31,17 +30,17 @@ const Cluster = ({
   },
 ]
 const Plot = ({ plotId, plotText, plotCountry, plotRegion, plotProvince }) => [
-  { type: NodeDef.nodeDefType.integer, value: plotId, label: 'Plot id' },
-  { type: NodeDef.nodeDefType.text, value: plotText, label: 'Plot text' },
+  { type: 'integer', value: plotId, label: 'Plot id' },
+  { type: 'text', value: plotText, label: 'Plot text' },
 
   {
-    type: NodeDef.nodeDefType.code,
+    type: 'code',
     value: plotCountry,
     label: 'Country',
     relativeSelectors: [countryRelativeSelectors],
   },
-  { type: NodeDef.nodeDefType.code, value: plotRegion, label: 'Region' },
-  { type: NodeDef.nodeDefType.code, value: plotProvince, label: 'Province' },
+  { type: 'code', value: plotRegion, label: 'Region' },
+  { type: 'code', value: plotProvince, label: 'Province' },
 ]
 
 const emptyPlot = []

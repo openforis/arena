@@ -71,13 +71,13 @@ const checkRecordFileAndContent = async ({
     filePath: path.join(surveyExtractedPath, 'records', `${recordUuid}.json`),
   })
 
-  await expect(Record.getUuid(record)).toBe(recordUuid)
+  await expect(record.uuid).toBe(recordUuid)
 
   const { clusterNodeDef, clusterNodeDefDefChildren, plotNodeDef, plotNodeDefChildren } = surveyNodeDefsToTest
 
   const clusterIdNodeDef = clusterNodeDefDefChildren.find((nodeDef) => NodeDef.getLabel(nodeDef, 'en') === 'Cluster id')
 
-  const [clusterIdNode] = Record.getNodesByDefUuid(NodeDef.getUuid(clusterIdNodeDef))(record)
+  const [clusterIdNode] = Record.getNodesByDefUuid(clusterIdNodeDef.uuid)(record)
 
   const mockRecord = mockRecords.find(
     (_mockRecord) => String(_mockRecord.cluster[0].value) === String(Node.getValue(clusterIdNode))
@@ -149,7 +149,7 @@ export const checkRecords = async ({ surveyExtractedPath }) => {
 
   const survey = getSurvey({ surveyExtractedPath })
 
-  const recordsUuids = records.map((record) => Record.getUuid(record))
+  const recordsUuids = records.map((record) => record.uuid)
 
   const surveyNodeDefsToTest = getSurveyNodeDefsToTest({ surveyExtractedPath })
 

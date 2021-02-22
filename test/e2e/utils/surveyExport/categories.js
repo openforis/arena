@@ -1,28 +1,27 @@
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import fs from 'fs'
 import path from 'path'
-import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import { checkFileAndGetContent } from './utils'
 
 const checkLevelAndReturnLevel = async ({ levels, levelName, index }) => {
-  const level = levels.find((_level) => CategoryLevel.getName(_level) === levelName)
+  const level = levels.find((_level) => _level.props.name === levelName)
   await expect(level).toBeTruthy()
-  await expect(CategoryLevel.getName(level)).toBe(levelName)
-  await expect(CategoryLevel.getIndex(level)).toBe(index)
+  await expect(level.props.name).toBe(levelName)
+  await expect(level.props.index).toBe(index)
   return level
 }
 
 // Country level
 const checkItemCountryLevel = async ({ item }) => {
-  await expect(CategoryItem.getParentUuid(item)).toBe(null)
-  await expect(CategoryItem.getCode(item)).toBe('00')
-  await expect(CategoryItem.getLabel('en')(item)).toBe('(00) Country')
+  const { parentUuid, props } = item
+  const { code, labels } = props
+  await expect(parentUuid).toBe(null)
+  await expect(code).toBe('00')
+  await expect(labels.en).toBe('(00) Country')
 }
 const getItemsCountryLevel = ({ administrativeUnitItems, countryLevel }) =>
-  administrativeUnitItems.filter((item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(countryLevel))
+  administrativeUnitItems.filter((item) => item.uuid === countryLevel.uuid)
 
 const checkItemsCountryLevel = async ({ itemsCountryLevel }) => {
   await expect(itemsCountryLevel.length).toBe(1)
@@ -31,36 +30,37 @@ const checkItemsCountryLevel = async ({ itemsCountryLevel }) => {
 
 // Region level
 const checkItemRegionLevel = async ({ item, index, regionLevel, parentUuid }) => {
-  await expect(CategoryItem.getParentUuid(item)).toBe(parentUuid)
-  await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(regionLevel))
+  await expect(item.parentUuid).toBe(parentUuid)
+  await expect(item.levelUuid).toBe(regionLevel.uuid)
   const code = `0${index + 1}`
-  await expect(CategoryItem.getCode(item)).toBe(`${code}`)
-  await expect(CategoryItem.getLabel('en')(item)).toBe(`(${code}) Region ${code}`)
+  await expect(item.props.code).toBe(`${code}`)
+  await expect(item.props.label.en).toBe(`(${code}) Region ${code}`)
 }
 
 const getItemsRegionLevel = ({ regionLevel, administrativeUnitItems }) =>
-  administrativeUnitItems.filter((item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(regionLevel))
+  administrativeUnitItems.filter((item) => item.levelUuid === regionLevel.uuid)
 
 const checkItemsRegionLevel = async ({ regionLevel, itemsCountryLevel, itemsRegionLevel }) => {
   await expect(itemsRegionLevel.length).toBe(5)
 
   const parent = itemsCountryLevel[0]
   await PromiseUtils.each(itemsRegionLevel, async (item, index) =>
-    checkItemRegionLevel({ item, index, regionLevel, parentUuid: CategoryItem.getUuid(parent) })
+    checkItemRegionLevel({ item, index, regionLevel, parentUuid: parent.uuid })
   )
 }
 
 // District level
 const checkItemDistrictLevel = async ({ item, index, itemsRegionLevel, districtLevel }) => {
-  await expect(CategoryItem.getParentUuid(item)).toBe(CategoryItem.getUuid(itemsRegionLevel[Math.floor(index / 5)]))
-  await expect(CategoryItem.getLevelUuid(item)).toBe(CategoryLevel.getUuid(districtLevel))
+  const { parentUuid, levelUuid } = item
+  await expect(parentUuid).toBe(itemsRegionLevel[Math.floor(index / 5)].uuid)
+  await expect(levelUuid).toBe(districtLevel.uuid)
   const code = `0${Math.floor(index / 5) + 1}0${(index % 5) + 1}`
-  await expect(CategoryItem.getCode(item)).toBe(code)
-  await expect(CategoryItem.getLabel('en')(item)).toBe(`(${code}) District ${code}`)
+  await expect(item.props.code).toBe(code)
+  await expect(item.props.labels.en).toBe(`(${code}) District ${code}`)
 }
 
 const getItemsDistrictLevel = ({ districtLevel, administrativeUnitItems }) =>
-  administrativeUnitItems.filter((item) => CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(districtLevel))
+  administrativeUnitItems.filter((item) => item.levelUuid === districtLevel.uuid)
 
 const checkItemsDistrictLevel = async ({ itemsDistrictLevel, itemsRegionLevel, districtLevel }) => {
   await expect(itemsDistrictLevel.length).toBe(25)
@@ -79,20 +79,21 @@ export const checkCategories = async ({ surveyExtractedPath }) => {
 
   await expect(categoriesAsArray.length).toBe(1)
 
-  const administrativeUnitCategory = categoriesAsArray.find(
-    (category) => Category.getName(category) === 'administrative_unit'
-  )
+  const administrativeUnitCategory = categoriesAsArray.find((category) => category.props.name === 'administrative_unit')
 
-  const administrativeUnitUuid = Category.getUuid(administrativeUnitCategory)
+  const administrativeUnitUuid = administrativeUnitCategory.uuid
 
   await expect(
     fs.existsSync(path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`))
   ).toBeTruthy()
 
-  const levels = Category.getLevelsArray(administrativeUnitCategory)
+  const { levels } = administrativeUnitCategory
 
   await expect(levels.length).toBe(3)
-  await expect(Category.getLevelsCount(administrativeUnitCategory)).toBe(3)
+
+  await expect(Math.max((administrativeUnitCategory.levels || []).length, administrativeUnitCategory.levelsCount)).toBe(
+    3
+  )
 
   const [countryLevel, regionLevel, districtLevel] = await Promise.all(
     ['country', 'region', 'district'].map(async (levelName, index) =>
