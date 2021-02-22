@@ -3,7 +3,7 @@ import * as R from 'ramda'
 // TOFIX
 import * as Survey from '@core/survey/survey'
 
-import * as PromiseUtils from '../PromiseUtils'
+import PromiseUtils from '../PromiseUtils'
 
 import { getSurvey } from './utils'
 
@@ -27,7 +27,6 @@ export const checkNodeDefs = async ({ surveyExtractedPath }) => {
   const root = Survey.getNodeDefRoot(survey)
 
   // Check cluster
-
   await expect(R.isNil(root.parentUuid)).toBe(true)
   await expect(root.props.name).toBe('cluster')
   await expect(root.props.labels.en).toBe('Cluster')

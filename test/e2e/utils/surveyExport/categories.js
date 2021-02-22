@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import * as PromiseUtils from '../PromiseUtils'
+import PromiseUtils from '../PromiseUtils'
 import { checkFileAndGetContent } from './utils'
 
 const checkLevelAndReturnLevel = async ({ levels, levelName, index }) => {

@@ -1,7 +1,6 @@
 import fs from 'fs'
 
-// TODFIX
-import { extractZip } from '@server/utils/file/fileZip'
+import { extractZip } from '../../../../server/utils/file/fileZip'
 
 export const extractZipFileAndCheck = async ({ zipPath, extractedPath, surveyExtractedPath }) => {
   await extractZip(zipPath, extractedPath)

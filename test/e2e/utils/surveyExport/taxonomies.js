@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import csvParseSync from 'csv-parse/lib/sync'
 
-import * as PromiseUtils from '../PromiseUtils'
+import PromiseUtils from '../PromiseUtils'
 import { checkFileAndGetContent } from './utils'
 
 // Taxonomies

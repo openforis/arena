@@ -8,7 +8,7 @@ import * as Node from '@core/record/node'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Survey from '@core/survey/survey'
 
-import * as PromiseUtils from '../PromiseUtils'
+import PromiseUtils from '../PromiseUtils'
 import { getSurvey, checkFileAndGetContent } from './utils'
 
 import { records as recordsMockData } from '../../resources/records/recordsData'
