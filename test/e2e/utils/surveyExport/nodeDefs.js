@@ -11,11 +11,28 @@ import { ClusterNodeDefItems, PlotNodeDefItems, TreeNodeDefItems } from '../../r
 
 const includeAnalysis = true
 
+const getLabel = ({ nodeDef, lang }) => {
+  const { props: nodeProps, type, analysis } = nodeDef
+  const { name, labels, virtual = false } = nodeProps
+
+  const label = labels[lang] || name
+
+  if (virtual) {
+    return `${label}${' (V)'}`
+  }
+
+  if (analysis && type !== 'entity') {
+    return `${label}${' (C)'}`
+  }
+
+  return label
+}
+
 const checkNode = async ({ node, expectedNode }) => {
   const { props: nodeProps, type, analysis } = node
-  const { name, labels, key = false } = nodeProps
+  const { name, key = false } = nodeProps
   await expect(name).toBe(expectedNode.name)
-  await expect(labels.en).toBe(expectedNode.label)
+  await expect(getLabel({ nodeDef: node, lang: 'en' })).toBe(expectedNode.label)
   await expect(type).toBe(expectedNode.type)
   await expect(key).toBe(expectedNode.isKey || false)
   await expect(analysis).toBe(expectedNode.isAnalysis || false)

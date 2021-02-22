@@ -4,11 +4,13 @@ import path from 'path'
 import PromiseUtils from '../PromiseUtils'
 import { checkFileAndGetContent } from './utils'
 
+export const getLabel = ({ labels, lang, code }) => `(${code}) ${labels[lang]}`
+
 const checkLevelAndReturnLevel = async ({ levels, levelName, index }) => {
   const level = levels.find((_level) => _level.props.name === levelName)
   await expect(level).toBeTruthy()
   await expect(level.props.name).toBe(levelName)
-  await expect(level.props.index).toBe(index)
+  await expect(level.index).toBe(index)
   return level
 }
 
@@ -18,10 +20,10 @@ const checkItemCountryLevel = async ({ item }) => {
   const { code, labels } = props
   await expect(parentUuid).toBe(null)
   await expect(code).toBe('00')
-  await expect(labels.en).toBe('(00) Country')
+  await expect(getLabel({ labels, lang: 'en', code })).toBe('(00) Country')
 }
 const getItemsCountryLevel = ({ administrativeUnitItems, countryLevel }) =>
-  administrativeUnitItems.filter((item) => item.uuid === countryLevel.uuid)
+  administrativeUnitItems.filter((item) => item.levelUuid === countryLevel.uuid)
 
 const checkItemsCountryLevel = async ({ itemsCountryLevel }) => {
   await expect(itemsCountryLevel.length).toBe(1)
@@ -34,7 +36,9 @@ const checkItemRegionLevel = async ({ item, index, regionLevel, parentUuid }) =>
   await expect(item.levelUuid).toBe(regionLevel.uuid)
   const code = `0${index + 1}`
   await expect(item.props.code).toBe(`${code}`)
-  await expect(item.props.label.en).toBe(`(${code}) Region ${code}`)
+  await expect(getLabel({ labels: item.props.labels, lang: 'en', code: item.props.code })).toBe(
+    `(${code}) Region ${code}`
+  )
 }
 
 const getItemsRegionLevel = ({ regionLevel, administrativeUnitItems }) =>
@@ -56,7 +60,9 @@ const checkItemDistrictLevel = async ({ item, index, itemsRegionLevel, districtL
   await expect(levelUuid).toBe(districtLevel.uuid)
   const code = `0${Math.floor(index / 5) + 1}0${(index % 5) + 1}`
   await expect(item.props.code).toBe(code)
-  await expect(item.props.labels.en).toBe(`(${code}) District ${code}`)
+  await expect(getLabel({ labels: item.props.labels, lang: 'en', code: item.props.code })).toBe(
+    `(${code}) District ${code}`
+  )
 }
 
 const getItemsDistrictLevel = ({ districtLevel, administrativeUnitItems }) =>
@@ -90,13 +96,11 @@ export const checkCategories = async ({ surveyExtractedPath }) => {
   const levelsAsArray = [...(Object.values(levels) || [])]
   await expect(levelsAsArray.length).toBe(3)
 
-  await expect(Math.max((administrativeUnitCategory.levels || []).length, administrativeUnitCategory.levelsCount)).toBe(
-    3
-  )
+  await expect(Math.max(levelsAsArray.length, administrativeUnitCategory.levelsCount || 0)).toBe(3)
 
   const [countryLevel, regionLevel, districtLevel] = await Promise.all(
     ['country', 'region', 'district'].map(async (levelName, index) =>
-      checkLevelAndReturnLevel({ levels, levelName, index })
+      checkLevelAndReturnLevel({ levels: levelsAsArray, levelName, index })
     )
   )
 
