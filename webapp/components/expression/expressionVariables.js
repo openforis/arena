@@ -113,9 +113,24 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
       return {
         label: NodeDef.getName(parentNodeDef),
         options: variablesParent,
+        root: NodeDef.isRoot(parentNodeDef),
       }
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
+}
+
+const _sortVariables = ({ nodeDefCurrent, variables }) => {
+  // Show current node def variable in the first position
+  const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
+  variables.sort((varA, varB) => {
+    if (varA.uuid === nodeDefCurrentUuid) {
+      return -1
+    }
+    if (varB.uuid === nodeDefCurrentUuid) {
+      return 1
+    }
+    return varA.label.localeCompare(varB.label)
+  })
 }
 
 export const getVariables = ({
@@ -131,21 +146,24 @@ export const getVariables = ({
 
   const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
 
-  // Show current node def variable in the first position
-  const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
-  variables.sort((varA, varB) => {
-    if (varA.uuid === nodeDefCurrentUuid) {
-      return -1
-    }
-    if (varB.uuid === nodeDefCurrentUuid) {
-      return 1
-    }
-    return varA.label.localeCompare(varB.label)
-  })
+  _sortVariables({ nodeDefCurrent, variables })
 
-  if (groupByParent) {
-    return getVariablesGroupedByParentUuid({ variables, survey })
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
+}
+
+export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, groupByParent }) => {
+  if (!NodeDef.isEntity(nodeDefContext)) {
+    return []
   }
+  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
+  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
 
-  return variables
+  const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
+    variablesAcc.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
+    return variablesAcc
+  }, [])
+
+  _sortVariables({ nodeDefCurrent, variables })
+
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
 }
