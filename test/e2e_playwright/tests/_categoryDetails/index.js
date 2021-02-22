@@ -28,9 +28,13 @@ export const addItems = (category, levelIdx, codePrefix = '') => {
         await expect(page).toHaveText('Define at least one item')
       }
 
-      await page.click(getSelector(DataTestId.categoryDetails.levelItemAddBtn(levelIdx), 'button'))
+      const itemErrorBadgeSelector = getSelector(DataTestId.categoryDetails.itemErrorBadge(levelIdx, itemIdx))
+      await Promise.all([
+        page.waitForSelector(itemErrorBadgeSelector),
+        page.click(getSelector(DataTestId.categoryDetails.levelItemAddBtn(levelIdx), 'button')),
+      ])
 
-      await page.hover(getSelector(DataTestId.categoryDetails.itemErrorBadge(levelIdx, itemIdx)))
+      await page.hover(itemErrorBadgeSelector)
       await expect(page).toHaveText('Code is required')
 
       await page.fill(

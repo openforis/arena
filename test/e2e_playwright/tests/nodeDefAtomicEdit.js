@@ -1,8 +1,8 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
+import { editNodeDef, addNodeDef, addNodeDefAtomicChildren, addNodeDefSubPage } from './_formDesigner'
 import { gotoFormDesigner } from './_navigation'
 import { publishWithErrors, publishWithoutErrors } from './_publish'
-import { editNodeDef, addNodeDef, addNodeDefAtomicChildren, addNodeDefSubPage } from './_surveyForm'
 
 export default () =>
   describe('NodeDef atomic edit', () => {

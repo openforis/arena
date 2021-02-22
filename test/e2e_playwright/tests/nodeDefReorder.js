@@ -1,6 +1,6 @@
-import { getSelector } from '../../../webapp/utils/dataTestId'
+import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { cluster } from '../mock/nodeDefs'
-import { gotoFormPage } from './_surveyForm'
+import { gotoFormPage } from './_formDesigner'
 import { dragAndDrop } from './utils/dragDrop'
 
 const getBBoxes = async (nodeDefTarget, nodeDefSource) => {
@@ -39,25 +39,18 @@ export default () =>
     )
 
     test('Reorder cluster', async () => {
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc1.jpg' })
       await moveRight(cluster.children.cluster_date, cluster.children.cluster_id)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc2.jpg' })
       await moveRight(cluster.children.cluster_time, cluster.children.cluster_date)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc3.jpg' })
       await moveRight(cluster.children.cluster_decimal, cluster.children.cluster_boolean)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc4.jpg' })
       await moveBelow(cluster.children.cluster_country, cluster.children.cluster_id)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc5.jpg' })
-      // await scrollIntoViewIfNeeded(cluster.children.cluster_region)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc6.jpg' })
       await moveBelow(cluster.children.cluster_region, cluster.children.cluster_date)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc7.jpg' })
-      // await scrollIntoViewIfNeeded(cluster.children.cluster_province)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc8.jpg' })
       await moveBelow(cluster.children.cluster_province, cluster.children.cluster_time)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc9.jpg' })
       await moveBelow(cluster.children.cluster_coordinate, cluster.children.cluster_country)
-      await page.screenshot({ path: '/Users/minotogna/Desktop/sc10.jpg' })
+      await page.waitForTimeout(1000)
+    })
+
+    test('Page reload', async () => {
+      await Promise.all([page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)), page.reload()])
     })
 
     verityEntityOrder(

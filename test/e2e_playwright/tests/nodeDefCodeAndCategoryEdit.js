@@ -3,9 +3,9 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { categories } from '../mock/categories'
 import { cluster } from '../mock/nodeDefs'
 import { addItems, addLevels, editCategoryProps } from './_categoryDetails'
+import { addNodeDef } from './_formDesigner'
 import { gotoFormDesigner } from './_navigation'
 import { editNodeDefDetails } from './_nodeDefDetails'
-import { addNodeDef } from './_surveyForm'
 
 // eslint-disable-next-line camelcase
 const { cluster_country, cluster_region, cluster_province } = cluster.children

@@ -54,7 +54,7 @@ const ExpressionEditor = (props) => {
       ) : (
         <div className="expression-editor__query-container">
           {!R.isEmpty(query) && (
-            <div className="query" id={`${idPrefix}-query`}>
+            <div className="query" id={`${idPrefix}-query`} data-testid={`${idPrefix}-query`}>
               {query}
             </div>
           )}
@@ -62,6 +62,7 @@ const ExpressionEditor = (props) => {
             type="button"
             className="btn btn-s btn-edit"
             id={`${idPrefix}-edit-btn`}
+            data-testid={`${idPrefix}-edit-btn`}
             onClick={() => setEdit(true)}
           >
             <span className="icon icon-pencil2 icon-14px" />
