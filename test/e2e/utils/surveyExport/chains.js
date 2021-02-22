@@ -7,7 +7,7 @@ export const checkChain = async ({ surveyExtractedPath, chainUuid }) => {
   const chainContent = fs.readFileSync(path.join(surveyExtractedPath, 'chains', `${chainUuid}.json`), 'utf8')
   const chain = JSON.parse(chainContent)
 
-  const { props: chainProps, processingSteps } = chain
+  const { props: chainProps, processing_steps: processingSteps } = chain
   const { labels, descriptions } = chainProps
 
   await expect(labels.en).toBe('Chain 1')

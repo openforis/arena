@@ -89,7 +89,7 @@ export const checkCategories = async ({ surveyExtractedPath }) => {
 
   const { levels } = administrativeUnitCategory
 
-  await expect(levels.length).toBe(3)
+  await expect(Object.values(levels).length).toBe(3)
 
   await expect(Math.max((administrativeUnitCategory.levels || []).length, administrativeUnitCategory.levelsCount)).toBe(
     3

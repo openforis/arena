@@ -32,7 +32,7 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
   await expect(taxonomies.length).toBe(1)
 
   const { uuid: taxonomyUuid } = taxonomies[0]
-  await expect(taxonomies[0].name).toBe('tree_species')
+  await expect(taxonomies[0].props.name).toBe('tree_species')
   await expect(taxonomies[0].descriptions.en).toBe('Tree Species List')
 
   const taxonomy = await checkFileAndGetContent({

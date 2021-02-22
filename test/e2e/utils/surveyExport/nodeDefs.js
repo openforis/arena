@@ -17,7 +17,7 @@ const checkNode = async ({ node, expectedNode }) => {
   await expect(name).toBe(expectedNode.name)
   await expect(labels.en).toBe(expectedNode.label)
   await expect(type).toBe(expectedNode.type)
-  await expect(key).toBe(expectedNode.isKey || false)
+  await expect(key).toBe(expectedNode.key || false)
   await expect(analysis).toBe(expectedNode.isAnalysis || false)
 }
 
