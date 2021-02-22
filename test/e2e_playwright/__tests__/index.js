@@ -8,6 +8,7 @@ import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
 
 import surveyDelete from '../tests/surveyDelete'
+import nodeDefReorder from '../tests/nodeDefReorder'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -26,6 +27,7 @@ describe('E2E Tests', () => {
   nodeDefAtomicEdit()
   nodeDefCodeAndCategoryEdit()
   nodeDefTaxonAndTaxonomyEdit()
+  nodeDefReorder()
   /**
    * Survey delete.
    */

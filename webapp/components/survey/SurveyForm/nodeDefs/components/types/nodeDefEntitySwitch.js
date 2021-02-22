@@ -27,13 +27,13 @@ const NodeDefEntitySwitch = (props) => {
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
   // attributes used in tests
-  let nodeDefName = null
-  let childNames = null
-  if (ProcessUtils.isEnvDevelopment) {
-    nodeDefName = NodeDef.getName(nodeDef)
-    const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
-    childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName)(survey))
-  }
+  // let nodeDefName = null
+  // let childNames = null
+  // if (ProcessUtils.isEnvDevelopment) {
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
+  const childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName)(survey))
+  // }
 
   return (
     <div

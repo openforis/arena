@@ -15,5 +15,9 @@ module.exports = {
     },
     locale: 'it-IT',
     timezoneId: 'Europe/Rome',
+    viewport: {
+      width: 1366,
+      height: 768,
+    },
   },
 }
