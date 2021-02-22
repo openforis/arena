@@ -81,15 +81,14 @@ export const checkCategories = async ({ surveyExtractedPath }) => {
 
   const administrativeUnitCategory = categoriesAsArray.find((category) => category.props.name === 'administrative_unit')
 
-  const administrativeUnitUuid = administrativeUnitCategory.uuid
+  const { uuid: administrativeUnitUuid, levels } = administrativeUnitCategory
 
   await expect(
     fs.existsSync(path.join(surveyExtractedPath, 'categories', `${administrativeUnitUuid}.json`))
   ).toBeTruthy()
 
-  const { levels } = administrativeUnitCategory
-
-  await expect(Object.values(levels).length).toBe(3)
+  const levelsAsArray = [...(Object.values(levels) || [])]
+  await expect(levelsAsArray.length).toBe(3)
 
   await expect(Math.max((administrativeUnitCategory.levels || []).length, administrativeUnitCategory.levelsCount)).toBe(
     3

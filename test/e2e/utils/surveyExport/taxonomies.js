@@ -16,10 +16,10 @@ export const checkTaxon = async ({ taxon, taxonomyMockDataParsedByCode }) => {
   const vernacularNamesByLang = taxon.vernacularNames
 
   await expect(
-    (vernacularNamesByLang?.eng || []).map((vernacularName) => vernacularName.vernacularName).join(' / ') || ''
+    (vernacularNamesByLang?.eng || []).map((vernacularName) => vernacularName.props.name).join(' / ') || ''
   ).toBe(taxonomyMockDataParsedByCode[code].eng || '')
   await expect(
-    (vernacularNamesByLang?.swa || []).map((vernacularName) => vernacularName.vernacularName).join(' / ') || ''
+    (vernacularNamesByLang?.swa || []).map((vernacularName) => vernacularName.props.name).join(' / ') || ''
   ).toBe(taxonomyMockDataParsedByCode[code].swa || '')
 }
 
@@ -33,7 +33,7 @@ export const checkTaxonomies = async ({ surveyExtractedPath }) => {
 
   const { uuid: taxonomyUuid } = taxonomies[0]
   await expect(taxonomies[0].props.name).toBe('tree_species')
-  await expect(taxonomies[0].descriptions.en).toBe('Tree Species List')
+  await expect(taxonomies[0].props.descriptions.en).toBe('Tree Species List')
 
   const taxonomy = await checkFileAndGetContent({
     filePath: path.join(surveyExtractedPath, 'taxonomies', `${taxonomyUuid}.json`),
