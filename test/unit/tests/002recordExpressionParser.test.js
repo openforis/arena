@@ -116,10 +116,31 @@ describe('RecordExpressionParser Test', () => {
     { q: 'plot[0].plot_multiple_number.length', r: 2 },
     { q: 'plot[1].plot_multiple_number.length', r: null },
     { q: 'plot[2].plot_multiple_number.length', r: 1 },
-    // entity index
-    { q: 'index()', r: 0, n: 'cluster/plot[0]/plot_id' },
-    { q: 'index()', r: 1, n: 'cluster/plot[1]/plot_id' },
-    { q: 'index()', r: 2, n: 'cluster/plot[2]/plot_id' },
+    // index (single entity)
+    { q: 'index(cluster)', r: 0 },
+    { q: 'index(cluster)', r: 0, n: 'cluster/plot[0]/plot_id' },
+    // index (multiple entity)
+    { q: 'index(plot)', r: 0, n: 'cluster/plot[0]' },
+    { q: 'index(plot)', r: 1, n: 'cluster/plot[1]' },
+    { q: 'index(plot)', r: -1, n: 'cluster/plot[4]' },
+    { q: 'index(plot)', r: 0, n: 'cluster/plot[0]/plot_id' },
+    { q: 'index(plot)', r: 1, n: 'cluster/plot[1]/plot_id' },
+    { q: 'index(plot)', r: -1, n: 'cluster/plot[4]/plot_id' },
+    { q: 'index(plot[0])', r: 0 },
+    { q: 'index(plot[1])', r: 1 },
+    { q: 'index(plot[2])', r: 2 },
+    { q: 'index(plot[3])', r: -1 },
+    // index (single attribute)
+    { q: 'index(visit_date)', r: 0, n: 'cluster/remarks' },
+    { q: 'index(plot[0].plot_id)', r: 0 },
+    { q: 'index(plot_id)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[1]' },
+    // index (multiple attribute)
+    { q: 'index(plot[0].plot_multiple_number[0])', r: 0 },
+    { q: 'index(plot[0].plot_multiple_number[1])', r: 1 },
+    { q: 'index(plot[0].plot_multiple_number[2])', r: -1 },
+    { q: 'index(plot_multiple_number)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[0]' },
+    { q: 'index(plot_multiple_number)', r: 1, n: 'cluster/plot[0]/plot_multiple_number[1]' },
+    { q: 'index(plot_multiple_number)', r: -1, n: 'cluster/plot[0]/plot_multiple_number[2]' },
   ]
 
   queries.forEach(({ q, r, n }) => {

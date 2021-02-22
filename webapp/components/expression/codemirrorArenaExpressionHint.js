@@ -7,7 +7,7 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
-    [Expression.functionNames.index]: `index()`,
+    [Expression.functionNames.index]: `index(node_name)`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
     [Expression.functionNames.min]: 'min(3,1) = 1',
     [Expression.functionNames.max]: 'max(3,1,2) = 3',

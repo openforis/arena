@@ -101,29 +101,46 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
-const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
-  const nodeReferencedParent = _getReferencedNodesParent(survey, record, nodeCtx, nodeDefReferenced)
+const _getReferencedNodes = ({ survey, record, node, nodeDefReferenced }) => {
+  const nodeReferencedParent = _getReferencedNodesParent(survey, record, node, nodeDefReferenced)
 
-  if (nodeReferencedParent)
+  if (nodeReferencedParent) {
     return Record.getNodeChildrenByDefUuid(nodeReferencedParent, NodeDef.getUuid(nodeDefReferenced))(record)
-
+  }
   return []
 }
 
-export const identifierEval = (survey, record) => (expr, { node }) => {
-  const nodeName = Expression.getName(expr)
+export const identifierEval = (survey, record) => (expr, { node, evaluateToNode }) => {
+  const nodeNameReferenced = Expression.getName(expr)
+  const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  const nodeDefReferenced = Survey.getNodeDefByName(nodeNameReferenced)(survey)
 
-  const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
-  const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
+  let nodeResult = null
+  if (NodeDef.isEqual(nodeDefCtx)(nodeDefReferenced)) {
+    // the referenced node is the current node itself
+    nodeResult = node
+  }
+  if (Survey.isNodeDefAncestor(nodeDefReferenced, nodeDefCtx)(survey)) {
+    // if the rerenced node name is an ancestor of the current node, return it following the hierarchy
+    nodeResult = Record.getAncestorByNodeDefUuid(node, NodeDef.getUuid(nodeDefReferenced))(record)
+  }
+  if (nodeResult) {
+    return evaluateToNode || NodeDef.isEntity(nodeDefCtx) ? nodeResult : _getNodeValue(survey)(nodeResult)
+  }
+
+  // the referenced nodes can be siblings of the current node
+  const referencedNodes = _getReferencedNodes({ survey, record, node, nodeDefReferenced })
 
   const single = NodeDef.isSingle(nodeDefReferenced)
   if (single && (referencedNodes.length === 0 || referencedNodes.length > 1)) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeNameReferenced })
   }
 
-  if (NodeDef.isAttribute(nodeDefReferenced)) {
+  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode) {
+    // return node values
     const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
     return single ? values[0] : values
   }
+  // return nodes
   return single ? referencedNodes[0] : referencedNodes
 }

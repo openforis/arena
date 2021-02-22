@@ -134,7 +134,7 @@ const callEval = (expr, ctx) => {
     throw new SystemError('undefinedFunction', { fnName })
   }
 
-  const { minArity, maxArity } = functionInfo
+  const { minArity, maxArity, evaluateArgsToNodes = false } = functionInfo
 
   if (numArgs < minArity) {
     throw new SystemError('functionHasTooFewArguments', {
@@ -154,7 +154,7 @@ const callEval = (expr, ctx) => {
     })
   }
 
-  const args = exprArgs.map((arg) => evalExpression(arg, ctx))
+  const args = exprArgs.map((arg) => evalExpression(arg, { ...ctx, evaluateToNode: evaluateArgsToNodes }))
 
   const fn = functionsCtx[fnName] || functionImplementations[fnName]
 
