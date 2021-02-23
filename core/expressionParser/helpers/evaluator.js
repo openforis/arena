@@ -181,7 +181,7 @@ const groupEval = (expr, ctx) => {
   return evalExpression(argument, ctx)
 }
 
-const typeFns = {
+const evaluatorsDefault = {
   [types.Identifier]: identifierEval,
   [types.MemberExpression]: memberEval,
   [types.Literal]: literalEval,
@@ -194,9 +194,9 @@ const typeFns = {
 }
 
 export const evalExpression = (expr, ctx = {}) => {
-  const expressionTypeEvaluators = R.pipe(R.prop('expressionTypeEvaluators'), R.mergeRight(typeFns))(ctx)
+  const evaluators = R.pipe(R.prop('evaluators'), R.mergeRight(evaluatorsDefault))(ctx)
 
-  const fn = expressionTypeEvaluators[expr.type]
+  const fn = evaluators[expr.type]
   if (!fn) {
     throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
   }
@@ -206,12 +206,12 @@ export const evalExpression = (expr, ctx = {}) => {
 
 export const getExpressionIdentifiers = (expr) => {
   const identifiers = []
-  const expressionTypeEvaluators = {
+  const evaluators = {
     [types.Identifier]: (exp) => {
       identifiers.push(R.prop('name')(exp))
     },
   }
 
-  evalExpression(expr, { expressionTypeEvaluators })
+  evalExpression(expr, { evaluators })
   return R.uniq(identifiers)
 }

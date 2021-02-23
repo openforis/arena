@@ -10,13 +10,13 @@ import { identifierEval } from './identifierEval'
 import { memberEval } from './memberEval'
 
 export const evalNodeQuery = (survey, record, node, query) => {
-  const expressionTypeEvaluators = {
+  const evaluators = {
     [Expression.types.Identifier]: identifierEval(survey, record),
     [Expression.types.MemberExpression]: memberEval,
   }
   const functions = recordExpressionFunctions({ survey, record, node })
 
-  return Expression.evalString(query, { node, expressionTypeEvaluators, functions })
+  return Expression.evalString(query, { node, evaluators, functions })
 }
 
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
