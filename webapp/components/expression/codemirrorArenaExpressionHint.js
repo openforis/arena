@@ -11,6 +11,7 @@ const functionExamples = {
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
     [Expression.functionNames.min]: 'min(3,1) = 1',
     [Expression.functionNames.max]: 'max(3,1,2) = 3',
+    [Expression.functionNames.parent]: `parent(node_name)`,
     [Expression.functionNames.pow]: 'pow(2,3) = 2³ = 8',
     [Expression.functionNames.ln]: 'ln(10) = 2.302…',
     [Expression.functionNames.log10]: 'log10(100) = 2',

@@ -446,6 +446,7 @@ $t(common.cantUndoWarning)`,
       max: 'Take the maximum of the arguments',
       min: 'Take the minimum of the arguments',
       now: 'Returns the current date or time',
+      parent: 'Returns the parent entity of the specified node',
       pow: 'Raise a number X to the power P',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',

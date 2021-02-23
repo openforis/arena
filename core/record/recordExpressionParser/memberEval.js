@@ -9,7 +9,7 @@ export const memberEval = (expr, ctx) => {
 
   const objectEval = Expression.evalExpr({ expr: object, ctx })
 
-  if (objectEval && !R.isEmpty(objectEval)) {
+  if (objectEval) {
     if (Expression.isIdentifier(property)) {
       const propertyName = Expression.getName(property)
       if (NodeNativeProperties.isNativeProperty(propertyName)) {

@@ -17,4 +17,10 @@ export const recordExpressionFunctions = ({ record }) => ({
     const children = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
     return children.findIndex(Node.isEqual(node))
   },
+  [Expression.functionNames.parent]: (node) => {
+    if (!node || Node.isRoot(node)) {
+      return null
+    }
+    return Record.getParentNode(node)(record)
+  },
 })

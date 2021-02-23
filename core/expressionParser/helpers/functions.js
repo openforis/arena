@@ -9,6 +9,7 @@ export const functionNames = {
   max: 'max',
   min: 'min',
   now: 'now',
+  parent: 'parent',
   pow: 'pow',
   sum: 'sum',
 }
@@ -31,6 +32,7 @@ export const functions = {
   [functionNames.max]: { minArity: 1, maxArity: -1 },
   [functionNames.min]: { minArity: 1, maxArity: -1 },
   [functionNames.now]: { minArity: 0, maxArity: 0 },
+  [functionNames.parent]: { minArity: 1, maxArity: 1, evaluateArgsToNodes: true },
   [functionNames.pow]: { minArity: 2 },
   [functionNames.sum]: { minArity: 1, maxArity: 1 },
 }
