@@ -17,6 +17,8 @@ export const modes = {
   sql: 'sql',
 }
 
+export const getName = R.prop('name')
+
 export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
 
@@ -41,7 +43,9 @@ export const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
+
+export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
 
 export const { isValid } = ExpressionUtils
 export const { getExpressionIdentifiers } = Evaluator
@@ -51,8 +55,7 @@ export const { getExpressionIdentifiers } = Evaluator
 const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
-export const isValidExpressionType = (nodeDef) =>
-  !NodeDef.isEntity(nodeDef) && !NodeDef.isCoordinate(nodeDef) && !NodeDef.isFile(nodeDef)
+export const isValidExpressionType = (nodeDef) => !NodeDef.isCoordinate(nodeDef) && !NodeDef.isFile(nodeDef)
 
 export const isLiteral = isType(types.Literal)
 export const isCompound = isType(types.Compound)

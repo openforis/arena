@@ -7,6 +7,7 @@ const keywords = [
   'desc',
   'file',
   'id',
+  'length',
   'node_def_uuid',
   'owner_uuid',
   'parent_id',
@@ -20,4 +21,4 @@ const keywords = [
   'value',
 ]
 
-export const isKeyword = value => R.includes(value, keywords)
+export const isKeyword = (value) => R.includes(value, keywords)

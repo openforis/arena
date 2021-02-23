@@ -22,6 +22,7 @@ const ExpressionEditorPopup = (props) => {
     expr,
     types,
     isBoolean,
+    isContextParent,
     mode,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
@@ -74,6 +75,7 @@ const ExpressionEditorPopup = (props) => {
           <AdvancedExpressionEditorPopup
             nodeDefCurrent={nodeDefCurrent}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
+            isContextParent={isContextParent}
             query={query}
             setExpressionCanBeApplied={setExpressionCanBeApplied}
             updateDraftQuery={updateDraftQuery}
@@ -121,6 +123,7 @@ ExpressionEditorPopup.propTypes = {
   expr: PropTypes.object, // AST expression
   header: PropTypes.node,
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
+  isContextParent: PropTypes.bool, // True if the context node def is the parent of the current node def
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   // NOTE: One of the two above is passed on component creation
   nodeDefUuidContext: PropTypes.string, // Entity
@@ -137,6 +140,7 @@ ExpressionEditorPopup.defaultProps = {
   expr: null,
   header: '',
   isBoolean: true,
+  isContextParent: false,
   mode: Expression.modes.json,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,

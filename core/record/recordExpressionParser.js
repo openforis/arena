@@ -14,6 +14,8 @@ import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
+import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
+
 const _getNodeValue = (survey) => (node) => {
   if (Node.isValueBlank(node)) {
     return null
@@ -42,8 +44,6 @@ const _getNodeValue = (survey) => (node) => {
   }
   return value
 }
-
-const _getNodeValues = (survey) => (nodes) => nodes.map(_getNodeValue(survey))
 
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
   if (NodeDef.isRoot(nodeDefCtx)) {
@@ -116,7 +116,8 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
 }
 
 const _identifierEval = (survey, record) => (expr, { node }) => {
-  const nodeName = R.prop('name')(expr)
+  const nodeName = Expression.getName(expr)
+
   const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
 
@@ -125,12 +126,44 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
     throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
   }
 
-  return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
+  if (NodeDef.isAttribute(nodeDefReferenced)) {
+    const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
+    return single ? values[0] : values
+  }
+  return single ? referencedNodes[0] : referencedNodes
+}
+
+const _memberEval = (expr, ctx) => {
+  const { object, property } = expr
+
+  const objectEval = Expression.evalExpr({ expr: object, ctx })
+
+  if (objectEval && !R.isEmpty(objectEval)) {
+    if (Expression.isIdentifier(property)) {
+      const propertyName = Expression.getName(property)
+      if (NodeNativeProperties.isNativeProperty(propertyName)) {
+        // property is a native property of the node
+        return NodeNativeProperties.evalProperty({ node: objectEval, propertyName })
+      }
+    }
+    // evaluate property moving the context node to the evaluated object
+    const propertyEval = Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+
+    if (Expression.isLiteral(property) && R.is(Array)(objectEval) && R.is(Number)(propertyEval)) {
+      // property is the index of a multiple node
+      return objectEval[propertyEval]
+    }
+
+    // property is a child of the "object" node
+    return propertyEval
+  }
+  return null
 }
 
 export const evalNodeQuery = (survey, record, node, query) => {
   const functions = {
     [Expression.types.Identifier]: _identifierEval(survey, record),
+    [Expression.types.MemberExpression]: _memberEval,
   }
 
   return Expression.evalString(query, { node, functions })

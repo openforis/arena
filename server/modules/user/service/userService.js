@@ -8,7 +8,7 @@ import * as UserInvite from '@core/user/userInvite'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -36,7 +36,11 @@ const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   const hasRoleInSurvey = authGroups.some((g) => AuthGroup.getSurveyUuid(g) === surveyUuid)
 
   if (!User.hasAccepted(userToInvite)) {
-    throw new SystemError('appErrors.userHasPendingInvitation', { email: User.getEmail(userToInvite) })
+    throw new SystemError(
+      'appErrors.userHasPendingInvitation',
+      { email: User.getEmail(userToInvite) },
+      StatusCodes.CONFLICT
+    )
   } else if (hasRoleInSurvey) {
     throw new SystemError('appErrors.userHasRole')
   } else if (User.isSystemAdmin(userToInvite)) {
