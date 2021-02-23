@@ -54,6 +54,7 @@ const NodeDefDetails = () => {
               {
                 label: i18n.t('nodeDefEdit.basic'),
                 component: BasicProps,
+                id: DataTestId.nodeDefDetails.basic,
                 props: {
                   state,
                   Actions,
@@ -66,6 +67,7 @@ const NodeDefDetails = () => {
                     {
                       label: i18n.t('nodeDefEdit.advanced'),
                       component: AdvancedProps,
+                      id: DataTestId.nodeDefDetails.advanced,
                       props: {
                         state,
                         Actions,
@@ -77,6 +79,7 @@ const NodeDefDetails = () => {
                           {
                             label: i18n.t('nodeDefEdit.validations'),
                             component: ValidationsProps,
+                            id: DataTestId.nodeDefDetails.validations,
                             props: {
                               state,
                               Actions,

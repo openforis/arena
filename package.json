@@ -34,6 +34,7 @@
     "test:e2e:watch": "cross-env PWDEBUG=1 jest --config=test/e2e_playwright/jest.config.js",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
+    "prod": "run-s clean build start",
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js --watch",
     "watch": "npm run build:server:dev && npm-run-all --parallel client:dev-server dev:server:nodemon watch:server",

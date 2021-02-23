@@ -7,6 +7,7 @@ import * as R from 'ramda'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import PanelRight from '@webapp/components/PanelRight'
 
@@ -63,6 +64,7 @@ const ExpressionEditorPopup = (props) => {
       <div className="expression-editor-popup">
         {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
           <button
+            data-testid={DataTestId.expressionEditor.toggleModeBtn}
             type="button"
             className="expression-editor-popup__toggle-advanced btn-s"
             onClick={onToggleAdvancedEditor}
@@ -103,6 +105,7 @@ const ExpressionEditorPopup = (props) => {
           <button
             type="button"
             className="btn btn-s btn-primary"
+            data-testid={DataTestId.expressionEditor.applyBtn}
             onClick={onApply}
             aria-disabled={!expressionCanBeApplied}
           >

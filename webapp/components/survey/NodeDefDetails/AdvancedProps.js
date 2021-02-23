@@ -5,11 +5,11 @@ import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { FormItem } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
 
@@ -38,7 +38,7 @@ const AdvancedProps = (props) => {
           </FormItem>
 
           <NodeDefExpressionsProp
-            qualifier="default-values"
+            qualifier={DataTestId.nodeDefDetails.defaultValues}
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
@@ -52,7 +52,7 @@ const AdvancedProps = (props) => {
       )}
 
       <NodeDefExpressionsProp
-        qualifier="relevant-if"
+        qualifier={DataTestId.nodeDefDetails.relevantIf}
         state={state}
         Actions={Actions}
         label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}

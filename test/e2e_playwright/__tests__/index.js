@@ -6,6 +6,7 @@ import surveyInfoEdit from '../tests/surveyInfoEdit'
 import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
 import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
+import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 
 import surveyDelete from '../tests/surveyDelete'
 import nodeDefReorder from '../tests/nodeDefReorder'
@@ -28,6 +29,7 @@ describe('E2E Tests', () => {
   nodeDefCodeAndCategoryEdit()
   nodeDefTaxonAndTaxonomyEdit()
   nodeDefReorder()
+  nodeDefExpressionsEdit()
   /**
    * Survey delete.
    */

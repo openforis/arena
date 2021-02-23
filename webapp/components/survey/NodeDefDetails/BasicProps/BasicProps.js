@@ -169,7 +169,7 @@ const BasicProps = (props) => {
             />
           </FormItem>
           <NodeDefExpressionsProp
-            qualifier="formula"
+            qualifier={DataTestId.nodeDefDetails.formula}
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.basicProps.formula')}
