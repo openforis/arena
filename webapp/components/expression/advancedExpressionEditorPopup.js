@@ -7,28 +7,14 @@ import 'codemirror/addon/hint/show-hint'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
-import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
+
 import { useI18n } from '@webapp/store/system'
+import { useSurvey } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
-
-const validateExpression = ({ variablesIds, exprString, mode }) => {
-  try {
-    const expr = Expression.fromString(exprString, mode)
-    const ids = getExpressionIdentifiers(expr)
-    const unknownIds = ids.filter((id) => !variablesIds.includes(id))
-
-    if (unknownIds.length > 0)
-      return { error: 'identifierError', message: `Unknown variable: ${unknownIds.join(', ')}` }
-
-    const canBeConstant = true // Name the param
-    return { ok: Expression.isValid(expr, canBeConstant) }
-  } catch (error) {
-    return { error: 'syntaxError', message: error.message }
-  }
-}
 
 const AdvancedExpressionEditorPopup = (props) => {
   const {
@@ -38,13 +24,15 @@ const AdvancedExpressionEditorPopup = (props) => {
     variables,
     nodeDefCurrent,
     excludeCurrentNodeDef,
+    isContextParent,
     updateDraftQuery,
   } = props
 
   const inputRef = useRef()
   const i18n = useI18n()
+  const survey = useSurvey()
 
-  const [validation, setValidation] = useState({})
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const variablesVisible = excludeCurrentNodeDef
     ? variables.map((group) => ({
@@ -61,19 +49,29 @@ const AdvancedExpressionEditorPopup = (props) => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(null, mode, i18n, variablesVisible) },
+      hintOptions: { hint: arenaExpressionHint({ mode, i18n, survey, nodeDefCurrent }) },
     })
     editor.setSize('100%', 'auto')
 
     editor.setValue(query)
 
     editor.on('change', (cm) => {
-      const value = cm.getValue()
-      const valueTrimmed = value.trim()
-      const newValidation = valueTrimmed === '' ? {} : validateExpression({ variablesIds, exprString: value, mode })
-      setValidation(newValidation)
-      setExpressionCanBeApplied(query !== value && !newValidation.error)
-      if (!newValidation.error) {
+      const exprString = cm.getValue()
+      const valueTrimmed = exprString.trim()
+      const newErrorMessage =
+        valueTrimmed === ''
+          ? null
+          : NodeDefExpressionValidator.validate({
+              survey,
+              nodeDefCurrent,
+              exprString,
+              isContextParent,
+              selfReferenceAllowed: !excludeCurrentNodeDef,
+            })
+      setErrorMessage(newErrorMessage)
+      const valid = !newErrorMessage
+      setExpressionCanBeApplied(query !== exprString && valid)
+      if (valid) {
         updateDraftQuery(valueTrimmed)
       }
     })
@@ -83,9 +81,9 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   return (
     <>
-      {validation.error ? (
+      {errorMessage ? (
         <div className="expression-editor__query-container">
-          <div className="query invalid">{validation.message}</div>
+          <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>
         </div>
       ) : (
         <div style={{ height: '34px' }} />
@@ -105,6 +103,7 @@ const AdvancedExpressionEditorPopup = (props) => {
 
 AdvancedExpressionEditorPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
+  isContextParent: PropTypes.bool,
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
@@ -115,6 +114,7 @@ AdvancedExpressionEditorPopup.propTypes = {
 
 AdvancedExpressionEditorPopup.defaultProps = {
   excludeCurrentNodeDef: true,
+  isContextParent: false,
   mode: Expression.modes.json,
   nodeDefCurrent: null,
   query: '',

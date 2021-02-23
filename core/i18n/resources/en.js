@@ -699,6 +699,7 @@ $t(common.cantUndoWarning)`,
 
     expressions: {
       cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
+      cannotGetLengthOfSingleNodes: 'cannot get the length of a single node',
       cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
       circularDependencyError: 'cannot reference node {{name}} because it references the current node',
       expressionInvalid: 'Invalid expression: {{details}}',
