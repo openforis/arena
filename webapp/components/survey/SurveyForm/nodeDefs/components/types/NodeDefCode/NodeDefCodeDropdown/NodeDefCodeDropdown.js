@@ -37,7 +37,7 @@ const NodeDefCodeDropdown = (props) => {
           items={items}
           disabled={disabled}
           itemKey="uuid"
-          itemLabel={CategoryItem.getLabel(lang)}
+          itemLabel={CategoryItem.getLabelWithCode(lang)}
           selection={selectedItems}
           onItemAdd={onItemAdd}
           onItemRemove={onItemRemove}
@@ -48,7 +48,7 @@ const NodeDefCodeDropdown = (props) => {
           items={items}
           disabled={disabled}
           itemKey="uuid"
-          itemLabel={CategoryItem.getLabel(lang)}
+          itemLabel={CategoryItem.getLabelWithCode(lang)}
           selection={R.head(selectedItems)}
           onChange={(item) => {
             // NB: onItemRemove is not possible?
