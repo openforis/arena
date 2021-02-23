@@ -62,6 +62,7 @@ export const findNodeByPath = (path) => (survey, record) => {
       if (children.length > childIndex) {
         currentNode = children[childIndex]
       } else {
+        currentNode = null
         // break the loop
         return true
       }

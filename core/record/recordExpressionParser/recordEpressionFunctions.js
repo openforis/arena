@@ -4,6 +4,12 @@ import * as Expression from '@core/expressionParser/expression'
 
 export const recordExpressionFunctions = ({ record }) => ({
   [Expression.functionNames.index]: (node) => {
+    if (!node) {
+      return -1
+    }
+    if (Node.isRoot(node)) {
+      return 0
+    }
     const nodeParent = Record.getParentNode(node)(record)
     if (!nodeParent) {
       return -1
