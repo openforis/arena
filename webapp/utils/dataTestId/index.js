@@ -10,7 +10,7 @@ export const DataTestId = {
     categoryName: 'category-name',
     // TODO remove category prefix below after removing taiko
     level: (idx) => `level-${idx}`,
-    levelItemAddBtn: (idx) => `level-${idx}-item-add-btn`,
+    levelAddItemBtn: (idx) => `level-${idx}-add-item-btn`,
     levelDeleteBtn: (idx) => `level-${idx}-delete-btn`,
     levelErrorBadge: (idx) => `level-${idx}-error-badge`,
     levelName: (idx) => `category-level-${idx}-name`,
@@ -36,6 +36,13 @@ export const DataTestId = {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,
   },
+  expressionEditor: {
+    advancedQuery: 'expression-advanced-query',
+    applyBtn: 'expression-apply-btn',
+    editBtn: (id) => `${id}-edit-btn`,
+    query: (id) => `${id}-query`,
+    toggleModeBtn: 'expression-mode-btn',
+  },
   header: {
     surveyCreateBtn: 'survey-create-btn',
     surveyListBtn: 'survey-list-btn',
@@ -51,15 +58,23 @@ export const DataTestId = {
     ok: 'text="Ok"',
   },
   nodeDefDetails: {
-    backBtn: 'node-def-back-btn',
+    advanced: 'advanced',
+    applyIf: (id) => `${id}-apply-if`,
+    backBtn: 'node-def-back',
+    basic: 'basic',
+    defaultValues: 'default-values',
+    expressionDeleteBtn: (id) => `${id}-delete-btn`,
+    formula: 'formula',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
     nodeDefCodeParent: 'node-def-code-parent',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
+    relevantIf: 'relevant-if',
     saveBtn: 'node-def-save-btn',
     taxonomySelector: 'taxonomy-selector',
     taxonomySelectorAddBtn: 'taxonomy-selector-add-btn',
+    validations: 'validations',
   },
   panelRight: {
     closeBtn: 'panel-right-close-btn',
@@ -93,6 +108,9 @@ export const DataTestId = {
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
+  },
+  tabBar: {
+    tabBarBtn: (id) => `${id}-btn`,
   },
   taxonomyDetails: {
     doneEditBtn: 'taxonomy-done-edit-btn',

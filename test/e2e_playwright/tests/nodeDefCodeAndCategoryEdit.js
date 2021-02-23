@@ -6,6 +6,7 @@ import { addItems, addLevels, editCategoryProps } from './_categoryDetails'
 import { addNodeDef } from './_formDesigner'
 import { gotoFormDesigner } from './_navigation'
 import { editNodeDefDetails } from './_nodeDefDetails'
+import { publishWithoutErrors } from './_publish'
 
 // eslint-disable-next-line camelcase
 const { cluster_country, cluster_region, cluster_province } = cluster.children
@@ -20,6 +21,8 @@ export default () =>
     test(`Add category ${category.label}`, async () => {
       const [response] = await Promise.all([
         page.waitForResponse('**/categories'),
+        page.waitForResponse('**/categories/**'),
+        page.waitForResponse('**/categories/**/items**'),
         page.click(getSelector(DataTestId.categorySelector.addCategoryBtn, 'button')),
       ])
       const json = await response.json()
@@ -42,4 +45,6 @@ export default () =>
     editNodeDefDetails(cluster_country)
     addNodeDef(cluster, cluster_region)
     addNodeDef(cluster, cluster_province)
+
+    publishWithoutErrors()
   })

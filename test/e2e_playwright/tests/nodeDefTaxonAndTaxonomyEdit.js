@@ -2,7 +2,9 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { plot, tree } from '../mock/nodeDefs'
 import { taxonomies } from '../mock/taxonomies'
 import { addNodeDef, gotoFormPage } from './_formDesigner'
+import { gotoFormDesigner } from './_navigation'
 import { editNodeDefDetails } from './_nodeDefDetails'
+import { publishWithoutErrors } from './_publish'
 import { editTaxonomyDetails } from './_taxonomyDetails'
 
 // eslint-disable-next-line camelcase
@@ -11,12 +13,19 @@ const taxonomy = taxonomies[tree_species.taxonomy]
 
 export default () =>
   describe('NodeDefTaxon and taxonomy edit', () => {
+    gotoFormDesigner()
     gotoFormPage(plot)
 
     addNodeDef(tree, tree_species, false)
 
     test(`Add Taxonomy`, async () => {
-      await page.click(getSelector(DataTestId.nodeDefDetails.taxonomySelectorAddBtn, 'button'))
+      await Promise.all([
+        page.waitForResponse('**/taxonomies'),
+        page.waitForResponse('**/taxonomies/**'),
+        page.waitForResponse('**/taxonomies/**/taxa**'),
+        page.waitForResponse('**/taxonomies/**/taxa/count**'),
+        page.click(getSelector(DataTestId.nodeDefDetails.taxonomySelectorAddBtn, 'button')),
+      ])
     })
 
     editTaxonomyDetails(taxonomy)
@@ -27,4 +36,6 @@ export default () =>
     })
 
     editNodeDefDetails(tree_species)
+
+    publishWithoutErrors()
   })

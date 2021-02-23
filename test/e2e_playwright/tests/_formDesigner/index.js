@@ -46,7 +46,7 @@ export const addNodeDefSubPage = (nodeDefParent, nodeDefChild) => {
 }
 
 // ==== edit
-export const editNodeDef = (formName, nodeDef) => {
+export const editNodeDef = (formName, nodeDef, editDetails = true) => {
   test(`${nodeDef.label} edit`, async () => {
     await Promise.all([
       page.waitForNavigation(),
@@ -54,7 +54,7 @@ export const editNodeDef = (formName, nodeDef) => {
     ])
   })
 
-  editNodeDefDetails(nodeDef)
+  if (editDetails) editNodeDefDetails(nodeDef)
 }
 
 // ==== form navigation

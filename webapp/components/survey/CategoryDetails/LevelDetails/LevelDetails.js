@@ -80,7 +80,7 @@ const LevelDetails = (props) => {
         {!readOnly && (
           <button
             id={`category-level-${levelIndex}-btn-item-add`}
-            data-testid={DataTestId.categoryDetails.levelItemAddBtn(levelIndex)}
+            data-testid={DataTestId.categoryDetails.levelAddItemBtn(levelIndex)}
             type="button"
             className="btn btn-s btn-add-item"
             aria-disabled={!canAddItem}
