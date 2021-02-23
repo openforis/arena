@@ -20,7 +20,7 @@ const actionHandlers = {
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
 
-  [SurveyFormActions.formReset]: () => ({}),
+  [SurveyFormActions.formClean]: () => ({}),
 
   // Form actions
   [SurveyFormActions.formNodeDefAddChildToUpdate]: (state, { nodeDef }) =>
@@ -59,7 +59,7 @@ const actionHandlers = {
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
       SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
-      SurveyFormState.assocFormActivePage(nodeDefActivePage)
+      R.isNil(nodeDefActivePage) ? R.identity : SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state),
 }
 

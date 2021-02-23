@@ -23,7 +23,9 @@ const Designer = () => {
   const canEditDef = useAuthCanEditSurvey()
 
   useEffect(() => {
-    dispatch(SurveyFormActions.resetForm())
+    return () => {
+      dispatch(SurveyFormActions.cleanForm())
+    }
   }, [])
 
   return (
