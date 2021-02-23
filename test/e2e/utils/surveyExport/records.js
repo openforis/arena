@@ -1,21 +1,20 @@
 import path from 'path'
 import fs from 'fs'
 
-// TOFIX
-import * as Record from '@core/record/record'
-import * as Survey from '@core/survey/survey'
-
 import PromiseUtils from '../PromiseUtils'
 import { getSurvey, checkFileAndGetContent } from './utils'
 
 import { getLabel as getCategoryLabel } from './categories'
+import { getNodeDefChildren, getNodeDefRoot } from './nodeDefs'
 
 import { records as recordsMockData } from '../../resources/records/recordsData'
 
 const includeAnalysis = true
 
-const { getNodesByDefUuid } = Record
-const { getNodeDefChildren, getCategoryItemByUuid, getNodeDefRoot } = Survey
+const getNodesByDefUuid = (nodeDefUuid) => (record) => {
+  const nodesUuidByNodeDefUuid = record._nodesByDef[nodeDefUuid]
+  return nodesUuidByNodeDefUuid.map((nodeUuid) => record.nodes[nodeUuid])
+}
 
 const getSurveyNodeDefsToTest = ({ surveyExtractedPath }) => {
   const contentSurvey = fs.readFileSync(path.join(surveyExtractedPath, 'survey.json'), 'utf8')
@@ -48,7 +47,8 @@ const nodeHasSameValueAsMockNode = ({ node, mockNode, survey }) => {
   ) {
     return true
   }
-  const categoyItem = getCategoryItemByUuid(node.value.itemUuid)(survey)
+  const categoyItem = survey._indexRefData.categoryItemUuidIndex[node.value.itemUuid]
+
   if (
     mockNode.type === 'code' &&
     getCategoryLabel({ labels: categoyItem.props.labels, lang: 'en', code: categoyItem.props.code }) === mockNode.value

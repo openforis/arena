@@ -35,7 +35,7 @@ export const getNodeDefByUuid = (uuid) => R.pipe(R.propOr({}, 'nodeDefs'), R.pro
 
 export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)
 
-const getNodeDefChildren = (nodeDef, _includeAnalysis = false) => (survey) => {
+export const getNodeDefChildren = (nodeDef, _includeAnalysis = false) => (survey) => {
   const children = []
   if (nodeDef.virtual) {
     // If nodeDef is virtual, get children from its source
