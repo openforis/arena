@@ -47,11 +47,12 @@ const nodeHasSameValueAsMockNode = ({ node, mockNode, survey }) => {
   ) {
     return true
   }
-  const categoyItem = survey._indexRefData.categoryItemUuidIndex[node.value.itemUuid]
 
+  const categoryItem = survey._indexRefData.categoryItemIndex[String(node.value.itemUuid)]
   if (
     mockNode.type === 'code' &&
-    getCategoryLabel({ labels: categoyItem.props.labels, lang: 'en', code: categoyItem.props.code }) === mockNode.value
+    getCategoryLabel({ labels: categoryItem.props.labels, lang: 'en', code: categoryItem.props.code }) ===
+      mockNode.value
   ) {
     return true
   }
