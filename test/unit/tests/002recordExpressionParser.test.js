@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
@@ -12,6 +10,8 @@ let survey = {}
 let record = {}
 
 let nodeDefault = {}
+
+const getNode = (path) => RecordUtils.findNodeByPath(path)(survey, record)
 
 describe('RecordExpressionParser Test', () => {
   beforeAll(async () => {
@@ -114,7 +114,7 @@ describe('RecordExpressionParser Test', () => {
     { q: 'plot[4].plot_id', r: null },
     // plot_multiple_number counts
     { q: 'plot[0].plot_multiple_number.length', r: 2 },
-    { q: 'plot[1].plot_multiple_number.length', r: null },
+    { q: 'plot[1].plot_multiple_number.length', r: 0 },
     { q: 'plot[2].plot_multiple_number.length', r: 1 },
     // index (single entity)
     { q: 'index(cluster)', r: 0 },
@@ -138,16 +138,24 @@ describe('RecordExpressionParser Test', () => {
     { q: 'index(plot[0].plot_multiple_number[2])', r: -1 },
     { q: 'index(plot_multiple_number)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[0]' },
     { q: 'index(plot_multiple_number)', r: 1, n: 'cluster/plot[0]/plot_multiple_number[1]' },
+    // parent
+    { q: 'parent(cluster)', r: null },
+    { q: 'parent(remarks)', r: () => getNode('cluster') },
+    { q: 'parent(plot_id)', r: () => getNode('cluster/plot[1]'), n: 'cluster/plot[1]/plot_id' },
+    { q: 'parent(parent(plot_id))', r: () => getNode('cluster'), n: 'cluster/plot[1]/plot_id' },
+    { q: 'index(parent(plot_id))', r: 1, n: 'cluster/plot[1]/plot_id' },
+    { q: 'parent(parent(plot_id)).plot[index(parent(plot_id))-1].plot_id', r: 1, n: 'cluster/plot[1]/plot_id' },
   ]
 
   queries.forEach(({ q, r, n }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
     it(testTitle, () => {
-      const resKeys = R.keys(r)
-      const node = n ? RecordUtils.findNodeByPath(n)(survey, record) : nodeDefault
+      const resKeys = r ? Object.keys(r) : []
+      const node = n ? getNode(n) : nodeDefault
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
-      if (R.isEmpty(resKeys)) {
-        expect(res).toEqual(r)
+      if (resKeys.length === 0) {
+        const resExpected = r instanceof Function ? r() : r
+        expect(res).toEqual(resExpected)
       } else {
         resKeys.forEach((key) => expect(res[key]).toEqual(r[key]))
       }
