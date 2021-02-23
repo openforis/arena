@@ -1,5 +1,3 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
 export const baseClusterNodeDefItems = [
   { type: 'integer', name: 'cluster_id', label: 'Cluster id', isKey: true },
   { type: 'decimal', name: 'cluster_decimal', label: 'Cluster decimal' }, // propsAdvanced.defaultValues, expression "0", apply if null
@@ -13,15 +11,15 @@ export const plotNodeDef = { type: 'entity', name: 'plot', label: 'Plot', isMult
 export const ClusterNodeDefItems = [...baseClusterNodeDefItems, plotNodeDef]
 
 export const basePlotNodeDefItems = [
-  { type: NodeDef.nodeDefType.integer, name: 'plot_id', label: 'Plot id', isKey: true },
-  { type: NodeDef.nodeDefType.text, name: 'plot_text', label: 'Plot text', isKey: false },
-  { type: NodeDef.nodeDefType.file, name: 'plot_file', label: 'Plot file', isKey: false },
+  { type: 'integer', name: 'plot_id', label: 'Plot id', isKey: true },
+  { type: 'text', name: 'plot_text', label: 'Plot text', isKey: false },
+  { type: 'file', name: 'plot_file', label: 'Plot file', isKey: false },
 ]
-export const treeNodeDef = { type: NodeDef.nodeDefType.entity, name: 'tree', label: 'Tree', isKey: false } // "multiple":true,"renderType":"table"
+export const treeNodeDef = { type: 'entity', name: 'tree', label: 'Tree', isKey: false } // "multiple":true,"renderType":"table"
 
-export const countryNodeDef = { type: NodeDef.nodeDefType.code, name: 'country', label: 'Country', isKey: false }
-export const regionNodeDef = { type: NodeDef.nodeDefType.code, name: 'region', label: 'Region', isKey: false }
-export const provinceNodeDef = { type: NodeDef.nodeDefType.code, name: 'province', label: 'Province', isKey: false }
+export const countryNodeDef = { type: 'code', name: 'country', label: 'Country', isKey: false }
+export const regionNodeDef = { type: 'code', name: 'region', label: 'Region', isKey: false }
+export const provinceNodeDef = { type: 'code', name: 'province', label: 'Province', isKey: false }
 
 export const PlotNodeDefItems = [...basePlotNodeDefItems, treeNodeDef, countryNodeDef, regionNodeDef, provinceNodeDef]
 
@@ -31,7 +29,7 @@ export const baseTreeNodeDefItems = [
   { type: 'decimal', name: 'tree_dec_2', label: 'Tree decimal 2', isKey: false },
 ]
 export const treeSpeciesNodeDef = {
-  type: NodeDef.nodeDefType.taxon,
+  type: 'taxon',
   name: 'tree_species',
   label: 'Tree Species',
   isKey: false,

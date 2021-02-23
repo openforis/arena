@@ -1,5 +1,4 @@
 import path from 'path'
-import * as User from '@core/user/user'
 
 import { checkFileAndGetContent } from './utils'
 
@@ -16,7 +15,7 @@ export const checkUsers = async ({
 
   await Promise.all(
     expectedUsers.map(async (expectedUser) => {
-      const tester = users.find((_user) => User.getEmail(_user) === expectedUser)
+      const tester = users.find((_user) => _user.email === expectedUser)
       await expect(tester).toBeTruthy()
     })
   )
