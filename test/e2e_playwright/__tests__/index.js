@@ -10,6 +10,7 @@ import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 
 import surveyDelete from '../tests/surveyDelete'
 import nodeDefReorder from '../tests/nodeDefReorder'
+import surveyFormPreview from '../tests/surveyFormPreview'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -30,6 +31,7 @@ describe('E2E Tests', () => {
   nodeDefTaxonAndTaxonomyEdit()
   nodeDefReorder()
   nodeDefExpressionsEdit()
+  surveyFormPreview()
   /**
    * Survey delete.
    */
