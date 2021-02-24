@@ -24,6 +24,7 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
     const entityDefCurrentUuid = NodeDef.getUuid(entityDefCurrent)
     const entityDefCurrentChildren = Survey.getNodeDefChildren(entityDefCurrent)(survey)
 
+    reachableNodeDefs.push(entityDefCurrent)
     reachableNodeDefs.push(...entityDefCurrentChildren)
 
     // visit nodes inside single entities
