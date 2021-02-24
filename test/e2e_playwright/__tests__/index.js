@@ -27,13 +27,13 @@ describe('E2E Tests', () => {
   /**
    * Designer.
    */
-  /*nodeDefAtomicEdit()
+  nodeDefAtomicEdit()
   nodeDefCodeAndCategoryEdit()
   nodeDefTaxonAndTaxonomyEdit()
   nodeDefReorder()
-  nodeDefExpressionsEdit()*/
+  nodeDefExpressionsEdit()
   /**
-   * Survey invite user
+   * Survey invite user.
    */
   surveyInviteUser()
   /**
