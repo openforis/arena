@@ -10,9 +10,8 @@ import { getContextUser } from '../../integration/config/context'
 
 let survey = {}
 let record = {}
-// Let root = {}
-let node = {}
-// Let dbh = {}
+
+let nodeDefault = {}
 
 describe('RecordExpressionParser Test', () => {
   beforeAll(async () => {
@@ -50,9 +49,7 @@ describe('RecordExpressionParser Test', () => {
       )
     ).build()
 
-    // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
-    node = RecordUtils.findNodeByPath('cluster/tree_height')(survey, record)
-    // Dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
+    nodeDefault = RecordUtils.findNodeByPath('cluster/tree_height')(survey, record)
   }, 10000)
 
   // ====== nodes hierarchy tests
@@ -119,13 +116,36 @@ describe('RecordExpressionParser Test', () => {
     { q: 'plot[0].plot_multiple_number.length', r: 2 },
     { q: 'plot[1].plot_multiple_number.length', r: null },
     { q: 'plot[2].plot_multiple_number.length', r: 1 },
+    // index (single entity)
+    { q: 'index(cluster)', r: 0 },
+    { q: 'index(cluster)', r: 0, n: 'cluster/plot[0]/plot_id' },
+    // index (multiple entity)
+    { q: 'index(plot)', r: 0, n: 'cluster/plot[0]' },
+    { q: 'index(plot)', r: 1, n: 'cluster/plot[1]' },
+    { q: 'index(plot)', r: 0, n: 'cluster/plot[0]/plot_id' },
+    { q: 'index(plot)', r: 1, n: 'cluster/plot[1]/plot_id' },
+    { q: 'index(plot[0])', r: 0 },
+    { q: 'index(plot[1])', r: 1 },
+    { q: 'index(plot[2])', r: 2 },
+    { q: 'index(plot[3])', r: -1 },
+    // index (single attribute)
+    { q: 'index(visit_date)', r: 0, n: 'cluster/remarks' },
+    { q: 'index(plot[0].plot_id)', r: 0 },
+    { q: 'index(plot_id)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[1]' },
+    // index (multiple attribute)
+    { q: 'index(plot[0].plot_multiple_number[0])', r: 0 },
+    { q: 'index(plot[0].plot_multiple_number[1])', r: 1 },
+    { q: 'index(plot[0].plot_multiple_number[2])', r: -1 },
+    { q: 'index(plot_multiple_number)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[0]' },
+    { q: 'index(plot_multiple_number)', r: 1, n: 'cluster/plot[0]/plot_multiple_number[1]' },
   ]
 
-  queries.forEach(({ q, r }) => {
-    it(q, () => {
+  queries.forEach(({ q, r, n }) => {
+    const testTitle = `${q}${n ? ` (${n})` : ''}`
+    it(testTitle, () => {
       const resKeys = R.keys(r)
+      const node = n ? RecordUtils.findNodeByPath(n)(survey, record) : nodeDefault
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
-
       if (R.isEmpty(resKeys)) {
         expect(res).toEqual(r)
       } else {

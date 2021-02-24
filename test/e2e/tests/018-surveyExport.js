@@ -4,7 +4,7 @@ import { waitFor, reload } from '../utils/api'
 
 import { expectHomeDashboard } from '../utils/ui/home'
 import { clickSidebarBtnHome } from '../utils/ui/sidebar'
-
+import { selectSurvey } from '../utils/ui/survey'
 import {
   extractZipFileAndCheck,
   exportSurvey,
@@ -26,6 +26,8 @@ const extractedPath = path.join(downloadPath, 'extracted')
 const surveyExtractedPath = path.join(extractedPath, 'survey_survey')
 
 describe('Survey export', () => {
+  test('Select survey', async () => selectSurvey())
+
   test('Open Survey', async () => {
     await reload()
     await waitFor(5000)
