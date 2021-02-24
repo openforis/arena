@@ -5,6 +5,7 @@ import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -15,7 +16,8 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
-import { useOnUpdate } from '@webapp/components/hooks'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
 
 import FormHeader from './FormHeader'
 import FormPageNavigation from './FormPageNavigation'
@@ -75,11 +77,10 @@ const SurveyForm = (props) => {
     }
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (entry && !preview) {
-        dispatch(SurveyFormActions.resetForm())
-      }
+  useHistoryListen((location) => {
+    // user enters in records the form is reset
+    if (matchPath(location.pathname, { path: appModuleUri(dataModules.records) })) {
+      dispatch(SurveyFormActions.resetForm())
     }
   }, [])
 
