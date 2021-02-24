@@ -14,7 +14,7 @@ import surveyDelete from '../tests/surveyDelete'
 import nodeDefReorder from '../tests/nodeDefReorder'
 
 beforeAll(async () => {
-  await page.goto('http://localhost:9000')
+  await page.goto('http://localhost:9090')
 })
 
 describe('E2E Tests', () => {
