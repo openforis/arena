@@ -75,6 +75,14 @@ const SurveyForm = (props) => {
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (entry && !preview) {
+        dispatch(SurveyFormActions.cleanForm(null))
+      }
+    }
+  }, [])
+
   return nodeDef ? (
     <div>
       <FormHeader edit={edit} entry={entry && canEditRecord} preview={preview} canEditDef={canEditDef} />
