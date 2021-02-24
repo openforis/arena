@@ -18,7 +18,7 @@ import { useOnUpdate, useQuery } from '@webapp/components/hooks'
 
 import { State } from './state'
 
-export const useLocalState = ({ canEditDef }) => {
+export const useLocalState = () => {
   const history = useHistory()
   const dispatch = useDispatch()
 
@@ -59,7 +59,7 @@ export const useLocalState = ({ canEditDef }) => {
     }
 
     // Reset form
-    if (!preview || canEditDef) {
+    if (!preview) {
       dispatch(SurveyFormActions.resetForm())
     }
 
