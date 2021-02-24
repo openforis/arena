@@ -72,7 +72,6 @@ const SurveyForm = (props) => {
       if (editAllowed) {
         dispatch(SurveyFormActions.setFormNodeDefAddChildTo(null))
       }
-      dispatch(SurveyFormActions.cleanForm())
     }
   }, [])
 
