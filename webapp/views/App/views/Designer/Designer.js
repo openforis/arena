@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
@@ -13,20 +12,12 @@ import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
 
 const Designer = () => {
-  const dispatch = useDispatch()
   const canEditDef = useAuthCanEditSurvey()
-
-  useEffect(() => {
-    return () => {
-      dispatch(SurveyFormActions.cleanForm())
-    }
-  }, [])
 
   return (
     <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>

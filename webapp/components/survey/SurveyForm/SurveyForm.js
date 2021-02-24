@@ -78,7 +78,7 @@ const SurveyForm = (props) => {
   useEffect(() => {
     return () => {
       if (entry && !preview) {
-        dispatch(SurveyFormActions.cleanForm(null))
+        dispatch(SurveyFormActions.resetForm())
       }
     }
   }, [])

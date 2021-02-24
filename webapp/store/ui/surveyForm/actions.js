@@ -17,11 +17,7 @@ import * as SurveyFormState from './state'
  */
 
 export const formReset = 'survey/form/reset'
-
 export const resetForm = () => (dispatch) => dispatch({ type: formReset })
-
-export const formClean = 'survey/form/clean'
-export const cleanForm = () => (dispatch) => dispatch({ type: formClean })
 
 export const formNodeDefAddChildToUpdate = 'survey/form/nodeDef/addChildTo/update'
 

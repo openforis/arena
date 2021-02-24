@@ -20,7 +20,7 @@ const actionHandlers = {
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
 
-  [SurveyFormActions.formClean]: () => ({}),
+  [SurveyFormActions.formReset]: () => ({}),
 
   // Form actions
   [SurveyFormActions.formNodeDefAddChildToUpdate]: (state, { nodeDef }) =>

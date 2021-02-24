@@ -18,7 +18,7 @@ import { useOnUpdate, useQuery } from '@webapp/components/hooks'
 
 import { State } from './state'
 
-export const useLocalState = () => {
+export const useLocalState = ({ canEditDef }) => {
   const history = useHistory()
   const dispatch = useDispatch()
 
@@ -59,7 +59,9 @@ export const useLocalState = () => {
     }
 
     // Reset form
-    dispatch(SurveyFormActions.resetForm())
+    if (!preview || canEditDef) {
+      dispatch(SurveyFormActions.resetForm())
+    }
 
     // Remove beforeunload event listener
     window.removeEventListener('beforeunload', componentUnload)

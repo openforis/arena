@@ -1,10 +1,12 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import SurveyForm from '@webapp/components/survey/SurveyForm'
+
 import { State, useLocalState } from './store'
 
-const Record = () => {
-  const { state } = useLocalState()
+const Record = ({ canEditDef }) => {
+  const { state } = useLocalState({ canEditDef })
 
   if (!State.isLoaded(state)) {
     return null
@@ -18,6 +20,14 @@ const Record = () => {
       canEditRecord={State.isEditable(state)}
     />
   )
+}
+
+Record.propTypes = {
+  canEditDef: PropTypes.bool,
+}
+
+Record.defaultProps = {
+  canEditDef: false,
 }
 
 export default Record
