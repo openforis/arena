@@ -25,36 +25,28 @@ const addDeps = (survey, nodeDef, type, expressions) => (graph) => {
   const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[type]
   const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[type]
 
-  const referencedNodeDefs = {}
-  expressions.forEach((nodeDefExpr) => {
+  const findReferencedNodeDefs = ({ exprString }) => {
     try {
-      Object.assign(
-        referencedNodeDefs,
-        NodeDefExpressionValidator.findReferencedNodeDefs({
-          survey,
-          nodeDef,
-          exprString: NodeDefExpression.getExpression(nodeDefExpr),
-          isContextParent,
-          selfReferenceAllowed,
-        })
-      )
+      return NodeDefExpressionValidator.findReferencedNodeDefs({
+        survey,
+        nodeDef,
+        exprString,
+        isContextParent,
+        selfReferenceAllowed,
+      })
     } catch (e) {
       // TODO ignore it?
+      return {}
     }
-    try {
-      Object.assign(
-        NodeDefExpressionValidator.findReferencedNodeDefs({
-          survey,
-          nodeDef,
-          exprString: NodeDefExpression.getApplyIf(nodeDefExpr),
-          isContextParent,
-          selfReferenceAllowed,
-        })
-      )
-    } catch (e) {
-      // TODO ignore it?
-    }
-  })
+  }
+  const referencedNodeDefs = expressions.reduce(
+    (referencedAcc, nodeDefExpr) => ({
+      ...referencedAcc,
+      ...findReferencedNodeDefs({ exprString: NodeDefExpression.getExpression(nodeDefExpr) }),
+      ...findReferencedNodeDefs({ exprString: NodeDefExpression.getApplyIf(nodeDefExpr) }),
+    }),
+    {}
+  )
 
   Object.values(referencedNodeDefs).forEach((nodeDefRef) => {
     _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
