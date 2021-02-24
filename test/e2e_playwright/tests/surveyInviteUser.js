@@ -6,7 +6,7 @@ const expectUser = async ({ user }) => {
 }
 
 const expectUsers = ({ users }) => {
-  test(`Expect users`, async () => {
+  test(`Invite User and check`, async () => {
     await Promise.all([users.map(async (user) => expectUser({ user }))])
   })
 }
@@ -21,6 +21,7 @@ const inviteUser = () => {
     await page.click(`text="Survey administrators"`)
 
     await page.click(getSelector(DataTestId.userList.submitBtn, 'button'))
+    await page.waitForTimeout(2000)
   })
 }
 
@@ -28,6 +29,8 @@ export default () =>
   describe('Invite user', () => {
     gotoSurveyUsersList()
     expectUsers({ users: ['test@arena.com'] })
+
     inviteUser()
+
     expectUsers({ users: ['test@arena.com', 'testtwo@arena.com'] })
   })
