@@ -27,25 +27,33 @@ const addDeps = (survey, nodeDef, type, expressions) => (graph) => {
 
   const referencedNodeDefs = {}
   expressions.forEach((nodeDefExpr) => {
-    Object.assign(
-      referencedNodeDefs,
-      NodeDefExpressionValidator.findReferencedNodeDefs({
-        survey,
-        nodeDef,
-        exprString: NodeDefExpression.getExpression(nodeDefExpr),
-        isContextParent,
-        selfReferenceAllowed,
-      })
-    )
-    Object.assign(
-      NodeDefExpressionValidator.findReferencedNodeDefs({
-        survey,
-        nodeDef,
-        exprString: NodeDefExpression.getApplyIf(nodeDefExpr),
-        isContextParent,
-        selfReferenceAllowed,
-      })
-    )
+    try {
+      Object.assign(
+        referencedNodeDefs,
+        NodeDefExpressionValidator.findReferencedNodeDefs({
+          survey,
+          nodeDef,
+          exprString: NodeDefExpression.getExpression(nodeDefExpr),
+          isContextParent,
+          selfReferenceAllowed,
+        })
+      )
+    } catch (e) {
+      // TODO ignore it?
+    }
+    try {
+      Object.assign(
+        NodeDefExpressionValidator.findReferencedNodeDefs({
+          survey,
+          nodeDef,
+          exprString: NodeDefExpression.getApplyIf(nodeDefExpr),
+          isContextParent,
+          selfReferenceAllowed,
+        })
+      )
+    } catch (e) {
+      // TODO ignore it?
+    }
   })
 
   Object.values(referencedNodeDefs).forEach((nodeDefRef) => {
