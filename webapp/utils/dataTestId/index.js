@@ -118,4 +118,11 @@ export const DataTestId = {
     taxonomyDescription: _withLang('taxonomy-description'),
     uploadInput: 'taxonomy-upload-input',
   },
+  userList: {
+    inviteBtn: 'invite-user-btn',
+    email: 'invite-user-name',
+    group: 'invite-user-group',
+    groupByName: (name) => `div[text="${name}"]`,
+    submitBtn: 'Send invitation',
+  },
 }
