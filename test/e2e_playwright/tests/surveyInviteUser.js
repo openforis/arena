@@ -6,13 +6,14 @@ const expectUser = async ({ user }) => {
 }
 
 const expectUsers = ({ users }) => {
-  test(`Invite User and check`, async () => {
-    await Promise.all([users.map(async (user) => expectUser({ user }))])
+  test(`Check users ${users.length}`, async () => {
+    await page.reload()
+    await Promise.all(users.map(async (user) => expectUser({ user })))
   })
 }
 
 const inviteUser = () => {
-  test(`Invite User and check`, async () => {
+  test(`Invite user`, async () => {
     await page.click(getSelector(DataTestId.userList.inviteBtn, 'a'))
 
     await page.fill(getSelector(DataTestId.userList.email, 'input'), 'testtwo@arena.com')
@@ -21,12 +22,12 @@ const inviteUser = () => {
     await page.click(`text="Survey administrators"`)
 
     await page.click(getSelector(DataTestId.userList.submitBtn, 'button'))
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(2500)
   })
 }
 
 export default () =>
-  describe('Invite user', () => {
+  describe('Invite user testtwo@arena.com', () => {
     gotoSurveyUsersList()
     expectUsers({ users: ['test@arena.com'] })
 
