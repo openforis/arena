@@ -11,13 +11,7 @@ import SystemError from '@core/systemError'
 import { identifierEval } from './identifierEval'
 import { memberEval } from './memberEval'
 
-export const findReferencedNodeDefs = ({
-  survey,
-  nodeDef,
-  exprString,
-  isContextParent = true,
-  selfReferenceAllowed = true,
-}) => {
+const _evaluateExpression = ({ survey, nodeDef, exprString, isContextParent = true, selfReferenceAllowed = true }) => {
   if (!exprString) {
     return []
   }
@@ -45,8 +39,42 @@ export const findReferencedNodeDefs = ({
     },
   }
   const nodeDefContext = isContextParent ? Survey.getNodeDefParent(nodeDef)(survey) : nodeDef
-  Expression.evalString(exprString, { evaluators, functions, node: nodeDefContext })
+  const result = Expression.evalString(exprString, { evaluators, functions, node: nodeDefContext })
+  return { referencedNodeDefs, result }
+}
+
+export const findReferencedNodeDefs = ({
+  survey,
+  nodeDef,
+  exprString,
+  isContextParent = true,
+  selfReferenceAllowed = true,
+}) => {
+  const { referencedNodeDefs } = _evaluateExpression({
+    survey,
+    nodeDef,
+    exprString,
+    isContextParent,
+    selfReferenceAllowed,
+  })
   return referencedNodeDefs
+}
+
+export const findReferencedNodeDefLast = ({
+  survey,
+  nodeDef,
+  exprString,
+  isContextParent = true,
+  selfReferenceAllowed = true,
+}) => {
+  const { result } = _evaluateExpression({
+    survey,
+    nodeDef,
+    exprString,
+    isContextParent,
+    selfReferenceAllowed,
+  })
+  return result
 }
 
 export const validate = ({

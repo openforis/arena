@@ -2,6 +2,7 @@ import CodeMirror from 'codemirror/lib/codemirror'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
 import * as ExpressionVariables from './expressionVariables'
 
@@ -37,11 +38,6 @@ const getVariableNameStart = ({ value, end }) => _findCharIndex({ value, end, ma
 
 const variablesSeparatorRegex = /[\s\-+*/&|]/
 const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: variablesSeparatorRegex })
-
-const getAbsolutePathPart = (pathPart) => {
-  const match = pathPart.match(/([\w_]+)(\[\d+\])?/)
-  return match ? match[1] : ''
-}
 
 const getVariableCompletion = ({ group, variable, token }) => {
   const { label, value } = variable
@@ -118,6 +114,46 @@ const _prepareTokenForCompletion = ({ token, cursorPosition, cursorLine }) => {
   }
 }
 
+const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath }) => {
+  const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+  let nodeDefContext = nodeDefContextParent
+
+  const { lang } = i18n
+  const groupByParent = true
+
+  if (nodeDefContextPath) {
+    try {
+      nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
+        survey,
+        nodeDef: nodeDefCurrent,
+        exprString: nodeDefContextPath,
+      })
+    } catch (e) {
+      // ignore it
+    }
+    return nodeDefContext
+      ? ExpressionVariables.getVariablesChildren({
+          survey,
+          nodeDefContext,
+          nodeDefCurrent,
+          mode,
+          lang,
+          groupByParent,
+        })
+      : []
+  } else {
+    // get variables from context node and its ancestors
+    return ExpressionVariables.getVariables({
+      survey,
+      nodeDefContext,
+      nodeDefCurrent,
+      mode,
+      lang,
+      groupByParent,
+    })
+  }
+}
+
 export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {
   const cur = editor.getCursor()
   const token = editor.getTokenAt(cur)
@@ -128,46 +164,11 @@ export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (
     getVariablePathStart({ value: token.string, end: cursorPosition }),
     cursorPosition
   )
-
   _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
 
-  const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
-  const nodeDefPathParts = variablePath.split('.')
+  const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
-  let nodeDefContext = nodeDefContextParent
-  let variablesGroupedByParentEntity = []
-  const { lang } = i18n
-  const groupByParent = true
-
-  if (nodeDefPathParts.length > 1) {
-    // get a nodeDef for every path part and use it as context node def
-    for (let i = 0; i < nodeDefPathParts.length - 1 && nodeDefContext; i += 1) {
-      const pathPart = nodeDefPathParts[i]
-      const childName = getAbsolutePathPart(pathPart)
-      nodeDefContext = Survey.getNodeDefChildByName(nodeDefContext, childName)(survey)
-    }
-
-    if (nodeDefContext) {
-      variablesGroupedByParentEntity = ExpressionVariables.getVariablesChildren({
-        survey,
-        nodeDefContext,
-        nodeDefCurrent,
-        mode,
-        lang,
-        groupByParent,
-      })
-    }
-  } else {
-    // get variables from context node and its ancestors
-    variablesGroupedByParentEntity = ExpressionVariables.getVariables({
-      survey,
-      nodeDefContext,
-      nodeDefCurrent,
-      mode,
-      lang,
-      groupByParent,
-    })
-  }
+  const variablesGroupedByParentEntity = _extractVariables({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath })
 
   return {
     list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),
