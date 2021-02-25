@@ -203,6 +203,7 @@ const evaluatorsDefault = {
 }
 
 const globalObjects = {
+  Array,
   Date,
   Math,
   Number,

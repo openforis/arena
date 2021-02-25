@@ -1,6 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import * as Validation from '@core/validation/validation'
+import SystemError from '@core/systemError'
+
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
@@ -157,19 +160,44 @@ describe('RecordExpressionParser Test', () => {
       r: 10,
       n: 'cluster/plot[2]/tree[1]/dbh',
     },
+    // global objects (Array)
+    { q: 'Array.of(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: [1, 2, 3] },
+    // global objects (Date)
+    { q: `Date.parse('01 Jan 1970 00:00:00 GMT')`, r: 0 },
+    { q: 'Math.round(Date.now() / 1000)', r: Math.round(Date.now() / 1000) },
+    // global objects (Math)
+    { q: 'Math.PI', r: Math.PI },
+    { q: 'Math.min(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: 1 },
+    { q: 'Math.max(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: 3 },
+    // global objects (Number)
+    { q: 'Number.isFinite(plot[1].plot_id)', r: true },
+    { q: 'Number.isFinite(plot[1].plot_id / 0)', r: false },
+    // global objects (String)
+    { q: 'String.fromCharCode(65, 66, 67)', r: 'ABC' },
+    // global objects (unknown objects/functions)
+    { q: 'Invalid.func(1)', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
+    { q: 'Math.unknownFunc(1)', e: new SystemError('undefinedFunction') },
   ]
 
-  queries.forEach(({ q, r, n }) => {
+  queries.forEach(({ q, r, n, e }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
     it(testTitle, () => {
-      const resKeys = r ? Object.keys(r) : []
-      const node = n ? getNode(n) : nodeDefault
-      const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
-      if (resKeys.length === 0) {
-        const resExpected = r instanceof Function ? r() : r
-        expect(res).toEqual(resExpected)
-      } else {
-        resKeys.forEach((key) => expect(res[key]).toEqual(r[key]))
+      try {
+        const resKeys = r ? Object.keys(r) : []
+        const node = n ? getNode(n) : nodeDefault
+        const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
+        if (resKeys.length === 0) {
+          const resExpected = r instanceof Function ? r() : r
+          expect(res).toEqual(resExpected)
+        } else {
+          resKeys.forEach((key) => expect(res[key]).toEqual(r[key]))
+        }
+      } catch (error) {
+        if (e) {
+          expect(error).toEqual(e)
+        } else {
+          throw error
+        }
       }
     })
   })
