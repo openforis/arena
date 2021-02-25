@@ -8,10 +8,10 @@ import { enterCluster, enterPlot, enterTrees } from './_record'
 
 export default () =>
   describe('Record add', () => {
-    gotoRecords()
-
     describe.each(Array.from(Array(records.length).keys()))(`Add record %s`, (idx) => {
       const record = records[idx]
+
+      gotoRecords()
 
       test(`Create record`, async () => {
         await Promise.all([
@@ -19,8 +19,9 @@ export default () =>
           page.waitForNavigation(),
           page.click(getSelector(DataTestId.records.addBtn, 'button')),
         ])
-        const errorBadge = await page.$(getSelector(DataTestId.record.errorBadge))
-        await expect(await errorBadge.innerText()).toBe('Invalid record')
+        const errorBadge = await page.waitForSelector(getSelector(DataTestId.record.errorBadge))
+        const actual = await errorBadge.innerText()
+        await expect(actual).toBe('Invalid record')
       })
 
       enterCluster(record)
@@ -31,7 +32,10 @@ export default () =>
 
       enterTrees(record)
 
-      gotoRecords()
+      test('Wait for enter complete', async () => {
+        // TODO thread issue: https://github.com/openforis/arena/issues/1412
+        await page.waitForTimeout(2000)
+      })
     })
 
     gotoHome()

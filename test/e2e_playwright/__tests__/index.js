@@ -7,11 +7,12 @@ import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
 import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
 import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
+import surveyFormPreview from '../tests/surveyFormPreview'
+
+import recordAdd from '../tests/recordAdd'
 
 import surveyDelete from '../tests/surveyDelete'
 import nodeDefReorder from '../tests/nodeDefReorder'
-import surveyFormPreview from '../tests/surveyFormPreview'
-// import recordAdd from '../tests/recordAdd'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -25,7 +26,7 @@ describe('E2E Tests', () => {
   surveyCreate()
   surveyInfoEdit()
   /**
-   * Designer.
+   * Node def edit.
    */
   nodeDefAtomicEdit()
   nodeDefCodeAndCategoryEdit()
@@ -33,10 +34,10 @@ describe('E2E Tests', () => {
   nodeDefReorder()
   nodeDefExpressionsEdit()
   surveyFormPreview()
-  // /**
-  //  * Data.
-  //  */
-  // recordAdd()
+  /**
+   * Data edit.
+   */
+  recordAdd()
   /**
    * Survey delete.
    */

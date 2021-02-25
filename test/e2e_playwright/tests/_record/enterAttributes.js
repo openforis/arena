@@ -20,8 +20,8 @@ const enterCode = async (nodeDef, value, parentSelector) => {
     'button'
   )}`
   await page.click(toggleBtnSelector)
-  await page.waitForSelector('.autocomplete-list')
-  await page.click(`text="${value}"`)
+  const itemEl = await page.waitForSelector(`text="${value}"`)
+  await itemEl.click()
 }
 
 const enterCoordinate = async (nodeDef, value, parentSelector) => {

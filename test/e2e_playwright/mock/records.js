@@ -56,8 +56,8 @@ export const createRecord = (idx) => {
     },
     [cluster_boolean.name]: Boolean(Number(getRandomInRange(0, 1))),
     [cluster_coordinate.name]: {
-      x: getRandomInRange(-180, 180, 3),
-      y: getRandomInRange(-180, 180, 3),
+      x: getRandomInRange(-180, 180, 4),
+      y: getRandomInRange(-180, 180, 4),
       srs: '4326',
       srsLabel: 'GCS WGS 1984 (EPSG:4326)',
     },
@@ -67,8 +67,8 @@ export const createRecord = (idx) => {
     // plot
     [plot_id.name]: getRandomInRange(1, 10),
     [plot_text.name]: 'This is a plot text',
-    trees: Array.from(Array(Number(getRandomInRange(1, 5))).keys()).map((treeIdx) => _createTree(treeIdx)),
+    trees: Array.from(Array(Number(5)).keys()).map((treeIdx) => _createTree(treeIdx)),
   }
 }
 
-export const records = Array.from(Array(15).keys()).map((idx) => createRecord(idx))
+export const records = Array.from(Array(3).keys()).map((idx) => createRecord(idx))

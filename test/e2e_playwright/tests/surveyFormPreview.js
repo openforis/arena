@@ -90,11 +90,22 @@ export default () =>
       const tree2Selector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, 1))
 
       test(`Verify ${tree_id.name} duplicate`, async () => {
-        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`)
+        // TODO thread issue: https://github.com/openforis/arena/issues/1412
+        await page.waitForTimeout(1000)
+
+        const treeIdTree1El = await page.waitForSelector(
+          `${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
+        )
+        await treeIdTree1El.hover()
         await expect(page).toHaveText('Duplicate entity key')
         await page.mouse.move(0, 0, { steps: 1 })
-        await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`)
+
+        const treeIdTree2El = await page.waitForSelector(
+          `${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
+        )
+        await treeIdTree2El.hover()
         await expect(page).toHaveText('Duplicate entity key')
+        await page.mouse.move(0, 0, { steps: 1 })
       })
 
       test(`Verify ${tree_dec_1.name} validation`, async () => {
@@ -115,6 +126,11 @@ export default () =>
       //   await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
       //   await expect(page).toHaveText('tree_dec_2 > 0')
       // })
+
+      test('Wait for enter complete', async () => {
+        // TODO thread issue: https://github.com/openforis/arena/issues/1412
+        await page.waitForTimeout(2000)
+      })
     })
 
     gotoHome()
