@@ -42,7 +42,10 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   return reachableNodeDefs
 }
 
-export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed }) => (expr, ctx) => {
+export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed, evaluateToNode = false }) => (
+  expr,
+  ctx
+) => {
   const { node: nodeDefContext } = ctx
 
   const nodeName = R.prop('name')(expr)
@@ -72,5 +75,5 @@ export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed })
     throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: nodeName })
   }
 
-  return NodeDef.isEntity(def) || NodeDef.isMultiple(def) ? def : _getNodeValue(def)
+  return NodeDef.isEntity(def) || NodeDef.isMultiple(def) || evaluateToNode ? def : _getNodeValue(def)
 }

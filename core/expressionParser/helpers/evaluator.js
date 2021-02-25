@@ -203,15 +203,3 @@ export const evalExpression = (expr, ctx = {}) => {
 
   return fn(expr, ctx)
 }
-
-export const getExpressionIdentifiers = (expr) => {
-  const identifiers = []
-  const evaluators = {
-    [types.Identifier]: (exp) => {
-      identifiers.push(R.prop('name')(exp))
-    },
-  }
-
-  evalExpression(expr, { evaluators })
-  return R.uniq(identifiers)
-}

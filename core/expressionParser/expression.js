@@ -49,7 +49,6 @@ export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
 export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
 
 export const { isValid } = ExpressionUtils
-export const { getExpressionIdentifiers } = Evaluator
 
 // ====== Type checking
 
