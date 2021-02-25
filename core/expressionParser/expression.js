@@ -82,3 +82,5 @@ export const newBinary = (left, right, operator = '') => ({
   left,
   right,
 })
+
+export const globalIdentifierEval = Evaluator.globalIdentifierEval
