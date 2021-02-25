@@ -7,6 +7,9 @@ import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
 import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
 import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
+import surveyFormPreview from '../tests/surveyFormPreview'
+
+import recordAdd from '../tests/recordAdd'
 
 import surveyInviteUser from '../tests/surveyInviteUser'
 
@@ -25,13 +28,18 @@ describe('E2E Tests', () => {
   surveyCreate()
   surveyInfoEdit()
   /**
-   * Designer.
+   * Node def edit.
    */
   nodeDefAtomicEdit()
   nodeDefCodeAndCategoryEdit()
   nodeDefTaxonAndTaxonomyEdit()
   nodeDefReorder()
   nodeDefExpressionsEdit()
+  surveyFormPreview()
+  /**
+   * Data edit.
+   */
+  recordAdd()
   /**
    * Survey invite user.
    */

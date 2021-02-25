@@ -10,6 +10,7 @@ import { types } from './helpers/types'
 
 export { types } from './helpers/types'
 export { operators } from './helpers/operators'
+export { functionNames } from './helpers/functions'
 export { toSql } from './toSql'
 
 export const modes = {
@@ -48,7 +49,6 @@ export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
 export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
 
 export const { isValid } = ExpressionUtils
-export const { getExpressionIdentifiers } = Evaluator
 
 // ====== Type checking
 
@@ -82,3 +82,5 @@ export const newBinary = (left, right, operator = '') => ({
   left,
   right,
 })
+
+export const globalIdentifierEval = Evaluator.globalIdentifierEval

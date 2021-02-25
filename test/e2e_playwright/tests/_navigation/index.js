@@ -40,4 +40,6 @@ const _gotoSubModule = (module, subModule) => () =>
 
 export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
 
+export const gotoRecords = _gotoSubModule('data', 'records')
+
 export const gotoSurveyUsersList = _gotoSubModule('users', 'userList')

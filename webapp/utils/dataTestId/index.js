@@ -8,18 +8,17 @@ export const DataTestId = {
   categoryDetails: {
     addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',
-    // TODO remove category prefix below after removing taiko
     level: (idx) => `level-${idx}`,
     levelAddItemBtn: (idx) => `level-${idx}-add-item-btn`,
     levelDeleteBtn: (idx) => `level-${idx}-delete-btn`,
     levelErrorBadge: (idx) => `level-${idx}-error-badge`,
-    levelName: (idx) => `category-level-${idx}-name`,
+    levelName: (idx) => `level-${idx}-name`,
     item: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}`,
     itemCloseBtn: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-close-btn`,
     itemDeleteBtn: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-delete-btn`,
     itemErrorBadge: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-error-badge`,
-    itemCode: (levelIdx, itemIdx) => `category-level-${levelIdx}-item-${itemIdx}-code`,
-    itemLabel: (levelIdx, itemIdx) => _withLang(`category-level-${levelIdx}-item-${itemIdx}-label`),
+    itemCode: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-code`,
+    itemLabel: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-label`),
   },
   categorySelector: {
     category: 'category-selector-category',
@@ -79,6 +78,12 @@ export const DataTestId = {
   panelRight: {
     closeBtn: 'panel-right-close-btn',
   },
+  record: {
+    errorBadge: 'record-error-badge',
+  },
+  records: {
+    addBtn: 'record-add-btn',
+  },
   sidebar: {
     module: (module) => `sidebar-module-${module}`,
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,
@@ -93,11 +98,21 @@ export const DataTestId = {
   },
   surveyForm: {
     addSubPageBtn: 'add-sub-page-btn',
-    nodeDefAddChildBtn: (name) => `node-def-add-child-${name}-btn`,
-    nodeDefEditBtn: (name) => `node-def-edit-${name}-btn`,
-    nodeDefErrorBadge: (name) => `node-def-error-badge-${name}`,
-    pageLinkBtn: (nodeDefName) => `page-link-${nodeDefName}-btn`,
+    codeInputDropdown: (name) => `${name}-code`,
+    coordinateX: (name) => `${name}-x`,
+    coordinateY: (name) => `${name}-y`,
+    coordinateSRS: (name) => `${name}-srs`,
+    entityAddBtn: (name) => `${name}-add-btn`,
+    entityRowHeader: (name) => `${name}-row-header`,
+    entityRowData: (name, idx) => `${name}-row-${idx}`,
+    nodeDefAddChildBtn: (name) => `${name}-add-child-btn`,
+    nodeDefEditBtn: (name) => `${name}-edit-btn`,
+    nodeDefErrorBadge: (name) => `${name}-error-badge`,
+    pageLinkBtn: (name) => `${name}-page-link-btn`,
+    previewCloseBtn: 'preview-close-btn',
+    previewOpenBtn: 'preview-open-btn',
     surveyForm: 'survey-form',
+    taxonField: (name, field) => `${name}-${field}`,
   },
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',

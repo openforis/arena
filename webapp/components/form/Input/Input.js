@@ -59,6 +59,7 @@ export const Input = React.forwardRef((props, ref) => {
             inputRef.current = el
           },
           id,
+          'data-testid': id,
           onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
           onFocus,
           onBlur,

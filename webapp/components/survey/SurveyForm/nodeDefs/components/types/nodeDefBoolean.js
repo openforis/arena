@@ -24,6 +24,7 @@ const NodeDefBoolean = (props) => {
       <button
         type="button"
         className="btn btn-s btn-transparent flex-center"
+        data-value={value}
         aria-disabled={disabled || !canEditRecord || readOnly}
         onClick={() => updateNode(nodeDef, node, checked ? null : value)}
       >

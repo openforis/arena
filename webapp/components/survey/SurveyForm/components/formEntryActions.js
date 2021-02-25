@@ -7,10 +7,11 @@ import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import ErrorBadge from '@webapp/components/errorBadge'
-
-import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
+import ErrorBadge from '@webapp/components/errorBadge'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
@@ -27,8 +28,8 @@ const RecordEntryButtons = () => {
   const getStepLabel = (step) => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
   return (
-    <React.Fragment>
-      <ErrorBadge validation={{ valid }} labelKey="dataView.invalidRecord" />
+    <>
+      <ErrorBadge id={DataTestId.record.errorBadge} validation={{ valid }} labelKey="dataView.invalidRecord" />
 
       <div className="survey-form-header__record-actions-steps">
         {stepPrev && (
@@ -89,7 +90,7 @@ const RecordEntryButtons = () => {
         <span className="icon icon-bin icon-12px icon-left" />
         {i18n.t('common.delete')}
       </button>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -102,7 +103,12 @@ const FormEntryActions = (props) => {
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button className="btn-s btn-transparent" onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}>
+        <button
+          className="btn-s btn-transparent"
+          data-testid={DataTestId.surveyForm.previewCloseBtn}
+          onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
+          type="button"
+        >
           <span className="icon icon-eye-blocked icon-12px icon-left" />
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>

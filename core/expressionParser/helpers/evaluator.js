@@ -3,34 +3,8 @@ import * as R from 'ramda'
 import SystemError from '@core/systemError'
 
 import { types } from './types'
-import * as Functions from './functions'
-
-// Built-in functions that can be called, i.e. the standard library.
-// Nothing outside of this set may be used.
-//
-// NB: Namespace conflicts between functions and nodes/variables are allowed
-// I.e. there can be a field called "pow", even if pow(2,3) is a function invocation.
-//
-// stdlib: { [fn]: [Function, min_arity, max_arity? (-1 for infinite)] }
-const stdlib = {
-  isEmpty: [Functions.isEmpty, 1, 1],
-
-  pow: [Functions.pow, 2], // Arity 2
-
-  ln: [Math.log, 1],
-  log10: [Math.log10, 1],
-
-  // arity 1+ (arity 0 allowed by JS)
-  min: [Math.min, 1, -1],
-  max: [Math.max, 1, -1],
-  includes: [Functions.includes, 2, 2],
-
-  now: [Functions.now, 0, 0],
-
-  avg: [R.identity, 1, 1],
-  count: [R.identity, 1, 1],
-  sum: [R.identity, 1, 1],
-}
+import { functionImplementations } from './functionImplementations'
+import { functions } from './functions'
 
 const unaryOperators = {
   // Only accept bools and nulls as input.
@@ -143,9 +117,16 @@ const memberEval = (expr, ctx) => {
 const callEval = (expr, ctx) => {
   // Arguments is a reserved word in strict mode
   const { callee, arguments: exprArgs } = expr
+  const { functions: functionsCtx = {} } = ctx
 
-  const fnName = callee.name
-  const fnArity = exprArgs.length
+  if (callee.type === types.MemberExpression) {
+    // global function (e.g. Math.round(...))
+    const fn = evalExpression(callee, ctx)
+    if (fn) {
+      const args = exprArgs.map((arg) => evalExpression(arg, ctx))
+      return R.apply(fn, args)
+    }
+  }
 
   // No complex expressions may be put in place of a function body.
   // Only a plain identifier is allowed.
@@ -153,32 +134,38 @@ const callEval = (expr, ctx) => {
     throw new SystemError('invalidSyntax', { fnType: callee.type })
   }
 
+  const fnName = callee.name
+  const numArgs = exprArgs.length
+
   // The function must be found in the standard library.
-  if (!(fnName in stdlib)) {
+  const functionInfo = functions[fnName]
+  if (!functionInfo) {
     throw new SystemError('undefinedFunction', { fnName })
   }
 
-  const [fn, minArity, maxArity] = stdlib[fnName]
+  const { minArity, maxArity, evaluateArgsToNodes = false } = functionInfo
 
-  if (fnArity < minArity) {
+  if (numArgs < minArity) {
     throw new SystemError('functionHasTooFewArguments', {
       fnName,
       minArgs: minArity,
-      numArgs: fnArity,
+      numArgs,
     })
   }
 
   const maxArityIsDefined = maxArity !== undefined
   const maxArityIsInfinite = maxArity < 0
-  if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity) {
+  if (maxArityIsDefined && !maxArityIsInfinite && numArgs > maxArity) {
     throw new SystemError('functionHasTooManyArguments', {
       fnName,
       maxArgs: maxArity,
-      numArgs: fnArity,
+      numArgs,
     })
   }
 
-  const args = exprArgs.map((arg) => evalExpression(arg, ctx))
+  const args = exprArgs.map((arg) => evalExpression(arg, { ...ctx, evaluateToNode: evaluateArgsToNodes }))
+
+  const fn = functionsCtx[fnName] || functionImplementations[fnName]
 
   // Currently there are no side effects from function evaluation so it's
   // safe to call the function even when we're just parsing the expression
@@ -203,7 +190,7 @@ const groupEval = (expr, ctx) => {
   return evalExpression(argument, ctx)
 }
 
-const typeFns = {
+const evaluatorsDefault = {
   [types.Identifier]: identifierEval,
   [types.MemberExpression]: memberEval,
   [types.Literal]: literalEval,
@@ -215,10 +202,18 @@ const typeFns = {
   [types.GroupExpression]: groupEval,
 }
 
-export const evalExpression = (expr, ctx) => {
-  const functions = R.pipe(R.prop('functions'), R.mergeRight(typeFns))(ctx)
+const globalObjects = {
+  Array,
+  Date,
+  Math,
+  Number,
+  String,
+}
 
-  const fn = functions[expr.type]
+export const evalExpression = (expr, ctx = {}) => {
+  const evaluators = R.pipe(R.prop('evaluators'), R.mergeRight(evaluatorsDefault))(ctx)
+
+  const fn = evaluators[expr.type]
   if (!fn) {
     throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
   }
@@ -226,14 +221,16 @@ export const evalExpression = (expr, ctx) => {
   return fn(expr, ctx)
 }
 
-export const getExpressionIdentifiers = (expr) => {
-  const identifiers = []
-  const functions = {
-    [types.Identifier]: (exp) => {
-      identifiers.push(R.prop('name')(exp))
-    },
+export const globalIdentifierEval = ({ identifierName, exprContext }) => {
+  if (identifierName in globalObjects) {
+    return globalObjects[identifierName]
   }
-
-  evalExpression(expr, { functions })
-  return R.uniq(identifiers)
+  if (Object.values(globalObjects).includes(exprContext)) {
+    const result = exprContext[identifierName]
+    if (!result) {
+      throw new SystemError('undefinedFunction', { fnName: identifierName })
+    }
+    return result
+  }
+  return null
 }
