@@ -35,7 +35,7 @@ const DropdownUserGroup = (props) => {
 
   return (
     <Dropdown
-      idInput={DataTestId.userList.group}
+      idInput={DataTestId.userInvite.group}
       disabled={disabled}
       validation={validation}
       placeholder={i18n.t('common.group')}

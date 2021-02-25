@@ -1,14 +1,16 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { gotoSurveyUsersList } from './_navigation'
+import { gotoSurveyUsersList, gotoHome } from './_navigation'
 
-const expectUser = async ({ user }) => {
-  await expect(page).toHaveText(user)
+const expectUser = async ({ user, index }) => {
+  const emails = await page.$$(getSelector(DataTestId.userList.email, 'div'))
+  const value = await emails[index].innerText()
+  await expect(value).toBe(user)
 }
 
 const expectUsers = ({ users }) => {
   test(`Check users ${users.length}`, async () => {
     await page.reload()
-    await Promise.all(users.map(async (user) => expectUser({ user })))
+    await Promise.all(users.map(async (user, index) => expectUser({ user, index })))
   })
 }
 
@@ -16,13 +18,15 @@ const inviteUser = () => {
   test(`Invite user`, async () => {
     await page.click(getSelector(DataTestId.userList.inviteBtn, 'a'))
 
-    await page.fill(getSelector(DataTestId.userList.email, 'input'), 'testtwo@arena.com')
+    await page.fill(getSelector(DataTestId.userInvite.email, 'input'), 'testtwo@arena.com')
 
-    await page.click(getSelector(DataTestId.dropdown.toggleBtn(DataTestId.userList.group), 'button'))
+    await page.click(getSelector(DataTestId.dropdown.toggleBtn(DataTestId.userInvite.group), 'button'))
     await page.click(`text="Survey administrators"`)
 
-    await page.click(getSelector(DataTestId.userList.submitBtn, 'button'))
-    await page.waitForTimeout(2500)
+    await Promise.all([
+      page.waitForResponse('**/users/invite'),
+      page.click(getSelector(DataTestId.userInvite.submitBtn, 'button')),
+    ])
   })
 }
 
@@ -34,4 +38,6 @@ export default () =>
     inviteUser()
 
     expectUsers({ users: ['test@arena.com', 'testtwo@arena.com'] })
+
+    gotoHome()
   })

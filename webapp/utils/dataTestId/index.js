@@ -135,9 +135,15 @@ export const DataTestId = {
   },
   userList: {
     inviteBtn: 'invite-user-btn',
+    profilePicture: 'user_profile_img',
+    name: 'user_name',
+    email: 'user_email',
+    authGroup: 'user_authGroup',
+    edit: 'user_edit_btn',
+  },
+  userInvite: {
     email: 'invite-user-name',
     group: 'invite-user-group',
-    groupByName: (name) => `div[text="${name}"]`,
     submitBtn: 'Send invitation',
   },
 }
