@@ -10,6 +10,7 @@ const expectUser = async ({ user, index }) => {
 const expectUsers = ({ users }) => {
   test(`Check users ${users.length}`, async () => {
     await page.reload()
+    await page.waitForSelector(getSelector(DataTestId.userList.email, 'div'))
     await Promise.all(users.map(async (user, index) => expectUser({ user, index })))
   })
 }
