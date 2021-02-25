@@ -110,10 +110,17 @@ const _getReferencedNodes = ({ survey, record, node, nodeDefReferenced }) => {
   return []
 }
 
-export const identifierEval = (survey, record) => (expr, { node, evaluateToNode }) => {
-  const nodeNameReferenced = Expression.getName(expr)
+export const identifierEval = (survey, record) => (expr, { node: exprContext, evaluateToNode }) => {
+  const exprName = Expression.getName(expr)
+
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, exprContext })
+  if (globalIdentifierEvalResult !== null) {
+    return globalIdentifierEvalResult
+  }
+
+  const node = exprContext
   const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  const nodeDefReferenced = Survey.getNodeDefByName(nodeNameReferenced)(survey)
+  const nodeDefReferenced = Survey.getNodeDefByName(exprName)(survey)
 
   let nodeResult = null
   if (NodeDef.isEqual(nodeDefCtx)(nodeDefReferenced)) {
@@ -133,7 +140,7 @@ export const identifierEval = (survey, record) => (expr, { node, evaluateToNode 
 
   const single = NodeDef.isSingle(nodeDefReferenced)
   if (single && (referencedNodes.length === 0 || referencedNodes.length > 1)) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeNameReferenced })
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
   }
 
   if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode) {

@@ -2,52 +2,42 @@ import * as R from 'ramda'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
-
-const isContextParentByDependencyType = {
-  [Survey.dependencyTypes.defaultValues]: false,
-  [Survey.dependencyTypes.applicable]: true,
-  [Survey.dependencyTypes.validations]: false,
-  [Survey.dependencyTypes.formula]: false,
-}
+import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
 
 const expressionsByDependencyTypeFns = {
-  [Survey.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
-  [Survey.dependencyTypes.applicable]: NodeDef.getApplicable,
-  [Survey.dependencyTypes.validations]: R.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
-  [Survey.dependencyTypes.formula]: NodeDef.getFormula,
-}
-
-const selfReferenceAllowedByDependencyType = {
-  [Survey.dependencyTypes.defaultValues]: false,
-  [Survey.dependencyTypes.applicable]: false,
-  [Survey.dependencyTypes.validations]: true,
-  [Survey.dependencyTypes.formula]: false,
+  [SurveyDependencyTypes.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
+  [SurveyDependencyTypes.dependencyTypes.applicable]: NodeDef.getApplicable,
+  [SurveyDependencyTypes.dependencyTypes.validations]: R.pipe(
+    NodeDef.getValidations,
+    NodeDefValidations.getExpressions
+  ),
+  [SurveyDependencyTypes.dependencyTypes.formula]: NodeDef.getFormula,
 }
 
 const applyIfUniquenessByDependencyType = {
-  [Survey.dependencyTypes.defaultValues]: true,
-  [Survey.dependencyTypes.applicable]: false,
-  [Survey.dependencyTypes.validations]: false,
-  [Survey.dependencyTypes.formula]: false,
+  [SurveyDependencyTypes.dependencyTypes.defaultValues]: true,
+  [SurveyDependencyTypes.dependencyTypes.applicable]: false,
+  [SurveyDependencyTypes.dependencyTypes.validations]: false,
+  [SurveyDependencyTypes.dependencyTypes.formula]: false,
 }
 
 const errorKeyByDependencyType = {
-  [Survey.dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
-  [Survey.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
-  [Survey.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
-  [Survey.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
+  [SurveyDependencyTypes.dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
+  [SurveyDependencyTypes.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
+  [SurveyDependencyTypes.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
+  [SurveyDependencyTypes.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
 }
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
   const exprString = R.pathOr(null, propName.split('.'), item)
-  const isContextParent = isContextParentByDependencyType[dependencyType]
-  const selfReferenceAllowed = selfReferenceAllowedByDependencyType[dependencyType]
+  const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
+  const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
+
   return exprString
     ? NodeDefExpressionValidator.validate({
         survey,
