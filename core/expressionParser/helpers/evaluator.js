@@ -119,14 +119,23 @@ const callEval = (expr, ctx) => {
   const { callee, arguments: exprArgs } = expr
   const { functions: functionsCtx = {} } = ctx
 
-  const fnName = callee.name
-  const numArgs = exprArgs.length
+  if (callee.type === types.MemberExpression) {
+    // global function (e.g. Math.round(...))
+    const fn = evalExpression(callee, ctx)
+    if (fn) {
+      const args = exprArgs.map((arg) => evalExpression(arg, ctx))
+      return R.apply(fn, args)
+    }
+  }
 
   // No complex expressions may be put in place of a function body.
   // Only a plain identifier is allowed.
   if (callee.type !== types.Identifier) {
     throw new SystemError('invalidSyntax', { fnType: callee.type })
   }
+
+  const fnName = callee.name
+  const numArgs = exprArgs.length
 
   // The function must be found in the standard library.
   const functionInfo = functions[fnName]
@@ -193,6 +202,14 @@ const evaluatorsDefault = {
   [types.GroupExpression]: groupEval,
 }
 
+const globalObjects = {
+  Array,
+  Date,
+  Math,
+  Number,
+  String,
+}
+
 export const evalExpression = (expr, ctx = {}) => {
   const evaluators = R.pipe(R.prop('evaluators'), R.mergeRight(evaluatorsDefault))(ctx)
 
@@ -202,4 +219,18 @@ export const evalExpression = (expr, ctx = {}) => {
   }
 
   return fn(expr, ctx)
+}
+
+export const globalIdentifierEval = ({ identifierName, exprContext }) => {
+  if (identifierName in globalObjects) {
+    return globalObjects[identifierName]
+  }
+  if (Object.values(globalObjects).includes(exprContext)) {
+    const result = exprContext[identifierName]
+    if (!result) {
+      throw new SystemError('undefinedFunction', { fnName: identifierName })
+    }
+    return result
+  }
+  return null
 }

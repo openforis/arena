@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -46,33 +44,36 @@ export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed, e
   expr,
   ctx
 ) => {
-  const { node: nodeDefContext } = ctx
+  const { node: exprContext } = ctx
 
-  const nodeName = R.prop('name')(expr)
+  const exprName = Expression.getName(expr)
 
-  const reachableNodeDefs = _getReachableNodeDefs(survey, nodeDefContext)
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, exprContext })
+  if (globalIdentifierEvalResult !== null) {
+    return globalIdentifierEvalResult
+  }
 
-  const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === nodeName)
+  const reachableNodeDefs = _getReachableNodeDefs(survey, exprContext)
+
+  const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === exprName)
 
   if (!def) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, {
-      name: nodeName,
-    })
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
   }
 
   if (!selfReferenceAllowed && NodeDef.isEqual(def)(nodeDefCurrent)) {
-    throw new SystemError(Validation.messageKeys.expressions.cannotUseCurrentNode, { name: nodeName })
+    throw new SystemError(Validation.messageKeys.expressions.cannotUseCurrentNode, { name: exprName })
   }
 
   if (!Expression.isValidExpressionType(def)) {
     throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, {
-      name: nodeName,
+      name: exprName,
       type: NodeDef.getType(def),
     })
   }
 
   if (Survey.isNodeDefDependentOn(NodeDef.getUuid(def), NodeDef.getUuid(nodeDefCurrent))(survey)) {
-    throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: nodeName })
+    throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: exprName })
   }
 
   return NodeDef.isEntity(def) || NodeDef.isMultiple(def) || evaluateToNode ? def : _getNodeValue(def)
