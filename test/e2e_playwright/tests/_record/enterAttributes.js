@@ -45,7 +45,7 @@ const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSel
 
 const enterTime = async (nodeDef, value, parentSelector) => enterText(nodeDef, formatTime(value), parentSelector)
 
-const enterValueFns = {
+const enterFns = {
   boolean: enterBoolean,
   code: enterCode,
   coordinate: enterCoordinate,
@@ -56,7 +56,7 @@ const enterValueFns = {
   time: enterTime,
 }
 
-export const enterNodeValue = (nodeDef, value, parentSelector = '') =>
+export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    await enterValueFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+    await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
   })

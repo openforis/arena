@@ -28,8 +28,8 @@ const RecordEntryButtons = () => {
   const getStepLabel = (step) => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
   return (
-    <React.Fragment>
-      <ErrorBadge validation={{ valid }} labelKey="dataView.invalidRecord" />
+    <>
+      <ErrorBadge id={DataTestId.record.errorBadge} validation={{ valid }} labelKey="dataView.invalidRecord" />
 
       <div className="survey-form-header__record-actions-steps">
         {stepPrev && (
@@ -90,7 +90,7 @@ const RecordEntryButtons = () => {
         <span className="icon icon-bin icon-12px icon-left" />
         {i18n.t('common.delete')}
       </button>
-    </React.Fragment>
+    </>
   )
 }
 

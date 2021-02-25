@@ -53,7 +53,7 @@ const verifyText = async (nodeDef, value, parentSelector) => {
 
 const verifyTime = async (nodeDef, value, parentSelector) => verifyText(nodeDef, formatTime(value), parentSelector)
 
-const verifyValueFns = {
+const verifyFns = {
   boolean: verifyBoolean,
   code: verifyText,
   coordinate: verifyCoordinate,
@@ -65,7 +65,7 @@ const verifyValueFns = {
   time: verifyTime,
 }
 
-export const verifyNodeValue = (nodeDef, value, parentSelector = '') =>
+export const verifyAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Verify ${nodeDef.name} value`, async () => {
-    await verifyValueFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+    await verifyFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
   })

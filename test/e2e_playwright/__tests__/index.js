@@ -11,6 +11,7 @@ import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 import surveyDelete from '../tests/surveyDelete'
 import nodeDefReorder from '../tests/nodeDefReorder'
 import surveyFormPreview from '../tests/surveyFormPreview'
+// import recordAdd from '../tests/recordAdd'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -32,6 +33,10 @@ describe('E2E Tests', () => {
   nodeDefReorder()
   nodeDefExpressionsEdit()
   surveyFormPreview()
+  // /**
+  //  * Data.
+  //  */
+  // recordAdd()
   /**
    * Survey delete.
    */

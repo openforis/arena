@@ -3,7 +3,7 @@ const headless = process.env.PWDEBUG !== '1'
 module.exports = {
   // browsers: ['chromium', 'firefox', 'webkit'],
   browsers: ['chromium'],
-  exitOnPageError: false, // GitHub currently throws errors
+  exitOnPageError: true,
   launchOptions: {
     headless,
     slowMo: headless ? null : 500,
