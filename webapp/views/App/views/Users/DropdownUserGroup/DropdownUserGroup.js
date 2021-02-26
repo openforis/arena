@@ -6,6 +6,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
+import { DataTestId } from '@webapp/utils/dataTestId'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -34,6 +35,7 @@ const DropdownUserGroup = (props) => {
 
   return (
     <Dropdown
+      idInput={DataTestId.userInvite.group}
       disabled={disabled}
       validation={validation}
       placeholder={i18n.t('common.group')}

@@ -10,7 +10,7 @@ import { click, expectExists, intercept, toLeftOf } from '../api'
 axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const fetchAndSaveSurvey = async ({
-  request = { request: { request: { url: 'http://localhost:9000/api/survey/1/export' } } },
+  request = { request: { request: { url: 'http://localhost:9090/api/survey/1/export' } } },
   zipFilePath,
 }) => {
   const responseAuth = await axios.post(`${request.request.url.split('api')[0]}auth/login`, {

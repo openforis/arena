@@ -13,6 +13,8 @@ import surveyFormPreview from '../tests/surveyFormPreview'
 import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
 
+import surveyInviteUser from '../tests/surveyInviteUser'
+
 import surveyDelete from '../tests/surveyDelete'
 
 beforeAll(async () => {
@@ -42,6 +44,11 @@ describe('E2E Tests', () => {
   // TODO: Fix tree order and uncomment recordVerify https://github.com/openforis/arena/issues/1413
   // recordVerify()
   /**
+   * Survey invite user.
+   */
+  surveyInviteUser()
+  /**
+   * Survey delete.
    * Delete.
    */
   surveyDelete()
