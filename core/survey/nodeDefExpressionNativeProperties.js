@@ -12,20 +12,26 @@ const jsTypeByNodeDefType = {
   [NodeDef.nodeDefType.text]: String,
 }
 
-export const hasNativeProperty = ({ nodeDef, propertyName }) => {
-  if (propertyName === nativeProperties.length && NodeDef.isMultiple(nodeDef)) {
+const _hasProperty = ({ jsType, propName }) => Object.prototype.hasOwnProperty.call(jsType, propName)
+const _hasFunction = ({ jsType, funcName }) => Boolean(jsType.prototype[funcName])
+
+export const hasNativeProperty = ({ nodeDef, propName }) => {
+  if (propName === nativeProperties.length && NodeDef.isMultiple(nodeDef)) {
     return true
   }
   const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
-  return jsType && (Object.prototype.hasOwnProperty.call(jsType, propertyName) || jsType.prototype[propertyName])
+  return jsType && (_hasProperty({ jsType, propName }) || _hasFunction({ jsType, funcName: propName }))
 }
 
-export const evalNodeDefProperty = ({ nodeDef, propertyName }) => {
-  if (propertyName === nativeProperties.length) {
+export const evalNodeDefProperty = ({ nodeDef, propName }) => {
+  if (propName === nativeProperties.length) {
     return 0
   }
   const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
-  return Object.prototype.hasOwnProperty.call(jsType, propertyName)
-    ? jsType[propertyName]
-    : jsType.prototype[propertyName].bind({})
+  if (_hasProperty({ jsType, propName })) {
+    return jsType[propName]
+  } else {
+    // return function with name "propertyName" and bind it to an empty object
+    return jsType.prototype[propName].bind({})
+  }
 }

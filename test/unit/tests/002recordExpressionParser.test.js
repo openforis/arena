@@ -27,6 +27,7 @@ describe('RecordExpressionParser Test', () => {
         SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
         SB.attribute('cluster_distance', NodeDef.nodeDefType.integer).key(),
         SB.attribute('visit_date', NodeDef.nodeDefType.date),
+        SB.attribute('gps_model', NodeDef.nodeDefType.text),
         SB.attribute('remarks', NodeDef.nodeDefType.text),
         SB.entity(
           'plot',
@@ -50,6 +51,7 @@ describe('RecordExpressionParser Test', () => {
         RB.attribute('cluster_id', 12),
         RB.attribute('cluster_distance', 18),
         RB.attribute('visit_date', '2021-01-01'),
+        RB.attribute('gps_model', 'ABC-123-xyz'),
         RB.attribute('remarks', ''),
         RB.entity(
           'plot',
@@ -57,7 +59,7 @@ describe('RecordExpressionParser Test', () => {
           RB.attribute('plot_multiple_number', 10),
           RB.attribute('plot_multiple_number', 20),
           RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 10), RB.attribute('dbh', 7)),
-          RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 11), RB.attribute('dbh', 10))
+          RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 11), RB.attribute('dbh', 10.123))
         ),
         RB.entity(
           'plot',
@@ -111,6 +113,8 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_date <= now()', r: true },
     // cluster_id is not empty
     { q: 'isEmpty(cluster_id)', r: false },
+    // gps_model is not empty
+    { q: 'isEmpty(gps_model)', r: false },
     // remarks is empty
     { q: 'isEmpty(remarks)', r: true },
     // plot count is 3
@@ -157,7 +161,7 @@ describe('RecordExpressionParser Test', () => {
     // access dbh of a tree inside sibling plot
     {
       q: 'parent(parent(parent(dbh))).plot[index(parent(parent(dbh))) - 2].tree[1].dbh',
-      r: 10,
+      r: 10.123,
       n: 'cluster/plot[2]/tree[1]/dbh',
     },
     // global objects (Array)
@@ -177,13 +181,20 @@ describe('RecordExpressionParser Test', () => {
     // global objects (unknown objects/functions)
     { q: 'Invalid.func(1)', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
     { q: 'Math.unknownFunc(1)', e: new SystemError('undefinedFunction') },
+    // native properties (number)
+    { q: 'Math.PI.toFixed(2)', r: '3.14' },
+    { q: 'plot[0].tree[1].dbh.toFixed(1)', r: '10.1' },
+    { q: 'plot[0].tree[1].dbh.toPrecision(4)', r: '10.12' },
+    // native properties (string)
+    { q: 'gps_model.toLowerCase()', r: 'abc-123-xyz' },
+    { q: 'gps_model.substring(4,7)', r: '123' },
   ]
 
   queries.forEach(({ q, r, n, e }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
     it(testTitle, () => {
       try {
-        const resKeys = r ? Object.keys(r) : []
+        const resKeys = r && typeof r == 'object' ? Object.keys(r) : []
         const node = n ? getNode(n) : nodeDefault
         const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
         if (resKeys.length === 0) {
