@@ -11,7 +11,6 @@ import * as Record from '@core/record/record'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
 import { useOnUpdate, useQuery } from '@webapp/components/hooks'
@@ -56,11 +55,6 @@ export const useLocalState = () => {
 
     if (loadedRef.current) {
       dispatch(RecordActions.checkOutRecord(recordUuid))
-    }
-
-    // Reset form
-    if (!preview) {
-      dispatch(SurveyFormActions.resetForm())
     }
 
     // Remove beforeunload event listener

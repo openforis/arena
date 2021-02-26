@@ -16,7 +16,7 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
 import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
 
 import FormHeader from './FormHeader'
@@ -79,7 +79,11 @@ const SurveyForm = (props) => {
 
   useHistoryListen((location) => {
     // user enters in records the form is reset
-    if (matchPath(location.pathname, { path: appModuleUri(dataModules.records) })) {
+    if (
+      matchPath(location.pathname, {
+        path: appModuleUri(canEditDef ? dataModules.records : designerModules.formDesigner),
+      })
+    ) {
       dispatch(SurveyFormActions.resetForm())
     }
   }, [])
