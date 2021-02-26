@@ -164,7 +164,7 @@ describe('RecordExpressionParser Test', () => {
     { q: 'Array.of(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: [1, 2, 3] },
     // global objects (Date)
     { q: `Date.parse('01 Jan 1970 00:00:00 GMT')`, r: 0 },
-    { q: 'Math.round(Date.now() / 1000)', r: Math.round(Date.now() / 1000) },
+    { q: 'Math.round(Date.now() / 1000)', r: () => Math.round(Date.now() / 1000) },
     // global objects (Math)
     { q: 'Math.PI', r: Math.PI },
     { q: 'Math.min(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: 1 },
