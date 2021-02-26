@@ -2,7 +2,16 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormPage } from './_formDesigner'
 import { gotoFormDesigner, gotoHome } from './_navigation'
-import { enterCluster, enterPlot, enterTrees, verifyAttribute, verifyCluster, verifyPlot, verifyTrees } from './_record'
+import {
+  enterCluster,
+  enterPlot,
+  enterTrees,
+  formatTime,
+  verifyAttribute,
+  verifyCluster,
+  verifyPlot,
+  verifyTrees,
+} from './_record'
 import { recordPreview } from '../mock/recordPreview'
 
 /* eslint-disable camelcase */
@@ -45,7 +54,12 @@ export default () =>
       verifyAttribute(cluster_region, '')
       verifyAttribute(cluster_province, '')
       verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '', srsLabel: '' })
-      verifyAttribute(cluster_time, () => startTime)
+      verifyAttribute(cluster_time, () => {
+        // it is possible the default value was set one minute after the startTime was initialized in the test
+        const date = new Date(startTime)
+        date.setMinutes(date.getMinutes() + 1)
+        return `(${formatTime(startTime)})|(${formatTime(date)})`
+      })
       verifyAttribute(cluster_date, () => startTime)
 
       gotoFormPage(plot)
