@@ -15,9 +15,8 @@ export const memberEval = (expr, ctx) => {
   }
   if (Expression.isIdentifier(property)) {
     const propertyName = Expression.getName(property)
-    if (NodeNativeProperties.isNativePropertyAllowed({ nodeDef: objectEval, propertyName })) {
-      // simulate node property getter
-      return {}
+    if (NodeNativeProperties.hasNativeProperty({ nodeDef: objectEval, propertyName })) {
+      return NodeNativeProperties.evalNodeDefProperty({ nodeDef: objectEval, propertyName })
     }
   }
   // eval property and return it (e.g. plot.plot_id)

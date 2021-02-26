@@ -1,29 +1,31 @@
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Validation from '@core/validation/validation'
-import SystemError from '@core/systemError'
 
 const nativeProperties = {
   length: 'length',
 }
 
-const nativePropertiesEvaluators = {
-  length: ({ node }) => {
-    if (Array.isArray(node)) {
-      return node.length
-    }
-    throw new SystemError(Validation.messageKeys.expressions.cannotGetLengthOfSingleNodes)
-  },
+const jsTypeByNodeDefType = {
+  [NodeDef.nodeDefType.code]: String,
+  [NodeDef.nodeDefType.date]: String,
+  [NodeDef.nodeDefType.decimal]: Number,
+  [NodeDef.nodeDefType.integer]: Number,
+  [NodeDef.nodeDefType.text]: String,
 }
 
-export const isNativePropertyAllowed = ({ nodeDef, propertyName }) =>
-  propertyName === nativeProperties.length && NodeDef.isMultiple(nodeDef)
-
-export const isNativeProperty = (propName) => Object.values(nativeProperties).includes(propName)
-
-export const evalProperty = ({ node, propertyName }) => {
-  const evaluator = nativePropertiesEvaluators[propertyName]
-  if (!evaluator) {
-    throw new SystemError(`Node property not supported: ${propertyName}`)
+export const hasNativeProperty = ({ nodeDef, propertyName }) => {
+  if (propertyName === nativeProperties.length && NodeDef.isMultiple(nodeDef)) {
+    return true
   }
-  return evaluator({ node })
+  const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
+  return jsType && (Object.prototype.hasOwnProperty.call(jsType, propertyName) || jsType.prototype[propertyName])
+}
+
+export const evalNodeDefProperty = ({ nodeDef, propertyName }) => {
+  if (propertyName === nativeProperties.length) {
+    return 0
+  }
+  const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
+  return Object.prototype.hasOwnProperty.call(jsType, propertyName)
+    ? jsType[propertyName]
+    : jsType.prototype[propertyName].bind({})
 }
