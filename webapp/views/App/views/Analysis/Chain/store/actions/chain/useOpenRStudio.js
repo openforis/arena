@@ -46,9 +46,14 @@ const _getRStudioUrl = async ({ userUuid }) => {
   The address of this tunnel should be set into the env vars. In production the serverURL comes from the server.
  */
 const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl }) =>
-  `url <- '${
+  `
+  url <- '${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}';download.file(url,"./${token}.zip");unzip("./${token}.zip",exdir=".");file.remove("./${token}.zip")`
+  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}';\n
+  download.file(url,"./${token}.zip");\n
+  unzip("./${token}.zip",exdir=".");\n
+  file.remove("./${token}.zip");\n
+  `
 
 const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
