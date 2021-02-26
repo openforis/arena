@@ -57,7 +57,8 @@ export default () =>
     })
 
     test('Page reload', async () => {
-      await Promise.all([page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)), page.reload()])
+      await page.reload()
+      await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
     })
 
     verityEntityOrder(

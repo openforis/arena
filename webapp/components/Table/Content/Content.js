@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const Content = (props) => {
   const {
@@ -37,7 +38,7 @@ const Content = (props) => {
       <div className="table__row-header" style={{ gridTemplateColumns }}>
         {React.createElement(rowHeaderComponent, { props, ...rowProps })}
       </div>
-      <div className="table__rows" ref={tableRef}>
+      <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
         {list.map((row, i) => {
           const active = isRowActive && isRowActive(row)
           let className = 'table__row'

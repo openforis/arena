@@ -36,7 +36,7 @@ export const verifyPlot = (record) =>
 export const verifyTrees = (record) => {
   const { trees } = record
 
-  describe.each(Array.from(Array(trees.length).keys()))(`Add tree %s`, (treeIdx) => {
+  describe.each(Array.from(Array(trees.length).keys()))(`Verify tree %s`, (treeIdx) => {
     const treeEntry = trees[treeIdx]
     const treeSelector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, treeIdx))
 

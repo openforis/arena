@@ -32,7 +32,7 @@ export default () =>
 
       enterTrees(record)
 
-      test('Wait for enter complete', async () => {
+      test('Wait thread to complete', async () => {
         // TODO thread issue: https://github.com/openforis/arena/issues/1412
         await page.waitForTimeout(2000)
       })

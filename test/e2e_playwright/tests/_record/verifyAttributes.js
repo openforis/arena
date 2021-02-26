@@ -51,7 +51,14 @@ const verifyText = async (nodeDef, value, parentSelector) => {
   await expect(await text.getAttribute('value')).toBe(value)
 }
 
-const verifyTime = async (nodeDef, value, parentSelector) => verifyText(nodeDef, formatTime(value), parentSelector)
+const verifyTime = async (nodeDef, value, parentSelector) => {
+  if (typeof value === 'string') {
+    const text = await page.$(getTextSelector(nodeDef, parentSelector))
+    await expect(await text.getAttribute('value')).toMatch(new RegExp(value))
+  } else {
+    await verifyText(nodeDef, formatTime(value), parentSelector)
+  }
+}
 
 const verifyFns = {
   boolean: verifyBoolean,

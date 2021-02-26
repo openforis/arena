@@ -41,29 +41,27 @@ const _createTree = (idx) => {
 }
 
 export const createRecord = (idx) => {
-  const region = `0${getRandomInRange(0, 1)}`
-  const province = `${region}${getRandomInRange(0, 2)}`
+  const clusterRegion = `0${getRandomInRange(0, 1)}`
+  const clusterProvince = `${clusterRegion}${getRandomInRange(0, 2)}`
+  const clusterTime = new Date()
+  clusterTime.setHours(getRandomInRange(0, 23))
+  clusterTime.setMinutes(getRandomInRange(0, 59))
 
   return {
     // cluster
     [cluster_id.name]: String(idx + 1),
     [cluster_decimal.name]: getRandomInRange(0, 12000, 4),
-    [cluster_time.name]: () => {
-      const date = new Date()
-      date.setHours(getRandomInRange(0, 23))
-      date.setMinutes(getRandomInRange(0, 59))
-      return date
-    },
+    [cluster_time.name]: clusterTime,
     [cluster_boolean.name]: Boolean(Number(getRandomInRange(0, 1))),
     [cluster_coordinate.name]: {
-      x: getRandomInRange(-180, 180, 4),
-      y: getRandomInRange(-180, 180, 4),
+      x: getRandomInRange(-90, 90, 4),
+      y: getRandomInRange(-90, 90, 4),
       srs: '4326',
       srsLabel: 'GCS WGS 1984 (EPSG:4326)',
     },
     [cluster_country.name]: '(0) country 0',
-    [cluster_region.name]: `(${region}) region ${region}`,
-    [cluster_province.name]: `(${province}) province ${province}`,
+    [cluster_region.name]: `(${clusterRegion}) region ${clusterRegion}`,
+    [cluster_province.name]: `(${clusterProvince}) province ${clusterProvince}`,
     // plot
     [plot_id.name]: getRandomInRange(1, 10),
     [plot_text.name]: 'This is a plot text',
@@ -71,4 +69,11 @@ export const createRecord = (idx) => {
   }
 }
 
-export const records = Array.from(Array(3).keys()).map((idx) => createRecord(idx))
+let _records = null
+const _getRecords = () => {
+  if (_records) return _records
+  _records = Array.from(Array(3).keys()).map((idx) => createRecord(idx))
+  return _records
+}
+
+export const records = _getRecords()
