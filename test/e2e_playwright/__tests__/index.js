@@ -6,13 +6,14 @@ import surveyInfoEdit from '../tests/surveyInfoEdit'
 import nodeDefAtomicEdit from '../tests/nodeDefAtomicEdit'
 import nodeDefCodeAndCategoryEdit from '../tests/nodeDefCodeAndCategoryEdit'
 import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
+import nodeDefReorder from '../tests/nodeDefReorder'
 import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 import surveyFormPreview from '../tests/surveyFormPreview'
 
 import recordAdd from '../tests/recordAdd'
+// import recordVerify from '../tests/recordVerify'
 
 import surveyDelete from '../tests/surveyDelete'
-import nodeDefReorder from '../tests/nodeDefReorder'
 
 beforeAll(async () => {
   await page.goto('http://localhost:9090')
@@ -38,8 +39,10 @@ describe('E2E Tests', () => {
    * Data edit.
    */
   recordAdd()
+  // TODO: Fix tree order and uncomment recordVerify https://github.com/openforis/arena/issues/1413
+  // recordVerify()
   /**
-   * Survey delete.
+   * Delete.
    */
   surveyDelete()
 })

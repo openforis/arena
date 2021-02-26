@@ -83,6 +83,8 @@ export const DataTestId = {
   },
   records: {
     addBtn: 'record-add-btn',
+    cellNodeDef: (name) => `${name}-cell`,
+    records: 'records',
   },
   sidebar: {
     module: (module) => `sidebar-module-${module}`,
@@ -123,6 +125,9 @@ export const DataTestId = {
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
+  },
+  table: {
+    rows: (module) => `${module}-rows`,
   },
   tabBar: {
     tabBarBtn: (id) => `${id}-btn`,

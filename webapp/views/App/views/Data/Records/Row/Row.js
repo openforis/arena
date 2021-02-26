@@ -3,18 +3,18 @@ import PropTypes from 'prop-types'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/store/system'
-
-import ErrorBadge from '@webapp/components/errorBadge'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
+import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo, useNodeDefRootKeys } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
+import ErrorBadge from '@webapp/components/errorBadge'
 
 const Row = (props) => {
   const { row: record, rowNo } = props
@@ -31,9 +31,16 @@ const Row = (props) => {
         <ErrorBadge validation={Validation.getValidation(record)} showLabel={false} className="error-badge-inverse" />
         {rowNo}
       </div>
-      {nodeDefKeys.map((nodeDef) => (
-        <div key={NodeDef.getUuid(nodeDef)}>{record[camelize(NodeDef.getName(nodeDef))]}</div>
-      ))}
+      {nodeDefKeys.map((nodeDef) => {
+        const name = NodeDef.getName(nodeDef)
+        const uuid = NodeDef.getUuid(nodeDef)
+        const value = record[camelize(name)]
+        return (
+          <div key={uuid} data-testid={DataTestId.records.cellNodeDef(name)} data-value={value}>
+            {value}
+          </div>
+        )
+      })}
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateModified(record))}</div>
       <div>{Record.getOwnerName(record)}</div>
