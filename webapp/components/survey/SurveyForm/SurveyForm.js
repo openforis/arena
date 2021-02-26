@@ -77,6 +77,19 @@ const SurveyForm = (props) => {
     }
   }, [])
 
+  useEffect(() => {
+    // OnUnmount Record resetForm
+    return () => {
+      if (
+        !matchPath(window.location.pathname, {
+          path: appModuleUri(designerModules.formDesigner),
+        })
+      ) {
+        dispatch(SurveyFormActions.resetForm())
+      }
+    }
+  }, [])
+
   useHistoryListen((location) => {
     // user enters in records the form is reset
     if (
