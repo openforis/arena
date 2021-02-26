@@ -14,6 +14,7 @@ export const functionImplementations = {
   [functionNames.min]: Math.min,
   [functionNames.max]: Math.max,
   [functionNames.now]: () => DateUtils.nowFormatDefault(),
+  [functionNames.parent]: () => null,
   [functionNames.pow]: (base, exponent) => base ** exponent,
   [functionNames.sum]: A.identity,
 }

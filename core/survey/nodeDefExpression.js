@@ -7,8 +7,6 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
-import * as Expression from '@core/expressionParser/expression'
-
 export const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
@@ -54,22 +52,6 @@ const assocProp = (propName, value) => R.pipe(R.assoc(propName, value), R.dissoc
 // ====== UTILS
 
 export const { isEqual } = ObjectUtils
-
-const extractNodeDefNames = (jsExpr = '') =>
-  StringUtils.isBlank(jsExpr) ? [] : Expression.getExpressionIdentifiers(Expression.fromString(jsExpr))
-
-export const findReferencedNodeDefs = (nodeDefExpressions) =>
-  R.pipe(
-    R.reduce(
-      (acc, nodeDefExpr) =>
-        R.pipe(
-          R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
-          R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr)))
-        )(acc),
-      []
-    ),
-    R.uniq
-  )(nodeDefExpressions)
 
 // UPDATE
 export const assocExpression = (expression) => assocProp(keys.expression, expression)
