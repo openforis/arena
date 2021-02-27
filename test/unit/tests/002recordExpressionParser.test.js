@@ -1,18 +1,14 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
-import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import * as RecordUtils from '../../utils/recordUtils'
-import * as SB from '../../utils/surveyBuilder'
-import * as RB from '../../utils/recordBuilder'
+import * as DataTest from '../../utils/dataTest'
+import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
+
 import { getContextUser } from '../../integration/config/context'
 
 let survey = {}
 let record = {}
-
-let nodeDefault = {}
 
 const getNode = (path) => RecordUtils.findNodeByPath(path)(survey, record)
 
@@ -20,68 +16,9 @@ describe('RecordExpressionParser Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
-    survey = SB.survey(
-      user,
-      SB.entity(
-        'cluster',
-        SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
-        SB.attribute('cluster_distance', NodeDef.nodeDefType.integer).key(),
-        SB.attribute('visit_date', NodeDef.nodeDefType.date),
-        SB.attribute('gps_model', NodeDef.nodeDefType.text),
-        SB.attribute('remarks', NodeDef.nodeDefType.text),
-        SB.entity(
-          'plot',
-          SB.attribute('plot_id', NodeDef.nodeDefType.integer).key(),
-          SB.attribute('plot_multiple_number', NodeDef.nodeDefType.integer).multiple(),
-          SB.entity(
-            'tree',
-            SB.attribute('tree_id', NodeDef.nodeDefType.integer).key(),
-            SB.attribute('tree_height', NodeDef.nodeDefType.integer),
-            SB.attribute('dbh', NodeDef.nodeDefType.decimal)
-          ).multiple()
-        ).multiple()
-      )
-    ).build()
+    survey = DataTest.createTestSurvey({ user })
 
-    record = RB.record(
-      user,
-      survey,
-      RB.entity(
-        'cluster',
-        RB.attribute('cluster_id', 12),
-        RB.attribute('cluster_distance', 18),
-        RB.attribute('visit_date', '2021-01-01'),
-        RB.attribute('gps_model', 'ABC-123-xyz'),
-        RB.attribute('remarks', ''),
-        RB.entity(
-          'plot',
-          RB.attribute('plot_id', 1),
-          RB.attribute('plot_multiple_number', 10),
-          RB.attribute('plot_multiple_number', 20),
-          RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 10), RB.attribute('dbh', 7)),
-          RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 11), RB.attribute('dbh', 10.123))
-        ),
-        RB.entity(
-          'plot',
-          RB.attribute('plot_id', 2),
-          RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 12), RB.attribute('dbh', 18)),
-          RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 10), RB.attribute('dbh', 15)),
-          RB.entity('tree', RB.attribute('tree_id', 3), RB.attribute('tree_height', 30), RB.attribute('dbh', 20))
-        ),
-        RB.entity(
-          'plot',
-          RB.attribute('plot_id', 3),
-          RB.attribute('plot_multiple_number', 30),
-          RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 13), RB.attribute('dbh', 19)),
-          RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 10), RB.attribute('dbh', 15)),
-          RB.entity('tree', RB.attribute('tree_id', 3), RB.attribute('tree_height', 11), RB.attribute('dbh', 16)),
-          RB.entity('tree', RB.attribute('tree_id', 4), RB.attribute('tree_height', 10), RB.attribute('dbh', 7)),
-          RB.entity('tree', RB.attribute('tree_id', 5), RB.attribute('tree_height', 33), RB.attribute('dbh', 22))
-        )
-      )
-    ).build()
-
-    nodeDefault = RecordUtils.findNodeByPath('cluster/cluster_id')(survey, record)
+    record = DataTest.createTestRecord({ user, survey })
   }, 10000)
 
   // ====== value expr tests
@@ -190,26 +127,5 @@ describe('RecordExpressionParser Test', () => {
     { q: 'gps_model.substring(4,7)', r: '123' },
   ]
 
-  queries.forEach(({ q, r, n, e }) => {
-    const testTitle = `${q}${n ? ` (${n})` : ''}`
-    it(testTitle, () => {
-      try {
-        const resKeys = r && typeof r == 'object' ? Object.keys(r) : []
-        const node = n ? getNode(n) : nodeDefault
-        const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
-        if (resKeys.length === 0) {
-          const resExpected = r instanceof Function ? r() : r
-          expect(res).toEqual(resExpected)
-        } else {
-          resKeys.forEach((key) => expect(res[key]).toEqual(r[key]))
-        }
-      } catch (error) {
-        if (e) {
-          expect(error).toEqual(e)
-        } else {
-          throw error
-        }
-      }
-    })
-  })
+  NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
 })
