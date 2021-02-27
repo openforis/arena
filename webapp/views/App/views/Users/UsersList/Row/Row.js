@@ -19,6 +19,8 @@ const Row = (props) => {
   const canEditUser = useAuthCanEditUser(userListItem)
 
   const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
+  const authGroupName = AuthGroup.getName(authGroup)
+  const email = User.getEmail(userListItem)
 
   return (
     <>
@@ -26,9 +28,11 @@ const Row = (props) => {
         <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail />
       </div>
       <div data-testid={DataTestId.userList.name}>{User.getName(userListItem)}</div>
-      <div data-testid={DataTestId.userList.email}>{User.getEmail(userListItem)}</div>
-      <div data-testid={DataTestId.userList.authGroup}>
-        {i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}
+      <div data-testid={DataTestId.userList.email} data-value={email}>
+        {email}
+      </div>
+      <div data-testid={DataTestId.userList.authGroup} data-value={authGroupName}>
+        {i18n.t(`authGroups.${authGroupName}.label_plural`)}
       </div>
       <div>
         {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}

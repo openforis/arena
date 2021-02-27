@@ -145,6 +145,7 @@ export const DataTestId = {
     email: 'user_email',
     authGroup: 'user_authGroup',
     edit: 'user_edit_btn',
+    users: 'users',
   },
   userInvite: {
     email: 'invite-user-name',

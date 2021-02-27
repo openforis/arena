@@ -14,7 +14,7 @@ import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
 import validationReport from '../tests/validationReport'
 
-import surveyInviteUser from '../tests/surveyInviteUser'
+import userInvite from '../tests/userInvite'
 
 import surveyDelete from '../tests/surveyDelete'
 
@@ -50,7 +50,7 @@ describe('E2E Tests', () => {
   /**
    * User.
    */
-  surveyInviteUser()
+  userInvite()
 
   /**
    * Validation Report.

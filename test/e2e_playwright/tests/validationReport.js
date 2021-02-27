@@ -59,7 +59,7 @@ export default () =>
     gotoValidationReport()
     expectMessages([])
 
-    describe(`Duplicate root entity key`, async () => {
+    describe(`Duplicate root entity key`, () => {
       gotoRecords()
       gotoRecord(record2)
       enterAttribute(cluster_id, '6')
