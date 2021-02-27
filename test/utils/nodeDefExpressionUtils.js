@@ -1,4 +1,6 @@
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import * as Survey from '@core/survey/survey'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
 import * as RecordUtils from './recordUtils'
 
@@ -12,7 +14,7 @@ const _expectResult = ({ result, resultExpected }) => {
   }
 }
 
-const _testExpressions = ({ queries, expressionEvaluator }) => {
+const _testExpressions = ({ queries, expressionEvaluator }) =>
   queries.forEach(({ q, r, n, e }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
 
@@ -29,9 +31,8 @@ const _testExpressions = ({ queries, expressionEvaluator }) => {
       }
     })
   })
-}
 
-export const testRecordExpressions = ({ surveyFn, recordFn, queries }) => {
+export const testRecordExpressions = ({ surveyFn, recordFn, queries }) =>
   _testExpressions({
     queries,
     expressionEvaluator: ({ nodePath, query }) => {
@@ -42,4 +43,19 @@ export const testRecordExpressions = ({ surveyFn, recordFn, queries }) => {
       return RecordExpressionParser.evalNodeQuery(survey, record, node, query)
     },
   })
-}
+
+export const testNodeDefExpressions = ({ surveyFn, queries }) =>
+  _testExpressions({
+    queries,
+    expressionEvaluator: ({ nodePath, query }) => {
+      const survey = surveyFn()
+      const nodeDefCurrent = Survey.getNodeDefByName(nodePath || 'cluster_id')(survey)
+      const validationResult = NodeDefExpressionValidator.validate({
+        survey,
+        nodeDefCurrent,
+        exprString: query,
+        selfReferenceAllowed: true,
+      })
+      return validationResult === null
+    },
+  })
