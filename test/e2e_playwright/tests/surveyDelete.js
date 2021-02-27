@@ -4,7 +4,7 @@ import { gotoSurveyList } from './_navigation'
 const deleteSurvey = (name, idx) =>
   test(`Delete ${name}`, async () => {
     await Promise.all([
-      page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/dashboard/' } */),
+      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
       page.click(getSelector(DataTestId.surveyList.surveyRow(idx))),
     ])
 
@@ -13,7 +13,7 @@ const deleteSurvey = (name, idx) =>
 
     // Click div[role="dialog"] >> text="Delete"
     await Promise.all([
-      page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/surveys/' } */),
+      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/surveys/` } */),
       page.click('div[role="dialog"] >> text="Delete"'),
     ])
 

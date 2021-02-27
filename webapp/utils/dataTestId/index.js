@@ -158,4 +158,10 @@ export const DataTestId = {
     validationReport: `validationReport`,
     cellMessages: `messages-cell`,
   },
+  chainsList: {
+    newBtn: 'add-chain-btn',
+    chainLabel: _withLang('chain-label'),
+    chainDescription: _withLang('chain-description'),
+    addStep: 'add-step-btn',
+  },
 }
