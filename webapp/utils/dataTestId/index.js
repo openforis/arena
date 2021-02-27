@@ -151,4 +151,8 @@ export const DataTestId = {
     group: 'invite-user-group',
     submitBtn: 'Send invitation',
   },
+  validationReport: {
+    validationReport: `validationReport`,
+    cellMessages: `messages-cell`,
+  },
 }

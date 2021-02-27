@@ -42,4 +42,6 @@ export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
 
 export const gotoRecords = _gotoSubModule('data', 'records')
 
-export const gotoSurveyUsersList = _gotoSubModule('users', 'userList')
+export const gotoValidationReport = _gotoSubModule('data', 'validationReport')
+
+export const gotoUserList = _gotoSubModule('users', 'userList')

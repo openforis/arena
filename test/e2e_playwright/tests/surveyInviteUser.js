@@ -1,5 +1,5 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { gotoSurveyUsersList, gotoHome } from './_navigation'
+import { gotoUserList, gotoHome } from './_navigation'
 
 const expectUser = async ({ user, index }) => {
   const emails = await page.$$(getSelector(DataTestId.userList.email, 'div'))
@@ -7,15 +7,14 @@ const expectUser = async ({ user, index }) => {
   await expect(value).toBe(user)
 }
 
-const expectUsers = ({ users }) => {
+const expectUsers = ({ users }) =>
   test(`Check users ${users.length}`, async () => {
     await page.reload()
     await page.waitForSelector(getSelector(DataTestId.userList.email, 'div'))
     await Promise.all(users.map(async (user, index) => expectUser({ user, index })))
   })
-}
 
-const inviteUser = () => {
+const inviteUser = () =>
   test(`Invite user`, async () => {
     await page.click(getSelector(DataTestId.userList.inviteBtn, 'a'))
 
@@ -29,11 +28,10 @@ const inviteUser = () => {
       page.click(getSelector(DataTestId.userInvite.submitBtn, 'button')),
     ])
   })
-}
 
 export default () =>
   describe('Invite user testtwo@arena.com', () => {
-    gotoSurveyUsersList()
+    gotoUserList()
     expectUsers({ users: ['test@arena.com'] })
 
     inviteUser()

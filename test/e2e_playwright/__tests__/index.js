@@ -12,6 +12,7 @@ import surveyFormPreview from '../tests/surveyFormPreview'
 
 import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
+import validationReport from '../tests/validationReport'
 
 import surveyInviteUser from '../tests/surveyInviteUser'
 
@@ -28,6 +29,7 @@ describe('E2E Tests', () => {
    */
   surveyCreate()
   surveyInfoEdit()
+
   /**
    * Node def edit.
    */
@@ -37,18 +39,25 @@ describe('E2E Tests', () => {
   nodeDefReorder()
   nodeDefExpressionsEdit()
   surveyFormPreview()
+
   /**
    * Data edit.
    */
   recordAdd()
   // TODO: Fix tree order and uncomment recordVerify https://github.com/openforis/arena/issues/1413
   // recordVerify()
+
   /**
-   * Survey invite user.
+   * User.
    */
   surveyInviteUser()
+
   /**
-   * Survey delete.
+   * Validation Report.
+   */
+  validationReport()
+
+  /**
    * Delete.
    */
   surveyDelete()

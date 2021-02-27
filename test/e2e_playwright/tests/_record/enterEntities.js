@@ -3,6 +3,7 @@ import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { cluster, plot, tree } from '../../mock/nodeDefs'
 import { enterAttribute } from './enterAttributes'
 import { verifyAttribute } from './verifyAttributes'
+import { getTreeSelector } from './utils'
 
 /* eslint-disable camelcase */
 const {
@@ -39,7 +40,7 @@ export const enterTrees = (record) => {
 
   describe.each(Array.from(Array(trees.length).keys()))(`Add tree %s`, (treeIdx) => {
     const treeEntry = trees[treeIdx]
-    const treeSelector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, treeIdx))
+    const treeSelector = getTreeSelector(treeIdx)
 
     test('Add tree', async () => {
       await page.click(getSelector(DataTestId.surveyForm.entityAddBtn(tree.name), 'button'))

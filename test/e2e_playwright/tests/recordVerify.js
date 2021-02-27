@@ -1,13 +1,11 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 
-import { cluster, plot } from '../mock/nodeDefs'
+import { plot } from '../mock/nodeDefs'
 import { records } from '../mock/records'
 import { gotoFormPage } from './_formDesigner'
 import { gotoHome, gotoRecords } from './_navigation'
 import { verifyCluster, verifyPlot, verifyTrees } from './_record'
-
-/* eslint-disable camelcase */
-const { cluster_id } = cluster.children
+import { gotoRecord } from './_records'
 
 export default () =>
   describe('Record verify', () => {
@@ -16,15 +14,9 @@ export default () =>
 
       gotoRecords()
 
-      test(`Goto record`, async () => {
-        const clusterIdName = cluster_id.name
-        const clusterId = record[clusterIdName]
-        const cellSelector = `${getSelector(DataTestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
-        await Promise.all([
-          page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)),
-          page.waitForNavigation(),
-          page.click(cellSelector),
-        ])
+      gotoRecord(record)
+
+      test(`Verify record valid`, async () => {
         const errorBadge = await page.$(getSelector(DataTestId.record.errorBadge))
         await expect(errorBadge).toBeNull()
       })

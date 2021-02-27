@@ -58,7 +58,7 @@ const getValidationFieldErrorMessage = (survey, field, i18n) =>
     )
   )
 
-const getValidationFieldMessages = (i18n, survey, showKeys = true) => (validation) => {
+export const getValidationFieldMessages = (i18n, survey, showKeys = true) => (validation) => {
   const messages = [] // Every message is an array with 2 items (severity and message)
 
   // Add messages from fields

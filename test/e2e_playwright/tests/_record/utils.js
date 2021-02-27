@@ -1,8 +1,10 @@
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
-// value parser
+import { tree } from '../../mock/nodeDefs'
+
+// ==== value parser
 export const parseValue = (value) => (typeof value === 'function' ? value() : value)
 
-// selector utils
+// ==== selector utils
 export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
   `${parentSelector} ${getSelector(nodeDef.name)}`.trim()
 
@@ -31,7 +33,9 @@ export const getTaxonSelector = (nodeDef, parentSelector) => {
 export const getTextSelector = (nodeDef, parentSelector) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} input[type="text"]`
 
-// format utils
+export const getTreeSelector = (treeIdx) => getSelector(DataTestId.surveyForm.entityRowData(tree.name, treeIdx))
+
+// ==== format utils
 export const formatTime = (date) => {
   const hours = `${date.getHours()}`.padStart(2, '0')
   const minutes = `${date.getMinutes()}`.padStart(2, '0')

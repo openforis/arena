@@ -1,7 +1,6 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
-
 import { cluster, plot, tree } from '../../mock/nodeDefs'
 import { verifyAttribute } from './verifyAttributes'
+import { getTreeSelector } from './utils'
 
 /* eslint-disable camelcase */
 const {
@@ -38,7 +37,7 @@ export const verifyTrees = (record) => {
 
   describe.each(Array.from(Array(trees.length).keys()))(`Verify tree %s`, (treeIdx) => {
     const treeEntry = trees[treeIdx]
-    const treeSelector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, treeIdx))
+    const treeSelector = getTreeSelector(treeIdx)
 
     verifyAttribute(tree_id, treeEntry[tree_id.name], treeSelector)
     verifyAttribute(tree_dec_1, treeEntry[tree_dec_1.name], treeSelector)
