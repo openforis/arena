@@ -14,8 +14,9 @@ import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
 import validationReport from '../tests/validationReport'
 
-import userInvite from '../tests/userInvite'
+// import userInvite from '../tests/userInvite'
 
+// import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
 
 beforeAll(async () => {
@@ -50,7 +51,8 @@ describe('E2E Tests', () => {
   /**
    * User.
    */
-  userInvite()
+  // TODO: Enable userInvite when implementing user delete.
+  // userInvite()
 
   /**
    * Validation Report.
@@ -60,5 +62,7 @@ describe('E2E Tests', () => {
   /**
    * Delete.
    */
+  // TODO: Enable when fixing https://github.com/openforis/arena/issues/1416
+  // recordDelete()
   surveyDelete()
 })

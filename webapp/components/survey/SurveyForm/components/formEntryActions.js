@@ -25,7 +25,7 @@ const RecordEntryButtons = () => {
   const stepPrev = RecordStep.getPreviousStep(stepId)
   const valid = Validation.isObjValid(record)
 
-  const getStepLabel = (step) => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
+  const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
   return (
     <>
@@ -44,6 +44,7 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            type="button"
           >
             <span className="icon icon-reply icon-12px" />
           </button>
@@ -69,6 +70,7 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            type="button"
           >
             <span className="icon icon-redo2 icon-12px" />
           </button>
@@ -77,6 +79,7 @@ const RecordEntryButtons = () => {
 
       <button
         className="btn-s btn-danger"
+        data-testid={DataTestId.record.deleteBtn}
         onClick={() =>
           dispatch(
             DialogConfirmActions.showDialogConfirm({
@@ -86,6 +89,7 @@ const RecordEntryButtons = () => {
           )
         }
         aria-disabled={false}
+        type="button"
       >
         <span className="icon icon-bin icon-12px icon-left" />
         {i18n.t('common.delete')}

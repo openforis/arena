@@ -80,6 +80,7 @@ export const DataTestId = {
   },
   record: {
     errorBadge: 'record-error-badge',
+    deleteBtn: 'record-delete-btn',
   },
   records: {
     addBtn: 'record-add-btn',
@@ -128,6 +129,7 @@ export const DataTestId = {
   },
   table: {
     rows: (module) => `${module}-rows`,
+    row: (module, idx) => `${module}_${idx}`,
   },
   tabBar: {
     tabBarBtn: (id) => `${id}-btn`,
