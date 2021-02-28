@@ -1,6 +1,7 @@
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
 import * as Expression from '@core/expressionParser/expression'
 import Queue from '@core/queue'
 import SystemError from '@core/systemError'
@@ -53,6 +54,12 @@ export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed, e
     return globalIdentifierEvalResult
   }
 
+  // identifier is a native property or function (e.g. String.length or String.toUpperCase())
+  if (NodeNativeProperties.hasNativeProperty({ nodeDef: exprContext, propName: exprName })) {
+    return NodeNativeProperties.evalNodeDefProperty({ nodeDef: exprContext, propName: exprName })
+  }
+
+  // identifier references a node
   const reachableNodeDefs = _getReachableNodeDefs(survey, exprContext)
 
   const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === exprName)

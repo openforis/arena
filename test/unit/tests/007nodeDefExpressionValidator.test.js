@@ -40,7 +40,6 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'index(plot, plot_id)', n: 'plot', r: false },
     // access attribute of sibling entity
     { q: 'plot[index(plot) - 1].plot_id', n: 'plot_id', r: true },
-    { q: 'plot[index(plot) - 1].plot_id', n: 'plot_id', r: true },
     // parent function
     { q: 'parent(plot_id)', n: 'plot_id', r: true },
     // global objects
