@@ -12,10 +12,20 @@ describe('NodeDefExpressionValidator Test', () => {
     survey = DataTest.createTestSurvey({ user })
   }, 10000)
 
-  // ====== node def expr tests
+  // ======
+  /**
+   * Node def expr tests
+   * query type:
+   * - q: expression to test
+   * - r: expected result (true = valid, false = not valid)
+   * - n: node def name (default to cluster_id)
+   * - s: self reference allowed (default to true).
+   */
   const queries = [
     // use of single attribute in context
     { q: 'cluster_id + 1', r: true },
+    // referencing same attribute when not allowed (error expected)
+    { q: 'cluster_id + 1', r: false, s: false },
     // use of undefined attribute
     { q: 'cluster_idd + 1', r: false },
     // use of different attributes
@@ -38,8 +48,8 @@ describe('NodeDefExpressionValidator Test', () => {
     // index function
     { q: 'index(plot)', n: 'plot', r: true },
     { q: 'index(plot, plot_id)', n: 'plot', r: false },
-    // access attribute of sibling entity
-    { q: 'plot[index(plot) - 1].plot_id', n: 'plot_id', r: true },
+    // access same attribute attribute in sibling entity (even when self reference is not allowed)
+    { q: 'plot[index(plot) - 1].plot_id + 1', n: 'plot_id', r: true, s: false },
     // parent function
     { q: 'parent(plot_id)', n: 'plot_id', r: true },
     // global objects

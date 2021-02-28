@@ -6,8 +6,6 @@ import * as Expression from '@core/expressionParser/expression'
 import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
-const _getNodeValue = (nodeDef) => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
-
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
 const _getReachableNodeDefs = (survey, nodeDefContext) => {
@@ -41,11 +39,8 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   return reachableNodeDefs
 }
 
-export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed, evaluateToNode = false }) => (
-  expr,
-  ctx
-) => {
-  const { node: exprContext } = ctx
+export const identifierEval = ({ survey, nodeDefCurrent }) => (expr, ctx) => {
+  const { node: exprContext, selfReferenceAllowed = true } = ctx
 
   const exprName = Expression.getName(expr)
 
@@ -83,5 +78,5 @@ export const identifierEval = ({ survey, nodeDefCurrent, selfReferenceAllowed, e
     throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: exprName })
   }
 
-  return NodeDef.isEntity(def) || NodeDef.isMultiple(def) || evaluateToNode ? def : _getNodeValue(def)
+  return def
 }

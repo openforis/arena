@@ -15,12 +15,12 @@ const _expectResult = ({ result, resultExpected }) => {
 }
 
 const _testExpressions = ({ queries, expressionEvaluator }) =>
-  queries.forEach(({ q, r, n, e }) => {
+  queries.forEach(({ q, r, n = null, e = null, s = true }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
 
     it(testTitle, () => {
       try {
-        const result = expressionEvaluator({ nodePath: n, query: q })
+        const result = expressionEvaluator({ nodePath: n, query: q, selfReferenceAllowed: s })
         _expectResult({ result, resultExpected: r })
       } catch (error) {
         if (e) {
@@ -47,14 +47,14 @@ export const testRecordExpressions = ({ surveyFn, recordFn, queries }) =>
 export const testNodeDefExpressions = ({ surveyFn, queries }) =>
   _testExpressions({
     queries,
-    expressionEvaluator: ({ nodePath, query }) => {
+    expressionEvaluator: ({ nodePath, query, selfReferenceAllowed }) => {
       const survey = surveyFn()
       const nodeDefCurrent = Survey.getNodeDefByName(nodePath || 'cluster_id')(survey)
       const validationResult = NodeDefExpressionValidator.validate({
         survey,
         nodeDefCurrent,
         exprString: query,
-        selfReferenceAllowed: true,
+        selfReferenceAllowed,
       })
       return validationResult === null
     },
