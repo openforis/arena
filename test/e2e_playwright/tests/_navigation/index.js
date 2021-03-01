@@ -31,12 +31,16 @@ export const gotoHome = () =>
     expect(page.url()).toBe(`${BASE_URL}/app/home/dashboard/`)
   })
 
-const _gotoSubModule = (module, subModule, key) => () =>
+const _gotoSubModule = (module, subModule, waitForApiPaths = null) => () =>
   test(`Goto ${module}->${subModule}`, async () => {
-    const _key = key ?? subModule
     await page.hover(getSelector(DataTestId.sidebar.module(module)))
 
-    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.sidebar.moduleBtn(_key), 'a'))])
+    await Promise.all([
+      ...(waitForApiPaths ? waitForApiPaths.map((path) => page.waitForResponse(path)) : []),
+      page.waitForNavigation(),
+      page.click(getSelector(DataTestId.sidebar.moduleBtn(subModule), 'a')),
+    ])
+
     expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
   })
 
@@ -50,5 +54,3 @@ export const gotoValidationReport = _gotoSubModule('data', 'validationReport', [
 ])
 
 export const gotoUserList = _gotoSubModule('users', 'userList')
-
-export const gotoChains = _gotoSubModule('analysis', 'processingChains', 'processingChain_plural')

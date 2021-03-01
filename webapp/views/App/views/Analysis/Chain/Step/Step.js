@@ -13,7 +13,7 @@ import * as Step from '@common/analysis/processingStep'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
 import { State } from '../store'
@@ -55,7 +55,6 @@ const StepComponent = (props) => {
         {!editingCalculation && (
           <>
             <button
-              data-testid={DataTestId.chainsList.step.close}
               type="button"
               className="btn-s btn-close btn-close-step"
               onClick={() => Actions.dismissStep({ state })}
@@ -79,7 +78,6 @@ const StepComponent = (props) => {
               readOnly={disabledEntityOrCategory}
             >
               <Link
-                data-testid={DataTestId.chainsList.step.editEntity}
                 type="button"
                 className="btn btn-s btn-edit"
                 to={`${appModuleUri(analysisModules.nodeDef)}${entityUuid}/`}
@@ -89,7 +87,6 @@ const StepComponent = (props) => {
                 {i18n.t('common.edit')}
               </Link>
               <button
-                data-testid={DataTestId.chainsList.step.newVirtualEntity}
                 type="button"
                 className="btn btn-s btn-add"
                 onClick={() => Actions.addEntityVirtual({ state })}

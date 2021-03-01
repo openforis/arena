@@ -8,7 +8,6 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State } from '../../store'
 
@@ -42,7 +41,6 @@ const CalculationList = (props) => {
             {i18n.t('processingStepView.calculationSteps')}
           </ValidationTooltip>
           <button
-            data-testid={DataTestId.chainsList.step.addCalculation}
             type="button"
             className="btn-s btn-transparent"
             onClick={Actions.createCalculation}

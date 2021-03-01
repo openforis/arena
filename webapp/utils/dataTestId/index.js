@@ -158,22 +158,4 @@ export const DataTestId = {
     validationReport: `validationReport`,
     cellMessages: `messages-cell`,
   },
-  chainsList: {
-    newBtn: 'add-chain-btn',
-    chainLabel: _withLang('chain-label'),
-    chainDescription: _withLang('chain-description'),
-    addStep: 'add-step-btn',
-    step: {
-      close: 'close-step-btn',
-      entitySelector: 'entity-selector',
-      editEntity: 'edit-entity',
-      newVirtualEntity: 'edit-entity',
-      addCalculation: 'add-calculation-btn',
-    },
-    calculation: {
-      close: 'close-calculation-btn',
-      calculationLabel: _withLang('calculation-label'),
-      addAttribute: 'add-calculation-attribute-btn',
-    },
-  },
 }

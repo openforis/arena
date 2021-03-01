@@ -15,7 +15,6 @@ import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State } from '../../store'
 import useCalculationState from './useCalculationState'
@@ -37,7 +36,6 @@ const CalculationComponent = (props) => {
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
       <button
-        data-testid={DataTestId.chainsList.calculation.close}
         type="button"
         className="btn-s btn-close btn-close-calculation"
         onClick={() => Actions.dismissCalculation({ state })}
@@ -46,7 +44,6 @@ const CalculationComponent = (props) => {
       </button>
 
       <LabelsEditor
-        inputFieldIdPrefix={DataTestId.chainsList.calculation.calculationLabel('')}
         labels={Calculation.getLabels(calculationEdit)}
         validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
         onChange={(labels) =>
@@ -82,12 +79,7 @@ const CalculationComponent = (props) => {
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
           </Link>
-          <button
-            data-testid={DataTestId.chainsList.calculation.addAttribute}
-            type="button"
-            className="btn btn-s btn-add"
-            onClick={() => Actions.addNodeDefAnalysis({ state })}
-          >
+          <button type="button" className="btn btn-s btn-add" onClick={() => Actions.addNodeDefAnalysis({ state })}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>

@@ -17,9 +17,6 @@ import validationReport from '../tests/validationReport'
 // import userInvite from '../tests/userInvite'
 // import recordDelete from '../tests/recordDelete'
 
-import chainEdit from '../tests/chainEdit'
-
-
 import surveyDelete from '../tests/surveyDelete'
 import { BASE_URL } from '../config'
 
@@ -62,11 +59,6 @@ describe('E2E Tests', () => {
    * Validation Report.
    */
   validationReport()
-
-  /**
-   * Chains.
-   */
-  chainEdit()
 
   /**
    * Delete.

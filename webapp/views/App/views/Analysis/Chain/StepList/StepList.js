@@ -6,7 +6,6 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
 import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
@@ -33,7 +32,6 @@ const StepList = (props) => {
             {i18n.t('processingChainView.processingSteps')}
           </ValidationTooltip>
           <button
-            data-testid={DataTestId.chainsList.addStep}
             type="button"
             className="btn-s btn-transparent btn-add-step"
             onClick={() => Actions.createStep({ state })}

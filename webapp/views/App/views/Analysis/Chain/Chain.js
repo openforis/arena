@@ -10,7 +10,6 @@ import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -42,7 +41,6 @@ const ChainComponent = () => {
 
         <div className="form">
           <LabelsEditor
-            inputFieldIdPrefix={DataTestId.chainsList.chainLabel('')}
             labels={Chain.getLabels(chainEdit)}
             formLabelKey="processingChainView.formLabel"
             readOnly={editingStep}
@@ -53,7 +51,6 @@ const ChainComponent = () => {
           {!editingStep && (
             <>
               <LabelsEditor
-                inputFieldIdPrefix={DataTestId.chainsList.chainDescription('')}
                 formLabelKey="common.description"
                 labels={Chain.getDescriptions(chainEdit)}
                 onChange={(descriptions) =>

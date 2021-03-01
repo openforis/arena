@@ -22,14 +22,7 @@ const editFnTypes = {
   code: editCodeDetails,
 }
 
-export const isInSurveyForm = async (nodeDef) => {
-  await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
-
-  await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
-  await expect(page).toHaveText(nodeDef.label)
-}
-
-export const persistNodeDefChanges = (nodeDef, postEdit = isInSurveyForm) =>
+export const persistNodeDefChanges = (nodeDef) =>
   test(`${nodeDef.label} persist changes`, async () => {
     // Save
     await Promise.all([
@@ -38,20 +31,21 @@ export const persistNodeDefChanges = (nodeDef, postEdit = isInSurveyForm) =>
     ])
     // Back
     await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button'))])
-    if (postEdit) await postEdit(nodeDef)
+    await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
+
+    await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
+    await expect(page).toHaveText(nodeDef.label)
   })
 
-export const editNodeDefDetails = (nodeDef, postEdit = isInSurveyForm) => {
+export const editNodeDefDetails = (nodeDef) => {
   test(`${nodeDef.label} edit details`, async () => {
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
-    if (nodeDef.descriptions)
-      await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefDescriptions(), 'input'), nodeDef.descriptions)
     if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
 
     const editFnType = editFnTypes[nodeDef.type]
     if (editFnType) await editFnType(nodeDef)
   })
 
-  persistNodeDefChanges(nodeDef, postEdit)
+  persistNodeDefChanges(nodeDef)
 }

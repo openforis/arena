@@ -11,7 +11,6 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
 
 import * as Chain from '@common/analysis/processingChain'
 import Dropdown from '@webapp/components/form/Dropdown'
@@ -65,7 +64,6 @@ const EntitySelector = (props) => {
       <div className="form-label chain-list__label">{i18n.t('nodeDefsTypes.entity')}</div>
 
       <Dropdown
-        idInput={DataTestId.chainsList.step.entitySelector}
         className="step-entity-selector__dropdown"
         autocompleteDialogClassName="step-entity-selector__dropdown-dialog"
         items={entities}
