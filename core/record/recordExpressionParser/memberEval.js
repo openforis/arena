@@ -1,20 +1,11 @@
 import * as Expression from '@core/expressionParser/expression'
 
-import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
-
 export const memberEval = (expr, ctx) => {
   const { object, property, computed } = expr
 
   const objectEval = Expression.evalExpr({ expr: object, ctx })
   if (!objectEval) {
     return null
-  }
-  if (!computed && Expression.isIdentifier(property)) {
-    const propertyName = Expression.getName(property)
-    if (NodeNativeProperties.isNativeProperty(propertyName)) {
-      // property is a native property of the node
-      return NodeNativeProperties.evalProperty({ node: objectEval, propertyName })
-    }
   }
 
   if (computed) {
