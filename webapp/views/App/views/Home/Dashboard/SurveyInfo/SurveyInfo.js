@@ -59,6 +59,7 @@ const SurveyInfo = () => {
           {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           <DownloadButton
+            id={DataTestId.dashboard.surveyExportBtn}
             className="btn-transparent"
             href={`/api/survey/${surveyId}/export/`}
             label={i18n.t('common.export')}

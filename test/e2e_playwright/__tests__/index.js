@@ -12,10 +12,12 @@ import surveyFormPreview from '../tests/surveyFormPreview'
 
 import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
-import validationReport from '../tests/validationReport'
 
 // import userInvite from '../tests/userInvite'
 
+import surveyExport from '../tests/surveyExport'
+
+import validationReport from '../tests/validationReport'
 // import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
 
@@ -53,6 +55,11 @@ describe('E2E Tests', () => {
    */
   // TODO: Enable userInvite when implementing user delete.
   // userInvite()
+
+  /**
+   * Survey export/import/clone.
+   */
+  surveyExport()
 
   /**
    * Validation Report.

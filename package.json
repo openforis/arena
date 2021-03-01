@@ -100,6 +100,7 @@
     "@esri/proj-codes": "^2.7.0",
     "@godaddy/terminus": "^4.6.0",
     "@sendgrid/mail": "^7.4.2",
+    "adm-zip": "^0.5.3",
     "archiver": "^5.2.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
