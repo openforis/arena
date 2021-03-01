@@ -3,7 +3,7 @@ import { taxonomies } from './taxonomies'
 
 const nodeDefCompositeTypes = ['entity', 'code', 'taxon']
 
-export const createAttribute = (name, label, type, key = false) => ({
+const createAttribute = (name, label, type, key = false) => ({
   name,
   label,
   type,

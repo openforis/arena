@@ -15,7 +15,7 @@ import recordAdd from '../tests/recordAdd'
 import validationReport from '../tests/validationReport'
 
 // import userInvite from '../tests/userInvite'
-// import recordDelete from '../tests/recordDelete'
+import recordDelete from '../tests/recordDelete'
 
 import surveyDelete from '../tests/surveyDelete'
 import { BASE_URL } from '../config'
@@ -63,7 +63,6 @@ describe('E2E Tests', () => {
   /**
    * Delete.
    */
-  // TODO: Enable when fixing https://github.com/openforis/arena/issues/1416
-  // recordDelete()
+  recordDelete()
   surveyDelete()
 })
