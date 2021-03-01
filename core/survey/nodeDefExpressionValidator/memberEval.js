@@ -1,7 +1,5 @@
 import * as Expression from '@core/expressionParser/expression'
 
-import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
-
 export const memberEval = (expr, ctx) => {
   const { object, property, computed } = expr
 
@@ -13,13 +11,8 @@ export const memberEval = (expr, ctx) => {
     // access element at index (e.g. plot[1] or plot[index(...)])
     return objectEval
   }
-  if (Expression.isIdentifier(property)) {
-    const propertyName = Expression.getName(property)
-    if (NodeNativeProperties.isNativePropertyAllowed({ nodeDef: objectEval, propertyName })) {
-      // simulate node property getter
-      return {}
-    }
-  }
   // eval property and return it (e.g. plot.plot_id)
-  return Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval } })
+  // allow self node def reference because the referenced node at runtime can be different from current node
+  // e.g. current node = plot_id ; expression = parent(plot).plot[index(plot) - 1].plot_id
+  return Expression.evalExpr({ expr: property, ctx: { ...ctx, node: objectEval, selfReferenceAllowed: true } })
 }

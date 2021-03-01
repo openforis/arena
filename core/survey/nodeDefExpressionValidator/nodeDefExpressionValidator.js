@@ -24,9 +24,7 @@ const _evaluateExpression = ({ survey, nodeDef, exprString, isContextParent = tr
   }
   const evaluators = {
     [Expression.types.Identifier]: (expr, ctx) =>
-      addReferencedNodeDef(
-        identifierEval({ survey, nodeDefCurrent: nodeDef, selfReferenceAllowed, evaluateToNode: true })(expr, ctx)
-      ),
+      addReferencedNodeDef(identifierEval({ survey, nodeDefCurrent: nodeDef })(expr, ctx)),
     [Expression.types.MemberExpression]: (expr, ctx) => addReferencedNodeDef(memberEval(expr, ctx)),
   }
   const functions = {
@@ -39,7 +37,12 @@ const _evaluateExpression = ({ survey, nodeDef, exprString, isContextParent = tr
     },
   }
   const nodeDefContext = isContextParent ? Survey.getNodeDefParent(nodeDef)(survey) : nodeDef
-  const result = Expression.evalString(exprString, { evaluators, functions, node: nodeDefContext })
+  const result = Expression.evalString(exprString, {
+    evaluators,
+    functions,
+    node: nodeDefContext,
+    selfReferenceAllowed,
+  })
   return { referencedNodeDefs, result }
 }
 
