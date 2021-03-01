@@ -50,8 +50,8 @@ export const identifierEval = ({ survey, nodeDefCurrent }) => (expr, ctx) => {
   }
 
   // identifier is a native property or function (e.g. String.length or String.toUpperCase())
-  if (NodeNativeProperties.hasNativeProperty({ nodeDef: exprContext, propName: exprName })) {
-    return NodeNativeProperties.evalNodeDefProperty({ nodeDef: exprContext, propName: exprName })
+  if (NodeNativeProperties.hasNativeProperty({ nodeDefOrValue: exprContext, propName: exprName })) {
+    return NodeNativeProperties.evalNodeDefProperty({ nodeDefOrValue: exprContext, propName: exprName })
   }
 
   // identifier references a node

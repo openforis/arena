@@ -57,8 +57,15 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'Number.isFinite(plot[1].plot_id)', r: true },
     { q: 'Number.isSomething(plot[1].plot_id)', r: false },
     { q: 'String.fromCharCode(65, 66, 67)', r: true },
-    // native properties
+    // native properties (number)
+    { q: 'Math.PI.toFixed(2)', r: true },
+    { q: 'plot[0].tree[1].dbh.toFixed(1)', r: true },
+    { q: 'plot[0].tree[1].dbh.toPrecision(4)', r: true },
+    // native properties (string)
     { q: 'gps_model.toLowerCase()', r: true },
+    { q: 'gps_model.substring(4,7)', r: true },
+    { q: 'gps_model.length', r: true },
+    { q: 'gps_model[1]', r: true },
   ]
 
   NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })

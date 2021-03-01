@@ -125,6 +125,8 @@ describe('RecordExpressionParser Test', () => {
     // native properties (string)
     { q: 'gps_model.toLowerCase()', r: 'abc-123-xyz' },
     { q: 'gps_model.substring(4,7)', r: '123' },
+    { q: 'gps_model.length', r: 11 },
+    { q: 'gps_model[1]', r: 'B' },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })

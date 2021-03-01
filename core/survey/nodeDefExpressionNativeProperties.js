@@ -12,26 +12,38 @@ const jsTypeByNodeDefType = {
   [NodeDef.nodeDefType.text]: String,
 }
 
-const _hasProperty = ({ jsType, propName }) => Object.prototype.hasOwnProperty.call(jsType, propName)
-const _hasFunction = ({ jsType, funcName }) => Boolean(jsType.prototype[funcName])
-
-export const hasNativeProperty = ({ nodeDef, propName }) => {
-  if (propName === nativeProperties.length && NodeDef.isMultiple(nodeDef)) {
-    return true
-  }
-  const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
-  return jsType && (_hasProperty({ jsType, propName }) || _hasFunction({ jsType, funcName: propName }))
+const classByName = {
+  number: Number,
+  string: String,
 }
 
-export const evalNodeDefProperty = ({ nodeDef, propName }) => {
+const _getJsType = (nodeDefOrValue) => {
+  if (NodeDef.getUuid(nodeDefOrValue)) {
+    // the parameter is a nodeDef
+    return jsTypeByNodeDefType[NodeDef.getType(nodeDefOrValue)]
+  }
+  // the parameter is a value (number or string)
+  return classByName[typeof nodeDefOrValue]
+}
+const _hasProperty = ({ JsType, propName }) => Object.prototype.hasOwnProperty.call(JsType, propName)
+const _hasFunction = ({ JsType, funcName }) => Boolean(JsType.prototype[funcName])
+
+export const hasNativeProperty = ({ nodeDefOrValue, propName }) => {
+  if (propName === nativeProperties.length && NodeDef.isMultiple(nodeDefOrValue)) {
+    return true
+  }
+  const JsType = _getJsType(nodeDefOrValue)
+  return JsType && (_hasProperty({ JsType, propName }) || _hasFunction({ JsType, funcName: propName }))
+}
+
+export const evalNodeDefProperty = ({ nodeDefOrValue, propName }) => {
   if (propName === nativeProperties.length) {
     return 0
   }
-  const jsType = jsTypeByNodeDefType[NodeDef.getType(nodeDef)]
-  if (_hasProperty({ jsType, propName })) {
-    return jsType[propName]
-  } else {
-    // return function with name "propertyName" and bind it to an empty object
-    return jsType.prototype[propName].bind({})
+  const JsType = _getJsType(nodeDefOrValue)
+  if (_hasProperty({ JsType, propName })) {
+    return JsType[propName]
   }
+  // return function with name "propertyName" and bind it to an instance of JsType
+  return JsType.prototype[propName].bind(new JsType())
 }
