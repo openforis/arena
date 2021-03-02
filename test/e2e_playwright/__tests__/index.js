@@ -1,3 +1,5 @@
+import { BASE_URL } from '../config'
+
 import login from '../tests/login'
 
 import surveyCreate from '../tests/surveyCreate'
@@ -14,6 +16,7 @@ import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
 
 // import userInvite from '../tests/userInvite'
+// import recordDelete from '../tests/recordDelete'
 
 import surveyExport from '../tests/surveyExport'
 
@@ -22,7 +25,7 @@ import validationReport from '../tests/validationReport'
 import surveyDelete from '../tests/surveyDelete'
 
 beforeAll(async () => {
-  await page.goto('http://localhost:9090')
+  await page.goto(BASE_URL)
 })
 
 describe('E2E Tests', () => {
@@ -66,10 +69,9 @@ describe('E2E Tests', () => {
    */
   validationReport()
 
-  /**
-   * Delete.
-   */
-  // TODO: Enable when fixing https://github.com/openforis/arena/issues/1416
+  // /**
+  //  * Delete.
+  //  */
   // recordDelete()
   surveyDelete()
 })

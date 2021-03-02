@@ -160,7 +160,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 }
 
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `SELECT 
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,

@@ -1,5 +1,6 @@
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { categories } from '../../mock/categories'
+import { BASE_URL } from '../../config'
 
 const editCodeDetails = async (nodeDef) => {
   const category = categories[nodeDef.category]
@@ -32,7 +33,7 @@ export const persistNodeDefChanges = (nodeDef) =>
     await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button'))])
     await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
 
-    await expect(page.url()).toBe('http://localhost:9090/app/designer/formDesigner/')
+    await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
     await expect(page).toHaveText(nodeDef.label)
   })
 
