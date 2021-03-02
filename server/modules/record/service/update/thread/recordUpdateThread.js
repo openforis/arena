@@ -95,7 +95,7 @@ class RecordUpdateThread extends Thread {
     // Init record
     this.record = await RecordManager.fetchRecordAndNodesByUuid(
       this.surveyId,
-      RecordUpdateThreadParams.getRecordUuid(this.params),
+      RecordUpdateThreadParams.getRecordUuid(this.params)
     )
 
     // Init survey
@@ -104,7 +104,7 @@ class RecordUpdateThread extends Thread {
       this.surveyId,
       Record.getCycle(this.record),
       preview,
-      true,
+      true
     )
 
     // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
@@ -129,7 +129,7 @@ class RecordUpdateThread extends Thread {
           this.survey,
           this.record,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this),
+          this.handleNodesValidationUpdated.bind(this)
         )
         break
 
@@ -140,7 +140,7 @@ class RecordUpdateThread extends Thread {
           this.record,
           msg.node,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this),
+          this.handleNodesValidationUpdated.bind(this)
         )
         break
 
@@ -151,7 +151,7 @@ class RecordUpdateThread extends Thread {
           this.record,
           msg.nodeUuid,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this),
+          this.handleNodesValidationUpdated.bind(this)
         )
         break
 

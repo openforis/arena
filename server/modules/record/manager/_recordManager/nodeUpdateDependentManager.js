@@ -114,9 +114,8 @@ export const updateSelfAndDependentsDefaultValues = async (survey, record, node,
         R.unless(R.isNil, (value) => RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, value))
       )(exprEval)
 
-      // 4. persist updated node value if changed, and return updated node
-
-      if (R.equals(oldValue, exprValue)) {
+      // 4. persist updated node value if changed and new value is not empty, and return updated node
+      if (R.equals(oldValue, exprValue) || R.isEmpty(oldValue)) {
         return {}
       }
 
