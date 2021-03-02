@@ -126,8 +126,8 @@ export default () =>
     describe(`Edit node in page`, () => {
       gotoNode(`Cluster[${record1[cluster_id.name]}] / Plot[] / Tree[] / Tree decimal 2`)
       enterAttribute(plot_id, record1[plot_id.name])
-      // TODO: uncomment line below when fixing https://github.com/openforis/arena/issues/1413
-      // enterAttribute(tree_id, record1.trees[0][tree_id.name], getTreeSelector(0))
+
+      enterAttribute(tree_id, record1.trees[0][tree_id.name], getTreeSelector(0))
       enterAttribute(tree_dec_2, record1.trees[0][tree_dec_2.name], getTreeSelector(0))
       waitThread()
 
@@ -141,8 +141,6 @@ export default () =>
           `Cluster[${record1[cluster_id.name]}] / Plot[${record1[plot_id.name]}] / Tree[10] / Tree id`,
           'Duplicate entity key',
         ],
-        // TODO: remove line below when fixing https://github.com/openforis/arena/issues/1413
-        [`Cluster[${record1[cluster_id.name]}] / Plot[${record1[plot_id.name]}] / Tree[] / Tree id`, 'Required value'],
       ])
     })
 

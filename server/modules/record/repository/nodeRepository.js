@@ -124,6 +124,7 @@ export const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client
     `
     ${_getNodeSelectQuery(surveyId, draft)}
     WHERE n.record_uuid = $1
+    order by n.date_created
     `,
     [recordUuid],
     dbTransformCallback
