@@ -13,7 +13,7 @@ import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 import surveyFormPreview from '../tests/surveyFormPreview'
 
 import recordAdd from '../tests/recordAdd'
-// import recordVerify from '../tests/recordVerify'
+import recordVerify from '../tests/recordVerify'
 
 // import userInvite from '../tests/userInvite'
 
@@ -49,8 +49,7 @@ describe('E2E Tests', () => {
    * Data edit.
    */
   recordAdd()
-  // TODO: Fix tree order and uncomment recordVerify https://github.com/openforis/arena/issues/1413
-  // recordVerify()
+  recordVerify()
 
   /**
    * User.
