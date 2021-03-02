@@ -114,30 +114,29 @@ const memberEval = (expr, ctx) => {
   return propertyEval
 }
 
-const callEval = (expr, ctx) => {
+const _callMemberEval = ({ expr, ctx }) => {
+  // Arguments is a reserved word in strict mode
+  const { callee, arguments: exprArgs } = expr
+
+  // global function (e.g. Math.round(...))
+  const fn = evalExpression(callee, ctx)
+  if (fn) {
+    const args = exprArgs.map((arg) => evalExpression(arg, ctx))
+    return fn(...args)
+  }
+  return null
+}
+
+const _callIdentifierEval = ({ expr, ctx }) => {
   // Arguments is a reserved word in strict mode
   const { callee, arguments: exprArgs } = expr
   const { functions: functionsCtx = {} } = ctx
 
-  if (callee.type === types.MemberExpression) {
-    // global function (e.g. Math.round(...))
-    const fn = evalExpression(callee, ctx)
-    if (fn) {
-      const args = exprArgs.map((arg) => evalExpression(arg, ctx))
-      return R.apply(fn, args)
-    }
-  }
-
-  // No complex expressions may be put in place of a function body.
-  // Only a plain identifier is allowed.
-  if (callee.type !== types.Identifier) {
-    throw new SystemError('invalidSyntax', { fnType: callee.type })
-  }
+  // The function must be found among the Arena functions.
 
   const fnName = callee.name
   const numArgs = exprArgs.length
 
-  // The function must be found in the standard library.
   const functionInfo = functions[fnName]
   if (!functionInfo) {
     throw new SystemError('undefinedFunction', { fnName })
@@ -171,6 +170,21 @@ const callEval = (expr, ctx) => {
   // safe to call the function even when we're just parsing the expression
   // to find all identifiers being used.
   return R.apply(fn, args)
+}
+
+const callEval = (expr, ctx) => {
+  const { callee } = expr
+
+  switch (callee.type) {
+    case types.MemberExpression:
+      return _callMemberEval({ expr, ctx })
+    case types.Identifier:
+      return _callIdentifierEval({ expr, ctx })
+    default:
+      // No complex expressions may be put in place of a function body.
+      // Only a plain identifier is allowed.
+      throw new SystemError('invalidSyntax', { fnType: callee.type })
+  }
 }
 
 const literalEval = (expr) => R.prop('value')(expr)

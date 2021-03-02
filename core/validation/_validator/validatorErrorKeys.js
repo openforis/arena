@@ -50,7 +50,6 @@ export const ValidatorErrorKeys = {
 
   expressions: {
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
-    cannotGetLengthOfSingleNodes: 'validationErrors.expressions.cannotGetLengthOfSingleNodes',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
     circularDependencyError: 'validationErrors.expressions.circularDependencyError',
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
