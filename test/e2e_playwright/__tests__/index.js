@@ -16,12 +16,11 @@ import recordAdd from '../tests/recordAdd'
 // import recordVerify from '../tests/recordVerify'
 
 // import userInvite from '../tests/userInvite'
-// import recordDelete from '../tests/recordDelete'
 
 import surveyExport from '../tests/surveyExport'
 
 import validationReport from '../tests/validationReport'
-// import recordDelete from '../tests/recordDelete'
+import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
 
 beforeAll(async () => {
@@ -69,9 +68,9 @@ describe('E2E Tests', () => {
    */
   validationReport()
 
-  // /**
-  //  * Delete.
-  //  */
-  // recordDelete()
+  /**
+   * Delete.
+   */
+  recordDelete()
   surveyDelete()
 })
