@@ -26,11 +26,11 @@ const verifyCoordinate = async (nodeExport, value) => {
   await expect(y).toBe(value.y)
   await expect(srs).toBe(value.srs)
 }
-// const verifyTaxon = async (nodeExport, value) => {
-//   const { refData } = nodeExport
-//   await expect(refData.taxon.props.code).toBe(value.code)
-//   await expect(refData.taxon.props.scientificName).toBe(value.scientificName)
-// }
+const verifyTaxon = async (nodeExport, value) => {
+  const { refData } = nodeExport
+  await expect(refData.taxon.props.code).toBe(value.code)
+  await expect(refData.taxon.props.scientificName).toBe(value.scientificName)
+}
 const verifyText = async (nodeExport, value) => expect(nodeExport.value).toBe(value)
 const verifyBoolean = async (nodeExport, value) => verifyText(nodeExport, String(value))
 const verifyTime = async (nodeExport, value) => verifyText(nodeExport, formatTime(value))
@@ -42,9 +42,8 @@ const verifyNodeFns = {
   // date: verifyText,
   decimal: verifyText,
   integer: verifyText,
-  // TODO: enable verifyTaxon when fixing https://github.com/openforis/arena/issues/1405
-  // taxon: verifyTaxon,
-  taxon: () => {},
+
+  taxon: verifyTaxon,
   text: verifyText,
   time: verifyTime,
 }
