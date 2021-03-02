@@ -66,6 +66,13 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'gps_model.substring(4,7)', r: true },
     { q: 'gps_model.length', r: true },
     { q: 'gps_model[1]', r: true },
+    // global objects (constructors)
+    { q: 'Boolean(cluster_id)', r: true },
+    { q: 'Boolean(remarks)', r: true },
+    { q: 'Date.parse(Date()) <= Date.now()', r: true },
+    { q: 'Number(remarks)', r: true },
+    { q: 'String(cluster_id)', r: true },
+    { q: 'Strings(cluster_id)', r: false },
   ]
 
   NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })

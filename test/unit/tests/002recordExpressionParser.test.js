@@ -127,6 +127,12 @@ describe('RecordExpressionParser Test', () => {
     { q: 'gps_model.substring(4,7)', r: '123' },
     { q: 'gps_model.length', r: 11 },
     { q: 'gps_model[1]', r: 'B' },
+    // global objects (constructors)
+    { q: 'Boolean(cluster_id)', r: true },
+    { q: 'Boolean(remarks)', r: false },
+    { q: 'Date.parse(Date()) <= Date.now()', r: true },
+    { q: 'Number(remarks)', r: 0 },
+    { q: 'String(cluster_id)', r: '12' },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
