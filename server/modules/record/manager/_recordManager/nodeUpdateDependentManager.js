@@ -115,7 +115,12 @@ export const updateSelfAndDependentsDefaultValues = async (survey, record, node,
       )(exprEval)
 
       // 4. persist updated node value if changed and new value is not empty, and return updated node
-      if (R.equals(oldValue, exprValue) || R.isEmpty(oldValue)) {
+      if (R.equals(oldValue, exprValue)) {
+        return {}
+      }
+
+      // if value is empty and node is Taxon leave empty, the user likes to clean the value
+      if (R.isEmpty(oldValue) && NodeDef.isTaxon(nodeDef)) {
         return {}
       }
 
