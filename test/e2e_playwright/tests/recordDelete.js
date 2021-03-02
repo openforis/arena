@@ -1,6 +1,7 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { records } from '../mock/records'
 import { gotoHome, gotoRecords } from './_navigation'
+import { BASE_URL } from '../config'
 
 export default () =>
   describe('Record delete', () => {
@@ -23,10 +24,7 @@ export default () =>
       test(`Delete record ${idx}`, async () => {
         await page.click(getSelector(DataTestId.record.deleteBtn, 'button'))
         await Promise.all([page.waitForNavigation(), page.click(DataTestId.modal.ok)])
-        await expect(page.url()).toBe('http://localhost:9090/app/data/records/')
-
-        // TODO: remove line below when fixing https://github.com/openforis/arena/issues/1416
-        await page.click("//div[normalize-space(.)='ERROR 500']/button/span")
+        await expect(page.url()).toBe(`${BASE_URL}/app/data/records/`)
       })
 
       test(`Verify record ${idx} deleted`, async () => {

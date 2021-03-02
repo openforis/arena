@@ -21,7 +21,7 @@ export default () =>
 
       // Click text="Login"
       await Promise.all([
-        page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/dashboard/' } */),
+        page.waitForNavigation(/* { url: `${BASE_URL}/app/home/dashboard/` } */),
         page.click('text="Login"'),
       ])
 

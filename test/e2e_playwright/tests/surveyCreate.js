@@ -12,7 +12,7 @@ const createSurvey = (name, label, idx) => {
     await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
 
     await Promise.all([
-      page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/dashboard/' } */),
+      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
       page.click(getSelector(DataTestId.surveyCreate.submitBtn, 'button')),
     ])
 
@@ -30,7 +30,7 @@ export default () =>
 
     test('Select Survey 1', async () => {
       await Promise.all([
-        page.waitForNavigation(/* { url: 'http://localhost:9090/app/home/dashboard/' } */),
+        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
         page.click(getSelector(DataTestId.surveyList.surveyRow(1))),
       ])
 
