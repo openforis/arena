@@ -1,1 +1,0 @@
-export { toLeftOf } from 'taiko'
