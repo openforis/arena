@@ -69,9 +69,8 @@ export const getUsers = async (streamZipFile) => {
   return JSON.parse(users)
 }
 export const getUser = async (streamZipFile, uuid) => {
-  const userPath = getPathByUuid(uuid)(getPaths(streamZipFile))
-  const user = await streamZipFile.getEntryData(userPath)
-  return JSON.parse(user)
+  const users = await getUsers(streamZipFile)
+  return (users || []).find((user) => user.uuid === uuid)
 }
 export const getProfilePicturePathByUuid = (uuid) => (entries) =>
   entries.find((entry) => new RegExp(`profilepictures/${uuid}`).test(entry))

@@ -132,12 +132,6 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   await Promise.all(
     users.map(async (_user) => {
       const userData = await UserService.fetchUserByUuidWithPassword(User.getUuid(_user))
-
-      files.push({
-        data: JSON.stringify(userData, null, 2),
-        name: FileUtils.join(usersPathDir, `${User.getUuid(_user)}.json`),
-      })
-
       if (User.hasProfilePicture(userData)) {
         const userProfilePicture = await UserService.fetchUserProfilePicture(User.getUuid(userData))
         files.push({
