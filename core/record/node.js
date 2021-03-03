@@ -38,6 +38,12 @@ export const valuePropsCode = {
   label: 'label',
 }
 
+export const valuePropsDate = {
+  day: 'day',
+  month: 'month',
+  year: 'year',
+}
+
 export const valuePropsCoordinate = {
   x: 'x',
   y: 'y',
@@ -59,6 +65,11 @@ export const valuePropsTaxon = {
   vernacularNameUuid: 'vernacularNameUuid',
 }
 
+export const valuePropsTime = {
+  hour: 'hour',
+  minute: 'minute',
+}
+
 /**
  * Props of node value indexed by node def type.
  * The node definitions here are only the ones of "composite" attributes.
@@ -66,8 +77,10 @@ export const valuePropsTaxon = {
 export const valuePropsByType = {
   [NodeDef.nodeDefType.code]: valuePropsCode,
   [NodeDef.nodeDefType.coordinate]: valuePropsCoordinate,
+  [NodeDef.nodeDefType.date]: valuePropsDate,
   [NodeDef.nodeDefType.file]: valuePropsFile,
   [NodeDef.nodeDefType.taxon]: valuePropsTaxon,
+  [NodeDef.nodeDefType.time]: valuePropsTime,
 }
 
 export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))

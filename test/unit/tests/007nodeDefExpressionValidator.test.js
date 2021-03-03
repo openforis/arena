@@ -79,6 +79,13 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'cluster_location.xyz', r: false },
     { q: 'plot[0].tree[0].tree_species.code', r: true },
     { q: 'plot[0].tree[0].tree_species.scientificName', r: true },
+    { q: 'visit_date.year', r: true },
+    { q: 'visit_date.month', r: true },
+    { q: 'visit_date.day', r: true },
+    { q: 'visit_date.hour', r: false },
+    { q: 'visit_time.hour', r: true },
+    { q: 'visit_time.minute', r: true },
+    { q: 'visit_time.seconds', r: false },
   ]
 
   NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })
