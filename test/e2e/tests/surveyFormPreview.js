@@ -133,11 +133,12 @@ export default () =>
       })
 
       test(`Verify ${tree_dec_2.name} validation`, async () => {
-        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
-        await expect(page).toHaveText('tree_dec_2 > 10')
-
+        // We check in reverse order because the tooltip hide the badge below
         await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
         await expect(page).toHaveText('tree_dec_2 > 0')
+
+        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
+        await expect(page).toHaveText('tree_dec_2 > 10')
       })
 
       test('Wait thread to complete', async () => {
