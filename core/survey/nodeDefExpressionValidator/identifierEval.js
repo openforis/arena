@@ -40,22 +40,22 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
 }
 
 export const identifierEval = ({ survey, nodeDefCurrent }) => (expr, ctx) => {
-  const { node: exprContext, selfReferenceAllowed = true } = ctx
+  const { node: nodeContext, selfReferenceAllowed = true } = ctx
 
   const exprName = Expression.getName(expr)
 
-  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, exprContext })
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext })
   if (globalIdentifierEvalResult !== null) {
     return globalIdentifierEvalResult
   }
 
   // identifier is a native property or function (e.g. String.length or String.toUpperCase())
-  if (NodeNativeProperties.hasNativeProperty({ nodeDefOrValue: exprContext, propName: exprName })) {
-    return NodeNativeProperties.evalNodeDefProperty({ nodeDefOrValue: exprContext, propName: exprName })
+  if (NodeNativeProperties.hasNativeProperty({ nodeDefOrValue: nodeContext, propName: exprName })) {
+    return NodeNativeProperties.evalNodeDefProperty({ nodeDefOrValue: nodeContext, propName: exprName })
   }
 
   // identifier references a node
-  const reachableNodeDefs = _getReachableNodeDefs(survey, exprContext)
+  const reachableNodeDefs = _getReachableNodeDefs(survey, nodeContext)
 
   const def = reachableNodeDefs.find((x) => NodeDef.getName(x) === exprName)
 

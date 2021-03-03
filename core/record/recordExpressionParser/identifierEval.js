@@ -110,23 +110,23 @@ const _getReferencedNodes = ({ survey, record, node, nodeDefReferenced }) => {
   return []
 }
 
-export const identifierEval = (survey, record) => (expr, { node: exprContext, evaluateToNode }) => {
+export const identifierEval = (survey, record) => (expr, { node: nodeContext, evaluateToNode }) => {
   const exprName = Expression.getName(expr)
 
   // identifier is global object
-  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, exprContext })
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext })
   if (globalIdentifierEvalResult !== null) {
     return globalIdentifierEvalResult
   }
 
   // identifier is a native property or function (e.g. String.length or String.toUpperCase())
-  const prop = exprContext[exprName]
+  const prop = nodeContext[exprName]
   if (prop !== undefined) {
-    return prop instanceof Function ? prop.bind(exprContext) : prop
+    return prop instanceof Function ? prop.bind(nodeContext) : prop
   }
 
   // identifier references a node
-  const node = exprContext
+  const node = nodeContext
   const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   const nodeDefReferenced = Survey.getNodeDefByName(exprName)(survey)
 
