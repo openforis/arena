@@ -45,9 +45,9 @@ export function getSelect(params) {
   _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
-  const columnTaxonUuid = _getColumnValueProp(Node.valuePropKeys.taxonUuid)
-  const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropKeys.itemUuid)
-  const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropKeys.vernacularNameUuid)
+  const columnTaxonUuid = _getColumnValueProp(Node.valuePropsTaxon.taxonUuid)
+  const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropsTaxon.itemUuid)
+  const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropsTaxon.vernacularNameUuid)
 
   const query = `SELECT ${this.columns},
         CASE

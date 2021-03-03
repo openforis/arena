@@ -130,16 +130,18 @@ export const isEntityOrMultiple = (nodeDef) => isEntity(nodeDef) || isMultiple(n
 export const isAttribute = R.pipe(isEntity, R.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isAttributeComposite = (nodeDef) =>
+  [nodeDefType.coordinate, nodeDefType.file, nodeDefType.taxon].includes(getType(nodeDef))
 
-export const isText = isType(nodeDefType.text)
 export const isBoolean = isType(nodeDefType.boolean)
-export const isDate = isType(nodeDefType.date)
 export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
+export const isDate = isType(nodeDefType.date)
 export const isDecimal = isType(nodeDefType.decimal)
 export const isFile = isType(nodeDefType.file)
 export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
+export const isText = isType(nodeDefType.text)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 

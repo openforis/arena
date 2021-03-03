@@ -1,6 +1,7 @@
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import * as NodeNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
 import * as Expression from '@core/expressionParser/expression'
 import Queue from '@core/queue'
@@ -49,9 +50,14 @@ export const identifierEval = ({ survey, nodeDefCurrent }) => (expr, ctx) => {
     return globalIdentifierEvalResult
   }
 
-  // identifier is a native property or function (e.g. String.length or String.toUpperCase())
+  // check if identifier is a native property or function (e.g. String.length or String.toUpperCase())
   if (NodeNativeProperties.hasNativeProperty({ nodeDefOrValue: nodeContext, propName: exprName })) {
     return NodeNativeProperties.evalNodeDefProperty({ nodeDefOrValue: nodeContext, propName: exprName })
+  }
+
+  // check if identifier is a composite attribute value prop
+  if (NodeDef.isAttribute(nodeContext) && Node.isValueProp({ nodeDef: nodeContext, prop: exprName })) {
+    return nodeContext
   }
 
   // identifier references a node

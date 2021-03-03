@@ -73,6 +73,12 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'Number(remarks)', r: true },
     { q: 'String(cluster_id)', r: true },
     { q: 'Strings(cluster_id)', r: false },
+    // composite attributes
+    { q: 'cluster_location.x', r: true },
+    { q: 'cluster_location.srs', r: true },
+    { q: 'cluster_location.xyz', r: false },
+    { q: 'plot[0].tree[0].tree_species.code', r: true },
+    { q: 'plot[0].tree[0].tree_species.scientificName', r: true },
   ]
 
   NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })
