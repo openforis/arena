@@ -26,7 +26,7 @@ const NodeDefBoolean = (props) => {
         className="btn btn-s btn-transparent flex-center"
         data-value={value}
         aria-disabled={disabled || !canEditRecord || readOnly}
-        onClick={() => updateNode(nodeDef, node, checked ? null : value)}
+        onClick={() => (checked ? null : updateNode(nodeDef, node, value))}
       >
         <span className={`icon icon-12px icon-radio-${checked ? 'checked2' : 'unchecked'} icon-left`} />
         {label}
