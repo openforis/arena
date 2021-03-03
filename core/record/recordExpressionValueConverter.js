@@ -31,7 +31,7 @@ const _toCode = ({ survey, record, nodeCtx, valueExpr }) => {
 
   const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
 
-  return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
+  return itemUuid ? { [Node.valuePropsCode.itemUuid]: itemUuid } : null
 }
 
 const _toDateTime = ({ valueExpr, format, formatsFrom = [DateUtils.formats.datetimeDefault] }) => {
@@ -52,7 +52,7 @@ const _toTaxon = ({ survey, nodeCtx, valueExpr }) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
 
-  return taxonUuid ? { [Node.valuePropKeys.taxonUuid]: taxonUuid } : null
+  return taxonUuid ? { [Node.valuePropsTaxon.taxonUuid]: taxonUuid } : null
 }
 
 const _valueExprToValueNodeFns = {

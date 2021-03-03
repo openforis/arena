@@ -32,30 +32,45 @@ export const metaKeys = {
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
-export const valuePropKeys = {
-  // Generic code (can be used by taxon or categoryItem)
+export const valuePropsCode = {
   code: 'code',
-
-  // Code
   itemUuid: 'itemUuid',
   label: 'label',
+}
 
-  // Coordinate
+export const valuePropsCoordinate = {
   x: 'x',
   y: 'y',
   srs: 'srs',
+}
 
-  // File
+export const valuePropsFile = {
   fileUuid: 'fileUuid',
   fileName: 'fileName',
   fileSize: 'fileSize',
-
-  // Taxon
-  taxonUuid: 'taxonUuid',
-  vernacularNameUuid: 'vernacularNameUuid',
-  scientificName: 'scientificName',
-  vernacularName: 'vernacularName',
 }
+
+export const valuePropsTaxon = {
+  code: 'code',
+  itemUuid: 'itemUuid',
+  scientificName: 'scientificName',
+  taxonUuid: 'taxonUuid',
+  vernacularName: 'vernacularName',
+  vernacularNameUuid: 'vernacularNameUuid',
+}
+
+/**
+ * Props of node value indexed by node def type.
+ * The node definitions here are only the ones of "composite" attributes.
+ */
+export const valuePropsByType = {
+  [NodeDef.nodeDefType.code]: valuePropsCode,
+  [NodeDef.nodeDefType.coordinate]: valuePropsCoordinate,
+  [NodeDef.nodeDefType.file]: valuePropsFile,
+  [NodeDef.nodeDefType.taxon]: valuePropsTaxon,
+}
+
+export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
 
 //
 // ======
@@ -164,12 +179,13 @@ export const isValueBlank = (node) => {
 // ====== Node Value extractor
 
 // Code
-export const getCategoryItemUuid = getValueProp(valuePropKeys.itemUuid)
+export const getCategoryItemUuid = getValueProp(valuePropsCode.itemUuid)
 
 // Coordinate
-export const getCoordinateX = getValueProp(valuePropKeys.x)
-export const getCoordinateY = getValueProp(valuePropKeys.y)
-export const getCoordinateSrs = (node, defaultValue = null) => getValueProp(valuePropKeys.srs, defaultValue)(node)
+export const getCoordinateX = getValueProp(valuePropsCoordinate.x)
+export const getCoordinateY = getValueProp(valuePropsCoordinate.y)
+export const getCoordinateSrs = (node, defaultValue = null) =>
+  getValueProp(valuePropsCoordinate.srs, defaultValue)(node)
 
 // Date
 const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim)
@@ -180,14 +196,14 @@ export const getDateCreated = R.prop(keys.dateCreated)
 export const getDateModified = R.prop(keys.dateModified)
 
 // File
-export const getFileName = getValueProp(valuePropKeys.fileName, '')
-export const getFileUuid = getValueProp(valuePropKeys.fileUuid, '')
+export const getFileName = getValueProp(valuePropsFile.fileName, '')
+export const getFileUuid = getValueProp(valuePropsFile.fileUuid, '')
 
 // Taxon
-export const getTaxonUuid = getValueProp(valuePropKeys.taxonUuid)
-export const getVernacularNameUuid = getValueProp(valuePropKeys.vernacularNameUuid)
-export const getScientificName = getValueProp(valuePropKeys.scientificName, '')
-export const getVernacularName = getValueProp(valuePropKeys.vernacularName, '')
+export const getTaxonUuid = getValueProp(valuePropsTaxon.taxonUuid)
+export const getVernacularNameUuid = getValueProp(valuePropsTaxon.vernacularNameUuid)
+export const getScientificName = getValueProp(valuePropsTaxon.scientificName, '')
+export const getVernacularName = getValueProp(valuePropsTaxon.vernacularName, '')
 
 // Time
 const _getTimePart = (index) => R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim)

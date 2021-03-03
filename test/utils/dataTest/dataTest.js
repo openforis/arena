@@ -9,6 +9,7 @@ export const createTestSurvey = ({ user }) =>
     SB.entity(
       'cluster',
       SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
+      SB.attribute('cluster_location', NodeDef.nodeDefType.coordinate),
       SB.attribute('cluster_distance', NodeDef.nodeDefType.integer),
       SB.attribute('visit_date', NodeDef.nodeDefType.date),
       SB.attribute('gps_model', NodeDef.nodeDefType.text),
@@ -21,7 +22,8 @@ export const createTestSurvey = ({ user }) =>
           'tree',
           SB.attribute('tree_id', NodeDef.nodeDefType.integer).key(),
           SB.attribute('tree_height', NodeDef.nodeDefType.integer),
-          SB.attribute('dbh', NodeDef.nodeDefType.decimal)
+          SB.attribute('dbh', NodeDef.nodeDefType.decimal),
+          SB.attribute('tree_species', NodeDef.nodeDefType.taxon)
         ).multiple()
       ).multiple()
     )

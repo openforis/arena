@@ -107,7 +107,7 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                "{""${Node.valuePropKeys.itemUuid}"": """ || c.uuid || """, ""${Node.valuePropKeys.code}"": """ || c.code || """, ""${Node.valuePropKeys.label}"": """ || c.label || """}" AS ${nodeVarName}
+                "{""${Node.valuePropsCode.itemUuid}"": """ || c.uuid || """, ""${Node.valuePropsCode.code}"": """ || c.code || """, ""${Node.valuePropsCode.label}"": """ || c.label || """}" AS ${nodeVarName}
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
             ON r.${nodeTmpVarName} = c.code  
