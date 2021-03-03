@@ -1,6 +1,7 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import { survey, survey2 } from '../mock/survey'
+import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
+import { selectSurvey } from './_surveyList'
 
 const expectSurveyLabel = async (label) =>
   expect(await page.innerText(getSelector(DataTestId.dashboard.surveyLabel, 'h3'))).toBe(label.toUpperCase())
@@ -29,12 +30,5 @@ export default () =>
 
     gotoSurveyList()
 
-    test('Select Survey 1', async () => {
-      await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
-        page.click(getSelector(DataTestId.surveyList.surveyRow(1))),
-      ])
-
-      await expectSurveyLabel(survey.label)
-    })
+    selectSurvey(survey, survey.label)
   })

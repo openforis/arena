@@ -1,30 +1,35 @@
+import * as PromiseUtils from '../../../core/promiseUtils'
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { survey, survey2, surveyImport } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
+import { clickSurvey } from './_surveyList'
 
-const deleteSurvey = (name, idx) =>
-  test(`Delete ${name}`, async () => {
-    await Promise.all([
-      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
-      page.click(getSelector(DataTestId.surveyList.surveyRow(idx))),
-    ])
+const deleteSurvey = async (surveyToDelete) => {
+  const { name } = surveyToDelete
 
-    await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
-    await page.fill('input[type="text"]', name)
+  await clickSurvey(surveyToDelete)
 
-    // Click div[role="dialog"] >> text="Delete"
-    await Promise.all([
-      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/surveys/` } */),
-      page.click('div[role="dialog"] >> text="Delete"'),
-    ])
+  await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
+  await page.fill('input[type="text"]', name)
 
-    await expect(page).toHaveText(`Survey ${name} has been deleted`)
-  })
+  // Click div[role="dialog"] >> text="Delete"
+  await Promise.all([
+    page.waitForNavigation(/* { url: `{BASE_URL}/app/home/surveys/` } */),
+    page.click('div[role="dialog"] >> text="Delete"'),
+  ])
+
+  await expect(page).toHaveText(`Survey ${name} has been deleted`)
+}
 
 export default () =>
   describe('Survey Delete', () => {
     gotoSurveyList()
 
-    deleteSurvey('survey_2', 1)
+    test('Delete surveys', async () => {
+      await PromiseUtils.each([survey2, surveyImport, survey], deleteSurvey)
+    })
 
-    deleteSurvey('survey', 0)
+    test('Verify survey list empty', async () => {
+      await expect(page).toHaveText('No Items')
+    })
   })
