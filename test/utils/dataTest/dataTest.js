@@ -1,4 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 
 import * as SB from '../surveyBuilder'
 import * as RB from '../recordBuilder'
@@ -36,6 +37,11 @@ export const createTestRecord = ({ user, survey }) =>
     RB.entity(
       'cluster',
       RB.attribute('cluster_id', 12),
+      RB.attribute('cluster_location', {
+        [Node.valuePropsCoordinate.srs]: 'EPSG:4326',
+        [Node.valuePropsCoordinate.x]: 41.883012,
+        [Node.valuePropsCoordinate.y]: 12.489056,
+      }),
       RB.attribute('cluster_distance', 18),
       RB.attribute('visit_date', '2021-01-01'),
       RB.attribute('gps_model', 'ABC-123-xyz'),
@@ -45,7 +51,16 @@ export const createTestRecord = ({ user, survey }) =>
         RB.attribute('plot_id', 1),
         RB.attribute('plot_multiple_number', 10),
         RB.attribute('plot_multiple_number', 20),
-        RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 10), RB.attribute('dbh', 7)),
+        RB.entity(
+          'tree',
+          RB.attribute('tree_id', 1),
+          RB.attribute('tree_height', 10),
+          RB.attribute('dbh', 7),
+          RB.attribute('tree_species', {
+            [Node.valuePropsTaxon.code]: 'ACA',
+            [Node.valuePropsTaxon.scientificName]: 'Acacia sp.',
+          })
+        ),
         RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 11), RB.attribute('dbh', 10.123))
       ),
       RB.entity(

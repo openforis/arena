@@ -86,7 +86,7 @@ export const getRecordUuid = R.prop(keys.recordUuid)
 
 export const getValue = (node = {}, defaultValue = {}) => R.propOr(defaultValue, keys.value, node)
 
-const getValueProp = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
+export const getValueProp = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
 
 export const { getNodeDefUuid } = ObjectUtils
 

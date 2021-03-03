@@ -133,6 +133,12 @@ describe('RecordExpressionParser Test', () => {
     { q: 'Date.parse(Date()) <= Date.now()', r: true },
     { q: 'Number(remarks)', r: 0 },
     { q: 'String(cluster_id)', r: '12' },
+    // composite attribute members
+    { q: 'cluster_location.x', r: 41.883012 },
+    { q: 'cluster_location.y', r: 12.489056 },
+    { q: 'cluster_location.srs', r: 'EPSG:4326' },
+    { q: 'plot[0].tree[0].tree_species.code', r: 'ACA' },
+    { q: 'plot[0].tree[0].tree_species.scientificName', r: 'Acacia sp.' },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
