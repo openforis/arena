@@ -1,4 +1,4 @@
-export { exportSurvey, removeExportedSurveyFiles } from './export'
+export { exportSurvey, removeExportSurveyFiles } from './export'
 
 // Survey
 export { verifySurvey } from './survey'

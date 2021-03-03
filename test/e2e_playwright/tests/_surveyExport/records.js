@@ -54,13 +54,13 @@ const verifyNode = async (nodeDefExport, nodeExport, value) => {
   return verifyNodeFn(nodeExport, value)
 }
 
-const verifyRecord = async (survey, surveyExport, recordUuid) => {
+const verifyRecord = async (survey, surveyExport, recordsMock, recordUuid) => {
   const clusterIdDef = cluster.children.cluster_id
   const clusterIdDefExport = getNodeDefByName(clusterIdDef.name)(surveyExport)
 
   const recordExport = getSurveyEntry(survey, 'records', `${recordUuid}.json`)
   const clusterIdExport = getNodeByDefUuid(clusterIdDefExport.uuid)(recordExport)
-  const record = records.find((_record) => _record[clusterIdDef.name] === clusterIdExport.value)
+  const record = recordsMock.find((_record) => _record[clusterIdDef.name] === clusterIdExport.value)
 
   await expect(recordExport.uuid).toBe(recordUuid)
   await expect(recordExport.preview).toBeFalsy()
@@ -94,14 +94,14 @@ const verifyRecord = async (survey, surveyExport, recordUuid) => {
   })
 }
 
-export const verifyRecords = (survey) =>
+export const verifyRecords = (survey, recordsMock = records) =>
   test('Verify records', async () => {
     const recordsExport = getSurveyEntry(survey, 'records', 'records.json')
     const surveyExport = getSurveyEntry(survey, 'survey.json')
 
-    await expect(recordsExport.length).toBe(records.length)
+    await expect(recordsExport.length).toBe(recordsMock.length)
 
     await PromiseUtils.each(recordsExport, async (recordExport) =>
-      verifyRecord(survey, surveyExport, recordExport.uuid)
+      verifyRecord(survey, surveyExport, recordsMock, recordExport.uuid)
     )
   })

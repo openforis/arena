@@ -5,7 +5,7 @@ import { BASE_URL } from '../../config'
 export const gotoSurveyCreate = () =>
   test('Goto survey create', async () => {
     await page.click(getSelector(DataTestId.header.userBtn, 'button'))
-    await page.click(getSelector(DataTestId.header.surveyCreateBtn, 'a'))
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.header.surveyCreateBtn, 'a'))])
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyNew/`)
   })
 

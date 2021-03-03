@@ -6,7 +6,7 @@ export const verifyActivityLog = (survey) =>
 
     const activities = Object.values(activityLog)
 
-    await expect(activities.length).toBeGreaterThan(1)
+    await expect(activities.length).toBeGreaterThanOrEqual(1)
 
     const [lastActivity] = activities.reverse()
     await expect(lastActivity.type).toBe('surveyCreate')

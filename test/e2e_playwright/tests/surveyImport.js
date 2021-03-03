@@ -4,7 +4,7 @@ import { survey, surveyImport } from '../mock/survey'
 import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
-  removeExportedSurveyFiles,
+  removeExportSurveyFiles,
   verifyCategories,
   verifyNodeDefs,
   verifyRecords,
@@ -35,7 +35,7 @@ export default () =>
       const json = await response.json()
       surveyImport.name = json.survey.info.props.name
     })
-    removeExportedSurveyFiles(survey)
+    removeExportSurveyFiles(survey)
 
     exportSurvey(surveyImport)
 
@@ -57,7 +57,7 @@ export default () =>
     // TODO: uncomment this when fixing https://github.com/openforis/arena/issues/1427
     // verifySurveyPublished()
 
-    removeExportedSurveyFiles(surveyImport)
+    removeExportSurveyFiles(surveyImport)
 
     gotoSurveyList()
 

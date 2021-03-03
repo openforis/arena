@@ -1,7 +1,7 @@
 import { survey } from '../mock/survey'
 import {
   exportSurvey,
-  removeExportedSurveyFiles,
+  removeExportSurveyFiles,
   verifyActivityLog,
   verifyCategories,
   verifyNodeDefs,
@@ -29,5 +29,5 @@ export default () =>
 
     verifyActivityLog(survey)
 
-    removeExportedSurveyFiles(survey)
+    removeExportSurveyFiles(survey)
   })

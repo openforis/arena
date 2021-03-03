@@ -21,3 +21,13 @@ export const survey2 = {
 export const surveyImport = {
   ...survey,
 }
+
+export const surveyClone = {
+  cloneFrom: survey.name,
+  name: 'survey_clone',
+  label: 'My Survey cloned',
+  labels: {
+    en: 'My Survey cloned',
+  },
+  languages: ['en', 'fr'],
+}

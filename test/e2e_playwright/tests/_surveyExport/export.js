@@ -22,7 +22,7 @@ export const exportSurvey = (survey) =>
     await expect(fs.existsSync(surveyDirPath)).toBeTruthy()
   })
 
-export const removeExportedSurveyFiles = (survey) =>
+export const removeExportSurveyFiles = (survey) =>
   test(`Remove exported survey ${survey.name} files`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
