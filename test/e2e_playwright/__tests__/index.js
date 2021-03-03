@@ -18,6 +18,7 @@ import recordVerify from '../tests/recordVerify'
 // import userInvite from '../tests/userInvite'
 
 import surveyExport from '../tests/surveyExport'
+import surveyImport from '../tests/surveyImport'
 
 import validationReport from '../tests/validationReport'
 import recordDelete from '../tests/recordDelete'
@@ -61,6 +62,7 @@ describe('E2E Tests', () => {
    * Survey export/import/clone.
    */
   surveyExport()
+  surveyImport()
 
   /**
    * Validation Report.

@@ -14,3 +14,7 @@ export const survey2 = {
   name: 'survey_2',
   label: 'Survey 2',
 }
+
+export const surveyImport = {
+  ...survey,
+}
