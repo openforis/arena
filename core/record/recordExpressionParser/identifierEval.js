@@ -120,14 +120,19 @@ export const identifierEval = (survey, record) => (expr, { node: nodeContext, ev
   }
 
   // identifier is a native property or function (e.g. String.length or String.toUpperCase())
+  // or a composite attribute value member (e.g. coordinate.x, species.scientificName)
   const prop = nodeContext[exprName]
   if (prop !== undefined) {
     return prop instanceof Function ? prop.bind(nodeContext) : prop
   }
 
-  // identifier references a node
+  // identifier references a node or a node value prop
   const node = nodeContext
   const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (Node.isValueProp({ nodeDef: nodeDefCtx, prop: exprName })) {
+    return Node.getValueProp(exprName)(node)
+  }
+
   const nodeDefReferenced = Survey.getNodeDefByName(exprName)(survey)
 
   let nodeResult = null
@@ -151,7 +156,7 @@ export const identifierEval = (survey, record) => (expr, { node: nodeContext, ev
     throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
   }
 
-  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode) {
+  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode && !NodeDef.isAttributeComposite(nodeDefReferenced)) {
     // return node values
     const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
     return single ? values[0] : values

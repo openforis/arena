@@ -39,7 +39,7 @@ const extractCodeValueAndMeta = (survey, nodeDef, record, node) => (collectNode)
     return itemUuid
       ? {
           value: {
-            [Node.valuePropKeys.itemUuid]: itemUuid,
+            [Node.valuePropsCode.itemUuid]: itemUuid,
           },
           meta: {
             [Node.metaKeys.hierarchyCode]: hierarchyCode,
@@ -59,9 +59,9 @@ const extractCoordinateValueAndMeta = (collectNode) => {
 
     return {
       value: {
-        [Node.valuePropKeys.x]: x,
-        [Node.valuePropKeys.y]: y,
-        [Node.valuePropKeys.srs]: srsId,
+        [Node.valuePropsCoordinate.x]: x,
+        [Node.valuePropsCoordinate.y]: y,
+        [Node.valuePropsCoordinate.srs]: srsId,
       },
     }
   }
@@ -102,9 +102,9 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
     return {
       value: {
-        [Node.valuePropKeys.fileUuid]: fileUuid,
-        [Node.valuePropKeys.fileName]: fileName,
-        [Node.valuePropKeys.fileSize]: fileSize,
+        [Node.valuePropsFile.fileUuid]: fileUuid,
+        [Node.valuePropsFile.fileName]: fileName,
+        [Node.valuePropsFile.fileSize]: fileSize,
       },
     }
   }
@@ -120,19 +120,19 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
 
   if (taxonUuid) {
     const value = {
-      [Node.valuePropKeys.taxonUuid]: taxonUuid,
+      [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
     }
 
     if (code === Taxon.unlistedCode) {
-      value[Node.valuePropKeys.scientificName] = scientificName
+      value[Node.valuePropsTaxon.scientificName] = scientificName
     }
 
     if (vernacularName) {
       const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(nodeDef, code, vernacularName)(survey)
       if (vernacularNameUuid) {
-        value[Node.valuePropKeys.vernacularNameUuid] = vernacularNameUuid
+        value[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
       } else {
-        value[Node.valuePropKeys.vernacularName] = vernacularName
+        value[Node.valuePropsTaxon.vernacularName] = vernacularName
       }
     }
 

@@ -74,11 +74,11 @@ NodeDefTaxonInputField.defaultProps = {
   canEditRecord: false,
   readOnly: false,
 
-  field: Node.valuePropKeys.code,
+  field: Node.valuePropsTaxon.code,
   selection: {
-    [Node.valuePropKeys.code]: '',
-    [Node.valuePropKeys.scientificName]: '',
-    [Node.valuePropKeys.vernacularName]: '',
+    [Node.valuePropsTaxon.code]: '',
+    [Node.valuePropsTaxon.scientificName]: '',
+    [Node.valuePropsTaxon.vernacularName]: '',
   },
   onChangeTaxon: null, // Function to call when the taxon value changed
   onChangeSelectionField: null, // Function to call when local selection changes

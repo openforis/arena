@@ -12,9 +12,9 @@ import NodeDeleteButton from '../nodeDeleteButton'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {
-    [Node.valuePropKeys.fileUuid]: uuidv4(),
-    [Node.valuePropKeys.fileName]: file.name,
-    [Node.valuePropKeys.fileSize]: file.size,
+    [Node.valuePropsFile.fileUuid]: uuidv4(),
+    [Node.valuePropsFile.fileName]: file.name,
+    [Node.valuePropsFile.fileSize]: file.size,
   }
   updateNode(nodeDef, node, value, file)
 }
