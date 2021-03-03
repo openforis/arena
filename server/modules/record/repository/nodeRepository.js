@@ -47,15 +47,15 @@ const _getNodeSelectQuery = (surveyId, draft) => {
     LEFT OUTER JOIN
         ${schema}.category_item c
     ON
-        (n.value->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
+        (n.value->>'${Node.valuePropsCode.itemUuid}')::uuid = c.uuid
     LEFT OUTER JOIN
         ${schema}.taxon t
     ON
-        (n.value->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
+        (n.value->>'${Node.valuePropsTaxon.taxonUuid}')::uuid = t.uuid
     LEFT OUTER JOIN
         ${schema}.taxon_vernacular_name v
     ON
-        (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
+        (n.value->>'${Node.valuePropsTaxon.vernacularNameUuid}')::uuid = v.uuid`
 }
 
 // ============== CREATE
