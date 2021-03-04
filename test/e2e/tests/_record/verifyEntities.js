@@ -13,7 +13,7 @@ const {
   cluster_province,
 } = cluster.children
 const { plot_id, plot_text } = plot.children
-const { tree_id, tree_dec_1, tree_dec_2 } = tree.children
+const { tree_id, tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 export const verifyCluster = (record) =>
   describe(`Verify ${cluster.name} values`, () => {
@@ -42,7 +42,6 @@ export const verifyTrees = (record) => {
     verifyAttribute(tree_id, treeEntry[tree_id.name], treeSelector)
     verifyAttribute(tree_dec_1, treeEntry[tree_dec_1.name], treeSelector)
     verifyAttribute(tree_dec_2, treeEntry[tree_dec_2.name], treeSelector)
-    // TODO: uncomment below with https://github.com/openforis/arena/issues/1405
-    // verifyAttribute(tree_species, treeEntry[tree_species.name], treeSelector)
+    verifyAttribute(tree_species, treeEntry[tree_species.name], treeSelector)
   })
 }

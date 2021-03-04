@@ -30,11 +30,11 @@ export const createExpressionPlaceholder = () => createExpression('', '', true)
 
 export const { getUuid } = ObjectUtils
 
-export const getExpression = R.prop(keys.expression)
+export const getExpression = R.propOr('', keys.expression)
 
 export const getApplyIf = R.prop(keys.applyIf)
 
-export const getMessages = R.propOr({}, keys.messages)
+export const getMessages = (expression) => R.propOr({}, keys.messages)(expression)
 
 export const getMessage = (lang, defaultValue = '') => R.pipe(getMessages, R.propOr(defaultValue, lang))
 

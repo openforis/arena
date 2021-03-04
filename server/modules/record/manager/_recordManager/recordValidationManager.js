@@ -24,10 +24,7 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 
   // 3. merge validations
   const validation = Validation.recalculateValidity(
-    Validation.newInstance(
-      true,
-      R.mergeDeepLeft(recordKeysValidation, Validation.getFieldValidations(nodesValidation)),
-    ),
+    Validation.newInstance(true, R.mergeDeepLeft(recordKeysValidation, Validation.getFieldValidations(nodesValidation)))
   )
 
   // 4. persist validation
@@ -39,11 +36,11 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 const isRootNodeKeysUpdated = (survey, nodes) =>
   R.pipe(
     R.values,
-    R.any(n => {
+    R.any((n) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
       const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
       return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
-    }),
+    })
   )(nodes)
 
 export const persistValidation = async (survey, record, nodesValidation, tx) => {
@@ -52,7 +49,7 @@ export const persistValidation = async (survey, record, nodesValidation, tx) => 
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
     Validation.mergeValidation(nodesValidation),
-    Validation.updateCounts,
+    Validation.updateCounts
   )(record)
 
   await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)
@@ -67,7 +64,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (survey, reco
     recordKeyNodes,
     Record.getUuid(record),
     excludeRecordFromCount,
-    t,
+    t
   )
 
   for (const [recordUuid, nodesKeyValidation] of Object.entries(validationByRecord)) {

@@ -64,7 +64,6 @@ export const enterTrees = (record) => {
     enterAttribute(tree_id, treeEntry[tree_id.name], treeSelector)
     enterAttribute(tree_dec_1, treeEntry[tree_dec_1.name], treeSelector)
     enterAttribute(tree_dec_2, treeEntry[tree_dec_2.name], treeSelector)
-    // TODO: uncomment below with https://github.com/openforis/arena/issues/1405
-    // enterAttribute(tree_species, treeEntry[tree_species.name], treeSelector)
+    enterAttribute(tree_species, treeEntry[tree_species.name], treeSelector)
   })
 }
