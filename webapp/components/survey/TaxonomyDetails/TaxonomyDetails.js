@@ -13,6 +13,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import Table from '@webapp/components/Table/Table'
 import Header from './Header'
@@ -63,7 +64,7 @@ const TaxonomyDetails = (props) => {
       </div>
 
       {showClose && (
-        <div className="button-bar">
+        <div className="button-bar" data-testid={DataTestId.taxonomyDetails.doneEditBtn}>
           <button type="button" className="btn" onClick={history.goBack}>
             {i18n.t('common.done')}
           </button>

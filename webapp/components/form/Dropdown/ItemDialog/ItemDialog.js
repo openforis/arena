@@ -1,12 +1,20 @@
 import './itemDialog.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const ItemDialog = (props) => {
-  const { item, itemLabel, onKeyDown, onMouseDown } = props
+  const { item, itemKey, itemLabel, onKeyDown, onMouseDown } = props
 
   return (
-    <div role="button" className={ItemDialog.className} onMouseDown={onMouseDown} onKeyDown={onKeyDown} tabIndex={0}>
+    <div
+      data-testid={DataTestId.dropdown.dropDownItem(itemKey(item))}
+      role="button"
+      className={ItemDialog.className}
+      onMouseDown={onMouseDown}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
+    >
       {itemLabel(item)}
     </div>
   )
@@ -14,6 +22,7 @@ const ItemDialog = (props) => {
 
 ItemDialog.propTypes = {
   item: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]).isRequired,
+  itemKey: PropTypes.func.isRequired,
   itemLabel: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
   onMouseDown: PropTypes.func.isRequired,

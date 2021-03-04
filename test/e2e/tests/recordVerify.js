@@ -1,0 +1,39 @@
+import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+
+import { plot } from '../mock/nodeDefs'
+import { records } from '../mock/records'
+import { gotoFormPage } from './_formDesigner'
+import { gotoHome, gotoRecords } from './_navigation'
+import { verifyCluster, verifyPlot, verifyTrees } from './_record'
+import { gotoRecord } from './_records'
+
+export default () =>
+  describe('Record verify', () => {
+    describe.each(Array.from(Array(records.length).keys()))(`Verify record %s`, (idx) => {
+      const record = records[idx]
+
+      gotoRecords()
+
+      gotoRecord(record)
+
+      test(`Verify record valid`, async () => {
+        const errorBadge = await page.$(getSelector(DataTestId.record.errorBadge))
+        await expect(errorBadge).toBeNull()
+      })
+
+      verifyCluster(record)
+
+      gotoFormPage(plot)
+
+      verifyPlot(record)
+
+      verifyTrees(record)
+
+      test('Wait thread to complete', async () => {
+        // TODO thread issue: https://github.com/openforis/arena/issues/1412
+        await page.waitForTimeout(500)
+      })
+    })
+
+    gotoHome()
+  })

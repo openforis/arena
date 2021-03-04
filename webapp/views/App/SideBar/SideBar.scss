@@ -40,6 +40,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
   &.active {
     border-right-color: $blue;
+    background: linear-gradient(to left, rgba($blue, 0.1) 0%, rgba($blue, 0.04) 50%, transparent 80%);
 
     &[aria-disabled='true'] {
       opacity: 1;
@@ -112,7 +113,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
 .sidebar__modules.popup-menu-opened {
   .sidebar__module.over {
-    background-color: $sidebarPopupMenuBgColor;
+    background: $sidebarPopupMenuBgColor;
   }
 }
 

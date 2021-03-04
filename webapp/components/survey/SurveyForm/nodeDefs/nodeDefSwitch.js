@@ -63,7 +63,7 @@ class NodeDefSwitch extends React.Component {
       (applicable ? '' : ' not-applicable')
 
     return (
-      <div className={className} ref={this.element}>
+      <div className={className} data-testid={NodeDef.getName(nodeDef)} ref={this.element}>
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
 
         {renderType === NodeDefLayout.renderType.tableHeader ? (

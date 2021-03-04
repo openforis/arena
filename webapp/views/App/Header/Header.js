@@ -6,13 +6,13 @@ import { useDispatch } from 'react-redux'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 
-import { useLang } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useIsAppSaving } from '@webapp/store/app'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { useLang } from '@webapp/store/system'
+import { UserActions, useUser } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { usePrevious } from '@webapp/components/hooks'
-import { UserActions, useUser } from '@webapp/store/user'
-
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
@@ -69,6 +69,7 @@ const Header = () => {
 
       <button
         className="header__btn-user"
+        data-testid={DataTestId.header.userBtn}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()

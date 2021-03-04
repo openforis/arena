@@ -2,19 +2,21 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/store/system'
-import { FormItem } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
-import CategorySelector from '@webapp/components/survey/CategorySelector'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
+import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
+import { FormItem } from '@webapp/components/form/Input'
+import Dropdown from '@webapp/components/form/Dropdown'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import CategorySelector from '@webapp/components/survey/CategorySelector'
+
 import { State } from './store'
 
 const displayAsItems = ({ i18n }) => [
@@ -73,6 +75,7 @@ const CodeProps = (props) => {
             >
               <Dropdown
                 disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
+                idInput={DataTestId.nodeDefDetails.nodeDefCodeParent}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
                 itemKey="uuid"

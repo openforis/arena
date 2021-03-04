@@ -83,11 +83,7 @@ export default class UsersImportJob extends Job {
   async execute() {
     const { arenaSurveyFileZip, surveyId, arenaSurvey, survey } = this.context
 
-    const usersList = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
-
-    const users = await Promise.all(
-      (usersList || []).map(async (user) => ArenaSurveyFileZip.getUser(arenaSurveyFileZip, User.getUuid(user)))
-    )
+    const users = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
 
     users.push(this.user)
 

@@ -31,6 +31,7 @@ const UploadButton = (props) => {
     <>
       <input
         id={inputFieldId}
+        data-testid={inputFieldId}
         ref={fileInput}
         type="file"
         style={{ display: 'none' }}

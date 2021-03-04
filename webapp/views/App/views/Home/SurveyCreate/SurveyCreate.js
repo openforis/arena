@@ -12,6 +12,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
@@ -38,6 +39,7 @@ const SurveyCreate = () => {
     <div className="home-survey-create">
       <div>
         <Input
+          id={DataTestId.surveyCreate.surveyName}
           placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
@@ -46,6 +48,7 @@ const SurveyCreate = () => {
       </div>
       <div>
         <Input
+          id={DataTestId.surveyCreate.surveyLabel}
           placeholder={i18n.t('common.label')}
           value={label}
           validation={Validation.getFieldValidation('label')(validation)}
@@ -63,20 +66,21 @@ const SurveyCreate = () => {
       <div>
         <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
       </div>
-      <button type="button" className="btn" onClick={onCreate}>
+      <button data-testid={DataTestId.surveyCreate.submitBtn} type="button" className="btn" onClick={onCreate}>
         <span className="icon icon-plus icon-left icon-12px" />
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>
 
       <div className="home-survey-create__collect-import">
         <UploadButton
-          inputFieldId="import-from-arena"
+          inputFieldId={DataTestId.surveyCreate.importFromArena}
           label={i18n.t('homeView.surveyCreate.importFromArena')}
           accept=".zip"
           onChange={(files) => onImport.Arena({ file: files[0] })}
         />
 
         <UploadButton
+          inputFieldId={DataTestId.surveyCreate.importFromCollect}
           label={i18n.t('homeView.surveyCreate.importFromCollect')}
           accept=".collect,.collect-backup"
           maxSize={1000}

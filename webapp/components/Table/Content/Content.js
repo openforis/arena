@@ -4,12 +4,14 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const Content = (props) => {
   const {
     gridTemplateColumns,
     isRowActive,
     list,
+    module,
     noItemsLabelKey,
     offset,
     onRowClick,
@@ -36,7 +38,7 @@ const Content = (props) => {
       <div className="table__row-header" style={{ gridTemplateColumns }}>
         {React.createElement(rowHeaderComponent, { props, ...rowProps })}
       </div>
-      <div className="table__rows" ref={tableRef}>
+      <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
         {list.map((row, i) => {
           const active = isRowActive && isRowActive(row)
           let className = 'table__row'
@@ -47,6 +49,7 @@ const Content = (props) => {
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
             <div
               role="button"
+              data-testid={`${module}_${i}`}
               key={String(i)}
               onClick={() => onRowClick && onRowClick(row)}
               className={className}
@@ -73,6 +76,7 @@ Content.propTypes = {
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
   list: PropTypes.array.isRequired,
+  module: PropTypes.string.isRequired,
   noItemsLabelKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,

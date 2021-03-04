@@ -3,12 +3,14 @@ import ValidationTooltip from '../validationTooltip'
 
 class Checkbox extends React.Component {
   render() {
-    const { validation, checked, label, onChange, disabled, radio } = this.props
+    const { id, validation, checked, label, onChange, disabled, radio } = this.props
 
     return (
       <div style={{ justifySelf: 'start' }}>
         <ValidationTooltip validation={validation}>
           <button
+            type="button"
+            data-testid={id}
             className="btn btn-s btn-transparent btn-checkbox"
             onClick={() => onChange(!checked)}
             aria-disabled={disabled}
@@ -23,6 +25,7 @@ class Checkbox extends React.Component {
 }
 
 Checkbox.defaultProps = {
+  id: null,
   checked: false,
   disabled: false,
   radio: false,

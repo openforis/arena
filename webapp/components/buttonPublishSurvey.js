@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled } = props
@@ -22,6 +23,7 @@ const ButtonPublishSurvey = (props) => {
       type="button"
       aria-disabled={disabled}
       className={`btn btn-s btn-publish ${className || ''}`}
+      data-testid={DataTestId.header.surveyPublishBtn}
       onClick={() =>
         dispatch(
           DialogConfirmActions.showDialogConfirm({
