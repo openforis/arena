@@ -25,13 +25,7 @@ export const insertSurvey = async (survey, client = db) =>
       VALUES ($1, $2, $3, $4, $5)
       RETURNING ${surveySelectFields()}
     `,
-    [
-      Survey.getUuid(survey),
-      survey.props,
-      survey.ownerUuid,
-      Survey.isPublished(survey),
-      Survey.isDraft(survey) ?? true,
-    ],
+    [Survey.getUuid(survey), survey.props, survey.ownerUuid, Survey.isPublished(survey), Survey.isDraft(survey)],
     (def) => dbTransformCallback(def, true)
   )
 
