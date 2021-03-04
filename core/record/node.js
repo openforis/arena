@@ -44,6 +44,12 @@ export const valuePropsCoordinate = {
   srs: 'srs',
 }
 
+export const valuePropsDate = {
+  day: 'day',
+  month: 'month',
+  year: 'year',
+}
+
 export const valuePropsFile = {
   fileUuid: 'fileUuid',
   fileName: 'fileName',
@@ -59,6 +65,11 @@ export const valuePropsTaxon = {
   vernacularNameUuid: 'vernacularNameUuid',
 }
 
+export const valuePropsTime = {
+  hour: 'hour',
+  minute: 'minute',
+}
+
 /**
  * Props of node value indexed by node def type.
  * The node definitions here are only the ones of "composite" attributes.
@@ -66,8 +77,10 @@ export const valuePropsTaxon = {
 export const valuePropsByType = {
   [NodeDef.nodeDefType.code]: valuePropsCode,
   [NodeDef.nodeDefType.coordinate]: valuePropsCoordinate,
+  [NodeDef.nodeDefType.date]: valuePropsDate,
   [NodeDef.nodeDefType.file]: valuePropsFile,
   [NodeDef.nodeDefType.taxon]: valuePropsTaxon,
+  [NodeDef.nodeDefType.time]: valuePropsTime,
 }
 
 export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
@@ -86,7 +99,7 @@ export const getRecordUuid = R.prop(keys.recordUuid)
 
 export const getValue = (node = {}, defaultValue = {}) => R.propOr(defaultValue, keys.value, node)
 
-export const getValueProp = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
+const _getValuePropRaw = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
 
 export const { getNodeDefUuid } = ObjectUtils
 
@@ -179,33 +192,58 @@ export const isValueBlank = (node) => {
 // ====== Node Value extractor
 
 // Code
-export const getCategoryItemUuid = getValueProp(valuePropsCode.itemUuid)
+export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
 // Coordinate
-export const getCoordinateX = getValueProp(valuePropsCoordinate.x)
-export const getCoordinateY = getValueProp(valuePropsCoordinate.y)
+export const getCoordinateX = _getValuePropRaw(valuePropsCoordinate.x)
+export const getCoordinateY = _getValuePropRaw(valuePropsCoordinate.y)
 export const getCoordinateSrs = (node, defaultValue = null) =>
-  getValueProp(valuePropsCoordinate.srs, defaultValue)(node)
+  _getValuePropRaw(valuePropsCoordinate.srs, defaultValue)(node)
 
 // Date
-const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim)
+const _getDatePart = (index) =>
+  R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim, Number)
 export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
+
 export const getDateCreated = R.prop(keys.dateCreated)
 export const getDateModified = R.prop(keys.dateModified)
 
 // File
-export const getFileName = getValueProp(valuePropsFile.fileName, '')
-export const getFileUuid = getValueProp(valuePropsFile.fileUuid, '')
+export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')
+export const getFileUuid = _getValuePropRaw(valuePropsFile.fileUuid, '')
 
 // Taxon
-export const getTaxonUuid = getValueProp(valuePropsTaxon.taxonUuid)
-export const getVernacularNameUuid = getValueProp(valuePropsTaxon.vernacularNameUuid)
-export const getScientificName = getValueProp(valuePropsTaxon.scientificName, '')
-export const getVernacularName = getValueProp(valuePropsTaxon.vernacularName, '')
+export const getTaxonUuid = _getValuePropRaw(valuePropsTaxon.taxonUuid)
+export const getVernacularNameUuid = _getValuePropRaw(valuePropsTaxon.vernacularNameUuid)
+export const getScientificName = _getValuePropRaw(valuePropsTaxon.scientificName, '')
+export const getVernacularName = _getValuePropRaw(valuePropsTaxon.vernacularName, '')
 
 // Time
-const _getTimePart = (index) => R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim)
+const _getTimePart = (index) =>
+  R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim, Number)
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
+
+// Generic value prop extractor
+const _datePropGetters = {
+  [valuePropsDate.day]: getDateDay,
+  [valuePropsDate.month]: getDateMonth,
+  [valuePropsDate.year]: getDateYear,
+}
+
+const _timePropGetters = {
+  [valuePropsTime.hour]: getTimeHour,
+  [valuePropsTime.minute]: getTimeMinute,
+}
+
+const _valuePropGetters = {
+  [NodeDef.nodeDefType.date]: (prop) => _datePropGetters[prop],
+  [NodeDef.nodeDefType.time]: (prop) => _timePropGetters[prop],
+}
+
+export const getValueProp = ({ nodeDef, prop }) => {
+  const propGetter = _valuePropGetters[NodeDef.getType(nodeDef)]
+  return propGetter ? propGetter(prop) : _getValuePropRaw(prop)
+}
