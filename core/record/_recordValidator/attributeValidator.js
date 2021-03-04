@@ -35,7 +35,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
     survey,
     record,
     node,
-    NodeDefValidations.getExpressions(validations),
+    NodeDefValidations.getExpressions(validations)
   )
 
   let errorMessage = null
@@ -48,7 +48,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
         ValidationResult.keys.customErrorMessageKey,
         null,
         NodeDefExpression.getSeverity(expression),
-        messages,
+        messages
       )
       break
     }
@@ -60,7 +60,6 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
 export const validateAttribute = async (survey, record, attribute) => {
   if (Record.isNodeApplicable(attribute)(record)) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(attribute))(survey)
-
     return await Validator.validate(
       attribute,
       {
@@ -71,7 +70,7 @@ export const validateAttribute = async (survey, record, attribute) => {
           AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef),
         ],
       },
-      false,
+      false
     )
   }
 
@@ -91,7 +90,7 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
         survey,
         node,
         Survey.dependencyTypes.validations,
-        true,
+        true
       )(record)
 
       const nodesToValidate = [
@@ -101,12 +100,12 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
 
       // Call validateAttribute for each attribute
 
-      for (const node of nodesToValidate) {
-        const nodeUuid = Node.getUuid(node)
+      for (const _node of nodesToValidate) {
+        const nodeUuid = Node.getUuid(_node)
 
         // Validate only attributes not deleted and not validated already
-        if (!Node.isDeleted(node) && !attributeValidations[nodeUuid]) {
-          attributeValidations[nodeUuid] = await validateAttribute(survey, record, node)
+        if (!Node.isDeleted(_node) && !attributeValidations[nodeUuid]) {
+          attributeValidations[nodeUuid] = await validateAttribute(survey, record, _node)
         }
       }
     }
