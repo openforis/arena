@@ -146,7 +146,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   const activityLogPathDir = FileUtils.join(prefix, 'activitylog')
   const activityLogPathFile = FileUtils.join(activityLogPathDir, 'activitylog.json')
 
-  const activityLog = await ActivityLogService.fetch({ user, surveyId, limit: 'ALL' })
+  const activityLog = await ActivityLogService.fetch({ user, surveyId, limit: 'ALL', orderIdBy: 'ASC' })
   files.push({ data: JSON.stringify(activityLog, null, 2), name: activityLogPathFile })
 
   Response.sendFilesAsZip(res, `${prefix}.zip`, files)
