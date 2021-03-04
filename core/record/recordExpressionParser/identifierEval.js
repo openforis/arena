@@ -39,17 +39,6 @@ const _getNodeValue = ({ survey, node, nodeDef }) => {
   return value
 }
 
-const _getNodeValueProp = ({ node, nodeDef, prop }) => {
-  switch (NodeDef.getType(nodeDef)) {
-    case NodeDef.nodeDefType.date:
-      return Node.getDateProp(prop)(node)
-    case NodeDef.nodeDefType.time:
-      return Node.getTimeProp(prop)(node)
-    default:
-      return Node.getValueProp(prop)(node)
-  }
-}
-
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
   if (NodeDef.isRoot(nodeDefCtx)) {
     return Record.getRootNode(record)
@@ -149,7 +138,7 @@ const _identifierEvalNode = ({ survey, record, node, nodeDef, propName, evaluate
 
   // node value prop
   if (Node.isValueProp({ nodeDef, prop: propName })) {
-    return _getNodeValueProp({ node, nodeDef, prop: propName })
+    return Node.getValueProp({ nodeDef, prop: propName })(node)
   }
 
   const nodeDefReferenced = Survey.getNodeDefByName(propName)(survey)
