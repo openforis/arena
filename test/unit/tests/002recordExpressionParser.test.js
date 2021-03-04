@@ -138,11 +138,13 @@ describe('RecordExpressionParser Test', () => {
     { q: 'cluster_location.srs', r: 'EPSG:4326' },
     { q: 'plot[0].tree[0].tree_species.code', r: 'ACA' },
     { q: 'plot[0].tree[0].tree_species.scientificName', r: 'Acacia sp.' },
-    { q: 'visit_date.year', r: '2021' },
-    { q: 'visit_date.month', r: '01' },
-    { q: 'visit_date.day', r: '01' },
-    { q: 'visit_time.hour', r: '10' },
-    { q: 'visit_time.minute', r: '30' },
+    { q: 'visit_date.year', r: 2021 },
+    { q: 'visit_date.month', r: 1 },
+    { q: 'visit_date.day', r: 1 },
+    { q: 'visit_date.week', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
+    { q: 'visit_time.hour', r: 10 },
+    { q: 'visit_time.minute', r: 30 },
+    { q: 'visit_time.seconds', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })

@@ -201,7 +201,8 @@ export const getCoordinateSrs = (node, defaultValue = null) =>
   getValueProp(valuePropsCoordinate.srs, defaultValue)(node)
 
 // Date
-const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim)
+const _getDatePart = (index) =>
+  R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim, Number)
 export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
@@ -230,9 +231,11 @@ export const getScientificName = getValueProp(valuePropsTaxon.scientificName, ''
 export const getVernacularName = getValueProp(valuePropsTaxon.vernacularName, '')
 
 // Time
-const _getTimePart = (index) => R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim)
+const _getTimePart = (index) =>
+  R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim, Number)
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
+
 const _timePropGetters = {
   [valuePropsTime.hour]: getTimeHour,
   [valuePropsTime.minute]: getTimeMinute,
