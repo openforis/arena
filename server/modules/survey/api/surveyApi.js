@@ -24,10 +24,10 @@ export const init = (app) => {
         const { name, label, lang, cloneFrom } = surveyReq
 
         const surveyInfo = Survey.newSurvey({
-          ownerUuid: User.getUuid(user),
-          name,
-          label,
-          languages: [lang],
+          [Survey.infoKeys.ownerUuid]: User.getUuid(user),
+          [Survey.infoKeys.name]: name,
+          [Survey.infoKeys.label]: label,
+          [Survey.infoKeys.languages]: [lang],
         })
 
         if (cloneFrom) {

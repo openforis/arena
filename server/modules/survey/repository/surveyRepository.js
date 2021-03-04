@@ -29,8 +29,8 @@ export const insertSurvey = async (survey, client = db) =>
       Survey.getUuid(survey),
       survey.props,
       survey.ownerUuid,
-      Survey.isPublished(survey) || Survey.isPublished(Survey.getSurveyInfo(survey)),
-      Survey.isDraft(survey),
+      Survey.isPublished(survey),
+      Survey.isDraft(survey) ?? true,
     ],
     (def) => dbTransformCallback(def, true)
   )

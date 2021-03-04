@@ -26,7 +26,8 @@ export default class CreateNewSurveyJob extends Job {
       [Survey.infoKeys.name]: Survey.getName(sourceSurveyInfo) || `clone_${Survey.getName(clonedSurveyInfo)}`,
       [Survey.infoKeys.languages]: Survey.getLanguages(clonedSurveyInfo),
       [Survey.infoKeys.labels]: Survey.getLabels(sourceSurveyInfo) || Survey.getLabels(clonedSurveyInfo),
-      [Survey.infoKeys.published]: Survey.isPublished(clonedSurveyInfo),
+      [Survey.infoKeys.published]: false,
+      [Survey.infoKeys.draft]: true,
     })
 
     let surveyInfo = await SurveyRepository.insertSurvey(newSurveyInfo, this.tx)

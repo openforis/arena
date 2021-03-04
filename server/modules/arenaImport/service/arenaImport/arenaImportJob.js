@@ -11,6 +11,7 @@ import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
 import RecordsImportJob from './metaImportJobs/recordsImportJob'
 import UsersImportJob from './metaImportJobs/usersImportJob'
 import ChainsImportJob from './metaImportJobs/chainsImportJob'
+import CreateRdbJob from './metaImportJobs/createRdb'
 
 export default class ArenaImportJob extends Job {
   constructor(params) {
@@ -23,6 +24,8 @@ export default class ArenaImportJob extends Job {
       new NodeDefsImportJob(),
       new RecordsImportJob(),
       new ChainsImportJob(),
+      // Needed when the survey is published
+      new CreateRdbJob(),
     ])
   }
 
