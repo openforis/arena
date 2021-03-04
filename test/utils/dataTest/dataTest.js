@@ -13,6 +13,7 @@ export const createTestSurvey = ({ user }) =>
       SB.attribute('cluster_location', NodeDef.nodeDefType.coordinate),
       SB.attribute('cluster_distance', NodeDef.nodeDefType.integer),
       SB.attribute('visit_date', NodeDef.nodeDefType.date),
+      SB.attribute('visit_time', NodeDef.nodeDefType.time),
       SB.attribute('gps_model', NodeDef.nodeDefType.text),
       SB.attribute('remarks', NodeDef.nodeDefType.text),
       SB.entity(
@@ -44,6 +45,7 @@ export const createTestRecord = ({ user, survey }) =>
       }),
       RB.attribute('cluster_distance', 18),
       RB.attribute('visit_date', '2021-01-01'),
+      RB.attribute('visit_time', '10:30'),
       RB.attribute('gps_model', 'ABC-123-xyz'),
       RB.attribute('remarks', ''),
       RB.entity(

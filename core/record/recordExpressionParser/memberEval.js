@@ -3,7 +3,7 @@ import * as Expression from '@core/expressionParser/expression'
 export const memberEval = (expr, ctx) => {
   const { object, property, computed } = expr
 
-  const objectEval = Expression.evalExpr({ expr: object, ctx })
+  const objectEval = Expression.evalExpr({ expr: object, ctx: { ...ctx, evaluateToNode: true } })
   if (!objectEval) {
     return null
   }
