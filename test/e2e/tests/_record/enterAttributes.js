@@ -9,8 +9,14 @@ import {
   parseValue,
 } from './utils'
 
-const enterBoolean = async (nodeDef, value, parentSelector) =>
-  page.click(getBooleanSelector(nodeDef, parentSelector, value))
+const enterBoolean = async (nodeDef, value, parentSelector) => {
+  // If the boolean is already checked, due to a default value with the same value we dont need to click
+  const span = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)} span`)
+  const currentClass = await span.getAttribute('class')
+  if (!new RegExp('icon-radio-checked2').test(currentClass)) {
+    await page.click(getBooleanSelector(nodeDef, parentSelector, value))
+  }
+}
 
 const enterCode = async (nodeDef, value, parentSelector) => {
   // only dropdown for now
