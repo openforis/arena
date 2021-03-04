@@ -25,7 +25,7 @@ import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
  * @param {object} [params.otherProps=null] - Other props to set.
  * @returns {object} The newly created survey info object.
  */
-export const newSurvey = ({ ownerUuid, name, label = null, languages, ...rest }) => ({
+export const newSurvey = ({ ownerUuid, name, label = null, languages, published, draft, ...rest }) => ({
   [SurveyInfo.keys.uuid]: uuidv4(),
   [SurveyInfo.keys.props]: {
     [SurveyInfo.keys.name]: name,
@@ -37,6 +37,8 @@ export const newSurvey = ({ ownerUuid, name, label = null, languages, ...rest })
     },
     ...rest,
   },
+  [SurveyInfo.keys.published]: published,
+  [SurveyInfo.keys.draft]: draft,
   [SurveyInfo.keys.ownerUuid]: ownerUuid,
 })
 

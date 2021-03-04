@@ -35,6 +35,7 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.labels]: labels,
       [Survey.infoKeys.label]: label,
       [Survey.infoKeys.published]: Survey.isPublished(surveyInfo),
+      [Survey.infoKeys.draft]: Survey.isDraft(surveyInfo),
     })
 
     const survey = await SurveyManager.importSurvey(
