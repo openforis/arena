@@ -131,7 +131,9 @@ export const isAttribute = R.pipe(isEntity, R.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 export const isAttributeComposite = (nodeDef) =>
-  [nodeDefType.coordinate, nodeDefType.file, nodeDefType.taxon].includes(getType(nodeDef))
+  [nodeDefType.coordinate, nodeDefType.date, nodeDefType.file, nodeDefType.taxon, nodeDefType.time].includes(
+    getType(nodeDef)
+  )
 
 export const isBoolean = isType(nodeDefType.boolean)
 export const isCode = isType(nodeDefType.code)
