@@ -126,7 +126,6 @@ describe('RecordExpressionParser Test', () => {
     { q: 'gps_model.toLowerCase()', r: 'abc-123-xyz' },
     { q: 'gps_model.substring(4,7)', r: '123' },
     { q: 'gps_model.length', r: 11 },
-    { q: 'gps_model[1]', r: 'B' },
     // global objects (constructors)
     { q: 'Boolean(cluster_id)', r: true },
     { q: 'Boolean(remarks)', r: false },
@@ -139,6 +138,11 @@ describe('RecordExpressionParser Test', () => {
     { q: 'cluster_location.srs', r: 'EPSG:4326' },
     { q: 'plot[0].tree[0].tree_species.code', r: 'ACA' },
     { q: 'plot[0].tree[0].tree_species.scientificName', r: 'Acacia sp.' },
+    { q: 'visit_date.year', r: '2021' },
+    { q: 'visit_date.month', r: '01' },
+    { q: 'visit_date.day', r: '01' },
+    { q: 'visit_time.hour', r: '10' },
+    { q: 'visit_time.minute', r: '30' },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })

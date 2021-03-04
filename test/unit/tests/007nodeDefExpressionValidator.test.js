@@ -65,7 +65,6 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'gps_model.toLowerCase()', r: true },
     { q: 'gps_model.substring(4,7)', r: true },
     { q: 'gps_model.length', r: true },
-    { q: 'gps_model[1]', r: true },
     // global objects (constructors)
     { q: 'Boolean(cluster_id)', r: true },
     { q: 'Boolean(remarks)', r: true },

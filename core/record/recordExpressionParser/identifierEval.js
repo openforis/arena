@@ -10,13 +10,12 @@ import * as Expression from '@core/expressionParser/expression'
 import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
+import * as NodeDefExpressionNativeProperties from '@core/survey/nodeDefExpressionNativeProperties'
 
-const _getNodeValue = (survey) => (node) => {
+const _getNodeValue = ({ survey, node, nodeDef }) => {
   if (Node.isValueBlank(node)) {
     return null
   }
-
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
   if (NodeDef.isCode(nodeDef)) {
     const itemUuid = Node.getCategoryItemUuid(node)
@@ -38,6 +37,17 @@ const _getNodeValue = (survey) => (node) => {
     return value === 'true'
   }
   return value
+}
+
+const _getNodeValueProp = ({ node, nodeDef, prop }) => {
+  switch (NodeDef.getType(nodeDef)) {
+    case NodeDef.nodeDefType.date:
+      return Node.getDateProp(prop)(node)
+    case NodeDef.nodeDefType.time:
+      return Node.getTimeProp(prop)(node)
+    default:
+      return Node.getValueProp(prop)(node)
+  }
 }
 
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
@@ -110,42 +120,57 @@ const _getReferencedNodes = ({ survey, record, node, nodeDefReferenced }) => {
   return []
 }
 
-export const identifierEval = (survey, record) => (expr, { node: nodeContext, evaluateToNode }) => {
-  const exprName = Expression.getName(expr)
+const _nativePropEval = ({ obj, propName }) => {
+  const prop = obj && obj[propName]
+  if (prop === undefined) {
+    return undefined
+  }
+  return prop instanceof Function ? prop.bind(obj) : prop
+}
 
-  // identifier is global object
-  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext })
-  if (globalIdentifierEvalResult !== null) {
-    return globalIdentifierEvalResult
+/**
+ * Evaluates an identifier expression when the context expression node is a record node.
+ *
+ * @param {!object} params - The parameters object.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!Record} [params.record] - The record.
+ * @param {!Node} [params.node] - The node in the expression context.
+ * @param {!NodeDef} [params.nodeDef] - The node definition of the node.
+ * @param {!string} [params.propName] - The name of the property or the function to identify.
+ * @param {!boolean} [params.evaluateToNode] - True if you want the expression a node, false if you want it to return the node value.
+ * @returns {any} - The return value can be Node, node value, value native property, depending on the expression.
+ */
+const _identifierEvalNode = ({ survey, record, node, nodeDef, propName, evaluateToNode }) => {
+  // native property or function (e.g. String.length or String.toUpperCase())
+  if (NodeDefExpressionNativeProperties.hasNativeProperty({ nodeDefOrValue: nodeDef, propName })) {
+    const value = _getNodeValue({ survey, node, nodeDef })
+    return _nativePropEval({ obj: value, propName })
   }
 
-  // identifier is a native property or function (e.g. String.length or String.toUpperCase())
-  // or a composite attribute value member (e.g. coordinate.x, species.scientificName)
-  const prop = nodeContext[exprName]
-  if (prop !== undefined) {
-    return prop instanceof Function ? prop.bind(nodeContext) : prop
+  // node value prop
+  if (Node.isValueProp({ nodeDef, prop: propName })) {
+    return _getNodeValueProp({ node, nodeDef, prop: propName })
   }
 
-  // identifier references a node or a node value prop
-  const node = nodeContext
-  const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  if (Node.isValueProp({ nodeDef: nodeDefCtx, prop: exprName })) {
-    return Node.getValueProp(exprName)(node)
+  const nodeDefReferenced = Survey.getNodeDefByName(propName)(survey)
+  if (!nodeDefReferenced) {
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: propName })
   }
 
-  const nodeDefReferenced = Survey.getNodeDefByName(exprName)(survey)
-
+  // referenced node
   let nodeResult = null
-  if (NodeDef.isEqual(nodeDefCtx)(nodeDefReferenced)) {
+  if (NodeDef.isEqual(nodeDef)(nodeDefReferenced)) {
     // the referenced node is the current node itself
     nodeResult = node
   }
-  if (Survey.isNodeDefAncestor(nodeDefReferenced, nodeDefCtx)(survey)) {
+  if (Survey.isNodeDefAncestor(nodeDefReferenced, nodeDef)(survey)) {
     // if the rerenced node name is an ancestor of the current node, return it following the hierarchy
     nodeResult = Record.getAncestorByNodeDefUuid(node, NodeDef.getUuid(nodeDefReferenced))(record)
   }
   if (nodeResult) {
-    return evaluateToNode || NodeDef.isEntity(nodeDefCtx) ? nodeResult : _getNodeValue(survey)(nodeResult)
+    return evaluateToNode || NodeDef.isEntity(nodeDef)
+      ? nodeResult
+      : _getNodeValue({ survey, node: nodeResult, nodeDef })
   }
 
   // the referenced nodes can be siblings of the current node
@@ -153,14 +178,40 @@ export const identifierEval = (survey, record) => (expr, { node: nodeContext, ev
 
   const single = NodeDef.isSingle(nodeDefReferenced)
   if (single && (referencedNodes.length === 0 || referencedNodes.length > 1)) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: propName })
   }
 
-  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode && !NodeDef.isAttributeComposite(nodeDefReferenced)) {
+  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode) {
     // return node values
-    const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
+    const values = referencedNodes.map((referencedNode) =>
+      _getNodeValue({ survey, node: referencedNode, nodeDef: nodeDefReferenced })
+    )
     return single ? values[0] : values
   }
   // return nodes
   return single ? referencedNodes[0] : referencedNodes
+}
+
+export const identifierEval = (survey, record) => (expr, { node, evaluateToNode }) => {
+  const exprName = Expression.getName(expr)
+
+  // global object property or function
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext: node })
+  if (globalIdentifierEvalResult !== null) {
+    return globalIdentifierEvalResult
+  }
+
+  // native property or function
+  const nativePropEvalResult = _nativePropEval({ obj: node, propName: exprName })
+  if (nativePropEvalResult !== undefined) {
+    return nativePropEvalResult
+  }
+
+  // node or a node value property
+  const nodeDefUuid = Node.getNodeDefUuid(node)
+  const nodeDef = nodeDefUuid ? Survey.getNodeDefByUuid(nodeDefUuid)(survey) : null
+  if (nodeDef) {
+    return _identifierEvalNode({ survey, record, node, nodeDef, propName: exprName, evaluateToNode })
+  }
+  throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
 }

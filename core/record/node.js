@@ -38,16 +38,16 @@ export const valuePropsCode = {
   label: 'label',
 }
 
-export const valuePropsDate = {
-  day: 'day',
-  month: 'month',
-  year: 'year',
-}
-
 export const valuePropsCoordinate = {
   x: 'x',
   y: 'y',
   srs: 'srs',
+}
+
+export const valuePropsDate = {
+  day: 'day',
+  month: 'month',
+  year: 'year',
 }
 
 export const valuePropsFile = {
@@ -205,6 +205,17 @@ const _getDatePart = (index) => R.pipe(R.partialRight(getValue, ['--']), R.split
 export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
+
+const _datePropGetters = {
+  [valuePropsDate.day]: getDateDay,
+  [valuePropsDate.month]: getDateMonth,
+  [valuePropsDate.year]: getDateYear,
+}
+export const getDateProp = (prop) => (node) => {
+  const getter = _datePropGetters[prop]
+  return getter && getter(node)
+}
+
 export const getDateCreated = R.prop(keys.dateCreated)
 export const getDateModified = R.prop(keys.dateModified)
 
@@ -222,3 +233,11 @@ export const getVernacularName = getValueProp(valuePropsTaxon.vernacularName, ''
 const _getTimePart = (index) => R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim)
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
+const _timePropGetters = {
+  [valuePropsTime.hour]: getTimeHour,
+  [valuePropsTime.minute]: getTimeMinute,
+}
+export const getTimeProp = (prop) => (node) => {
+  const getter = _timePropGetters[prop]
+  return getter && getter(node)
+}
