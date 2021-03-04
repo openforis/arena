@@ -25,7 +25,7 @@ const ActivityLog = () => {
         {messages.map((message, index) => {
           const setRef = (el) => (index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
 
-          return <Message setRef={setRef} key={ActivityLogMessage.getId(message)} message={message} />
+          return <Message setRef={setRef} key={ActivityLogMessage.getId(message) || String(index)} message={message} />
         })}
       </div>
     </div>
