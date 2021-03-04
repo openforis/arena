@@ -27,7 +27,7 @@ const {
   cluster_province,
 } = cluster.children
 const { plot_id } = plot.children
-const { tree_id, tree_dec_1 } = tree.children
+const { tree_id, tree_dec_1, tree_dec_2 } = tree.children
 
 export default () =>
   describe('SurveyForm preview', () => {
@@ -132,14 +132,14 @@ export default () =>
         await expect(treeDec1Tree2BadgeEl).toBeNull()
       })
 
-      // TODO: uncomment below with https://github.com/openforis/arena/issues/1409
-      // test(`Verify ${tree_dec_2.name} validation`, async () => {
-      //   await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
-      //   await expect(page).toHaveText('tree_dec_2 > 10')
-      //
-      //   await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
-      //   await expect(page).toHaveText('tree_dec_2 > 0')
-      // })
+      test(`Verify ${tree_dec_2.name} validation`, async () => {
+        // We check in reverse order because the tooltip hide the badge below
+        await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
+        await expect(page).toHaveText('tree_dec_2 > 0')
+
+        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
+        await expect(page).toHaveText('tree_dec_2 > 10')
+      })
 
       test('Wait thread to complete', async () => {
         // TODO thread issue: https://github.com/openforis/arena/issues/1412
