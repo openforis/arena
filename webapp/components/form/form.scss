@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 // form grid
 .form {
@@ -10,18 +10,18 @@
 
 .form-item {
   display: grid;
-  grid-template-columns: .3fr .65fr;
-  grid-column-gap: .5rem;
+  grid-template-columns: 0.3fr 0.65fr;
+  grid-column-gap: 0.5rem;
   height: 100%;
   align-items: center;
 }
 
 .form-label {
   justify-self: right;
-  font-size: .9rem;
+  font-size: 0.9rem;
   text-align: end;
   padding-left: 2px;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
 }
 
 .form-input-container {
@@ -35,11 +35,11 @@
 }
 
 .form-input {
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid $greyBorder;
   //width: 100%;
 
   &[readonly] {
-    border-bottom: 1px solid rgba($greyBorder, .5);
+    border-bottom: 1px solid rgba($greyBorder, 0.5);
   }
 }

@@ -159,7 +159,7 @@ export default class NodeDefsImportJob extends Job {
 
     Object.assign(
       nodeDefsUpdated,
-      await NodeDefManager.insertNodeDef(this.user, surveyId, Survey.cycleOneKey, nodeDefParam, true, this.tx)
+      await NodeDefManager.insertNodeDef({ user: this.user, surveyId, nodeDef: nodeDefParam, system: true }, this.tx)
     )
 
     let nodeDef = nodeDefsUpdated[nodeDefUuid]
@@ -480,11 +480,12 @@ export default class NodeDefsImportJob extends Job {
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
       const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
-        this.user,
-        this.surveyId,
-        Survey.cycleOneKey,
-        qualifierNodeDefParam,
-        true,
+        {
+          user: this.user,
+          surveyId: this.surveyId,
+          nodeDef: qualifierNodeDefParam,
+          system: true,
+        },
         this.tx
       )
       const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)

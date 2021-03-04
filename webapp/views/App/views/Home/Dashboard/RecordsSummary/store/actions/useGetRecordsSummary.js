@@ -6,7 +6,7 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { getFromDate } from '../utils'
 
-const formatDate = (date) => DateUtils.format(date, 'yyyy-MM-dd')
+const formatDate = (date) => DateUtils.formatDateISO(date)
 
 export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
   const surveyId = useSurveyId()

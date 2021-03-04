@@ -7,22 +7,25 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
 import { useLang } from '@webapp/store/system'
-import { useCategoryByUuid, useNodeDefByUuid } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurveyId } from '@webapp/store/survey'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
+import { useFetchCategoryByUuid } from '@webapp/service/hooks'
 import { State } from '../../store'
 
 const StepItem = (props) => {
   const { state, step, Actions } = props
 
+  const surveyId = useSurveyId()
   const chain = State.getChainEdit(state)
   const stepEditing = State.getStepEdit(state)
   const lang = useLang()
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
-  const category = useCategoryByUuid(Step.getCategoryUuid(step))
+  const categoryUuid = Step.getCategoryUuid(step)
   const editing = Step.isEqual(stepEditing)(step)
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
+  const { category } = useFetchCategoryByUuid({ surveyId, categoryUuid })
 
   return (
     <button

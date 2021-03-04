@@ -1,10 +1,7 @@
 import * as R from 'ramda'
 
-import * as StringUtils from '@core/stringUtils'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 import * as Record from '@core/record/record'
@@ -43,8 +40,6 @@ const _getNodeValue = (survey) => (node) => {
   return value
 }
 
-const _getNodeValues = (survey) => (nodes) => nodes.map(_getNodeValue(survey))
-
 const _getNodeCommonAncestor = ({ record, nodeCtxHierarchy, nodeDefCtx, nodeDefReferenced }) => {
   if (NodeDef.isRoot(nodeDefCtx)) {
     return Record.getRootNode(record)
@@ -75,11 +70,11 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
   const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
   const nodeDefCtxH = NodeDef.getMetaHierarchy(nodeDefCtx)
 
-  const nodeCtxH = R.pipe(
-    Node.getHierarchy,
+  const nodeCtxH = [...Node.getHierarchy(nodeCtx)]
+  if (NodeDef.isEntity(nodeDefCtx)) {
     // When nodeDefCtx is entity, expression is type applicableIf (and context always starts from parent)
-    R.when(R.always(NodeDef.isEntity(nodeDefCtx)), R.append(Node.getUuid(nodeCtx)))
-  )(nodeCtx)
+    nodeCtxH.push(Node.getUuid(nodeCtx))
+  }
 
   if (R.startsWith(nodeDefReferencedH, nodeDefCtxH)) {
     // Referenced node is a descendant of an ancestor of the context node
@@ -106,63 +101,66 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
-const _getReferencedNodes = (survey, record, nodeCtx, nodeDefReferenced) => {
-  const nodeReferencedParent = _getReferencedNodesParent(survey, record, nodeCtx, nodeDefReferenced)
+const _getReferencedNodes = ({ survey, record, node, nodeDefReferenced }) => {
+  const nodeReferencedParent = _getReferencedNodesParent(survey, record, node, nodeDefReferenced)
 
-  if (nodeReferencedParent)
+  if (nodeReferencedParent) {
     return Record.getNodeChildrenByDefUuid(nodeReferencedParent, NodeDef.getUuid(nodeDefReferenced))(record)
-
+  }
   return []
 }
 
-const _identifierEval = (survey, record) => (expr, { node }) => {
-  const nodeName = R.prop('name')(expr)
-  const nodeDefReferenced = Survey.getNodeDefByName(nodeName)(survey)
-  const referencedNodes = _getReferencedNodes(survey, record, node, nodeDefReferenced)
+export const identifierEval = (survey, record) => (expr, { node: nodeContext, evaluateToNode }) => {
+  const exprName = Expression.getName(expr)
+
+  // identifier is global object
+  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext })
+  if (globalIdentifierEvalResult !== null) {
+    return globalIdentifierEvalResult
+  }
+
+  // identifier is a native property or function (e.g. String.length or String.toUpperCase())
+  // or a composite attribute value member (e.g. coordinate.x, species.scientificName)
+  const prop = nodeContext[exprName]
+  if (prop !== undefined) {
+    return prop instanceof Function ? prop.bind(nodeContext) : prop
+  }
+
+  // identifier references a node or a node value prop
+  const node = nodeContext
+  const nodeDefCtx = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (Node.isValueProp({ nodeDef: nodeDefCtx, prop: exprName })) {
+    return Node.getValueProp(exprName)(node)
+  }
+
+  const nodeDefReferenced = Survey.getNodeDefByName(exprName)(survey)
+
+  let nodeResult = null
+  if (NodeDef.isEqual(nodeDefCtx)(nodeDefReferenced)) {
+    // the referenced node is the current node itself
+    nodeResult = node
+  }
+  if (Survey.isNodeDefAncestor(nodeDefReferenced, nodeDefCtx)(survey)) {
+    // if the rerenced node name is an ancestor of the current node, return it following the hierarchy
+    nodeResult = Record.getAncestorByNodeDefUuid(node, NodeDef.getUuid(nodeDefReferenced))(record)
+  }
+  if (nodeResult) {
+    return evaluateToNode || NodeDef.isEntity(nodeDefCtx) ? nodeResult : _getNodeValue(survey)(nodeResult)
+  }
+
+  // the referenced nodes can be siblings of the current node
+  const referencedNodes = _getReferencedNodes({ survey, record, node, nodeDefReferenced })
 
   const single = NodeDef.isSingle(nodeDefReferenced)
   if (single && (referencedNodes.length === 0 || referencedNodes.length > 1)) {
-    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
   }
 
-  return single ? _getNodeValue(survey)(referencedNodes[0]) : _getNodeValues(survey)(referencedNodes)
-}
-
-export const evalNodeQuery = (survey, record, node, query) => {
-  const functions = {
-    [Expression.types.Identifier]: _identifierEval(survey, record),
+  if (NodeDef.isAttribute(nodeDefReferenced) && !evaluateToNode && !NodeDef.isAttributeComposite(nodeDefReferenced)) {
+    // return node values
+    const values = referencedNodes.map((referencedNode) => _getNodeValue(survey)(referencedNode))
+    return single ? values[0] : values
   }
-
-  return Expression.evalString(query, { node, functions })
+  // return nodes
+  return single ? referencedNodes[0] : referencedNodes
 }
-
-const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = []
-  for (let i = 0; i < expressions.length; i += 1) {
-    const expression = expressions[i]
-
-    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
-
-    if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
-      applicableExpressions.push(expression)
-
-      if (stopAtFirstFound) {
-        return applicableExpressions
-      }
-    }
-  }
-
-  return applicableExpressions
-}
-
-export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
-
-  return applicableExpressions.map((expression) => ({
-    expression,
-    value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression)),
-  }))
-}
-
-export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
-  R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))

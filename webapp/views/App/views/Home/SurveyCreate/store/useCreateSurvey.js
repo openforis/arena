@@ -6,6 +6,7 @@ const initialSurvey = {
   name: '',
   label: '',
   lang: 'en',
+  cloneFrom: '',
   validation: {},
 }
 

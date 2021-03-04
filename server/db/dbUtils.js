@@ -13,11 +13,17 @@ export const selectDate = (field, fieldAlias = null) =>
 
 export const now = "timezone('UTC', now())"
 
-export const insertAllQuery = (schema, table, cols, itemsValues) => {
+export const cloneTable = ({ source, destination }) =>
+  `INSERT INTO  ${destination} OVERRIDING SYSTEM VALUE (SELECT * FROM ${source}) on conflict do nothing`
+
+export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },
   })
+  return pgp.helpers.insert(itemsValues, columnSet)
+}
 
+export const insertAllQuery = (schema, table, cols, itemsValues) => {
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
     for (const [i, element] of cols.entries()) {
@@ -26,7 +32,8 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
 
     return item
   })
-  return pgp.helpers.insert(valuesIndexedByCol, columnSet)
+
+  return insertAllQueryBatch(schema, table, cols, valuesIndexedByCol)
 }
 
 /**
@@ -94,6 +101,6 @@ export const formatQuery = pgp.as.format
 
 // USERS (ROLES)
 export const createUser = async (name, password, client = db) =>
-  await client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
+  client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
 
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)

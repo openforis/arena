@@ -19,6 +19,7 @@ const ExpressionProp = (props) => {
     index,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
+    excludeCurrentNodeDef,
     validation,
     expression,
     applyIf,
@@ -75,6 +76,7 @@ const ExpressionProp = (props) => {
             qualifier={`${qualifier}-expression`}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCurrent={nodeDefUuidCurrent}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
             query={NodeDefExpression.getExpression(expression)}
             onChange={(expr) => onUpdate(NodeDefExpression.assocExpression(expr)(expression))}
             isContextParent={isContextParent}
@@ -95,6 +97,7 @@ const ExpressionProp = (props) => {
               qualifier={`${qualifier}-applyIf`}
               nodeDefUuidContext={nodeDefUuidContext}
               nodeDefUuidCurrent={nodeDefUuidCurrent}
+              excludeCurrentNodeDef={excludeCurrentNodeDef}
               query={NodeDefExpression.getApplyIf(expression)}
               onChange={(expr) => onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))}
               isContextParent={isContextParent}
@@ -134,6 +137,7 @@ ExpressionProp.propTypes = {
 
   nodeDefUuidContext: PropTypes.string,
   nodeDefUuidCurrent: PropTypes.string,
+  excludeCurrentNodeDef: PropTypes.bool,
   validation: PropTypes.object,
 
   expression: PropTypes.object.isRequired,
@@ -155,6 +159,7 @@ ExpressionProp.propTypes = {
 ExpressionProp.defaultProps = {
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
+  excludeCurrentNodeDef: true,
   validation: null,
 
   applyIf: true, // Show apply if expression editor

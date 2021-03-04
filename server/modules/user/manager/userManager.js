@@ -18,6 +18,7 @@ export const {
   fetchUserProfilePicture,
   updateNamePasswordAndStatus,
   resetUsersPrefsSurveyCycle,
+  importNewUser,
 } = UserRepository
 
 export const {
@@ -93,17 +94,18 @@ const _initializeUser = async (user) => {
 
 const _userFetcher = (fetchFn) => async (...args) => {
   const user = await fetchFn(...args)
-  return user ? await _initializeUser(user) : null
+  return user ? _initializeUser(user) : null
 }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
+export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
-  await client.tx(async (t) => {
+  client.tx(async (t) => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
-    return await Promise.all(users.map(_initializeUser))
+    return Promise.all(users.map(_initializeUser))
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
@@ -157,17 +159,16 @@ export const updateUserPrefs = async (user) => ({
 // ==== DELETE
 
 export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
-  await client.tx(
-    async (t) =>
-      await Promise.all([
-        AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
-        ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.userRemove,
-          { [ActivityLog.keysContent.uuid]: userUuidToRemove },
-          false,
-          t
-        ),
-      ])
+  client.tx(async (t) =>
+    Promise.all([
+      AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.userRemove,
+        { [ActivityLog.keysContent.uuid]: userUuidToRemove },
+        false,
+        t
+      ),
+    ])
   )

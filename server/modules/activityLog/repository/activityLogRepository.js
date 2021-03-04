@@ -14,8 +14,18 @@ import * as DbUtils from '@server/db/dbUtils'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
+export const tableName = 'activity_log'
+
+export const tableColumns = [
+  ActivityLog.keys.type,
+  'user_uuid',
+  ActivityLog.keys.content,
+  ActivityLog.keys.system,
+  'date_created',
+] // Used for activity_logs values batch insert
+
 // ===== CREATE
-export const insert = async (user, surveyId, type, content, system, client) =>
+export const insert = async (user, surveyId, type, content, system, client = db) =>
   client.none(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
@@ -23,7 +33,7 @@ export const insert = async (user, surveyId, type, content, system, client) =>
     [type, User.getUuid(user), content || {}, system]
   )
 
-export const insertMany = async (user, surveyId, activities, client) =>
+export const insertMany = async (user, surveyId, activities, client = db) =>
   client.batch(
     activities.map((activity) =>
       insert(
@@ -37,15 +47,31 @@ export const insertMany = async (user, surveyId, activities, client) =>
     )
   )
 
+export const insertManyBatch = async (user, surveyId, activities, client = db) =>
+  activities.length > 0 &&
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      getSurveyDBSchema(surveyId),
+      tableName,
+      tableColumns,
+      activities.map((activity) => ({
+        ...activity,
+        user_uuid: User.getUuid(user),
+        date_created: ActivityLog.getDateCreated(activity),
+        [ActivityLog.keys.system]: ActivityLog.isSystem(activity),
+      }))
+    )
+  )
+
 // ===== READ
-export const fetch = async (
+export const fetch = async ({
   surveyInfo,
   activityTypes = null,
   idGreaterThan = null,
   idLessThan = null,
   limit = 30,
-  client = db
-) => {
+  client = db,
+}) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
@@ -66,7 +92,9 @@ export const fetch = async (
         WHERE true
         ${activityTypes ? ' AND type in ($2:csv)' : ''}
         ${limitedById ? ` AND ${conditionLimitedById}` : ''}
-        LIMIT $3::int + 100 -- add 100 rows to get a better estimation of date
+        ${
+          !Number.isNaN(Number(limit)) ? 'LIMIT $3::int + 100' : 'LIMIT ALL'
+        } -- add 100 rows to get a better estimation of date
       ),
       log_days_all AS (
         -- With the date, refine the query to include ALL rows
@@ -92,7 +120,8 @@ export const fetch = async (
         FROM log_days_all
         ${limitedById ? `WHERE ${conditionLimitedById}` : ''}
         ORDER BY date_created DESC, id DESC -- id is a tie-breaker
-        LIMIT $3
+        ${!Number.isNaN(Number(limit)) ? 'LIMIT $3' : 'LIMIT ALL'}
+        
       )
 
     SELECT

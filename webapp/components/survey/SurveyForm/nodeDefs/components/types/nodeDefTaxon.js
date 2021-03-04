@@ -17,7 +17,7 @@ import * as StringUtils from '@core/stringUtils'
 import { SurveyState } from '@webapp/store/survey'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropKeys
+const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
 
 const selectionDefault = {
   [code]: '',

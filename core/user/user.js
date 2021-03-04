@@ -22,6 +22,7 @@ export const { isEqual } = ObjectUtils
 export const { getUuid } = ObjectUtils
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
+export const getPassword = R.prop(keys.password)
 export const getGroupUuid = R.prop(keys.groupUuid)
 export const getLang = R.propOr('en', keys.lang)
 export const { getAuthGroups } = ObjectUtils

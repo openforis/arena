@@ -1,5 +1,8 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
+
 import {
   click,
   writeIntoTextBox,
@@ -8,16 +11,26 @@ import {
   textBox,
   expectInputTextToBe,
   getElement,
-  expectExists,
   within,
   button,
   waitFor,
   dropDown,
+  expectExists,
+  expectNotExists,
+  near,
+  pressEsc,
+  waitFor1sec,
+  clearTextBox,
 } from '../api'
 
 const enterNodeDefValueBase = async ({ value, label }) => {
-  await waitFor(2000)
-  await writeIntoTextBox({ text: value, selector: below(label), clearBefore: true })
+  await waitFor(3000)
+  const selector = below(label)
+  if (StringUtils.isNotBlank(value)) {
+    await writeIntoTextBox({ text: value, selector, clearBefore: true })
+  } else {
+    await clearTextBox({ selector })
+  }
 }
 
 const expectNodeDefBase = async ({ value: text, label, relativeSelectors = [] }) =>
@@ -43,6 +56,35 @@ export const NodeDefsUtils = {
   },
   [NodeDef.nodeDefType.date]: {
     ...NodeDefBase,
+    enterValue: async ({ value, label }) => {
+      const [year, month, day] = value.split('-')
+      await writeIntoTextBox({
+        text: day,
+        selector: { class: 'input-day' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      await writeIntoTextBox({
+        text: month,
+        selector: { class: 'input-month' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      await writeIntoTextBox({
+        text: year,
+        selector: { class: 'input-year' },
+        relativeSelectors: [below(label)],
+        clearBefore: true,
+      })
+      // close calendar
+      await pressEsc()
+    },
+    expectValue: async ({ value, label }) => {
+      const [year, month, day] = value.split('-')
+      await expectInputTextToBe({ text: day, selector: { class: 'input-day' }, relativeSelectors: [below(label)] })
+      await expectInputTextToBe({ text: month, selector: { class: 'input-month' }, relativeSelectors: [below(label)] })
+      await expectInputTextToBe({ text: year, selector: { class: 'input-year' }, relativeSelectors: [below(label)] })
+    },
   },
   [NodeDef.nodeDefType.time]: {
     ...NodeDefBase,
@@ -97,34 +139,52 @@ const getEnterParams = ({ type, ...values }) => ({ ...values })
 const getCheckFunction = ({ type }) => NodeDefsUtils[type].expectValue
 const getCheckParams = ({ type, ...values }) => ({ ...values })
 
-const doSequencial = async ({ items, getFunction, getParams }) =>
+const doSequential = async ({ items, getFunction, getParams }) =>
   items.reduce(async (promise, item) => {
     await promise
     return getFunction(item)(getParams(item))
   }, true)
 
-const enterValuesSequencial = async ({ items }) =>
-  doSequencial({ items, getFunction: getEnterFunction, getParams: getEnterParams })
+export const enterValuesSequential = async ({ items }) => {
+  await doSequential({ items, getFunction: getEnterFunction, getParams: getEnterParams })
+  // wait for relevance/validation feedback
+  await waitFor1sec()
+}
 
-const checkValuesSequencial = async ({ items }) =>
-  doSequencial({ items, getFunction: getCheckFunction, getParams: getCheckParams })
+const checkValuesSequential = async ({ items }) =>
+  doSequential({ items, getFunction: getCheckFunction, getParams: getCheckParams })
 
-export const enterValuesCluster = enterValuesSequencial
+export const enterValuesCluster = enterValuesSequential
 export const enterValuesPlot = async ({ items }) => {
   await click('Plot')
   await waitFor(500)
   await click('Add')
   await waitFor(500)
-  await enterValuesSequencial({ items })
+  await enterValuesSequential({ items })
 }
 
-export const checkValuesCluster = checkValuesSequencial
-export const checkValuesPlot = async ({ id, items }) => {
+export const checkValuesCluster = checkValuesSequential
+
+export const navigateToPlotForm = async ({ plotId = null, openPlot = false } = {}) => {
   await click('Plot')
   await waitFor(500)
-  await dropDown({ class: 'node-select' }).select(`Plot id - ${id}`)
+  if (plotId) {
+    await dropDown({ class: 'node-select' }).select(`Plot id - ${plotId}`)
+  }
+  if (openPlot && !plotId) {
+    await dropDown({ class: 'node-select' }).select(`Plot id -`)
+  }
   await waitFor(500)
-  await checkValuesSequencial({ items })
+}
+
+export const checkValuesPlot = async ({ items }) => {
+  const plotIdItem = items.find((item) => item.label === 'Plot id')
+  let plotId = false
+  if (plotIdItem) {
+    plotId = plotIdItem.value
+  }
+  await navigateToPlotForm({ plotId: plotId || false, openPlot: true })
+  await checkValuesSequential({ items })
 }
 
 export const insertRecord = async (record) => {
@@ -132,8 +192,7 @@ export const insertRecord = async (record) => {
   await waitFor(500)
   const { cluster, plots } = record
   await enterValuesCluster({ items: cluster })
-  await enterValuesPlot({ items: plots[0] })
-  await enterValuesPlot({ items: plots[1] })
+  await PromiseUtils.each(plots, async (plot) => enterValuesPlot({ items: plot }))
 }
 
 export const checkRecord = async (record, position) => {
@@ -141,6 +200,17 @@ export const checkRecord = async (record, position) => {
   await click(await getElement({ selector: `.table__row:nth-child(${position})` }))
   await waitFor(500)
   await checkValuesCluster({ items: cluster })
-  await checkValuesPlot({ id: 1, items: plots[0] })
-  await checkValuesPlot({ id: 2, items: plots[1] })
+  await PromiseUtils.each(plots, async (plot) => checkValuesPlot({ items: plot }))
 }
+
+export const expectIsRelevant = async ({ label }) =>
+  expectNotExists({ selector: '.not-applicable', relativeSelectors: [near(label)] })
+
+export const expectIsNotRelevant = async ({ label }) =>
+  expectExists({ selector: '.not-applicable', relativeSelectors: [near(label)] })
+
+export const expectIsValid = async ({ label }) =>
+  expectNotExists({ selector: '.error', relativeSelectors: [near(label)] })
+
+export const expectIsInvalid = async ({ label }) =>
+  expectExists({ selector: '.error', relativeSelectors: [near(label)] })

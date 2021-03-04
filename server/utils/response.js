@@ -1,7 +1,7 @@
 import Archiver from 'archiver'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from './unauthorizedError'
 
 const status = {
@@ -24,11 +24,11 @@ const _getErr = ({ key, params }) => ({
 
 export const sendErr = (res, err) => {
   if (err instanceof UnauthorizedError) {
-    res.status(403).json(_getErr(err))
+    res.status(StatusCodes.FORBIDDEN).json(_getErr(err))
   } else if (err instanceof SystemError) {
-    res.status(500).json(_getErr(err))
+    res.status(err.statusCode).json(_getErr(err))
   } else {
-    res.status(500).json(
+    res.status(err.statusCode).json(
       _getErr({
         key: 'appErrors.generic',
         params: { text: `Could not serve: ${err.toString()}` },

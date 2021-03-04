@@ -16,6 +16,7 @@ const ExpressionEditor = (props) => {
     query,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
+    excludeCurrentNodeDef,
     mode,
     isContextParent,
     canBeConstant,
@@ -41,6 +42,7 @@ const ExpressionEditor = (props) => {
           query={query}
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={nodeDefUuidCurrent}
+          excludeCurrentNodeDef={excludeCurrentNodeDef}
           mode={mode}
           isContextParent={isContextParent}
           canBeConstant={canBeConstant}
@@ -77,6 +79,7 @@ ExpressionEditor.propTypes = {
   query: PropTypes.string, // String representing the expression
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
+  excludeCurrentNodeDef: PropTypes.bool,
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
@@ -91,6 +94,7 @@ ExpressionEditor.defaultProps = {
   query: '',
   nodeDefUuidContext: '',
   nodeDefUuidCurrent: null,
+  excludeCurrentNodeDef: true,
   mode: Expression.modes.json,
   types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   isContextParent: false,

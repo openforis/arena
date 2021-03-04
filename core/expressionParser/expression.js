@@ -10,12 +10,15 @@ import { types } from './helpers/types'
 
 export { types } from './helpers/types'
 export { operators } from './helpers/operators'
+export { functionNames } from './helpers/functions'
 export { toSql } from './toSql'
 
 export const modes = {
   json: 'json',
   sql: 'sql',
 }
+
+export const getName = R.prop('name')
 
 export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
@@ -41,18 +44,18 @@ export const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
+
+export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
 
 export const { isValid } = ExpressionUtils
-export const { getExpressionIdentifiers } = Evaluator
 
 // ====== Type checking
 
 const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
-export const isValidExpressionType = (nodeDef) =>
-  !NodeDef.isEntity(nodeDef) && !NodeDef.isCoordinate(nodeDef) && !NodeDef.isFile(nodeDef)
+export const isValidExpressionType = (nodeDef) => !NodeDef.isFile(nodeDef)
 
 export const isLiteral = isType(types.Literal)
 export const isCompound = isType(types.Compound)
@@ -79,3 +82,5 @@ export const newBinary = (left, right, operator = '') => ({
   left,
   right,
 })
+
+export const globalIdentifierEval = Evaluator.globalIdentifierEval

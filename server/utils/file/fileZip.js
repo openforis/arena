@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 import StreamZip from 'node-stream-zip'
 
+import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Log from '@server/log/log'
 
 export default class FileZip {
@@ -22,13 +23,21 @@ export default class FileZip {
       })
 
       // Handle errors
-      streamZip.on('error', err => {
+      streamZip.on('error', (err) => {
         this.logger.error(`Error initializing stream: ${err}`)
         reject(err)
       })
 
       this.streamZip = streamZip
     })
+  }
+
+  extract(path) {
+    return new Promise((resolve, reject) =>
+      this.streamZip.extract(null, path, (err, count) => {
+        return err ? reject(err) : resolve(count)
+      })
+    )
   }
 
   hasEntry(entryName) {
@@ -47,7 +56,7 @@ export default class FileZip {
   async getEntryStream(entryName) {
     return this.hasEntry(entryName)
       ? new Promise((resolve, reject) =>
-          this.streamZip.stream(entryName, (err, stm) => (err ? reject(err) : resolve(stm))),
+          this.streamZip.stream(entryName, (err, stm) => (err ? reject(err) : resolve(stm)))
         )
       : null
   }
@@ -57,11 +66,24 @@ export default class FileZip {
       R.filter(R.propEq('isDirectory', false)),
       R.keys,
       R.filter(R.startsWith(path)),
-      R.map(entry => entry.slice(path.length)),
+      R.map((entry) => entry.slice(path.length))
     )(this.streamZip.entries())
   }
 
   close() {
     this.streamZip.close()
   }
+}
+
+export const extractZip = async (src, extractedPath) => {
+  // the clean and create the destination folder
+  if (FileUtils.existsDir(extractedPath)) {
+    await FileUtils.rmdir(extractedPath)
+  }
+  await FileUtils.mkdir(extractedPath)
+
+  const fileZip = new FileZip(src)
+  await fileZip.init()
+  await fileZip.extract(extractedPath)
+  await fileZip.close()
 }

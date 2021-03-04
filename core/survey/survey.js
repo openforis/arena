@@ -78,9 +78,10 @@ export const {
   getCollectReport,
   hasCollectReportIssues,
   getOwnerName,
+  getOwnerUuid,
 } = SurveyInfo
 
-export const { getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
+export const { getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin, assocAuthGroups } = SurveyInfo
 
 // UPDATE
 export const { markDraft } = SurveyInfo

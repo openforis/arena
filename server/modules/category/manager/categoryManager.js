@@ -54,12 +54,14 @@ export const validateCategories = async (surveyId, client = db) => {
 
 // ====== CREATE
 
-export const insertLevel = async (user, surveyId, levelParam, system = false, client = db) =>
+export const insertLevel = async ({ user, surveyId, level: levelParam, system = false, addLogs = true }, client = db) =>
   client.tx(async (t) => {
     const [level] = await Promise.all([
       CategoryRepository.insertLevel(surveyId, levelParam, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t),
+      ...(addLogs
+        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t)]
+        : []),
     ])
     return {
       level,
@@ -67,13 +69,17 @@ export const insertLevel = async (user, surveyId, levelParam, system = false, cl
     }
   })
 
-export const insertCategory = async (user, surveyId, category, system = false, client = db) =>
+export const insertCategory = async ({ user, surveyId, category, system = false, addLogs = true }, client = db) =>
   client.tx(async (t) => {
     const [categoryDb] = await Promise.all([
       CategoryRepository.insertCategory(surveyId, category, t),
-      ...Category.getLevelsArray(category).map((level) => insertLevel(user, surveyId, level, true, t)),
+      ...Category.getLevelsArray(category).map((level) =>
+        insertLevel({ user, surveyId, level, system: true, addLogs }, t)
+      ),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryInsert, category, system, t),
+      ...(addLogs
+        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryInsert, category, system, t)]
+        : []),
     ])
 
     return validateCategory(surveyId, Category.getUuid(categoryDb), t)
@@ -129,6 +135,7 @@ export const {
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
   getCategoryExportTemplate,
+  insertItems: insertItemsInBatch,
 } = CategoryRepository
 
 // ====== UPDATE
@@ -328,7 +335,7 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
     await Promise.all([
       CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
-      ...levelsNew.map((level) => insertLevel(user, surveyId, level, true, t)),
+      ...levelsNew.map((level) => insertLevel({ user, surveyId, level, system: true }, t)),
       markSurveyDraft(surveyId, t),
     ])
     return Category.assocLevelsArray(levelsNew)(category)

@@ -12,6 +12,7 @@ const _clickModule = async ({ moduleLabel, moduleId }) => {
 const _clickDesignerModule = async ({ moduleLabel }) => _clickModule({ moduleLabel, moduleId: 'sidebar_btn_designer' })
 const _clickAnalysisModule = async ({ moduleLabel }) => _clickModule({ moduleLabel, moduleId: 'sidebar_btn_analysis' })
 const _clickDataModule = async ({ moduleLabel }) => _clickModule({ moduleLabel, moduleId: 'sidebar_btn_data' })
+const _clickUsersModule = async ({ moduleLabel }) => _clickModule({ moduleLabel, moduleId: 'sidebar_btn_users' })
 
 export const clickSidebarBtnSurveyForm = async () => _clickDesignerModule({ moduleLabel: 'FORM DESIGNER' })
 
@@ -23,3 +24,6 @@ export const clickSidebarBtnAnalysisProcessingChains = async () =>
   _clickAnalysisModule({ moduleLabel: 'PROCESSING CHAINS' })
 
 export const clickSiderbarBtnDataRecords = async () => _clickDataModule({ moduleLabel: 'RECORDS' })
+export const clickSiderbarBtnDataValidationReport = async () => _clickDataModule({ moduleLabel: 'VALIDATION REPORT' })
+
+export const clickSidebarBtnUsersList = async () => _clickUsersModule({ moduleLabel: 'USER LIST' })

@@ -60,6 +60,9 @@ export const {
   createImportSummaryFromStream,
   insertLevel,
   insertItem,
+  insertItems,
+
+  insertItemsInBatch,
 
   countCategories,
   fetchCategoriesBySurveyId,

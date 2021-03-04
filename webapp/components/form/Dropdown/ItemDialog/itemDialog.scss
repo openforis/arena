@@ -1,9 +1,10 @@
 @import 'webapp/style/vars';
 
 .dropdown__list-item {
-  padding: 0.4rem 0;
+  padding: 0.4rem;
+  padding-right: 0;
   grid-column: 2;
-  text-align: center;
+  text-align: left;
 
   &:hover,
   &:focus {

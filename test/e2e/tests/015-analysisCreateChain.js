@@ -1,19 +1,25 @@
 import { clickSidebarBtnAnalysisProcessingChains } from '../utils/ui/sidebar'
+import { click, expectExists, expectToBe, reload, toRightOf, waitFor, writeIntoTextBox } from '../utils/api'
 import {
-  clearTextBox,
-  click,
-  expectExists,
-  getElement,
-  writeIntoTextBox,
-  toRightOf,
-  button,
-  textBox,
-  above,
-  below,
-  waitFor,
-  reload,
-} from '../utils/api'
-import { waitForLoader } from '../utils/ui/loader'
+  addCalculationStep,
+  addCalculationAttribute,
+  addProcessingStep,
+  closeCalculation,
+  closeStep,
+  deleteItem,
+  expectStepAddButtonDisabled,
+  expectStepCategorySelectorNotExists,
+  publishSurvey,
+  save,
+} from '../utils/ui/calculationChain'
+
+const chainData = { label: 'Chain 1', description: 'Processing description' }
+const calculationData = { label: 'Tree volume' }
+const calculationAttributeData = {
+  name: 'tree_volume',
+  label: 'Tree volume label',
+  description: 'Tree volume description',
+}
 
 describe('Analysis create chain.', () => {
   test("Chain can't be created until survey is published", async () => {
@@ -21,13 +27,8 @@ describe('Analysis create chain.', () => {
     await expectExists({ text: 'This section is available only when survey is published' })
   })
 
-  test('Publish chain', async () => {
-    await click('Publish')
-    await waitForLoader()
-    await click('Ok')
-    await waitFor(5000)
-
-    await click('Close')
+  test('Publish survey', async () => {
+    await publishSurvey()
   })
 
   test('Add new chain', async () => {
@@ -35,56 +36,82 @@ describe('Analysis create chain.', () => {
     await waitFor(2000)
     await clickSidebarBtnAnalysisProcessingChains()
     await click('New')
-    await clearTextBox({ selector: toRightOf('Processing chain label') })
-    await writeIntoTextBox({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
-    await clearTextBox({ selector: toRightOf('Description') })
-    await writeIntoTextBox({ text: 'Processing description', selector: toRightOf('Description') })
+    await writeIntoTextBox({ text: chainData.label, selector: toRightOf('Processing chain label') })
+    await writeIntoTextBox({ text: chainData.description, selector: toRightOf('Description') })
   })
 
   test('Add new step', async () => {
-    await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Processing steps'))
-    await click(textBox(toRightOf('Entity')))
-    await click('Tree')
+    await addProcessingStep({ entity: 'Tree' })
   })
 
   test('Add new calculation', async () => {
-    await click(button(getElement({ selector: '.icon-plus' })), toRightOf('Calculation steps'))
-    await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: 'Tree volume', selector: above('Quantitative') })
-  })
-
-  test('Add new calculation attribute', async () => {
-    await click('Add', toRightOf('Attribute'))
-
-    await clearTextBox({ selector: toRightOf('Name') })
-    await writeIntoTextBox({ text: 'tree_volume', selector: toRightOf('Name') })
-    await expectExists({ text: 'DECIMAL' })
-    await expectExists({ selector: '.icon-checkbox-checked', relativeSelectors: [toRightOf('Analysis')] })
-
-    await clearTextBox({ selector: toRightOf('Labels') })
-    await writeIntoTextBox({ text: 'Tree volume', selector: toRightOf('Labels') })
-
-    await clearTextBox({ selector: toRightOf('Descriptions') })
-    await writeIntoTextBox({ text: 'Tree volume description', selector: toRightOf('Descriptions') })
-
-    await click('Save')
-    await waitForLoader()
-    await click('Back')
-  })
+    await addCalculationStep({ label: calculationData.label })
+    await addCalculationAttribute({ attribute: calculationAttributeData })
+  }, 30000)
 
   test('Check values after Add new calculation attribute', async () => {
-    await expectExists({ text: 'Chain 1', selector: toRightOf('Processing chain label') })
+    await expectExists({ text: chainData.label, selector: toRightOf('Processing chain label') })
     await expectExists({ text: 'Tree', selector: toRightOf('1') })
-    await expectExists({ text: 'Tree volume (Tree volume (C))' })
+    await expectExists({ text: 'Tree volume (Tree volume label (C))' })
     await expectExists({ text: 'Tree volume', selector: toRightOf('Labels') })
-    await expectExists({ text: 'Tree volume (C)', selector: toRightOf('Attribute') })
+    await expectExists({ text: 'Tree volume label (C)', selector: toRightOf('Attribute') })
   })
 
   test('Save calculation', async () => {
-    await click('Save')
-    await waitForLoader()
-    await expectExists({ text: 'Saved!' })
+    await save()
+  })
+
+  test('Add new step (with category)', async () => {
+    await closeCalculation()
+    await closeStep()
+
+    await addProcessingStep({ category: 'administrative_unit' })
+
+    await save()
+  }, 30000)
+
+  test('Expect cannot add new processing steps', async () => {
+    await closeStep()
+
+    await expectStepAddButtonDisabled()
+
+    await click('Tree')
+    await expectStepCategorySelectorNotExists()
+
+    await closeStep()
+  }, 30000)
+
+  test('Delete processing step', async () => {
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 2 })
+
+    await click('administrative_unit')
+
+    await deleteItem()
+
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
+  })
+
+  test('Expect exists chain in chains list', async () => {
     await clickSidebarBtnAnalysisProcessingChains()
-    await expectExists({ text: 'Processing chain', selector: below('Label') })
+    await expectExists({ text: chainData.label })
+  })
+
+  test('Chain reload', async () => {
+    // reload page
+    await reload()
+    await waitFor(2000)
+
+    // select chain
+    await click(chainData.label)
+
+    await expectExists({ text: chainData.label, selector: toRightOf('Processing chain label') })
+    await expectExists({ text: 'Tree', selector: toRightOf('1') })
+    await expectToBe({ selector: '.chain-list-item', numberOfItems: 1 })
+
+    await clickSidebarBtnAnalysisProcessingChains()
+  })
+
+  test('Publish survey after chain creation', async () => {
+    await publishSurvey()
   })
 })

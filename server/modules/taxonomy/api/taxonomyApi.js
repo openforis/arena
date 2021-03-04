@@ -27,7 +27,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const taxonomyReq = Request.getBody(req)
 
-      const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, taxonomyReq)
+      const taxonomy = await TaxonomyService.insertTaxonomy({ user, surveyId, taxonomy: taxonomyReq })
 
       res.json({ taxonomy })
     } catch (error) {

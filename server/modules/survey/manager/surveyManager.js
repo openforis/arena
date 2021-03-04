@@ -84,7 +84,7 @@ export const insertSurvey = async (params, client = db) => {
           ),
         }
       )
-      await NodeDefManager.insertNodeDef(user, surveyId, Survey.cycleOneKey, rootEntityDef, true, t)
+      await NodeDefManager.insertNodeDef({ user, surveyId, nodeDef: rootEntityDef, system: true }, t)
     }
 
     // Update user prefs
@@ -111,6 +111,39 @@ export const insertSurvey = async (params, client = db) => {
   return assocSurveyInfo(survey)
 }
 
+export const importSurvey = async (params, client = db) => {
+  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
+  const survey = await client.tx(async (t) => {
+    // Insert survey into db
+    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
+    // Create survey data schema
+    await migrateSurveySchema(surveyId)
+
+    // Update user prefs
+    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+    await UserRepository.updateUserPrefs(userUpdated, t)
+
+    // Create default groups for this survey
+    surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+
+    // Add user to survey admins group (if not system admin)
+    if (!User.isSystemAdmin(user)) {
+      await UserManager.addUserToGroup(
+        user,
+        surveyId,
+        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
+        User.getUuid(user),
+        t
+      )
+    }
+
+    return surveyInfo
+  })
+
+  return assocSurveyInfo(survey)
+}
 // ====== READ
 export const { fetchAllSurveyIds } = SurveyRepository
 
@@ -238,4 +271,4 @@ export const deleteSurvey = async (surveyId) =>
     ])
   })
 
-export const { dropSurveySchema } = SurveyRepository
+export const { dropSurveySchema, cloneTables } = SurveyRepository

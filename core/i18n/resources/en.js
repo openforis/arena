@@ -20,7 +20,9 @@ Do you want to cancel them?`,
     close: 'Close',
     cnt: 'Count',
     code: 'Code',
+    cloneFrom: 'Clone from',
     childrenEmpty: 'Define at least one child item',
+    export: 'Export',
     csvExport: 'CSV Export',
     csvImport: 'CSV Import',
     cycle: 'Cycle',
@@ -223,6 +225,7 @@ Do you want to proceed?`,
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
+      importFromArena: 'Import from Arena',
     },
     collectImportReport: {
       expression: 'Expression',
@@ -414,6 +417,7 @@ $t(common.cantUndoWarning)`,
     deleteConfirm: `Delete this calculation step?
     
 $t(common.cantUndoWarning)`,
+    deleteComplete: 'Processing step calculation deleted',
   },
 
   itemsTable: {
@@ -434,11 +438,16 @@ $t(common.cantUndoWarning)`,
     },
     editorCompletionHelp: '- Show the available variables and functions that can be used',
     functionDescriptions: {
-      min: 'Take the minimum of the arguments',
-      max: 'Take the maximum of the arguments',
-      pow: 'Raise a number X to the power P',
+      includes: 'Returns true if the specified multiple attribute includes the specified value.',
+      index: 'Returns the index of the context node among its siblings',
+      isEmpty: 'Returns true if the argument has no value specified',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
+      max: 'Take the maximum of the arguments',
+      min: 'Take the minimum of the arguments',
+      now: 'Returns the current date or time',
+      parent: 'Returns the parent entity of the specified node',
+      pow: 'Raise a number X to the power P',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
@@ -811,6 +820,14 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    // import arena survey
+    ArenaImportJob: 'Arena import',
+    ArenaSurveyReaderJob: 'Arena Survey Reader',
+    UsersImportJob: 'Users Import',
+    // clone survey
+    SurveyCloneJob: 'Clone survey',
+    CloneSurveyJob: 'Clone survey',
+    CloneTablesJob: 'Clone survey tables',
   },
 
   // ====== App Errors

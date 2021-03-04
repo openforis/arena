@@ -1,84 +1,60 @@
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { $ } from '../api'
 
-const expressionQualifier = {
+export const placeholderIndex = 'placeholder'
+
+export const qualifiers = {
   defaultValues: 'default-values',
   relevantIf: 'relevant-if',
+  validations: 'validations',
 }
 
-const expressionEditorEl = ({ index = 0, qualifier, type, elType }) =>
+const elementType = {
+  editBtn: 'edit-btn',
+  deleteBtn: 'btn-delete',
+  query: 'query',
+}
+
+const expressionEditorEl = ({ index = 0, qualifier, type = NodeDefExpression.keys.expression, elType }) =>
   $(`#expression-editor-${index}-${qualifier}-${type}-${elType}`)
 
 export const nodeDefDetailsAdvancedSelectors = {
-  defaultValuesTooltip: ({ error = false } = {}) =>
-    `.node-def-edit__expressions-default-values-tooltip${error ? '.tooltip-error' : ''}`,
+  expressionEditorsWrapperInvalid: ({ qualifier }) => `.node-def-edit__expressions-${qualifier}-tooltip.tooltip-error`,
 }
 
-export const nodeDefDetailsAdvancedElements = {
-  // default values
-  defaultValuesTooltip: ({ error = false } = {}) =>
-    $(`.node-def-edit__expressions-default-values-tooltip${error ? '.tooltip-error' : ''}`),
-  defaultValueExpressionEditBtn: ({ index }) =>
+export const expressionEditorElements = {
+  expressionItems: ({ qualifier }) =>
+    $(`.node-def-edit__expressions-${qualifier}-tooltip .node-def-edit__expressions .node-def-edit__expression`),
+  expressionEditBtn: ({ qualifier, index }) =>
     expressionEditorEl({
+      qualifier,
       index,
-      qualifier: expressionQualifier.defaultValues,
-      type: NodeDefExpression.keys.expression,
-      elType: 'edit-btn',
+      elType: elementType.editBtn,
     }),
-  defaultValueExpressionDeleteBtn: ({ index }) =>
+  deleteBtn: ({ qualifier, index }) =>
     expressionEditorEl({
+      qualifier,
       index,
-      qualifier: expressionQualifier.defaultValues,
-      type: NodeDefExpression.keys.expression,
-      elType: 'btn-delete',
+      elType: elementType.deleteBtn,
     }),
-  defaultValuePlaceholderExpressionEditBtn: () =>
+  expressionQuery: ({ qualifier, index }) =>
     expressionEditorEl({
-      index: 'placeholder',
-      qualifier: expressionQualifier.defaultValues,
-      type: NodeDefExpression.keys.expression,
-      elType: 'edit-btn',
-    }),
-  defaultValueExpressionQuery: ({ index }) =>
-    expressionEditorEl({
+      qualifier,
       index,
-      qualifier: expressionQualifier.defaultValues,
-      type: NodeDefExpression.keys.expression,
-      elType: 'query',
+      elType: elementType.query,
     }),
-  defaultValueApplyIfEditBtn: ({ index }) =>
+  applyIfEditBtn: ({ qualifier, index }) =>
     expressionEditorEl({
+      qualifier,
       index,
-      qualifier: expressionQualifier.defaultValues,
       type: NodeDefExpression.keys.applyIf,
-      elType: 'edit-btn',
+      elType: elementType.editBtn,
     }),
-  defaultValueApplyIfQuery: ({ index }) =>
+  applyIfQuery: ({ qualifier, index }) =>
     expressionEditorEl({
+      qualifier,
       index,
-      qualifier: expressionQualifier.defaultValues,
       type: NodeDefExpression.keys.applyIf,
-      elType: 'query',
-    }),
-  // relevant if
-  relevantIfPlaceholderEditBtn: () =>
-    expressionEditorEl({
-      index: 'placeholder',
-      qualifier: expressionQualifier.relevantIf,
-      type: NodeDefExpression.keys.expression,
-      elType: 'edit-btn',
-    }),
-  relevantIfEditBtn: () =>
-    expressionEditorEl({
-      index: '0',
-      qualifier: expressionQualifier.relevantIf,
-      type: NodeDefExpression.keys.expression,
-      elType: 'edit-btn',
-    }),
-  relevantIfExpressionQuery: () =>
-    expressionEditorEl({
-      qualifier: expressionQualifier.relevantIf,
-      type: NodeDefExpression.keys.expression,
-      elType: 'query',
+      elType: elementType.query,
     }),
 }

@@ -75,7 +75,7 @@ export default class CategoryImportJob extends Job {
       ActivityLog.type.categoryImport,
       { uuid: Category.getUuid(this.category) },
       false,
-      this.tx,
+      this.tx
     )
   }
 
@@ -122,13 +122,16 @@ export default class CategoryImportJob extends Job {
   async _fetchOrCreateCategory() {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
-      return await CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
+      return  CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
     }
 
     const category = Category.newCategory({
       [Category.keysProps.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
-    return await CategoryManager.insertCategory(this.user, this.surveyId, category, true, this.tx)
+    return  CategoryManager.insertCategory(
+      { user: this.user, surveyId: this.surveyId, category, system: true },
+      this.tx
+    )
   }
 
   async _importLevels() {
@@ -154,7 +157,7 @@ export default class CategoryImportJob extends Job {
         Category.keysProps.itemExtraDef,
         itemExtraDef,
         true,
-        this.tx,
+        this.tx
       )
       this.category = Category.assocItemExtraDef(itemExtraDef)(this.category)
     }
@@ -166,23 +169,23 @@ export default class CategoryImportJob extends Job {
     this.logDebug('reading CSV file rows')
 
     this.itemsBatchInserter = new BatchPersister(
-      async items => await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx),
+      async (items) => await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
     )
     this.itemsBatchUpdater = new BatchPersister(
-      async items =>
-        await CategoryManager.updateItemsExtra(
+      async (items) =>
+         CategoryManager.updateItemsExtra(
           this.user,
           this.surveyId,
           Category.getUuid(this.category),
           items,
-          this.tx,
-        ),
+          this.tx
+        )
     )
 
     const reader = await CategoryImportCSVParser.createRowsReaderFromStream(
       await this.createReadStream(),
       this.summary,
-      async itemRow => {
+      async (itemRow) => {
         if (this.isCanceled()) {
           reader.cancel()
           return
@@ -190,9 +193,9 @@ export default class CategoryImportJob extends Job {
 
         await this._onRow(itemRow)
       },
-      total => {
+      (total) => {
         this.total = total + 1
-      }, // +1 consider final db inserts
+      } // +1 consider final db inserts
     )
 
     await reader.start()
@@ -288,7 +291,7 @@ export default class CategoryImportJob extends Job {
     const code = codes[levelIndex]
     const columnName = CategoryImportSummary.getColumnName(
       CategoryImportSummary.columnTypes.code,
-      levelIndex,
+      levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeDuplicate, {
       columnName,
@@ -299,7 +302,7 @@ export default class CategoryImportJob extends Job {
   _addErrorCodeRequired(levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(
       CategoryImportSummary.columnTypes.code,
-      levelIndex,
+      levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeRequired, {
       columnName,

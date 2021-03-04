@@ -1,30 +1,43 @@
 import CodeMirror from 'codemirror/lib/codemirror'
+
+import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+
+import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
-    min: 'max(3,1) = 1',
-    max: 'max(3,1,2) = 3',
-    pow: 'pow(2,3) = 2³ = 8',
-    ln: 'ln(10) = 2.302…',
-    log10: 'log10(100) = 2',
-    includes: `includes(multiple_attribute_name, 'value') = true/false`,
+    [Expression.functionNames.index]: `index(node_name)`,
+    [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
+    [Expression.functionNames.min]: 'min(3,1) = 1',
+    [Expression.functionNames.max]: 'max(3,1,2) = 3',
+    [Expression.functionNames.parent]: `parent(node_name)`,
+    [Expression.functionNames.pow]: 'pow(2,3) = 2³ = 8',
+    [Expression.functionNames.ln]: 'ln(10) = 2.302…',
+    [Expression.functionNames.log10]: 'log10(100) = 2',
+    [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
+    [Expression.functionNames.now]: 'now()',
   },
   [Expression.modes.sql]: {
-    avg: 'avg(variable_name)',
-    count: 'count(variable_name)',
-    sum: 'sum(variable_name)',
+    [Expression.functionNames.avg]: 'avg(variable_name)',
+    [Expression.functionNames.count]: 'count(variable_name)',
+    [Expression.functionNames.sum]: 'sum(variable_name)',
   },
+}
+
+const _findCharIndex = ({ value, end, matchingRegEx }) => {
+  for (let i = end; i >= 0; i -= 1) {
+    if (matchingRegEx.test(value[i])) return i + 1
+  }
+  return 0
 }
 
 const nonIdRegex = /[^\w_]/
-const getWordStart = (value, end) => {
-  for (let i = end; i >= 0; i -= 1) {
-    if (nonIdRegex.test(value[i])) return i + 1
-  }
+const getVariableNameStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: nonIdRegex })
 
-  return 0
-}
+const variablesSeparatorRegex = /[\s\-+*/&|]/
+const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: variablesSeparatorRegex })
 
 const getVariableCompletion = ({ group, variable, token }) => {
   const { label, value } = variable
@@ -90,16 +103,72 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
   return completions
 }
 
-export const arenaExpressionHint = (mode, i18n, variablesGroupedByParentEntity, editor) => {
+/* eslint-disable no-param-reassign */
+const _prepareTokenForCompletion = ({ token, cursorPosition, cursorLine }) => {
+  token.start = getVariableNameStart({ value: token.string, end: cursorPosition })
+  token.line = cursorLine
+
+  if (token.end > cursorPosition) {
+    token.end = cursorPosition
+    token.string = token.string.slice(0, cursorPosition - token.start)
+  }
+}
+
+const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath }) => {
+  const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+  let nodeDefContext = nodeDefContextParent
+
+  const { lang } = i18n
+  const groupByParent = true
+
+  if (nodeDefContextPath) {
+    try {
+      nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
+        survey,
+        nodeDef: nodeDefCurrent,
+        exprString: nodeDefContextPath,
+      })
+    } catch (e) {
+      // ignore it
+    }
+    return nodeDefContext
+      ? ExpressionVariables.getVariablesChildren({
+          survey,
+          nodeDefContext,
+          nodeDefCurrent,
+          mode,
+          lang,
+          groupByParent,
+        })
+      : []
+  } else {
+    // get variables from context node and its ancestors
+    return ExpressionVariables.getVariables({
+      survey,
+      nodeDefContext,
+      nodeDefCurrent,
+      mode,
+      lang,
+      groupByParent,
+    })
+  }
+}
+
+export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {
   const cur = editor.getCursor()
   const token = editor.getTokenAt(cur)
-  token.start = getWordStart(token.string, cur.ch)
-  token.line = cur.line
 
-  if (token.end > cur.ch) {
-    token.end = cur.ch
-    token.string = token.string.slice(0, cur.ch - token.start)
-  }
+  const { ch: cursorPosition, line: cursorLine } = cur
+
+  const variablePath = token.string.slice(
+    getVariablePathStart({ value: token.string, end: cursorPosition }),
+    cursorPosition
+  )
+  _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
+
+  const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
+
+  const variablesGroupedByParentEntity = _extractVariables({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath })
 
   return {
     list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),
