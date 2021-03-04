@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = (props) => {
-  const { children, className, labelKey, showIcon, showLabel, showKeys, validation } = props
+  const { children, className, id, labelKey, showIcon, showLabel, showKeys, validation } = props
 
   const i18n = useI18n()
   const valid = Validation.isValid(validation)
@@ -24,6 +24,7 @@ const ErrorBadge = (props) => {
         error: Validation.isError(validation),
         warning: Validation.isWarning(validation),
       })}
+      id={id}
     >
       <div className="badge__content">
         {children}
@@ -39,6 +40,7 @@ const ErrorBadge = (props) => {
 ErrorBadge.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  id: PropTypes.string,
   labelKey: PropTypes.string,
   showIcon: PropTypes.bool,
   showKeys: PropTypes.bool,
@@ -49,6 +51,7 @@ ErrorBadge.propTypes = {
 ErrorBadge.defaultProps = {
   children: null,
   className: '',
+  id: null,
   labelKey: 'common.invalid',
   showIcon: false,
   showKeys: false,

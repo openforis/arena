@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/Dropdown'
-import * as API from '@webapp/service/api'
 import * as Survey from '@core/survey/survey'
+
+import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const SurveyDropdown = (props) => {
   const { selection, onChange } = props
@@ -23,6 +26,7 @@ const SurveyDropdown = (props) => {
 
   return (
     <Dropdown
+      idInput={DataTestId.surveyCreate.surveyCloneFrom}
       placeholder={i18n.t('common.cloneFrom')}
       items={surveys}
       selection={selectedItem}

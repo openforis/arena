@@ -59,6 +59,7 @@ export const Input = React.forwardRef((props, ref) => {
             inputRef.current = el
           },
           id,
+          'data-testid': id,
           onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
           onFocus,
           onBlur,
@@ -75,6 +76,7 @@ export const Input = React.forwardRef((props, ref) => {
           aria-disabled={disabled}
           className="form-input"
           disabled={disabled}
+          data-testid={id}
           id={id}
           maxLength={maxLength}
           onChange={(event) => handleValueChange(event.target.value)}

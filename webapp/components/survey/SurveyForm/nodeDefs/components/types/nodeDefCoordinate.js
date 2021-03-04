@@ -7,10 +7,12 @@ import { useI18n } from '@webapp/store/system'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Srs from '@core/geo/srs'
@@ -42,6 +44,7 @@ const NodeDefCoordinate = (props) => {
 
   const xInput = (
     <Input
+      id={DataTestId.surveyForm.coordinateX(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.x}
@@ -51,6 +54,7 @@ const NodeDefCoordinate = (props) => {
 
   const yInput = (
     <Input
+      id={DataTestId.surveyForm.coordinateY(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.y}
@@ -60,6 +64,7 @@ const NodeDefCoordinate = (props) => {
 
   const srsDropdown = (
     <Dropdown
+      idInput={DataTestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
       readOnly={entryDisabled}
       items={surveySrs}
       itemKey="code"

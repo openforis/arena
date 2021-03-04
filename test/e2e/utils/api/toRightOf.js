@@ -1,1 +1,0 @@
-export { toRightOf } from 'taiko'

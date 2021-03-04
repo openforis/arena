@@ -15,6 +15,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyLang } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State, useActions } from '../../store'
 
@@ -57,6 +58,7 @@ const ItemDetails = (props) => {
   return (
     <div
       id={prefixId}
+      data-testid={DataTestId.categoryDetails.item(levelIndex, index)}
       className={`category__item ${active ? 'active' : ''}`}
       onKeyDown={setActive}
       onClick={setActive}
@@ -64,11 +66,17 @@ const ItemDetails = (props) => {
       role="button"
       tabIndex={0}
     >
-      <ErrorBadge validation={validation} showLabel={false} showIcon />
+      <ErrorBadge
+        id={DataTestId.categoryDetails.itemErrorBadge(levelIndex, index)}
+        validation={validation}
+        showLabel={false}
+        showIcon
+      />
       {active ? (
         <>
           <button
             id={`${prefixId}-btn-close`}
+            data-testid={DataTestId.categoryDetails.itemCloseBtn(levelIndex, index)}
             type="button"
             className="btn btn-s btn-close"
             onClick={() => Actions.resetItemActive({ levelIndex })}
@@ -78,7 +86,7 @@ const ItemDetails = (props) => {
 
           <FormItem label={i18n.t('common.code')}>
             <Input
-              id={`${prefixId}-code`}
+              id={DataTestId.categoryDetails.itemCode(levelIndex, index)}
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
@@ -88,7 +96,7 @@ const ItemDetails = (props) => {
           </FormItem>
 
           <LabelsEditor
-            inputFieldIdPrefix={`${prefixId}-label`}
+            inputFieldIdPrefix={DataTestId.categoryDetails.itemLabel(levelIndex, index)('')}
             labels={CategoryItem.getLabels(item)}
             onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
             readOnly={readOnly}
@@ -113,6 +121,7 @@ const ItemDetails = (props) => {
             <button
               type="button"
               className="btn btn-delete"
+              data-testid={DataTestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
               aria-disabled={disabled}
               onClick={() => Actions.deleteItem({ category, level, item, leaf })}
             >

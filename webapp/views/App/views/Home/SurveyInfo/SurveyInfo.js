@@ -7,9 +7,9 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { Input } from '@webapp/components/form/Input'
-
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import CyclesEditor from './CyclesEditor'
@@ -49,7 +49,7 @@ const SurveyInfo = () => {
             {i18n.t('common.name')}
           </label>
           <Input
-            id="survey-name"
+            id={DataTestId.surveyInfo.surveyName}
             value={name}
             validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
@@ -58,7 +58,7 @@ const SurveyInfo = () => {
         </div>
 
         <LabelsEditor
-          inputFieldIdPrefix="survey-label"
+          inputFieldIdPrefix={DataTestId.surveyInfo.surveyLabel('')}
           readOnly={readOnly}
           languages={languages}
           labels={labels}
@@ -66,7 +66,7 @@ const SurveyInfo = () => {
         />
 
         <LabelsEditor
-          inputFieldIdPrefix="survey-description"
+          inputFieldIdPrefix={DataTestId.surveyInfo.surveyDescription('')}
           readOnly={readOnly}
           formLabelKey="common.description"
           languages={languages}
@@ -75,7 +75,7 @@ const SurveyInfo = () => {
         />
 
         <LanguagesEditor
-          idInput="survey-language"
+          idInput={DataTestId.surveyInfo.surveyLanguage}
           readOnly={readOnly}
           languages={languages}
           setLanguages={setLanguages}
@@ -102,7 +102,12 @@ const SurveyInfo = () => {
         </div>
 
         {!readOnly && (
-          <button className="btn btn-save" type="button" onClick={saveProps}>
+          <button
+            className="btn btn-save"
+            data-testid={DataTestId.surveyInfo.saveBtn}
+            type="button"
+            onClick={saveProps}
+          >
             <span className="icon icon-floppy-disk icon-12px icon-left" />
             {i18n.t('common.save')}
           </button>

@@ -16,6 +16,7 @@ import { useUser } from '@webapp/store/user'
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 
 import ProfilePicture from '@webapp/components/profilePicture'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const UserPopupMenu = (props) => {
   const { onClose } = props
@@ -50,6 +51,7 @@ const UserPopupMenu = (props) => {
           <div>
             <Link
               className="btn-s btn-transparent"
+              data-testid={DataTestId.header.userProfileBtn}
               to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
               onClick={onClose}
             >
@@ -62,13 +64,23 @@ const UserPopupMenu = (props) => {
 
       <div className="user-popup-menu__sep" />
 
-      <Link to={appModuleUri(homeModules.surveyList)} onClick={onClose} className="btn-s btn-transparent">
+      <Link
+        data-testid={DataTestId.header.surveyListBtn}
+        to={appModuleUri(homeModules.surveyList)}
+        onClick={onClose}
+        className="btn-s btn-transparent"
+      >
         <span className="icon icon-paragraph-justify icon-12px icon-left" />
         {i18n.t('appModules.surveyList')}
       </Link>
 
       {User.isSystemAdmin(user) && (
-        <Link to={appModuleUri(homeModules.surveyNew)} onClick={onClose} className="btn-s btn-transparent">
+        <Link
+          data-testid={DataTestId.header.surveyCreateBtn}
+          to={appModuleUri(homeModules.surveyNew)}
+          onClick={onClose}
+          className="btn-s btn-transparent"
+        >
           <span className="icon icon-plus icon-12px icon-left" />
           {i18n.t('homeView.createSurvey')}
         </Link>
@@ -77,6 +89,7 @@ const UserPopupMenu = (props) => {
       <div className="user-popup-menu__sep" />
 
       <button
+        data-testid={DataTestId.header.userLogoutBtn}
         type="button"
         className="btn-s btn-transparent"
         onClick={() => {

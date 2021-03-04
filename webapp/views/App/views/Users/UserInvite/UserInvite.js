@@ -7,6 +7,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
@@ -23,6 +24,7 @@ const UserInviteComponent = () => {
     <div className="user-invite form">
       <FormItem label={i18n.t('common.email')}>
         <Input
+          id={DataTestId.userInvite.email}
           placeholder={i18n.t('common.email')}
           value={UserInvite.getEmail(userInvite)}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
@@ -39,6 +41,7 @@ const UserInviteComponent = () => {
 
       <div className="user-invite__buttons">
         <button
+          data-testid={DataTestId.userInvite.submitBtn}
           type="button"
           className="btn btn-invite"
           aria-disabled={!Validation.isValid(validation)}

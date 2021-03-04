@@ -6,6 +6,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import ExpressionEditor from '@webapp/components/expression/expressionEditor'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
@@ -57,6 +58,7 @@ const ExpressionProp = (props) => {
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && (
           <button
+            data-testid={DataTestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             type="button"
             className="btn btn-s btn-transparent btn-delete"
@@ -73,7 +75,7 @@ const ExpressionProp = (props) => {
           <ExpressionEditor
             index={index}
             placeholder={isPlaceholder}
-            qualifier={`${qualifier}-expression`}
+            qualifier={qualifier}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCurrent={nodeDefUuidCurrent}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
@@ -94,7 +96,7 @@ const ExpressionProp = (props) => {
             <ExpressionEditor
               index={index}
               placeholder={isPlaceholder}
-              qualifier={`${qualifier}-applyIf`}
+              qualifier={DataTestId.nodeDefDetails.applyIf(qualifier)}
               nodeDefUuidContext={nodeDefUuidContext}
               nodeDefUuidCurrent={nodeDefUuidCurrent}
               excludeCurrentNodeDef={excludeCurrentNodeDef}
