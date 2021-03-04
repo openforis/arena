@@ -10,7 +10,6 @@ import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'

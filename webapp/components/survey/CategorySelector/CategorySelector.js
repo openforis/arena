@@ -4,13 +4,12 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
-
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
-
 import * as API from '@webapp/service/api'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -45,6 +44,7 @@ const CategorySelector = (props) => {
   return (
     <div className="category-selector">
       <Dropdown
+        idInput={DataTestId.categorySelector.category}
         disabled={disabled}
         items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
@@ -53,7 +53,13 @@ const CategorySelector = (props) => {
         selection={category}
         onChange={onChange}
       />
-      {showAdd && <ButtonMetaItemAdd onAdd={setCategoryToEdit} metaItemType={metaItemTypes.category} />}
+      {showAdd && (
+        <ButtonMetaItemAdd
+          id={DataTestId.categorySelector.addCategoryBtn}
+          onAdd={setCategoryToEdit}
+          metaItemType={metaItemTypes.category}
+        />
+      )}
       {showManage && (
         <button
           type="button"

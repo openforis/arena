@@ -18,6 +18,7 @@ const DownloadButton = (props) => {
     className,
     showLabel,
     disabled,
+    id,
   } = props
 
   return (
@@ -25,6 +26,7 @@ const DownloadButton = (props) => {
       type="button"
       className={`btn btn-s ${className}`}
       aria-disabled={disabled}
+      data-testid={id}
       title={title}
       onClick={async () => {
         const response = await axios({
@@ -48,6 +50,7 @@ const DownloadButton = (props) => {
 DownloadButton.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  id: PropTypes.string,
   href: PropTypes.string.isRequired,
   label: PropTypes.string,
   requestMethod: PropTypes.oneOf(['GET', 'POST']),
@@ -59,6 +62,7 @@ DownloadButton.propTypes = {
 DownloadButton.defaultProps = {
   className: '',
   disabled: false,
+  id: null,
   label: null,
   requestMethod: 'GET',
   requestParams: null,

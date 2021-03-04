@@ -8,6 +8,7 @@ import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
 const NodeDefTaxonInputField = (props) => {
   const {
+    id,
     surveyId,
     taxonomyUuid,
     edit,
@@ -39,6 +40,7 @@ const NodeDefTaxonInputField = (props) => {
   return (
     <React.Fragment>
       <Input
+        id={id}
         ref={inputRef}
         disabled={entryDisabled}
         readOnly={edit}
@@ -64,6 +66,7 @@ const NodeDefTaxonInputField = (props) => {
 }
 
 NodeDefTaxonInputField.defaultProps = {
+  id: null,
   surveyId: null,
   taxonomyUuid: null,
   edit: false,

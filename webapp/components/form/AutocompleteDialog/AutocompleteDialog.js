@@ -41,6 +41,7 @@ const AutocompleteDialog = (props) => {
           key={State.getItemKey(state)(item)}
           tabIndex="0"
           item={item}
+          itemKey={State.getItemKey(state)}
           itemLabel={State.getItemLabel(state)}
           onKeyDown={Actions.onListItemKeyDown({
             state,

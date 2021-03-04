@@ -1,4 +1,4 @@
-name: Run yarn test
+name: Run test
 
 on:
   pull_request:
@@ -20,46 +20,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Use Node.js 14.15.0
-        uses: actions/setup-node@v1
+      - uses: microsoft/playwright-github-action@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
-      - name: install browser dependencies
+      - name: Install pm2
+        run: npm install pm2 -g
+      - name: Copy db migrations
+        run: cp -r test/db/migrations/** server/db/migration/public/migrations
+      - name: Yarn
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Run server
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwoff1 \
-                        libopus0 \
-                        libwebp6 \
-                        libwebpdemux2 \
-                        libenchant1c2a \
-                        libgudev-1.0-0 \
-                        libsecret-1-0 \
-                        libhyphen0 \
-                        libgdk-pixbuf2.0-0 \
-                        libegl1 \
-                        libnotify4 \
-                        libxslt1.1 \
-                        libevent-2.1-6 \
-                        libgles2 \
-                        libgl1 \
-                        libegl1 \
-                        libvpx5 \
-                        libnss3 \
-                        libxss1 \
-                        libasound2 \
-                        libdbus-glib-1-2 \
-                        libxt6
-      - run: npm install -g chromium --unsafe-perm
-      - run: npm install pm2 -g
-      - run: cp test/db/migrations/*.js server/db/migration/public/migrations
-      - run: cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
-      - run: yarn
-      - run: yarn build:server:dev
-      - run: yarn build-dev
-      - run: ln -s dist/server.js .
-      - name: run server
-        run: exec pm2-runtime server.js &
+          ln -s dist/server.js .
+          exec pm2-runtime server.js &
         env:
           PGHOST: localhost
           PGPORT: 5444
@@ -69,10 +45,10 @@ jobs:
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-
-      - run: while ! nc -z localhost 9090; do sleep 10; done;
-      - name: run migrations and tests
-        run: yarn run npm-run-all server:migrate test
+      - name: Wait for server to start
+        run: while ! nc -z localhost 9090; do sleep 5; done;
+      - name: Run db migrations
+        run: yarn server:migrate
         env:
           PGHOST: localhost
           PGPORT: 5444
@@ -83,3 +59,5 @@ jobs:
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+      - name: Run tests
+        run: yarn test

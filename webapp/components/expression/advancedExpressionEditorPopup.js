@@ -12,6 +12,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
@@ -88,7 +89,7 @@ const AdvancedExpressionEditorPopup = (props) => {
         <div style={{ height: '34px' }} />
       )}
       <div className="expression-editor-popup__expr-container">
-        <textarea ref={inputRef} />
+        <textarea data-testid={DataTestId.expressionEditor.advancedQuery} ref={inputRef} />
       </div>
       <div className="expression-editor-popup__editor-help">
         <p>{i18n.t(`nodeDefEdit.editorHelp.${mode}`)}</p>

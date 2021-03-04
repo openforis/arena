@@ -12,7 +12,18 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
 const NodeDefEntityTableRow = (props) => {
-  const { edit, nodeDef, nodeDefColumns, node, canEditRecord, canEditDef, renderType, i = 'header', removeNode } = props
+  const {
+    edit,
+    id,
+    nodeDef,
+    nodeDefColumns,
+    node,
+    canEditRecord,
+    canEditDef,
+    renderType,
+    i = 'header',
+    removeNode,
+  } = props
 
   const draggable = edit && canEditDef
 
@@ -85,7 +96,7 @@ const NodeDefEntityTableRow = (props) => {
     (dragged ? ' drag-in-progress' : '')
 
   return (
-    <div ref={rowRef} className={className} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
+    <div ref={rowRef} className={className} data-testid={id} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
       {nodeDefColumns.map((nodeDefChild) => (
         <NodeDefEntityTableCell
           key={NodeDef.getUuid(nodeDefChild)}

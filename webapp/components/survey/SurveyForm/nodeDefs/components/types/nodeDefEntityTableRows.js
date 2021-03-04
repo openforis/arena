@@ -11,6 +11,7 @@ import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { SurveyState } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
@@ -116,27 +117,35 @@ const NodeDefEntityTableRows = (props) => {
     }, [NodeDef.getUuid(nodeDef)])
   }
 
-  const createRow = (renderType, node = null, key = undefined, i = undefined) => (
-    <NodeDefEntityTableRow
-      key={key}
-      canEditDef={canEditDef}
-      canEditRecord={canEditRecord}
-      edit={edit}
-      entry={entry}
-      gridSize={gridSize}
-      i={i}
-      node={node}
-      nodeDef={nodeDef}
-      nodeDefColumns={nodeDefColumns}
-      nodes={null}
-      parentNode={parentNode}
-      preview={preview}
-      recordUuid={recordUuid}
-      renderType={renderType}
-      surveyCycleKey={surveyCycleKey}
-      surveyInfo={surveyInfo}
-    />
-  )
+  const createRow = (renderType, node = null, key = undefined, i = undefined) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return (
+      <NodeDefEntityTableRow
+        id={
+          renderType === NodeDefLayout.renderType.tableHeader
+            ? DataTestId.surveyForm.entityRowHeader(nodeDefName)
+            : DataTestId.surveyForm.entityRowData(nodeDefName, i)
+        }
+        key={key}
+        canEditDef={canEditDef}
+        canEditRecord={canEditRecord}
+        edit={edit}
+        entry={entry}
+        gridSize={gridSize}
+        i={i}
+        node={node}
+        nodeDef={nodeDef}
+        nodeDefColumns={nodeDefColumns}
+        nodes={null}
+        parentNode={parentNode}
+        preview={preview}
+        recordUuid={recordUuid}
+        renderType={renderType}
+        surveyCycleKey={surveyCycleKey}
+        surveyInfo={surveyInfo}
+      />
+    )
+  }
 
   return (
     <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>

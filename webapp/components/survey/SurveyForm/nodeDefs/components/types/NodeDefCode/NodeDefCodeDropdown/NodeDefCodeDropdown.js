@@ -2,13 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import InputChips from '@webapp/components/form/InputChips'
-import Dropdown from '@webapp/components/form/Dropdown'
-
-import { useLang } from '@webapp/store/system'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { useLang } from '@webapp/store/system'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
+import InputChips from '@webapp/components/form/InputChips'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const NodeDefCodeDropdown = (props) => {
   const {
@@ -44,6 +44,7 @@ const NodeDefCodeDropdown = (props) => {
         />
       ) : (
         <Dropdown
+          idInput={DataTestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}

@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State } from './store'
 
@@ -23,12 +24,18 @@ const ButtonBar = (props) => {
 
   return (
     <div className="button-bar">
-      <button type="button" className="btn btn-cancel" onClick={() => Actions.cancelEdits({ state })}>
+      <button
+        type="button"
+        className="btn btn-cancel"
+        data-testid={DataTestId.nodeDefDetails.backBtn}
+        onClick={() => Actions.cancelEdits({ state })}
+      >
         {i18n.t(dirty ? 'common.cancel' : 'common.back')}
       </button>
       <button
         type="button"
         className="btn btn-primary"
+        data-testid={DataTestId.nodeDefDetails.saveBtn}
         onClick={() => Actions.saveEdits({ state })}
         aria-disabled={!dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
       >

@@ -18,7 +18,7 @@ const creatorsByType = {
 }
 
 const ButtonMetaItemAdd = (props) => {
-  const { onAdd, metaItemType } = props
+  const { id, onAdd, metaItemType } = props
 
   const i18n = useI18n()
   const dispatch = useDispatch()
@@ -33,7 +33,7 @@ const ButtonMetaItemAdd = (props) => {
   }, [])
 
   return (
-    <button type="button" onClick={add} className={`btn btn-s btn-add-${metaItemType}`}>
+    <button data-testid={id} type="button" onClick={add} className={`btn btn-s btn-add-${metaItemType}`}>
       <span className="icon icon-plus icon-12px icon-left" />
       {i18n.t('common.add')}
     </button>
@@ -41,8 +41,13 @@ const ButtonMetaItemAdd = (props) => {
 }
 
 ButtonMetaItemAdd.propTypes = {
+  id: PropTypes.string,
   onAdd: PropTypes.func.isRequired,
   metaItemType: PropTypes.string.isRequired,
+}
+
+ButtonMetaItemAdd.defaultProps = {
+  id: null,
 }
 
 export default ButtonMetaItemAdd
