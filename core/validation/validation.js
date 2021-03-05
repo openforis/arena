@@ -173,13 +173,23 @@ export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validati
     cleanup
   )(validation)
 
-export const mergeValidation = (validationNew) => (validationOld) =>
-  R.pipe(
-    (validation) => ({
-      [keys.fields]: R.mergeDeepRight(getFieldValidations(validation), getFieldValidations(validationNew)),
-    }),
-    cleanup
-  )(validationOld)
+export const mergeValidation = (validationNext) => (validationPrev) => {
+  const validationFieldsResult = { ...getFieldValidations(validationPrev) }
+  const validationFieldsNext = getFieldValidations(validationNext)
+
+  // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
+  Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
+    if (isValid(validationFieldNext)) {
+      // field validation valid: remove it from resulting validation
+      delete validationFieldsResult[fieldKey]
+    } else {
+      // field validtion not valid: deep merge it with the previous one
+      validationFieldsResult[fieldKey] = R.mergeDeepRight(validationFieldsResult[fieldKey])(validationFieldNext)
+    }
+  })
+  const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
+  return cleanup(validationResult)
+}
 
 // Object
 
