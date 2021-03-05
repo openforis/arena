@@ -8,6 +8,6 @@ export const verifyActivityLog = (survey) =>
 
     await expect(activities.length).toBeGreaterThanOrEqual(1)
 
-    const [lastActivity] = activities.reverse()
-    await expect(lastActivity.type).toBe('surveyCreate')
+    const [mostRecentActivity] = activities
+    await expect(mostRecentActivity.type).toBe('surveyCreate')
   })

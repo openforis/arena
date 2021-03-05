@@ -11,6 +11,7 @@ import {
   verifySurvey,
   verifyTaxonomies,
   verifyUsers,
+  verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
 import { verifySurveyPublished } from './_publish'
@@ -51,8 +52,7 @@ export default () =>
 
     verifyUsers(surveyImport)
 
-    // TODO uncomment this when fixing https://github.com/openforis/arena/issues/1424
-    // verifyActivityLog(surveyImport)
+    verifyActivityLog(surveyImport)
 
     verifySurveyPublished()
 
