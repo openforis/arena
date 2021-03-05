@@ -14,7 +14,7 @@ import {
   verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
-// import { verifySurveyPublished } from './_publish'
+import { verifySurveyPublished } from './_publish'
 
 export default () =>
   describe('Survey import', () => {
@@ -54,8 +54,7 @@ export default () =>
 
     verifyActivityLog(surveyImport)
 
-    // TODO: uncomment this when fixing https://github.com/openforis/arena/issues/1427
-    // verifySurveyPublished()
+    verifySurveyPublished()
 
     removeExportSurveyFiles(surveyImport)
 
