@@ -9,6 +9,7 @@ import {
   verifySurvey,
   verifyTaxonomies,
   verifyUsers,
+  verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
 import { createSurvey } from './_surveyCreate'
@@ -24,8 +25,7 @@ export default () =>
     verifyTaxonomies(surveyClone)
     verifyRecords(surveyClone, [])
     verifyUsers(surveyClone)
-    // TODO uncomment this when fixing https://github.com/openforis/arena/issues/1428
-    // verifyActivityLog(surveyClone)
+    verifyActivityLog(surveyClone)
     removeExportSurveyFiles(surveyClone)
 
     gotoSurveyList()

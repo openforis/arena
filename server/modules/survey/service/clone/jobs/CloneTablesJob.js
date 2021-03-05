@@ -1,6 +1,8 @@
 import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ActivityLog from '@common/activityLog/activityLog'
 
 export default class CloneTablesJob extends Job {
   constructor(params) {
@@ -10,7 +12,7 @@ export default class CloneTablesJob extends Job {
   }
 
   async execute() {
-    const { surveyId: clonedSurveyId, newSurveyId } = this.context
+    const { surveyId: clonedSurveyId, newSurveyId, surveyInfo, user } = this.context
 
     await Promise.all(
       this.tables.map(async (table) =>
@@ -24,5 +26,7 @@ export default class CloneTablesJob extends Job {
         )
       )
     )
+
+    await ActivityLogRepository.insert(user, newSurveyId, ActivityLog.type.surveyCreate, surveyInfo, false, this.tx)
   }
 }
