@@ -45,7 +45,6 @@ export default class SurveyCreatorJob extends Job {
     const surveyId = Survey.getId(survey)
 
     const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip)
-
     await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
