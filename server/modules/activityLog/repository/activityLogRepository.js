@@ -70,7 +70,7 @@ export const fetch = async ({
   idGreaterThan = null,
   idLessThan = null,
   limit = 30,
-  orderIdBy = 'DESC',
+  orderBy = 'DESC',
   client = db,
 }) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -251,7 +251,7 @@ export const fetch = async ({
     -- end of analysis activities part
 
     ORDER BY
-      l.id ${orderIdBy}`,
+      l.id ${orderBy}`,
     [surveyUuid, activityTypes, limit],
     camelize
   )
