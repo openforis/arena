@@ -144,16 +144,15 @@ export default () =>
       ])
     })
 
-    // TODO: Fix with https://github.com/openforis/arena/issues/1415
-    // describe(`Verify non relevant nodes get invalidated`, () => {
-    //   gotoRecords()
-    //   gotoRecord(record1)
-    //   enterAttribute(cluster_id, '')
-    //   waitThread()
-    //
-    //   gotoValidationReport()
-    //   expectMessages([['Cluster[] / Cluster id', 'Required value']])
-    // })
+    describe(`Verify non relevant nodes validation is cleared`, () => {
+      gotoRecords()
+      gotoRecord(record1)
+      enterAttribute(cluster_id, '')
+      waitThread()
+
+      gotoValidationReport()
+      expectMessages([['Cluster[] / Cluster id', 'Required value']])
+    })
 
     gotoHome()
   })
