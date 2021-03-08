@@ -1,7 +1,8 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { cluster } from '../mock/nodeDefs'
-import { dragAndDrop } from './utils/dragDrop'
+import { cluster, plot, tree } from '../mock/nodeDefs'
+import { dragAndDrop, dragAndDropOver } from './utils/dragDrop'
 import { gotoFormDesigner } from './_navigation'
+import { gotoFormPage } from './_formDesigner'
 import { publishWithoutErrors } from './_publish'
 
 const getBBoxes = async (nodeDefTarget, nodeDefSource) => {
@@ -10,7 +11,14 @@ const getBBoxes = async (nodeDefTarget, nodeDefSource) => {
   await targetEl.scrollIntoViewIfNeeded()
   const targetBBox = await targetEl.boundingBox()
   const sourceBBox = await sourceEl.boundingBox()
-  return { targetBBox, sourceBBox }
+  return { targetEl, sourceEl, targetBBox, sourceBBox }
+}
+
+const getBoxCenter = (bBox) => {
+  return {
+    x: bBox.x + bBox.width / 2,
+    y: bBox.y + bBox.height / 2,
+  }
 }
 
 const moveRight = async (nodeDefTarget, nodeDefSource) => {
@@ -18,16 +26,22 @@ const moveRight = async (nodeDefTarget, nodeDefSource) => {
   await dragAndDrop(targetBBox.x + 2, targetBBox.y + 2, sourceBBox.x + sourceBBox.width + 5, sourceBBox.y)
 }
 
-// TODO: uncomment when testing tree reorder
-// const moveLeft = async (nodeDefTarget, nodeDefSource) => {
-//   const { targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
-//   await dragAndDrop(targetBBox.x + 2, targetBBox.y + 2, sourceBBox.x, sourceBBox.y)
-// }
-
 const moveBelow = async (nodeDefTarget, nodeDefSource) => {
   const { targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
   await dragAndDrop(targetBBox.x + 2, targetBBox.y + 2, sourceBBox.x, sourceBBox.y + sourceBBox.height + 5)
 }
+
+const moveEntityTableCell = (offset = { x: 2, y: 2 }) => async (nodeDefTarget, nodeDefSource) => {
+  const { targetEl, sourceEl, targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
+  await dragAndDropOver({
+    targetEl,
+    sourceEl,
+    from: { x: targetBBox.x + 2, y: targetBBox.y + 2 },
+    to: { x: getBoxCenter(sourceBBox).x + offset.x, y: sourceBBox.y + offset.y },
+  })
+}
+const moveEntityTableCellRight = moveEntityTableCell({ x: 5, y: 2 })
+const moveEntityTableCellLeft = moveEntityTableCell({ x: -5, y: 2 })
 
 const verityEntityOrder = (nodeDef, expectedOrder) =>
   test(`Verify entity ${cluster.name} order`, async () => {
@@ -66,17 +80,16 @@ export default () =>
       'cluster_id,cluster_date,cluster_time,cluster_country,cluster_region,cluster_province,cluster_coordinate,cluster_boolean,cluster_decimal'
     )
 
-    // TODO - it seems that reordering nodeDef table isn't working anymore. see https://github.com/openforis/arena/issues/1397
-    // gotoFormPage(plot)
-    //
-    // verityEntityOrder(tree, 'tree_id,tree_dec_1,tree_dec_2,tree_species')
-    //
-    // test('Reorder tree', async () => {
-    //   await moveRight(tree.children.tree_species, tree.children.tree_id)
-    //   await moveLeft(tree.children.tree_dec_2, tree.children.tree_dec_1)
-    // })
-    //
-    // verityEntityOrder(tree, 'tree_id,tree_species,tree_dec_2,tree_dec_1')
+    gotoFormPage(plot)
+
+    verityEntityOrder(tree, 'tree_id,tree_dec_1,tree_dec_2,tree_species')
+
+    test('Reorder tree', async () => {
+      await moveEntityTableCellRight(tree.children.tree_species, tree.children.tree_id)
+      await moveEntityTableCellLeft(tree.children.tree_dec_2, tree.children.tree_dec_1)
+    })
+
+    verityEntityOrder(tree, 'tree_id,tree_species,tree_dec_2,tree_dec_1')
 
     publishWithoutErrors()
   })
