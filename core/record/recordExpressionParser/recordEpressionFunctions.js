@@ -13,11 +13,11 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
     const categoryItem = Survey.getCategoryItemByHierarchicalCodes({
       categoryUuid: Category.getUuid(category),
       codePaths,
-    })
+    })(survey)
+
     if (!categoryItem) return null
 
-    const extra = CategoryItem.getExtra(categoryItem)
-    return extra[itemPropName]
+    return CategoryItem.getExtraProp(itemPropName)(categoryItem)
   },
   [Expression.functionNames.index]: (node) => {
     if (!node) {

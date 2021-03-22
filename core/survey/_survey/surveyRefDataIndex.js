@@ -83,8 +83,8 @@ export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode,
 export const getCategoryItemByUuid = (categoryItemUuid) =>
   R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
 
-export const getCategoryItemByHierarchicalCodes = ({ categoryUuid, hiearachicalCodes }) => (survey) => {
-  const itemUuid = hiearachicalCodes.reduce(
+export const getCategoryItemByHierarchicalCodes = ({ categoryUuid, codePaths }) => (survey) => {
+  const itemUuid = codePaths.reduce(
     (currentParentUuid, code) => getCategoryItemUuid({ categoryUuid, parentItemUuid: currentParentUuid, code })(survey),
     categoryItemNullParentUuid
   )
