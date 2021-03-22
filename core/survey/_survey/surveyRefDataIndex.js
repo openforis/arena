@@ -11,7 +11,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxon from '@core/survey/taxon'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
-/**
+/*
  * CategoryItemUuidIndex : {
  *    [$categoryUuid] : {
  *      [$parentCategoryItemUuid] :{
@@ -52,83 +52,82 @@ const keys = {
   taxonIndex: 'taxonIndex',
 }
 
+const categoryItemNullParentUuid = 'null'
+
 // ====== READ
 
 // ==== category index
-export const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => survey => {
+const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
+  R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
+
+export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode, code) => (survey) => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  let parentCategoryItemUuid = 'null'
+  let parentItemUuid = categoryItemNullParentUuid
   let hierarchyCode = []
 
   if (levelIndex > 0) {
     const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-    parentCategoryItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
-    hierarchyCode = R.append(parentCategoryItemUuid, Node.getHierarchyCode(parentCodeAttribute))
+    parentItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
+    hierarchyCode = R.append(parentItemUuid, Node.getHierarchyCode(parentCodeAttribute))
   }
 
-  const itemUuid = R.path(
-    [keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentCategoryItemUuid, code],
-    survey,
-  )
+  const itemUuid = getCategoryItemUuid({ categoryUuid, parentItemUuid, code })(survey)
+
   return {
     itemUuid,
     hierarchyCode,
   }
 }
 
-export const getCategoryItemByUuid = categoryItemUuid =>
+export const getCategoryItemByUuid = (categoryItemUuid) =>
   R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+
+export const getCategoryItemByHierarchicalCodes = ({ categoryUuid, hiearachicalCodes }) => (survey) => {
+  const itemUuid = hiearachicalCodes.reduce(
+    (currentParentUuid, code) => getCategoryItemUuid({ categoryUuid, parentItemUuid: currentParentUuid, code })(survey),
+    categoryItemNullParentUuid
+  )
+  return getCategoryItemByUuid(itemUuid)(survey)
+}
 
 // ==== taxonomy index
 
-export const getTaxonUuid = (nodeDef, taxonCode) => survey => {
+export const getTaxonUuid = (nodeDef, taxonCode) => (survey) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path([keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.uuid], survey)
 }
 
-export const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => survey => {
+export const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => (survey) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
     [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.vernacularNames, vernacularName],
-    survey,
+    survey
   )
 }
 
-export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => survey => {
+export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => (survey) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.pipe(
     R.path([keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.vernacularNames]),
     R.values,
-    R.includes(vernacularNameUuid),
+    R.includes(vernacularNameUuid)
   )(survey)
 }
 
-export const getTaxonByUuid = taxonUuid => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
+export const getTaxonByUuid = (taxonUuid) => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
 
 // ====== UPDATE
-
-export const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
-  const refDataIndex = {
-    ..._getCategoryIndex(categoryItemsRefData),
-    ..._getTaxonomyIndex(taxaIndexRefData),
-  }
-
-  return {
-    ...survey,
-    [keys.indexRefData]: refDataIndex,
-  }
-}
 
 const _getCategoryIndex = R.reduce((accIndex, row) => {
   ObjectUtils.setInPath(
     [
       keys.categoryItemUuidIndex,
       CategoryLevel.getCategoryUuid(row),
-      CategoryItem.getParentUuid(row) || 'null',
+      CategoryItem.getParentUuid(row) || categoryItemNullParentUuid,
       CategoryItem.getCode(row),
     ],
-    CategoryItem.getUuid(row),
+    CategoryItem.getUuid(row)
   )(accIndex)
 
   ObjectUtils.setInPath([keys.categoryItemIndex, CategoryItem.getUuid(row)], row)(accIndex)
@@ -146,3 +145,15 @@ const _getTaxonomyIndex = R.reduce((accIndex, row) => {
 
   return accIndex
 }, {})
+
+export const assocRefData = (categoryItemsRefData, taxaIndexRefData) => (survey) => {
+  const refDataIndex = {
+    ..._getCategoryIndex(categoryItemsRefData),
+    ..._getTaxonomyIndex(taxaIndexRefData),
+  }
+
+  return {
+    ...survey,
+    [keys.indexRefData]: refDataIndex,
+  }
+}
