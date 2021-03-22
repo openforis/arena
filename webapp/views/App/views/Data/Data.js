@@ -15,6 +15,7 @@ import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 import ValidationReport from './ValidationReport'
 import Records from './Records'
 import Explorer from './Explorer'
+import ExportData from './ExportData'
 
 const Data = () => {
   const dispatch = useDispatch()
@@ -47,6 +48,11 @@ const Data = () => {
           {
             component: Explorer,
             path: appModuleUri(dataModules.explorer),
+          },
+          // Data export
+          {
+            component: ExportData,
+            path: appModuleUri(dataModules.export),
           },
           // Validation report
           {

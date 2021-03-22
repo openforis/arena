@@ -112,6 +112,10 @@ export const dataModules = {
     key: 'explorer',
     path: `${appModules.data.path}/explorer`,
   },
+  export: {
+    key: 'export',
+    path: `${appModules.data.path}/export`,
+  },
   validationReport: {
     key: 'validationReport',
     path: `${appModules.data.path}/validationReport`,

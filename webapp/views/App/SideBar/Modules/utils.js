@@ -43,6 +43,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   getModule(appModules.data, [
     dataModules.records,
     dataModules.explorer,
+    dataModules.export,
     ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
   ]),
   ...(Authorizer.canAnalyzeRecords(user, surveyInfo)
