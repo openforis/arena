@@ -29,7 +29,22 @@ export const createTestSurvey = ({ user }) =>
         ).multiple()
       ).multiple()
     )
-  ).build()
+  )
+    .category(
+      'simple_category',
+      SB.categoryItem('1')
+        .extra({ prop1: 'Extra prop1 item 1', prop2: 'Extra prop2 item 1' })
+        .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 1-1', prop2: 'Extra prop2 item 1-1' })),
+      SB.categoryItem('2')
+        .extra({ prop1: 'Extra prop1 item 2', prop2: 'Extra prop2 item 2' })
+        .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 2-1', prop2: 'Extra prop2 item 2-1' }))
+        .item(SB.categoryItem('2').extra({ prop1: 'Extra prop1 item 2-2', prop2: 'Extra prop2 item 2-2' }))
+        .item(SB.categoryItem('3').extra({ prop1: 'Extra prop1 item 2-3', prop2: 'Extra prop2 item 2-3' })),
+      SB.categoryItem('3')
+        .extra({ prop1: 'Extra prop1 item 3', prop2: 'Extra prop2 item 3' })
+        .item(SB.categoryItem('3a').extra({ prop1: 'Extra prop1 item 3a', prop2: 'Extra prop2 item 3a' }))
+    )
+    .build()
 
 export const createTestRecord = ({ user, survey }) =>
   RB.record(

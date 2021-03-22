@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -17,7 +18,8 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
 
     if (!categoryItem) return null
 
-    return CategoryItem.getExtraProp(itemPropName)(categoryItem)
+    const extraProp = CategoryItem.getExtraProp(itemPropName)(categoryItem)
+    return A.isEmpty(extraProp) ? null : extraProp
   },
   [Expression.functionNames.index]: (node) => {
     if (!node) {

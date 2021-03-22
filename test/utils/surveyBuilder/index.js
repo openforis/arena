@@ -4,6 +4,7 @@ import { db } from '../../../server/db/db'
 
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
+import * as Category from '../../../core/survey/category'
 import * as User from '../../../core/user/user'
 import * as PromiseUtils from '../../../core/promiseUtils'
 
@@ -14,7 +15,10 @@ import * as SurveyUtils from '../surveyUtils'
 
 import NodeDefEntityBuilder from './nodeDefEntityBuilder'
 import NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
-import { TaxonomyBuilder, TaxonBuilder } from './surveyBuilderTaxonomy'
+import { CategoryBuilder } from './categoryBuilder'
+import { TaxonomyBuilder } from './taxonomyBuilder'
+import { TaxonBuilder } from './taxonBuilder'
+import { ItemBuilder } from './categoryItemBuilder'
 
 const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
@@ -37,7 +41,14 @@ class SurveyBuilder {
     this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder
 
+    this.categoryBuilders = []
     this.taxonomyBuilders = []
+  }
+
+  category(name, ...itemBuilders) {
+    const categoryBuilder = new CategoryBuilder(name, ...itemBuilders)
+    this.categoryBuilders.push(categoryBuilder)
+    return this
   }
 
   taxonomy(name, ...taxonBuilders) {
@@ -47,14 +58,25 @@ class SurveyBuilder {
   }
 
   build() {
-    const survey = Survey.newSurvey({
+    let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
       name: this.name,
       label: this.label,
       languages: [this.lang],
     })
-    const nodeDefs = this.rootDefBuilder.build(survey)
+    // categories
+    const categories = []
+    const categoryItemsRefData = []
+    this.categoryBuilders.forEach((categoryBuilder) => {
+      const { category, items } = categoryBuilder.build()
+      categories.push(category)
+      categoryItemsRefData.push(...items.map((item) => ({ ...item, categoryUuid: Category.getUuid(category) })))
+    })
+    survey = Survey.assocCategories(categories)(survey)
+    survey = Survey.assocRefData({ categoryItemsRefData })(survey)
 
+    // node defs
+    const nodeDefs = this.rootDefBuilder.build(survey)
     return Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: true })(survey)
   }
 
@@ -111,6 +133,8 @@ class SurveyBuilder {
 export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder)
 export const entity = (name, ...childBuilders) => new NodeDefEntityBuilder(name, ...childBuilders)
 export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefAttributeBuilder(name, type)
+// ==== category
+export const categoryItem = (code, ...itemBuilders) => new ItemBuilder(code, ...itemBuilders)
 // ==== taxonomy
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>
   new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

@@ -146,7 +146,7 @@ const _getTaxonomyIndex = R.reduce((accIndex, row) => {
   return accIndex
 }, {})
 
-export const assocRefData = (categoryItemsRefData, taxaIndexRefData) => (survey) => {
+export const assocRefData = ({ categoryItemsRefData = [], taxaIndexRefData = [] }) => (survey) => {
   const refDataIndex = {
     ..._getCategoryIndex(categoryItemsRefData),
     ..._getTaxonomyIndex(taxaIndexRefData),
