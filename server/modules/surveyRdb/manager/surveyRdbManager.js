@@ -16,7 +16,7 @@ import * as DataViewRepository from '../repository/dataView'
 // ==== DDL
 
 // schema
-export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
+export { createSchema, dropSchema, getTables } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository

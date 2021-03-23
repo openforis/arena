@@ -827,6 +827,7 @@ $t(common.cantUndoWarning)`,
     TaxonomyImportJob: 'Taxonomy Import',
     // export csv data
     ExportCsvDataJob: 'Export CSV data',
+    PrepareData: 'Prepare data in csv files',
     // import arena survey
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',

@@ -5,6 +5,8 @@ import * as DateUtils from '@core/dateUtils'
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
 export default class PrepareData extends Job {
   constructor(params) {
@@ -23,8 +25,14 @@ export default class PrepareData extends Job {
     const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
     await FileUtils.rmdir(dir)
     await FileUtils.mkdir(dir)
-    await FileUtils.writeFile(FileUtils.join(dir, 'aa.csv'), 'aaa,bbb')
-    await FileUtils.writeFile(FileUtils.join(dir, 'bb.csv'), 'bbb,ccc')
+
+    const tables = await SurveyRdbManager.getTables(surveyId, this.tx)
+    await Promise.all(
+      tables.map(async ({ schemaname, tablename }) => {
+        const data = await this.tx.query(`SELECT * from ${schemaname}.${tablename}`)
+        await CSVWriter.writeToFile(FileUtils.join(dir, `${tablename}.csv`), data)
+      })
+    )
 
     this.setContext({ dir, exportDataFolderName })
   }
