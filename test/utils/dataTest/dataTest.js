@@ -1,5 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as Srs from '@core/geo/srs'
 
 import * as SB from '../surveyBuilder'
 import * as RB from '../recordBuilder'
@@ -19,6 +20,7 @@ export const createTestSurvey = ({ user }) =>
       SB.entity(
         'plot',
         SB.attribute('plot_id', NodeDef.nodeDefType.integer).key(),
+        SB.attribute('plot_location', NodeDef.nodeDefType.coordinate),
         SB.attribute('plot_multiple_number', NodeDef.nodeDefType.integer).multiple(),
         SB.entity(
           'tree',
@@ -54,7 +56,7 @@ export const createTestRecord = ({ user, survey }) =>
       'cluster',
       RB.attribute('cluster_id', 12),
       RB.attribute('cluster_location', {
-        [Node.valuePropsCoordinate.srs]: 'EPSG:4326',
+        [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
         [Node.valuePropsCoordinate.x]: 41.883012,
         [Node.valuePropsCoordinate.y]: 12.489056,
       }),
@@ -66,6 +68,11 @@ export const createTestRecord = ({ user, survey }) =>
       RB.entity(
         'plot',
         RB.attribute('plot_id', 1),
+        RB.attribute('plot_location', {
+          [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
+          [Node.valuePropsCoordinate.x]: 41.803012,
+          [Node.valuePropsCoordinate.y]: 12.409056,
+        }),
         RB.attribute('plot_multiple_number', 10),
         RB.attribute('plot_multiple_number', 20),
         RB.entity(
@@ -83,6 +90,11 @@ export const createTestRecord = ({ user, survey }) =>
       RB.entity(
         'plot',
         RB.attribute('plot_id', 2),
+        RB.attribute('plot_location', {
+          [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
+          [Node.valuePropsCoordinate.x]: 41.823012,
+          [Node.valuePropsCoordinate.y]: 12.409056,
+        }),
         RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 12), RB.attribute('dbh', 18)),
         RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 10), RB.attribute('dbh', 15)),
         RB.entity('tree', RB.attribute('tree_id', 3), RB.attribute('tree_height', 30), RB.attribute('dbh', 20))

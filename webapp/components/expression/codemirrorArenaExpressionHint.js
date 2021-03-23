@@ -8,6 +8,7 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
+    [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [Expression.functionNames
       .categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [Expression.functionNames.index]: `index(node_name)`,
