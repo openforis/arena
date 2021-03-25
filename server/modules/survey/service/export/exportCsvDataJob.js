@@ -1,19 +1,14 @@
-import * as ActivityLog from '@common/activityLog/activityLog'
-
 import Job from '@server/job/job'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
-import PrepareData from './jobs/PrepareData'
+import CSVDataExtraction from './jobs/CSVDataExtraction'
 
 export default class ExportCsvDataJob extends Job {
   constructor(params) {
-    super(ExportCsvDataJob.type, params, [new PrepareData()])
+    super(ExportCsvDataJob.type, params, [new CSVDataExtraction()])
   }
 
   async onStart() {
     await super.onStart()
-
-    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
   }
 
   async beforeSuccess() {

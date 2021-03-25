@@ -47,7 +47,7 @@ const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) 
 }
 
 const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
-  if (columnNodeDefs) {
+  if (!R.isEmpty(columnNodeDefs)) {
     queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
@@ -194,6 +194,25 @@ export const fetchViewData = async (params, client = db) => {
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
+}
+
+export const _fetchViewData = async (params) => {
+  const { survey, columnNodeDefs = [], entityDefUuid } = params
+
+  const nodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const nodeDefCols = columnNodeDefs // [] //Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey)
+
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const queryBuilder = new SqlSelectBuilder()
+  queryBuilder.select('*')
+
+  _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols })
+
+  const select = queryBuilder.build()
+  const queryParams = queryBuilder.params
+
+  return new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
 }
 
 export const runCount = async ({ surveyId, cycle, tableName, filter }, client = db) => {

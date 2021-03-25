@@ -159,4 +159,8 @@ export const DataTestId = {
     validationReport: `validationReport`,
     cellMessages: `messages-cell`,
   },
+  dataExport: {
+    prepareExport: 'prepareExport',
+    exportCSV: 'exportCSV',
+  },
 }

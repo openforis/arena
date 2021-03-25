@@ -1,12 +1,18 @@
+import * as DateUtils from '@core/dateUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+import { db } from '../../../db/db'
+import * as CSVWriter from '../../../utils/file/csvWriter'
+
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
 import { Query } from '../../../../common/model/query'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-
-import * as Survey from '../../../../core/survey/survey'
-
-import { db } from '../../../db/db'
-import * as CSVWriter from '../../../utils/file/csvWriter'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -20,7 +26,7 @@ export { createSchema, dropSchema, getTables } from '../repository/schemaRdbRepo
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, countViewDataAgg, fetchViewDataAgg } = DataViewRepository
+export const { createDataView, countViewDataAgg, fetchViewDataAgg, _fetchViewData } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -79,6 +85,48 @@ export const fetchViewData = async (params) => {
   return result
 }
 
+export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, true, false, false, false, client)
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyName = Survey.getName(surveyInfo)
+
+  const exportDataFolderName = `${surveyName}_export_${DateUtils.nowFormatDefault()}`
+  const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
+  await FileUtils.rmdir(dir)
+  await FileUtils.mkdir(dir)
+
+  const entities = Survey.getNodeDefsArray(survey).filter(NodeDef.isEntity)
+
+  await Promise.all(
+    entities.map(async (entity) => {
+      const entityDefUuid = NodeDef.getUuid(entity)
+      const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(entity)}.csv`))
+
+      const nodeDefContext = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+
+      let childDefs = []
+      if (nodeDefContext) {
+        childDefs = NodeDef.isEntity(nodeDefContext)
+          ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+          : [nodeDefContext] // Multiple attribute
+      }
+
+      const result = await _fetchViewData({ survey, entityDefUuid, columnNodeDefs: childDefs }, client)
+
+      const headers = childDefs.reduce(
+        (acc, nodeDef) => (NodeDef.isEntity(nodeDef) ? acc : [...acc, ...NodeDefTable.getColNames(nodeDef)]),
+        []
+      )
+
+      await db.stream(result, (streamQuery) => {
+        streamQuery.pipe(CSVWriter.transformToStream(stream, headers))
+      })
+    })
+  )
+
+  return { exportDataFolderName, dir }
+}
 /**
  * Counts the number of rows in the data view related to the specified query object.
  *
