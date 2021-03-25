@@ -8,6 +8,8 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
+    [Expression.functionNames
+      .categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [Expression.functionNames.index]: `index(node_name)`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
     [Expression.functionNames.min]: 'min(3,1) = 1',
@@ -141,17 +143,16 @@ const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextP
           groupByParent,
         })
       : []
-  } else {
-    // get variables from context node and its ancestors
-    return ExpressionVariables.getVariables({
-      survey,
-      nodeDefContext,
-      nodeDefCurrent,
-      mode,
-      lang,
-      groupByParent,
-    })
   }
+  // get variables from context node and its ancestors
+  return ExpressionVariables.getVariables({
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    lang,
+    groupByParent,
+  })
 }
 
 export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {

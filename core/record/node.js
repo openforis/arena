@@ -58,7 +58,6 @@ export const valuePropsFile = {
 
 export const valuePropsTaxon = {
   code: 'code',
-  itemUuid: 'itemUuid',
   scientificName: 'scientificName',
   taxonUuid: 'taxonUuid',
   vernacularName: 'vernacularName',

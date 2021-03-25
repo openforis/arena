@@ -147,14 +147,24 @@ export const { getNodeDefCategoryLevelIndex, getNodeDefParentCode, getNodeDefCod
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories
-export const { getCategories, getCategoriesArray, getCategoryByUuid, assocCategories } = SurveyCategories
+export const {
+  getCategories,
+  getCategoriesArray,
+  getCategoryByUuid,
+  getCategoryByName,
+  assocCategories,
+} = SurveyCategories
 
 // ====== Taxonomies
 export const { getTaxonomiesArray, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
 
 // ====== Survey Reference data index
-// category index
-export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid } = SurveyRefDataIndex
+// Category index
+export const {
+  getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid,
+  getCategoryItemByHierarchicalCodes,
+} = SurveyRefDataIndex
 // Taxon index
 export const {
   getTaxonUuid,

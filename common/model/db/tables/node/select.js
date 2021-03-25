@@ -46,7 +46,7 @@ export function getSelect(params) {
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
   const columnTaxonUuid = _getColumnValueProp(Node.valuePropsTaxon.taxonUuid)
-  const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropsTaxon.itemUuid)
+  const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropsCode.itemUuid)
   const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropsTaxon.vernacularNameUuid)
 
   const query = `SELECT ${this.columns},

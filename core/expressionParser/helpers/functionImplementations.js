@@ -5,6 +5,7 @@ import { functionNames } from './functions'
 
 export const functionImplementations = {
   [functionNames.avg]: A.identity,
+  [functionNames.categoryItemProp]: () => null, // To be implemented by evaluator sub classes
   [functionNames.count]: A.identity,
   [functionNames.includes]: (items, value) => Array.isArray(items) && items.includes(String(value)),
   [functionNames.index]: () => 0,
