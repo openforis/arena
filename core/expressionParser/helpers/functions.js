@@ -1,5 +1,6 @@
 export const functionNames = {
   avg: 'avg',
+  categoryItemProp: 'categoryItemProp',
   count: 'count',
   includes: 'includes',
   index: 'index',
@@ -23,6 +24,7 @@ export const functionNames = {
  */
 export const functions = {
   [functionNames.avg]: { minArity: 1, maxArity: 1 },
+  [functionNames.categoryItemProp]: { minArity: 3, maxArity: -1 },
   [functionNames.count]: { minArity: 1, maxArity: 1 },
   [functionNames.includes]: { minArity: 2, maxArity: 2 },
   [functionNames.index]: { minArity: 1, maxArity: 1, evaluateArgsToNodes: true },

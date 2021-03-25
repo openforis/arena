@@ -12,6 +12,7 @@ import Queue from '@core/queue'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import SystemError from '@core/systemError'
+import * as CategoryManager from '../../../../category/manager/categoryManager'
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordUpdateThreadParams from './recordUpdateThreadParams'
@@ -113,6 +114,13 @@ class RecordUpdateThread extends Thread {
       : await SurveyManager.fetchDependencies(this.surveyId)
 
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
+
+    // assoc categories to the survey
+    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({
+      surveyId: this.surveyId,
+      draft: preview,
+    })
+    this.survey = Survey.assocCategories(categories)(this.survey)
   }
 
   async processMessage(msg) {

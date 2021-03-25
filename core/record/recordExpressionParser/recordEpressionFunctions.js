@@ -1,8 +1,26 @@
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
 
-export const recordExpressionFunctions = ({ record }) => ({
+export const recordExpressionFunctions = ({ survey, record }) => ({
+  [Expression.functionNames.categoryItemProp]: (categoryName, itemPropName, ...codePaths) => {
+    const category = Survey.getCategoryByName(categoryName)(survey)
+    if (!category) return null
+
+    const categoryItem = Survey.getCategoryItemByHierarchicalCodes({
+      categoryUuid: Category.getUuid(category),
+      codePaths,
+    })(survey)
+
+    if (!categoryItem) return null
+
+    const extraProp = CategoryItem.getExtraProp(itemPropName)(categoryItem)
+    return A.isEmpty(extraProp) ? null : extraProp
+  },
   [Expression.functionNames.index]: (node) => {
     if (!node) {
       return -1
