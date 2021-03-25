@@ -24,7 +24,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as Srs from './srs'
 import * as Point from './point'
 
-const invalidLatLonPoint = Point.newPoint({ srs: Srs.latLonSrsCode, x: 0, y: 90 }) // Proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
+const invalidLatLongPoint = Point.newPoint({ srs: Srs.latLongSrsCode, x: 0, y: 90 }) // Proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
 const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 
@@ -56,11 +56,11 @@ export const findSrsByCodeOrName = (codeOrName, limit = 200) =>
 
 const getSrsByCode = (code) => srsByCode[code]
 
-const toLatLon = (point) => {
+const toLatLong = (point) => {
   if (!Point.isFilled(point)) return null
 
   const srsId = Point.getSrs(point)
-  if (Srs.isLatLon(srsId)) {
+  if (Srs.isLatLong(srsId)) {
     // projection is not needed
     return point
   }
@@ -70,12 +70,12 @@ const toLatLon = (point) => {
   const srsFrom = getSrsByCode(srsId)
   const srsTo = Srs.latLonSrs
 
-  const lonLat = proj4(
+  const [long, lat] = proj4(
     Srs.getWkt(srsFrom),
     Srs.getWkt(srsTo), // To srs
     [x, y] // Coordinates
   )
-  return Point.newPoint({ srs: Srs.latLonSrsCode, x: lonLat[0], y: lonLat[1] })
+  return Point.newPoint({ srs: Srs.latLongSrsCode, x: long, y: lat })
 }
 
 export const isCoordinateValid = (srsCode, x, y) => {
@@ -85,39 +85,42 @@ export const isCoordinateValid = (srsCode, x, y) => {
     return false
   }
 
-  const pointLatLon = toLatLon(Point.newPoint({ srs: srsCode, x: NumberUtils.toNumber(x), y: NumberUtils.toNumber(y) }))
+  const pointLatLong = toLatLong(
+    Point.newPoint({ srs: srsCode, x: NumberUtils.toNumber(x), y: NumberUtils.toNumber(y) })
+  )
   return (
-    !R.equals(pointLatLon, invalidLatLonPoint) && isValidCoordinates(Point.getX(pointLatLon), Point.getY(pointLatLon))
+    !R.equals(pointLatLong, invalidLatLongPoint) &&
+    isValidCoordinates(Point.getX(pointLatLong), Point.getY(pointLatLong))
   )
 }
 
 /**
- * Takes in latitude and longitude of two location and returns the distance between them as the crow flies (in meters).
+ * Takes two points and returns the distance between them as the crow flies (in meters).
  *
  * @param {!object} pointFrom - Start point.
  * @param {!object} pointTo - End point.
  * @returns {number} - Distance between the specified points in meters.
  */
 export const distance = (pointFrom, pointTo) => {
-  const point1LatLon = toLatLon(pointFrom)
-  const point2LatLon = toLatLon(pointTo)
+  const point1LatLong = toLatLong(pointFrom)
+  const point2LatLong = toLatLong(pointTo)
 
-  if (!point1LatLon || !point2LatLon) return null
+  if (!point1LatLong || !point2LatLong) return null
 
   const toRad = (value) => (value * Math.PI) / 180
 
-  const lon1 = Point.getX(point1LatLon)
-  const lat1 = Point.getY(point1LatLon)
-  const lon2 = Point.getX(point2LatLon)
-  const lat2 = Point.getY(point2LatLon)
+  const long1 = Point.getX(point1LatLong)
+  const lat1 = Point.getY(point1LatLong)
+  const long2 = Point.getX(point2LatLong)
+  const lat2 = Point.getY(point2LatLong)
 
   const earthRadius = 6371000 // Earth radius in meters
-  const dLat = toRad(lat2 - lat1)
-  const dLon = toRad(lon2 - lon1)
+  const distanceLat = toRad(lat2 - lat1)
+  const distanceLong = toRad(long2 - long1)
   const lat1Rad = toRad(lat1)
   const lat2Rad = toRad(lat2)
 
-  const a = Math.sin(dLat / 2) ** 2 + Math.sin(dLon / 2) ** 2 * Math.cos(lat1Rad) * Math.cos(lat2Rad)
+  const a = Math.sin(distanceLat / 2) ** 2 + Math.sin(distanceLong / 2) ** 2 * Math.cos(lat1Rad) * Math.cos(lat2Rad)
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return earthRadius * c
 }

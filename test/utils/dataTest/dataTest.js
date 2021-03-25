@@ -90,7 +90,7 @@ export const createTestRecord = ({ user, survey }) =>
       'cluster',
       RB.attribute('cluster_id', 12),
       RB.attribute('cluster_location', {
-        [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
+        [Node.valuePropsCoordinate.srs]: Srs.latLongSrsCode,
         [Node.valuePropsCoordinate.x]: 41.883012,
         [Node.valuePropsCoordinate.y]: 12.489056,
       }),
@@ -103,7 +103,7 @@ export const createTestRecord = ({ user, survey }) =>
         'plot',
         RB.attribute('plot_id', 1),
         RB.attribute('plot_location', {
-          [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
+          [Node.valuePropsCoordinate.srs]: Srs.latLongSrsCode,
           [Node.valuePropsCoordinate.x]: 41.803012,
           [Node.valuePropsCoordinate.y]: 12.409056,
         }),
@@ -125,7 +125,7 @@ export const createTestRecord = ({ user, survey }) =>
         'plot',
         RB.attribute('plot_id', 2),
         RB.attribute('plot_location', {
-          [Node.valuePropsCoordinate.srs]: Srs.latLonSrsCode,
+          [Node.valuePropsCoordinate.srs]: Srs.latLongSrsCode,
           [Node.valuePropsCoordinate.x]: 41.823012,
           [Node.valuePropsCoordinate.y]: 12.409056,
         }),
