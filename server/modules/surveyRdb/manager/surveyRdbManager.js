@@ -112,7 +112,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
           : [nodeDefContext] // Multiple attribute
       }
 
-      const result = await _fetchViewData({ survey, entityDefUuid, columnNodeDefs: childDefs }, client)
+      const result = await _fetchViewData({ survey, entityDefUuid, columnNodeDefs: childDefs })
 
       const headers = childDefs.reduce(
         (acc, nodeDef) => (NodeDef.isEntity(nodeDef) ? acc : [...acc, ...NodeDefTable.getColNames(nodeDef)]),
