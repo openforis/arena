@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 const keys = {
   srs: 'srs',
@@ -21,14 +21,14 @@ export const newPoint = ({ srs, x, y }) => ({
  * @param {!string} pointText - The point to parse.
  * @returns {object} - The parsed Point object.
  */
-export const parsePoint = (pointText) => {
+export const parse = (pointText) => {
   const match = /SRID=((EPSG:)?(\w+));POINT\((\d+(\.\d+)?) (\d+(\.\d+)?)\)/.exec(pointText)
   return match ? newPoint({ srs: match[3], x: match[4], y: match[6] }) : null
 }
 
-export const getSrs = R.propOr(null, keys.srs)
-export const getX = R.propOr(null, keys.x)
-export const getY = R.propOr(null, keys.y)
+export const getSrs = A.propOr(null, keys.srs)
+export const getX = A.propOr(null, keys.x)
+export const getY = A.propOr(null, keys.y)
 
 export const toString = (point) => {
   const srsId = getSrs(point)
@@ -37,4 +37,5 @@ export const toString = (point) => {
   return `SRID=${srsId};POINT(${x} ${y})`
 }
 
-export const isFilled = (point) => (point && getX(point) !== null && getY(point) !== null) || getSrs(point) !== null
+export const isFilled = (point) =>
+  point && !A.isEmpty(getX(point)) && !A.isEmpty(getY(point)) && !A.isEmpty(getSrs(point))

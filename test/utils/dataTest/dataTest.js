@@ -32,19 +32,53 @@ export const createTestSurvey = ({ user }) =>
       ).multiple()
     )
   )
-    .category(
-      'simple_category',
-      SB.categoryItem('1')
-        .extra({ prop1: 'Extra prop1 item 1', prop2: 'Extra prop2 item 1' })
-        .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 1-1', prop2: 'Extra prop2 item 1-1' })),
-      SB.categoryItem('2')
-        .extra({ prop1: 'Extra prop1 item 2', prop2: 'Extra prop2 item 2' })
-        .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 2-1', prop2: 'Extra prop2 item 2-1' }))
-        .item(SB.categoryItem('2').extra({ prop1: 'Extra prop1 item 2-2', prop2: 'Extra prop2 item 2-2' }))
-        .item(SB.categoryItem('3').extra({ prop1: 'Extra prop1 item 2-3', prop2: 'Extra prop2 item 2-3' })),
-      SB.categoryItem('3')
-        .extra({ prop1: 'Extra prop1 item 3', prop2: 'Extra prop2 item 3' })
-        .item(SB.categoryItem('3a').extra({ prop1: 'Extra prop1 item 3a', prop2: 'Extra prop2 item 3a' }))
+    .categories(
+      SB.category('simple_category', SB.categoryItem('1'), SB.categoryItem('2'), SB.categoryItem('3')),
+      SB.category('hierarchical_category')
+        .levels('level_1', 'level_2')
+        .item(
+          SB.categoryItem('1')
+            .extra({ prop1: 'Extra prop1 item 1', prop2: 'Extra prop2 item 1' })
+            .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 1-1', prop2: 'Extra prop2 item 1-1' }))
+        )
+        .item(
+          SB.categoryItem('2')
+            .extra({ prop1: 'Extra prop1 item 2', prop2: 'Extra prop2 item 2' })
+            .item(SB.categoryItem('1').extra({ prop1: 'Extra prop1 item 2-1', prop2: 'Extra prop2 item 2-1' }))
+            .item(SB.categoryItem('2').extra({ prop1: 'Extra prop1 item 2-2', prop2: 'Extra prop2 item 2-2' }))
+            .item(SB.categoryItem('3').extra({ prop1: 'Extra prop1 item 2-3', prop2: 'Extra prop2 item 2-3' }))
+        )
+        .item(
+          SB.categoryItem('3')
+            .extra({ prop1: 'Extra prop1 item 3', prop2: 'Extra prop2 item 3' })
+            .item(SB.categoryItem('3a').extra({ prop1: 'Extra prop1 item 3a', prop2: 'Extra prop2 item 3a' }))
+        ),
+      SB.category('sampling_point')
+        .levels('cluster', 'plot')
+        .item(
+          SB.categoryItem('11')
+            .extra({ location: 'SRID=EPSG:4326;POINT(12.89463 42.00048)' })
+            .item(SB.categoryItem('1').extra({ location: 'SRID=EPSG:4326;POINT(12.88963 42.00548)' }))
+            .item(SB.categoryItem('2').extra({ location: 'SRID=EPSG:4326;POINT(12.88963 41.99548)' }))
+            .item(SB.categoryItem('3').extra({ location: 'SRID=EPSG:4326;POINT(12.89963 42.00548)' }))
+            .item(SB.categoryItem('4').extra({ location: 'SRID=EPSG:4326;POINT(12.89963 41.99548)' }))
+        )
+        .item(
+          SB.categoryItem('12')
+            .extra({ location: 'SRID=EPSG:4326;POINT(12.99463 42.00048)' })
+            .item(SB.categoryItem('1').extra({ location: 'SRID=EPSG:4326;POINT(12.98963 42.00548)' }))
+            .item(SB.categoryItem('2').extra({ location: 'SRID=EPSG:4326;POINT(12.98963 41.99548)' }))
+            .item(SB.categoryItem('3').extra({ location: 'SRID=EPSG:4326;POINT(12.99963 42.00548)' }))
+            .item(SB.categoryItem('4').extra({ location: 'SRID=EPSG:4326;POINT(12.99963 41.99548)' }))
+        )
+        .item(
+          SB.categoryItem('13')
+            .extra({ location: 'SRID=EPSG:4326;POINT(13.09463 42.00048)' })
+            .item(SB.categoryItem('1').extra({ location: 'SRID=EPSG:4326;POINT(13.08963 42.00548)' }))
+            .item(SB.categoryItem('2').extra({ location: 'SRID=EPSG:4326;POINT(13.08963 41.99548)' }))
+            .item(SB.categoryItem('3').extra({ location: 'SRID=EPSG:4326;POINT(13.09963 42.00548)' }))
+            .item(SB.categoryItem('4').extra({ location: 'SRID=EPSG:4326;POINT(13.09963 41.99548)' }))
+        )
     )
     .build()
 

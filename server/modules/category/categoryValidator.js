@@ -73,7 +73,7 @@ const _extraPropValidators = {
   [Category.itemExtraDefDataTypes.number]: (key, extra) =>
     Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
   [Category.itemExtraDefDataTypes.geometryPoint]: (key, extra) => {
-    const point = Point.parsePoint(extra[key])
+    const point = Point.parse(extra[key])
     return GeoUtils.isCoordinateValid(Point.getSrs(point), Point.getX(point), Point.getY(point))
       ? null
       : ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
