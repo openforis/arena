@@ -8,7 +8,7 @@ export const exportCsvDataUrlUpdate = 'exportCsvData/update'
 export const updateExportCsvDataUrl = (exportCsvDataUrl) => (dispatch) =>
   dispatch({ type: exportCsvDataUrlUpdate, exportCsvDataUrl })
 
-export const requestExportCsvData = () => async (dispatch, getState) => {
+export const startCSVExport = () => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
 

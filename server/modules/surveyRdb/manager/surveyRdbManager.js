@@ -22,11 +22,11 @@ import * as DataViewRepository from '../repository/dataView'
 // ==== DDL
 
 // schema
-export { createSchema, dropSchema, getTables } from '../repository/schemaRdbRepository'
+export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, countViewDataAgg, fetchViewDataAgg, _fetchViewData } = DataViewRepository
+export const { createDataView, countViewDataAgg, fetchViewDataAgg } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -112,16 +112,10 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
           : [nodeDefContext] // Multiple attribute
       }
 
-      const result = await _fetchViewData({ survey, entityDefUuid, columnNodeDefs: childDefs })
+      let query = Query.create({ entityDefUuid })
+      query = Query.assocAttributeDefUuids(childDefs.map(NodeDef.getUuid))(query)
 
-      const headers = childDefs.reduce(
-        (acc, nodeDef) => (NodeDef.isEntity(nodeDef) ? acc : [...acc, ...NodeDefTable.getColNames(nodeDef)]),
-        []
-      )
-
-      await db.stream(result, (streamQuery) => {
-        streamQuery.pipe(CSVWriter.transformToStream(stream, headers))
-      })
+      await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query })
     })
   )
 

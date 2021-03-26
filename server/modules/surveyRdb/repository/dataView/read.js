@@ -162,8 +162,10 @@ export const fetchViewData = async (params, client = db) => {
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
-  queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
-  queryBuilder.addParams({ cycle })
+  if (!R.isNil(cycle)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+    queryBuilder.addParams({ cycle })
+  }
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
@@ -194,25 +196,6 @@ export const fetchViewData = async (params, client = db) => {
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
-}
-
-export const _fetchViewData = async (params) => {
-  const { survey, columnNodeDefs = [], entityDefUuid } = params
-
-  const nodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const nodeDefCols = columnNodeDefs // [] //Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey)
-
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-
-  const queryBuilder = new SqlSelectBuilder()
-  queryBuilder.select('*')
-
-  _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols })
-
-  const select = queryBuilder.build()
-  const queryParams = queryBuilder.params
-
-  return new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
 }
 
 export const runCount = async ({ surveyId, cycle, tableName, filter }, client = db) => {

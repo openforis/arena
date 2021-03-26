@@ -29,7 +29,7 @@ const ExportData = () => {
           data-testid={DataTestId.dataExport.prepareExport}
           type="button"
           className="btn"
-          onClick={() => dispatch(ExportCsvDataActions.requestExportCsvData())}
+          onClick={() => dispatch(ExportCsvDataActions.startCSVExport())}
         >
           {i18n.t('dataExportView.startCsvExport')}
         </button>
