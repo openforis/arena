@@ -96,7 +96,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
   await FileUtils.rmdir(dir)
   await FileUtils.mkdir(dir)
 
-  const entities = Survey.getNodeDefsArray(survey).filter(NodeDef.isEntity)
+  const entities = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
 
   await Promise.all(
     entities.map(async (entity) => {
