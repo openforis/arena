@@ -18,7 +18,7 @@ const ExportData = () => {
 
   useEffect(() => {
     return () => {
-      ExportCsvDataActions.updateExportCsvDataUrl(false)
+      dispatch(ExportCsvDataActions.updateExportCsvDataUrl(false))
     }
   }, [])
 
