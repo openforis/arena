@@ -6,7 +6,6 @@ export class ItemBuilder {
   constructor(code) {
     this.code = code
     this._label = ''
-    this.levelIndex = 0
     this.extraProps = {}
     this.childItemBuilders = []
   }
@@ -27,7 +26,7 @@ export class ItemBuilder {
   }
 
   build(category, parentItem = null, levelIndex = 0) {
-    const level = Category.getLevelByIndex(this.levelIndex)(category)
+    const level = Category.getLevelByIndex(levelIndex)(category)
     const item = CategoryItem.newItem(CategoryLevel.getUuid(level), CategoryItem.getUuid(parentItem), {
       [CategoryItem.keysProps.code]: this.code,
       [CategoryItem.keysProps.labels]: { en: this._label },

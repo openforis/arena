@@ -2,26 +2,31 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 
 export class CategoryBuilder {
-  constructor(name, ...itemBuilders) {
+  constructor(name) {
     this.name = name
-    this.itemBuilders = itemBuilders
+    this.childItemBuilders = []
     this.levelNames = []
   }
 
-  level(levelName) {
-    this.levelNames.push(levelName)
+  levels(...levelNames) {
+    this.levelNames = [...levelNames]
+    return this
+  }
+
+  item(itemBuilder) {
+    this.childItemBuilders.push(itemBuilder)
     return this
   }
 
   build() {
     let category = Category.newCategory({ [Category.keysProps.name]: this.name })
     if (this.levelNames.length > 0) {
-      const levels = this.levelNames.map((levelName) =>
-        Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName })
+      const levels = this.levelNames.map((levelName, index) =>
+        Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
       )
       category = Category.assocLevelsArray(levels)(category)
     }
-    const items = this.itemBuilders.flatMap((itemBuilder) => itemBuilder.build(category))
+    const items = this.childItemBuilders.flatMap((itemBuilder) => itemBuilder.build(category))
 
     return {
       category,
