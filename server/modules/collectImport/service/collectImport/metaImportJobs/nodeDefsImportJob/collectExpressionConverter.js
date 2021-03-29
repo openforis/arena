@@ -1,5 +1,5 @@
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 const convert = ({ survey, nodeDefCurrent, expression }) => {
@@ -20,9 +20,12 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: /^\s*false(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
     { pattern: /^\s*false(\(\))?\s+/, replace: ' false ', ignoreCase: true },
     { pattern: /\sfalse(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
+    // predefined variables
+    { pattern: '\\$this', replace: NodeDef.getName(nodeDefCurrent) },
     // custom functions
-    { pattern: 'idm:isBlank', replace: 'isEmpty' },
-    { pattern: 'idm:isNotBlank', replace: '!isEmpty' },
+    { pattern: 'idm:array', replace: 'Array.of' },
+    { pattern: 'idm:blank', replace: 'isEmpty' },
+    { pattern: 'idm:not-blank', replace: '!isEmpty' },
     { pattern: 'idm:currentDate', replace: 'now' },
     { pattern: 'idm:currentTime', replace: 'now' },
   ]
@@ -35,10 +38,19 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
 
   // remove extra spaces
   converted = converted.replace(/\s+/g, ' ').trim()
+  if (converted.length === 0) {
+    return null
+  }
 
-  const validation = NodeDefExpressionValidator.validate({ survey, nodeDefCurrent, exprString: converted })
-  if (!Validation.isValid(validation)) {
-    throw new Error(`Error converting expression: ${expression}`)
+  const validationResult = NodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent,
+    exprString: converted,
+    isContextParent: true,
+    selfReferenceAllowed: true,
+  })
+  if (validationResult !== null) {
+    throw new Error(`Error converting expression: ${expression} - ${JSON.stringify(validationResult)}`)
   }
   return converted
 }

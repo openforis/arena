@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
-import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -324,14 +323,16 @@ export default class NodeDefsImportJob extends Job {
 
     // 3. applicable
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
-    if (relevantExpr) {
+    if (StringUtils.isNotBlank(relevantExpr)) {
       try {
         const relevantExprConverted = CollectExpressionConverter.convert({
           survey: this.survey,
           nodeDefCurrent: nodeDef,
           expression: relevantExpr,
         })
-        // propsAdvanced[NodeDef.keysPropsAdvanced.applicable] =
+        propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
+          NodeDefExpression.createExpression(relevantExprConverted),
+        ]
       } catch (e) {
         await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr)
       }
@@ -414,11 +415,7 @@ export default class NodeDefsImportJob extends Job {
         this.logDebug('empty value found in default attribute constant value')
       }
       if (exprConverted !== null) {
-        defaultValues.push({
-          [ObjectUtils.keys.uuid]: uuidv4(),
-          [NodeDefExpression.keys.expression]: exprConverted,
-          [NodeDefExpression.keys.applyIf]: applyIfConverted,
-        })
+        defaultValues.push(NodeDefExpression.createExpression(exprConverted, applyIfConverted))
       }
     })
 
@@ -429,47 +426,55 @@ export default class NodeDefsImportJob extends Job {
     const { defaultLanguage } = this.context
 
     const validationRules = []
-    const elements = CollectSurvey.getElements(collectNodeDef)
-    await PromiseUtils.each(elements, async (element) => {
-      const checkType = CollectSurvey.getElementName(element)
+
+    const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
+
+    await PromiseUtils.each(collectValidationRules, async (collectValidationRule) => {
+      const checkType = CollectSurvey.getElementName(collectValidationRule)
       const checkExpressionParser = checkExpressionParserByType[checkType]
       if (checkExpressionParser) {
-        const collectExpr = checkExpressionParser(element)
-        const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
-        const { if: condition, flag, expr } = CollectSurvey.getAttributes(element)
-        try {
-          let exprConverted = null
-          if (checkType === collectCheckType.distance) {
-            const { max, to } = CollectSurvey.getAttributes(element)
-            const toConverted = CollectExpressionConverter.convert({
-              survey: this.survey,
-              nodeDefCurrent,
-              expression: to,
-            })
-            exprConverted = `distance(${nodeDefCurrent}, ${toConverted}) <== ${max}`
-          } else {
-            exprConverted = CollectExpressionConverter.convert({
-              survey: this.survey,
-              nodeDefCurrent,
-              expression: expr,
-            })
+        const collectExpr = checkExpressionParser(collectValidationRule)
+        if (collectExpr) {
+          const messages = CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule)
+          const { if: condition, flag } = CollectSurvey.getAttributes(collectValidationRule)
+          try {
+            let exprConverted = null
+            if (checkType === collectCheckType.distance) {
+              const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
+              const toConverted = CollectExpressionConverter.convert({
+                survey: this.survey,
+                nodeDefCurrent,
+                expression: to,
+              })
+              exprConverted = `distance(${nodeDefCurrent}, ${toConverted}) <== ${max}`
+            } else {
+              exprConverted = CollectExpressionConverter.convert({
+                survey: this.survey,
+                nodeDefCurrent,
+                expression: collectExpr,
+              })
+            }
+            if (exprConverted) {
+              const conditionConverted = CollectExpressionConverter.convert({
+                survey: this.survey,
+                nodeDefCurrent,
+                expression: condition,
+              })
+              validationRules.push(NodeDefExpression.createExpression(exprConverted, conditionConverted))
+            }
+          } catch (e) {
+            const exprType =
+              flag === 'error'
+                ? CollectImportReportItem.exprTypes.validationRuleError
+                : CollectImportReportItem.exprTypes.validationRuleWarning
+            await this.addNodeDefImportIssue(
+              NodeDef.getUuid(nodeDefCurrent),
+              exprType,
+              collectExpr,
+              condition,
+              messages
+            )
           }
-          const conditionConverted = CollectExpressionConverter.convert({
-            survey: this.survey,
-            nodeDefCurrent,
-            expression: condition,
-          })
-          validationRules.push({
-            [ObjectUtils.keys.uuid]: uuidv4(),
-            [NodeDefExpression.keys.expression]: exprConverted,
-            [NodeDefExpression.keys.applyIf]: conditionConverted,
-          })
-        } catch (e) {
-          const exprType =
-            flag === 'error'
-              ? CollectImportReportItem.exprTypes.validationRuleError
-              : CollectImportReportItem.exprTypes.validationRuleWarning
-          await this.addNodeDefImportIssue(NodeDef.getUuid(nodeDefCurrent), exprType, collectExpr, condition, messages)
         }
       }
     })
