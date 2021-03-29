@@ -11,15 +11,31 @@ import { records } from '../mock/records'
 import { gotoHome, gotoDataExport } from './_navigation'
 
 import { downloadsPath } from '../downloads/path'
-import { cluster, tree } from '../mock/nodeDefs'
+import { cluster, tree, plot } from '../mock/nodeDefs'
+import * as DateUtils from '../../../core/dateUtils'
 
 let surveyZipPath = ''
 let extractedFolderName = ''
 
 /* eslint-disable camelcase */
-const { cluster_decimal } = cluster.children
-const { tree_dec_1 } = tree.children
+const {
+  cluster_time,
+  cluster_boolean,
+  // cluster_coordinate,
+  cluster_decimal,
+  cluster_country,
+  cluster_region,
+  cluster_province,
+} = cluster.children
 
+const { plot_id, plot_text } = plot.children
+const { tree_dec_1, tree_dec_2, tree_species } = tree.children
+
+const getCodeAndLabel = (value) => {
+  const code = value.match(new RegExp(/\([0-9]+\)/))[0].replace(/\D/g, '')
+  const label = value.replace(/\([0-9]+\) /, '')
+  return { code, label }
+}
 export default () =>
   describe('Export data in csv', () => {
     gotoDataExport()
@@ -75,12 +91,31 @@ export default () =>
 
       await Promise.all(
         clusterData.map(async (_cluster) => {
-          await expect(
-            records.some(
-              (record) =>
-                Number(record[cluster_decimal.name]).toFixed(2) === Number(_cluster.cluster_decimal).toFixed(2)
-            )
-          ).toBeTruthy()
+          const mockRecord = records.find(
+            (record) => Number(record[cluster_decimal.name]).toFixed(2) === Number(_cluster.cluster_decimal).toFixed(2)
+          )
+          await expect(mockRecord).toBeTruthy()
+
+          await expect(Number(_cluster.cluster_decimal).toFixed(2)).toBe(
+            Number(mockRecord[cluster_decimal.name]).toFixed(2)
+          )
+
+          // await expect(_cluster.cluster_coordinate).toBe(mockRecord[cluster_coordinate.name])
+
+          await expect(_cluster.cluster_time).toBe(`${DateUtils.format(mockRecord[cluster_time.name], 'HH:mm')}:00`)
+          await expect(String(_cluster.cluster_boolean)).toBe(String(mockRecord[cluster_boolean.name]))
+
+          const { code: countryCode, label: countryLabel } = getCodeAndLabel(mockRecord[cluster_country.name])
+          await expect(_cluster.cluster_country_code).toBe(countryCode)
+          await expect(_cluster.cluster_country_label).toBe(countryLabel)
+
+          const { code: regionCode, label: regionLabel } = getCodeAndLabel(mockRecord[cluster_region.name])
+          await expect(_cluster.cluster_region_code).toBe(regionCode)
+          await expect(_cluster.cluster_region_label).toBe(regionLabel)
+
+          const { code: provinceCode, label: provinceLabel } = getCodeAndLabel(mockRecord[cluster_province.name])
+          await expect(_cluster.cluster_province_code).toBe(provinceCode)
+          await expect(_cluster.cluster_province_label).toBe(provinceLabel)
         })
       )
     })
@@ -93,9 +128,22 @@ export default () =>
         skip_empty_lines: true,
       })
 
-      const mockPlots = records.flatMap((record) => record.plot_id)
+      const mockPlots = records.flatMap((record) => ({
+        plot_id: record.plot_id,
+        plot_text: record.plot_text,
+      }))
 
       await expect(mockPlots.length).toBe(plotData.length)
+
+      await Promise.all(
+        plotData.map(async (_plot) => {
+          const mockPlot = mockPlots.find(
+            (_mockPlot) => String(_mockPlot[plot_id.name]) === String(_plot[plot_id.name])
+          )
+          await expect(mockPlot).toBeTruthy()
+          await expect(mockPlot[plot_text.name]).toBe(_plot[plot_text.name])
+        })
+      )
     })
 
     test(`Check tree data`, async () => {
@@ -112,11 +160,16 @@ export default () =>
 
       await Promise.all(
         treeData.map(async (_tree) => {
-          await expect(
-            mockTrees.some(
-              (mockTree) => Number(_tree[tree_dec_1.name]).toFixed(2) === Number(mockTree[tree_dec_1.name]).toFixed(2)
-            )
-          ).toBeTruthy()
+          const mockTree = mockTrees.find(
+            (_mockTree) => Number(_tree[tree_dec_1.name]).toFixed(2) === Number(_mockTree[tree_dec_1.name]).toFixed(2)
+          )
+
+          await expect(mockTree).toBeTruthy()
+          await expect(Number(mockTree[tree_dec_1.name]).toFixed(2)).toBe(Number(_tree[tree_dec_1.name]).toFixed(2))
+          await expect(Number(mockTree[tree_dec_2.name]).toFixed(2)).toBe(Number(_tree[tree_dec_2.name]).toFixed(2))
+
+          await expect(mockTree[tree_species.name].code).toBe(_tree.tree_species_code)
+          await expect(mockTree[tree_species.name].scientificName).toBe(_tree.tree_species_scientific_name)
         })
       )
     })

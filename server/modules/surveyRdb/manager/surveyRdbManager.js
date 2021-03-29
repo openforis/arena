@@ -99,11 +99,9 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
   const entities = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
 
   await Promise.all(
-    entities.map(async (entity) => {
-      const entityDefUuid = NodeDef.getUuid(entity)
-      const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(entity)}.csv`))
-
-      const nodeDefContext = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+    entities.map(async (nodeDefContext) => {
+      const entityDefUuid = NodeDef.getUuid(nodeDefContext)
+      const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
       let childDefs = []
       if (nodeDefContext) {
