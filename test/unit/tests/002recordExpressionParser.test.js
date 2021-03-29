@@ -102,23 +102,42 @@ describe('RecordExpressionParser Test', () => {
       n: 'cluster/plot[2]/tree[1]/dbh',
     },
     // categoryItemProp
-    { q: `categoryItemProp('simple_category', 'prop1', '1')`, r: 'Extra prop1 item 1' },
-    { q: `categoryItemProp('simple_category', 'prop2', '3')`, r: 'Extra prop2 item 3' },
-    { q: `categoryItemProp('simple_category', 'prop1', '2', '1')`, r: 'Extra prop1 item 2-1' },
-    { q: `categoryItemProp('simple_category', 'prop1', cluster_id - 10)`, r: 'Extra prop1 item 2' },
+    { q: `categoryItemProp('hierarchical_category', 'prop1', '1')`, r: 'Extra prop1 item 1' },
+    { q: `categoryItemProp('hierarchical_category', 'prop2', '3')`, r: 'Extra prop2 item 3' },
+    { q: `categoryItemProp('hierarchical_category', 'prop1', '2', '1')`, r: 'Extra prop1 item 2-1' },
+    { q: `categoryItemProp('hierarchical_category', 'prop1', cluster_id - 10)`, r: 'Extra prop1 item 2' },
     {
-      q: `categoryItemProp('simple_category', 'prop1', cluster_id - 10, plot_id)`,
+      q: `categoryItemProp('hierarchical_category', 'prop1', cluster_id - 10, plot_id)`,
       r: 'Extra prop1 item 2-2',
       n: 'cluster/plot[1]/plot_id',
     },
     // categoryItemProp: unexisting prop or code
     {
-      q: `categoryItemProp('simple_category', 'prop9', '1')`,
+      q: `categoryItemProp('hierarchical_category', 'prop9', '1')`,
       r: null,
     },
     {
-      q: `categoryItemProp('simple_category', 'prop1', '999')`,
+      q: `categoryItemProp('hierarchical_category', 'prop1', '999')`,
       r: null,
+    },
+    // distance
+    { q: 'distance(plot[0].plot_location, plot[1].plot_location).toFixed(2)', r: '2171.94' },
+    {
+      q:
+        'distance(plot[0].plot_location, plot[1].plot_location) == distance(plot[1].plot_location, plot[0].plot_location)',
+      r: true,
+    },
+    // distance (invalid node type)
+    { q: 'distance(plot[0].plot_location, remarks)', r: null },
+    // distance (using categoryItemProp)
+    {
+      q: `distance(cluster_location, categoryItemProp('sampling_point', 'location', cluster_id)).toFixed(2)`,
+      r: '4307919.62',
+    },
+    {
+      q: `distance(plot_location, categoryItemProp('sampling_point', 'location', cluster_id, plot_id)).toFixed(2)`,
+      r: '4311422.21',
+      n: 'cluster/plot[1]/plot_id',
     },
     // global objects (Array)
     { q: 'Array.of(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: [1, 2, 3] },
@@ -154,7 +173,7 @@ describe('RecordExpressionParser Test', () => {
     // composite attribute members
     { q: 'cluster_location.x', r: 41.883012 },
     { q: 'cluster_location.y', r: 12.489056 },
-    { q: 'cluster_location.srs', r: 'EPSG:4326' },
+    { q: 'cluster_location.srs', r: '4326' },
     { q: 'plot[0].tree[0].tree_species.code', r: 'ACA' },
     { q: 'plot[0].tree[0].tree_species.scientificName', r: 'Acacia sp.' },
     { q: 'visit_date.year', r: 2021 },

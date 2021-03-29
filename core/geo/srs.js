@@ -36,6 +36,6 @@ export const latLonSrs = newSrs(
       AUTHORITY["EPSG","4326"]]`
 )
 
-export const latLonSrsCode = getCode(latLonSrs)
-export const isLatLon = (code) => latLonSrsCode === code
+export const latLongSrsCode = getCode(latLonSrs)
+export const isLatLong = (code) => latLongSrsCode === code
 export const getNameAndCode = (srs) => `${getName(srs)} (EPSG:${getCode(srs)})`
