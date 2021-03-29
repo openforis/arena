@@ -10,7 +10,7 @@ import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImportJob'
-import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
+import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob/nodeDefsImportJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
 export default class CollectImportJob extends Job {

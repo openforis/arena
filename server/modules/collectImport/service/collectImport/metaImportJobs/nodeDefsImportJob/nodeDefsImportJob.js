@@ -18,10 +18,10 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as CollectImportJobContext from '../collectImportJobContext'
-import * as CollectImportReportManager from '../../../manager/collectImportReportManager'
-import * as CollectSurvey from '../model/collectSurvey'
-import SamplingPointDataImportJob from './samplingPointDataImportJob'
+import * as CollectImportJobContext from '../../collectImportJobContext'
+import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
+import * as CollectSurvey from '../../model/collectSurvey'
+import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 
 const specifyAttributeSuffix = 'specify'
 
@@ -110,6 +110,13 @@ export default class NodeDefsImportJob extends Job {
    *
    * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
    * (used to import Collect composite attribute definitions like Range)
+   *
+   * @param {NodeDef} parentNodeDef - Parent node def definition.
+   * @param {!string} parentPath - Parent node path.
+   * @param {!Object} collectNodeDef - Collect node definition.
+   * @param {!string} type - Node definition type.
+   * @param {string} field - Node sub-field.
+   * @returns {object} - Inserted node definitions.
    */
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const { surveyId, defaultLanguage } = this.context
@@ -123,7 +130,7 @@ export default class NodeDefsImportJob extends Job {
     const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
     const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
 
-    const collectNodeDefPath = parentPath + '/' + collectNodeDefName
+    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
 
     const tableLayout =
       multiple &&
