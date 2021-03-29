@@ -442,6 +442,8 @@ $t(common.cantUndoWarning)`,
     },
     editorCompletionHelp: '- Show the available variables and functions that can be used',
     functionDescriptions: {
+      categoryItemProp: 'Returns the value of the specified extra prop of a category item having the specified code',
+      distance: 'Returns the distance (in meters) between the specified coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the context node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',

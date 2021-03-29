@@ -35,6 +35,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   async logCategoryImportActivity() {
     // Do not log category import activity for sampling point data category
+    return this // avoids eslint complain
   }
 
   async shouldExecute() {
@@ -73,9 +74,9 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   }
 
   extractItemExtraProps(extra) {
-    const { srs_id: srsId, x, y } = extra
+    const { srs_id: srs, x, y } = extra
 
-    const point = Point.newPoint({ srsId, x, y })
+    const point = Point.newPoint({ srs, x, y })
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),

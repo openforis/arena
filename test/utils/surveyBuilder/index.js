@@ -15,10 +15,10 @@ import * as SurveyUtils from '../surveyUtils'
 
 import NodeDefEntityBuilder from './nodeDefEntityBuilder'
 import NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
-import { CategoryBuilder } from './categoryBuilder'
 import { TaxonomyBuilder } from './taxonomyBuilder'
 import { TaxonBuilder } from './taxonBuilder'
 import { ItemBuilder } from './categoryItemBuilder'
+import { CategoryBuilder } from './categoryBuilder'
 
 const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
@@ -45,15 +45,14 @@ class SurveyBuilder {
     this.taxonomyBuilders = []
   }
 
-  category(name, ...itemBuilders) {
-    const categoryBuilder = new CategoryBuilder(name, ...itemBuilders)
-    this.categoryBuilders.push(categoryBuilder)
-    return this
-  }
-
   taxonomy(name, ...taxonBuilders) {
     const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
     this.taxonomyBuilders.push(taxonomyBuilder)
+    return this
+  }
+
+  categories(...categoryBuilders) {
+    this.categoryBuilders = categoryBuilders
     return this
   }
 
@@ -134,7 +133,8 @@ export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefB
 export const entity = (name, ...childBuilders) => new NodeDefEntityBuilder(name, ...childBuilders)
 export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefAttributeBuilder(name, type)
 // ==== category
-export const categoryItem = (code, ...itemBuilders) => new ItemBuilder(code, ...itemBuilders)
+export const category = (name, ...itemBuilders) => new CategoryBuilder(name, ...itemBuilders)
+export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>
   new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

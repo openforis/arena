@@ -5,6 +5,8 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
+import * as GeoUtils from '@core/geo/geoUtils'
+import * as Point from '@core/geo/point'
 
 export const recordExpressionFunctions = ({ survey, record }) => ({
   [Expression.functionNames.categoryItemProp]: (categoryName, itemPropName, ...codePaths) => {
@@ -20,6 +22,13 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
 
     const extraProp = CategoryItem.getExtraProp(itemPropName)(categoryItem)
     return A.isEmpty(extraProp) ? null : extraProp
+  },
+  [Expression.functionNames.distance]: (coordinateFrom, coordinateTo) => {
+    const toPoint = (coordinate) =>
+      coordinate && typeof coordinate === 'string' ? Point.parse(coordinate) : coordinate
+    const pointFrom = toPoint(coordinateFrom)
+    const pointTo = toPoint(coordinateTo)
+    return GeoUtils.distance(pointFrom, pointTo)
   },
   [Expression.functionNames.index]: (node) => {
     if (!node) {
