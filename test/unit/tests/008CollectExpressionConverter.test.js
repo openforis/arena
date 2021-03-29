@@ -1,4 +1,4 @@
-import * as CollectExpressionConverter from '@server/modules/collectImport/service/collectImport/metaImportJobs/nodeDefsImportJob/collectExpressionConverter'
+import { CollectExpressionConverter } from '@server/modules/collectImport/service/collectImport/metaImportJobs/nodeDefsImportJob/collectExpressionConverter'
 
 describe('CollectExpressionConverter Test', () => {
   // ====== value expr tests
@@ -22,10 +22,10 @@ describe('CollectExpressionConverter Test', () => {
   ]
 
   queries.forEach((query) => {
-    const { q: collectExpression, r: result } = query
-    it(collectExpression, () => {
-      const expression = CollectExpressionConverter.convertExpression({ collectExpression })
-      expect(expression).toBe(result)
+    const { q: expression, r: result } = query
+    it(expression, () => {
+      const converted = CollectExpressionConverter.convert({ expression })
+      expect(converted).toBe(result)
     })
   })
 })
