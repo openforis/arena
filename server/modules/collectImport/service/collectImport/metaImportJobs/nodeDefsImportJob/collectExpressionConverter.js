@@ -10,7 +10,7 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
   }
   const itemsToReplace = [
     // operators
-    { pattern: /(?<!([<|>|!]))=/, replace: '==' }, // equal operator; do not convert less than, greater than or not equal operators
+    { pattern: /(?<!([<>!]))=/, replace: '==' }, // equal operator; do not convert less than, greater than or not equal operators
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
