@@ -32,6 +32,9 @@ describe('CollectExpressionConverter Test', () => {
     // predefined variables ($this)
     { q: '$this', r: 'cluster_id' },
     { q: '$this >= 1 and $this < 20', r: 'cluster_id >= 1 && cluster_id < 20' },
+    // node property access
+    { q: 'cluster_location/@x', r: 'cluster_location.x' },
+    { q: 'tree_species/@scientificName', r: 'tree_species.scientificName', n: 'tree_height' },
     // boolean values
     { q: 'true()', r: 'true' },
     { q: 'false()', r: 'false' },

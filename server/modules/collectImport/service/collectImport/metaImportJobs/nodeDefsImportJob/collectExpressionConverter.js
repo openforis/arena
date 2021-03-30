@@ -30,6 +30,8 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
         return match // ancestor node definition not found
       },
     },
+    // node property access
+    { pattern: '/@', replace: '.' },
     // path separator
     { pattern: '/', replace: '.' },
     // boolean values
