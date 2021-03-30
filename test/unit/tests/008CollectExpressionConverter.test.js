@@ -33,15 +33,46 @@ describe('CollectExpressionConverter Test', () => {
     { q: 'idm:not-blank(cluster_id)', r: '!isEmpty(cluster_id)' },
     { q: 'idm:currentDate()', r: 'now()' },
     { q: 'idm:currentTime()', r: 'now()' },
+    {
+      q: 'idm:samplingPointCoordinate(cluster_id, plot_id)',
+      r: `categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)`,
+      n: 'plot_id',
+    },
+    {
+      q: 'idm:not-blank(idm:samplingPointCoordinate(cluster_id, plot_id))',
+      r: `!isEmpty(categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id))`,
+      n: 'plot_id',
+    },
+    {
+      q: `idm:samplingPointData('region', cluster_id, plot_id)`,
+      r: `categoryItemProp('sampling_point_data', 'region', cluster_id, plot_id)`,
+      n: 'plot_id',
+    },
+    ...[
+      'abs',
+      'acos',
+      'asin',
+      'atan',
+      'log',
+      'log10',
+      'max',
+      'min',
+      'pow',
+      'random',
+      'sin',
+      'sqrt',
+      'tan',
+    ].map((fn) => ({ q: `math:${fn}`, r: `Math.${fn}` })),
+    { q: 'math:PI()', r: 'Math.PI' },
     // predefined variables
     { q: '$this', r: 'cluster_id' },
     { q: '$this < 10 and $this > 0', r: 'cluster_id < 10 && cluster_id > 0' },
   ]
 
   queries.forEach((query) => {
-    const { q: expression, r: result } = query
+    const { q: expression, r: result, n: nodeName } = query
     it(`${expression} => ${result}`, () => {
-      const nodeDefCurrent = Survey.getNodeDefByName('cluster_id')(survey)
+      const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
       const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
       expect(converted).toBe(result)
     })

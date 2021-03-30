@@ -177,6 +177,7 @@ export default class NodeDefsImportJob extends Job {
       nodeDefsUpdated,
       await NodeDefManager.insertNodeDef({ user: this.user, surveyId, nodeDef: nodeDefParam, system: true }, this.tx)
     )
+    Object.assign(this.nodeDefs, nodeDefsUpdated)
 
     let nodeDef = nodeDefsUpdated[nodeDefUuid]
 
@@ -434,11 +435,12 @@ export default class NodeDefsImportJob extends Job {
       const checkExpressionParser = checkExpressionParserByType[checkType]
       if (checkExpressionParser) {
         const collectExpr = checkExpressionParser(collectValidationRule)
-        if (collectExpr) {
+        let exprConverted = null
+
+        if (StringUtils.isNotBlank(collectExpr)) {
           const messages = CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule)
           const { if: condition, flag } = CollectSurvey.getAttributes(collectValidationRule)
           try {
-            let exprConverted = null
             if (checkType === collectCheckType.distance) {
               const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
               const toConverted = CollectExpressionConverter.convert({
@@ -454,15 +456,17 @@ export default class NodeDefsImportJob extends Job {
                 expression: collectExpr,
               })
             }
-            if (exprConverted) {
-              const conditionConverted = CollectExpressionConverter.convert({
-                survey: this.survey,
-                nodeDefCurrent,
-                expression: condition,
-              })
-              validationRules.push(NodeDefExpression.createExpression(exprConverted, conditionConverted))
-            }
           } catch (e) {
+            // ignore it
+          }
+          if (exprConverted) {
+            const conditionConverted = CollectExpressionConverter.convert({
+              survey: this.survey,
+              nodeDefCurrent,
+              expression: condition,
+            })
+            validationRules.push(NodeDefExpression.createExpression(exprConverted, conditionConverted))
+          } else {
             const exprType =
               flag === 'error'
                 ? CollectImportReportItem.exprTypes.validationRuleError
@@ -643,7 +647,7 @@ export default class NodeDefsImportJob extends Job {
 
   get survey() {
     return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: true })({})
-  }
+  } 
 }
 
 const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
