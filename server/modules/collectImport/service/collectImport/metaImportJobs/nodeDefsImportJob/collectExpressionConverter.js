@@ -1,3 +1,4 @@
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as StringUtils from '@core/stringUtils'
@@ -9,9 +10,28 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
   }
   const itemsToReplace = [
     // operators
-    { pattern: '=', replace: '==' },
+    { pattern: /(?<!([<|>|!]))=/, replace: '==' }, // equal operator; do not convert less than, greater than or not equal operators
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
+    // parent function
+    {
+      // repeated pattern. E.g. parent()/parent()/..
+      // replace all the parent() invocations with the corresponging ancestor def name
+      pattern: /(parent\(\)\s*\/\s*)+/,
+      replace: (match) => {
+        const parentsCount = match.split('/').length - 1
+        let currentParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+        for (let i = 0; i < parentsCount && currentParent !== null; i += 1) {
+          currentParent = Survey.getNodeDefParent(currentParent)(survey)
+          if (i === parentsCount - 1) {
+            return `${NodeDef.getName(currentParent)}/`
+          }
+        }
+        return match // ancestor node definition not found
+      },
+    },
+    // path separator
+    { pattern: '/', replace: '.' },
     // boolean values
     // boolean value: true, true(), FALSE or FALSE()
     { pattern: /^\s*true(\(\))?\s*$/, replace: ' true ', ignoreCase: true },

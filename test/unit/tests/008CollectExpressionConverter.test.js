@@ -16,11 +16,22 @@ describe('CollectExpressionConverter Test', () => {
   // ====== value expr tests
   const queries = [
     // operators
+    { q: 'cluster_id > 0', r: 'cluster_id > 0' },
     { q: 'cluster_id = 10', r: 'cluster_id == 10' },
+    { q: 'cluster_id >= 1', r: 'cluster_id >= 1' },
+    { q: 'cluster_id <= 100', r: 'cluster_id <= 100' },
     { q: '1 = 1 and 2 = 2', r: '1 == 1 && 2 == 2' },
     { q: '1 = 1 AND 2 = 2', r: '1 == 1 && 2 == 2' },
     { q: '1 = 1 or 2 = 2', r: '1 == 1 || 2 == 2' },
     { q: '1 = 1 OR 2 = 2', r: '1 == 1 || 2 == 2' },
+    // parent
+    { q: 'parent()/remarks', r: 'cluster.remarks', n: 'plot_id' },
+    { q: 'parent()/tree[1]', r: 'plot.tree[1]', n: 'tree_id' },
+    { q: 'parent()/parent()/plot[0]/tree[1].tree_id', r: 'cluster.plot[0].tree[1].tree_id', n: 'tree_id' },
+    { q: 'parent()/parent()/remarks', r: 'cluster.remarks', n: 'plot_id', e: true },
+    // predefined variables ($this)
+    { q: '$this', r: 'cluster_id' },
+    { q: '$this >= 1 and $this < 20', r: 'cluster_id >= 1 && cluster_id < 20' },
     // boolean values
     { q: 'true()', r: 'true' },
     { q: 'false()', r: 'false' },
@@ -70,11 +81,19 @@ describe('CollectExpressionConverter Test', () => {
   ]
 
   queries.forEach((query) => {
-    const { q: expression, r: result, n: nodeName } = query
+    const { q: expression, r: result, n: nodeName, e: errorExpected } = query
     it(`${expression} => ${result}`, () => {
-      const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
-      const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
-      expect(converted).toBe(result)
+      try {
+        const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
+        const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
+        expect(converted).toBe(result)
+      } catch (e) {
+        if (errorExpected) {
+          expect(e).toBeDefined()
+        } else {
+          throw e
+        }
+      }
     })
   })
 })

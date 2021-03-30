@@ -207,11 +207,11 @@ export default class NodeDefsImportJob extends Job {
 
       // 3b. add specify text attribute def
       const {
-        nodeDefsUpdated: qualifierNodeDefsUpdaetd,
+        nodeDefsUpdated: qualifierNodeDefsUpdated,
         nodeDefsInserted: qualifierNodeDefsInserted,
       } = await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
 
-      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdaetd)
+      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
 
@@ -530,8 +530,7 @@ export default class NodeDefsImportJob extends Job {
     const categories = this.getContextProp('categories', {})
     const category = R.find((category) => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
     const categoryName = Category.getName(category)
-    const survey = this.survey
-    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
     const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
     const qualifiableItemCodes = R.pathOr(
@@ -647,7 +646,7 @@ export default class NodeDefsImportJob extends Job {
 
   get survey() {
     return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: true })({})
-  } 
+  }
 }
 
 const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
