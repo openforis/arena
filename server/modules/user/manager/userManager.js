@@ -12,6 +12,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
+import * as UserInvitationManager from './userInvitationManager'
 
 export const {
   countUsersBySurveyId,
@@ -158,7 +159,7 @@ export const updateUserPrefs = async (user) => ({
 
 // ==== DELETE
 
-export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
+export const deleteUser = async ({ user, surveyId, userUuidToRemove, survey }, client = db) =>
   client.tx(async (t) =>
     Promise.all([
       AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
@@ -170,5 +171,6 @@ export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) 
         false,
         t
       ),
+      UserInvitationManager.removeUserInvitation({ survey, userUuidToRemove }, t),
     ])
   )

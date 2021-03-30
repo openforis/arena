@@ -14,6 +14,7 @@ import * as Mailer from '@server/utils/mailer'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
+import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
 
 // ====== CREATE
@@ -76,17 +77,17 @@ export const inviteUser = async (
   }
 
   const email = UserInvite.getEmail(userToInviteParam)
-  const userToInvite = await UserManager.fetchUserByEmail(email)
+  let userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const emailParams = {
     urlServer,
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${AuthGroup.getName(group)}.label)`,
   }
+  await db.tx(async (t) => {
+    if (userToInvite) {
+      // User to invite already exists
 
-  if (userToInvite) {
-    // User to invite already exists
-    await db.tx(async (t) => {
       if (repeatInvitation) {
         // Generate reset password and send email again
         await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
@@ -98,12 +99,11 @@ export const inviteUser = async (
         // Send email
         await Mailer.sendEmail(email, 'emails.userInvite', emailParams, lang)
       }
-    })
-  } else {
-    // User to invite does not exist
-    await db.tx(async (t) => {
+    } else {
+      // User to invite does not exist
+
       // Add user to db
-      await UserManager.insertUser(
+      userToInvite = await UserManager.insertUser(
         {
           user,
           surveyId,
@@ -117,8 +117,10 @@ export const inviteUser = async (
       )
       // Generate reset password and send email
       await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
-    })
-  }
+    }
+
+    await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
+  })
 }
 
 /**
