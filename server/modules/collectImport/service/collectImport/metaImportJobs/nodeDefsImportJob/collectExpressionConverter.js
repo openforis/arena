@@ -13,6 +13,10 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: /(?<!([<|>|!]))=/, replace: '==' }, // equal operator; do not convert less than, greater than or not equal operators
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
+    // predefined variables
+    { pattern: '\\$this', replace: NodeDef.getName(nodeDefCurrent) },
+    // not function
+    { pattern: /not\(/, replace: '!(' },
     // parent function
     {
       // repeated pattern. E.g. parent()/parent()/..
@@ -35,7 +39,7 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     // path separator
     { pattern: '/', replace: '.' },
     // boolean values
-    // boolean value: true, true(), FALSE or FALSE()
+    // boolean value: true, true(), TRUE or TRUE()
     { pattern: /^\s*true(\(\))?\s*$/, replace: ' true ', ignoreCase: true },
     { pattern: /^\s*true(\(\))?\s+/, replace: ' true ', ignoreCase: true },
     { pattern: /\strue(\(\))?\s*$/, replace: ' true ', ignoreCase: true },
@@ -43,8 +47,13 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: /^\s*false(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
     { pattern: /^\s*false(\(\))?\s+/, replace: ' false ', ignoreCase: true },
     { pattern: /\sfalse(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
-    // predefined variables
-    { pattern: '\\$this', replace: NodeDef.getName(nodeDefCurrent) },
+    // object conversion
+    { pattern: /boolean\(/, replace: 'Boolean(' },
+    { pattern: /number\(/, replace: 'Number(' },
+    { pattern: /string\(/, replace: 'String(' },
+    // numeric functions
+    { pattern: /ceiling\(/, replace: 'Math.ceil(' },
+    { pattern: /floor\(/, replace: 'Math.floor(' },
     // custom functions
     // idm namespace
     { pattern: 'idm:array', replace: 'Array.of' },
