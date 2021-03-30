@@ -44,6 +44,8 @@ describe('CollectExpressionConverter Test', () => {
     { q: 'idm:not-blank(cluster_id)', r: '!isEmpty(cluster_id)' },
     { q: 'idm:currentDate()', r: 'now()' },
     { q: 'idm:currentTime()', r: 'now()' },
+    { q: 'idm:index()', r: 'index(plot)', n: 'plot_id' },
+    { q: 'idm:position()', r: 'index(plot) + 1', n: 'plot_id' },
     {
       q: 'idm:samplingPointCoordinate(cluster_id, plot_id)',
       r: `categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)`,

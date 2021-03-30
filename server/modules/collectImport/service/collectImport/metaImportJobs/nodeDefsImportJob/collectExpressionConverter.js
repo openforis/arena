@@ -51,6 +51,14 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: 'idm:currentDate', replace: 'now' },
     { pattern: 'idm:currentTime', replace: 'now' },
     {
+      pattern: /idm:index\(\)/,
+      replace: `index(${NodeDef.getName(Survey.getNodeDefParent(nodeDefCurrent)(survey))})`,
+    },
+    {
+      pattern: /idm:position\(\)/,
+      replace: `index(${NodeDef.getName(Survey.getNodeDefParent(nodeDefCurrent)(survey))}) + 1`,
+    },
+    {
       pattern: /idm:samplingPointCoordinate\(([^)]+)\)/,
       // change the function name but keep the same arguments.
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)
@@ -63,7 +71,8 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
       replace: (_, fnArs) => `categoryItemProp('${SamplingPointDataImportJob.categoryName}', ${fnArs})`,
     },
     // geo namespace
-    { pattern: 'geo:distance', replace: 'distance' },
+    // idm:distance is deprecated in Collect
+    { pattern: '(geo|idm):distance', replace: 'distance' },
     // math namespace
     { pattern: /math:PI\(\)/, replace: 'Math.PI' },
     // convert directly some functions from math:fnName to Math.fnName
@@ -92,10 +101,6 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
 
   // remove extra spaces
   converted = converted.replace(/\s+/g, ' ').trim()
-
-  if (converted.length === 0) {
-    return null
-  }
 
   const validationResult = NodeDefExpressionValidator.validate({
     survey,
