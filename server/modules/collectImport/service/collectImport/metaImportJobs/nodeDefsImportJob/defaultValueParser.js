@@ -16,39 +16,37 @@ export const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaul
     return null
   }
 
-  let exprConverted = null
-  let applyIfConverted = null
+  const exprConverted = StringUtils.isNotBlank(value)
+    ? JSON.stringify(value) // Default value is a constant
+    : CollectExpressionConverter.convert({
+        survey,
+        nodeDefCurrent: nodeDef,
+        expression: collectExpr,
+      })
 
-  if (StringUtils.isNotBlank(value)) {
-    // Default value is a constant
-    exprConverted = JSON.stringify(value)
-  } else {
-    exprConverted = CollectExpressionConverter.convert({
-      survey,
-      nodeDefCurrent: nodeDef,
-      expression: collectExpr,
-    })
-    if (StringUtils.isNotBlank(collectApplyIf)) {
-      applyIfConverted = CollectExpressionConverter.convert({
+  const applyIfConverted = StringUtils.isNotBlank(collectApplyIf)
+    ? CollectExpressionConverter.convert({
         survey,
         nodeDefCurrent: nodeDef,
         expression: collectApplyIf,
       })
-    }
-  }
+    : ''
+
   const success = exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null)
 
   // if expression has been converted without errors, mark the import issue as resolved
   const importIssue = CollectImportReportItem.newReportItem({
     nodeDefUuid: NodeDef.getUuid(nodeDef),
     expressionType: CollectImportReportItem.exprTypes.defaultValue,
-    expression: collectExpr,
+    expression: StringUtils.isNotBlank(value) ? value : collectExpr,
     applyIf: collectApplyIf,
     messages: CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue),
     resolved: success,
   })
   return {
     importIssue,
-    defaultValue: success ? NodeDefExpression.createExpression(exprConverted, applyIfConverted) : null,
+    defaultValue: success
+      ? NodeDefExpression.createExpression(exprConverted, applyIfConverted === null ? '' : applyIfConverted)
+      : null,
   }
 }

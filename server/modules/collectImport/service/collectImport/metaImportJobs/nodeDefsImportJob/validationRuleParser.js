@@ -113,7 +113,9 @@ export const parseValidationRule = async ({ survey, collectValidationRule, nodeD
   })
 
   return {
-    validationRule: success ? NodeDefExpression.createExpression(exprConverted, applyIfConverted) : null,
+    validationRule: success
+      ? NodeDefExpression.createExpression(exprConverted, applyIfConverted === null ? '' : applyIfConverted)
+      : null,
     importIssue,
   }
 }
