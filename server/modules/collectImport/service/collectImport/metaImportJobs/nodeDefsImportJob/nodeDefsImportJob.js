@@ -23,53 +23,10 @@ import * as CollectImportReportManager from '../../../../manager/collectImportRe
 import * as CollectSurvey from '../../model/collectSurvey'
 import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 import { CollectExpressionConverter } from './collectExpressionConverter'
+import { parseValidationRule } from './validationRuleParser'
+import { parseDefaultValue } from './defaultValueParser'
 
 const specifyAttributeSuffix = 'specify'
-
-const collectCheckType = {
-  check: 'check',
-  compare: 'compare',
-  distance: 'distance',
-  pattern: 'pattern',
-  unique: 'unique',
-}
-
-const checkExpressionParserByType = {
-  [collectCheckType.compare]: (collectCheck) => {
-    const attributeToOperator = {
-      gt: '>',
-      gte: '>=',
-      lt: '<',
-      lte: '<=',
-    }
-    const attributes = CollectSurvey.getAttributes(collectCheck)
-    const exprParts = Object.entries(attributes).reduce((accParts, [attrName, attribute]) => {
-      const operator = attributeToOperator[attrName]
-      if (operator) {
-        accParts.push(`$this ${operator} ${attribute}`)
-      }
-      return accParts
-    }, [])
-
-    return R.join(' and ', exprParts)
-  },
-  [collectCheckType.check]: (collectCheck) => {
-    const { expr } = CollectSurvey.getAttributes(collectCheck)
-    return expr
-  },
-  [collectCheckType.distance]: (collectCheck) => {
-    const { max, to } = CollectSurvey.getAttributes(collectCheck)
-    return `distance from $this to ${to} must be <= ${max}m`
-  },
-  [collectCheckType.pattern]: (collectCheck) => {
-    const { regex } = CollectSurvey.getAttributes(collectCheck)
-    return `$this must respect the pattern: ${regex}`
-  },
-  [collectCheckType.unique]: (collectCheck) => {
-    const { expr } = CollectSurvey.getAttributes(collectCheck)
-    return expr
-  },
-}
 
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
@@ -115,14 +72,14 @@ export default class NodeDefsImportJob extends Job {
   }
 
   /**
-   * Inserts a node definition and all its descendants (if any)
+   * Inserts a node definition and all its descendants (if any).
    *
    * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
-   * (used to import Collect composite attribute definitions like Range)
+   * (used to import Collect composite attribute definitions like Range).
    *
    * @param {NodeDef} parentNodeDef - Parent node def definition.
    * @param {!string} parentPath - Parent node path.
-   * @param {!Object} collectNodeDef - Collect node definition.
+   * @param {!object} collectNodeDef - Collect node definition.
    * @param {!string} type - Node definition type.
    * @param {string} field - Node sub-field.
    * @returns {object} - Inserted node definitions.
@@ -296,7 +253,7 @@ export default class NodeDefsImportJob extends Job {
     const propsAdvanced = {}
 
     // 1. default values
-    const defaultValues = await this.parseNodeDefDefaultValues({ nodeDef, collectNodeDef })
+    const defaultValues = await this.parseDefaultValues({ nodeDef, collectNodeDef })
 
     if (!R.isEmpty(defaultValues)) {
       propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
@@ -317,7 +274,7 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      const validationRules = await this.parseNodeDefValidationRules({ nodeDef, collectNodeDef })
+      const validationRules = await this.parseValidationRules({ nodeDef, collectNodeDef })
       validations[NodeDefValidations.keys.expressions] = validationRules
     }
     propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
@@ -325,17 +282,26 @@ export default class NodeDefsImportJob extends Job {
     // 3. applicable
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     if (StringUtils.isNotBlank(relevantExpr)) {
-      try {
-        const relevantExprConverted = CollectExpressionConverter.convert({
-          survey: this.survey,
-          nodeDefCurrent: nodeDef,
+      const relevantExprConverted = CollectExpressionConverter.convert({
+        survey: this.survey,
+        nodeDefCurrent: nodeDef,
+        expression: relevantExpr,
+      })
+      const success = relevantExprConverted !== null
+
+      await this.addImportIssue(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid,
+          expressionType: CollectImportReportItem.exprTypes.applicable,
           expression: relevantExpr,
+          resolved: success,
         })
+      )
+
+      if (success) {
         propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
           NodeDefExpression.createExpression(relevantExprConverted),
         ]
-      } catch (e) {
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr)
       }
     }
 
@@ -375,7 +341,7 @@ export default class NodeDefsImportJob extends Job {
     }
   }
 
-  async parseNodeDefDefaultValues({ nodeDef, collectNodeDef }) {
+  async parseDefaultValues({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
@@ -383,102 +349,47 @@ export default class NodeDefsImportJob extends Job {
     const defaultValues = []
 
     await PromiseUtils.each(collectDefaultValues, async (collectDefaultValue) => {
-      const { value, expr, applyIf } = CollectSurvey.getAttributes(collectDefaultValue)
-
-      let exprConverted = null
-      let applyIfConverted = null
-      if (StringUtils.isNotBlank(value)) {
-        // Default value is a constant
-        exprConverted = JSON.stringify(value)
-      } else if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
-        try {
-          exprConverted = CollectExpressionConverter.convert({
-            survey: this.survey,
-            nodeDefCurrent: nodeDef,
-            expression: expr,
-          })
-          applyIfConverted = CollectExpressionConverter.convert({
-            survey: this.survey,
-            nodeDefCurrent: nodeDef,
-            expression: applyIf,
-          })
-        } catch (e) {
-          const messages = CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue)
-          await this.addNodeDefImportIssue(
-            NodeDef.getUuid(nodeDef),
-            CollectImportReportItem.exprTypes.defaultValue,
-            expr,
-            applyIf,
-            messages
-          )
+      const parseResult = parseDefaultValue({
+        survey: this.survey,
+        collectDefaultValue,
+        nodeDef,
+        defaultLanguage,
+      })
+      if (parseResult) {
+        const { defaultValue, importIssue } = parseResult
+        if (defaultValue) {
+          defaultValues.push(defaultValue)
         }
-      } else {
-        this.logDebug('empty value found in default attribute constant value')
-      }
-      if (exprConverted !== null) {
-        defaultValues.push(NodeDefExpression.createExpression(exprConverted, applyIfConverted))
+        if (importIssue) {
+          await this.addImportIssue(importIssue)
+        }
       }
     })
 
     return defaultValues
   }
 
-  async parseNodeDefValidationRules({ nodeDef: nodeDefCurrent, collectNodeDef }) {
-    const { defaultLanguage } = this.context
-
+  async parseValidationRules({ nodeDef: nodeDefCurrent, collectNodeDef }) {
     const validationRules = []
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
     await PromiseUtils.each(collectValidationRules, async (collectValidationRule) => {
-      const checkType = CollectSurvey.getElementName(collectValidationRule)
-      const checkExpressionParser = checkExpressionParserByType[checkType]
-      if (checkExpressionParser) {
-        const collectExpr = checkExpressionParser(collectValidationRule)
-        let exprConverted = null
+      const { defaultLanguage } = this.context
 
-        if (StringUtils.isNotBlank(collectExpr)) {
-          const messages = CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule)
-          const { if: condition, flag } = CollectSurvey.getAttributes(collectValidationRule)
-          try {
-            if (checkType === collectCheckType.distance) {
-              const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
-              const toConverted = CollectExpressionConverter.convert({
-                survey: this.survey,
-                nodeDefCurrent,
-                expression: to,
-              })
-              exprConverted = `distance(${nodeDefCurrent}, ${toConverted}) <== ${max}`
-            } else {
-              exprConverted = CollectExpressionConverter.convert({
-                survey: this.survey,
-                nodeDefCurrent,
-                expression: collectExpr,
-              })
-            }
-          } catch (e) {
-            // ignore it
-          }
-          if (exprConverted) {
-            const conditionConverted = CollectExpressionConverter.convert({
-              survey: this.survey,
-              nodeDefCurrent,
-              expression: condition,
-            })
-            validationRules.push(NodeDefExpression.createExpression(exprConverted, conditionConverted))
-          } else {
-            const exprType =
-              flag === 'error'
-                ? CollectImportReportItem.exprTypes.validationRuleError
-                : CollectImportReportItem.exprTypes.validationRuleWarning
-            await this.addNodeDefImportIssue(
-              NodeDef.getUuid(nodeDefCurrent),
-              exprType,
-              collectExpr,
-              condition,
-              messages
-            )
-          }
+      const parseResult = await parseValidationRule({
+        survey: this.survey,
+        collectValidationRule,
+        nodeDefCurrent,
+        defaultLanguage,
+      })
+      if (parseResult) {
+        const { validationRule, importIssue } = parseResult
+        if (validationRule) {
+          validationRules.push(validationRule)
+        }
+        if (importIssue) {
+          this.addImportIssue(importIssue)
         }
       }
     })
@@ -512,15 +423,9 @@ export default class NodeDefsImportJob extends Job {
     return finalName
   }
 
-  async addNodeDefImportIssue(nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}) {
-    await CollectImportReportManager.insertItem(
-      this.surveyId,
-      nodeDefUuid,
-      CollectImportReportItem.newReportItem(expressionType, expression, applyIf, messages),
-      this.tx
-    )
-
-    this.issuesCount++
+  async addImportIssue(reportItem) {
+    await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
+    this.issuesCount += 1
   }
 
   /**
@@ -618,27 +523,32 @@ export default class NodeDefsImportJob extends Job {
       const collectNodeDefParentPathParts = parentPath.split('/')
       const codeParentExprParts = collectCodeParentExpr.split('/')
 
-      for (let index = 0; index < codeParentExprParts.length - 1; index++) {
-        const part = codeParentExprParts[index]
+      let success = true
+
+      codeParentExprParts.some((part) => {
         if (part === 'parent()') {
           collectNodeDefParentPathParts.pop()
-        } else {
-          // Unsupported expression
-          await this.addNodeDefImportIssue(
-            NodeDef.getUuid(nodeDef),
-            CollectImportReportItem.exprTypes.codeParent,
-            collectCodeParentExpr
-          )
-          return null
+          return false
         }
-      }
+        // Unsupported expression; break the loop.
+        success = false
+        return true
+      })
+
+      await this.addImportIssue(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          expressionType: CollectImportReportItem.exprTypes.codeParent,
+          expression: collectCodeParentExpr,
+          resolved: success,
+        })
+      )
 
       const codeParentPath = `${collectNodeDefParentPathParts.join('/')}/${
         codeParentExprParts[codeParentExprParts.length - 1]
       }`
-      const nodeDefInfosCodeParent = this.nodeDefsInfoByCollectPath[codeParentPath]
 
-      return R.pipe(R.head, R.propOr(null, 'uuid'))(nodeDefInfosCodeParent)
+      return R.pipe(R.propOr([], codeParentPath), R.head, R.propOr(null, 'uuid'))(this.nodeDefsInfoByCollectPath)
     }
 
     return null

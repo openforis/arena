@@ -1,13 +1,18 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-import * as StringUtils from '@core/stringUtils'
 import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 
+/**
+ * Converts a Collect XPath expression into a valid JS expression.
+ *
+ * @param {object} params - Parameters object.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!NodeDef} [params.nodeDefCurrent] - The current node definition being evaluated.
+ * @param {!string} [params.expression] - The expression to convert.
+ * @returns {string} - The converted expression or null if the conversion is not possible.
+ */
 const convert = ({ survey, nodeDefCurrent, expression }) => {
-  if (StringUtils.isBlank(expression)) {
-    return null
-  }
   const itemsToReplace = [
     // operators
     { pattern: /(?<!([<>!]))=/, replace: '==' }, // equal operator; do not convert less than, greater than or not equal operators
@@ -104,14 +109,16 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     ].map((fn) => ({ pattern: `math:${fn}`, replace: `Math.${fn}` })),
   ]
 
-  let converted = itemsToReplace.reduce(
-    (expressionAcc, item) =>
-      expressionAcc.replace(new RegExp(item.pattern, `g${item.ignoreCase ? 'i' : ''}`), item.replace),
-    expression
-  )
-
-  // remove extra spaces
-  converted = converted.replace(/\s+/g, ' ').trim()
+  const converted = itemsToReplace
+    .reduce(
+      (expressionAcc, item) =>
+        expressionAcc.replace(new RegExp(item.pattern, `g${item.ignoreCase ? 'i' : ''}`), item.replace),
+      expression
+    )
+    // remove extra spaces
+    .replace(/\s+/g, ' ')
+    .trim()
+    .concat('\n')
 
   const validationResult = NodeDefExpressionValidator.validate({
     survey,
@@ -120,10 +127,8 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     isContextParent: true,
     selfReferenceAllowed: true,
   })
-  if (validationResult !== null) {
-    throw new Error(`Error converting expression: ${expression} => ${converted} : ${JSON.stringify(validationResult)}`)
-  }
-  return converted
+
+  return validationResult ? null : converted
 }
 
 export const CollectExpressionConverter = {
