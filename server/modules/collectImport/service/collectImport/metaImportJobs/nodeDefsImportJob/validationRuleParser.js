@@ -52,7 +52,7 @@ const checkExpressionParserByType = {
   },
 }
 
-export const parseValidationRule = async ({ survey, collectValidationRule, nodeDefCurrent, defaultLanguage }) => {
+const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCurrent, defaultLanguage }) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
   const checkExpressionParser = checkExpressionParserByType[checkType]
   if (!checkExpressionParser) {
@@ -82,19 +82,11 @@ export const parseValidationRule = async ({ survey, collectValidationRule, nodeD
       exprConverted = `distance(${NodeDef.getName(nodeDefCurrent)}, ${toExprConverted}) <= ${max}`
     }
   } else {
-    exprConverted = CollectExpressionConverter.convert({
-      survey,
-      nodeDefCurrent,
-      expression: collectExpr,
-    })
+    exprConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression: collectExpr })
   }
 
   if (StringUtils.isNotBlank(collectApplyIf)) {
-    applyIfConverted = CollectExpressionConverter.convert({
-      survey,
-      nodeDefCurrent,
-      expression: collectApplyIf,
-    })
+    applyIfConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression: collectApplyIf })
   }
 
   const success = exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null)
@@ -116,4 +108,21 @@ export const parseValidationRule = async ({ survey, collectValidationRule, nodeD
     validationRule: success ? NodeDefExpression.createExpression(exprConverted, applyIfConverted) : null,
     importIssue,
   }
+}
+
+export const parseValidationRules = ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
+  const validationRules = []
+  const importIssues = []
+
+  collectValidationRules.forEach((collectValidationRule) => {
+    const parseResult = parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
+    if (parseResult) {
+      const { validationRule, importIssue } = parseResult
+      if (validationRule) {
+        validationRules.push(validationRule)
+      }
+      importIssues.push(importIssue)
+    }
+  })
+  return { validationRules, importIssues }
 }
