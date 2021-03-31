@@ -96,16 +96,14 @@ describe('CollectExpressionConverter Test', () => {
   queries.forEach((query) => {
     const { q: expression, r: result, n: nodeName, e: errorExpected } = query
     it(`${expression} => ${result}`, () => {
-      try {
-        const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
-        const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
-        expect(converted).toBe(result)
-      } catch (e) {
-        if (errorExpected) {
-          expect(e).toBeDefined()
-        } else {
-          throw e
-        }
+      const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
+      const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
+      if (errorExpected) {
+        expect(converted).toBeNull()
+      } else {
+        // converted expression has a new line character at the end;
+        // remove it before comparing the expression with the expected one
+        expect(converted.trim()).toBe(result)
       }
     })
   })
