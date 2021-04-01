@@ -63,7 +63,10 @@ export const useLocalState = () => {
 
   const componentLoad = () => {
     // Check in record
-    dispatch(RecordActions.checkInRecord(recordUuid, preview, pageNodeUuidUrlParam, pageNodeDefUuidUrlParam))
+    // when previewing a survey or when the survey has been imported from Collect and not published,
+    // record must be checked in as draft
+    const draft = preview || !Survey.isPublished(surveyInfo)
+    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuidUrlParam, pageNodeDefUuidUrlParam))
 
     // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, (content) => dispatch(RecordActions.recordNodesUpdate(content)))
