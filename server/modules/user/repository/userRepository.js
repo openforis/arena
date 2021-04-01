@@ -39,7 +39,7 @@ export const insertUser = async ({ surveyId, surveyCycleKey, email, password, st
 // READ
 
 export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
-  await client.one(
+  client.one(
     `
     SELECT count(*)
     FROM "user" u
@@ -53,27 +53,30 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     [surveyId, countSystemAdmins]
   )
 
-export const fetchUsersBySurveyId = async (
-  surveyId,
-  offset = 0,
-  limit = null,
-  fetchSystemAdmins = false,
-  client = db
-) =>
-  await client.map(
+export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>
+  client.map(
     `
-    SELECT ${selectFieldsCommaSep}
+    SELECT 
+        ${selectFieldsCommaSep},
+        
+        (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
+        
+        
+        ui.invited_date
     FROM "user" u
     JOIN survey s ON s.id = $1
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
       AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))
-    GROUP BY u.uuid, g.name
+    LEFT OUTER JOIN user_invitation ui
+      ON u.uuid = ui.user_uuid
+      AND s.uuid = ui.survey_uuid
+    GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [surveyId, fetchSystemAdmins],
+    [surveyId, isSystemAdmin],
     camelize
   )
 
@@ -108,7 +111,7 @@ export const fetchUserByEmail = async (email, client = db) =>
   )
 
 export const fetchUserAndPasswordByEmail = async (email, client = db) =>
-  await client.oneOrNone(
+  client.oneOrNone(
     `
     SELECT ${selectFieldsCommaSep}, password
     FROM "user" u

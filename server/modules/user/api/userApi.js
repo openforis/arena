@@ -199,7 +199,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
 
       const survey = await SurveyManager.fetchSurveyById(surveyId)
-      await UserService.deleteUser({ user, surveyId, userUuidToRemove: userUuid, survey })
+      await UserService.deleteUser({ user, userUuidToRemove: userUuid, survey })
 
       Response.sendOk(res)
     } catch (error) {

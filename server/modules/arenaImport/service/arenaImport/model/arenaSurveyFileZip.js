@@ -80,6 +80,13 @@ export const getUserProfilePicture = async (streamZipFile, uuid) => {
   return false
 }
 
+export const getUserInvitationsPath = getPath('userInvitations.json$')
+export const getUserInvitations = async (streamZipFile) => {
+  const userInvitationsPath = getUserInvitationsPath(getPaths(streamZipFile))
+  const userInvitations = await streamZipFile.getEntryData(userInvitationsPath)
+  return JSON.parse(userInvitations)
+}
+
 // Chains
 export const getChainsPath = getPath('chains.json$')
 export const getChains = async (streamZipFile) => {

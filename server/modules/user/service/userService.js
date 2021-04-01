@@ -146,15 +146,15 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
 // ====== READ
 
 export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
-  const fetchSystemAdmins = User.isSystemAdmin(user)
+  const isSystemAdmin = User.isSystemAdmin(user)
 
-  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
+  return UserManager.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin)
 }
 
 export const countUsersBySurveyId = async (user, surveyId) => {
-  const countSystemAdmins = User.isSystemAdmin(user)
+  const isSystemAdmin = User.isSystemAdmin(user)
 
-  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
+  return UserManager.countUsersBySurveyId(surveyId, isSystemAdmin)
 }
 
 export const { fetchUserByUuid, fetchUserByUuidWithPassword, fetchUserProfilePicture } = UserManager
@@ -164,6 +164,7 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   return userUuid ? await UserManager.fetchUserByUuid(userUuid) : null
 }
 
+export const { fetchUserInvitationsBySurveyId } = UserInvitationManager
 // ====== UPDATE
 
 export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
