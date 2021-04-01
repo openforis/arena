@@ -10,9 +10,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import * as UserState from './state'
 
 export const useUser = () => useSelector(UserState.getUser)
-export const useIsSystemAdminUser = () => {
+export const useUserIsSystemAdmin = () => {
   const user = useSelector(UserState.getUser)
-  return !User.isSystemAdmin(user)
+  return User.isSystemAdmin(user)
 }
 
 // ====== Auth

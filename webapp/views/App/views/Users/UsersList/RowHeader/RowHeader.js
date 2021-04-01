@@ -1,11 +1,11 @@
 import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
-import { useIsSystemAdminUser } from '@webapp/store/user'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 const RowHeader = () => {
   const i18n = useI18n()
-  const isSystemAdmin = useIsSystemAdminUser()
+  const isSystemAdmin = useUserIsSystemAdmin()
   return (
     <>
       <div />

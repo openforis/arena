@@ -8,7 +8,7 @@ import {
   useAuthCanCleanseRecords,
   useAuthCanEditUser,
   useAuthCanInviteUser,
-  useIsSystemAdminUser,
+  useUserIsSystemAdmin,
   useProfilePicture,
 } from './hooks'
 
@@ -22,6 +22,6 @@ export {
   useAuthCanCleanseRecords,
   useAuthCanEditUser,
   useAuthCanInviteUser,
-  useIsSystemAdminUser,
+  useUserIsSystemAdmin,
   useProfilePicture,
 }
