@@ -29,8 +29,8 @@ const specifyAttributeSuffix = 'specify'
 
 const arenaFileTypeByCollectFileType = {
   AUDIO: NodeDef.fileTypeValues.audio,
-  IMAGE: NodeDef.fileTypeValues.image,
   DOCUMENT: NodeDef.fileTypeValues.other,
+  IMAGE: NodeDef.fileTypeValues.image,
   VIDEO: NodeDef.fileTypeValues.video,
 }
 
