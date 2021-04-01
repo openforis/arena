@@ -27,6 +27,13 @@ import { parseDefaultValues } from './defaultValueParser'
 
 const specifyAttributeSuffix = 'specify'
 
+const arenaFileTypeByCollectFileType = {
+  AUDIO: NodeDef.fileTypeValues.audio,
+  IMAGE: NodeDef.fileTypeValues.image,
+  DOCUMENT: NodeDef.fileTypeValues.other,
+  VIDEO: NodeDef.fileTypeValues.video,
+}
+
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
     super(NodeDefsImportJob.type, params)
@@ -326,7 +333,17 @@ export default class NodeDefsImportJob extends Job {
           [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, renderType),
         }
       }
-
+      case NodeDef.nodeDefType.file: {
+        const collectMaxSize = CollectSurvey.getAttribute('maxSize')(collectNodeDef)
+        // in Collect max size is in bytes; convert it into MB
+        const maxSize = collectMaxSize ? Math.ceil(collectMaxSize / (1024 * 1024)) : null
+        const collectFileType = CollectSurvey.getAttribute('n0:fileType', 'IMAGE')(collectNodeDef)
+        const fileType = arenaFileTypeByCollectFileType[collectFileType]
+        return {
+          [NodeDef.propKeys.maxFileSize]: maxSize,
+          [NodeDef.propKeys.fileType]: fileType,
+        }
+      }
       case NodeDef.nodeDefType.taxon: {
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
         const taxonomy = CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
