@@ -24,11 +24,22 @@ export const exprTypes = {
   validationRuleWarning: 'validationRuleWarning',
 }
 
-export const newReportItem = (expressionType, expression, applyIf, messages) => ({
-  [propKeys.expressionType]: expressionType,
-  [propKeys.expression]: expression,
-  [propKeys.applyIf]: applyIf,
-  [propKeys.messages]: messages,
+export const newReportItem = ({
+  nodeDefUuid,
+  expressionType,
+  expression = null,
+  applyIf = null,
+  messages = {},
+  resolved = false,
+}) => ({
+  [keys.nodeDefUuid]: nodeDefUuid,
+  [keys.props]: {
+    [propKeys.expressionType]: expressionType,
+    [propKeys.expression]: expression,
+    [propKeys.applyIf]: applyIf,
+    [propKeys.messages]: messages,
+  },
+  [keys.resolved]: resolved,
 })
 
 export const { getId } = ObjectUtils

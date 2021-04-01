@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
-import * as ObjectUtils from '@core/objectUtils'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,49 +18,15 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as CollectImportJobContext from '../collectImportJobContext'
-import * as CollectImportReportManager from '../../../manager/collectImportReportManager'
-import * as CollectSurvey from '../model/collectSurvey'
-import SamplingPointDataImportJob from './samplingPointDataImportJob'
+import * as CollectImportJobContext from '../../collectImportJobContext'
+import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
+import * as CollectSurvey from '../../model/collectSurvey'
+import SamplingPointDataImportJob from '../samplingPointDataImportJob'
+import { CollectExpressionConverter } from './collectExpressionConverter'
+import { parseValidationRule } from './validationRuleParser'
+import { parseDefaultValue } from './defaultValueParser'
 
 const specifyAttributeSuffix = 'specify'
-
-const checkExpressionParserByType = {
-  compare: (collectCheck) => {
-    const attributeToOperator = {
-      gt: '>',
-      gte: '>=',
-      lt: '<',
-      lte: '<=',
-    }
-    const attributes = CollectSurvey.getAttributes(collectCheck)
-    const exprParts = Object.entries(attributes).reduce((accParts, [attrName, attribute]) => {
-      const operator = attributeToOperator[attrName]
-      if (operator) {
-        accParts.push(`$this ${operator} ${attribute}`)
-      }
-      return accParts
-    }, [])
-
-    return R.join(' and ', exprParts)
-  },
-  check: (collectCheck) => {
-    const { expr } = CollectSurvey.getAttributes(collectCheck)
-    return expr
-  },
-  distance: (collectCheck) => {
-    const { max, to } = CollectSurvey.getAttributes(collectCheck)
-    return `distance from $this to ${to} must be <= ${max}m`
-  },
-  pattern: (collectCheck) => {
-    const { regex } = CollectSurvey.getAttributes(collectCheck)
-    return `$this must respect the pattern: ${regex}`
-  },
-  unique: (collectCheck) => {
-    const { expr } = CollectSurvey.getAttributes(collectCheck)
-    return expr
-  },
-}
 
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
@@ -106,10 +72,17 @@ export default class NodeDefsImportJob extends Job {
   }
 
   /**
-   * Inserts a node definition and all its descendants (if any)
+   * Inserts a node definition and all its descendants (if any).
    *
    * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
-   * (used to import Collect composite attribute definitions like Range)
+   * (used to import Collect composite attribute definitions like Range).
+   *
+   * @param {NodeDef} parentNodeDef - Parent node def definition.
+   * @param {!string} parentPath - Parent node path.
+   * @param {!object} collectNodeDef - Collect node definition.
+   * @param {!string} type - Node definition type.
+   * @param {string} field - Node sub-field.
+   * @returns {object} - Inserted node definitions.
    */
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const { surveyId, defaultLanguage } = this.context
@@ -123,7 +96,7 @@ export default class NodeDefsImportJob extends Job {
     const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
     const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
 
-    const collectNodeDefPath = parentPath + '/' + collectNodeDefName
+    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
 
     const tableLayout =
       multiple &&
@@ -161,6 +134,7 @@ export default class NodeDefsImportJob extends Job {
       nodeDefsUpdated,
       await NodeDefManager.insertNodeDef({ user: this.user, surveyId, nodeDef: nodeDefParam, system: true }, this.tx)
     )
+    Object.assign(this.nodeDefs, nodeDefsUpdated)
 
     let nodeDef = nodeDefsUpdated[nodeDefUuid]
 
@@ -190,16 +164,16 @@ export default class NodeDefsImportJob extends Job {
 
       // 3b. add specify text attribute def
       const {
-        nodeDefsUpdated: qualifierNodeDefsUpdaetd,
+        nodeDefsUpdated: qualifierNodeDefsUpdated,
         nodeDefsInserted: qualifierNodeDefsInserted,
       } = await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
 
-      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdaetd)
+      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
 
     // 4. update node def with other props
-    const propsAdvanced = await this.extractNodeDefAdvancedProps(nodeDefUuid, type, collectNodeDef)
+    const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
 
     Object.assign(
       nodeDefsUpdated,
@@ -272,20 +246,21 @@ export default class NodeDefsImportJob extends Job {
     return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)
   }
 
-  async extractNodeDefAdvancedProps(nodeDefUuid, type, collectNodeDef) {
+  async extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef }) {
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
 
     const propsAdvanced = {}
 
     // 1. default values
-    const defaultValues = await this.parseNodeDefDefaultValues(nodeDefUuid, collectNodeDef)
+    const defaultValues = await this.parseDefaultValues({ nodeDef, collectNodeDef })
 
     if (!R.isEmpty(defaultValues)) {
       propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
     }
 
     // 2. validations
-    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = {
+    const validations = {
       ...(multiple
         ? {
             [NodeDefValidations.keys.count]: {
@@ -299,13 +274,35 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      await this.parseNodeDefValidationRules(nodeDefUuid, collectNodeDef)
+      const validationRules = await this.parseValidationRules({ nodeDef, collectNodeDef })
+      validations[NodeDefValidations.keys.expressions] = validationRules
     }
+    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
 
-    // 3. applicable (not supported)
+    // 3. applicable
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
-    if (relevantExpr) {
-      await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr)
+    if (StringUtils.isNotBlank(relevantExpr)) {
+      const relevantExprConverted = CollectExpressionConverter.convert({
+        survey: this.survey,
+        nodeDefCurrent: nodeDef,
+        expression: relevantExpr,
+      })
+      const success = relevantExprConverted !== null
+
+      await this.addImportIssue(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid,
+          expressionType: CollectImportReportItem.exprTypes.applicable,
+          expression: relevantExpr,
+          resolved: success,
+        })
+      )
+
+      if (success) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
+          NodeDefExpression.createExpression(relevantExprConverted),
+        ]
+      }
     }
 
     return propsAdvanced
@@ -344,57 +341,59 @@ export default class NodeDefsImportJob extends Job {
     }
   }
 
-  async parseNodeDefDefaultValues(nodeDefUuid, collectNodeDef) {
+  async parseDefaultValues({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
 
     const defaultValues = []
 
-    for (const collectDefaultValue of collectDefaultValues) {
-      const { value, expr, applyIf } = CollectSurvey.getAttributes(collectDefaultValue)
-
-      if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
-        // Default value is an expression: skip it and add an import issue
-        const messages = CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue)
-        await this.addNodeDefImportIssue(
-          nodeDefUuid,
-          CollectImportReportItem.exprTypes.defaultValue,
-          expr,
-          applyIf,
-          messages
-        )
-      } else if (StringUtils.isNotBlank(value)) {
-        // Default value is a constant
-        defaultValues.push({
-          [ObjectUtils.keys.uuid]: uuidv4(),
-          [NodeDefExpression.keys.expression]: JSON.stringify(value),
-        })
-      } else {
-        this.logDebug('empty value found in default attribute constant value')
+    await PromiseUtils.each(collectDefaultValues, async (collectDefaultValue) => {
+      const parseResult = parseDefaultValue({
+        survey: this.survey,
+        collectDefaultValue,
+        nodeDef,
+        defaultLanguage,
+      })
+      if (parseResult) {
+        const { defaultValue, importIssue } = parseResult
+        if (defaultValue) {
+          defaultValues.push(defaultValue)
+        }
+        if (importIssue) {
+          await this.addImportIssue(importIssue)
+        }
       }
-    }
+    })
 
     return defaultValues
   }
 
-  async parseNodeDefValidationRules(nodeDefUuid, collectNodeDef) {
-    const { defaultLanguage } = this.context
+  async parseValidationRules({ nodeDef: nodeDefCurrent, collectNodeDef }) {
+    const validationRules = []
 
-    const elements = CollectSurvey.getElements(collectNodeDef)
-    for (const element of elements) {
-      const checkExpressionParser = checkExpressionParserByType[CollectSurvey.getElementName(element)]
-      if (checkExpressionParser) {
-        const collectExpr = checkExpressionParser(element)
-        const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
-        const { if: condition, flag } = CollectSurvey.getAttributes(element)
-        const exprType =
-          flag === 'error'
-            ? CollectImportReportItem.exprTypes.validationRuleError
-            : CollectImportReportItem.exprTypes.validationRuleWarning
-        await this.addNodeDefImportIssue(nodeDefUuid, exprType, collectExpr, condition, messages)
+    const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
+
+    await PromiseUtils.each(collectValidationRules, async (collectValidationRule) => {
+      const { defaultLanguage } = this.context
+
+      const parseResult = await parseValidationRule({
+        survey: this.survey,
+        collectValidationRule,
+        nodeDefCurrent,
+        defaultLanguage,
+      })
+      if (parseResult) {
+        const { validationRule, importIssue } = parseResult
+        if (validationRule) {
+          validationRules.push(validationRule)
+        }
+        if (importIssue) {
+          this.addImportIssue(importIssue)
+        }
       }
-    }
+    })
+    return validationRules
   }
 
   getUniqueNodeDefName(parentNodeDef, collectNodeDefName) {
@@ -424,15 +423,9 @@ export default class NodeDefsImportJob extends Job {
     return finalName
   }
 
-  async addNodeDefImportIssue(nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}) {
-    await CollectImportReportManager.insertItem(
-      this.surveyId,
-      nodeDefUuid,
-      CollectImportReportItem.newReportItem(expressionType, expression, applyIf, messages),
-      this.tx
-    )
-
-    this.issuesCount++
+  async addImportIssue(reportItem) {
+    await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
+    this.issuesCount += 1
   }
 
   /**
@@ -442,10 +435,7 @@ export default class NodeDefsImportJob extends Job {
     const categories = this.getContextProp('categories', {})
     const category = R.find((category) => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
     const categoryName = Category.getName(category)
-    const survey = {
-      nodeDefs: this.nodeDefs,
-    }
-    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
     const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
     const qualifiableItemCodes = R.pathOr(
@@ -533,30 +523,39 @@ export default class NodeDefsImportJob extends Job {
       const collectNodeDefParentPathParts = parentPath.split('/')
       const codeParentExprParts = collectCodeParentExpr.split('/')
 
-      for (let index = 0; index < codeParentExprParts.length - 1; index++) {
-        const part = codeParentExprParts[index]
+      let success = true
+
+      codeParentExprParts.some((part) => {
         if (part === 'parent()') {
           collectNodeDefParentPathParts.pop()
-        } else {
-          // Unsupported expression
-          await this.addNodeDefImportIssue(
-            NodeDef.getUuid(nodeDef),
-            CollectImportReportItem.exprTypes.codeParent,
-            collectCodeParentExpr
-          )
-          return null
+          return false
         }
-      }
+        // Unsupported expression; break the loop.
+        success = false
+        return true
+      })
+
+      await this.addImportIssue(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          expressionType: CollectImportReportItem.exprTypes.codeParent,
+          expression: collectCodeParentExpr,
+          resolved: success,
+        })
+      )
 
       const codeParentPath = `${collectNodeDefParentPathParts.join('/')}/${
         codeParentExprParts[codeParentExprParts.length - 1]
       }`
-      const nodeDefInfosCodeParent = this.nodeDefsInfoByCollectPath[codeParentPath]
 
-      return R.pipe(R.head, R.propOr(null, 'uuid'))(nodeDefInfosCodeParent)
+      return R.pipe(R.propOr([], codeParentPath), R.head, R.propOr(null, 'uuid'))(this.nodeDefsInfoByCollectPath)
     }
 
     return null
+  }
+
+  get survey() {
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: true })({})
   }
 }
 
