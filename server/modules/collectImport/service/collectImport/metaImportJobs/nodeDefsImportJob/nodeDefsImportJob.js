@@ -109,6 +109,7 @@ export default class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
+      [NodeDef.propKeys.descriptions]: CollectSurvey.toLabels('description', defaultLanguage)(collectNodeDef),
       // Layout props (render)
       ...(type === NodeDef.nodeDefType.entity // Calculated
         ? {
