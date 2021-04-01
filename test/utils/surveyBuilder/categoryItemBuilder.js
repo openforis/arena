@@ -20,8 +20,8 @@ export class ItemBuilder {
     return this
   }
 
-  item(itemBuilder) {
-    this.childItemBuilders.push(itemBuilder)
+  items(...itemBuilders) {
+    this.childItemBuilders = [...itemBuilders]
     return this
   }
 

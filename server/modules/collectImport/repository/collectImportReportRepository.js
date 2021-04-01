@@ -51,14 +51,18 @@ export const countItems = async (surveyId, client = db) =>
     R.prop('tot')
   )
 
-export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
+export const insertItem = async (surveyId, item, client = db) =>
   client.one(
     `
-      INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props)
-      VALUES ($1, $2)
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props, resolved)
+      VALUES ($1, $2, $3)
       RETURNING *
     `,
-    [nodeDefUuid, props],
+    [
+      CollectImportReportItem.getNodeDefUuid(item),
+      CollectImportReportItem.getProps(item),
+      CollectImportReportItem.isResolved(item),
+    ],
     dbTransformCallback
   )
 
