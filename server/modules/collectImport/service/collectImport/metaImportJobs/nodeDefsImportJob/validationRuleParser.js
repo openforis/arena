@@ -52,7 +52,7 @@ const checkExpressionParserByType = {
   },
 }
 
-export const parseValidationRule = async ({ survey, collectValidationRule, nodeDefCurrent, defaultLanguage }) => {
+const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCurrent, defaultLanguage }) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
   const checkExpressionParser = checkExpressionParserByType[checkType]
   if (!checkExpressionParser) {
@@ -118,4 +118,21 @@ export const parseValidationRule = async ({ survey, collectValidationRule, nodeD
       : null,
     importIssue,
   }
+}
+
+export const parseValidationRules = ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
+  const validationRules = []
+  const importIssues = []
+
+  collectValidationRules.forEach((collectValidationRule) => {
+    const parseResult = parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
+    if (parseResult) {
+      const { validationRule, importIssue } = parseResult
+      if (validationRule) {
+        validationRules.push(validationRule)
+      }
+      importIssues.push(importIssue)
+    }
+  })
+  return { validationRules, importIssues }
 }
