@@ -82,11 +82,19 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
       exprConverted = `distance(${NodeDef.getName(nodeDefCurrent)}, ${toExprConverted}) <= ${max}`
     }
   } else {
-    exprConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression: collectExpr })
+    exprConverted = CollectExpressionConverter.convert({
+      survey,
+      nodeDefCurrent,
+      expression: collectExpr,
+    })
   }
 
   if (StringUtils.isNotBlank(collectApplyIf)) {
-    applyIfConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression: collectApplyIf })
+    applyIfConverted = CollectExpressionConverter.convert({
+      survey,
+      nodeDefCurrent,
+      expression: collectApplyIf,
+    })
   }
 
   const success = exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null)
