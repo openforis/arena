@@ -502,20 +502,26 @@ export default class NodeDefsImportJob extends Job {
   async _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
     const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
     if (collectCodeParentExpr) {
+      // starting from the node def parent path, find the path of the node referenced by collectCodeParentExpr
+      // e.g. parentPath = /cluster/plot, collectCodeParentExpr = parent()/cluster_id, result is /cluster/cluster_id
+
       const collectNodeDefParentPathParts = parentPath.split('/')
       const codeParentExprParts = collectCodeParentExpr.split('/')
 
-      let success = true
+      // count the calls to parent() function
+      const countOfParentCalls = codeParentExprParts.findIndex((part) => part !== 'parent()')
 
-      codeParentExprParts.some((part) => {
-        if (part === 'parent()') {
-          collectNodeDefParentPathParts.pop()
-          return false
-        }
-        // Unsupported expression; break the loop.
-        success = false
-        return true
-      })
+      // referenced node path will be the concatenation of:
+      // - parentPath moved up "countOfParentCalls" levels
+      // - last part of collectCodeParentExpr
+      const referecedNodeDefPath = [
+        ...collectNodeDefParentPathParts.slice(0, collectNodeDefParentPathParts.length - countOfParentCalls),
+        ...codeParentExprParts.slice(countOfParentCalls),
+      ].join('/')
+
+      const nodeDefsInfo = this.nodeDefsInfoByCollectPath[referecedNodeDefPath]
+
+      const success = Boolean(nodeDefsInfo)
 
       await this.addImportIssue(
         CollectImportReportItem.newReportItem({
@@ -526,11 +532,7 @@ export default class NodeDefsImportJob extends Job {
         })
       )
 
-      const codeParentPath = `${collectNodeDefParentPathParts.join('/')}/${
-        codeParentExprParts[codeParentExprParts.length - 1]
-      }`
-
-      return R.pipe(R.propOr([], codeParentPath), R.head, R.propOr(null, 'uuid'))(this.nodeDefsInfoByCollectPath)
+      return nodeDefsInfo ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
     }
 
     return null
