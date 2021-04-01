@@ -160,18 +160,19 @@ export default class RecordsImportJob extends Job {
         let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 
         const valueAndMeta = NodeDef.isAttribute(nodeDef)
-          ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
+          ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
               survey,
               nodeDef,
-              record,
-              nodeToInsert,
+              record: recordUpdated,
+              node: nodeToInsert,
               collectSurveyFileZip,
               collectNodeDef,
               collectNode,
-              field,
-              this.tx
-            )
+              collectNodeField: field,
+              tx: this.tx,
+            })
           : {}
+
         const { value = null, meta = {} } = valueAndMeta || {}
 
         nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
@@ -191,7 +192,7 @@ export default class RecordsImportJob extends Job {
           )
           queue.enqueueItems(nodesToInsert)
         } else {
-          const validationAttribute = await RecordValidator.validateAttribute(survey, record, nodeToInsert)
+          const validationAttribute = await RecordValidator.validateAttribute(survey, recordUpdated, nodeToInsert)
           if (!Validation.isValid(validationAttribute)) {
             Validation.setValid(false)(recordValidation)
             Validation.setField(Node.getUuid(nodeToInsert), validationAttribute)(recordValidation)

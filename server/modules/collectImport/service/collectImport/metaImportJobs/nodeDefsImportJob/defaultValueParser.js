@@ -7,7 +7,7 @@ import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
-export const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
+const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
   const { value, expr: collectExpr, applyIf: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
   if (StringUtils.isBlank(value) && StringUtils.isBlank(collectExpr)) {
@@ -43,10 +43,29 @@ export const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaul
     messages: CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue),
     resolved: success,
   })
+
   return {
     importIssue,
     defaultValue: success
       ? NodeDefExpression.createExpression(exprConverted, applyIfConverted === null ? '' : applyIfConverted)
       : null,
   }
+}
+
+export const parseDefaultValues = ({ survey, nodeDef, collectDefaultValues, defaultLanguage }) => {
+  const defaultValues = []
+  const importIssues = []
+
+  collectDefaultValues.forEach((collectDefaultValue) => {
+    const parseResult = parseDefaultValue({ survey, collectDefaultValue, nodeDef, defaultLanguage })
+    if (parseResult) {
+      const { defaultValue, importIssue } = parseResult
+      if (defaultValue) {
+        defaultValues.push(defaultValue)
+      }
+      importIssues.push(importIssue)
+    }
+  })
+
+  return { defaultValues, importIssues }
 }
