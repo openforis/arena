@@ -34,6 +34,8 @@ jobs:
         run: cp -r test/db/migrations/** server/db/migration/public/migrations
       - name: Yarn
         run: yarn
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: Build
         run: yarn build
       - name: Run server
