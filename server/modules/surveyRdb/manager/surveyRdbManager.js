@@ -2,6 +2,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -85,7 +86,7 @@ export const fetchViewData = async (params) => {
   return result
 }
 
-export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
+export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, true, false, false, false, client)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -96,26 +97,23 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId }, client) => {
   await FileUtils.rmdir(dir)
   await FileUtils.mkdir(dir)
 
-  const entities = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
 
-  await Promise.all(
-    entities.map(async (nodeDefContext) => {
-      const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-      const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
+  await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
+    const entityDefUuid = NodeDef.getUuid(nodeDefContext)
+    const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
-      let childDefs = []
-      if (nodeDefContext) {
-        childDefs = NodeDef.isEntity(nodeDefContext)
-          ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
-          : [nodeDefContext] // Multiple attribute
-      }
+    const childDefs = NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+      : [nodeDefContext] // Multiple attribute
 
-      let query = Query.create({ entityDefUuid })
-      query = Query.assocAttributeDefUuids(childDefs.map(NodeDef.getUuid))(query)
+    let query = Query.create({ entityDefUuid })
+    query = Query.assocAttributeDefUuids(childDefs.map(NodeDef.getUuid))(query)
 
-      await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query })
-    })
-  )
+    callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
+
+    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query })
+  })
 
   return { exportDataFolderName, dir }
 }
