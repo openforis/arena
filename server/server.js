@@ -5,7 +5,7 @@ import { ArenaServer, DBMigrator } from '@openforis/arena-server'
 import * as ProcessUtils from '@core/processUtils'
 import * as appCluster from './system/appCluster'
 
-const dbMigrationsFolder = 'server/db/migration/public/migrations'
+const dbMigrationsFolder = `server/db`
 
 const initialize = async () => {
   await ArenaServer.init()
