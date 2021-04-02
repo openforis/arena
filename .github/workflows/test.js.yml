@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
+          always-auth: true
+          auth-token: ${{secrets.ACCESS_TOKEN}}
       - name: Install pm2
         run: npm install pm2 -g
       - name: Copy db migrations
