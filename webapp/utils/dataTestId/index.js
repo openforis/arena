@@ -147,6 +147,8 @@ export const DataTestId = {
   },
   userList: {
     inviteBtn: 'invite-user-btn',
+    invitedBy: 'invited_by',
+    invitedDate: 'invited_date',
     profilePicture: 'user_profile_img',
     name: 'user_name',
     email: 'user_email',

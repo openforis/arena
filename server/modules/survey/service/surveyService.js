@@ -143,6 +143,10 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
     })
   )
 
+  const userInvitationsPathFile = FileUtils.join(usersPathDir, 'userInvitations.json')
+  const userInvitations = await UserService.fetchUserInvitationsBySurveyId({ survey })
+  files.push({ data: JSON.stringify(userInvitations, null, 2), name: userInvitationsPathFile })
+
   // Activity Log
   const activityLogPathDir = FileUtils.join(prefix, 'activitylog')
   const activityLogPathFile = FileUtils.join(activityLogPathDir, 'activitylog.json')

@@ -351,6 +351,8 @@ Do you want to proceed?`,
     accepted: 'Accepted',
     updateUserConfirmation: 'User {{name}} has been updated',
     notAcceptedYet: 'Invitation not accepted yet',
+    invitedBy: 'Invited by',
+    invitedDate: 'Invited date',
   },
 
   userView: {
