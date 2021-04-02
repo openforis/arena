@@ -10,10 +10,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import * as UserState from './state'
 
 export const useUser = () => useSelector(UserState.getUser)
-export const useUserIsSystemAdmin = () => {
-  const user = useSelector(UserState.getUser)
-  return User.isSystemAdmin(user)
-}
+export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 
 // ====== Auth
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
