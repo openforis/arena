@@ -17,7 +17,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import { db } from '@server/db/db'
-import { migrateSurveySchema } from '@server/db/migration/dbMigrator'
+import { DBMigrator } from '@openforis/arena-server'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
@@ -63,7 +63,7 @@ export const insertSurvey = async (params, client = db) => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
-    await migrateSurveySchema(surveyId)
+    await DBMigrator.migrateSurveySchema(surveyId)
 
     // Log survey create activity
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
@@ -119,7 +119,7 @@ export const importSurvey = async (params, client = db) => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
-    await migrateSurveySchema(surveyId)
+    await DBMigrator.migrateSurveySchema(surveyId)
 
     // Update user prefs
     const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)

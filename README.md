@@ -46,24 +46,6 @@ Note: What's tested is the **committed** code only. Uncommitted changes are igno
 yarn test:docker
 ```
 
-## Database migrations
-
-Migrations are run automatically on server startup.
-
-### Adding a new database migration
-
-When you need execute DDL or other update update logic (e.g. to add a new table to the database, `dbtable`), create a migration template with:
-
-```shell
-yarn run create-migration add-table-dbtable
-```
-
-Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>- add-table-dbtable-<up/down>.sql`
-
-You should edit the `<timestamp>-add-table-dbtable-up.sql` to contain your DDL statements.
-
-You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to undo migrations.
-
 ## Run R Studio Server locally
 
 To install RStudio Server as a Docker container run the following command:

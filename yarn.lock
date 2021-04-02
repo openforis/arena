@@ -1227,6 +1227,26 @@
     readdirp "^2.2.1"
     upath "^1.1.1"
 
+"@openforis/arena-core@^0.0.45":
+  version "0.0.45"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.45/34387e35666f0313004711f384fb40e6b8b9973943ba09daa610fa5c816a1d7c#3df46963e9ce2a6b7d1f96882303ce7d87b5981b"
+  integrity sha512-VSJ3Bc57gOJ2+qhOu/6KwSr8H8/WYEuU5p22WGJtDks1snvDWH7XGBqIT2aqNDOJ2iS1EkBRy0ElFu/L0xwzUQ==
+  dependencies:
+    "@esri/proj-codes" "^2.7.0"
+    proj4 "^2.7.2"
+    uuid "^8.3.2"
+
+"@openforis/arena-server@^0.0.7":
+  version "0.0.7"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.7/b1f3a887ba798ee9ee7c70b26f28338ad4677a071a9ae94babd6f1695285c2ed#b43538a6f08a62d1dbbe9e6234c16add3a0f1aa2"
+  integrity sha512-ohQdXiWKfl3FKn/U4PYVvWkks4wLzQoCzOlcI4vxCP6BTbz+5IUMf0+6WJTm6sRKH4TQDG/BC3UignnfH5K1Nw==
+  dependencies:
+    "@openforis/arena-core" "^0.0.45"
+    db-migrate "^0.11.12"
+    db-migrate-pg "^1.2.2"
+    log4js "^6.3.0"
+    pg-promise "^10.9.5"
+
 "@pmmmwh/react-refresh-webpack-plugin@^0.4.2":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.4.3.tgz#1eec460596d200c0236bf195b078a5d1df89b766"
@@ -9258,6 +9278,16 @@ pg-promise@^10.9.2:
     pg-minify "1.6.2"
     spex "3.2.0"
 
+pg-promise@^10.9.5:
+  version "10.9.5"
+  resolved "https://registry.yarnpkg.com/pg-promise/-/pg-promise-10.9.5.tgz#1ad7a2bb7fcbb3cea328caaf1e54eaa07ced4147"
+  integrity sha512-llJfdNQVTixjpsTuKTGStybkTWN5PYHWCTb0iqA9GFsvf1khJaH2dexljkMuyeQ41FG8ZkuqkmxrtRVauuS+0A==
+  dependencies:
+    assert-options "0.7.0"
+    pg "8.5.1"
+    pg-minify "1.6.2"
+    spex "3.2.0"
+
 pg-protocol@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.4.0.tgz#43a71a92f6fe3ac559952555aa3335c8cb4908be"
@@ -9862,6 +9892,14 @@ proj4@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.7.0.tgz#4250ee16699d53ebc3318befb1875e9722145f29"
   integrity sha512-UVhulf8m70/dREOBrJagWq8cDYUgjQUWILRqys/gqo/+ZLeNB/04zbtPhJbz8+cCPzZNQMychfBaWUCP60U9mQ==
+  dependencies:
+    mgrs "1.0.0"
+    wkt-parser "^1.2.4"
+
+proj4@^2.7.2:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.7.2.tgz#faa42e5965aa275af5438ba2da8c59d1cc501137"
+  integrity sha512-x/EboBmIq48a9FED0Z9zWCXkd8VIpXHLsyEXljGtsnzeztC41bFjPjJ0S//wBbNLDnDYRe0e6c3FSSiqMCebDA==
   dependencies:
     mgrs "1.0.0"
     wkt-parser "^1.2.4"
