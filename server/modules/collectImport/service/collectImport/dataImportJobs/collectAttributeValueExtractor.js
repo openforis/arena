@@ -150,7 +150,7 @@ const extractTimeValueAndMeta = (collectNode) => {
   }
 }
 
-export const extractAttributeValueAndMeta = async (
+export const extractAttributeValueAndMeta = async ({
   survey,
   nodeDef,
   record,
@@ -159,8 +159,8 @@ export const extractAttributeValueAndMeta = async (
   collectNodeDef,
   collectNode,
   collectNodeField, // Collect items
-  tx
-) => {
+  tx,
+}) => {
   switch (NodeDef.getType(nodeDef)) {
     case nodeDefType.boolean:
     case nodeDefType.decimal:

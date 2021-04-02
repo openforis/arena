@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,8 +22,8 @@ import * as CollectImportReportManager from '../../../../manager/collectImportRe
 import * as CollectSurvey from '../../model/collectSurvey'
 import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 import { CollectExpressionConverter } from './collectExpressionConverter'
-import { parseValidationRule } from './validationRuleParser'
-import { parseDefaultValue } from './defaultValueParser'
+import { parseValidationRules } from './validationRuleParser'
+import { parseDefaultValues } from './defaultValueParser'
 
 const specifyAttributeSuffix = 'specify'
 
@@ -110,6 +109,7 @@ export default class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
+      [NodeDef.propKeys.descriptions]: CollectSurvey.toLabels('description', defaultLanguage)(collectNodeDef),
       // Layout props (render)
       ...(type === NodeDef.nodeDefType.entity // Calculated
         ? {
@@ -346,53 +346,32 @@ export default class NodeDefsImportJob extends Job {
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
 
-    const defaultValues = []
-
-    await PromiseUtils.each(collectDefaultValues, async (collectDefaultValue) => {
-      const parseResult = parseDefaultValue({
-        survey: this.survey,
-        collectDefaultValue,
-        nodeDef,
-        defaultLanguage,
-      })
-      if (parseResult) {
-        const { defaultValue, importIssue } = parseResult
-        if (defaultValue) {
-          defaultValues.push(defaultValue)
-        }
-        if (importIssue) {
-          await this.addImportIssue(importIssue)
-        }
-      }
+    const { defaultValues, importIssues } = parseDefaultValues({
+      survey: this.survey,
+      nodeDef,
+      collectDefaultValues,
+      defaultLanguage,
     })
+
+    await this.addImportIssues(importIssues)
 
     return defaultValues
   }
 
-  async parseValidationRules({ nodeDef: nodeDefCurrent, collectNodeDef }) {
-    const validationRules = []
+  async parseValidationRules({ nodeDef, collectNodeDef }) {
+    const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
-    await PromiseUtils.each(collectValidationRules, async (collectValidationRule) => {
-      const { defaultLanguage } = this.context
-
-      const parseResult = await parseValidationRule({
-        survey: this.survey,
-        collectValidationRule,
-        nodeDefCurrent,
-        defaultLanguage,
-      })
-      if (parseResult) {
-        const { validationRule, importIssue } = parseResult
-        if (validationRule) {
-          validationRules.push(validationRule)
-        }
-        if (importIssue) {
-          this.addImportIssue(importIssue)
-        }
-      }
+    const { validationRules, importIssues } = parseValidationRules({
+      survey: this.survey,
+      nodeDef,
+      collectValidationRules,
+      defaultLanguage,
     })
+
+    await this.addImportIssues(importIssues)
+
     return validationRules
   }
 
@@ -426,6 +405,10 @@ export default class NodeDefsImportJob extends Job {
   async addImportIssue(reportItem) {
     await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
     this.issuesCount += 1
+  }
+
+  async addImportIssues(importIssues) {
+    await Promise.all(importIssues.map((importIssue) => this.addImportIssue(importIssue)))
   }
 
   /**
@@ -520,20 +503,26 @@ export default class NodeDefsImportJob extends Job {
   async _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
     const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
     if (collectCodeParentExpr) {
+      // starting from the node def parent path, find the path of the node referenced by collectCodeParentExpr
+      // e.g. parentPath = /cluster/plot, collectCodeParentExpr = parent()/cluster_id, result is /cluster/cluster_id
+
       const collectNodeDefParentPathParts = parentPath.split('/')
       const codeParentExprParts = collectCodeParentExpr.split('/')
 
-      let success = true
+      // count the calls to parent() function
+      const countOfParentCalls = codeParentExprParts.findIndex((part) => part !== 'parent()')
 
-      codeParentExprParts.some((part) => {
-        if (part === 'parent()') {
-          collectNodeDefParentPathParts.pop()
-          return false
-        }
-        // Unsupported expression; break the loop.
-        success = false
-        return true
-      })
+      // referenced node path will be the concatenation of:
+      // - parentPath moved up "countOfParentCalls" levels
+      // - last part of collectCodeParentExpr
+      const referecedNodeDefPath = [
+        ...collectNodeDefParentPathParts.slice(0, collectNodeDefParentPathParts.length - countOfParentCalls),
+        ...codeParentExprParts.slice(countOfParentCalls),
+      ].join('/')
+
+      const nodeDefsInfo = this.nodeDefsInfoByCollectPath[referecedNodeDefPath]
+
+      const success = Boolean(nodeDefsInfo)
 
       await this.addImportIssue(
         CollectImportReportItem.newReportItem({
@@ -544,18 +533,14 @@ export default class NodeDefsImportJob extends Job {
         })
       )
 
-      const codeParentPath = `${collectNodeDefParentPathParts.join('/')}/${
-        codeParentExprParts[codeParentExprParts.length - 1]
-      }`
-
-      return R.pipe(R.propOr([], codeParentPath), R.head, R.propOr(null, 'uuid'))(this.nodeDefsInfoByCollectPath)
+      return nodeDefsInfo ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
     }
 
     return null
   }
 
   get survey() {
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: true })({})
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs })({})
   }
 }
 
