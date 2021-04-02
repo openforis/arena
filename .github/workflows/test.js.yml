@@ -26,6 +26,8 @@ jobs:
           node-version: '14.15.0'
           always-auth: true
           auth-token: ${{secrets.ACCESS_TOKEN}}
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@openforis'
       - name: Install pm2
         run: npm install pm2 -g
       - name: Copy db migrations
