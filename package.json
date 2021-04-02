@@ -118,7 +118,6 @@
     "d3-interpolate-path": "^2.2.1",
     "d3-tip": "^0.9.1",
     "date-fns": "^2.17.0",
-    "db-migrate": "^0.11.12",
     "db-migrate-pg": "^1.2.2",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
