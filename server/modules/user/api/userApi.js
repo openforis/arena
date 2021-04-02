@@ -10,6 +10,8 @@ import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -196,7 +198,8 @@ export const init = (app) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await UserService.deleteUser(user, surveyId, userUuid)
+      const survey = await SurveyManager.fetchSurveyById(surveyId)
+      await UserService.deleteUser({ user, userUuidToRemove: userUuid, survey })
 
       Response.sendOk(res)
     } catch (error) {

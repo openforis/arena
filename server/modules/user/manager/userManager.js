@@ -7,11 +7,13 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
+import * as UserInvitationManager from './userInvitationManager'
 
 export const {
   countUsersBySurveyId,
@@ -102,9 +104,9 @@ export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
-export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
+export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
   client.tx(async (t) => {
-    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
+    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)
     return Promise.all(users.map(_initializeUser))
   })
 
@@ -158,9 +160,10 @@ export const updateUserPrefs = async (user) => ({
 
 // ==== DELETE
 
-export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
-  client.tx(async (t) =>
-    Promise.all([
+export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db) =>
+  client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
+    return Promise.all([
       AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
       ActivityLogRepository.insert(
         user,
@@ -170,5 +173,6 @@ export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) 
         false,
         t
       ),
+      UserInvitationManager.updateRemovedDate({ survey, userUuidToRemove }, t),
     ])
-  )
+  })
