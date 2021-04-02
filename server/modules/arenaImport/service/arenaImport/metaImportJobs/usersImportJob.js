@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
+import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -101,6 +102,9 @@ export default class UsersImportJob extends Job {
         )
       )
     )
+
+    const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
+    await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
 
     this.setContext({ users })
   }

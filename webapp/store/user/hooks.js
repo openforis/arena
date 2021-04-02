@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
+import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
@@ -9,6 +10,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import * as UserState from './state'
 
 export const useUser = () => useSelector(UserState.getUser)
+export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 
 // ====== Auth
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
