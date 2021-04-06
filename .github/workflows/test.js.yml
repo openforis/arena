@@ -30,6 +30,8 @@ jobs:
           scope: '@openforis'
       - name: Install pm2
         run: npm install pm2 -g
+      - name: Create db migrations folder
+        run: mkdir -p server/db/migration/public/migrations
       - name: Copy db migrations
         run: cp -r test/db/migrations/** server/db/migration/public/migrations
       - name: Yarn
