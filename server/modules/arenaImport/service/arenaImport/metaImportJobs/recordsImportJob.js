@@ -21,12 +21,15 @@ export default class RecordsImportJob extends Job {
     )
 
     if (recordsToInsert.length <= 0) return
-    await RecordManager.insertRecordsInBatch({
-      user: this.user,
-      surveyId,
-      records: recordsToInsert,
-      userUuid: User.getUuid(this.user),
-    })
+    await RecordManager.insertRecordsInBatch(
+      {
+        user: this.user,
+        surveyId,
+        records: recordsToInsert,
+        userUuid: User.getUuid(this.user),
+      },
+      this.tx
+    )
 
     const nodesToInsert = []
     recordsToInsert.forEach((record) => {
@@ -38,7 +41,7 @@ export default class RecordsImportJob extends Job {
     })
 
     if (nodesToInsert.length <= 0) return
-    await RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodesToInsert })
+    await RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodesToInsert }, this.tx)
   }
 }
 

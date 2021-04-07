@@ -6,10 +6,10 @@ import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManag
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
-const insertTaxonomy = async ({ taxonomy, user, surveyId, arenaSurveyFileZip }) => {
+const insertTaxonomy = async ({ taxonomy, user, surveyId, arenaSurveyFileZip, tx }) => {
   const taxonomyImported = await TaxonomyManager.insertTaxonomy({ user, surveyId, taxonomy, addLogs: false })
   const taxa = await ArenaSurveyFileZip.getTaxa(arenaSurveyFileZip, Taxonomy.getUuid(taxonomyImported))
-  await TaxonomyManager.insertTaxa({ user, surveyId, taxa, addLogs: false })
+  await TaxonomyManager.insertTaxa({ user, surveyId, taxa, addLogs: false }, tx)
 }
 
 /**
@@ -27,7 +27,9 @@ export default class TaxonomiesImportJob extends Job {
     const taxonomies = await ArenaSurveyFileZip.getTaxonomies(arenaSurveyFileZip)
 
     await Promise.all(
-      taxonomies.map(async (taxonomy) => insertTaxonomy({ taxonomy, user: this.user, surveyId, arenaSurveyFileZip }))
+      taxonomies.map(async (taxonomy) =>
+        insertTaxonomy({ taxonomy, user: this.user, surveyId, arenaSurveyFileZip, tx: this.tx })
+      )
     )
 
     this.setContext({ taxonomies })
