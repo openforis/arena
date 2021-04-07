@@ -46,6 +46,7 @@ export const DataTestId = {
   header: {
     surveyCreateBtn: 'survey-create-btn',
     surveyListBtn: 'survey-list-btn',
+    surveyListTemplateBtn: 'survey-list-template-btn',
     surveyPublishBtn: 'survey-publish-btn',
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',

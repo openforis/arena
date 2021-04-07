@@ -18,6 +18,8 @@ import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+const Separator = () => <div className="user-popup-menu__sep" />
+
 const UserPopupMenu = (props) => {
   const { onClose } = props
 
@@ -62,7 +64,7 @@ const UserPopupMenu = (props) => {
         </div>
       </div>
 
-      <div className="user-popup-menu__sep" />
+      <Separator />
 
       <Link
         data-testid={DataTestId.header.surveyListBtn}
@@ -86,7 +88,19 @@ const UserPopupMenu = (props) => {
         </Link>
       )}
 
-      <div className="user-popup-menu__sep" />
+      <Separator />
+
+      <Link
+        data-testid={DataTestId.header.surveyListTemplateBtn}
+        to={appModuleUri(homeModules.surveyListTemplates)}
+        onClick={onClose}
+        className="btn-s btn-transparent"
+      >
+        <span className="icon icon-paragraph-justify icon-12px icon-left" />
+        {i18n.t('appModules.surveyListTemplates')}
+      </Link>
+
+      <Separator />
 
       <button
         data-testid={DataTestId.header.userLogoutBtn}
