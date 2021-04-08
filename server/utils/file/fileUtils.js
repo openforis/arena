@@ -22,3 +22,5 @@ export const writeFile = async (path, data = '') => promises.writeFile(path, dat
 export const appendFile = async (path, data = '') => promises.appendFile(path, data)
 
 export const copyFile = async (src, dest) => promises.copyFile(src, dest)
+
+export const createWriteSteam = fs.createWriteStream

@@ -47,7 +47,7 @@ const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) 
 }
 
 const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
-  if (columnNodeDefs) {
+  if (!R.isEmpty(columnNodeDefs)) {
     queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
@@ -162,8 +162,10 @@ export const fetchViewData = async (params, client = db) => {
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
-  queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
-  queryBuilder.addParams({ cycle })
+  if (!R.isNil(cycle)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+    queryBuilder.addParams({ cycle })
+  }
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
