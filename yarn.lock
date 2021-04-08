@@ -1270,10 +1270,10 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.9":
-  version "0.0.9"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.9/9fac6a017f203ae99517e44b9fb0d66778d4fd3fb71c9e6bfd760374ae07f645#d33ccd21cd8b104b4a41515a6454a93f8cae8b10"
-  integrity sha512-wdtwKT/QrkOHlCaUEZ/2ytwI2O3+NYBhydug4RDsIt2Fdn256CD4ViQ98B9GzSGyzUq8zLWwDlQF+rGm72Kj/g==
+"@openforis/arena-server@^0.0.11":
+  version "0.0.11"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.11/41cbfabc586cc1a0cd7d130e9b4869c046f41324366ca13b935b70846bdd7da4#fe2ad718ba8176b646676e8ddcbf44edc17e82a3"
+  integrity sha512-C5jCm6FD0TnTn5GZ82zSHzVNE/UdJ3JDf8DNCp4M4Hu3Rl2DBLQG/WtrN0642HuIh+TUPEqzCRTmRerj7keMAQ==
   dependencies:
     "@openforis/arena-core" "^0.0.47"
     db-migrate "^0.11.12"
