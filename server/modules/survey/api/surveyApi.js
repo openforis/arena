@@ -1,4 +1,6 @@
 import * as R from 'ramda'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -99,6 +101,37 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  // export-csv-data
+  // generate zip with CSV
+  app.post('/survey/:surveyId/export-csv-data', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const user = Request.getUser(req)
+
+      const job = SurveyService.startExportCsvDataJob({ surveyId, user })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // get zip with csv
+  app.get(
+    '/survey/:surveyId/export-csv-data/:exportDataFolderName',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { exportDataFolderName } = Request.getParams(req)
+        const name = `${exportDataFolderName}.zip`
+        const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
+        Response.sendZipFile(res, dir, name)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // ==== UPDATE
 

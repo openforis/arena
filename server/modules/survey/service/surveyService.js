@@ -18,6 +18,7 @@ import * as SurveyManager from '../manager/surveyManager'
 
 import SurveyPublishJob from './publish/surveyPublishJob'
 import SurveyCloneJob from './clone/surveyCloneJob'
+import ExportCsvDataJob from './export/exportCsvDataJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -160,6 +161,14 @@ export const cloneSurvey = ({ user, surveyInfo, surveyId }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfo })
   JobManager.executeJobThread(job)
   return JobUtils.jobToJSON(job)
+}
+
+export const startExportCsvDataJob = ({ surveyId, user }) => {
+  const job = new ExportCsvDataJob({ user, surveyId })
+
+  JobManager.executeJobThread(job)
+
+  return job
 }
 
 export const {

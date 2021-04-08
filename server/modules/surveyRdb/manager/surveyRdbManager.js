@@ -1,12 +1,19 @@
+import * as DateUtils from '@core/dateUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as PromiseUtils from '@core/promiseUtils'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+import { db } from '../../../db/db'
+import * as CSVWriter from '../../../utils/file/csvWriter'
+
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
 import { Query } from '../../../../common/model/query'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-
-import * as Survey from '../../../../core/survey/survey'
-
-import { db } from '../../../db/db'
-import * as CSVWriter from '../../../utils/file/csvWriter'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -79,6 +86,37 @@ export const fetchViewData = async (params) => {
   return result
 }
 
+export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, true, false, false, false, client)
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyName = Survey.getName(surveyInfo)
+
+  const exportDataFolderName = `${surveyName}_export_${DateUtils.nowFormatDefault()}`
+  const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
+  await FileUtils.rmdir(dir)
+  await FileUtils.mkdir(dir)
+
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
+
+  await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
+    const entityDefUuid = NodeDef.getUuid(nodeDefContext)
+    const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
+
+    const childDefs = NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+      : [nodeDefContext] // Multiple attribute
+
+    let query = Query.create({ entityDefUuid })
+    query = Query.assocAttributeDefUuids(childDefs.map(NodeDef.getUuid))(query)
+
+    callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
+
+    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query })
+  })
+
+  return { exportDataFolderName, dir }
+}
 /**
  * Counts the number of rows in the data view related to the specified query object.
  *

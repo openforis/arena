@@ -32,6 +32,10 @@ export const DataTestId = {
     surveyLabel: 'survey-label',
     surveyStatus: 'survey-status',
   },
+  dataExport: {
+    exportCSV: 'exportCSV',
+    prepareExport: 'prepareExport',
+  },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,

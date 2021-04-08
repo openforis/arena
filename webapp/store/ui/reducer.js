@@ -5,6 +5,7 @@ import { LoaderReducer, LoaderState } from './loader'
 import { DialogConfirmReducer, DialogConfirmState } from './dialogConfirm'
 import { RecordReducer, RecordState } from './record'
 import { SurveyFormReducer, SurveyFormState } from './surveyForm'
+import { ExportCsvDataReducer, ExportCsvDataState } from './exportCsvData'
 
 export default combineReducers({
   [NotificationState.stateKey]: NotificationReducer,
@@ -12,4 +13,5 @@ export default combineReducers({
   [DialogConfirmState.stateKey]: DialogConfirmReducer,
   [RecordState.stateKey]: RecordReducer,
   [SurveyFormState.stateKey]: SurveyFormReducer,
+  [ExportCsvDataState.stateKey]: ExportCsvDataReducer,
 })

@@ -48,6 +48,8 @@ export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
 
 export const gotoRecords = _gotoSubModule('data', 'records')
 
+export const gotoDataExport = _gotoSubModule('data', 'export')
+
 export const gotoValidationReport = _gotoSubModule('data', 'validationReport', [
   '**/validationReport**',
   '**/validationReport/count**',
