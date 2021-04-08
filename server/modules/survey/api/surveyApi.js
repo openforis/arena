@@ -52,7 +52,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { offset, limit } = Request.getParams(req)
 
-      const list = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
+      const list = await SurveyService.fetchUserSurveysInfo({ user, offset, limit })
 
       res.json({ list })
     } catch (error) {
