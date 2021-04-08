@@ -68,8 +68,8 @@ export const getLevelNames = R.pipe(getColumns, R.values, R.filter(isColumnCode)
 export const getColumnName = (type, levelIndex) =>
   R.pipe(
     getColumns,
-    Object.values,
-    R.find((column) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
+    Object.entries,
+    R.find(([, column]) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
     (entry) => (entry ? entry[0] : null)
   )
 
