@@ -193,8 +193,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-export const fetchUserSurveysInfo = async (user, offset, limit) =>
-  R.map(assocSurveyInfo, await SurveyRepository.fetchUserSurveys(user, offset, limit))
+export const fetchUserSurveysInfo = async ({ user, offset, limit }) =>
+  (await SurveyRepository.fetchUserSurveys({ user, offset, limit })).map(assocSurveyInfo)
 
 export const { countUserSurveys, fetchDependencies } = SurveyRepository
 

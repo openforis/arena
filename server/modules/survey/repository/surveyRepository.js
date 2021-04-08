@@ -10,7 +10,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepositoryUtils'
 
 const surveySelectFields = (alias = '') => {
-  const prefix = alias ? alias + '.' : ''
+  const prefix = alias ? `${alias}.` : ''
   return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_uuid,
   ${selectDate(`${prefix}date_created`, 'date_created')}, 
   ${selectDate(`${prefix}date_modified`, 'date_modified')}`
@@ -19,7 +19,7 @@ const surveySelectFields = (alias = '') => {
 // ============== CREATE
 
 export const insertSurvey = async (survey, client = db) =>
-  await client.one(
+  client.one(
     `
       INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft )
       VALUES ($1, $2, $3, $4, $5)
@@ -41,12 +41,12 @@ export const cloneTables = async ({ sourceId, destinationId, table }, client) =>
 
 // ============== READ
 
-export const fetchAllSurveyIds = async (client = db) => await client.map('SELECT id FROM survey', [], R.prop('id'))
+export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
-export const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => {
+export const fetchUserSurveys = async ({ user, offset = 0, limit = null, template = false }, client = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
-  return await client.map(
+  return client.map(
     `
     SELECT ${surveySelectFields('s')},
     u.name as owner_name
@@ -63,11 +63,12 @@ export const fetchUserSurveys = async (user, offset = 0, limit = null, client = 
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
         : ''
     }
+    WHERE s.template = $2
     ORDER BY s.date_modified DESC
-    LIMIT ${limit ? limit : 'ALL'}
+    LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
   `,
-    [User.getUuid(user)],
+    [User.getUuid(user), template],
     (def) => dbTransformCallback(def, true)
   )
 }
@@ -75,7 +76,7 @@ export const fetchUserSurveys = async (user, offset = 0, limit = null, client = 
 export const countUserSurveys = async (user, client = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
-  return await client.one(
+  return client.one(
     `
     SELECT count(s.id)
     FROM survey s
@@ -94,19 +95,19 @@ export const countUserSurveys = async (user, client = db) => {
 }
 
 export const fetchSurveysByName = async (surveyName, client = db) =>
-  await client.map(
+  client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     (def) => dbTransformCallback(def)
   )
 
 export const fetchSurveyById = async (surveyId, draft = false, client = db) =>
-  await client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
+  client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     dbTransformCallback(def, draft)
   )
 
 export const fetchDependencies = async (surveyId, client = db) =>
-  await client.oneOrNone(
+  client.oneOrNone(
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
     R.prop('dependencies')
@@ -116,7 +117,7 @@ export const fetchDependencies = async (surveyId, client = db) =>
 export const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = { [key]: value }
 
-  return await client.one(
+  return client.one(
     `
     UPDATE survey
     SET props_draft = props_draft || $1,
@@ -130,7 +131,7 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
 }
 
 export const publishSurveyProps = async (surveyId, client = db) =>
-  await client.none(
+  client.none(
     `
     UPDATE
         survey
@@ -149,7 +150,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
   const meta = {
     dependencyGraphs,
   }
-  return await client.one(
+  return client.one(
     `
     UPDATE survey
     SET meta = meta || $1::jsonb
@@ -161,8 +162,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
 }
 
 // ============== DELETE
-export const deleteSurvey = async (id, client = db) =>
-  await client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = R.pipe(
@@ -183,4 +183,4 @@ export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = 
 }
 
 export const dropSurveySchema = async (id, client = db) =>
-  await client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
+  client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
