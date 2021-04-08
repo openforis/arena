@@ -54,27 +54,34 @@ export const validateCategories = async (surveyId, client = db) => {
 
 // ====== CREATE
 
-export const insertLevel = async ({ user, surveyId, level: levelParam, system = false, addLogs = true }, client = db) =>
-  client.tx(async (t) => {
-    const [level] = await Promise.all([
-      CategoryRepository.insertLevel(surveyId, levelParam, t),
-      markSurveyDraft(surveyId, t),
-      ...(addLogs
-        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t)]
-        : []),
-    ])
-    return {
-      level,
-      category: await validateCategory(surveyId, CategoryLevel.getCategoryUuid(level), t),
-    }
-  })
+const _insertLevelInTransaction = async ({ user, surveyId, level: levelParam, system, addLogs, validate, t }) => {
+  const [level] = await Promise.all([
+    CategoryRepository.insertLevel(surveyId, levelParam, t),
+    markSurveyDraft(surveyId, t),
+    ...(addLogs
+      ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t)]
+      : []),
+  ])
+  return {
+    level,
+    category: validate ? await validateCategory(surveyId, CategoryLevel.getCategoryUuid(level), t) : null,
+  }
+}
 
-export const insertCategory = async ({ user, surveyId, category, system = false, addLogs = true }, client = db) =>
+export const insertLevel = async (
+  { user, surveyId, level, system = false, addLogs = true, validate = true },
+  client = db
+) => client.tx(async (t) => _insertLevelInTransaction({ user, surveyId, level, system, addLogs, validate, t }))
+
+export const insertCategory = async (
+  { user, surveyId, category, system = false, addLogs = true, validate = true },
+  client = db
+) =>
   client.tx(async (t) => {
     const [categoryDb] = await Promise.all([
       CategoryRepository.insertCategory(surveyId, category, t),
       ...Category.getLevelsArray(category).map((level) =>
-        insertLevel({ user, surveyId, level, system: true, addLogs }, t)
+        _insertLevelInTransaction({ user, surveyId, level, system: true, addLogs, validate, t })
       ),
       markSurveyDraft(surveyId, t),
       ...(addLogs
@@ -82,7 +89,7 @@ export const insertCategory = async ({ user, surveyId, category, system = false,
         : []),
     ])
 
-    return validateCategory(surveyId, Category.getUuid(categoryDb), t)
+    return validate ? validateCategory(surveyId, Category.getUuid(categoryDb), t) : categoryDb
   })
 
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>

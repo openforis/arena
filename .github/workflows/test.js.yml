@@ -24,12 +24,20 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14.15.0'
+          always-auth: true
+          auth-token: ${{secrets.ACCESS_TOKEN}}
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@openforis'
       - name: Install pm2
         run: npm install pm2 -g
+      - name: Create db migrations folder
+        run: mkdir -p server/db/migration/public/migrations
       - name: Copy db migrations
         run: cp -r test/db/migrations/** server/db/migration/public/migrations
       - name: Yarn
         run: yarn
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: Build
         run: yarn build
       - name: Run server

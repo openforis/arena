@@ -1,3 +1,5 @@
+import { DBMigrator } from '@openforis/arena-server'
+
 import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
@@ -8,8 +10,6 @@ import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as AuthGroup from '@core/auth/authGroup'
-
-import { migrateSurveySchema } from '@server/db/migration/dbMigrator'
 
 export default class CreateNewSurveyJob extends Job {
   constructor(params) {
@@ -30,7 +30,7 @@ export default class CreateNewSurveyJob extends Job {
 
     let surveyInfo = await SurveyRepository.insertSurvey(newSurveyInfo, this.tx)
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-    await migrateSurveySchema(surveyId)
+    await DBMigrator.migrateSurveySchema(surveyId)
 
     const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
     await UserRepository.updateUserPrefs(userUpdated, this.tx)
