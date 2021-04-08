@@ -117,6 +117,7 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
  * @param {!number} surveyId - The id of the survey.
  * @param {!any} items - Category items to be inserted.
  * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<*>} - The result promise (void).
  */
 export const insertItems = async (user, surveyId, items, client = db) =>
   client.tx(async (t) => {
@@ -299,6 +300,7 @@ export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, clien
  * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category to filter by.
  * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<Category>} - Category with updated levels.
  */
 export const deleteLevelsEmptyByCategory = async (user, surveyId, category, client = db) =>
   client.tx(async (t) => {
@@ -329,6 +331,7 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
  * @param {string[]} levelNamesNew - Array of new level names.
  * @param {pgPromise.IDatabase} client - The database client.
  *
+ * @returns {Promise<Category>} - Category with updated levels.
  */
 export const replaceLevels = async (user, surveyId, category, levelNamesNew, client = db) =>
   client.tx(async (t) => {
@@ -342,7 +345,7 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
     await Promise.all([
       CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
-      ...levelsNew.map((level) => insertLevel({ user, surveyId, level, system: true }, t)),
+      ...levelsNew.map((level) => _insertLevelInTransaction({ user, surveyId, level, system: true, t })),
       markSurveyDraft(surveyId, t),
     ])
     return Category.assocLevelsArray(levelsNew)(category)

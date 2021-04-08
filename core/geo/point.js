@@ -22,7 +22,7 @@ export const newPoint = ({ srs, x, y }) => ({
  * @returns {object} - The parsed Point object.
  */
 export const parse = (pointText) => {
-  const match = /SRID=((EPSG:)?(\w+));POINT\((\d+(\.\d+)?) (\d+(\.\d+)?)\)/.exec(pointText)
+  const match = /SRID=((EPSG:)?(\w+));POINT\((-?\d+(\.\d+)?) (-?\d+(\.\d+)?)\)/.exec(pointText)
   return match ? newPoint({ srs: match[3], x: match[4], y: match[6] }) : null
 }
 
