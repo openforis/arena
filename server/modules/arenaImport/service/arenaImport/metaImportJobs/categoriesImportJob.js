@@ -5,20 +5,23 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
-
-const insertCategory = async ({ category, user, surveyId, arenaSurveyFileZip }) => {
+const insertCategory = async ({ category, user, surveyId, arenaSurveyFileZip, tx }) => {
   const categoryWithLevels = Category.assocLevelsArray(
     Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(Category.getUuid(category)))
   )(category)
 
-  const categoryInserted = await CategoryService.insertCategory({
-    user,
-    surveyId,
-    category: categoryWithLevels,
-    addLogs: false,
-  })
+  const categoryInserted = await CategoryService.insertCategory(
+    {
+      user,
+      surveyId,
+      category: categoryWithLevels,
+      addLogs: false,
+      validate: false,
+    },
+    tx
+  )
   const items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, Category.getUuid(categoryInserted))
-  await CategoryService.insertItemsInBatch(surveyId, items)
+  await CategoryService.insertItemsInBatch(surveyId, items, tx)
 }
 
 /**
@@ -38,11 +41,11 @@ export default class CategoriesImportJob extends Job {
     const categoriesArray = Object.values(categories || {})
     await Promise.all(
       categoriesArray.map(async (category) =>
-        insertCategory({ category, user: this.user, surveyId, arenaSurveyFileZip })
+        insertCategory({ category, user: this.user, surveyId, arenaSurveyFileZip, tx: this.tx })
       )
     )
 
-    await CategoryManager.validateCategories(surveyId)
+    await CategoryManager.validateCategories(surveyId, this.tx)
     this.setContext({ categories })
   }
 }
