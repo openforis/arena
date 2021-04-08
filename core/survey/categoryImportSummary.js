@@ -23,7 +23,7 @@ export const columnTypes = {
 
 // ===== SUMMARY
 
-export const newSummary = (columns, filePath = null) => ({
+export const newSummary = ({ columns, filePath = null }) => ({
   [keys.columns]: columns,
   [keys.filePath]: filePath,
 })
@@ -34,7 +34,7 @@ export const getFilePath = R.prop(keys.filePath)
 
 // ===== COLUMN
 
-export const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
+export const newColumn = ({ type, levelName = null, levelIndex = -1, lang = null, dataType = null }) => ({
   [keysColumn.type]: type,
   [keysColumn.levelName]: levelName,
   [keysColumn.levelIndex]: levelIndex,
@@ -68,8 +68,8 @@ export const getLevelNames = R.pipe(getColumns, R.values, R.filter(isColumnCode)
 export const getColumnName = (type, levelIndex) =>
   R.pipe(
     getColumns,
-    Object.entries,
-    R.find(([_columnName, column]) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
+    Object.values,
+    R.find((column) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
     (entry) => (entry ? entry[0] : null)
   )
 

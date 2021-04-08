@@ -61,7 +61,13 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
-    return stream ? CategoryManager.createImportSummaryFromStream(stream) : null
+    return stream
+      ? CategoryManager.createImportSummaryFromStream({
+          stream,
+          codeColumnPattern: /(level\d+)_code/,
+          ignoreLabelsAndDescriptions: true,
+        })
+      : null
   }
 
   extractItemExtraDef() {
