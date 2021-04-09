@@ -1,18 +1,17 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
+import { PointFactory, Points } from '@openforis/arena-core'
+
 import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
+import * as DateTimeUtils from '@core/dateUtils'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
-import * as Point from '@core/geo/point'
-import * as GeoUtils from '@core/geo/geoUtils'
-import * as DateTimeUtils from '@core/dateUtils'
 
 const { nodeDefType } = NodeDef
 
@@ -100,9 +99,13 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => () => {
       const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
-      return () => (GeoUtils.isCoordinateValid(srs, x, y) ? Point.toString(Point.newPoint({ srs, x, y })) : null)
+      const point = PointFactory.createInstance({ srs, x, y })
+      if (point && Points.isValid(point)) {
+        return Points.toString(point)
+      }
+      return null
     },
   },
 
