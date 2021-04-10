@@ -19,7 +19,6 @@
     "dev:server:nodemon": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
     "build:test:integration": "webpack --display-error-details --config test/integration/config/webpack.config.js",
     "build:test:unit": "webpack --display-error-details --config test/unit/config/webpack.config.js",
-    "heroku-prebuild": "echo \"//registry.npmjs.org/:_authToken=\\${NPM_TOKEN}\" >> .npmrc",
     "jest:integration": "jest --silent dist/__tests__/bundle.integration.js",
     "jest:unit": "jest --silent dist/__tests__/bundle.unit.js",
     "test:integration": "run-s build:test:integration jest:integration",
