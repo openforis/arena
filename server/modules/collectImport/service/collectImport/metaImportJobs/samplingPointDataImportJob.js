@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { PointFactory, SRSs } from '@openforis/arena-core'
+import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -91,12 +91,9 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
     const point = PointFactory.createInstance({ srs, x, y })
 
-    const toString = (p) => `SRID=${p.srs};POINT(${p.x} ${p.y})`
-    const pointStr = toString(point)
-
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: pointStr,
+      [keysItem.location]: Points.toString(point),
     }
 
     return super.extractItemExtraProps(extraUpdated)
