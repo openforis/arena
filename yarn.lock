@@ -1038,7 +1038,7 @@
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.7.0.tgz#4e92a04d8e27a322f99382730149a26bae7702cf"
   integrity sha512-QgAcLXuWuBwXXbARKmcvxiUZr6SuY28uYSMHyvrEZIeXwObMHKTChiwco2MvcRuXSb8O6RdJlnwX+j7pukaYxg==
 
-"@godaddy/terminus@^4.6.0":
+"@godaddy/terminus@^4.6.0", "@godaddy/terminus@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.7.1.tgz#f4b850617923e00f7080c64f2c97d653e4eea66a"
   integrity sha512-WA1UpDIUvEJ6pMIlgXrzXkAjHdt33G+j7074MLppZ1b2uN8OaH/QKo5zrASrLCWuczwS31t69aMtqiPWN3ruBA==
@@ -1261,25 +1261,35 @@
     readdirp "^2.2.1"
     upath "^1.1.1"
 
-"@openforis/arena-core@^0.0.47":
-  version "0.0.47"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.47/b68c3f3c62e2922fe0d8a431c57e5fd407aec39fc22b0842fff3e885bc268025#f2515cf3529af74868a39877c82ed7afcc2bed82"
-  integrity sha512-T7s4ks4F7FkDTBTKflxBGBehISi09WZ0x9AvKAA/a/iUxrHnMYpgVrq4ocftPabpVGwy4OZL8oi5ddifpyj9rg==
+"@openforis/arena-core@^0.0.50":
+  version "0.0.50"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.50/0f0900d98f92ec559682fce1511bebec562eeb2f47741bd4cf27b8037dc5e34f#1717737906e6b3bb4d7a83f57cb551321138bed8"
+  integrity sha512-AIlgwurf8F3ttM9IiHEUKLAolBM1ILUBjMXUJXyVmuX1X4DzhZa+H8+em0yTOS03Fo7uTUMz9sqw0w1GxcMFUw==
   dependencies:
     "@esri/proj-codes" "^2.7.0"
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.11":
-  version "0.0.11"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.11/41cbfabc586cc1a0cd7d130e9b4869c046f41324366ca13b935b70846bdd7da4#fe2ad718ba8176b646676e8ddcbf44edc17e82a3"
-  integrity sha512-C5jCm6FD0TnTn5GZ82zSHzVNE/UdJ3JDf8DNCp4M4Hu3Rl2DBLQG/WtrN0642HuIh+TUPEqzCRTmRerj7keMAQ==
+"@openforis/arena-server@^0.0.16":
+  version "0.0.16"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.16/362d53a620c6c9986c3ad7eaeeedfb9b7d9b3c776dd4c81e24d228553832dc15#fc9cfb048e2db1945d557641d10bdc5a0a63b5f0"
+  integrity sha512-XEqJqc6Uz+IucAos4lJrLNiDgKtnKS6YuTB4VYZFVyIAW7rVMeffvycuBijAM5FimGOIRXPWm5swQmN201MiGw==
   dependencies:
-    "@openforis/arena-core" "^0.0.47"
+    "@godaddy/terminus" "^4.7.1"
+    "@openforis/arena-core" "^0.0.50"
+    body-parser "^1.19.0"
+    compression "^1.7.4"
+    connect-pg-simple "^6.2.1"
+    cookie-parser "^1.4.5"
     db-migrate "^0.11.12"
     db-migrate-pg "^1.2.2"
+    express "^4.17.1"
+    express-fileupload "^1.2.1"
+    express-session "^1.17.1"
+    lodash.throttle "^4.1.1"
     log4js "^6.3.0"
     pg-promise "^10.10.1"
+    socket.io "^4.0.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.4.2":
   version "0.4.3"
@@ -4616,6 +4626,19 @@ engine.io@~4.1.0:
     engine.io-parser "~4.0.0"
     ws "~7.4.2"
 
+engine.io@~5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/engine.io/-/engine.io-5.0.0.tgz#470dc94a8a4907fa4d2cd1fa6611426afcee61bf"
+  integrity sha512-BATIdDV3H1SrE9/u2BAotvsmjJg0t1P4+vGedImSs1lkFAtQdvk4Ev1y4LDiPF7BPWgXWEG+NDY+nLvW3UrMWw==
+  dependencies:
+    accepts "~1.3.4"
+    base64id "2.0.0"
+    cookie "~0.4.1"
+    cors "~2.8.5"
+    debug "~4.3.1"
+    engine.io-parser "~4.0.0"
+    ws "~7.4.2"
+
 enhanced-resolve@^0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-0.9.1.tgz#4d6e689b3725f86090927ccc86cd9f1635b89e2e"
@@ -5179,7 +5202,7 @@ express-fileupload@^1.2.1:
   dependencies:
     busboy "^0.3.1"
 
-express-session@^1.17.0:
+express-session@^1.17.0, express-session@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.1.tgz#36ecbc7034566d38c8509885c044d461c11bf357"
   integrity sha512-UbHwgqjxQZJiWRTMyhvWGvjBQduGCSBDhhZXYenziMFjxst5rMV+aJZ6hKPHZnPyHGsrqRICxtX8jtEbm/z36Q==
@@ -7926,6 +7949,11 @@ lodash.once@^4.0.0, lodash.once@^4.1.1:
   resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
   integrity sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=
 
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
 lodash.truncate@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
@@ -8087,10 +8115,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-marked@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-2.0.1.tgz#5e7ed7009bfa5c95182e4eb696f85e948cefcee3"
-  integrity sha512-5+/fKgMv2hARmMW7DOpykr2iLhl0NgjyELk5yn92iE7z8Se1IS9n3UsFm86hFXIkvMBmVxki8+ckcpjBeyo/hw==
+marked@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-2.0.3.tgz#3551c4958c4da36897bda2a16812ef1399c8d6b0"
+  integrity sha512-5otztIIcJfPc2qGTN8cVtOJEjNJZ0jwa46INMagrYfk0EvqtRuEHLsEe0LrFS0/q+ZRKT0+kXK7P2T1AN5lWRA==
 
 md5.js@^1.3.4:
   version "1.3.5"
@@ -10271,10 +10299,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-number-format@^4.4.4:
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/react-number-format/-/react-number-format-4.5.3.tgz#c7b99cad759c6ccd7f82379f2f86d2d920c5ff29"
-  integrity sha512-y7+2HtVjQI82Pome1Xxdf8RODZ6vAGwBnao4Iohl8/zhzWpkuLzvquXHXzXuHT6Xija4QddFAGitUbW3dN4sNg==
+react-number-format@^4.5.5:
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/react-number-format/-/react-number-format-4.5.5.tgz#563807ee142a03857111115806d39767bc698797"
+  integrity sha512-3NGqgSbMUwRwgJ4852RH24UFkW89yx/e0P78Hwmf3TajLMKCOJ7DPJCcl/6z+2+HpJ8AG7je/J8na3ykWx8acg==
   dependencies:
     prop-types "^15.7.2"
 
@@ -11251,6 +11279,11 @@ socket.io-adapter@~2.1.0:
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.1.0.tgz#edc5dc36602f2985918d631c1399215e97a1b527"
   integrity sha512-+vDov/aTsLjViYTwS9fPy5pEtTkrbEKsw2M+oVSoFGw6OD1IpvlV1VPhUzNbofCQ8oyMbdYJqDtGdmHQK6TdPg==
 
+socket.io-adapter@~2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.2.0.tgz#43af9157c4609e74b8addc6867873ac7eb48fda2"
+  integrity sha512-rG49L+FwaVEwuAdeBRq49M97YI3ElVabJPzvHT9S6a2CWhDKnjSFasvwAwSYPRhQzfn4NtDIbCaGYgOCOU/rlg==
+
 socket.io-client@^3.1.1:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/socket.io-client/-/socket.io-client-3.1.3.tgz#57ddcefea58cfab71f0e94c21124de8e3c5aa3e2"
@@ -11286,6 +11319,21 @@ socket.io@^3.1.1:
     debug "~4.3.1"
     engine.io "~4.1.0"
     socket.io-adapter "~2.1.0"
+    socket.io-parser "~4.0.3"
+
+socket.io@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.0.1.tgz#d2e01cf3780d810b66182b3fbef08a04a4ccf924"
+  integrity sha512-g8eZB9lV0f4X4gndG0k7YZAywOg1VxYgCUspS4V+sDqsgI/duqd0AW84pKkbGj/wQwxrqrEq+VZrspRfTbHTAQ==
+  dependencies:
+    "@types/cookie" "^0.4.0"
+    "@types/cors" "^2.8.8"
+    "@types/node" ">=10.0.0"
+    accepts "~1.3.4"
+    base64id "~2.0.0"
+    debug "~4.3.1"
+    engine.io "~5.0.0"
+    socket.io-adapter "~2.2.0"
     socket.io-parser "~4.0.3"
 
 sockjs-client@^1.5.0:
