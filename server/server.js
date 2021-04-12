@@ -1,16 +1,12 @@
 import 'dotenv/config'
 
-import { ArenaServer, DBMigrator } from '@openforis/arena-server'
+import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as appCluster from './system/appCluster'
 
-const dbMigrationsFolder = `server/db`
-
 const initialize = async () => {
   await ArenaServer.init()
-
-  await DBMigrator.migrateSchema({ migrationsFolder: dbMigrationsFolder })
 
   if (ProcessUtils.ENV.migrateOnly) {
     // eslint-disable-next-line unicorn/no-process-exit
