@@ -53,3 +53,9 @@ jobs:
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
         run: yarn test
+        env:
+          PGHOST: localhost
+          PGPORT: 5444
+          PGDATABASE: of-arena-test
+          PGUSER: arena
+          PGPASSWORD: arena
