@@ -1,6 +1,11 @@
-## Related Issue
+## Description
 
-Resolves #xxx
+<!--- List the changes proposed and/or how the issue(s) has(have) been solved. -->
+
+- #### Added/Removed/Updated something...
+   <!--- Add a screenshot or brief description if needed -->
+- #### Added/Removed/Updated something else...
+    <!--- Add a screenshot or brief description if needed -->
 
 ## Types of changes
 
@@ -13,20 +18,18 @@ Resolves #xxx
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 
-## Brief description of the changes proposed and/or how the issue(s) has(have) been solved.
-
-<!--- Describe briefly your changes -->
-
 ## How has this been tested
 
 <!--- Please describe in detail how you tested your changes. -->
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
 
-##### Do you consider this PR needs further testing?
+#### Do you consider this PR needs further testing?
 
 - [ ] No
 - [ ] Yes
+
+<!--- If Yes, describe why or what to do next -->
 
 ## UI changes
 
