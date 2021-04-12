@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { SRSs } from '@openforis/arena-core'
+
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
@@ -92,7 +94,10 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  async initRecordAndSurvey() {
+  async init() {
+    // Init SRSs
+    await SRSs.init()
+
     // Init record
     this.record = await RecordManager.fetchRecordAndNodesByUuid(
       this.surveyId,
@@ -128,7 +133,7 @@ class RecordUpdateThread extends Thread {
 
     switch (msg.type) {
       case messageTypes.threadInit:
-        await this.initRecordAndSurvey()
+        await this.init()
         break
 
       case messageTypes.recordInit:

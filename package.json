@@ -96,8 +96,8 @@
   },
   "dependencies": {
     "@godaddy/terminus": "^4.6.0",
-    "@openforis/arena-core": "^0.0.50",
-    "@openforis/arena-server": "^0.0.16",
+    "@openforis/arena-core": "^0.0.51",
+    "@openforis/arena-server": "^0.0.15",
     "@sendgrid/mail": "^7.4.2",
     "adm-zip": "^0.5.3",
     "archiver": "^5.2.0",
