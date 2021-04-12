@@ -1038,7 +1038,7 @@
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.7.0.tgz#4e92a04d8e27a322f99382730149a26bae7702cf"
   integrity sha512-QgAcLXuWuBwXXbARKmcvxiUZr6SuY28uYSMHyvrEZIeXwObMHKTChiwco2MvcRuXSb8O6RdJlnwX+j7pukaYxg==
 
-"@godaddy/terminus@^4.6.0":
+"@godaddy/terminus@^4.6.0", "@godaddy/terminus@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.7.1.tgz#f4b850617923e00f7080c64f2c97d653e4eea66a"
   integrity sha512-WA1UpDIUvEJ6pMIlgXrzXkAjHdt33G+j7074MLppZ1b2uN8OaH/QKo5zrASrLCWuczwS31t69aMtqiPWN3ruBA==
@@ -1270,11 +1270,12 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.15":
-  version "0.0.15"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.15/50f8c7d8180be524ae3b9409e5cbc2b267882baa642c204553e0457979d5e81f#cdc883447604b5801f968179056bd7b3717fb01f"
-  integrity sha512-k2b/QDlv4GAx21hPZetw6aU3QaU1vivh5iLD/RWeXdACsc7zjzVufz9yDxBE8A08IdqUXUO3Zr1uytqzCcGocA==
+"@openforis/arena-server@^0.0.16":
+  version "0.0.16"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.16/362d53a620c6c9986c3ad7eaeeedfb9b7d9b3c776dd4c81e24d228553832dc15#fc9cfb048e2db1945d557641d10bdc5a0a63b5f0"
+  integrity sha512-XEqJqc6Uz+IucAos4lJrLNiDgKtnKS6YuTB4VYZFVyIAW7rVMeffvycuBijAM5FimGOIRXPWm5swQmN201MiGw==
   dependencies:
+    "@godaddy/terminus" "^4.7.1"
     "@openforis/arena-core" "^0.0.50"
     body-parser "^1.19.0"
     compression "^1.7.4"
@@ -1288,6 +1289,7 @@
     lodash.throttle "^4.1.1"
     log4js "^6.3.0"
     pg-promise "^10.10.1"
+    socket.io "^4.0.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.4.2":
   version "0.4.3"
@@ -4615,6 +4617,19 @@ engine.io@~4.1.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/engine.io/-/engine.io-4.1.1.tgz#9a8f8a5ac5a5ea316183c489bf7f5b6cf91ace5b"
   integrity sha512-t2E9wLlssQjGw0nluF6aYyfX8LwYU8Jj0xct+pAhfWfv/YrBn6TSNtEYsgxHIfaMqfrLx07czcMg9bMN6di+3w==
+  dependencies:
+    accepts "~1.3.4"
+    base64id "2.0.0"
+    cookie "~0.4.1"
+    cors "~2.8.5"
+    debug "~4.3.1"
+    engine.io-parser "~4.0.0"
+    ws "~7.4.2"
+
+engine.io@~5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/engine.io/-/engine.io-5.0.0.tgz#470dc94a8a4907fa4d2cd1fa6611426afcee61bf"
+  integrity sha512-BATIdDV3H1SrE9/u2BAotvsmjJg0t1P4+vGedImSs1lkFAtQdvk4Ev1y4LDiPF7BPWgXWEG+NDY+nLvW3UrMWw==
   dependencies:
     accepts "~1.3.4"
     base64id "2.0.0"
@@ -11264,6 +11279,11 @@ socket.io-adapter@~2.1.0:
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.1.0.tgz#edc5dc36602f2985918d631c1399215e97a1b527"
   integrity sha512-+vDov/aTsLjViYTwS9fPy5pEtTkrbEKsw2M+oVSoFGw6OD1IpvlV1VPhUzNbofCQ8oyMbdYJqDtGdmHQK6TdPg==
 
+socket.io-adapter@~2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.2.0.tgz#43af9157c4609e74b8addc6867873ac7eb48fda2"
+  integrity sha512-rG49L+FwaVEwuAdeBRq49M97YI3ElVabJPzvHT9S6a2CWhDKnjSFasvwAwSYPRhQzfn4NtDIbCaGYgOCOU/rlg==
+
 socket.io-client@^3.1.1:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/socket.io-client/-/socket.io-client-3.1.3.tgz#57ddcefea58cfab71f0e94c21124de8e3c5aa3e2"
@@ -11299,6 +11319,21 @@ socket.io@^3.1.1:
     debug "~4.3.1"
     engine.io "~4.1.0"
     socket.io-adapter "~2.1.0"
+    socket.io-parser "~4.0.3"
+
+socket.io@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.0.1.tgz#d2e01cf3780d810b66182b3fbef08a04a4ccf924"
+  integrity sha512-g8eZB9lV0f4X4gndG0k7YZAywOg1VxYgCUspS4V+sDqsgI/duqd0AW84pKkbGj/wQwxrqrEq+VZrspRfTbHTAQ==
+  dependencies:
+    "@types/cookie" "^0.4.0"
+    "@types/cors" "^2.8.8"
+    "@types/node" ">=10.0.0"
+    accepts "~1.3.4"
+    base64id "~2.0.0"
+    debug "~4.3.1"
+    engine.io "~5.0.0"
+    socket.io-adapter "~2.2.0"
     socket.io-parser "~4.0.3"
 
 sockjs-client@^1.5.0:
