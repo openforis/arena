@@ -173,6 +173,7 @@ Do you want to proceed?`,
     data: 'Data',
     records: 'Records',
     explorer: 'Explorer',
+    export: 'Export',
     validationReport: 'Validation report',
 
     users: 'Users',
@@ -330,6 +331,9 @@ Do you want to proceed?`,
     sessionExpired: 'Record session has expired',
   },
 
+  dataExportView: {
+    startCsvExport: 'Start CSV export',
+  },
   dataView: {
     records: {
       owner: 'Owner',
@@ -826,6 +830,9 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    // export csv data
+    ExportCsvDataJob: 'Export CSV data',
+    CSVDataExtraction: 'Extracting data in csv',
     // import arena survey
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',

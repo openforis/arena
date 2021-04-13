@@ -11,6 +11,7 @@ import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
 import nodeDefReorder from '../tests/nodeDefReorder'
 import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 import surveyFormPreview from '../tests/surveyFormPreview'
+import exportCsvData from '../tests/exportCsvData'
 
 import recordAdd from '../tests/recordAdd'
 import recordVerify from '../tests/recordVerify'
@@ -58,6 +59,11 @@ describe('E2E Tests', () => {
    */
   // TODO: Enable userInvite when implementing user delete.
   // userInvite()
+
+  /**
+   * Survey export data.
+   */
+  exportCsvData()
 
   /**
    * Survey export/import/clone.
