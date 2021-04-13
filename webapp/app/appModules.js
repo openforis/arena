@@ -57,9 +57,9 @@ export const homeModules = {
     key: 'surveys',
     path: `${appModules.home.path}/surveys`,
   },
-  surveyListTemplates: {
-    key: 'surveyListTemplates',
-    path: `${appModules.home.path}/templates`,
+  surveyTemplateList: {
+    key: 'surveyTemplateList',
+    path: `${appModules.home.path}/surveyTemplates`,
   },
   surveyNew: {
     key: 'surveyNew',

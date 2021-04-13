@@ -91,8 +91,8 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <Link
-        data-testid={DataTestId.header.surveyListTemplateBtn}
-        to={appModuleUri(homeModules.surveyListTemplates)}
+        data-testid={DataTestId.header.surveyTemplateListBtn}
+        to={appModuleUri(homeModules.surveyTemplateList)}
         onClick={onClose}
         className="btn-s btn-transparent"
       >

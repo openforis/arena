@@ -18,7 +18,7 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const Surveys = (props) => {
-  const { module, moduleApiUri, showStatus, title } = props
+  const { module, moduleApiUri, template, title } = props
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -36,12 +36,14 @@ const Surveys = (props) => {
   }
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+  const showStatus = !template
   const columns = showStatus ? 6 : 5
 
   return (
     <Table
       module={module}
       moduleApiUri={moduleApiUri}
+      restParams={{ template }}
       gridTemplateColumns={`50px repeat(${columns}, 1.5fr)`}
       headerLeftComponent={() => HeaderLeft({ title })}
       rowHeaderComponent={() => RowHeader({ showStatus })}
@@ -53,14 +55,26 @@ const Surveys = (props) => {
 }
 
 Surveys.propTypes = {
+  /**
+   * Module name.
+   */
   module: PropTypes.string.isRequired,
+  /**
+   * Module API URI.
+   */
   moduleApiUri: PropTypes.string.isRequired,
-  showStatus: PropTypes.bool,
+  /**
+   * If true, show only survey templates.
+   */
+  template: PropTypes.bool,
+  /**
+   * Title to be shown in the top header.
+   */
   title: PropTypes.string.isRequired,
 }
 
 Surveys.defaultProps = {
-  showStatus: false,
+  template: false,
 }
 
 export { Surveys }
