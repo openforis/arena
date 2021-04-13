@@ -40,9 +40,11 @@ const SurveyInfo = () => {
         <Header>
           <h3 data-testid={DataTestId.dashboard.surveyLabel}>{surveyLabel}</h3>
 
-          <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
-            ({Survey.getStatus(surveyInfo)})
-          </div>
+          {!Survey.isTemplate(surveyInfo) && (
+            <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
+              ({Survey.getStatus(surveyInfo)})
+            </div>
+          )}
         </Header>
 
         <div>
@@ -56,7 +58,9 @@ const SurveyInfo = () => {
             {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
+          {canEditDef && !Survey.isTemplate(surveyInfo) && (
+            <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
+          )}
 
           <DownloadButton
             id={DataTestId.dashboard.surveyExportBtn}
