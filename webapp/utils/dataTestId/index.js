@@ -50,6 +50,7 @@ export const DataTestId = {
   header: {
     surveyCreateBtn: 'survey-create-btn',
     surveyListBtn: 'survey-list-btn',
+    surveyTemplateListBtn: 'survey-list-template-btn',
     surveyPublishBtn: 'survey-publish-btn',
     templateCreateBtn: 'template-create-btn',
     templateListBtn: 'template-list-btn',
