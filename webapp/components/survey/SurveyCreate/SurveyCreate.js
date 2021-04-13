@@ -24,13 +24,13 @@ import { useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
-  const { showClone, showImport, submitButtonLabel } = props
+  const { showClone, showImport, submitButtonLabel, template } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const history = useHistory()
 
-  const { newSurvey, onUpdate, onCreate, onImport } = useCreateSurvey()
+  const { newSurvey, onUpdate, onCreate, onImport } = useCreateSurvey({ template })
   const { name, label, lang, validation, cloneFrom } = newSurvey
 
   // Redirect to dashboard on survey change
@@ -106,12 +106,14 @@ SurveyCreate.propTypes = {
   showClone: PropTypes.bool,
   showImport: PropTypes.bool,
   submitButtonLabel: PropTypes.string,
+  template: PropTypes.bool,
 }
 
 SurveyCreate.defaultProps = {
   showClone: true,
   showImport: true,
   submitButtonLabel: 'homeView.surveyCreate.createSurvey',
+  template: false,
 }
 
 export { SurveyCreate }
