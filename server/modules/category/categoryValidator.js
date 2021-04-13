@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Points } from '@openforis/arena-core'
+
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -7,8 +9,6 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as StringUtils from '@core/stringUtils'
-import * as GeoUtils from '@core/geo/geoUtils'
-import * as Point from '@core/geo/point'
 
 const keys = {
   children: 'children',
@@ -73,10 +73,11 @@ const _extraPropValidators = {
   [Category.itemExtraDefDataTypes.number]: (key, extra) =>
     Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
   [Category.itemExtraDefDataTypes.geometryPoint]: (key, extra) => {
-    const point = Point.parse(extra[key])
-    return GeoUtils.isCoordinateValid(Point.getSrs(point), Point.getX(point), Point.getY(point))
-      ? null
-      : ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
+    const point = Points.parse(extra[key])
+    if (point && Points.isValid(point)) {
+      return null
+    }
+    return ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
   },
   [Category.itemExtraDefDataTypes.text]: () => null,
 }

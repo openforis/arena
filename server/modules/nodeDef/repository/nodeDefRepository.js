@@ -342,14 +342,15 @@ export const deleteNodeDefsAnalysisUnused = async (surveyId, client = db) =>
       n.analysis 
       -- not used by any processing steps
       AND NOT EXISTS (
-        SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step s
+        SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.chain_node_def s
         WHERE (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid = n.uuid
       )
       -- not used by any processing step calculations
-      AND NOT EXISTS (
-        SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
-        WHERE c.node_def_uuid = n.uuid
-      )
+      -- TODO remove it
+      -- AND NOT EXISTS (
+      --   SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+      --   WHERE c.node_def_uuid = n.uuid
+      -- )
     RETURNING n.uuid
     `,
     [],

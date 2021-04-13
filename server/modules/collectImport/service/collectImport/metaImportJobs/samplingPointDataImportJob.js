@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
+import { PointFactory, Points, SRSs } from '@openforis/arena-core'
+
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Point from '@core/geo/point'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
@@ -33,6 +34,12 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     )
   }
 
+  async onStart() {
+    await super.onStart()
+    // initialize SRSs list since it's used by category extra props (with coordinates) validator
+    await SRSs.init()
+  }
+
   async logCategoryImportActivity() {
     // Do not log category import activity for sampling point data category
     return this // avoids eslint complain
@@ -61,7 +68,13 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
-    return stream ? CategoryManager.createImportSummaryFromStream(stream) : null
+    return stream
+      ? CategoryManager.createImportSummaryFromStream({
+          stream,
+          codeColumnPattern: /(level\d+)_code/,
+          ignoreLabelsAndDescriptions: true,
+        })
+      : null
   }
 
   extractItemExtraDef() {
@@ -76,11 +89,11 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   extractItemExtraProps(extra) {
     const { srs_id: srs, x, y } = extra
 
-    const point = Point.newPoint({ srs, x, y })
+    const point = PointFactory.createInstance({ srs, x, y })
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: Point.toString(point),
+      [keysItem.location]: Points.toString(point),
     }
 
     return super.extractItemExtraProps(extraUpdated)

@@ -18,7 +18,7 @@ const columnSet = {
  */
 export default class TableChain extends TableSurvey {
   constructor(surveyId) {
-    super(surveyId, 'processing_chain', columnSet)
+    super(surveyId, 'chain', columnSet)
     this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.scriptCommon))
     this.getSelect = getSelect.bind(this)
   }

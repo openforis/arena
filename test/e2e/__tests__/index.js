@@ -25,8 +25,10 @@ import surveyClone from '../tests/surveyClone'
 import validationReport from '../tests/validationReport'
 import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
+import { insertTestUser } from '../tests/utils/insertTestUser'
 
 beforeAll(async () => {
+  await insertTestUser()
   await page.goto(BASE_URL)
 })
 

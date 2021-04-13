@@ -122,16 +122,13 @@ export default class CategoryImportJob extends Job {
   async _fetchOrCreateCategory() {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
-      return  CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
+      return CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
     }
 
     const category = Category.newCategory({
       [Category.keysProps.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
-    return  CategoryManager.insertCategory(
-      { user: this.user, surveyId: this.surveyId, category, system: true },
-      this.tx
-    )
+    return CategoryManager.insertCategory({ user: this.user, surveyId: this.surveyId, category, system: true }, this.tx)
   }
 
   async _importLevels() {
@@ -168,18 +165,11 @@ export default class CategoryImportJob extends Job {
   async _readItems() {
     this.logDebug('reading CSV file rows')
 
-    this.itemsBatchInserter = new BatchPersister(
-      async (items) => await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
+    this.itemsBatchInserter = new BatchPersister(async (items) =>
+      CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
     )
-    this.itemsBatchUpdater = new BatchPersister(
-      async (items) =>
-         CategoryManager.updateItemsExtra(
-          this.user,
-          this.surveyId,
-          Category.getUuid(this.category),
-          items,
-          this.tx
-        )
+    this.itemsBatchUpdater = new BatchPersister(async (items) =>
+      CategoryManager.updateItemsExtra(this.user, this.surveyId, Category.getUuid(this.category), items, this.tx)
     )
 
     const reader = await CategoryImportCSVParser.createRowsReaderFromStream(

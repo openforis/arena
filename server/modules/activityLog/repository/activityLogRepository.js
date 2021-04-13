@@ -153,10 +153,10 @@ export const fetch = async ({
       agu.user_uuid AS target_user_uuid, -- null if user has been removed from survey
       
       -- analysis activities keys
-      processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
-      processing_step.index AS processing_step_index,
-      processing_step_calculation.index AS processing_step_calculation_index
-      
+      chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
+      chain_node_def.index AS processing_step_index,
+      -- processing_step_calculation.index AS processing_step_calculation_index
+      0 AS processing_step_calculation_index
     FROM
       log_limited AS l
     JOIN
@@ -235,19 +235,20 @@ export const fetch = async ({
 
     -- start of analysis activities part
     LEFT OUTER JOIN 
-      ${schema}.processing_chain
+      ${schema}.chain
     ON 
-      processing_chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
+      chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
     LEFT OUTER JOIN 
-      ${schema}.processing_step
+      ${schema}.chain_node_def
     ON 
-      processing_step.uuid IN (l.content_uuid, (l.content->>'${
+      chain_node_def.uuid IN (l.content_uuid, (l.content->>'${
         ProcessingStepCalculation.keys.processingStepUuid
       }')::uuid)
-    LEFT OUTER JOIN 
-      ${schema}.processing_step_calculation
-    ON 
-      processing_step_calculation.uuid = l.content_uuid
+    -- TODO remove join with processing_step_calculation table
+    -- LEFT OUTER JOIN 
+    -- ${schema}.processing_step_calculation
+    -- ON 
+    --   processing_step_calculation.uuid = l.content_uuid
     -- end of analysis activities part
 
     ORDER BY
