@@ -32,7 +32,7 @@ const Home = () => {
         },
         {
           component: SurveyTemplateList,
-          path: appModuleUri(homeModules.surveyTemplateList),
+          path: appModuleUri(homeModules.templateList),
         },
         ...(User.isSystemAdmin(user)
           ? [

@@ -84,21 +84,33 @@ const UserPopupMenu = (props) => {
           className="btn-s btn-transparent"
         >
           <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('homeView.createSurvey')}
+          {i18n.t('homeView.surveyCreate.createSurvey')}
         </Link>
       )}
 
       <Separator />
 
       <Link
-        data-testid={DataTestId.header.surveyTemplateListBtn}
-        to={appModuleUri(homeModules.surveyTemplateList)}
+        data-testid={DataTestId.header.templateListBtn}
+        to={appModuleUri(homeModules.templateList)}
         onClick={onClose}
         className="btn-s btn-transparent"
       >
         <span className="icon icon-paragraph-justify icon-12px icon-left" />
-        {i18n.t('appModules.surveyListTemplates')}
+        {i18n.t('appModules.templateList')}
       </Link>
+
+      {User.isSystemAdmin(user) && (
+        <Link
+          data-testid={DataTestId.header.templateCreateBtn}
+          to={appModuleUri(homeModules.templateNew)}
+          onClick={onClose}
+          className="btn-s btn-transparent"
+        >
+          <span className="icon icon-plus icon-12px icon-left" />
+          {i18n.t('homeView.surveyCreate.createTemplate')}
+        </Link>
+      )}
 
       <Separator />
 

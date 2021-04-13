@@ -161,7 +161,7 @@ Do you want to proceed?`,
     home: 'Home',
     dashboard: 'Dashboard',
     surveyList: 'My Surveys',
-    surveyListTemplates: 'My Templates',
+    templateList: 'My Templates',
     collectImportReport: 'Collect Import Report',
 
     designer: 'Survey',
@@ -207,7 +207,6 @@ Do you want to proceed?`,
   },
 
   homeView: {
-    createSurvey: 'Create Survey',
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
@@ -226,6 +225,7 @@ Do you want to proceed?`,
     },
     surveyCreate: {
       createSurvey: 'Create Survey',
+      createTemplate: 'Create Template',
       importFromCollect: 'Import from Collect',
       importFromArena: 'Import from Arena',
     },
