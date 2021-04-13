@@ -193,8 +193,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-export const fetchUserSurveysInfo = async ({ user, offset, limit }) =>
-  (await SurveyRepository.fetchUserSurveys({ user, offset, limit })).map(assocSurveyInfo)
+export const fetchUserSurveysInfo = async ({ user, offset, limit, template = false }) =>
+  (await SurveyRepository.fetchUserSurveys({ user, offset, limit, template })).map(assocSurveyInfo)
 
 export const { countUserSurveys, fetchDependencies } = SurveyRepository
 

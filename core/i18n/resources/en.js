@@ -161,6 +161,7 @@ Do you want to proceed?`,
     home: 'Home',
     dashboard: 'Dashboard',
     surveyList: 'My Surveys',
+    surveyListTemplates: 'My Templates',
     collectImportReport: 'Collect Import Report',
 
     designer: 'Survey',
