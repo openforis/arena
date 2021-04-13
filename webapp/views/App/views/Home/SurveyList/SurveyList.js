@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Surveys } from '@webapp/components/Surveys'
 
-const SurveyList = () => <Surveys module="surveys" moduleApiUri="/api/surveys" title="appModules.surveyList" />
+const SurveyList = () => (
+  <Surveys module="surveys" moduleApiUri="/api/surveys" title="appModules.surveyList" showStatus />
+)
 
 export default SurveyList

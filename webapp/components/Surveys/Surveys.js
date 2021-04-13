@@ -18,7 +18,7 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const Surveys = (props) => {
-  const { module, moduleApiUri, title } = props
+  const { module, moduleApiUri, showStatus, title } = props
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -36,15 +36,16 @@ const Surveys = (props) => {
   }
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+  const columns = showStatus ? 6 : 5
 
   return (
     <Table
       module={module}
       moduleApiUri={moduleApiUri}
-      gridTemplateColumns="50px repeat(6, 1.5fr)"
+      gridTemplateColumns={`50px repeat(${columns}, 1.5fr)`}
       headerLeftComponent={() => HeaderLeft({ title })}
-      rowHeaderComponent={RowHeader}
-      rowComponent={Row}
+      rowHeaderComponent={() => RowHeader({ showStatus })}
+      rowComponent={({ row, active }) => Row({ active, row, showStatus })}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
     />
@@ -54,7 +55,12 @@ const Surveys = (props) => {
 Surveys.propTypes = {
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string.isRequired,
+  showStatus: PropTypes.bool,
   title: PropTypes.string.isRequired,
+}
+
+Surveys.defaultProps = {
+  showStatus: false,
 }
 
 export { Surveys }
