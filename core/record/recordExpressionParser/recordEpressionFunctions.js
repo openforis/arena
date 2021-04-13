@@ -1,3 +1,5 @@
+import { Points } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -5,8 +7,6 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
-import * as GeoUtils from '@core/geo/geoUtils'
-import * as Point from '@core/geo/point'
 
 export const recordExpressionFunctions = ({ survey, record }) => ({
   [Expression.functionNames.categoryItemProp]: (categoryName, itemPropName, ...codePaths) => {
@@ -25,10 +25,11 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
   },
   [Expression.functionNames.distance]: (coordinateFrom, coordinateTo) => {
     const toPoint = (coordinate) =>
-      coordinate && typeof coordinate === 'string' ? Point.parse(coordinate) : coordinate
+      coordinate && typeof coordinate === 'string' ? Points.parse(coordinate) : coordinate
     const pointFrom = toPoint(coordinateFrom)
     const pointTo = toPoint(coordinateTo)
-    return GeoUtils.distance(pointFrom, pointTo)
+    if (pointFrom === null || pointTo === null) return null
+    return Points.distance(pointFrom, pointTo)
   },
   [Expression.functionNames.index]: (node) => {
     if (!node) {

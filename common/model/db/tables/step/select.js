@@ -1,12 +1,13 @@
 import * as ProcessingStep from '../../../../analysis/processingStep'
-import * as SQL from '../../sql'
+// import * as SQL from '../../sql'
 import TableCalculation from '../calculation'
 
 function _getJoinCalculation({ includeScript }) {
-  return `LEFT JOIN LATERAL (
-    ${this.tableCalculation.getSelect({ includeScript, stepUuid: this.columnUuid })}
-  ) AS ${this.tableCalculation.alias}
-  ON TRUE`
+  return ''
+  // return `LEFT JOIN LATERAL (
+  //   ${this.tableCalculation.getSelect({ includeScript, stepUuid: this.columnUuid })}
+  // ) AS ${this.tableCalculation.alias}
+  // ON TRUE`
 }
 
 /**
@@ -35,10 +36,10 @@ export function getSelect(params) {
   this.tableCalculation = new TableCalculation(this.surveyId)
 
   const selectFields = [...this.columns]
-  if (includeCalculations) {
-    const jsonAgg = SQL.jsonAgg(this.tableCalculation.getColumn('*'), [this.tableCalculation.columnIndex])
-    selectFields.push(`${jsonAgg} AS calculations`)
-  }
+  // if (includeCalculations) {
+  //   const jsonAgg = SQL.jsonAgg(this.tableCalculation.getColumn('*'), [this.tableCalculation.columnIndex])
+  //   selectFields.push(`${jsonAgg} AS calculations`)
+  // }
 
   const whereConditions = []
   if (chainUuid) whereConditions.push(`${this.columnChainUuid} = ${chainUuid}`)

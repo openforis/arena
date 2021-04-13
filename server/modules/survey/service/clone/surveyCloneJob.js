@@ -16,9 +16,9 @@ export default class SurveyCloneJob extends Job {
           'taxon',
           'taxon_vernacular_name',
           'node_def',
-          'processing_chain',
-          'processing_step',
-          'processing_step_calculation',
+          'chain',
+          'chain_node_def',
+          'chain_node_def_aggregate',
         ],
       }),
     ])

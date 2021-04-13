@@ -1,3 +1,5 @@
+import { SRSs } from '@openforis/arena-core'
+
 import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -27,6 +29,11 @@ export default class ArenaImportJob extends Job {
       // Needed when the survey is published
       new CreateRdbJob(),
     ])
+  }
+
+  async onStart() {
+    await super.onStart()
+    await SRSs.init()
   }
 
   async beforeSuccess() {
