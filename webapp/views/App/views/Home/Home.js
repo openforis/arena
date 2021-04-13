@@ -12,7 +12,8 @@ import CollectImportReport from './CollectImportReport'
 import SurveyList from './SurveyList'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
-import SurveyTemplateList from './SurveyTemplateList'
+import TemplateList from './TemplateList'
+import TemplateCreate from './TemplateCreate'
 
 const Home = () => {
   const user = useUser()
@@ -31,7 +32,7 @@ const Home = () => {
           path: appModuleUri(homeModules.surveyList),
         },
         {
-          component: SurveyTemplateList,
+          component: TemplateList,
           path: appModuleUri(homeModules.templateList),
         },
         ...(User.isSystemAdmin(user)
@@ -39,6 +40,10 @@ const Home = () => {
               {
                 component: SurveyCreate,
                 path: appModuleUri(homeModules.surveyNew),
+              },
+              {
+                component: TemplateCreate,
+                path: appModuleUri(homeModules.templateNew),
               },
             ]
           : []),
