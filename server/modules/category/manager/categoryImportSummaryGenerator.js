@@ -12,89 +12,50 @@ import * as CSVReader from '@server/utils/file/csvReader'
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
   [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
-  [CategoryImportSummary.columnTypes.description]: {
-    suffix: '_description',
-    lang: true,
-  },
+  [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
 }
 
 const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
-const columnLabelSuffix = columnProps[CategoryImportSummary.columnTypes.label].suffix
-const columnDescriptionSuffix = columnProps[CategoryImportSummary.columnTypes.description].suffix
 
-const columnRegExpLabel = new RegExp(`^.*${columnLabelSuffix}(_[a-z]{2})?$`)
-const columnRegExpDescription = new RegExp(`^.*${columnDescriptionSuffix}(_[a-z]{2})?$`)
-
-export const createImportSummaryFromStream = async (stream) => {
-  const columnNames = await CSVReader.readHeadersFromStream(stream)
-
-  if (R.find(StringUtils.isBlank)(columnNames)) {
-    throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
+const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
+  // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
+  // the language suffix is optional
+  const langSuffixPattern = columnProp.lang ? `(_([a-z]{2}))?` : ''
+  const pattern = new RegExp(`^(.*)${columnProp.suffix}${langSuffixPattern}$`)
+  return {
+    ...columnPatterns,
+    [columnType]: pattern,
   }
+}, {})
 
-  const levelsByName = {}
+const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndDescriptions = false }) => {
+  // try to find column type by matching one of the column patterns
+  const columnType = Object.keys(columnPatterns).find((type) => columnPatterns[type].test(columnName))
 
-  const getOrCreateLevel = (columnName, columnType) => {
-    const columnProp = columnProps[columnType]
-    if (columnProp) {
-      const name = columnName.slice(0, columnName.length - columnProp.suffix.length - (columnProp.lang ? 3 : 0))
-
-      let level = levelsByName[name]
-      if (!level) {
-        level = {
-          name,
-          index: Object.keys(levelsByName).length,
-        }
-        levelsByName[name] = level
-      }
-
-      return level
-    }
-
-    return { name: null, index: -1 }
-  }
-
-  const getColumnTypeByName = (columnName) => {
-    if (columnName.endsWith(columnCodeSuffix)) return CategoryImportSummary.columnTypes.code
-    if (columnRegExpLabel.test(columnName)) return CategoryImportSummary.columnTypes.label
-    if (columnRegExpDescription.test(columnName)) return CategoryImportSummary.columnTypes.description
-    return CategoryImportSummary.columnTypes.extra
-  }
-
-  const columns = columnNames.reduce((acc, columnName) => {
-    const columnType = getColumnTypeByName(columnName)
-
-    const level = getOrCreateLevel(columnName, columnType)
-
-    const extraDataType =
-      columnType === CategoryImportSummary.columnTypes.extra ? Category.itemExtraDefDataTypes.text : null
-
-    const columnProp = columnProps[columnType]
-    const language = columnProp && columnProp.lang ? columnName.slice(columnName.lastIndexOf('_') + 1) : null
-
-    acc[columnName] = CategoryImportSummary.newColumn(columnType, level.name, level.index, language, extraDataType)
-
-    return acc
-  }, {})
-
-  const summary = CategoryImportSummary.newSummary(columns)
-
-  _validateSummary(summary)
-
-  return summary
+  // columns not matching any of the predefined patterns will be considered of type extra
+  return columnType && (!ignoreLabelsAndDescriptions || columnType === CategoryImportSummary.columnTypes.code)
+    ? columnType
+    : CategoryImportSummary.columnTypes.extra
 }
 
-export const createImportSummary = async (filePath) => ({
-  ...(await createImportSummaryFromStream(fs.createReadStream(filePath))),
-  [CategoryImportSummary.keys.filePath]: filePath,
-})
+const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
+  const pattern = columnPatterns[columnType]
+  const match = columnName.match(pattern)
+  return match[1]
+}
+
+const _extractLang = ({ columnPatterns, columnName, columnType }) => {
+  const pattern = columnPatterns[columnType]
+  const match = columnName.match(pattern)
+  return match[3]
+}
 
 const _validateSummary = (summary) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   let atLeastOneCodeColumn = false
 
-  for (const column of Object.values(columns)) {
+  Object.values(columns).forEach((column) => {
     if (CategoryImportSummary.isColumnCode(column)) {
       atLeastOneCodeColumn = true
     } else if (CategoryImportSummary.isColumnLabel(column) || CategoryImportSummary.isColumnDescription(column)) {
@@ -111,9 +72,77 @@ const _validateSummary = (summary) => {
         throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, { columnNameMissing })
       }
     }
-  }
+  })
 
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
 }
+
+export const createImportSummaryFromColumnNames = ({
+  columnNames,
+  codeColumnPattern = null,
+  ignoreLabelsAndDescriptions = false,
+}) => {
+  if (R.find(StringUtils.isBlank)(columnNames)) {
+    throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
+  }
+
+  // if a codeColumnPattern is specified, use it to test if a column is of type code
+  const columnPatterns = { ...columnPatternsDefault }
+  if (codeColumnPattern) {
+    columnPatterns[CategoryImportSummary.columnTypes.code] = codeColumnPattern
+  }
+
+  const levelsByName = {}
+
+  const getOrCreateLevel = ({ columnName, columnType }) => {
+    const columnProp = columnProps[columnType]
+    if (columnProp) {
+      const levelName = _extractLevelName({ columnPatterns, columnName, columnType })
+      let level = levelsByName[levelName]
+      if (!level) {
+        level = { name: levelName, index: Object.keys(levelsByName).length }
+        levelsByName[levelName] = level
+      }
+      return level
+    }
+
+    return { name: null, index: -1 }
+  }
+
+  const columns = columnNames.reduce((acc, columnName) => {
+    const columnType = _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
+    const extra = columnType === CategoryImportSummary.columnTypes.extra
+
+    const level = getOrCreateLevel({ columnName, columnType })
+    const { name: levelName, index: levelIndex } = level
+
+    const dataType = extra ? Category.itemExtraDefDataTypes.text : null
+
+    const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
+
+    const column = CategoryImportSummary.newColumn({ type: columnType, levelName, levelIndex, lang, dataType })
+    return { ...acc, [columnName]: column }
+  }, {})
+
+  const summary = CategoryImportSummary.newSummary({ columns })
+
+  _validateSummary(summary)
+
+  return summary
+}
+
+export const createImportSummaryFromStream = async ({
+  stream,
+  codeColumnPattern = null,
+  ignoreLabelsAndDescriptions = false,
+}) => {
+  const columnNames = await CSVReader.readHeadersFromStream(stream)
+  return createImportSummaryFromColumnNames({ columnNames, codeColumnPattern, ignoreLabelsAndDescriptions })
+}
+
+export const createImportSummary = async (filePath) => ({
+  ...(await createImportSummaryFromStream({ stream: fs.createReadStream(filePath) })),
+  [CategoryImportSummary.keys.filePath]: filePath,
+})

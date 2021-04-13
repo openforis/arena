@@ -12,10 +12,6 @@ mkdir -p $TEMP_FOLDER $ANALYSIS_OUTPUT_DIR;
 # wait for postgres to startup
 while ! nc -z $PGHOST $PGPORT; do sleep 1; done;
 
-# Copy db migrations from test to server folder
-cp test/db/migrations/*.js server/db/migration/public/migrations
-cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
-
 # Build and start Arena in dev environment
 npm run build:server:dev; npm run build-dev;
 ln -s dist/server.js .

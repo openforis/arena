@@ -1,25 +1,33 @@
 import * as R from 'ramda'
 
+import { PointFactory, Points } from '@openforis/arena-core'
+
 import * as DateTimeUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-const { nodeDefType } = NodeDef
 import * as Taxon from '@core/survey/taxon'
 
-import * as GeoUtils from '@core/geo/geoUtils'
-
 import * as Validation from '@core/validation/validation'
+
 import * as Node from '../node'
+
+const { nodeDefType } = NodeDef
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (_survey, _nodeDef, _node, value) => R.includes(value, ['true', 'false']),
 
   [nodeDefType.code]: (survey, nodeDef, node, _value) => validateCode(survey, nodeDef, node),
 
-  [nodeDefType.coordinate]: (_survey, _nodeDef, node, _value) =>
-    GeoUtils.isCoordinateValid(Node.getCoordinateSrs(node), Node.getCoordinateX(node), Node.getCoordinateY(node)),
+  [nodeDefType.coordinate]: (_survey, _nodeDef, node, _value) => {
+    const point = PointFactory.createInstance({
+      srs: Node.getCoordinateSrs(node),
+      x: Node.getCoordinateX(node),
+      y: Node.getCoordinateY(node),
+    })
+    return point && Points.isValid(point)
+  },
 
   [nodeDefType.date]: (_survey, _nodeDef, node, _value) => {
     const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]

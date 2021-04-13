@@ -4,12 +4,12 @@ import { getSelect } from './select'
 
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
-  chainUuid: 'processing_chain_uuid',
+  chainUuid: 'chain_uuid',
   index: 'index',
   props: Table.columnSetCommon.props,
 }
 
-const tableName = 'processing_step'
+const tableName = 'chain_node_def'
 /**
  * @typedef {module:arena.TableSurvey} module:arena.TableStep
  */
