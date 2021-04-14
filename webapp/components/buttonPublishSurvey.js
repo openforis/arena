@@ -18,6 +18,8 @@ const ButtonPublishSurvey = (props) => {
 
   const surveyLabel = Survey.getLabel(surveyInfo, i18n.lang)
 
+  if (Survey.isTemplate(surveyInfo)) return null
+
   return (
     <button
       type="button"
