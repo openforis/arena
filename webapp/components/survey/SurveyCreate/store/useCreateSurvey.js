@@ -7,11 +7,12 @@ const initialSurvey = {
   label: '',
   lang: 'en',
   cloneFrom: '',
+  template: false,
   validation: {},
 }
 
-export const useCreateSurvey = () => {
-  const [newSurvey, setNewSurvey] = useState(initialSurvey)
+export const useCreateSurvey = ({ template = false } = {}) => {
+  const [newSurvey, setNewSurvey] = useState({ ...initialSurvey, template })
 
   const { onUpdate, onCreate, onImport } = useActions({
     newSurvey,

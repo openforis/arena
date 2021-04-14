@@ -9,13 +9,17 @@ import PopupMenu from './PopupMenu'
 const Modules = (props) => {
   const { user, surveyInfo, pathname, sideBarOpened } = props
 
+  const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
+    (module) => !SideBarModule.isHidden(module)
+  )
+
   // Popup menu module
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
   return (
     <div className={`sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}>
       <div className="sidebar__module-placeholder" />
-      {SideBarModule.getModulesHierarchy(user, surveyInfo).map((module) => (
+      {modulesHierarchy.map((module) => (
         <Module
           key={SideBarModule.getKey(module)}
           surveyInfo={surveyInfo}

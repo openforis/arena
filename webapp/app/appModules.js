@@ -65,6 +65,14 @@ export const homeModules = {
     key: 'surveyNew',
     path: `${appModules.home.path}/surveyNew`,
   },
+  templateList: {
+    key: 'templates',
+    path: `${appModules.home.path}/templates`,
+  },
+  templateNew: {
+    key: 'templateNew',
+    path: `${appModules.home.path}/templateNew`,
+  },
   collectImportReport: {
     key: 'collectImportReport',
     path: `${appModules.home.path}/collectImportReport`,

@@ -40,9 +40,11 @@ const SurveyInfo = () => {
         <Header>
           <h3 data-testid={DataTestId.dashboard.surveyLabel}>{surveyLabel}</h3>
 
-          <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
-            ({Survey.getStatus(surveyInfo)})
-          </div>
+          {!Survey.isTemplate(surveyInfo) && (
+            <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
+              ({Survey.getStatus(surveyInfo)})
+            </div>
+          )}
         </Header>
 
         <div>

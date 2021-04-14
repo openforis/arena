@@ -47,4 +47,4 @@ SurveyDropdown.defaultProps = {
   onChange: () => ({}),
 }
 
-export default SurveyDropdown
+export { SurveyDropdown }

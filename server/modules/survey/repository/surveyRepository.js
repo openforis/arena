@@ -11,9 +11,12 @@ import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepository
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
-  return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_uuid,
-  ${selectDate(`${prefix}date_created`, 'date_created')}, 
-  ${selectDate(`${prefix}date_modified`, 'date_modified')}`
+  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template']
+  return [
+    ...columns.map((c) => `${prefix}${c}`),
+    selectDate(`${prefix}date_created`, 'date_created'),
+    selectDate(`${prefix}date_modified`, 'date_modified'),
+  ].join(', ')
 }
 
 // ============== CREATE
@@ -21,11 +24,18 @@ const surveySelectFields = (alias = '') => {
 export const insertSurvey = async (survey, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft )
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft, template )
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING ${surveySelectFields()}
     `,
-    [Survey.getUuid(survey), survey.props, survey.ownerUuid, Survey.isPublished(survey), Survey.isDraft(survey)],
+    [
+      Survey.getUuid(survey),
+      survey.props,
+      survey.ownerUuid,
+      Survey.isPublished(survey),
+      Survey.isDraft(survey),
+      Survey.isTemplate(survey),
+    ],
     (def) => dbTransformCallback(def, true)
   )
 

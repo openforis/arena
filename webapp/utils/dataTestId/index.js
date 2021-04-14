@@ -52,6 +52,8 @@ export const DataTestId = {
     surveyListBtn: 'survey-list-btn',
     surveyTemplateListBtn: 'survey-list-template-btn',
     surveyPublishBtn: 'survey-publish-btn',
+    templateCreateBtn: 'template-create-btn',
+    templateListBtn: 'template-list-btn',
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',

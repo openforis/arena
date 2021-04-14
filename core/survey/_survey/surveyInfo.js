@@ -25,6 +25,7 @@ export const keys = {
   languages: 'languages',
   srs: 'srs',
   steps: 'steps',
+  template: 'template',
 }
 
 export const collectReportKeys = {
@@ -37,9 +38,7 @@ export const cycleOneKey = '0'
 export const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-export const getId = ObjectUtils.getId
-
-export const getUuid = ObjectUtils.getUuid
+export const { getId, getUuid } = ObjectUtils
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 
@@ -74,22 +73,22 @@ export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
 export const getDefaultSRS = R.pipe(getSRS, R.head)
 
-export const getStatus = (surveyInfo) =>
-  isPublished(surveyInfo) && isDraft(surveyInfo)
-    ? 'PUBLISHED-DRAFT'
-    : isPublished(surveyInfo)
-    ? 'PUBLISHED'
-    : isDraft(surveyInfo)
-    ? 'DRAFT'
-    : ''
+export const getStatus = (surveyInfo) => {
+  const published = isPublished(surveyInfo)
+  const draft = isDraft(surveyInfo)
+  if (published && draft) return 'PUBLISHED-DRAFT'
+  if (published) return 'PUBLISHED'
+  if (draft) return 'DRAFT'
+  return ''
+}
 
 export const getCycles = ObjectUtils.getProp(keys.cycles)
 
 export const getCycleKeys = R.pipe(getCycles, R.keys)
 
-export const getDateCreated = ObjectUtils.getDateCreated
+export const { getDateCreated } = ObjectUtils
 
-export const getDateModified = ObjectUtils.getDateModified
+export const { getDateModified } = ObjectUtils
 
 export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
@@ -105,6 +104,8 @@ export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
 
+export const isTemplate = R.propEq(keys.template, true)
+
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
 
@@ -114,7 +115,7 @@ export const isValid = (surveyInfo) => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-export const getAuthGroups = ObjectUtils.getAuthGroups
+export const { getAuthGroups } = ObjectUtils
 
 const _getAuthGroupByName = (name) => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
 
