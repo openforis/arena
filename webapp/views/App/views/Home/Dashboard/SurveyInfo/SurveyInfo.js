@@ -58,9 +58,7 @@ const SurveyInfo = () => {
             {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditDef && !Survey.isTemplate(surveyInfo) && (
-            <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
-          )}
+          {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           <DownloadButton
             id={DataTestId.dashboard.surveyExportBtn}

@@ -62,9 +62,7 @@ const Header = () => {
                   dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
                 }}
               />
-              {Survey.isDraft(surveyInfo) && !Survey.isTemplate(surveyInfo) && (
-                <ButtonPublishSurvey className="btn-secondary" />
-              )}
+              {Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
             </>
           ))}
       </div>
