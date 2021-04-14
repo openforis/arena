@@ -75,7 +75,6 @@ describe('E2E Tests', () => {
    * Survey template.
    */
   templateCreate()
-  templateDelete()
 
   /**
    * Survey export/import/clone.
@@ -94,4 +93,5 @@ describe('E2E Tests', () => {
    */
   recordDelete()
   surveyDelete()
+  templateDelete()
 })
