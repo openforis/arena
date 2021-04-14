@@ -31,3 +31,19 @@ export const surveyClone = {
   },
   languages: ['en', 'fr'],
 }
+
+export const template = {
+  name: 'survey_template',
+  label: 'Survey Template',
+  labels: {
+    en: 'Survey Template',
+  },
+}
+
+export const template2 = {
+  name: 'survey_template_2',
+  label: 'Survey Template 2',
+  labels: {
+    en: 'Survey Template 2',
+  },
+}

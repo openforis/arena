@@ -16,6 +16,20 @@ export const gotoSurveyList = () =>
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveys/`)
   })
 
+export const gotoTemplateCreate = () =>
+  test('Goto template create', async () => {
+    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.header.templateCreateBtn, 'a'))])
+    expect(page.url()).toBe(`${BASE_URL}/app/home/templateNew/`)
+  })
+
+export const gotoTemplateList = () =>
+  test('Goto template list', async () => {
+    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
+    await page.click(getSelector(DataTestId.header.templateListBtn, 'a'))
+    expect(page.url()).toBe(`${BASE_URL}/app/home/templates/`)
+  })
+
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
   test('Goto survey create', async () => {

@@ -18,6 +18,8 @@ import recordVerify from '../tests/recordVerify'
 
 // import userInvite from '../tests/userInvite'
 
+import templateCreate from '../tests/templateCreate'
+
 import surveyExport from '../tests/surveyExport'
 import surveyImport from '../tests/surveyImport'
 import surveyClone from '../tests/surveyClone'
@@ -25,6 +27,8 @@ import surveyClone from '../tests/surveyClone'
 import validationReport from '../tests/validationReport'
 import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
+import templateDelete from '../tests/templateDelete'
+
 import { insertTestUser } from '../tests/utils/insertTestUser'
 
 beforeAll(async () => {
@@ -66,6 +70,12 @@ describe('E2E Tests', () => {
    * Survey export data.
    */
   exportCsvData()
+
+  /**
+   * Survey template.
+   */
+  templateCreate()
+  templateDelete()
 
   /**
    * Survey export/import/clone.
