@@ -47,3 +47,13 @@ export const template2 = {
     en: 'Survey Template 2',
   },
 }
+
+export const templateCloned = {
+  cloneFrom: survey.name,
+  name: 'survey_template_cloned',
+  label: 'Survey Template Cloned',
+  labels: {
+    en: 'Survey Template Cloned',
+  },
+  languages: ['en', 'fr'],
+}

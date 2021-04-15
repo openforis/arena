@@ -1,36 +1,34 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { template, template2 } from '../mock/survey'
+import { template, template2, templateCloned } from '../mock/survey'
 import { gotoTemplateList } from './_navigation'
 import { clickSurvey } from './_surveyList'
 
-const deleteTemplate = async (templateToDelete) => {
-  const { name } = templateToDelete
+const deleteTemplate = (templateToDelete) => {
+  gotoTemplateList()
 
-  await clickSurvey(templateToDelete)
+  test(`Delete ${templateToDelete.name}`, async () => {
+    const { name } = templateToDelete
 
-  await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
-  await page.fill('input[type="text"]', name)
+    await clickSurvey(templateToDelete)
 
-  // Click div[role="dialog"] >> text="Delete"
-  await Promise.all([
-    page.waitForNavigation(/* { url: `{BASE_URL}/app/home/templates/` } */),
-    page.click('div[role="dialog"] >> text="Delete"'),
-  ])
+    await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
+    await page.fill('input[type="text"]', name)
 
-  await expect(page).toHaveText(`Survey ${name} has been deleted`)
+    // Click div[role="dialog"] >> text="Delete"
+    await Promise.all([
+      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/templates/` } */),
+      page.click('div[role="dialog"] >> text="Delete"'),
+    ])
+
+    await expect(page).toHaveText(`Survey ${name} has been deleted`)
+  })
 }
 
 export default () =>
   describe('Template Delete', () => {
-    gotoTemplateList()
-    test('Delete 1st template', async () => {
-      await deleteTemplate(template)
-    })
-
-    gotoTemplateList()
-    test('Delete 2nd template', async () => {
-      await deleteTemplate(template2)
-    })
+    deleteTemplate(template)
+    deleteTemplate(template2)
+    deleteTemplate(templateCloned)
 
     gotoTemplateList()
     test('Verify template list empty', async () => {
