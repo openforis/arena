@@ -1261,31 +1261,22 @@
     readdirp "^2.2.1"
     upath "^1.1.1"
 
-"@openforis/arena-core@^0.0.51":
-  version "0.0.51"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.51/5c9bb21a908f7d4a51f285a2c3ef4c42e2d3cfb4052158b77ecad3858cb30548#b7eaeaa61814d3f8293f827cb83044f12041702f"
-  integrity sha512-19ehlDGT3ELLx6fKzd0cA91zypjQslo8YWdEU0YxSvBLi7XdKSWrTbLb/ANGJqeXcQLav+FystkYArXJBgQlbw==
+"@openforis/arena-core@^0.0.55":
+  version "0.0.55"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.55/ecbb5a7f73508253241c14a1cdac159cf0c450fc70c50126112437c4618246dc#697cf9080c74d7cba589315cd0351cf008bbccea"
+  integrity sha512-nYuLyjcwovNYNCla+skr9Sa62mGO/yFW86qsZUNP/4eyDDddRpfVg5ga5vge5KwedKrp1GjYZrgkr9S8Ivg+aw==
   dependencies:
     "@esri/proj-codes" "^2.7.0"
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-core@^0.0.53":
-  version "0.0.53"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.53/b2383ca5db082e55de56d72fe1c23706f78f18dbf2667676b15a7efc16d2ebc5#202faee13b304add171a005c5aeba4cce5968017"
-  integrity sha512-Q39qc0s3CEw95kqzVrNpVYyz5+3Upd7GVb5OjywpgprU8caXK1UkLWHHXISLAWd4AU3+ZOzmRSdQ5Y2bWKSY7A==
-  dependencies:
-    "@esri/proj-codes" "^2.7.0"
-    proj4 "^2.7.2"
-    uuid "^8.3.2"
-
-"@openforis/arena-server@^0.0.18":
-  version "0.0.18"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.18/c8a3e006da9dff570e673926d734815ffafda698ae3e77ad86234678ac7b0903#facb001906fb1d7bbf6c845f8aa75555c6f59812"
-  integrity sha512-8VBB8WSOAj3MlFSXEZhtPyi9dMkfo1HZyDJcU+ediS2llQnPYAklIxP80WfSm6mowKqgdLkrP2wVBtBN9QvCig==
+"@openforis/arena-server@^0.0.20":
+  version "0.0.20"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.20/5eb4b4f24cf2dccaf5563ea95512e20191cb9bd458c790eb98a356e3df8124d3#00e617f4fb9924bcf6230bbcf0e891dc55d1abb5"
+  integrity sha512-IeaFZ8TVUZw4XQ0jMS/De461oFQnxY3Hns1BQA4zjSHVWHBCwd5rGi6UoHG3YnoinTAlbebBtXHOZeFXG5uqxg==
   dependencies:
     "@godaddy/terminus" "^4.7.1"
-    "@openforis/arena-core" "^0.0.53"
+    "@openforis/arena-core" "^0.0.55"
     body-parser "^1.19.0"
     compression "^1.7.4"
     connect-pg-simple "^6.2.1"

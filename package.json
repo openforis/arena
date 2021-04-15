@@ -96,8 +96,8 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.51",
-    "@openforis/arena-server": "^0.0.18",
+    "@openforis/arena-core": "^0.0.55",
+    "@openforis/arena-server": "^0.0.20",
     "@sendgrid/mail": "^7.4.2",
     "adm-zip": "^0.5.3",
     "archiver": "^5.2.0",
