@@ -96,7 +96,6 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@godaddy/terminus": "^4.6.0",
     "@openforis/arena-core": "^0.0.51",
     "@openforis/arena-server": "^0.0.18",
     "@sendgrid/mail": "^7.4.2",
@@ -153,7 +152,6 @@
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.3.0",
     "rxjs": "^6.6.3",
-    "socket.io": "^3.1.1",
     "socket.io-client": "^3.1.1",
     "to-snake-case": "^1.0.0",
     "uuid": "^8.3.2",

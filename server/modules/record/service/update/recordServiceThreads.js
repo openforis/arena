@@ -1,10 +1,9 @@
 import * as R from 'ramda'
 
+import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import ThreadManager from '@server/threads/threadManager'
 import * as ThreadParams from '@server/threads/threadParams'
-
-import * as WebSocket from '@server/utils/webSocket'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as RecordThreadsMap from './recordThreadsMap'
 import * as RecordSocketsMap from './recordSocketsMap'
@@ -26,7 +25,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
     [RecordUpdateThreadParams.keys.recordUuid]: recordUuid,
   }
 
-  const messageHandler = msg => {
+  const messageHandler = (msg) => {
     if (msg.type === RecordThreadMessageTypes.threadKill) {
       if (RecordThreadsMap.isZombie(recordUuid)) {
         clearTimeout(recordThreadTimeouts[recordUuid])
@@ -38,8 +37,8 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
     } else {
       // Notify all sockets that have checked in the record
       const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
-      socketIds.forEach(socketIdCurrent => {
-        WebSocket.notifySocket(socketIdCurrent, msg.type, R.prop('content', msg))
+      socketIds.forEach((socketIdCurrent) => {
+        WebSocketServer.notifySocket(socketIdCurrent, msg.type, R.prop('content', msg))
       })
     }
   }
@@ -56,7 +55,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
 
 // ====== READ
 
-const _resetThreadInactivityTimeout = recordUuid => {
+const _resetThreadInactivityTimeout = (recordUuid) => {
   clearTimeout(recordThreadTimeouts[recordUuid])
 
   // After one hour of inactivity, thread gets killed and user is notified
@@ -64,7 +63,9 @@ const _resetThreadInactivityTimeout = recordUuid => {
     killRecordThread(recordUuid)
 
     const userUuids = RecordSocketsMap.getSocketIds(recordUuid)
-    userUuids.forEach(userUuid => WebSocket.notifyUser(userUuid, WebSocketEvents.recordSessionExpired, recordUuid))
+    userUuids.forEach((userUuid) =>
+      WebSocketServer.notifyUser(userUuid, WebSocketEvent.recordSessionExpired, recordUuid)
+    )
   }, 60 * 60 * 1000)
 }
 
@@ -81,7 +82,7 @@ export const getOrCreatedRecordThread = (socketId, user, surveyId, recordUuid) =
 }
 
 // ====== DELETE
-export const killRecordThread = recordUuid => {
+export const killRecordThread = (recordUuid) => {
   const thread = getRecordThread(recordUuid)
 
   RecordThreadsMap.markZombie(recordUuid)
@@ -96,7 +97,7 @@ export const getSocketIds = RecordSocketsMap.getSocketIds
 
 export const assocSocket = RecordSocketsMap.assocSocket
 
-const _terminateThreadIfNoSockets = recordUuid => {
+const _terminateThreadIfNoSockets = (recordUuid) => {
   const thread = getRecordThread(recordUuid)
   // Terminate thread if there are no more users editing the record
   if (thread && !RecordSocketsMap.hasSockets(recordUuid)) {
@@ -104,7 +105,7 @@ const _terminateThreadIfNoSockets = recordUuid => {
   }
 }
 
-export const dissocSocket = socketId => {
+export const dissocSocket = (socketId) => {
   const recordUuid = RecordSocketsMap.getRecordUuid(socketId)
   if (recordUuid) {
     RecordSocketsMap.dissocSocket(recordUuid, socketId)
@@ -112,7 +113,7 @@ export const dissocSocket = socketId => {
   }
 }
 
-export const dissocSocketsByRecordUuid = recordUuid => {
+export const dissocSocketsByRecordUuid = (recordUuid) => {
   RecordSocketsMap.dissocSockets(recordUuid)
   _terminateThreadIfNoSockets(recordUuid)
 }

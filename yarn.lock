@@ -1038,7 +1038,7 @@
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.7.0.tgz#4e92a04d8e27a322f99382730149a26bae7702cf"
   integrity sha512-QgAcLXuWuBwXXbARKmcvxiUZr6SuY28uYSMHyvrEZIeXwObMHKTChiwco2MvcRuXSb8O6RdJlnwX+j7pukaYxg==
 
-"@godaddy/terminus@^4.6.0", "@godaddy/terminus@^4.7.1":
+"@godaddy/terminus@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.7.1.tgz#f4b850617923e00f7080c64f2c97d653e4eea66a"
   integrity sha512-WA1UpDIUvEJ6pMIlgXrzXkAjHdt33G+j7074MLppZ1b2uN8OaH/QKo5zrASrLCWuczwS31t69aMtqiPWN3ruBA==
@@ -4621,19 +4621,6 @@ engine.io-parser@~4.0.0, engine.io-parser@~4.0.1:
   integrity sha512-sHfEQv6nmtJrq6TKuIz5kyEKH/qSdK56H/A+7DnAuUPWosnIZAS2NHNcPLmyjtY3cGS/MqJdZbUjW97JU72iYg==
   dependencies:
     base64-arraybuffer "0.1.4"
-
-engine.io@~4.1.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/engine.io/-/engine.io-4.1.1.tgz#9a8f8a5ac5a5ea316183c489bf7f5b6cf91ace5b"
-  integrity sha512-t2E9wLlssQjGw0nluF6aYyfX8LwYU8Jj0xct+pAhfWfv/YrBn6TSNtEYsgxHIfaMqfrLx07czcMg9bMN6di+3w==
-  dependencies:
-    accepts "~1.3.4"
-    base64id "2.0.0"
-    cookie "~0.4.1"
-    cors "~2.8.5"
-    debug "~4.3.1"
-    engine.io-parser "~4.0.0"
-    ws "~7.4.2"
 
 engine.io@~5.0.0:
   version "5.0.0"
@@ -11283,11 +11270,6 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-socket.io-adapter@~2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.1.0.tgz#edc5dc36602f2985918d631c1399215e97a1b527"
-  integrity sha512-+vDov/aTsLjViYTwS9fPy5pEtTkrbEKsw2M+oVSoFGw6OD1IpvlV1VPhUzNbofCQ8oyMbdYJqDtGdmHQK6TdPg==
-
 socket.io-adapter@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.2.0.tgz#43af9157c4609e74b8addc6867873ac7eb48fda2"
@@ -11314,21 +11296,6 @@ socket.io-parser@~4.0.3, socket.io-parser@~4.0.4:
     "@types/component-emitter" "^1.2.10"
     component-emitter "~1.3.0"
     debug "~4.3.1"
-
-socket.io@^3.1.1:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-3.1.2.tgz#06e27caa1c4fc9617547acfbb5da9bc1747da39a"
-  integrity sha512-JubKZnTQ4Z8G4IZWtaAZSiRP3I/inpy8c/Bsx2jrwGrTbKeVU5xd6qkKMHpChYeM3dWZSO0QACiGK+obhBNwYw==
-  dependencies:
-    "@types/cookie" "^0.4.0"
-    "@types/cors" "^2.8.8"
-    "@types/node" ">=10.0.0"
-    accepts "~1.3.4"
-    base64id "~2.0.0"
-    debug "~4.3.1"
-    engine.io "~4.1.0"
-    socket.io-adapter "~2.1.0"
-    socket.io-parser "~4.0.3"
 
 socket.io@^4.0.1:
   version "4.0.1"

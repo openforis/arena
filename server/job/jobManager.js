@@ -1,8 +1,8 @@
+import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import ThreadsCache from '@server/threads/threadsCache'
 import ThreadManager from '@server/threads/threadManager'
 
-import * as WebSocket from '@server/utils/webSocket'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import { jobThreadMessageTypes } from './jobUtils'
 
 // USER JOB WORKERS
@@ -12,7 +12,7 @@ const userJobThreads = new ThreadsCache()
 const _notifyJobUpdate = (jobSerialized) => {
   const { userUuid } = jobSerialized
 
-  WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
+  WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobSerialized)
   if (!jobSerialized.ended) {
     return
   }

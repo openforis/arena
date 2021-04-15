@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import { SRSs } from '@openforis/arena-core'
+import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
@@ -10,8 +11,6 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import Queue from '@core/queue'
-
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import SystemError from '@core/systemError'
 import * as CategoryManager from '../../../../category/manager/categoryManager'
@@ -41,7 +40,7 @@ class RecordUpdateThread extends Thread {
   async handleNodesUpdated(updatedNodes) {
     if (!R.isEmpty(updatedNodes)) {
       this.postMessage({
-        type: WebSocketEvents.nodesUpdate,
+        type: WebSocketEvent.nodesUpdate,
         content: updatedNodes,
       })
     }
@@ -51,7 +50,7 @@ class RecordUpdateThread extends Thread {
     const recordUpdated = Record.mergeNodeValidations(validations)(this.record)
 
     this.postMessage({
-      type: WebSocketEvents.nodeValidationsUpdate,
+      type: WebSocketEvent.nodeValidationsUpdate,
       content: {
         recordUuid: Record.getUuid(this.record),
         recordValid: Validation.isObjValid(recordUpdated),
@@ -76,7 +75,7 @@ class RecordUpdateThread extends Thread {
         // SystemError is an expected error type, e.g. when there's a problem with expressions.
         if (error instanceof SystemError) {
           this.postMessage({
-            type: WebSocketEvents.applicationError,
+            type: WebSocketEvent.applicationError,
             content: {
               key: error.key,
               params: error.params,
@@ -177,7 +176,7 @@ class RecordUpdateThread extends Thread {
     }
 
     if (R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])) {
-      this.postMessage({ type: WebSocketEvents.nodesUpdateCompleted })
+      this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted })
     }
   }
 }

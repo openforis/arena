@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
+import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 
 import * as Survey from '@core/survey/survey'
@@ -8,9 +10,6 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
-
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import * as WebSocket from '@server/utils/webSocket'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -62,7 +61,7 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
   socketIds.forEach((socketIdCurrent) => {
     if (socketIdCurrent !== socketId) {
-      WebSocket.notifyUser(socketIdCurrent, WebSocketEvents.recordDelete, recordUuid)
+      WebSocketServer.notifyUser(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
     }
   })
   RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
