@@ -7,7 +7,7 @@ import * as DateUtils from '@core/dateUtils'
 import { useI18n } from '@webapp/store/system'
 
 const Row = (props) => {
-  const { row, active, showStatus } = props
+  const { row, active } = props
   const surveyInfoRow = Survey.getSurveyInfo(row)
   const name = Survey.getName(surveyInfoRow)
 
@@ -21,7 +21,7 @@ const Row = (props) => {
       <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
       <div>{DateUtils.getRelativeDate(i18n, Survey.getDateCreated(surveyInfoRow))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Survey.getDateModified(surveyInfoRow))}</div>
-      {showStatus && <div>{Survey.getStatus(surveyInfoRow)}</div>}
+      <div>{Survey.getStatus(surveyInfoRow)}</div>
     </>
   )
 }
@@ -29,11 +29,6 @@ const Row = (props) => {
 Row.propTypes = {
   active: PropTypes.bool.isRequired,
   row: PropTypes.object.isRequired,
-  showStatus: PropTypes.bool,
-}
-
-Row.defaultProps = {
-  showStatus: false,
 }
 
 export default Row
