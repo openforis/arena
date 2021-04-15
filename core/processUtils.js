@@ -28,7 +28,6 @@ const ENV = {
   pgPort,
   pgDatabase,
   pgSsl: process.env.PGSSL === 'true',
-  migrateOnly: process.env.MIGRATE_ONLY === 'true',
   // EMAIL
   adminEmail: process.env.ADMIN_EMAIL,
   sendGridApiKey: process.env.SENDGRID_API_KEY,
