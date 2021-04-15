@@ -1,21 +1,12 @@
 import 'dotenv/config'
 
 import { SRSs } from '@openforis/arena-core'
-import { ArenaServer } from '@openforis/arena-server'
 
-import * as ProcessUtils from '@core/processUtils'
 import * as appCluster from './system/appCluster'
 
 const initialize = async () => {
-  await ArenaServer.init()
-
   // initialize SRSs
   await SRSs.init()
-
-  if (ProcessUtils.ENV.migrateOnly) {
-    // eslint-disable-next-line unicorn/no-process-exit
-    process.exit()
-  }
 
   await appCluster.run()
 }

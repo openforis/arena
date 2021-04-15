@@ -1,13 +1,12 @@
 import * as path from 'path'
 import { Worker } from 'worker_threads'
 
+import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
 
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
 import * as Log from '@server/log/log'
-import * as WebSocket from '@server/utils/webSocket'
 
 import Thread from './thread'
 import * as ThreadParams from './threadParams'
@@ -40,9 +39,9 @@ export default class ThreadManager {
     return ({ user, msg }) => {
       if (msg.type === Thread.messageTypes.error) {
         if (this.socketId) {
-          WebSocket.notifySocket(this.socketId, WebSocketEvents.error, msg.error)
+          WebSocketServer.notifySocket(this.socketId, WebSocketEvent.threadError, msg.error)
         } else {
-          WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
+          WebSocketServer.notifyUser(User.getUuid(user), WebSocketEvent.threadError, msg.error)
         }
       } else {
         messageHandler(msg)
