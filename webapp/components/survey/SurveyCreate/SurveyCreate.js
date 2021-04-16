@@ -24,7 +24,7 @@ import { useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
-  const { showClone, showImport, submitButtonLabel, template } = props
+  const { showImport, submitButtonLabel, template } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
@@ -67,11 +67,9 @@ const SurveyCreate = (props) => {
         />
       </div>
 
-      {showClone && (
-        <div>
-          <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-        </div>
-      )}
+      <div>
+        <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
+      </div>
 
       <button data-testid={DataTestId.surveyCreate.submitBtn} type="button" className="btn" onClick={onCreate}>
         <span className="icon icon-plus icon-left icon-12px" />
@@ -103,14 +101,12 @@ const SurveyCreate = (props) => {
 }
 
 SurveyCreate.propTypes = {
-  showClone: PropTypes.bool,
   showImport: PropTypes.bool,
   submitButtonLabel: PropTypes.string,
   template: PropTypes.bool,
 }
 
 SurveyCreate.defaultProps = {
-  showClone: true,
   showImport: true,
   submitButtonLabel: 'homeView.surveyCreate.createSurvey',
   template: false,

@@ -1,38 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-
-import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-import Dropdown from '@webapp/components/form/Dropdown'
+import Select from '@webapp/components/form/Select'
+import { useOptions } from './useOptions'
 
 const SurveyDropdown = (props) => {
   const { selection, onChange } = props
-  const [surveys, setSurveys] = useState([])
+  const { options } = useOptions()
+
+  const allOptions = options.reduce((optionsAcc, optionGroup) => [...optionsAcc, ...optionGroup.options], [])
+  const selectedOption = allOptions.find((option) => option.value === selection)
 
   const i18n = useI18n()
 
-  useEffect(() => {
-    ;(async () => {
-      const fetchedSurveys = await API.fetchSurveys()
-      setSurveys(fetchedSurveys)
-    })()
-  }, [])
-
-  const selectedItem = surveys.find((survey) => String(Survey.getIdSurveyInfo(survey)) === String(selection))
-
   return (
-    <Dropdown
+    <Select
       idInput={DataTestId.surveyCreate.surveyCloneFrom}
+      options={options}
+      value={selectedOption}
+      onChange={(item) => onChange(item.value)}
       placeholder={i18n.t('common.cloneFrom')}
-      items={surveys}
-      selection={selectedItem}
-      onChange={(e) => onChange(e ? e.id : null)}
-      itemLabel={Survey.getName}
-      itemKey={Survey.infoKeys.id}
     />
   )
 }
