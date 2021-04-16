@@ -5,23 +5,7 @@ import CloneTablesJob from './jobs/CloneTablesJob'
 
 export default class SurveyCloneJob extends Job {
   constructor(params) {
-    super(SurveyCloneJob.type, params, [
-      new CreateNewSurveyJob(),
-      new CloneTablesJob({
-        tables: [
-          'category',
-          'category_level',
-          'category_item',
-          'taxonomy',
-          'taxon',
-          'taxon_vernacular_name',
-          'node_def',
-          'chain',
-          'chain_node_def',
-          'chain_node_def_aggregate',
-        ],
-      }),
-    ])
+    super(SurveyCloneJob.type, params, [new CreateNewSurveyJob(), new CloneTablesJob()])
   }
 
   async beforeSuccess() {

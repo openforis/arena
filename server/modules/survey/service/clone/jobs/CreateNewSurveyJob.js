@@ -17,16 +17,16 @@ export default class CreateNewSurveyJob extends Job {
   }
 
   async execute() {
-    const { surveyId: clonedSurveyId, surveyInfo: sourceSurveyInfo, user } = this.context
-    const clonedSurvey = await SurveyManager.fetchSurveyById(clonedSurveyId, true, false, this.tx)
-    const clonedSurveyInfo = Survey.getSurveyInfo(clonedSurvey)
+    const { surveyId: clonedSurveyId, surveyInfo: surveyInfoDest, user } = this.context
+    const surveySource = await SurveyManager.fetchSurveyById(clonedSurveyId, true, false, this.tx)
+    const surveyInfoSource = Survey.getSurveyInfo(surveySource)
 
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(user),
-      [Survey.infoKeys.name]: Survey.getName(sourceSurveyInfo) || `clone_${Survey.getName(clonedSurveyInfo)}`,
-      [Survey.infoKeys.languages]: Survey.getLanguages(clonedSurveyInfo),
-      [Survey.infoKeys.labels]: Survey.getLabels(sourceSurveyInfo) || Survey.getLabels(clonedSurveyInfo),
-      [Survey.infoKeys.template]: Survey.isTemplate(sourceSurveyInfo),
+      [Survey.infoKeys.name]: Survey.getName(surveyInfoDest) || `clone_${Survey.getName(surveyInfoSource)}`,
+      [Survey.infoKeys.languages]: Survey.getLanguages(surveyInfoSource),
+      [Survey.infoKeys.labels]: Survey.getLabels(surveyInfoDest) || Survey.getLabels(surveyInfoSource),
+      [Survey.infoKeys.template]: Survey.isTemplate(surveyInfoDest),
     })
 
     let surveyInfo = await SurveyRepository.insertSurvey(newSurveyInfo, this.tx)
@@ -38,7 +38,7 @@ export default class CreateNewSurveyJob extends Job {
 
     const authGroups = await AuthGroupRepository.createSurveyGroups(
       surveyId,
-      Survey.getAuthGroups(clonedSurveyInfo) || Survey.getDefaultAuthGroups(),
+      Survey.getAuthGroups(surveyInfoSource) || Survey.getDefaultAuthGroups(),
       this.tx
     )
 
@@ -54,6 +54,6 @@ export default class CreateNewSurveyJob extends Job {
       )
     }
 
-    this.setContext({ newSurveyId: surveyId, surveyInfo })
+    this.setContext({ newSurveyId: surveyId, surveyInfo, surveyInfoSource })
   }
 }

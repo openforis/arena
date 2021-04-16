@@ -13,8 +13,14 @@ export const selectDate = (field, fieldAlias = null) =>
 
 export const now = "timezone('UTC', now())"
 
-export const cloneTable = ({ source, destination }) =>
-  `INSERT INTO  ${destination} OVERRIDING SYSTEM VALUE (SELECT * FROM ${source}) on conflict do nothing`
+export const cloneTable = ({ source, destination, excludeColumns = [], filterRowsCondition = null }) => {
+  const where = filterRowsCondition ? `WHERE ${filterRowsCondition}` : ''
+  const insertRowsScript = `INSERT INTO ${destination} OVERRIDING SYSTEM VALUE (SELECT * FROM ${source} ${where}) on conflict do nothing;`
+
+  const setNullValuesScript = excludeColumns.map((col) => `UPDATE ${destination} SET ${col} = DEFAULT`).join(`; `)
+
+  return `${insertRowsScript}; ${setNullValuesScript};`
+}
 
 export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
