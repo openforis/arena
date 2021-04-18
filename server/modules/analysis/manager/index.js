@@ -36,6 +36,10 @@ export { fetchCalculationAttributeUuids, updateCalculation, deleteCalculation } 
 
 // ====== Persist all
 
+/* eslint-disable */
+/**
+ * @deprecated
+ */
 export const persistAll = async ({ user, surveyId, chain, step = null, calculation = null }, client = DB.client) =>
   client.tx(async (tx) => {
     // 1. Persist chain / step / calculation

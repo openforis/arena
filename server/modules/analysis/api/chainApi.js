@@ -1,3 +1,5 @@
+import { ChainFactory } from '@openforis/arena-core'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -5,6 +7,24 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
+  // ====== CREATE - Chain
+
+  app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { cycle, surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const chain = await AnalysisService.create({
+        surveyId,
+        user,
+        chain: ChainFactory.createInstance({ cycles: [cycle] }),
+      })
+
+      res.json(chain)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ====== READ - Chains
 
   app.get(
@@ -42,7 +62,7 @@ export const init = (app) => {
   // ====== READ - Chain
 
   app.get(
-    '/survey/:surveyId/processing-chain/:chainUuid',
+    '/survey/:surveyId/chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -93,29 +113,25 @@ export const init = (app) => {
 
   // ====== UPDATE - Chain
 
-  app.put(
-    '/survey/:surveyId/processing-chain/',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
+  app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
 
-        const user = Request.getUser(req)
+      const user = Request.getUser(req)
 
-        const { chain, step, calculation } = Request.getBody(req)
-        await AnalysisService.persistAll({ user, surveyId, chain, step, calculation })
+      const { chain } = Request.getBody(req)
+      await AnalysisService.update({ user, surveyId, chain })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // ====== DELETE - Chain
 
   app.delete(
-    '/survey/:surveyId/processing-chain/:chainUuid',
+    '/survey/:surveyId/chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {

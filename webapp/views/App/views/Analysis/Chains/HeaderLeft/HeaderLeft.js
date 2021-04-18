@@ -1,17 +1,24 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { ChainActions } from '@webapp/store/ui/chain'
 
 const HeaderLeft = () => {
+  const dispatch = useDispatch()
+  const history = useHistory()
   const i18n = useI18n()
 
+  const createChain = () => {
+    dispatch(ChainActions.createChain({ history }))
+  }
+
   return (
-    <Link to={appModuleUri(analysisModules.processingChain)} className="btn btn-s">
+    <button className="btn btn-s" onClick={createChain} type="button">
       <span className="icon icon-plus icon-12px icon-left" />
       {i18n.t('common.new')}
-    </Link>
+    </button>
   )
 }
 

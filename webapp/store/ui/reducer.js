@@ -6,6 +6,7 @@ import { DialogConfirmReducer, DialogConfirmState } from './dialogConfirm'
 import { RecordReducer, RecordState } from './record'
 import { SurveyFormReducer, SurveyFormState } from './surveyForm'
 import { ExportCsvDataReducer, ExportCsvDataState } from './exportCsvData'
+import { ChainReducer } from './chain'
 
 export default combineReducers({
   [NotificationState.stateKey]: NotificationReducer,
@@ -14,4 +15,5 @@ export default combineReducers({
   [RecordState.stateKey]: RecordReducer,
   [SurveyFormState.stateKey]: SurveyFormReducer,
   [ExportCsvDataState.stateKey]: ExportCsvDataReducer,
+  chain: ChainReducer,
 })

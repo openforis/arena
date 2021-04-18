@@ -8,7 +8,7 @@ const _getProcessingChainLabel = (lang) => R.pipe(ActivityLog.getProcessingChain
 
 export default {
   // ====== Chain
-  [ActivityLog.type.processingChainPropUpdate]: (survey, i18n) => (activityLog) => ({
+  [ActivityLog.type.chainPropUpdate]: (survey, i18n) => (activityLog) => ({
     key: ActivityLog.getContentKey(activityLog),
     label: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
