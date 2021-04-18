@@ -11,7 +11,7 @@ const HeaderLeft = () => {
   const i18n = useI18n()
 
   const createChain = () => {
-    dispatch(ChainActions.create({ history }))
+    dispatch(ChainActions.createChain({ history }))
   }
 
   return (

@@ -18,7 +18,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
-// import ButtonBar from './ButtonBar'
+import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
   const dispatch = useDispatch()
@@ -28,10 +28,10 @@ const ChainComponent = () => {
   const validation = Chain.getValidation(chain)
 
   const openRStudio = () => {} // TODO Actions.openRStudio({ state })}
-  const updateChain = (chainUpdate) => dispatch(ChainActions.update({ chain: chainUpdate }))
+  const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
   useEffect(() => {
-    dispatch(ChainActions.fetch({ chainUuid }))
+    dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [])
 
   if (!chain) return null
@@ -67,7 +67,7 @@ const ChainComponent = () => {
 
         {/* <Step state={state} Actions={Actions} /> */}
 
-        {/* <ButtonBar /> */}
+        <ButtonBar />
       </div>
 
       {/* <VariablePrevStepEditor state={state} Actions={Actions} /> */}

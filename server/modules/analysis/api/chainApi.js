@@ -131,7 +131,7 @@ export const init = (app) => {
   // ====== DELETE - Chain
 
   app.delete(
-    '/survey/:surveyId/processing-chain/:chainUuid',
+    '/survey/:surveyId/chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {

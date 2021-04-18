@@ -5,7 +5,7 @@ import { SurveyState } from '@webapp/store/survey'
 
 import { ChainActionTypes } from './actionTypes'
 
-export const fetch = ({ chainUuid }) => async (dispatch, getState) => {
+export const fetchChain = ({ chainUuid }) => async (dispatch, getState) => {
   dispatch(LoaderActions.showLoader())
 
   const state = getState()

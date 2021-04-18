@@ -78,7 +78,7 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.uuid]: chainUuid,
       [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
     }
-    return Promise.all([
+    return tx.batch([
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx),
       markSurveyDraft(surveyId, tx),
     ])

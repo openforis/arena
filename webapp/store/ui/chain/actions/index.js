@@ -1,11 +1,13 @@
-import { create } from './create'
-import { fetch } from './fetch'
-import { update } from './update'
+import { createChain } from './createChain'
+import { fetchChain } from './fetchChain'
+import { updateChain } from './updateChain'
+import { deleteChain } from './deleteChain'
 
 export { ChainActionTypes } from './actionTypes'
 
 export const ChainActions = {
-  create,
-  fetch,
-  update,
+  createChain,
+  fetchChain,
+  updateChain,
+  deleteChain,
 }

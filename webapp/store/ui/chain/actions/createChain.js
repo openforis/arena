@@ -3,7 +3,7 @@ import axios from 'axios'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { SurveyState } from '@webapp/store/survey'
 
-export const create = ({ history }) => async (dispatch, getState) => {
+export const createChain = ({ history }) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)

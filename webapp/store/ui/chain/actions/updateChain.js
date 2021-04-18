@@ -5,7 +5,7 @@ import { SurveyActions, SurveyState } from '@webapp/store/survey'
 import { ChainActionTypes } from '@webapp/store/ui/chain/actions/actionTypes'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-export const update = ({ chain }) => async (dispatch, getState) => {
+export const updateChain = ({ chain }) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
 
