@@ -1,10 +1,12 @@
+import { BaseProtocol } from '@openforis/arena-server'
+
 import * as DB from '../../../../db'
 
 import * as ObjectUtils from '../../../../../core/objectUtils'
 import { TableChain } from '../../../../../common/model/db'
 import * as Chain from '../../../../../common/analysis/processingChain'
 
-const transformCallback = (row) => {
+export const transformCallback = (row) => {
   if (!row) return {}
   /* eslint-disable-next-line camelcase */
   const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
@@ -24,7 +26,7 @@ const transformCallback = (row) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {string} [params.cycle=null] - The survey cycle.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<number>} - The result promise.
  */
@@ -44,7 +46,7 @@ export const countChains = async (params, client = DB.client) => {
  * @param {number} [params.limit=null] - The select query limit.
  * @param {boolean} [params.includeStepsAndCalculations=false] - Whether to include the processing steps and calculations.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<any[]>} - The result promise.
  */
@@ -78,7 +80,7 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!string} params.chainUuid - The processing chain uuid.
  * @param {boolean} [params.includeStepsAndCalculations=false] - Whether to include the processing steps and calculations.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */

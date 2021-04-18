@@ -1,3 +1,5 @@
+import { ChainFactory } from '@openforis/arena-core'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -5,6 +7,24 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
+  // ====== CREATE - Chain
+
+  app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { cycle, surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const chain = await AnalysisService.create({
+        surveyId,
+        user,
+        chain: ChainFactory.createInstance({ cycles: [cycle] }),
+      })
+
+      res.json(chain)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ====== READ - Chains
 
   app.get(

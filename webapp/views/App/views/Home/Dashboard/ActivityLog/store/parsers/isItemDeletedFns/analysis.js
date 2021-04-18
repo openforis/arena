@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _isProcessingChainDeleted = () => R.pipe(ActivityLog.getProcessingChainLabels, R.isNil)
+const _isProcessingChainDeleted = () => R.pipe(ActivityLog.getChainUuid, R.isNil)
 const _isProcessingStepDeleted = () => R.pipe(ActivityLog.getProcessingStepIndex, R.isNil)
 const _isProcessingStepCalculationDeleted = () => R.pipe(ActivityLog.getProcessingStepCalculationIndex, R.isNil)
 

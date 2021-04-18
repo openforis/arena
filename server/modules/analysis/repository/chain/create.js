@@ -1,7 +1,8 @@
-import * as DB from '../../../../db'
+import { DB, BaseProtocol } from '@openforis/arena-server'
 
 import * as Chain from '../../../../../common/analysis/processingChain'
 import { TableChain } from '../../../../../common/model/db'
+import { transformCallback } from './read'
 
 /**
  * Create a processing chain.
@@ -9,11 +10,11 @@ import { TableChain } from '../../../../../common/model/db'
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!object} params.chain - The processing chain.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChain = async (params, client = DB.client) => {
+export const insertChain = async (params, client = DB) => {
   const { surveyId, chain } = params
   const tableChain = new TableChain(surveyId)
 
@@ -24,6 +25,6 @@ export const insertChain = async (params, client = DB.client) => {
     VALUES ($1, $2, $3)
     RETURNING *`,
     [Chain.getUuid(chain), Chain.getProps(chain), Chain.getValidation(chain)],
-    DB.transformCallback
+    transformCallback
   )
 }
