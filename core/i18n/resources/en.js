@@ -302,8 +302,8 @@ Do you want to proceed?`,
       [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
       // Analysis
-      [ActivityLog.type.processingChainCreate]: 'added processing chain',
-      [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
+      [ActivityLog.type.chainCreate]: 'added processing chain',
+      [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]:

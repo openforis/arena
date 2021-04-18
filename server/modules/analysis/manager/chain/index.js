@@ -12,7 +12,7 @@ import * as ChainRepository from '../../repository/chain'
 // ====== CREATE
 const _insertChain = async ({ user, surveyId, chain }, client) => {
   const chainDb = await ChainRepository.insertChain({ surveyId, chain }, client)
-  await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, chainDb, false, client)
+  await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, chainDb, false, client)
 }
 
 // ====== READ
@@ -44,7 +44,7 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
   // activity log for each updated prop
   const promises = Object.entries(propsToUpdate).map(([key, value]) => {
     const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
-    const type = ActivityLog.type.processingChainPropUpdate
+    const type = ActivityLog.type.chainPropUpdate
     return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
   })
   // chain props and validation update
@@ -59,6 +59,10 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
 }
 
 // ====== PERSIST
+/* eslint-disable */
+/**
+ * @deprecated
+ */
 export const persistChain = async ({ user, surveyId, chain }, client) => {
   const chainDb = await ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain) }, client)
   return !A.isEmpty(chainDb)

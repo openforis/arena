@@ -7,9 +7,9 @@ const _isProcessingStepDeleted = () => R.pipe(ActivityLog.getProcessingStepIndex
 const _isProcessingStepCalculationDeleted = () => R.pipe(ActivityLog.getProcessingStepCalculationIndex, R.isNil)
 
 export default {
-  [ActivityLog.type.processingChainCreate]: _isProcessingChainDeleted,
+  [ActivityLog.type.chainCreate]: _isProcessingChainDeleted,
 
-  [ActivityLog.type.processingChainPropUpdate]: _isProcessingChainDeleted,
+  [ActivityLog.type.chainPropUpdate]: _isProcessingChainDeleted,
 
   [ActivityLog.type.processingChainStatusExecSuccess]: _isProcessingChainDeleted,
 

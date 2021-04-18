@@ -3,77 +3,74 @@ import './chainList.scss'
 import './chainListItem.scss'
 import './chainForm.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useParams } from 'react-router'
+import { useDispatch } from 'react-redux'
 
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurveyInfo } from '@webapp/store/survey'
+
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
-import { State, useLocalState } from './store'
-import StepList from './StepList'
-import Step from './Step'
-import ButtonBar from './ButtonBar'
-import VariablePrevStepEditor from './VariablePrevStepEditor'
+// import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
+  const dispatch = useDispatch()
+  const { chainUuid } = useParams()
   const surveyInfo = useSurveyInfo()
-  const { state, Actions } = useLocalState()
+  const chain = useChain()
+  const validation = Chain.getValidation(chain)
 
-  if (state === null) return null
+  const openRStudio = () => {} // TODO Actions.openRStudio({ state })}
+  const updateChain = (chainUpdate) => dispatch(ChainActions.update({ chain: chainUpdate }))
 
-  const chainEdit = State.getChainEdit(state)
-  const editingStep = State.isEditingStep(state)
+  useEffect(() => {
+    dispatch(ChainActions.fetch({ chainUuid }))
+  }, [])
 
-  const validation = Chain.getValidation(chainEdit)
+  if (!chain) return null
 
   return (
     <>
-      <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-        <ButtonRStudio
-          onClick={() => Actions.openRStudio({ state })}
-          disabled={Survey.isDraft(surveyInfo) || State.isChainDirty(state)}
-        />
+      {/* <div className={`chain ${editingStep ? 'show-step' : ''}`}> */}
+      <div className="chain">
+        <ButtonRStudio onClick={openRStudio} disabled={Survey.isDraft(surveyInfo)} />
 
         <div className="form">
           <LabelsEditor
-            labels={Chain.getLabels(chainEdit)}
+            labels={chain.props.labels}
             formLabelKey="processingChainView.formLabel"
-            readOnly={editingStep}
+            readOnly={false}
             validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-            onChange={(labels) => Actions.updateChain({ name: Chain.keysProps.labels, value: labels, state })}
+            onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}
           />
 
-          {!editingStep && (
-            <>
-              <LabelsEditor
-                formLabelKey="common.description"
-                labels={Chain.getDescriptions(chainEdit)}
-                onChange={(descriptions) =>
-                  Actions.updateChain({ name: Chain.keysProps.descriptions, value: descriptions, state })
-                }
-              />
+          <LabelsEditor
+            formLabelKey="common.description"
+            labels={chain.props.descriptions}
+            onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
+          />
 
-              <CyclesSelector
-                cyclesKeysSelected={Chain.getCycles(chainEdit)}
-                onChange={(cycles) => Actions.updateCycles({ cycles, state })}
-              />
-            </>
-          )}
+          <CyclesSelector
+            cyclesKeysSelected={chain.props.cycles}
+            onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
+          />
 
-          <StepList state={state} Actions={Actions} />
+          {/* <StepList state={state} Actions={Actions} /> */}
         </div>
 
-        <Step state={state} Actions={Actions} />
+        {/* <Step state={state} Actions={Actions} /> */}
 
-        <ButtonBar state={state} Actions={Actions} />
+        {/* <ButtonBar /> */}
       </div>
 
-      <VariablePrevStepEditor state={state} Actions={Actions} />
+      {/* <VariablePrevStepEditor state={state} Actions={Actions} /> */}
     </>
   )
 }

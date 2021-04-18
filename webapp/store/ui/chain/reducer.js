@@ -11,7 +11,7 @@ const actionHandlers = {
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
 
-  [ChainActionTypes.chainLoad]: (state, action) => ({
+  [ChainActionTypes.chainUpdate]: (state, action) => ({
     chain: action.chain,
   }),
 }

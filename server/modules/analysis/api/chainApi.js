@@ -62,7 +62,7 @@ export const init = (app) => {
   // ====== READ - Chain
 
   app.get(
-    '/survey/:surveyId/processing-chain/:chainUuid',
+    '/survey/:surveyId/chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -113,24 +113,20 @@ export const init = (app) => {
 
   // ====== UPDATE - Chain
 
-  app.put(
-    '/survey/:surveyId/processing-chain/',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
+  app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
 
-        const user = Request.getUser(req)
+      const user = Request.getUser(req)
 
-        const { chain, step, calculation } = Request.getBody(req)
-        await AnalysisService.persistAll({ user, surveyId, chain, step, calculation })
+      const { chain } = Request.getBody(req)
+      await AnalysisService.update({ user, surveyId, chain })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // ====== DELETE - Chain
 

@@ -53,8 +53,8 @@ export const type = {
   userRemove: 'userRemove',
 
   // Analysis
-  processingChainCreate: 'processingChainCreate',
-  processingChainPropUpdate: 'processingChainPropUpdate',
+  chainCreate: 'chainCreate',
+  chainPropUpdate: 'chainPropUpdate',
   processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',

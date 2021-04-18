@@ -8,7 +8,7 @@ export const create = async ({ user, surveyId, chain }) => {
   const res = await DB.tx((t) =>
     t.batch([
       ChainRepository.insertChain({ surveyId, chain }, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, chain, false, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, chain, false, t),
     ])
   )
 

@@ -78,20 +78,15 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {boolean} [params.includeStepsAndCalculations=false] - Whether to include the processing steps and calculations.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
 export const fetchChain = async (params, client = DB.client) => {
-  const { surveyId, chainUuid, includeScript = false, includeStepsAndCalculations = false } = params
+  const { surveyId, chainUuid, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)
 
-  return client.oneOrNone(
-    tableChain.getSelect({ surveyId, chainUuid, includeScript, includeStepsAndCalculations }),
-    [],
-    transformCallback
-  )
+  return client.oneOrNone(tableChain.getSelect({ surveyId, chainUuid, includeScript }), [], transformCallback)
 }

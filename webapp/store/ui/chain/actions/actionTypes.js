@@ -1,3 +1,3 @@
 export const ChainActionTypes = {
-  chainLoad: 'ui/chain/load',
+  chainUpdate: 'ui/chain/update',
 }
