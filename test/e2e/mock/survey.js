@@ -57,3 +57,5 @@ export const surveyFromTemplate = {
   },
   languages: ['en', 'fr'],
 }
+
+export const templates = [template, template2, templateFromSurvey]
