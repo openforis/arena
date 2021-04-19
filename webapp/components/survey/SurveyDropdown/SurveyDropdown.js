@@ -18,7 +18,7 @@ const SurveyDropdown = (props) => {
 
   return (
     <Select
-      idInput={DataTestId.surveyCreate.surveyCloneFrom}
+      id={DataTestId.surveyCreate.surveyCloneFrom}
       options={options}
       value={selectedOption}
       onChange={(item) => onChange(item.value)}

@@ -6,14 +6,14 @@ import ReactSelect from 'react-select'
 import { defaultComponents, baseStyles, baseTheme } from './config'
 import { adaptSelection } from './utils'
 
-export const Select = ({ className, components, idInput, onChange, options, placeholder, style, value }) => (
+export const Select = ({ className, components, id, onChange, options, placeholder, style, value }) => (
   <ReactSelect
     className={className}
     classNamePrefix="select"
     options={options}
     onChange={onChange}
     value={adaptSelection(value)}
-    inputId={idInput}
+    id={id}
     isSearchable
     theme={baseTheme}
     components={{ ...defaultComponents, ...components }}
@@ -25,7 +25,7 @@ export const Select = ({ className, components, idInput, onChange, options, plac
 Select.propTypes = {
   className: PropTypes.string,
   components: PropTypes.object,
-  idInput: PropTypes.string,
+  id: PropTypes.string,
   onChange: PropTypes.func,
   options: PropTypes.array,
   placeholder: PropTypes.string,
@@ -36,7 +36,7 @@ Select.propTypes = {
 Select.defaultProps = {
   className: '',
   components: {},
-  idInput: undefined,
+  id: undefined,
   onChange: null,
   options: [],
   placeholder: undefined,

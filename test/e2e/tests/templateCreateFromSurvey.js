@@ -1,18 +1,18 @@
-import { templateCloned } from '../mock/survey'
+import { templateFromSurvey } from '../mock/survey'
 import { createTemplate } from './_templateCreate'
 import { exportSurvey, verifyCategories, verifyNodeDefs, verifySurvey, verifyTaxonomies } from './_surveyExport'
 
 export default () =>
   describe('Template Create from Survey', () => {
-    createTemplate(templateCloned)
+    createTemplate(templateFromSurvey)
 
-    exportSurvey(templateCloned)
+    exportSurvey(templateFromSurvey)
 
-    verifySurvey(templateCloned)
+    verifySurvey(templateFromSurvey)
 
-    verifyNodeDefs(templateCloned)
+    verifyNodeDefs(templateFromSurvey)
 
-    verifyCategories(templateCloned)
+    verifyCategories(templateFromSurvey)
 
-    verifyTaxonomies(templateCloned)
+    verifyTaxonomies(templateFromSurvey)
   })
