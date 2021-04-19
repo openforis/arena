@@ -36,18 +36,16 @@ const Surveys = (props) => {
   }
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
-  const showStatus = !template
-  const columns = showStatus ? 6 : 5
 
   return (
     <Table
       module={module}
       moduleApiUri={moduleApiUri}
       restParams={{ template }}
-      gridTemplateColumns={`50px repeat(${columns}, 1.5fr)`}
+      gridTemplateColumns="50px repeat(6, 1.5fr)"
       headerLeftComponent={() => HeaderLeft({ title })}
-      rowHeaderComponent={() => RowHeader({ showStatus })}
-      rowComponent={({ row, active }) => Row({ active, row, showStatus })}
+      rowHeaderComponent={RowHeader}
+      rowComponent={Row}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
     />

@@ -17,43 +17,43 @@ export default class CreateNewSurveyJob extends Job {
   }
 
   async execute() {
-    const { surveyId: clonedSurveyId, surveyInfo: sourceSurveyInfo, user } = this.context
-    const clonedSurvey = await SurveyManager.fetchSurveyById(clonedSurveyId, true, false, this.tx)
-    const clonedSurveyInfo = Survey.getSurveyInfo(clonedSurvey)
+    const { surveyIdSource, surveyInfoTarget: surveyInfoTargetParam, user } = this.context
+    const surveySource = await SurveyManager.fetchSurveyById(surveyIdSource, true, false, this.tx)
+    const surveyInfoSource = Survey.getSurveyInfo(surveySource)
 
-    const newSurveyInfo = Survey.newSurvey({
+    const surveyInfoTarget = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(user),
-      [Survey.infoKeys.name]: Survey.getName(sourceSurveyInfo) || `clone_${Survey.getName(clonedSurveyInfo)}`,
-      [Survey.infoKeys.languages]: Survey.getLanguages(clonedSurveyInfo),
-      [Survey.infoKeys.labels]: Survey.getLabels(sourceSurveyInfo) || Survey.getLabels(clonedSurveyInfo),
-      [Survey.infoKeys.template]: Survey.isTemplate(sourceSurveyInfo),
+      [Survey.infoKeys.name]: Survey.getName(surveyInfoTargetParam) || `clone_${Survey.getName(surveyInfoSource)}`,
+      [Survey.infoKeys.languages]: Survey.getLanguages(surveyInfoSource),
+      [Survey.infoKeys.labels]: Survey.getLabels(surveyInfoTargetParam) || Survey.getLabels(surveyInfoSource),
+      [Survey.infoKeys.template]: Survey.isTemplate(surveyInfoTargetParam),
     })
 
-    let surveyInfo = await SurveyRepository.insertSurvey(newSurveyInfo, this.tx)
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-    await DBMigrator.migrateSurveySchema(surveyId)
+    let surveyInfoTargetInserted = await SurveyRepository.insertSurvey(surveyInfoTarget, this.tx)
+    const surveyIdTarget = Survey.getIdSurveyInfo(surveyInfoTargetInserted)
+    await DBMigrator.migrateSurveySchema(surveyIdTarget)
 
-    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyIdTarget, Survey.cycleOneKey)(user)
     await UserRepository.updateUserPrefs(userUpdated, this.tx)
 
     const authGroups = await AuthGroupRepository.createSurveyGroups(
-      surveyId,
-      Survey.getAuthGroups(clonedSurveyInfo) || Survey.getDefaultAuthGroups(),
+      surveyIdTarget,
+      Survey.getAuthGroups(surveyInfoSource) || Survey.getDefaultAuthGroups(),
       this.tx
     )
 
-    surveyInfo = Survey.assocAuthGroups(authGroups)(surveyInfo)
+    surveyInfoTargetInserted = Survey.assocAuthGroups(authGroups)(surveyInfoTargetInserted)
 
     if (!User.isSystemAdmin(user)) {
       await UserManager.addUserToGroup(
         user,
-        surveyId,
-        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
+        surveyIdTarget,
+        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfoTargetInserted)),
         User.getUuid(user),
         this.tx
       )
     }
 
-    this.setContext({ newSurveyId: surveyId, surveyInfo })
+    this.setContext({ surveyIdTarget, surveyInfoTarget: surveyInfoTargetInserted, surveyInfoSource })
   }
 }

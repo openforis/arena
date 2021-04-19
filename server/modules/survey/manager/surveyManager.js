@@ -271,4 +271,4 @@ export const deleteSurvey = async (surveyId) =>
     ])
   })
 
-export const { dropSurveySchema, cloneTables } = SurveyRepository
+export const { dropSurveySchema, cloneTable } = SurveyRepository

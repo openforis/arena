@@ -11,7 +11,7 @@ export const createSurvey = (surveyToAdd) => {
     await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
 
     if (cloneFrom) {
-      await page.focus(getSelector(DataTestId.surveyCreate.surveyCloneFrom, 'input'))
+      await page.click(`#${DataTestId.surveyCreate.surveyCloneFrom}`)
       await page.click(`text="${cloneFrom}"`)
       await page.click(getSelector(DataTestId.surveyCreate.submitBtn, 'button'))
       await Promise.all([

@@ -22,16 +22,6 @@ export const surveyImport = {
   ...survey,
 }
 
-export const surveyClone = {
-  cloneFrom: survey.name,
-  name: 'survey_clone',
-  label: 'My Survey cloned',
-  labels: {
-    en: 'My Survey cloned',
-  },
-  languages: ['en', 'fr'],
-}
-
 export const template = {
   name: 'survey_template',
   label: 'Survey Template',
@@ -48,12 +38,22 @@ export const template2 = {
   },
 }
 
-export const templateCloned = {
+export const templateFromSurvey = {
   cloneFrom: survey.name,
-  name: 'survey_template_cloned',
-  label: 'Survey Template Cloned',
+  name: 'template_from_survey',
+  label: 'Template from Survey',
   labels: {
-    en: 'Survey Template Cloned',
+    en: 'Template from Survey',
+  },
+  languages: ['en', 'fr'],
+}
+
+export const surveyFromTemplate = {
+  cloneFrom: templateFromSurvey.name,
+  name: 'survey_from_template',
+  label: 'Survey from Template',
+  labels: {
+    en: 'Survey from Template',
   },
   languages: ['en', 'fr'],
 }

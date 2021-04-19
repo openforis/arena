@@ -1,5 +1,5 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { template, template2, templateCloned } from '../mock/survey'
+import { template, template2, templateFromSurvey } from '../mock/survey'
 import { gotoTemplateList } from './_navigation'
 import { clickSurvey } from './_surveyList'
 
@@ -28,7 +28,7 @@ export default () =>
   describe('Template Delete', () => {
     deleteTemplate(template)
     deleteTemplate(template2)
-    deleteTemplate(templateCloned)
+    deleteTemplate(templateFromSurvey)
 
     gotoTemplateList()
     test('Verify template list empty', async () => {

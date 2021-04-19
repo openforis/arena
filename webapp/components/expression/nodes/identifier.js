@@ -17,8 +17,6 @@ const Identifier = ({ node, variables, onChange }) => (
   <Select
     className="identifier"
     options={variables}
-    itemLabel="label"
-    itemKey="value"
     value={findValue({ variables, node })}
     onChange={(item) => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
   />

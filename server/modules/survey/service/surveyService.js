@@ -157,8 +157,8 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   Response.sendFilesAsZip(res, `${prefix}.zip`, files)
 }
 
-export const cloneSurvey = ({ user, surveyInfo, surveyId }) => {
-  const job = new SurveyCloneJob({ user, surveyId, surveyInfo })
+export const cloneSurvey = ({ user, surveyIdSource, surveyInfoTarget }) => {
+  const job = new SurveyCloneJob({ user, surveyIdSource, surveyInfoTarget })
   JobManager.executeJobThread(job)
   return JobUtils.jobToJSON(job)
 }
