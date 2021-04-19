@@ -42,13 +42,13 @@ export const insertSurvey = async (survey, client = db) =>
 // ============== CLONE
 
 export const cloneTable = async (
-  { sourceId, destinationId, table, excludeColumns = [], filterRowsCondition = null },
+  { surveyIdSource, surveyIdTarget, table, excludeColumns = [], filterRowsCondition = null },
   client
 ) =>
   client.none(
     DbUtils.cloneTable({
-      source: `${getSurveyDBSchema(sourceId)}.${table}`,
-      destination: `${getSurveyDBSchema(destinationId)}.${table}`,
+      source: `${getSurveyDBSchema(surveyIdSource)}.${table}`,
+      target: `${getSurveyDBSchema(surveyIdTarget)}.${table}`,
       table,
       excludeColumns,
       filterRowsCondition,

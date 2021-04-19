@@ -48,7 +48,7 @@ export default class CloneTablesJob extends Job {
   }
 
   async execute() {
-    const { surveyId: surveyIdSource, newSurveyId, surveyInfo, surveyInfoSource, user } = this.context
+    const { surveyIdSource, surveyInfoSource, surveyIdTarget, surveyInfoTarget, user } = this.context
 
     // if the source survey is a template, clone only published items, otherwise clone even draft ones
     const tablesInfo = Survey.isTemplate(surveyInfoSource) ? tablesPublishedInfo : tablesDraftInfo
@@ -57,8 +57,8 @@ export default class CloneTablesJob extends Job {
       tablesInfo.map(async ({ table, excludeColumns = [], filterRowsCondition = null }) =>
         SurveyManager.cloneTable(
           {
-            sourceId: surveyIdSource,
-            destinationId: newSurveyId,
+            surveyIdSource,
+            surveyIdTarget,
             table,
             excludeColumns,
             filterRowsCondition,
@@ -68,6 +68,13 @@ export default class CloneTablesJob extends Job {
       )
     )
 
-    await ActivityLogRepository.insert(user, newSurveyId, ActivityLog.type.surveyCreate, surveyInfo, false, this.tx)
+    await ActivityLogRepository.insert(
+      user,
+      surveyIdTarget,
+      ActivityLog.type.surveyCreate,
+      surveyInfoTarget,
+      false,
+      this.tx
+    )
   }
 }
