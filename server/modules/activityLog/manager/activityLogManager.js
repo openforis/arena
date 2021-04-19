@@ -42,9 +42,9 @@ const activityTypesByPermission = {
     ActivityLog.type.recordDelete,
   ],
   [AuthGroups.permissions.recordAnalyse]: [
-    ActivityLog.type.processingChainCreate,
+    ActivityLog.type.chainCreate,
     ActivityLog.type.processingChainDelete,
-    ActivityLog.type.processingChainPropUpdate,
+    ActivityLog.type.chainPropUpdate,
     ActivityLog.type.processingStepCreate,
   ],
   [AuthGroups.permissions.userEdit]: [ActivityLog.type.userEdit],

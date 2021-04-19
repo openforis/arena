@@ -53,8 +53,8 @@ export const type = {
   userRemove: 'userRemove',
 
   // Analysis
-  processingChainCreate: 'processingChainCreate',
-  processingChainPropUpdate: 'processingChainPropUpdate',
+  chainCreate: 'chainCreate',
+  chainPropUpdate: 'chainPropUpdate',
   processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',
@@ -84,6 +84,7 @@ export const keys = {
   targetUserEmail: 'targetUserEmail',
   targetUserUuid: 'targetUserUuid',
   // Analysis
+  chainUuid: 'chainUuid',
   processingChainLabels: 'processingChainLabels',
   processingStepIndex: 'processingStepIndex',
   processingStepCalculationIndex: 'processingStepCalculationIndex',
@@ -150,6 +151,7 @@ export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getTargetUserName = R.prop(keys.targetUserName)
 export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
+export const getChainUuid = R.prop(keys.chainUuid)
 export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
 export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
 export const getProcessingStepCalculationIndex = R.prop(keys.processingStepCalculationIndex)
