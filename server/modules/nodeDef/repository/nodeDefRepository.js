@@ -9,19 +9,20 @@ import {
   dbTransformCallback as dbTransformCallbackCommon,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const dbTransformCallback = (nodeDef, draft, advanced = false) => {
-  const def = advanced
-    ? R.pipe(
-        R.unless(R.always(R.isEmpty(nodeDef.props_advanced_draft)), R.assoc('draft_advanced', true)),
-        R.when(
-          R.always(draft),
-          R.assoc('props_advanced', R.mergeDeepLeft(nodeDef.props_advanced_draft, nodeDef.props_advanced))
-        ),
-        R.omit(['props_advanced_draft'])
-      )(nodeDef)
-    : nodeDef
-
-  return dbTransformCallbackCommon(def, draft, true)
+const dbTransformCallback = ({ row, draft, advanced = false, mergeProps = true }) => {
+  const rowUpdated = { ...row }
+  if (advanced) {
+    if (!R.isEmpty(row.props_advanced_draft)) {
+      rowUpdated.draft_advanced = true
+    }
+    if (draft && mergeProps) {
+      rowUpdated.props_advanced = R.mergeDeepLeft(row.props_advanced_draft, row.props_advanced)
+    }
+    if (mergeProps || !draft) {
+      delete rowUpdated.props_advanced_draft
+    }
+  }
+  return dbTransformCallbackCommon(rowUpdated, draft, true, mergeProps)
 }
 
 const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, 
@@ -47,7 +48,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
       NodeDef.isAnalysis(nodeDef),
       NodeDef.isVirtual(nodeDef),
     ],
-    (def) => dbTransformCallback(def, true, true) // Always loading draft when creating or updating a nodeDef
+    (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs }, client = db) =>
@@ -67,11 +68,7 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs }, client = db) =
 // ============== READ
 
 export const fetchNodeDefsBySurveyId = async (
-  surveyId,
-  cycle,
-  draft,
-  advanced = false,
-  includeDeleted = false,
+  { surveyId, cycle, draft, advanced = false, includeDeleted = false, mergeProps = true },
   client = db
 ) =>
   client.map(
@@ -89,7 +86,7 @@ export const fetchNodeDefsBySurveyId = async (
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
     [JSON.stringify(cycle || null)],
-    (res) => dbTransformCallback(res, draft, advanced)
+    (row) => dbTransformCallback({ row, draft, advanced, mergeProps })
   )
 
 export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
@@ -98,7 +95,7 @@ export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE parent_uuid IS NULL`,
     [],
-    (res) => dbTransformCallback(res, draft, false)
+    (row) => dbTransformCallback({ row, draft })
   )
 
 export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = db) =>
@@ -107,7 +104,7 @@ export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced 
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE uuid = $1`,
     [nodeDefUuid],
-    (res) => dbTransformCallback(res, draft, advanced)
+    (row) => dbTransformCallback({ row, draft, advanced })
   )
 
 const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
@@ -119,7 +116,7 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = d
     AND deleted IS NOT TRUE
     ORDER BY id`,
     [parentUuid],
-    (res) => dbTransformCallback(res, draft, false)
+    (row) => dbTransformCallback({ row, draft })
   )
 
 export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = db) =>
@@ -132,7 +129,7 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
     AND ${DbUtils.getPropColCombined('key', draft)} = $2
     ORDER BY id`,
     [nodeDefRootUuid, 'true'],
-    (res) => dbTransformCallback(res, draft, false)
+    (row) => dbTransformCallback({ row, draft })
   )
 
 // ============== UPDATE
@@ -149,7 +146,7 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, prop
     RETURNING ${nodeDefSelectFields}
   `,
     [props, propsAdvanced, parentUuid, nodeDefUuid],
-    (def) => dbTransformCallback(def, true, true) // Always loading draft when updating a nodeDef
+    (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
 
 // CYCLES
@@ -163,7 +160,7 @@ export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycl
     WHERE meta->'h' @> $1
     RETURNING ${nodeDefSelectFields}`,
     [JSON.stringify(nodeDefUuid)],
-    (def) => dbTransformCallback(def, true, true) // Always loading draft when creating or updating a nodeDef
+    (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
 }
 
@@ -254,7 +251,7 @@ export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => 
     RETURNING ${nodeDefSelectFields}
   `,
     [nodeDefUuid],
-    (def) => dbTransformCallback(def, true, true)
+    (row) => dbTransformCallback({ row, draft: true, advanced: true })
   )
 
   const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)

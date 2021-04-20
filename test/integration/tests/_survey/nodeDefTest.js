@@ -61,7 +61,7 @@ export const updateNodeDefTest = async () => {
   )
   expect(NodeDef.getName(updatedNodeDef)).toBe(newName)
 
-  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
+  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, cycle: Survey.cycleOneKey, draft: true })
 
   // Only one node def with that name
   expect(R.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).toBe(1)

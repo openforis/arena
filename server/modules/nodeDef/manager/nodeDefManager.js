@@ -48,19 +48,11 @@ export const insertNodeDef = async (
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
 export const fetchNodeDefsBySurveyId = async (
-  surveyId,
-  cycle = null,
-  draft = false,
-  advanced = false,
-  includeDeleted = false,
+  { surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, mergeProps = true },
   client = db
 ) => {
   const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(
-    surveyId,
-    cycle,
-    draft,
-    advanced,
-    includeDeleted,
+    { surveyId, cycle, draft, advanced, includeDeleted, mergeProps },
     client
   )
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)

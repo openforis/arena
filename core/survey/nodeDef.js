@@ -29,7 +29,9 @@ export const keys = {
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
+  propsDraft: 'propsDraft',
   propsAdvanced: 'propsAdvanced',
+  propsAdvancedDraft: 'propsAdvancedDraft',
   meta: 'meta',
   draftAdvanced: 'draftAdvanced',
   type: 'type',
@@ -110,6 +112,8 @@ export const maxKeyAttributes = 3
 // ==== READ
 
 export const { getLabels, getParentUuid, getProp, getProps, getUuid, getId, isEqual, isTemporary } = ObjectUtils
+export const getPropsDraft = R.propOr({}, keys.propsDraft)
+export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')

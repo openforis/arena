@@ -158,12 +158,20 @@ export const fetchSurveyById = async (surveyId, draft = false, validate = false,
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false },
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    mergeProps = true,
+  },
   client = db
 ) => {
   const [surveyDb, nodeDefs] = await Promise.all([
     fetchSurveyById(surveyId, draft, validate, client),
-    NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client),
+    NodeDefManager.fetchNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, includeDeleted, mergeProps }, client),
   ])
   const survey = Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: validate })(surveyDb)
 
@@ -171,11 +179,22 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false },
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    mergeProps = true,
+  },
   client = db
 ) => {
   const [survey, categoryItemsRefData, taxaIndexRefData] = await Promise.all([
-    fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted }, client),
+    fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle, draft, advanced, validate, includeDeleted, mergeProps },
+      client
+    ),
     CategoryRepository.fetchIndex(surveyId, draft, client),
     TaxonomyRepository.fetchIndex(surveyId, draft, client),
   ])
