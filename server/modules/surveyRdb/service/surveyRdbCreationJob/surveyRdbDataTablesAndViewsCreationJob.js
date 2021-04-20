@@ -68,7 +68,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
   async fetchSurvey() {
     const { surveyId, tx } = this
-    const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 

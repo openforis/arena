@@ -34,7 +34,7 @@ export default class RecordsUniquenessValidationJob extends Job {
   }
 
   async execute() {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
     this.total = R.length(cycleKeys) * 2

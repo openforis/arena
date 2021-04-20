@@ -128,7 +128,7 @@ export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.clien
     if (Step.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
       const [surveyInfo, chain] = await Promise.all([
-        SurveyRepository.fetchSurveyById(surveyId, false, tx),
+        SurveyRepository.fetchSurveyById({ surveyId, draft: false }, tx),
         ChainRepository.fetchChain({ surveyId, chainUuid }, tx),
       ])
       const chainValidation = await ChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))

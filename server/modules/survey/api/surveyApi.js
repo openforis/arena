@@ -81,7 +81,7 @@ export const init = (app) => {
       const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
-        SurveyService.fetchSurveyById(surveyId, draft, validate),
+        SurveyService.fetchSurveyById({ surveyId, draft, validate }),
         UserService.updateUserPrefs(user),
       ])
 

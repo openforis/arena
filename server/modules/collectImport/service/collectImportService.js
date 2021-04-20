@@ -30,12 +30,12 @@ export const fetchReportItemsStream = CollectImportReportManager.fetchItemsStrea
 
 // UPDATE
 export const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
-  await client.tx(async tx => {
+  client.tx(async (tx) => {
     // 1. update import report item
     const itemUpdated = await CollectImportReportManager.updateItem(surveyId, itemId, props, resolved, tx)
 
     // 2. update survey collect report items count
-    const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const collectReport = Survey.getCollectReport(surveyInfo)
     const issuesResolved = R.propOr(0, Survey.collectReportKeys.issuesResolved)(collectReport)

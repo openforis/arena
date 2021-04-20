@@ -1,4 +1,5 @@
 import { db } from '@server/db/db'
+import * as DB from '@server/db'
 import * as R from 'ramda'
 
 import { selectDate } from '@server/db/dbUtils'
@@ -36,7 +37,7 @@ export const insertSurvey = async (survey, client = db) =>
       Survey.isDraft(survey),
       Survey.isTemplate(survey),
     ],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 
 // ============== CLONE
@@ -84,7 +85,7 @@ export const fetchUserSurveys = async ({ user, offset = 0, limit = null, templat
     OFFSET ${offset}
   `,
     [User.getUuid(user), template],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 }
 
@@ -113,12 +114,12 @@ export const fetchSurveysByName = async (surveyName, client = db) =>
   client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
-    (def) => dbTransformCallback(def)
+    (def) => DB.transformCallback(def)
   )
 
-export const fetchSurveyById = async (surveyId, draft = false, client = db) =>
+export const fetchSurveyById = async ({ surveyId, draft = false, mergeProps = true }, client = db) =>
   client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
-    dbTransformCallback(def, draft)
+    DB.transformCallback(def, draft, false, mergeProps)
   )
 
 export const fetchDependencies = async (surveyId, client = db) =>
@@ -141,7 +142,7 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     RETURNING ${surveySelectFields()}
   `,
     [JSON.stringify(prop), surveyId],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 }
 

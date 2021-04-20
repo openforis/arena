@@ -76,7 +76,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
 }
 
 export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, draft)
   const preview = Record.isPreview(record)

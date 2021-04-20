@@ -65,7 +65,7 @@ export const inviteUser = async (
     throw new UnauthorizedError(User.getName(user))
   }
 
-  const survey = await SurveyManager.fetchSurveyById(surveyId, true)
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   // If the survey is not published, only survey admins and system admins can be invited
@@ -161,7 +161,7 @@ export const { fetchUserByUuid, fetchUserByUuidWithPassword, fetchUserProfilePic
 
 export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
-  return userUuid ? await UserManager.fetchUserByUuid(userUuid) : null
+  return userUuid ? UserManager.fetchUserByUuid(userUuid) : null
 }
 
 export const { fetchUserInvitationsBySurveyId } = UserInvitationManager
@@ -170,7 +170,7 @@ export const { fetchUserInvitationsBySurveyId } = UserInvitationManager
 export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
   // If surveyId is not specified, user is updating him/her self
   if (surveyId) {
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
     const surveyInfo = Survey.getSurveyInfo(survey)
     const userToUpdate = await UserManager.fetchUserByUuid(User.getUuid(userToUpdateParam))
     const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
@@ -195,7 +195,7 @@ export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
-  return await UserManager.updateUser(user, surveyId, userToUpdateParam, profilePicture)
+  return UserManager.updateUser(user, surveyId, userToUpdateParam, profilePicture)
 }
 
 export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, title }) => {

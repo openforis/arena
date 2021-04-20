@@ -14,7 +14,7 @@ export default class NodeDefsValidationJob extends Job {
   }
 
   async execute() {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
       const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(

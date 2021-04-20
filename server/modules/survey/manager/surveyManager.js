@@ -147,9 +147,12 @@ export const importSurvey = async (params, client = db) => {
 // ====== READ
 export const { fetchAllSurveyIds } = SurveyRepository
 
-export const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
+export const fetchSurveyById = async (
+  { surveyId, draft = false, validate = false, mergeProps = true },
+  client = db
+) => {
   const [surveyInfo, authGroups] = await Promise.all([
-    SurveyRepository.fetchSurveyById(surveyId, draft, client),
+    SurveyRepository.fetchSurveyById({ surveyId, draft, mergeProps }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
   const validation = validate ? await validateSurveyInfo(surveyInfo) : null
@@ -170,7 +173,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   client = db
 ) => {
   const [surveyDb, nodeDefs] = await Promise.all([
-    fetchSurveyById(surveyId, draft, validate, client),
+    fetchSurveyById({ surveyId, draft, validate, mergeProps }, client),
     NodeDefManager.fetchNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, includeDeleted, mergeProps }, client),
   ])
   const survey = Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: validate })(surveyDb)
@@ -216,14 +219,14 @@ export const updateSurveyProp = async (user, surveyId, key, value, system = fals
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
-    return fetchSurveyById(surveyId, true, true, t)
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   client.tx(async (t) => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
     if (Validation.isValid(validation)) {
-      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
+      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
       await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
@@ -253,7 +256,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
           }
         }
       })
-      return fetchSurveyById(surveyId, true, true, t)
+      return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
     }
 
     return assocSurveyInfo({ validation })
