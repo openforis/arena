@@ -8,7 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from './surveySchemaRepositoryUtils'
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
@@ -22,16 +22,17 @@ const surveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-export const insertSurvey = async (survey, client = db) =>
+export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft, template )
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template )
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING ${surveySelectFields()}
     `,
     [
       Survey.getUuid(survey),
-      survey.props,
+      props,
+      propsDraft,
       survey.ownerUuid,
       Survey.isPublished(survey),
       Survey.isDraft(survey),

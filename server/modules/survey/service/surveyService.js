@@ -30,12 +30,8 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const exportSurvey = async ({ surveyId, res, user }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-    surveyId,
-    draft: true,
-    advanced: true,
-    mergeProps: false,
-  })
+  // fetch survey with combined props and propsDraft to get proper survey info
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)
 
@@ -43,7 +39,14 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   const prefix = `survey_${surveyName}`
 
   // Survey
-  files.push({ data: JSON.stringify(survey, null, 2), name: FileUtils.join(prefix, `survey.json`) })
+  // fetch survey with props and propsDraft not combined together to get a full export
+  const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    draft: true,
+    advanced: true,
+    mergeProps: false,
+  })
+  files.push({ data: JSON.stringify(surveyFull, null, 2), name: FileUtils.join(prefix, `survey.json`) })
 
   // Categories
   const categoriesPathDir = FileUtils.join(prefix, 'categories')

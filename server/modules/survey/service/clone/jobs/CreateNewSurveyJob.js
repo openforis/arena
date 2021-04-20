@@ -29,7 +29,10 @@ export default class CreateNewSurveyJob extends Job {
       [Survey.infoKeys.template]: Survey.isTemplate(surveyInfoTargetParam),
     })
 
-    let surveyInfoTargetInserted = await SurveyRepository.insertSurvey(surveyInfoTarget, this.tx)
+    let surveyInfoTargetInserted = await SurveyRepository.insertSurvey(
+      { survey: surveyInfoTarget, propsDraft: Survey.getProps(surveyInfoTarget) },
+      this.tx
+    )
     const surveyIdTarget = Survey.getIdSurveyInfo(surveyInfoTargetInserted)
     await DBMigrator.migrateSurveySchema(surveyIdTarget)
 

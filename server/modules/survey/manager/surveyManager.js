@@ -59,7 +59,10 @@ export const insertSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyInfo = await SurveyRepository.insertSurvey(
+      { survey: surveyInfoParam, propsDraft: Survey.getProps(surveyInfoParam) },
+      t
+    )
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
@@ -115,7 +118,14 @@ export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyInfo = await SurveyRepository.insertSurvey(
+      {
+        survey: surveyInfoParam,
+        props: Survey.getProps(surveyInfoParam),
+        propsDraft: Survey.getPropsDraft(surveyInfoParam),
+      },
+      t
+    )
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
