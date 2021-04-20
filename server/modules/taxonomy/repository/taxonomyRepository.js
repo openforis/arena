@@ -7,6 +7,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
+import * as DB from '@server/db'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -101,7 +102,7 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
   )
 
 export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, limit = null, offset = 0, search = null },
+  { surveyId, draft = false, mergeProps = true, limit = null, offset = 0, search = null },
   client = db
 ) =>
   client.map(
@@ -130,7 +131,7 @@ export const fetchTaxonomiesBySurveyId = async (
       offset,
       search: `%${search}%`,
     },
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true, mergeProps)
   )
 
 export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
@@ -153,11 +154,7 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
   )
 
 export const fetchTaxaWithVernacularNames = async (
-  surveyId,
-  taxonomyUuid,
-  draft = false,
-  limit = null,
-  offset = 0,
+  { surveyId, taxonomyUuid, draft = false, mergeProps = true, limit = null, offset = 0 },
   client = db
 ) =>
   client.map(
@@ -201,7 +198,7 @@ export const fetchTaxaWithVernacularNames = async (
       OFFSET $2
     `,
     [taxonomyUuid, offset],
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true, mergeProps)
   )
 
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {

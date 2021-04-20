@@ -27,7 +27,7 @@ export const fetchTaxonomyUuidByName = async (surveyId, name, draft) => {
 }
 
 export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft) => {
-  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)
+  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft })
   return R.find((taxon) => Taxon.getCode(taxon) === code)(taxa)
 }
 

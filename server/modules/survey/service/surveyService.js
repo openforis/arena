@@ -74,12 +74,17 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   // Taxonomy
   const taxonomiesPathDir = FileUtils.join(prefix, 'taxonomies')
   const taxonomiesPathFile = FileUtils.join(taxonomiesPathDir, 'taxonomies.json')
-  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true })
+  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true, mergeProps: false })
   files.push({ data: JSON.stringify(taxonomies, null, 2), name: taxonomiesPathFile })
 
   await Promise.all(
     taxonomies.map(async (taxonomy) => {
-      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomy.uuid, true)
+      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames({
+        surveyId,
+        taxonomyUuid: taxonomy.uuid,
+        draft: true,
+        mergeProps: false,
+      })
       files.push({
         data: JSON.stringify(taxaData, null, 2),
         name: FileUtils.join(taxonomiesPathDir, `${taxonomy.uuid}.json`),

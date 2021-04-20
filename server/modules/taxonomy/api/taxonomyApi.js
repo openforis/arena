@@ -135,7 +135,7 @@ export const init = (app) => {
             )
           }
         } else {
-          list = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
+          list = await TaxonomyService.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft, limit, offset })
         }
 
         res.json({ list })
