@@ -18,13 +18,14 @@ export default class NodeDefsValidationJob extends Job {
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
       const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        this.surveyId,
-        cycle,
-        true,
-        true,
-        true,
-        false,
-        this.tx,
+        {
+          surveyId: this.surveyId,
+          cycle,
+          draft: true,
+          advanced: true,
+          validate: true,
+        },
+        this.tx
       )
 
       R.pipe(
@@ -33,7 +34,7 @@ export default class NodeDefsValidationJob extends Job {
         R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
           const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(surveyAndNodeDefs)
           this.errors[NodeDef.getName(nodeDef)] = Validation.getFieldValidations(nodeDefValidation)
-        }),
+        })
       )(surveyAndNodeDefs)
     }
 

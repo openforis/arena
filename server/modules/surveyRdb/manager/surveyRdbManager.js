@@ -87,7 +87,7 @@ export const fetchViewData = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, true, false, false, false, client)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, client)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)

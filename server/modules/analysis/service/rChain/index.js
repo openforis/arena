@@ -24,7 +24,7 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) 
 // ==== READ
 export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
   const [survey, step] = await Promise.all([
-    SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle),
+    SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle }),
     AnalysisManager.fetchStep({ surveyId, stepUuid }),
   ])
   const query = Query.create({ entityDefUuid: Step.getEntityUuid(step) })
@@ -34,7 +34,7 @@ export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
 // ==== UPDATE
 
 export const persistResults = async ({ surveyId, cycle, stepUuid, filePath }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
 
   const entityDefStep = Survey.getNodeDefByUuid(Step.getEntityUuid(step))(survey)
@@ -79,7 +79,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
     // Persist calculation scripts
     const [chain, survey] = await Promise.all([
       AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
-      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }),
     ])
     await Promise.all(
       Chain.getProcessingSteps(chain).map((step) => {

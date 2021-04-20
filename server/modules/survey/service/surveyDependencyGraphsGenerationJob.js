@@ -18,13 +18,8 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
     const survey =
       this.contextSurvey ||
       (await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        this.surveyId,
-        Survey.cycleOneKey,
-        false,
-        true,
-        false,
-        false,
-        this.tx,
+        { surveyId: this.surveyId, cycle: Survey.cycleOneKey, advanced: true },
+        this.tx
       ))
 
     const graph = Survey.buildDependencyGraph(survey)

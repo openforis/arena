@@ -7,7 +7,7 @@ import * as SurveyRdbManager from '../manager/surveyRdbManager'
 const _fetchSurvey = async (surveyId, cycle) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId, true))
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
-  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
+  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: loadDraftDefs })
 }
 
 /**

@@ -46,7 +46,7 @@ export const fetchRecordCreatedCountsByDates = RecordManager.fetchRecordCreatedC
 
 export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Record.getCycle(record))
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   return await RecordManager.updateRecordStep(user, survey, record, stepId)
 }
 
@@ -54,7 +54,7 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Record.getCycle(record))
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   await RecordManager.deleteRecord(user, survey, recordUuid)
 
   // Notify other users viewing or editing the record it has been deleted

@@ -15,7 +15,7 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
     const { surveyId, tx } = this
 
     const [survey, chains] = await Promise.all([
-      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, false, false, false, false, tx),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, tx),
       AnalysisManager.fetchChains({ surveyId, includeStepsAndCalculations: true }, tx),
       SurveyRdbManager.createResultNodeTable({ surveyId }, tx),
     ])
