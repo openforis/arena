@@ -69,7 +69,26 @@ export const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, offset = null, limit = null }) => `
+const _getFetchCategoriesAndLevelsQuery = ({
+  surveyId,
+  draft,
+  includeValidation,
+  mergeProps = true,
+  offset = null,
+  limit = null,
+}) => {
+  const propsFields = (tableAlias) => {
+    if (mergeProps) {
+      return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
+    }
+    const fields = [`'props', ${tableAlias}.props`]
+    if (draft) {
+      fields.push(`'propsDraft', ${tableAlias}.props_draft`)
+    }
+    return fields.join(', ')
+  }
+
+  return `
     WITH
       levels AS
       (
@@ -79,7 +98,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
             'id', l.id, 
             'uuid', l.uuid, 
             'index', l.index, 
-            'props', l.props${draft ? ' || l.props_draft' : ''}
+            ${propsFields('l')}
           )) AS levels
         FROM
           ${getSurveyDBSchema(surveyId)}.category_level l
@@ -99,7 +118,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
       'uuid', c.uuid,
-      'props', c.props${draft ? ' || c.props_draft' : ''},
+      ${propsFields('c')},
       'published', c.published, 
       'levels', l.levels
       ${includeValidation ? ", 'validation', c.validation" : ''}
@@ -109,6 +128,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       levels l
     ON
       c.uuid = l.category_uuid`
+}
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
   client.one(
@@ -149,11 +169,11 @@ export const fetchCategoriesBySurveyId = async (
 }
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, mergeProps = true, offset = 0, limit = null },
   client = db
 ) => {
   const { categories } = await client.one(
-    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, offset, limit }),
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, mergeProps, offset, limit }),
     {
       offset,
       limit,
@@ -177,7 +197,10 @@ export const fetchCategoryAndLevelsByUuid = async (
   return A.pipe(R.values, R.head)(categories)
 }
 
-export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
+export const fetchItemsByCategoryUuid = async (
+  { surveyId, categoryUuid, draft = false, mergeProps = true },
+  client = db
+) => {
   const items = await client.map(
     `
       SELECT i.* 
@@ -188,7 +211,7 @@ export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = f
      ORDER BY i.id
     `,
     [categoryUuid],
-    (def) => dbTransformCallback(def, draft, true)
+    (def) => DB.transformCallback(def, draft, true, mergeProps)
   )
 
   return draft ? items : R.filter((item) => item.published)(items)
