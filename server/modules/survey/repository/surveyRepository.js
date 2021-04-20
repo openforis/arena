@@ -49,7 +49,6 @@ export const cloneTable = async (
     DbUtils.cloneTable({
       source: `${getSurveyDBSchema(surveyIdSource)}.${table}`,
       target: `${getSurveyDBSchema(surveyIdTarget)}.${table}`,
-      table,
       excludeColumns,
       filterRowsCondition,
     })
