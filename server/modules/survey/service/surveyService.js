@@ -30,7 +30,7 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const exportSurvey = async ({ surveyId, res, user }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, null, true)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, draft: true })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)
 

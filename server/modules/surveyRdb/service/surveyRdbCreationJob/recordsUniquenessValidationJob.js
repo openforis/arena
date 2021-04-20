@@ -45,12 +45,7 @@ export default class RecordsUniquenessValidationJob extends Job {
   async validateRecordsUniquenessByCycle(cycle) {
     // 1. fetch survey and node defs
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      this.surveyId,
-      cycle,
-      true,
-      true,
-      false,
-      false,
+      { surveyId: this.surveyId, cycle, draft: true, advanced: true },
       this.tx
     )
     this.incrementProcessedItems()

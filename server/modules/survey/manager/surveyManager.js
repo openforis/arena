@@ -171,12 +171,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
-  surveyId,
-  cycle = null,
-  draft = false,
-  advanced = false,
-  validate = false,
-  includeDeleted = false,
+  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false },
   client = db
 ) => {
   const [survey, categoryItemsRefData, taxaIndexRefData] = await Promise.all([

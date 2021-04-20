@@ -37,12 +37,7 @@ export default class RecordCheckJob extends Job {
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
       const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-        this.surveyId,
-        cycle,
-        true,
-        true,
-        false,
-        true,
+        { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
 

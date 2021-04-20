@@ -106,9 +106,7 @@ class RecordUpdateThread extends Thread {
     // Init survey
     const preview = Record.isPreview(this.record)
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      this.surveyId,
-      Record.getCycle(this.record),
-      preview,
+      { surveyId: this.surveyId, cycle: Record.getCycle(this.record), draft: preview },
       true
     )
 
