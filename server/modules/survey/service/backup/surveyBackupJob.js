@@ -31,14 +31,14 @@ export default class SurveyBackupJob extends Job {
 
   async onStart() {
     super.onStart()
-    const { surveyId } = this.context
+    const { outputFileName } = this.context
 
-    const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, `survey_${surveyId}_${Date.now()}.zip`)
-    const output = fs.createWriteStream(outputFilePath)
+    const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
+    const outputFileStream = fs.createWriteStream(outputFilePath)
     const archive = Archiver('zip')
-    archive.pipe(output)
+    archive.pipe(outputFileStream)
 
-    this.setContext({ archive, outputFilePath })
+    this.setContext({ archive })
   }
 
   async onEnd() {
@@ -48,11 +48,11 @@ export default class SurveyBackupJob extends Job {
   }
 
   async beforeSuccess() {
-    const { survey, outputFilePath } = this.context
+    const { survey, outputFileName } = this.context
 
     this.setResult({
       survey,
-      outputFilePath,
+      outputFileName,
     })
   }
 }

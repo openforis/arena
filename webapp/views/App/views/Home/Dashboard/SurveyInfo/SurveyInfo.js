@@ -8,7 +8,7 @@ import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
@@ -26,8 +26,6 @@ const SurveyInfo = () => {
   const history = useHistory()
 
   const surveyInfo = useSurveyInfo()
-
-  const surveyId = useSurveyId()
 
   const canEditDef = useAuthCanEditSurvey()
 
@@ -61,7 +59,7 @@ const SurveyInfo = () => {
           <DownloadButton
             id={DataTestId.dashboard.surveyExportBtn}
             className="btn-transparent"
-            href={`/api/survey/${surveyId}/export/`}
+            onClick={() => dispatch(SurveyActions.exportSurvey())}
             label={i18n.t('common.export')}
           />
 

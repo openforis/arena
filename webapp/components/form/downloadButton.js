@@ -10,15 +10,16 @@ const DownloadButton = (props) => {
   const i18n = useI18n()
 
   const {
+    disabled,
     href,
+    id,
+    label = i18n.t('common.download'),
+    onClick,
     requestMethod,
     requestParams,
-    label = i18n.t('common.download'),
+    showLabel,
     title,
     className,
-    showLabel,
-    disabled,
-    id,
   } = props
 
   return (
@@ -29,16 +30,22 @@ const DownloadButton = (props) => {
       data-testid={id}
       title={title}
       onClick={async () => {
-        const response = await axios({
-          url: href,
-          method: requestMethod,
-          responseType: 'blob',
-          data: requestParams,
-        })
-        const blob = new Blob([response.data])
-        const contentDisposition = R.path(['headers', 'content-disposition'], response)
-        const fileName = contentDisposition.slice('attachment; filename='.length)
-        FileSaver.saveAs(blob, fileName)
+        if (href) {
+          const response = await axios({
+            url: href,
+            method: requestMethod,
+            responseType: 'blob',
+            data: requestMethod !== 'GET' ? requestParams : null,
+            params: requestMethod === 'GET' ? requestParams : null,
+          })
+          const blob = new Blob([response.data])
+          const contentDisposition = R.path(['headers', 'content-disposition'], response)
+          const fileName = contentDisposition.slice('attachment; filename='.length)
+          FileSaver.saveAs(blob, fileName)
+        }
+        if (onClick) {
+          await onClick()
+        }
       }}
     >
       <span className={`icon icon-download2 icon-14px${showLabel && label ? ' icon-left' : ''}`} />
@@ -51,8 +58,9 @@ DownloadButton.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
-  href: PropTypes.string.isRequired,
+  href: PropTypes.string, // specify href, onClick or both
   label: PropTypes.string,
+  onClick: PropTypes.func, // specify href, onClick or both
   requestMethod: PropTypes.oneOf(['GET', 'POST']),
   requestParams: PropTypes.object,
   showLabel: PropTypes.bool,
@@ -62,8 +70,10 @@ DownloadButton.propTypes = {
 DownloadButton.defaultProps = {
   className: '',
   disabled: false,
+  href: null,
   id: null,
-  label: null,
+  label: undefined, // default to i18n.t('common.download')
+  onClick: null,
   requestMethod: 'GET',
   requestParams: null,
   showLabel: true,

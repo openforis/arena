@@ -846,6 +846,15 @@ $t(common.cantUndoWarning)`,
     SurveyCloneJob: 'Clone survey',
     CloneSurveyJob: 'Clone survey',
     CloneTablesJob: 'Clone survey tables',
+    // survey backup
+    SurveyInfoBackupJob: 'Survey Info Export',
+    CategoriesBackupJob: 'Categories Export',
+    TaxonomiesBackupJob: 'Taxonomies Export',
+    RecordsBackupJob: 'Records Export',
+    FilesBackupJob: 'Files Export',
+    ChainBackupJob: 'Chain Export',
+    UsersBackupJob: 'Users Export',
+    ActivityLogBackupJob: 'Activity Log Export',
   },
 
   // ====== App Errors

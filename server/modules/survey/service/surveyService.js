@@ -1,7 +1,3 @@
-import * as Survey from '@core/survey/survey'
-
-import * as Response from '@server/utils/response'
-
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as SurveyManager from '../manager/surveyManager'
@@ -20,12 +16,13 @@ export const startPublishJob = (user, surveyId) => {
   return job
 }
 
-export const exportSurvey = async ({ surveyId, res, user }) => {
-  const job = new SurveyBackupJob({ surveyId, user })
-  await job.start()
-  const { survey, outputFilePath } = job.result
-  Response.setContentTypeFile(res)
-  Response.sendFile({ res, filePath: outputFilePath, fileNameOutput: `survey_${Survey.getName(survey)}.zip` })
+export const exportSurvey = ({ surveyId, user }) => {
+  const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
+  const job = new SurveyBackupJob({ surveyId, user, outputFileName })
+
+  JobManager.executeJobThread(job)
+
+  return { job: JobUtils.jobToJSON(job), outputFileName }
 }
 
 export const cloneSurvey = ({ user, surveyIdSource, surveyInfoTarget }) => {

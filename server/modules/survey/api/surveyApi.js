@@ -97,7 +97,20 @@ export const init = (app) => {
 
       const user = Request.getUser(req)
 
-      await SurveyService.exportSurvey({ surveyId, user, res })
+      const { job, outputFileName } = SurveyService.exportSurvey({ surveyId, user })
+      res.json({ job, outputFileName })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // download generated survey export file
+  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyName, outputFileName } = Request.getParams(req)
+
+      const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
+      Response.sendFile({ res, filePath: outputFilePath, fileNameOutput: `survey_${surveyName}.zip` })
     } catch (error) {
       next(error)
     }
