@@ -1,5 +1,5 @@
 import './EntitySelectorTreeNode.scss'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -10,8 +10,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
 import { DataTestId } from '@webapp/utils/dataTestId'
-
-import { useOnUpdate } from '@webapp/components/hooks'
 
 const EntitySelectorTreeNode = (props) => {
   const { expanded, isDisabled, nodeDef, nodeDefUuidActive, onlyPages, onSelect } = props
@@ -28,19 +26,17 @@ const EntitySelectorTreeNode = (props) => {
   const [showChildren, setShowChildren] = useState(root)
   const toggleShowChildren = () => setShowChildren((prevState) => !prevState)
 
-  useOnUpdate(() => {
+  useEffect(() => {
     setShowChildren(expanded)
   }, [expanded])
 
   return (
     <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root })}>
       <div className={classNames('display-flex', 'entity-selector-tree-node', { 'with-children': showChildren })}>
-        {childEntityDefs.length > 0 ? (
+        {childEntityDefs.length > 0 && (
           <button type="button" className="btn-xs btn-toggle" onClick={toggleShowChildren}>
             <span className="icon icon-play3 icon-14px" />
           </button>
-        ) : (
-          <span className="toggle-placeholder" />
         )}
 
         <button

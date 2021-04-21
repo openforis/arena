@@ -3,7 +3,11 @@
 
 .entity-selector-tree-node-wrapper {
   &:not(.is-root) {
-    margin-left: 1rem;
+    margin-left: 24px;
+
+    .btn-toggle {
+      margin-left: -4px;
+    }
   }
 }
 
@@ -22,9 +26,5 @@
   .btn-node-def {
     padding-left: unset;
     font-size: 0.9rem;
-  }
-
-  .toggle-placeholder {
-    margin-left: 14px;
   }
 }
