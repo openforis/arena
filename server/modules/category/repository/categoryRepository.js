@@ -73,19 +73,21 @@ const _getFetchCategoriesAndLevelsQuery = ({
   surveyId,
   draft,
   includeValidation,
-  mergeProps = true,
+  backup = false,
   offset = null,
   limit = null,
 }) => {
   const propsFields = (tableAlias) => {
-    if (mergeProps) {
-      return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
+    if (backup) {
+      // keep both props and propsDraft
+      const fields = [`'props', ${tableAlias}.props`]
+      if (draft) {
+        fields.push(`'propsDraft', ${tableAlias}.props_draft`)
+      }
+      return fields.join(', ')
     }
-    const fields = [`'props', ${tableAlias}.props`]
-    if (draft) {
-      fields.push(`'propsDraft', ${tableAlias}.props_draft`)
-    }
-    return fields.join(', ')
+    // combine props and props_draft column into one
+    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
   }
 
   return `
@@ -169,11 +171,11 @@ export const fetchCategoriesBySurveyId = async (
 }
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, mergeProps = true, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, backup = false, offset = 0, limit = null },
   client = db
 ) => {
   const { categories } = await client.one(
-    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, mergeProps, offset, limit }),
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup, offset, limit }),
     {
       offset,
       limit,
@@ -198,7 +200,7 @@ export const fetchCategoryAndLevelsByUuid = async (
 }
 
 export const fetchItemsByCategoryUuid = async (
-  { surveyId, categoryUuid, draft = false, mergeProps = true },
+  { surveyId, categoryUuid, draft = false, backup = false },
   client = db
 ) => {
   const items = await client.map(
@@ -211,7 +213,7 @@ export const fetchItemsByCategoryUuid = async (
      ORDER BY i.id
     `,
     [categoryUuid],
-    (def) => DB.transformCallback(def, draft, true, mergeProps)
+    (def) => DB.transformCallback(def, draft, true, backup)
   )
 
   return draft ? items : R.filter((item) => item.published)(items)

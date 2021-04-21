@@ -9,20 +9,22 @@ import {
   dbTransformCallback as dbTransformCallbackCommon,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const dbTransformCallback = ({ row, draft, advanced = false, mergeProps = true }) => {
+const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
   if (advanced) {
     if (!R.isEmpty(row.props_advanced_draft)) {
       rowUpdated.draft_advanced = true
     }
-    if (draft && mergeProps) {
+    if (draft && !backup) {
+      // merge props_advanced and props_advanced_draft into props_advanced
       rowUpdated.props_advanced = R.mergeDeepLeft(row.props_advanced_draft, row.props_advanced)
     }
-    if (mergeProps || !draft) {
+    if (!backup || !draft) {
+      // ignore pops_advanced_draft
       delete rowUpdated.props_advanced_draft
     }
   }
-  return dbTransformCallbackCommon(rowUpdated, draft, true, mergeProps)
+  return dbTransformCallbackCommon(rowUpdated, draft, true, backup)
 }
 
 const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, 
@@ -68,7 +70,7 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs }, client = db) =
 // ============== READ
 
 export const fetchNodeDefsBySurveyId = async (
-  { surveyId, cycle, draft, advanced = false, includeDeleted = false, mergeProps = true },
+  { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false },
   client = db
 ) =>
   client.map(
@@ -86,7 +88,7 @@ export const fetchNodeDefsBySurveyId = async (
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
     [JSON.stringify(cycle || null)],
-    (row) => dbTransformCallback({ row, draft, advanced, mergeProps })
+    (row) => dbTransformCallback({ row, draft, advanced, backup })
   )
 
 export const fetchRootNodeDef = async (surveyId, draft, client = db) =>

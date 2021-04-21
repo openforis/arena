@@ -7,7 +7,7 @@ const _assocPublishedDraft = (row) => ({
   draft: !A.isEmpty(row.props_draft),
 })
 
-export const transformCallback = (row, draft = false, assocPublishedDraft = false, mergePropsParam = true) => {
+export const transformCallback = (row, draft = false, assocPublishedDraft = false, backup = false) => {
   if (A.isNull(row)) {
     return null
   }
@@ -18,10 +18,11 @@ export const transformCallback = (row, draft = false, assocPublishedDraft = fals
     A.camelizePartial({ skip: ['validation', 'props', 'props_draft'] })
   )(row)
 
-  if (mergePropsParam) {
+  if (!backup) {
     return mergeProps({ draft })(rowUpdated)
   }
-  // camelize 'props_draft' column
+
+  // backup: camelize props_draft column into propsDraft
   if (draft) {
     rowUpdated.propsDraft = row.props_draft
   }

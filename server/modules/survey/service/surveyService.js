@@ -44,7 +44,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
     surveyId,
     draft: true,
     advanced: true,
-    mergeProps: false,
+    backup: true,
   })
   files.push({ data: JSON.stringify(surveyFull, null, 2), name: FileUtils.join(prefix, `survey.json`) })
 
@@ -54,7 +54,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
     surveyId,
     draft: true,
-    mergeProps: false,
+    backup: true,
   })
   const categoriesUuids = Object.keys(categories || {})
   files.push({ data: JSON.stringify(categories, null, 2), name: categoriesPathFile })
@@ -65,7 +65,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
         surveyId,
         categoryUuid,
         draft: true,
-        mergeProps: false,
+        backup: true,
       })
       files.push({
         data: JSON.stringify(itemsData, null, 2),
@@ -77,7 +77,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
   // Taxonomy
   const taxonomiesPathDir = FileUtils.join(prefix, 'taxonomies')
   const taxonomiesPathFile = FileUtils.join(taxonomiesPathDir, 'taxonomies.json')
-  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true, mergeProps: false })
+  const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true, backup: true })
   files.push({ data: JSON.stringify(taxonomies, null, 2), name: taxonomiesPathFile })
 
   await Promise.all(
@@ -86,7 +86,7 @@ export const exportSurvey = async ({ surveyId, res, user }) => {
         surveyId,
         taxonomyUuid: taxonomy.uuid,
         draft: true,
-        mergeProps: false,
+        backup: true,
       })
       files.push({
         data: JSON.stringify(taxaData, null, 2),

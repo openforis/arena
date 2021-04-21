@@ -102,7 +102,7 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
   )
 
 export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, mergeProps = true, limit = null, offset = 0, search = null },
+  { surveyId, draft = false, backup = false, limit = null, offset = 0, search = null },
   client = db
 ) =>
   client.map(
@@ -131,7 +131,7 @@ export const fetchTaxonomiesBySurveyId = async (
       offset,
       search: `%${search}%`,
     },
-    (record) => DB.transformCallback(record, draft, true, mergeProps)
+    (record) => DB.transformCallback(record, draft, true, backup)
   )
 
 export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
@@ -154,7 +154,7 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
   )
 
 export const fetchTaxaWithVernacularNames = async (
-  { surveyId, taxonomyUuid, draft = false, mergeProps = true, limit = null, offset = 0 },
+  { surveyId, taxonomyUuid, draft = false, backup = false, limit = null, offset = 0 },
   client = db
 ) =>
   client.map(
@@ -198,7 +198,7 @@ export const fetchTaxaWithVernacularNames = async (
       OFFSET $2
     `,
     [taxonomyUuid, offset],
-    (record) => DB.transformCallback(record, draft, true, mergeProps)
+    (record) => DB.transformCallback(record, draft, true, backup)
   )
 
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {

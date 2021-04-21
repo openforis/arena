@@ -118,9 +118,9 @@ export const fetchSurveysByName = async (surveyName, client = db) =>
     (def) => DB.transformCallback(def)
   )
 
-export const fetchSurveyById = async ({ surveyId, draft = false, mergeProps = true }, client = db) =>
+export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
-    DB.transformCallback(def, draft, false, mergeProps)
+    DB.transformCallback(def, draft, false, backup)
   )
 
 export const fetchDependencies = async (surveyId, client = db) =>
