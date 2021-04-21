@@ -1,0 +1,30 @@
+@import 'webapp/style/vars';
+@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
+
+.entity-selector-tree-node-wrapper {
+  &:not(.is-root) {
+    margin-left: 1rem;
+  }
+}
+
+.entity-selector-tree-node {
+  &.with-children {
+    > .btn-toggle {
+      transform: rotate(90deg);
+    }
+  }
+
+  .btn-toggle {
+    align-self: flex-start;
+    margin-top: 1px;
+  }
+
+  .btn-node-def {
+    padding-left: unset;
+    font-size: 0.9rem;
+  }
+
+  .toggle-placeholder {
+    margin-left: 14px;
+  }
+}

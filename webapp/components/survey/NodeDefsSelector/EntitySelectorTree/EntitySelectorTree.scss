@@ -1,0 +1,37 @@
+@import 'webapp/style/vars';
+@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
+
+.entity-selector-tree {
+  position: relative;
+  overflow-y: auto;
+  border: $formBorder;
+  background-color: $white;
+
+  button {
+    border: none;
+    background-color: transparent;
+    text-align: left;
+
+    &:hover {
+      color: $orange;
+      background-color: transparent;
+    }
+
+    &.active {
+      font-weight: bold;
+      background-color: transparent;
+    }
+  }
+
+  .btn-expand {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+  }
+}
+
+.survey-form.edit {
+  .entity-selector-tree {
+    border: $formBorderEdit;
+  }
+}
