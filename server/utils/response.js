@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import path from 'path'
 import Archiver from 'archiver'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -48,10 +50,19 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   }
 }
 
-export const sendFile = (res, name, content, size) => {
+export const sendFileContent = (res, name, content, size) => {
   setContentTypeFile(res, name, size)
   res.write(content, 'binary')
   res.end(null, 'binary')
+}
+
+export const sendFile = ({ res, filePath, fileNameOutput = null }) => {
+  const stats = fs.statSync(filePath)
+  const { size } = stats
+  const fileName = fileNameOutput || path.basename(filePath)
+  setContentTypeFile(res, fileName, size)
+  fs.createReadStream(filePath).pipe(res)
+  res.end()
 }
 
 export const sendZipFile = (res, dir, name) => {

@@ -164,7 +164,8 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   return userUuid ? UserManager.fetchUserByUuid(userUuid) : null
 }
 
-export const { fetchUserInvitationsBySurveyId } = UserInvitationManager
+export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
+
 // ====== UPDATE
 
 export const updateUser = async (user, surveyId, userToUpdateParam, file) => {

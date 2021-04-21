@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { sendOk, sendFile } from '@server/utils/response'
+import { sendOk, sendFileContent } from '@server/utils/response'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -100,7 +100,7 @@ export const init = (app) => {
         const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
         const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
 
-        sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
+        sendFileContent(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
       } catch (error) {
         next(error)
       }
