@@ -20,8 +20,9 @@ export const deleteSurvey = (history) => async (dispatch, getState) => {
 
   await dispatch({ type: surveyDelete, surveyInfo })
 
-  // Navigate to survey list
-  history.push(appModuleUri(homeModules.surveyList))
+  // Navigate to survey/template list
+  const moduleDestination = Survey.isTemplate(surveyInfo) ? homeModules.templateList : homeModules.surveyList
+  history.push(appModuleUri(moduleDestination))
 
   await dispatch(LoaderActions.hideLoader())
 

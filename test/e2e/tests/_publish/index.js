@@ -22,13 +22,15 @@ export const verifySurveyPublished = () =>
     expect(await page.innerText(getSelector(DataTestId.dashboard.surveyStatus))).toBe('(PUBLISHED)')
   })
 
-export const publishWithoutErrors = () => {
+export const publishWithoutErrors = ({ inHomePage = false } = {}) => {
   test('Survey Publish', async () => {
     await publish()
     await page.click(DataTestId.modal.close)
   })
 
-  gotoHome()
+  if (!inHomePage) {
+    gotoHome()
+  }
 
   verifySurveyPublished()
 }

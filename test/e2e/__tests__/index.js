@@ -21,6 +21,7 @@ import recordVerify from '../tests/recordVerify'
 import templateCreate from '../tests/templateCreate'
 import templateCreateFromSurvey from '../tests/templateCreateFromSurvey'
 import templateDelete from '../tests/templateDelete'
+import templatePublish from '../tests/templatePublish'
 
 import surveyExport from '../tests/surveyExport'
 import surveyImport from '../tests/surveyImport'
@@ -77,6 +78,7 @@ describe('E2E Tests', () => {
    */
   templateCreate()
   templateCreateFromSurvey()
+  templatePublish()
 
   /**
    * Survey export/import/clone.

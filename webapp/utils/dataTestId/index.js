@@ -148,6 +148,9 @@ export const DataTestId = {
     taxonomyDescription: _withLang('taxonomy-description'),
     uploadInput: 'taxonomy-upload-input',
   },
+  templateList: {
+    module: 'templates',
+  },
   userList: {
     inviteBtn: 'invite-user-btn',
     invitedBy: 'invited_by',
