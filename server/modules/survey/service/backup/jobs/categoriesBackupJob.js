@@ -1,3 +1,5 @@
+import * as PromiseUtils from '@core/promiseUtils'
+
 import Job from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -18,22 +20,23 @@ export default class CategoriesBackupJob extends Job {
       draft: true,
       backup: true,
     })
-    const categoriesUuids = Object.keys(categories || {})
     archive.append(JSON.stringify(categories, null, 2), { name: categoriesPathFile })
 
     // for each category create a  `${categoryUuid}.json` file with the category items
-    await Promise.all(
-      categoriesUuids.map(async (categoryUuid) => {
-        const itemsData = await CategoryService.fetchItemsByCategoryUuid({
-          surveyId,
-          categoryUuid,
-          draft: true,
-          backup: true,
-        })
-        archive.append(JSON.stringify(itemsData, null, 2), {
-          name: FileUtils.join(categoriesPathDir, `${categoryUuid}.json`),
-        })
+    const categoriesUuids = Object.keys(categories || {})
+    this.total = categoriesUuids.length
+
+    await PromiseUtils.each(categoriesUuids, async (categoryUuid) => {
+      const itemsData = await CategoryService.fetchItemsByCategoryUuid({
+        surveyId,
+        categoryUuid,
+        draft: true,
+        backup: true,
       })
-    )
+      archive.append(JSON.stringify(itemsData, null, 2), {
+        name: FileUtils.join(categoriesPathDir, `${categoryUuid}.json`),
+      })
+      this.incrementProcessedItems()
+    })
   }
 }
