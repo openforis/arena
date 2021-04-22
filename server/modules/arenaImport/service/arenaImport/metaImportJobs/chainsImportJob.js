@@ -11,8 +11,8 @@ const insertChain = async ({ chainUuid, user, surveyId, arenaSurveyFileZip }, cl
 }
 
 /**
- * Inserts a taxonomy for each taxonomy
- * Saves the list of inserted taxonomies in the "taxonomies" context property.
+ * Inserts a chain for each chain in the zip file.
+ * Saves the list of inserted chains in the "chains" context property.
  */
 export default class ChainsImportJob extends Job {
   constructor(params) {
