@@ -2,34 +2,32 @@ import AdmZip from 'adm-zip'
 import fs from 'fs'
 
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
-import { downloadsPath, getSurveyDirPath, getSurveyZipPath } from '../../downloads/path'
+import { getSurveyDirPath, getSurveyZipPath, downloadsSurveysPath } from '../../downloads/path'
 
 export const exportSurvey = (survey) =>
   test(`Export survey ${survey.name}`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
+    await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
+    await page.waitForSelector(getSelector(DataTestId.modal.modal))
+
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.waitForResponse('**/export/'),
-      page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button')),
+      page.waitForResponse(/.+\/download\?.*/),
+      page.click(DataTestId.surveyExport.downloadBtn),
     ])
 
     await download.saveAs(surveyZipPath)
     const zip = new AdmZip(surveyZipPath)
-    zip.extractAllTo(downloadsPath, true, '')
+    zip.extractAllTo(surveyDirPath, true, '')
 
     await expect(fs.existsSync(surveyDirPath)).toBeTruthy()
   })
 
-export const removeExportSurveyFiles = (survey) =>
-  test(`Remove exported survey ${survey.name} files`, async () => {
-    const surveyZipPath = getSurveyZipPath(survey)
-    const surveyDirPath = getSurveyDirPath(survey)
-
-    fs.rmSync(surveyZipPath)
-    fs.rmdirSync(surveyDirPath, { recursive: true })
-
-    await expect(fs.existsSync(surveyZipPath)).toBeFalsy()
-    await expect(fs.existsSync(surveyDirPath)).toBeFalsy()
+export const removeExportSurveyFiles = async () => {
+  test(`Remove exported survey files`, async () => {
+    fs.rmdirSync(downloadsSurveysPath, { recursive: true })
+    await expect(fs.existsSync(downloadsSurveysPath)).toBeFalsy()
   })
+}

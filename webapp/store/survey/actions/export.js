@@ -3,9 +3,10 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 
-import { JobActions } from '@webapp/store/app'
-
 import DownloadButton from '@webapp/components/form/downloadButton'
+import { JobActions } from '@webapp/store/app'
+import { DataTestId } from '@webapp/utils/dataTestId'
+
 import * as SurveyState from '../state'
 
 export const exportSurvey = () => async (dispatch, getState) => {
@@ -24,6 +25,7 @@ export const exportSurvey = () => async (dispatch, getState) => {
       job,
       closeButton: (
         <DownloadButton
+          id={DataTestId.surveyExport.downloadBtn}
           href={`/api/survey/${surveyId}/export/download`}
           requestParams={{ outputFileName, surveyName }}
           onClick={() => dispatch(JobActions.hideJobMonitor())}

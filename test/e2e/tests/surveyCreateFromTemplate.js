@@ -2,7 +2,6 @@ import { survey, surveyFromTemplate } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
-  removeExportSurveyFiles,
   verifyCategories,
   verifyNodeDefs,
   verifyRecords,
@@ -19,6 +18,7 @@ export default () =>
     createSurvey(surveyFromTemplate)
 
     exportSurvey(surveyFromTemplate)
+
     verifySurvey(surveyFromTemplate)
     verifyNodeDefs(surveyFromTemplate)
     verifyCategories(surveyFromTemplate)
@@ -26,7 +26,6 @@ export default () =>
     verifyRecords(surveyFromTemplate, [])
     verifyUsers(surveyFromTemplate)
     verifyActivityLog(surveyFromTemplate)
-    removeExportSurveyFiles(surveyFromTemplate)
 
     gotoSurveyList()
     selectSurvey(survey)

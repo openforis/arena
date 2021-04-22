@@ -4,7 +4,6 @@ import { survey, surveyImport } from '../mock/survey'
 import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
-  removeExportSurveyFiles,
   verifyCategories,
   verifyNodeDefs,
   verifyRecords,
@@ -36,7 +35,6 @@ export default () =>
       const json = await response.json()
       surveyImport.name = json.survey.info.props.name
     })
-    removeExportSurveyFiles(survey)
 
     exportSurvey(surveyImport)
 
@@ -55,8 +53,6 @@ export default () =>
     verifyActivityLog(surveyImport)
 
     verifySurveyPublished()
-
-    removeExportSurveyFiles(surveyImport)
 
     gotoSurveyList()
 
