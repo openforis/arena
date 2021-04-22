@@ -17,7 +17,7 @@ export const ExportFile = {
   categoryItems: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
   chains: FileUtils.join(dir.chains, 'chains.json'),
   chain: ({ chainUuid }) => FileUtils.join(dir.chains, `${chainUuid}.json`),
-  file: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.json`),
+  file: ({ fileUuid }) => FileUtils.join(dir.files, fileUuid),
   records: FileUtils.join(dir.records, 'records.json'),
   record: ({ recordUuid }) => FileUtils.join(dir.records, `${recordUuid}.json`),
   survey: 'survey.json',
