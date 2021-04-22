@@ -2,7 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { ExportFile } from '../surveyExportFile'
 
 export default class CategoriesExportJob extends Job {
   constructor(params) {
@@ -13,8 +13,7 @@ export default class CategoriesExportJob extends Job {
     const { archive, surveyId } = this.context
 
     // categories.json: list of all categories with levels
-    const categoriesPathDir = 'categories'
-    const categoriesPathFile = FileUtils.join(categoriesPathDir, 'categories.json')
+    const categoriesPathFile = ExportFile.categories
     const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
       surveyId,
       draft: true,
@@ -34,7 +33,7 @@ export default class CategoriesExportJob extends Job {
         backup: true,
       })
       archive.append(JSON.stringify(itemsData, null, 2), {
-        name: FileUtils.join(categoriesPathDir, `${categoryUuid}.json`),
+        name: ExportFile.category({ categoryUuid }),
       })
       this.incrementProcessedItems()
     })

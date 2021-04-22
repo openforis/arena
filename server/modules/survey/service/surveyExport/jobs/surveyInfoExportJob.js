@@ -1,5 +1,6 @@
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { ExportFile } from '../surveyExportFile'
 
 export default class SurveyInfoExportJob extends Job {
   constructor(params) {
@@ -19,7 +20,7 @@ export default class SurveyInfoExportJob extends Job {
       advanced: true,
       backup: true,
     })
-    archive.append(JSON.stringify(surveyFull, null, 2), { name: 'survey.json' })
+    archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })
 
     this.setContext({ survey })
   }

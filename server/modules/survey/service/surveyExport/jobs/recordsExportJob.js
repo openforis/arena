@@ -2,9 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as RecordService from '@server/modules/record/service/recordService'
-import * as FileUtils from '@server/utils/file/fileUtils'
-
-const recordsPathDir = 'records'
+import { ExportFile } from '../surveyExportFile'
 
 export default class RecordsExportJob extends Job {
   constructor(params) {
@@ -14,17 +12,17 @@ export default class RecordsExportJob extends Job {
   async execute() {
     const { archive, surveyId } = this.context
 
-    const recordsPathFile = FileUtils.join(recordsPathDir, 'records.json')
     const records = await RecordService.fetchRecordsUuidAndCycle(surveyId)
-    archive.append(JSON.stringify(records, null, 2), { name: recordsPathFile })
+    archive.append(JSON.stringify(records, null, 2), { name: ExportFile.records })
 
     this.total = records.length
 
     await PromiseUtils.each(records, async (record) => {
-      const recordData = await RecordService.fetchRecordAndNodesByUuid(surveyId, record.uuid, true)
+      const recordUuid = record.uuid
+      const recordData = await RecordService.fetchRecordAndNodesByUuid(surveyId, recordUuid, true)
 
       archive.append(JSON.stringify(recordData, null, 2), {
-        name: FileUtils.join(recordsPathDir, `${record.uuid}.json`),
+        name: ExportFile.record({ recordUuid }),
       })
       this.incrementProcessedItems()
     })

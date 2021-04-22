@@ -2,7 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as AnalysisService from '@server/modules/analysis/service'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { ExportFile } from '../surveyExportFile'
 
 export default class ChainExportJob extends Job {
   constructor(params) {
@@ -12,22 +12,22 @@ export default class ChainExportJob extends Job {
   async execute() {
     const { archive, surveyId } = this.context
 
-    const chainsPathDir = 'chains'
-    const chainsPathFile = FileUtils.join(chainsPathDir, 'chains.json')
+    const chainsPathFile = ExportFile.chains
     const chains = await AnalysisService.fetchChains({ surveyId })
     archive.append(JSON.stringify(chains, null, 2), { name: chainsPathFile })
 
     this.total = chains.length
 
     await PromiseUtils.each(chains, async (chain) => {
+      const chainUuid = chain.uuid
       const chainData = await AnalysisService.fetchChain({
         surveyId,
-        chainUuid: chain.uuid,
+        chainUuid,
         includeStepsAndCalculations: true,
         includeScript: true,
       })
       archive.append(JSON.stringify(chainData, null, 2), {
-        name: FileUtils.join(chainsPathDir, `${chain.uuid}.json`),
+        name: ExportFile.chain({ chainUuid }),
       })
       this.incrementProcessedItems()
     })
