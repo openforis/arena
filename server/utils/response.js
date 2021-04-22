@@ -56,10 +56,10 @@ export const sendFileContent = (res, name, content, size) => {
   res.end(null, 'binary')
 }
 
-export const sendFile = ({ res, filePath, fileNameOutput = null }) => {
+export const sendFile = ({ res, path: filePath, name = null }) => {
   const stats = fs.statSync(filePath)
   const { size } = stats
-  const fileName = fileNameOutput || path.basename(filePath)
+  const fileName = name || path.basename(filePath)
   setContentTypeFile(res, fileName, size)
   fs.createReadStream(filePath).pipe(res)
   res.end()

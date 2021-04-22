@@ -17,7 +17,7 @@ export const exportSurvey = () => async (dispatch, getState) => {
   const surveyName = Survey.getName(surveyInfo)
 
   const {
-    data: { job, outputFileName },
+    data: { job, outputFileName: fileName },
   } = await axios.get(`/api/survey/${surveyId}/export/`)
 
   dispatch(
@@ -27,7 +27,7 @@ export const exportSurvey = () => async (dispatch, getState) => {
         <DownloadButton
           id={DataTestId.surveyExport.downloadBtn}
           href={`/api/survey/${surveyId}/export/download`}
-          requestParams={{ outputFileName, surveyName }}
+          requestParams={{ fileName, surveyName }}
           onClick={() => dispatch(JobActions.hideJobMonitor())}
         />
       ),
