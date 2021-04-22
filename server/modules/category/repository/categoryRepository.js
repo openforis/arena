@@ -80,11 +80,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
   const propsFields = (tableAlias) => {
     if (backup) {
       // keep both props and propsDraft
-      const fields = [`'props', ${tableAlias}.props`]
-      if (draft) {
-        fields.push(`'propsDraft', ${tableAlias}.props_draft`)
-      }
-      return fields.join(', ')
+      return `'props', ${tableAlias}.props,
+              'propsDraft', ${tableAlias}.props_draft`
     }
     // combine props and props_draft column into one
     return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
