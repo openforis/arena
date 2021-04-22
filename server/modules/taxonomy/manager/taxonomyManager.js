@@ -31,10 +31,10 @@ export const insertTaxonomy = async ({ user, surveyId, taxonomy, addLogs = true,
     return validateTaxonomy(surveyId, [], taxonomyInserted, true, t)
   })
 
-export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true }, client = db) =>
+export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup = false, client = db }) =>
   client.tx(async (t) =>
     Promise.all([
-      TaxonomyRepository.insertTaxa(surveyId, taxa, t),
+      TaxonomyRepository.insertTaxa({ surveyId, taxa, backup, client: t }),
       ...(addLogs
         ? [
             ActivityLogRepository.insertMany(
