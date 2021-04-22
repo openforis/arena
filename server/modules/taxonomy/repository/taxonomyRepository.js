@@ -55,10 +55,11 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
  * }
  * ```.
  *
- * @param {!number} surveyId - The ID of the survey.
- * @param {!string} taxonUuid - The UUID of the taxon.
- * @param {!object} vernacularNames - The vernacular names indexed by language code.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {!object} params - The search parameters.
+ * @param {!number} [params.surveyId] - The ID of the survey.
+ * @param {!string} [params.taxonUuid] - The UUID of the taxon.
+ * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
+ * @param {pgPromise.IDatabase} [params.client=db] - The database client.
  * @returns {Array.<Promise>} - The result promises.
  */
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
@@ -426,7 +427,12 @@ export const updateTaxon = async (surveyId, taxon, client = db) =>
        WHERE uuid = $1`,
       [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
     ),
-    ..._insertOrUpdateVernacularNames(surveyId, Taxon.getUuid(taxon), Taxon.getVernacularNames(taxon), client),
+    ..._insertOrUpdateVernacularNames({
+      surveyId,
+      taxonUuid: Taxon.getUuid(taxon),
+      vernacularNames: Taxon.getVernacularNames(taxon),
+      client,
+    }),
   ])
 
 export const updateTaxa = async (surveyId, taxa, client = db) =>
