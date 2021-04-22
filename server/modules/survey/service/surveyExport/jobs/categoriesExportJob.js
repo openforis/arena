@@ -4,9 +4,9 @@ import Job from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export default class CategoriesBackupJob extends Job {
+export default class CategoriesExportJob extends Job {
   constructor(params) {
-    super('CategoriesBackupJob', params)
+    super('CategoriesExportJob', params)
   }
 
   async execute() {

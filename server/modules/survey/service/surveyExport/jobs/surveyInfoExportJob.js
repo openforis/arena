@@ -1,9 +1,9 @@
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-export default class SurveyInfoBackupJob extends Job {
+export default class SurveyInfoExportJob extends Job {
   constructor(params) {
-    super('SurveyInfoBackupJob', params)
+    super('SurveyInfoExportJob', params)
   }
 
   async execute() {

@@ -4,9 +4,9 @@ import Job from '@server/job/job'
 import * as AnalysisService from '@server/modules/analysis/service'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export default class ChainBackupJob extends Job {
+export default class ChainExportJob extends Job {
   constructor(params) {
-    super('ChainBackupJob', params)
+    super('ChainExportJob', params)
   }
 
   async execute() {

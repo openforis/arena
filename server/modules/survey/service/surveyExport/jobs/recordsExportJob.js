@@ -6,9 +6,9 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 const recordsPathDir = 'records'
 
-export default class RecordsBackupJob extends Job {
+export default class RecordsExportJob extends Job {
   constructor(params) {
-    super('RecordsBackupJob', params)
+    super('RecordsExportJob', params)
   }
 
   async execute() {

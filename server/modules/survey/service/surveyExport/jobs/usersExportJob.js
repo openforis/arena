@@ -6,9 +6,9 @@ import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export default class UsersBackupJob extends Job {
+export default class UsersExportJob extends Job {
   constructor(params) {
-    super('UsersBackupJob', params)
+    super('UsersExportJob', params)
   }
 
   async execute() {

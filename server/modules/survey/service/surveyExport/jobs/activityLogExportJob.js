@@ -2,9 +2,9 @@ import Job from '@server/job/job'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export default class ActivityLogBackupJob extends Job {
+export default class ActivityLogExportJob extends Job {
   constructor(params) {
-    super('ActivityLogBackupJob', params)
+    super('ActivityLogExportJob', params)
   }
 
   async execute() {

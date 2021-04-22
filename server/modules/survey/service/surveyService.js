@@ -5,7 +5,7 @@ import * as SurveyManager from '../manager/surveyManager'
 import SurveyPublishJob from './publish/surveyPublishJob'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import ExportCsvDataJob from './export/exportCsvDataJob'
-import SurveyBackupJob from './backup/surveyBackupJob'
+import SurveyExportJob from './surveyExport/surveyExportJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -18,7 +18,7 @@ export const startPublishJob = (user, surveyId) => {
 
 export const exportSurvey = ({ surveyId, user }) => {
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
-  const job = new SurveyBackupJob({ surveyId, user, outputFileName })
+  const job = new SurveyExportJob({ surveyId, user, outputFileName })
 
   JobManager.executeJobThread(job)
 

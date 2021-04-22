@@ -4,9 +4,9 @@ import Job from '@server/job/job'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export default class TaxonomiesBackupJob extends Job {
+export default class TaxonomiesExportJob extends Job {
   constructor(params) {
-    super('TaxonomiesBackupJob', params)
+    super('TaxonomiesExportJob', params)
   }
 
   async execute() {
