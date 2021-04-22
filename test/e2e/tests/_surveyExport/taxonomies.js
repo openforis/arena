@@ -19,7 +19,7 @@ export const verifyTaxonomies = (survey) =>
       const taxaFilePath = path.resolve(__dirname, '..', '..', 'resources', `${taxonomy.name}_predefined.csv`)
       const taxa = csv.parse(fs.readFileSync(taxaFilePath), { columns: true, skip_empty_lines: true })
 
-      const taxaExport = getSurveyEntry(survey, ExportFile.taxonomy({ taxonomyUuid: taxonomyExport.uuid }))
+      const taxaExport = getSurveyEntry(survey, ExportFile.taxa({ taxonomyUuid: taxonomyExport.uuid }))
       await expect(taxaExport.length).toBe(taxa.length)
 
       await PromiseUtils.each(taxaExport, async (taxonExport) => {

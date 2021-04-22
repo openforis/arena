@@ -14,7 +14,7 @@ const dir = {
 export const ExportFile = {
   activityLog: FileUtils.join(dir.activityLog, 'activityLog.json'),
   categories: FileUtils.join(dir.categories, 'categories.json'),
-  category: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
+  categoryItems: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
   chains: FileUtils.join(dir.chains, 'chains.json'),
   chain: ({ chainUuid }) => FileUtils.join(dir.chains, `${chainUuid}.json`),
   file: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.json`),
@@ -22,7 +22,7 @@ export const ExportFile = {
   record: ({ recordUuid }) => FileUtils.join(dir.records, `${recordUuid}.json`),
   survey: 'survey.json',
   taxonomies: FileUtils.join(dir.taxonomies, 'taxonomies.json'),
-  taxonomy: ({ taxonomyUuid }) => FileUtils.join(dir.taxonomies, `${taxonomyUuid}.json`),
+  taxa: ({ taxonomyUuid }) => FileUtils.join(dir.taxonomies, `${taxonomyUuid}.json`),
   users: FileUtils.join(dir.users, 'users.json'),
   userInvitations: FileUtils.join(dir.users, 'userInvitations.json'),
   userProfilePicture: ({ userUuid }) => FileUtils.join(dir.userProfilePictures, userUuid),

@@ -28,7 +28,7 @@ export default class TaxonomiesExportJob extends Job {
         backup: true,
       })
       archive.append(JSON.stringify(taxaData, null, 2), {
-        name: ExportFile.taxonomy({ taxonomyUuid }),
+        name: ExportFile.taxa({ taxonomyUuid }),
       })
       this.incrementProcessedItems()
     })

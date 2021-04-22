@@ -18,7 +18,7 @@ export const verifyCategories = (survey) =>
       })
 
       // verify items count
-      const itemsExport = getSurveyEntry(survey, ExportFile.category({ categoryUuid: categoryExport.uuid }))
+      const itemsExport = getSurveyEntry(survey, ExportFile.categoryItems({ categoryUuid: categoryExport.uuid }))
       const items = categoryItems[category.name]
       await expect(itemsExport.length).toBe(items.length)
 

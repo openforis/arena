@@ -33,7 +33,7 @@ export default class CategoriesExportJob extends Job {
         backup: true,
       })
       archive.append(JSON.stringify(itemsData, null, 2), {
-        name: ExportFile.category({ categoryUuid }),
+        name: ExportFile.categoryItems({ categoryUuid }),
       })
       this.incrementProcessedItems()
     })
