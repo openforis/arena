@@ -54,9 +54,18 @@ export const validateCategories = async (surveyId, client = db) => {
 
 // ====== CREATE
 
-const _insertLevelInTransaction = async ({ user, surveyId, level: levelParam, system, addLogs, validate, t }) => {
+const _insertLevelInTransaction = async ({
+  user,
+  surveyId,
+  level: levelParam,
+  system,
+  addLogs,
+  validate,
+  backup,
+  t,
+}) => {
   const [level] = await Promise.all([
-    CategoryRepository.insertLevel(surveyId, levelParam, t),
+    CategoryRepository.insertLevel({ surveyId, level: levelParam, backup, client: t }),
     markSurveyDraft(surveyId, t),
     ...(addLogs
       ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t)]
@@ -74,14 +83,14 @@ export const insertLevel = async (
 ) => client.tx(async (t) => _insertLevelInTransaction({ user, surveyId, level, system, addLogs, validate, t }))
 
 export const insertCategory = async (
-  { user, surveyId, category, system = false, addLogs = true, validate = true },
+  { user, surveyId, category, system = false, addLogs = true, validate = true, backup = false },
   client = db
 ) =>
   client.tx(async (t) => {
     const [categoryDb] = await Promise.all([
-      CategoryRepository.insertCategory(surveyId, category, t),
+      CategoryRepository.insertCategory({ surveyId, category, backup, client: t }),
       ...Category.getLevelsArray(category).map((level) =>
-        _insertLevelInTransaction({ user, surveyId, level, system: true, addLogs, validate, t })
+        _insertLevelInTransaction({ user, surveyId, level, system: true, addLogs, validate, backup, t })
       ),
       markSurveyDraft(surveyId, t),
       ...(addLogs
