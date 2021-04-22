@@ -60,3 +60,17 @@
 .survey-form.edit.form-actions-off.page-navigation-off {
   grid-template-columns: 1fr 0;
 }
+
+// entity-selector-tree
+.survey-form {
+  .entity-selector-tree {
+    border: $formBorder;
+    background-color: $white;
+  }
+
+  &.edit {
+    .entity-selector-tree {
+      border: $formBorderEdit;
+    }
+  }
+}

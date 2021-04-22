@@ -1,0 +1,10 @@
+@import 'webapp/style/vars';
+
+.chain-node-defs {
+  display: grid;
+  grid-template-columns: 320px 1px;
+
+  .entity-selector-tree {
+    border-right: 1px solid $greyBorder;
+  }
+}

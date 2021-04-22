@@ -1,5 +1,5 @@
 export { ChainActions } from './actions'
 
-export { useChain } from './hooks'
+export { useChain, useChainEntityDefUuid } from './hooks'
 
 export { ChainReducer } from './reducer'
