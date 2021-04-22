@@ -1270,10 +1270,19 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.20":
-  version "0.0.20"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.20/5eb4b4f24cf2dccaf5563ea95512e20191cb9bd458c790eb98a356e3df8124d3#00e617f4fb9924bcf6230bbcf0e891dc55d1abb5"
-  integrity sha512-IeaFZ8TVUZw4XQ0jMS/De461oFQnxY3Hns1BQA4zjSHVWHBCwd5rGi6UoHG3YnoinTAlbebBtXHOZeFXG5uqxg==
+"@openforis/arena-core@^0.0.63":
+  version "0.0.63"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.63/a062d322e16ccb159893ca97c2c1439a4fdf4006416c08e40596c79d79240195#c84d48436dafbccfcbaf18cde94ad4ecdcc47640"
+  integrity sha512-/+OKbvb15hDUB0C4vdO9ATmxTrIzlxN92hiwVrB7xZB/zoIxx/Ije4eW4yjQffEFukVQuberhP3nNyYctrsyOw==
+  dependencies:
+    "@esri/proj-codes" "^2.7.0"
+    proj4 "^2.7.2"
+    uuid "^8.3.2"
+
+"@openforis/arena-server@^0.0.21":
+  version "0.0.21"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.21/be54b92ea6279d2646d8c3bde61d2fd5b8c19550bcc14d841ee8b0dac306d1ca#17e3522f9727e93c69dc975d34956db88cbd9d86"
+  integrity sha512-wBtT+6386FxonMNrZWl6eOL2zcvldja6AI/Ih3ezscBz4ab1GoRLygsK1NT4OkANBsrCjNi9ERVUs7EiYZgezQ==
   dependencies:
     "@godaddy/terminus" "^4.7.1"
     "@openforis/arena-core" "^0.0.55"

@@ -1,0 +1,29 @@
+.chain {
+  display: grid;
+  grid-template-rows: 1fr 52px;
+
+  .form {
+    grid-row-gap: 2rem;
+    grid-template-rows: repeat(2, auto) 1fr;
+  }
+
+  .form-item {
+    grid-template-columns: 0.2fr 0.8fr;
+    grid-column-gap: 1rem;
+  }
+
+  .button-bar {
+    align-self: center;
+  }
+
+  .btn-rstudio {
+    position: absolute;
+    right: 16px;
+  }
+}
+
+.chain.with-cycles {
+  .form {
+    grid-template-rows: repeat(3, auto) 1fr;
+  }
+}

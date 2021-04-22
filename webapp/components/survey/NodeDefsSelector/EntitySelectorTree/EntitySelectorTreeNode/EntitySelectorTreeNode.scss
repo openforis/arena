@@ -1,0 +1,29 @@
+@import 'webapp/style/vars';
+
+.entity-selector-tree-node-wrapper {
+  &:not(.is-root) {
+    margin-left: 24px;
+
+    .btn-toggle {
+      margin-left: -4px;
+    }
+  }
+}
+
+.entity-selector-tree-node {
+  &.with-children {
+    > .btn-toggle {
+      transform: rotate(90deg);
+    }
+  }
+
+  .btn-toggle {
+    align-self: flex-start;
+    margin-top: 1px;
+  }
+
+  .btn-node-def {
+    padding-left: unset;
+    font-size: 0.9rem;
+  }
+}
