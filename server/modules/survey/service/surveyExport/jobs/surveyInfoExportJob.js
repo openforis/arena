@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { ExportFile } from '../surveyExportFile'
+import { ExportFile } from '../exportFile'
 
 export default class SurveyInfoExportJob extends Job {
   constructor(params) {

@@ -2,7 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
-import { ExportFile } from '../surveyExportFile'
+import { ExportFile } from '../exportFile'
 
 export default class CategoriesExportJob extends Job {
   constructor(params) {

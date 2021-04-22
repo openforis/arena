@@ -2,7 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as FileService from '@server/modules/record/service/fileService'
-import { ExportFile } from '../surveyExportFile'
+import { ExportFile } from '../exportFile'
 
 export default class FilesExportJob extends Job {
   constructor(params) {

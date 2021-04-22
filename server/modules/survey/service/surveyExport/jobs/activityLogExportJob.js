@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
-import { ExportFile } from '../surveyExportFile'
+import { ExportFile } from '../exportFile'
 
 export default class ActivityLogExportJob extends Job {
   constructor(params) {

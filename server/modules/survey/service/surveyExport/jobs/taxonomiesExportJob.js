@@ -2,7 +2,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
-import { ExportFile } from '../surveyExportFile'
+import { ExportFile } from '../exportFile'
 
 export default class TaxonomiesExportJob extends Job {
   constructor(params) {
