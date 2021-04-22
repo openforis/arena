@@ -43,7 +43,7 @@ const JobMonitor = () => {
         </button>
 
         {JobSerialized.isEnded(job) &&
-          (closeButton || (
+          ((JobSerialized.isSucceeded(job) && closeButton) || (
             <button
               type="button"
               className="btn modal-footer__item"
