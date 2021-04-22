@@ -4,6 +4,11 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { ChainActionTypes } from './actions'
 
+const initialState = {
+  chain: null,
+  entityDefUuid: null,
+}
+
 const actionHandlers = {
   [SystemActions.SYSTEM_RESET]: () => ({}),
 
@@ -12,8 +17,14 @@ const actionHandlers = {
   [SurveyActions.surveyDelete]: () => ({}),
 
   [ChainActionTypes.chainUpdate]: (state, action) => ({
+    ...state,
     chain: action.chain,
+  }),
+
+  [ChainActionTypes.entityDefUuidUpdate]: (state, action) => ({
+    ...state,
+    entityDefUuid: action.entityDefUuid,
   }),
 }
 
-export const ChainReducer = exportReducer(actionHandlers)
+export const ChainReducer = exportReducer(actionHandlers, initialState)

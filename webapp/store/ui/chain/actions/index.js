@@ -2,6 +2,7 @@ import { createChain } from './createChain'
 import { fetchChain } from './fetchChain'
 import { updateChain } from './updateChain'
 import { deleteChain } from './deleteChain'
+import { updateEntityDefUuid } from './updateEntityDefUuid'
 
 export { ChainActionTypes } from './actionTypes'
 
@@ -10,4 +11,5 @@ export const ChainActions = {
   fetchChain,
   updateChain,
   deleteChain,
+  updateEntityDefUuid,
 }

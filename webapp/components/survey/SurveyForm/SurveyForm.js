@@ -3,24 +3,25 @@ import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
-import { SurveyState } from '@webapp/store/survey'
+import { SurveyState, useSurvey } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
 
+import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import FormHeader from './FormHeader'
-import FormPageNavigation from './FormPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
@@ -41,7 +42,10 @@ const SurveyForm = (props) => {
   } = props
 
   const dispatch = useDispatch()
+  const state = useSelector((rootState) => rootState)
   const isSideBarOpened = useIsSidebarOpened()
+  const survey = useSurvey()
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const editAllowed = edit && canEditDef
 
   let className = editAllowed ? ' edit' : ''
@@ -108,13 +112,19 @@ const SurveyForm = (props) => {
 
       <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
         {showPageNavigation && (
-          <FormPageNavigation
-            surveyInfo={surveyInfo}
-            surveyCycleKey={surveyCycleKey}
-            edit={edit}
-            entry={entry}
-            canEditDef={canEditDef}
-            level={0}
+          <EntitySelectorTree
+            isDisabled={(nodeDefArg) => {
+              const parentNodeArg = SurveyFormState.getFormPageParentNode(nodeDefArg)(state)
+              return !(
+                edit ||
+                NodeDef.isRoot(nodeDefArg) ||
+                NodeDef.getUuid(nodeDefRoot) === NodeDef.getParentUuid(nodeDefArg) ||
+                Boolean(parentNodeArg)
+              )
+            }}
+            nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
+            onlyPages
+            onSelect={(nodeDefToSelect) => dispatch(SurveyFormActions.setFormActivePage(nodeDefToSelect))}
           />
         )}
 

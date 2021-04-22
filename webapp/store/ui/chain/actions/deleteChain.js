@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
+import { LoaderActions } from '@webapp/store/ui/loader'
+import { NotificationActions } from '@webapp/store/ui/notification'
 import { SurveyActions, SurveyState } from '@webapp/store/survey'
 
 export const deleteChain = ({ chain, history }) => async (dispatch, getState) => {
