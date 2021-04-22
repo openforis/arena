@@ -20,10 +20,7 @@ export default class FilesExportJob extends Job {
 
     await PromiseUtils.each(filesData, async (fileData) => {
       const fileUuid = RecordFile.getUuid(fileData)
-      const content = RecordFile.getContent(fileData)
-      const contentBuffer = Buffer.from(Object.values(content))
-
-      archive.append(contentBuffer, { name: ExportFile.file({ fileUuid }) })
+      archive.append(JSON.stringify(fileData, null, 2), { name: ExportFile.file({ fileUuid }) })
       this.incrementProcessedItems()
     })
   }

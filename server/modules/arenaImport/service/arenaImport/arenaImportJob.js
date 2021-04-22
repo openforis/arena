@@ -11,6 +11,7 @@ import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
 import RecordsImportJob from './metaImportJobs/recordsImportJob'
+import FilesImportJob from './metaImportJobs/filesImportJob'
 import UsersImportJob from './metaImportJobs/usersImportJob'
 import ChainsImportJob from './metaImportJobs/chainsImportJob'
 import CreateRdbJob from './metaImportJobs/createRdb'
@@ -25,6 +26,7 @@ export default class ArenaImportJob extends Job {
       new CategoriesImportJob(),
       new NodeDefsImportJob(),
       new RecordsImportJob(),
+      new FilesImportJob(),
       new ChainsImportJob(),
       // Needed when the survey is published
       new CreateRdbJob(),

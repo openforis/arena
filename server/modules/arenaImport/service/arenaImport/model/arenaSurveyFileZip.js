@@ -21,6 +21,14 @@ export const getCategoryItems = async (zipFile, categoryUuid) =>
 export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records)
 export const getRecord = async (zipFile, recordUuid) => _getJson(zipFile, ExportFile.record({ recordUuid }))
 
+// Files
+export const getFileUuids = async (zipFile) => {
+  const entryNames = (await zipFile.getEntryNames(ExportFile.filesDir)) || []
+  // extract uuids from entry names
+  return entryNames.map((entryName) => entryName.slice(1, entryName.length - 5))
+}
+export const getFile = async (zipFile, fileUuid) => _getJson(zipFile, ExportFile.file({ fileUuid }))
+
 // Activities
 export const getActivities = async (zipFile) => _getJson(zipFile, ExportFile.activityLog)
 
