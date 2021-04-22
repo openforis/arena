@@ -1,5 +1,5 @@
 import './EntitySelectorTreeNode.scss'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -10,6 +10,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
 import { DataTestId } from '@webapp/utils/dataTestId'
+
+import { useOnUpdate } from '@webapp/components/hooks'
 
 const EntitySelectorTreeNode = (props) => {
   const { expanded, isDisabled, nodeDef, nodeDefUuidActive, onlyPages, onSelect } = props
@@ -23,10 +25,10 @@ const EntitySelectorTreeNode = (props) => {
     : childDefs.filter(NodeDef.isEntity)
   const root = NodeDef.isRoot(nodeDef)
 
-  const [showChildren, setShowChildren] = useState(root)
+  const [showChildren, setShowChildren] = useState(root || expanded)
   const toggleShowChildren = () => setShowChildren((prevState) => !prevState)
 
-  useEffect(() => {
+  useOnUpdate(() => {
     setShowChildren(expanded)
   }, [expanded])
 
@@ -72,9 +74,13 @@ EntitySelectorTreeNode.propTypes = {
   expanded: PropTypes.bool.isRequired,
   isDisabled: PropTypes.func.isRequired,
   nodeDef: PropTypes.object.isRequired,
-  nodeDefUuidActive: PropTypes.string.isRequired,
+  nodeDefUuidActive: PropTypes.string,
   onlyPages: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
+}
+
+EntitySelectorTreeNode.defaultProps = {
+  nodeDefUuidActive: null,
 }
 
 export { EntitySelectorTreeNode }

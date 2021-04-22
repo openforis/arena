@@ -44,13 +44,14 @@ const EntitySelectorTree = (props) => {
 
 EntitySelectorTree.propTypes = {
   isDisabled: PropTypes.func,
-  nodeDefUuidActive: PropTypes.string.isRequired,
+  nodeDefUuidActive: PropTypes.string,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 }
 
 EntitySelectorTree.defaultProps = {
   isDisabled: () => false,
+  nodeDefUuidActive: null,
   onlyPages: false,
 }
 
