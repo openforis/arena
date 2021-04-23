@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { ChainActions, useChainEntityDefUuid } from '@webapp/store/ui/chain'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { Attributes } from './Attributes'
 
 const ChainNodeDefs = () => {
   const dispatch = useDispatch()
@@ -15,6 +16,7 @@ const ChainNodeDefs = () => {
   return (
     <div className="chain-node-defs">
       <EntitySelectorTree nodeDefUuidActive={entityDefUuid} onSelect={selectEntity} />
+      {entityDefUuid && <Attributes />}
     </div>
   )
 }

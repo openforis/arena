@@ -152,11 +152,11 @@ export const userModules = {
 export const analysisModules = {
   processingChains: {
     key: 'processingChain_plural',
-    path: `${appModules.analysis.path}/processingChains`,
+    path: `${appModules.analysis.path}/chains`,
   },
   processingChain: {
     key: 'processingChain',
-    path: `${appModules.analysis.path}/processingChain`,
+    path: `${appModules.analysis.path}/chain`,
   },
   nodeDef: {
     key: 'nodeDef',

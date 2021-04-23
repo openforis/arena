@@ -401,6 +401,11 @@ $t(common.cantUndoWarning)`,
 `,
   },
 
+  chain: {
+    quantitative: 'Quantitative',
+    categorical: 'Categorical',
+  },
+
   processingStepView: {
     deleteConfirm: `Delete this processing step?
     

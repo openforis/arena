@@ -2,7 +2,8 @@
 
 .chain-node-defs {
   display: grid;
-  grid-template-columns: 320px 1px;
+  grid-template-columns: 320px 1fr;
+  grid-column-gap: 32px;
 
   .entity-selector-tree {
     border-right: 1px solid $greyBorder;
