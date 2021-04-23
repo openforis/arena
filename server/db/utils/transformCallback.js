@@ -22,10 +22,9 @@ export const transformCallback = (row, draft = false, assocPublishedDraft = fals
     return mergeProps({ draft })(rowUpdated)
   }
 
-  // backup: camelize props_draft column into propsDraft
-  if (draft) {
-    rowUpdated.propsDraft = row.props_draft
-  }
+  // backup
+  // camelize props_draft column into propsDraft
+  rowUpdated.propsDraft = row.props_draft
   delete rowUpdated.props_draft
   return rowUpdated
 }
