@@ -1,4 +1,5 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
+import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../downloads/path'
 import { records } from '../../mock/records'
 import { cluster, tree } from '../../mock/nodeDefs'
@@ -57,7 +58,7 @@ const verifyRecord = async (survey, surveyExport, recordsMock, recordUuid) => {
   const clusterIdDef = cluster.children.cluster_id
   const clusterIdDefExport = getNodeDefByName(clusterIdDef.name)(surveyExport)
 
-  const recordExport = getSurveyEntry(survey, 'records', `${recordUuid}.json`)
+  const recordExport = getSurveyEntry(survey, ExportFile.record({ recordUuid }))
   const clusterIdExport = getNodeByDefUuid(clusterIdDefExport.uuid)(recordExport)
   const record = recordsMock.find((_record) => _record[clusterIdDef.name] === clusterIdExport.value)
 
@@ -95,8 +96,8 @@ const verifyRecord = async (survey, surveyExport, recordsMock, recordUuid) => {
 
 export const verifyRecords = (survey, recordsMock = records) =>
   test('Verify records', async () => {
-    const recordsExport = getSurveyEntry(survey, 'records', 'records.json')
-    const surveyExport = getSurveyEntry(survey, 'survey.json')
+    const recordsExport = getSurveyEntry(survey, ExportFile.records)
+    const surveyExport = getSurveyEntry(survey, ExportFile.survey)
 
     await expect(recordsExport.length).toBe(recordsMock.length)
 

@@ -59,7 +59,10 @@ export const insertSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyInfo = await SurveyRepository.insertSurvey(
+      { survey: surveyInfoParam, propsDraft: Survey.getProps(surveyInfoParam) },
+      t
+    )
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
@@ -115,7 +118,14 @@ export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
+    const surveyInfo = await SurveyRepository.insertSurvey(
+      {
+        survey: surveyInfoParam,
+        props: Survey.getProps(surveyInfoParam),
+        propsDraft: Survey.getPropsDraft(surveyInfoParam),
+      },
+      t
+    )
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
@@ -147,9 +157,9 @@ export const importSurvey = async (params, client = db) => {
 // ====== READ
 export const { fetchAllSurveyIds } = SurveyRepository
 
-export const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
+export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([
-    SurveyRepository.fetchSurveyById(surveyId, draft, client),
+    SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
   const validation = validate ? await validateSurveyInfo(surveyInfo) : null
@@ -158,17 +168,12 @@ export const fetchSurveyById = async (surveyId, draft = false, validate = false,
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (
-  surveyId,
-  cycle = null,
-  draft = false,
-  advanced = false,
-  validate = false,
-  includeDeleted = false,
+  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
   const [surveyDb, nodeDefs] = await Promise.all([
-    fetchSurveyById(surveyId, draft, validate, client),
-    NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client),
+    fetchSurveyById({ surveyId, draft, validate, backup }, client),
+    NodeDefManager.fetchNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, includeDeleted, backup }, client),
   ])
   const survey = Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: validate })(surveyDb)
 
@@ -176,16 +181,11 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
-  surveyId,
-  cycle = null,
-  draft = false,
-  advanced = false,
-  validate = false,
-  includeDeleted = false,
+  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
   const [survey, categoryItemsRefData, taxaIndexRefData] = await Promise.all([
-    fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate, includeDeleted, client),
+    fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted, backup }, client),
     CategoryRepository.fetchIndex(surveyId, draft, client),
     TaxonomyRepository.fetchIndex(surveyId, draft, client),
   ])
@@ -207,14 +207,14 @@ export const updateSurveyProp = async (user, surveyId, key, value, system = fals
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
-    return fetchSurveyById(surveyId, true, true, t)
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   client.tx(async (t) => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
     if (Validation.isValid(validation)) {
-      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
+      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
       await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
@@ -244,7 +244,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
           }
         }
       })
-      return fetchSurveyById(surveyId, true, true, t)
+      return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
     }
 
     return assocSurveyInfo({ validation })

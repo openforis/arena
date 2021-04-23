@@ -60,4 +60,9 @@ export const destroyTestContext = async () => {
 }
 
 export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  SurveyManager.fetchSurveyAndNodeDefsBySurveyId(getContextSurveyId(), Survey.cycleOneKey, draft, advanced)
+  SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId: getContextSurveyId(),
+    cycle: Survey.cycleOneKey,
+    draft,
+    advanced,
+  })

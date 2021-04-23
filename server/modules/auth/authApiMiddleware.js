@@ -19,10 +19,10 @@ const checkPermission = (req, next, permissionFn, ...args) => {
   }
 }
 
-const requireSurveyPermission = permissionFn => async (req, _res, next) => {
+const requireSurveyPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId } = Request.getParams(req)
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
     const surveyInfo = Survey.getSurveyInfo(survey)
 
     checkPermission(req, next, permissionFn, surveyInfo)
@@ -31,7 +31,7 @@ const requireSurveyPermission = permissionFn => async (req, _res, next) => {
   }
 }
 
-const requireRecordPermission = permissionFn => async (req, _res, next) => {
+const requireRecordPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, recordUuid } = Request.getParams(req)
 
@@ -43,10 +43,10 @@ const requireRecordPermission = permissionFn => async (req, _res, next) => {
   }
 }
 
-const requireUserPermission = permissionFn => async (req, _res, next) => {
+const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
     const surveyInfo = Survey.getSurveyInfo(survey)
     const user = await UserService.fetchUserByUuid(userUuid)
 

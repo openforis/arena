@@ -18,9 +18,9 @@ const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
-    let survey = await SurveyService.fetchSurveyById(surveyId, false, false)
+    let survey = await SurveyService.fetchSurveyById({ surveyId, draft: false, validate: false })
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
-      survey = await SurveyService.fetchSurveyById(surveyId, true, true)
+      survey = await SurveyService.fetchSurveyById({ surveyId, draft: true, validate: true })
     }
 
     sendResponse(res, user, survey)

@@ -1,10 +1,11 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
+import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../downloads/path'
 import { categories, categoryItems } from '../../mock/categories'
 
 export const verifyCategories = (survey) =>
   test('Verify categories', async () => {
-    const categoriesExport = Object.values(getSurveyEntry(survey, 'categories', 'categories.json'))
+    const categoriesExport = Object.values(getSurveyEntry(survey, ExportFile.categories))
     await expect(categoriesExport.length).toBe(Object.values(categories).length)
 
     await PromiseUtils.each(categoriesExport, async (categoryExport) => {
@@ -17,7 +18,7 @@ export const verifyCategories = (survey) =>
       })
 
       // verify items count
-      const itemsExport = getSurveyEntry(survey, 'categories', `${categoryExport.uuid}.json`)
+      const itemsExport = getSurveyEntry(survey, ExportFile.categoryItems({ categoryUuid: categoryExport.uuid }))
       const items = categoryItems[category.name]
       await expect(itemsExport.length).toBe(items.length)
 

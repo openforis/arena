@@ -46,10 +46,10 @@ export default class CyclesDeletedCheckJob extends Job {
   }
 
   async _findDeletedCycleKeys() {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo)) {
-      const surveyPrev = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
+      const surveyPrev = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
       const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
       return R.difference(Survey.getCycleKeys(surveyInfoPrev), Survey.getCycleKeys(surveyInfo))
     }

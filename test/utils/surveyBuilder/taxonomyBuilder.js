@@ -24,6 +24,6 @@ export class TaxonomyBuilder {
     const { taxonomy, taxa } = this.build()
 
     await TaxonomyManager.insertTaxonomy({ user, surveyId, taxonomy, system: false }, t)
-    await TaxonomyManager.insertTaxa({ user, surveyId, taxa }, t)
+    await TaxonomyManager.insertTaxa({ user, surveyId, taxa, client: t })
   }
 }

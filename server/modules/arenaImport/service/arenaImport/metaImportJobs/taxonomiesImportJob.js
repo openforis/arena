@@ -9,7 +9,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 const insertTaxonomy = async ({ taxonomy, user, surveyId, arenaSurveyFileZip, tx }) => {
   const taxonomyImported = await TaxonomyManager.insertTaxonomy({ user, surveyId, taxonomy, addLogs: false })
   const taxa = await ArenaSurveyFileZip.getTaxa(arenaSurveyFileZip, Taxonomy.getUuid(taxonomyImported))
-  await TaxonomyManager.insertTaxa({ user, surveyId, taxa, addLogs: false }, tx)
+  await TaxonomyManager.insertTaxa({ user, surveyId, taxa, addLogs: false, backup: true, client: tx })
 }
 
 /**

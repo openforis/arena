@@ -14,7 +14,12 @@ export default class NodeDefsImportJob extends Job {
 
     const nodeDefs = Survey.getNodeDefs(arenaSurvey)
 
-    await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: Object.values(nodeDefs || {}) }, this.tx)
+    await NodeDefManager.insertNodeDefsBatch({
+      surveyId,
+      nodeDefs: Object.values(nodeDefs || {}),
+      backup: true,
+      client: this.tx,
+    })
   }
 }
 

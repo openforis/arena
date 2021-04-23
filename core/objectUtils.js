@@ -14,6 +14,7 @@ export const keys = {
   nodeDefUuid: 'nodeDefUuid',
   parentUuid: 'parentUuid',
   props: 'props',
+  propsDraft: 'propsDraft',
   uuid: 'uuid',
   temporary: 'temporary', // True when the object has been created but not persisted yet
 }
@@ -24,15 +25,12 @@ export const keysProps = {
   cycles: 'cycles',
 }
 
-// ====== CHECK
-const isBlank = (value) => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
-export const isEqual = (other) => (self) => getUuid(other) === getUuid(self)
-
 // ====== READ
 export const getId = R.prop(keys.id)
 export const getUuid = R.propOr(null, keys.uuid)
 
 export const getProps = R.propOr({}, keys.props)
+export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
 export const isKeyTrue = (key) => R.pipe(R.propOr(false, key), R.equals(true))
 export const isPropTrue = (prop) => R.pipe(getProp(prop), R.equals(true))
@@ -56,6 +54,10 @@ export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.propOr([], keys.authGroups)
 
 export const isTemporary = isKeyTrue(keys.temporary)
+
+// ====== CHECK
+const isBlank = (value) => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
+export const isEqual = (other) => (self) => getUuid(other) === getUuid(self)
 
 // ===== Props
 

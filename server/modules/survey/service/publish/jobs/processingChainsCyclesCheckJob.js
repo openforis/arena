@@ -39,11 +39,11 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
   }
 
   async _getCycleKeys() {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const cycleKeys = Survey.getCycleKeys(surveyInfo)
     if (Survey.isPublished(surveyInfo)) {
-      const surveyPrev = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
+      const surveyPrev = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
       const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
       const cycleKeysDeleted = R.difference(Survey.getCycleKeys(surveyInfoPrev), cycleKeys)
       return { cycleKeys, cycleKeysDeleted }

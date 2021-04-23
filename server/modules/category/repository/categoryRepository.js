@@ -19,25 +19,31 @@ import * as CategoryExportRepository from './categoryExportRepository'
 
 // ============== CREATE
 
-export const insertCategory = async (surveyId, category, client = db) =>
-  client.one(
+export const insertCategory = async ({ surveyId, category, backup = false, client = db }) => {
+  const props = backup ? Category.getProps(category) : {}
+  const propsDraft = backup ? Category.getPropsDraft(category) : Category.getProps(category)
+  return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props_draft)
-        VALUES ($1, $2)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props, props_draft)
+        VALUES ($1, $2, $3)
         RETURNING *`,
-    [Category.getUuid(category), category.props],
+    [Category.getUuid(category), props, propsDraft],
     (def) => dbTransformCallback(def, true, true)
   )
+}
 
-export const insertLevel = async (surveyId, level, client = db) =>
-  client.one(
+export const insertLevel = async ({ surveyId, level, backup = false, client = db }) => {
+  const props = backup ? CategoryLevel.getProps(level) : {}
+  const propsDraft = backup ? CategoryLevel.getPropsDraft(level) : CategoryLevel.getProps(level)
+  return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props, props_draft)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-    [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
+    [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), props, propsDraft],
     (def) => dbTransformCallback(def, true, true)
   )
+}
 
 export const insertItem = async (surveyId, item, client = db) =>
   client.one(
@@ -49,19 +55,20 @@ export const insertItem = async (surveyId, item, client = db) =>
     (def) => dbTransformCallback(def, true, true)
   )
 
-export const insertItems = async (surveyId, items, client = db) => {
+export const insertItems = async ({ surveyId, items, backup = false, client = db }) => {
   const values = items.map((item) => [
     CategoryItem.getUuid(item),
     CategoryItem.getLevelUuid(item),
     CategoryItem.getParentUuid(item),
-    item.props,
+    backup ? CategoryItem.getProps(item) : {},
+    backup ? CategoryItem.getPropsDraft(item) : CategoryItem.getProps(item),
   ])
 
   await client.none(
     DbUtils.insertAllQuery(
       getSurveyDBSchema(surveyId),
       'category_item',
-      ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
+      ['uuid', 'level_uuid', 'parent_uuid', 'props', 'props_draft'],
       values
     )
   )
@@ -69,7 +76,25 @@ export const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation, offset = null, limit = null }) => `
+const _getFetchCategoriesAndLevelsQuery = ({
+  surveyId,
+  draft,
+  includeValidation,
+  backup = false,
+  offset = null,
+  limit = null,
+}) => {
+  const propsFields = (tableAlias) => {
+    if (backup) {
+      // keep both props and propsDraft
+      return `'props', ${tableAlias}.props,
+              'propsDraft', ${tableAlias}.props_draft`
+    }
+    // combine props and props_draft column into one
+    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
+  }
+
+  return `
     WITH
       levels AS
       (
@@ -79,7 +104,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
             'id', l.id, 
             'uuid', l.uuid, 
             'index', l.index, 
-            'props', l.props${draft ? ' || l.props_draft' : ''}
+            ${propsFields('l')}
           )) AS levels
         FROM
           ${getSurveyDBSchema(surveyId)}.category_level l
@@ -99,7 +124,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
       'uuid', c.uuid,
-      'props', c.props${draft ? ' || c.props_draft' : ''},
+      ${propsFields('c')},
       'published', c.published, 
       'levels', l.levels
       ${includeValidation ? ", 'validation', c.validation" : ''}
@@ -109,6 +134,7 @@ const _getFetchCategoriesAndLevelsQuery = ({ surveyId, draft, includeValidation,
       levels l
     ON
       c.uuid = l.category_uuid`
+}
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
   client.one(
@@ -149,11 +175,11 @@ export const fetchCategoriesBySurveyId = async (
 }
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, backup = false, offset = 0, limit = null },
   client = db
 ) => {
   const { categories } = await client.one(
-    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, offset, limit }),
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup, offset, limit }),
     {
       offset,
       limit,
@@ -177,7 +203,10 @@ export const fetchCategoryAndLevelsByUuid = async (
   return A.pipe(R.values, R.head)(categories)
 }
 
-export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
+export const fetchItemsByCategoryUuid = async (
+  { surveyId, categoryUuid, draft = false, backup = false },
+  client = db
+) => {
   const items = await client.map(
     `
       SELECT i.* 
@@ -188,7 +217,7 @@ export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = f
      ORDER BY i.id
     `,
     [categoryUuid],
-    (def) => dbTransformCallback(def, draft, true)
+    (def) => DB.transformCallback(def, draft, true, backup)
   )
 
   return draft ? items : R.filter((item) => item.published)(items)

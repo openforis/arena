@@ -1,9 +1,10 @@
 import { getSurveyEntry } from '../../downloads/path'
 import { user } from '../../mock/user'
+import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 
 export const verifyUsers = (survey) =>
   test(`Verify users`, async () => {
-    const usersExport = getSurveyEntry(survey, 'users', 'users.json')
+    const usersExport = getSurveyEntry(survey, ExportFile.users)
     const users = [user]
 
     await expect(usersExport.length).toBe(users.length)

@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { SRSs } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -16,6 +18,11 @@ export default class RecordCheckJob extends Job {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
+  }
+
+  async onStart() {
+    super.onStart()
+    await SRSs.init()
   }
 
   async execute() {
@@ -37,12 +44,7 @@ export default class RecordCheckJob extends Job {
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
       const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-        this.surveyId,
-        cycle,
-        true,
-        true,
-        false,
-        true,
+        { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
 

@@ -163,7 +163,11 @@ export const taxonomyImportNewTest = async () => {
   // Check that the job completed successfully
   expect(job.status).toBe(jobStatus.succeeded)
   // Check that the correct number of taxa has been imported
-  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(Survey.getId(survey), taxonomyUuid, true)
+  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames({
+    surveyId: Survey.getId(survey),
+    taxonomyUuid,
+    draft: true,
+  })
   expect(taxa.length).toBe(14 /* 12 items + Unlisted + Unknown */)
 
   // Check that all taxon props have been imported

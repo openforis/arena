@@ -17,32 +17,33 @@ import JobProgress from './JobProgress'
 const JobMonitor = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const job = useJob()
+  const { job, closeButton } = useJob()
+
+  if (!job || JobSerialized.isCanceled(job)) return null
 
   return (
-    job &&
-    !JobSerialized.isCanceled(job) && (
-      <Modal className="app-job-monitor" closeOnEsc={false}>
-        <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
+    <Modal className="app-job-monitor" closeOnEsc={false}>
+      <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
 
-        <ModalBody>
-          <JobProgress job={job} />
-          <JobErrors job={job} />
+      <ModalBody>
+        <JobProgress job={job} />
+        <JobErrors job={job} />
 
-          <InnerJobs innerJobs={JobSerialized.getInnerJobs(job)} />
-        </ModalBody>
+        <InnerJobs innerJobs={JobSerialized.getInnerJobs(job)} />
+      </ModalBody>
 
-        <ModalFooter>
-          <button
-            type="button"
-            className="btn modal-footer__item"
-            onClick={() => dispatch(JobActions.cancelJob())}
-            aria-disabled={!JobSerialized.isRunning(job)}
-          >
-            {i18n.t('common.cancel')}
-          </button>
+      <ModalFooter>
+        <button
+          type="button"
+          className="btn modal-footer__item"
+          onClick={() => dispatch(JobActions.cancelJob())}
+          aria-disabled={!JobSerialized.isRunning(job)}
+        >
+          {i18n.t('common.cancel')}
+        </button>
 
-          {JobSerialized.isEnded(job) && (
+        {JobSerialized.isEnded(job) &&
+          ((JobSerialized.isSucceeded(job) && closeButton) || (
             <button
               type="button"
               className="btn modal-footer__item"
@@ -51,10 +52,9 @@ const JobMonitor = () => {
             >
               {i18n.t('common.close')}
             </button>
-          )}
-        </ModalFooter>
-      </Modal>
-    )
+          ))}
+      </ModalFooter>
+    </Modal>
   )
 }
 

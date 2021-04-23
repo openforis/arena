@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as PromiseUtils from '../../../../core/promiseUtils'
+import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../downloads/path'
 import { cluster, plot, tree } from '../../mock/nodeDefs'
 import { getLabel, getNodeDefChildren, getNodeDefRoot } from './_surveyUtils'
@@ -21,7 +22,7 @@ const verifyNodeDef = async (nodeDefExport, nodeDefMock) => {
 
 export const verifyNodeDefs = (survey) => {
   test(`Verify ${survey.name} nodeDefs`, async () => {
-    const surveyExport = getSurveyEntry(survey, 'survey.json')
+    const surveyExport = getSurveyEntry(survey, ExportFile.survey)
     const clusterExport = getNodeDefRoot(surveyExport)
     const clusterExportChildDefs = getNodeDefChildren(clusterExport, true)(surveyExport)
 

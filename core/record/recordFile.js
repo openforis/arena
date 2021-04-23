@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
 import { truncate } from '@core/stringUtils'
-
-const getProp = (prop) => R.path(['props', prop])
+import * as ObjectUtils from '@core/objectUtils'
 
 const keys = {
-  props: 'props',
+  uuid: ObjectUtils.keys.uuid,
+  props: ObjectUtils.keys.props,
   content: 'content',
 }
 
@@ -17,7 +17,7 @@ export const propKeys = {
 }
 
 export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
-  uuid,
+  [keys.uuid]: uuid,
   [keys.props]: {
     [propKeys.name]: fileName,
     [propKeys.size]: fileSize,
@@ -40,6 +40,7 @@ export const truncateFileName = (fileName, maxLength = 10) => {
 }
 
 // READ
-export const getName = getProp(propKeys.name)
-export const getSize = getProp(propKeys.size)
+export const { getUuid } = ObjectUtils
+export const getName = ObjectUtils.getProp(propKeys.name)
+export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getContent = R.prop(keys.content)
