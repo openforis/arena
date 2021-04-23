@@ -55,6 +55,7 @@ export const type = {
   // Analysis
   chainCreate: 'chainCreate',
   chainPropUpdate: 'chainPropUpdate',
+  chainNodeDefCreate: 'chainNodeDefCreate',
   processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',
@@ -117,6 +118,7 @@ export const keysContent = {
   groupUuid: 'groupUuid',
   // Analysis
   labels: 'labels',
+  chainUuid: 'chainUuid',
   processingChainUuid: 'processingChainUuid',
   processingStepUuid: 'processingStepUuid',
   indexFrom: 'indexFrom',
@@ -179,6 +181,7 @@ export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
 // Content props user
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
 // Content props analysis
+export const getContentChainUuid = _getContentProp(keysContent.chainUuid)
 export const getContentLabels = _getContentProp(keysContent.labels)
 export const getContentIndexFrom = _getContentProp(keysContent.indexFrom)
 export const getContentIndexTo = _getContentProp(keysContent.indexTo)

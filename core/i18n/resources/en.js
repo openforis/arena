@@ -308,6 +308,7 @@ Do you want to proceed?`,
       // Analysis
       [ActivityLog.type.chainCreate]: 'added processing chain',
       [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
+      [ActivityLog.type.chainNodeDefCreate]: 'added calculated node definition {{type}} in entity {{parentName}}',
       [ActivityLog.type.processingChainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]:

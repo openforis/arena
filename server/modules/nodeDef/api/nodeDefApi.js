@@ -38,9 +38,15 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
-      const { surveyCycleKey, nodeDef } = Request.getBody(req)
+      const { surveyCycleKey, nodeDef, chainNodeDef } = Request.getBody(req)
 
-      const nodeDefsUpdated = await NodeDefService.insertNodeDef({ user, surveyId, cycle: surveyCycleKey, nodeDef })
+      const nodeDefsUpdated = await NodeDefService.insertNodeDef({
+        user,
+        surveyId,
+        cycle: surveyCycleKey,
+        nodeDef,
+        chainNodeDef,
+      })
 
       await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated))
     } catch (error) {

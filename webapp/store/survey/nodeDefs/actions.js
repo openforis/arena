@@ -83,14 +83,14 @@ export const putNodeDefProps = ({ nodeDefUuid, parentUuid, props, propsAdvanced 
   dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
 
-export const postNodeDef = ({ nodeDef }) => async (dispatch, getState) => {
+export const postNodeDef = ({ nodeDef, chainNodeDef = null }) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
   const {
     data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef })
+  } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef, chainNodeDef })
 
   dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
