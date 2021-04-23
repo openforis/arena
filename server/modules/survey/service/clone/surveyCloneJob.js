@@ -13,7 +13,8 @@ export default class SurveyCloneJob extends Job {
   }
 
   async beforeSuccess() {
-    const { surveyIdTarget: surveyId } = this.context
+    const { surveyIdTarget, surveyId: surveyIdContext, cloning } = this.context
+    const surveyId = cloning ? surveyIdContext : surveyIdTarget
 
     this.setResult({ surveyId })
   }
