@@ -12,6 +12,7 @@ export {
 export { setActiveSurvey } from './active'
 export { initSurveyDefs, resetSurveyDefs } from './defs'
 export { deleteSurvey } from './delete'
+export { exportSurvey } from './export'
 export { publishSurvey } from './publish'
 export { createSurvey } from './create'
 export { chainSave, chainItemDelete } from './chain'

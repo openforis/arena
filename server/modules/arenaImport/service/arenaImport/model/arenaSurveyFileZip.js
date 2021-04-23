@@ -1,101 +1,45 @@
-export const getPaths = (streamZipFile) => streamZipFile.getEntryNames()
+import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 
-export const getPath = (pattern) => (entries) => entries.find((entry) => new RegExp(`${pattern}$`).test(entry))
-
-export const getPathByUuid = (uuid, extension = 'json') => (entries) =>
-  entries.find((entry) => new RegExp(`${uuid}.${extension}$`).test(entry))
+const _getJson = async (zipFile, entryName) => {
+  const content = await zipFile.getEntryData(entryName)
+  return content ? JSON.parse(content) : null
+}
 
 // Survey
-export const getSurveyPath = getPath('survey.json')
-
-export const getSurvey = async (streamZipFile) => {
-  const surveyPath = getSurveyPath(getPaths(streamZipFile))
-  const arenaSurvey = await streamZipFile.getEntryData(surveyPath)
-  return JSON.parse(arenaSurvey)
-}
+export const getSurvey = async (zipFile) => _getJson(zipFile, ExportFile.survey)
 
 // Taxonomies
-export const getTaxonomiesPath = getPath('taxonomies.json')
-export const getTaxonomies = async (streamZipFile) => {
-  const taxonomiesPath = getTaxonomiesPath(getPaths(streamZipFile))
-  const arenaTaxonomies = await streamZipFile.getEntryData(taxonomiesPath)
-  return JSON.parse(arenaTaxonomies)
-}
-export const getTaxa = async (streamZipFile, uuid) => {
-  const taxaPath = getPathByUuid(uuid)(getPaths(streamZipFile))
-  const arenaTaxa = await streamZipFile.getEntryData(taxaPath)
-  return JSON.parse(arenaTaxa)
-}
+export const getTaxonomies = async (zipFile) => _getJson(zipFile, ExportFile.taxonomies)
+export const getTaxa = async (zipFile, taxonomyUuid) => _getJson(zipFile, ExportFile.taxa({ taxonomyUuid }))
 
 // Categories
-export const getCategoriesPath = getPath('categories.json')
-export const getCategories = async (streamZipFile) => {
-  const categoriesPath = getCategoriesPath(getPaths(streamZipFile))
-  const arenaCategories = await streamZipFile.getEntryData(categoriesPath)
-  return JSON.parse(arenaCategories)
-}
-export const getCategoryItems = async (streamZipFile, categoryUuid) => {
-  const itemsPath = getPathByUuid(categoryUuid)(getPaths(streamZipFile))
-  const items = await streamZipFile.getEntryData(itemsPath)
-  return JSON.parse(items)
-}
+export const getCategories = async (zipFile) => _getJson(zipFile, ExportFile.categories)
+export const getCategoryItems = async (zipFile, categoryUuid) =>
+  _getJson(zipFile, ExportFile.categoryItems({ categoryUuid }))
 
 // Records
-export const getRecordsPath = getPath('records.json')
-export const getRecords = async (streamZipFile) => {
-  const recordsPath = getRecordsPath(getPaths(streamZipFile))
-  const records = await streamZipFile.getEntryData(recordsPath)
-  return JSON.parse(records)
+export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records)
+export const getRecord = async (zipFile, recordUuid) => _getJson(zipFile, ExportFile.record({ recordUuid }))
+
+// Files
+export const getFileUuids = async (zipFile) => {
+  const entryNames = (await zipFile.getEntryNames(ExportFile.filesDir)) || []
+  // extract uuids from entry names
+  return entryNames.map((entryName) => entryName.slice(1, entryName.length - 5))
 }
-export const getRecord = async (streamZipFile, uuid) => {
-  const recordPath = getPathByUuid(uuid)(getPaths(streamZipFile))
-  const record = await streamZipFile.getEntryData(recordPath)
-  return JSON.parse(record)
-}
+export const getFile = async (zipFile, fileUuid) => _getJson(zipFile, ExportFile.file({ fileUuid }))
 
 // Activities
-export const getActivitiesPath = getPath('activitylog.json')
-export const getActivities = async (streamZipFile) => {
-  const activitiesPath = getActivitiesPath(getPaths(streamZipFile))
-  const activities = await streamZipFile.getEntryData(activitiesPath)
-  return JSON.parse(activities)
-}
+export const getActivities = async (zipFile) => _getJson(zipFile, ExportFile.activityLog)
 
 // Users
-export const getUsersPath = getPath('users.json')
-export const getUsers = async (streamZipFile) => {
-  const usersPath = getUsersPath(getPaths(streamZipFile))
-  const users = await streamZipFile.getEntryData(usersPath)
-  return JSON.parse(users)
-}
-export const getProfilePicturePathByUuid = (uuid) => (entries) =>
-  entries.find((entry) => new RegExp(`profilepictures/${uuid}`).test(entry))
+export const getUsers = async (zipFile) => _getJson(zipFile, ExportFile.users)
 
-export const getUserProfilePicture = async (streamZipFile, uuid) => {
-  const profilePicturePath = getProfilePicturePathByUuid(uuid)(getPaths(streamZipFile))
-  if (profilePicturePath) {
-    const profilePicture = await streamZipFile.getEntryData(profilePicturePath)
-    return profilePicture
-  }
-  return false
-}
+export const getUserProfilePicture = async (zipFile, userUuid) =>
+  zipFile.getEntryData(ExportFile.userProfilePicture({ userUuid }))
 
-export const getUserInvitationsPath = getPath('userInvitations.json')
-export const getUserInvitations = async (streamZipFile) => {
-  const userInvitationsPath = getUserInvitationsPath(getPaths(streamZipFile))
-  const userInvitations = await streamZipFile.getEntryData(userInvitationsPath)
-  return JSON.parse(userInvitations)
-}
+export const getUserInvitations = async (zipFile) => _getJson(zipFile, ExportFile.userInvitations)
 
 // Chains
-export const getChainsPath = getPath('chains.json')
-export const getChains = async (streamZipFile) => {
-  const chainsPath = getChainsPath(getPaths(streamZipFile))
-  const chains = await streamZipFile.getEntryData(chainsPath)
-  return JSON.parse(chains)
-}
-export const getChain = async (streamZipFile, uuid) => {
-  const chainPath = getPathByUuid(uuid)(getPaths(streamZipFile))
-  const chain = await streamZipFile.getEntryData(chainPath)
-  return JSON.parse(chain)
-}
+export const getChains = async (zipFile) => _getJson(zipFile, ExportFile.chains)
+export const getChain = async (zipFile, chainUuid) => _getJson(zipFile, ExportFile.chain({ chainUuid }))

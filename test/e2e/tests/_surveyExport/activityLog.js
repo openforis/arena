@@ -1,8 +1,9 @@
 import { getSurveyEntry } from '../../downloads/path'
+import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 
 export const verifyActivityLog = (survey) =>
   test('Verify activity log', async () => {
-    const activityLog = getSurveyEntry(survey, 'activitylog', 'activitylog.json')
+    const activityLog = getSurveyEntry(survey, ExportFile.activityLog)
 
     const activities = Object.values(activityLog)
 

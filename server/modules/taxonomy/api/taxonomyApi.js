@@ -135,7 +135,7 @@ export const init = (app) => {
             )
           }
         } else {
-          list = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
+          list = await TaxonomyService.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft, limit, offset })
         }
 
         res.json({ list })
@@ -171,7 +171,7 @@ export const init = (app) => {
         const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
         const [survey, taxonomy] = await Promise.all([
-          SurveyService.fetchSurveyById(surveyId, draft),
+          SurveyService.fetchSurveyById({ surveyId, draft }),
           TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
         ])
         const surveyName = Survey.getName(Survey.getSurveyInfo(survey))

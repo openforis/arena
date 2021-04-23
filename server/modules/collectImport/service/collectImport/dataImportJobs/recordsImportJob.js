@@ -44,12 +44,7 @@ export default class RecordsImportJob extends Job {
 
     const cycle = Survey.cycleOneKey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      surveyId,
-      cycle,
-      true,
-      true,
-      false,
-      false,
+      { surveyId, cycle, draft: true, advanced: true },
       tx
     )
 

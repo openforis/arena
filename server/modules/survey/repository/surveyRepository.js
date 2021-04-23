@@ -1,4 +1,5 @@
 import { db } from '@server/db/db'
+import * as DB from '@server/db'
 import * as R from 'ramda'
 
 import { selectDate } from '@server/db/dbUtils'
@@ -7,7 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from './surveySchemaRepositoryUtils'
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
@@ -21,22 +22,23 @@ const surveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-export const insertSurvey = async (survey, client = db) =>
+export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props_draft, owner_uuid, published, draft, template )
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template )
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING ${surveySelectFields()}
     `,
     [
       Survey.getUuid(survey),
-      survey.props,
+      props,
+      propsDraft,
       survey.ownerUuid,
       Survey.isPublished(survey),
       Survey.isDraft(survey),
       Survey.isTemplate(survey),
     ],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 
 // ============== CLONE
@@ -84,7 +86,7 @@ export const fetchUserSurveys = async ({ user, offset = 0, limit = null, templat
     OFFSET ${offset}
   `,
     [User.getUuid(user), template],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 }
 
@@ -113,12 +115,12 @@ export const fetchSurveysByName = async (surveyName, client = db) =>
   client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
-    (def) => dbTransformCallback(def)
+    (def) => DB.transformCallback(def)
   )
 
-export const fetchSurveyById = async (surveyId, draft = false, client = db) =>
+export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${surveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
-    dbTransformCallback(def, draft)
+    DB.transformCallback(def, draft, false, backup)
   )
 
 export const fetchDependencies = async (surveyId, client = db) =>
@@ -141,7 +143,7 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     RETURNING ${surveySelectFields()}
   `,
     [JSON.stringify(prop), surveyId],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 }
 

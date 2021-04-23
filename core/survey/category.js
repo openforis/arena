@@ -33,7 +33,7 @@ export const itemExtraDefDataTypes = {
 // ========
 
 // ====== READ
-export const { getUuid } = ObjectUtils
+export const { getProps, getPropsDraft, getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const { getValidation } = Validation
 

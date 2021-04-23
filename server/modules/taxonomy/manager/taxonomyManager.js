@@ -31,10 +31,10 @@ export const insertTaxonomy = async ({ user, surveyId, taxonomy, addLogs = true,
     return validateTaxonomy(surveyId, [], taxonomyInserted, true, t)
   })
 
-export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true }, client = db) =>
+export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup = false, client = db }) =>
   client.tx(async (t) =>
     Promise.all([
-      TaxonomyRepository.insertTaxa(surveyId, taxa, t),
+      TaxonomyRepository.insertTaxa({ surveyId, taxa, backup, client: t }),
       ...(addLogs
         ? [
             ActivityLogRepository.insertMany(
@@ -52,11 +52,11 @@ export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true }, clien
  * ====== READ
  */
 export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, validate = false, limit = null, offset = 0, search = null },
+  { surveyId, draft = false, validate = false, backup = false, limit = null, offset = 0, search = null },
   client = db
 ) => {
   const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(
-    { surveyId, draft, limit, offset, search },
+    { surveyId, draft, backup, limit, offset, search },
     client
   )
 
@@ -168,7 +168,7 @@ export const {
 } = TaxonomyRepository
 
 export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
-  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)
+  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft })
   return ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
 }
 

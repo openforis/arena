@@ -107,6 +107,9 @@ export const DataTestId = {
     surveyName: 'survey-name',
     surveyLabel: 'survey-label',
   },
+  surveyExport: {
+    downloadBtn: 'text="Download"',
+  },
   surveyForm: {
     addSubPageBtn: 'add-sub-page-btn',
     codeInputDropdown: (name) => `${name}-code`,

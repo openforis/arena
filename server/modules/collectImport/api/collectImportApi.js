@@ -53,7 +53,7 @@ export const init = (app) => {
       try {
         const { surveyId, draft = true } = Request.getParams(req)
 
-        const survey = await SurveyService.fetchSurveyById(surveyId, draft)
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const surveyName = Survey.getName(surveyInfo)
         const messageLangCode = Survey.getDefaultLanguage(surveyInfo)

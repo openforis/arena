@@ -19,7 +19,7 @@ const sendRespNodeDefsAndValidation = async (
   validate = true,
   nodeDefsUpdated = null
 ) => {
-  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
+  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate })
 
   res.json({
     nodeDefs: sendNodeDefs ? Survey.getNodeDefs(survey) : null,

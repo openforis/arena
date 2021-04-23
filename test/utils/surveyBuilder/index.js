@@ -115,12 +115,12 @@ class SurveyBuilder {
       }
 
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        surveyId,
-        Survey.cycleOneKey,
-        !publish,
-        true,
-        false,
-        false,
+        {
+          surveyId,
+          cycle: Survey.cycleOneKey,
+          draft: !publish,
+          advanced: true,
+        },
         t
       )
       return Survey.buildAndAssocDependencyGraph(surveyDb)

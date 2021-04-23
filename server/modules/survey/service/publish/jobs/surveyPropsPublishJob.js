@@ -10,10 +10,10 @@ import * as CategoryManager from '../../../../category/manager/categoryManager'
 import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
 const findDeletedLanguages = async (surveyId, t) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true, validate: false }, t)
   const surveyInfo = Survey.getSurveyInfo(survey)
   if (Survey.isPublished(surveyInfo)) {
-    const publishedSurvey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
+    const publishedSurvey = await SurveyManager.fetchSurveyById({ surveyId, draft: false, validate: false }, t)
     const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
     return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfo))
   }

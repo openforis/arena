@@ -50,7 +50,7 @@ export const { insertNode } = RecordUpdateManager
 // ==== READ
 
 export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
+  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)

@@ -92,6 +92,8 @@ export const {
   getOwnerName,
   getOwnerUuid,
   isTemplate,
+  getProps,
+  getPropsDraft,
 } = SurveyInfo
 
 export const { getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin, assocAuthGroups } = SurveyInfo

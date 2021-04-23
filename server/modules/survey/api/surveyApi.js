@@ -81,7 +81,7 @@ export const init = (app) => {
       const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
-        SurveyService.fetchSurveyById(surveyId, draft, validate),
+        SurveyService.fetchSurveyById({ surveyId, draft, validate }),
         UserService.updateUserPrefs(user),
       ])
 
@@ -97,7 +97,20 @@ export const init = (app) => {
 
       const user = Request.getUser(req)
 
-      await SurveyService.exportSurvey({ surveyId, user, res })
+      const { job, outputFileName } = SurveyService.exportSurvey({ surveyId, user })
+      res.json({ job, outputFileName })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // download generated survey export file
+  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyName, fileName } = Request.getParams(req)
+
+      const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
+      Response.sendFile({ res, path, name: `survey_${surveyName}.zip` })
     } catch (error) {
       next(error)
     }

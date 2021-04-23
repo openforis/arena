@@ -26,7 +26,7 @@ export const updateRemovedDate = async ({ survey, userUuidToRemove }, client = d
     [userUuidToRemove, Survey.getUuid(Survey.getSurveyInfo(survey))]
   )
 
-export const fetchUserInvitationsBySurveyId = async ({ survey }, client = db) =>
+export const fetchUserInvitationsBySurveyUuid = async ({ surveyUuid }, client = db) =>
   client.map(
     `
     SELECT 
@@ -34,7 +34,7 @@ export const fetchUserInvitationsBySurveyId = async ({ survey }, client = db) =>
     FROM user_invitation
     WHERE survey_uuid = $1
     `,
-    [Survey.getUuid(Survey.getSurveyInfo(survey))],
+    [surveyUuid],
     camelize
   )
 

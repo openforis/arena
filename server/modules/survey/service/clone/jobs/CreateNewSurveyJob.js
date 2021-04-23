@@ -18,7 +18,7 @@ export default class CreateNewSurveyJob extends Job {
 
   async execute() {
     const { surveyIdSource, surveyInfoTarget: surveyInfoTargetParam, user } = this.context
-    const surveySource = await SurveyManager.fetchSurveyById(surveyIdSource, true, false, this.tx)
+    const surveySource = await SurveyManager.fetchSurveyById({ surveyId: surveyIdSource, draft: true }, this.tx)
     const surveyInfoSource = Survey.getSurveyInfo(surveySource)
 
     const surveyInfoTarget = Survey.newSurvey({
@@ -29,7 +29,10 @@ export default class CreateNewSurveyJob extends Job {
       [Survey.infoKeys.template]: Survey.isTemplate(surveyInfoTargetParam),
     })
 
-    let surveyInfoTargetInserted = await SurveyRepository.insertSurvey(surveyInfoTarget, this.tx)
+    let surveyInfoTargetInserted = await SurveyRepository.insertSurvey(
+      { survey: surveyInfoTarget, propsDraft: Survey.getProps(surveyInfoTarget) },
+      this.tx
+    )
     const surveyIdTarget = Survey.getIdSurveyInfo(surveyInfoTargetInserted)
     await DBMigrator.migrateSurveySchema(surveyIdTarget)
 

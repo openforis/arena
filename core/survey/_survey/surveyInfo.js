@@ -38,7 +38,7 @@ export const cycleOneKey = '0'
 export const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-export const { getId, getUuid } = ObjectUtils
+export const { getId, getUuid, getProps, getPropsDraft } = ObjectUtils
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 

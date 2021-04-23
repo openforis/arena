@@ -21,8 +21,8 @@ export default class TaxonomyImportManager {
     this.vernacularLanguageCodes = vernacularLanguageCodes
     this.tx = tx
 
-    this.batchPersisterInsert = new BatchPersister(async (items) =>
-      TaxonomyManager.insertTaxa({ user: this.user, surveyId: this.surveyId, taxa: items }, this.tx)
+    this.batchPersisterInsert = new BatchPersister(async (taxa) =>
+      TaxonomyManager.insertTaxa({ user: this.user, surveyId: this.surveyId, taxa, client: this.tx })
     )
     this.batchPersisterUpdate = new BatchPersister(async (items) =>
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)

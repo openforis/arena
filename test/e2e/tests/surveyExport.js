@@ -2,7 +2,6 @@ import { survey } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
-  removeExportSurveyFiles,
   verifyActivityLog,
   verifyCategories,
   verifyNodeDefs,
@@ -34,6 +33,4 @@ export default () =>
     verifyUsers(survey)
 
     verifyActivityLog(survey)
-
-    removeExportSurveyFiles(survey)
   })

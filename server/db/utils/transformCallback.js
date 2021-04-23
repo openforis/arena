@@ -7,15 +7,24 @@ const _assocPublishedDraft = (row) => ({
   draft: !A.isEmpty(row.props_draft),
 })
 
-export const transformCallback = (row, draft = false, assocPublishedDraft = false) => {
+export const transformCallback = (row, draft = false, assocPublishedDraft = false, backup = false) => {
   if (A.isNull(row)) {
     return null
   }
 
-  return A.pipe(
+  const rowUpdated = A.pipe(
     // Assoc published and draft properties based on props
     (rowCurrent) => (assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
-    A.camelizePartial({ skip: ['validation', 'props', 'props_draft'] }),
-    mergeProps({ draft })
+    A.camelizePartial({ skip: ['validation', 'props', 'props_draft'] })
   )(row)
+
+  if (!backup) {
+    return mergeProps({ draft })(rowUpdated)
+  }
+
+  // backup
+  // camelize props_draft column into propsDraft
+  rowUpdated.propsDraft = row.props_draft
+  delete rowUpdated.props_draft
+  return rowUpdated
 }

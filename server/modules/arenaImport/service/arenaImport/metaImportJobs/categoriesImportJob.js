@@ -17,11 +17,12 @@ const insertCategory = async ({ category, user, surveyId, arenaSurveyFileZip, tx
       category: categoryWithLevels,
       addLogs: false,
       validate: false,
+      backup: true,
     },
     tx
   )
   const items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, Category.getUuid(categoryInserted))
-  await CategoryService.insertItemsInBatch(surveyId, items, tx)
+  await CategoryService.insertItemsInBatch({ surveyId, items, backup: true, client: tx })
 }
 
 /**

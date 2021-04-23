@@ -54,7 +54,7 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
 
     // 2. Reload chain including steps and calculations
     const [surveyInfo, chainDb] = await Promise.all([
-      SurveyRepository.fetchSurveyById(surveyId, true, tx),
+      SurveyRepository.fetchSurveyById({ surveyId, draft: true }, tx),
       ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain), includeStepsAndCalculations: true }, tx),
     ])
     const stepDb = step ? Chain.getStepByIdx(Step.getIndex(step))(chainDb) : null

@@ -7,6 +7,7 @@ import ExportCsvDataJob from '@server/modules/survey/service/export/exportCsvDat
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
+import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 
 const jobClasses = [
   CategoryImportJob,
@@ -16,6 +17,7 @@ const jobClasses = [
   TaxonomyImportJob,
   ArenaImportJob,
   SurveyCloneJob,
+  SurveyExportJob,
 ]
 
 const getJobClass = (jobType) => R.find(R.propEq('type', jobType), jobClasses)

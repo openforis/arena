@@ -62,12 +62,7 @@ export default class NodeDefsImportJob extends Job {
 
     // Fetch survey and store it in context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      surveyId,
-      Survey.cycleOneKey,
-      true,
-      true,
-      false,
-      false,
+      { surveyId, cycle: Survey.cycleOneKey, draft: true, advanced: true },
       this.tx
     )
 
