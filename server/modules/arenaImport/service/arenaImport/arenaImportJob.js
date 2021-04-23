@@ -16,21 +16,25 @@ import UsersImportJob from './metaImportJobs/usersImportJob'
 import ChainsImportJob from './metaImportJobs/chainsImportJob'
 import CreateRdbJob from './metaImportJobs/createRdb'
 
+const createInnerJobs = (params) => {
+  const { cloning } = params
+  return [
+    new ArenaSurveyReaderJob(),
+    new SurveyCreatorJob(),
+    new UsersImportJob(),
+    new TaxonomiesImportJob(),
+    new CategoriesImportJob(),
+    new NodeDefsImportJob(),
+    ...(cloning ? [] : [new RecordsImportJob(), new FilesImportJob()]),
+    new ChainsImportJob(),
+    // Needed when the survey is published
+    new CreateRdbJob(),
+  ]
+}
+
 export default class ArenaImportJob extends Job {
   constructor(params) {
-    super(ArenaImportJob.type, params, [
-      new ArenaSurveyReaderJob(),
-      new SurveyCreatorJob(),
-      new UsersImportJob(),
-      new TaxonomiesImportJob(),
-      new CategoriesImportJob(),
-      new NodeDefsImportJob(),
-      new RecordsImportJob(),
-      new FilesImportJob(),
-      new ChainsImportJob(),
-      // Needed when the survey is published
-      new CreateRdbJob(),
-    ])
+    super(ArenaImportJob.type, params, createInnerJobs(params))
   }
 
   async onStart() {
