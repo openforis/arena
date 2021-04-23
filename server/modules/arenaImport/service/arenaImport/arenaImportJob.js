@@ -5,6 +5,7 @@ import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
+import ActivityLogImportJob from './metaImportJobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './metaImportJobs/arenaSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
@@ -25,8 +26,9 @@ const createInnerJobs = (params) => {
     new TaxonomiesImportJob(),
     new CategoriesImportJob(),
     new NodeDefsImportJob(),
-    ...(cloning ? [] : [new RecordsImportJob(), new FilesImportJob()]),
     new ChainsImportJob(),
+    // when cloning a survey, skip activity log, records and files
+    ...(cloning ? [] : [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()]),
     // Needed when the survey is published
     new CreateRdbJob(),
   ]

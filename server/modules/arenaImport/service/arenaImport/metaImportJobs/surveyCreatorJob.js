@@ -4,8 +4,6 @@ import * as User from '@core/user/user'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
@@ -13,7 +11,7 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, arenaSurveyFileZip, cloning, surveyInfoTarget } = this.context
+    const { arenaSurvey, cloning, surveyInfoTarget } = this.context
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
 
@@ -50,9 +48,6 @@ export default class SurveyCreatorJob extends Job {
     )
 
     const surveyId = Survey.getId(survey)
-
-    const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip)
-    await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }

@@ -288,11 +288,6 @@ export default class Job {
     await this._setStatus(jobStatus.failed)
   }
 
-  async beforeInnerJobStart(innerJob) {
-    // to be extended by subclasses
-    return this
-  }
-
   // INTERNAL METHODS
   async _executeInnerJobs() {
     this.total = this.innerJobs.length
@@ -309,7 +304,6 @@ export default class Job {
 
       innerJob.onEvent(this._handleInnerJobEvent.bind(this))
 
-      await this.beforeInnerJobStart(innerJob)
       await innerJob.start(this.tx)
 
       if (innerJob.isSucceeded()) {
