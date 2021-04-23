@@ -26,15 +26,20 @@ const getTaxonVernacularNameSelectFields = (draft) => `
 
 // ============== CREATE
 
-export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
-  client.one(
+export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, client = db) => {
+  // backup: preserve both props and props draft
+  const props = backup ? Taxonomy.getProps(taxonomy) : {}
+  const propsDraft = backup ? Taxonomy.getPropsDraft(taxonomy) : Taxonomy.getProps(taxonomy)
+
+  return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props_draft)
-        VALUES ($1, $2)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props, props_draft)
+        VALUES ($1, $2, $3)
         RETURNING *`,
-    [Taxonomy.getUuid(taxonomy), taxonomy.props],
+    [Taxonomy.getUuid(taxonomy), props, propsDraft],
     (record) => dbTransformCallback(record, true, true)
   )
+}
 
 /**
  * Inserts or updated vernacular names into the specified taxon.
