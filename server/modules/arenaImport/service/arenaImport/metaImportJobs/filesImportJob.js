@@ -15,10 +15,12 @@ export default class FilesImportJob extends Job {
     const { arenaSurveyFileZip, surveyId } = this.context
 
     const fileUuids = await ArenaSurveyFileZip.getFileUuids(arenaSurveyFileZip)
+    this.total = fileUuids.length
 
     await PromiseUtils.each(fileUuids, async (fileUuid) => {
       const file = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
-      FileManager.insertFile(surveyId, file, this.tx)
+      await FileManager.insertFile(surveyId, file, this.tx)
+      this.incrementProcessedItems()
     })
   }
 }
