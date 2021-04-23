@@ -1,3 +1,5 @@
+import * as Survey from '@core/survey/survey'
+
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '../exportFile'
@@ -8,20 +10,23 @@ export default class SurveyInfoExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId } = this.context
+    const { archive, cloning, surveyId } = this.context
 
     // fetch survey with combined props and propsDraft to get proper survey info
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
 
+    const backup = !cloning
+    const draft = backup || !Survey.isTemplate(survey)
+
     // fetch survey with props and propsDraft not combined together to get a full export
-    const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
       surveyId,
-      draft: true,
+      draft,
       advanced: true,
-      backup: true,
+      backup,
     })
     archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })
 
-    this.setContext({ survey })
+    this.setContext({ survey, draft, backup })
   }
 }
