@@ -1,4 +1,5 @@
 import { BaseProtocol, DB, Schemata } from '@openforis/arena-server'
+import { camelize } from '@core/arena'
 
 /**
  * Fetches chainNodeDefs by the given survey id, chain uuid and parent entity definition.
@@ -15,13 +16,14 @@ export const getMany = async (params, client = DB) => {
   const { surveyId, chainUuid, entityDefUuid } = params
 
   const schema = Schemata.getSchemaSurvey(surveyId)
-  return client.many(
+  return client.map(
     `select cnd.uuid, cnd.chain_uuid, cnd.node_def_uuid, cnd.index, cnd.props
     from ${schema}.chain_node_def cnd
     where cnd.chain_uuid = $1
     and cnd.node_def_uuid in
         (select n.uuid from ${schema}.node_def n where n.parent_uuid = $2)
     order by cnd.index`,
-    [chainUuid, entityDefUuid]
+    [chainUuid, entityDefUuid],
+    camelize
   )
 }

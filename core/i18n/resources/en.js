@@ -3,6 +3,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 export const enTranslation = {
   common: {
+    active: 'Active',
     add: 'Add',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
@@ -220,7 +221,7 @@ Do you want to proceed?`,
     },
     surveyList: {
       status: 'Status',
-      active: 'Active',
+      active: '$t(common.active)',
       activate: 'Activate',
     },
     surveyCreate: {

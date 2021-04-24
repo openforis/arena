@@ -1,23 +1,17 @@
 @import 'webapp/style/vars';
 
-.chain-node-defs-attributes {
-  display: grid;
-  grid-row-gap: 2rem;
-  align-items: start;
-}
-
-.chain-node-defs-attributes__header {
+.chain-node-defs-header {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-column-gap: 64px;
   align-items: center;
 }
 
-.chain-node-defs-attributes__header-label {
+.chain-node-defs__header-label {
   font-weight: 600;
 }
 
-.chain-node-defs-attributes__header-buttons {
+.chain-node-defs-header__buttons {
   background-color: rgba($greyBorder, 0.6);
   display: flex;
   align-items: center;
