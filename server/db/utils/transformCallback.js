@@ -14,7 +14,7 @@ export const transformCallback = (row, draft = false, assocPublishedDraft = fals
 
   const rowUpdated = A.pipe(
     // Assoc published and draft properties based on props
-    (rowCurrent) => (assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
+    (rowCurrent) => (backup || assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
     A.camelizePartial({ skip: ['validation', 'props', 'props_draft'] })
   )(row)
 

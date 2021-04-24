@@ -11,13 +11,13 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, cloning, surveyInfoTarget } = this.context
+    const { arenaSurvey, backup, surveyInfoTarget } = this.context
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
 
-    const name = cloning
-      ? Survey.getName(surveyInfoTarget) || `clone_${Survey.getName(surveyInfoArenaSurvey)}`
-      : `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
+    const name = backup
+      ? `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
+      : Survey.getName(surveyInfoTarget) || `clone_${Survey.getName(surveyInfoArenaSurvey)}`
 
     const languages = Survey.getLanguages(surveyInfoArenaSurvey)
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
@@ -25,11 +25,11 @@ export default class SurveyCreatorJob extends Job {
     const labels = surveyInfoTarget ? Survey.getLabels(surveyInfoTarget) : Survey.getLabels(surveyInfoArenaSurvey)
     const descriptions = Survey.getDescriptions(surveyInfoTarget)
 
-    // always import as draft when cloning
-    const published = cloning ? false : Survey.isPublished(surveyInfoArenaSurvey)
-    const draft = cloning ? true : Survey.isDraft(surveyInfoArenaSurvey)
+    // always import as draft when not backup
+    const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
+    const draft = !backup
 
-    const template = cloning ? Survey.isTemplate(surveyInfoTarget) : Survey.isTemplate(surveyInfoArenaSurvey)
+    const template = backup ? Survey.isTemplate(surveyInfoArenaSurvey) : Survey.isTemplate(surveyInfoTarget)
 
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),

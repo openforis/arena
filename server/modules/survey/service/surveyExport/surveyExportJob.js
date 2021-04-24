@@ -15,30 +15,41 @@ import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
 import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
 
-const createInnerJobs = (params) => {
-  const { cloning } = params
-  // records, files, activity log are not inlcuded if cloning survey
+const createInnerJobs = ({ backup }) => {
+  // records, files, activity log are inlcuded only if exporting survey as backup (not cloning)
   return [
     new SurveyInfoExportJob(),
     new CategoriesExportJob(),
     new TaxonomiesExportJob(),
-    ...(cloning ? [] : [new RecordsExportJob(), new FilesExportJob()]),
+    ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
     new ChainExportJob(),
     new UsersExportJob(),
-    ...(cloning ? [] : [new ActivityLogExportJob()]),
+    ...(backup ? [new ActivityLogExportJob()] : []),
   ]
 }
 
 export default class SurveyExportJob extends Job {
+  /**
+   * It creates a survey export job that exports a survey including node definitions, categories, taxonomies, chains and users.
+   * If the export is for a backup, it includes also records, files and activity log.
+   *
+   * @param {!object} params - The export parameters.
+   * @param {!number} [params.surveyId] - The id of the survey to export.
+   * @param {!object} [params.user] - The user performing the export.
+   * @param {string} [params.outputFileName = null] - If specified, it will be used to generate the name of the export file, otherwise the file name will be automatically generated.
+   * @param {boolean} [params.backup = true] - If true, includes also published and draft props, records, files and activity log.
+   * @returns {SurveyExportJob} - The export job.
+   */
   constructor(params) {
-    super(SurveyExportJob.type, params, createInnerJobs(params))
+    const { backup = true, outputFileName: outputFileNameParam = null, surveyId } = params
+    const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
+
+    super(SurveyExportJob.type, { ...params, backup, outputFileName }, createInnerJobs({ backup }))
   }
 
   async onStart() {
     super.onStart()
-    const { surveyId, outputFileName: outputFileNameParam } = this.context
-
-    const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
+    const { outputFileName } = this.context
 
     const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
     const outputFileStream = fs.createWriteStream(outputFilePath)

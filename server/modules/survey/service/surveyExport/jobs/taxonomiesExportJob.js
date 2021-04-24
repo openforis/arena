@@ -10,10 +10,10 @@ export default class TaxonomiesExportJob extends Job {
   }
 
   async execute() {
-    const { archive, backup, surveyId } = this.context
+    const { archive, backup, draft, surveyId } = this.context
 
     // taxonomies.json: list of all categories with levels
-    const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft: true, backup })
+    const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, backup })
     archive.append(JSON.stringify(taxonomies, null, 2), { name: ExportFile.taxonomies })
 
     this.total = taxonomies.length
@@ -24,7 +24,7 @@ export default class TaxonomiesExportJob extends Job {
       const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames({
         surveyId,
         taxonomyUuid,
-        draft: true,
+        draft,
         backup,
       })
       archive.append(JSON.stringify(taxaData, null, 2), {

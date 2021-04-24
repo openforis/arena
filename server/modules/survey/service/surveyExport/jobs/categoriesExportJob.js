@@ -22,6 +22,7 @@ export default class CategoriesExportJob extends Job {
       },
       this.tx
     )
+
     archive.append(JSON.stringify(categories, null, 2), { name: categoriesPathFile })
 
     // for each category create a  `${categoryUuid}.json` file with the category items
@@ -38,6 +39,7 @@ export default class CategoriesExportJob extends Job {
         },
         this.tx
       )
+
       archive.append(JSON.stringify(itemsData, null, 2), {
         name: ExportFile.categoryItems({ categoryUuid }),
       })

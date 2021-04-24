@@ -17,12 +17,13 @@ export default class CategoriesImportJob extends Job {
   async execute() {
     const { arenaSurveyFileZip, surveyId } = this.context
 
-    const categories = await ArenaSurveyFileZip.getCategories(arenaSurveyFileZip)
+    const categories = (await ArenaSurveyFileZip.getCategories(arenaSurveyFileZip)) || {}
 
-    const categoriesArray = Object.values(categories || {})
-    await Promise.all(categoriesArray.map(async (category) => this._insertCategory({ category })))
-
-    await CategoryManager.validateCategories(surveyId, this.tx)
+    const categoriesArray = Object.values(categories)
+    if (categoriesArray.length > 0) {
+      await Promise.all(categoriesArray.map(async (category) => this._insertCategory({ category })))
+      await CategoryManager.validateCategories(surveyId, this.tx)
+    }
     this.setContext({ categories })
   }
 

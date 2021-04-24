@@ -131,14 +131,11 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
 export const fetchTaxonomiesBySurveyId = async (
   { surveyId, draft = false, backup = false, limit = null, offset = 0, search = null },
   client = db
-) =>
-  client.map(
-    `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
-     ${
-       search
-         ? `WHERE 
-      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
+) => {
+  const whereConditions = []
+  if (search) {
+    whereConditions.push(
+      `${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
         OR 
       EXISTS(
         SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
@@ -148,11 +145,19 @@ export const fetchTaxonomiesBySurveyId = async (
         WHERE value ILIKE $/search/
         )
       `
-         : ''
-     } 
+    )
+  }
+  if (!backup && !draft) {
+    // exclude not published taxonomies
+    whereConditions.push(`props::text <> '{}'::text`)
+  }
+  return client.map(
+    `SELECT * 
+     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
+     ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''}
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
      LIMIT ${limit ? `$/limit/` : 'ALL'}
-    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
+     ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       limit,
       offset,
@@ -160,6 +165,7 @@ export const fetchTaxonomiesBySurveyId = async (
     },
     (record) => DB.transformCallback(record, draft, true, backup)
   )
+}
 
 export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
   client.one(
