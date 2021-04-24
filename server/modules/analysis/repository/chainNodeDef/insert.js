@@ -2,12 +2,12 @@ import { DB, Schemata } from '@openforis/arena-server'
 
 export const insert = async (params, client = DB) => {
   const { chainNodeDef, surveyId } = params
-  const { chainUuid, nodeDefUuid, uuid } = chainNodeDef
+  const { chainUuid, nodeDefUuid, props, uuid } = chainNodeDef
   const schema = Schemata.getSchemaSurvey(surveyId)
 
   return client.none(
-    `insert into ${schema}.chain_node_def (uuid, chain_uuid, node_def_uuid, index)
-    select $1, $2, $3, coalesce(max(cnd.index + 1), 0)
+    `insert into ${schema}.chain_node_def (uuid, chain_uuid, node_def_uuid, props, index)
+    select $1, $2, $3, $4::jsonb, coalesce(max(cnd.index + 1), 0)
     from ${schema}.chain_node_def cnd
     where cnd.node_def_uuid in (
         select n.uuid
@@ -19,6 +19,6 @@ export const insert = async (params, client = DB) => {
         )
         and n.analysis = true
     )`,
-    [uuid, chainUuid, nodeDefUuid]
+    [uuid, chainUuid, nodeDefUuid, props]
   )
 }
