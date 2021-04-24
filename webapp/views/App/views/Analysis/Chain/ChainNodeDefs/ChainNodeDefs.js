@@ -19,8 +19,6 @@ const ChainNodeDefs = () => {
   useEffect(() => {
     if (entityDefUuid) {
       dispatch(ChainActions.fetchChainNodeDefs({ chainUuid: chain.uuid, entityDefUuid }))
-    } else {
-      dispatch(ChainActions.resetChainNodeDefs())
     }
   }, [chain, entityDefUuid])
 
@@ -37,8 +35,8 @@ const ChainNodeDefs = () => {
           {chainNodeDefs.length > 0 && (
             <div className="chain-node-def list-header">
               <div>{i18n.t('common.name')}</div>
-              <div>{i18n.t('common.type')}</div>
               <div>{i18n.t('common.label')}</div>
+              <div>{i18n.t('common.type')}</div>
               <div>{i18n.t('common.active')}</div>
               <div />
             </div>

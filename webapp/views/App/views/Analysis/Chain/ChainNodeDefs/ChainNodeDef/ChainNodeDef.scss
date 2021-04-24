@@ -3,7 +3,7 @@
 .chain-node-def {
   font-size: 0.9rem;
   display: grid;
-  grid-template-columns: 160px 80px 1fr 80px 80px;
+  grid-template-columns: 160px 1fr 120px repeat(2, 80px);
   grid-column-gap: 32px;
   align-items: center;
   padding: 8px 0;
@@ -33,5 +33,13 @@
     input {
       border: unset;
     }
+  }
+}
+
+.chain-node-def__type {
+  font-size: 0.8rem;
+
+  .icon {
+    font-size: 0.8rem !important;
   }
 }

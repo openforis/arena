@@ -11,7 +11,6 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 
 import { useNodeDefLabel, useSurvey } from '@webapp/store/survey'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 const ChainNodeDef = (props) => {
   const { chainNodeDef } = props
@@ -21,12 +20,15 @@ const ChainNodeDef = (props) => {
   const survey = useSurvey()
   const nodeDef = Survey.getNodeDefByUuid(chainNodeDef.nodeDefUuid)(survey)
   const nodeDefLabel = useNodeDefLabel(nodeDef)
+  const nodeDefType = NodeDef.getType(nodeDef)
 
   return (
     <div className="chain-node-def">
       <div>{NodeDef.getName(nodeDef)}</div>
-      <div>{NodeDefUIProps.getIconByType(NodeDef.getType(nodeDef))}</div>
       <div>{nodeDefLabel}</div>
+      <div className="chain-node-def__type">
+        {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
+      </div>
       <div>{chainNodeDef.props.active === true}</div>
       <div>
         <Link

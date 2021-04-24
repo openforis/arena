@@ -13,9 +13,9 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid, entityDefUuid } = Request.getParams(req)
 
-        const count = await AnalysisService.getManyChainNodeDefs({ surveyId, entityDefUuid, chainUuid })
+        const chainNodeDefs = await AnalysisService.getManyChainNodeDefs({ surveyId, entityDefUuid, chainUuid })
 
-        res.json(count)
+        res.json(chainNodeDefs)
       } catch (error) {
         next(error)
       }

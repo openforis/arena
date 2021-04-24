@@ -10,12 +10,16 @@ const initialState = {
   chainNodeDefs: [],
 }
 
-const actionHandlers = {
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+const reset = () => initialState
 
-  [SurveyActions.surveyCreate]: () => ({}),
-  [SurveyActions.surveyUpdate]: () => ({}),
-  [SurveyActions.surveyDelete]: () => ({}),
+const actionHandlers = {
+  [SystemActions.SYSTEM_RESET]: reset,
+
+  [SurveyActions.surveyCreate]: reset,
+  [SurveyActions.surveyUpdate]: reset,
+  [SurveyActions.surveyDelete]: reset,
+
+  [ChainActionTypes.chainReset]: reset,
 
   [ChainActionTypes.chainUpdate]: (state, { chain }) => ({ ...state, chain }),
 
