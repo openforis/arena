@@ -7,6 +7,7 @@ import { ChainActionTypes } from './actions'
 const initialState = {
   chain: null,
   entityDefUuid: null,
+  chainNodeDefs: [],
 }
 
 const actionHandlers = {
@@ -16,15 +17,11 @@ const actionHandlers = {
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
 
-  [ChainActionTypes.chainUpdate]: (state, action) => ({
-    ...state,
-    chain: action.chain,
-  }),
+  [ChainActionTypes.chainUpdate]: (state, { chain }) => ({ ...state, chain }),
 
-  [ChainActionTypes.entityDefUuidUpdate]: (state, action) => ({
-    ...state,
-    entityDefUuid: action.entityDefUuid,
-  }),
+  [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
+
+  [ChainActionTypes.chainNodeDefsUpdate]: (state, { chainNodeDefs }) => ({ ...state, chainNodeDefs }),
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)

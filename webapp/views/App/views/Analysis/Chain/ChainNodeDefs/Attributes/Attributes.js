@@ -1,5 +1,5 @@
 import './Attributes.scss'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
@@ -22,6 +22,10 @@ const Attributes = () => {
   const nodeDefLabel = useNodeDefLabel(nodeDef)
 
   const createNodeDef = (type) => dispatch(ChainActions.createNodeDef({ history, type }))
+
+  useEffect(() => {
+    dispatch(ChainActions.fetchChainNodeDefs({ entityDefUuid }))
+  }, [entityDefUuid])
 
   return (
     <div className="chain-node-defs-attributes">
