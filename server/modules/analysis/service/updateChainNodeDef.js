@@ -15,7 +15,13 @@ export const updateChainNodeDef = async ({ user, surveyId, chainNodeDef }) =>
 
     // activity log for each updated prop
     const activityLogs = Object.entries(propsToUpdate).map(([key, value]) => {
-      const content = { [ActivityLog.keysContent.uuid]: chainNodeDefUuid, key, value }
+      const content = {
+        [ActivityLog.keysContent.uuid]: chainNodeDefUuid,
+        [ActivityLog.keysContent.chainUuid]: chainNodeDef.chainUuid,
+        [ActivityLog.keysContent.nodeDefUuid]: chainNodeDef.nodeDefUuid,
+        key,
+        value,
+      }
       const type = ActivityLog.type.chainNodeDefPropUpdate
       return ActivityLogRepository.insert(user, surveyId, type, content, false, t)
     })

@@ -25,6 +25,16 @@ export default {
     }
   },
 
+  [ActivityLog.type.chainNodeDefPropUpdate]: (survey) => (activityLog) => {
+    const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    return {
+      key: ActivityLog.getContentKey(activityLog),
+      value: ActivityLog.getContentValue(activityLog),
+      name: NodeDef.getName(nodeDef),
+    }
+  },
+
   [ActivityLog.type.processingChainStatusExecSuccess]: (survey, i18n) => (activityLog) => ({
     label: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
