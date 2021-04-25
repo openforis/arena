@@ -28,5 +28,6 @@ export { generateScript, fetchStepData, persistResults, persistUserScripts } fro
 export { generateRStudioToken, checkRStudioToken } from './rStudio'
 
 // chain node def
+export const countChainNodeDefs = ChainNodeDefRepository.count
 export const getManyChainNodeDefs = ChainNodeDefRepository.getMany
 export { updateChainNodeDef } from './updateChainNodeDef'

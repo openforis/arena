@@ -2,7 +2,13 @@ import './ChainNodeDefs.scss'
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { ChainActions, useChain, useChainEntityDefUuid, useChainNodeDefs } from '@webapp/store/ui/chain'
+import {
+  ChainActions,
+  useChain,
+  useChainEntityDefUuid,
+  useChainNodeDefs,
+  useChainNodeDefsCount,
+} from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
@@ -14,7 +20,14 @@ const ChainNodeDefs = () => {
   const i18n = useI18n()
   const chain = useChain()
   const entityDefUuid = useChainEntityDefUuid()
+  const chainNodeDefsCount = useChainNodeDefsCount()
   const chainNodeDefs = useChainNodeDefs()
+
+  const selectEntity = (entityDef) => dispatch(ChainActions.updateEntityDefUuid(entityDef.uuid))
+  const getLabelPostfix = (entityDef) => {
+    const count = chainNodeDefsCount[entityDef.uuid]
+    return count ? ` (${count})` : ''
+  }
 
   useEffect(() => {
     if (entityDefUuid) {
@@ -22,11 +35,9 @@ const ChainNodeDefs = () => {
     }
   }, [chain, entityDefUuid])
 
-  const selectEntity = (entityDef) => dispatch(ChainActions.updateEntityDefUuid(entityDef.uuid))
-
   return (
     <div className="chain-node-defs-wrapper">
-      <EntitySelectorTree nodeDefUuidActive={entityDefUuid} onSelect={selectEntity} />
+      <EntitySelectorTree getLabelPostfix={getLabelPostfix} nodeDefUuidActive={entityDefUuid} onSelect={selectEntity} />
 
       {entityDefUuid && (
         <div className="chain-node-defs">

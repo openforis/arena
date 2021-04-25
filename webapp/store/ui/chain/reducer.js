@@ -8,6 +8,7 @@ const initialState = {
   chain: null,
   entityDefUuid: null,
   chainNodeDefs: [],
+  chainNodeDefsCount: {},
 }
 
 const reset = () => initialState
@@ -21,7 +22,11 @@ const actionHandlers = {
 
   [ChainActionTypes.chainReset]: reset,
 
-  [ChainActionTypes.chainUpdate]: (state, { chain }) => ({ ...state, chain }),
+  [ChainActionTypes.chainUpdate]: (state, { chain, chainNodeDefsCount = null }) => ({
+    ...state,
+    chain,
+    chainNodeDefsCount: chainNodeDefsCount || state.chainNodeDefsCount,
+  }),
 
   [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
 

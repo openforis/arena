@@ -8,6 +8,22 @@ export const init = (app) => {
   // ====== READ
 
   app.get(
+    '/survey/:surveyId/chain/:chainUuid/chain-node-def/count',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const count = await AnalysisService.countChainNodeDefs({ surveyId, chainUuid })
+
+        res.json(count)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
     '/survey/:surveyId/chain/:chainUuid/chain-node-def/:entityDefUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
