@@ -6,6 +6,7 @@ import { resetChainStore } from './resetChainStore'
 import { updateEntityDefUuid } from './updateEntityDefUuid'
 import { createNodeDef } from './createNodeDef'
 import { fetchChainNodeDefs } from './fetchChainNodeDefs'
+import { updateChainNodeDef } from './updateChainNodeDef'
 
 export { ChainActionTypes } from './actionTypes'
 
@@ -18,4 +19,5 @@ export const ChainActions = {
   updateEntityDefUuid,
   createNodeDef,
   fetchChainNodeDefs,
+  updateChainNodeDef,
 }

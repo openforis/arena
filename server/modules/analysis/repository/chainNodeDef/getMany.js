@@ -1,3 +1,4 @@
+// import { Objects } from '@openforis/arena-core'
 import { BaseProtocol, DB, Schemata } from '@openforis/arena-server'
 import { camelize } from '@core/arena'
 
@@ -5,7 +6,7 @@ import { camelize } from '@core/arena'
  * Fetches chainNodeDefs by the given survey id, chain uuid and parent entity definition.
  *
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
+ * @param {!number} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The chain uuid.
  * @param {!string} params.entityDefUuid - The entity .
  * @param {BaseProtocol} [client=db] - The database client.

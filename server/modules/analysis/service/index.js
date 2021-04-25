@@ -29,3 +29,4 @@ export { generateRStudioToken, checkRStudioToken } from './rStudio'
 
 // chain node def
 export const getManyChainNodeDefs = ChainNodeDefRepository.getMany
+export { updateChainNodeDef } from './updateChainNodeDef'

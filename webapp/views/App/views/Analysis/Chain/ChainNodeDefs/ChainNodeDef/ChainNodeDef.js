@@ -1,6 +1,6 @@
 import './ChainNodeDef.scss'
 import React from 'react'
-// import { useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
@@ -10,18 +10,23 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useNodeDefLabel, useSurvey } from '@webapp/store/survey'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
 
 const ChainNodeDef = (props) => {
   const { chainNodeDef } = props
 
-  // const dispatch = useDispatch()
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
+  const chain = useChain()
   const nodeDef = Survey.getNodeDefByUuid(chainNodeDef.nodeDefUuid)(survey)
   const nodeDefLabel = useNodeDefLabel(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
+
+  const updateChainNodeDef = (chainNodeDefUpdate) =>
+    dispatch(ChainActions.updateChainNodeDef({ chainNodeDef: chainNodeDefUpdate, chainUuid: chain.uuid }))
 
   return (
     <div className="chain-node-def">
@@ -32,8 +37,8 @@ const ChainNodeDef = (props) => {
       </div>
       <div>
         <InputSwitch
-          onChange={() => {
-            // console.log(active)
+          onChange={(active) => {
+            updateChainNodeDef({ ...chainNodeDef, props: { ...chainNodeDef.props, active } })
           }}
           checked={chainNodeDef.props.active}
         />

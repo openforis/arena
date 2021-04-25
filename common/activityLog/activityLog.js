@@ -56,6 +56,7 @@ export const type = {
   chainCreate: 'chainCreate',
   chainPropUpdate: 'chainPropUpdate',
   chainNodeDefCreate: 'chainNodeDefCreate',
+  chainNodeDefPropUpdate: 'chainNodeDefPropUpdate',
   processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',

@@ -26,6 +26,15 @@ const actionHandlers = {
   [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
 
   [ChainActionTypes.chainNodeDefsUpdate]: (state, { chainNodeDefs }) => ({ ...state, chainNodeDefs }),
+
+  [ChainActionTypes.chainNodeDefUpdate]: (state, { chainNodeDef }) => {
+    const { chainNodeDefs } = state
+    chainNodeDefs[chainNodeDef.index] = chainNodeDef
+    return {
+      ...state,
+      chainNodeDefs: [...chainNodeDefs],
+    }
+  },
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)
