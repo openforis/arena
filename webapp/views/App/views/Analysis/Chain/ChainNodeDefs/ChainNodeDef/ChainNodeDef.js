@@ -3,6 +3,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -24,12 +25,13 @@ const ChainNodeDef = (props) => {
   const nodeDef = Survey.getNodeDefByUuid(chainNodeDef.nodeDefUuid)(survey)
   const nodeDefLabel = useNodeDefLabel(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
+  const nodeDefDeleted = !nodeDef
 
   const updateChainNodeDef = (chainNodeDefUpdate) =>
     dispatch(ChainActions.updateChainNodeDef({ chainNodeDef: chainNodeDefUpdate, chainUuid: chain.uuid }))
 
   return (
-    <div className="chain-node-def">
+    <div className={classNames('chain-node-def', { deleted: nodeDefDeleted })}>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{nodeDefLabel}</div>
       <div className="chain-node-def__type">
@@ -37,10 +39,11 @@ const ChainNodeDef = (props) => {
       </div>
       <div>
         <InputSwitch
+          checked={!nodeDefDeleted && chainNodeDef.props.active}
+          disabled={nodeDefDeleted}
           onChange={(active) => {
             updateChainNodeDef({ ...chainNodeDef, props: { ...chainNodeDef.props, active } })
           }}
-          checked={chainNodeDef.props.active}
         />
       </div>
       <div>
