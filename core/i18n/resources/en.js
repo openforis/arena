@@ -683,9 +683,7 @@ $t(common.cantUndoWarning)`,
 
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
-      processingChain: {
-        stepsRequired: 'At least one step is required',
-      },
+      chainNodeDefsRequired: 'At least one calculated attribute is required',
       processingStep: {
         entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',

@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingStep from '@common/analysis/processingStep'
 import {
   getSurveyDBSchema,
   dbTransformCallback as dbTransformCallbackCommon,
@@ -345,20 +344,3 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
       e.uuid = n.uuid
   `)
 }
-
-export const deleteNodeDefsAnalysisUnused = async (surveyId, client = db) =>
-  client.map(
-    `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node_def n
-    WHERE
-      n.analysis 
-      -- not used by any chainNodeDef
-      AND NOT EXISTS (
-        SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.chain_node_def cnd
-        WHERE cnd.uuid = n.uuid
-      )
-    RETURNING n.uuid
-    `,
-    [],
-    R.prop('uuid')
-  )
