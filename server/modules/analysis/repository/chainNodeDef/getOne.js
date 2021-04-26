@@ -16,7 +16,8 @@ export const getOne = async (params, client = DB) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
 
   return client.one(
-    `select cnd.uuid, cnd.chain_uuid, cnd.node_def_uuid, cnd.index, cnd.props
+    `
+    select cnd.uuid, cnd.chain_uuid, cnd.node_def_uuid, cnd.index, cnd.props
     from ${schema}.chain_node_def cnd
     where cnd.uuid = $1`,
     [chainNodeDefUuid],

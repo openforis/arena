@@ -3,6 +3,7 @@ import { count } from './count'
 import { getMany } from './getMany'
 import { getOne } from './getOne'
 import { update } from './update'
+import { updateIndexes } from './updateIndexes'
 
 export const ChainNodeDefRepository = {
   insert,
@@ -10,4 +11,5 @@ export const ChainNodeDefRepository = {
   getMany,
   getOne,
   update,
+  updateIndexes,
 }

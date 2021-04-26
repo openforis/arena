@@ -15,14 +15,15 @@ export const count = async (params, client = DB) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
 
   return client.one(
-    `with c as (
-      select n.parent_uuid, count(cnd.uuid)
-      from ${schema}.chain_node_def cnd
-      right join ${schema}.node_def n
-      on cnd.node_def_uuid = n.uuid
-      and n.deleted = false
-      where cnd.chain_uuid = $1
-      group by cnd.chain_uuid, n.parent_uuid
+    `
+    with c as (
+        select n.parent_uuid, count(cnd.uuid)
+        from ${schema}.chain_node_def cnd
+        right join ${schema}.node_def n
+        on cnd.node_def_uuid = n.uuid
+        and n.deleted = false
+        where cnd.chain_uuid = $1
+        group by cnd.chain_uuid, n.parent_uuid
     )
     select coalesce(jsonb_object_agg(c.parent_uuid, c.count), '{}'::jsonb) as count
     from c`,

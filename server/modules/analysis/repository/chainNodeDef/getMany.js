@@ -18,7 +18,8 @@ export const getMany = async (params, client = DB) => {
 
   const schema = Schemata.getSchemaSurvey(surveyId)
   return client.map(
-    `select cnd.uuid, cnd.chain_uuid, cnd.node_def_uuid, cnd.index, cnd.props
+    `
+    select cnd.uuid, cnd.chain_uuid, cnd.node_def_uuid, cnd.index, cnd.props
     from ${schema}.chain_node_def cnd
     where cnd.chain_uuid = $1
     and cnd.node_def_uuid in
