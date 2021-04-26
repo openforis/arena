@@ -1,8 +1,10 @@
 import * as R from 'ramda'
 
+export const getProps = (obj) => ({ ...obj.props, ...obj.propsDraft })
+
 export const getLabel = (nodeDef, lang) => {
-  const { props: nodeProps, type, analysis } = nodeDef
-  const { name, labels, virtual = false } = nodeProps
+  const { type, analysis } = nodeDef
+  const { name, labels, virtual = false } = getProps(nodeDef)
   const label = labels[lang] || name
 
   if (virtual) {
