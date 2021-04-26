@@ -5,6 +5,12 @@ import * as User from '@core/user/user'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+const isTemplate = ({ backup = true, surveyInfoArenaSurvey, surveyInfoTarget = null }) => {
+  if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
+  if (surveyInfoTarget) return Survey.isTemplate(surveyInfoTarget)
+  return false
+}
+
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
     super('SurveyCreatorJob', params)
@@ -23,13 +29,15 @@ export default class SurveyCreatorJob extends Job {
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
 
     const labels = surveyInfoTarget ? Survey.getLabels(surveyInfoTarget) : Survey.getLabels(surveyInfoArenaSurvey)
-    const descriptions = Survey.getDescriptions(surveyInfoTarget)
+    const descriptions = surveyInfoTarget
+      ? Survey.getDescriptions(surveyInfoTarget)
+      : Survey.getDescriptions(surveyInfoArenaSurvey)
 
     // always import as draft when not backup
     const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
     const draft = !backup
 
-    const template = backup ? Survey.isTemplate(surveyInfoArenaSurvey) : Survey.isTemplate(surveyInfoTarget)
+    const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),

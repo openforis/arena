@@ -48,7 +48,8 @@ export default class ArenaImportJob extends Job {
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
-    super(ArenaImportJob.type, params, createInnerJobs(params))
+    const { backup = true, ...paramsRest } = params
+    super(ArenaImportJob.type, { ...paramsRest, backup }, createInnerJobs(params))
   }
 
   async onStart() {

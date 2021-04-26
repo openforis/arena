@@ -27,7 +27,7 @@ export const getNodeDefByUuid = (uuid) => R.pipe(R.propOr({}, 'nodeDefs'), R.pro
 export const getNodeDefByName = (name) =>
   R.pipe(
     getNodeDefsArray,
-    R.find((nodeDef) => nodeDef.props.name === name)
+    R.find((nodeDef) => getProps(nodeDef).name === name)
   )
 
 export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)

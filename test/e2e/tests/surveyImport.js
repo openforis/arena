@@ -13,7 +13,6 @@ import {
   verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
-import { verifySurveyPublished } from './_publish'
 
 export default () =>
   describe('Survey import', () => {
@@ -51,8 +50,6 @@ export default () =>
     verifyUsers(surveyImport)
 
     verifyActivityLog(surveyImport)
-
-    verifySurveyPublished()
 
     gotoSurveyList()
 
