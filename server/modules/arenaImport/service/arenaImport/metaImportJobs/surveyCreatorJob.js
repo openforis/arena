@@ -43,7 +43,7 @@ export default class SurveyCreatorJob extends Job {
     })
 
     const survey = await SurveyManager.importSurvey(
-      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey) },
+      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey), backup },
       this.tx
     )
 

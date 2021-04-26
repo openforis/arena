@@ -115,14 +115,15 @@ export const insertSurvey = async (params, client = db) => {
 }
 
 export const importSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
+  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
+
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(
       {
         survey: surveyInfoParam,
-        props: Survey.getProps(surveyInfoParam),
-        propsDraft: Survey.getPropsDraft(surveyInfoParam),
+        props: backup ? Survey.getProps(surveyInfoParam) : {},
+        propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
       },
       t
     )
