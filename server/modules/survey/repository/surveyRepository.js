@@ -3,7 +3,6 @@ import * as DB from '@server/db'
 import * as R from 'ramda'
 
 import { selectDate } from '@server/db/dbUtils'
-import * as DbUtils from '@server/db/dbUtils'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -39,21 +38,6 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
       Survey.isTemplate(survey),
     ],
     (def) => DB.transformCallback(def, true)
-  )
-
-// ============== CLONE
-
-export const cloneTable = async (
-  { surveyIdSource, surveyIdTarget, table, excludeColumns = [], filterRowsCondition = null },
-  client
-) =>
-  client.none(
-    DbUtils.cloneTable({
-      source: `${getSurveyDBSchema(surveyIdSource)}.${table}`,
-      target: `${getSurveyDBSchema(surveyIdTarget)}.${table}`,
-      excludeColumns,
-      filterRowsCondition,
-    })
   )
 
 // ============== READ
