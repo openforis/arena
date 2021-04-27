@@ -41,15 +41,16 @@ export default class SurveyExportJob extends Job {
    * @returns {SurveyExportJob} - The export job.
    */
   constructor(params) {
-    const { backup = true, outputFileName: outputFileNameParam = null, surveyId } = params
-    const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
-
-    super(SurveyExportJob.type, { ...params, backup, outputFileName }, createInnerJobs({ backup }))
+    const { backup = true } = params
+    super(SurveyExportJob.type, { ...params, backup }, createInnerJobs({ backup }))
   }
 
   async onStart() {
     super.onStart()
-    const { outputFileName } = this.context
+    const { outputFileName: outputFileNameParam = null, surveyId } = this.context
+
+    // generate output file name if not specified in params
+    const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
 
     const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
     const outputFileStream = fs.createWriteStream(outputFilePath)

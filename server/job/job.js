@@ -300,7 +300,7 @@ export default class Job {
 
       this.logDebug(`- running inner job ${this.currentInnerJobIndex + 1}`)
 
-      innerJob.context = Object.assign(this.context, innerJob.context)
+      innerJob.context = this.context
 
       innerJob.onEvent(this._handleInnerJobEvent.bind(this))
 

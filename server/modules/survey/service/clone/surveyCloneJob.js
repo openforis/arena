@@ -5,11 +5,9 @@ import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImport
 
 export default class SurveyCloneJob extends Job {
   constructor(params) {
-    const { surveyIdSource } = params
-    super(SurveyCloneJob.type, params, [
-      new SurveyExportJob({ surveyId: surveyIdSource, backup: false }),
-      new ArenaImportJob({ backup: false }),
-    ])
+    const backup = false
+    // pass backup parameter to inner jobs
+    super(SurveyCloneJob.type, { ...params, backup }, [new SurveyExportJob({ backup }), new ArenaImportJob({ backup })])
   }
 
   async beforeSuccess() {

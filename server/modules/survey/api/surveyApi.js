@@ -34,7 +34,7 @@ export const init = (app) => {
         })
 
         if (cloneFrom) {
-          const job = SurveyService.cloneSurvey({ surveyIdSource: cloneFrom, surveyInfoTarget, user, res })
+          const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfoTarget, user, res })
           res.json({ job })
           return
         }
