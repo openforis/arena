@@ -10,18 +10,11 @@ export default class CategoriesExportJob extends Job {
   }
 
   async execute() {
-    const { archive, backup, draft, surveyId } = this.context
+    const { archive, backup, surveyId } = this.context
 
     // categories.json: list of all categories with levels
     const categoriesPathFile = ExportFile.categories
-    const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId(
-      {
-        surveyId,
-        draft,
-        backup,
-      },
-      this.tx
-    )
+    const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({ surveyId, backup }, this.tx)
 
     archive.append(JSON.stringify(categories, null, 2), { name: categoriesPathFile })
 
@@ -30,15 +23,7 @@ export default class CategoriesExportJob extends Job {
     this.total = categoriesUuids.length
 
     await PromiseUtils.each(categoriesUuids, async (categoryUuid) => {
-      const itemsData = await CategoryService.fetchItemsByCategoryUuid(
-        {
-          surveyId,
-          categoryUuid,
-          draft,
-          backup,
-        },
-        this.tx
-      )
+      const itemsData = await CategoryService.fetchItemsByCategoryUuid({ surveyId, categoryUuid, backup }, this.tx)
 
       archive.append(JSON.stringify(itemsData, null, 2), {
         name: ExportFile.categoryItems({ categoryUuid }),

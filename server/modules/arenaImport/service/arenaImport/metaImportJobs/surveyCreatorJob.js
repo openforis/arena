@@ -35,7 +35,7 @@ export default class SurveyCreatorJob extends Job {
 
     // always import as draft when not backup
     const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
-    const draft = !backup
+    const draft = !published
 
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
