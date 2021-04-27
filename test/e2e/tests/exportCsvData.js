@@ -10,11 +10,10 @@ import { survey } from '../mock/survey'
 import { records } from '../mock/records'
 import { gotoHome, gotoDataExport } from './_navigation'
 
-import { downloadsPath } from '../downloads/path'
+import { downloadsSurveysPath } from '../downloads/path'
 import { cluster, tree, plot } from '../mock/nodeDefs'
 import * as DateUtils from '../../../core/dateUtils'
 
-let surveyZipPath = ''
 let extractedFolderName = ''
 
 /* eslint-disable camelcase */
@@ -61,14 +60,14 @@ export default () =>
         page.click(getSelector(DataTestId.dataExport.exportCSV, 'button')),
       ])
 
-      surveyZipPath = path.resolve(downloadsPath, zipFileName)
+      const surveyZipPath = path.resolve(downloadsSurveysPath, zipFileName)
 
       await download.saveAs(surveyZipPath)
 
       await expect(fs.existsSync(surveyZipPath)).toBeTruthy()
 
       const zip = new AdmZip(surveyZipPath)
-      extractedFolderName = path.resolve(downloadsPath, filename)
+      extractedFolderName = path.resolve(downloadsSurveysPath, filename)
 
       zip.extractAllTo(extractedFolderName, true, '')
 
