@@ -61,6 +61,9 @@ export const { getDependentCodeAttributes } = RecordReader
 export const { getEntityKeyNodes } = RecordReader
 export const { getEntityKeyValues } = RecordReader
 
+// ====== Unique
+export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
+
 // ====== UPDATE
 export const { assocNodes } = RecordUpdater
 export const { assocNode } = RecordUpdater

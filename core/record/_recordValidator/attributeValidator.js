@@ -99,7 +99,7 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
         ...(NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, record, Record.getParentNode(node)(record)) : []),
         ...(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
-          ? AttributeUniqueValidator.getSiblingUniqueAttributes({ record, attribute: node, attributeDef: nodeDef })
+          ? Record.getAttributesUniqueSibling({ record, attribute: node, attributeDef: nodeDef })
           : []),
       ]
 

@@ -7,25 +7,8 @@ import * as Validation from '@core/validation/validation'
 import * as Record from '../record'
 import * as Node from '../node'
 
-export const getSiblingUniqueAttributes = ({ record, attribute, attributeDef }) => {
-  const parentEntity = Record.getParentNode(attribute)(record)
-  const ancestorEntity = Record.getParentNode(parentEntity)(record)
-  const siblingParentEntities = Record.getNodeChildrenByDefUuid(
-    ancestorEntity,
-    NodeDef.getParentUuid(attributeDef)
-  )(record)
-
-  return siblingParentEntities.reduce(
-    (siblingsAcc, siblingEntity) => [
-      ...siblingsAcc,
-      ...Record.getNodeChildrenByDefUuid(siblingEntity, NodeDef.getUuid(attributeDef))(record),
-    ],
-    []
-  )
-}
-
 const _isAttributeDuplicate = ({ record, attribute, attributeDef }) => {
-  const nodeSiblings = getSiblingUniqueAttributes({ record, attribute, attributeDef })
+  const nodeSiblings = Record.getAttributesUniqueSibling({ record, attribute, attributeDef })
 
   return nodeSiblings.some(
     (sibling) => !Node.isEqual(attribute)(sibling) && R.equals(Node.getValue(sibling), Node.getValue(attribute))
