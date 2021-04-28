@@ -32,7 +32,7 @@ import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
 
 import { insertTestUser } from '../tests/utils/insertTestUser'
-import { removeDowloadsFolder } from '../tests/removeDowloadsFolder'
+import { cleanDowloadsFolder } from '../tests/cleanDowloadsFolder'
 
 beforeAll(async () => {
   await insertTestUser()
@@ -99,5 +99,5 @@ describe('E2E Tests', () => {
   recordDelete()
   surveyDelete()
   templateDelete()
-  removeDowloadsFolder()
+  cleanDowloadsFolder()
 })
