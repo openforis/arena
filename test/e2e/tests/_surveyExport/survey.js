@@ -1,5 +1,5 @@
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
-import { getSurveyEntry } from '../../downloads/path'
+import { getSurveyEntry } from '../../paths'
 import { getProps } from './_surveyUtils'
 
 export const verifySurvey = (survey) =>

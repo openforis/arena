@@ -32,7 +32,7 @@ import recordDelete from '../tests/recordDelete'
 import surveyDelete from '../tests/surveyDelete'
 
 import { insertTestUser } from '../tests/utils/insertTestUser'
-import { removeExportSurveyFiles } from '../tests/_surveyExport'
+import { removeDowloadsFolder } from '../tests/removeDowloadsFolder'
 
 beforeAll(async () => {
   await insertTestUser()
@@ -99,5 +99,5 @@ describe('E2E Tests', () => {
   recordDelete()
   surveyDelete()
   templateDelete()
-  removeExportSurveyFiles()
+  removeDowloadsFolder()
 })

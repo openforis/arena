@@ -2,7 +2,7 @@ import AdmZip from 'adm-zip'
 import fs from 'fs'
 
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
-import { getSurveyDirPath, getSurveyZipPath, downloadsSurveysPath } from '../../downloads/path'
+import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
   test(`Export survey ${survey.name}`, async () => {
@@ -24,10 +24,3 @@ export const exportSurvey = (survey) =>
 
     await expect(fs.existsSync(surveyDirPath)).toBeTruthy()
   })
-
-export const removeExportSurveyFiles = async () => {
-  test(`Remove exported survey files`, async () => {
-    fs.rmdirSync(downloadsSurveysPath, { recursive: true })
-    await expect(fs.existsSync(downloadsSurveysPath)).toBeFalsy()
-  })
-}

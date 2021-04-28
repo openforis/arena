@@ -1,5 +1,5 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { getSurveyZipPath } from '../downloads/path'
+import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
 import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {

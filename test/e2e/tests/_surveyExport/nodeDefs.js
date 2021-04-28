@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as PromiseUtils from '../../../../core/promiseUtils'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
-import { getSurveyEntry } from '../../downloads/path'
+import { getSurveyEntry } from '../../paths'
 import { cluster, plot, tree } from '../../mock/nodeDefs'
 import { getLabel, getNodeDefChildren, getNodeDefRoot, getProps } from './_surveyUtils'
 

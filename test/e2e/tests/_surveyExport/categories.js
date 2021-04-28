@@ -1,6 +1,6 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
-import { getSurveyEntry } from '../../downloads/path'
+import { getSurveyEntry } from '../../paths'
 import { categories, categoryItems } from '../../mock/categories'
 import { getProps } from './_surveyUtils'
 
