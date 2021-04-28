@@ -189,14 +189,11 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
 }
 
 export const fetchCategoryAndLevelsByUuid = async (
-  surveyId,
-  categoryUuid,
-  draft = false,
-  includeValidation = false,
+  { surveyId, categoryUuid, draft = false, includeValidation = false, backup = false },
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation })} 
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup })} 
     WHERE c.uuid = $1`,
     [categoryUuid]
   )
