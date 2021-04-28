@@ -86,6 +86,7 @@ export const ValidatorErrorKeys = {
     nodesMaxCountExceeded: 'validationErrors.record.nodesMaxCountExceeded',
     nodesMinCountNotReached: 'validationErrors.record.nodesMinCountNotReached',
     oneOrMoreInvalidValues: 'validationErrors.record.oneOrMoreInvalidValues',
+    uniqueAttributeDuplicate: 'validationErrors.record.uniqueAttributeDuplicate',
     valueInvalid: 'validationErrors.record.valueInvalid',
     valueRequired: 'validationErrors.record.valueRequired',
   },
