@@ -61,7 +61,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
 export const validateAttribute = async (survey, record, attribute) => {
   if (Record.isNodeApplicable(attribute)(record)) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(attribute))(survey)
-    return await Validator.validate(
+    return Validator.validate(
       attribute,
       {
         [Node.keys.value]: [
@@ -98,6 +98,9 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
         ...(NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, record, Record.getParentNode(node)(record)) : []),
+        ...(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+          ? AttributeUniqueValidator.getSiblingUniqueAttributes({ record, attribute: node, attributeDef: nodeDef })
+          : []),
       ]
 
       // Call validateAttribute for each attribute
