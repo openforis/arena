@@ -60,7 +60,10 @@ export const cloneTable = async (
 
 export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
-export const fetchUserSurveys = async ({ user, offset = 0, limit = null, template = false }, client = db) => {
+export const fetchUserSurveys = async (
+  { user, draft = false, template = false, offset = 0, limit = null },
+  client = db
+) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return client.map(
@@ -80,7 +83,10 @@ export const fetchUserSurveys = async ({ user, offset = 0, limit = null, templat
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
         : ''
     }
-    WHERE s.template = $2
+    WHERE 
+      -- if draft is false, fetch only published surveys
+      ${draft ? '' : `s.props <> '{}'::jsonb AND `}
+      s.template = $2
     ORDER BY s.date_modified DESC
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
