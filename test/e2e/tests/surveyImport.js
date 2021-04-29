@@ -17,6 +17,10 @@ import { verifySurveyPublished } from './_publish'
 
 export default () =>
   describe('Survey import', () => {
+    gotoSurveyList()
+
+    selectSurvey(survey)
+
     exportSurvey(survey)
 
     gotoSurveyCreate()
