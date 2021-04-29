@@ -36,10 +36,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: Build
         run: yarn build
-      - name: create folder
-        run: mkdir /tmp/arena_upload
-      - name: give folder permission
-        run: chmod 777 /tmp/arena_upload
       - name: Run server
         run: |
           ln -s dist/server.js .
