@@ -96,8 +96,8 @@ describe('E2E Tests', () => {
   /**
    * Delete.
    */
-  recordDelete()
+  /*recordDelete()
   surveyDelete()
   templateDelete()
-  removeExportSurveyFiles()
+  removeExportSurveyFiles()*/
 })
