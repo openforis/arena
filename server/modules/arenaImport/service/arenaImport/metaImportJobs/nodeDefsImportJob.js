@@ -10,16 +10,11 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, surveyId } = this.context
+    const { arenaSurvey, backup, surveyId } = this.context
 
-    const nodeDefs = Survey.getNodeDefs(arenaSurvey)
+    const nodeDefs = Survey.getNodeDefsArray(arenaSurvey)
 
-    await NodeDefManager.insertNodeDefsBatch({
-      surveyId,
-      nodeDefs: Object.values(nodeDefs || {}),
-      backup: true,
-      client: this.tx,
-    })
+    await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs, backup, client: this.tx })
   }
 }
 
