@@ -4,8 +4,12 @@ import * as User from '@core/user/user'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
+
+const isTemplate = ({ backup = true, surveyInfoArenaSurvey, surveyInfoTarget = null }) => {
+  if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
+  if (surveyInfoTarget) return Survey.isTemplate(surveyInfoTarget)
+  return false
+}
 
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
@@ -13,40 +17,44 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, arenaSurveyFileZip } = this.context
+    const { arenaSurvey, backup, surveyInfoTarget } = this.context
 
-    const surveyInfo = Survey.getSurveyInfo(arenaSurvey)
-    const surveyName = Survey.getName(surveyInfo)
-    const name = `${surveyName}-import-${DateUtils.nowFormatDefault()}`
+    const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
 
-    const languages = Survey.getLanguages(surveyInfo)
-    const defaultLanguage = Survey.getDefaultLanguage(surveyInfo)
+    const name = backup
+      ? `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
+      : Survey.getName(surveyInfoTarget) || `clone_${Survey.getName(surveyInfoArenaSurvey)}`
 
-    const labels = Survey.getLabels(surveyInfo)
-    const label = Survey.getLabel(surveyInfo, defaultLanguage)
+    const languages = Survey.getLanguages(surveyInfoArenaSurvey)
+    const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
 
-    const descriptions = Survey.getDescriptions(surveyInfo)
+    const labels = surveyInfoTarget ? Survey.getLabels(surveyInfoTarget) : Survey.getLabels(surveyInfoArenaSurvey)
+    const descriptions = surveyInfoTarget
+      ? Survey.getDescriptions(surveyInfoTarget)
+      : Survey.getDescriptions(surveyInfoArenaSurvey)
 
+    // always import as draft when not backup
+    const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
+    const draft = !published
+
+    const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.languages]: languages,
       [Survey.infoKeys.descriptions]: descriptions,
       [Survey.infoKeys.labels]: labels,
-      [Survey.infoKeys.label]: label,
-      [Survey.infoKeys.published]: Survey.isPublished(surveyInfo),
-      [Survey.infoKeys.draft]: Survey.isDraft(surveyInfo),
+      [Survey.infoKeys.published]: published,
+      [Survey.infoKeys.draft]: draft,
+      [Survey.infoKeys.template]: template,
     })
 
     const survey = await SurveyManager.importSurvey(
-      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfo) },
+      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey), backup },
       this.tx
     )
 
     const surveyId = Survey.getId(survey)
-
-    const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip)
-    await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }
