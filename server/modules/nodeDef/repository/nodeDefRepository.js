@@ -97,7 +97,8 @@ export const fetchNodeDefsBySurveyId = async (
           AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1`
           : ''
       } 
-      ${!draft ? " AND props <> '{}'::jsonb" : ''}
+      -- fetch only published node defs if not backup and not draft
+      ${!backup && !draft ? " AND props <> '{}'::jsonb" : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
     [JSON.stringify(cycle || null)],
