@@ -962,7 +962,7 @@ $t(common.cantUndoWarning)`,
       subject: 'OpenForis Arena. Password reset',
       body: `<p>Hello {{name}},</p>
              <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
-             <p><a href="{{url}}">Reset your password</a></p>
+             <p><a href="{{url}}">Reset your password.</a></p>
              $t(emails.temporaryMsg)
              <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
              $t(emails.signature)`,
