@@ -1,4 +1,3 @@
-import fs from 'fs'
 import Archiver from 'archiver'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -31,10 +30,19 @@ export default class SurveyExportJob extends Job {
 
   async onStart() {
     super.onStart()
+
+    await this.initArchive()
+  }
+
+  async initArchive() {
     const { outputFileName } = this.context
 
-    const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
-    const outputFileStream = fs.createWriteStream(outputFilePath)
+    const outputDir = ProcessUtils.ENV.tempFolder
+    if (!FileUtils.existsDir(outputDir)) {
+      await FileUtils.mkdir(outputDir)
+    }
+    const outputFilePath = FileUtils.join(outputDir, outputFileName)
+    const outputFileStream = FileUtils.createWriteStream(outputFilePath)
     const archive = Archiver('zip')
     archive.pipe(outputFileStream)
 
@@ -43,8 +51,11 @@ export default class SurveyExportJob extends Job {
 
   async onEnd() {
     await super.onEnd()
+
+    // finalize archive
     const { archive } = this.context
     archive.finalize()
+    this.setContext({ archive: null })
   }
 
   async beforeSuccess() {
