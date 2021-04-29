@@ -1261,27 +1261,31 @@
     readdirp "^2.2.1"
     upath "^1.1.1"
 
-"@openforis/arena-core@^0.0.65":
-  version "0.0.65"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.65/c4b2cbedf969278bcbe79adf4a89c5c29eed1846cc7aba6900a00de1cbceac47#6fb87db5643280aa0540ac249d6aa00260f4f63b"
-  integrity sha512-1hV89mtp2wff+MI27eaWaDlvfuZnGx2dX4dC2/PoKaBcGWteABf9nuTWFDmNPz6KINSg8NIwNH4M1yqIpVWoNQ==
+"@openforis/arena-core@^0.0.55":
+  version "0.0.55"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.55/ecbb5a7f73508253241c14a1cdac159cf0c450fc70c50126112437c4618246dc#697cf9080c74d7cba589315cd0351cf008bbccea"
+  integrity sha512-nYuLyjcwovNYNCla+skr9Sa62mGO/yFW86qsZUNP/4eyDDddRpfVg5ga5vge5KwedKrp1GjYZrgkr9S8Ivg+aw==
   dependencies:
     "@esri/proj-codes" "^2.7.0"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.25":
-  version "0.0.25"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.25/1f206d9f2dd0aa7df7f0b1dd35a72a5f4ae141ece3683422f727126ed8668733#382713c5d9d158aae22edb46a556f70fd7ac6263"
-  integrity sha512-1pa0gdIFZUygFqs9VzJFWxc5nqQxhhEDlbqSSCAJtaPjLqayrqTKVByD25f8fwhujk5qW8ajOkZr68CuLvFlZw==
+"@openforis/arena-core@^0.0.63":
+  version "0.0.63"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.63/a062d322e16ccb159893ca97c2c1439a4fdf4006416c08e40596c79d79240195#c84d48436dafbccfcbaf18cde94ad4ecdcc47640"
+  integrity sha512-/+OKbvb15hDUB0C4vdO9ATmxTrIzlxN92hiwVrB7xZB/zoIxx/Ije4eW4yjQffEFukVQuberhP3nNyYctrsyOw==
+  dependencies:
+    "@esri/proj-codes" "^2.7.0"
+    proj4 "^2.7.2"
+    uuid "^8.3.2"
+
+"@openforis/arena-server@^0.0.21":
+  version "0.0.21"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.21/be54b92ea6279d2646d8c3bde61d2fd5b8c19550bcc14d841ee8b0dac306d1ca#17e3522f9727e93c69dc975d34956db88cbd9d86"
+  integrity sha512-wBtT+6386FxonMNrZWl6eOL2zcvldja6AI/Ih3ezscBz4ab1GoRLygsK1NT4OkANBsrCjNi9ERVUs7EiYZgezQ==
   dependencies:
     "@godaddy/terminus" "^4.7.1"
-    "@openforis/arena-core" "^0.0.65"
-    bcryptjs "^2.4.3"
+    "@openforis/arena-core" "^0.0.55"
     body-parser "^1.19.0"
     compression "^1.7.4"
     connect-pg-simple "^6.2.1"
@@ -1293,8 +1297,6 @@
     express-session "^1.17.1"
     lodash.throttle "^4.1.1"
     log4js "^6.3.0"
-    passport "^0.4.1"
-    passport-local "^1.0.0"
     pg-promise "^10.10.1"
     socket.io "^4.0.1"
 
@@ -7888,11 +7890,6 @@ lodash.difference@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.difference/-/lodash.difference-4.5.0.tgz#9ccb4e505d486b91651345772885a2df27fd017c"
   integrity sha1-nMtOUF1Ia5FlE0V3KIWi3yf9AXw=
 
-lodash.differencewith@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.differencewith/-/lodash.differencewith-4.5.0.tgz#bafafbc918b55154e179176a00bb0aefaac854b7"
-  integrity sha1-uvr7yRi1UVTheRdqALsK76rIVLc=
-
 lodash.flatten@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.flatten/-/lodash.flatten-4.4.0.tgz#f31c22225a9632d2bbf8e4addbef240aa765a61f"
@@ -7902,11 +7899,6 @@ lodash.flattendeep@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.flattendeep/-/lodash.flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
   integrity sha1-+wMJF/hqMTTlvJvsDWngAT3f7bI=
-
-lodash.frompairs@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/lodash.frompairs/-/lodash.frompairs-4.0.1.tgz#bc4e5207fa2757c136e573614e9664506b2b1bd2"
-  integrity sha1-vE5SB/onV8E25XNhTpZkUGsrG9I=
 
 lodash.includes@^4.3.0:
   version "4.3.0"
@@ -7918,7 +7910,7 @@ lodash.isboolean@^3.0.3:
   resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
   integrity sha1-bC4XHbKiV82WgC/UOwGyDV9YcPY=
 
-lodash.isequal@^4.0.0, lodash.isequal@^4.5.0:
+lodash.isequal@^4.0.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
   integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
@@ -7957,11 +7949,6 @@ lodash.throttle@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
   integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
-
-lodash.topairs@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/lodash.topairs/-/lodash.topairs-4.3.0.tgz#3b6deaa37d60fb116713c46c5f17ea190ec48d64"
-  integrity sha1-O23qo31g+xFnE8RsXxfqGQ7EjWQ=
 
 lodash.truncate@^4.4.2:
   version "4.4.2"
