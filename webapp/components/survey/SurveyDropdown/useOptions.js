@@ -21,10 +21,8 @@ export const useOptions = () => {
 
   useEffect(() => {
     ;(async () => {
-      const [surveys, templates] = await Promise.all([
-        API.fetchSurveys({ draft: false }),
-        API.fetchSurveys({ draft: false, template: true }),
-      ])
+      const [surveys, templates] = await Promise.all([API.fetchSurveys(), API.fetchSurveys({ template: true })])
+
       setOptions([
         {
           label: i18n.t('homeView.surveyCreate.template', { count: templates.length }),
