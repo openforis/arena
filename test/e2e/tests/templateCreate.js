@@ -1,6 +1,6 @@
 import { template, template2 } from '../mock/survey'
 import { createTemplate } from './_templateCreate'
-import { selectSurvey } from './_surveyList'
+import { selectTemplate } from './_surveyList'
 import { gotoTemplateList } from './_navigation'
 
 export default () =>
@@ -11,9 +11,9 @@ export default () =>
 
     // verify template
     gotoTemplateList()
-    selectSurvey(template, template.label)
+    selectTemplate(template, template.label)
 
     // verify template2
     gotoTemplateList()
-    selectSurvey(template2, template2.label)
+    selectTemplate(template2, template2.label)
   })

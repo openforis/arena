@@ -2,7 +2,7 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { BASE_URL } from '../config'
 import { templates } from '../mock/survey'
 import { gotoHome, gotoTemplateList } from './_navigation'
-import { clickSurvey } from './_surveyList'
+import { clickTemplate } from './_surveyList'
 
 export default () =>
   describe('Template Delete', () => {
@@ -12,7 +12,7 @@ export default () =>
       const template = templates[idx]
 
       test(`Goto template ${idx}`, async () => {
-        await clickSurvey(template)
+        await clickTemplate(template)
       })
 
       test(`Delete template ${template.name}`, async () => {

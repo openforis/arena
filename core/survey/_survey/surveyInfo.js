@@ -40,7 +40,8 @@ export const getInfo = R.propOr({}, keys.info)
 // ====== READ surveyInfo
 export const { getId, getUuid, getProps, getPropsDraft } = ObjectUtils
 
-export const getName = ObjectUtils.getProp(keys.name, '')
+export const getName = (surveyInfo) =>
+  ObjectUtils.getProp(keys.name, ObjectUtils.getPropDraft(keys.name, '')(surveyInfo))(surveyInfo)
 
 export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 
