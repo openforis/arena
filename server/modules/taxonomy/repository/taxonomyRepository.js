@@ -26,16 +26,20 @@ const getTaxonVernacularNameSelectFields = (draft) => `
 
 // ============== CREATE
 
-export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
-  client.one(
+export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, client = db) => {
+  // backup: preserve both props and props draft
+  const props = backup ? Taxonomy.getProps(taxonomy) : {}
+  const propsDraft = backup ? Taxonomy.getPropsDraft(taxonomy) : Taxonomy.getProps(taxonomy)
+
+  return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props_draft)
-        VALUES ($1, $2)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props, props_draft)
+        VALUES ($1, $2, $3)
         RETURNING *`,
-    [Taxonomy.getUuid(taxonomy), taxonomy.props],
+    [Taxonomy.getUuid(taxonomy), props, propsDraft],
     (record) => dbTransformCallback(record, true, true)
   )
-
+}
 /**
  * Inserts or updated vernacular names into the specified taxon.
  * The vernacularNames parameter is an object indexed by language.
@@ -126,28 +130,33 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
 export const fetchTaxonomiesBySurveyId = async (
   { surveyId, draft = false, backup = false, limit = null, offset = 0, search = null },
   client = db
-) =>
-  client.map(
+) => {
+  const whereConditions = []
+  if (search) {
+    whereConditions.push(
+      `${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
+          OR 
+        EXISTS(
+          SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
+            Taxonomy.keysProps.descriptions,
+            draft
+          )})::jsonb, '{}'::jsonb))
+          WHERE value ILIKE $/search/
+          )
+        `
+    )
+  }
+  if (!backup && !draft) {
+    // exclude not published taxonomies
+    whereConditions.push(`props::text <> '{}'::text`)
+  }
+  return client.map(
     `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
-     ${
-       search
-         ? `WHERE 
-      ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
-        OR 
-      EXISTS(
-        SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
-          Taxonomy.keysProps.descriptions,
-          draft
-        )})::jsonb, '{}'::jsonb))
-        WHERE value ILIKE $/search/
-        )
-      `
-         : ''
-     } 
-     ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
-     LIMIT ${limit ? `$/limit/` : 'ALL'}
-    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
+       FROM ${getSurveyDBSchema(surveyId)}.taxonomy
+       ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''}
+       ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
+       LIMIT ${limit ? `$/limit/` : 'ALL'}
+       ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
       limit,
       offset,
@@ -155,6 +164,7 @@ export const fetchTaxonomiesBySurveyId = async (
     },
     (record) => DB.transformCallback(record, draft, true, backup)
   )
+}
 
 export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
   client.one(
