@@ -1,6 +1,5 @@
-// import { Objects } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 import { BaseProtocol, DB, Schemata } from '@openforis/arena-server'
-import { camelize } from '@core/arena'
 
 /**
  * Fetches chainNodeDefs by the given survey id, chain uuid and parent entity definition.
@@ -26,6 +25,6 @@ export const getMany = async (params, client = DB) => {
         (select n.uuid from ${schema}.node_def n where n.parent_uuid = $2)
     order by cnd.index`,
     [chainUuid, entityDefUuid],
-    camelize
+    Objects.camelize
   )
 }
