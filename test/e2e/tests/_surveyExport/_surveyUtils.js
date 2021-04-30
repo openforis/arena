@@ -1,8 +1,10 @@
 import * as R from 'ramda'
 
+export const getProps = (obj) => ({ ...obj.props, ...obj.propsDraft })
+
 export const getLabel = (nodeDef, lang) => {
-  const { props: nodeProps, type, analysis } = nodeDef
-  const { name, labels, virtual = false } = nodeProps
+  const { type, analysis } = nodeDef
+  const { name, labels, virtual = false } = getProps(nodeDef)
   const label = labels[lang] || name
 
   if (virtual) {
@@ -25,7 +27,7 @@ export const getNodeDefByUuid = (uuid) => R.pipe(R.propOr({}, 'nodeDefs'), R.pro
 export const getNodeDefByName = (name) =>
   R.pipe(
     getNodeDefsArray,
-    R.find((nodeDef) => nodeDef.props.name === name)
+    R.find((nodeDef) => getProps(nodeDef).name === name)
   )
 
 export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)

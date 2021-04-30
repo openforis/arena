@@ -8,20 +8,18 @@ export default class SurveyInfoExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId } = this.context
+    const { archive, backup, surveyId } = this.context
 
     // fetch survey with combined props and propsDraft to get proper survey info
-    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, this.tx)
 
     // fetch survey with props and propsDraft not combined together to get a full export
-    const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-      surveyId,
-      draft: true,
-      advanced: true,
-      backup: true,
-    })
+    const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, advanced: true, backup },
+      this.tx
+    )
     archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })
 
-    this.setContext({ survey })
+    this.setContext({ survey, backup })
   }
 }

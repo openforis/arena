@@ -20,7 +20,7 @@ export const newTaxonomy = (props = {}) => ({
 })
 
 // READ
-export const { getUuid } = ObjectUtils
+export const { getProps, getPropsDraft, getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const { getDescriptions, getDescription } = ObjectUtils
 export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
