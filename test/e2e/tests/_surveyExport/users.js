@@ -1,4 +1,4 @@
-import { getSurveyEntry } from '../../downloads/path'
+import { getSurveyEntry } from '../../paths'
 import { user } from '../../mock/user'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 
