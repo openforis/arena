@@ -8,6 +8,7 @@ import * as dbUtils from '../../../../db/dbUtils'
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as Record from '../../../../../core/record/record'
+import * as Node from '../../../../../core/record/node'
 import * as Expression from '../../../../../core/expressionParser/expression'
 
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
@@ -255,60 +256,60 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
   return runCount({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
 }
 
-export const fetchRecordsCountByKeys = async (
+export const fetchRecordsCountByRootNodesValue = async (
   survey,
   cycle,
-  keyNodes,
+  nodes,
   recordUuidExcluded,
   excludeRecordFromCount,
   client = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
+  const nodeDefs = nodes.map((node) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
   const surveyId = Survey.getId(survey)
-  const schemaRdb = SchemaRdb.getName(surveyId)
+  const schemaRdb = Schemata.getSchemaSurveyRdb(surveyId)
   const schema = Schemata.getSchemaSurvey(surveyId)
   const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
   const rootTableAlias = 'r'
 
-  const keyColumns = nodeDefKeys.map(NodeDefTable.getColName)
-  const keyColumnsString = keyColumns.join(', ')
-  const keysCondition = R.pipe(
-    R.addIndex(R.map)((nodeDefKey, idx) => {
-      const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
-      return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
-    }),
-    R.join(' AND ')
-  )(nodeDefKeys)
+  const filterColumns = nodeDefs.map(NodeDefTable.getColName)
+  const filterColumnsString = filterColumns.join(', ')
+  const filterCondition = nodeDefs
+    .map((nodeDef, idx) => {
+      const node = nodes[idx]
+      const value = DataCol.getValue(survey, nodeDef, node)
+      return `${rootTableAlias}.${NodeDefTable.getColName(nodeDef)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+    })
+    .join(' AND ')
 
   return client.map(
     `
     WITH count_records AS (
       SELECT
-        ${keyColumnsString}, COUNT(*) AS count
+        ${filterColumnsString}, COUNT(*) AS count
       FROM
         ${rootTable}
       WHERE 
         ${DataTable.colNameRecordCycle} = $2
         ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != $1` : ''} 
       GROUP BY 
-        ${keyColumnsString}
+        ${filterColumnsString}
     )
     SELECT
       ${rootTableAlias}.${DataTable.colNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
-      ON ${keyColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
+      ON ${filterColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefKeys.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.colNameRecordCycle} = $2
-      AND ${keysCondition}
+      AND ${filterCondition}
       AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
-    `,
+  `,
     [recordUuidExcluded, cycle],
     camelize
   )
