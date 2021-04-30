@@ -115,14 +115,15 @@ export const insertSurvey = async (params, client = db) => {
 }
 
 export const importSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups() } = params
+  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
+
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(
       {
         survey: surveyInfoParam,
-        props: Survey.getProps(surveyInfoParam),
-        propsDraft: Survey.getPropsDraft(surveyInfoParam),
+        props: backup ? Survey.getProps(surveyInfoParam) : {},
+        propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
       },
       t
     )
@@ -193,8 +194,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-export const fetchUserSurveysInfo = async ({ user, offset, limit, template = false }) =>
-  (await SurveyRepository.fetchUserSurveys({ user, offset, limit, template })).map(assocSurveyInfo)
+export const fetchUserSurveysInfo = async ({ user, draft = true, template = false, offset, limit }) =>
+  (await SurveyRepository.fetchUserSurveys({ user, draft, template, offset, limit })).map(assocSurveyInfo)
 
 export const { countUserSurveys, fetchDependencies } = SurveyRepository
 
@@ -271,4 +272,4 @@ export const deleteSurvey = async (surveyId) =>
     ])
   })
 
-export const { dropSurveySchema, cloneTable } = SurveyRepository
+export const { dropSurveySchema } = SurveyRepository

@@ -1,21 +1,19 @@
 import Job from '@server/job/job'
 
-import CreateNewSurveyJob from './jobs/CreateNewSurveyJob'
-import CloneTablesJob from './jobs/CloneTablesJob'
+import SurveyExportJob from '../surveyExport/surveyExportJob'
+import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImportJob'
 
 export default class SurveyCloneJob extends Job {
   constructor(params) {
-    super(SurveyCloneJob.type, params, [new CreateNewSurveyJob(), new CloneTablesJob()])
+    const backup = false
+    // pass backup parameter to inner jobs
+    super(SurveyCloneJob.type, { ...params, backup }, [new SurveyExportJob({ backup }), new ArenaImportJob({ backup })])
   }
 
   async beforeSuccess() {
-    const { surveyIdTarget: surveyId } = this.context
+    const { surveyId } = this.context
 
     this.setResult({ surveyId })
-  }
-
-  async onEnd() {
-    await super.onEnd()
   }
 }
 

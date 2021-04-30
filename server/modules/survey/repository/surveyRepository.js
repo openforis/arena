@@ -3,7 +3,6 @@ import * as DB from '@server/db'
 import * as R from 'ramda'
 
 import { selectDate } from '@server/db/dbUtils'
-import * as DbUtils from '@server/db/dbUtils'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -41,26 +40,14 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
     (def) => DB.transformCallback(def, true)
   )
 
-// ============== CLONE
-
-export const cloneTable = async (
-  { surveyIdSource, surveyIdTarget, table, excludeColumns = [], filterRowsCondition = null },
-  client
-) =>
-  client.none(
-    DbUtils.cloneTable({
-      source: `${getSurveyDBSchema(surveyIdSource)}.${table}`,
-      target: `${getSurveyDBSchema(surveyIdTarget)}.${table}`,
-      excludeColumns,
-      filterRowsCondition,
-    })
-  )
-
 // ============== READ
 
 export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
-export const fetchUserSurveys = async ({ user, offset = 0, limit = null, template = false }, client = db) => {
+export const fetchUserSurveys = async (
+  { user, draft = false, template = false, offset = 0, limit = null },
+  client = db
+) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return client.map(
@@ -80,7 +67,10 @@ export const fetchUserSurveys = async ({ user, offset = 0, limit = null, templat
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
         : ''
     }
-    WHERE s.template = $2
+    WHERE 
+      -- if draft is false, fetch only published surveys
+      ${draft ? '' : `s.props <> '{}'::jsonb AND `}
+      s.template = $2
     ORDER BY s.date_modified DESC
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}

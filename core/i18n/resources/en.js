@@ -849,7 +849,6 @@ $t(common.cantUndoWarning)`,
     // clone survey
     SurveyCloneJob: 'Clone survey',
     CloneSurveyJob: 'Clone survey',
-    CloneTablesJob: 'Clone survey tables',
     // survey backup
     SurveyInfoExportJob: 'Survey Info Export',
     CategoriesExportJob: 'Categories Export',
