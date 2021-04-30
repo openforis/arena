@@ -29,7 +29,7 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid } = Request.getParams(req)
 
-        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid })
 
         if (Category.isPublished(category)) {
           throw new SystemError('categoryEdit.cantImportCsvIntoPublishedCategory')
@@ -140,7 +140,12 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, draft, validate } = Request.getParams(req)
 
-        const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft, validate)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({
+          surveyId,
+          categoryUuid,
+          draft,
+          includeValidation: validate,
+        })
 
         res.json({ category })
       } catch (error) {

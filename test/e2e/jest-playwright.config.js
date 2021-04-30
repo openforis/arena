@@ -1,4 +1,4 @@
-const { downloadsPath } = require('./downloads/path')
+const { downloadsPath } = require('./paths')
 
 const headless = process.env.PWDEBUG !== '1'
 // https://github.com/playwright-community/jest-playwright/#configuration

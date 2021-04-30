@@ -24,17 +24,6 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
     dbTransformCallback
   )
 
-export const _fetchSurveyGroups = async (surveyId, client = db) =>
-  client.map(
-    `
-    SELECT auth_group.*
-    FROM auth_group
-    JOIN survey s
-    ON s.id = $1
-    WHERE auth_group.survey_uuid = s.uuid`,
-    [surveyId],
-    dbTransformCallback
-  )
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
   Promise.all(surveyGroups.map((authGroup) => insertGroup(authGroup, surveyId, client)))
 

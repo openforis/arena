@@ -20,10 +20,13 @@ import * as TaxonomyValidator from '../taxonomyValidator'
 /**
  * ====== CREATE
  */
-export const insertTaxonomy = async ({ user, surveyId, taxonomy, addLogs = true, system = false }, client = db) =>
+export const insertTaxonomy = async (
+  { user, surveyId, taxonomy, addLogs = true, system = false, backup = false },
+  client = db
+) =>
   client.tx(async (t) => {
     const [taxonomyInserted] = await Promise.all([
-      TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
+      TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy, backup }, t),
       ...(addLogs
         ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)]
         : []),
