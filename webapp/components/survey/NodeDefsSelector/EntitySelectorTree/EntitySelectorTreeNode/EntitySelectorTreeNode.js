@@ -14,7 +14,7 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 const EntitySelectorTreeNode = (props) => {
-  const { expanded, isDisabled, nodeDef, nodeDefUuidActive, onlyPages, onSelect } = props
+  const { expanded, getLabelPostfix, isDisabled, nodeDef, nodeDefUuidActive, onlyPages, onSelect } = props
 
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -51,6 +51,7 @@ const EntitySelectorTreeNode = (props) => {
           aria-disabled={isDisabled(nodeDef)}
         >
           {label}
+          {getLabelPostfix(nodeDef)}
         </button>
       </div>
 
@@ -59,6 +60,7 @@ const EntitySelectorTreeNode = (props) => {
           <EntitySelectorTreeNode
             key={NodeDef.getUuid(nodeDefChild)}
             expanded={expanded}
+            getLabelPostfix={getLabelPostfix}
             isDisabled={isDisabled}
             nodeDef={nodeDefChild}
             nodeDefUuidActive={nodeDefUuidActive}
@@ -72,6 +74,7 @@ const EntitySelectorTreeNode = (props) => {
 
 EntitySelectorTreeNode.propTypes = {
   expanded: PropTypes.bool.isRequired,
+  getLabelPostfix: PropTypes.func.isRequired,
   isDisabled: PropTypes.func.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefUuidActive: PropTypes.string,

@@ -8,7 +8,6 @@ import {
   verifySurvey,
   verifyTaxonomies,
   verifyUsers,
-  verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
 import { createSurvey } from './_surveyCreate'
@@ -25,7 +24,6 @@ export default () =>
     verifyTaxonomies(surveyFromTemplate)
     verifyRecords(surveyFromTemplate, [])
     verifyUsers(surveyFromTemplate)
-    verifyActivityLog(surveyFromTemplate)
 
     gotoSurveyList()
     selectSurvey(survey)

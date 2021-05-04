@@ -3,6 +3,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 export const enTranslation = {
   common: {
+    active: 'Active',
     add: 'Add',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
@@ -220,7 +221,7 @@ Do you want to proceed?`,
     },
     surveyList: {
       status: 'Status',
-      active: 'Active',
+      active: '$t(common.active)',
       activate: 'Activate',
     },
     surveyCreate: {
@@ -308,6 +309,8 @@ Do you want to proceed?`,
       // Analysis
       [ActivityLog.type.chainCreate]: 'added processing chain',
       [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
+      [ActivityLog.type.chainNodeDefCreate]: 'added calculated node definition {{type}} in entity {{parentName}}',
+      [ActivityLog.type.chainNodeDefPropUpdate]: 'updated {{key}} to {{value}} of calculated node definition {{name}}',
       [ActivityLog.type.processingChainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]:
@@ -399,6 +402,11 @@ $t(common.cantUndoWarning)`,
 {{rStudioCode}}
 
 `,
+  },
+
+  chain: {
+    quantitative: 'Quantitative',
+    categorical: 'Categorical',
   },
 
   processingStepView: {
@@ -675,9 +683,7 @@ $t(common.cantUndoWarning)`,
 
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
-      processingChain: {
-        stepsRequired: 'At least one step is required',
-      },
+      chainNodeDefsRequired: 'At least one calculated attribute is required',
       processingStep: {
         entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',
@@ -838,7 +844,7 @@ $t(common.cantUndoWarning)`,
     TaxonomyImportJob: 'Taxonomy Import',
     // export csv data
     ExportCsvDataJob: 'Export CSV data',
-    CSVDataExtraction: 'Extracting data in csv',
+    CSVDataExtraction: 'Data export',
     // import arena survey
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',
@@ -847,7 +853,6 @@ $t(common.cantUndoWarning)`,
     // clone survey
     SurveyCloneJob: 'Clone survey',
     CloneSurveyJob: 'Clone survey',
-    CloneTablesJob: 'Clone survey tables',
     // survey backup
     SurveyInfoExportJob: 'Survey Info Export',
     CategoriesExportJob: 'Categories Export',

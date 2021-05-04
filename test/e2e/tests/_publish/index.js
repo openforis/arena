@@ -25,6 +25,7 @@ export const verifySurveyPublished = () =>
 export const publishWithoutErrors = ({ inHomePage = false } = {}) => {
   test('Survey Publish', async () => {
     await publish()
+    await page.waitForSelector(getSelector(DataTestId.modal.modal))
     await page.click(DataTestId.modal.close)
   })
 

@@ -133,7 +133,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
     JOIN
       levels l
     ON
-      c.uuid = l.category_uuid`
+      c.uuid = l.category_uuid
+    ${backup || draft ? '' : `WHERE c.published`}`
 }
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
@@ -189,14 +190,11 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
 }
 
 export const fetchCategoryAndLevelsByUuid = async (
-  surveyId,
-  categoryUuid,
-  draft = false,
-  includeValidation = false,
+  { surveyId, categoryUuid, draft = false, includeValidation = false, backup = false },
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation })} 
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup })} 
     WHERE c.uuid = $1`,
     [categoryUuid]
   )
@@ -220,7 +218,7 @@ export const fetchItemsByCategoryUuid = async (
     (def) => DB.transformCallback(def, draft, true, backup)
   )
 
-  return draft ? items : R.filter((item) => item.published)(items)
+  return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
 export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>

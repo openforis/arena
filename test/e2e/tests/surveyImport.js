@@ -1,5 +1,5 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
-import { getSurveyZipPath } from '../downloads/path'
+import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
 import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
@@ -13,7 +13,6 @@ import {
   verifyActivityLog,
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
-import { verifySurveyPublished } from './_publish'
 
 export default () =>
   describe('Survey import', () => {
@@ -52,8 +51,6 @@ export default () =>
     verifyUsers(surveyImport)
 
     verifyActivityLog(surveyImport)
-
-    verifySurveyPublished()
 
     gotoSurveyList()
 

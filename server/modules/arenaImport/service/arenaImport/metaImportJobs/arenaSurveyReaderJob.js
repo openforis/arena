@@ -13,7 +13,8 @@ export default class ArenaSurveyReaderJob extends Job {
   }
 
   async execute() {
-    const filePath = this.getContextProp('filePath')
+    const { filePath } = this.context
+
     const arenaSurveyFileZip = new FileZip(filePath)
     await arenaSurveyFileZip.init()
 

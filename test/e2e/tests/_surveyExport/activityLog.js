@@ -1,4 +1,4 @@
-import { getSurveyEntry } from '../../downloads/path'
+import { getSurveyEntry } from '../../paths'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 
 export const verifyActivityLog = (survey) =>

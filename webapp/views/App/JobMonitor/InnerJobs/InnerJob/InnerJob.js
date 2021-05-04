@@ -8,9 +8,6 @@ import { useI18n } from '@webapp/store/system'
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 
-const getJobStatus = (job) =>
-  job?.result?.step && job?.result?.total ? `· ${job?.result?.step} / ${job?.result?.total}` : ''
-
 const InnerJob = ({ innerJob, index }) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
@@ -26,7 +23,6 @@ const InnerJob = ({ innerJob, index }) => {
       <div className="job" ref={elementRef}>
         <div className="name">
           {index + 1}. {i18n.t(`jobs.${JobSerialized.getType(innerJob)}`)}
-          {getJobStatus(innerJob)}
         </div>
         <JobProgress job={innerJob} />
       </div>

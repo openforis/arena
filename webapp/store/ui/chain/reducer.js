@@ -7,24 +7,39 @@ import { ChainActionTypes } from './actions'
 const initialState = {
   chain: null,
   entityDefUuid: null,
+  chainNodeDefs: [],
+  chainNodeDefsCount: {},
 }
 
+const reset = () => initialState
+
 const actionHandlers = {
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: reset,
 
-  [SurveyActions.surveyCreate]: () => ({}),
-  [SurveyActions.surveyUpdate]: () => ({}),
-  [SurveyActions.surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: reset,
+  [SurveyActions.surveyUpdate]: reset,
+  [SurveyActions.surveyDelete]: reset,
 
-  [ChainActionTypes.chainUpdate]: (state, action) => ({
+  [ChainActionTypes.chainReset]: reset,
+
+  [ChainActionTypes.chainUpdate]: (state, { chain, chainNodeDefsCount = null }) => ({
     ...state,
-    chain: action.chain,
+    chain,
+    chainNodeDefsCount: chainNodeDefsCount || state.chainNodeDefsCount,
   }),
 
-  [ChainActionTypes.entityDefUuidUpdate]: (state, action) => ({
-    ...state,
-    entityDefUuid: action.entityDefUuid,
-  }),
+  [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
+
+  [ChainActionTypes.chainNodeDefsUpdate]: (state, { chainNodeDefs }) => ({ ...state, chainNodeDefs }),
+
+  [ChainActionTypes.chainNodeDefUpdate]: (state, { chainNodeDef }) => {
+    const { chainNodeDefs } = state
+    chainNodeDefs[chainNodeDef.index] = chainNodeDef
+    return {
+      ...state,
+      chainNodeDefs: [...chainNodeDefs],
+    }
+  },
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)

@@ -16,12 +16,12 @@ export const createCategoryTest = async () => {
   /* eslint-disable no-unused-expressions */
   expect(Category.getUuid(category)).toBeDefined()
 
-  const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid(
+  const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid({
     surveyId,
-    Category.getUuid(category),
-    true,
-    true
-  )
+    categoryUuid: Category.getUuid(category),
+    draft: true,
+    includeValidation: true,
+  })
 
   expect(reloadedCategory).toEqual(category)
 }
@@ -45,12 +45,12 @@ export const createCategoryLevelTest = async () => {
   // Inserted level should be the 2nd
   expect(level.index).toBe(1)
 
-  const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid(
+  const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid({
     surveyId,
-    Category.getUuid(category),
-    true,
-    false
-  )
+    categoryUuid: Category.getUuid(category),
+    draft: true,
+    includeValidation: false,
+  })
 
   // Levels must be 2
   expect(Category.getLevelsArray(reloadedCategory).length).toBe(2)

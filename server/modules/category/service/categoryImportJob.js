@@ -122,7 +122,15 @@ export default class CategoryImportJob extends Job {
   async _fetchOrCreateCategory() {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
-      return CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
+      return CategoryManager.fetchCategoryAndLevelsByUuid(
+        {
+          surveyId: this.surveyId,
+          categoryUuid,
+          draft: true,
+          includeValidation: false,
+        },
+        this.tx
+      )
     }
 
     const category = Category.newCategory({

@@ -25,8 +25,8 @@ export const exportSurvey = ({ surveyId, user }) => {
   return { job: JobUtils.jobToJSON(job), outputFileName }
 }
 
-export const cloneSurvey = ({ user, surveyIdSource, surveyInfoTarget }) => {
-  const job = new SurveyCloneJob({ user, surveyIdSource, surveyInfoTarget })
+export const cloneSurvey = ({ user, surveyId, surveyInfoTarget }) => {
+  const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget })
   JobManager.executeJobThread(job)
   return JobUtils.jobToJSON(job)
 }

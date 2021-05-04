@@ -7,6 +7,7 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -18,25 +19,42 @@ export {
   permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
-  deleteNodeDefsAnalysisUnused,
   insertNodeDefsBatch,
 } from '../repository/nodeDefRepository'
 
 // ======= CREATE
 
 export const insertNodeDef = async (
-  { user, surveyId, cycle = Survey.cycleOneKey, nodeDef: nodeDefParam, system = false, addLogs = true },
+  {
+    user,
+    surveyId,
+    cycle = Survey.cycleOneKey,
+    nodeDef: nodeDefParam,
+    system = false,
+    addLogs = true,
+    chainNodeDef = null,
+  },
   client = db
 ) =>
   client.tx(async (t) => {
-    const [nodeDef, nodeDefsParentUpdated] = await Promise.all([
+    const insertLog = addLogs
+      ? ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
+      : null
+
+    const [nodeDef, nodeDefsParentUpdated] = await t.batch([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef: nodeDefParam, cyclesAdded: [cycle] }, t),
       markSurveyDraft(surveyId, t),
-      ...(addLogs
-        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)]
-        : []),
+      insertLog,
     ])
+
+    if (chainNodeDef) {
+      await t.batch([
+        ChainNodeDefRepository.insert({ chainNodeDef, surveyId }, t),
+        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainNodeDefCreate, chainNodeDef, system, t),
+      ])
+    }
+
     return {
       ...nodeDefsParentUpdated,
       [NodeDef.getUuid(nodeDef)]: nodeDef,
