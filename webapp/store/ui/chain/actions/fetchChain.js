@@ -10,8 +10,11 @@ export const fetchChain = ({ chainUuid }) => async (dispatch, getState) => {
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
-  const { data: chain } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}`)
+  const [{ data: chain }, { data: chainNodeDefsCount }] = await Promise.all([
+    axios.get(`/api/survey/${surveyId}/chain/${chainUuid}`),
+    axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/chain-node-def/count`),
+  ])
 
-  dispatch({ type: ChainActionTypes.chainUpdate, chain })
+  dispatch({ type: ChainActionTypes.chainUpdate, chain, chainNodeDefsCount })
   dispatch(LoaderActions.hideLoader())
 }

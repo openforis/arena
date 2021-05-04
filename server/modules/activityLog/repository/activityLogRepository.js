@@ -6,8 +6,6 @@ import * as User from '@core/user/user'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -231,20 +229,17 @@ export const fetch = async ({
       public.auth_group ag
     ON 
       ag.uuid = agu.group_uuid AND ag.survey_uuid = $1
-    
     -- end of user activities part
 
     -- start of analysis activities part
     LEFT OUTER JOIN 
       ${schema}.chain
     ON 
-      chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
+      chain.uuid IN (l.content_uuid, (l.content->>'chainUuid')::uuid)
     LEFT OUTER JOIN 
       ${schema}.chain_node_def
     ON 
-      chain_node_def.uuid IN (l.content_uuid, (l.content->>'${
-        ProcessingStepCalculation.keys.processingStepUuid
-      }')::uuid)
+      chain_node_def.uuid = l.content_uuid
     -- end of analysis activities part
 
     ORDER BY

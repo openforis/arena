@@ -14,7 +14,7 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
   }
 
   async execute() {
-    this.total = 4
+    this.total = 3
 
     const { surveyId, tx } = this
     const { cycleKeys, cycleKeysDeleted = [] } = await this._getCycleKeys()
@@ -26,15 +26,10 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
     if (!R.isEmpty(cycleKeysDeleted)) {
       await AnalysisManager.removeChainCycles({ surveyId, cycles: cycleKeysDeleted }, tx)
     }
-
     this.incrementProcessedItems()
 
     // 3. delete processing chains with no cycles
     await AnalysisManager.deleteChainWithoutCycle({ surveyId }, tx)
-    this.incrementProcessedItems()
-
-    // 4. delete analysis nodeDef if they are not used
-    await NodeDefManager.deleteNodeDefsAnalysisUnused(surveyId, tx)
     this.incrementProcessedItems()
   }
 
