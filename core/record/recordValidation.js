@@ -23,13 +23,12 @@ export const isValidationResultErrorCount = (validationResult) =>
 export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)
 
 // ===== CREATE
-export const newValidationRecordDuplicate = (isUnique = false) =>
-  Validation.newInstance(isUnique, {
-    [keys.recordKeys]: Validation.newInstance(
-      isUnique,
-      {},
-      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
-    ),
+export const newValidationRecordDuplicate = ({
+  unique = false,
+  errorKey = Validation.messageKeys.record.keyDuplicate,
+} = {}) =>
+  Validation.newInstance(unique, {
+    [keys.recordKeys]: Validation.newInstance(unique, {}, unique ? [] : [{ key: errorKey }]),
   })
 
 // ===== READ

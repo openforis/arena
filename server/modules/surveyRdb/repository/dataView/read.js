@@ -224,10 +224,9 @@ export const runCount = async ({ surveyId, cycle, tableName, filter }, client = 
   return Number(countRS.count)
 }
 
-export const countDuplicateRecords = async (survey, record, client = db) => {
+const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique }, client = db) => {
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const nodeRoot = Record.getRootNode(record)
 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
@@ -239,21 +238,33 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
   )
 
   const filter = R.reduce(
-    (whereExprAcc, nodeDefKey) => {
-      const nodeKey = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefKey))(record)
+    (whereExprAcc, nodeDefUnique) => {
+      const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
-      const identifier = Expression.newIdentifier(NodeDefTable.getColName(nodeDefKey))
-      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefKey, nodeKey))
+      const identifier = Expression.newIdentifier(NodeDefTable.getColName(nodeDefUnique))
+      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
 
       const condition = Expression.newBinary(identifier, value, Expression.operators.comparison.eq.key)
 
       return Expression.newBinary(whereExprAcc, condition, Expression.operators.logical.and.key)
     },
     recordNotEqualCondition,
-    nodeDefKeys
+    nodeDefsUnique
   )
 
   return runCount({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
+}
+
+export const isRecordUniqueByKeys = async ({ survey, record }, client = db) => {
+  const nodeDefsUnique = Survey.getNodeDefRootKeys(survey)
+  const duplicateCount = await countDuplicateRecordsByNodeDefs({ survey, record, nodeDefsUnique }, client)
+  return duplicateCount === 0
+}
+
+export const isRecordUniqueByUniqueNodes = async ({ survey, record }, client = db) => {
+  const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
+  const duplicateCount = await countDuplicateRecordsByNodeDefs({ survey, record, nodeDefsUnique }, client)
+  return duplicateCount === 0
 }
 
 export const fetchRecordsCountByRootNodesValue = async (
