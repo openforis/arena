@@ -83,8 +83,9 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
 }
 
 // ==== DELETE
-export const deleteRecord = async (user, survey, uuid) =>
-  await db.tx(async (t) => {
+export const deleteRecord = async (user, survey, record) =>
+  db.tx(async (t) => {
+    const { uuid } = record
     const rootDef = Survey.getNodeDefRoot(survey)
     const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(
       survey,
@@ -97,6 +98,20 @@ export const deleteRecord = async (user, survey, uuid) =>
       [ActivityLog.keysContent.uuid]: uuid,
       [ActivityLog.keysContent.keys]: keys,
     }
+
+    // validate uniqueness of records with same keys/unique node values
+    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+      { survey, record, excludeRecordFromCount: true },
+      t
+    )
+    const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
+    await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
+      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+        { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
+        t
+      )
+    )
+
     const surveyId = Survey.getId(survey)
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
@@ -216,10 +231,13 @@ const _beforeNodeUpdate = async (user, survey, record, node, t) => {
 
   if (NodeDef.isKey(nodeDef)) {
     // Validate record uniqueness of records with same record keys
-    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(survey, record, true, t)
+    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+      { survey, record, excludeRecordFromCount: true },
+      t
+    )
   } else if (NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))) {
     // Validate record uniqueness of records with same record unique nodes
-    await RecordValidationManager.validateRecordUniqeNodesUniquenessAndPersistValidation(
+    await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
       { survey, record, nodeDefUniqueUuid: nodeDefUuid, excludeRecordFromCount: true },
       t
     )
@@ -294,7 +312,10 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
     // Check if root keys have been modified
     if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
       // Validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(survey, record, false, t)
+      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+        { survey, record, excludeRecordFromCount: false },
+        t
+      )
     }
 
     // Check if root unique nodes have been modified
@@ -306,7 +327,7 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
     if (rootUniqueNodeDefsModified.length > 0) {
       // for each modified node def, validate record uniqueness of records with same record unique nodes
       await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
-        RecordValidationManager.validateRecordUniqeNodesUniquenessAndPersistValidation(
+        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
           { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
           t
         )

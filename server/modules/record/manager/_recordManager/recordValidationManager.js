@@ -62,7 +62,7 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 }
 
 const _validateRecordUniquenessAndPersistValidation = async (
-  { survey, record, nodesUnique, excludeRecordFromCount },
+  { survey, record, nodesUnique, excludeRecordFromCount, errorKey },
   t
 ) => {
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
@@ -72,6 +72,7 @@ const _validateRecordUniquenessAndPersistValidation = async (
       nodesUnique,
       recordUuidExcluded: Record.getUuid(record),
       excludeRecordFromCount,
+      errorKey,
     },
     t
   )
@@ -84,18 +85,33 @@ const _validateRecordUniquenessAndPersistValidation = async (
   )
 }
 
-export const validateRecordKeysUniquenessAndPersistValidation = async (survey, record, excludeRecordFromCount, t) => {
+export const validateRecordKeysUniquenessAndPersistValidation = async (
+  { survey, record, excludeRecordFromCount },
+  t
+) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
-  return _validateRecordUniquenessAndPersistValidation({ survey, record, nodesUnique, excludeRecordFromCount }, t)
+  return _validateRecordUniquenessAndPersistValidation(
+    { survey, record, nodesUnique, excludeRecordFromCount, errorKey: Validation.messageKeys.record.keyDuplicate },
+    t
+  )
 }
 
-export const validateRecordUniqeNodesUniquenessAndPersistValidation = async (
+export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
   { survey, record, nodeDefUniqueUuid, excludeRecordFromCount },
   t
 ) => {
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
-  return _validateRecordUniquenessAndPersistValidation({ survey, record, nodesUnique, excludeRecordFromCount }, t)
+  return _validateRecordUniquenessAndPersistValidation(
+    {
+      survey,
+      record,
+      nodesUnique,
+      excludeRecordFromCount,
+      errorKey: Validation.messageKeys.record.uniqueAttributeDuplicate,
+    },
+    t
+  )
 }
 
 export const { updateRecordValidationsFromValues } = RecordRepository
