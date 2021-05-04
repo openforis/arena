@@ -78,6 +78,7 @@ const ValidationsProps = (props) => {
         (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
           <FormItem label={i18n.t('common.unique')}>
             <Checkbox
+              id={DataTestId.nodeDefDetails.nodeDefUnique}
               checked={NodeDefValidations.isUnique(nodeDefValidations)}
               disabled={readOnly}
               onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocUnique(checked)(nodeDefValidations))}

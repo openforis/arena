@@ -42,7 +42,14 @@ export const editNodeDefDetails = (nodeDef) => {
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
     if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
-
+    if (nodeDef.unique) {
+      // go to Validations tab
+      await page.click(getSelector(DataTestId.tabBar.tabBarBtn(DataTestId.nodeDefDetails.validations), 'button'))
+      // select unique
+      await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefUnique, 'button'))
+      // go back to Basic tab
+      await page.click(getSelector(DataTestId.tabBar.tabBarBtn(DataTestId.nodeDefDetails.basic), 'button'))
+    }
     const editFnType = editFnTypes[nodeDef.type]
     if (editFnType) await editFnType(nodeDef)
   })
