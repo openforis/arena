@@ -1,5 +1,4 @@
 import * as express from 'express'
-
 import morgan from 'morgan'
 
 import { ArenaServer } from '@openforis/arena-server'
@@ -7,10 +6,7 @@ import { ArenaServer } from '@openforis/arena-server'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
-import * as authConfig from '@server/modules/auth/config/authConfig'
 import * as authApi from '@server/modules/auth/api/authApi'
-
-import * as accessControlMiddleware from './middleware/accessControlMiddleware'
 
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
@@ -30,11 +26,6 @@ export const run = async () => {
   }
 
   // ====== app initializations
-
-  authConfig.init(app)
-  // AccessControlMiddleware must be initialized after authConfig
-  accessControlMiddleware.init(app)
-
   app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
   const dist = ProcessUtils.ENV.arenaDist

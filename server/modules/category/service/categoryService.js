@@ -26,7 +26,7 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 }
 
 export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
-  const category = await CategoryManager.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid, draft)
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft, backup: true })
   const numberOfItemsInCategory = await CategoryManager.countItemsByCategoryUuid(surveyId, categoryUuid)
 
   if (numberOfItemsInCategory <= 0) {

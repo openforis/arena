@@ -1,6 +1,6 @@
 import './Chain.scss'
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router'
+import { matchPath, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -8,9 +8,11 @@ import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 
+import { useHistoryListen } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -32,6 +34,13 @@ const ChainComponent = () => {
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [chainUuid])
+
+  useHistoryListen((location) => {
+    const path = appModuleUri(analysisModules.nodeDef)
+    if (!matchPath(location.pathname, { path })) {
+      dispatch(ChainActions.resetChainStore())
+    }
+  }, [])
 
   if (!chain) return null
 

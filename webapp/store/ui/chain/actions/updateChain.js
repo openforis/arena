@@ -18,5 +18,5 @@ export const updateChain = ({ chain }) => async (dispatch, getState) => {
   }
 
   dispatch(SurveyActions.metaUpdated())
-  dispatch(debounceAction(action, `chain_updated_${chain.uuid}`))
+  dispatch(debounceAction(action, `chain_update_${chain.uuid}`))
 }

@@ -96,8 +96,8 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.63",
-    "@openforis/arena-server": "^0.0.21",
+    "@openforis/arena-core": "^0.0.66",
+    "@openforis/arena-server": "^0.0.26",
     "@sendgrid/mail": "^7.4.2",
     "adm-zip": "^0.5.3",
     "archiver": "^5.2.0",
@@ -147,6 +147,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-select": "^4.1.0",
+    "react-switch": "^6.0.0",
     "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
     "redux-debounced": "^0.5.0",

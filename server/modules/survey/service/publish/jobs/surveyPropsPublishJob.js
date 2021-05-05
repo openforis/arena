@@ -4,10 +4,11 @@ import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 
-import * as NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
-import * as SurveyManager from '../../../manager/surveyManager'
-import * as CategoryManager from '../../../../category/manager/categoryManager'
-import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true, validate: false }, t)
@@ -29,7 +30,7 @@ export default class SurveyPropsPublishJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    this.total = 6
+    this.total = 7
 
     const langsDeleted = await findDeletedLanguages(surveyId, tx)
     this.incrementProcessedItems()
@@ -47,6 +48,9 @@ export default class SurveyPropsPublishJob extends Job {
     this.incrementProcessedItems()
 
     await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
+    this.incrementProcessedItems()
+
+    await ChainNodeDefRepository.updateIndexes({ surveyId }, tx)
     this.incrementProcessedItems()
   }
 }
