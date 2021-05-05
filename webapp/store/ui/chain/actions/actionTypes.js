@@ -4,4 +4,5 @@ export const ChainActionTypes = {
   entityDefUuidUpdate: 'ui/chain/entityDefUuid/update',
   chainNodeDefsUpdate: 'ui/chain/chainNodeDefs/update',
   chainNodeDefUpdate: 'ui/chain/chainNodeDef/update',
+  chainNodeDefUpdateIndex: 'ui/chain/chainNodeDef/update/index',
 }
