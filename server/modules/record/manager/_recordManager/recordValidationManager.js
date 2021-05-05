@@ -49,10 +49,7 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
       : {}
 
   // 3. merge validations
-  const validationFields = {
-    ...Validation.getFieldValidations(nodesValidation),
-    ...recordUniqueNodesValidation,
-  }
+  const validationFields = R.mergeDeepLeft(recordUniqueNodesValidation, Validation.getFieldValidations(nodesValidation))
   const validation = Validation.recalculateValidity(Validation.newInstance(true, validationFields))
 
   // 4. persist validation

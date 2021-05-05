@@ -19,7 +19,7 @@ export const validateAttributeUnique = (survey, record, attributeDef) => async (
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
   const nodeDefValidations = NodeDef.getValidations(attributeDef)
 
-  // uniqeness at record level evaluated else where
+  // uniqueness at record level evaluated elsewhere
   if (!NodeDefValidations.isUnique(nodeDefValidations) || NodeDef.isRoot(nodeDefParent)) {
     return null
   }
