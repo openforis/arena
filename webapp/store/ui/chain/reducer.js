@@ -40,6 +40,28 @@ const actionHandlers = {
       chainNodeDefs: [...chainNodeDefs],
     }
   },
+
+  [ChainActionTypes.chainNodeDefUpdateIndex]: (state, { chainNodeDef, newIndex }) => {
+    const { chainNodeDefs } = state
+    const { index: oldIndex } = chainNodeDef
+    const chainNodeDefsUpdate = []
+
+    chainNodeDefs.forEach((chainNodeDefCurrent) => {
+      const { index } = chainNodeDefCurrent
+      let indexUpdate
+      if (index > oldIndex && index <= newIndex) indexUpdate = index - 1
+      else if (index < oldIndex && index >= newIndex) indexUpdate = index + 1
+      else if (index === oldIndex) indexUpdate = newIndex
+      else indexUpdate = index
+
+      chainNodeDefsUpdate[indexUpdate] = { ...chainNodeDefCurrent, index: indexUpdate }
+    })
+
+    return {
+      ...state,
+      chainNodeDefs: [...chainNodeDefsUpdate],
+    }
+  },
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)

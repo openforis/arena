@@ -32,6 +32,11 @@ const ChainNodeDef = (props) => {
 
   return (
     <div className={classNames('chain-node-def', { deleted: nodeDefDeleted })}>
+      <div>
+        <button className="chain-node-def__btn-move" type="button">
+          <span className="icon icon-14px icon-menu" />
+        </button>
+      </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{nodeDefLabel}</div>
       <div className="chain-node-def__type">
