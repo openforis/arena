@@ -70,3 +70,5 @@ export const gotoValidationReport = _gotoSubModule('data', 'validationReport', [
 ])
 
 export const gotoUserList = _gotoSubModule('users', 'userList')
+
+export const gotoEntities = _gotoSubModule('analysis', 'entities')

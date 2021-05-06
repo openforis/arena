@@ -33,6 +33,7 @@ import surveyDelete from '../tests/surveyDelete'
 
 import { insertTestUser } from '../tests/utils/insertTestUser'
 import { cleanDowloadsFolder } from '../tests/cleanDowloadsFolder'
+import createVirtualEntities from '../tests/createVirtualEntities'
 
 beforeAll(async () => {
   await insertTestUser()
@@ -68,6 +69,11 @@ describe('E2E Tests', () => {
    */
   // TODO: Enable userInvite when implementing user delete.
   // userInvite()
+
+  /**
+   * Analysis
+   */
+  createVirtualEntities()
 
   /**
    * Survey export data.

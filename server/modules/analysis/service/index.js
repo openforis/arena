@@ -12,6 +12,9 @@ export {
   fetchCalculationAttributeUuids,
   // ======  READ - Variables Previous Steps
   fetchVariablesPrevSteps,
+  // ======  READ - entities
+  countVirtualEntities,
+  fetchVirtualEntities,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain

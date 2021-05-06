@@ -183,6 +183,7 @@ Do you want to proceed?`,
     analysis: 'Analysis',
     processingChain: 'Processing Chain',
     processingChain_plural: 'Processing Chains',
+    entities: 'Virtual entities',
   },
 
   surveyDefsLoader: {
@@ -402,6 +403,9 @@ $t(common.cantUndoWarning)`,
 {{rStudioCode}}
 
 `,
+    entities: {
+      new: 'Virtual entity',
+    },
   },
 
   chain: {
