@@ -8,6 +8,7 @@ import { createNodeDef } from './createNodeDef'
 import { createVirtualEntity } from './createVirtualEntity'
 import { fetchChainNodeDefs } from './fetchChainNodeDefs'
 import { updateChainNodeDef } from './updateChainNodeDef'
+import { updateChainNodeDefIndex } from './updateChainNodeDefIndex'
 
 export { ChainActionTypes } from './actionTypes'
 
@@ -22,4 +23,5 @@ export const ChainActions = {
   createVirtualEntity,
   fetchChainNodeDefs,
   updateChainNodeDef,
+  updateChainNodeDefIndex,
 }
