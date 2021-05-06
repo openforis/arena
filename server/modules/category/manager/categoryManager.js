@@ -132,7 +132,7 @@ export const insertItems = async (user, surveyId, items, client = db) =>
   client.tx(async (t) => {
     const activityLogs = items.map((item) => ActivityLog.newActivity(ActivityLog.type.categoryItemInsert, item, true))
     await Promise.all([
-      CategoryRepository.insertItems(surveyId, items, t),
+      CategoryRepository.insertItems({ surveyId, items }, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, activityLogs, t),
     ])

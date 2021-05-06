@@ -55,7 +55,7 @@ export const insertItem = async (surveyId, item, client = db) =>
     (def) => dbTransformCallback(def, true, true)
   )
 
-export const insertItems = async ({ surveyId, items, backup = false, client = db }) => {
+export const insertItems = async ({ surveyId, items, backup = false }, client = db) => {
   const values = items.map((item) => [
     CategoryItem.getUuid(item),
     CategoryItem.getLevelUuid(item),
