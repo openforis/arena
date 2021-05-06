@@ -37,3 +37,4 @@ export { generateRStudioToken, checkRStudioToken } from './rStudio'
 export const countChainNodeDefs = ChainNodeDefRepository.count
 export const getManyChainNodeDefs = ChainNodeDefRepository.getMany
 export { updateChainNodeDef } from './updateChainNodeDef'
+export const updateIndexesChainNodeDefs = ChainNodeDefRepository.updateIndexes
