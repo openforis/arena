@@ -46,6 +46,6 @@ export default class CategoriesImportJob extends Job {
       this.tx
     )
     const items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, Category.getUuid(categoryInserted))
-    await CategoryService.insertItemsInBatch({ surveyId, items, backup, client: this.tx })
+    await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
   }
 }
