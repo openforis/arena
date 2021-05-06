@@ -42,6 +42,8 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
 const enterTaxon = async (nodeDef, value, parentSelector) => {
   const { codeSelector } = getTaxonSelector(nodeDef, parentSelector)
 
+  // clear code first (searched value could be equal to current one and popup won't open)
+  await page.fill(codeSelector, '')
   await page.fill(codeSelector, value.code.substring(0, 3))
   await page.waitForSelector('.autocomplete-list')
   await page.click(`text="${value.code}"`)
