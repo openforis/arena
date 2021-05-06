@@ -72,15 +72,15 @@ describe('E2E Tests', () => {
   // userInvite()
 
   /**
+   * Survey export data.
+   */
+  exportCsvData()
+
+  /**
    * Analysis.
    */
   createVirtualEntities()
   deleteVirtualEntities()
-
-  /**
-   * Survey export data.
-   */
-  exportCsvData()
 
   /**
    * Survey template.
