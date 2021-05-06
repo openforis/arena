@@ -7,6 +7,8 @@ import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
 
+const DUPLICATE_VALUE = 'Duplicate value'
+
 /* eslint-disable camelcase */
 const { cluster_id, cluster_coordinate } = cluster.children
 const { plot_id } = plot.children
@@ -101,8 +103,8 @@ export default () =>
 
       gotoValidationReport()
       expectMessages([
-        [`Cluster[1] / Cluster coordinate`, 'Duplicate unique attribute'],
-        [`Cluster[2] / Cluster coordinate`, 'Duplicate unique attribute'],
+        [`Cluster[1] / Cluster coordinate`, DUPLICATE_VALUE],
+        [`Cluster[2] / Cluster coordinate`, DUPLICATE_VALUE],
       ])
 
       // restore old values
@@ -160,9 +162,9 @@ export default () =>
 
       gotoValidationReport()
       expectMessages([
-        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[1] / Tree Species`, 'Duplicate unique attribute'],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[1] / Tree Species`, DUPLICATE_VALUE],
         [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree id`, 'Duplicate entity key'],
-        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree Species`, 'Duplicate unique attribute'],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree Species`, DUPLICATE_VALUE],
         [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree id`, 'Duplicate entity key'],
       ])
     })
