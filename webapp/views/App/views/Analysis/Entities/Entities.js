@@ -19,7 +19,7 @@ const ChainsView = () => {
       className="entities"
       gridTemplateColumns="30px repeat(3, 1fr) 50px"
       headerLeftComponent={HeaderLeft}
-      module="entities"
+      module="virtual-entities"
       onRowClick={onRowClick}
       restParams={{}}
       rowHeaderComponent={RowHeader}

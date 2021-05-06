@@ -34,9 +34,6 @@ export { fetchSteps, fetchStep, fetchVariablesPrevSteps, deleteStep } from './st
 // ====== Calculation
 export { fetchCalculationAttributeUuids, updateCalculation, deleteCalculation } from './calculation'
 
-// ====== Entity
-export { fetchVirtualEntities, countVirtualEntities } from './entity'
-
 // ====== Persist all
 
 /* eslint-disable */

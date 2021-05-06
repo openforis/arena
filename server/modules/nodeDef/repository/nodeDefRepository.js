@@ -363,7 +363,7 @@ export const fetchVirtualEntities = async (params, client = DB.client) => {
 
   const tableNodeDef = new TableNodeDef(surveyId)
 
-  return client.map(
+  return client.query(
     ` 
     select
   _nd.*,
@@ -375,9 +375,7 @@ export const fetchVirtualEntities = async (params, client = DB.client) => {
   on _ndp.uuid = _nd.parent_uuid
   where _nd.virtual = TRUE and _nd.deleted = FALSE
   LIMIT ${limit || 'ALL'}
-  OFFSET ${offset}`,
-    [],
-    dbTransformCallback
+  OFFSET ${offset}`
   )
 }
 
