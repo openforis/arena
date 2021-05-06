@@ -12,9 +12,6 @@ export {
   fetchCalculationAttributeUuids,
   // ======  READ - Variables Previous Steps
   fetchVariablesPrevSteps,
-  // ======  READ - entities
-  countVirtualEntities,
-  fetchVirtualEntities,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain
@@ -26,6 +23,12 @@ export {
   // ==== ALL
   persistAll,
 } from '../manager'
+
+export {
+  // ======  READ - entities
+  countVirtualEntities,
+  fetchVirtualEntities,
+} from '@server/modules/nodeDef/repository/nodeDefRepository'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'

@@ -13,7 +13,7 @@ export default () =>
 
       await page.click(getSelector(DataTestId.nodeDefDetails.deleteBtn, 'button'))
       await Promise.all([page.waitForNavigation(), page.click(DataTestId.modal.ok)])
-      await expect(page.url()).toBe(`${BASE_URL}/app/analysis/entities/`)
+      await expect(page.url()).toBe(`${BASE_URL}/app/analysis/virtual-entities/`)
     })
     gotoHome()
   })

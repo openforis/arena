@@ -5,6 +5,7 @@ import { useHistory } from 'react-router'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
 import { DataTestId } from '@webapp/utils/dataTestId'
+import * as NodeDef from '@core/survey/nodeDef'
 
 const HeaderLeft = () => {
   const dispatch = useDispatch()
@@ -12,7 +13,7 @@ const HeaderLeft = () => {
   const i18n = useI18n()
 
   const createVirtualEntity = () => {
-    dispatch(ChainActions.createVirtualEntity({ history }))
+    dispatch(ChainActions.createNodeDef({ history, type: NodeDef.nodeDefType.entity, virtual: true, analysis: false }))
   }
 
   return (

@@ -4,7 +4,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
-export const createNodeDef = ({ history, type, virtual = false, analysis = true }) => async (dispatch, getState) => {
+export const createNodeDef = ({ history, type, virtual = false }) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const { entityDefUuid } = state.ui.chain
@@ -12,7 +12,7 @@ export const createNodeDef = ({ history, type, virtual = false, analysis = true 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const cycleKeys = Survey.getCycleKeys(surveyInfo)
   const nodeDefParent = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const nodeDef = NodeDef.newNodeDef(nodeDefParent, type, cycleKeys, {}, {}, analysis, virtual)
+  const nodeDef = NodeDef.newNodeDef(nodeDefParent, type, cycleKeys, {}, {}, true, virtual)
 
   await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
   history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
