@@ -99,13 +99,13 @@ describe('E2E Tests', () => {
   /**
    * Validation Report.
    */
-  // validationReport()
+  validationReport()
 
   /**
    * Delete.
    */
-  /* recordDelete()
+  recordDelete()
   surveyDelete()
   templateDelete()
-  cleanDowloadsFolder() */
+  cleanDowloadsFolder()
 })
