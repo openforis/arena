@@ -74,13 +74,13 @@ describe('E2E Tests', () => {
   /**
    * Survey export data.
    */
-  // exportCsvData()
+  exportCsvData()
 
   /**
    * Analysis.
    */
-  /* createVirtualEntities()
-  deleteVirtualEntities() */
+  createVirtualEntities()
+  deleteVirtualEntities()
 
   /**
    * Survey template.
