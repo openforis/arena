@@ -19,6 +19,7 @@ export const DataTestId = {
     itemErrorBadge: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-error-badge`,
     itemCode: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-code`,
     itemLabel: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-label`),
+    exportBtn: 'category-export-btn',
   },
   categorySelector: {
     category: 'category-selector-category',
