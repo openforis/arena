@@ -9,6 +9,7 @@ import {
   getSurveyDBSchema,
   dbTransformCallback as dbTransformCallbackCommon,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { Objects } from '@openforis/arena-core'
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
@@ -363,19 +364,18 @@ export const fetchVirtualEntities = async (params, client = DB.client) => {
 
   const tableNodeDef = new TableNodeDef(surveyId)
 
-  return client.query(
+  return client.map(
     ` 
     select
   _nd.*,
-  _nd.props || _nd.props_draft as props,
-  _ndp.props || _ndp.props_draft as source_props
+  _nd.props || _nd.props_draft as props
   from
   ${tableNodeDef.nameQualified} as _nd
-  Left join ${tableNodeDef.nameQualified} as _ndp
-  on _ndp.uuid = _nd.parent_uuid
   where _nd.virtual = TRUE and _nd.deleted = FALSE
   LIMIT ${limit || 'ALL'}
-  OFFSET ${offset}`
+  OFFSET ${offset}`,
+    [],
+    Objects.camelize
   )
 }
 

@@ -74,38 +74,38 @@ describe('E2E Tests', () => {
   /**
    * Survey export data.
    */
-  exportCsvData()
+  // exportCsvData()
 
   /**
    * Analysis.
    */
-  createVirtualEntities()
-  deleteVirtualEntities()
+  /* createVirtualEntities()
+  deleteVirtualEntities() */
 
   /**
    * Survey template.
    */
-  templateCreate()
+  /* templateCreate()
   templateCreateFromSurvey()
-  templatePublish()
+  templatePublish() */
 
   /**
    * Survey export/import/clone.
    */
-  surveyExport()
+  /* surveyExport()
   surveyImport()
-  surveyCreateFromTemplate()
+  surveyCreateFromTemplate() */
 
   /**
    * Validation Report.
    */
-  validationReport()
+  // validationReport()
 
   /**
    * Delete.
    */
-  recordDelete()
+  /* recordDelete()
   surveyDelete()
   templateDelete()
-  cleanDowloadsFolder()
+  cleanDowloadsFolder() */
 })
