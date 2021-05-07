@@ -7,7 +7,7 @@ import { useNodeDefByUuid } from '@webapp/store/survey'
 const Row = (props) => {
   const { row: entity } = props
   const i18n = useI18n()
-  const parentDef = useNodeDefByUuid(entity.parentUuid)
+  const parentDef = useNodeDefByUuid(entity?.parentUuid)
 
   return (
     <>

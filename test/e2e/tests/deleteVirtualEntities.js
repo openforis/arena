@@ -2,7 +2,6 @@ import { gotoEntities, gotoHome } from './_navigation'
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 
 import { virtualEntities } from '../mock/nodeDefs'
-import { BASE_URL } from '../config'
 
 export default () =>
   describe('Delete virtual entities', () => {
