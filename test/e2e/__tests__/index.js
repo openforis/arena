@@ -77,12 +77,6 @@ describe('E2E Tests', () => {
   exportCsvData()
 
   /**
-   * Analysis.
-   */
-  createVirtualEntities()
-  deleteVirtualEntities()
-
-  /**
    * Survey template.
    */
   templateCreate()
@@ -93,8 +87,14 @@ describe('E2E Tests', () => {
    * Survey export/import/clone.
    */
   surveyExport()
-  /*surveyImport()
-  surveyCreateFromTemplate() */
+  surveyImport()
+  surveyCreateFromTemplate()
+
+  /**
+   * Analysis.
+   */
+  createVirtualEntities()
+  deleteVirtualEntities()
 
   /**
    * Validation Report.
