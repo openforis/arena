@@ -13,29 +13,28 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   const reachableNodeDefs = []
 
   const queue = new Queue()
-  const visitedUuids = []
+  const visitedIds = []
 
   queue.enqueue(NodeDef.isEntity(nodeDefContext) ? nodeDefContext : Survey.getNodeDefParent(nodeDefContext)(survey))
 
   while (!queue.isEmpty()) {
     const entityDefCurrent = queue.dequeue()
-    const entityDefCurrentUuid = NodeDef.getUuid(entityDefCurrent)
+    const entityDefCurrentId = NodeDef.getId(entityDefCurrent)
     const entityDefCurrentChildren = Survey.getNodeDefChildren(entityDefCurrent)(survey)
 
-    reachableNodeDefs.push(entityDefCurrent)
-    reachableNodeDefs.push(...entityDefCurrentChildren)
+    reachableNodeDefs.push(entityDefCurrent, ...entityDefCurrentChildren)
 
     // visit nodes inside single entities
     queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
 
     // avoid visiting 2 times the same entity definition when traversing single entities
-    if (!visitedUuids.includes(entityDefCurrentUuid)) {
+    if (!visitedIds.includes(entityDefCurrentId)) {
       const entityDefCurrentParent = Survey.getNodeDefParent(entityDefCurrent)(survey)
       if (entityDefCurrentParent) {
         queue.enqueue(entityDefCurrentParent)
       }
+      visitedIds.push(entityDefCurrentId)
     }
-    visitedUuids.push(entityDefCurrentUuid)
   }
   return reachableNodeDefs
 }
