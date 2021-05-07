@@ -92,8 +92,8 @@ describe('E2E Tests', () => {
   /**
    * Survey export/import/clone.
    */
-  /* surveyExport()
-  surveyImport()
+  surveyExport()
+  /*surveyImport()
   surveyCreateFromTemplate() */
 
   /**
