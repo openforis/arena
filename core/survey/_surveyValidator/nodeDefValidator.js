@@ -146,7 +146,7 @@ export const validateNodeDef = async (survey, nodeDef) => {
   const advancedPropsValidation = await validateAdvancedProps(survey, nodeDef)
 
   const valid = Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation)
-  if (!valid) return null
+  if (valid) return null
 
   return R.pipe(R.mergeDeepLeft(advancedPropsValidation), Validation.setValid(valid))(nodeDefValidation)
 }
@@ -158,11 +158,12 @@ export const validateNodeDefs = async (survey) => {
     Object.values(nodeDefs).map((nodeDef) => validateNodeDef(survey, nodeDef))
   )
   // exclude valid node def validations
-  const fieldsValidation = nodeDefsValidation.reduce((fieldsValidationAcc, nodeDefValidation) => {
-    if (!Validation.isValid(nodeDefValidation)) {
-      fieldsValidationAcc.push(nodeDefValidation)
+  const fieldsValidation = Object.values(nodeDefs).reduce((fieldsValidationAcc, nodeDef, index) => {
+    const nodeDefValidation = nodeDefsValidation[index]
+    return {
+      ...fieldsValidationAcc,
+      ...(Validation.isValid(nodeDefValidation) ? {} : { [nodeDef.uuid]: nodeDefValidation }),
     }
-    return fieldsValidationAcc
   }, {})
 
   return Validation.newInstance(R.isEmpty(fieldsValidation), fieldsValidation)
