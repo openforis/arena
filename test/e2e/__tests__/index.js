@@ -91,15 +91,15 @@ describe('E2E Tests', () => {
   surveyCreateFromTemplate()
 
   /**
+   * Validation Report.
+   */
+  validationReport()
+
+  /**
    * Analysis.
    */
   createVirtualEntities()
   deleteVirtualEntities()
-
-  /**
-   * Validation Report.
-   */
-  validationReport()
 
   /**
    * Delete.
