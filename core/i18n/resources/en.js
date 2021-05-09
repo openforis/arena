@@ -184,6 +184,7 @@ Do you want to proceed?`,
     processingChain: 'Processing Chain',
     processingChain_plural: 'Processing Chains',
     virtualEntity: 'Virtual Entity',
+    entities: 'Virtual entities',
     virtualEntity_plural: 'Virtual entities',
   },
 

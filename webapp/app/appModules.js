@@ -159,7 +159,7 @@ export const analysisModules = {
     path: `${appModules.analysis.path}/chain`,
   },
   entities: {
-    key: 'virtualEntity_plural',
+    key: 'entities',
     path: `${appModules.analysis.path}/entities`,
   },
   nodeDef: {
