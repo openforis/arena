@@ -93,13 +93,13 @@ describe('E2E Tests', () => {
   /**
    * Validation Report.
    */
-  validationReport()
+  // validationReport()
 
   /**
    * Analysis.
    */
-  createVirtualEntities()
-  deleteVirtualEntities()
+  /* createVirtualEntities()
+  deleteVirtualEntities() */
 
   /**
    * Delete.
