@@ -82,16 +82,16 @@ export default () =>
       ])
     })
 
-    describe(`Restore root entity key`, () => {
+    /*describe(`Restore root entity key`, () => {
       gotoNode('Cluster[6] / Cluster id')
       enterAttribute(cluster_id, '9')
       waitThread()
 
       gotoValidationReport()
       expectMessages([])
-    })
+    })*/
 
-    describe(`Invalidate record ${cluster_id.name} ${record1[cluster_id.name]}`, () => {
+    /*describe(`Invalidate record ${cluster_id.name} ${record1[cluster_id.name]}`, () => {
       gotoRecords()
       gotoRecord(record1)
       enterAttribute(cluster_id, '')
@@ -142,9 +142,9 @@ export default () =>
           'Duplicate entity key',
         ],
       ])
-    })
+    })*/
 
-    describe(`Verify non relevant nodes validation is cleared`, () => {
+    /*describe(`Verify non relevant nodes validation is cleared`, () => {
       gotoRecords()
       gotoRecord(record1)
       enterAttribute(cluster_id, '')
@@ -152,7 +152,7 @@ export default () =>
 
       gotoValidationReport()
       expectMessages([['Cluster[] / Cluster id', 'Required value']])
-    })
+    })*/
 
     gotoHome()
   })

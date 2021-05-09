@@ -99,7 +99,7 @@ describe('E2E Tests', () => {
   /**
    * Validation Report.
    */
-  // validationReport()
+  validationReport()
 
   /**
    * Delete.
