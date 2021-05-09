@@ -13,7 +13,7 @@ const HeaderLeft = () => {
   const i18n = useI18n()
 
   const createVirtualEntity = () => {
-    dispatch(ChainActions.createNodeDef({ history, type: NodeDef.nodeDefType.entity, virtual: true, analysis: false }))
+    dispatch(ChainActions.createNodeDef({ history, type: NodeDef.nodeDefType.entity, virtual: true }))
   }
 
   return (
