@@ -16,8 +16,6 @@ import { selectSurvey } from './_surveyList'
 
 export default () =>
   describe('Survey import', () => {
-    gotoHome()
-
     exportSurvey(survey)
 
     gotoSurveyCreate()
@@ -37,7 +35,6 @@ export default () =>
       const json = await response.json()
 
       surveyImport.name = json.survey.info.props.name
-      await page.reload()
     })
 
     gotoHome()
