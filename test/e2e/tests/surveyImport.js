@@ -31,7 +31,16 @@ export default () =>
         page.waitForNavigation(),
         page.click(DataTestId.modal.close),
       ])
+
       const json = await response.json()
+
+      await expect(
+        JSON.stringify({
+          response,
+          json,
+        })
+      ).toHaveText('No Items')
+
       surveyImport.name = json.survey.info.props.name
       await page.reload()
     })
