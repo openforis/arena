@@ -17,8 +17,10 @@ const record2 = records[1]
 const record3 = records[2]
 
 const { validationReport } = DataTestId.validationReport
-const getMessagesEl = (path) =>
-  page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+const getMessagesEl = async (path) => {
+  await page.waitForSelector(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+  return page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+}
 
 const waitThread = (timeout = 1000) =>
   test('Wait thread to complete', async () => {
