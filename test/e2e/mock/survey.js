@@ -20,6 +20,7 @@ export const survey2 = {
 
 export const surveyImport = {
   ...survey,
+  isImport: true,
 }
 
 export const template = {
