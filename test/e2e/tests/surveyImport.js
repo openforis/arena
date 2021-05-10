@@ -14,6 +14,7 @@ import {
 } from './_surveyExport'
 import { selectSurvey } from './_surveyList'
 
+let _surveyImport = { ...surveyImport }
 export default () =>
   describe('Survey import', () => {
     exportSurvey(survey)
@@ -34,32 +35,26 @@ export default () =>
 
       const json = await response.json()
 
-      await expect(
-        JSON.stringify({
-          response,
-          json,
-        })
-      ).toBe('No Items')
-
       surveyImport.name = json.survey.info.props.name
+      _surveyImport = { ..._surveyImport, name: json.survey.info.props.name }
       await page.reload()
     })
 
-    exportSurvey(surveyImport)
+    exportSurvey(_surveyImport)
 
-    verifySurvey(surveyImport)
+    verifySurvey(_surveyImport)
 
-    verifyNodeDefs(surveyImport)
+    verifyNodeDefs(_surveyImport)
 
-    verifyCategories(surveyImport)
+    verifyCategories(_surveyImport)
 
-    verifyTaxonomies(surveyImport)
+    verifyTaxonomies(_surveyImport)
 
-    verifyRecords(surveyImport)
+    verifyRecords(_surveyImport)
 
-    verifyUsers(surveyImport)
+    verifyUsers(_surveyImport)
 
-    verifyActivityLog(surveyImport)
+    verifyActivityLog(_surveyImport)
 
     gotoSurveyList()
 
