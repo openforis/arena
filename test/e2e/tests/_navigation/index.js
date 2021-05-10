@@ -41,7 +41,10 @@ export const gotoSurveyInfo = () =>
 // ==== Sidebar
 export const gotoHome = () =>
   test('Goto home', async () => {
-    await page.click(getSelector(DataTestId.sidebar.moduleBtn('home'), 'a'))
+    const currentUrl = await page.url()
+    if (currentUrl !== `${BASE_URL}/app/home/dashboard/`) {
+      await page.click(getSelector(DataTestId.sidebar.moduleBtn('home'), 'a'))
+    }
     expect(page.url()).toBe(`${BASE_URL}/app/home/dashboard/`)
   })
 

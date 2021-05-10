@@ -5,8 +5,7 @@ import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
-  test(`Export survey ${survey.name}`, async () => {
-    await page.reload()
+  test(`Export survey ${survey?.name}`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
