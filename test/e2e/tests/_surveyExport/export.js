@@ -6,20 +6,16 @@ import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
   test(`Export survey ${survey.name}`, async () => {
+    await page.reload()
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    if (survey.isImport) {
-      await expect({
-        surveyZipPath,
-        surveyDirPath,
-        survey,
-      }).toBe('aa')
-    }
+    await Promise.all([
+      page.waitForSelector(getSelector(DataTestId.modal.modal)),
+      page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button')),
+    ])
 
-    await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
-
-    await page.waitForSelector(getSelector(DataTestId.modal.modal))
+    await page.waitForSelector(DataTestId.surveyExport.downloadBtn)
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
