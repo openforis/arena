@@ -9,8 +9,6 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
-
     if (survey.isImport) {
       await expect({
         surveyZipPath,
@@ -18,6 +16,8 @@ export const exportSurvey = (survey) =>
         survey,
       }).toBe('aa')
     }
+
+    await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
 
     await page.waitForSelector(getSelector(DataTestId.modal.modal))
 
