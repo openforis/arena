@@ -13,6 +13,7 @@ import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
 import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
+import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
 
 /**
  * Creates a new survey info object with the specified parameters.
@@ -136,8 +137,17 @@ export const {
 export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependencies
 
 // ====== UPDATE
-const updateNodeDefs = ({ updateFn, updateDependencyGraph }) =>
-  R.pipe(updateFn, R.when(R.always(updateDependencyGraph), SurveyDependencies.buildAndAssocDependencyGraph))
+const updateNodeDefs = ({ updateFn, updateDependencyGraph }) => (survey) => {
+  let surveyUpdated = updateFn(survey)
+  if (updateDependencyGraph) {
+    surveyUpdated = {
+      ...surveyUpdated,
+      nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
+    }
+    surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
+  }
+  return surveyUpdated
+}
 
 export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) =>
   updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDefs(nodeDefs), updateDependencyGraph })
@@ -149,6 +159,8 @@ export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
+
+export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex } = SurveyNodeDefsIndex
 
 // ====== NodeDefsValidation
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation

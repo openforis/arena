@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as Category from '../category'
+import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -25,45 +26,9 @@ export const getNodeDefsByUuids = (uuids = []) => (survey) => {
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
-const _calculateNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
-  const children = []
-  if (NodeDef.isVirtual(nodeDef)) {
-    // If nodeDef is virtual, get children from its source
-    const entitySource = getNodeDefSource(nodeDef)(survey)
-    children.push(..._calculateNodeDefChildren(entitySource, includeAnalysis)(survey))
-  }
-
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  children.push(
-    ...R.pipe(
-      getNodeDefsArray,
-      R.filter((nodeDefCurrent) => {
-        if (NodeDef.isAnalysis(nodeDefCurrent) && !includeAnalysis) {
-          return false
-        }
-        if (NodeDef.isVirtual(nodeDefCurrent)) {
-          // Include virtual entities having their source as a child of the given entity
-          const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
-          return NodeDef.getParentUuid(entitySource) === nodeDefUuid
-        }
-        // "natural" child
-        return NodeDef.getParentUuid(nodeDefCurrent) === nodeDefUuid
-      })
-    )(survey)
-  )
-  return children
-}
-
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
-  const { nodeDefsIndex } = survey
-  if (nodeDefsIndex) {
-    const childrenUuidsIndex = includeAnalysis
-      ? nodeDefsIndex.childDefUuidsByParentUuidAnalysis
-      : nodeDefsIndex.childDefUuidsByParentUuid
-    const childDefUuids = childrenUuidsIndex[nodeDef.uuid]
-    return childDefUuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
-  }
-  return _calculateNodeDefChildren(nodeDef, includeAnalysis)(survey)
+  const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
+  return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef, includeAnalysis)(surveyIndexed)
 }
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
@@ -114,38 +79,9 @@ export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predic
 
 // ====== UPDATE
 
-const _updateNodeDefIndex = (nodeDef) => (survey) => {
-  const { nodeDefsIndex } = survey
-  const children = _calculateNodeDefChildren(nodeDef)(survey)
-  const childrenAnalysis = _calculateNodeDefChildren(nodeDef, true)(survey)
-  nodeDefsIndex.childDefUuidsByParentUuid[nodeDef.uuid] = children.map(NodeDef.getUuid)
-  nodeDefsIndex.childDefUuidsByParentUuidAnalysis[nodeDef.uuid] = childrenAnalysis.map(NodeDef.getUuid)
-  return { ...survey, nodeDefsIndex }
-}
+export const assocNodeDefs = (nodeDefs) => R.assoc(nodeDefsKey, nodeDefs)
 
-export const assocNodeDefs = (nodeDefs) => (survey) => {
-  let surveyUpdated = {
-    ...survey,
-    nodeDefs,
-    nodeDefsIndex: {
-      childDefUuidsByParentUuidAnalysis: {},
-      childDefUuidsByParentUuid: {},
-    },
-  }
-  Object.values(nodeDefs).forEach((nodeDef) => {
-    surveyUpdated = _updateNodeDefIndex(nodeDef)(surveyUpdated)
-  })
-  return surveyUpdated
-}
-
-export const assocNodeDef = (nodeDef) => (survey) => {
-  const surveyUpdated = R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)(survey)
-  if (nodeDef.parentUuid && surveyUpdated.nodeDefsIndex) {
-    const nodeDefParent = getNodeDefParent(nodeDef)(surveyUpdated)
-    return _updateNodeDefIndex(nodeDefParent)(surveyUpdated)
-  }
-  return surveyUpdated
-}
+export const assocNodeDef = (nodeDef) => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 
 // ====== HIERARCHY
 
