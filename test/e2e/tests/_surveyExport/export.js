@@ -9,14 +9,6 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    if (survey.isImport) {
-      await expect({
-        surveyZipPath,
-        surveyDirPath,
-        survey,
-      }).toBe('aa')
-    }
-
     await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
     await page.waitForSelector(getSelector(DataTestId.modal.modal))
 
@@ -27,6 +19,15 @@ export const exportSurvey = (survey) =>
     ])
 
     await download.saveAs(surveyZipPath)
+
+    if (survey.isImport) {
+      await expect({
+        surveyZipPath,
+        surveyDirPath,
+        survey,
+      }).toBe('aa')
+    }
+
     const zip = new AdmZip(surveyZipPath)
     zip.extractAllTo(surveyDirPath, true, '')
 
