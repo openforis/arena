@@ -39,7 +39,7 @@ export default () =>
           response,
           json,
         })
-      ).toHaveText('No Items')
+      ).toBe('No Items')
 
       surveyImport.name = json.survey.info.props.name
       await page.reload()
