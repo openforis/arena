@@ -185,7 +185,7 @@ Do you want to proceed?`,
     processingChain_plural: 'Processing Chains',
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
-    virtualEntity_plural: 'Virtual entities',
+    virtualEntity_plural: '$t(appModules.entities)',
   },
 
   surveyDefsLoader: {

@@ -1,15 +1,13 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as DB from '@server/db'
-import { TableNodeDef } from '@openforis/arena-server'
+import { DB, BaseProtocol, TableNodeDef } from '@openforis/arena-server'
+import { Objects } from '@openforis/arena-core'
 import {
   getSurveyDBSchema,
   dbTransformCallback as dbTransformCallbackCommon,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
-import { Objects } from '@openforis/arena-core'
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
@@ -35,7 +33,7 @@ const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, vir
 
 // ============== CREATE
 
-export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
+export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
   client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
@@ -55,7 +53,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
 
-export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false, client = db }) =>
+export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false, client = DB }) =>
   client.none(
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
@@ -86,7 +84,7 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false, 
 
 export const fetchNodeDefsBySurveyId = async (
   { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false },
-  client = db
+  client = DB
 ) =>
   client.map(
     `
@@ -106,7 +104,7 @@ export const fetchNodeDefsBySurveyId = async (
     (row) => dbTransformCallback({ row, draft, advanced, backup })
   )
 
-export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+export const fetchRootNodeDef = async (surveyId, draft, client = DB) =>
   client.one(
     `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
@@ -115,7 +113,7 @@ export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
     (row) => dbTransformCallback({ row, draft })
   )
 
-export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = db) =>
+export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = DB) =>
   client.one(
     `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
@@ -124,7 +122,7 @@ export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced 
     (row) => dbTransformCallback({ row, draft, advanced })
   )
 
-const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
+const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = DB) =>
   client.map(
     `
     SELECT ${nodeDefSelectFields}
@@ -136,7 +134,7 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = d
     (row) => dbTransformCallback({ row, draft })
   )
 
-export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = db) =>
+export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = DB) =>
   client.map(
     `
     SELECT ${nodeDefSelectFields}
@@ -151,7 +149,7 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 
 // ============== UPDATE
 
-export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, props, propsAdvanced = {}, client = db) =>
+export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, props, propsAdvanced = {}, client = DB) =>
   client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
@@ -167,7 +165,7 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, prop
   )
 
 // CYCLES
-export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add, client = db) => {
+export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add, client = DB) => {
   const op = add ? `|| '[${cycles.map(JSON.stringify).join(',')}]'` : cycles.map((c) => `- '${c}'`).join(' ')
 
   return client.map(
@@ -181,7 +179,7 @@ export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycl
   )
 }
 
-export const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = db) => {
+export const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
   const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
   await client.query(
     `
@@ -196,7 +194,7 @@ export const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart
   )
 }
 
-export const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) => {
+export const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = DB) => {
   // Add cycle to prop cycles
   await client.query(
     `
@@ -210,7 +208,7 @@ export const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = d
   await copyNodeDefsCyclesLayout(surveyId, null, cycleStart, cycles, client)
 }
 
-export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, client = db) =>
+export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, client = DB) =>
   client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
@@ -223,7 +221,7 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
     [nodeDefUuid]
   )
 
-export const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
+export const deleteNodeDefsCycles = async (surveyId, cycles, client = DB) => {
   // Delete cycles from props
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
@@ -235,7 +233,7 @@ export const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
   await deleteNodeDefsCyclesLayout(surveyId, null, cycles, client)
 }
 
-export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = db) =>
+export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = DB) =>
   client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
@@ -246,7 +244,7 @@ export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = 
   )
 
 // PUBLISH
-export const publishNodeDefsProps = async (surveyId, client = db) =>
+export const publishNodeDefsProps = async (surveyId, client = DB) =>
   client.query(`
     UPDATE
       ${getSurveyDBSchema(surveyId)}.node_def
@@ -259,7 +257,7 @@ export const publishNodeDefsProps = async (surveyId, client = db) =>
 
 // ============== DELETE
 
-export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
+export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => {
   const nodeDef = await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
@@ -279,7 +277,7 @@ export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => 
   return nodeDef
 }
 
-export const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
+export const permanentlyDeleteNodeDefs = async (surveyId, client = DB) =>
   client.query(`
         DELETE
         FROM
@@ -288,7 +286,7 @@ export const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
           deleted = true
     `)
 
-export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = db) =>
+export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET deleted = true
@@ -296,19 +294,19 @@ export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = db) =>
       jsonb_array_length(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, true, '', false)}) = 0
   `)
 
-const _deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
+const _deleteNodeDefsProp = async (surveyId, deletePath, client = DB) =>
   client.none(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props = props #- '{${deletePath.join(',')}}'
   `)
 
-export const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
+export const deleteNodeDefsLabels = async (surveyId, langCode, client = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
-export const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
+export const deleteNodeDefsDescriptions = async (surveyId, langCode, client = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
-export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = db) => {
+export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = DB) => {
   const schema = getSurveyDBSchema(surveyId)
 
   await client.query(`
@@ -359,7 +357,7 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchVirtualEntities = async (params, client = DB.client) => {
+export const fetchVirtualEntities = async (params, client = DB) => {
   const { surveyId, offset = 0, limit = null } = params
 
   const tableNodeDef = new TableNodeDef(surveyId)
@@ -372,9 +370,9 @@ export const fetchVirtualEntities = async (params, client = DB.client) => {
   from
   ${tableNodeDef.nameQualified} as _nd
   where _nd.virtual = TRUE and _nd.deleted = FALSE
-  LIMIT ${limit || 'ALL'}
-  OFFSET ${offset}`,
-    [],
+  LIMIT $1
+  OFFSET $2`,
+    [limit || 'ALL', offset],
     Objects.camelize
   )
 }
@@ -388,7 +386,7 @@ export const fetchVirtualEntities = async (params, client = DB.client) => {
  *
  * @returns {Promise<number>} - The result promise.
  */
-export const countVirtualEntities = async (params, client = DB.client) => {
+export const countVirtualEntities = async (params, client = DB) => {
   const { surveyId } = params
   const tableNodeDef = new TableNodeDef(surveyId)
   return client.one(`select count(*) from ${tableNodeDef.nameAliased} where virtual = TRUE and deleted = FALSE`)

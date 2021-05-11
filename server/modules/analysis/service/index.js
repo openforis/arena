@@ -24,12 +24,6 @@ export {
   persistAll,
 } from '../manager'
 
-export {
-  // ======  READ - entities
-  countVirtualEntities,
-  fetchVirtualEntities,
-} from '@server/modules/nodeDef/repository/nodeDefRepository'
-
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'
 

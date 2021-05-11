@@ -22,7 +22,7 @@ const getMessagesEl = async (path) => {
   return page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
 }
 
-const waitThread = (timeout = 1000) =>
+const waitThread = (timeout = 1500) =>
   test('Wait thread to complete', async () => {
     // TODO thread issue: https://github.com/openforis/arena/issues/1412
     await page.waitForTimeout(timeout)
