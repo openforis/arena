@@ -79,17 +79,19 @@ export const init = (app) => {
         const { props, propsAdvanced } = Request.getBody(req)
         const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
 
-        const nodeDefsUpdated = await NodeDefService.updateNodeDefProps(
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps(
           user,
           surveyId,
+          cycle,
           nodeDefUuid,
           parentUuid,
           props,
           propsAdvanced
         )
-        delete nodeDefsUpdated[nodeDefUuid]
 
-        await sendRespNodeDefsUpdated(res, surveyId, cycle, nodeDefsUpdated)
+        // do not send updated node def back to client (node def already updated client side)
+        delete nodeDefsUpdated[nodeDefUuid]
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)
       }

@@ -16,10 +16,11 @@ const keys = {
 
 const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
 
-const _addDep = (type, nodeDefUuid, nodeDefDepUuid) => (graph) =>
-  R.pipe(_getDeps(type, nodeDefUuid), R.append(nodeDefDepUuid), (dep) =>
-    ObjectUtils.setInPath([type, nodeDefUuid], dep)(graph)
-  )(graph)
+const _addDep = (type, nodeDefUuid, nodeDefDepUuid) => (graph) => {
+  const deps = _getDeps(type, nodeDefUuid)(graph)
+  const depsUpdated = [...deps, nodeDefDepUuid]
+  return ObjectUtils.setInPath([type, nodeDefUuid], depsUpdated)(graph)
+}
 
 const addDeps = (survey, nodeDef, type, expressions) => (graph) => {
   const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[type]
@@ -55,54 +56,29 @@ const addDeps = (survey, nodeDef, type, expressions) => (graph) => {
   return graph
 }
 
-// ====== CREATE
-export const buildGraph = (survey) =>
-  R.reduce(
-    (graph, nodeDef) =>
-      R.pipe(
-        addDeps(
-          survey,
-          nodeDef,
-          SurveyDependencyTypes.dependencyTypes.defaultValues,
-          NodeDef.getDefaultValues(nodeDef)
-        ),
-        addDeps(survey, nodeDef, SurveyDependencyTypes.dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
-        addDeps(
-          survey,
-          nodeDef,
-          SurveyDependencyTypes.dependencyTypes.validations,
-          NodeDef.getValidationExpressions(nodeDef)
-        )
-      )(graph),
-    {},
-    SurveyNodeDefs.getNodeDefsArray(survey)
-  )
-
+// READ
 export const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
 
-export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
-  R.pipe(
-    getDependencyGraph,
-    R.ifElse(
-      R.always(R.isNil(dependencyType)),
-      // Return all node def dependents
-      R.pipe(
-        R.values,
-        R.reduce(
-          (accDependents, graph) =>
-            R.pipe(
-              R.propOr([], nodeDefUuid),
-              R.ifElse(R.isEmpty, R.always(accDependents), R.concat(accDependents))
-            )(graph),
-          []
-        ),
-        R.flatten,
-        R.uniq
-      ),
-      // Return dependents by dependency Type
-      R.pathOr([], [dependencyType, nodeDefUuid])
-    )
-  )
+export const hasDependencyGraph = (survey) => {
+  const graph = getDependencyGraph(survey)
+  return !R.isEmpty(graph)
+}
+
+export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => (survey) => {
+  const dependencyGraphsByType = getDependencyGraph(survey)
+  if (dependencyType) {
+    return R.pathOr([], [dependencyType, nodeDefUuid])(dependencyGraphsByType)
+  }
+  // Return all node def dependents
+  const nodeDefDependents = Object.values(dependencyGraphsByType).reduce((accDependents, graph) => {
+    const dependents = R.propOr([], nodeDefUuid)(graph)
+    if (R.isEmpty(dependents)) {
+      return accDependents
+    }
+    return [...accDependents, ...dependents]
+  }, [])
+  return R.uniq(nodeDefDependents)
+}
 
 /**
  * Determines if the specified nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
@@ -144,5 +120,45 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 // UPDATE
 export const assocDependencyGraph = (dependencyGraph) => R.assoc(keys.dependencyGraph, dependencyGraph)
 
+// ====== CREATE
+export const addNodeDefDependencies = (nodeDef) => (survey) => {
+  const graph = getDependencyGraph(survey)
+  const graphUpdated = R.pipe(
+    addDeps(survey, nodeDef, SurveyDependencyTypes.dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
+    addDeps(survey, nodeDef, SurveyDependencyTypes.dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
+    addDeps(
+      survey,
+      nodeDef,
+      SurveyDependencyTypes.dependencyTypes.validations,
+      NodeDef.getValidationExpressions(nodeDef)
+    )
+  )(graph)
+  return assocDependencyGraph(graphUpdated)(survey)
+}
+
+export const buildGraph = (survey) => {
+  const surveyUpdated = SurveyNodeDefs.getNodeDefsArray(survey).reduce(
+    (surveyUpdatedAcc, nodeDef) => addNodeDefDependencies(nodeDef)(surveyUpdatedAcc),
+    survey
+  )
+  return getDependencyGraph(surveyUpdated)
+}
+
 export const buildAndAssocDependencyGraph = (survey) =>
   R.pipe(buildGraph, (graph) => assocDependencyGraph(graph)(survey))(survey)
+
+// DELETE
+export const removeNodeDefDependencies = (nodeDefUuid, dependencyType = null) => (survey) => {
+  const dependencyGraph = getDependencyGraph(survey)
+  let dependencyGraphUpdated
+  if (dependencyType) {
+    dependencyGraphUpdated = R.dissocPath([dependencyType, nodeDefUuid])(dependencyGraph)
+  } else {
+    const dependencyTypes = Object.keys(dependencyGraph)
+    dependencyGraphUpdated = dependencyTypes.reduce(
+      (dependencyGraphAcc, type) => R.dissocPath([type, nodeDefUuid])(dependencyGraphAcc),
+      dependencyGraph
+    )
+  }
+  return assocDependencyGraph(dependencyGraphUpdated)(survey)
+}

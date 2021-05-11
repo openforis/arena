@@ -1,5 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
+// ==== READ
+
 const getNodeDefByUuid = (uuid) => (survey) => survey.nodeDefs[uuid] || null
 
 const getNodeDefSource = (nodeDef) => (survey) =>
@@ -31,6 +33,11 @@ const calculateNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) 
   return children
 }
 
+export const getNodeDefsIndex = (survey) => {
+  const { nodeDefsIndex } = survey
+  return nodeDefsIndex || {}
+}
+
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
   const { nodeDefsIndex } = survey
   if (!nodeDefsIndex) throw new Error('Node defs index not initialized')
@@ -43,6 +50,10 @@ export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey)
   return childDefUuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
 }
 
+export const assocNodeDefsIndex = ({ survey, nodeDefsIndex }) => ({ ...survey, nodeDefsIndex })
+
+// ==== UPDATE
+
 export const addNodeDefToIndex = ({ nodeDefsIndex, nodeDef }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
   // add node def uuid to parent node def children references
@@ -53,6 +64,8 @@ export const addNodeDefToIndex = ({ nodeDefsIndex, nodeDef }) => {
   }
   return nodeDefsIndexUpdated
 }
+
+// ==== DELETE
 
 export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDefDeleted }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
@@ -81,6 +94,8 @@ export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDefDeleted }) => {
   return nodeDefsIndexUpdated
 }
 
+// ==== CREATE
+
 const initNodeDefIndex = ({ survey, nodeDef }) => {
   const { nodeDefsIndex } = survey
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
@@ -98,7 +113,8 @@ export const initNodeDefsIndex = (survey) => {
     childDefUuidsByParentUuidAnalysis: {},
     childDefUuidsByParentUuid: {},
   }
-  Object.values(survey.nodeDefs).forEach((nodeDef) => {
+  const nodeDefsSorted = Object.values(survey.nodeDefs).sort((nodeDef1, nodeDef2) => nodeDef1.id - nodeDef2.id)
+  nodeDefsSorted.forEach((nodeDef) => {
     nodeDefsIndex = initNodeDefIndex({ survey: { ...survey, nodeDefsIndex }, nodeDef })
   })
   return nodeDefsIndex

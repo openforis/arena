@@ -134,26 +134,50 @@ export const {
 } = SurveyNodeDefs
 
 // ====== READ dependencies
-export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependencies
+export const {
+  addNodeDefDependencies,
+  getDependencyGraph,
+  getNodeDefDependencies,
+  hasDependencyGraph,
+  isNodeDefDependentOn,
+  removeNodeDefDependencies,
+} = SurveyDependencies
 
 // ====== UPDATE
-const updateNodeDefs = ({ updateFn, updateDependencyGraph }) => (survey) => {
-  let surveyUpdated = updateFn(survey)
+export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) => (survey) => {
+  let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
+  surveyUpdated = {
+    ...surveyUpdated,
+    nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
+  }
   if (updateDependencyGraph) {
-    surveyUpdated = {
-      ...surveyUpdated,
-      nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
-    }
     surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
   }
   return surveyUpdated
 }
 
-export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) =>
-  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDefs(nodeDefs), updateDependencyGraph })
-
-export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) =>
-  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDef(nodeDef), updateDependencyGraph })
+export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) => (survey) => {
+  let surveyUpdated
+  if (updateDependencyGraph) {
+    const dependencies = SurveyDependencies.getNodeDefDependencies(nodeDef.uuid)(survey)
+    surveyUpdated = dependencies.reduce(
+      (surveyUpdatedAcc, nodeDefDependent) =>
+        SurveyDependencies.removeNodeDefDependencies(nodeDefDependent.uuid)(surveyUpdatedAcc),
+      survey
+    )
+    const nodeDefsIndex = SurveyNodeDefsIndex.getNodeDefsIndex(surveyUpdated)
+    const nodeDefsIndexUpdated = SurveyNodeDefsIndex.addNodeDefToIndex({ nodeDefsIndex, nodeDef })
+    surveyUpdated = SurveyNodeDefsIndex.assocNodeDefsIndex({
+      survey: surveyUpdated,
+      nodeDefsIndex: nodeDefsIndexUpdated,
+    })
+  } else {
+    surveyUpdated = { ...survey }
+  }
+  surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDef)(surveyUpdated)
+  surveyUpdated = SurveyDependencies.addNodeDefDependencies(nodeDef)(surveyUpdated)
+  return surveyUpdated
+}
 
 export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
