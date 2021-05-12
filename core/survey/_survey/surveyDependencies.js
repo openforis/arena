@@ -137,9 +137,12 @@ export const addNodeDefDependencies = (nodeDef) => (survey) => {
 }
 
 export const buildGraph = (survey) => {
-  const surveyUpdated = SurveyNodeDefs.getNodeDefsArray(survey).reduce(
+  // reset survey dependency graph
+  let surveyUpdated = assocDependencyGraph({})(survey)
+  // add dependencies for every node def
+  surveyUpdated = SurveyNodeDefs.getNodeDefsArray(survey).reduce(
     (surveyUpdatedAcc, nodeDef) => addNodeDefDependencies(nodeDef)(surveyUpdatedAcc),
-    survey
+    surveyUpdated
   )
   return getDependencyGraph(surveyUpdated)
 }

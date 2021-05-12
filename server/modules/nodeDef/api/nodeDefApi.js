@@ -28,9 +28,6 @@ const sendRespNodeDefsAndValidation = async (
   })
 }
 
-const sendRespNodeDefsUpdated = async (res, surveyId, cycle, nodeDefsUpdated) =>
-  sendRespNodeDefsAndValidation(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
-
 export const init = (app) => {
   // ==== CREATE
 
@@ -107,9 +104,16 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const { surveyId, surveyCycleKey, nodeDefUuid } = Request.getParams(req)
 
-        const nodeDefsUpdated = await NodeDefService.markNodeDefDeleted(user, surveyId, surveyCycleKey, nodeDefUuid)
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefDeleted({
+          user,
+          surveyId,
+          surveyCycleKey,
+          nodeDefUuid,
+        })
 
-        await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(nodeDefUuid, nodeDefsUpdated))
+        // do not send updated node def back to client (node def already updated client side)
+        delete nodeDefsUpdated[nodeDefUuid]
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)
       }
