@@ -64,5 +64,7 @@ export const cluster = createEntity('cluster', 'Cluster', {
 export const { plot } = cluster.children
 export const { tree } = plot.children
 
+export const virtualEntities = [createEntity('entity_one', 'Entity One'), createEntity('entity_two', 'Entity Two')]
+
 export const getAtomicAttributeKeys = (nodeDef) =>
   Object.keys(nodeDef.children).filter((key) => !nodeDefCompositeTypes.includes(nodeDef.children[key].type))
