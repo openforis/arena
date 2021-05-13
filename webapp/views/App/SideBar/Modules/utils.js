@@ -62,7 +62,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   // analysis
   getModule({
     module: appModules.analysis,
-    children: [analysisModules.processingChains],
+    children: [analysisModules.processingChains, analysisModules.entities],
     hidden: !Authorizer.canAnalyzeRecords(user, surveyInfo),
   }),
   // users

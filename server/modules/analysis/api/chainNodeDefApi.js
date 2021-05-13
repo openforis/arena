@@ -48,9 +48,9 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { chainNodeDef } = Request.getBody(req)
+        const { chainNodeDef, newIndex } = Request.getBody(req)
 
-        await AnalysisService.updateChainNodeDef({ user, surveyId, chainNodeDef })
+        await AnalysisService.updateChainNodeDef({ user, surveyId, chainNodeDef, newIndex })
 
         Response.sendOk(res)
       } catch (error) {

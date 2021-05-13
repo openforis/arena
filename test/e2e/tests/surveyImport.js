@@ -1,7 +1,7 @@
 import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
-import { gotoSurveyCreate, gotoSurveyList } from './_navigation'
+import { gotoHome, gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
   verifyCategories,
@@ -31,10 +31,14 @@ export default () =>
         page.waitForNavigation(),
         page.click(DataTestId.modal.close),
       ])
+
       const json = await response.json()
+
       surveyImport.name = json.survey.info.props.name
       await page.reload()
     })
+
+    gotoHome()
 
     exportSurvey(surveyImport)
 

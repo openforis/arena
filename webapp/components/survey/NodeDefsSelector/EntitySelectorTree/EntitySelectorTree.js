@@ -9,7 +9,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { EntitySelectorTreeNode } from './EntitySelectorTreeNode'
 
 const EntitySelectorTree = (props) => {
-  const { getLabelPostfix, isDisabled, nodeDefUuidActive, onlyPages, onSelect } = props
+  const { getLabelSuffix, isDisabled, nodeDefUuidActive, onlyPages, onSelect } = props
   const survey = useSurvey()
 
   const [expanded, setExpanded] = useState(false)
@@ -31,7 +31,7 @@ const EntitySelectorTree = (props) => {
 
       <EntitySelectorTreeNode
         expanded={expanded}
-        getLabelPostfix={getLabelPostfix}
+        getLabelSuffix={getLabelSuffix}
         isDisabled={isDisabled}
         nodeDef={nodeDefRoot}
         nodeDefUuidActive={nodeDefUuidActive}
@@ -44,7 +44,7 @@ const EntitySelectorTree = (props) => {
 }
 
 EntitySelectorTree.propTypes = {
-  getLabelPostfix: PropTypes.func,
+  getLabelSuffix: PropTypes.func,
   isDisabled: PropTypes.func,
   nodeDefUuidActive: PropTypes.string,
   onlyPages: PropTypes.bool,
@@ -52,7 +52,7 @@ EntitySelectorTree.propTypes = {
 }
 
 EntitySelectorTree.defaultProps = {
-  getLabelPostfix: () => '',
+  getLabelSuffix: () => '',
   isDisabled: () => false,
   nodeDefUuidActive: null,
   onlyPages: false,

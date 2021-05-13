@@ -158,6 +158,10 @@ export const analysisModules = {
     key: 'processingChain',
     path: `${appModules.analysis.path}/chain`,
   },
+  entities: {
+    key: 'entities',
+    path: `${appModules.analysis.path}/entities`,
+  },
   nodeDef: {
     key: 'nodeDef',
     path: `${appModules.analysis.path}/nodeDef`,
