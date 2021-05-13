@@ -10,10 +10,10 @@ export default class ChainNodeDefAggregateExportJob extends Job {
   async execute() {
     const { archive, surveyId } = this.context
 
-    const chainNodeDefsPathFile = ExportFile.chainNodeDef
-    const chainNodeDefs = await AnalysisService.getAllChainNodeDefs({ surveyId })
-    archive.append(JSON.stringify(chainNodeDefs, null, 2), { name: chainNodeDefsPathFile })
+    const chainNodeDefsAggregatePathFile = ExportFile.chainNodeDefAggregate
+    const chainNodeDefsAggregate = await AnalysisService.getAllChainNodeDefsAggregate({ surveyId })
+    archive.append(JSON.stringify(chainNodeDefsAggregate, null, 2), { name: chainNodeDefsAggregatePathFile })
 
-    this.total = chainNodeDefs.length
+    this.total = chainNodeDefsAggregate.length
   }
 }
