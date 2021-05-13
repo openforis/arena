@@ -1,7 +1,9 @@
 import * as NodeDefManager from '../manager/nodeDefManager'
 
-export const insertNodeDef = NodeDefManager.insertNodeDef
+export const { insertNodeDef, updateNodeDefProps, markNodeDefDeleted } = NodeDefManager
 
-export const updateNodeDefProps = NodeDefManager.updateNodeDefProps
-
-export const markNodeDefDeleted = NodeDefManager.markNodeDefDeleted
+export {
+  // ======  READ - entities
+  countVirtualEntities,
+  fetchVirtualEntities,
+} from '../repository/nodeDefRepository'

@@ -184,6 +184,9 @@ Do you want to proceed?`,
     analysis: 'Analysis',
     processingChain: 'Processing Chain',
     processingChain_plural: 'Processing Chains',
+    virtualEntity: 'Virtual Entity',
+    entities: 'Virtual entities',
+    virtualEntity_plural: '$t(appModules.entities)',
   },
 
   surveyDefsLoader: {
@@ -403,6 +406,9 @@ $t(common.cantUndoWarning)`,
 {{rStudioCode}}
 
 `,
+    entities: {
+      new: 'Virtual entity',
+    },
   },
 
   chain: {
@@ -417,7 +423,6 @@ $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing step deleted',
     category: 'Category',
     calculationSteps: 'Calculation Steps',
-    virtualEntity: 'Virtual Entity',
     variablesPreviousStep: {
       title: 'Variables previous step',
       variableName: 'Variable name',

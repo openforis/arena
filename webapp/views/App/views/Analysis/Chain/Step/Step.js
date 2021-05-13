@@ -93,7 +93,7 @@ const StepComponent = (props) => {
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
-                {i18n.t('processingStepView.virtualEntity')}
+                {i18n.t('appModules.virtualEntity_plural')}
               </button>
             </EntitySelector>
 

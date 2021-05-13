@@ -40,8 +40,14 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      await page.click(getSelector(DataTestId.dataExport.prepareExport, 'button'))
-      await page.waitForSelector(getSelector(DataTestId.modal.modal))
+      await page.waitForSelector(getSelector(DataTestId.dataExport.prepareExport, 'button'))
+
+      await Promise.all([
+        page.waitForSelector(getSelector(DataTestId.modal.modal)),
+        page.click(getSelector(DataTestId.dataExport.prepareExport, 'button')),
+      ])
+
+      await page.waitForSelector(DataTestId.modal.close)
       await page.click(DataTestId.modal.close)
 
       await expect(getSelector(DataTestId.dataExport.exportCSV, 'button')).toBeTruthy()
