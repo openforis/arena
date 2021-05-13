@@ -129,3 +129,9 @@ export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid },
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependent, nodeDefsUpdated }, t)
   })
+
+export {
+  // ======  READ - entities
+  countVirtualEntities,
+  fetchVirtualEntities,
+} from '../repository/nodeDefRepository'
