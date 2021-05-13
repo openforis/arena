@@ -58,22 +58,28 @@ export const addNodeDefToIndex = ({ nodeDefsIndex, nodeDef }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
   // add node def uuid to parent node def children references
   const { parentUuid } = nodeDef
-  if (parentUuid && !nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid].includes(nodeDef.uuid)) {
-    nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid].push(nodeDef.uuid)
-    nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[parentUuid].push(nodeDef.uuid)
+  if (parentUuid) {
+    const parentChildDefUuids = nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid] || []
+    if (parentChildDefUuids.includes(nodeDef.uuid)) return nodeDefsIndexUpdated
+
+    parentChildDefUuids.push(nodeDef.uuid)
+    nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid] = parentChildDefUuids
+    const parentChildDefUuidsAnalysis = nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[parentUuid] || []
+    parentChildDefUuidsAnalysis.push(nodeDef.uuid)
+    nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[parentUuid] = parentChildDefUuidsAnalysis
   }
   return nodeDefsIndexUpdated
 }
 
 // ==== DELETE
 
-export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDefDeleted }) => {
+export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDef }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
-  delete nodeDefsIndexUpdated.childDefUuidsByParentUuid[nodeDefDeleted.uuid]
-  delete nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[nodeDefDeleted.uuid]
+  delete nodeDefsIndexUpdated.childDefUuidsByParentUuid[nodeDef.uuid]
+  delete nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[nodeDef.uuid]
 
   // remove node def deleted uuid from parent children references
-  const { parentUuid } = nodeDefDeleted
+  const { parentUuid } = nodeDef
 
   const deleteItem = ({ array, uuid }) => {
     const itemIdx = array.indexOf(uuid)
@@ -84,11 +90,11 @@ export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDefDeleted }) => {
 
   nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid] = deleteItem({
     array: nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid],
-    uuid: nodeDefDeleted.uuid,
+    uuid: nodeDef.uuid,
   })
   nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[parentUuid] = deleteItem({
     array: nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[parentUuid],
-    uuid: nodeDefDeleted.uuid,
+    uuid: nodeDef.uuid,
   })
 
   return nodeDefsIndexUpdated
