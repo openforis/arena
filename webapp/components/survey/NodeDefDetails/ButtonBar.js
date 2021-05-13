@@ -44,6 +44,7 @@ const ButtonBar = (props) => {
       </button>
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
         <button
+          data-testid={DataTestId.nodeDefDetails.deleteBtn}
           type="button"
           className="btn btn-danger btn-delete"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}
