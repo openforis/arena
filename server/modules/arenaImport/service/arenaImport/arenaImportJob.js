@@ -15,6 +15,8 @@ import RecordsImportJob from './metaImportJobs/recordsImportJob'
 import FilesImportJob from './metaImportJobs/filesImportJob'
 import UsersImportJob from './metaImportJobs/usersImportJob'
 import ChainsImportJob from './metaImportJobs/chainsImportJob'
+import ChainNodeDefsImportJob from './metaImportJobs/chainNodeDefsImportJob'
+import ChainNodeDefsAggregateImportJob from './metaImportJobs/chainNodeDefsAggregateImportJob'
 import CreateRdbJob from './metaImportJobs/createRdb'
 
 const createInnerJobs = (params) => {
@@ -27,6 +29,8 @@ const createInnerJobs = (params) => {
     new CategoriesImportJob(),
     new NodeDefsImportJob(),
     new ChainsImportJob(),
+    new ChainNodeDefsImportJob(),
+    new ChainNodeDefsAggregateImportJob(),
     // when not restoring a survey backup, skip activity log, records and files
     ...(backup ? [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()] : []),
     // Needed when the survey is published
