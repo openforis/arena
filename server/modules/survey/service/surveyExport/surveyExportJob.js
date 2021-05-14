@@ -9,6 +9,8 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import ActivityLogExportJob from './jobs/activityLogExportJob'
 import CategoriesExportJob from './jobs/categoriesExportJob'
 import ChainExportJob from './jobs/chainExportJob'
+import ChainNodeDefExportJob from './jobs/chainNodeDefExportJob'
+import ChainNodeDefAggregateExportJob from './jobs/chainNodeDefAggregateExportJob'
 import FilesExportJob from './jobs/filesExportJob'
 import RecordsExportJob from './jobs/recordsExportJob'
 import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
@@ -16,13 +18,15 @@ import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
 
 const createInnerJobs = ({ backup }) => {
-  // records, files, activity log are inlcuded only if exporting survey as backup (not cloning)
+  // records, files, activity log are included only if exporting survey as backup (not cloning)
   return [
     new SurveyInfoExportJob(),
     new CategoriesExportJob(),
     new TaxonomiesExportJob(),
     ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
     new ChainExportJob(),
+    new ChainNodeDefExportJob(),
+    new ChainNodeDefAggregateExportJob(),
     new UsersExportJob(),
     ...(backup ? [new ActivityLogExportJob()] : []),
   ]
