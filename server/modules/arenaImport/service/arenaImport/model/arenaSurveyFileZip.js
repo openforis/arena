@@ -42,7 +42,6 @@ export const getUserInvitations = async (zipFile) => _getJson(zipFile, ExportFil
 
 // Chains
 export const getChains = async (zipFile) => _getJson(zipFile, ExportFile.chains)
-export const getChain = async (zipFile, chainUuid) => _getJson(zipFile, ExportFile.chain({ chainUuid }))
 
 // ChainNodeDefs
 export const getChainNodeDefs = async (zipFile) => _getJson(zipFile, ExportFile.chainNodeDef, [])
