@@ -16,7 +16,7 @@ import * as AttributeTypeValidator from './attributeTypeValidator'
 import * as AttributeKeyValidator from './attributeKeyValidator'
 import * as AttributeUniqueValidator from './attributeUniqueValidator'
 
-const _validateRequired = (survey, nodeDef) => (propName, node) =>
+const _validateRequired = ({ nodeDef }) => (_propName, node) =>
   (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))) && Node.isValueBlank(node)
     ? { key: Validation.messageKeys.record.valueRequired }
     : null
@@ -65,7 +65,7 @@ export const validateAttribute = async (survey, record, attribute) => {
       attribute,
       {
         [Node.keys.value]: [
-          _validateRequired(survey, nodeDef),
+          _validateRequired({ nodeDef }),
           AttributeTypeValidator.validateValueType(survey, nodeDef),
           _validateNodeValidations(survey, record, nodeDef),
           AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef),

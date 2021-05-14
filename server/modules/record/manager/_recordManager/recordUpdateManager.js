@@ -203,7 +203,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
   t = db
 ) =>
   await t.tx(async (t) => {
-    await _beforeNodeUpdate(user, survey, record, node, t)
+    await _beforeNodeUpdate({ survey, record, node }, t)
 
     const nodesUpdated = await nodesUpdateFn(user, survey, record, node, t)
 
@@ -214,12 +214,12 @@ const _updateNodeAndValidateRecordUniqueness = async (
       nodesValidationListener,
       t
     )
-    await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
+    await _afterNodesUpdate({ survey, record: updatedRecord, nodes: updatedNodesAndDependents }, t)
 
     return updatedRecord
   })
 
-const _beforeNodeUpdate = async (user, survey, record, node, t) => {
+const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   if (Record.isPreview(record)) return
 
   const nodeDefUuid = Node.getNodeDefUuid(node)
@@ -303,7 +303,7 @@ const _onNodesUpdate = async (
   }
 }
 
-const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
+const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
   if (!Record.isPreview(record)) {
     const nodeDefsModified = Object.values(nodes).map((node) =>
       Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
