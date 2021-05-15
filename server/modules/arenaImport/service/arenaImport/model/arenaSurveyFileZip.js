@@ -1,8 +1,8 @@
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 
-const _getJson = async (zipFile, entryName) => {
+const _getJson = async (zipFile, entryName, defaultValue = null) => {
   const content = await zipFile.getEntryData(entryName)
-  return content ? JSON.parse(content) : null
+  return content ? JSON.parse(content) : defaultValue
 }
 
 // Survey
@@ -42,4 +42,9 @@ export const getUserInvitations = async (zipFile) => _getJson(zipFile, ExportFil
 
 // Chains
 export const getChains = async (zipFile) => _getJson(zipFile, ExportFile.chains)
-export const getChain = async (zipFile, chainUuid) => _getJson(zipFile, ExportFile.chain({ chainUuid }))
+
+// ChainNodeDefs
+export const getChainNodeDefs = async (zipFile) => _getJson(zipFile, ExportFile.chainNodeDef, [])
+
+// ChainNodeDefsAggregate
+export const getChainNodeDefsAggregate = async (zipFile) => _getJson(zipFile, ExportFile.chainNodeDefAggregate, [])
