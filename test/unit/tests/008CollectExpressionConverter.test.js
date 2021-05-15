@@ -101,6 +101,7 @@ describe('CollectExpressionConverter Test', () => {
       if (errorExpected) {
         expect(converted).toBeNull()
       } else {
+        expect(converted).toBeDefined()
         // converted expression has a new line character at the end;
         // remove it before comparing the expression with the expected one
         expect(converted.trim()).toBe(result)

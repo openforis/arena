@@ -13,13 +13,13 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   const reachableNodeDefs = []
 
   const queue = new Queue()
-  const visitedIds = []
+  const visitedUuids = []
 
   queue.enqueue(NodeDef.isEntity(nodeDefContext) ? nodeDefContext : Survey.getNodeDefParent(nodeDefContext)(survey))
 
   while (!queue.isEmpty()) {
     const entityDefCurrent = queue.dequeue()
-    const entityDefCurrentId = NodeDef.getId(entityDefCurrent)
+    const entityDefCurrentUuid = NodeDef.getUuid(entityDefCurrent)
     const entityDefCurrentChildren = Survey.getNodeDefChildren(entityDefCurrent)(survey)
 
     reachableNodeDefs.push(entityDefCurrent, ...entityDefCurrentChildren)
@@ -28,12 +28,12 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
     queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
 
     // avoid visiting 2 times the same entity definition when traversing single entities
-    if (!visitedIds.includes(entityDefCurrentId)) {
+    if (!visitedUuids.includes(entityDefCurrentUuid)) {
       const entityDefCurrentParent = Survey.getNodeDefParent(entityDefCurrent)(survey)
       if (entityDefCurrentParent) {
         queue.enqueue(entityDefCurrentParent)
       }
-      visitedIds.push(entityDefCurrentId)
+      visitedUuids.push(entityDefCurrentUuid)
     }
   }
   return reachableNodeDefs
