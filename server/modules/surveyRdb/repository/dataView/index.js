@@ -1,5 +1,11 @@
 export { createDataView } from './create'
 
-export { countDuplicateRecords, fetchViewData, fetchRecordsCountByKeys, runCount } from './read'
+export {
+  isRecordUniqueByKeys,
+  isRecordUniqueByUniqueNodes,
+  fetchViewData,
+  fetchRecordsCountByRootNodesValue,
+  runCount,
+} from './read'
 
 export { countViewDataAgg, fetchViewDataAgg } from './readAgg'

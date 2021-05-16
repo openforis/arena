@@ -109,6 +109,7 @@ export const {
   getNodeDefsByUuids,
   getNodeDefRoot,
   getNodeDefRootKeys,
+  getNodeDefsRootUnique,
   getNodeDefByUuid,
   getNodeDefChildren,
   hasNodeDefChildrenEntities,
