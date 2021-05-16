@@ -26,8 +26,7 @@ const taxa = csv.parse(fs.readFileSync(taxonomyPath), { columns: true, skip_empt
 const getRandomInRange = (from, to, fixed = 0) => (Math.random() * (to - from) + from).toFixed(fixed)
 
 const _createTree = (idx) => {
-  const taxon = taxa[Number(getRandomInRange(0, taxa.length - 1))]
-
+  const taxon = taxa[idx % taxa.length]
   return {
     [tree_id.name]: String(idx + 1),
     [tree_dec_1.name]: getRandomInRange(1, 50000, 5),

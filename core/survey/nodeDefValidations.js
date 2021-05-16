@@ -3,11 +3,12 @@ import * as R from 'ramda'
 import * as NumberUtils from '@core/numberUtils'
 
 export const keys = {
-  required: 'required',
   count: 'count',
-  min: 'min',
-  max: 'max',
   expressions: 'expressions',
+  max: 'max',
+  min: 'min',
+  required: 'required',
+  unique: 'unique',
 }
 
 // COUNT
@@ -22,7 +23,7 @@ export const getMaxCount = getCountProp(keys.max)
 export const hasMinOrMaxCount = (validations) => {
   const minCount = NumberUtils.toNumber(getMinCount(validations))
   const maxCount = NumberUtils.toNumber(getMaxCount(validations))
-  return !isNaN(minCount) || !isNaN(maxCount)
+  return !Number.isNaN(minCount) || !Number.isNaN(maxCount)
 }
 
 const assocCountProp = (key) => (value) =>
@@ -39,6 +40,11 @@ export const assocMaxCount = assocCountProp(keys.max)
 export const isRequired = R.propOr(false, keys.required)
 export const assocRequired = (required) => R.assoc(keys.required, required)
 export const dissocRequired = R.dissoc(keys.required)
+
+// UNIQUE
+export const isUnique = R.propOr(false, keys.unique)
+export const assocUnique = (unique) => R.assoc(keys.unique, unique)
+export const dissocUnique = R.dissoc(keys.unique)
 
 // EXPRESSIONS
 export const getExpressions = R.propOr([], keys.expressions)

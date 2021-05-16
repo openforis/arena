@@ -17,6 +17,7 @@ const keywords = [
   'props_advanced',
   'record_uuid',
   'step',
+  'unique',
   'uuid',
   'value',
 ]
