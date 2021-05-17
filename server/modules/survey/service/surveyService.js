@@ -6,6 +6,7 @@ import SurveyPublishJob from './publish/surveyPublishJob'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import ExportCsvDataJob from './export/exportCsvDataJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
+import { SchemaSummary } from './schemaSummary'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -38,6 +39,9 @@ export const startExportCsvDataJob = ({ surveyId, user }) => {
 
   return job
 }
+
+export const exportSchemaSummary = async ({ surveyId, outputStream }) =>
+  SchemaSummary.exportSchemaSummary({ surveyId, outputStream })
 
 export const {
   // CREATE

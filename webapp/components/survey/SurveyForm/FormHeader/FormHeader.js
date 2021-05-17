@@ -84,7 +84,7 @@ const FormHeader = (props) => {
         {edit && (
           <DownloadButton
             id={DataTestId.surveyForm.schemaSummary}
-            href={`/api/survey/${surveyId}/summary-export/`}
+            href={`/api/survey/${surveyId}/schema-summary/`}
             label={i18n.t('surveyForm.schemaSummary')}
           />
         )}
