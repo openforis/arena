@@ -131,6 +131,7 @@ export const DataTestId = {
     pageLinkBtn: (name) => `${name}-page-link-btn`,
     previewCloseBtn: 'preview-close-btn',
     previewOpenBtn: 'preview-open-btn',
+    schemaSummary: 'schema-summary-btn',
     surveyForm: 'survey-form',
     taxonField: (name, field) => `${name}-${field}`,
   },

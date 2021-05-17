@@ -8,7 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import {
   SurveyFormActions,
   useNodeDefLabelType,
@@ -17,6 +17,7 @@ import {
 } from '@webapp/store/ui/surveyForm'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+import DownloadButton from '@webapp/components/form/downloadButton'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import FormEntryActions from '../components/formEntryActions'
@@ -30,6 +31,7 @@ const FormHeader = (props) => {
   const history = useHistory()
   const i18n = useI18n()
 
+  const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
@@ -79,6 +81,13 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
+        {edit && (
+          <DownloadButton
+            id={DataTestId.surveyForm.schemaSummary}
+            href={`/api/survey/${surveyId}/summary-export/`}
+            label={i18n.t('surveyForm.schemaSummary')}
+          />
+        )}
         <NodeDefLabelSwitch
           className="btn-s btn-transparent"
           labelType={nodeDefLabelType}
