@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
@@ -19,11 +21,13 @@ const ValidationsProps = (props) => {
   const { state, Actions } = props
 
   const readOnly = !useAuthCanEditSurvey()
+  const survey = useSurvey()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   const onValidationsUpdate = (validations) =>
     Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations })
@@ -69,6 +73,18 @@ const ValidationsProps = (props) => {
           />
         </FormItem>
       )}
+      {NodeDef.isAttribute(nodeDef) &&
+        !NodeDef.isKey(nodeDef) &&
+        (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
+          <FormItem label={i18n.t('common.unique')}>
+            <Checkbox
+              id={DataTestId.nodeDefDetails.nodeDefUnique}
+              checked={NodeDefValidations.isUnique(nodeDefValidations)}
+              disabled={readOnly}
+              onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocUnique(checked)(nodeDefValidations))}
+            />
+          </FormItem>
+        )}
       {NodeDef.isAttribute(nodeDef) && (
         <ExpressionsProp
           qualifier={DataTestId.nodeDefDetails.validations}

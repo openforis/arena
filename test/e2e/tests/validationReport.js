@@ -7,20 +7,24 @@ import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
 
+const DUPLICATE_VALUE = 'Duplicate value'
+
 /* eslint-disable camelcase */
-const { cluster_id } = cluster.children
+const { cluster_id, cluster_coordinate } = cluster.children
 const { plot_id } = plot.children
-const { tree_id, tree_dec_2 } = tree.children
+const { tree_id, tree_dec_2, tree_species } = tree.children
 
 const record1 = records[0]
 const record2 = records[1]
 const record3 = records[2]
 
 const { validationReport } = DataTestId.validationReport
-const getMessagesEl = (path) =>
-  page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+const getMessagesEl = async (path) => {
+  await page.waitForSelector(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+  return page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+}
 
-const waitThread = (timeout = 1000) =>
+const waitThread = (timeout = 1500) =>
   test('Wait thread to complete', async () => {
     // TODO thread issue: https://github.com/openforis/arena/issues/1412
     await page.waitForTimeout(timeout)
@@ -42,6 +46,7 @@ const expectMessages = (messages) => {
       test(`Verify messages ${path}`, async () => {
         await page.waitForSelector(getSelector(DataTestId.table.row(DataTestId.validationReport.validationReport, idx)))
         const messagesEl = await getMessagesEl(path)
+        await expect(messagesEl).not.toBeNull()
         await expect(await messagesEl.getAttribute('data-value')).toBe(message)
       })
     )
@@ -59,22 +64,23 @@ const expectMessages = (messages) => {
   })
 }
 
+const gotoRecordAndEnterValue = (record, attribute, value) => {
+  gotoRecords()
+  gotoRecord(record)
+  enterAttribute(attribute, value)
+  // eslint-disable-next-line no-param-reassign
+  record[attribute.name] = value
+  waitThread()
+}
+
 export default () =>
   describe('Validation report', () => {
     gotoValidationReport()
     expectMessages([])
 
     describe(`Duplicate root entity key`, () => {
-      gotoRecords()
-      gotoRecord(record2)
-      enterAttribute(cluster_id, '6')
-      waitThread()
-
-      gotoRecords()
-      gotoRecord(record3)
-      enterAttribute(cluster_id, '6')
-      waitThread()
-
+      gotoRecordAndEnterValue(record2, cluster_id, '6')
+      gotoRecordAndEnterValue(record3, cluster_id, '6')
       gotoValidationReport()
       expectMessages([
         [`Cluster[6] / Cluster id`, 'Duplicate record key'],
@@ -82,10 +88,30 @@ export default () =>
       ])
     })
 
-    describe(`Restore root entity key`, () => {
-      gotoNode('Cluster[6] / Cluster id')
-      enterAttribute(cluster_id, '9')
-      waitThread()
+    describe(`Restore root entity keys`, () => {
+      gotoRecordAndEnterValue(record3, cluster_id, '3')
+      gotoRecordAndEnterValue(record2, cluster_id, '2')
+      gotoValidationReport()
+      expectMessages([])
+    })
+
+    describe(`Duplicate root entity unique attribute`, () => {
+      const record1CoordinateValuePrev = record1[cluster_coordinate.name]
+      const record2CoordinateValuePrev = record2[cluster_coordinate.name]
+      const clusterCoordinateDuplicate = { x: '10', y: '20', srs: '4326' }
+
+      gotoRecordAndEnterValue(record1, cluster_coordinate, clusterCoordinateDuplicate)
+      gotoRecordAndEnterValue(record2, cluster_coordinate, clusterCoordinateDuplicate)
+
+      gotoValidationReport()
+      expectMessages([
+        [`Cluster[1] / Cluster coordinate`, DUPLICATE_VALUE],
+        [`Cluster[2] / Cluster coordinate`, DUPLICATE_VALUE],
+      ])
+
+      // restore old values
+      gotoRecordAndEnterValue(record1, cluster_coordinate, record1CoordinateValuePrev)
+      gotoRecordAndEnterValue(record2, cluster_coordinate, record2CoordinateValuePrev)
 
       gotoValidationReport()
       expectMessages([])
@@ -124,23 +150,24 @@ export default () =>
     })
 
     describe(`Edit node in page`, () => {
-      gotoNode(`Cluster[${record1[cluster_id.name]}] / Plot[] / Tree[] / Tree decimal 2`)
-      enterAttribute(plot_id, record1[plot_id.name])
+      const clusterIdValue = record1[cluster_id.name]
+      const plotIdValue = record1[plot_id.name]
+
+      gotoNode(`Cluster[${clusterIdValue}] / Plot[] / Tree[] / Tree decimal 2`)
+      enterAttribute(plot_id, plotIdValue)
 
       enterAttribute(tree_id, record1.trees[0][tree_id.name], getTreeSelector(0))
       enterAttribute(tree_dec_2, record1.trees[0][tree_dec_2.name], getTreeSelector(0))
+      // duplicate species with value of previous tree
+      enterAttribute(tree_species, record1.trees[0][tree_species.name], getTreeSelector(1))
       waitThread()
 
       gotoValidationReport()
       expectMessages([
-        [
-          `Cluster[${record1[cluster_id.name]}] / Plot[${record1[plot_id.name]}] / Tree[10] / Tree id`,
-          'Duplicate entity key',
-        ],
-        [
-          `Cluster[${record1[cluster_id.name]}] / Plot[${record1[plot_id.name]}] / Tree[10] / Tree id`,
-          'Duplicate entity key',
-        ],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[1] / Tree Species`, DUPLICATE_VALUE],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree id`, 'Duplicate entity key'],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree Species`, DUPLICATE_VALUE],
+        [`Cluster[${clusterIdValue}] / Plot[${plotIdValue}] / Tree[10] / Tree id`, 'Duplicate entity key'],
       ])
     })
 

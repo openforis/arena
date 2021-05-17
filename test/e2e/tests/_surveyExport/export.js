@@ -5,13 +5,18 @@ import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
-  test(`Export survey ${survey.name}`, async () => {
+  test(`Export survey ${survey?.name}`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
     await page.waitForSelector(getSelector(DataTestId.dashboard.surveyExportBtn))
-    await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
-    await page.waitForSelector(getSelector(DataTestId.modal.modal))
+
+    await Promise.all([
+      page.waitForSelector(getSelector(DataTestId.modal.modal)),
+      page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button')),
+    ])
+
+    await page.waitForSelector(DataTestId.surveyExport.downloadBtn)
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
@@ -20,6 +25,7 @@ export const exportSurvey = (survey) =>
     ])
 
     await download.saveAs(surveyZipPath)
+
     const zip = new AdmZip(surveyZipPath)
     zip.extractAllTo(surveyDirPath, true, '')
 

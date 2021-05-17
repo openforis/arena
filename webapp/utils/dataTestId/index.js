@@ -41,6 +41,10 @@ export const DataTestId = {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,
   },
+  entities: {
+    addBtn: 'entity-add-btn',
+    entitySelector: 'entity-selector',
+  },
   expressionEditor: {
     advancedQuery: 'expression-advanced-query',
     applyBtn: 'expression-apply-btn',
@@ -66,6 +70,7 @@ export const DataTestId = {
     ok: 'text="Ok"',
   },
   nodeDefDetails: {
+    deleteBtn: 'nodedef-delete-btn',
     advanced: 'advanced',
     applyIf: (id) => `${id}-apply-if`,
     backBtn: 'node-def-back',
@@ -78,6 +83,7 @@ export const DataTestId = {
     nodeDefCodeParent: 'node-def-code-parent',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
+    nodeDefUnique: 'node-def-unique',
     relevantIf: 'relevant-if',
     saveBtn: 'node-def-save-btn',
     taxonomySelector: 'taxonomy-selector',

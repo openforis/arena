@@ -3,11 +3,12 @@ import { taxonomies } from './taxonomies'
 
 const nodeDefCompositeTypes = ['entity', 'code', 'taxon']
 
-const createAttribute = (name, label, type, key = false) => ({
+const createAttribute = (name, label, type, key = false, unique = false) => ({
   name,
   label,
   type,
   key,
+  unique,
 })
 
 const createCode = (name, label, category, parent = null, key = false) => ({
@@ -16,8 +17,8 @@ const createCode = (name, label, category, parent = null, key = false) => ({
   parent,
 })
 
-const createTaxon = (name, label, taxonomy) => ({
-  ...createAttribute(name, label, 'taxon'),
+const createTaxon = (name, label, taxonomy, unique = false) => ({
+  ...createAttribute(name, label, 'taxon', false, unique),
   taxonomy,
 })
 
@@ -34,7 +35,7 @@ export const cluster = createEntity('cluster', 'Cluster', {
   cluster_date: createAttribute('cluster_date', 'Cluster date', 'date'),
   cluster_time: createAttribute('cluster_time', 'Cluster time', 'time'),
   cluster_boolean: createAttribute('cluster_boolean', 'Cluster boolean', 'boolean'),
-  cluster_coordinate: createAttribute('cluster_coordinate', 'Cluster coordinate', 'coordinate'),
+  cluster_coordinate: createAttribute('cluster_coordinate', 'Cluster coordinate', 'coordinate', false, true),
   cluster_country: createCode('cluster_country', 'Cluster country', categories.administrative_unit.name),
   cluster_region: createCode(
     'cluster_region',
@@ -56,13 +57,15 @@ export const cluster = createEntity('cluster', 'Cluster', {
       tree_id: createAttribute('tree_id', 'Tree id', 'integer', true),
       tree_dec_1: createAttribute('tree_dec_1', 'Tree decimal 1', 'decimal'),
       tree_dec_2: createAttribute('tree_dec_2', 'Tree decimal 2', 'decimal'),
-      tree_species: createTaxon('tree_species', 'Tree Species', taxonomies.species_list.name),
+      tree_species: createTaxon('tree_species', 'Tree Species', taxonomies.species_list.name, true),
     }),
   }),
 })
 
 export const { plot } = cluster.children
 export const { tree } = plot.children
+
+export const virtualEntities = [createEntity('entity_one', 'Entity One'), createEntity('entity_two', 'Entity Two')]
 
 export const getAtomicAttributeKeys = (nodeDef) =>
   Object.keys(nodeDef.children).filter((key) => !nodeDefCompositeTypes.includes(nodeDef.children[key].type))

@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
+import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 
 const nodeDefsKey = 'nodeDefs'
@@ -88,6 +89,13 @@ export const getNodeDefRootKeys = (survey) => getNodeDefKeys(getNodeDefRoot(surv
 
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
+
+export const getNodeDefsRootUnique = (survey) => {
+  const nodeDefRoot = getNodeDefRoot(survey)
+  return getNodeDefChildren(nodeDefRoot)(survey).filter(
+    (nodeDef) => NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) && !NodeDef.isDeleted(nodeDef)
+  )
+}
 
 export const getNodeDefByName = (name) =>
   R.pipe(getNodeDefsArray, R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name)))
