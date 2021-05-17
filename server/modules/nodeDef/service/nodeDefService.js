@@ -7,7 +7,7 @@ import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
-const fetchSurvey = async ({ surveyId, cycle }, t) => {
+const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
   const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     {
       surveyId,
@@ -16,13 +16,13 @@ const fetchSurvey = async ({ surveyId, cycle }, t) => {
       advanced: true,
       validate: false,
     },
-    t
+    client
   )
   // build dependency graph if empty
   return Survey.hasDependencyGraph(surveyDb) ? surveyDb : Survey.buildAndAssocDependencyGraph(surveyDb)
 }
 
-const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nodeDefsUpdated }, t) => {
+const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nodeDefsUpdated }, client = db) => {
   // merge node defs with existing ones
   let surveyUpdated = Survey.assocNodeDefs({
     nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated },
@@ -30,7 +30,11 @@ const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nod
 
   // add dependent node defs to dependency graph
   surveyUpdated = Survey.addNodeDefDependencies(nodeDef)(surveyUpdated)
-  await SurveyManager.updateSurveyDependencyGraphs(Survey.getId(survey), Survey.getDependencyGraph(surveyUpdated), t)
+  await SurveyManager.updateSurveyDependencyGraphs(
+    Survey.getId(survey),
+    Survey.getDependencyGraph(surveyUpdated),
+    client
+  )
 
   const nodeDefsToValidate = [
     ...(NodeDef.isRoot(nodeDef) ? [] : [Survey.getNodeDefParent(nodeDef)(surveyUpdated)]), // always re-validate parent entity (keys may have been changed)
@@ -82,14 +86,7 @@ export const insertNodeDef = async (
   })
 
 export const updateNodeDefProps = async (
-  user,
-  surveyId,
-  cycle,
-  nodeDefUuid,
-  parentUuid,
-  props,
-  propsAdvanced = {},
-  system = false,
+  { user, surveyId, cycle, nodeDefUuid, parentUuid, props, propsAdvanced = {}, system = false },
   client = db
 ) =>
   client.tx(async (t) => {
