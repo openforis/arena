@@ -9,6 +9,7 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
+    await page.waitForSelector(getSelector(DataTestId.dashboard.surveyExportBtn))
     await page.click(getSelector(DataTestId.dashboard.surveyExportBtn, 'button'))
     await page.waitForSelector(getSelector(DataTestId.modal.modal))
 
