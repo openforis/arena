@@ -44,7 +44,7 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 
   await page.fill(codeSelector, value.code.substring(0, 3))
   await page.waitForSelector('.survey-form__node-def-taxon-autocomplete-list')
-  await page.click(`text="${value.code}"`)
+  await page.click(`.survey-form__node-def-taxon-autocomplete-list div:text("${value.code}")`)
 }
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
