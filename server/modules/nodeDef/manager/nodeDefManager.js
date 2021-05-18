@@ -135,8 +135,8 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
 // ======= DELETE
 
-export const markNodeDefDeleted = async (user, surveyId, cycle, nodeDefUuid) =>
-  db.tx(async (t) => {
+export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
     const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
