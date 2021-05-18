@@ -46,9 +46,10 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 
   const fillCodeAndSelectItem = async () => {
     try {
-      await page.fill(codeSelector, value.code.substring(0, 3))
-      await page.waitForSelector('.autocomplete-list', { timeout: 5000 })
-      await page.click(`text="${value.code}"`)
+      const timeout = 5000
+      await page.fill(codeSelector, value.code.substring(0, 3), { timeout })
+      await page.waitForSelector('.autocomplete-list', { timeout })
+      await page.click(`text="${value.code}"`, { timeout })
       return true
     } catch (e) {
       return false
