@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
-import * as AnalysisManager from '@server/modules/analysis/manager'
 
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 /**
@@ -17,9 +17,7 @@ export default class ChainsImportJob extends Job {
 
     const chains = await ArenaSurveyFileZip.getChains(arenaSurveyFileZip)
 
-    await Promise.all(
-      chains.map(async (chain) => AnalysisManager.importChain({ surveyId, chain, user: this.user }, this.tx))
-    )
+    await ChainRepository.insertMany({ surveyId, chains }, this.tx)
 
     this.setContext({ chains })
   }
