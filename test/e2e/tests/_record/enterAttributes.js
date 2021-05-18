@@ -83,4 +83,4 @@ const enterFns = {
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
-  })
+  }, 30000)
