@@ -52,6 +52,7 @@ export const {
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,
   // UPDATE
+  updateSurveyDependencyGraphs,
   updateSurveyProps,
   // DELETE
   deleteSurvey,

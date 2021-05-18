@@ -15,5 +15,6 @@ export default class ChainNodeDefAggregateExportJob extends Job {
     archive.append(JSON.stringify(chainNodeDefsAggregate, null, 2), { name: chainNodeDefsAggregatePathFile })
 
     this.total = chainNodeDefsAggregate.length
+
   }
 }
