@@ -2,14 +2,31 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
-  Survey.visitAncestorsAndSelf(nodeDef, (n) => pathParts.push(n.props.name))(survey)
+  Survey.visitAncestorsAndSelf(nodeDef, (n) => pathParts.unshift(n.props.name))(survey)
   return pathParts.join('.')
+}
+
+const getValidationsSummary = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const expressions = NodeDefValidations.getExpressions(validations)
+  return expressions
+    .reduce((acc, expression) => {
+      const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
+
+      let text = `(${severity}) Expression: ${expr}`
+      if (applyIf) {
+        text += ` - Apply if: ${applyIf}`
+      }
+      return [...acc, text]
+    }, [])
+    .join('\r\n')
 }
 
 export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
@@ -34,7 +51,7 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
     const applicable = NodeDef.getApplicable(nodeDef)
     const applyIf = applicable.lenght > 0 ? NodeDefExpression.getExpression(applicable[0]) : ''
 
-    const item = {
+    return {
       uuid,
       path: pathByNodeDefUuid[uuid],
       type: NodeDef.isEntity(nodeDef) ? 'entity' : 'attribute',
@@ -43,12 +60,12 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
         (labelsAcc, lang) => ({ ...labelsAcc, [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang) }),
         {}
       ),
+      key: String(NodeDef.isKey(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       applyIf,
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+      valiadtions: getValidationsSummary({ nodeDef }),
     }
-
-    return item
   })
 
   await CSVWriter.writeToStream(outputStream, items)
