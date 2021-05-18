@@ -42,10 +42,16 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
 const enterTaxon = async (nodeDef, value, parentSelector) => {
   const { codeSelector } = getTaxonSelector(nodeDef, parentSelector)
 
-  await page.fill(codeSelector, '')
   await page.fill(codeSelector, value.code.substring(0, 3))
-  await page.waitForSelector('.autocomplete-list')
-  await page.click(`text="${value.scientificName}"`)
+  const autocompleteSelector = '.survey-form__node-def-taxon-autocomplete-list'
+  await page.waitForSelector(autocompleteSelector, { timeout: 5000 })
+  if (!page.$(autocompleteSelector)) {
+    // autocomplete selector may have been closed during record update
+    await page.fill(codeSelector, value.code.substring(0, 3))
+    await page.waitForSelector(autocompleteSelector, { timeout: 5000 })
+  }
+  expect(page.$(autocompleteSelector)).not.toBeNull()
+  await page.click(`.survey-form__node-def-taxon-autocomplete-list .item div:text("${value.scientificName}")`)
 }
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
