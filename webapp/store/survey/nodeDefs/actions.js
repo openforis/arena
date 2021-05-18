@@ -179,14 +179,14 @@ export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getSt
 
           const [
             {
-              data: { nodeDefsValidation },
+              data: { nodeDefsUpdated, nodeDefsValidation },
             },
           ] = await Promise.all([
             axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
             dispatch({ type: nodeDefDelete, nodeDef }),
           ])
 
-          dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+          dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
           if (history) {
             history.goBack()
           }

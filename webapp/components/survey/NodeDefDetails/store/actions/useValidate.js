@@ -14,7 +14,7 @@ export const useValidate = ({ setState }) => {
   const survey = useSelector(SurveyState.getSurvey)
 
   return useCallback(async ({ state, nodeDefUpdated }) => {
-    const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefUpdated, updateDependencyGraph: true })(survey)
+    const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefUpdated })(survey)
 
     // Validate node def
     const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDefUpdated)
