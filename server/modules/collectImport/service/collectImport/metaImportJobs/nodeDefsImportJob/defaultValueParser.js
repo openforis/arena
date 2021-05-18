@@ -7,6 +7,14 @@ import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
+const parseConstantValue = ({ survey, nodeDef, value }) => {
+  if (NodeDef.isBoolean(nodeDef)) {
+    const valueConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent: nodeDef, expression: value })
+    return valueConverted ? JSON.stringify(valueConverted.trim()) : null
+  }
+  return JSON.stringify(value)
+}
+
 const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
   const { value, expr: collectExpr, applyIf: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
@@ -17,7 +25,7 @@ const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLangua
   }
 
   const exprConverted = StringUtils.isNotBlank(value)
-    ? JSON.stringify(value) // Default value is a constant
+    ? parseConstantValue({ survey, nodeDef, value })
     : CollectExpressionConverter.convert({
         survey,
         nodeDefCurrent: nodeDef,
