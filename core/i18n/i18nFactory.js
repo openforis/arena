@@ -29,6 +29,7 @@ export const createI18nPromise = (lang) => {
     createInstance(createParams(lang), (err, t) => {
       if (err) {
         reject(err)
+        return
       }
 
       resolve({ lang, t })
