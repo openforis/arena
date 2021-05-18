@@ -17,23 +17,23 @@ const getValidationsSummary = ({ nodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
   return expressions
-    .reduce((acc, expression) => {
+    .reduce((summaryTexts, expression) => {
       const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
 
-      let text = `(${severity}) Expression: ${expr}`
+      let text = `(${severity}) Expression: ${expr.trim()}`
       if (applyIf) {
-        text += ` - Apply if: ${applyIf}`
+        text += ` - Apply if: ${applyIf.trim()}`
       }
-      return [...acc, text]
+      return [...summaryTexts, text]
     }, [])
-    .join('\r\n')
+    .join('\n')
 }
 
 export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = Survey.getNodeDefsArray(survey)
   const pathByNodeDefUuid = nodeDefs.reduce(
-    (acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
+    (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
     {}
   )
   // sort node defs by path
@@ -56,6 +56,7 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
       path: pathByNodeDefUuid[uuid],
       type: NodeDef.isEntity(nodeDef) ? 'entity' : 'attribute',
       attributeType: NodeDef.isAttribute(nodeDef) ? type : '',
+      // labels
       ...languages.reduce(
         (labelsAcc, lang) => ({ ...labelsAcc, [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang) }),
         {}
@@ -64,9 +65,9 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       applyIf,
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
-      valiadtions: getValidationsSummary({ nodeDef }),
+      validations: getValidationsSummary({ nodeDef }),
     }
   })
 
-  await CSVWriter.writeToStream(outputStream, items)
+  await CSVWriter.writeToStream(outputStream, items, { removeNewLines: false })
 }
