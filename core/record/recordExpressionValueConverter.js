@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Points } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -34,6 +36,8 @@ const _toCode = ({ survey, record, nodeCtx, valueExpr }) => {
   return itemUuid ? { [Node.valuePropsCode.itemUuid]: itemUuid } : null
 }
 
+const _toCoordinate = ({ valueExpr }) => (valueExpr ? Points.parse(valueExpr) : null)
+
 const _toDateTime = ({ valueExpr, format, formatsFrom = [DateUtils.formats.datetimeDefault] }) => {
   if (!valueExpr) {
     return null
@@ -58,6 +62,7 @@ const _toTaxon = ({ survey, nodeCtx, valueExpr }) => {
 const _valueExprToValueNodeFns = {
   [NodeDef.nodeDefType.boolean]: _toBoolean,
   [NodeDef.nodeDefType.code]: _toCode,
+  [NodeDef.nodeDefType.coordinate]: _toCoordinate,
   [NodeDef.nodeDefType.date]: ({ valueExpr }) =>
     _toDateTime({
       valueExpr,
@@ -78,5 +83,7 @@ const _valueExprToValueNodeFns = {
 
 export const toNodeValue = (survey, record, nodeCtx, valueExpr) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
-  return _valueExprToValueNodeFns[NodeDef.getType(nodeDef)]({ survey, record, nodeCtx, valueExpr })
+  const fn = _valueExprToValueNodeFns[NodeDef.getType(nodeDef)]
+  if (!fn) throw new Error(`Unsupported type ${NodeDef.getType(nodeDef)} for record node value conversion`)
+  return fn({ survey, record, nodeCtx, valueExpr })
 }
