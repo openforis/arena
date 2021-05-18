@@ -16,7 +16,7 @@ const parseConstantValue = ({ survey, nodeDef, value }) => {
 }
 
 const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
-  const { value, expr: collectExpr, applyIf: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
+  const { value, expr: collectExpr, if: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
   if (StringUtils.isBlank(value) && StringUtils.isBlank(collectExpr)) {
     // empty default value, skip it
