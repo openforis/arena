@@ -1,3 +1,5 @@
+import * as PromiseUtils from '../../../../core/promiseUtils'
+
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 import {
   formatTime,
@@ -46,7 +48,7 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
     try {
       await page.fill(codeSelector, value.code.substring(0, 3))
       await page.waitForSelector('.autocomplete-list', { timeout: 5000 })
-      await page.click(`text="${value.scientificName}"`)
+      await page.click(`text="${value.code}"`)
       return true
     } catch (e) {
       return false
@@ -54,7 +56,13 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   }
   // try to fill the code and select an item from the autocomplete 2 times:
   // autocomplete dialog could have been closed after record update
-  ;[...new Array(2).keys()].some(async () => fillCodeAndSelectItem())
+  let valueSet = false
+  await PromiseUtils.each([...new Array(2).keys()], async () => {
+    if (!valueSet) {
+      if (await fillCodeAndSelectItem()) valueSet = true
+    }
+  })
+  expect(valueSet).toBeTruthy()
 }
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
