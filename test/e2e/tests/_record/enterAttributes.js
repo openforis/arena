@@ -52,7 +52,9 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
       return false
     }
   }
-  new Array(2).some(() => fillCodeAndSelectItem())
+  // try to fill the code and select an item from the autocomplete 2 times:
+  // autocomplete dialog could have been closed after record update
+  ;[1, 2].some(() => fillCodeAndSelectItem())
 }
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
