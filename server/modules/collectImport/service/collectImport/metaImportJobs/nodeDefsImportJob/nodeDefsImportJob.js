@@ -552,7 +552,8 @@ export default class NodeDefsImportJob extends Job {
   }
 
   get survey() {
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs })({})
+    // dependency graph generation not necessary
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })({})
   }
 }
 

@@ -28,9 +28,6 @@ const sendRespNodeDefsAndValidation = async (
   })
 }
 
-const sendRespNodeDefsUpdated = async (res, surveyId, cycle, nodeDefsUpdated) =>
-  sendRespNodeDefsAndValidation(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
-
 export const init = (app) => {
   // ==== CREATE
 
@@ -40,15 +37,14 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
       const { surveyCycleKey, nodeDef, chainNodeDef } = Request.getBody(req)
 
-      const nodeDefsUpdated = await NodeDefService.insertNodeDef({
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDef({
         user,
         surveyId,
         cycle: surveyCycleKey,
         nodeDef,
         chainNodeDef,
       })
-
-      await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated))
+      res.json({ nodeDefsUpdated: R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
     } catch (error) {
       next(error)
     }
@@ -79,17 +75,19 @@ export const init = (app) => {
         const { props, propsAdvanced } = Request.getBody(req)
         const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
 
-        const nodeDefsUpdated = await NodeDefService.updateNodeDefProps(
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps({
           user,
           surveyId,
+          cycle,
           nodeDefUuid,
           parentUuid,
           props,
-          propsAdvanced
-        )
-        delete nodeDefsUpdated[nodeDefUuid]
+          propsAdvanced,
+        })
 
-        await sendRespNodeDefsUpdated(res, surveyId, cycle, nodeDefsUpdated)
+        // do not send updated node def back to client (node def already updated client side)
+        delete nodeDefsUpdated[nodeDefUuid]
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)
       }
@@ -106,9 +104,16 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const { surveyId, surveyCycleKey, nodeDefUuid } = Request.getParams(req)
 
-        const nodeDefsUpdated = await NodeDefService.markNodeDefDeleted(user, surveyId, surveyCycleKey, nodeDefUuid)
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefDeleted({
+          user,
+          surveyId,
+          surveyCycleKey,
+          nodeDefUuid,
+        })
 
-        await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(nodeDefUuid, nodeDefsUpdated))
+        // do not send updated node def back to client (node def already updated client side)
+        delete nodeDefsUpdated[nodeDefUuid]
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)
       }
