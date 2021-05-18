@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-xenial
+    runs-on: ubuntu:xenial
 
     steps:
       - uses: actions/checkout@v2
