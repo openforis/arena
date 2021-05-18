@@ -4,6 +4,7 @@ import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
+import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -27,32 +28,8 @@ export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
-  const children = []
-  if (NodeDef.isVirtual(nodeDef)) {
-    // If nodeDef is virtual, get children from its source
-    const entitySource = getNodeDefSource(nodeDef)(survey)
-    children.push(...getNodeDefChildren(entitySource, includeAnalysis)(survey))
-  }
-
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  children.push(
-    ...R.pipe(
-      getNodeDefsArray,
-      R.filter((nodeDefCurrent) => {
-        if (NodeDef.isAnalysis(nodeDefCurrent) && !includeAnalysis) {
-          return false
-        }
-        if (NodeDef.isVirtual(nodeDefCurrent)) {
-          // Include virtual entities having their source as a child of the given entity
-          const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
-          return NodeDef.getParentUuid(entitySource) === nodeDefUuid
-        }
-        // "natural" child
-        return NodeDef.getParentUuid(nodeDefCurrent) === nodeDefUuid
-      })
-    )(survey)
-  )
-  return children
+  const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
+  return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef, includeAnalysis)(surveyIndexed)
 }
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
@@ -111,6 +88,7 @@ export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predic
 // ====== UPDATE
 
 export const assocNodeDefs = (nodeDefs) => R.assoc(nodeDefsKey, nodeDefs)
+
 export const assocNodeDef = (nodeDef) => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 
 // ====== HIERARCHY

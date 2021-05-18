@@ -148,7 +148,7 @@ export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], 
 
   if (R.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
     // no changes applied
-    return nodeDefParent
+    return {}
   }
   const nodeDefParentUuid = NodeDef.getUuid(nodeDefParentUpdated)
   return {

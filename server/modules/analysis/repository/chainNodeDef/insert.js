@@ -28,7 +28,7 @@ export const insert = async (params, client = DB) => {
 export const insertMany = async ({ surveyId, chainNodeDefs = [] }, client = DB) =>
   client.tx(async (tx) => {
     const schema = Schemata.getSchemaSurvey(surveyId)
-    return tx.batch([
+    await tx.batch([
       chainNodeDefs.map(({ uuid, chainUuid, nodeDefUuid, index, props, script }) =>
         tx.none(
           `

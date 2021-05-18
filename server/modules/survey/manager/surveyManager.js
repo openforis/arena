@@ -156,7 +156,7 @@ export const importSurvey = async (params, client = db) => {
   return assocSurveyInfo(survey)
 }
 // ====== READ
-export const { fetchAllSurveyIds } = SurveyRepository
+export const { countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([
@@ -172,13 +172,22 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
-  const [surveyDb, nodeDefs] = await Promise.all([
+  const [surveyDb, nodeDefs, dependencies] = await Promise.all([
     fetchSurveyById({ surveyId, draft, validate, backup }, client),
     NodeDefManager.fetchNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, includeDeleted, backup }, client),
+    fetchDependencies(surveyId),
   ])
-  const survey = Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: validate })(surveyDb)
-
-  return validate ? Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey) : survey
+  let survey = Survey.assocNodeDefs({ nodeDefs })(surveyDb)
+  if (dependencies) {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
+  }
+  if (validate) {
+    const dependencyGraph = dependencies || Survey.buildDependencyGraph(survey)
+    survey = Survey.assocDependencyGraph(dependencyGraph)(survey)
+    const validation = await SurveyValidator.validateNodeDefs(survey)
+    survey = Survey.assocNodeDefsValidation(validation)(survey)
+  }
+  return survey
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
@@ -196,8 +205,6 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
 
 export const fetchUserSurveysInfo = async ({ user, draft = true, template = false, offset, limit }) =>
   (await SurveyRepository.fetchUserSurveys({ user, draft, template, offset, limit })).map(assocSurveyInfo)
-
-export const { countUserSurveys, fetchDependencies } = SurveyRepository
 
 // ====== UPDATE
 export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
