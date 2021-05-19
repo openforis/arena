@@ -11,3 +11,5 @@ usePackage("sqldf")
 usePackage("httr")
 usePackage("jsonlite")
 usePackage('zip')
+
+usePackage('data.table')
