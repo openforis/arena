@@ -44,7 +44,9 @@ describe('CollectExpressionConverter Test', () => {
     { q: 'false()', r: 'false' },
     { q: 'TRUE', r: 'true' },
     { q: 'FALSE', r: 'false' },
+    { q: 'cluster_accessible and true()', r: 'cluster_accessible && true' },
     { q: 'false() or TRUE', r: 'false || true' },
+    { q: 'cluster_accessible=true()', r: 'cluster_accessible==true' },
     // object conversion
     { q: 'boolean(remarks)', r: 'Boolean(remarks)' },
     { q: 'number(gps_model)', r: 'Number(gps_model)' },
@@ -75,21 +77,9 @@ describe('CollectExpressionConverter Test', () => {
       r: `categoryItemProp('sampling_point_data', 'region', cluster_id, plot_id)`,
       n: 'plot_id',
     },
-    ...[
-      'abs',
-      'acos',
-      'asin',
-      'atan',
-      'log',
-      'log10',
-      'max',
-      'min',
-      'pow',
-      'random',
-      'sin',
-      'sqrt',
-      'tan',
-    ].map((fn) => ({ q: `math:${fn}`, r: `Math.${fn}` })),
+    ...['abs', 'acos', 'asin', 'atan', 'log', 'log10', 'max', 'min', 'pow', 'random', 'sin', 'sqrt', 'tan'].map(
+      (fn) => ({ q: `math:${fn}`, r: `Math.${fn}` })
+    ),
     { q: 'math:PI()', r: 'Math.PI' },
   ]
 
@@ -101,7 +91,7 @@ describe('CollectExpressionConverter Test', () => {
       if (errorExpected) {
         expect(converted).toBeNull()
       } else {
-        expect(converted).toBeDefined()
+        expect(converted).not.toBeNull()
         // converted expression has a new line character at the end;
         // remove it before comparing the expression with the expected one
         expect(converted.trim()).toBe(result)
