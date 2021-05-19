@@ -40,7 +40,9 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
   nodeDefs.sort((nodeDef1, nodeDef2) => {
     const path1 = pathByNodeDefUuid[nodeDef1.uuid]
     const path2 = pathByNodeDefUuid[nodeDef2.uuid]
-    return path1 - path2
+    if (path1 > path2) return 1
+    if (path2 > path1) return -1
+    return 0
   })
 
   const items = nodeDefs.map((nodeDef) => {
@@ -54,8 +56,7 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
     return {
       uuid,
       path: pathByNodeDefUuid[uuid],
-      type: NodeDef.isEntity(nodeDef) ? 'entity' : 'attribute',
-      attributeType: NodeDef.isAttribute(nodeDef) ? type : '',
+      type,
       // labels
       ...languages.reduce(
         (labelsAcc, lang) => ({ ...labelsAcc, [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang) }),
