@@ -11,6 +11,7 @@ import nodeDefTaxonAndTaxonomyEdit from '../tests/nodeDefTaxonAndTaxonomyEdit'
 import nodeDefReorder from '../tests/nodeDefReorder'
 import nodeDefExpressionsEdit from '../tests/nodeDefExpressionsEdit'
 import surveyFormPreview from '../tests/surveyFormPreview'
+import surveySchemaSummary from '../tests/surveySchemaSummary'
 import exportCsvData from '../tests/exportCsvData'
 
 import recordAdd from '../tests/recordAdd'
@@ -57,7 +58,16 @@ describe('E2E Tests', () => {
   nodeDefTaxonAndTaxonomyEdit()
   nodeDefReorder()
   nodeDefExpressionsEdit()
+
+  /**
+   * Survey Form Preview.
+   */
   surveyFormPreview()
+
+  /**
+   * Survey Schema Summary.
+   */
+  surveySchemaSummary()
 
   /**
    * Data edit.

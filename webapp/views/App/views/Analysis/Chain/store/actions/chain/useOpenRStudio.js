@@ -65,6 +65,43 @@ export const useOpenRStudio = () => {
   const userUuid = User.getUuid(user)
 
   return useCallback(
+    async ({ chain }) => {
+      dispatch(LoaderActions.showLoader())
+
+      const config = { params: { surveyCycleKey } }
+      const chainUuid = Chain.getUuid(chain)
+      const { data } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}/script`, config)
+
+      const rStudioUrl = await _getRStudioUrl({ userUuid })
+
+      const { token, serverUrl } = data
+
+      const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl })
+
+      dispatch(LoaderActions.hideLoader())
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'processingChainView.copyRStudioCode',
+          params: { rStudioCode },
+          onOk: () => {
+            _copyRStudioCode({ rStudioCode })
+            window.open(rStudioUrl, 'rstudio')
+          },
+        })
+      )
+    },
+    [dispatch, surveyId, surveyCycleKey, userUuid]
+  )
+}
+
+export const _useOpenRStudio = () => {
+  const dispatch = useDispatch()
+  const surveyId = useSurveyId()
+  const surveyCycleKey = useSurveyCycleKey()
+  const user = useUser()
+  const userUuid = User.getUuid(user)
+
+  return useCallback(
     async ({ state }) => {
       dispatch(LoaderActions.showLoader())
 

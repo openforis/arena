@@ -1,4 +1,6 @@
 import * as R from 'ramda'
+
+import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
 
@@ -146,6 +148,21 @@ export const init = (app) => {
       }
     }
   )
+
+  app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+      const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+      const fileName = `${surveyName}_schema_summary_${DateUtils.nowFormatDefault()}.csv`
+      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+      await SurveyService.exportSchemaSummary({ surveyId, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // ==== UPDATE
 

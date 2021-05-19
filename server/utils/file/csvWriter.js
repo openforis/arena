@@ -4,14 +4,19 @@ import { transform, stringify } from 'csv'
 
 import * as StringUtils from '@core/stringUtils'
 
-const _transformObj = (obj) =>
-  Object.entries(obj).reduce(
-    (objAcc, [key, value]) => Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
-    {}
-  )
+const _transformObj =
+  (options = {}) =>
+  (obj) => {
+    const { removeNewLines = true } = options
+    return Object.entries(obj).reduce(
+      (objAcc, [key, value]) =>
+        Object.assign(objAcc, { [key]: removeNewLines ? StringUtils.removeNewLines(value) : value }),
+      {}
+    )
+  }
 
-export const transformToStream = (stream, columns) => {
-  const transformer = transform(_transformObj)
+export const transformToStream = (stream, columns, options = {}) => {
+  const transformer = transform(_transformObj(options))
   transformer
     // eslint-disable-next-line camelcase
     .pipe(stringify({ quoted_string: true, header: true, columns }))
@@ -19,9 +24,9 @@ export const transformToStream = (stream, columns) => {
   return transformer
 }
 
-export const writeToStream = (stream, data) =>
+export const writeToStream = (stream, data, options = {}) =>
   new Promise((resolve, reject) => {
-    const transformer = transformToStream(stream, R.pipe(R.head, R.keys)(data))
+    const transformer = transformToStream(stream, R.pipe(R.head, R.keys)(data), options)
     transformer.on('error', reject).on('finish', resolve)
 
     data.forEach((row) => transformer.write(row))
