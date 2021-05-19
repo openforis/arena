@@ -16,7 +16,6 @@ import { useHistoryListen } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
-import { useOpenRStudio } from '@webapp/views/App/views/Analysis/Chain/store/actions/chain/useOpenRStudio'
 
 import ButtonBar from './ButtonBar'
 import { ChainNodeDefs } from './ChainNodeDefs'
@@ -26,13 +25,13 @@ const ChainComponent = () => {
   const { chainUuid } = useParams()
   const surveyInfo = useSurveyInfo()
   const cycleKeys = useSurveyCycleKeys()
-  const openRStudio = useOpenRStudio()
+
   const chain = useChain()
   const validation = Chain.getValidation(chain)
 
   const _openRStudio = () => {
-    openRStudio({ chain })
-  } // TODO Actions.openRStudio({ state })}
+    dispatch(ChainActions.openRStudio({ chain }))
+  }
   const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
   useEffect(() => {
