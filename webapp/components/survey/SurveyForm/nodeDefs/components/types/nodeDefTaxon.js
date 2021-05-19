@@ -55,12 +55,17 @@ const NodeDefTaxon = (props) => {
     if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
       const nodeValue = {
         [taxonUuid]: Taxon.getUuid(taxon),
-        [scientificName]:
-          Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
-            ? selection[scientificName]
-            : Taxon.getScientificName(taxon),
-        [vernacularName]: Taxon.isUnlistedTaxon(taxon) && selection[vernacularName] ? selection[vernacularName] : '',
-        [vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
+      }
+      if (Taxon.isUnlistedTaxon(taxon)) {
+        if (selection[scientificName]) {
+          nodeValue[scientificName] = selection[scientificName]
+        }
+        if (selection[vernacularName]) {
+          nodeValue[vernacularName] = selection[vernacularName]
+        }
+        if (Taxon.getVernacularNameUuid(taxon)) {
+          nodeValue[vernacularNameUuid] = Taxon.getVernacularNameUuid(taxon)
+        }
       }
 
       updateNodeValue(nodeValue, taxon)

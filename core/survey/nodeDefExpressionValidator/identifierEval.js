@@ -22,8 +22,7 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
     const entityDefCurrentUuid = NodeDef.getUuid(entityDefCurrent)
     const entityDefCurrentChildren = Survey.getNodeDefChildren(entityDefCurrent)(survey)
 
-    reachableNodeDefs.push(entityDefCurrent)
-    reachableNodeDefs.push(...entityDefCurrentChildren)
+    reachableNodeDefs.push(entityDefCurrent, ...entityDefCurrentChildren)
 
     // visit nodes inside single entities
     queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
@@ -34,8 +33,8 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
       if (entityDefCurrentParent) {
         queue.enqueue(entityDefCurrentParent)
       }
+      visitedUuids.push(entityDefCurrentUuid)
     }
-    visitedUuids.push(entityDefCurrentUuid)
   }
   return reachableNodeDefs
 }

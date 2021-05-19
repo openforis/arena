@@ -13,6 +13,7 @@ import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
 import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
+import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
 
 /**
  * Creates a new survey info object with the specified parameters.
@@ -108,6 +109,7 @@ export const {
   getNodeDefsByUuids,
   getNodeDefRoot,
   getNodeDefRootKeys,
+  getNodeDefsRootUnique,
   getNodeDefByUuid,
   getNodeDefChildren,
   hasNodeDefChildrenEntities,
@@ -133,22 +135,51 @@ export const {
 } = SurveyNodeDefs
 
 // ====== READ dependencies
-export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependencies
+export const {
+  addNodeDefDependencies,
+  getDependencyGraph,
+  getNodeDefDependencies,
+  hasDependencyGraph,
+  isNodeDefDependentOn,
+  removeNodeDefDependencies,
+} = SurveyDependencies
 
 // ====== UPDATE
-const updateNodeDefs = ({ updateFn, updateDependencyGraph }) =>
-  R.pipe(updateFn, R.when(R.always(updateDependencyGraph), SurveyDependencies.buildAndAssocDependencyGraph))
+export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) => (survey) => {
+  let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
+  surveyUpdated = {
+    ...surveyUpdated,
+    nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
+  }
+  if (updateDependencyGraph) {
+    surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
+  }
+  return surveyUpdated
+}
 
-export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) =>
-  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDefs(nodeDefs), updateDependencyGraph })
+export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) => (survey) => {
+  let surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDef)(survey)
+  // update node defs index
+  const nodeDefsIndex = SurveyNodeDefsIndex.getNodeDefsIndex(surveyUpdated)
+  const nodeDefsIndexUpdated = SurveyNodeDefsIndex.addNodeDefToIndex({ nodeDefsIndex, nodeDef })
+  surveyUpdated = SurveyNodeDefsIndex.assocNodeDefsIndex({
+    survey: surveyUpdated,
+    nodeDefsIndex: nodeDefsIndexUpdated,
+  })
 
-export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) =>
-  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDef(nodeDef), updateDependencyGraph })
+  if (updateDependencyGraph) {
+    surveyUpdated = SurveyDependencies.removeNodeDefDependencies(nodeDef.uuid)(surveyUpdated)
+    surveyUpdated = SurveyDependencies.addNodeDefDependencies(nodeDef)(surveyUpdated)
+  }
+  return surveyUpdated
+}
 
 export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
+
+export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex } = SurveyNodeDefsIndex
 
 // ====== NodeDefsValidation
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation

@@ -69,6 +69,7 @@ const CategoryDetails = (props) => {
             />
           )}
           <DownloadButton
+            id={DataTestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/export/`}
             label={i18n.t('common.csvExport')}
           />

@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
@@ -7,54 +9,74 @@ import * as Validation from '@core/validation/validation'
 
 import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 
-export const validateRecordKeysUniqueness = async (survey, record, tx) => {
-  // 1. check if record is unique
-  const recordsCount = await DataViewRepository.countDuplicateRecords(survey, record, tx)
-  const isUnique = recordsCount === 0
+const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) =>
+  nodes.reduce(
+    (validationAcc, keyNode) => ({
+      ...validationAcc,
+      [Node.getUuid(keyNode)]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
+    }),
+    {}
+  )
 
-  // 3. fetch key nodes
+const validateRecordKeysUniqueness = async ({ survey, record }, tx) => {
   const rootNode = Record.getRootNode(record)
-  const keyNodes = Record.getEntityKeyNodes(survey, rootNode)(record)
+  const unique = await DataViewRepository.isRecordUniqueByKeys({ survey, record }, tx)
+  const nodes = Record.getEntityKeyNodes(survey, rootNode)(record)
+  return createNodesRecordUniqueValidation({ nodes, unique, errorKey: Validation.messageKeys.record.keyDuplicate })
+}
 
-  // 4. associate validation error to each key node
-  const validationNodesKey = {}
-  keyNodes.forEach((keyNode) => {
-    validationNodesKey[Node.getUuid(keyNode)] = RecordValidation.newValidationRecordDuplicate(isUnique)
+const validateRecordUniqueNodesUniqueness = async ({ survey, record }, tx) => {
+  const rootNode = Record.getRootNode(record)
+  const unique = await DataViewRepository.isRecordUniqueByUniqueNodes({ survey, record }, tx)
+  const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
+  const nodes = nodeDefsUnique.reduce((nodesAcc, nodeDefUnique) => {
+    const nodeUnique = Record.getNodeChildByDefUuid(rootNode, NodeDef.getUuid(nodeDefUnique))(record)
+    if (nodeUnique) {
+      nodesAcc.push(nodeUnique)
+    }
+    return nodesAcc
+  }, [])
+  return createNodesRecordUniqueValidation({
+    nodes,
+    unique,
+    errorKey: Validation.messageKeys.record.uniqueAttributeDuplicate,
   })
+}
 
-  return validationNodesKey
+export const validateRecordUniqueNodes = async ({ survey, record }, tx) => {
+  const keysValidation = await validateRecordKeysUniqueness({ survey, record }, tx)
+  const uniqueNodesValidation = await validateRecordUniqueNodesUniqueness({ survey, record }, tx)
+  return { ...keysValidation, ...uniqueNodesValidation }
 }
 
 // Returns an indexed object with recordUuid as key and validation as value
 export const validateRecordsUniqueness = async (
-  survey,
-  cycle,
-  keyNodes,
-  recordUuidExcluded,
-  excludeRecordFromCount,
+  { survey, cycle, nodesUnique, recordUuidExcluded, excludeRecordFromCount, errorKey },
   tx
 ) => {
-  const result = {}
-  const recordsCountRows = await DataViewRepository.fetchRecordsCountByKeys(
+  const recordsCountRows = await DataViewRepository.fetchRecordsCountByRootNodesValue(
     survey,
     cycle,
-    keyNodes,
+    nodesUnique,
     recordUuidExcluded,
     excludeRecordFromCount,
     tx
   )
 
-  if (!R.isEmpty(recordsCountRows)) {
-    recordsCountRows.forEach(({ recordUuid, count, nodesKeyUuids }) => {
-      const isUnique = count === '1'
-      const validationNodesKeyFields = {}
-      nodesKeyUuids.forEach((nodeKeyUuid) => {
-        validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate(isUnique)
-      })
+  if (R.isEmpty(recordsCountRows)) return {}
 
-      result[recordUuid] = Validation.newInstance(isUnique, validationNodesKeyFields)
-    })
-  }
-
-  return result
+  return recordsCountRows.reduce((result, { recordUuid, count, nodesKeyUuids }) => {
+    const unique = Number(count) === 1
+    const validationNodesKeyFields = nodesKeyUuids.reduce(
+      (validationFieldsAcc, nodeKeyUuid) => ({
+        ...validationFieldsAcc,
+        [nodeKeyUuid]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
+      }),
+      {}
+    )
+    return {
+      ...result,
+      [recordUuid]: Validation.newInstance(unique, validationNodesKeyFields),
+    }
+  }, {})
 }

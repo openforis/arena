@@ -268,9 +268,17 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   // and return them so they will be re-validated later on
   const nodeDependentKeyAttributes = _getNodeDependentKeyAttributes(survey, record, node)
 
+  const nodeDependentUniqueAttributes = Record.getAttributesUniqueDependent({ survey, record, node })
+
   const recordUpdated = Record.assocNode(node)(record)
 
-  return _onNodeUpdate(survey, recordUpdated, node, nodeDependentKeyAttributes, t)
+  return _onNodeUpdate(
+    survey,
+    recordUpdated,
+    node,
+    { ...nodeDependentKeyAttributes, ...nodeDependentUniqueAttributes },
+    t
+  )
 }
 
 export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>

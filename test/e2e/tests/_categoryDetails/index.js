@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+import { downloadsPath } from '../../paths'
 import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
 
 const waitForApi = async (action) => Promise.all([page.waitForResponse('**/categories/**'), action])
@@ -69,4 +72,19 @@ export const addItems = (category, levelIdx, codePrefix = '') => {
       addItems(category, levelIdxNext, `${codePrefix}${itemIdx}`)
     })
   }
+}
+
+export const exportCategory = (category) => {
+  test(`Export category ${category.name}`, async () => {
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.waitForResponse('**/export/**'),
+      page.click(getSelector(DataTestId.categoryDetails.exportBtn, 'button')),
+    ])
+    const exportFilePath = path.resolve(downloadsPath, `category-${category.name}-export.zip`)
+
+    await download.saveAs(exportFilePath)
+
+    await expect(fs.existsSync(exportFilePath)).toBeTruthy()
+  })
 }

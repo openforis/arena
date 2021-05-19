@@ -5,6 +5,8 @@ import Queue from '@core/queue'
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as SurveyDependencies from '@core/survey/_survey/surveyDependencies'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
 
 import { keys } from './recordKeys'
@@ -15,26 +17,26 @@ import * as NodesIndex from './recordNodesIndex'
  */
 export const getNodes = R.propOr({}, keys.nodes)
 
-export const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
+export const getNodeByUuid = (uuid) => R.path([keys.nodes, uuid])
 
-export const getRootNode = record => R.pipe(NodesIndex.getNodeRootUuid, uuid => getNodeByUuid(uuid)(record))(record)
+export const getRootNode = (record) => R.pipe(NodesIndex.getNodeRootUuid, (uuid) => getNodeByUuid(uuid)(record))(record)
 
-export const getNodesByDefUuid = nodeDefUuid => record =>
+export const getNodesByDefUuid = (nodeDefUuid) => (record) =>
   R.pipe(
     NodesIndex.getNodeUuidsByDef(nodeDefUuid),
-    R.map(uuid => getNodeByUuid(uuid)(record)),
+    R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
 /**
  * ==== hierarchy
  */
 // ancestors
-export const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
+export const getParentNode = (node) => getNodeByUuid(Node.getParentUuid(node))
 
 /**
  * Returns the list of ancestors from the given entity to the root entity
  */
-export const getAncestorsAndSelf = entity => record => {
+export const getAncestorsAndSelf = (entity) => (record) => {
   const ancestors = []
   while (entity) {
     ancestors.push(entity)
@@ -44,31 +46,31 @@ export const getAncestorsAndSelf = entity => record => {
   return ancestors
 }
 
-export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
+export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
   R.pipe(
     getParentNode(node),
-    parentNode => getAncestorsAndSelf(parentNode)(record),
-    R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid),
+    (parentNode) => getAncestorsAndSelf(parentNode)(record),
+    R.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
 // Descendants
-export const getNodeChildren = node => record =>
+export const getNodeChildren = (node) => (record) =>
   R.pipe(
     NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
-    R.map(uuid => getNodeByUuid(uuid)(record)),
+    R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
-export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record =>
+export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
   R.pipe(
     NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
-    R.map(uuid => getNodeByUuid(uuid)(record)),
-    nodes => R.sortWith([R.propOr(false, Node.keys.placeholder), R.prop(Node.keys.dateCreated)])(nodes),
+    R.map((uuid) => getNodeByUuid(uuid)(record)),
+    (nodes) => R.sortWith([R.propOr(false, Node.keys.placeholder), R.prop(Node.keys.dateCreated)])(nodes)
   )(record)
 
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
   R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
 
-export const visitDescendantsAndSelf = (node, visitor) => record => {
+export const visitDescendantsAndSelf = (node, visitor) => (record) => {
   const queue = new Queue()
 
   queue.enqueue(node)
@@ -86,7 +88,7 @@ export const visitDescendantsAndSelf = (node, visitor) => record => {
 /**
  * Returns true if a node and all its ancestors are applicable
  */
-export const isNodeApplicable = node => record => {
+export const isNodeApplicable = (node) => (record) => {
   if (Node.isRoot(node)) {
     return true
   }
@@ -111,13 +113,9 @@ export const isNodeApplicable = node => record => {
  *   nodeDef, //node definition
  * }
  */
-export const getDependentNodePointers = (
-  survey,
-  node,
-  dependencyType,
-  includeSelf = false,
-  filterFn = null,
-) => record => {
+export const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => (
+  record
+) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
@@ -131,7 +129,7 @@ export const getDependentNodePointers = (
       // 1 find common parent def
       const commonParentDefUuid = R.pipe(
         R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
-        R.last,
+        R.last
       )(NodeDef.getMetaHierarchy(dependentDef))
 
       // 2 find common parent node
@@ -176,20 +174,20 @@ export const getDependentNodePointers = (
 }
 
 // Code attributes
-export const getDependentCodeAttributes = node => record =>
+export const getDependentCodeAttributes = (node) => (record) =>
   R.pipe(
     NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
-    R.map(uuid => getNodeByUuid(uuid)(record)),
+    R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
-export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
+export const getParentCodeAttribute = (survey, parentNode, nodeDef) => (record) => {
   const parentCodeDefUuid = NodeDef.getParentCodeDefUuid(nodeDef)
 
   if (parentCodeDefUuid) {
     const ancestors = getAncestorsAndSelf(parentNode)(record)
     for (const ancestor of ancestors) {
       const children = getNodeChildren(ancestor)(record)
-      const nodeFound = children.find(node => Node.getNodeDefUuid(node) === parentCodeDefUuid)
+      const nodeFound = children.find((node) => Node.getNodeDefUuid(node) === parentCodeDefUuid)
       if (nodeFound) {
         return nodeFound
       }
@@ -201,15 +199,56 @@ export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record =>
 
 // ====== Keys
 
-export const getEntityKeyNodes = (survey, nodeEntity) => record => {
+export const getEntityKeyNodes = (survey, nodeEntity) => (record) => {
   const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeEntity))(survey)
   const nodeDefKeys = SurveyNodeDefs.getNodeDefKeys(nodeDefEntity)(survey)
 
   return R.pipe(
-    R.map(nodeDefKey => getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)),
-    R.flatten,
+    R.map((nodeDefKey) => getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)),
+    R.flatten
   )(nodeDefKeys)
 }
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
   R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))
+
+export const getAttributesUniqueSibling = ({ record, attribute, attributeDef }) => {
+  const parentEntity = getParentNode(attribute)(record)
+  const ancestorEntity = getParentNode(parentEntity)(record)
+  const siblingParentEntities = getNodeChildrenByDefUuid(ancestorEntity, NodeDef.getParentUuid(attributeDef))(record)
+
+  return siblingParentEntities.reduce(
+    (siblingsAcc, siblingEntity) => [
+      ...siblingsAcc,
+      ...getNodeChildrenByDefUuid(siblingEntity, NodeDef.getUuid(attributeDef))(record),
+    ],
+    []
+  )
+}
+
+const _isNodeDefUnique = (nodeDef) => NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+
+export const getAttributesUniqueDependent = ({ survey, record, node }) => {
+  const nodeDef = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (NodeDef.isSingleEntity(nodeDef)) return {}
+
+  let siblingUniqueAttributes = []
+  if (NodeDef.isEntity(nodeDef)) {
+    const nodeDefsUnique = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey).filter(_isNodeDefUnique)
+
+    siblingUniqueAttributes = nodeDefsUnique.reduce((siblingsAcc, nodeDefUnique) => {
+      if (NodeDef.isSingle(nodeDefUnique)) {
+        const attribute = getNodeChildByDefUuid(node, NodeDef.getUuid(nodeDefUnique))(record)
+        siblingsAcc.push(...getAttributesUniqueSibling({ record, attribute, attributeDef: nodeDefUnique }))
+      }
+      return siblingsAcc
+    }, [])
+  } else if (_isNodeDefUnique(nodeDef)) {
+    siblingUniqueAttributes = getAttributesUniqueSibling({
+      record,
+      attribute: node,
+      attributeDef: nodeDef,
+    })
+  }
+  return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
+}
