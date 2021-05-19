@@ -51,7 +51,7 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
     const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
     const applicable = NodeDef.getApplicable(nodeDef)
-    const applyIf = applicable.lenght > 0 ? NodeDefExpression.getExpression(applicable[0]) : ''
+    const applyIf = applicable.length > 0 ? NodeDefExpression.getExpression(applicable[0]) : ''
 
     return {
       uuid,
