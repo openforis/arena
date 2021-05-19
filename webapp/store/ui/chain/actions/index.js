@@ -8,6 +8,7 @@ import { createNodeDef } from './createNodeDef'
 import { fetchChainNodeDefs } from './fetchChainNodeDefs'
 import { updateChainNodeDef } from './updateChainNodeDef'
 import { updateChainNodeDefIndex } from './updateChainNodeDefIndex'
+import { openRStudio } from './openRStudio'
 
 export { ChainActionTypes } from './actionTypes'
 
@@ -22,4 +23,5 @@ export const ChainActions = {
   fetchChainNodeDefs,
   updateChainNodeDef,
   updateChainNodeDefIndex,
+  openRStudio,
 }

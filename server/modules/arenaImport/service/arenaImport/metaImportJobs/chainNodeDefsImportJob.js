@@ -17,7 +17,6 @@ export default class ChainNodeDefsImportJob extends Job {
     const { arenaSurveyFileZip, surveyId } = this.context
 
     const chainNodeDefs = await ArenaSurveyFileZip.getChainNodeDefs(arenaSurveyFileZip)
-
     await ChainNodeDefRepository.insertMany({ surveyId, chainNodeDefs }, this.tx)
 
     this.setContext({ chainNodeDefs })

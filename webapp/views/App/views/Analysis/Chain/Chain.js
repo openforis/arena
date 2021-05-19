@@ -25,10 +25,13 @@ const ChainComponent = () => {
   const { chainUuid } = useParams()
   const surveyInfo = useSurveyInfo()
   const cycleKeys = useSurveyCycleKeys()
+
   const chain = useChain()
   const validation = Chain.getValidation(chain)
 
-  const openRStudio = () => {} // TODO Actions.openRStudio({ state })}
+  const _openRStudio = () => {
+    dispatch(ChainActions.openRStudio({ chain }))
+  }
   const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
   useEffect(() => {
@@ -46,7 +49,7 @@ const ChainComponent = () => {
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
-      <ButtonRStudio onClick={openRStudio} disabled={Survey.isDraft(surveyInfo)} />
+      <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
 
       <div className="form">
         <LabelsEditor
