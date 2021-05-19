@@ -1,4 +1,5 @@
 import { ChainNodeDefRepository } from '../repository/chainNodeDef'
+import { ChainNodeDefAggregateRepository } from '../repository/chainNodeDefAggregate'
 
 export { create } from './create'
 export { update } from './update'
@@ -33,3 +34,5 @@ export const getManyChainNodeDefs = ChainNodeDefRepository.getMany
 export const getAllChainNodeDefs = ChainNodeDefRepository.getAll
 export { updateChainNodeDef } from './updateChainNodeDef'
 export const updateIndexesChainNodeDefs = ChainNodeDefRepository.updateIndexes
+
+export const getAllChainNodeDefsAggregate = ChainNodeDefAggregateRepository.getAll
