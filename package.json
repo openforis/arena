@@ -124,6 +124,7 @@
     "is-valid-coordinates": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.4",
+    "lodash": "^4.17.21",
     "log4js": "^6.3.0",
     "marked": "^2.0.3",
     "morgan": "^1.10.0",
