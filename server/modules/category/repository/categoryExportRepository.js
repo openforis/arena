@@ -7,7 +7,7 @@ const getEmpty = ({ header }) => `'' AS ${header}`
 
 const getFieldIdAlias = ({ index }) => `level_${index}_id`
 
-const getFieldId = ({ index, isEmpty }) => `${isEmpty ? 'null' : `c${index}.id`} AS ${getFieldIdAlias({ index })}`
+const getFieldId = ({ index, isEmpty }) => `${isEmpty ? '-1' : `c${index}.id`} AS ${getFieldIdAlias({ index })}`
 
 const getFieldCode = ({ index, header, isEmpty }) =>
   isEmpty ? getEmpty({ header }) : `(c${index}.props || c${index}.props_draft) ->> 'code' AS ${header}`
@@ -122,7 +122,7 @@ export const generateCategoryExportQuery = ({ surveyId, levels, headers, languag
       )
       .join(' UNION ')}
     -- order by item id to preserve insertion order
-    ORDER BY ${levels.map((_, index) => getFieldIdAlias({ index })).join(', ')} NULLS FIRST
+    ORDER BY ${levels.map((_, index) => getFieldIdAlias({ index })).join(', ')}
   ) AS sel`
 }
 
