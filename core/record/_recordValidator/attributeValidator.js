@@ -14,8 +14,9 @@ import * as Record from '../record'
 
 import * as AttributeTypeValidator from './attributeTypeValidator'
 import * as AttributeKeyValidator from './attributeKeyValidator'
+import * as AttributeUniqueValidator from './attributeUniqueValidator'
 
-const _validateRequired = (survey, nodeDef) => (propName, node) =>
+const _validateRequired = ({ nodeDef }) => (_propName, node) =>
   (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))) && Node.isValueBlank(node)
     ? { key: Validation.messageKeys.record.valueRequired }
     : null
@@ -60,14 +61,15 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
 export const validateAttribute = async (survey, record, attribute) => {
   if (Record.isNodeApplicable(attribute)(record)) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(attribute))(survey)
-    return await Validator.validate(
+    return Validator.validate(
       attribute,
       {
         [Node.keys.value]: [
-          _validateRequired(survey, nodeDef),
+          _validateRequired({ nodeDef }),
           AttributeTypeValidator.validateValueType(survey, nodeDef),
           _validateNodeValidations(survey, record, nodeDef),
           AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef),
+          AttributeUniqueValidator.validateAttributeUnique(survey, record, nodeDef),
         ],
       },
       false
@@ -96,6 +98,9 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
         ...(NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, record, Record.getParentNode(node)(record)) : []),
+        ...(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+          ? Record.getAttributesUniqueSibling({ record, attribute: node, attributeDef: nodeDef })
+          : []),
       ]
 
       // Call validateAttribute for each attribute

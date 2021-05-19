@@ -19,6 +19,7 @@ export const DataTestId = {
     itemErrorBadge: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-error-badge`,
     itemCode: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-code`,
     itemLabel: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-label`),
+    exportBtn: 'category-export-btn',
   },
   categorySelector: {
     category: 'category-selector-category',
@@ -82,6 +83,7 @@ export const DataTestId = {
     nodeDefCodeParent: 'node-def-code-parent',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
+    nodeDefUnique: 'node-def-unique',
     relevantIf: 'relevant-if',
     saveBtn: 'node-def-save-btn',
     taxonomySelector: 'taxonomy-selector',

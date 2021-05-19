@@ -2,7 +2,7 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 
 import { categories } from '../mock/categories'
 import { cluster } from '../mock/nodeDefs'
-import { addItems, addLevels, editCategoryProps } from './_categoryDetails'
+import { addItems, addLevels, editCategoryProps, exportCategory } from './_categoryDetails'
 import { addNodeDef } from './_formDesigner'
 import { gotoFormDesigner } from './_navigation'
 import { editNodeDefDetails } from './_nodeDefDetails'
@@ -36,6 +36,8 @@ export default () =>
     addLevels(category)
 
     addItems(category, 0)
+
+    exportCategory(category)
 
     test('Close category editor', async () => {
       await page.click(getSelector(DataTestId.panelRight.closeBtn, 'button'))

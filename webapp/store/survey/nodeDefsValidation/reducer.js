@@ -1,3 +1,5 @@
+import * as Validation from '@core/validation/validation'
+
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { SystemActions } from '@webapp/store/system'
@@ -16,7 +18,8 @@ const actionHandlers = {
 
   // NodeDefsValidation load
   [SurveyActions.surveyDefsLoad]: (_state, { nodeDefsValidation }) => nodeDefsValidation,
-  [NodeDefsActions.nodeDefsValidationUpdate]: (_state, { nodeDefsValidation }) => nodeDefsValidation,
+  [NodeDefsActions.nodeDefsValidationUpdate]: (state, { nodeDefsValidation }) =>
+    Validation.mergeValidation(nodeDefsValidation)(state),
 }
 
 export default exportReducer(actionHandlers)
