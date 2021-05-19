@@ -62,7 +62,6 @@ export const sendFile = ({ res, path: filePath, name = null }) => {
   const fileName = name || path.basename(filePath)
   setContentTypeFile(res, fileName, size)
   fs.createReadStream(filePath).pipe(res)
-  res.end()
 }
 
 export const sendZipFile = (res, dir, name) => {
