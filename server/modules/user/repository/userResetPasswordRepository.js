@@ -12,7 +12,7 @@ export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
       ON CONFLICT (user_uuid) DO UPDATE SET date_created = NOW(), uuid = DEFAULT
       RETURNING uuid`,
     [userUuid],
-    R.prop('uuid'),
+    R.prop('uuid')
   )
 
 export const findUserUuidByUuid = async (uuid, client = db) =>
@@ -21,7 +21,7 @@ export const findUserUuidByUuid = async (uuid, client = db) =>
      FROM user_reset_password
      WHERE uuid = $1 AND NOT ${expiredCondition}`,
     [uuid],
-    R.prop('user_uuid'),
+    R.prop('user_uuid')
   )
 
 export const existsResetPasswordValidByUserUuid = async (userUuid, client = db) =>
@@ -30,8 +30,17 @@ export const existsResetPasswordValidByUserUuid = async (userUuid, client = db) 
     FROM user_reset_password
     WHERE user_uuid = $1 AND NOT ${expiredCondition}`,
     [userUuid],
-    R.prop('result'),
+    R.prop('result')
   )
+
+export const existResetPasswordValidByUserUuids = async (userUuids, client = db) => {
+  return client.query(
+    `SELECT user_uuid, COUNT(*) > 0 as result
+    FROM user_reset_password
+    WHERE user_uuid in (${userUuids.map((uuid) => `'${uuid}'`).join(',')}) AND NOT ${expiredCondition}
+    group by user_uuid`
+  )
+}
 
 export const deleteUserResetPasswordByUuid = async (uuid, client = db) =>
   await client.none(`DELETE FROM user_reset_password WHERE uuid = $1`, [uuid])
@@ -41,5 +50,5 @@ export const deleteUserResetPasswordExpired = async (client = db) =>
     `DELETE FROM user_reset_password
     WHERE ${expiredCondition}`,
     [],
-    R.prop('rowCount'),
+    R.prop('rowCount')
   )

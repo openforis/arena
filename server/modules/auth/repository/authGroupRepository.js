@@ -75,6 +75,20 @@ export const fetchUserGroups = async (userUuid, client = db) =>
     dbTransformCallback
   )
 
+export const fetchUsersGroups = async (userUuids, client = db) =>
+  client.map(
+    `
+    SELECT gu.user_uuid, g.*
+    FROM auth_group_user gu
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
+    WHERE
+      gu.user_uuid in (${userUuids.map((uuid) => `'${uuid}'`).join(',')})
+    `,
+    [],
+    dbTransformCallback
+  )
+
 // ==== UPDATE
 
 export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
