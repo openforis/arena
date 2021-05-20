@@ -83,9 +83,9 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
     WHERE
-      gu.user_uuid in (${userUuids.map((uuid) => `'${uuid}'`).join(',')})
+      gu.user_uuid in ($1:csv)
     `,
-    [],
+    [userUuids],
     dbTransformCallback
   )
 

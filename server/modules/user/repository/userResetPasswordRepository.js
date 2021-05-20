@@ -37,8 +37,9 @@ export const existResetPasswordValidByUserUuids = async (userUuids, client = db)
   return client.query(
     `SELECT user_uuid, COUNT(*) > 0 as result
     FROM user_reset_password
-    WHERE user_uuid in (${userUuids.map((uuid) => `'${uuid}'`).join(',')}) AND NOT ${expiredCondition}
-    group by user_uuid`
+    WHERE user_uuid IN ($1:csv) AND NOT ${expiredCondition}
+    group by user_uuid`,
+    [userUuids]
   )
 }
 
