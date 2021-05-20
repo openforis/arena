@@ -35,7 +35,6 @@ export default () =>
       const json = await response.json()
 
       surveyImport.name = json.survey.info.props.name
-      await page.reload()
     })
 
     gotoHome()
