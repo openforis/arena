@@ -43,15 +43,26 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: '/@', replace: '.' },
     // path separator
     { pattern: '/', replace: '.' },
-    // boolean values
-    // boolean value: true, true(), TRUE or TRUE()
-    { pattern: /^\s*true(\(\))?\s*$/, replace: ' true ', ignoreCase: true },
-    { pattern: /^\s*true(\(\))?\s+/, replace: ' true ', ignoreCase: true },
-    { pattern: /\strue(\(\))?\s*$/, replace: ' true ', ignoreCase: true },
-    // boolean value: false, false(), FALSE or FALSE()
-    { pattern: /^\s*false(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
-    { pattern: /^\s*false(\(\))?\s+/, replace: ' false ', ignoreCase: true },
-    { pattern: /\sfalse(\(\))?\s*$/, replace: ' false ', ignoreCase: true },
+    // boolean values: true, true(), TRUE or TRUE(), false, false(), FALSE or FALSE()
+    {
+      pattern: /([\s|=]*)((true|false)(\(\))?)([\s|=]*)/,
+      replace: (_match, p1, p2, _p3, _p4, p5) => {
+        const parts = []
+
+        // p1: start
+        if (p1 !== undefined) parts.push(p1)
+
+        // p2: true or false value
+        const replaceValue = String(p2.toLowerCase().startsWith('true'))
+        parts.push(replaceValue)
+
+        // p5: end
+        if (p5 !== undefined) parts.push(p5)
+
+        return parts.join('')
+      },
+      ignoreCase: true,
+    },
     // object conversion
     { pattern: /boolean\(/, replace: 'Boolean(' },
     { pattern: /number\(/, replace: 'Number(' },
@@ -92,32 +103,22 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     // math namespace
     { pattern: /math:PI\(\)/, replace: 'Math.PI' },
     // convert directly some functions from math:fnName to Math.fnName
-    ...[
-      'abs',
-      'acos',
-      'asin',
-      'atan',
-      'log',
-      'log10',
-      'max',
-      'min',
-      'pow',
-      'random',
-      'sin',
-      'sqrt',
-      'tan',
-    ].map((fn) => ({ pattern: `math:${fn}`, replace: `Math.${fn}` })),
+    ...['abs', 'acos', 'asin', 'atan', 'log', 'log10', 'max', 'min', 'pow', 'random', 'sin', 'sqrt', 'tan'].map(
+      (fn) => ({ pattern: `math:${fn}`, replace: `Math.${fn}` })
+    ),
   ]
 
   const converted = itemsToReplace
-    .reduce(
-      (expressionAcc, item) =>
-        expressionAcc.replace(new RegExp(item.pattern, `g${item.ignoreCase ? 'i' : ''}`), item.replace),
-      expression
-    )
+    .reduce((expressionAcc, item) => {
+      const { pattern, ignoreCase, replace } = item
+      const flags = ['g']
+      if (ignoreCase) flags.push('i')
+      return expressionAcc.replace(new RegExp(pattern, flags.join('')), replace)
+    }, expression.trim())
     // remove extra spaces
     .replace(/\s+/g, ' ')
     .trim()
+    // append new line to consider converted expression as an expression inserted with the "advanced expression editor"
     .concat('\n')
 
   const validationResult = NodeDefExpressionValidator.validate({
