@@ -115,10 +115,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
     })(survey)
 
     let query = Query.create({ entityDefUuid })
-    const [childDefKey, ...restChildDefs] = childDefs
-    query = Query.assocAttributeDefUuids([childDefKey].concat(parentKeys).concat(restChildDefs).map(NodeDef.getUuid))(
-      query
-    )
+    query = Query.assocAttributeDefUuids(parentKeys.reverse().concat(childDefs).map(NodeDef.getUuid))(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
