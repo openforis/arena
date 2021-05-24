@@ -107,8 +107,15 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
       ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
       : [nodeDefContext] // Multiple attribute
 
+    let parentKeys = []
+    Survey.visitAncestorsAndSelf(nodeDefContext, (n) => {
+      if (NodeDef.getUuid(n) === NodeDef.getUuid(nodeDefContext)) return
+      const keys = Survey.getNodeDefKeys(n)(survey)
+      parentKeys = parentKeys.concat(keys)
+    })(survey)
+
     let query = Query.create({ entityDefUuid })
-    query = Query.assocAttributeDefUuids(childDefs.map(NodeDef.getUuid))(query)
+    query = Query.assocAttributeDefUuids(childDefs.concat(parentKeys).map(NodeDef.getUuid))(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
