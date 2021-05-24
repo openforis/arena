@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as PromiseUtils from '@core/promiseUtils'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
@@ -83,7 +85,7 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
   // Output
   const attributeValidations = {}
 
-  for (const node of Object.values(nodes)) {
+  await PromiseUtils.each(Object.values(nodes), async (node) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
     if (NodeDef.isAttribute(nodeDef)) {
@@ -105,16 +107,16 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
 
       // Call validateAttribute for each attribute
 
-      for (const _node of nodesToValidate) {
+      await PromiseUtils.each(nodesToValidate, async (_node) => {
         const nodeUuid = Node.getUuid(_node)
 
         // Validate only attributes not deleted and not validated already
         if (!Node.isDeleted(_node) && !attributeValidations[nodeUuid]) {
           attributeValidations[nodeUuid] = await validateAttribute(survey, record, _node)
         }
-      }
+      })
     }
-  }
+  })
 
   return attributeValidations
 }
