@@ -22,15 +22,16 @@ const NodeDeleteButton = (props) => {
       aria-disabled={disabled}
       onClick={() => {
         const performDelete = () => dispatch(RecordActions.removeNode(nodeDef, node))
+        const handleDelete = removeNode || performDelete
         if (showConfirm) {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
               key: 'surveyForm.confirmNodeDelete',
-              onOk: removeNode || performDelete,
+              onOk: handleDelete,
             })
           )
         } else {
-          ;(removeNode || performDelete)?.()
+          handleDelete()
         }
       }}
     >

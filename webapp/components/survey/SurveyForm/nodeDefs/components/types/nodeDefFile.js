@@ -9,7 +9,6 @@ import DownloadButton from '@webapp/components/form/downloadButton'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDeleteButton from '../nodeDeleteButton'
-import { useDispatch } from 'react-redux'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {
@@ -22,7 +21,6 @@ const handleFileChange = (nodeDef, node, file, updateNode) => {
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
-  const dispatch = useDispatch()
 
   const fileName = Node.getFileName(node)
   const fileUploaded = !edit && fileName
