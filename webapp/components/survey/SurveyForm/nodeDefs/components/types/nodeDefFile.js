@@ -24,7 +24,6 @@ const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
   const dispatch = useDispatch()
 
-  console.log('props', props)
   const fileName = Node.getFileName(node)
   const fileUploaded = !edit && fileName
 
