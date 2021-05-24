@@ -7,7 +7,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
 
 const NodeDeleteButton = (props) => {
-  const { nodeDef, node, disabled, showConfirm } = props
+  const { nodeDef, node, disabled, showConfirm, removeNode } = props
 
   const dispatch = useDispatch()
 
@@ -26,11 +26,11 @@ const NodeDeleteButton = (props) => {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
               key: 'surveyForm.confirmNodeDelete',
-              onOk: performDelete,
+              onOk: removeNode || performDelete,
             })
           )
         } else {
-          performDelete()
+          ;(removeNode || performDelete)?.()
         }
       }}
     >
@@ -44,11 +44,13 @@ NodeDeleteButton.propTypes = {
   node: PropTypes.any.isRequired,
   disabled: PropTypes.bool,
   showConfirm: PropTypes.bool,
+  removeNode: PropTypes.func,
 }
 
 NodeDeleteButton.defaultProps = {
   disabled: false,
   showConfirm: true,
+  removeNode: null,
 }
 
 export default NodeDeleteButton

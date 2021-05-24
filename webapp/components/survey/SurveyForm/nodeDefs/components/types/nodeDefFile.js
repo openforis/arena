@@ -9,6 +9,7 @@ import DownloadButton from '@webapp/components/form/downloadButton'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDeleteButton from '../nodeDeleteButton'
+import { useDispatch } from 'react-redux'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {
@@ -19,20 +20,21 @@ const handleFileChange = (nodeDef, node, file, updateNode) => {
   updateNode(nodeDef, node, value, file)
 }
 
-const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
-  if (NodeDef.isMultiple(nodeDef)) {
-    removeNode(nodeDef, node)
-  } else {
-    // Do not delete single node, delete only its value
-    updateNode(nodeDef, node, null)
-  }
-}
-
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
+  const dispatch = useDispatch()
 
+  console.log('props', props)
   const fileName = Node.getFileName(node)
   const fileUploaded = !edit && fileName
+
+  const handleNodeDelete = () => {
+    if (NodeDef.isMultiple(nodeDef)) {
+      removeNode(nodeDef, node)
+    } else {
+      updateNode(nodeDef, node, null)
+    }
+  }
 
   return (
     <div className="survey-form__node-def-file">
@@ -51,11 +53,7 @@ const FileInput = (props) => {
             className="ellipsis"
           />
 
-          <NodeDeleteButton
-            nodeDef={nodeDef}
-            node={node}
-            removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}
-          />
+          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={handleNodeDelete} />
         </React.Fragment>
       )}
     </div>
