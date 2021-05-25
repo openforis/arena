@@ -24,7 +24,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
 )
 
 const MultipleTextInput = (props) => {
-  const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
+  const { nodeDef, parentNode, nodes, canEditRecord } = props
 
   return (
     <div>
@@ -42,7 +42,7 @@ const MultipleTextInput = (props) => {
               <TextInput {...props} node={n} />
 
               {!n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord && (
-                <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true} removeNode={removeNode} />
+                <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true}  />
               )}
             </div>
           )
