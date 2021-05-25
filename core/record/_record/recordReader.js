@@ -60,11 +60,15 @@ export const getNodeChildren = (node) => (record) =>
     R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
-export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
+export const getNodeChildrenByDefUuidUnsorted = (parentNode, nodeDefUuid) => (record) =>
   R.pipe(
     NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
-    R.map((uuid) => getNodeByUuid(uuid)(record)),
-    (nodes) => R.sortWith([R.propOr(false, Node.keys.placeholder), R.prop(Node.keys.dateCreated)])(nodes)
+    R.map((uuid) => getNodeByUuid(uuid)(record))
+  )(record)
+
+export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
+  R.pipe(getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid), (nodes) =>
+    R.sortWith([R.propOr(false, Node.keys.placeholder), R.prop(Node.keys.dateCreated)])(nodes)
   )(record)
 
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
