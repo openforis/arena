@@ -107,7 +107,7 @@ export default () =>
 
           // await expect(_cluster.cluster_coordinate).toBe(mockRecord[cluster_coordinate.name])
 
-          await expect(_cluster.cluster_time).toBe(`${DateUtils.format(mockRecord[cluster_time.name], 'HH:mm')}:00`)
+          await expect(_cluster.cluster_time).toBe(DateUtils.format(mockRecord[cluster_time.name], 'HH:mm'))
           await expect(String(_cluster.cluster_boolean)).toBe(String(mockRecord[cluster_boolean.name]))
 
           const { code: countryCode, label: countryLabel } = getCodeAndLabel(mockRecord[cluster_country.name])
