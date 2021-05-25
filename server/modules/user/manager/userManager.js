@@ -82,12 +82,16 @@ export const generateResetPasswordUuid = async (email, client = db) => {
 }
 // ==== READ
 
-const _initializeUser = async (user) => {
+const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
   // Assoc auth groups
-  let userUpdated = User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+
+  const _userGroups = userGroups || (await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))
+  let userUpdated = User.assocAuthGroups(_userGroups)(user)
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
-    const invitationValid = await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid)
+    const invitationValid =
+      invitationsByUserUuid[userUuid] ||
+      (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -96,7 +100,7 @@ const _initializeUser = async (user) => {
 
 const _userFetcher = (fetchFn) => async (...args) => {
   const user = await fetchFn(...args)
-  return user ? _initializeUser(user) : null
+  return user ? _initializeUser({ user }) : null
 }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
@@ -107,13 +111,34 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
   client.tx(async (t) => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)
-    return Promise.all(users.map(_initializeUser))
+    const usersUuids = users.map(User.getUuid)
+    const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
+    const invitationsByUserUuid = invitations.reduce(
+      (_invitationsByUserUuid, invitation) => ({
+        ..._invitationsByUserUuid,
+        [invitation.user_uuid]: invitation.result,
+      }),
+      {}
+    )
+
+    const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
+
+    return Promise.all(
+      users.map((user) =>
+        _initializeUser({
+          user,
+          invitationsByUserUuid,
+          userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+        })
+      )
+    )
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
-  if (user && (await passwordCompareFn(password, user.password))) return _initializeUser(R.dissoc('password', user))
+  if (user && (await passwordCompareFn(password, user.password)))
+    return _initializeUser({ user: R.dissoc('password', user) })
 
   return null
 }

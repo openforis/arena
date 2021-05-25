@@ -7,7 +7,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
 
 const NodeDeleteButton = (props) => {
-  const { nodeDef, node, disabled, showConfirm } = props
+  const { nodeDef, node, disabled, showConfirm, removeNode } = props
 
   const dispatch = useDispatch()
 
@@ -22,15 +22,17 @@ const NodeDeleteButton = (props) => {
       aria-disabled={disabled}
       onClick={() => {
         const performDelete = () => dispatch(RecordActions.removeNode(nodeDef, node))
+        const _removeNode = () => (removeNode ? removeNode(nodeDef, node) : null)
+        const handleDelete = removeNode ? _removeNode : performDelete
         if (showConfirm) {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
               key: 'surveyForm.confirmNodeDelete',
-              onOk: performDelete,
+              onOk: handleDelete,
             })
           )
         } else {
-          performDelete()
+          handleDelete()
         }
       }}
     >

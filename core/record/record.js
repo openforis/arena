@@ -48,6 +48,7 @@ export const { getAncestorByNodeDefUuid } = RecordReader
 
 export const { getNodeChildren } = RecordReader
 export const { getNodeChildrenByDefUuid } = RecordReader
+export const { getNodeChildrenByDefUuidUnsorted } = RecordReader
 export const { getNodeChildByDefUuid } = RecordReader
 export const { visitDescendantsAndSelf } = RecordReader
 export const { isNodeApplicable } = RecordReader

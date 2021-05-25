@@ -22,7 +22,6 @@ const NodeDefEntityTableRow = (props) => {
     canEditDef,
     renderType,
     i = 'header',
-    removeNode,
   } = props
 
   const draggable = edit && canEditDef
@@ -114,7 +113,7 @@ const NodeDefEntityTableRow = (props) => {
       {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
 
       {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
-        <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode} />
+        <NodeDeleteButton nodeDef={nodeDef} node={node} />
       )}
     </div>
   )
@@ -129,14 +128,12 @@ NodeDefEntityTableRow.propTypes = {
   canEditRecord: PropTypes.bool.isRequired,
   renderType: PropTypes.string.isRequired,
   i: PropTypes.any,
-  removeNode: PropTypes.func,
 }
 
 NodeDefEntityTableRow.defaultProps = {
   nodeDefColumns: [],
   node: null,
   i: 'header',
-  removeNode: null,
 }
 
 export default NodeDefEntityTableRow

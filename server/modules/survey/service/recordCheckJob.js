@@ -8,6 +8,7 @@ import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
@@ -30,13 +31,13 @@ export default class RecordCheckJob extends Job {
 
     this.total = R.length(recordsUuidAndCycle)
 
-    for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
+    await PromiseUtils.each(recordsUuidAndCycle, async ({ uuid: recordUuid, cycle }) => {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
       await this._checkRecord(surveyAndNodeDefs, recordUuid)
 
       this.incrementProcessedItems()
-    }
+    })
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
@@ -140,15 +141,18 @@ export default class RecordCheckJob extends Job {
  * Returns an indexed object with all the inserted nodes.
  */
 const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
-  if (NodeDef.isSingle(childDef)) {
-    const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
-    if (R.isEmpty(children)) {
-      const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
-      return await RecordManager.insertNode(user, survey, record, childNode, true, tx)
-    }
+  if (!NodeDef.isSingle(childDef)) {
+    // multiple node: don't insert it
+    return {}
   }
-
-  return {}
+  const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+  if (!R.isEmpty(children)) {
+    // single node already inserted
+    return {}
+  }
+  // insert missing single node
+  const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  return RecordManager.insertNode(user, survey, record, childNode, true, tx)
 }
 
 /**
@@ -158,14 +162,13 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
  */
 const _insertMissingSingleNodes = async (survey, nodeDefAddedUuids, record, user, tx) => {
   const nodesAdded = {}
-  for (const nodeDefUuid of nodeDefAddedUuids) {
+  await PromiseUtils.each(nodeDefAddedUuids, async (nodeDefUuid) => {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
-    for (const parentNode of parentNodes) {
+    await PromiseUtils.each(parentNodes, async (parentNode) => {
       Object.assign(nodesAdded, await _insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx))
-    }
-  }
-
+    })
+  })
   return nodesAdded
 }
 
@@ -175,14 +178,14 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   }
 
   // Include nodes associated to updated node defs
-  for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
+  nodeDefUpdatedUuids.forEach((nodeDefUpdatedUuid) => {
     const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
-    for (const nodeUpdated of nodesToUpdatePartial) {
+    nodesToUpdatePartial.forEach((nodeUpdated) => {
       nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
-    }
-  }
+    })
+  })
 
-  return await RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
+  return RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
 const _clearRecordKeysValidation = (record) => {
@@ -210,15 +213,16 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
   }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
-  for (const nodeDefUuid of nodeDefAddedUpdatedUuids) {
+  nodeDefAddedUpdatedUuids.forEach((nodeDefUuid) => {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
-    for (const parentNode of parentNodes) {
+    parentNodes.forEach((parentNode) => {
       nodesToValidate[Node.getUuid(parentNode)] = parentNode
-    }
-  }
+    })
+  })
 
   // Record keys uniqueness must be validated after RDB generation
+
   await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
 
