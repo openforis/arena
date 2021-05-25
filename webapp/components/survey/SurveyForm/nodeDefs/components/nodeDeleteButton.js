@@ -22,7 +22,8 @@ const NodeDeleteButton = (props) => {
       aria-disabled={disabled}
       onClick={() => {
         const performDelete = () => dispatch(RecordActions.removeNode(nodeDef, node))
-        const handleDelete = removeNode || performDelete
+        const _removeNode = () => (removeNode ? removeNode(nodeDef, node) : null)
+        const handleDelete = removeNode ? _removeNode : performDelete
         if (showConfirm) {
           dispatch(
             DialogConfirmActions.showDialogConfirm({
@@ -45,13 +46,11 @@ NodeDeleteButton.propTypes = {
   node: PropTypes.any.isRequired,
   disabled: PropTypes.bool,
   showConfirm: PropTypes.bool,
-  removeNode: PropTypes.func,
 }
 
 NodeDeleteButton.defaultProps = {
   disabled: false,
   showConfirm: true,
-  removeNode: null,
 }
 
 export default NodeDeleteButton
