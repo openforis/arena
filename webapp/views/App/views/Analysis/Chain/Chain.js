@@ -25,7 +25,6 @@ const ChainComponent = () => {
   const { chainUuid } = useParams()
   const surveyInfo = useSurveyInfo()
   const cycleKeys = useSurveyCycleKeys()
-
   const chain = useChain()
   const validation = Chain.getValidation(chain)
 
