@@ -1,7 +1,6 @@
 import Job from '@server/job/job'
 
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { jobEvents } from '@server/job/jobUtils'
 
 export default class CSVDataExtraction extends Job {
   constructor(params) {
@@ -14,10 +13,9 @@ export default class CSVDataExtraction extends Job {
     const { exportDataFolderName, dir } = await SurveyRdbManager.fetchEntitiesDataToCsvFiles(
       {
         surveyId,
-        callback: (result) => {
-          this.setResult(result)
-          const event = this._createJobEvent(jobEvents.statusChange)
-          this._notifyEvent(event)
+        callback: ({ total }) => {
+          this.total = total
+          this.incrementProcessedItems()
         },
       },
       this.tx

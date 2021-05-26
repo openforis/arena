@@ -110,17 +110,8 @@ export const maxKeyAttributes = 3
 
 // ==== READ
 
-export const {
-  getLabels,
-  getParentUuid,
-  getProp,
-  getProps,
-  getPropsDraft,
-  getUuid,
-  getId,
-  isEqual,
-  isTemporary,
-} = ObjectUtils
+export const { getLabels, getParentUuid, getProp, getProps, getPropsDraft, getUuid, getId, isEqual, isTemporary } =
+  ObjectUtils
 export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
 
 export const getType = R.prop(keys.type)
@@ -156,6 +147,7 @@ export const isFile = isType(nodeDefType.file)
 export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
 export const isText = isType(nodeDefType.text)
+export const isTime = isType(nodeDefType.time)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 

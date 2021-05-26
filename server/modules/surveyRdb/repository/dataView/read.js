@@ -33,23 +33,40 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-const _selectsByNodeDefType = ({ viewDataNodeDef, streamMode }) => (nodeDefCol) => {
-  const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+const _selectsByNodeDefType =
+  ({ viewDataNodeDef, streamMode }) =>
+  (nodeDefCol) => {
+    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+    const { name: alias, nameFull, namesFull } = columnNodeDef
 
-  if (streamMode && NodeDef.isBooleanLabelYesNo(columnNodeDef.nodeDef)) {
-    return `CASE WHEN ${columnNodeDef.namesFull}::boolean = True THEN 'Yes' ELSE 'No' END as ${columnNodeDef.name}`
+    if (streamMode) {
+      if (NodeDef.isBooleanLabelYesNo(nodeDefCol)) {
+        return [`CASE WHEN ${nameFull}::boolean = True THEN 'Yes' ELSE 'No' END AS ${alias}`]
+      }
+      if (NodeDef.isDate(nodeDefCol)) {
+        return [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`]
+      }
+      if (NodeDef.isTime(nodeDefCol)) {
+        return [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`]
+      }
+    }
+    if (NodeDef.isCoordinate(nodeDefCol)) {
+      return [
+        `'EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
+      ]
+    }
+    return namesFull
   }
-
-  if (streamMode && NodeDef.isDate(columnNodeDef.nodeDef)) {
-    return `TO_CHAR(${columnNodeDef.namesFull}, 'yyyy-mm-dd') as ${columnNodeDef.name}`
-  }
-
-  return columnNodeDef.namesFull
-}
 
 const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
-  if (!R.isEmpty(columnNodeDefs)) {
-    queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
+  if (columnNodeDefs) {
+    queryBuilder.select(
+      viewDataNodeDef.columnRecordUuid,
+      ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
+        _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
+      )
+    )
+    // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
@@ -57,7 +74,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.map(_selectsByNodeDefType({ viewDataNodeDef, streamMode })).flat(),
+      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
@@ -98,32 +115,34 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
   }
 }
 
-const _dbTransformCallbackSelect = ({ viewDataNodeDef, nodeDefCols, editMode }) => (row) => {
-  if (!editMode) {
-    return row
-  }
-  const rowUpdated = { ...row }
-  // Node columns (one column for each selected node def)
-  rowUpdated.cols = {}
-  nodeDefCols.forEach((nodeDefCol) => {
-    const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
-    const nodeJson = rowUpdated[nodeDefColUuid]
-    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
-    const parentUuid = rowUpdated[nodeDefParentColumnUuid]
-    rowUpdated.cols[nodeDefColUuid] = {
-      node: TableNode.dbTransformCallback(nodeJson),
-      parentUuid,
+const _dbTransformCallbackSelect =
+  ({ viewDataNodeDef, nodeDefCols, editMode }) =>
+  (row) => {
+    if (!editMode) {
+      return row
     }
-    delete rowUpdated[nodeDefColUuid]
-  })
-  // Record column
-  rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
-  // Parent node uuid column
-  const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
-  rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
+    const rowUpdated = { ...row }
+    // Node columns (one column for each selected node def)
+    rowUpdated.cols = {}
+    nodeDefCols.forEach((nodeDefCol) => {
+      const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
+      const nodeJson = rowUpdated[nodeDefColUuid]
+      const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+      const parentUuid = rowUpdated[nodeDefParentColumnUuid]
+      rowUpdated.cols[nodeDefColUuid] = {
+        node: TableNode.dbTransformCallback(nodeJson),
+        parentUuid,
+      }
+      delete rowUpdated[nodeDefColUuid]
+    })
+    // Record column
+    rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
+    // Parent node uuid column
+    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
+    rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
 
-  return rowUpdated
-}
+    return rowUpdated
+  }
 
 /**
  * Runs a select query on a data view associated to an entity node definition.
