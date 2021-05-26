@@ -27,6 +27,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
 const SurveyForm = (props) => {
   const {
+    analysis,
     surveyInfo,
     surveyCycleKey,
     nodeDef,
@@ -108,7 +109,13 @@ const SurveyForm = (props) => {
 
   return nodeDef ? (
     <div>
-      <FormHeader edit={edit} entry={entry && canEditRecord} preview={preview} canEditDef={canEditDef} />
+      <FormHeader
+        edit={edit}
+        analysis={analysis}
+        entry={entry && canEditRecord}
+        preview={preview}
+        canEditDef={canEditDef}
+      />
 
       <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
         {showPageNavigation && (
@@ -148,6 +155,7 @@ const SurveyForm = (props) => {
 }
 
 SurveyForm.defaultProps = {
+  analysis: false,
   surveyInfo: null,
   // Current nodeDef page
   nodeDef: null,
@@ -182,6 +190,7 @@ const mapStateToProps = (state, props) => {
     nodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
+    analysis: Record.isInAnalysisStep(record),
     ...(props.entry ? mapEntryProps() : {}),
   }
 }

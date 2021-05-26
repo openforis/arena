@@ -32,6 +32,11 @@ export const isPreview = R.propEq(keys.preview, true)
 export const getOwnerUuid = R.prop(keys.ownerUuid)
 export const getOwnerName = R.prop(keys.ownerName)
 export const getStep = R.prop(keys.step)
+export const isInAnalysisStep = (record) => {
+  const stepId = getStep(record)
+  const step = RecordStep.getStep(stepId)
+  return RecordStep.getName(step) === RecordStep.stepNames.analysis
+}
 export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
