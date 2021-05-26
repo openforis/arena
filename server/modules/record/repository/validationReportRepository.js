@@ -9,6 +9,8 @@ import * as Validation from '@core/validation/validation'
 import { db } from '@server/db/db'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
+const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
+
 // ============== READ
 
 const query = (surveyId) =>
@@ -21,7 +23,7 @@ const query = (surveyId) =>
       
       -- validation_count_child_def_uuid
       CASE WHEN LENGTH(node_validation.key) > 36 
-        THEN SUBSTRING(node_validation.key, ${RecordValidation.prefixValidationFieldChildrenCount.length + 38}, 36)
+        THEN SUBSTRING(node_validation.key, ${prefixChildrenCount.length + 38}, 36)
         ELSE NULL
         END 
         AS validation_count_child_def_uuid,
@@ -36,11 +38,13 @@ const query = (surveyId) =>
       jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) node_validation
     JOIN
       ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
-    ON LENGTH(node_validation.key) = 36 AND node_validation.key = h.node_uuid::text
-    -- count validation
-    OR LENGTH(node_validation.key) > 36 AND SUBSTRING(node_validation.key, ${
-      RecordValidation.prefixValidationFieldChildrenCount.length + 1
-    }, 36) = h.node_uuid::text
+    ON (CASE 
+      WHEN LENGTH(node_validation.key) = 36 
+      THEN node_validation.key 
+      -- count validation: the key of the field validation starts with '${prefixChildrenCount}' followed by the child def uuid
+      ELSE SUBSTRING(node_validation.key, ${prefixChildrenCount.length + 1}, 36)
+      END
+    ) = h.node_uuid::text
     WHERE 
       h.record_uuid = r.uuid 
       AND r.cycle = $/cycle/
@@ -61,4 +65,4 @@ export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit =
   )
 
 export const countValidationReports = async (surveyId, cycle, client = db) =>
-  client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, { cycle })
+  client.one(`SELECT COUNT(*) FROM(${query(surveyId)}) AS v`, { cycle })
