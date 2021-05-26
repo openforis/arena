@@ -18,13 +18,14 @@ const Dashboard = () => {
 
   return (
     <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
-      <div className="home-dashboard">
-        <SurveyInfo />
+      <>
+        <div className="home-dashboard">
+          <SurveyInfo />
 
-        {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-
+          {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+        </div>
         <ActivityLog />
-      </div>
+      </>
     </SurveyDefsLoader>
   )
 }
