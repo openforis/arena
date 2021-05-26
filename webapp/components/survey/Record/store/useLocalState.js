@@ -34,7 +34,10 @@ export const useLocalState = () => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const record = useSelector(RecordState.getRecord)
-  const editable = useAuthCanEditRecord(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
+  const editable =
+    useAuthCanEditRecord(record) &&
+    !Record.isInAnalysisStep(record) &&
+    (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 
   const [state, setState] = useState(() => State.create({ preview }))
   const loadedRef = useRef(false)
