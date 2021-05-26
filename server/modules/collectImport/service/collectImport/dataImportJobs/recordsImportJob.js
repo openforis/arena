@@ -7,13 +7,9 @@ import Queue from '@core/queue'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
-import * as RecordValidator from '@core/record/recordValidator'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
@@ -74,13 +70,8 @@ export default class RecordsImportJob extends Job {
       // This.logDebug(`${entryName} recordToCreate end`)
 
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
-      const recordValidation = await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
+      await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
-
-      // persist validation
-      // this.logDebug(`${entryName} persistValidation start`)
-      await RecordManager.persistValidation(survey, record, recordValidation, tx)
-      // This.logDebug(`${entryName} persistValidation end`)
 
       // this.logDebug(`-- end import record ${entryName}`)
 
@@ -126,7 +117,6 @@ export default class RecordsImportJob extends Job {
     const { nodeDefsInfoByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
     const recordUuid = Record.getUuid(record)
-    const recordValidation = Record.getValidation(record)
     let recordUpdated = { ...record }
 
     const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
@@ -182,32 +172,22 @@ export default class RecordsImportJob extends Job {
             collectNodeDef,
             collectNodeDefPath,
             collectNode,
-            nodeToInsert,
-            recordValidation
+            nodeToInsert
           )
           queue.enqueueItems(nodesToInsert)
-        } else {
-          const validationAttribute = await RecordValidator.validateAttribute(survey, recordUpdated, nodeToInsert)
-          if (!Validation.isValid(validationAttribute)) {
-            Validation.setValid(false)(recordValidation)
-            Validation.setField(Node.getUuid(nodeToInsert), validationAttribute)(recordValidation)
-          }
         }
       }
     }
 
     await this._updateRelevance(survey, recordUpdated)
-
-    return recordValidation
   }
 
-  _createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, node, recordValidation) {
+  _createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, node) {
     const { nodeDefsInfoByCollectPath } = this.context
 
     // Output
     const nodesToInsert = []
 
-    const nodeUuid = Node.getUuid(node)
     const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
     for (const collectNodeDefChild of collectNodeDefChildren) {
       if (this.isCanceled()) {
@@ -241,20 +221,6 @@ export default class RecordsImportJob extends Job {
         const { uuid: nodeDefChildUuid } = nodeDefsInfo[0]
         const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
 
-        // Validate min/max count
-        if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
-          const validationCount = RecordValidator.validateChildrenCount(nodeDefChild, childrenCount)
-
-          if (!Validation.isValid(validationCount)) {
-            RecordValidation.setValidationCount(
-              nodeUuid,
-              NodeDef.getUuid(nodeDefChild),
-              validationCount
-            )(recordValidation)
-            Validation.setValid(false)(recordValidation)
-          }
-        }
-
         if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
           nodesToInsert.push({
             nodeParent: node,
@@ -270,7 +236,6 @@ export default class RecordsImportJob extends Job {
 
     return {
       nodesToInsert,
-      recordValidation,
     }
   }
 
