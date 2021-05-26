@@ -2,15 +2,15 @@
 @import 'webapp/style/animate';
 
 .activity-log {
-  grid-row: 1/4;
-  grid-column-start: 2;
-  position: relative;
-  background-color: $white;
+  width: calc(min(450px, 100vw));
+  margin-left: 25px;
+  position: absolute;
+  right: 0;
+  top: 0px;
 }
 
 .activity-log__header {
-  position: absolute;
-  width: calc(100% + 50px);
+  width: calc(100% + 0px);
   height: 35px;
   left: -25px;
   padding-left: 30px;
@@ -25,11 +25,11 @@
 }
 
 .activity-log__messages {
-  margin-top: 45px;
   padding: 10px 0;
-  height: calc(100% - 45px);
+  height: calc(100vh - 45px - 15px);
   overflow-y: auto;
   position: relative;
+  background-color: $white;
 }
 
 .activity-log__message {
@@ -72,5 +72,25 @@
     justify-self: right;
     padding-right: 5px;
     color: $blueDark;
+  }
+}
+
+.btn-expand {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  color: $white;
+
+  &:hover {
+    color: $orange;
+    background-color: transparent;
+  }
+
+  &.active {
+    font-weight: bold;
+    background-color: transparent;
   }
 }

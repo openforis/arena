@@ -14,6 +14,8 @@ import { useI18n } from '@webapp/store/system'
 import * as ActivityLogMessage from '../activityLogMessage'
 import * as ActivityLogMessageParser from '../parsers'
 
+const POLL_INTERVAL = 5000
+
 export const useFetchMessages = ({ messages, setMessages }) => {
   const i18n = useI18n()
   const survey = useSurvey()
@@ -77,7 +79,7 @@ export const useFetchMessages = ({ messages, setMessages }) => {
 export const useGetActivityLogMessages = ({ messages, setMessages }) => {
   const fetchMessages = useFetchMessages({ messages, setMessages })
 
-  useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), 3000)
+  useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), POLL_INTERVAL)
 
   return () => {
     ;(async () => fetchMessages({ newest: true }))()

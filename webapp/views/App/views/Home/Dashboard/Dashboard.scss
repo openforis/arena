@@ -1,9 +1,7 @@
 @import 'webapp/style/vars';
 
 .home-dashboard {
-  width: calc(100% + 25px);
   display: grid;
   grid-template-rows: 120px 500px 1fr;
-  grid-template-columns: 0.6fr 0.4fr;
   grid-column-gap: 10px;
 }
