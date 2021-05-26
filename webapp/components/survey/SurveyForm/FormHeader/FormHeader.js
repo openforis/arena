@@ -25,7 +25,7 @@ import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 
 const FormHeader = (props) => {
-  const { edit, entry, preview, canEditDef } = props
+  const { edit, entry, preview, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -97,6 +97,7 @@ const FormHeader = (props) => {
         />
         <div> | </div>
       </div>
+      {analysis && <FormEntryActions analysis={analysis} />}
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )
@@ -107,6 +108,7 @@ FormHeader.propTypes = {
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,
   preview: PropTypes.bool.isRequired,
+  analysis: PropTypes.bool.isRequired,
 }
 
 export default FormHeader
