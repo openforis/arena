@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
@@ -24,6 +25,7 @@ const RecordEntryButtons = () => {
   const stepNext = RecordStep.getNextStep(stepId)
   const stepPrev = RecordStep.getPreviousStep(stepId)
   const valid = Validation.isObjValid(record)
+  const analysis = Record.isInAnalysisStep(record)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
@@ -77,29 +79,31 @@ const RecordEntryButtons = () => {
         )}
       </div>
 
-      <button
-        className="btn-s btn-danger"
-        data-testid={DataTestId.record.deleteBtn}
-        onClick={() =>
-          dispatch(
-            DialogConfirmActions.showDialogConfirm({
-              key: 'surveyForm.formEntryActions.confirmDelete',
-              onOk: () => dispatch(RecordActions.deleteRecord(history)),
-            })
-          )
-        }
-        aria-disabled={false}
-        type="button"
-      >
-        <span className="icon icon-bin icon-12px icon-left" />
-        {i18n.t('common.delete')}
-      </button>
+      {!analysis && (
+        <button
+          className="btn-s btn-danger"
+          data-testid={DataTestId.record.deleteBtn}
+          onClick={() =>
+            dispatch(
+              DialogConfirmActions.showDialogConfirm({
+                key: 'surveyForm.formEntryActions.confirmDelete',
+                onOk: () => dispatch(RecordActions.deleteRecord(history)),
+              })
+            )
+          }
+          aria-disabled={false}
+          type="button"
+        >
+          <span className="icon icon-bin icon-12px icon-left" />
+          {i18n.t('common.delete')}
+        </button>
+      )}
     </>
   )
 }
 
 const FormEntryActions = (props) => {
-  const { preview, entry } = props
+  const { preview, entry, analysis } = props
 
   const i18n = useI18n()
   const dispatch = useDispatch()
@@ -117,15 +121,22 @@ const FormEntryActions = (props) => {
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>
       ) : (
-        entry && <RecordEntryButtons />
+        (entry || analysis) && <RecordEntryButtons />
       )}
     </div>
   )
 }
 
+FormEntryActions.propTypes = {
+  preview: PropTypes.bool,
+  entry: PropTypes.bool,
+  analysis: PropTypes.bool,
+}
+
 FormEntryActions.defaultProps = {
   preview: false,
   entry: false,
+  analysis: false,
 }
 
 export default FormEntryActions
