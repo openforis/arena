@@ -22,9 +22,8 @@ const Dashboard = () => {
         <SurveyInfo />
 
         {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-
-        <ActivityLog />
       </div>
+      <ActivityLog />
     </SurveyDefsLoader>
   )
 }
