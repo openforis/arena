@@ -19,6 +19,7 @@ export const isValidationResultErrorCount = (validationResult) =>
   R.includes(ValidationResult.getKey(validationResult), [
     Validation.messageKeys.record.nodesMinCountNotReached,
     Validation.messageKeys.record.nodesMaxCountExceeded,
+    Validation.messageKeys.record.nodesCountInvalid,
   ])
 export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)
 

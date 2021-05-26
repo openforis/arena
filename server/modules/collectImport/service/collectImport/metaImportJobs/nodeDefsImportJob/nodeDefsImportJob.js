@@ -165,10 +165,8 @@ export default class NodeDefsImportJob extends Job {
       }
 
       // 3b. add specify text attribute def
-      const {
-        nodeDefsUpdated: qualifierNodeDefsUpdated,
-        nodeDefsInserted: qualifierNodeDefsInserted,
-      } = await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
+      const { nodeDefsUpdated: qualifierNodeDefsUpdated, nodeDefsInserted: qualifierNodeDefsInserted } =
+        await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
@@ -242,7 +240,9 @@ export default class NodeDefsImportJob extends Job {
       const elPrecision = CollectSurvey.getElementByName('precision')(collectNodeDef)
       if (elPrecision) {
         const unit = CollectSurvey.getAttribute('unit')(elPrecision)
-        suffix += ` [${unit}]`
+        if (!unit) {
+          suffix += ` [${unit}]`
+        }
       }
     }
     return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)

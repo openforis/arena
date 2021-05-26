@@ -8,6 +8,7 @@ import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
@@ -126,7 +127,13 @@ export default class RecordCheckJob extends Job {
 
     // 6. validate nodes
 
+    const newNodes = nodeDefAddedUuids.reduce((nodesByUuid, nodeDefUuid) => {
+      const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
+      return { ...nodesByUuid, ...ObjectUtils.toUuidIndexedObj(nodes) }
+    }, {})
+
     const nodesToValidate = {
+      ...newNodes,
       ...missingNodes,
       ...nodesUpdatedDefaultValues,
     }
