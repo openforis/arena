@@ -2,6 +2,7 @@ import Job from '@server/job/job'
 
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
+import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 
@@ -24,6 +25,7 @@ export default class CollectImportJob extends Job {
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
+      new RecordCheckJob(),
       new SurveyRdbCreationJob(),
     ])
   }

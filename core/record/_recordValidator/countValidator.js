@@ -11,8 +11,16 @@ import * as NumberUtils from '@core/numberUtils'
 import * as Record from '../record'
 import * as Node from '../node'
 
-const _createValidationResult = (nodeDefUuid, isMinCountValidation, minCount, maxCount) =>
-  Validation.newInstance(false, {}, [
+const _createValidationResult = (nodeDefUuid, isMinCountValidation, minCount, maxCount) => {
+  if (minCount === maxCount) {
+    return Validation.newInstance(false, {}, [
+      {
+        key: Validation.messageKeys.record.nodesCountInvalid,
+        params: { nodeDefUuid, count: minCount },
+      },
+    ])
+  }
+  return Validation.newInstance(false, {}, [
     {
       key: isMinCountValidation
         ? Validation.messageKeys.record.nodesMinCountNotReached
@@ -23,6 +31,7 @@ const _createValidationResult = (nodeDefUuid, isMinCountValidation, minCount, ma
       },
     },
   ])
+}
 
 export const validateChildrenCount = (nodeDefChild, count) => {
   const validations = NodeDef.getValidations(nodeDefChild)
