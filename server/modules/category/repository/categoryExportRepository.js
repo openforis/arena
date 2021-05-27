@@ -1,5 +1,6 @@
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Category from '@core/survey/category'
 import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
@@ -39,6 +40,20 @@ const getFieldsLabel = ({ index, languages, numColumnsPerLevel, headers, isEmpty
     })
   )
 
+const getExtraProps = ({ index, extraProps, isEmpty, levels }) => {
+  const numPropsPerLevel = extraProps.length / levels.length
+  const extraPropsInLevel = extraProps.slice(index * numPropsPerLevel, numPropsPerLevel + index * numPropsPerLevel)
+
+  return isEmpty
+    ? extraPropsInLevel.map((extraProp) => getEmpty({ header: extraProp }))
+    : extraPropsInLevel.map(
+        (extraProp) =>
+          `COALESCE(((c${index}.props || c${index}.props_draft) -> 'extra') ->> '${extraProp.substring(
+            extraProp.indexOf('_') + 1
+          )}', NULL) AS ${extraProp}`
+      )
+}
+
 /**
  * Prepare the values that should be returned by the query.
  * The values for a level deeper than the levelIndex should be returned empty.
@@ -52,7 +67,7 @@ const getFieldsLabel = ({ index, languages, numColumnsPerLevel, headers, isEmpty
  *
  * @returns {string} The select fields that will be added to the query.
  */
-const getSelectFields = ({ levelIndex, levels, headers, numColumnsPerLevel, languages }) =>
+const getSelectFields = ({ levelIndex, levels, headers, extraProps, numColumnsPerLevel, languages }) =>
   levels
     .reduce((selectFields, _, index) => {
       const isEmpty = index > levelIndex
@@ -61,6 +76,9 @@ const getSelectFields = ({ levelIndex, levels, headers, numColumnsPerLevel, lang
         getFieldId({ index, isEmpty }),
         getFieldCode({ index, header: headers[index * numColumnsPerLevel], isEmpty }),
         ...getFieldsLabel({ index, languages, numColumnsPerLevel, headers, isEmpty }),
+        ...(extraProps
+          ? getExtraProps({ index, languages, numColumnsPerLevel, headers, extraProps, isEmpty, levels })
+          : []),
       ]
     }, [])
     .join(', ')
@@ -85,10 +103,10 @@ const getJoins = ({ levelIndex, surveyId }) => {
   return joins
 }
 
-const getSubqueryByLevel = ({ surveyId, languages, levels, headers, numColumnsPerLevel, levelIndex }) =>
+const getSubqueryByLevel = ({ surveyId, languages, levels, headers, extraProps, numColumnsPerLevel, levelIndex }) =>
   `(
     SELECT
-      ${getSelectFields({ levelIndex, levels, headers, numColumnsPerLevel, languages })}
+      ${getSelectFields({ levelIndex, levels, headers, extraProps, numColumnsPerLevel, languages })}
     FROM
         ${getSurveyDBSchema(surveyId)}.category_item c0
             LEFT JOIN ${getSurveyDBSchema(surveyId)}.category_level l0
@@ -110,15 +128,23 @@ const getSubqueryByLevel = ({ surveyId, languages, levels, headers, numColumnsPe
  *
  * @returns {string} The query to be used to export the category.
  */
-export const generateCategoryExportQuery = ({ surveyId, levels, headers, languages }) => {
+export const generateCategoryExportQuery = ({ surveyId, levels, headers, extraPropsHeaders = [], languages }) => {
   // code_column + # of languages
   const numColumnsPerLevel = 1 + languages.length
 
   // iterate over the levels to build the query
-  return `SELECT ${headers} FROM (
+  return `SELECT ${[...headers, extraPropsHeaders]} FROM (
     ${levels
       .map((_, levelIndex) =>
-        getSubqueryByLevel({ surveyId, languages, levels, headers, numColumnsPerLevel, levelIndex })
+        getSubqueryByLevel({
+          surveyId,
+          languages,
+          levels,
+          headers,
+          extraProps: extraPropsHeaders,
+          numColumnsPerLevel,
+          levelIndex,
+        })
       )
       .join(' UNION ')}
     -- order by item id to preserve insertion order
@@ -134,6 +160,19 @@ export const getCategoryExportHeaders = ({ levels, languages }) =>
         ...headers,
         `${CategoryLevel.getName(level)}_code`,
         ...(languages || []).map((language) => `${CategoryLevel.getName(level)}_label_${language}`),
+      ],
+      []
+    )
+
+export const getCategoryExportHeadersExtraProps = ({ levels, category }) =>
+  levels
+    .sort((la, lb) => la.index - lb.index)
+    .reduce(
+      (headers, level) => [
+        ...headers,
+        ...(Category.getItemExtraDefKeys(category) || []).map(
+          (extraProp) => `${CategoryLevel.getName(level)}_${extraProp}`
+        ),
       ],
       []
     )
