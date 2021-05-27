@@ -66,10 +66,16 @@ export const getNodeChildrenByDefUuidUnsorted = (parentNode, nodeDefUuid) => (re
     R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
-export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
-  R.pipe(getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid), (nodes) =>
-    R.sortWith([R.propOr(false, Node.keys.placeholder), R.prop(Node.keys.dateCreated)])(nodes)
-  )(record)
+export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) => {
+  const children = getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid)(record)
+  return children.sort((node1, node2) => {
+    if (Node.isPlaceholder(node1) && !Node.isPlaceholder(node2)) return 1
+    if (!Node.isPlaceholder(node1) && Node.isPlaceholder(node2)) return -1
+    if (node1.id < node2.id || node1.dateCreated < node2.dateCreated) return -1
+    if (node1.id > node2.id || node1.dateCreated > node2.dateCreated) return 1
+    return 0
+  })
+}
 
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
   R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
@@ -117,65 +123,65 @@ export const isNodeApplicable = (node) => (record) => {
  *   nodeDef, //node definition
  * }
  */
-export const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => (
-  record
-) => {
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
-  const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
+export const getDependentNodePointers =
+  (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
+  (record) => {
+    const nodeDefUuid = Node.getNodeDefUuid(node)
+    const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
+    const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
 
-  const nodePointers = []
+    const nodePointers = []
 
-  if (dependentUuids) {
-    const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
+    if (dependentUuids) {
+      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
 
-    for (const dependentDef of dependentDefs) {
-      // 1 find common parent def
-      const commonParentDefUuid = R.pipe(
-        R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
-        R.last
-      )(NodeDef.getMetaHierarchy(dependentDef))
+      for (const dependentDef of dependentDefs) {
+        // 1 find common parent def
+        const commonParentDefUuid = R.pipe(
+          R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
+          R.last
+        )(NodeDef.getMetaHierarchy(dependentDef))
 
-      // 2 find common parent node
-      const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
+        // 2 find common parent node
+        const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
 
-      // 3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
-      const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
+        // 3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
+        const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
 
-      const nodeDefUuidDependent = isDependencyApplicable
-        ? NodeDef.getParentUuid(dependentDef)
-        : NodeDef.getUuid(dependentDef)
+        const nodeDefUuidDependent = isDependencyApplicable
+          ? NodeDef.getParentUuid(dependentDef)
+          : NodeDef.getUuid(dependentDef)
 
-      const nodeDependents = getNodesByDefUuid(nodeDefUuidDependent)(record)
-      for (const nodeDependent of nodeDependents) {
-        if (
-          Node.isDescendantOf(commonParentNode)(nodeDependent) ||
-          (isDependencyApplicable && Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode))
-        ) {
-          const nodePointer = {
-            nodeDef: dependentDef,
-            nodeCtx: nodeDependent,
-          }
-          if (filterFn === null || filterFn(nodePointer)) {
-            nodePointers.push(nodePointer)
+        const nodeDependents = getNodesByDefUuid(nodeDefUuidDependent)(record)
+        for (const nodeDependent of nodeDependents) {
+          if (
+            Node.isDescendantOf(commonParentNode)(nodeDependent) ||
+            (isDependencyApplicable && Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode))
+          ) {
+            const nodePointer = {
+              nodeDef: dependentDef,
+              nodeCtx: nodeDependent,
+            }
+            if (filterFn === null || filterFn(nodePointer)) {
+              nodePointers.push(nodePointer)
+            }
           }
         }
       }
     }
-  }
 
-  if (includeSelf) {
-    const nodePointerSelf = {
-      nodeDef,
-      nodeCtx: node,
+    if (includeSelf) {
+      const nodePointerSelf = {
+        nodeDef,
+        nodeCtx: node,
+      }
+      if (filterFn === null || filterFn(nodePointerSelf)) {
+        nodePointers.push(nodePointerSelf)
+      }
     }
-    if (filterFn === null || filterFn(nodePointerSelf)) {
-      nodePointers.push(nodePointerSelf)
-    }
-  }
 
-  return nodePointers
-}
+    return nodePointers
+  }
 
 // Code attributes
 export const getDependentCodeAttributes = (node) => (record) =>
