@@ -133,7 +133,7 @@ export const generateCategoryExportQuery = ({ surveyId, levels, headers, extraPr
   const numColumnsPerLevel = 1 + languages.length
 
   // iterate over the levels to build the query
-  return `SELECT ${[...headers, extraPropsHeaders]} FROM (
+  return `SELECT ${[...headers, ...extraPropsHeaders]} FROM (
     ${levels
       .map((_, levelIndex) =>
         getSubqueryByLevel({

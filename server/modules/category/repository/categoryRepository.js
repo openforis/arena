@@ -194,8 +194,8 @@ export const fetchCategoryAndLevelsByUuid = async (
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup })} 
-    WHERE c.uuid = $1`,
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft: true, includeValidation, backup })} 
+    ${backup || draft ? 'WHERE' : 'AND'} c.uuid = $1`,
     [categoryUuid]
   )
   return A.pipe(R.values, R.head)(categories)
