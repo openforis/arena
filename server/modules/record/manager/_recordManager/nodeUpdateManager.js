@@ -162,10 +162,9 @@ export const persistNode = async (user, survey, record, node, system, t) => {
   if (existingNode) {
     // Updating existing node
     return updateNode(user, survey, record, node, system, t)
-  } else {
-    // Inserting new node
-    return insertNode(user, survey, record, node, system, t)
   }
+  // Inserting new node
+  return insertNode(user, survey, record, node, system, t)
 }
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
@@ -174,7 +173,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
 
   const nodesToVisit = new Queue(R.values(nodes))
 
-  const nodesVisitedUuids = new Set() // Used to avoid visiting the same node 2 times
+  const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
 
   let recordUpdated = record
 
@@ -183,19 +182,31 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const nodeUuid = Node.getUuid(node)
 
     // Visit only unvisited nodes
-    if (!nodesVisitedUuids.has(nodeUuid)) {
-      // Update node dependents
-      const [nodesApplicability, nodesDefaultValues] = await Promise.all([
-        NodeUpdateDependentManager.updateSelfAndDependentsApplicable(survey, recordUpdated, node, tx),
-        NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(survey, recordUpdated, node, tx),
-      ])
+    const visitedCount = visitedCountByUuid[nodeUuid] || 0
+    if (visitedCount < 2) {
+      // Update node dependents (applicability)
+      const nodesApplicability = await NodeUpdateDependentManager.updateSelfAndDependentsApplicable(
+        survey,
+        recordUpdated,
+        node,
+        tx
+      )
+      recordUpdated = Record.assocNodes(nodesApplicability)(recordUpdated)
+
+      // Update node dependents (default values)
+      const nodesDefaultValues = await NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(
+        survey,
+        recordUpdated,
+        node,
+        tx
+      )
+      recordUpdated = Record.assocNodes(nodesDefaultValues)(recordUpdated)
 
       // Update record nodes
       const nodesUpdatedCurrent = {
         ...nodesApplicability,
         ...nodesDefaultValues,
       }
-      recordUpdated = Record.assocNodes(nodesUpdatedCurrent)(recordUpdated)
 
       // Mark updated nodes to visit
       nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
@@ -204,7 +215,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
       Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
       // Mark node visited
-      nodesVisitedUuids.add(nodeUuid)
+      visitedCountByUuid[nodeUuid] = visitedCount + 1
     }
   }
 
