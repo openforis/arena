@@ -167,6 +167,13 @@ export const persistNode = async (user, survey, record, node, system, t) => {
   return insertNode(user, survey, record, node, system, t)
 }
 
+/**
+ * Nodes can be visited maximum 2 times during the update of the dependent nodes, to avoid loops in the evaluation.
+ * The first time the applicability can depend on attributes with default values not applied yet.
+ * The second time the applicability expression can be evaluated correctly.
+ */
+const MAX_VISITING_TIMES = 2
+
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
   const nodesUpdated = { ...nodes }
@@ -181,9 +188,9 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
-    // Visit only unvisited nodes
     const visitedCount = visitedCountByUuid[nodeUuid] || 0
-    if (visitedCount < 2) {
+
+    if (visitedCount < MAX_VISITING_TIMES) {
       // Update node dependents (applicability)
       const nodesApplicability = await NodeUpdateDependentManager.updateSelfAndDependentsApplicable(
         survey,
