@@ -40,18 +40,16 @@ const getFieldsLabel = ({ index, languages, numColumnsPerLevel, headers, isEmpty
     })
   )
 
-const getExtraProps = ({ index, extraProps, isEmpty, levels }) => {
-  const numPropsPerLevel = extraProps.length / levels.length
-  const extraPropsInLevel = extraProps.slice(index * numPropsPerLevel, numPropsPerLevel + index * numPropsPerLevel)
-
-  return isEmpty
-    ? extraPropsInLevel.map((extraProp) => getEmpty({ header: extraProp }))
-    : extraPropsInLevel.map(
-        (extraProp) =>
-          `COALESCE(((c${index}.props || c${index}.props_draft) -> 'extra') ->> '${extraProp.substring(
-            extraProp.indexOf('_') + 1
-          )}', NULL) AS ${extraProp}`
-      )
+const getExtraProps = ({ extraProps, levels, levelIndex }) => {
+  return extraProps.map((extraProp) => {
+    return `COALESCE(${levels.map((l, lindex) =>
+      levels.length - lindex - 1 > levelIndex
+        ? 'NULL'
+        : `(((c${levels.length - lindex - 1}.props || c${
+            levels.length - lindex - 1
+          }.props_draft) -> 'extra') ->> '${extraProp}')`
+    )}, NULL) AS ${extraProp}`
+  })
 }
 
 /**
@@ -76,11 +74,11 @@ const getSelectFields = ({ levelIndex, levels, headers, extraProps, numColumnsPe
         getFieldId({ index, isEmpty }),
         getFieldCode({ index, header: headers[index * numColumnsPerLevel], isEmpty }),
         ...getFieldsLabel({ index, languages, numColumnsPerLevel, headers, isEmpty }),
-        ...(extraProps
-          ? getExtraProps({ index, languages, numColumnsPerLevel, headers, extraProps, isEmpty, levels })
-          : []),
       ]
     }, [])
+    .concat([
+      ...(extraProps ? getExtraProps({ languages, numColumnsPerLevel, headers, extraProps, levels, levelIndex }) : []),
+    ])
     .join(', ')
 
 /**
@@ -164,18 +162,7 @@ export const getCategoryExportHeaders = ({ levels, languages }) =>
       []
     )
 
-export const getCategoryExportHeadersExtraProps = ({ levels, category }) =>
-  levels
-    .sort((la, lb) => la.index - lb.index)
-    .reduce(
-      (headers, level) => [
-        ...headers,
-        ...(Category.getItemExtraDefKeys(category) || []).map(
-          (extraProp) => `${CategoryLevel.getName(level)}_${extraProp}`
-        ),
-      ],
-      []
-    )
+export const getCategoryExportHeadersExtraProps = ({ category }) => Category.getItemExtraDefKeys(category) || []
 
 export const getCategoryExportTemplate = async ({ res }) => {
   Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
