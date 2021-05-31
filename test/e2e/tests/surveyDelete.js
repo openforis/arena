@@ -3,6 +3,7 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { survey, survey2, surveyFromTemplate, surveyImport } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import { clickSurvey } from './_surveyList'
+import { expectNoItems } from './_tables'
 
 const deleteSurvey = async (surveyToDelete) => {
   const { name } = surveyToDelete
@@ -30,8 +31,6 @@ export default () =>
     })
 
     test('Verify survey list empty', async () => {
-      // wait for loading bar to disappear and for "no items" to appear
-      await page.waitForSelector(getSelector(DataTestId.table.noItems), { timeout: 5000 })
-      await expect(page).toHaveText('No Items')
+      await expectNoItems()
     })
   })

@@ -6,6 +6,7 @@ import { gotoFormPage } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
+import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
 
@@ -52,9 +53,7 @@ const expectMessages = (messages) => {
     )
   } else {
     test('Verify validation report empty', async () => {
-      // wait for loading bar to disappear and for "no items" to appear
-      await page.waitForSelector(getSelector(DataTestId.table.noItems), { timeout: 5000 })
-      await expect(page).toHaveText('No Items')
+      await expectNoItems()
     })
   }
 
