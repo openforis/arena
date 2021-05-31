@@ -162,7 +162,7 @@ export const getCategoryExportHeaders = ({ levels, languages }) =>
       []
     )
 
-export const getCategoryExportHeadersExtraProps = ({ category }) => Category.getItemExtraDefKeys(category) || []
+export const getCategoryExportHeadersExtraProps = ({ category }) => Category.getItemExtraDefKeys(category)
 
 export const getCategoryExportTemplate = async ({ res }) => {
   Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
