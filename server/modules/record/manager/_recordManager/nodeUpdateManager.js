@@ -162,11 +162,17 @@ export const persistNode = async (user, survey, record, node, system, t) => {
   if (existingNode) {
     // Updating existing node
     return updateNode(user, survey, record, node, system, t)
-  } else {
-    // Inserting new node
-    return insertNode(user, survey, record, node, system, t)
   }
+  // Inserting new node
+  return insertNode(user, survey, record, node, system, t)
 }
+
+/**
+ * Nodes can be visited maximum 2 times during the update of the dependent nodes, to avoid loops in the evaluation.
+ * The first time the applicability can depend on attributes with default values not applied yet.
+ * The second time the applicability expression can be evaluated correctly.
+ */
+const MAX_VISITING_TIMES = 2
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
@@ -174,7 +180,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
 
   const nodesToVisit = new Queue(R.values(nodes))
 
-  const nodesVisitedUuids = new Set() // Used to avoid visiting the same node 2 times
+  const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
 
   let recordUpdated = record
 
@@ -182,20 +188,32 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
-    // Visit only unvisited nodes
-    if (!nodesVisitedUuids.has(nodeUuid)) {
-      // Update node dependents
-      const [nodesApplicability, nodesDefaultValues] = await Promise.all([
-        NodeUpdateDependentManager.updateSelfAndDependentsApplicable(survey, recordUpdated, node, tx),
-        NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(survey, recordUpdated, node, tx),
-      ])
+    const visitedCount = visitedCountByUuid[nodeUuid] || 0
+
+    if (visitedCount < MAX_VISITING_TIMES) {
+      // Update node dependents (applicability)
+      const nodesApplicability = await NodeUpdateDependentManager.updateSelfAndDependentsApplicable(
+        survey,
+        recordUpdated,
+        node,
+        tx
+      )
+      recordUpdated = Record.assocNodes(nodesApplicability)(recordUpdated)
+
+      // Update node dependents (default values)
+      const nodesDefaultValues = await NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(
+        survey,
+        recordUpdated,
+        node,
+        tx
+      )
+      recordUpdated = Record.assocNodes(nodesDefaultValues)(recordUpdated)
 
       // Update record nodes
       const nodesUpdatedCurrent = {
         ...nodesApplicability,
         ...nodesDefaultValues,
       }
-      recordUpdated = Record.assocNodes(nodesUpdatedCurrent)(recordUpdated)
 
       // Mark updated nodes to visit
       nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
@@ -204,7 +222,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
       Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
       // Mark node visited
-      nodesVisitedUuids.add(nodeUuid)
+      visitedCountByUuid[nodeUuid] = visitedCount + 1
     }
   }
 
