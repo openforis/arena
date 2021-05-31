@@ -47,8 +47,8 @@ const Content = (props) => {
 
       <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
         {loading &&
-          new Array(maxRows).fill(0).map(() => (
-            <div className="table__row">
+          new Array(maxRows).fill(0).map((_item, index) => (
+            <div className="table__row" key={String(index)}>
               <LoadingBar />
             </div>
           ))}
