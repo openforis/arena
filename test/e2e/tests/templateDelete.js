@@ -35,6 +35,8 @@ export default () =>
       test(`Verify template ${idx} deleted`, async () => {
         if (idx === templates.length - 1) {
           // last template deleted
+          // wait for loading bar to disappear and for "no items" to appear
+          await page.waitForSelector(getSelector(DataTestId.table.noItems), { timeout: 5000 })
           await expect(page).toHaveText('No Items')
         } else {
           const expectedTemplatesCount = templates.length - (idx + 1)

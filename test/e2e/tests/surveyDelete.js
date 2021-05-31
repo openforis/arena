@@ -30,6 +30,8 @@ export default () =>
     })
 
     test('Verify survey list empty', async () => {
+      // wait for loading bar to disappear and for "no items" to appear
+      await page.waitForSelector(getSelector(DataTestId.table.noItems), { timeout: 5000 })
       await expect(page).toHaveText('No Items')
     })
   })

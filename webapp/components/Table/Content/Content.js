@@ -36,7 +36,11 @@ const Content = (props) => {
   }, [offset, tableRef])
 
   if (!loading && R.isEmpty(list)) {
-    return <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
+    return (
+      <div className="table__empty-rows" data-testid={DataTestId.table.noItems}>
+        {i18n.t(noItemsLabelKey)}
+      </div>
+    )
   }
 
   return (
