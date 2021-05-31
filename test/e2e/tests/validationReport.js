@@ -6,6 +6,7 @@ import { gotoFormPage } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
+import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
 
@@ -52,7 +53,7 @@ const expectMessages = (messages) => {
     )
   } else {
     test('Verify validation report empty', async () => {
-      await expect(page).toHaveText('No Items')
+      await expectNoItems()
     })
   }
 

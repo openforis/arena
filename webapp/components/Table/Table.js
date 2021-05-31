@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Header from './Header'
 import Content from './Content'
 import { useTable } from './useTable'
+import LoadingBar from '../LoadingBar'
 
 const Table = (props) => {
   const {
@@ -22,7 +23,15 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { list, offset, limit, count, initData } = useTable({ moduleApiUri, module, restParams })
+  const { loadingData, loadingCount, list, offset, limit, count, initData } = useTable({
+    moduleApiUri,
+    module,
+    restParams,
+  })
+
+  if (loadingCount) {
+    return <LoadingBar />
+  }
 
   return (
     <div className={`table ${className}`}>
@@ -39,6 +48,8 @@ const Table = (props) => {
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
         list={list}
+        loading={loadingData}
+        maxRows={limit}
         module={module}
         noItemsLabelKey={noItemsLabelKey}
         offset={offset}

@@ -11,10 +11,18 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
   const offset = getOffset()
   const limit = getLimit()
 
-  const { data: { list } = { list: [] }, dispatch: fetchData } = useAsyncGetRequest(apiUri, {
+  const {
+    data: { list } = { list: [] },
+    dispatch: fetchData,
+    loading: loadingData,
+  } = useAsyncGetRequest(apiUri, {
     params: { offset, limit, ...restParams },
   })
-  const { data: { count } = { count: 0 }, dispatch: fetchCount } = useAsyncGetRequest(`${apiUri}/count`, {
+  const {
+    data: { count } = { count: 0 },
+    dispatch: fetchCount,
+    loading: loadingCount,
+  } = useAsyncGetRequest(`${apiUri}/count`, {
     params: restParams,
   })
 
@@ -29,5 +37,5 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     fetchData()
   }, [offset])
 
-  return { list, offset, limit, count: Number(count), initData }
+  return { loadingData, loadingCount, list, offset, limit, count: Number(count), initData }
 }

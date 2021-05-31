@@ -3,6 +3,7 @@ import { BASE_URL } from '../config'
 import { templates } from '../mock/survey'
 import { gotoHome, gotoTemplateList } from './_navigation'
 import { clickSurvey } from './_surveyList'
+import { expectNoItems } from './_tables'
 
 export default () =>
   describe('Template Delete', () => {
@@ -35,7 +36,7 @@ export default () =>
       test(`Verify template ${idx} deleted`, async () => {
         if (idx === templates.length - 1) {
           // last template deleted
-          await expect(page).toHaveText('No Items')
+          await expectNoItems()
         } else {
           const expectedTemplatesCount = templates.length - (idx + 1)
 
