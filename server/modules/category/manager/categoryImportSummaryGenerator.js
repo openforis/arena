@@ -11,7 +11,7 @@ import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
-  [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
+  [CategoryImportSummary.columnTypes.label]: { preffix: 'label', lang: true },
   [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
 }
 
@@ -21,7 +21,9 @@ const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns
   // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
   // the language suffix is optional
   const langSuffixPattern = columnProp.lang ? `(_([a-z]{2}))?` : ''
-  const pattern = new RegExp(`^(.*)${columnProp.suffix}${langSuffixPattern}$`)
+  const pattern = new RegExp(
+    `${columnProp.preffix ? columnProp.preffix : `^(.*)${columnProp.suffix}`}${langSuffixPattern}$`
+  )
   return {
     ...columnPatterns,
     [columnType]: pattern,
@@ -47,7 +49,7 @@ const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
 const _extractLang = ({ columnPatterns, columnName, columnType }) => {
   const pattern = columnPatterns[columnType]
   const match = columnName.match(pattern)
-  return match[3]
+  return match[2]
 }
 
 const _validateSummary = (summary) => {
@@ -62,6 +64,7 @@ const _validateSummary = (summary) => {
       // If column is label or description, a code in the same level must be defined
 
       if (
+        false &&
         !CategoryImportSummary.hasColumn(
           CategoryImportSummary.columnTypes.code,
           CategoryImportSummary.getColumnLevelIndex(column)
@@ -99,7 +102,7 @@ export const createImportSummaryFromColumnNames = ({
 
   const getOrCreateLevel = ({ columnName, columnType }) => {
     const columnProp = columnProps[columnType]
-    if (columnProp) {
+    if (columnProp && columnType === CategoryImportSummary.columnTypes.code) {
       const levelName = _extractLevelName({ columnPatterns, columnName, columnType })
       let level = levelsByName[levelName]
       if (!level) {

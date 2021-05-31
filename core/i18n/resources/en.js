@@ -662,6 +662,7 @@ $t(common.cantUndoWarning)`,
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
       columnTypeSummaryExtra: '{{type}}',
       columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
+      columnTypeLabelWithLanguage: 'Label ({{language}})',
       columnType: {
         code: 'code',
         description: 'description',

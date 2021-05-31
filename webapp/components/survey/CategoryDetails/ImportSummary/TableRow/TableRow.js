@@ -11,12 +11,16 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { useI18n } from '@webapp/store/system'
 
 const _getColumnSummaryKey = ({ column }) => {
+  if (CategoryImportSummary.isColumnLabel(column)) {
+    return 'categoryEdit.importSummary.columnTypeLabelWithLanguage'
+  }
   if (CategoryImportSummary.hasColumnLang(column)) {
     return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
   }
   if (CategoryImportSummary.isColumnExtra(column)) {
-    return 'categoryEdit.importSummary.columnTypeSummaryExtra'
+    return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
   }
+
   return 'categoryEdit.importSummary.columnTypeSummary'
 }
 
