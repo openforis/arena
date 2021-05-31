@@ -43,6 +43,7 @@ $tableHeaderHeight: 30px;
   justify-items: center;
   border-bottom: $tableRowBorder;
   height: $tableRowHeight;
+  min-height: $tableRowHeight;
   position: relative;
   font-size: 0.9rem;
 
