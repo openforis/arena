@@ -20,7 +20,7 @@ const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suf
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
   // the language suffix is optional
-  const langSuffixPattern = columnProp.lang ? `((_([a-z]{2}))$)` : ''
+  const langSuffixPattern = columnProp.lang ? `(_([a-z]{2}))?` : ''
   const pattern = new RegExp(`^(.*)${columnProp.suffix}${langSuffixPattern}$`)
   return {
     ...columnPatterns,
@@ -112,9 +112,13 @@ export const createImportSummaryFromColumnNames = ({
     return { name: null, index: -1 }
   }
 
+  let someExtraWasCreated = false
   const columns = columnNames.reduce((acc, columnName) => {
-    const columnType = _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
+    const columnType = someExtraWasCreated
+      ? CategoryImportSummary.columnTypes.extra
+      : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
     const extra = columnType === CategoryImportSummary.columnTypes.extra
+    if (extra && !someExtraWasCreated) someExtraWasCreated = true
 
     const level = getOrCreateLevel({ columnName, columnType })
     const { name: levelName, index: levelIndex } = level
