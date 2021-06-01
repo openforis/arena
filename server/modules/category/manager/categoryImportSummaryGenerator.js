@@ -12,7 +12,7 @@ import * as CSVReader from '@server/utils/file/csvReader'
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
   [CategoryImportSummary.columnTypes.label]: { preffix: 'label', lang: true },
-  [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
+  [CategoryImportSummary.columnTypes.description]: { preffix: 'description', lang: true },
 }
 
 const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
