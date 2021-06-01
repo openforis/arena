@@ -2,7 +2,10 @@ const defaults = { lang: 'en' }
 
 export const getSelector = (id, tag = '') => `${tag}[data-testid="${id}"]`
 
-const _withLang = (key) => (lang = defaults.lang) => `${key}${lang && lang.length > 0 ? `-${lang}` : ''}`
+const _withLang =
+  (key) =>
+  (lang = defaults.lang) =>
+    `${key}${lang && lang.length > 0 ? `-${lang}` : ''}`
 
 export const DataTestId = {
   categoryDetails: {
@@ -147,6 +150,7 @@ export const DataTestId = {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
   },
   table: {
+    noItems: 'no-items',
     rows: (module) => `${module}-rows`,
     row: (module, idx) => `${module}_${idx}`,
   },
