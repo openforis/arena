@@ -86,7 +86,9 @@ export default class UsersImportJob extends Job {
 
     const users = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
 
-    users.push(this.user)
+    if (this.user) {
+      users.push(this.user)
+    }
 
     await Promise.all(
       users.map(async (user) =>

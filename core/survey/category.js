@@ -52,11 +52,13 @@ export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
 // ====== UPDATE
-export const assocProp = ({ key, value }) => (category) => {
-  const categoryUpdated = ObjectUtils.setProp(key, value)(category)
-  const validationUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(key))(categoryUpdated)
-  return Validation.assocValidation(validationUpdated)(categoryUpdated)
-}
+export const assocProp =
+  ({ key, value }) =>
+  (category) => {
+    const categoryUpdated = ObjectUtils.setProp(key, value)(category)
+    const validationUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(key))(categoryUpdated)
+    return Validation.assocValidation(validationUpdated)(categoryUpdated)
+  }
 
 // ==== CREATE
 export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
@@ -73,10 +75,12 @@ const assocLevels = ({ levels }) => R.assoc(keys.levels, levels)
 
 export const assocLevelsArray = (array) => assocLevels({ levels: ObjectUtils.toIndexedObj(array, 'index') })
 
-export const assocLevel = ({ level }) => (category) => {
-  const levelsUpdated = R.pipe(getLevels, R.assoc(CategoryLevel.getIndex(level), level))(category)
-  return assocLevels({ levels: levelsUpdated })(category)
-}
+export const assocLevel =
+  ({ level }) =>
+  (category) => {
+    const levelsUpdated = R.pipe(getLevels, R.assoc(CategoryLevel.getIndex(level), level))(category)
+    return assocLevels({ levels: levelsUpdated })(category)
+  }
 
 // ========
 // ITEMS
@@ -97,6 +101,10 @@ export const getItemValidation = (item) =>
 
 // ====== ITEMS extra def
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
+export const getItemExtraDefKeys = (category) => {
+  const itemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})(category)
+  return Object.keys(itemExtraDef)
+}
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
 // ========

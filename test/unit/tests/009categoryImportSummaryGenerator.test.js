@@ -25,43 +25,43 @@ describe('CategoryImportSummaryGenerator Test', () => {
     },
     {
       title: 'flat code list with label',
-      columns: ['region_code', 'region_label_en'],
+      columns: ['region_code', 'label_en'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
           region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          region_label_en: newColumn({ type: label, levelName: 'region', levelIndex: 0, lang: 'en' }),
+          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
         },
       }),
     },
     {
       title: 'flat code list with label in default language',
-      columns: ['region_code', 'region_label'],
+      columns: ['region_code', 'label'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
           region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          region_label: newColumn({ type: label, levelName: 'region', levelIndex: 0, lang: null }),
+          label: newColumn({ type: label, levelIndex: -1, lang: null }),
         },
       }),
     },
     {
       title: 'flat code list with label and description',
-      columns: ['region_code', 'region_label_en', 'region_description_en'],
+      columns: ['region_code', 'label_en', 'description_en'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
           region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          region_label_en: newColumn({ type: label, levelName: 'region', levelIndex: 0, lang: 'en' }),
-          region_description_en: newColumn({ type: description, levelName: 'region', levelIndex: 0, lang: 'en' }),
+          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
+          description_en: newColumn({ type: description, levelIndex: -1, lang: 'en' }),
         },
       }),
     },
     {
       title: 'flat code list with label, description and extras',
-      columns: ['region_code', 'region_label_en', 'region_description_en', 'extra_1', 'extra_2'],
+      columns: ['region_code', 'label_en', 'description_en', 'extra_1', 'extra_2'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
           region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          region_label_en: newColumn({ type: label, levelName: 'region', levelIndex: 0, lang: 'en' }),
-          region_description_en: newColumn({ type: description, levelName: 'region', levelIndex: 0, lang: 'en' }),
+          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
+          description_en: newColumn({ type: description, levelIndex: -1, lang: 'en' }),
           extra_1: newColumn({ type: extra, dataType: text }),
           extra_2: newColumn({ type: extra, dataType: text }),
         },
@@ -82,11 +82,10 @@ describe('CategoryImportSummaryGenerator Test', () => {
       title: 'hierarchical code list full',
       columns: [
         'region_code',
-        'region_label_en',
         'province_code',
-        'province_label_en',
-        'district_label_en',
         'district_code',
+        'label_en',
+        'label_en',
         'extra_1',
         'extra_2',
         'extra_3',
@@ -94,11 +93,9 @@ describe('CategoryImportSummaryGenerator Test', () => {
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
           region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          region_label_en: newColumn({ type: label, levelName: 'region', levelIndex: 0, lang: 'en' }),
           province_code: newColumn({ type: code, levelName: 'province', levelIndex: 1 }),
-          province_label_en: newColumn({ type: label, levelName: 'province', levelIndex: 1, lang: 'en' }),
           district_code: newColumn({ type: code, levelName: 'district', levelIndex: 2 }),
-          district_label_en: newColumn({ type: label, levelName: 'district', levelIndex: 2, lang: 'en' }),
+          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
           extra_1: newColumn({ type: extra, dataType: text }),
           extra_2: newColumn({ type: extra, dataType: text }),
           extra_3: newColumn({ type: extra, dataType: text }),
