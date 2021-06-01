@@ -15,8 +15,6 @@ const columnProps = {
   [CategoryImportSummary.columnTypes.description]: { preffix: 'description', lang: true },
 }
 
-const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
-
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
   // the language suffix is optional
@@ -54,30 +52,7 @@ const _extractLang = ({ columnPatterns, columnName, columnType }) => {
 
 const _validateSummary = (summary) => {
   const columns = CategoryImportSummary.getColumns(summary)
-
-  let atLeastOneCodeColumn = false
-
-  Object.values(columns).forEach((column) => {
-    if (CategoryImportSummary.isColumnCode(column)) {
-      atLeastOneCodeColumn = true
-    } else if (CategoryImportSummary.isColumnLabel(column) || CategoryImportSummary.isColumnDescription(column)) {
-      // If column is label or description, a code in the same level must be defined
-
-      if (
-        false &&
-        !CategoryImportSummary.hasColumn(
-          CategoryImportSummary.columnTypes.code,
-          CategoryImportSummary.getColumnLevelIndex(column)
-        )(summary) &&
-        columns[column.levelName]?.type !== 'extra'
-      ) {
-        const levelName = CategoryImportSummary.getColumnLevelName(column)
-        const columnNameMissing = `${levelName}${columnCodeSuffix}`
-        throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, { columnNameMissing })
-      }
-    }
-  })
-
+  const atLeastOneCodeColumn = Object.values(columns).some((column) => CategoryImportSummary.isColumnCode(column))
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
