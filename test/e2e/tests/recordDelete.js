@@ -2,6 +2,7 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 import { records } from '../mock/records'
 import { gotoHome, gotoRecords } from './_navigation'
 import { BASE_URL } from '../config'
+import { expectNoItems } from './_tables'
 
 export default () =>
   describe('Record delete', () => {
@@ -26,8 +27,8 @@ export default () =>
       test(`Verify record ${idx} deleted`, async () => {
         // await page.waitForResponse('**/records**')
         if (idx === records.length - 1) {
-          // last record deleted
-          await expect(page).toHaveText('No records added')
+          // last record deleted: no items in table
+          await expectNoItems()
         } else {
           const rowsSelector = getSelector(DataTestId.table.rows(DataTestId.records.records))
           await page.waitForSelector(rowsSelector)

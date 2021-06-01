@@ -12,7 +12,7 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
   return CSVReader.createReaderFromStream(
     stream,
     null,
-    async row => {
+    async (row) => {
       const codes = []
       const extra = {}
       const labelsByLevel = {}
@@ -29,7 +29,9 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
           } else {
             // Label or description
             const lang = CategoryImportSummary.getColumnLang(column)
-            const levelName = CategoryImportSummary.getColumnLevelName(column)
+            const levelName =
+              CategoryImportSummary.getColumnLevelName(column) ||
+              `level${R.findLastIndex(StringUtils.isNotBlank)(codes) + 1}`
 
             if (CategoryImportSummary.isColumnLabel(column)) {
               ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
@@ -51,6 +53,6 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
         extra,
       })
     },
-    onTotalChange,
+    onTotalChange
   )
 }

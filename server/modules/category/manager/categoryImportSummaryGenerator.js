@@ -11,17 +11,17 @@ import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
-  [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
-  [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
+  [CategoryImportSummary.columnTypes.label]: { preffix: 'label', lang: true },
+  [CategoryImportSummary.columnTypes.description]: { preffix: 'description', lang: true },
 }
-
-const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
 
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
   // the language suffix is optional
   const langSuffixPattern = columnProp.lang ? `(_([a-z]{2}))?` : ''
-  const pattern = new RegExp(`^(.*)${columnProp.suffix}${langSuffixPattern}$`)
+  const pattern = new RegExp(
+    `${columnProp.preffix ? columnProp.preffix : `^(.*)${columnProp.suffix}`}${langSuffixPattern}$`
+  )
   return {
     ...columnPatterns,
     [columnType]: pattern,
@@ -47,33 +47,12 @@ const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
 const _extractLang = ({ columnPatterns, columnName, columnType }) => {
   const pattern = columnPatterns[columnType]
   const match = columnName.match(pattern)
-  return match[3]
+  return match[2]
 }
 
 const _validateSummary = (summary) => {
   const columns = CategoryImportSummary.getColumns(summary)
-
-  let atLeastOneCodeColumn = false
-
-  Object.values(columns).forEach((column) => {
-    if (CategoryImportSummary.isColumnCode(column)) {
-      atLeastOneCodeColumn = true
-    } else if (CategoryImportSummary.isColumnLabel(column) || CategoryImportSummary.isColumnDescription(column)) {
-      // If column is label or description, a code in the same level must be defined
-
-      if (
-        !CategoryImportSummary.hasColumn(
-          CategoryImportSummary.columnTypes.code,
-          CategoryImportSummary.getColumnLevelIndex(column)
-        )(summary)
-      ) {
-        const levelName = CategoryImportSummary.getColumnLevelName(column)
-        const columnNameMissing = `${levelName}${columnCodeSuffix}`
-        throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, { columnNameMissing })
-      }
-    }
-  })
-
+  const atLeastOneCodeColumn = Object.values(columns).some((column) => CategoryImportSummary.isColumnCode(column))
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
@@ -98,7 +77,7 @@ export const createImportSummaryFromColumnNames = ({
 
   const getOrCreateLevel = ({ columnName, columnType }) => {
     const columnProp = columnProps[columnType]
-    if (columnProp) {
+    if (columnProp && columnType === CategoryImportSummary.columnTypes.code) {
       const levelName = _extractLevelName({ columnPatterns, columnName, columnType })
       let level = levelsByName[levelName]
       if (!level) {
@@ -111,9 +90,13 @@ export const createImportSummaryFromColumnNames = ({
     return { name: null, index: -1 }
   }
 
+  let someExtraWasCreated = false
   const columns = columnNames.reduce((acc, columnName) => {
-    const columnType = _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
+    const columnType = someExtraWasCreated
+      ? CategoryImportSummary.columnTypes.extra
+      : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
     const extra = columnType === CategoryImportSummary.columnTypes.extra
+    if (extra && !someExtraWasCreated) someExtraWasCreated = true
 
     const level = getOrCreateLevel({ columnName, columnType })
     const { name: levelName, index: levelIndex } = level

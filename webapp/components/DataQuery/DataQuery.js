@@ -10,7 +10,7 @@ import { Paginator } from '@webapp/components/Table'
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
-import LoadingBar from './LoadingBar'
+import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
 
 const DataQuery = (props) => {

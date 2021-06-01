@@ -34,15 +34,21 @@ export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
   }
 
   const levels = Category.getLevelsArray(category)
+
   // get survey languages
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const languages = R.pipe(Survey.getSurveyInfo, Survey.getLanguages)(survey)
 
-  const { stream: categoryStream, headers } = CategoryManager.getCategoryStreamAndHeaders({
+  const {
+    stream: categoryStream,
+    headers = [],
+    extraPropsHeaders = [],
+  } = CategoryManager.getCategoryStreamAndHeaders({
     surveyId,
     categoryUuid,
     levels,
     languages,
+    category,
   })
 
   const fileName = `${Category.getName(category) || 'category'}_code_list_hierarchical.csv`
@@ -50,7 +56,7 @@ export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
   return db.stream(categoryStream, (stream) => {
-    stream.pipe(CSVWriter.transformToStream(res, headers))
+    stream.pipe(CSVWriter.transformToStream(res, [...headers, ...extraPropsHeaders]))
   })
 }
 
