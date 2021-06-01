@@ -194,8 +194,8 @@ export const fetchCategoryAndLevelsByUuid = async (
   client = db
 ) => {
   const { categories } = await client.one(
-    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup })} 
-    WHERE c.uuid = $1`,
+    `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft: true, includeValidation, backup })} 
+    ${backup || draft ? 'WHERE' : 'AND'} c.uuid = $1`,
     [categoryUuid]
   )
   return A.pipe(R.values, R.head)(categories)
@@ -283,19 +283,21 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, languages }) => {
-  const headers = CategoryExportRepository.getCategoryExportHeaders({ levels, languages })
+export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, languages, category }) => {
+  const headers = CategoryExportRepository.getCategoryExportHeaders({ levels, languages, category })
+  const extraPropsHeaders = CategoryExportRepository.getCategoryExportHeadersExtraProps({ levels, languages, category })
 
   const query = CategoryExportRepository.generateCategoryExportQuery({
     surveyId,
     categoryUuid,
     levels,
     headers,
+    extraPropsHeaders,
     languages,
   })
 
   const stream = new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
-  return { stream, headers }
+  return { stream, headers, extraPropsHeaders }
 }
 
 export const { getCategoryExportTemplate } = CategoryExportRepository

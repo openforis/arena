@@ -655,6 +655,8 @@ $t(common.cantUndoWarning)`,
 
 $t(common.cantUndoWarning)`,
     deleteItem: 'Delete item',
+    extraProp: 'Extra property',
+    extraProp_plural: 'Extra properties',
     level: 'Level',
 
     importSummary: {
@@ -662,6 +664,7 @@ $t(common.cantUndoWarning)`,
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
       columnTypeSummaryExtra: '{{type}}',
       columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
+      columnTypeLabelWithLanguage: 'Label ({{language}})',
       columnType: {
         code: 'code',
         description: 'description',
