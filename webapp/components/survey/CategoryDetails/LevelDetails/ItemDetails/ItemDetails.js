@@ -1,3 +1,5 @@
+import './itemDetails.scss'
+
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
@@ -102,20 +104,23 @@ const ItemDetails = (props) => {
             readOnly={readOnly}
           />
 
-          {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
-            <FormItem label={key} key={key}>
-              <Input
-                value={CategoryItem.getExtraProp(key)(item)}
-                numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
-                readOnly={readOnly}
-                validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
-                onChange={(value) => {
-                  const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
-                  updateProp({ key: CategoryItem.keysProps.extra, value: extra })
-                }}
-              />
-            </FormItem>
-          ))}
+          <fieldset className="extra-props-fieldset">
+            <legend>Extra props</legend>
+            {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
+              <FormItem label={key} key={key}>
+                <Input
+                  value={CategoryItem.getExtraProp(key)(item)}
+                  numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
+                  readOnly={readOnly}
+                  validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
+                  onChange={(value) => {
+                    const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
+                    updateProp({ key: CategoryItem.keysProps.extra, value: extra })
+                  }}
+                />
+              </FormItem>
+            ))}
+          </fieldset>
 
           {!readOnly && (
             <button
