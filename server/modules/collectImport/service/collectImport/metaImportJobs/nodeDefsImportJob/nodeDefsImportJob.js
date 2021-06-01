@@ -240,7 +240,7 @@ export default class NodeDefsImportJob extends Job {
       const elPrecision = CollectSurvey.getElementByName('precision')(collectNodeDef)
       if (elPrecision) {
         const unit = CollectSurvey.getAttribute('unit')(elPrecision)
-        if (!unit) {
+        if (StringUtils.isNotBlank(unit)) {
           suffix += ` [${unit}]`
         }
       }
