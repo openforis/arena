@@ -1,9 +1,11 @@
 import Job from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as PromiseUtils from '@core/promiseUtils'
 
 /**
  * Inserts a category for each code list in the Collect survey.
@@ -21,7 +23,14 @@ export default class CategoriesImportJob extends Job {
 
     const categoriesArray = Object.values(categories)
     if (categoriesArray.length > 0) {
-      await Promise.all(categoriesArray.map(async (category) => this._insertCategory({ category })))
+      this.total = categoriesArray.length
+
+      await PromiseUtils.each(categoriesArray, async (category) => {
+        if (!this.isCanceled()) {
+          await this._insertCategory({ category })
+          this.incrementProcessedItems()
+        }
+      })
       await CategoryManager.validateCategories(surveyId, this.tx)
     }
     this.setContext({ categories })

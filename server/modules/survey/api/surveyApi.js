@@ -68,8 +68,9 @@ export const init = (app) => {
   app.get('/surveys/count', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const { template = false } = Request.getParams(req)
 
-      const count = await SurveyService.countUserSurveys(user)
+      const count = await SurveyService.countUserSurveys({ user, template })
 
       res.json(count)
     } catch (error) {
