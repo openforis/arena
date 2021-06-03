@@ -8,6 +8,20 @@ import LoadingBar from '@webapp/components/LoadingBar'
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+const LoadingRows = ({ rows }) => (
+  <div className="table__rows">
+    {new Array(rows).fill(0).map((_item, index) => (
+      <div className="table__row" key={String(index)}>
+        <LoadingBar />
+      </div>
+    ))}
+  </div>
+)
+
+LoadingRows.propTypes = {
+  rows: PropTypes.number.isRequired,
+}
+
 const Content = (props) => {
   const {
     gridTemplateColumns,
@@ -49,15 +63,11 @@ const Content = (props) => {
         {React.createElement(rowHeaderComponent, { props, ...rowProps })}
       </div>
 
-      <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
-        {loading &&
-          new Array(maxRows).fill(0).map((_item, index) => (
-            <div className="table__row" key={String(index)}>
-              <LoadingBar />
-            </div>
-          ))}
-        {!loading &&
-          list.map((row, i) => {
+      {loading ? (
+        <LoadingRows maxRows={maxRows} />
+      ) : (
+        <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
+          {list.map((row, i) => {
             const active = isRowActive && isRowActive(row)
             let className = 'table__row'
             className += onRowClick ? ' hoverable' : ''
@@ -85,7 +95,8 @@ const Content = (props) => {
               </div>
             )
           })}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
