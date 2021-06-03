@@ -64,7 +64,7 @@ const Content = (props) => {
       </div>
 
       {loading ? (
-        <LoadingRows maxRows={maxRows} />
+        <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
           {list.map((row, i) => {
