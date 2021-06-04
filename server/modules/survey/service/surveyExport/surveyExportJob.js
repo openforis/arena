@@ -79,7 +79,7 @@ export default class SurveyExportJob extends Job {
     })
 
     // cleanup job context
-    this.deleteContextProps('survey', 'surveyId', 'backup')
+    this.deleteContextProps('survey', 'surveyId')
   }
 }
 
