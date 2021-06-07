@@ -13,12 +13,14 @@ const columnSet = {
   scriptCommon: 'script_common',
 }
 
+const tableName = 'chain'
+
 /**
  * @typedef {module:arena.TableSurvey} module:arena.TableChain
  */
 export default class TableChain extends TableSurvey {
   constructor(surveyId) {
-    super(surveyId, 'chain', columnSet)
+    super(surveyId, tableName, columnSet)
     this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.scriptCommon))
     this.getSelect = getSelect.bind(this)
   }
@@ -29,3 +31,4 @@ export default class TableChain extends TableSurvey {
 }
 
 TableChain.columnSet = columnSet
+TableChain.tableName = tableName

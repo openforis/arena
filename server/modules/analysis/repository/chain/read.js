@@ -1,4 +1,4 @@
-import { BaseProtocol } from '@openforis/arena-server'
+import { BaseProtocol, Schemata } from '@openforis/arena-server'
 
 import * as DB from '../../../../db'
 
@@ -78,15 +78,26 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
+ 
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
 export const fetchChain = async (params, client = DB.client) => {
-  const { surveyId, chainUuid, includeScript = false } = params
+  const { surveyId, chainUuid } = params
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const chainColumns = TableChain.columnSet
 
-  const tableChain = new TableChain(surveyId)
-
-  return client.oneOrNone(tableChain.getSelect({ surveyId, chainUuid, includeScript }), [], transformCallback)
+  return client.oneOrNone(
+    ` SELECT
+  ${Object.values(chainColumns)
+    .map((columnName) => `_c.${columnName}`)
+    .join(',')}
+  FROM
+    ${schema}.${TableChain.tableName} AS _c
+  WHERE _c.uuid = $1
+  GROUP BY _c.uuid`,
+    [chainUuid],
+    transformCallback
+  )
 }
