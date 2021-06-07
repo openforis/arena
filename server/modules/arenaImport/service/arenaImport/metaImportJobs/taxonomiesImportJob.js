@@ -1,4 +1,5 @@
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 
@@ -19,8 +20,14 @@ export default class TaxonomiesImportJob extends Job {
     const { arenaSurveyFileZip } = this.context
 
     const taxonomies = await ArenaSurveyFileZip.getTaxonomies(arenaSurveyFileZip)
+    this.total = taxonomies.length
 
-    await Promise.all(taxonomies.map(async (taxonomy) => this._insertTaxonomy({ taxonomy })))
+    await PromiseUtils.each(taxonomies, async (taxonomy) => {
+      if (!this.isCanceled()) {
+        await this._insertTaxonomy({ taxonomy })
+        this.incrementProcessedItems()
+      }
+    })
 
     this.setContext({ taxonomies })
   }

@@ -80,7 +80,7 @@ export const fetchUserSurveys = async (
   )
 }
 
-export const countUserSurveys = async (user, client = db) => {
+export const countUserSurveys = async ({ user, template = false }, client = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return client.one(
@@ -96,8 +96,9 @@ export const countUserSurveys = async (user, client = db) => {
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
         : ''
     }
+    WHERE s.template = $2
     `,
-    [User.getUuid(user)]
+    [User.getUuid(user), template]
   )
 }
 

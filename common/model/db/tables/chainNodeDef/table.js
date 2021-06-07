@@ -12,11 +12,11 @@ const columnSet = {
 }
 
 const tableName = 'chain_node_def'
-// TODO maybe we should move this Table to a new folder ChainNodeDef,
+
 /**
- * @typedef {module:arena.TableSurvey} module:arena.TableStep
+ * @typedef {module:arena.TableSurvey} module:arena.TableChainNodeDef
  */
-export default class TableStep extends TableSurvey {
+export default class TableChainNodeDef extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, tableName, columnSet)
     this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.script))
@@ -44,5 +44,5 @@ export default class TableStep extends TableSurvey {
   }
 }
 
-TableStep.columnSet = columnSet
-TableStep.tableName = tableName
+TableChainNodeDef.columnSet = columnSet
+TableChainNodeDef.tableName = tableName
