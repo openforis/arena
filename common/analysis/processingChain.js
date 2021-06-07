@@ -4,8 +4,6 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
 import * as Validation from '@core/validation/validation'
 
-import * as Step from './processingStep'
-
 export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
@@ -16,7 +14,8 @@ export const keys = {
   temporary: ObjectUtils.keys.temporary,
   validation: ObjectUtils.keys.validation,
   scriptCommon: 'script_common',
-  processingSteps: 'processing_steps',
+  processingSteps: 'chain_node_defs',
+  chainNodeDefs: 'chain_node_defs',
 }
 
 export const keysProps = {
@@ -50,12 +49,13 @@ export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 
+// ===== READ - chainNodeDef
+export const getChainNodeDefs = (chain) => chain?.[keys.chainNodeDefs] || []
+
 // ===== READ - Steps
 export const getProcessingSteps = R.propOr([], keys.processingSteps)
 export const getStepByIdx = (stepIdx) =>
   R.ifElse(R.always(stepIdx >= 0), R.pipe(getProcessingSteps, R.propOr(null, stepIdx)), R.always(null))
-export const getStepPrev = (step) => getStepByIdx(Step.getIndex(step) - 1)
-export const getStepNext = (step) => getStepByIdx(Step.getIndex(step) + 1)
 
 // ====== CHECK
 

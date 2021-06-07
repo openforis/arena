@@ -12,6 +12,7 @@ export const keys = {
   props: ObjectUtils.keys.props,
   temporary: ObjectUtils.keys.temporary,
   uuid: ObjectUtils.keys.uuid,
+  nodeDefUuid: 'node_def_uuid',
 }
 
 export const keysProps = {

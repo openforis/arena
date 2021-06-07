@@ -1,9 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ApiRoutes from '@common/apiRoutes'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import RFileSystem from './rFileSystem'
 import { dfVar, setVar, arenaGet, asNumeric } from '../../rFunctions'
@@ -13,43 +12,38 @@ export default class RFileReadData extends RFileSystem {
     super(rChain, 'read-data')
   }
 
-  async initSteps(steps) {
+  async initEntitiesNodeDefs(entitiesNodeDefs) {
     const { survey, cycle } = this.rChain
 
-    await Promise.all(
-      steps.map(async (step) => {
-        // Fetch entity data
-        const getEntityData = arenaGet(
-          ApiRoutes.rChain.stepEntityData(Survey.getId(survey), cycle, ProcessingStep.getUuid(step))
-        )
-        const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-        const dfEntity = NodeDef.getName(entityDef)
-        await this.appendContent(setVar(dfEntity, getEntityData))
+    await PromiseUtils.each(entitiesNodeDefs, async (entityDef) => {
+      // Fetch entity data
+      const getEntityData = arenaGet(
+        ApiRoutes.rChain.stepEntityData(Survey.getId(survey), cycle, NodeDef.getUuid(entityDef))
+      )
+      const dfEntity = NodeDef.getName(entityDef)
+      await this.appendContent(setVar(dfEntity, getEntityData))
 
-        // Convert numeric node def values
-        const contentConvertNumericFields = []
-        Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-          Survey.getNodeDefChildren(ancestorDef)(survey)
-            .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
-            .forEach((nodeDef) => {
-              const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColName(nodeDef))
-              contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
-            })
-        })(survey)
-        await this.appendContent(...contentConvertNumericFields)
-      })
-    )
+      // Convert numeric node def values
+      const contentConvertNumericFields = []
+      Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
+        Survey.getNodeDefChildren(ancestorDef)(survey)
+          .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
+          .forEach((nodeDef) => {
+            const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColName(nodeDef))
+            contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
+          })
+      })(survey)
+      await this.appendContent(...contentConvertNumericFields)
+    })
   }
 
   async init() {
     await super.init()
-    this.initSteps = this.initSteps.bind(this)
+    this.initEntitiesNodeDefs = this.initEntitiesNodeDefs.bind(this)
 
-    const { chain, listCategories } = this.rChain
+    const { listCategories, entitiesWithChainNodeDef } = this.rChain
 
-    // Fetch steps entity data
-    const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.hasEntity)
-    await this.initSteps(steps)
+    await this.initEntitiesNodeDefs(entitiesWithChainNodeDef)
 
     // Append categories initialization
     await this.appendContent(...listCategories.scripts)
