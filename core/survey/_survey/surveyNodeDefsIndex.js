@@ -7,48 +7,58 @@ const getNodeDefByUuid = (uuid) => (survey) => survey.nodeDefs[uuid] || null
 const getNodeDefSource = (nodeDef) => (survey) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getUuid)(survey) : null
 
-const calculateNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
-  const children = []
-  if (NodeDef.isVirtual(nodeDef)) {
-    // If nodeDef is virtual, get children from its source
-    const entitySource = getNodeDefSource(nodeDef)(survey)
-    children.push(...calculateNodeDefChildren(entitySource, includeAnalysis)(survey))
-  }
+const calculateNodeDefChildren =
+  (nodeDef, includeAnalysis = false) =>
+  (survey) => {
+    const children = []
+    if (NodeDef.isVirtual(nodeDef)) {
+      // If nodeDef is virtual, get children from its source
+      const entitySource = getNodeDefSource(nodeDef)(survey)
+      children.push(...calculateNodeDefChildren(entitySource, includeAnalysis)(survey))
+    }
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  children.push(
-    ...Object.values(survey.nodeDefs).filter((nodeDefCurrent) => {
-      if (!includeAnalysis && NodeDef.isAnalysis(nodeDefCurrent)) {
-        return false
-      }
-      if (NodeDef.isVirtual(nodeDefCurrent)) {
-        // Include virtual entities having their source as a child of the given entity
-        const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
-        return NodeDef.getParentUuid(entitySource) === nodeDefUuid
-      }
-      // "natural" child
-      return NodeDef.getParentUuid(nodeDefCurrent) === nodeDefUuid
-    })
-  )
-  return children
-}
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    children.push(
+      ...Object.values(survey.nodeDefs).filter((nodeDefCurrent) => {
+        if (!includeAnalysis && NodeDef.isAnalysis(nodeDefCurrent)) {
+          return false
+        }
+        if (NodeDef.isVirtual(nodeDefCurrent)) {
+          // Include virtual entities having their source as a child of the given entity
+          const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
+          return NodeDef.getParentUuid(entitySource) === nodeDefUuid
+        }
+        // "natural" child
+        return NodeDef.getParentUuid(nodeDefCurrent) === nodeDefUuid
+      })
+    )
+    return children
+  }
 
 export const getNodeDefsIndex = (survey) => {
   const { nodeDefsIndex } = survey
   return nodeDefsIndex || {}
 }
 
-export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
-  const { nodeDefsIndex } = survey
-  if (!nodeDefsIndex) throw new Error('Node defs index not initialized')
+export const getNodeDefChildren =
+  (nodeDef, includeAnalysis = false) =>
+  (survey) => {
+    const { nodeDefsIndex } = survey
+    if (!nodeDefsIndex) throw new Error('Node defs index not initialized')
 
-  const childrenUuidsIndex = includeAnalysis
-    ? nodeDefsIndex.childDefUuidsByParentUuidAnalysis
-    : nodeDefsIndex.childDefUuidsByParentUuid
-  const childDefUuids = childrenUuidsIndex[nodeDef.uuid] || []
+    const childrenUuidsIndex = includeAnalysis
+      ? nodeDefsIndex.childDefUuidsByParentUuidAnalysis
+      : nodeDefsIndex.childDefUuidsByParentUuid
 
-  return childDefUuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
-}
+    let actualEntityUuid = nodeDef.uuid
+    if (NodeDef.isVirtual(nodeDef)) {
+      const entitySource = getNodeDefSource(nodeDef)(survey)
+      actualEntityUuid = entitySource?.uuid
+    }
+    const childDefUuids = childrenUuidsIndex[actualEntityUuid] || []
+
+    return childDefUuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
+  }
 
 export const assocNodeDefsIndex = ({ survey, nodeDefsIndex }) => ({ ...survey, nodeDefsIndex })
 
@@ -56,6 +66,12 @@ export const assocNodeDefsIndex = ({ survey, nodeDefsIndex }) => ({ ...survey, n
 
 export const addNodeDefToIndex = ({ nodeDefsIndex, nodeDef }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
+
+  if (NodeDef.isVirtual(nodeDef)) {
+    // no need to add items to the index
+    return nodeDefsIndexUpdated
+  }
+
   // add node def uuid to parent node def children references
   const { parentUuid } = nodeDef
   if (parentUuid) {

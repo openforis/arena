@@ -23,6 +23,7 @@ const getJsVariables = (nodeDef) => [
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
+    entity: NodeDef.isEntity(nodeDef),
   },
 ]
 
@@ -39,6 +40,7 @@ const getSqlVariables = (nodeDef, lang) => {
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
+    entity: NodeDef.isEntity(nodeDef),
   }))
 }
 
@@ -77,7 +79,10 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
 
     entitiesVisitedByUuid[NodeDef.getUuid(nodeDef)] = true
 
-    if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
+    if (NodeDef.isVirtual(nodeDef)) {
+      const source = Survey.getNodeDefSource(nodeDef)(survey)
+      if (source) stack.push(source)
+    } else if (!NodeDef.isEqual(nodeDefContext)(nodeDef)) {
       // get variables from every child def
       const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
       nodeDefChildren.forEach((childDef) => {
