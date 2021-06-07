@@ -1,4 +1,3 @@
-import fs from 'fs'
 import Archiver from 'archiver'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -57,7 +56,8 @@ export default class SurveyExportJob extends Job {
     const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
 
     const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
-    const outputFileStream = fs.createWriteStream(outputFilePath)
+    const outputFileStream = FileUtils.createWriteSteam(outputFilePath)
+
     const archive = Archiver('zip')
     archive.pipe(outputFileStream)
 
@@ -77,6 +77,9 @@ export default class SurveyExportJob extends Job {
       survey,
       outputFileName,
     })
+
+    // cleanup job context
+    this.deleteContextProps('survey', 'surveyId')
   }
 }
 

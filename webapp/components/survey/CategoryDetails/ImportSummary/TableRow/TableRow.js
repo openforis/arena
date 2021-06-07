@@ -18,7 +18,7 @@ const _getColumnSummaryKey = ({ column }) => {
     return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
   }
   if (CategoryImportSummary.isColumnExtra(column)) {
-    return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
+    return 'categoryEdit.importSummary.columnTypeSummaryExtra'
   }
 
   return 'categoryEdit.importSummary.columnTypeSummary'

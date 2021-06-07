@@ -260,6 +260,12 @@ export default class Job {
     Object.assign(this.context, context)
   }
 
+  deleteContextProps(...propNames) {
+    propNames.forEach((propName) => {
+      delete this.context[propName]
+    })
+  }
+
   setResult(result) {
     Object.assign(this.result, result)
   }
