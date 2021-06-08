@@ -15,12 +15,13 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
 
-import { useCreateSurvey } from './store'
+import { createTypes, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
@@ -30,8 +31,8 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const history = useHistory()
 
-  const { newSurvey, onUpdate, onCreate, onImport } = useCreateSurvey({ template })
-  const { name, label, lang, validation, cloneFrom } = newSurvey
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
+  const { createType, name, label, lang, validation, cloneFrom } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -40,7 +41,32 @@ const SurveyCreate = (props) => {
 
   return (
     <div className="home-survey-create">
-      <div>
+      <div className="row">
+        <div className="form-label">{i18n.t('homeView.surveyCreate.createFrom')}</div>
+        <ButtonGroup
+          selectedItemKey={createType}
+          onChange={onCreateTypeUpdate}
+          items={[
+            {
+              key: createTypes.fromScratch,
+              label: i18n.t('homeView.surveyCreate.fromScratch'),
+            },
+            {
+              key: createTypes.clone,
+              label: i18n.t('common.clone'),
+            },
+            ...(showImport
+              ? [
+                  {
+                    key: createTypes.import,
+                    label: i18n.t('common.import'),
+                  },
+                ]
+              : []),
+          ]}
+        />
+      </div>
+      <div className="row">
         <Input
           id={DataTestId.surveyCreate.surveyName}
           placeholder={i18n.t('common.name')}
@@ -49,43 +75,54 @@ const SurveyCreate = (props) => {
           onChange={(value) => onUpdate({ name: 'name', value: StringUtils.normalizeName(value) })}
         />
       </div>
-      <div>
-        <Input
-          id={DataTestId.surveyCreate.surveyLabel}
-          placeholder={i18n.t('common.label')}
-          value={label}
-          validation={Validation.getFieldValidation('label')(validation)}
-          onChange={(value) => onUpdate({ name: 'label', value })}
-        />
-      </div>
-      <div>
-        <LanguageDropdown
-          selection={lang}
-          validation={Validation.getFieldValidation('lang')(validation)}
-          onChange={(value) => onUpdate({ name: 'lang', value })}
-          disabled={!A.isEmpty(cloneFrom)}
-        />
-      </div>
-
-      <div>
-        <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-      </div>
-
-      <button data-testid={DataTestId.surveyCreate.submitBtn} type="button" className="btn" onClick={onCreate}>
-        <span className="icon icon-plus icon-left icon-12px" />
-        {i18n.t(submitButtonLabel)}
-      </button>
-
-      {showImport && (
+      {createType === createTypes.fromScratch && (
         <>
-          <div className="home-survey-create__collect-import">
+          <div className="row">
+            <Input
+              id={DataTestId.surveyCreate.surveyLabel}
+              placeholder={i18n.t('common.label')}
+              value={label}
+              validation={Validation.getFieldValidation('label')(validation)}
+              onChange={(value) => onUpdate({ name: 'label', value })}
+            />
+          </div>
+          <div className="row">
+            <LanguageDropdown
+              selection={lang}
+              validation={Validation.getFieldValidation('lang')(validation)}
+              onChange={(value) => onUpdate({ name: 'lang', value })}
+              disabled={!A.isEmpty(cloneFrom)}
+            />
+          </div>
+        </>
+      )}
+
+      {createType === createTypes.clone && (
+        <div className="row">
+          <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
+        </div>
+      )}
+
+      {createType !== createTypes.import && (
+        <div className="row">
+          <button data-testid={DataTestId.surveyCreate.submitBtn} type="button" className="btn" onClick={onCreate}>
+            <span className="icon icon-plus icon-left icon-12px" />
+            {i18n.t(submitButtonLabel)}
+          </button>
+        </div>
+      )}
+
+      {createType === createTypes.import && showImport && (
+        <>
+          <div className="row">
             <UploadButton
               inputFieldId={DataTestId.surveyCreate.importFromArena}
               label={i18n.t('homeView.surveyCreate.importFromArena')}
               accept=".zip"
               onChange={(files) => onImport.Arena({ file: files[0] })}
             />
-
+          </div>
+          <div className="row">
             <UploadButton
               inputFieldId={DataTestId.surveyCreate.importFromCollect}
               label={i18n.t('homeView.surveyCreate.importFromCollect')}
