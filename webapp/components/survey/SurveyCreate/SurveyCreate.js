@@ -42,7 +42,6 @@ const SurveyCreate = (props) => {
   return (
     <div className="home-survey-create">
       <div className="row">
-        <div className="form-label">{i18n.t('homeView.surveyCreate.createFrom')}</div>
         <ButtonGroup
           selectedItemKey={createType}
           onChange={onCreateTypeUpdate}
@@ -105,7 +104,13 @@ const SurveyCreate = (props) => {
 
       {createType !== createTypes.import && (
         <div className="row">
-          <button data-testid={DataTestId.surveyCreate.submitBtn} type="button" className="btn" onClick={onCreate}>
+          <button
+            data-testid={DataTestId.surveyCreate.submitBtn}
+            type="button"
+            className="btn"
+            onClick={onCreate}
+            disabled={createType === createTypes.clone && !cloneFrom}
+          >
             <span className="icon icon-plus icon-left icon-12px" />
             {i18n.t(submitButtonLabel)}
           </button>
