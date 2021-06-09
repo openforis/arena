@@ -21,6 +21,8 @@ export const createTemplate = (template) => {
         page.click(DataTestId.modal.close),
       ])
     } else {
+      await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
+
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
         page.click(getSelector(DataTestId.surveyCreate.submitBtn, 'button')),

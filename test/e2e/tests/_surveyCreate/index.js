@@ -27,6 +27,8 @@ export const createSurvey = (surveyToAdd) => {
         page.click(DataTestId.modal.close),
       ])
     } else {
+      await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
+
       // press "Create survey" and wait for the navigation to the survey dashboard
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
