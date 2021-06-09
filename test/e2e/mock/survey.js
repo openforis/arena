@@ -53,6 +53,7 @@ export const surveyFromTemplate = {
   name: 'survey_from_template',
   label: templateFromSurvey.label,
   labels: templateFromSurvey.labels,
+  descriptions: templateFromSurvey.descriptions,
   languages: templateFromSurvey.languages,
 }
 
