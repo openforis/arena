@@ -333,6 +333,9 @@ export default class Job {
         // Propagate progress event to parent job
         await this._notifyEvent(this._createJobEvent(jobEvents.progress))
         break
+      case jobStatus.succeeded:
+        // do nothing
+        break
       default:
         this.logDebug(`Unknown event status: ${event.status}`)
     }
