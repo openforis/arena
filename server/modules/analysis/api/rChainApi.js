@@ -8,15 +8,15 @@ import * as CategoryService from '../../category/service/categoryService'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
-  // ====== READ - Step entity data
+  // ====== READ - Chain entity data
   app.get(
-    ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
+    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':entityDefUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, stepUuid } = Request.getParams(req)
+        const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchStepData({ surveyId, cycle, stepUuid })
+        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid })
 
         res.json(data)
       } catch (error) {
