@@ -8,9 +8,11 @@ export const createSurvey = (surveyToAdd) => {
     const { cloneFrom, label, name } = surveyToAdd
 
     await page.fill(getSelector(DataTestId.surveyCreate.surveyName, 'input'), name)
-    await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
 
     if (cloneFrom) {
+      await page.click(
+        getSelector(DataTestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'clone' }))
+      )
       // set survey 'Clone from' field
       await page.click(`#${DataTestId.surveyCreate.surveyCloneFrom}`)
       await page.click(`text="${cloneFrom}"`)
@@ -32,7 +34,7 @@ export const createSurvey = (surveyToAdd) => {
       ])
     }
 
-    const labelSelector = getSelector(DataTestId.dashboard.surveyLabel, 'h3')
-    await expect(await page.innerText(labelSelector)).toBe(label.toUpperCase())
+    const surveyTitleSelector = getSelector(DataTestId.header.surveyTitle)
+    await expect(await page.innerText(surveyTitleSelector)).toBe(`${name} - ${label}`)
   })
 }

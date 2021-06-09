@@ -8,9 +8,11 @@ export const createTemplate = (template) => {
 
   test(`Create Template ${name}`, async () => {
     await page.fill(getSelector(DataTestId.surveyCreate.surveyName, 'input'), name)
-    await page.fill(getSelector(DataTestId.surveyCreate.surveyLabel, 'input'), label)
 
     if (cloneFrom) {
+      await page.click(
+        getSelector(DataTestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' }))
+      )
       await page.click(`#${DataTestId.surveyCreate.surveyCloneFrom}`)
       await page.click(`text="${cloneFrom}"`)
       await page.click(getSelector(DataTestId.surveyCreate.submitBtn, 'button'))
@@ -25,7 +27,7 @@ export const createTemplate = (template) => {
       ])
     }
 
-    const labelSelector = getSelector(DataTestId.dashboard.surveyLabel, 'h3')
-    await expect(await page.innerText(labelSelector)).toBe(label.toUpperCase())
+    const surveyTitleSelector = getSelector(DataTestId.header.surveyTitle)
+    await expect(await page.innerText(surveyTitleSelector)).toBe(`${name} - ${label}`)
   })
 }

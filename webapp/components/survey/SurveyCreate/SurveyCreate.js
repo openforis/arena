@@ -43,6 +43,7 @@ const SurveyCreate = (props) => {
     <div className="home-survey-create">
       <div className="row">
         <ButtonGroup
+          groupName={template ? 'templateCreateType' : 'surveyCreateType'}
           selectedItemKey={createType}
           onChange={onCreateTypeUpdate}
           items={[
