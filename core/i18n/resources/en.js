@@ -12,6 +12,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    clone: 'Clone',
     copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
@@ -233,6 +234,10 @@ Do you want to proceed?`,
       createTemplate: 'Create Template',
       importFromCollect: 'Import from Collect',
       importFromArena: 'Import from Arena',
+      newSurvey: 'New Survey',
+      newSurveyFromScratch: 'New Survey From Scratch',
+      newTemplate: 'New Template',
+      newTemplateFromScratch: 'New Template From Scratch',
       survey: 'Survey',
       survey_plural: 'Surveys',
       template: 'Template',

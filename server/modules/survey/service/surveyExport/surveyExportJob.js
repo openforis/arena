@@ -56,6 +56,9 @@ export default class SurveyExportJob extends Job {
     const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
 
     const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
+
+    this.logDebug(`using output file: ${outputFilePath}`)
+
     const outputFileStream = FileUtils.createWriteSteam(outputFilePath)
 
     const archive = Archiver('zip')
@@ -67,7 +70,7 @@ export default class SurveyExportJob extends Job {
   async onEnd() {
     await super.onEnd()
     const { archive } = this.context
-    archive.finalize()
+    await archive.finalize()
   }
 
   async beforeSuccess() {

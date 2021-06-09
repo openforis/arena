@@ -25,7 +25,7 @@ export {
   persistAll,
 } from '../manager'
 
-export { generateScript, fetchEntityData, _persistResults, persistResults, persistUserScripts } from './rChain'
+export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'
 
 // chain node def

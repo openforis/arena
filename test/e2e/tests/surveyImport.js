@@ -21,6 +21,9 @@ export default () =>
     gotoSurveyCreate()
 
     test(`Import survey `, async () => {
+      await page.click(
+        getSelector(DataTestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' }))
+      )
       const input = await page.$(getSelector(DataTestId.surveyCreate.importFromArena), 'input')
       await Promise.all([
         page.waitForResponse('**/survey/**'), // job status response

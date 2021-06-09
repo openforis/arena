@@ -16,8 +16,5 @@ export const stepEntityData = (surveyId, cycle, stepUuid) =>
 export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`
 
 // entity
-export const _entityData = (surveyId, cycle, chainUuid, stepUuid) =>
+export const entityData = (surveyId, cycle, stepUuid) =>
   `${getRChainCyclePath(surveyId, cycle)}/entities/${stepUuid}/data`
-
-export const entityData = (surveyId, cycle, chainUuid, entityUuid) =>
-  `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/entities/${entityUuid}/data`
