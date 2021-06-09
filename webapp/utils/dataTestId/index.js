@@ -56,6 +56,7 @@ export const DataTestId = {
     toggleModeBtn: 'expression-mode-btn',
   },
   header: {
+    surveyTitle: 'header-survey-title',
     surveyCreateBtn: 'survey-create-btn',
     surveyListBtn: 'survey-list-btn',
     surveyTemplateListBtn: 'survey-list-template-btn',
@@ -110,6 +111,7 @@ export const DataTestId = {
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,
   },
   surveyCreate: {
+    createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,
     importFromArena: 'import-from-arena',
     importFromCollect: 'import-from-collect',
     submitBtn: 'survey-create-submit-btn',

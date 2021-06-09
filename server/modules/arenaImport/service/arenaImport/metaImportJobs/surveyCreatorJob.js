@@ -25,13 +25,7 @@ export default class SurveyCreatorJob extends Job {
       ? `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
       : Survey.getName(surveyInfoTarget) || `clone_${Survey.getName(surveyInfoArenaSurvey)}`
 
-    const languages = Survey.getLanguages(surveyInfoArenaSurvey)
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
-
-    const labels = surveyInfoTarget ? Survey.getLabels(surveyInfoTarget) : Survey.getLabels(surveyInfoArenaSurvey)
-    const descriptions = surveyInfoTarget
-      ? Survey.getDescriptions(surveyInfoTarget)
-      : Survey.getDescriptions(surveyInfoArenaSurvey)
 
     // always import as draft when not backup
     const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
@@ -42,9 +36,9 @@ export default class SurveyCreatorJob extends Job {
     const newSurveyInfo = Survey.newSurvey({
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
-      [Survey.infoKeys.languages]: languages,
-      [Survey.infoKeys.descriptions]: descriptions,
-      [Survey.infoKeys.labels]: labels,
+      [Survey.infoKeys.languages]: Survey.getLanguages(surveyInfoArenaSurvey),
+      [Survey.infoKeys.descriptions]: Survey.getDescriptions(surveyInfoArenaSurvey),
+      [Survey.infoKeys.labels]: Survey.getLabels(surveyInfoArenaSurvey),
       [Survey.infoKeys.published]: published,
       [Survey.infoKeys.draft]: draft,
       [Survey.infoKeys.template]: template,
