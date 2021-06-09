@@ -14,3 +14,7 @@ export const stepEntityData = (surveyId, cycle, stepUuid) =>
 
 // category
 export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`
+
+// entity
+export const entityData = (surveyId, cycle, stepUuid) =>
+  `${getRChainCyclePath(surveyId, cycle)}/entities/${stepUuid}/data`
