@@ -3,12 +3,13 @@ import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
 
-const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (
+const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (
   <div className={`btn-group${className ? ` ${className}` : ''}`}>
     {items.map((item) => {
       const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
       return (
         <button
+          data-testid={groupName ? `${groupName}_${item.key}` : null}
           key={item.key}
           type="button"
           className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
@@ -34,6 +35,7 @@ const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, des
 
 ButtonGroup.propTypes = {
   items: PropTypes.array,
+  groupName: PropTypes.string,
   selectedItemKey: PropTypes.any, // Array of values if multiple=true
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
@@ -44,6 +46,7 @@ ButtonGroup.propTypes = {
 
 ButtonGroup.defaultProps = {
   items: [],
+  groupName: null,
   selectedItemKey: null,
   onChange: () => {},
   disabled: false,

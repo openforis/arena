@@ -85,6 +85,7 @@ button,
   }
 }
 
+button:disabled,
 *[aria-disabled='true'] {
   color: currentColor;
   display: inline-block; /* For IE11/ MS Edge bug */
