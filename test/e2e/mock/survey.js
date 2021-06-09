@@ -42,8 +42,9 @@ export const template2 = {
 export const templateFromSurvey = {
   cloneFrom: survey.name,
   name: 'template_from_survey',
-  label: survey.label,
+  label: 'My Survey',
   labels: survey.labels,
+  descriptions: survey.descriptions,
   languages: survey.languages,
 }
 
