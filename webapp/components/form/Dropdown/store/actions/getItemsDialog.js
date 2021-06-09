@@ -8,19 +8,19 @@ export const getItemsDialog = async ({ state, value }) => {
   const searchValue = value.trim()
 
   if (autocompleteMinChars <= 0 && searchValue.length === 0) {
-    return items.constructor === Array ? items : items(searchValue)
+    return Array.isArray(items) ? items : items(searchValue)
   }
 
   if (autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars) {
     return []
   }
 
-  return items.constructor === Array
-    ? items.filter((item) =>
-        item.constructor === String
-          ? StringUtils.contains(searchValue, item)
-          : StringUtils.contains(searchValue, State.getItemKey(state)(item)) ||
-            StringUtils.contains(searchValue, State.getItemLabel(state)(item))
+  return Array.isArray(items)
+    ? items.filter(
+        (item) =>
+          (item.constructor === String && StringUtils.contains(searchValue, item)) ||
+          StringUtils.contains(searchValue, State.getItemKey(state)(item)) ||
+          StringUtils.contains(searchValue, State.getItemLabel(state)(item))
       )
     : items(value)
 }
