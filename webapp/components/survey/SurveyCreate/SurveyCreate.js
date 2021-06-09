@@ -48,7 +48,9 @@ const SurveyCreate = (props) => {
           items={[
             {
               key: createTypes.fromScratch,
-              label: i18n.t('homeView.surveyCreate.fromScratch'),
+              label: i18n.t(
+                template ? 'homeView.surveyCreate.newTemplateFromScratch' : 'homeView.surveyCreate.newSurveyFromScratch'
+              ),
             },
             {
               key: createTypes.clone,
