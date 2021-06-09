@@ -1,7 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import { ColumnNodeDef, TableResultNode, ViewDataNodeDef } from '@common/model/db'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
@@ -10,9 +9,9 @@ import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
  * Class that models a data frame step results.
  */
 export default class DfResults {
-  constructor(rChain, step) {
+  constructor(rChain, entity) {
     this._rChain = rChain
-    this._step = step
+    this._entity = entity
     this._scripts = []
 
     this.initDf()
@@ -28,16 +27,16 @@ export default class DfResults {
     return this.rChain.survey
   }
 
-  get step() {
-    return this._step
+  get entity() {
+    return this._entity
   }
 
-  get calculations() {
+  /*get calculations() {
     return ProcessingStep.getCalculations(this.step)
-  }
+  }*/
 
   get entityDef() {
-    return Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(this.step))(this.survey)
+    return this._entity
   }
 
   get dfSourceName() {
@@ -53,13 +52,16 @@ export default class DfResults {
   }
 
   initDf() {
-    // init attribute columns: only output attribute values
-    const dfResultColumns = this.calculations.map((calculation) => {
-      const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
-      const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
-      return NodeDef.getName(nodeDefCalculation)
-    }, [])
-    this.scripts.push(setVar(this.name, sqldf(`SELECT ${dfResultColumns.join(', ')} FROM ${this.dfSourceName}`)))
+    const { entitiesWithChainNodeDef } = this.rChain
+    const currentEntityWithChainNodeDefs = entitiesWithChainNodeDef.find(
+      (_entity) => NodeDef.getUuid(_entity) === NodeDef.getUuid(this.entity)
+    )
+
+    const chainNodeDefsColumns = (currentEntityWithChainNodeDefs.chainNodeDefs || []).map((chainNodeDef) =>
+      NodeDef.getName(Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(this.survey))
+    )
+
+    this.scripts.push(setVar(this.name, sqldf(`SELECT ${chainNodeDefsColumns.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
   initUuids() {
@@ -68,7 +70,7 @@ export default class DfResults {
       : this.entityDef
     const setUuids = [
       { name: TableResultNode.columnSet.chainUuid, value: `'${this.rChain.chainUuid}'` },
-      { name: TableResultNode.columnSet.stepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
+      //{ name: TableResultNode.columnSet.stepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
       {
         name: TableResultNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
@@ -83,6 +85,8 @@ export default class DfResults {
   }
 
   initCodeAttributes() {
+    return
+    // TODO with category or code atttributes
     this.calculations.forEach((calculation) => {
       const nodeDef = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(this.survey)
       if (NodeDef.isCode(nodeDef)) {

@@ -9,7 +9,7 @@ import { ColumnNodeDef } from '../../tables/dataNodeDef'
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
   chainUuid: 'processing_chain_uuid',
-  stepUuid: 'processing_step_uuid',
+  //stepUuid: 'processing_step_uuid',
   recordUuid: 'record_uuid',
   parentUuid: 'parent_uuid',
   nodeDefUuid: 'node_def_uuid',

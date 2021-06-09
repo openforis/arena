@@ -1,19 +1,16 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import { TableResultNode } from '@common/model/db'
 
 import MassiveInsert from '@server/db/massiveInsert'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 
 export default class MassiveInsertResultNodes extends MassiveInsert {
-  constructor(survey, step, tx) {
+  constructor(survey, entity, chain, tx) {
     const cols = [
-      TableResultNode.columnSet.chainUuid,
-      TableResultNode.columnSet.stepUuid,
       TableResultNode.columnSet.recordUuid,
       TableResultNode.columnSet.parentUuid,
+      TableResultNode.columnSet.chainUuid,
       TableResultNode.columnSet.nodeDefUuid,
       TableResultNode.columnSet.value,
     ]
@@ -21,28 +18,41 @@ export default class MassiveInsertResultNodes extends MassiveInsert {
     super(tableResultNode.schema, tableResultNode.name, cols, tx)
 
     this.survey = survey
-    this.calculations = ProcessingStep.getCalculations(step)
+    this.entity = entity
+    this.chain = chain
+  }
+
+  get chainNodeDefsWithNodeDef() {
+    return this.chain.chain_node_defs
   }
 
   async push(rowResult) {
     const insertValues = []
-    this.calculations.forEach((calculation) => {
-      const nodeDef = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(this.survey)
+
+    const chainNodeDefsInEntity = (this.chainNodeDefsWithNodeDef || []).filter(
+      (chainNodeDef) => chainNodeDef.chain_uuid === this.chain.uuid
+    )
+
+    chainNodeDefsInEntity.forEach((chainNodeDef) => {
+      const nodeDef = Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(this.survey)
       const nodeDefName = NodeDef.getName(nodeDef)
+
       const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
       let value = rowResult[nodeDefName]
       if (value === NA) value = null
 
       const insertValue = {
-        [TableResultNode.columnSet.chainUuid]: rowResult[TableResultNode.columnSet.chainUuid],
-        [TableResultNode.columnSet.stepUuid]: rowResult[TableResultNode.columnSet.stepUuid],
         [TableResultNode.columnSet.recordUuid]: rowResult[TableResultNode.columnSet.recordUuid],
         [TableResultNode.columnSet.parentUuid]: rowResult[TableResultNode.columnSet.parentUuid],
+        [TableResultNode.columnSet.chainUuid]: rowResult[TableResultNode.columnSet.chainUuid],
         [TableResultNode.columnSet.nodeDefUuid]: nodeDefUuid,
         [TableResultNode.columnSet.value]: value,
       }
+      
       insertValues.push(insertValue)
     })
+
     return super.push(...insertValues)
   }
 }

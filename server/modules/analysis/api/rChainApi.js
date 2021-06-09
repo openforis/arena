@@ -10,7 +10,7 @@ import * as AnalysisService from '../service'
 export const init = (app) => {
   // ====== READ - Chain entity data
   app.get(
-    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':entityDefUuid'),
+    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -56,7 +56,23 @@ export const init = (app) => {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        await AnalysisService.persistResults({ surveyId, cycle, stepUuid, filePath })
+        await AnalysisService._persistResults({ surveyId, cycle, stepUuid, filePath })
+
+        Response.sendOk(res)
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  app.put(
+    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const filePath = Request.getFilePath(req)
+        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
+        await AnalysisService.persistResults({ surveyId, cycle, entityDefUuid, chainUuid, filePath })
 
         Response.sendOk(res)
       } catch (e) {

@@ -167,7 +167,10 @@ class RChain {
       )
 
       if (chainNodeDefsInEntity.length > 0) {
-        entitiesWithChainNodeDef.push(entity)
+        entitiesWithChainNodeDef.push({
+          ...entity,
+          chainNodeDefs: chainNodeDefsInEntity,
+        })
       }
     })
 

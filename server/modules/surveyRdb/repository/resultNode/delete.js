@@ -16,6 +16,7 @@ export const deleteNodeResultsByChainUuid = async ({ surveyId, cycle, chainUuid 
   const tableResultNode = new TableResultNode(surveyId)
   const tableRecord = new TableRecord(surveyId)
 
+
   return client.query(
     `DELETE
   FROM

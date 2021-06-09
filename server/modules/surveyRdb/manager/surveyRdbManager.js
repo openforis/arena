@@ -36,7 +36,6 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 
 // Result tables and views
 export { createResultNodeTable, deleteNodeResultsByChainUuid, MassiveInsertResultNodes } from '../repository/resultNode'
-export { createResultStepView, refreshResultStepView } from '../repository/resultStep'
 
 // ==== DML
 

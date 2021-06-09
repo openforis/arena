@@ -32,7 +32,7 @@ export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid }) => {
 
 // ==== UPDATE
 
-export const persistResults = async ({ surveyId, cycle, stepUuid, filePath }) => {
+export const _persistResults = async ({ surveyId, cycle, stepUuid, filePath }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
 
@@ -52,7 +52,50 @@ export const persistResults = async ({ surveyId, cycle, stepUuid, filePath }) =>
     await massiveInsert.flush()
 
     // refresh result step materialized view
-    await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
+    //await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
+  })
+
+  fileZip.close()
+}
+
+export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  const chain = await AnalysisManager.fetchChain({
+    surveyId,
+    chainUuid,
+    includeScript: true,
+    includeChainNodeDefs: true,
+  })
+
+  const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+
+  const fileZip = new FileZip(filePath)
+  await fileZip.init()
+  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entity)}.csv`)
+  await db.tx(async (tx) => {
+    // Reset node results
+    await SurveyRdbManager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
+
+    // Insert node results
+    const massiveInsert = new SurveyRdbManager.MassiveInsertResultNodes(survey, entity, chain, tx)
+    await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
+    await massiveInsert.flush()
+
+  //   DELETE
+  // FROM
+  //     survey_1_data."_res_node"
+  // WHERE
+  //     processing_chain_uuid = $1
+  // AND record_uuid IN
+  // (
+  //     SELECT _r.uuid
+  //     FROM survey_1."record" AS _r
+  //     WHERE _r.cycle = $2
+  // )
+
+
+    // refresh result step materialized view
+    // await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()
@@ -75,6 +118,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       tx
     )
 
+    // TODO persist chainNodeDefScripts
     // Persist calculation scripts
     const [chain, survey] = await Promise.all([
       AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
