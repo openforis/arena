@@ -10,7 +10,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import Chains from './Chains'
 import Chain from './Chain'
-import Entities from './Entities'
+// import Entities from './Entities'
 
 const Analysis = () => {
   const history = useHistory()
@@ -37,10 +37,10 @@ const Analysis = () => {
             component: Chain,
             path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
           },
-          {
-            component: Entities,
-            path: appModuleUri(analysisModules.entities),
-          },
+          // {
+          //   component: Entities,
+          //   path: appModuleUri(analysisModules.entities),
+          // },
           {
             component: NodeDefDetails,
             path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
