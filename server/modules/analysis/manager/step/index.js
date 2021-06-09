@@ -101,39 +101,3 @@ export const persistStep = async ({ user, surveyId, step }, client) => {
   )
   return stepDb ? _updateStep({ user, surveyId, step, stepDb }, client) : _insertStep({ user, surveyId, step }, client)
 }
-
-// ====== DELETE
-export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.client) =>
-  client.tx(async (tx) => {
-    const step = await StepRepository.fetchStep({ surveyId, stepUuid }, tx)
-
-    const chainUuid = Step.getProcessingChainUuid(step)
-    const stepNext = await StepRepository.fetchStep({ surveyId, chainUuid, stepIndex: Step.getIndex(step) + 1 }, tx)
-    if (stepNext) {
-      throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
-    }
-
-    const content = {
-      [ActivityLog.keysContent.uuid]: stepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: chainUuid,
-      [ActivityLog.keysContent.index]: Step.getIndex(step),
-    }
-    await Promise.all([
-      StepRepository.deleteStep({ surveyId, stepUuid }, tx),
-      ChainRepository.updateChain({ surveyId, chainUuid, dateModified: true }, tx),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, content, false, tx),
-      markSurveyDraft(surveyId, tx),
-    ])
-
-    if (Step.getIndex(step) === 0) {
-      // Deleted processing step was the only one, chain validation must be updated (steps are required)
-      const [surveyInfo, chain] = await Promise.all([
-        SurveyRepository.fetchSurveyById({ surveyId, draft: false }, tx),
-        ChainRepository.fetchChain({ surveyId, chainUuid }, tx),
-      ])
-      const chainValidation = await ChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
-      const chainUpdated = Chain.assocItemValidation(chainUuid, chainValidation)(chain)
-      const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
-      await ChainRepository.updateChain({ surveyId, chainUuid, fields }, tx)
-    }
-  })

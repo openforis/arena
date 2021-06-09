@@ -17,10 +17,6 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
-  // ======  DELETE - Step
-  deleteStep,
-  // ======  DELETE - Calculation
-  deleteCalculation,
   // ==== ALL
   persistAll,
 } from '../manager'
