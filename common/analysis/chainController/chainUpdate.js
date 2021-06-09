@@ -19,14 +19,3 @@ export const dissocTemporary = ({ chain, step, calculation }) => ({
   step: ObjectUtils.dissocTemporary(step),
   calculation: ObjectUtils.dissocTemporary(calculation),
 })
-
-export const dissocSteps = ({ chain }) => ({ chain: A.dissoc(Chain.keys.processingSteps, chain) })
-
-const _filterSteps = ({ chain, filterFn }) => ({
-  chain: A.assoc(Chain.keys.processingSteps, Chain.getProcessingSteps(chain).filter(filterFn), chain),
-})
-
-export const dissocStep = ({ chain, step: stepToDissoc }) =>
-  _filterSteps({ chain, filterFn: (step) => !Step.isEqual(step)(stepToDissoc) })
-
-export const dissocStepTemporary = ({ chain }) => _filterSteps({ chain, filterFn: (step) => !Step.isTemporary(step) })

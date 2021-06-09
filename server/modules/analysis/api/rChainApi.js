@@ -49,23 +49,6 @@ export const init = (app) => {
 
   // ====== UPDATE - Step entity data
   app.put(
-    ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const filePath = Request.getFilePath(req)
-        const { surveyId, cycle, stepUuid } = Request.getParams(req)
-
-        await AnalysisService._persistResults({ surveyId, cycle, stepUuid, filePath })
-
-        Response.sendOk(res)
-      } catch (e) {
-        next(e)
-      }
-    }
-  )
-
-  app.put(
     ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
