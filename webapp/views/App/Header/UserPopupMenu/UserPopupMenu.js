@@ -84,7 +84,7 @@ const UserPopupMenu = (props) => {
           className="btn-s btn-transparent"
         >
           <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('homeView.surveyCreate.createSurvey')}
+          {i18n.t('homeView.surveyCreate.newSurvey')}
         </Link>
       )}
 
@@ -108,7 +108,7 @@ const UserPopupMenu = (props) => {
           className="btn-s btn-transparent"
         >
           <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('homeView.surveyCreate.createTemplate')}
+          {i18n.t('homeView.surveyCreate.newTemplate')}
         </Link>
       )}
 
