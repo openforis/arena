@@ -49,7 +49,6 @@ export default class MassiveInsertResultNodes extends MassiveInsert {
         [TableResultNode.columnSet.nodeDefUuid]: nodeDefUuid,
         [TableResultNode.columnSet.value]: value,
       }
-      
       insertValues.push(insertValue)
     })
 
