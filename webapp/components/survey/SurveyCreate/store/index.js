@@ -1,1 +1,1 @@
-export { useCreateSurvey } from './useCreateSurvey'
+export { createTypes, useCreateSurvey } from './useCreateSurvey'
