@@ -1,8 +1,6 @@
 import * as pgPromise from 'pg-promise'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { db } from '@server/db/db'
 import { TableDataNodeDef } from '@common/model/db'
@@ -11,8 +9,8 @@ import { TableDataNodeDef } from '@common/model/db'
  * Deletes the nodes of the result node table for the specified processing chain.
  *
  * @param {!object} params - Filter parameters.
- * @param {!object} params.survey - The survey
- * @param {!object} params.entity - The entity
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.entity - The entity.
  * @param {!string} params.cycle - The survey cycle.
  * @param {!pgPromise.IDatabase} client - The database client.
  */

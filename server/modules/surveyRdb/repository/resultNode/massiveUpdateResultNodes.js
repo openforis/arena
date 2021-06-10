@@ -48,7 +48,7 @@ export default class MassiveUpdateResultNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    const insertValues = (this.columnsNames || {}).reduce(
+    const insertValues = (this.columnsNames || []).reduce(
       (values, cloumnName) => {
         let value = 'DEFAULT'
         if (rowResult[cloumnName] && rowResult[cloumnName] !== NA) {
