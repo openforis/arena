@@ -45,24 +45,12 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   const stream = await fileZip.getEntryStream(`${NodeDef.getName(entity)}.csv`)
   await db.tx(async (tx) => {
     // Reset node results
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
+    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity, chain, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new SurveyRdbManager.MassiveInsertResultNodes(survey, entity, chain, tx)
+    const massiveInsert = new SurveyRdbManager.MassiveUpdateResultNodes({ survey, entity, chain, chainUuid, cycle }, tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()
-
-    //   DELETE
-    // FROM
-    //     survey_1_data."_res_node"
-    // WHERE
-    //     processing_chain_uuid = $1
-    // AND record_uuid IN
-    // (
-    //     SELECT _r.uuid
-    //     FROM survey_1."record" AS _r
-    //     WHERE _r.cycle = $2
-    // )
 
     // refresh result step materialized view
     // await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)

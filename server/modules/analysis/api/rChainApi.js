@@ -47,7 +47,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== UPDATE - Step entity data
+  // ====== UPDATE - calculated entity data
   app.put(
     ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
