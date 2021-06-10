@@ -9,20 +9,12 @@ export {
   countChains,
   fetchChains,
   fetchChain,
-  // ======  READ - Calculations
-  fetchCalculationAttributeUuids,
   // ======  READ - Variables Previous Steps
   fetchVariablesPrevSteps,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
-  // ======  DELETE - Step
-  deleteStep,
-  // ======  DELETE - Calculation
-  deleteCalculation,
-  // ==== ALL
-  persistAll,
 } from '../manager'
 
 export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'

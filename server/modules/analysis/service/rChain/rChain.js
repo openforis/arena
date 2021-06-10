@@ -241,14 +241,20 @@ class RChain {
         // create ChainNodeDefs files
         await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef, chainNodeDefIndex) => {
           this._scriptIndexNext = chainNodeDefIndex + 1
-          const rFile = new RFile(this, entityPath, 'chain-node-def')
+
+          let attributeName = NodeDef.getName(chainNodeDef.nodeDef)
+
+          const rFile = new RFile(this, entityPath, attributeName)
 
           await rFile.init()
 
-          const entityName = NodeDef.getName(entity)
-          const attributeName = NodeDef.getName(chainNodeDef.nodeDef)
-
           const { script } = chainNodeDef
+          const entityName = NodeDef.getName(entity)
+
+          if (NodeDef.isCode(chainNodeDef.nodeDef)) {
+            attributeName = `${attributeName}_code`
+          }
+
           const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
 
           await rFile.appendContent(content)
