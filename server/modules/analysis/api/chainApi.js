@@ -77,24 +77,6 @@ export const init = (app) => {
     }
   )
 
-  // TO REMOVE
-  app.get(
-    '/survey/:surveyId/processing-chain/:chainUuid/attribute-uuids-other-chains',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
-
-        const params = { surveyId, chainUuidExclude: chainUuid }
-        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
-
-        res.json(attributeUuids)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
   app.get(
     '/survey/:surveyId/processing-chains/variables-prev-steps',
     AuthMiddleware.requireRecordAnalysisPermission,

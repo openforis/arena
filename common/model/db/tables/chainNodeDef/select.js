@@ -1,6 +1,5 @@
 import * as ProcessingStep from '../../../../analysis/processingStep'
 // import * as SQL from '../../sql'
-import TableCalculation from '../calculation'
 
 /**
  * Generate the select query for the processing_step table by the given parameters.
@@ -10,15 +9,11 @@ import TableCalculation from '../calculation'
  * @param {number} [params.stepIndex=null] - The step index to filter by.
  * @param {string} [params.stepUuid=null] - The step uuid to filter by.
  * @param {string} [params.entityUuid=null] - The entity uuid to filter by.
- * @param {boolean} [params.includeCalculations=false] - Whether to include calculations.
- * @param {boolean} [params.includeScript=false] - Whether to include calculations script.
  *
  * @returns {string} - The select query.
  */
 export function getSelect(params) {
   const { chainUuid = null, stepIndex = null, stepUuid = null, entityUuid = null } = params
-
-  this.tableCalculation = new TableCalculation(this.surveyId)
 
   const selectFields = [...this.columns]
 
