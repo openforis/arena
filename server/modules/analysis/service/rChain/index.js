@@ -48,9 +48,21 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity, chain, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new SurveyRdbManager.MassiveUpdateResultNodes({ survey, entity, chain, chainUuid, cycle }, tx)
-    await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
-    await massiveInsert.flush()
+    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entity, chain, chainUuid, cycle }, tx)
+
+    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes(
+      { survey, surveyId, entity, chain, chainUuid, cycle },
+      tx
+    )
+
+    await CSVReader.createReaderFromStream(stream, null, (row) => {
+      massiveUpdateData.push.bind(massiveUpdateData)(row)
+      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+    }).start()
+    await massiveUpdateData.flush()
+    await massiveUpdateNodes.flush()
+
+    // Insert node results
 
     // refresh result step materialized view
     // await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)

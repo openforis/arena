@@ -6,15 +6,10 @@ import { TableDataNodeDef } from '@common/model/db'
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 
-// TODO we need to add values to node Table too
-export default class MassiveUpdateResultNodes extends MassiveUpdate {
+export default class MassiveUpdateData extends MassiveUpdate {
   constructor({ survey, entity, chain, cycle }, tx) {
-    // repeated code in deleteNodeResultsByChainUuid
-
     const chainNodeDefsInEntity = ProcessingChain.getChainNodeDefsInEntity({ survey, entity })(chain)
-
     const columnsNames = ProcessingChain.getColumnsNamesInEntity({ survey, entity })(chain)
-
     const nodeDefsByColumnName = ProcessingChain.getNodeDefsByColumnNameInEntity({ survey, entity })(chain)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid

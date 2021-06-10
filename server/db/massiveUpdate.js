@@ -32,10 +32,8 @@ export default class MassiveUpdate {
   async flush() {
     if (this.values.length > 0) {
       const query = pgp.helpers.update(this.values, this.columnSet) + this.where
-      console.log(query)
       await this.client.none(query)
       this.values.length = 0
     }
   }
 }
-

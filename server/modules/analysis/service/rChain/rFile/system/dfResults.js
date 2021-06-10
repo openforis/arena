@@ -13,6 +13,7 @@ export default class DfResults {
     this._entity = entity
     this._scripts = []
 
+    this.initDf = this.initDf.bind(this)
     this.initDf()
     this.initUuids()
     this.initCodeAttributes()
@@ -20,6 +21,10 @@ export default class DfResults {
 
   get rChain() {
     return this._rChain
+  }
+
+  get chain() {
+    return this._rChain.chain
   }
 
   get survey() {
@@ -44,7 +49,7 @@ export default class DfResults {
 
   initDf() {
     const columnNames = ProcessingChain.getColumnsNamesInEntity({ survey: this.survey, entity: this.entity })(
-      this.rChain
+      this.chain
     )
 
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
@@ -70,9 +75,12 @@ export default class DfResults {
   }
 
   initCodeAttributes() {
-    const { chainNodeDefsWithNodeDef } = this.rChain
+    const chainNodeDefsWithNodeDefInEntity = ProcessingChain.getChainNodeDefsInEntity({
+      survey: this.survey,
+      entity: this.entity,
+    })(this.rChain.chain)
 
-    chainNodeDefsWithNodeDef.forEach((chainNodeDef) => {
+    chainNodeDefsWithNodeDefInEntity.forEach((chainNodeDef) => {
       const { nodeDef } = chainNodeDef
 
       if (NodeDef.isCode(nodeDef)) {
@@ -88,7 +96,8 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                c.label as computed_category_label
+                c.label as computed_category_label,
+                c.uuid as computed_category_uuid
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
             ON r.${nodeVarName}_code = c.code  
@@ -96,6 +105,7 @@ export default class DfResults {
         this.scripts.push(setVar('category_values', sqldf(query)))
 
         this.scripts.push(setVar(`${this.name}$${nodeVarName}_label`, `category_values$computed_category_label`))
+        this.scripts.push(setVar(`${this.name}$${nodeVarName}_uuid`, `category_values$computed_category_uuid`))
 
         // remove temp category variable
         this.scripts.push(rm(categoryTempVar))
