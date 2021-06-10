@@ -1,19 +1,6 @@
-export { createAndAssocStep } from './createAndAssocStep'
-export { createAndAssocCalculation } from './createAndAssocCalculation'
-
 export { assocCalculation } from './assocCalculation'
-export { deleteCalculation } from './deleteCalculation'
-export { mergeStepProps } from './mergeStepProps'
 
-export {
-  assocProp,
-  assocStep,
-  assocSteps,
-  dissocStep,
-  dissocStepTemporary,
-  dissocSteps,
-  dissocTemporary,
-} from './chainUpdate'
+export { assocProp, assocStep, assocSteps, dissocTemporary } from './chainUpdate'
 
 export {
   assocCalculationUuids,

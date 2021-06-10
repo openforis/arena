@@ -29,10 +29,10 @@ export {
 } from './chain'
 
 // ====== Step
-export { fetchSteps, fetchStep, fetchVariablesPrevSteps, deleteStep } from './step'
+export { fetchSteps, fetchStep, fetchVariablesPrevSteps } from './step'
 
 // ====== Calculation
-export { fetchCalculationAttributeUuids, updateCalculation, deleteCalculation } from './calculation'
+export { fetchCalculationAttributeUuids, updateCalculation } from './calculation'
 
 // ====== Persist all
 
