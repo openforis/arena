@@ -2,7 +2,6 @@ import * as pgPromise from 'pg-promise'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as ProcessingStep from '../../../../../common/analysis/processingStep'
 
 import * as SQL from '../../../../../common/model/db/sql'
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
@@ -20,11 +19,6 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     })
     .flat()
 
-const _getSelectFieldSteps = (viewDataNodeDef) =>
-  viewDataNodeDef.viewResultSteps
-    .map((viewResultStep) => viewResultStep.columnNodeDefs.map((columnNodeDef) => columnNodeDef.namesFull))
-    .flat(Infinity)
-
 const _getSelectFieldKeys = (viewDataNodeDef) => {
   const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
     .map((nodeDef) => {
@@ -41,13 +35,12 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
  * @param {object} params - The query parameters.
  * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data view for.
- * @param {ProcessingStep[]} params.steps - The processing steps linked to the nodeDef.
  * @param {pgPromise.IDatabase} client - The data base client.
  *
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createDataView = async ({ survey, nodeDef, steps }, client) => {
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef, steps)
+export const createDataView = async ({ survey, nodeDef }, client) => {
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
   const { tableData, viewDataParent } = viewDataNodeDef
 
   // TODO - do not use select * from virtual entities, it includes parent_uuid column (see https://github.com/openforis/arena/issues/728)
@@ -61,7 +54,6 @@ export const createDataView = async ({ survey, nodeDef, steps }, client) => {
         tableData.columnDateModified,
         _getSelectFieldKeys(viewDataNodeDef),
         ..._getSelectFieldNodeDefs(viewDataNodeDef),
-        ..._getSelectFieldSteps(viewDataNodeDef),
       ]
 
   const query = `
@@ -76,16 +68,8 @@ export const createDataView = async ({ survey, nodeDef, steps }, client) => {
           : `LEFT JOIN ${viewDataParent.nameAliased}  
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
       }
-      ${viewDataNodeDef.viewResultSteps
-        .map(
-          (viewResultStep) =>
-            `LEFT OUTER JOIN ${viewResultStep.nameAliased}
-            ON ${viewResultStep.columnParentUuid} = ${tableData.columnUuid}
-            `
-        )
-        .join('')}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
-     
+
   return client.query(query)
 }

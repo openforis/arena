@@ -9,6 +9,3 @@ export {
   deleteChain,
   deleteChainWithoutCycle,
 } from './chain'
-
-// ====== Step
-export { fetchSteps } from './step'

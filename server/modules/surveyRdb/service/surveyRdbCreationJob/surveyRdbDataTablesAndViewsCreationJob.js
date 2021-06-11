@@ -5,7 +5,6 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 
 import * as SurveyRdbManager from '../../manager/surveyRdbManager'
 import * as SurveyManager from '../../../survey/manager/surveyManager'
-import * as AnalysisManager from '../../../analysis/manager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {
@@ -13,7 +12,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   }
 
   async execute() {
-    const { surveyId, tx } = this
+    const { tx } = this
 
     const survey = await this.fetchSurvey()
 
@@ -29,16 +28,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       }
 
       const nodeDefName = NodeDef.getName(nodeDef)
-      const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
       // ===== create table and view
       this.logDebug(`create data table ${nodeDefName} - start`)
       await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
-      const steps = await AnalysisManager.fetchSteps(
-        { surveyId, entityUuid: nodeDefUuid, includeCalculations: true },
-        tx
-      )
-      await SurveyRdbManager.createDataView({ survey, nodeDef, steps }, tx)
+      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table
