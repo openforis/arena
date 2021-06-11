@@ -264,6 +264,9 @@ Do you want to proceed?`,
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
     },
+    recordsImport: {
+      importFromCollect: 'Import from Collect',
+    }
   },
 
   activityLogView: {
