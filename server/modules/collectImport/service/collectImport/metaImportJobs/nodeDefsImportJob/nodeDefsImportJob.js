@@ -11,7 +11,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-import * as Validator from '@core/validation/validator'
 
 import Job from '@server/job/job'
 
@@ -24,6 +23,7 @@ import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 import { parseValidationRules } from './validationRuleParser'
 import { parseDefaultValues } from './defaultValueParser'
+import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
 
 const specifyAttributeSuffix = 'specify'
 
@@ -39,7 +39,7 @@ export default class NodeDefsImportJob extends Job {
     super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} // Node definitions by uuid
-    this.nodeDefNames = [] // Node def names used (to avoid naming collision)
+    this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator() // to avoid naming collision
     this.nodeDefsInfoByCollectPath = {} // Used by following jobs
     this.issuesCount = 0
   }
@@ -107,7 +107,10 @@ export default class NodeDefsImportJob extends Job {
     const nodeDefNameSuffix = field ? `_${field}` : ''
 
     const props = {
-      [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName + nodeDefNameSuffix),
+      [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+        parentNodeDef,
+        nodeDefName: collectNodeDefName + nodeDefNameSuffix,
+      }),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
@@ -387,33 +390,6 @@ export default class NodeDefsImportJob extends Job {
     return validationRules
   }
 
-  getUniqueNodeDefName(parentNodeDef, collectNodeDefName) {
-    let finalName = collectNodeDefName
-
-    if (R.includes(finalName, this.nodeDefNames) || Validator.isKeyword(finalName)) {
-      // Name is in use or is a keyword
-
-      // try to add parent node def name as prefix
-      if (parentNodeDef) {
-        finalName = `${NodeDef.getName(parentNodeDef)}_${finalName}`
-      }
-
-      if (R.includes(finalName, this.nodeDefNames)) {
-        // Try to make it unique by adding _# suffix
-        const prefix = finalName + '_'
-        let count = 1
-        finalName = prefix + count
-        while (R.includes(finalName, this.nodeDefNames)) {
-          finalName = prefix + ++count
-        }
-      }
-    }
-
-    this.nodeDefNames.push(finalName)
-
-    return finalName
-  }
-
   async addImportIssue(reportItem) {
     await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
     this.issuesCount += 1
@@ -445,10 +421,10 @@ export default class NodeDefsImportJob extends Job {
     for (const itemCode of qualifiableItemCodes) {
       const nodeDefName = NodeDef.getName(nodeDef)
       const props = {
-        [NodeDef.propKeys.name]: this.getUniqueNodeDefName(
+        [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
           parentNodeDef,
-          `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`
-        ),
+          nodeDefName: `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`,
+        }),
         [NodeDef.propKeys.labels]: R.pipe(
           NodeDef.getLabels,
           R.mapObjIndexed((label) => `${label} ${specifyAttributeSuffix}`)
