@@ -9,8 +9,6 @@ export {
   countChains,
   fetchChains,
   fetchChain,
-  // ======  READ - Variables Previous Steps
-  fetchVariablesPrevSteps,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain

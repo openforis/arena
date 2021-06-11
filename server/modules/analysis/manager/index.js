@@ -11,4 +11,4 @@ export {
 } from './chain'
 
 // ====== Step
-export { fetchSteps, fetchStep, fetchVariablesPrevSteps } from './step'
+export { fetchSteps } from './step'

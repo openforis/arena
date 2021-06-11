@@ -1,14 +1,5 @@
 import * as ProcessingStep from '../../../../analysis/processingStep'
 // import * as SQL from '../../sql'
-import TableCalculation from '../calculation'
-
-function _getJoinCalculation({ includeScript }) {
-  return ''
-  // return `LEFT JOIN LATERAL (
-  //   ${this.tableCalculation.getSelect({ includeScript, stepUuid: this.columnUuid })}
-  // ) AS ${this.tableCalculation.alias}
-  // ON TRUE`
-}
 
 /**
  * Generate the select query for the processing_step table by the given parameters.
@@ -32,14 +23,11 @@ export function getSelect(params) {
     includeCalculations = false,
     includeScript = false,
   } = params
-  this.getJoinCalculation = _getJoinCalculation.bind(this)
-  this.tableCalculation = new TableCalculation(this.surveyId)
+  
+  
 
   const selectFields = [...this.columns]
-  // if (includeCalculations) {
-  //   const jsonAgg = SQL.jsonAgg(this.tableCalculation.getColumn('*'), [this.tableCalculation.columnIndex])
-  //   selectFields.push(`${jsonAgg} AS calculations`)
-  // }
+  
 
   const whereConditions = []
   if (chainUuid) whereConditions.push(`${this.columnChainUuid} = ${chainUuid}`)
@@ -52,7 +40,6 @@ export function getSelect(params) {
         ${selectFields.join(', ')}
     FROM 
         ${this.nameAliased}
-        ${includeCalculations ? this.getJoinCalculation({ includeScript }) : ''}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''}
         ${includeCalculations ? `GROUP BY ${this.columnUuid}` : ''}`
 }

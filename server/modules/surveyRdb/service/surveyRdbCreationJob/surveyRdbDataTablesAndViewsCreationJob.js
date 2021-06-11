@@ -33,10 +33,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
       // ===== create table and view
       this.logDebug(`create data table ${nodeDefName} - start`)
-      const [steps] = await Promise.all([
-        AnalysisManager.fetchSteps({ surveyId, entityUuid: nodeDefUuid, includeCalculations: true }, tx),
-        SurveyRdbManager.createDataTable({ survey, nodeDef }, tx),
-      ])
+      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
+      const steps = await AnalysisManager.fetchSteps(
+        { surveyId, entityUuid: nodeDefUuid, includeCalculations: true },
+        tx
+      )
       await SurveyRdbManager.createDataView({ survey, nodeDef, steps }, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 

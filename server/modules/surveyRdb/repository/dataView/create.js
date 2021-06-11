@@ -86,7 +86,6 @@ export const createDataView = async ({ survey, nodeDef, steps }, client) => {
         .join('')}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
-
-     console.log(query)
+     
   return client.query(query)
 }
