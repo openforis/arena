@@ -1,3 +1,7 @@
+import * as PromiseUtils from '@core/promiseUtils'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
+
 import { db } from '../../../../db/db'
 
 import FileZip from '../../../../utils/file/fileZip'
@@ -12,6 +16,8 @@ import { Query } from '../../../../../common/model/query'
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
+
+import { padStart } from './rFile'
 
 import RChain from './rChain'
 
@@ -88,29 +94,42 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       tx
     )
 
-    // TODO persist chainNodeDefScripts
-    // Persist calculation scripts
-    /* const [chain, survey] = await Promise.all([
-      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
+    const [chain, survey] = await Promise.all([
+      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeChainNodeDefs: true }, tx),
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }),
-    ]) */
-    /* await Promise.all(
-      Chain.getProcessingSteps(chain).map((step) => {
-        const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
-        return Promise.all(
-          Step.getCalculations(step).map(async (calculation) => {
-            // Persist the script of each calculation
-            const calculationUuid = Calculation.getUuid(calculation)
-            const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
-            const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-            const script = (await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))).trim()
-            return AnalysisManager.updateCalculation(
-              { surveyId, calculationUuid, fields: { [TableCalculation.columnSet.script]: script } },
-              tx
-            )
-          })
-        )
-      })
-    ) */
+    ])
+
+    const { root } = Survey.getHierarchy()(survey)
+
+    const entities = []
+    Survey.traverseHierarchyItemSync(root, (nodeDef) => {
+      if (NodeDef.isEntity(nodeDef)) {
+        entities.push(nodeDef)
+      }
+    })
+
+    const chainNodeDefs = ProcessingChain.getChainNodeDefs(chain)
+    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
+      ...chainNodeDef,
+      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),
+    }))
+
+    await PromiseUtils.each(entities, async (entity, entityIndex) => {
+      const chainNodeDefsInEntity = chainNodeDefsWithNodeDef.filter(
+        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
+      )
+
+      if (chainNodeDefsInEntity.length > 0) {
+        await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef) => {
+          const chainNodeDefName = NodeDef.getName(chainNodeDef.nodeDef)
+
+          const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
+
+          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, chainNodeDefName)))?.trim()
+
+          await ChainNodeDefRepository.updateScript({ surveyId, uuid: chainNodeDef.uuid, newSript: script }, tx)
+        })
+      }
+    })
   })
 }
