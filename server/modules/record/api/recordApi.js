@@ -58,10 +58,15 @@ export const init = (app) => {
   app.post('/survey/:surveyId/record/importfromcollect', requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, deleteAllRecords } = Request.getParams(req)
       const file = Request.getFile(req)
 
-      const job = RecordService.startCollectDataImportJob({ user, surveyId, filePath: file.tempFilePath })
+      const job = RecordService.startCollectDataImportJob({
+        user,
+        surveyId,
+        filePath: file.tempFilePath,
+        deleteAllRecords,
+      })
       const jobSerialized = JobUtils.jobToJSON(job)
       res.json({ job: jobSerialized })
     } catch (error) {

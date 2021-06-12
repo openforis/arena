@@ -1,7 +1,13 @@
 @import 'webapp/style/vars';
 
-.data-import {
+.app-module > :first-child.data-import {
+  height: auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+
+  .form-item {
+    display: flex;
+  }
 }

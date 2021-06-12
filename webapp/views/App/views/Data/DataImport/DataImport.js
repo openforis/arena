@@ -1,6 +1,6 @@
 import './DataImport.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
@@ -15,14 +15,18 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 import { NotificationActions } from '@webapp/store/ui'
+import Checkbox from '@webapp/components/form/checkbox'
+import { FormItem } from '@webapp/components/form/Input'
 
 const DataImport = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const dispatch = useDispatch()
 
-  const onFileChange = (file) => {
-    const job = API.importRecordsFromCollect({ surveyId, file })
+  const [deleteAllRecords, setDeleteAllRecords] = useState(true)
+
+  const onFileChange = async (file) => {
+    const job = await API.importRecordsFromCollect({ surveyId, file, deleteAllRecords })
     dispatch(
       JobActions.showJobMonitor({
         job,
@@ -42,6 +46,9 @@ const DataImport = () => {
 
   return (
     <div className="data-import">
+      <FormItem label={i18n.t('homeView.recordsImport.deleteAllRecordsBeforeImport')}>
+        <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
+      </FormItem>
       <UploadButton
         inputFieldId={DataTestId.recordsImport.importDataBtn}
         label={i18n.t('homeView.recordsImport.importFromCollect')}

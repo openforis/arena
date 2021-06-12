@@ -265,6 +265,7 @@ Do you want to proceed?`,
       year_plural: '{{count}} Years',
     },
     recordsImport: {
+      deleteAllRecordsBeforeImport: 'Delete all records before import',
       importFromCollect: 'Import from Collect',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
     },

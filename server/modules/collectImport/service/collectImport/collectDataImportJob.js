@@ -8,7 +8,7 @@ import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
 export default class CollectDataImportJob extends Job {
   constructor(params) {
-    super(CollectDataImportJob.type, { ...params, deleteAllRecords: true }, [
+    super(CollectDataImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new RecordsImportJob(),
       new RecordCheckJob(),
