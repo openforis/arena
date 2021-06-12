@@ -59,6 +59,14 @@ export default class NodeDefsImportJob extends Job {
       [Survey.collectReportKeys.issuesResolved]: 0,
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, true, this.tx)
+    await SurveyManager.updateSurveyProp(
+      user,
+      surveyId,
+      Survey.infoKeys.collectNodeDefsInfoByPath,
+      this.nodeDefsInfoByCollectPath,
+      true,
+      this.tx
+    )
 
     // Fetch survey and store it in context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
@@ -521,7 +529,7 @@ export default class NodeDefsImportJob extends Job {
         })
       )
 
-      return nodeDefsInfo ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
+      return success ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
     }
 
     return null

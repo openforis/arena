@@ -14,6 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
+import { NotificationActions } from '@webapp/store/ui'
 
 const DataImport = () => {
   const i18n = useI18n()
@@ -25,8 +26,15 @@ const DataImport = () => {
     dispatch(
       JobActions.showJobMonitor({
         job,
+        autoHide: true,
         onComplete: async (jobCompleted) => {
-          // const { surveyId } = JobSerialized.getResult(jobCompleted)
+          const { insertedRecords } = JobSerialized.getResult(jobCompleted)
+          dispatch(
+            NotificationActions.notifyInfo({
+              key: 'homeView.recordsImport.importComplete',
+              params: { insertedRecords },
+            })
+          )
         },
       })
     )
@@ -37,7 +45,7 @@ const DataImport = () => {
       <UploadButton
         inputFieldId={DataTestId.recordsImport.importDataBtn}
         label={i18n.t('homeView.recordsImport.importFromCollect')}
-        accept=".collect-data,*.collect-backup"
+        accept=".collect-backup,.collect-data"
         onChange={(files) => onFileChange(files[0])}
       />
     </div>

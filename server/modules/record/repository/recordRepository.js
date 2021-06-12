@@ -24,23 +24,25 @@ const tableName = 'record'
 
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (surveyId, includeValidationFields = true) => (record) => {
-  const validation = Record.getValidation(record)
-  return R.pipe(
-    R.dissoc(Validation.keys.validation),
-    camelize,
-    R.assoc('surveyId', surveyId),
-    R.assoc(
-      Validation.keys.validation,
-      includeValidationFields
-        ? validation
-        : {
-            ...Validation.newInstance(Validation.isValid(validation)),
-            [Validation.keys.counts]: Validation.getCounts(validation),
-          }
-    )
-  )(record)
-}
+const dbTransformCallback =
+  (surveyId, includeValidationFields = true) =>
+  (record) => {
+    const validation = Record.getValidation(record)
+    return R.pipe(
+      R.dissoc(Validation.keys.validation),
+      camelize,
+      R.assoc('surveyId', surveyId),
+      R.assoc(
+        Validation.keys.validation,
+        includeValidationFields
+          ? validation
+          : {
+              ...Validation.newInstance(Validation.isValid(validation)),
+              [Validation.keys.counts]: Validation.getCounts(validation),
+            }
+      )
+    )(record)
+  }
 
 // ============== CREATE
 
@@ -259,5 +261,15 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
     RETURNING uuid
   `,
     [cycles],
+    R.prop('uuid')
+  )
+
+export const deleteRecordsBySurvey = async ({ surveyId }, client = db) =>
+  client.map(
+    `
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    RETURNING uuid
+  `,
+    [],
     R.prop('uuid')
   )

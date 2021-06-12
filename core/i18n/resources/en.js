@@ -266,7 +266,8 @@ Do you want to proceed?`,
     },
     recordsImport: {
       importFromCollect: 'Import from Collect',
-    }
+      importComplete: 'Import complete. {{insertedRecords}} records imported',
+    },
   },
 
   activityLogView: {
@@ -842,6 +843,7 @@ $t(common.cantUndoWarning)`,
     ChainsImportJob: 'Chains Import',
     ChainNodeDefsImportJob: 'Chains NodeDef Import',
     ChainNodeDefsAggregateImportJob: 'Chains NodeDef Aggregate Import',
+    CollectDataImportJob: 'Collect Data Import',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     CyclesDeletedCheckJob: 'Deleted Cycles Check',

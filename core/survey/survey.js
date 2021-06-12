@@ -89,6 +89,7 @@ export const {
   isFromCollect,
   getCollectUri,
   getCollectReport,
+  getCollectNodeDefsInfoByPath,
   hasCollectReportIssues,
   getOwnerName,
   getOwnerUuid,
@@ -145,34 +146,38 @@ export const {
 } = SurveyDependencies
 
 // ====== UPDATE
-export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) => (survey) => {
-  let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
-  surveyUpdated = {
-    ...surveyUpdated,
-    nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
+export const assocNodeDefs =
+  ({ nodeDefs, updateDependencyGraph = false }) =>
+  (survey) => {
+    let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
+    surveyUpdated = {
+      ...surveyUpdated,
+      nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
+    }
+    if (updateDependencyGraph) {
+      surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
+    }
+    return surveyUpdated
   }
-  if (updateDependencyGraph) {
-    surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
-  }
-  return surveyUpdated
-}
 
-export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) => (survey) => {
-  let surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDef)(survey)
-  // update node defs index
-  const nodeDefsIndex = SurveyNodeDefsIndex.getNodeDefsIndex(surveyUpdated)
-  const nodeDefsIndexUpdated = SurveyNodeDefsIndex.addNodeDefToIndex({ nodeDefsIndex, nodeDef })
-  surveyUpdated = SurveyNodeDefsIndex.assocNodeDefsIndex({
-    survey: surveyUpdated,
-    nodeDefsIndex: nodeDefsIndexUpdated,
-  })
+export const assocNodeDef =
+  ({ nodeDef, updateDependencyGraph = false }) =>
+  (survey) => {
+    let surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDef)(survey)
+    // update node defs index
+    const nodeDefsIndex = SurveyNodeDefsIndex.getNodeDefsIndex(surveyUpdated)
+    const nodeDefsIndexUpdated = SurveyNodeDefsIndex.addNodeDefToIndex({ nodeDefsIndex, nodeDef })
+    surveyUpdated = SurveyNodeDefsIndex.assocNodeDefsIndex({
+      survey: surveyUpdated,
+      nodeDefsIndex: nodeDefsIndexUpdated,
+    })
 
-  if (updateDependencyGraph) {
-    surveyUpdated = SurveyDependencies.removeNodeDefDependencies(nodeDef.uuid)(surveyUpdated)
-    surveyUpdated = SurveyDependencies.addNodeDefDependencies(nodeDef)(surveyUpdated)
+    if (updateDependencyGraph) {
+      surveyUpdated = SurveyDependencies.removeNodeDefDependencies(nodeDef.uuid)(surveyUpdated)
+      surveyUpdated = SurveyDependencies.addNodeDefDependencies(nodeDef)(surveyUpdated)
+    }
+    return surveyUpdated
   }
-  return surveyUpdated
-}
 
 export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
@@ -191,29 +196,16 @@ export const { getNodeDefCategoryLevelIndex, getNodeDefParentCode, getNodeDefCod
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories
-export const {
-  getCategories,
-  getCategoriesArray,
-  getCategoryByUuid,
-  getCategoryByName,
-  assocCategories,
-} = SurveyCategories
+export const { getCategories, getCategoriesArray, getCategoryByUuid, getCategoryByName, assocCategories } =
+  SurveyCategories
 
 // ====== Taxonomies
 export const { getTaxonomiesArray, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index
-export const {
-  getCategoryItemUuidAndCodeHierarchy,
-  getCategoryItemByUuid,
-  getCategoryItemByHierarchicalCodes,
-} = SurveyRefDataIndex
+export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
+  SurveyRefDataIndex
 // Taxon index
-export const {
-  getTaxonUuid,
-  getTaxonVernacularNameUuid,
-  getTaxonByUuid,
-  includesTaxonVernacularName,
-  assocRefData,
-} = SurveyRefDataIndex
+export const { getTaxonUuid, getTaxonVernacularNameUuid, getTaxonByUuid, includesTaxonVernacularName, assocRefData } =
+  SurveyRefDataIndex
