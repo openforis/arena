@@ -9,7 +9,7 @@ import * as Survey from '@core/survey/survey'
 import { useIsAppSaving } from '@webapp/store/app'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useLang } from '@webapp/store/system'
-import { UserActions, useUser } from '@webapp/store/user'
+import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { usePrevious } from '@webapp/components/hooks'
@@ -27,6 +27,7 @@ const Header = () => {
   const appSaving = useIsAppSaving()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
+  const canEditSurvey = useAuthCanEditSurvey()
 
   const [showUserPopup, setShowUserPopup] = useState(false)
   const toggleShowUserPopup = () => setShowUserPopup((showUserPopupPrev) => !showUserPopupPrev)
@@ -62,7 +63,7 @@ const Header = () => {
                   dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
                 }}
               />
-              {Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
+              {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
             </>
           ))}
       </div>
