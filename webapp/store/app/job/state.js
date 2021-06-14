@@ -20,6 +20,8 @@ export const getCloseButton = R.pipe(getJob, R.propOr(null, keys.closeButton))
 
 export const getOnComplete = R.pipe(getJob, R.propOr(null, keys.onComplete))
 
+export const isAutoHide = R.pipe(getJob, R.propOr(false, keys.autoHide))
+
 export const hasJob = (state) => Object.keys(getJob(state)).length > 0
 
 // ====== UPDATE
@@ -30,4 +32,7 @@ export const startJob = ({ job, onComplete = null, closeButton = null, autoHide 
   [keys.onComplete]: onComplete,
 })
 
-export const updateJob = ({ job }) => (state) => (job ? { ...state, ...job } : initialState)
+export const updateJob =
+  ({ job }) =>
+  (state) =>
+    job ? { ...state, ...job } : initialState

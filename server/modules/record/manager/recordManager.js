@@ -111,6 +111,7 @@ export {
   deleteRecordPreview,
   deleteRecordsPreview,
   deleteRecordsByCycles,
+  deleteRecordsBySurvey,
   deleteNode,
   deleteNodesByNodeDefUuids,
 } from './_recordManager/recordUpdateManager'

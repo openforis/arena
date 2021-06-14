@@ -135,7 +135,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
     return recordUuids.length
   })
 
-export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
+export const { deleteRecordsByCycles, deleteRecordsBySurvey } = RecordRepository
 
 /**
  * ======
@@ -257,10 +257,8 @@ const _onNodesUpdate = async (
   }
 
   // 2. update dependent nodes
-  const {
-    record: recordUpdatedDependentNodes,
-    nodes: updatedDependentNodes,
-  } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
+  const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
+    await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }
