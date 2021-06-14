@@ -1,5 +1,6 @@
 import * as Request from '@server/utils/request'
 import { sendOk, sendFileContent } from '@server/utils/response'
+import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -49,6 +50,25 @@ export const init = (app) => {
       await RecordService.persistNode(socketId, user, surveyId, node, file)
 
       sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/importfromcollect', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, deleteAllRecords } = Request.getParams(req)
+      const file = Request.getFile(req)
+
+      const job = RecordService.startCollectDataImportJob({
+        user,
+        surveyId,
+        filePath: file.tempFilePath,
+        deleteAllRecords,
+      })
+      const jobSerialized = JobUtils.jobToJSON(job)
+      res.json({ job: jobSerialized })
     } catch (error) {
       next(error)
     }

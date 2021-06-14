@@ -128,6 +128,10 @@ export const dataModules = {
     key: 'export',
     path: `${appModules.data.path}/export`,
   },
+  import: {
+    key: 'import',
+    path: `${appModules.data.path}/import`,
+  },
   validationReport: {
     key: 'validationReport',
     path: `${appModules.data.path}/validationReport`,
