@@ -68,7 +68,7 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
 
-        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true })
+        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid })
 
         res.json(chain)
       } catch (error) {
@@ -76,7 +76,6 @@ export const init = (app) => {
       }
     }
   )
-
 
   // ====== UPDATE - Chain
 
