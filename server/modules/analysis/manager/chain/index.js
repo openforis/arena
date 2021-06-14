@@ -38,7 +38,7 @@ export const fetchChain = async (params, client = DB.client) => {
 
   if (includeChainNodeDefs) {
     const chainNodeDefs = await ChainNodeDefRepository.fetchChainNodeDefsByChainUuid(params, client)
-    chain[Chain.keys.processingSteps] = chainNodeDefs
+    chain[Chain.keys.chainNodeDefs] = chainNodeDefs
   }
 
   return chain

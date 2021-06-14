@@ -4,7 +4,7 @@ import { fetchChainNodeDef, fetchChainNodeDefsByChainUuid } from './read'
 import { count } from './count'
 import { getMany, getAll } from './getMany'
 import { getOne } from './getOne'
-import { update } from './update'
+import { update, updateScript } from './update'
 import { updateIndexes } from './updateIndexes'
 
 export const ChainNodeDefRepository = {
@@ -17,5 +17,6 @@ export const ChainNodeDefRepository = {
   getAll,
   getOne,
   update,
+  updateScript,
   updateIndexes,
 }
