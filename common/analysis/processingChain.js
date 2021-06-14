@@ -17,7 +17,6 @@ export const keys = {
   temporary: ObjectUtils.keys.temporary,
   validation: ObjectUtils.keys.validation,
   scriptCommon: 'script_common',
-  processingSteps: 'chain_node_defs',
   chainNodeDefs: 'chain_node_defs',
 }
 
@@ -120,11 +119,6 @@ export const getNodeDefsByColumnNameInEntity =
     return nodeDefsByColumnName
   }
 
-// ===== READ - Steps
-export const getProcessingSteps = R.propOr([], keys.processingSteps)
-export const getStepByIdx = (stepIdx) =>
-  R.ifElse(R.always(stepIdx >= 0), R.pipe(getProcessingSteps, R.propOr(null, stepIdx)), R.always(null))
-
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
@@ -132,7 +126,7 @@ export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true)
 )
 
 // ====== VALIDATION
-// The validation object contains the validation of chain, steps, calculations, index by uuids
+// The validation object contains the validation of chain index by uuids
 export const { getValidation } = Validation
 export const { hasValidation } = Validation
 export const { assocValidation } = Validation

@@ -1,4 +1,4 @@
-import * as ProcessingStep from '../../../../analysis/processingStep'
+import * as ProcessingChainNodeDef from '../../../../analysis/processingChainNodeDef'
 // import * as SQL from '../../sql'
 
 /**
@@ -15,26 +15,16 @@ import * as ProcessingStep from '../../../../analysis/processingStep'
  * @returns {string} - The select query.
  */
 export function getSelect(params) {
-  const {
-    chainUuid = null,
-    stepIndex = null,
-    stepUuid = null,
-    entityUuid = null,
-    includeCalculations = false,
-    includeScript = false,
-  } = params
-  
-  
+  const { chainUuid = null, stepIndex = null, stepUuid = null, entityUuid = null, includeCalculations = false } = params
 
   const selectFields = [...this.columns]
-  
 
   const whereConditions = []
   if (chainUuid) whereConditions.push(`${this.columnChainUuid} = ${chainUuid}`)
   if (stepIndex) whereConditions.push(`${this.columnIndex} = ${stepIndex}`)
   if (stepUuid) whereConditions.push(`${this.columnUuid} = ${stepUuid}`)
   if (entityUuid)
-    whereConditions.push(`${this.columnProps}->'${ProcessingStep.keysProps.entityUuid}' @> '"${entityUuid}"'`)
+    whereConditions.push(`${this.columnProps}->'${ProcessingChainNodeDef.keysProps.entityUuid}' @> '"${entityUuid}"'`)
 
   return `SELECT
         ${selectFields.join(', ')}
