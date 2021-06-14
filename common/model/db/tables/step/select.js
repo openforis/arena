@@ -15,19 +15,9 @@ import * as ProcessingStep from '../../../../analysis/processingStep'
  * @returns {string} - The select query.
  */
 export function getSelect(params) {
-  const {
-    chainUuid = null,
-    stepIndex = null,
-    stepUuid = null,
-    entityUuid = null,
-    includeCalculations = false,
-    includeScript = false,
-  } = params
-  
-  
+  const { chainUuid = null, stepIndex = null, stepUuid = null, entityUuid = null, includeCalculations = false } = params
 
   const selectFields = [...this.columns]
-  
 
   const whereConditions = []
   if (chainUuid) whereConditions.push(`${this.columnChainUuid} = ${chainUuid}`)
