@@ -4,6 +4,7 @@ export { fetchCategories, fetchCategory, createCategory, fetchCategoryItems, del
 export { fetchTaxonomies, fetchTaxonomy, createTaxonomy, uploadTaxa, updateTaxonomy } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export { fetchVariablesPrevSteps } from './analysis'
+export { importRecordsFromCollect } from './data'
 export { fetchSurveys } from './survey'
 
 export { cancelableGetRequest } from './cancelableRequest'

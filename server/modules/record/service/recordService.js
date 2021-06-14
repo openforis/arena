@@ -11,6 +11,9 @@ import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
 
+import * as JobManager from '@server/job/jobManager'
+import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
+
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as FileManager from '../manager/fileManager'
@@ -102,9 +105,13 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 
 export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
-export const fetchValidationReport = RecordManager.fetchValidationReport
+export const { fetchValidationReport, countValidationReports } = RecordManager
 
-export const countValidationReports = RecordManager.countValidationReports
+export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords }) => {
+  const job = new CollectDataImportJob({ user, surveyId, filePath, deleteAllRecords })
+  JobManager.executeJobThread(job)
+  return job
+}
 
 /**
  * ======
@@ -124,7 +131,7 @@ const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
   }
 }
 
-export const fetchNodeByUuid = RecordManager.fetchNodeByUuid
+export const { fetchNodeByUuid } = RecordManager
 
 export const persistNode = async (socketId, user, surveyId, node, file) => {
   const recordUuid = Node.getRecordUuid(node)
