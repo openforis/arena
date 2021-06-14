@@ -106,6 +106,9 @@ export const DataTestId = {
     cellNodeDef: (name) => `${name}-cell`,
     records: 'records',
   },
+  recordsImport: {
+    importDataBtn: 'records-import-data-btn',
+  },
   sidebar: {
     module: (module) => `sidebar-module-${module}`,
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,

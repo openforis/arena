@@ -18,6 +18,7 @@ export const keys = {
   // Props
   collectUri: 'collectUri',
   collectReport: 'collectReport',
+  collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
   name: 'name',
@@ -98,6 +99,8 @@ export const hasCollectReportIssues = R.pipe(
   getCollectReport,
   R.propSatisfies((total) => total > 0, collectReportKeys.issuesTotal)
 )
+
+export const getCollectNodeDefsInfoByPath = ObjectUtils.getProp(keys.collectNodeDefsInfoByPath, {})
 
 export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
