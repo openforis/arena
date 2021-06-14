@@ -14,12 +14,12 @@ export default class MassiveUpdateData extends MassiveUpdate {
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [`?${TableDataNodeDef.columnSet.recordUuid}`, ...(columnsNames || [])]
-    const tableResultNode = new TableDataNodeDef(survey, entity)
+    const tabletNode = new TableDataNodeDef(survey, entity)
 
     super(
       {
-        schema: tableResultNode.schema,
-        table: tableResultNode.name,
+        schema: tabletNode.schema,
+        table: tabletNode.name,
         cols,
         where: ` WHERE t.record_uuid::uuid = v.record_uuid::uuid AND t.record_cycle = '${cycle}' `,
       },

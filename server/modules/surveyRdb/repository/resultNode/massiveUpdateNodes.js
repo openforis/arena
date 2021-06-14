@@ -25,12 +25,12 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
-    const tableResultNode = new TableNode(surveyId)
+    const tabletNode = new TableNode(surveyId)
 
     super(
       {
-        schema: tableResultNode.schema,
-        table: tableResultNode.name,
+        schema: tabletNode.schema,
+        table: tabletNode.name,
         cols,
         where: ` WHERE t.${TableNode.columnSet.recordUuid}::uuid = v.${TableNode.columnSet.recordUuid}::uuid AND t.${TableNode.columnSet.nodeDefUuid}::uuid = v.${TableNode.columnSet.nodeDefUuid}::uuid `,
       },
