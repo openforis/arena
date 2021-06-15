@@ -30,6 +30,7 @@ export const getLang = R.propOr('en', keys.lang)
 export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
 export const getProps = R.propOr({}, keys.props)
+export const getProfilePicture = R.prop(keys.profilePicture)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
@@ -41,6 +42,7 @@ export const { assocValidation } = Validation
 export const assocGroupUuid = R.assoc(keys.groupUuid)
 export const assocName = R.assoc(keys.name)
 export const assocInvitationExpired = R.assoc(keys.invitationExpired)
+export const assocProfilePicture = R.assoc(keys.profilePicture)
 
 // ====== CHECK
 export const isSystemAdmin = (user) => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
@@ -49,15 +51,17 @@ export const isInvited = R.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = R.propEq(keys.invitationExpired, true)
 
 // ====== AUTH GROUP
-export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => (user) =>
-  R.pipe(
-    getAuthGroups,
-    R.ifElse(
-      R.always(includeSystemAdmin && isSystemAdmin(user)),
-      R.head,
-      R.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
-    )
-  )(user)
+export const getAuthGroupBySurveyUuid =
+  (surveyUuid, includeSystemAdmin = true) =>
+  (user) =>
+    R.pipe(
+      getAuthGroups,
+      R.ifElse(
+        R.always(includeSystemAdmin && isSystemAdmin(user)),
+        R.head,
+        R.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
+      )
+    )(user)
 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 
