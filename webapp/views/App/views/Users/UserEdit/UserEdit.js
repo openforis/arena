@@ -28,6 +28,7 @@ const UserEdit = () => {
     canEditGroup,
     canEditEmail,
     canRemove,
+    canSave,
 
     onUpdate,
     onUpdateProfilePicture,
@@ -101,12 +102,7 @@ const UserEdit = () => {
           )}
 
           {canEdit && (
-            <button
-              type="button"
-              className="btn btn-save"
-              aria-disabled={!Validation.isValid(validation)}
-              onClick={onSave}
-            >
+            <button type="button" className="btn btn-save" aria-disabled={!canSave} onClick={onSave}>
               <span className="icon icon-floppy-disk icon-left icon-12px" />
               {i18n.t('common.save')}
             </button>

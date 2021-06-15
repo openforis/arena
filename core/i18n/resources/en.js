@@ -12,6 +12,7 @@ export const enTranslation = {
     ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
+    clone: 'Clone',
     copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
@@ -233,6 +234,10 @@ Do you want to proceed?`,
       createTemplate: 'Create Template',
       importFromCollect: 'Import from Collect',
       importFromArena: 'Import from Arena',
+      newSurvey: 'New Survey',
+      newSurveyFromScratch: 'New Survey From Scratch',
+      newTemplate: 'New Template',
+      newTemplateFromScratch: 'New Template From Scratch',
       survey: 'Survey',
       survey_plural: 'Surveys',
       template: 'Template',
@@ -258,6 +263,11 @@ Do you want to proceed?`,
       month_plural: '{{count}} Months',
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
+    },
+    recordsImport: {
+      deleteAllRecordsBeforeImport: 'Delete all records before import',
+      importFromCollect: 'Import from Collect',
+      importComplete: 'Import complete. {{insertedRecords}} records imported',
     },
   },
 
@@ -317,19 +327,6 @@ Do you want to proceed?`,
       [ActivityLog.type.chainNodeDefPropUpdate]: 'updated {{key}} to {{value}} of calculated node definition {{name}}',
       [ActivityLog.type.processingChainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
-      [ActivityLog.type.processingStepCreate]:
-        'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropUpdate]:
-        'updated {{key}} of processing chain {{processingChainLabel}} step {{index}}',
-      [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
-      [ActivityLog.type.processingStepCalculationCreate]:
-        'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
-      [ActivityLog.type.processingStepCalculationIndexUpdate]:
-        'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
-      [ActivityLog.type.processingStepCalculationUpdate]:
-        'updated calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
-      [ActivityLog.type.processingStepCalculationDelete]:
-        'deleted calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     },
   },
 
@@ -396,7 +393,6 @@ Do you want to proceed?`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
-    processingSteps: 'Processing steps',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####
@@ -414,35 +410,6 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
-  },
-
-  processingStepView: {
-    deleteConfirm: `Delete this processing step?
-    
-$t(common.cantUndoWarning)`,
-    deleteComplete: 'Processing step deleted',
-    category: 'Category',
-    calculationSteps: 'Calculation Steps',
-    variablesPreviousStep: {
-      title: 'Variables previous step',
-      variableName: 'Variable name',
-      include: 'Include',
-      aggregate: 'Aggregate',
-      aggregateFunctionOfVariable: `Aggregate function of variable '{{variableLabel}}'`,
-      deleteConfirm: 'Remove the variable and its aggregate function?',
-    },
-  },
-
-  processingStepCalculation: {
-    attribute: 'Attribute',
-    types: {
-      quantitative: 'Quantitative',
-      categorical: 'Categorical',
-    },
-    deleteConfirm: `Delete this calculation step?
-    
-$t(common.cantUndoWarning)`,
-    deleteComplete: 'Processing step calculation deleted',
   },
 
   itemsTable: {
@@ -695,17 +662,6 @@ $t(common.cantUndoWarning)`,
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
       chainNodeDefsRequired: 'At least one calculated attribute is required',
-      processingStep: {
-        entityOrCategoryRequired: 'One of Entity or Category is required',
-        calculationsRequired: 'At least one calculation is required',
-        variablesPrevStep: {
-          aggregateFunctionNotSpecified: 'Aggregate function not specified',
-        },
-      },
-      processingStepCalculation: {
-        attributeRequired: 'Attribute is required',
-        invalid: 'Processing Step Calculation is invalid',
-      },
     },
 
     categoryEdit: {
@@ -834,6 +790,7 @@ $t(common.cantUndoWarning)`,
     ChainsImportJob: 'Chains Import',
     ChainNodeDefsImportJob: 'Chains NodeDef Import',
     ChainNodeDefsAggregateImportJob: 'Chains NodeDef Aggregate Import',
+    CollectDataImportJob: 'Collect Data Import',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     CyclesDeletedCheckJob: 'Deleted Cycles Check',
@@ -892,9 +849,7 @@ $t(common.cantUndoWarning)`,
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
-    processingChainCannotBeSaved: 'Processing chain or step or calculation is invalid and cannot be saved',
-    processingStepOnlyLastCanBeDeleted:
-      'Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted',
+    processingChainCannotBeSaved: 'Processing chain is invalid and cannot be saved',
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',

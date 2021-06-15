@@ -16,6 +16,7 @@ import ValidationReport from './ValidationReport'
 import Records from './Records'
 import Explorer from './Explorer'
 import ExportData from './ExportData'
+import DataImport from './DataImport'
 
 const Data = () => {
   const dispatch = useDispatch()
@@ -53,6 +54,11 @@ const Data = () => {
           {
             component: ExportData,
             path: appModuleUri(dataModules.export),
+          },
+          // Data import
+          {
+            component: DataImport,
+            path: appModuleUri(dataModules.import),
           },
           // Validation report
           {

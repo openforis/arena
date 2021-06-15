@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
+import { SRSs } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
@@ -32,6 +34,8 @@ export default class CategoryImportJob extends Job {
 
   async onStart() {
     await super.onStart()
+
+    await SRSs.init()
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()

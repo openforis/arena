@@ -38,11 +38,18 @@ export default class RecordsImportJob extends Job {
   async execute() {
     const { surveyId, user, tx } = this
 
+    const { deleteAllRecords } = this.context
+
     const cycle = Survey.cycleOneKey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: true, advanced: true },
       tx
     )
+
+    if (deleteAllRecords) {
+      this.logDebug('deleting all records before import')
+      await RecordManager.deleteRecordsBySurvey({ surveyId }, this.tx)
+    }
 
     const entryNames = this.getEntryNames()
 
@@ -77,6 +84,8 @@ export default class RecordsImportJob extends Job {
 
       this.incrementProcessedItems()
     }
+
+    this.setContext({ insertedRecords: this.processed })
   }
 
   async beforeSuccess() {
@@ -114,7 +123,10 @@ export default class RecordsImportJob extends Job {
   }
 
   async traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson) {
-    const { nodeDefsInfoByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
+    const { collectSurveyFileZip, collectSurvey } = this.context
+
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
     const recordUuid = Record.getUuid(record)
     let recordUpdated = { ...record }
@@ -183,7 +195,8 @@ export default class RecordsImportJob extends Job {
   }
 
   _createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, node) {
-    const { nodeDefsInfoByCollectPath } = this.context
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
     // Output
     const nodesToInsert = []

@@ -59,13 +59,6 @@ export const type = {
   chainNodeDefPropUpdate: 'chainNodeDefPropUpdate',
   processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
-  processingStepCreate: 'processingStepCreate',
-  processingStepPropUpdate: 'processingStepPropUpdate',
-  processingStepDelete: 'processingStepDelete',
-  processingStepCalculationCreate: 'processingStepCalculationCreate',
-  processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',
-  processingStepCalculationUpdate: 'processingStepCalculationUpdate',
-  processingStepCalculationDelete: 'processingStepCalculationDelete',
 }
 
 export const keys = {
@@ -88,8 +81,6 @@ export const keys = {
   // Analysis
   chainUuid: 'chainUuid',
   processingChainLabels: 'processingChainLabels',
-  processingStepIndex: 'processingStepIndex',
-  processingStepCalculationIndex: 'processingStepCalculationIndex',
 }
 
 export const keysContent = {
@@ -121,7 +112,6 @@ export const keysContent = {
   labels: 'labels',
   chainUuid: 'chainUuid',
   processingChainUuid: 'processingChainUuid',
-  processingStepUuid: 'processingStepUuid',
   indexFrom: 'indexFrom',
   indexTo: 'indexTo',
 }
@@ -156,8 +146,6 @@ export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
 export const getChainUuid = R.prop(keys.chainUuid)
 export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
-export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
-export const getProcessingStepCalculationIndex = R.prop(keys.processingStepCalculationIndex)
 
 // Content props
 const _getContentProp = (prop) => R.path([keys.content, prop])

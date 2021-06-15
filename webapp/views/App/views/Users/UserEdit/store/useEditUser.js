@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useUser } from '@webapp/store/user'
+import * as R from 'ramda'
 
 import * as User from '@core/user/user'
-import * as R from 'ramda'
+import * as Validation from '@core/validation/validation'
+
 import * as Authorizer from '@core/auth/authorizer'
+
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
 import { useActions } from './actions'
 
@@ -16,12 +19,17 @@ const getEditCapabilities = ({ user, userToUpdate, surveyInfo, ready }) => {
   const canEditGroup = canEditUser && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)
   const canRemove = Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
   const canEdit = canEditName || canEditEmail || canEditGroup
+
+  const validation = User.getValidation(userToUpdate)
+  const canSave = Validation.isValid(validation)
+
   return {
     canEdit,
     canEditName,
     canEditGroup,
     canEditEmail,
     canRemove,
+    canSave,
   }
 }
 

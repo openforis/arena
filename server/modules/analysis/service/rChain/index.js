@@ -1,3 +1,7 @@
+import * as PromiseUtils from '@core/promiseUtils'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
+
 import { db } from '../../../../db/db'
 
 import FileZip from '../../../../utils/file/fileZip'
@@ -5,55 +9,69 @@ import * as CSVReader from '../../../../utils/file/csvReader'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as Chain from '../../../../../common/analysis/processingChain'
-import * as Step from '../../../../../common/analysis/processingStep'
-import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
-import { TableChain, TableCalculation } from '../../../../../common/model/db'
+
+import { TableChain } from '../../../../../common/model/db'
 import { Query } from '../../../../../common/model/query'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
+import { padStart } from './rFile'
+
 import RChain from './rChain'
-import RStep from './rStep'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 
 // ==== READ
-export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
-  const [survey, step] = await Promise.all([
-    SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle }),
-    AnalysisManager.fetchStep({ surveyId, stepUuid }),
-  ])
-  const query = Query.create({ entityDefUuid: Step.getEntityUuid(step) })
-  return SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs: true })
+export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid }) => {
+  const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const query = Query.create({ entityDefUuid })
+
+  return SurveyRdbManager.fetchViewData({ survey: surveyAndNodeDefs, cycle, query, columnNodeDefs: true })
 }
 
 // ==== UPDATE
 
-export const persistResults = async ({ surveyId, cycle, stepUuid, filePath }) => {
+export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-  const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
+  const chain = await AnalysisManager.fetchChain({
+    surveyId,
+    chainUuid,
+    includeScript: true,
+    includeChainNodeDefs: true,
+  })
 
-  const entityDefStep = Survey.getNodeDefByUuid(Step.getEntityUuid(step))(survey)
+  const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
   const fileZip = new FileZip(filePath)
   await fileZip.init()
-  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDefStep)}.csv`)
+  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entity)}.csv`)
   await db.tx(async (tx) => {
     // Reset node results
-    const chainUuid = Step.getProcessingChainUuid(step)
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
+    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity, chain, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new SurveyRdbManager.MassiveInsertResultNodes(survey, step, tx)
-    await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
-    await massiveInsert.flush()
+    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entity, chain, chainUuid, cycle }, tx)
+
+    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes(
+      { survey, surveyId, entity, chain, chainUuid, cycle },
+      tx
+    )
+
+    await CSVReader.createReaderFromStream(stream, null, (row) => {
+      massiveUpdateData.push.bind(massiveUpdateData)(row)
+      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+    }).start()
+    await massiveUpdateData.flush()
+    await massiveUpdateNodes.flush()
+
+    // Insert node results
 
     // refresh result step materialized view
-    await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
+    // await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()
@@ -76,28 +94,42 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       tx
     )
 
-    // Persist calculation scripts
     const [chain, survey] = await Promise.all([
-      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
+      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeChainNodeDefs: true }, tx),
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }),
     ])
-    await Promise.all(
-      Chain.getProcessingSteps(chain).map((step) => {
-        const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
-        return Promise.all(
-          Step.getCalculations(step).map(async (calculation) => {
-            // Persist the script of each calculation
-            const calculationUuid = Calculation.getUuid(calculation)
-            const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
-            const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-            const script = (await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))).trim()
-            return AnalysisManager.updateCalculation(
-              { surveyId, calculationUuid, fields: { [TableCalculation.columnSet.script]: script } },
-              tx
-            )
-          })
-        )
-      })
-    )
+
+    const { root } = Survey.getHierarchy()(survey)
+
+    const entities = []
+    Survey.traverseHierarchyItemSync(root, (nodeDef) => {
+      if (NodeDef.isEntity(nodeDef)) {
+        entities.push(nodeDef)
+      }
+    })
+
+    const chainNodeDefs = ProcessingChain.getChainNodeDefs(chain)
+    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
+      ...chainNodeDef,
+      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),
+    }))
+
+    await PromiseUtils.each(entities, async (entity, entityIndex) => {
+      const chainNodeDefsInEntity = chainNodeDefsWithNodeDef.filter(
+        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
+      )
+
+      if (chainNodeDefsInEntity.length > 0) {
+        await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef) => {
+          const chainNodeDefName = NodeDef.getName(chainNodeDef.nodeDef)
+
+          const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
+
+          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, chainNodeDefName)))?.trim()
+
+          await ChainNodeDefRepository.updateScript({ surveyId, uuid: chainNodeDef.uuid, newSript: script }, tx)
+        })
+      }
+    })
   })
 }
