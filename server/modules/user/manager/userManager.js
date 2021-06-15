@@ -85,8 +85,9 @@ export const generateResetPasswordUuid = async (email, client = db) => {
 const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
   // Assoc auth groups
 
-  const _userGroups = userGroups || (await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))
+  const _userGroups = R.isEmpty(userGroups) ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user)) : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
+
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
     const invitationValid =
@@ -98,10 +99,12 @@ const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = 
   return userUpdated
 }
 
-const _userFetcher = (fetchFn) => async (...args) => {
-  const user = await fetchFn(...args)
-  return user ? _initializeUser({ user }) : null
-}
+const _userFetcher =
+  (fetchFn) =>
+  async (...args) => {
+    const user = await fetchFn(...args)
+    return user ? _initializeUser({ user }) : null
+  }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
@@ -155,7 +158,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
       // If new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
       await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
       await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
-    } else {
+    } else if (surveyId) {
       await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
       // Log user update activity only for non system admin users
       await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userUpdate, userToUpdate, false, t)

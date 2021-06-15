@@ -175,7 +175,6 @@ export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const userToUpdate = await UserManager.fetchUserByUuid(User.getUuid(userToUpdateParam))
     const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
-
     // Check if group has changed and user can edit group
     if (
       AuthGroup.getUuid(groupToUpdate) !== User.getGroupUuid(userToUpdateParam) &&

@@ -1,8 +1,7 @@
-import * as R from 'ramda'
+import * as User from '@core/user/user'
 
-const key = 'profilePicture'
-
-export const useOnUpdateProfilePicture = ({ userToUpdate, setUserToUpdate }) => ({ profilePicture }) => {
-  const userWithNewProfilePicture = R.pipe(R.assoc(key, profilePicture))(userToUpdate)
-  setUserToUpdate(userWithNewProfilePicture)
-}
+export const useOnUpdateProfilePicture =
+  ({ userToUpdate, setUserToUpdate }) =>
+  ({ profilePicture }) => {
+    setUserToUpdate(User.assocProfilePicture(profilePicture)(userToUpdate))
+  }
