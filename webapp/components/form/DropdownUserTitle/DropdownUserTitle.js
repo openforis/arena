@@ -10,7 +10,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 const titleItems = User.titleKeys.map((key) => ({ key }))
 
 const DropdownUserTitle = (props) => {
-  const { user, onChange, validation } = props
+  const { disabled, user, onChange, validation } = props
   const titleSelected = User.getTitle(user)
   const itemSelected = A.isEmpty(titleSelected) ? undefined : { key: titleSelected }
 
@@ -18,6 +18,7 @@ const DropdownUserTitle = (props) => {
 
   return (
     <Dropdown
+      disabled={disabled}
       placeholder={i18n.t('user.title')}
       onChange={(item) => onChange(User.assocTitle(item?.key)(user))}
       items={titleItems}
@@ -29,12 +30,14 @@ const DropdownUserTitle = (props) => {
 }
 
 DropdownUserTitle.propTypes = {
+  disabled: PropTypes.bool,
   user: PropTypes.any.isRequired,
   validation: PropTypes.any,
   onChange: PropTypes.func.isRequired,
 }
 
 DropdownUserTitle.defaultProps = {
+  disabled: false,
   validation: {},
 }
 

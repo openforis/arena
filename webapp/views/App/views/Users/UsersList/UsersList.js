@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { useAuthCanInviteUser, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
 import Table from '@webapp/components/Table/Table'
 
 import HeaderLeft from './HeaderLeft'
@@ -14,9 +14,7 @@ import Row from './Row'
 
 const UsersList = () => {
   const history = useHistory()
-  const systemAdmin = useUserIsSystemAdmin()
-  const canInviteUser = useAuthCanInviteUser()
-  const emailVisible = systemAdmin || canInviteUser
+  const emailVisible = useAuthCanViewOtherUsersEmail()
 
   const onRowClick = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
 
