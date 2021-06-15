@@ -153,9 +153,7 @@ export const fetch = async ({
       -- analysis activities keys
       chain.uuid AS chain_uuid,
       chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
-      chain_node_def.index AS processing_step_index,
-      -- processing_step_calculation.index AS processing_step_calculation_index
-      0 AS processing_step_calculation_index
+      chain_node_def.index AS chain_node_def_index
     FROM
       log_limited AS l
     JOIN

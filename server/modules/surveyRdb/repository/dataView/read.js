@@ -14,14 +14,7 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { Query, Sort } from '../../../../../common/model/query'
-import {
-  ViewDataNodeDef,
-  TableNode,
-  TableResultNode,
-  ColumnNodeDef,
-  TableRecord,
-  Schemata,
-} from '../../../../../common/model/db'
+import { ViewDataNodeDef, TableNode, ColumnNodeDef, TableRecord, Schemata } from '../../../../../common/model/db'
 import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
 
 import * as DataCol from '../../schemaRdb/dataCol'
@@ -100,7 +93,7 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
       ...nodeDefCols.map((nodeDefCol, idx) => {
         const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
         const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
-        const tableNode = NodeDef.isAnalysis(nodeDefCol) ? new TableResultNode(surveyId) : new TableNode(surveyId)
+        const tableNode = new TableNode(surveyId)
         tableNode.alias = `n${idx + 1}`
 
         return `LEFT JOIN LATERAL ( 

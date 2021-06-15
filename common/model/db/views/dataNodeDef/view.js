@@ -4,7 +4,6 @@ import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression
 import * as Expression from '../../../../../core/expressionParser/expression'
 
 import TableDataNodeDef, { ColumnNodeDef } from '../../tables/dataNodeDef'
-import ViewResultStep from '../resultStep'
 
 const columnSet = {
   dateCreated: TableDataNodeDef.columnSetCommon.dateCreated,
@@ -18,7 +17,7 @@ const columnSet = {
  * @typedef {module:arena.TableDataNodeDef} module:arena.ViewDataNodeDef
  */
 export default class ViewDataNodeDef extends TableDataNodeDef {
-  constructor(survey, nodeDef, steps = []) {
+  constructor(survey, nodeDef) {
     super(survey, nodeDef)
     this.name = `${super.name}_view`
     this._virtual = NodeDef.isVirtual(this.nodeDef)
@@ -36,12 +35,6 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
       const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
       this._viewDataParent = new ViewDataNodeDef(this.survey, nodeDefParent)
     }
-
-    this._viewResultSteps = steps.map((step, i) => {
-      const viewResultStep = new ViewResultStep(this.survey, step)
-      viewResultStep.alias = `${viewResultStep.alias}_${i}`
-      return viewResultStep
-    })
   }
 
   get columnNodeDefUuid() {
@@ -101,10 +94,6 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get viewDataParent() {
     return this._viewDataParent
-  }
-
-  get viewResultSteps() {
-    return this._viewResultSteps
   }
 
   get root() {

@@ -9,18 +9,6 @@ export const ValidatorErrorKeys = {
   analysis: {
     labelDefaultLangRequired: 'validationErrors.analysis.labelDefaultLangRequired',
     chainNodeDefsRequired: 'validationErrors.analysis.chainNodeDefsRequired',
-    processingStep: {
-      entityOrCategoryRequired: 'validationErrors.analysis.processingStep.entityOrCategoryRequired',
-      calculationsRequired: 'validationErrors.analysis.processingStep.calculationsRequired',
-      variablesPrevStep: {
-        aggregateFunctionNotSpecified:
-          'validationErrors.analysis.processingStep.variablesPrevStep.aggregateFunctionNotSpecified',
-      },
-    },
-    processingStepCalculation: {
-      attributeRequired: 'validationErrors.analysis.processingStepCalculation.attributeRequired',
-      invalid: 'validationErrors.analysis.processingStepCalculation.invalid',
-    },
   },
 
   categoryEdit: {

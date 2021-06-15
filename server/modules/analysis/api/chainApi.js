@@ -68,43 +68,9 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
 
-        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true })
+        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid })
 
         res.json(chain)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
-    '/survey/:surveyId/processing-chain/:chainUuid/attribute-uuids-other-chains',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
-
-        const params = { surveyId, chainUuidExclude: chainUuid }
-        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
-
-        res.json(attributeUuids)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
-    '/survey/:surveyId/processing-chains/variables-prev-steps',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, entityUuid } = Request.getParams(req)
-
-        const params = { surveyId, entityUuid }
-        const variablesPrevSteps = await AnalysisService.fetchVariablesPrevSteps(params)
-
-        res.json(variablesPrevSteps)
       } catch (error) {
         next(error)
       }
@@ -141,45 +107,6 @@ export const init = (app) => {
         await AnalysisService.deleteChain({ user, surveyId, chainUuid })
 
         Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  // ====== DELETE - Step
-
-  app.delete(
-    '/survey/:surveyId/processing-step/:stepUuid',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, stepUuid } = Request.getParams(req)
-        const user = Request.getUser(req)
-
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteStep({ user, surveyId, stepUuid })
-
-        res.json(nodeDefUnusedDeletedUuids)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  // ====== DELETE - Calculation
-
-  app.delete(
-    '/survey/:surveyId/processing-step/:stepUuid/calculation/:calculationUuid',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, stepUuid, calculationUuid } = Request.getParams(req)
-        const user = Request.getUser(req)
-
-        const params = { user, surveyId, stepUuid, calculationUuid }
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteCalculation(params)
-
-        res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }

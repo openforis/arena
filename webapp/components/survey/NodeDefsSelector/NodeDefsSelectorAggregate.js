@@ -7,15 +7,31 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
-import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
-import { useRequest } from '@webapp/components/hooks'
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
 import AttributesSelector from './AttributesSelector/AttributesSelector'
 import EntitySelector from './EntitySelector'
 import AttributeSelector from './AttributesSelector/AttributeSelector'
+
+const PREV_CALCULATIONS_ENABLED = false
+const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
+  const variablesPrevCalculations = []
+  const currentEntity = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
+  Survey.visitAncestorsAndSelf(currentEntity, (ancestorDef) => {
+    if (NodeDef.getUuid(ancestorDef) === nodeDefUuidEntity) {
+      return
+    }
+    const children = Survey.getNodeDefChildren(ancestorDef)(survey)
+    const analysisChildren = children.filter(NodeDef.isAnalysis).map((object) => ({
+      ...object,
+      aggregate: Query.aggregateFunctions.sum, // TODO_ADD_AGGREGATE_EXPRESSION
+    }))
+    variablesPrevCalculations.push(...analysisChildren)
+  })(survey)
+  return variablesPrevCalculations
+}
 
 const NodeDefsSelectorAggregate = (props) => {
   const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
@@ -24,12 +40,7 @@ const NodeDefsSelectorAggregate = (props) => {
   const lang = useSurveyLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
 
-  const variablesPrevSteps = useRequest({
-    defaultValue: [],
-    dependencies: [nodeDefUuidEntity],
-    requestFunction: API.fetchVariablesPrevSteps,
-    requestArguments: [{ surveyId: Survey.getId(survey), entityUuid: nodeDefUuidEntity }],
-  })
+  const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
 
   const onToggleMeasure = (nodeDefUuid) => {
     const measuresUpdate = new Map(measures)
@@ -90,7 +101,8 @@ const NodeDefsSelectorAggregate = (props) => {
               showMultipleAttributes={false}
             />
           </ExpansionPanel>
-          {variablesPrevSteps.length > 0 && (
+
+          {PREV_CALCULATIONS_ENABLED && variablesPrevSteps.length > 0 && (
             <ExpansionPanel buttonLabel="common.measurePrevSteps" buttonLabelParams={{ count: 2 }}>
               {variablesPrevSteps.map((variablePrevStep) => {
                 const variableNodeDefUuid = StepVariable.getUuid(variablePrevStep)

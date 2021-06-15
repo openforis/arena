@@ -1,20 +1,19 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import { ColumnNodeDef, TableResultNode, ViewDataNodeDef } from '@common/model/db'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import { ColumnNodeDef, TableNode, TableChainNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 /**
  * Class that models a data frame step results.
  */
 export default class DfResults {
-  constructor(rChain, step) {
+  constructor(rChain, entity) {
     this._rChain = rChain
-    this._step = step
+    this._entity = entity
     this._scripts = []
 
+    this.initDf = this.initDf.bind(this)
     this.initDf()
     this.initUuids()
     this.initCodeAttributes()
@@ -24,24 +23,20 @@ export default class DfResults {
     return this._rChain
   }
 
+  get chain() {
+    return this._rChain.chain
+  }
+
   get survey() {
     return this.rChain.survey
   }
 
-  get step() {
-    return this._step
-  }
-
-  get calculations() {
-    return ProcessingStep.getCalculations(this.step)
-  }
-
-  get entityDef() {
-    return Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(this.step))(this.survey)
+  get entity() {
+    return this._entity
   }
 
   get dfSourceName() {
-    return NodeDef.getName(this.entityDef)
+    return NodeDef.getName(this.entity)
   }
 
   get name() {
@@ -53,28 +48,25 @@ export default class DfResults {
   }
 
   initDf() {
-    // init attribute columns: only output attribute values
-    const dfResultColumns = this.calculations.map((calculation) => {
-      const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
-      const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
-      return NodeDef.getName(nodeDefCalculation)
-    }, [])
-    this.scripts.push(setVar(this.name, sqldf(`SELECT ${dfResultColumns.join(', ')} FROM ${this.dfSourceName}`)))
+    const columnNames = ProcessingChain.getColumnsNamesInEntity({ survey: this.survey, entity: this.entity })(
+      this.chain
+    )
+
+    this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
   initUuids() {
-    const columnNodeDef = NodeDef.isVirtual(this.entityDef)
-      ? Survey.getNodeDefParent(this.entityDef)(this.survey)
-      : this.entityDef
+    const columnNodeDef = NodeDef.isVirtual(this.entity)
+      ? Survey.getNodeDefParent(this.entity)(this.survey)
+      : this.entity
     const setUuids = [
-      { name: TableResultNode.columnSet.chainUuid, value: `'${this.rChain.chainUuid}'` },
-      { name: TableResultNode.columnSet.stepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
+      { name: TableChainNodeDef.columnSet.chainUuid, value: `'${this.rChain.chainUuid}'` },
       {
-        name: TableResultNode.columnSet.recordUuid,
+        name: TableNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
       },
       {
-        name: TableResultNode.columnSet.parentUuid,
+        name: TableNode.columnSet.parentUuid,
         value: dfVar(this.dfSourceName, ColumnNodeDef.getColName(columnNodeDef)),
       },
     ].map((uuidMapping) => setVar(dfVar(this.name, uuidMapping.name), uuidMapping.value))
@@ -83,20 +75,17 @@ export default class DfResults {
   }
 
   initCodeAttributes() {
-    this.calculations.forEach((calculation) => {
-      const nodeDef = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(this.survey)
+    const chainNodeDefsWithNodeDefInEntity = ProcessingChain.getChainNodeDefsInEntity({
+      survey: this.survey,
+      entity: this.entity,
+    })(this.rChain.chain)
+
+    chainNodeDefsWithNodeDefInEntity.forEach((chainNodeDef) => {
+      const { nodeDef } = chainNodeDef
+
       if (NodeDef.isCode(nodeDef)) {
         const nodeVarName = NodeDef.getName(nodeDef)
-        const nodeTmpVarName = `${nodeVarName}_TMP`
-        const dfNodeVar = dfVar(this.name, nodeVarName)
-        const dfNodeTmpVar = dfVar(this.name, nodeTmpVarName)
         const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
-
-        // copy code value into temp variable
-        this.scripts.push(setVar(dfNodeTmpVar, dfNodeVar))
-
-        // remove code variable from data frame
-        this.scripts.push(setVar(dfNodeVar, `NULL`))
 
         // copy category data frame into temp variable
         const categoryTempVar = 'category'
@@ -107,18 +96,20 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                "{""${Node.valuePropsCode.itemUuid}"": """ || c.uuid || """, ""${Node.valuePropsCode.code}"": """ || c.code || """, ""${Node.valuePropsCode.label}"": """ || c.label || """}" AS ${nodeVarName}
+                c.label as computed_category_label,
+                c.uuid as computed_category_uuid
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
-            ON r.${nodeTmpVarName} = c.code  
+            ON r.${nodeVarName}_code = c.code  
         `
-        this.scripts.push(setVar(this.name, sqldf(query)))
+        this.scripts.push(setVar('category_values', sqldf(query)))
+
+        this.scripts.push(setVar(`${this.name}$${nodeVarName}_label`, `category_values$computed_category_label`))
+        this.scripts.push(setVar(`${this.name}$${nodeVarName}_uuid`, `category_values$computed_category_uuid`))
 
         // remove temp category variable
         this.scripts.push(rm(categoryTempVar))
-
-        // remove tmp var
-        this.scripts.push(setVar(dfNodeTmpVar, `NULL`))
+        this.scripts.push(rm('category_values'))
       }
     })
   }
