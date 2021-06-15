@@ -9,6 +9,7 @@ export const keys = {
   authGroups: ObjectUtils.keys.authGroups,
   hasProfilePicture: 'hasProfilePicture',
   prefs: 'prefs',
+  profilePicture: 'profilePicture',
   props: ObjectUtils.keys.props,
   status: 'status',
   validation: ObjectUtils.keys.validation,

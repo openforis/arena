@@ -13,12 +13,12 @@ export default class RFileReadData extends RFileSystem {
   }
 
   async initEntitiesNodeDefs(entitiesNodeDefs) {
-    const { survey, cycle } = this.rChain
+    const { chainUuid, survey, cycle } = this.rChain
 
     await PromiseUtils.each(entitiesNodeDefs, async (entityDef) => {
       // Fetch entity data
       const getEntityData = arenaGet(
-        ApiRoutes.rChain.entityData(Survey.getId(survey), cycle, NodeDef.getUuid(entityDef))
+        ApiRoutes.rChain.entityData(Survey.getId(survey), cycle, chainUuid, NodeDef.getUuid(entityDef))
       )
       const dfEntity = NodeDef.getName(entityDef)
       await this.appendContent(setVar(dfEntity, getEntityData))

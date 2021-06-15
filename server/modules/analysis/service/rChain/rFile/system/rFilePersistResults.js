@@ -1,18 +1,16 @@
 import * as PromiseUtils from '@core/promiseUtils'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import RFileSystem from './rFileSystem'
 import DfResults from './dfResults'
 
 import { dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
 
-const getPutResultsScripts = (rChain, dfResults) => {
-  const { surveyId, cycle, dirResults } = rChain
-  const { name: dfResultName, dfSourceName, step } = dfResults
+const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
+  const { chainUuid, surveyId, cycle, dirResults } = rChain
+  const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []
 
   // csv file
@@ -22,22 +20,22 @@ const getPutResultsScripts = (rChain, dfResults) => {
   const fileZip = `${dirResults}/${dfSourceName}.zip`
   scripts.push(zipr(fileZip, fileResults))
   // put request
-  scripts.push(arenaPutFile(ApiRoutes.rChain.stepEntityData(surveyId, cycle, ProcessingStep.getUuid(step)), fileZip))
+  scripts.push(arenaPutFile(ApiRoutes.rChain.entityData(surveyId, cycle, chainUuid, NodeDef.getUuid(entity)), fileZip))
 
   return scripts
 }
 
-function* initPersistStepResults() {
-  const { chain } = this.rChain
-  const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.hasEntity)
+function* initPersistChainEntitiesResults() {
+  const { entitiesWithChainNodeDef } = this.rChain
 
-  for (let i = 0; i < steps.length; i += 1) {
-    const step = steps[i]
-    const dfResults = new DfResults(this.rChain, step)
+  for (let i = 0; i < entitiesWithChainNodeDef.length; i += 1) {
+    const entity = entitiesWithChainNodeDef[i]
+    // TODO FIX to persist changes on scripts
+    const dfResults = new DfResults(this.rChain, entity)
 
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
     yield this.appendContent(...dfResults.scripts)
-    yield this.appendContent(...getPutResultsScripts(this.rChain, dfResults))
+    yield this.appendContent(...getPutResultsScripts({ rChain: this.rChain, entity, dfResults }))
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
   }
 }
@@ -62,12 +60,12 @@ export default class RFilePersistResults extends RFileSystem {
   async init() {
     await super.init()
     const { dirResults } = this.rChain
-    this.initPersistStepResults = initPersistStepResults.bind(this)
+    this.initPersistChainEntitiesResults = initPersistChainEntitiesResults.bind(this)
 
     // create results dir
     await this.appendContent(dirCreate(dirResults))
-    // persist step results
-    await PromiseUtils.resolveGenerator(this.initPersistStepResults())
+    // persist chainEntitiesResults
+    await PromiseUtils.resolveGenerator(this.initPersistChainEntitiesResults())
     // persist user scripts
     await this.initPersistUserScripts()
     // remove results dir
