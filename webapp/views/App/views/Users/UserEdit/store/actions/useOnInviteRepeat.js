@@ -26,16 +26,20 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
         const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
         const userInviteParams = R.assoc('surveyCycleKey', surveyCycleKey)(userInvite)
 
-        await axios.post(`/api/survey/${surveyId}/users/inviteRepeat`, userInviteParams)
+        const { data } = await axios.post(`/api/survey/${surveyId}/users/inviteRepeat`, userInviteParams)
+        const { error } = data
+        if (error) {
+          dispatch(NotificationActions.notifyError({ key: error }))
+        } else {
+          dispatch(
+            NotificationActions.notifyInfo({
+              key: 'emails.userInviteRepeatConfirmation',
+              params: { email: UserInvite.getEmail(userInvite) },
+            })
+          )
 
-        dispatch(
-          NotificationActions.notifyInfo({
-            key: 'emails.userInviteRepeatConfirmation',
-            params: { email: UserInvite.getEmail(userInvite) },
-          })
-        )
-
-        history.push(appModuleUri(userModules.users))
+          history.push(appModuleUri(userModules.users))
+        }
       } finally {
         dispatch(LoaderActions.hideLoader())
       }

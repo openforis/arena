@@ -12,7 +12,7 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { validateUserInvite } from './validate'
 
-export const useOnInvite = ({ userInvite }) => {
+export const useOnInvite = ({ userInvite, repeatInvitation = false }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyId = useSurveyId()
@@ -28,18 +28,23 @@ export const useOnInvite = ({ userInvite }) => {
 
           const userInviteParams = R.pipe(
             R.omit([UserInvite.keys.validation]),
-            R.assoc('surveyCycleKey', surveyCycleKey)
+            R.assoc('surveyCycleKey', surveyCycleKey),
+            R.assoc('repeatInvitation', repeatInvitation)
           )(userInviteValidated)
-          await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
 
-          dispatch(
-            NotificationActions.notifyInfo({
-              key: 'common.emailSentConfirmation',
-              params: { email: UserInvite.getEmail(userInvite) },
-            })
-          )
-
-          history.push(appModuleUri(userModules.users))
+          const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
+          const { error } = data
+          if (error) {
+            dispatch(NotificationActions.notifyError({ key: error }))
+          } else {
+            dispatch(
+              NotificationActions.notifyInfo({
+                key: 'common.emailSentConfirmation',
+                params: { email: UserInvite.getEmail(userInvite) },
+              })
+            )
+            history.push(appModuleUri(userModules.users))
+          }
         } finally {
           dispatch(LoaderActions.hideLoader())
         }

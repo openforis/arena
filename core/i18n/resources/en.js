@@ -933,6 +933,13 @@ $t(common.cantUndoWarning)`,
              $t(emails.temporaryMsg)
              $t(emails.signature)`,
     },
+    existingUserInvite: {
+      subject: 'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in OpenForis Arena!',
+      body: `<p>Hello,</p>
+             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
+             $t(emails.signature)`,
+    },
     userInviteRepeatConfirmation:
       'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
     userResetPassword: {
