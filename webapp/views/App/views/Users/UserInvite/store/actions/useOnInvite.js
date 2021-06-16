@@ -33,9 +33,10 @@ export const useOnInvite = ({ userInvite, repeatInvitation = false }) => {
           )(userInviteValidated)
 
           const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-          const { error } = data
-          if (error) {
-            dispatch(NotificationActions.notifyError({ key: error }))
+          const { errorKey, errorParams } = data
+
+          if (errorKey) {
+            dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
           } else {
             dispatch(
               NotificationActions.notifyInfo({

@@ -46,7 +46,7 @@ export const init = (app) => {
         await UserService.inviteUser({ user, surveyId, surveyCycleKey, userToInvite, serverUrl, repeatInvitation })
         Response.sendOk(res)
       } catch (e) {
-        res.json({ error: e.message })
+        res.json({ errorKey: e.key, errorParams: e.params })
       }
     } catch (error) {
       next(error)
