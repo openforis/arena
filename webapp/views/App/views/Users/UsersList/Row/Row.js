@@ -7,16 +7,16 @@ import * as User from '@core/user/user'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditUser, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import * as DateUtils from '@core/dateUtils'
 
 const Row = (props) => {
-  const { row: userListItem } = props
+  const { row: userListItem, emailVisible } = props
   const surveyInfo = useSurveyInfo()
-  const isSystemAdmin = useUserIsSystemAdmin()
+
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
 
@@ -32,7 +32,7 @@ const Row = (props) => {
         <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail />
       </div>
       <div data-testid={DataTestId.userList.name}>{User.getName(userListItem)}</div>
-      {isSystemAdmin && (
+      {emailVisible && (
         <div data-testid={DataTestId.userList.email} data-value={email}>
           {email}
         </div>
@@ -61,6 +61,11 @@ const Row = (props) => {
 
 Row.propTypes = {
   row: PropTypes.object.isRequired,
+  emailVisible: PropTypes.bool,
+}
+
+Row.defaultProps = {
+  emailVisible: false,
 }
 
 export default Row
