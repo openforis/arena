@@ -17,7 +17,7 @@ import { TableDataNodeDef } from '@common/model/db'
 export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycle }, client = db) => {
   const tableData = new TableDataNodeDef(survey, entity)
 
-  const columnsNames = ProcessingChain.getColumnsNamesInEntity({ survey, entity })(chain)
+  const columnsNames = ProcessingChain.getColumnsNamesInEntity({ entity })(chain)
   return client.query(
     `UPDATE ${tableData.nameQualified}
     SET 

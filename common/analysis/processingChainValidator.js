@@ -3,6 +3,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
 export const keys = {
   entityOrCategory: 'entityOrCategory',
@@ -17,13 +18,13 @@ const _validationsCommonProps = (defaultLang) => ({
   ],
 })
 
-const _validateChainNodeDefs = (chainNodeDefsCount) => () =>
-  Object.keys(chainNodeDefsCount).length === 0
+const _validateChainNodeDefs = (chain) => () =>
+  (ProcessingChain.getChainNodeDefs(chain) || []).length === 0
     ? ValidationResult.newInstance(Validation.messageKeys.analysis.chainNodeDefsRequired)
     : null
 
-export const validateChain = async (chain, chainNodeDefsCount, defaultLang) =>
+export const validateChain = async (chain, defaultLang) =>
   Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
-    chainNodeDefs: [_validateChainNodeDefs(chainNodeDefsCount)],
+    chainNodeDefs: [_validateChainNodeDefs(chain)],
   })

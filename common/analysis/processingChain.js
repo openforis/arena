@@ -1,6 +1,5 @@
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -53,37 +52,25 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 
 // ===== READ - chainNodeDef
 export const getChainNodeDefs = (chain) => chain?.[keys.chainNodeDefs] || []
-export const getChainNodeDefsWithNodeDef =
-  ({ survey }) =>
-  (chain) => {
-    const chainNodeDefs = getChainNodeDefs(chain)
-    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
-      ...chainNodeDef,
-      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),
-    }))
-
-    return chainNodeDefsWithNodeDef
-  }
 
 export const getChainNodeDefsInEntity =
-  ({ survey, entity }) =>
+  ({ entity }) =>
   (chain) => {
-    const chainNodeDefsWithNodeDef = getChainNodeDefsWithNodeDef({ survey })(chain)
+    const chainNodeDefsWithNodeDef = getChainNodeDefs(chain)
     const chainNodeDefsInEntity = (chainNodeDefsWithNodeDef || []).filter(
       (chainNodeDef) =>
-        NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity) &&
-        chainNodeDef.chain_uuid === getUuid(chain)
+        NodeDef.getParentUuid(chainNodeDef) === NodeDef.getUuid(entity) &&
+        NodeDef.getChainUuid(chainNodeDef) === getUuid(chain)
     )
     return chainNodeDefsInEntity
   }
 
 export const getColumnsNamesWithNodeDefsInEntity =
-  ({ survey, entity }) =>
+  ({ entity }) =>
   (chain) => {
-    const chainNodeDefsInEntity = getChainNodeDefsInEntity({ survey, entity })(chain)
+    const chainNodeDefsInEntity = getChainNodeDefsInEntity({ entity })(chain)
 
-    const columnsNamesWithNodeDefs = chainNodeDefsInEntity.flatMap((chainNodeDef) => {
-      const { nodeDef } = chainNodeDef
+    const columnsNamesWithNodeDefs = chainNodeDefsInEntity.flatMap((nodeDef) => {
       const name = NodeDef.getName(nodeDef)
       if (NodeDef.isCode(nodeDef)) {
         return [
@@ -100,17 +87,17 @@ export const getColumnsNamesWithNodeDefsInEntity =
   }
 
 export const getColumnsNamesInEntity =
-  ({ survey, entity }) =>
+  ({ entity }) =>
   (chain) => {
-    const columnsNamesWithNodeDefs = getColumnsNamesWithNodeDefsInEntity({ survey, entity })(chain)
+    const columnsNamesWithNodeDefs = getColumnsNamesWithNodeDefsInEntity({ entity })(chain)
     const columnsNames = columnsNamesWithNodeDefs.map(({ columnName }) => columnName)
     return columnsNames
   }
 
 export const getNodeDefsByColumnNameInEntity =
-  ({ survey, entity }) =>
+  ({ entity }) =>
   (chain) => {
-    const columnsNamesWithNodeDefs = getColumnsNamesWithNodeDefsInEntity({ survey, entity })(chain)
+    const columnsNamesWithNodeDefs = getColumnsNamesWithNodeDefsInEntity({ entity })(chain)
     const nodeDefsByColumnName = columnsNamesWithNodeDefs.reduce(
       (nodeDefs, { columnName, nodeDef }) => ({ ...nodeDefs, [columnName]: nodeDef }),
       {}

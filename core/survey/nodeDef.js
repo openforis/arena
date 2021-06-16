@@ -100,6 +100,12 @@ export const keysPropsAdvanced = {
   defaultValues: 'defaultValues',
   validations: 'validations',
   formula: 'formula',
+
+  // Analisys
+  script: 'script',
+  chainUuid: 'chainUuid',
+  index: 'index',
+  active: 'active',
 }
 
 const metaKeys = {
@@ -112,7 +118,6 @@ export const maxKeyAttributes = 3
 
 export const { getLabels, getParentUuid, getProp, getProps, getPropsDraft, getUuid, getId, isEqual, isTemporary } =
   ObjectUtils
-export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
@@ -213,9 +218,21 @@ export const isDescendantOf = (nodeDefAncestor) => (nodeDef) => {
 }
 
 // Advanced props
+
 export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
+export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
+
 export const getPropAdvanced = (prop, defaultTo = null) =>
   R.pipe(getPropsAdvanced, R.pathOr(defaultTo, prop.split('.')))
+
+export const getPropAdvancedDraft = (prop, defaultTo = null) =>
+  R.pipe(getPropsAdvancedDraft, R.pathOr(defaultTo, prop.split('.')))
+
+export const getPropOrDraftAdvanced =
+  (prop, defaultTo = null) =>
+  (nodeDef) =>
+    getPropAdvanced(prop, getPropAdvancedDraft(prop, defaultTo)(nodeDef))(nodeDef)
+
 export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
@@ -231,6 +248,13 @@ export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 
 export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
+
+export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, [])
+
+export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
+
+export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
+export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 // ==== CREATE
 

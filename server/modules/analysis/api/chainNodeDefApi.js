@@ -5,39 +5,6 @@ import * as Response from '@server/utils/response'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
-  // ====== READ
-
-  app.get(
-    '/survey/:surveyId/chain/:chainUuid/chain-node-def/count',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
-
-        const count = await AnalysisService.countChainNodeDefs({ surveyId, chainUuid })
-
-        res.json(count)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
-    '/survey/:surveyId/chain/:chainUuid/chain-node-def/:entityDefUuid',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, entityDefUuid } = Request.getParams(req)
-
-        const chainNodeDefs = await AnalysisService.getManyChainNodeDefs({ surveyId, entityDefUuid, chainUuid })
-
-        res.json(chainNodeDefs)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   // ====== UPDATE
 

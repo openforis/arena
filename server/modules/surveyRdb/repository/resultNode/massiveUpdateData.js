@@ -8,9 +8,9 @@ import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 
 export default class MassiveUpdateData extends MassiveUpdate {
   constructor({ survey, entity, chain, cycle }, tx) {
-    const chainNodeDefsInEntity = ProcessingChain.getChainNodeDefsInEntity({ survey, entity })(chain)
-    const columnsNames = ProcessingChain.getColumnsNamesInEntity({ survey, entity })(chain)
-    const nodeDefsByColumnName = ProcessingChain.getNodeDefsByColumnNameInEntity({ survey, entity })(chain)
+    const chainNodeDefsInEntity = ProcessingChain.getChainNodeDefsInEntity({ entity })(chain)
+    const columnsNames = ProcessingChain.getColumnsNamesInEntity({ entity })(chain)
+    const nodeDefsByColumnName = ProcessingChain.getNodeDefsByColumnNameInEntity({ entity })(chain)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [`?${TableDataNodeDef.columnSet.recordUuid}`, ...(columnsNames || [])]

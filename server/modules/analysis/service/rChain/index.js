@@ -40,7 +40,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
-    includeScript: true,
     includeChainNodeDefs: true,
   })
 
@@ -95,7 +94,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
     )
 
     const [chain, survey] = await Promise.all([
-      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeChainNodeDefs: true }, tx),
+      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true }, tx),
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }),
     ])
 

@@ -63,10 +63,7 @@ const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nod
   }
 }
 
-export const insertNodeDef = async (
-  { user, surveyId, cycle = Survey.cycleOneKey, nodeDef, chainNodeDef = null },
-  client = db
-) =>
+export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey, nodeDef }, client = db) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
@@ -76,7 +73,6 @@ export const insertNodeDef = async (
         surveyId,
         cycle,
         nodeDef,
-        chainNodeDef,
       },
       t
     )

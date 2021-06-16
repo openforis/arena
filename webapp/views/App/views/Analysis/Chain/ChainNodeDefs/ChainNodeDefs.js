@@ -1,30 +1,35 @@
 import './ChainNodeDefs.scss'
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
-
-import { ChainActions, useChainEntityDefUuid, useChainNodeDefs, useChainNodeDefsCount } from '@webapp/store/ui/chain'
+import * as Chain from '@common/analysis/processingChain'
+import * as NodeDef from '@core/survey/nodeDef'
+import { ChainActions, useChainEntityDefUuid } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { useChain } from '@webapp/store/ui/chain'
+
 import { ChainNodeDefsHeader } from './ChainNodeDefsHeader'
 import { ChainNodeDef } from './ChainNodeDef'
-import { useFetchChainNodeDefs, useSortChainNodeDefs } from './hooks'
+import { useSortChainNodeDefs } from './hooks'
 
 const ChainNodeDefs = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
-  const chainNodeDefsCount = useChainNodeDefsCount()
-  const chainNodeDefs = useChainNodeDefs()
+
+  const chain = useChain()
+
+  const chainNodeDefs = Chain.getChainNodeDefs(chain)
+
   const chainNodeDefsRef = useRef(null)
 
   const selectEntity = (entityDef) => dispatch(ChainActions.updateEntityDefUuid(entityDef.uuid))
   const getLabelSuffix = (entityDef) => {
-    const count = chainNodeDefsCount[entityDef.uuid]
+    const count = (Chain.getChainNodeDefsInEntity({ entity: entityDef })(chain) || []).length
     return count ? ` (${count})` : ''
   }
 
-  useFetchChainNodeDefs()
   useSortChainNodeDefs({ chainNodeDefsRef })
 
   return (
@@ -46,9 +51,11 @@ const ChainNodeDefs = () => {
             </div>
           )}
 
-          {chainNodeDefs.map((chainNodeDef) => (
-            <ChainNodeDef key={chainNodeDef.uuid} chainNodeDef={chainNodeDef} />
-          ))}
+          {chainNodeDefs
+            .filter((chainNodeDef) => NodeDef.getParentUuid(chainNodeDef) === entityDefUuid)
+            .map((chainNodeDef) => (
+              <ChainNodeDef key={chainNodeDef.uuid} chainNodeDef={chainNodeDef} />
+            ))}
         </div>
       )}
     </div>

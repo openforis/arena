@@ -19,8 +19,6 @@ export { generateScript, fetchEntityData, persistResults, persistUserScripts } f
 export { generateRStudioToken, checkRStudioToken } from './rStudio'
 
 // chain node def
-export const countChainNodeDefs = ChainNodeDefRepository.count
-export const getManyChainNodeDefs = ChainNodeDefRepository.getMany
 export const getAllChainNodeDefs = ChainNodeDefRepository.getAll
 export { updateChainNodeDef } from './updateChainNodeDef'
 export const updateIndexesChainNodeDefs = ChainNodeDefRepository.updateIndexes

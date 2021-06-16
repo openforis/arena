@@ -465,6 +465,7 @@ $t(common.cantUndoWarning)`,
       readOnly: 'Read only',
       defaultValues: 'Default values',
       relevantIf: 'Relevant if',
+      script: 'Script'
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',

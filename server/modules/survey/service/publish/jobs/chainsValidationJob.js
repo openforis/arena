@@ -1,13 +1,12 @@
 import * as Chain from '@common/analysis/processingChain'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import Job from '@server/job/job'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 export default class ChainsValidationJob extends Job {
   constructor(params) {
@@ -26,8 +25,13 @@ export default class ChainsValidationJob extends Job {
 
     const validations = await Promise.all(
       chains.map(async (chain) => {
-        const chainNodeDefsCount = await ChainNodeDefRepository.count({ surveyId, chainUuid: chain.uuid }, tx)
-        return ChainValidator.validateChain(chain, chainNodeDefsCount, defaultLang)
+        const _chain = {
+          ...chain,
+          [Chain.keys.chainNodeDefs]: Survey.getNodeDefsArray(survey).filter(
+            (nodeDef) => NodeDef.isAnalysis(nodeDef) && NodeDef.getChainUuid(nodeDef) === Chain.getUuid(chain)
+          ),
+        }
+        return ChainValidator.validateChain(_chain, defaultLang)
       })
     )
     validations.forEach((validation, index) => {

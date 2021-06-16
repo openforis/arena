@@ -68,7 +68,7 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
 
-        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid })
+        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid, includeChainNodeDefs: true })
 
         res.json(chain)
       } catch (error) {

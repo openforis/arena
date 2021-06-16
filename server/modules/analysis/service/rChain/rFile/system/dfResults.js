@@ -48,7 +48,7 @@ export default class DfResults {
   }
 
   initDf() {
-    const columnNames = ProcessingChain.getColumnsNamesInEntity({ survey: this.survey, entity: this.entity })(
+    const columnNames = ProcessingChain.getColumnsNamesInEntity({ entity: this.entity })(
       this.chain
     )
 
@@ -76,7 +76,6 @@ export default class DfResults {
 
   initCodeAttributes() {
     const chainNodeDefsWithNodeDefInEntity = ProcessingChain.getChainNodeDefsInEntity({
-      survey: this.survey,
       entity: this.entity,
     })(this.rChain.chain)
 
