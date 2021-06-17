@@ -22,6 +22,7 @@ const getEditCapabilities = ({ user, userToUpdate, surveyInfo, ready }) => {
 
   const validation = User.getValidation(userToUpdate)
   const canSave = Validation.isValid(validation)
+  const canViewEmail = User.isEqual(user)(userToUpdate) || Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
 
   return {
     canEdit,
@@ -30,6 +31,7 @@ const getEditCapabilities = ({ user, userToUpdate, surveyInfo, ready }) => {
     canEditEmail,
     canRemove,
     canSave,
+    canViewEmail,
   }
 }
 

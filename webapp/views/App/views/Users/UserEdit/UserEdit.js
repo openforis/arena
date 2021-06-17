@@ -29,6 +29,7 @@ const UserEdit = () => {
     canEditEmail,
     canRemove,
     canSave,
+    canViewEmail,
 
     onUpdate,
     onUpdateProfilePicture,
@@ -56,6 +57,7 @@ const UserEdit = () => {
 
       <FormItem label={i18n.t('user.title')}>
         <DropdownUserTitle
+          disabled={!canEdit}
           user={userToUpdate}
           onChange={onUpdate}
           validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
@@ -73,15 +75,17 @@ const UserEdit = () => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('common.email')}>
-        <Input
-          disabled={!canEditEmail}
-          placeholder={i18n.t('common.email')}
-          value={User.getEmail(userToUpdate)}
-          validation={Validation.getFieldValidation(User.keys.email)(validation)}
-          onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
-        />
-      </FormItem>
+      {canViewEmail && (
+        <FormItem label={i18n.t('common.email')}>
+          <Input
+            disabled={!canEditEmail}
+            placeholder={i18n.t('common.email')}
+            value={User.getEmail(userToUpdate)}
+            validation={Validation.getFieldValidation(User.keys.email)(validation)}
+            onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
+          />
+        </FormItem>
+      )}
       <FormItem label={i18n.t('common.group')}>
         <DropdownUserGroup
           editingLoggedUser={User.isEqual(user)(userToUpdate)}
