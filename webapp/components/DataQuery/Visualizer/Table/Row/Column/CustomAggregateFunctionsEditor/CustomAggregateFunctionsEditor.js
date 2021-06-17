@@ -79,10 +79,9 @@ export const CustomAggregateFunctionsEditor = (props) => {
               const editing = editedUuid === uuid
 
               return (
-                <div className="table__row">
+                <div key={uuid} className="table__row">
                   {editing ? (
                     <CustomAggregateFunctionEditor
-                      key={uuid}
                       fn={fn}
                       onCancel={onEditCancel}
                       onDelete={onDelete}
