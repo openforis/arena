@@ -98,6 +98,7 @@ const ColumnHeader = (props) => {
 
       {showAggregateFunctionsPanel && (
         <PanelRight
+          width="700px"
           header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
           onClose={() => setShowAggregateFunctionsPanel(false)}
         >
@@ -116,8 +117,9 @@ const ColumnHeader = (props) => {
           <CustomAggregateFunctionsEditor
             selectedUuids={customAggregateFunctionUuids}
             onSelectionChange={(selection) => {
-              const { uuid } = selection
-              onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn: uuid })(query))
+              // Object.keys(selection).forEach((uuid) =>
+              //   onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn: uuid })(query))
+              // )
             }}
           />
         </PanelRight>

@@ -1,9 +1,28 @@
 .custom-aggregate-functions {
-  .custom-aggreate-functions-table {
-    .table-header,
-    .table-row {
-      display: grid;
-      grid-template-columns: 30px 1fr 50px;
+  height: 500px;
+}
+.custom-aggregate-functions .table__row-header,
+.custom-aggregate-functions .table__row {
+  display: grid;
+  grid-template-columns: 30px 1fr 50px;
+  height: fit-content;
+
+  .form {
+    column-span: all;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    width: 600px;
+    height: 260px;
+    max-width: none;
+    margin: auto;
+
+    .form-item {
+      height: auto;
+
+      textarea {
+        height: 120px;
+      }
     }
   }
 }
