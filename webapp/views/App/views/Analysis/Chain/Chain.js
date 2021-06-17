@@ -6,7 +6,7 @@ import classNames from 'classnames'
 
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
-import * as Chain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
@@ -53,7 +53,7 @@ const ChainComponent = () => {
       <div className="form">
         <LabelsEditor
           labels={chain.props.labels}
-          formLabelKey="processingChainView.formLabel"
+          formLabelKey="chainView.formLabel"
           readOnly={false}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
           onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}

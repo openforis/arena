@@ -1,4 +1,4 @@
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import * as pgPromise from 'pg-promise'
 
@@ -13,9 +13,9 @@ const { Column } = pgp.helpers
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
-    const chainNodeDefsInEntity = ProcessingChain.getChainNodeDefsInEntity({ entity })(chain)
-    const columnsNames = ProcessingChain.getColumnsNamesInEntity({ entity })(chain)
-    const nodeDefsByColumnName = ProcessingChain.getNodeDefsByColumnNameInEntity({ entity })(chain)
+    const chainNodeDefsInEntity = Chain.getChainNodeDefsInEntity({ entity })(chain)
+    const columnsNames = Chain.getColumnsNamesInEntity({ entity })(chain)
+    const nodeDefsByColumnName = Chain.getNodeDefsByColumnNameInEntity({ entity })(chain)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [

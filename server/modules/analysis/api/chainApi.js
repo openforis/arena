@@ -28,22 +28,6 @@ export const init = (app) => {
   // ====== READ - Chains
 
   app.get(
-    '/survey/:surveyId/processing-chains/count',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
-
-        const count = await AnalysisService.countChains({ surveyId, cycle })
-
-        res.json(count)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
     '/survey/:surveyId/processing-chains',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
@@ -53,6 +37,22 @@ export const init = (app) => {
         const list = await AnalysisService.fetchChains({ surveyId, cycle, offset, limit })
 
         res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/processing-chains/count',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
+
+        const count = await AnalysisService.countChains({ surveyId, cycle })
+
+        res.json(count)
       } catch (error) {
         next(error)
       }
@@ -115,7 +115,7 @@ export const init = (app) => {
 
   // === GENERATE R SCRIPTS
   app.get(
-    '/survey/:surveyId/processing-chain/:chainUuid/script',
+    '/survey/:surveyId/chain/:chainUuid/script',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -131,7 +131,7 @@ export const init = (app) => {
   )
 
   // === Download R SCRIPTS
-  app.get('/survey/:surveyId/processing-chain/:chainUuid/script/public', async (req, res, next) => {
+  app.get('/survey/:surveyId/chain/:chainUuid/script/public', async (req, res, next) => {
     try {
       const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
       if (!AnalysisService.checkRStudioToken({ token, chainUuid })) Response.sendErr()

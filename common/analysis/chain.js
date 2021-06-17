@@ -57,7 +57,7 @@ export const getChainNodeDefsInEntity =
   ({ entity }) =>
   (chain) => {
     const chainNodeDefsWithNodeDef = getChainNodeDefs(chain)
-    const chainNodeDefsInEntity = (chainNodeDefsWithNodeDef || []).filter(
+    const chainNodeDefsInEntity = chainNodeDefsWithNodeDef.filter(
       (chainNodeDef) =>
         NodeDef.getParentUuid(chainNodeDef) === NodeDef.getUuid(entity) &&
         NodeDef.getChainUuid(chainNodeDef) === getUuid(chain)

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Chain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'

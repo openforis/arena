@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingChain from '@common/analysis/processingChain'
-import { ColumnNodeDef, TableNode, TableChainNodeDef, ViewDataNodeDef } from '@common/model/db'
+import * as Chain from '@common/analysis/chain'
+import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 /**
@@ -48,9 +48,7 @@ export default class DfResults {
   }
 
   initDf() {
-    const columnNames = ProcessingChain.getColumnsNamesInEntity({ entity: this.entity })(
-      this.chain
-    )
+    const columnNames = Chain.getColumnsNamesInEntity({ entity: this.entity })(this.chain)
 
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
@@ -60,7 +58,7 @@ export default class DfResults {
       ? Survey.getNodeDefParent(this.entity)(this.survey)
       : this.entity
     const setUuids = [
-      { name: TableChainNodeDef.columnSet.chainUuid, value: `'${this.rChain.chainUuid}'` },
+      { name: NodeDef.keysPropsAdvanced.chainUuid, value: `'${this.rChain.chainUuid}'` },
       {
         name: TableNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
@@ -75,7 +73,7 @@ export default class DfResults {
   }
 
   initCodeAttributes() {
-    const chainNodeDefsWithNodeDefInEntity = ProcessingChain.getChainNodeDefsInEntity({
+    const chainNodeDefsWithNodeDefInEntity = Chain.getChainNodeDefsInEntity({
       entity: this.entity,
     })(this.rChain.chain)
 
