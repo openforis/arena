@@ -19,7 +19,7 @@ const _validationsCommonProps = (defaultLang) => ({
 })
 
 const _validateChainNodeDefs = (chain) => () =>
-  (Chain.getChainNodeDefs(chain) || []).length === 0
+  Chain.getChainNodeDefs(chain).length === 0
     ? ValidationResult.newInstance(Validation.messageKeys.analysis.chainNodeDefsRequired)
     : null
 
