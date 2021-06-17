@@ -46,6 +46,7 @@ export const useSaveEdits = ({ setState }) => {
       }
       let chainNodeDef = null
       if (NodeDef.isAnalysis(nodeDefUpdated) && NodeDef.isAttribute(nodeDefUpdated)) {
+        // REVIEW
         chainNodeDef = {
           chainUuid: chain.uuid,
           nodeDefUuid: NodeDef.getUuid(nodeDefUpdated),

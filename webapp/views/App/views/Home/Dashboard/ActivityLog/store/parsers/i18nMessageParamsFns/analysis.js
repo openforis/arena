@@ -13,16 +13,6 @@ export default {
     label: _getChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.chainNodeDefCreate]: (survey) => (activityLog) => {
-    const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-    return {
-      type: NodeDef.getType(nodeDef),
-      parentName: NodeDef.getName(nodeDefParent),
-    }
-  },
-
   [ActivityLog.type.chainNodeDefPropUpdate]: (survey) => (activityLog) => {
     const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)

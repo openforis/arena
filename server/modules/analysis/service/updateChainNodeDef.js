@@ -7,7 +7,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
-const getActivityLog = ({ user, surveyId, chainNodeDef, key, value, t }) => {
+const insertActivityLog = ({ user, surveyId, chainNodeDef, key, value, t }) => {
   const content = {
     [ActivityLog.keysContent.uuid]: chainNodeDef.uuid,
     [ActivityLog.keysContent.chainUuid]: chainNodeDef.chainUuid,
@@ -27,10 +27,10 @@ export const updateChainNodeDef = async ({ user, surveyId, chainNodeDef, newInde
 
     // activity log for each updated prop
     const activityLogs = Object.entries(propsToUpdate).map(([key, value]) =>
-      getActivityLog({ user, surveyId, chainNodeDef, key, value, t })
+      insertActivityLog({ user, surveyId, chainNodeDef, key, value, t })
     )
     if (newIndex !== null) {
-      activityLogs.push(getActivityLog({ user, surveyId, chainNodeDef, key: 'index', value: newIndex, t }))
+      activityLogs.push(insertActivityLog({ user, surveyId, chainNodeDef, key: 'index', value: newIndex, t }))
     }
 
     return t.batch([
