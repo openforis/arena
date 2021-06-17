@@ -15,7 +15,6 @@ export default {
   [ActivityLog.type.chainCreate]: _isChainDeleted,
   [ActivityLog.type.chainPropUpdate]: _isChainDeleted,
 
-  [ActivityLog.type.chainNodeDefCreate]: _isChainNodeDefDeleted,
   [ActivityLog.type.chainNodeDefPropUpdate]: _isChainNodeDefDeleted,
 
   [ActivityLog.type.chainStatusExecSuccess]: _isChainDeleted,
