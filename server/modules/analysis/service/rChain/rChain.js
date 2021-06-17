@@ -58,7 +58,6 @@ class RChain {
     this._entities = []
     this._entitiesWithChainNodeDef = []
     this._rChainNodeDefs = []
-    this._rChainNodeDefsWithNodeDef = []
   }
 
   get surveyId() {
@@ -129,10 +128,6 @@ class RChain {
     return this._rChainNodeDefs
   }
 
-  get chainNodeDefsWithNodeDef() {
-    return this._rChainNodeDefsWithNodeDef
-  }
-
   async _initEntities() {
     // GET entities in survey in order
     const { root } = Survey.getHierarchy()(this._survey)
@@ -149,21 +144,15 @@ class RChain {
 
   async _initChainNodeDefs() {
     const chainNodeDefs = Chain.getChainNodeDefs(this._chain)
-    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
-      ...chainNodeDef,
-      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(this._survey),
-    }))
-
     this._rChainNodeDef = chainNodeDefs
-    this._rChainNodeDefsWithNodeDef = chainNodeDefsWithNodeDef
   }
 
   async _initEntitiesWithChainNodeDefs() {
     const entitiesWithChainNodeDef = []
 
     await PromiseUtils.each(this.entities, async (entity) => {
-      const chainNodeDefsInEntity = this.chainNodeDefsWithNodeDef.filter(
-        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
+      const chainNodeDefsInEntity = this.chainNodeDefs.filter(
+        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
       )
 
       if (chainNodeDefsInEntity.length > 0) {
@@ -230,8 +219,8 @@ class RChain {
 
   async _initChainNodeDefsFiles() {
     await PromiseUtils.each(this.entitiesWithChainNodeDef, async (entity, entityIndex) => {
-      const chainNodeDefsInEntity = this.chainNodeDefsWithNodeDef.filter(
-        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
+      const chainNodeDefsInEntity = this.chainNodeDefs.filter(
+        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
       )
 
       if (chainNodeDefsInEntity.length > 0) {
@@ -239,19 +228,19 @@ class RChain {
         await FileUtils.mkdir(entityPath)
 
         // create ChainNodeDefs files
-        await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef, chainNodeDefIndex) => {
-          this._scriptIndexNext = chainNodeDefIndex + 1
+        await PromiseUtils.each(chainNodeDefsInEntity, async (nodeDef, nodeDefIndex) => {
+          this._scriptIndexNext = nodeDefIndex + 1
 
-          let attributeName = NodeDef.getName(chainNodeDef.nodeDef)
+          let attributeName = NodeDef.getName(nodeDef)
 
           const rFile = new RFile(this, entityPath, attributeName)
 
           await rFile.init()
 
-          const { script } = chainNodeDef
+          const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
           const entityName = NodeDef.getName(entity)
 
-          if (NodeDef.isCode(chainNodeDef.nodeDef)) {
+          if (NodeDef.isCode(nodeDef)) {
             attributeName = `${attributeName}_code`
           }
 

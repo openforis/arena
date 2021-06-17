@@ -45,10 +45,6 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     this.columnsNames = columnsNames
   }
 
-  get chainNodeDefsWithNodeDef() {
-    return this.chain.chain_node_defs
-  }
-
   get chainNodeDefsInEnity() {
     return this.chainNodeDefsInEntity
   }

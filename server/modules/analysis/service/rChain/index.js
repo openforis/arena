@@ -108,25 +108,22 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
     })
 
     const chainNodeDefs = Chain.getChainNodeDefs(chain)
-    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
-      ...chainNodeDef,
-      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),
-    }))
 
     await PromiseUtils.each(entities, async (entity, entityIndex) => {
-      const chainNodeDefsInEntity = chainNodeDefsWithNodeDef.filter(
-        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
+      const chainNodeDefsInEntity = chainNodeDefs.filter(
+        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
       )
 
       if (chainNodeDefsInEntity.length > 0) {
-        await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef) => {
-          const chainNodeDefName = NodeDef.getName(chainNodeDef.nodeDef)
+        await PromiseUtils.each(chainNodeDefsInEntity, async (nodeDef) => {
+          const nodeDefName = NodeDef.getName(nodeDef)
 
           const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
 
-          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, chainNodeDefName)))?.trim()
+          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
-          await ChainNodeDefRepository.updateScript({ surveyId, uuid: chainNodeDef.uuid, newSript: script }, tx)
+          // TO UPDATE
+          await ChainNodeDefRepository.updateScript({ surveyId, uuid: NodeDef.getUuid(nodeDef), newSript: script }, tx)
         })
       }
     })

@@ -6,24 +6,48 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { useSurvey, NodeDefsActions } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
 
-const ChainNodeDef = (props) => {
-  const { chainNodeDef: nodeDef } = props
+const ChainNodeDef = ({ nodeDefUuid }) => {
+  const survey = useSurvey()
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const chain = useChain()
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
 
-  const updateChainNodeDef = (chainNodeDefUpdate) =>
-    dispatch(ChainActions.updateChainNodeDef({ chainNodeDef: chainNodeDefUpdate, chainUuid: chain.uuid }))
+  const updateChainNodeDef = () => {
+    const newNodeDef = {
+      ...nodeDef,
+      [NodeDef.keys.propsAdvanced]: {
+        ...NodeDef.getPropsAdvanced(nodeDef),
+        ...NodeDef.getPropsAdvancedDraft(nodeDef),
+        [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
+      },
+    }
+
+    dispatch(
+      NodeDefsActions.putNodeDefProps({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        parentUuid: NodeDef.getParentUuid(nodeDef),
+        props: { ...NodeDef.getProps(nodeDef), ...NodeDef.getPropsDraft(nodeDef) },
+        propsAdvanced: {
+          ...NodeDef.getPropsAdvanced(nodeDef),
+          ...NodeDef.getPropsAdvancedDraft(nodeDef),
+          [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
+        },
+      })
+    )
+
+    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
+  }
 
   return (
     <div className={classNames('chain-node-def', { deleted: nodeDefDeleted })}>
@@ -41,9 +65,7 @@ const ChainNodeDef = (props) => {
         <InputSwitch
           checked={!nodeDefDeleted && NodeDef.getActive(nodeDef)}
           disabled={nodeDefDeleted}
-          onChange={(active) => {
-            updateChainNodeDef({ ...nodeDef, props: { ...nodeDef.props, active } })
-          }}
+          onChange={updateChainNodeDef}
         />
       </div>
       <div>
@@ -60,7 +82,7 @@ const ChainNodeDef = (props) => {
 }
 
 ChainNodeDef.propTypes = {
-  chainNodeDef: PropTypes.object.isRequired,
+  nodeDefUuid: PropTypes.string.isRequired,
 }
 
 export { ChainNodeDef }
