@@ -1,7 +1,7 @@
 import './ChainNodeDefs.scss'
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import * as Chain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import * as NodeDef from '@core/survey/nodeDef'
 import { ChainActions, useChainEntityDefUuid } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'

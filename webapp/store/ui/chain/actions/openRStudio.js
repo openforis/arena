@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as ProcessUtils from '@core/processUtils'
-import * as Chain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import * as User from '@core/user/user'
 
@@ -74,7 +74,7 @@ export const openRStudio = ({ chain }) => async (dispatch, getState) => {
   dispatch(LoaderActions.hideLoader())
   dispatch(
     DialogConfirmActions.showDialogConfirm({
-      key: 'processingChainView.copyRStudioCode',
+      key: 'chainView.copyRStudioCode',
       params: { rStudioCode },
       onOk: () => {
         _copyRStudioCode({ rStudioCode })

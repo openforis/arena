@@ -5,7 +5,7 @@ import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -152,7 +152,7 @@ export const fetch = async ({
       
       -- analysis activities keys
       chain.uuid AS chain_uuid,
-      chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
+      chain.props->'${Chain.keysProps.labels}' AS processing_chain_labels,
       chain_node_def.index AS chain_node_def_index
     FROM
       log_limited AS l

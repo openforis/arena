@@ -1,5 +1,5 @@
 import * as PromiseUtils from '@core/promiseUtils'
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 import { db } from '../../../../db/db'
@@ -107,7 +107,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       }
     })
 
-    const chainNodeDefs = ProcessingChain.getChainNodeDefs(chain)
+    const chainNodeDefs = Chain.getChainNodeDefs(chain)
     const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
       ...chainNodeDef,
       nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),

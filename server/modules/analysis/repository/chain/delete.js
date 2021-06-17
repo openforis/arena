@@ -1,7 +1,9 @@
 import * as DB from '../../../../db'
 
-import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import { TableChain } from '../../../../../common/model/db'
+
+
 
 /**
  * Delete processing chain(s) according to query parameters.

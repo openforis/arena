@@ -4,7 +4,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -148,7 +148,7 @@ class RChain {
   }
 
   async _initChainNodeDefs() {
-    const chainNodeDefs = ProcessingChain.getChainNodeDefs(this._chain)
+    const chainNodeDefs = Chain.getChainNodeDefs(this._chain)
     const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
       ...chainNodeDef,
       nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(this._survey),
@@ -198,7 +198,7 @@ class RChain {
     // Init dirs
     const surveyInfo = Survey.getSurveyInfo(this.survey)
     const surveyName = Survey.getName(surveyInfo)
-    const chainLabel = ProcessingChain.getLabel(Survey.getDefaultLanguage(surveyInfo))(this.chain)
+    const chainLabel = Chain.getLabel(Survey.getDefaultLanguage(surveyInfo))(this.chain)
     this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, surveyName, chainLabel)
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)

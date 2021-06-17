@@ -45,7 +45,7 @@ export const useNodeDefDetails = () => {
     if (editingFromDesigner) {
       history.goBack()
     } else {
-      history.push(appModuleUri(analysisModules.processingChains))
+      history.push(appModuleUri(analysisModules.chains))
     }
   }, [surveyCycleKey])
 

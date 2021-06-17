@@ -5,7 +5,6 @@ import * as Response from '@server/utils/response'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
-
   // ====== UPDATE
 
   app.put(

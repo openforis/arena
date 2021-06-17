@@ -1,5 +1,5 @@
-import * as Chain from '@common/analysis/processingChain'
-import * as ChainValidator from '@common/analysis/processingChainValidator'
+import * as Chain from '@common/analysis/chain'
+import * as ChainValidator from '@common/analysis/chainValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'

@@ -4,7 +4,7 @@ import * as DB from '../../../../db'
 
 import * as ObjectUtils from '../../../../../core/objectUtils'
 import { TableChain } from '../../../../../common/model/db'
-import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 export const transformCallback = (row) => {
   if (!row) return {}

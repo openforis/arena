@@ -1,6 +1,6 @@
 import * as pgPromise from 'pg-promise'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import { db } from '@server/db/db'
 import { TableDataNodeDef } from '@common/model/db'
@@ -17,7 +17,7 @@ import { TableDataNodeDef } from '@common/model/db'
 export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycle }, client = db) => {
   const tableData = new TableDataNodeDef(survey, entity)
 
-  const columnsNames = ProcessingChain.getColumnsNamesInEntity({ entity })(chain)
+  const columnsNames = Chain.getColumnsNamesInEntity({ entity })(chain)
   return client.query(
     `UPDATE ${tableData.nameQualified}
     SET 

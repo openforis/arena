@@ -27,37 +27,29 @@ export const init = (app) => {
 
   // ====== READ - Chains
 
-  app.get(
-    '/survey/:surveyId/processing-chains/count',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
+  app.get('/survey/:surveyId/chains/count', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
 
-        const count = await AnalysisService.countChains({ surveyId, cycle })
+      const count = await AnalysisService.countChains({ surveyId, cycle })
 
-        res.json(count)
-      } catch (error) {
-        next(error)
-      }
+      res.json(count)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
-  app.get(
-    '/survey/:surveyId/processing-chains',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey: cycle, offset, limit } = Request.getParams(req)
+  app.get('/survey/:surveyId/chains', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, surveyCycleKey: cycle, offset, limit } = Request.getParams(req)
 
-        const list = await AnalysisService.fetchChains({ surveyId, cycle, offset, limit })
+      const list = await AnalysisService.fetchChains({ surveyId, cycle, offset, limit })
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ list })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // ====== READ - Chain
 

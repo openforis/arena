@@ -8,9 +8,9 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 
-export default class ProcessingChainsCyclesCheckJob extends Job {
+export default class chainsCyclesCheckJob extends Job {
   constructor(params) {
-    super(ProcessingChainsCyclesCheckJob.type, params)
+    super(chainsCyclesCheckJob.type, params)
   }
 
   async execute() {
@@ -48,4 +48,4 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
   }
 }
 
-ProcessingChainsCyclesCheckJob.type = 'ProcessingChainsCyclesCheckJob'
+chainsCyclesCheckJob.type = 'chainsCyclesCheckJob'

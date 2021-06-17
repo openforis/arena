@@ -5,7 +5,7 @@ import * as DB from '../../../../db'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import { TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 
@@ -61,7 +61,7 @@ export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusE
       ),
     ]
     if (statusExec === Chain.statusExec.success) {
-      const type = ActivityLog.type.processingChainStatusExecSuccess
+      const type = ActivityLog.type.chainStatusExecSuccess
       const content = { [ActivityLog.keysContent.uuid]: chainUuid }
       promises.push(ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
     }
@@ -110,7 +110,7 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
     }
     return tx.batch([
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
       markSurveyDraft(surveyId, tx),
     ])
   })

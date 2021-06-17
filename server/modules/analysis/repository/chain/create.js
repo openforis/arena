@@ -1,6 +1,6 @@
 import { DB, BaseProtocol } from '@openforis/arena-server'
 
-import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import { TableChain } from '../../../../../common/model/db'
 import { transformCallback } from './read'
 
