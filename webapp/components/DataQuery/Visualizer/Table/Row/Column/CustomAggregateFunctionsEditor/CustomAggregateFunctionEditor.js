@@ -5,11 +5,10 @@ import * as StringUtils from '@core/stringUtils'
 import { useI18n } from '@webapp/store/system'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonSave } from '@webapp/components/ButtonSave'
-import { ButtonCancel } from '@webapp/components/ButtonCancel'
+import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
 
 export const CustomAggregateFunctionEditor = (props) => {
-  const { fn, onSave, onCancel } = props
+  const { fn, onCancel, onDelete, onSave } = props
 
   const [name, setName] = useState(fn.name)
   const [expression, setExpression] = useState(fn.expression)
@@ -29,6 +28,7 @@ export const CustomAggregateFunctionEditor = (props) => {
       <div className="button-bar">
         <ButtonSave onClick={() => onSave({ uuid, name, expression, placeholder })} />
         <ButtonCancel onClick={() => onCancel(fn)} />
+        {!placeholder && <ButtonDelete onClick={() => onDelete(fn)} />}
       </div>
     </div>
   )

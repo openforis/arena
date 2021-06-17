@@ -4,10 +4,14 @@ import PropTypes from 'prop-types'
 import { Button } from './Button'
 
 export const ButtonNew = (props) => {
-  const { onClick } = props
+  const { disabled, id, onClick, testId } = props
 
   return (
     <Button
+      id={id}
+      data-testid={testId}
+      disabled={disabled}
+      aria-disabled={disabled}
       className="btn-primary"
       iconClassName="icon-plus icon-12px icon-left"
       label="common.new"
@@ -17,5 +21,14 @@ export const ButtonNew = (props) => {
 }
 
 ButtonNew.propTypes = {
+  disabled: PropTypes.bool,
+  id: PropTypes.string,
   onClick: PropTypes.func.isRequired,
+  testId: PropTypes.string,
+}
+
+ButtonNew.defaultProps = {
+  disabled: false,
+  id: null,
+  testId: null,
 }

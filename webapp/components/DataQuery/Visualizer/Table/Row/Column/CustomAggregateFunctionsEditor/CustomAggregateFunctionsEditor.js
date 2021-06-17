@@ -1,17 +1,21 @@
 import './CustomAggregateFunctionsEditor.scss'
 
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+
 import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { ButtonNew } from '@webapp/components/ButtonNew'
+import { ButtonNew } from '@webapp/components'
 import { CustomAggregateFunctionEditor } from './CustomAggregateFunctionEditor'
 import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 
 export const CustomAggregateFunctionsEditor = (props) => {
   const { selectedUuids, onSelectionChange } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
 
   const [customAggregateFunctions, setCustomAggregateFunctions] = useState([
@@ -44,6 +48,21 @@ export const CustomAggregateFunctionsEditor = (props) => {
     setEditedUuid(null)
   }
 
+  const onDelete = (fnToDelete) => {
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'dataExplorerView.customAggregateFunction.confirmDelete',
+        onOk: async () => {
+          const fnIndex = customAggregateFunctions.findIndex((fn) => fn.uuid === fnToDelete.uuid)
+          const functionsUpdated = [...customAggregateFunctions]
+          functionsUpdated.splice(fnIndex, 1)
+          setCustomAggregateFunctions(functionsUpdated)
+          setEditedUuid(null)
+        },
+      })
+    )
+  }
+
   return (
     <fieldset className="custom-aggregate-functions">
       <legend>Custom aggregate functions</legend>
@@ -62,7 +81,13 @@ export const CustomAggregateFunctionsEditor = (props) => {
               return (
                 <div className="table__row">
                   {editing ? (
-                    <CustomAggregateFunctionEditor key={uuid} fn={fn} onSave={onSave} onCancel={onEditCancel} />
+                    <CustomAggregateFunctionEditor
+                      key={uuid}
+                      fn={fn}
+                      onCancel={onEditCancel}
+                      onDelete={onDelete}
+                      onSave={onSave}
+                    />
                   ) : (
                     <CustomAggregateFunctionViewer
                       fn={fn}

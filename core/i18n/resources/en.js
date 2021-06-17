@@ -340,9 +340,16 @@ Do you want to proceed?`,
     sessionExpired: 'Record session has expired',
   },
 
+  dataExplorerView: {
+    customAggregateFunction: {
+      confirmDelete: 'Delete this custom aggregate function?',
+    },
+  },
+
   dataExportView: {
     startCsvExport: 'Start CSV export',
   },
+
   dataView: {
     records: {
       owner: 'Owner',
