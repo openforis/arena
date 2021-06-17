@@ -44,7 +44,7 @@ const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl }) =>
   `
   url <- '${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/processing-chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}';\n
+  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}';\n
   download.file(url,"./${token}.zip");\n
   unzip("./${token}.zip",exdir=".");\n
   file.remove("./${token}.zip");\n
@@ -52,34 +52,36 @@ const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl }) =>
 
 const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
-export const openRStudio = ({ chain }) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const user = UserState.getUser(state)
-  const userUuid = User.getUuid(user)
+export const openRStudio =
+  ({ chain }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+    const user = UserState.getUser(state)
+    const userUuid = User.getUuid(user)
 
-  dispatch(LoaderActions.showLoader())
+    dispatch(LoaderActions.showLoader())
 
-  const config = { params: { surveyCycleKey } }
-  const chainUuid = Chain.getUuid(chain)
-  const { data } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}/script`, config)
+    const config = { params: { surveyCycleKey } }
+    const chainUuid = Chain.getUuid(chain)
+    const { data } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
-  const rStudioUrl = await _getRStudioUrl({ userUuid })
+    const rStudioUrl = await _getRStudioUrl({ userUuid })
 
-  const { token, serverUrl } = data
+    const { token, serverUrl } = data
 
-  const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl })
+    const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl })
 
-  dispatch(LoaderActions.hideLoader())
-  dispatch(
-    DialogConfirmActions.showDialogConfirm({
-      key: 'chainView.copyRStudioCode',
-      params: { rStudioCode },
-      onOk: () => {
-        _copyRStudioCode({ rStudioCode })
-        window.open(rStudioUrl, 'rstudio')
-      },
-    })
-  )
-}
+    dispatch(LoaderActions.hideLoader())
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'chainView.copyRStudioCode',
+        params: { rStudioCode },
+        onOk: () => {
+          _copyRStudioCode({ rStudioCode })
+          window.open(rStudioUrl, 'rstudio')
+        },
+      })
+    )
+  }
