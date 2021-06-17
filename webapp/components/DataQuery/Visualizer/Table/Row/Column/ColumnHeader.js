@@ -15,6 +15,7 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 import PanelRight from '@webapp/components/PanelRight'
 
 import { useColumn } from './store'
+import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor/CustomAggregateFunctionsEditor'
 
 const getColLabelKey = ({ colName, nodeDef }) => {
   const col = ColumnNodeDef.extractColName({ nodeDef, colName })
@@ -34,6 +35,7 @@ const ColumnHeader = (props) => {
     isMeasure,
     aggregateFunctions,
     customAggregateFunction,
+    customAggregateFunctionUuids,
     noCols,
     widthInner,
     widthOuter,
@@ -99,7 +101,7 @@ const ColumnHeader = (props) => {
           header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
           onClose={() => setShowAggregateFunctionsPanel(false)}
         >
-          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
+          {Object.keys(Query.DEFAULT_AGGREGATE_FUNCTIONS).map((aggregateFn) => (
             <button
               key={aggregateFn}
               type="button"
@@ -111,6 +113,13 @@ const ColumnHeader = (props) => {
               {i18n.t(`common.${aggregateFn}`)}
             </button>
           ))}
+          <CustomAggregateFunctionsEditor
+            selectedUuids={customAggregateFunctionUuids}
+            onSelectionChange={(selection) => {
+              const { uuid } = selection
+              onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn: uuid })(query))
+            }}
+          />
         </PanelRight>
       )}
     </div>

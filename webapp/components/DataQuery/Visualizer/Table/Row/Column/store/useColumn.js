@@ -16,10 +16,15 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
       aggregateFunctions.map((aggregateFn) => `${ColumnNodeDef.getColName(nodeDef)}_${aggregateFn}`)
     : ColumnNodeDef.getColNames(nodeDef)
 
+  // TODO check where and how it's used
   const customAggregateFunction =
-    isMeasure && !Object.values(Query.aggregateFunctions).includes(aggregateFunctions[0])
+    isMeasure && !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFunctions[0])
       ? aggregateFunctions[0].clause
       : null
+
+  const customAggregateFunctionUuids = isMeasure
+    ? aggregateFunctions.filter((fn) => !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(fn))
+    : []
 
   const noCols = modeEdit ? NodeDefUIProps.getFormFields(nodeDef).length : colNames.length
 
@@ -32,6 +37,7 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
     isMeasure,
     aggregateFunctions,
     customAggregateFunction,
+    customAggregateFunctionUuids,
     noCols,
     widthInner,
     widthOuter,

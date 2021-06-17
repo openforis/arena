@@ -7,12 +7,12 @@ import { Query } from '../../query'
 import SqlSelectBuilder from './sqlSelectBuilder'
 
 const sqlFunctionByAggregateFunction = {
-  [Query.aggregateFunctions.avg]: 'AVG',
-  [Query.aggregateFunctions.cnt]: 'COUNT',
-  [Query.aggregateFunctions.max]: 'MAX',
-  [Query.aggregateFunctions.med]: 'MEDIAN',
-  [Query.aggregateFunctions.min]: 'MIN',
-  [Query.aggregateFunctions.sum]: 'SUM',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.avg]: 'AVG',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt]: 'COUNT',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.max]: 'MAX',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.med]: 'MEDIAN',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.min]: 'MIN',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.sum]: 'SUM',
 }
 
 /**
