@@ -77,6 +77,9 @@ export const canViewUser = (user, surveyInfo, userToView) => {
   )
 }
 
+export const canViewOtherUsersEmail = ({ user, surveyInfo }) =>
+  User.isSystemAdmin(user) || canInviteUsers(user, surveyInfo)
+
 // EDIT
 const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
   User.isSystemAdmin(user) ||
