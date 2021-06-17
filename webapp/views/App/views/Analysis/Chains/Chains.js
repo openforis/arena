@@ -25,7 +25,7 @@ const ChainsView = () => {
       className="chains"
       gridTemplateColumns="30px repeat(4, 1fr) repeat(2, 80px) 50px"
       headerLeftComponent={HeaderLeft}
-      module="chains"
+      module="processing-chains"
       onRowClick={onRowClick}
       restParams={{ surveyCycleKey }}
       rowHeaderComponent={RowHeader}
