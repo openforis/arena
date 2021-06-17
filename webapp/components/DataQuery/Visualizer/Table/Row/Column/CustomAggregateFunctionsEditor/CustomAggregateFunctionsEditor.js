@@ -1,67 +1,48 @@
 import './CustomAggregateFunctionsEditor.scss'
 
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import { uuidv4 } from '@core/uuid'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
-import Checkbox from '@webapp/components/form/checkbox'
-import * as StringUtils from '@core/stringUtils'
 
-const CustomAggregateFunctionEditor = (props) => {
-  const { fn, onFnChange, onCancel } = props
-
-  const [name, setName] = useState(fn.name)
-  const [expression, setExpression] = useState(fn.expression)
-
-  const i18n = useI18n()
-
-  return (
-    <div className="form">
-      <FormItem label={i18n.t('common.name')}>
-        <Input value={name} onChange={(value) => setName(StringUtils.normalizeName(value))} />
-      </FormItem>
-      <FormItem label={i18n.t('common.expression')}>
-        <textarea rows="4" value={expression} onChange={(e) => setExpression(e.target.value)} />
-      </FormItem>
-      <div className="button-bar">
-        <button type="button" className="btn btn-primary" onClick={() => onFnChange({ name, expression })}>
-          <span className="icon icon-floppy-disk icon-left icon-12px" />
-          {i18n.t('common.save')}
-        </button>
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>
-          {i18n.t('common.cancel')}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-const CustomAggregateFunctionViewer = ({ fn, selected, onSelectionChange, setEditedUuid }) => {
-  const { name, uuid } = fn
-  return (
-    <>
-      <div>
-        <Checkbox checked={selected} onChange={() => onSelectionChange({ [uuid]: !selected })} />
-      </div>
-      <div className="ellipsis">{name}</div>
-      <button type="button" onClick={() => setEditedUuid(uuid)}>
-        <span className="icon icon-pencil2 icon-14px" />
-      </button>
-    </>
-  )
-}
+import { ButtonNew } from '@webapp/components/ButtonNew'
+import { CustomAggregateFunctionEditor } from './CustomAggregateFunctionEditor'
+import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 
 export const CustomAggregateFunctionsEditor = (props) => {
   const { selectedUuids, onSelectionChange } = props
 
   const i18n = useI18n()
 
-  const customAggregateFunctions = [
+  const [customAggregateFunctions, setCustomAggregateFunctions] = useState([
     { uuid: '123456', name: 'test_1' },
     { uuid: '1234567', name: 'test_2' },
-  ]
+  ])
   const [editedUuid, setEditedUuid] = useState(null)
+
+  const onNewClick = () => {
+    const newFn = { uuid: uuidv4(), name: '', expression: '', placeholder: true }
+    setCustomAggregateFunctions([...customAggregateFunctions, newFn])
+    setEditedUuid(newFn.uuid)
+  }
+
+  const onSave = (fnUpdated) => {
+    const { placeholder, ...fnToSave } = fnUpdated
+    const fnIndex = customAggregateFunctions.findIndex((fn) => fn.uuid === fnToSave.uuid)
+    const functionsUpdated = [...customAggregateFunctions]
+    functionsUpdated.splice(fnIndex, 1, fnToSave)
+    setCustomAggregateFunctions(functionsUpdated)
+    setEditedUuid(null)
+  }
+
+  const onEditCancel = (fn) => {
+    const { uuid, placeholder } = fn
+    if (placeholder) {
+      const functionsUpdated = customAggregateFunctions.filter((f) => f.uuid !== uuid)
+      setCustomAggregateFunctions(functionsUpdated)
+    }
+    setEditedUuid(null)
+  }
 
   return (
     <fieldset className="custom-aggregate-functions">
@@ -81,12 +62,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
               return (
                 <div className="table__row">
                   {editing ? (
-                    <CustomAggregateFunctionEditor
-                      key={uuid}
-                      fn={fn}
-                      onFnChange={(fnUpdated) => setEditedUuid(null)}
-                      onCancel={() => setEditedUuid(null)}
-                    />
+                    <CustomAggregateFunctionEditor key={uuid} fn={fn} onSave={onSave} onCancel={onEditCancel} />
                   ) : (
                     <CustomAggregateFunctionViewer
                       fn={fn}
@@ -101,6 +77,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
           </div>
         </div>
       </div>
+      <ButtonNew onClick={onNewClick} />
     </fieldset>
   )
 }
