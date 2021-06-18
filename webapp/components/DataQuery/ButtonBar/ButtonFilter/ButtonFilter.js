@@ -7,11 +7,15 @@ import { Query } from '@common/model/query'
 import Tooltip from '@webapp/components/tooltip'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
+import { useI18n } from '@webapp/store/system'
 
 import { State } from '../store'
 
 const ButtonFilter = (props) => {
   const { disabled, query, onChangeQuery, state, Actions } = props
+
+  const i18n = useI18n()
+
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -20,6 +24,7 @@ const ButtonFilter = (props) => {
       <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
         <button
           type="button"
+          title={i18n.t('dataView.filter')}
           className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
           onClick={Actions.togglePanelFilter}
           aria-disabled={disabled}
