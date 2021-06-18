@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 // ==== CREATE
-export const createAccessRequest = async ({ accessRequest }) => {
+export const createAccessRequest = async ({ accessRequest: accessRequestParam }) => {
   const {
-    data: { accessRequest: accessRequestInserted },
-  } = await axios.post(`/api/user/request-access`, accessRequest)
+    data: { accessRequest, error, validation },
+  } = await axios.post(`/api/user/request-access`, accessRequestParam)
 
-  return accessRequestInserted
+  return { accessRequest, error, validation }
 }

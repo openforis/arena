@@ -1,19 +1,32 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
+import * as API from '@webapp/service/api'
 
 const AccessRequest = () => {
   const dispatch = useDispatch()
+  const history = useHistory()
   const i18n = useI18n()
 
   const [request, setRequest] = useState({})
 
   const onSubmit = () => {
-    const onSubmitConfirm = () => {}
+    const onSubmitConfirm = async () => {
+      const { error, validation } = await API.createAccessRequest({ accessRequest: request })
+      if (error) {
+        dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error } }))
+      } else {
+        dispatch(
+          NotificationActions.notifyInfo({ key: 'accessRequestView.requestSent', params: { email: request.email } })
+        )
+        history.goBack()
+      }
+    }
 
     dispatch(
       DialogConfirmActions.showDialogConfirm({
