@@ -343,13 +343,21 @@ Do you want to proceed?`,
     startCsvExport: 'Start CSV export',
   },
   dataView: {
+    aggregateMode: 'Aggregate Mode',
+    editMode: 'Edit Mode',
+    filter: 'Filter records',
+    invalidRecord: 'Invalid record',
+    nodeDefsSelector: {
+      hide: 'Hide Node Definitions Selector',
+      show: 'Show Node Definitions Selector',
+    },
     records: {
       owner: 'Owner',
       step: 'Step',
       noRecordsAdded: 'No records added',
     },
     rowNum: 'Row #',
-    invalidRecord: 'Invalid record',
+    sort: 'Sort records',
     dataVis: {
       noData: 'This query returned no data',
     },
