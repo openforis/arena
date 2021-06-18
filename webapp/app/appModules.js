@@ -9,6 +9,9 @@ export const guestModules = {
   forgotPassword: {
     path: `/${guest}/forgotPassword/`,
   },
+  accessRequest: {
+    path: `/${guest}/accessRequest/`,
+  },
 }
 
 // ==== Logged in modules

@@ -53,6 +53,16 @@ export const init = (app) => {
     }
   })
 
+  app.post('/user/request-access', async (req, res, next) => {
+    try {
+      // const accessRequest = Request.getBody(req)
+
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== READ
 
   const _getUser = async (req, res) => {
