@@ -12,7 +12,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
     const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
-    const cols = [`?${TableDataNodeDef.columnSet.recordUuid}`, ...(columnNames || [])]
+    const cols = [`?${TableDataNodeDef.columnSet.recordUuid}`, ...columnNames]
     const tabletNode = new TableDataNodeDef(survey, entity)
 
     super(
@@ -31,7 +31,6 @@ export default class MassiveUpdateData extends MassiveUpdate {
     this.nodeDefsByColumnName = nodeDefsByColumnName
     this.columnNames = columnNames
   }
-
 
   async push(rowResult) {
     const insertValues = (this.columnNames || []).reduce(
