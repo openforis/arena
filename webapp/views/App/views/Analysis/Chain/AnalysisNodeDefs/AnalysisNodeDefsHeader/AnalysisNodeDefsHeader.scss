@@ -1,17 +1,17 @@
 @import 'webapp/style/vars';
 
-.chain-node-defs-header {
+.analysis-node-defs-header {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-column-gap: 64px;
   align-items: center;
 }
 
-.chain-node-defs__header-label {
+.analysis-node-defs__header-label {
   font-weight: 600;
 }
 
-.chain-node-defs-header__buttons {
+.analysis-node-defs-header__buttons {
   background-color: rgba($greyBorder, 0.6);
   display: flex;
   align-items: center;

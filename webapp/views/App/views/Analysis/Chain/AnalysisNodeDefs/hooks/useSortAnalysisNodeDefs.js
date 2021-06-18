@@ -4,17 +4,15 @@ import { Sortable } from '@shopify/draggable'
 import * as NodeDef from '@core/survey/nodeDef'
 import { NodeDefsActions } from '@webapp/store/survey'
 
-export const useSortChainNodeDefs = ({ chainNodeDefsRef, chainNodeDefs = [] }) => {
+export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs = [] }) => {
   const dispatch = useDispatch()
 
   const sortableRef = useRef(null)
 
-  const updateChainNodeDef = ({ nodeDef, newIndex }) => {
+  const updateAnalysisNodeDef = ({ nodeDef, newIndex }) => {
     const newNodeDef = {
       ...nodeDef,
       [NodeDef.keys.propsAdvanced]: {
-        ...NodeDef.getPropsAdvanced(nodeDef),
-        ...NodeDef.getPropsAdvancedDraft(nodeDef),
         [NodeDef.keysPropsAdvanced.index]: newIndex,
       },
     }
@@ -23,8 +21,7 @@ export const useSortChainNodeDefs = ({ chainNodeDefsRef, chainNodeDefs = [] }) =
       NodeDefsActions.putNodeDefProps({
         nodeDefUuid: NodeDef.getUuid(nodeDef),
         parentUuid: NodeDef.getParentUuid(nodeDef),
-        props: { ...NodeDef.getProps(nodeDef), ...NodeDef.getPropsDraft(nodeDef) },
-        propsAdvanced: { ...NodeDef.getPropsAdvanced(newNodeDef) },
+        propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: newIndex },
       })
     )
 
@@ -32,10 +29,10 @@ export const useSortChainNodeDefs = ({ chainNodeDefsRef, chainNodeDefs = [] }) =
   }
 
   const initSortable = useCallback(() => {
-    if (chainNodeDefs.length > 0 && chainNodeDefsRef.current !== null) {
-      sortableRef.current = new Sortable(chainNodeDefsRef.current, {
-        draggable: '.chain-node-def',
-        handle: '.chain-node-def__btn-move',
+    if (analysisNodeDefs.length > 0 && analysisNodeDefsRef.current !== null) {
+      sortableRef.current = new Sortable(analysisNodeDefsRef.current, {
+        draggable: '.analysis-node-def',
+        handle: '.analysis-node-def__btn-move',
         mirror: {
           appendTo: 'body',
           constrainDimensions: true,
@@ -44,17 +41,17 @@ export const useSortChainNodeDefs = ({ chainNodeDefsRef, chainNodeDefs = [] }) =
 
       sortableRef.current.on('sortable:stop', (event) => {
         const { newIndex, oldIndex } = event.data
-        const chainNodeDef = chainNodeDefs[oldIndex]
-        const newChainNodeDefs = [...chainNodeDefs]
-        newChainNodeDefs.splice(oldIndex, 1)
-        newChainNodeDefs.splice(newIndex, 0, chainNodeDef)
+        const analysisNodeDef = analysisNodeDefs[oldIndex]
+        const newAnalysisNodeDefs = [...analysisNodeDefs]
+        newAnalysisNodeDefs.splice(oldIndex, 1)
+        newAnalysisNodeDefs.splice(newIndex, 0, analysisNodeDef)
 
-        newChainNodeDefs.forEach((nodeDef, i) => {
-          updateChainNodeDef({ nodeDef, newIndex: i })
+        newAnalysisNodeDefs.forEach((nodeDef, i) => {
+          updateAnalysisNodeDef({ nodeDef, newIndex: i })
         })
       })
     }
-  }, [chainNodeDefs, chainNodeDefsRef])
+  }, [analysisNodeDefs, analysisNodeDefsRef])
 
   const destroySortable = useCallback(() => {
     if (sortableRef.current) sortableRef.current.destroy()

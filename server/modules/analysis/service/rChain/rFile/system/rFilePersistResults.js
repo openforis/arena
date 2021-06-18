@@ -26,10 +26,10 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
 }
 
 function* initPersistChainEntitiesResults() {
-  const { entitiesWithChainNodeDef } = this.rChain
+  const { entities } = this.rChain
 
-  for (let i = 0; i < entitiesWithChainNodeDef.length; i += 1) {
-    const entity = entitiesWithChainNodeDef[i]
+  for (let i = 0; i < entities.length; i += 1) {
+    const entity = entities[i]
     // TODO FIX to persist changes on scripts
     const dfResults = new DfResults(this.rChain, entity)
 

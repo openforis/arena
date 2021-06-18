@@ -18,7 +18,7 @@ import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import ButtonBar from './ButtonBar'
-import { ChainNodeDefs } from './ChainNodeDefs'
+import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 
 const ChainComponent = () => {
   const dispatch = useDispatch()
@@ -70,7 +70,7 @@ const ChainComponent = () => {
           onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
         />
 
-        <ChainNodeDefs />
+        <AnalysisNodeDefs />
       </div>
 
       <ButtonBar />

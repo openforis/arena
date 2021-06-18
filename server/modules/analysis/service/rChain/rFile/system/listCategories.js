@@ -1,16 +1,15 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as Chain from '@common/analysis/chain'
 import * as ApiRoutes from '@common/apiRoutes'
 
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
-const getCategoryUuidsInChain = ({ chain }) => {
+const getCategoryUuidsInChain = ({ chain, survey }) => {
   // Get unique category uuids for ChainNodeDefs
   const categoryUuids = new Set()
 
-  Chain.getChainNodeDefs(chain).forEach((nodeDef) => {
+  Survey.getAnalysisNodeDefs({ chain })(survey).forEach((nodeDef) => {
     if (NodeDef.isCode(nodeDef)) {
       categoryUuids.add(NodeDef.getCategoryUuid(nodeDef))
     }
@@ -65,8 +64,8 @@ export default class ListCategories {
   }
 
   initList() {
-    const { chain } = this.rChain
-    this._categoryUuids = getCategoryUuidsInChain({ chain })
+    const { chain, survey } = this.rChain
+    this._categoryUuids = getCategoryUuidsInChain({ chain, survey })
     this.initCategories()
   }
 }

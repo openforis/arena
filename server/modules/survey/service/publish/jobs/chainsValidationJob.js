@@ -1,6 +1,5 @@
 import * as Chain from '@common/analysis/chain'
 import * as ChainValidator from '@common/analysis/chainValidator'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
@@ -24,15 +23,7 @@ export default class ChainsValidationJob extends Job {
     const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
     const validations = await Promise.all(
-      chains.map(async (chain) => {
-        const _chain = {
-          ...chain,
-          [Chain.keys.chainNodeDefs]: Survey.getNodeDefsArray(survey).filter(
-            (nodeDef) => NodeDef.isAnalysis(nodeDef) && NodeDef.getChainUuid(nodeDef) === Chain.getUuid(chain)
-          ),
-        }
-        return ChainValidator.validateChain(_chain, defaultLang)
-      })
+      chains.map(async (chain) => ChainValidator.validateChain({ chain, defaultLang, survey }))
     )
     validations.forEach((validation, index) => {
       if (!Validation.isValid(validation)) {

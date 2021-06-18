@@ -1,6 +1,7 @@
 import * as pgPromise from 'pg-promise'
 
-import * as Chain from '@common/analysis/chain'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { db } from '@server/db/db'
 import { TableDataNodeDef } from '@common/model/db'
@@ -17,11 +18,13 @@ import { TableDataNodeDef } from '@common/model/db'
 export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycle }, client = db) => {
   const tableData = new TableDataNodeDef(survey, entity)
 
-  const columnsNames = Chain.getColumnsNamesInEntity({ entity })(chain)
+  const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+  const columnNames = NodeDef.getNodeDefsColumnNames(analysisNodeDefsInEntity)
+
   return client.query(
     `UPDATE ${tableData.nameQualified}
     SET 
-      ${columnsNames.map((name) => `${name} = DEFAULT `).join(',')}
+      ${columnNames.map((name) => `${name} = DEFAULT `).join(',')}
     WHERE
       ${TableDataNodeDef.columnSet.recordCycle} = $1
   `,

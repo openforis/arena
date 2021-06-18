@@ -1,11 +1,11 @@
 import * as A from '@core/arena'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Chain from '@common/analysis/chain'
 
 import * as DB from '../../../../db'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as Chain from '@common/analysis/chain'
 import { TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 

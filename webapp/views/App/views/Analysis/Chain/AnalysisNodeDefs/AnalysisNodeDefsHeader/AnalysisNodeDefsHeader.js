@@ -1,4 +1,4 @@
-import './ChainNodeDefsHeader.scss'
+import './AnalysisNodeDefsHeader.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-const ChainNodeDefsHeader = () => {
+const AnalysisNodeDefsHeader = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   const i18n = useI18n()
@@ -24,22 +24,22 @@ const ChainNodeDefsHeader = () => {
   const createNodeDef = (type) => dispatch(ChainActions.createNodeDef({ history, type }))
 
   return (
-    <div className="chain-node-defs-header">
-      <div className="chain-node-defs__header-label">{nodeDefLabel}</div>
+    <div className="analysis-node-defs-header">
+      <div className="analysis-node-defs__header-label">{nodeDefLabel}</div>
 
-      <div className="chain-node-defs-header__buttons">
+      <div className="analysis-node-defs-header__buttons">
         <div>
           {i18n.t('common.add')} <span className="icon icon-plus icon-12px" />
         </div>
         <button className="btn btn-s" onClick={() => createNodeDef(NodeDef.nodeDefType.decimal)} type="button">
-          {i18n.t('chain.quantitative')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
+          {i18n.t('analysis.quantitative')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
         </button>
         <button className="btn btn-s" onClick={() => createNodeDef(NodeDef.nodeDefType.code)} type="button">
-          {i18n.t('chain.categorical')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
+          {i18n.t('analysis.categorical')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
         </button>
       </div>
     </div>
   )
 }
 
-export { ChainNodeDefsHeader }
+export { AnalysisNodeDefsHeader }

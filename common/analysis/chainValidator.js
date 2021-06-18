@@ -3,7 +3,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as Chain from '@common/analysis/chain'
+import * as Survey from '@core/survey/survey'
 
 export const keys = {
   entityOrCategory: 'entityOrCategory',
@@ -18,13 +18,15 @@ const _validationsCommonProps = (defaultLang) => ({
   ],
 })
 
-const _validateChainNodeDefs = (chain) => () =>
-  Chain.getChainNodeDefs(chain).length === 0
-    ? ValidationResult.newInstance(Validation.messageKeys.analysis.chainNodeDefsRequired)
-    : null
+const _validateAnalysisNodeDefs =
+  ({ survey, chain }) =>
+  () =>
+    Survey.getAnalysisNodeDefs({ chain })(survey).length === 0
+      ? ValidationResult.newInstance(Validation.messageKeys.analysis.analysisNodeDefsRequired)
+      : null
 
-export const validateChain = async (chain, defaultLang) =>
+export const validateChain = async ({ chain, defaultLang, survey }) =>
   Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
-    chainNodeDefs: [_validateChainNodeDefs(chain)],
+    analysisNodeDefs: [_validateAnalysisNodeDefs({ chain, survey })],
   })

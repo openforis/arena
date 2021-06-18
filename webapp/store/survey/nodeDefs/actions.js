@@ -66,34 +66,38 @@ const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) =>
   }
 }
 
-export const putNodeDefProps = ({ nodeDefUuid, parentUuid, props, propsAdvanced }) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const cycle = SurveyState.getSurveyCycleKey(state)
+export const putNodeDefProps =
+  ({ nodeDefUuid, parentUuid, props, propsAdvanced }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const {
-    data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
-    parentUuid,
-    cycle,
-    props,
-    propsAdvanced,
-  })
+    const {
+      data: { nodeDefsValidation, nodeDefsUpdated },
+    } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
+      parentUuid,
+      cycle,
+      props,
+      propsAdvanced,
+    })
 
-  dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-}
+    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+  }
 
-export const postNodeDef = ({ nodeDef, chainNodeDef = null }) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+export const postNodeDef =
+  ({ nodeDef }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-  const {
-    data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef, chainNodeDef })
+    const {
+      data: { nodeDefsValidation, nodeDefsUpdated },
+    } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef })
 
-  dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-}
+    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+  }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
   debounceAction(
@@ -107,17 +111,19 @@ const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
   )
 
 // Updates the specified layout prop of a node def and persists the change
-export const putNodeDefLayoutProp = ({ nodeDef, key, value }) => (dispatch, getState) => {
-  const state = getState()
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const surveyUpdated = Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
-  const nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDef))(surveyUpdated)
-  dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
+export const putNodeDefLayoutProp =
+  ({ nodeDef, key, value }) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+    const surveyUpdated = Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
+    const nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDef))(surveyUpdated)
+    dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
 
-  const props = { [NodeDefLayout.keys.layout]: NodeDefLayout.getLayout(nodeDefUpdated) }
-  dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
-}
+    const props = { [NodeDefLayout.keys.layout]: NodeDefLayout.getLayout(nodeDefUpdated) }
+    dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
+  }
 
 // ==== DELETE
 
@@ -163,35 +169,37 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   return false
 }
 
-export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getState) => {
-  const state = getState()
-  const survey = SurveyState.getSurvey(state)
+export const removeNodeDef =
+  (nodeDef, history = null) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
-        onOk: async () => {
-          const surveyId = Survey.getId(survey)
-          const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+    if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
+          onOk: async () => {
+            const surveyId = Survey.getId(survey)
+            const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-          const [
-            {
-              data: { nodeDefsUpdated, nodeDefsValidation },
-            },
-          ] = await Promise.all([
-            axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
-            dispatch({ type: nodeDefDelete, nodeDef }),
-          ])
+            const [
+              {
+                data: { nodeDefsUpdated, nodeDefsValidation },
+              },
+            ] = await Promise.all([
+              axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
+              dispatch({ type: nodeDefDelete, nodeDef }),
+            ])
 
-          dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-          if (history) {
-            history.goBack()
-          }
-        },
-      })
-    )
+            dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+            if (history) {
+              history.goBack()
+            }
+          },
+        })
+      )
+    }
   }
-}
