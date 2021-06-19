@@ -6,7 +6,7 @@ import * as ApiRoutes from '@common/apiRoutes'
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
 const getCategoryUuidsInChain = ({ chain, survey }) => {
-  // Get unique category uuids for ChainNodeDefs
+  // Get unique category uuids for AnalysisNodeDefs
   const categoryUuids = new Set()
 
   Survey.getAnalysisNodeDefs({ chain })(survey).forEach((nodeDef) => {

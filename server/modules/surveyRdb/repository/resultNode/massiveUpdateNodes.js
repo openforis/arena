@@ -14,7 +14,6 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
     const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
     const nodeDefsByColumnName = NodeDef.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
-    const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
@@ -41,7 +40,6 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     this.chain = chain
 
     this.nodeDefsByColumnName = nodeDefsByColumnName
-    this.columnNames = columnNames
   }
 
   async push(rowResult) {

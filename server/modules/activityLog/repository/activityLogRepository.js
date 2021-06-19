@@ -152,8 +152,7 @@ export const fetch = async ({
       
       -- analysis activities keys
       chain.uuid AS chain_uuid,
-      chain.props->'${Chain.keysProps.labels}' AS processing_chain_labels,
-      chain_node_def.index AS chain_node_def_index
+      chain.props->'${Chain.keysProps.labels}' AS processing_chain_labels
     FROM
       log_limited AS l
     JOIN
@@ -233,11 +232,7 @@ export const fetch = async ({
     LEFT OUTER JOIN 
       ${schema}.chain
     ON 
-      chain.uuid IN (l.content_uuid, (l.content->>'chainUuid')::uuid)
-    LEFT OUTER JOIN 
-      ${schema}.chain_node_def
-    ON 
-      chain_node_def.uuid = l.content_uuid
+      chain.uuid IN (l.content_uuid, (l.content->>'chainUuid')::uuid)    
     -- end of analysis activities part
 
     ORDER BY

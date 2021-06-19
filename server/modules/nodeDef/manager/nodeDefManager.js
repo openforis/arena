@@ -18,6 +18,7 @@ export {
   permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
+  updateNodeDefAnalysisScript,
   insertNodeDefsBatch,
 } from '../repository/nodeDefRepository'
 

@@ -30,7 +30,7 @@ const AnalysisNodeDefs = () => {
   }
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain, entityUuid: entityDefUuid })(survey),
+    () => Survey.getAnalysisNodeDefs({ chain, entityDefUuid })(survey),
     [chain, survey, entityDefUuid]
   )
 

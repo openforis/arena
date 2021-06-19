@@ -32,10 +32,10 @@ const AnalysisNodeDefsHeader = () => {
           {i18n.t('common.add')} <span className="icon icon-plus icon-12px" />
         </div>
         <button className="btn btn-s" onClick={() => createNodeDef(NodeDef.nodeDefType.decimal)} type="button">
-          {i18n.t('analysis.quantitative')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
+          {i18n.t('chain.quantitative')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
         </button>
         <button className="btn btn-s" onClick={() => createNodeDef(NodeDef.nodeDefType.code)} type="button">
-          {i18n.t('analysis.categorical')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
+          {i18n.t('chain.categorical')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
         </button>
       </div>
     </div>
