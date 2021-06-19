@@ -55,7 +55,7 @@ export const type = {
   // Analysis
   chainCreate: 'chainCreate',
   chainPropUpdate: 'chainPropUpdate',
-  chainNodeDefPropUpdate: 'chainNodeDefPropUpdate',
+  analysisNodeDefPropUpdate: 'analysisNodeDefPropUpdate',
   chainStatusExecSuccess: 'chainStatusExecSuccess',
   chainDelete: 'chainDelete',
 }

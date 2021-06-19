@@ -52,12 +52,7 @@ class RChain {
 
     this._counter = new Counter()
 
-    this._rChainNodeDef = []
-    this._rChainNodeDefAggregate = []
-
     this._entities = []
-
-    this._rChainNodeDefs = []
   }
 
   get surveyId() {
@@ -120,8 +115,10 @@ class RChain {
     return this._entities
   }
 
-  get chainNodeDefs() {
-    return this._rChainNodeDefs
+  get entitiesWithAnalysisNodeDefs() {
+    return this._entities.filter(
+      (entity) => Survey.getAnalysisNodeDefs({ entity, chain: this.chain })(this.survey).length > 0
+    )
   }
 
   async _initEntities() {
@@ -147,7 +144,6 @@ class RChain {
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
       includeScript: true,
-      includeChainNodeDefs: true,
     })
     this._listCategories = new ListCategories(this)
     await this._initEntities()

@@ -1,11 +1,8 @@
 import * as A from '@core/arena'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as Chain from '@common/analysis/chain'
 
 import * as DB from '../../../../db'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 
@@ -20,35 +17,8 @@ const _insertChain = async ({ user, surveyId, chain }, client) => {
 }
 
 // ====== READ
-export const { countChains, fetchChains } = ChainRepository
+export const { countChains, fetchChains, fetchChain } = ChainRepository
 
-/**
- * Fetches a single processing chain by the given survey id and chainUuid.
- *
- * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
- * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {boolean} [params.includeChainNodeDefs=false] - Whether to ChainNodeDefs.
- * @param {BaseProtocol} [client=db] - The database client.
- *
- * @returns {Promise<Chain|null>} - The result promise.
- */
-export const fetchChain = async (params, client = DB.client) => {
-  const { includeChainNodeDefs = false, surveyId, chainUuid } = params
-
-  const chain = await ChainRepository.fetchChain(params, client)
-
-  if (includeChainNodeDefs) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true })
-
-    chain[Chain.keys.chainNodeDefs] = Survey.getNodeDefsArray(survey)
-      .filter((_nodeDef) => NodeDef.isAnalysis(_nodeDef) && NodeDef.getChainUuid(_nodeDef) === chainUuid)
-      .sort((nodeDef1, nodeDef2) => NodeDef.getChainIndex(nodeDef1) - NodeDef.getChainIndex(nodeDef2))
-  }
-
-  return chain
-}
 // ====== UPDATE
 export const { updateChain, removeChainCycles } = ChainRepository
 

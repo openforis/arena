@@ -67,7 +67,7 @@ const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) =>
 }
 
 export const putNodeDefProps =
-  ({ nodeDefUuid, parentUuid, props, propsAdvanced }) =>
+  ({ nodeDefUuid, parentUuid, props = {}, propsAdvanced }) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)

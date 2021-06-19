@@ -323,7 +323,8 @@ Do you want to proceed?`,
       // Analysis
       [ActivityLog.type.chainCreate]: 'added processing chain',
       [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
-      [ActivityLog.type.chainNodeDefPropUpdate]: 'updated {{key}} to {{value}} of calculated node definition {{name}}',
+      [ActivityLog.type.analysisNodeDefPropUpdate]:
+        'updated {{key}} to {{value}} of calculated node definition {{name}}',
       [ActivityLog.type.chainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.chainDelete]: 'deleted processing chain {{label}}',
     },

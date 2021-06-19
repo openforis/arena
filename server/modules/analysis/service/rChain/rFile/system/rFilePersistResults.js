@@ -26,7 +26,7 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
 }
 
 function* initPersistChainEntitiesResults() {
-  const { entities } = this.rChain
+  const { entitiesWithAnalysisNodeDefs: entities } = this.rChain
 
   for (let i = 0; i < entities.length; i += 1) {
     const entity = entities[i]

@@ -24,12 +24,9 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
   const nodeDefDeleted = !nodeDef
 
   const updateAnalysisNodeDef = () => {
-    const newNodeDef = {
-      ...nodeDef,
-      [NodeDef.keys.propsAdvanced]: {
-        [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
-      },
-    }
+    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !NodeDef.getActive(nodeDef) })(
+      nodeDef
+    )
 
     dispatch(
       NodeDefsActions.putNodeDefProps({

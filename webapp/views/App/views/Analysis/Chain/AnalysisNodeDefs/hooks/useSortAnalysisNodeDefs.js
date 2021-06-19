@@ -10,12 +10,7 @@ export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs 
   const sortableRef = useRef(null)
 
   const updateAnalysisNodeDef = ({ nodeDef, newIndex }) => {
-    const newNodeDef = {
-      ...nodeDef,
-      [NodeDef.keys.propsAdvanced]: {
-        [NodeDef.keysPropsAdvanced.index]: newIndex,
-      },
-    }
+    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.index, value: newIndex })(nodeDef)
 
     dispatch(
       NodeDefsActions.putNodeDefProps({

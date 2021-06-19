@@ -16,7 +16,7 @@ export default class ChainsValidationJob extends Job {
     const { surveyId, tx } = this
 
     const [survey, chains] = await Promise.all([
-      SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, tx),
       AnalysisManager.fetchChains({ surveyId }, tx),
     ])
 

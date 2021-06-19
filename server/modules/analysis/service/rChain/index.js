@@ -1,5 +1,4 @@
 import * as PromiseUtils from '@core/promiseUtils'
-import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 import { db } from '../../../../db/db'
 
@@ -13,6 +12,7 @@ import { TableChain } from '../../../../../common/model/db'
 import { Query } from '../../../../../common/model/query'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as NodeDefManager from '../../../nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
@@ -39,7 +39,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
-    includeChainNodeDefs: true,
   })
 
   const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
@@ -118,7 +117,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
           // TO UPDATE
-          await ChainNodeDefRepository.updateScript({ surveyId, uuid: NodeDef.getUuid(nodeDef), newSript: script }, tx)
+          await NodeDefManager.updateNodeDefAnalysisScript({ surveyId, script, nodeDef }, tx)
         })
       }
     })

@@ -255,6 +255,16 @@ export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = 
     [cycleKeys]
   )
 
+export const updateNodeDefAnalysisScript = async ({ surveyId, script, nodeDef }, client = DB) =>
+  client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_advanced_draft = jsonb_set(props_advanced_draft, '{script}', to_jsonb($2::text))
+    WHERE uuid = $1
+  `,
+    [NodeDef.getUuid(nodeDef), script]
+  )
+
 // PUBLISH
 export const publishNodeDefsProps = async (surveyId, client = DB) =>
   client.query(`
