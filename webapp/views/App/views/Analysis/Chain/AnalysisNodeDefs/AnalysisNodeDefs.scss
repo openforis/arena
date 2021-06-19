@@ -1,6 +1,6 @@
 @import 'webapp/style/vars';
 
-.chain-node-defs-wrapper {
+.analysis-node-defs-wrapper {
   display: grid;
   grid-template-columns: 320px 1fr;
   grid-column-gap: 16px;
@@ -10,7 +10,7 @@
   }
 }
 
-.chain-node-defs {
+.analysis-node-defs {
   display: grid;
   align-content: start;
 }

@@ -52,12 +52,7 @@ class RChain {
 
     this._counter = new Counter()
 
-    this._rChainNodeDef = []
-    this._rChainNodeDefAggregate = []
-
     this._entities = []
-    this._entitiesWithChainNodeDef = []
-    this._rChainNodeDefs = []
   }
 
   get surveyId() {
@@ -116,16 +111,14 @@ class RChain {
     return this._listCategories
   }
 
-  get entitiesWithChainNodeDef() {
-    return this._entitiesWithChainNodeDef
-  }
-
   get entities() {
     return this._entities
   }
 
-  get chainNodeDefs() {
-    return this._rChainNodeDefs
+  get entitiesWithAnalysisNodeDefs() {
+    return this._entities.filter(
+      (entity) => Survey.getAnalysisNodeDefs({ entity, chain: this.chain })(this.survey).length > 0
+    )
   }
 
   async _initEntities() {
@@ -142,30 +135,6 @@ class RChain {
     this._entities = entities
   }
 
-  async _initChainNodeDefs() {
-    const chainNodeDefs = Chain.getChainNodeDefs(this._chain)
-    this._rChainNodeDef = chainNodeDefs
-  }
-
-  async _initEntitiesWithChainNodeDefs() {
-    const entitiesWithChainNodeDef = []
-
-    await PromiseUtils.each(this.entities, async (entity) => {
-      const chainNodeDefsInEntity = this.chainNodeDefs.filter(
-        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
-      )
-
-      if (chainNodeDefsInEntity.length > 0) {
-        entitiesWithChainNodeDef.push({
-          ...entity,
-          chainNodeDefs: chainNodeDefsInEntity,
-        })
-      }
-    })
-
-    this._entitiesWithChainNodeDef = entitiesWithChainNodeDef
-  }
-
   async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId: this.surveyId, cycle: this.cycle })
 
@@ -175,12 +144,9 @@ class RChain {
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
       includeScript: true,
-      includeChainNodeDefs: true,
     })
     this._listCategories = new ListCategories(this)
     await this._initEntities()
-    await this._initChainNodeDefs()
-    await this._initEntitiesWithChainNodeDefs()
   }
 
   async _initDirs() {
@@ -217,18 +183,16 @@ class RChain {
     this._fileCommon = await new RFileCommon(this).init()
   }
 
-  async _initChainNodeDefsFiles() {
-    await PromiseUtils.each(this.entitiesWithChainNodeDef, async (entity, entityIndex) => {
-      const chainNodeDefsInEntity = this.chainNodeDefs.filter(
-        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
-      )
+  async _initAnalysisNodeDefsFiles() {
+    await PromiseUtils.each(this.entities, async (entity, entityIndex) => {
+      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain: this.chain })(this.survey)
 
-      if (chainNodeDefsInEntity.length > 0) {
+      if (analysisNodeDefsInEntity.length > 0) {
         const entityPath = FileUtils.join(this.dirUser, `${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`)
         await FileUtils.mkdir(entityPath)
 
-        // create ChainNodeDefs files
-        await PromiseUtils.each(chainNodeDefsInEntity, async (nodeDef, nodeDefIndex) => {
+        // create analysisNodeDefs files
+        await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef, nodeDefIndex) => {
           this._scriptIndexNext = nodeDefIndex + 1
 
           let attributeName = NodeDef.getName(nodeDef)
@@ -261,7 +225,7 @@ class RChain {
     await this._initSurveyAndChain()
     await this._initDirs()
     await this._initFiles()
-    await this._initChainNodeDefsFiles()
+    await this._initAnalysisNodeDefsFiles()
     await this._initFilesClosing()
 
     return this

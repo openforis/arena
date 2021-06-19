@@ -1,7 +1,7 @@
 @import 'webapp/style/partials';
 
-.chain-node-def,
-.chain-node-def__list-header {
+.analysis-node-def,
+.analysis-node-def__list-header {
   position: relative;
   display: grid;
   grid-template-columns: 40px 200px 1fr 120px repeat(2, 80px);
@@ -14,7 +14,7 @@
   }
 }
 
-.chain-node-def__list-header {
+.analysis-node-def__list-header {
   margin-top: 16px;
   height: 32px;
   padding: unset;
@@ -25,7 +25,7 @@
   font-weight: 600;
 }
 
-.chain-node-def {
+.analysis-node-def {
   font-size: 0.9rem;
   padding: 8px 0;
 
@@ -42,18 +42,18 @@
   }
 }
 
-.chain-node-def.draggable-mirror {
+.analysis-node-def.draggable-mirror {
   background-color: lighten($orangeLight, 10%);
   border: 1px dashed $blue;
 
-  .chain-node-def__btn-move {
+  .analysis-node-def__btn-move {
     span {
       color: lighten($black, 5%);
     }
   }
 }
 
-.chain-node-def.deleted {
+.analysis-node-def.deleted {
   background-color: rgba($greyBorder, 0.4);
   opacity: 0.7;
 
@@ -75,7 +75,7 @@
   }
 }
 
-.chain-node-def__type {
+.analysis-node-def__type {
   font-size: 0.8rem;
 
   .icon {
@@ -83,7 +83,7 @@
   }
 }
 
-.chain-node-def__btn-move {
+.analysis-node-def__btn-move {
   border: unset;
   background-color: unset;
   padding: unset;

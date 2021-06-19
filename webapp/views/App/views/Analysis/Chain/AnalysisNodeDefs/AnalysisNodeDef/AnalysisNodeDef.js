@@ -1,4 +1,4 @@
-import './ChainNodeDef.scss'
+import './AnalysisNodeDef.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -14,7 +14,7 @@ import { useI18n } from '@webapp/store/system'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
 
-const ChainNodeDef = ({ nodeDefUuid }) => {
+const AnalysisNodeDef = ({ nodeDefUuid }) => {
   const survey = useSurvey()
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -23,24 +23,16 @@ const ChainNodeDef = ({ nodeDefUuid }) => {
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
 
-  const updateChainNodeDef = () => {
-    const newNodeDef = {
-      ...nodeDef,
-      [NodeDef.keys.propsAdvanced]: {
-        ...NodeDef.getPropsAdvanced(nodeDef),
-        ...NodeDef.getPropsAdvancedDraft(nodeDef),
-        [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
-      },
-    }
+  const updateAnalysisNodeDef = () => {
+    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !NodeDef.getActive(nodeDef) })(
+      nodeDef
+    )
 
     dispatch(
       NodeDefsActions.putNodeDefProps({
         nodeDefUuid: NodeDef.getUuid(nodeDef),
         parentUuid: NodeDef.getParentUuid(nodeDef),
-        props: { ...NodeDef.getProps(nodeDef), ...NodeDef.getPropsDraft(nodeDef) },
         propsAdvanced: {
-          ...NodeDef.getPropsAdvanced(nodeDef),
-          ...NodeDef.getPropsAdvancedDraft(nodeDef),
           [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
         },
       })
@@ -50,22 +42,22 @@ const ChainNodeDef = ({ nodeDefUuid }) => {
   }
 
   return (
-    <div className={classNames('chain-node-def', { deleted: nodeDefDeleted })}>
+    <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
       <div>
-        <button className="chain-node-def__btn-move" type="button">
+        <button className="analysis-node-def__btn-move" type="button">
           <span className="icon icon-14px icon-menu" />
         </button>
       </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef)}</div>
-      <div className="chain-node-def__type">
+      <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
       </div>
       <div>
         <InputSwitch
           checked={!nodeDefDeleted && NodeDef.getActive(nodeDef)}
           disabled={nodeDefDeleted}
-          onChange={updateChainNodeDef}
+          onChange={updateAnalysisNodeDef}
         />
       </div>
       <div>
@@ -81,8 +73,8 @@ const ChainNodeDef = ({ nodeDefUuid }) => {
   )
 }
 
-ChainNodeDef.propTypes = {
+AnalysisNodeDef.propTypes = {
   nodeDefUuid: PropTypes.string.isRequired,
 }
 
-export { ChainNodeDef }
+export { AnalysisNodeDef }

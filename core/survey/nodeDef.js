@@ -256,6 +256,33 @@ export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
+// Analysis
+
+export const getNodeDefsWithColumnNames = (nodeDefs) => {
+  return nodeDefs.flatMap((nodeDef) => {
+    const name = getName(nodeDef)
+    if (isCode(nodeDef)) {
+      return [
+        {
+          columnName: `${name}_code`,
+          nodeDef,
+        },
+        { columnName: `${name}_label`, nodeDef },
+      ]
+    }
+    return { columnName: name, nodeDef }
+  })
+}
+
+export const getNodeDefsColumnNames = (nodeDefs) =>
+  getNodeDefsWithColumnNames(nodeDefs).map(({ columnName }) => columnName)
+
+export const getNodeDefsByColumnNames = (nodeDefs) =>
+  getNodeDefsWithColumnNames(nodeDefs).reduce(
+    (_nodeDefs, { columnName, nodeDef }) => ({ ..._nodeDefs, [columnName]: nodeDef }),
+    {}
+  )
+
 // ==== CREATE
 
 export const newNodeDef = (

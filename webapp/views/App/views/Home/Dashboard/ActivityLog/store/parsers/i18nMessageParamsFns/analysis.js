@@ -13,7 +13,7 @@ export default {
     label: _getChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.chainNodeDefPropUpdate]: (survey) => (activityLog) => {
+  [ActivityLog.type.analysisNodeDefPropUpdate]: (survey) => (activityLog) => {
     const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     return {

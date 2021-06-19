@@ -1,6 +1,4 @@
 import * as PromiseUtils from '@core/promiseUtils'
-import * as Chain from '@common/analysis/chain'
-import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 import { db } from '../../../../db/db'
 
@@ -14,6 +12,7 @@ import { TableChain } from '../../../../../common/model/db'
 import { Query } from '../../../../../common/model/query'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as NodeDefManager from '../../../nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
@@ -40,7 +39,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
-    includeChainNodeDefs: true,
   })
 
   const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
@@ -107,15 +105,11 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       }
     })
 
-    const chainNodeDefs = Chain.getChainNodeDefs(chain)
-
     await PromiseUtils.each(entities, async (entity, entityIndex) => {
-      const chainNodeDefsInEntity = chainNodeDefs.filter(
-        (nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity)
-      )
+      const AnalysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
 
-      if (chainNodeDefsInEntity.length > 0) {
-        await PromiseUtils.each(chainNodeDefsInEntity, async (nodeDef) => {
+      if (AnalysisNodeDefsInEntity.length > 0) {
+        await PromiseUtils.each(AnalysisNodeDefsInEntity, async (nodeDef) => {
           const nodeDefName = NodeDef.getName(nodeDef)
 
           const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
@@ -123,7 +117,7 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
           // TO UPDATE
-          await ChainNodeDefRepository.updateScript({ surveyId, uuid: NodeDef.getUuid(nodeDef), newSript: script }, tx)
+          await NodeDefManager.updateNodeDefAnalysisScript({ surveyId, script, nodeDef }, tx)
         })
       }
     })
