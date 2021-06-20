@@ -8,6 +8,7 @@ import * as R from 'ramda'
 import * as ObjectUtils from '@core/objectUtils'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
+import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 
@@ -21,14 +22,20 @@ const AccessRequest = () => {
   const i18n = useI18n()
 
   const [request, setRequestState] = useState({})
+  const [validation, setValidation] = useState(null)
 
-  const onRequestUpdate = (requestUpdated) => {
-    setRequestState(requestUpdated)
+  const validate = async () => setValidation(await UserAccessRequestValidator.validateUserAccessRequest(request))
+
+  const onFieldValueChange = async ({ name, value }) => {
+    setRequestState((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
+    await validate()
   }
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const onSubmitConfirm = async () => {
-      const { error, validation } = await API.createAccessRequest({ accessRequest: request })
+      const { error, validation: validationServer } = await API.createAccessRequest({ accessRequest: request })
+      setValidation(validationServer)
+
       if (error) {
         dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error } }))
       } else {
@@ -37,6 +44,13 @@ const AccessRequest = () => {
         )
         history.goBack()
       }
+    }
+    const validationUpdated = await UserAccessRequestValidator.validateUserAccessRequest(request)
+    setValidation(validationUpdated)
+
+    if (!Validation.isValid(validationUpdated)) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave' }))
+      return
     }
 
     dispatch(
@@ -60,17 +74,19 @@ const AccessRequest = () => {
     <div className="access-request">
       <div className="title">{i18n.t('accessRequestView.title')}</div>
       <div className="introduction">{i18n.t('accessRequestView.introduction')}</div>
-      <form onSubmit={onSubmit}>
-        {fields.map(({ name }) => (
-          <FormItem key={name} label={i18n.t(`accessRequestView.fields.${name}`)}>
-            <Input
-              value={R.path(name.split('.'))(request)}
-              onChange={(value) =>
-                onRequestUpdate((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
-              }
-            />
-          </FormItem>
-        ))}
+      <form onSubmit={(event) => event.preventDefault()}>
+        {fields.map(({ name }) => {
+          const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
+          return (
+            <FormItem key={name} label={i18n.t(`accessRequestView.fields.${name}`)}>
+              <Input
+                value={R.path(name.split('.'))(request)}
+                onChange={(value) => onFieldValueChange({ name, value })}
+                validation={Validation.getFieldValidation(validationFieldName)(validation)}
+              />
+            </FormItem>
+          )
+        })}
 
         <div className="guest__buttons">
           <button type="submit" className="btn" onClick={onSubmit}>

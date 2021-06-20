@@ -228,6 +228,7 @@ For more information please visit our website: http://www.openforis.org`,
       },
     },
     sendRequest: 'Send Request',
+    sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
   },
 
   resetPasswordView: {
@@ -681,6 +682,7 @@ $t(common.cantUndoWarning)`,
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
     nameRequired: 'Name is required',
+    requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     analysis: {
@@ -802,6 +804,14 @@ $t(common.cantUndoWarning)`,
 
       userNotFound: 'User not found. Make sure email and password are correct',
       passwordChangeRequired: 'Password change required',
+    },
+
+    userAccessRequest: {
+      emailRequired: 'Email is required',
+      firstNameRequired: 'First name is required',
+      lastNameRequired: 'Last name is required',
+      invalidRequest: 'Invalid user access request',
+      userAlreadyExisting: 'User with email {{email}} already existing',
     },
   },
 

@@ -5,8 +5,11 @@ import { db } from '@server/db/db'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userInvite'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
+import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
+import * as Validation from '@core/validation/validation'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -154,6 +157,20 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   } catch (error) {
     return { error: error.message }
   }
+}
+
+export const insertUserAccessRequest = async ({ userAccessRequest }) => {
+  // validate request
+  const validation = await UserAccessRequestValidator.validateUserAccessRequest(userAccessRequest)
+  if (!Validation.isValid(validation)) {
+    return { error: 'validationErrors.userAccessRequest.invalidRequest', validation }
+  }
+  const existingUser = await UserManager.fetchUserByEmail(userAccessRequest.email)
+  if (existingUser) {
+    return { error: 'validationErrors.userAccessRequest.userAlreadyExisting' }
+  }
+  const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
+  return { requestInserted }
 }
 
 // ====== READ

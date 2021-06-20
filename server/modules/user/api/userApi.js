@@ -55,9 +55,9 @@ export const init = (app) => {
 
   app.post('/user/request-access', async (req, res, next) => {
     try {
-      // const accessRequest = Request.getBody(req)
-
-      Response.sendOk(res)
+      const userAccessRequest = Request.getBody(req)
+      const { error, validation, requestInserted } = await UserService.insertUserAccessRequest({ userAccessRequest })
+      res.json({ error, validation, requestInserted })
     } catch (error) {
       next(error)
     }
