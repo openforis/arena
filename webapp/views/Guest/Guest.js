@@ -25,16 +25,14 @@ const Guest = () => (
       </div>
     </div>
 
-    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <Switch>
-        <Route path={guestModules.resetPassword.path} exact component={ResetPassword} />
-        <Route path={guestModules.forgotPassword.path} exact component={ForgotPassword} />
-        <Route path={guestModules.accessRequest.path} exact component={AccessRequest} />
-        <Route>
-          <Login />
-        </Route>
-      </Switch>
-    </form>
+    <Switch>
+      <Route path={guestModules.resetPassword.path} exact component={ResetPassword} />
+      <Route path={guestModules.forgotPassword.path} exact component={ForgotPassword} />
+      <Route path={guestModules.accessRequest.path} exact component={AccessRequest} />
+      <Route>
+        <Login />
+      </Route>
+    </Switch>
   </>
 )
 

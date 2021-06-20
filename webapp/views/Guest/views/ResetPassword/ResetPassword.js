@@ -21,7 +21,7 @@ const ResetPassword = () => {
   if (!user || !user.email) return null
 
   return (
-    <>
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <input value={user.email} readOnly type="text" name="email" />
 
       <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
@@ -51,7 +51,7 @@ const ResetPassword = () => {
       </div>
 
       <Error error={error} />
-    </>
+    </form>
   )
 }
 

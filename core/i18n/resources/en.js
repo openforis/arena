@@ -212,17 +212,20 @@ Do you want to proceed?`,
 
   accessRequestView: {
     title: 'Requesting access to $t(common.appNameFull)',
-    introduction: `The platform is still beta, so if you want access, you have to request here.  We are also interested in what you want to do with it so please let us know!
+    introduction: `The platform is still beta, so if you want access, you have to request here.  
+We are also interested in what you want to do with it so please let us know!
 PLEASE also give us a few moments to process your request.
 This is not an automated service and sometimes it takes us a little time to enter your information.
 For more information please visit our website: http://www.openforis.org`,
     fields: {
       email: '$t(common.email)',
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      institution: 'Institution',
-      country: 'Country',
-      purpose: 'What do you need it for?',
+      props: {
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        institution: 'Institution',
+        country: 'Country',
+        purpose: 'What do you need it for?',
+      },
     },
     sendRequest: 'Send Request',
   },
