@@ -211,12 +211,7 @@ Do you want to proceed?`,
   },
 
   accessRequestView: {
-    title: 'Requesting access to $t(common.appNameFull)',
-    introduction: `The platform is still beta, so if you want access, you have to request here.  
-We are also interested in what you want to do with it so please let us know!
-PLEASE also give us a few moments to process your request.
-This is not an automated service and sometimes it takes us a little time to enter your information.
-For more information please visit our website: http://www.openforis.org`,
+    error: 'Error requesting access: {{error}}',
     fields: {
       email: '$t(common.email)',
       props: {
@@ -227,8 +222,15 @@ For more information please visit our website: http://www.openforis.org`,
         purpose: 'What do you need it for?',
       },
     },
+    introduction: `The platform is still beta, so if you want access, you have to request here.  
+We are also interested in what you want to do with it so please let us know!
+PLEASE also give us a few moments to process your request.
+This is not an automated service and sometimes it takes us a little time to enter your information.
+For more information please visit our website: http://www.openforis.org`,
+    requestSent: 'Access Request sent correctly',
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
+    title: 'Requesting access to $t(common.appNameFull)',
   },
 
   resetPasswordView: {
@@ -812,6 +814,7 @@ $t(common.cantUndoWarning)`,
       lastNameRequired: 'Last name is required',
       invalidRequest: 'Invalid user access request',
       userAlreadyExisting: 'User with email {{email}} already existing',
+      requestAlreadySent: `Access request for user with email {{email}} already sent`,
     },
   },
 
@@ -974,6 +977,24 @@ $t(common.cantUndoWarning)`,
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.signature)`,
+    },
+    userAccessRequest: {
+      subject: '$t(common.appNameFull) - User Access Request',
+      body: `<p>Hello,</p>
+      <p>The following user has requested access to $t(common.appNameFull).</p>
+      <p>
+        <ul>
+          <li>$t(accessRequestView.fields.email): {{email}}</li>
+          <li>$t(accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
+        </ul>
+      </p>
+      <p>Please evaluate this request and get back to the user as soon as possible.</p>
+      <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+      $t(emails.signature)`,
     },
     userInviteRepeatConfirmation:
       'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',

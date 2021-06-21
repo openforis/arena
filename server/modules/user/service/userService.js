@@ -32,7 +32,7 @@ const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) =
     urlResetPassword: `${serverUrl}/guest/resetPassword/${uuid}`,
   }
   // Send email
-  await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
+  await Mailer.sendEmail({ to: email, msgKey: 'emails.userInvite', msgParams, lang })
 }
 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
@@ -122,7 +122,7 @@ export const inviteUser = async ({
         // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
         // Send email
-        await Mailer.sendEmail(email, 'emails.existingUserInvite', emailParams, lang)
+        await Mailer.sendEmail({ to: email, msgKey: 'emails.existingUserInvite', msgParams: emailParams, lang })
       } else if (repeatInvitation) {
         // User has a pending invitation still
         // Generate reset password and send email again
@@ -151,7 +151,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
       const name = User.getName(user)
-      await Mailer.sendEmail(email, 'emails.userResetPassword', { url, name }, lang)
+      await Mailer.sendEmail({ to: email, msgKey: 'emails.userResetPassword', msgParams: { url, name }, lang })
       return { uuid }
     })
   } catch (error) {
@@ -159,18 +159,46 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   }
 }
 
-export const insertUserAccessRequest = async ({ userAccessRequest }) => {
+export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) => {
   // validate request
   const validation = await UserAccessRequestValidator.validateUserAccessRequest(userAccessRequest)
   if (!Validation.isValid(validation)) {
     return { error: 'validationErrors.userAccessRequest.invalidRequest', validation }
   }
-  const existingUser = await UserManager.fetchUserByEmail(userAccessRequest.email)
+  const { email } = userAccessRequest
+  const existingUser = await UserManager.fetchUserByEmail(email)
   if (existingUser) {
     return { error: 'validationErrors.userAccessRequest.userAlreadyExisting' }
   }
-  const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
-  return { requestInserted }
+  const existingRequest = await UserManager.fetchUserAccessRequestByEmail({ email })
+  if (existingRequest) {
+    return { error: 'validationErrors.userAccessRequest.requestAlreadySent', errorParams: { email } }
+  }
+
+  try {
+    return await db.tx(async (t) => {
+      const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail(t)
+      const { firstName, lastName, institution = '', country = '', purpose = '' } = userAccessRequest.props
+      await Mailer.sendEmail({
+        to: systemAdminEmails,
+        msgKey: 'emails.userAccessRequest',
+        msgParams: {
+          email,
+          firstName,
+          lastName,
+          institution,
+          country,
+          purpose,
+          serverUrl,
+        },
+      })
+
+      const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest }, t)
+      return { requestInserted }
+    })
+  } catch (error) {
+    return { error: error.message }
+  }
 }
 
 // ====== READ

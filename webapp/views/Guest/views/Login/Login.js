@@ -17,11 +17,12 @@ const Login = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
-    { email, password: '' },
-    LoginValidator.validateLoginObj,
-    true
-  )
+  const {
+    object: formObject,
+    setObjectField,
+    objectValid,
+    validation,
+  } = useFormObject({ email, password: '' }, LoginValidator.validateLoginObj, true)
 
   const onClickLogin = () => {
     if (objectValid) {
@@ -43,7 +44,7 @@ const Login = () => {
   }
 
   return (
-    <>
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <input
         defaultValue={formObject.email}
         onChange={onChangeEmail}
@@ -71,7 +72,7 @@ const Login = () => {
       </div>
 
       <Error error={error} />
-    </>
+    </form>
   )
 }
 

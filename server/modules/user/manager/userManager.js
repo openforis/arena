@@ -149,6 +149,10 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
   return null
 }
 
+export { fetchUserAccessRequestByEmail } from '../repository/userAccessRequestRepository'
+
+export { fetchSystemAdministratorsEmail } from '../repository/userRepository'
+
 // ==== UPDATE
 
 const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
