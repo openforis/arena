@@ -19,6 +19,7 @@ import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
+import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 
 // ====== CREATE
 
@@ -160,16 +161,24 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
 }
 
 export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) => {
+  // verify reCaptcha
+  const { reCaptchaToken } = userAccessRequest
+  const reCaptchaVerified = await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken })
+  if (!reCaptchaVerified) {
+    return { error: 'validationErrors.userAccessRequest.invalidReCaptcha' }
+  }
   // validate request
   const validation = await UserAccessRequestValidator.validateUserAccessRequest(userAccessRequest)
   if (!Validation.isValid(validation)) {
     return { error: 'validationErrors.userAccessRequest.invalidRequest', validation }
   }
+  // verify user not already existing
   const { email } = userAccessRequest
   const existingUser = await UserManager.fetchUserByEmail(email)
   if (existingUser) {
     return { error: 'validationErrors.userAccessRequest.userAlreadyExisting' }
   }
+  // verify request not already existing
   const existingRequest = await UserManager.fetchUserAccessRequestByEmail({ email })
   if (existingRequest) {
     return { error: 'validationErrors.userAccessRequest.requestAlreadySent', errorParams: { email } }

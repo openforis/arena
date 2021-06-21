@@ -227,6 +227,7 @@ We are also interested in what you want to do with it so please let us know!
 PLEASE also give us a few moments to process your request.
 This is not an automated service and sometimes it takes us a little time to enter your information.
 For more information please visit our website: http://www.openforis.org`,
+    reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
@@ -815,6 +816,7 @@ $t(common.cantUndoWarning)`,
       invalidRequest: 'Invalid user access request',
       userAlreadyExisting: 'User with email {{email}} already existing',
       requestAlreadySent: `Access request for user with email {{email}} already sent`,
+      invalidReCaptcha: 'Invalid ReCaptcha',
     },
   },
 

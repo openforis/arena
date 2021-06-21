@@ -62,6 +62,7 @@ const plugins = [
         APPLICATION_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
           : JSON.stringify(process.env.APP_VERSION),
+        RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
       },
     },
   }),

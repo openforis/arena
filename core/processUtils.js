@@ -42,6 +42,9 @@ const ENV = {
   rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
   rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
   rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
+  // ReCaptcha
+  reCaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+  reCaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
 }
 
 module.exports = {

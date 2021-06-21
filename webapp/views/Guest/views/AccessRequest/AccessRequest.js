@@ -7,13 +7,14 @@ import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
+import { ReCaptcha } from '@webapp/components/ReCaptcha'
 
 import { useI18n } from '@webapp/store/system'
 import { useAccessRequest } from './useAccessRequest'
 
 const AccessRequest = () => {
   const i18n = useI18n()
-  const { request, validation, onFieldValueChange, onSubmit } = useAccessRequest()
+  const { request, validation, onFieldValueChange, onSubmit, reCaptchaRef } = useAccessRequest()
 
   return (
     <div className="access-request">
@@ -32,6 +33,9 @@ const AccessRequest = () => {
             </FormItem>
           )
         })}
+        <div className="recaptcha-wrapper">
+          <ReCaptcha ref={reCaptchaRef} />
+        </div>
 
         <div className="guest__buttons">
           <button type="submit" className="btn" onClick={onSubmit}>

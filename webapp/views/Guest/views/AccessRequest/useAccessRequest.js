@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
@@ -17,6 +17,7 @@ export const useAccessRequest = () => {
 
   const [request, setRequestState] = useState({})
   const [validation, setValidation] = useState(null)
+  const reCaptchaRef = useRef(null)
 
   const validate = async () => setValidation(await UserAccessRequestValidator.validateUserAccessRequest(request))
 
@@ -25,13 +26,35 @@ export const useAccessRequest = () => {
     await validate()
   }
 
+  const checkFormValid = async () => {
+    const validationUpdated = await UserAccessRequestValidator.validateUserAccessRequest(request)
+    setValidation(validationUpdated)
+
+    if (!Validation.isValid(validationUpdated)) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave' }))
+      return false
+    }
+
+    const reCaptchaToken = reCaptchaRef.current?.getValue()
+    if (!reCaptchaToken) {
+      dispatch(NotificationActions.notifyWarning({ key: 'accessRequestView.reCaptchaNotAnswered' }))
+      return false
+    }
+    return true
+  }
+
   const onSubmit = async () => {
     const onSubmitConfirm = async () => {
-      const { error, validation: validationServer } = await API.createAccessRequest({ accessRequest: request })
+      const reCaptchaToken = reCaptchaRef.current?.getValue()
+
+      const { error, validation: validationServer } = await API.createAccessRequest({
+        accessRequest: { ...request, reCaptchaToken },
+      })
       setValidation(validationServer)
 
       if (error) {
         dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: i18n.t(error) } }))
+        reCaptchaRef.current.reset()
       } else {
         dispatch(
           NotificationActions.notifyInfo({ key: 'accessRequestView.requestSent', params: { email: request.email } })
@@ -39,21 +62,16 @@ export const useAccessRequest = () => {
         history.goBack()
       }
     }
-    const validationUpdated = await UserAccessRequestValidator.validateUserAccessRequest(request)
-    setValidation(validationUpdated)
 
-    if (!Validation.isValid(validationUpdated)) {
-      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave' }))
-      return
+    if (await checkFormValid()) {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'accessRequestView.sendRequestConfirm',
+          onOk: onSubmitConfirm,
+        })
+      )
     }
-
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'accessRequestView.sendRequestConfirm',
-        onOk: onSubmitConfirm,
-      })
-    )
   }
 
-  return { request, validation, onFieldValueChange, onSubmit }
+  return { request, validation, onFieldValueChange, onSubmit, reCaptchaRef }
 }
