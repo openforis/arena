@@ -3,13 +3,13 @@ import * as R from 'ramda'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ColProps from './dataColProps'
 
-export const getNames = NodeDefTable.getColNames
-export const getName = NodeDefTable.getColName
+export const getNames = NodeDefTable.getColumnNames
+export const getName = NodeDefTable.getColumnName
 
 export const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
   const valueFn = valueFnProcessor(survey, nodeDefCol, nodeCol)
-  const values = getNames(nodeDefCol).map((colName) => valueFn(nodeCol, colName))
+  const values = getNames(nodeDefCol).map((columnName) => valueFn(nodeCol, columnName))
   return values
 }
 

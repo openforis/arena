@@ -1,6 +1,6 @@
 import { DB } from '@openforis/arena-server'
 
-import * as Chain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import { TableChain } from '@common/model/db'
 

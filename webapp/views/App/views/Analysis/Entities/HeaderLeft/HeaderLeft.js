@@ -19,7 +19,7 @@ const HeaderLeft = () => {
   return (
     <button data-testid={DataTestId.entities.addBtn} className="btn btn-s" onClick={createVirtualEntity} type="button">
       <span className="icon icon-plus icon-12px icon-left" />
-      {i18n.t('processingChainView.entities.new')}
+      {i18n.t('chainView.entities.new')}
     </button>
   )
 }

@@ -8,7 +8,7 @@ export const ValidatorErrorKeys = {
 
   analysis: {
     labelDefaultLangRequired: 'validationErrors.analysis.labelDefaultLangRequired',
-    chainNodeDefsRequired: 'validationErrors.analysis.chainNodeDefsRequired',
+    analysisNodeDefsRequired: 'validationErrors.analysis.analysisNodeDefsRequired',
   },
 
   categoryEdit: {

@@ -1,4 +1,4 @@
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 function _getSelectFields({ count, includeScript }) {
   if (count) {
@@ -31,7 +31,7 @@ export function getSelect(params) {
     FROM 
         ${this.nameAliased}
     
-    ${cycle ? `WHERE (${this.columnProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
+    ${cycle ? `WHERE (${this.columnProps})->'${Chain.keysProps.cycles}' @> '"${cycle}"'` : ''}
     ${chainUuid ? `WHERE ${this.columnUuid} = '${chainUuid}'` : ''}
     `
 }

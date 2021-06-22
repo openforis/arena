@@ -19,23 +19,23 @@ const Analysis = () => {
       draft
       validate={false}
       requirePublish
-      onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.processingChains))}
+      onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.chains))}
     >
       <ModuleSwitch
         moduleRoot={appModules.analysis}
-        moduleDefault={analysisModules.processingChains}
+        moduleDefault={analysisModules.chains}
         modules={[
           {
             component: Chains,
-            path: appModuleUri(analysisModules.processingChains),
+            path: appModuleUri(analysisModules.chains),
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.processingChain)}`,
+            path: `${appModuleUri(analysisModules.chain)}`,
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
+            path: `${appModuleUri(analysisModules.chain)}:chainUuid/`,
           },
           // {
           //   component: Entities,

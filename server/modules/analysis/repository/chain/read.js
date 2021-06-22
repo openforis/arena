@@ -4,7 +4,7 @@ import * as DB from '../../../../db'
 
 import * as ObjectUtils from '../../../../../core/objectUtils'
 import { TableChain } from '../../../../../common/model/db'
-import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 export const transformCallback = (row) => {
   if (!row) return {}
@@ -70,7 +70,6 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
- 
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.

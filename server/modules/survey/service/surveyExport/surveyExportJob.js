@@ -8,8 +8,6 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import ActivityLogExportJob from './jobs/activityLogExportJob'
 import CategoriesExportJob from './jobs/categoriesExportJob'
 import ChainExportJob from './jobs/chainExportJob'
-import ChainNodeDefExportJob from './jobs/chainNodeDefExportJob'
-import ChainNodeDefAggregateExportJob from './jobs/chainNodeDefAggregateExportJob'
 import FilesExportJob from './jobs/filesExportJob'
 import RecordsExportJob from './jobs/recordsExportJob'
 import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
@@ -24,8 +22,6 @@ const createInnerJobs = ({ backup }) => {
     new TaxonomiesExportJob(),
     ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
     new ChainExportJob(),
-    new ChainNodeDefExportJob(),
-    new ChainNodeDefAggregateExportJob(),
     new UsersExportJob(),
     ...(backup ? [new ActivityLogExportJob()] : []),
   ]
