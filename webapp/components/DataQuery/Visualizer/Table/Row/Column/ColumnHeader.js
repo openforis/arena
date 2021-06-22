@@ -115,6 +115,7 @@ const ColumnHeader = (props) => {
             </button>
           ))}
           <CustomAggregateFunctionsEditor
+            nodeDef={nodeDef}
             selectedUuids={customAggregateFunctionUuids}
             onSelectionChange={(selection) => {
               // Object.keys(selection).forEach((uuid) =>

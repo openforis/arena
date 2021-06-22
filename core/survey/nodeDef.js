@@ -106,6 +106,7 @@ export const keysPropsAdvanced = {
   chainUuid: 'chainUuid',
   index: 'index',
   active: 'active',
+  aggregateFunctions: 'aggregateFunctions',
 }
 
 const metaKeys = {
@@ -255,6 +256,8 @@ export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 
 export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
+
+export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, [])
 
 // ==== CREATE
 
