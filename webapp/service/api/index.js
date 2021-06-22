@@ -7,3 +7,5 @@ export { importRecordsFromCollect } from './data'
 export { fetchSurveys } from './survey'
 
 export { cancelableGetRequest } from './cancelableRequest'
+
+export { createAccessRequest } from './user'

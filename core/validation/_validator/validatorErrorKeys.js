@@ -121,4 +121,10 @@ export const ValidatorErrorKeys = {
     userNotFound: 'validationErrors.user.userNotFound',
     passwordChangeRequired: 'validationErrors.user.passwordChangeRequired',
   },
+
+  userAccessRequest: {
+    emailRequired: 'validationErrors.userAccessRequest.emailRequired',
+    firstNameRequired: 'validationErrors.userAccessRequest.firstNameRequired',
+    lastNameRequired: 'validationErrors.userAccessRequest.lastNameRequired',
+  },
 }

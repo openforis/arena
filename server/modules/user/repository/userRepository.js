@@ -130,6 +130,20 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
     (row) => row.profile_picture
   )
 
+export const fetchSystemAdministratorsEmail = async (client = db) =>
+  client.map(
+    `
+    SELECT u.email 
+    FROM "user" u 
+    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
+    WHERE g.name = 'systemAdmin'
+  `,
+    [],
+    (row) => row.email
+  )
+
 // ==== UPDATE
 
 export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>

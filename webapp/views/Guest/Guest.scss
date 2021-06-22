@@ -15,6 +15,7 @@
 
 .guest__bg {
   @include full-screen-fixed();
+  z-index: -1;
   background-size: cover;
   background-position: center;
   background-image: url('/img/not-logged-in-bg.jpg');
@@ -66,7 +67,7 @@
   grid-template-columns: 1fr;
   justify-content: center;
   align-content: center;
-  grid-row-gap: 3rem;
+  grid-row-gap: 2rem;
 }
 
 .guest__form input {

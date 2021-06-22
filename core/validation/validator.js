@@ -41,10 +41,13 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 }
 
 // Validator functions
-export const { validateRequired } = ValidatorFunctions
-export const { validateItemPropUniqueness } = ValidatorFunctions
-export const { validateNotKeyword } = ValidatorFunctions
-export const { validateName } = ValidatorFunctions
-export const { validateNumber } = ValidatorFunctions
-export const { validatePositiveNumber } = ValidatorFunctions
-export const { isKeyword } = ValidatorFunctions
+export const {
+  validateRequired,
+  validateItemPropUniqueness,
+  validateNotKeyword,
+  validateName,
+  validateNumber,
+  validatePositiveNumber,
+  validateEmail,
+  isKeyword,
+} = ValidatorFunctions
