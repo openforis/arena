@@ -1,6 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { TableDataNodeDef } from '@common/model/db'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
@@ -8,7 +9,7 @@ import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 export default class MassiveUpdateData extends MassiveUpdate {
   constructor({ survey, entity, chain, cycle }, tx) {
     const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
-    const nodeDefsByColumnName = NodeDef.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
     const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
