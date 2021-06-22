@@ -116,7 +116,6 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
-          // TO UPDATE
           await NodeDefManager.updateNodeDefProps(
             user,
             surveyId,
