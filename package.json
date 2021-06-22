@@ -97,7 +97,7 @@
   },
   "dependencies": {
     "@openforis/arena-core": "^0.0.66",
-    "@openforis/arena-server": "^0.0.26",
+    "@openforis/arena-server": "^0.1.17",
     "@sendgrid/mail": "^7.4.2",
     "@shopify/draggable": "^1.0.0-beta.8",
     "adm-zip": "^0.5.3",

@@ -1075,9 +1075,9 @@
   integrity sha512-RKHfmQuB4PX72qkOqbdr9V9GgtnYUxDmvhQtun2Jkvn0jJmtgnQoi6PW6d/fGCBcMjuplK7+MCKmilf2j/501A==
 
 "@godaddy/terminus@^4.7.1":
-  version "4.7.2"
-  resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.7.2.tgz#69919e781232b789d8db308f4a0becd906ea2886"
-  integrity sha512-hiTKQUXcp84uvnr57/mFK/0xUUuzpVJsCs0hsulk5+6mA+U/drewHG58QDgoCFuWjo8ceumFP7uvr4PpmFYG9g==
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.9.0.tgz#c7de0b45ede05116854d1461832dd05df169f689"
+  integrity sha512-j1E22ZK5jW+DVb2vIEOx9I6epWT/geJyWzuxsUThyPcds5UxjCBeKcDTtNVkoWLRASM49o9OKRrCKKybX7z9bw==
   dependencies:
     stoppable "^1.1.0"
 
@@ -1323,10 +1323,10 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-server@^0.0.26":
-  version "0.0.26"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.0.26/6bf82f0bc5282fe58f9ad47864a91127fc9508cf91e5081c00be0143877050ec#33c7cc3e673cba8e6c1e461f7acc8095406ce435"
-  integrity sha512-Fbqxz7gl3ogfy3hJclQB8Hn73eDyw5oEadZlI5RT2KnQsl0RfN8Alx3aG4E79JztQjUjj6mwVj256b+DZUqK1Q==
+"@openforis/arena-server@^0.1.17":
+  version "0.1.17"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.17/33bd6259ac42a87f79b54fe424b3dc944bcfca89798e082bbfa644a09f8563ae#ca161346f10a09bfbc8b3bba94a31aa651e150ed"
+  integrity sha512-JDFiWzxQMinkZc6QTKFSyOuYKUS7/b5mf42oLgjL15H4RJnxFpFKhavAwZccXvEYPro9+sB6nrsDy6b61tqauw==
   dependencies:
     "@godaddy/terminus" "^4.7.1"
     "@openforis/arena-core" "^0.0.65"
@@ -1545,10 +1545,15 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.4.tgz#f0ec25dbf2f0e4b18647313ac031134ca5b24b21"
   integrity sha512-1z8k4wzFnNjVK/tlxvrWuK5WMt6mydWWP7+zvH5eFep4oj+UkrfiJTRtjCeBXNpwaA/FYqqtb4/QS4ianFpIRA==
 
-"@types/node@*", "@types/node@>=10.0.0":
+"@types/node@*":
   version "15.3.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-15.3.0.tgz#d6fed7d6bc6854306da3dea1af9f874b00783e26"
   integrity sha512-8/bnjSZD86ZfpBsDlCIkNXIvm+h6wi9g7IqL+kmFkQ+Wvu3JrasgLElfiPgoo8V8vVfnEi0QVS12gbl94h9YsQ==
+
+"@types/node@>=10.0.0":
+  version "15.12.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.12.4.tgz#e1cf817d70a1e118e81922c4ff6683ce9d422e26"
+  integrity sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -3444,7 +3449,7 @@ cookie@0.4.0:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.0.tgz#beb437e7022b3b6d49019d088665303ebe9c14ba"
   integrity sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==
 
-cookie@~0.4.1:
+cookie@0.4.1, cookie@~0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.1.tgz#afd713fe26ebd21ba95ceb61f9a8116e50a537d1"
   integrity sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==
@@ -5259,7 +5264,7 @@ express-fileupload@^1.2.1:
   dependencies:
     busboy "^0.3.1"
 
-express-session@^1.17.0, express-session@^1.17.1:
+express-session@^1.17.0:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.1.tgz#36ecbc7034566d38c8509885c044d461c11bf357"
   integrity sha512-UbHwgqjxQZJiWRTMyhvWGvjBQduGCSBDhhZXYenziMFjxst5rMV+aJZ6hKPHZnPyHGsrqRICxtX8jtEbm/z36Q==
@@ -5271,6 +5276,20 @@ express-session@^1.17.0, express-session@^1.17.1:
     on-headers "~1.0.2"
     parseurl "~1.3.3"
     safe-buffer "5.2.0"
+    uid-safe "~2.1.5"
+
+express-session@^1.17.1:
+  version "1.17.2"
+  resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.2.tgz#397020374f9bf7997f891b85ea338767b30d0efd"
+  integrity sha512-mPcYcLA0lvh7D4Oqr5aNJFMtBMKPLl++OKKxkHzZ0U0oDq1rpKBnkR5f5vCHR26VeArlTOEF9td4x5IjICksRQ==
+  dependencies:
+    cookie "0.4.1"
+    cookie-signature "1.0.6"
+    debug "2.6.9"
+    depd "~2.0.0"
+    on-headers "~1.0.2"
+    parseurl "~1.3.3"
+    safe-buffer "5.2.1"
     uid-safe "~2.1.5"
 
 express@^4.16.3, express@^4.17.1:
@@ -10979,7 +10998,7 @@ safe-buffer@5.2.0:
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.0.tgz#b74daec49b1148f88c64b68d49b1e815c1f2f519"
   integrity sha512-fZEwUGbVl7kouZs1jCdMLdt95hdIv0ZeHg6L7qPeciMZhZ+/gdesW4wgTARkrFWEpspjEATAzUGPG8N2jJiwbg==
 
-safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
+safe-buffer@5.2.1, safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
   integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
@@ -11363,9 +11382,9 @@ snapdragon@^0.8.1:
     use "^3.1.0"
 
 socket.io-adapter@~2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.3.0.tgz#63090df6dd6d289b0806acff4a0b2f1952ffe37e"
-  integrity sha512-jdIbSFRWOkaZpo5mXy8T7rXEN6qo3bOFuq4nVeX1ZS7AtFlkbk39y153xTXEIW7W94vZfhVOux1wTU88YxcM1w==
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.3.1.tgz#a442720cb09a4823cfb81287dda1f9b52d4ccdb2"
+  integrity sha512-8cVkRxI8Nt2wadkY6u60Y4rpW3ejA1rxgcK2JuyIhmF+RMNpTy1QRtkHIDUOf3B4HlQwakMsWbKftMv/71VMmw==
 
 socket.io-client@^3.1.1:
   version "3.1.3"
