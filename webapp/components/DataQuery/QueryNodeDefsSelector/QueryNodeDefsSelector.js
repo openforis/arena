@@ -13,7 +13,7 @@ const QueryNodeDefsSelector = (props) => {
   const { query, onChangeQuery } = props
 
   const survey = useSurvey()
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
   const onChangeEntity = (entityDefUuid) => onChangeQuery(Query.create({ entityDefUuid }))
 
   return Query.isModeAggregate(query) ? (

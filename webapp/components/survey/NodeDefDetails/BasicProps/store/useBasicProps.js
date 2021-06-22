@@ -34,8 +34,7 @@ export const useBasicProps = (props) => {
 
   // Analysis
   const entitySourceHierarchy = Survey.getHierarchy(
-    (nodeDefCurrent) => NodeDef.isEntity(nodeDefCurrent) && !NodeDef.isAnalysis(nodeDefCurrent),
-    true
+    (nodeDefCurrent) => NodeDef.isEntity(nodeDefCurrent) && !NodeDef.isAnalysis(nodeDefCurrent)
   )(survey)
 
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)

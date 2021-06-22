@@ -8,19 +8,19 @@ const getNodeDefSource = (nodeDef) => (survey) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getUuid)(survey) : null
 
 const calculateNodeDefChildren =
-  (nodeDef, includeAnalysis = false) =>
+  (nodeDef) =>
   (survey) => {
     const children = []
     if (NodeDef.isVirtual(nodeDef)) {
       // If nodeDef is virtual, get children from its source
       const entitySource = getNodeDefSource(nodeDef)(survey)
-      children.push(...calculateNodeDefChildren(entitySource, includeAnalysis)(survey))
+      children.push(...calculateNodeDefChildren(entitySource)(survey))
     }
 
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     children.push(
       ...Object.values(survey.nodeDefs).filter((nodeDefCurrent) => {
-        if (!includeAnalysis && NodeDef.isAnalysis(nodeDefCurrent)) {
+        if (NodeDef.isAnalysis(nodeDefCurrent)) {
           return false
         }
         if (NodeDef.isVirtual(nodeDefCurrent)) {
@@ -40,15 +40,12 @@ export const getNodeDefsIndex = (survey) => {
   return nodeDefsIndex || {}
 }
 
-export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = false) =>
+export const getNodeDefChildren = (nodeDef) =>
   (survey) => {
     const { nodeDefsIndex } = survey
     if (!nodeDefsIndex) throw new Error('Node defs index not initialized')
 
-    const childrenUuidsIndex = includeAnalysis
-      ? nodeDefsIndex.childDefUuidsByParentUuidAnalysis
-      : nodeDefsIndex.childDefUuidsByParentUuid
+    const childrenUuidsIndex = nodeDefsIndex.childDefUuidsByParentUuid
 
     let actualEntityUuid = nodeDef.uuid
     if (NodeDef.isVirtual(nodeDef)) {
@@ -123,7 +120,7 @@ const initNodeDefIndex = ({ survey, nodeDef }) => {
   const nodeDefsIndexUpdated = { ...nodeDefsIndex }
   if (NodeDef.isEntity(nodeDef)) {
     const children = calculateNodeDefChildren(nodeDef)(survey)
-    const childrenAnalysis = calculateNodeDefChildren(nodeDef, true)(survey)
+    const childrenAnalysis = calculateNodeDefChildren(nodeDef)(survey)
     nodeDefsIndexUpdated.childDefUuidsByParentUuid[nodeDef.uuid] = children.map(NodeDef.getUuid)
     nodeDefsIndexUpdated.childDefUuidsByParentUuidAnalysis[nodeDef.uuid] = childrenAnalysis.map(NodeDef.getUuid)
   }
