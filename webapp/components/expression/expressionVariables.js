@@ -28,13 +28,14 @@ const getJsVariables = (nodeDef) => [
 ]
 
 const getSqlVariables = (nodeDef, lang) => {
-  const colNames = NodeDefTable.getColNames(nodeDef)
+  const columnNames = NodeDefTable.getColumnNames(nodeDef)
 
   // Returns the label of the nodeDef with the col name as suffix (when there are multiple columns)
   const getLabel = (col) =>
-    NodeDef.getLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ` - ${NodeDefTable.extractColName(nodeDef, col)}`)
+    NodeDef.getLabel(nodeDef, lang) +
+    (columnNames.length === 1 ? '' : ` - ${NodeDefTable.extractColumnName(nodeDef, col)}`)
 
-  return colNames.map((col) => ({
+  return columnNames.map((col) => ({
     value: col,
     label: getLabel(col),
     type: toSqlType(nodeDef),
@@ -71,34 +72,40 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
   const stack = []
   const entitiesVisitedByUuid = {}
 
+  const isVisited = (nDef) => Boolean(entitiesVisitedByUuid[NodeDef.getUuid(nDef)])
+  const markVisited = (nDef) => {
+    entitiesVisitedByUuid[NodeDef.getUuid(nDef)] = true
+  }
+  const visitNext = (nDef) => {
+    if (nDef && !isVisited(nDef)) stack.push(nDef)
+  }
+
   // visit nodeDefContext and its ancestors following the hierarchy
   stack.push(nodeDefContext)
 
   while (stack.length > 0) {
     const nodeDef = stack.pop()
 
-    entitiesVisitedByUuid[NodeDef.getUuid(nodeDef)] = true
+    markVisited(nodeDef)
 
     if (NodeDef.isVirtual(nodeDef)) {
       const source = Survey.getNodeDefSource(nodeDef)(survey)
-      if (source) stack.push(source)
-    } else if (!NodeDef.isEqual(nodeDefContext)(nodeDef)) {
+      visitNext(source)
+    } else {
       // get variables from every child def
       const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
       nodeDefChildren.forEach((childDef) => {
         variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
 
         // if the child def is a single entity, include variables from the descendants of that entity
-        if (NodeDef.isSingleEntity(childDef) && !entitiesVisitedByUuid[NodeDef.getUuid(childDef)]) {
-          stack.push(childDef)
+        if (NodeDef.isSingleEntity(childDef)) {
+          visitNext(childDef)
         }
       })
     }
     // add parent to stack only if not visited yet
     const parent = Survey.getNodeDefParent(nodeDef)(survey)
-    if (parent && !entitiesVisitedByUuid[NodeDef.getUuid(parent)]) {
-      stack.push(parent)
-    }
+    visitNext(parent)
   }
   return variables
 }

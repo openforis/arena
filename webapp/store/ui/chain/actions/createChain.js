@@ -12,5 +12,5 @@ export const createChain =
 
     const { data: chain } = await axios.post(`/api/survey/${surveyId}/chain`, { cycle })
 
-    history.push(`${appModuleUri(analysisModules.processingChain)}${chain.uuid}/`)
+    history.push(`${appModuleUri(analysisModules.chain)}${chain.uuid}/`)
   }

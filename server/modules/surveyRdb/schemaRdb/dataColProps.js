@@ -17,16 +17,16 @@ const { nodeDefType } = NodeDef
 
 const colValueProcessor = 'colValueProcessor'
 
-const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
+const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) => {
   // Remove nodeDefName from col name
-  const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
+  const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
 
   return isInProps ? NodeDef.getProp(prop)(item) : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (_survey, nodeDefCol) => (node, colName) => {
+const nodeValuePropProcessor = (_survey, nodeDefCol) => (node, columnName) => {
   const nodeValue = Node.getValue(node)
-  return getValueFromItem(nodeDefCol, colName, nodeValue)
+  return getValueFromItem(nodeDefCol, columnName, nodeValue)
 }
 
 /**
@@ -75,22 +75,22 @@ const props = {
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
 
-      return (_node, colName) =>
-        R.endsWith('code', colName)
-          ? getValueFromItem(nodeDefCol, colName, item, true)
+      return (_node, columnName) =>
+        R.endsWith('code', columnName)
+          ? getValueFromItem(nodeDefCol, columnName, item, true)
           : ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
     },
   },
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: (survey, _nodeDefCol, nodeCol) => {
-      // Return (node, colName) => null
+      // Return (node, columnName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
-      return (node, colName) =>
+      return (node, columnName) =>
         // eslint-disable-next-line no-nested-ternary
-        R.endsWith('code', colName)
+        R.endsWith('code', columnName)
           ? Taxon.getCode(taxon)
           : Taxon.isUnlistedTaxon(taxon) // Scientific_name
           ? Node.getScientificName(node) // From node value

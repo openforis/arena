@@ -33,12 +33,12 @@ const ColumnData = (props) => {
   const { colWidth, nodeDef, query, row } = props
   const i18n = useI18n()
 
-  const { colNames, widthInner, widthOuter } = useColumn({ nodeDef, query, colWidth })
+  const { columnNames, widthInner, widthOuter } = useColumn({ nodeDef, query, colWidth })
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="table__inner-cell">
-        {colNames.map((col) => (
+        {columnNames.map((col) => (
           <div key={col} style={{ width: widthInner }} className="ellipsis">
             {getColValue({ nodeDef, col, row, i18n })}
           </div>

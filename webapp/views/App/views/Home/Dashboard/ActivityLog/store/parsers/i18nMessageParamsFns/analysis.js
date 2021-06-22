@@ -4,26 +4,16 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _getProcessingChainLabel = (lang) => R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
+const _getChainLabel = (lang) => R.pipe(ActivityLog.getChainLabels, R.prop(lang))
 
 export default {
   // ====== Chain
   [ActivityLog.type.chainPropUpdate]: (survey, i18n) => (activityLog) => ({
     key: ActivityLog.getContentKey(activityLog),
-    label: _getProcessingChainLabel(i18n.lang)(activityLog),
+    label: _getChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.chainNodeDefCreate]: (survey) => (activityLog) => {
-    const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-    return {
-      type: NodeDef.getType(nodeDef),
-      parentName: NodeDef.getName(nodeDefParent),
-    }
-  },
-
-  [ActivityLog.type.chainNodeDefPropUpdate]: (survey) => (activityLog) => {
+  [ActivityLog.type.analysisNodeDefPropUpdate]: (survey) => (activityLog) => {
     const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     return {
@@ -33,11 +23,11 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingChainStatusExecSuccess]: (survey, i18n) => (activityLog) => ({
-    label: _getProcessingChainLabel(i18n.lang)(activityLog),
+  [ActivityLog.type.chainStatusExecSuccess]: (survey, i18n) => (activityLog) => ({
+    label: _getChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.processingChainDelete]: (survey, i18n) => (activityLog) => ({
+  [ActivityLog.type.chainDelete]: (survey, i18n) => (activityLog) => ({
     label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.lang))(activityLog),
   }),
 }

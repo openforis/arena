@@ -10,7 +10,7 @@ import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCre
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
 import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
 import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
-import ProcessingChainsCyclesCheckJob from './jobs/processingChainsCyclesCheckJob'
+import ChainsCyclesCheckJob from './jobs/chainsCyclesCheckJob'
 import ChainsValidationJob from './jobs/chainsValidationJob'
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
@@ -24,7 +24,7 @@ export default class SurveyPublishJob extends Job {
       new TaxonomiesValidationJob(),
       new SurveyInfoValidationJob(),
       new CyclesDeletedCheckJob(),
-      new ProcessingChainsCyclesCheckJob(),
+      new ChainsCyclesCheckJob(),
       new ChainsValidationJob(),
       // Record check must be executed before publishing survey props
       new RecordCheckJob(),

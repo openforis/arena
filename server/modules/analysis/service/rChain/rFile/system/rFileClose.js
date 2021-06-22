@@ -1,5 +1,5 @@
+import * as Chain from '@common/analysis/chain'
 import * as ApiRoutes from '../../../../../../../common/apiRoutes'
-import * as ProcessingChain from '../../../../../../../common/analysis/processingChain'
 
 import RFileSystem from './rFileSystem'
 
@@ -15,7 +15,7 @@ export default class RFileClose extends RFileSystem {
 
     const { surveyId, chainUuid } = this.rChain
 
-    const params = { statusExec: `'${ProcessingChain.statusExec.success}'` }
+    const params = { statusExec: `'${Chain.statusExec.success}'` }
     const updateChain = arenaPut(ApiRoutes.rChain.chainStatusExec(surveyId, chainUuid), params)
     await this.appendContent(updateChain)
 

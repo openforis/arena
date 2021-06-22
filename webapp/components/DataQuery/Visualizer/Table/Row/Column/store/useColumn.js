@@ -11,24 +11,24 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
     ? Query.getMeasures(query).get(NodeDef.getUuid(nodeDef))
     : null
   const isMeasure = Boolean(aggregateFunctions)
-  const colNames = isMeasure
+  const columnNames = isMeasure
     ? // for every measure add a column for each aggregate function
-      aggregateFunctions.map((aggregateFn) => `${ColumnNodeDef.getColName(nodeDef)}_${aggregateFn}`)
-    : ColumnNodeDef.getColNames(nodeDef)
+      aggregateFunctions.map((aggregateFn) => `${ColumnNodeDef.getColumnName(nodeDef)}_${aggregateFn}`)
+    : ColumnNodeDef.getColumnNames(nodeDef)
 
   const customAggregateFunction =
     isMeasure && !Object.values(Query.aggregateFunctions).includes(aggregateFunctions[0])
       ? aggregateFunctions[0].clause
       : null
 
-  const noCols = modeEdit ? NodeDefUIProps.getFormFields(nodeDef).length : colNames.length
+  const noCols = modeEdit ? NodeDefUIProps.getFormFields(nodeDef).length : columnNames.length
 
   const widthOuter = colWidth * noCols
   const widthInner = `${(1 / noCols) * 100}%`
 
   return {
     modeEdit,
-    colNames,
+    columnNames,
     isMeasure,
     aggregateFunctions,
     customAggregateFunction,

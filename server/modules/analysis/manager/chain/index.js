@@ -1,14 +1,14 @@
 import * as A from '@core/arena'
+import * as Chain from '@common/analysis/chain'
+
 import * as DB from '../../../../db'
 
-import * as Chain from '../../../../../common/analysis/processingChain'
 import { TableChain } from '../../../../../common/model/db'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 
 import { markSurveyDraft } from '../../../survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '../../../activityLog/repository/activityLogRepository'
 import * as ChainRepository from '../../repository/chain'
-import { ChainNodeDefRepository } from '../../repository/chainNodeDef'
 
 // ====== CREATE
 const _insertChain = async ({ user, surveyId, chain }, client) => {
@@ -17,32 +17,7 @@ const _insertChain = async ({ user, surveyId, chain }, client) => {
 }
 
 // ====== READ
-export const { countChains, fetchChains } = ChainRepository
-
-/**
- * Fetches a single processing chain by the given survey id and chainUuid.
- *
- * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
- * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {boolean} [params.includeChainNodeDefs=false] - Whether to ChainNodeDefs.
- * @param {BaseProtocol} [client=db] - The database client.
- *
- * @returns {Promise<Chain|null>} - The result promise.
- */
-export const fetchChain = async (params, client = DB.client) => {
-  const { includeChainNodeDefs = false } = params
-
-  const chain = await ChainRepository.fetchChain(params, client)
-
-  if (includeChainNodeDefs) {
-    const chainNodeDefs = await ChainNodeDefRepository.fetchChainNodeDefsByChainUuid(params, client)
-    chain[Chain.keys.chainNodeDefs] = chainNodeDefs
-  }
-
-  return chain
-}
+export const { countChains, fetchChains, fetchChain } = ChainRepository
 
 // ====== UPDATE
 export const { updateChain, removeChainCycles } = ChainRepository
@@ -56,7 +31,7 @@ export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusE
       ),
     ]
     if (statusExec === Chain.statusExec.success) {
-      const type = ActivityLog.type.processingChainStatusExecSuccess
+      const type = ActivityLog.type.chainStatusExecSuccess
       const content = { [ActivityLog.keysContent.uuid]: chainUuid }
       promises.push(ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
     }
@@ -105,7 +80,7 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
     }
     return tx.batch([
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
       markSurveyDraft(surveyId, tx),
     ])
   })

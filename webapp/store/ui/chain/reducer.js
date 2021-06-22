@@ -7,8 +7,6 @@ import { ChainActionTypes } from './actions'
 const initialState = {
   chain: null,
   entityDefUuid: null,
-  chainNodeDefs: [],
-  chainNodeDefsCount: {},
 }
 
 const reset = () => initialState
@@ -22,46 +20,15 @@ const actionHandlers = {
 
   [ChainActionTypes.chainReset]: reset,
 
-  [ChainActionTypes.chainUpdate]: (state, { chain, chainNodeDefsCount = null }) => ({
+  [ChainActionTypes.chainUpdate]: (state, { chain }) => ({
     ...state,
     chain,
-    chainNodeDefsCount: chainNodeDefsCount || state.chainNodeDefsCount,
   }),
 
   [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
 
-  [ChainActionTypes.chainNodeDefsUpdate]: (state, { chainNodeDefs }) => ({ ...state, chainNodeDefs }),
 
-  [ChainActionTypes.chainNodeDefUpdate]: (state, { chainNodeDef }) => {
-    const { chainNodeDefs } = state
-    chainNodeDefs[chainNodeDef.index] = chainNodeDef
-    return {
-      ...state,
-      chainNodeDefs: [...chainNodeDefs],
-    }
-  },
 
-  [ChainActionTypes.chainNodeDefUpdateIndex]: (state, { chainNodeDef, newIndex }) => {
-    const { chainNodeDefs } = state
-    const { index: oldIndex } = chainNodeDef
-    const chainNodeDefsUpdate = []
-
-    chainNodeDefs.forEach((chainNodeDefCurrent) => {
-      const { index } = chainNodeDefCurrent
-      let indexUpdate
-      if (index > oldIndex && index <= newIndex) indexUpdate = index - 1
-      else if (index < oldIndex && index >= newIndex) indexUpdate = index + 1
-      else if (index === oldIndex) indexUpdate = newIndex
-      else indexUpdate = index
-
-      chainNodeDefsUpdate[indexUpdate] = { ...chainNodeDefCurrent, index: indexUpdate }
-    })
-
-    return {
-      ...state,
-      chainNodeDefs: [...chainNodeDefsUpdate],
-    }
-  },
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)

@@ -1,4 +1,4 @@
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/chain'
 
 import RFileUser from './rFileUser'
 
@@ -11,6 +11,6 @@ export default class RFileCommon extends RFileUser {
     await super.init()
 
     const { chain } = this.rChain
-    await this.appendContent(ProcessingChain.getScriptCommon(chain))
+    await this.appendContent(Chain.getScriptCommon(chain))
   }
 }
