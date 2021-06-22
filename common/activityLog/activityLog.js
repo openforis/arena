@@ -55,10 +55,9 @@ export const type = {
   // Analysis
   chainCreate: 'chainCreate',
   chainPropUpdate: 'chainPropUpdate',
-  chainNodeDefCreate: 'chainNodeDefCreate',
-  chainNodeDefPropUpdate: 'chainNodeDefPropUpdate',
-  processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
-  processingChainDelete: 'processingChainDelete',
+  analysisNodeDefPropUpdate: 'analysisNodeDefPropUpdate',
+  chainStatusExecSuccess: 'chainStatusExecSuccess',
+  chainDelete: 'chainDelete',
 }
 
 export const keys = {
@@ -80,7 +79,7 @@ export const keys = {
   targetUserUuid: 'targetUserUuid',
   // Analysis
   chainUuid: 'chainUuid',
-  processingChainLabels: 'processingChainLabels',
+  chainLabels: 'chainLabels',
 }
 
 export const keysContent = {
@@ -111,7 +110,6 @@ export const keysContent = {
   // Analysis
   labels: 'labels',
   chainUuid: 'chainUuid',
-  processingChainUuid: 'processingChainUuid',
   indexFrom: 'indexFrom',
   indexTo: 'indexTo',
 }
@@ -145,7 +143,7 @@ export const getTargetUserName = R.prop(keys.targetUserName)
 export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
 export const getChainUuid = R.prop(keys.chainUuid)
-export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
+export const getChainLabels = R.prop(keys.chainLabels)
 
 // Content props
 const _getContentProp = (prop) => R.path([keys.content, prop])

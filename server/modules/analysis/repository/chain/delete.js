@@ -1,6 +1,7 @@
+import * as Chain from '@common/analysis/chain'
+
 import * as DB from '../../../../db'
 
-import * as Chain from '../../../../../common/analysis/processingChain'
 import { TableChain } from '../../../../../common/model/db'
 
 /**

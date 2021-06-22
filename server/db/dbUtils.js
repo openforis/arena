@@ -45,12 +45,12 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  * @returns Generated query string
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColName = (col) => R.propOr(col, 'name', col)
+  const getColumnName = (col) => R.propOr(col, 'name', col)
 
-  const idColName = getColName(idCol)
+  const idColumnName = getColumnName(idCol)
   const idColCast = R.propOr('text', 'cast', idCol)
 
-  const cols = [`?${idColName}`, ...updateCols]
+  const cols = [`?${idColumnName}`, ...updateCols]
 
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },
@@ -59,9 +59,9 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
     // Id column is always the first among item values
-    item[idColName] = itemValues[0]
+    item[idColumnName] = itemValues[0]
     for (const [i, updateCol] of updateCols.entries()) {
-      item[getColName(updateCol)] = itemValues[i + 1]
+      item[getColumnName(updateCol)] = itemValues[i + 1]
     }
 
     return item
@@ -70,7 +70,7 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
   return `${pgp.helpers.update(
     valuesIndexedByCol,
     columnSet
-  )} WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
+  )} WHERE v.${idColumnName}::${idColCast} = t.${idColumnName}::${idColCast}`
 }
 
 /**

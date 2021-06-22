@@ -31,21 +31,33 @@ const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), colsByType)
 const getDefaultColumnName = (nodeDef) =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
-export const getColNames = (nodeDef) => {
+export const getColumnNames = (nodeDef) => {
   const cols = getCols(nodeDef)
   return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map((col) => `${NodeDef.getName(nodeDef)}_${col}`)
 }
 
-export const getColName = R.pipe(getColNames, R.head)
+export const getColumnName = R.pipe(getColumnNames, R.head)
 
-export const getColNamesByUuids = (nodeDefUuidCols) => (survey) =>
+export const getNodeDefsWithColumnNames = (nodeDefs) =>
+  nodeDefs.flatMap((nodeDef) => ({ columnName: getColumnNames(nodeDef), nodeDef }))
+
+export const getNodeDefsColumnNames = (nodeDefs) =>
+  getNodeDefsWithColumnNames(nodeDefs).map(({ columnName }) => columnName)
+
+export const getNodeDefsByColumnNames = (nodeDefs) =>
+  getNodeDefsWithColumnNames(nodeDefs).reduce(
+    (_nodeDefs, { columnName, nodeDef }) => ({ ..._nodeDefs, [columnName]: nodeDef }),
+    {}
+  )
+
+export const getColumnNamesByUuids = (nodeDefUuidCols) => (survey) =>
   R.reduce(
-    (cols, uuid) => R.pipe(Survey.getNodeDefByUuid(uuid), getColNames, R.concat(cols))(survey),
+    (cols, uuid) => R.pipe(Survey.getNodeDefByUuid(uuid), getColumnNames, R.concat(cols))(survey),
     [],
     nodeDefUuidCols
   )
 
-export const extractColName = (nodeDef, col) =>
+export const extractColumnName = (nodeDef, col) =>
   R.replace(
     // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
     `${toSnakeCase(NodeDef.getName(nodeDef))}_`,

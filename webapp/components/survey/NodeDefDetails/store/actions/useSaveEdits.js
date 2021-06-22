@@ -1,14 +1,12 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
-import { useChain } from '@webapp/store/ui/chain'
 import * as SurveyState from '@webapp/store/survey/state'
 import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 import { State } from '../state'
@@ -18,7 +16,6 @@ export const useSaveEdits = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
-  const chain = useChain()
 
   return useCallback(async ({ state }) => {
     const nodeDef = State.getNodeDef(state)
@@ -44,16 +41,8 @@ export const useSaveEdits = ({ setState }) => {
           nodeDefUpdated
         )
       }
-      let chainNodeDef = null
-      if (NodeDef.isAnalysis(nodeDefUpdated) && NodeDef.isAttribute(nodeDefUpdated)) {
-        chainNodeDef = {
-          chainUuid: chain.uuid,
-          nodeDefUuid: NodeDef.getUuid(nodeDefUpdated),
-          props: { active: true },
-          uuid: uuidv4(),
-        }
-      }
-      await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated, chainNodeDef }))
+
+      await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated }))
     } else {
       const props = State.getPropsUpdated(state)
       const propsAdvanced = State.getPropsAdvancedUpdated(state)

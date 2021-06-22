@@ -10,19 +10,19 @@ import * as DataCol from './dataCol'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const colNameUuuid = 'uuid'
+export const columnNameUuuid = 'uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const colNameParentUuuid = 'parent_uuid'
+export const columnNameParentUuuid = 'parent_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const colNameRecordUuuid = 'record_uuid'
+export const columnNameRecordUuuid = 'record_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const colNameRecordCycle = 'record_cycle'
+export const columnNameRecordCycle = 'record_cycle'
 // eslint-disable-next-line
 /**
  * @deprecated - Use TableDataNodeDef
@@ -47,10 +47,10 @@ export const getName = NodeDefTable.getTableName
  * @deprecated - Use TableDataNodeDef
  */
 export const getColumnNames = (survey, nodeDef) => [
-  colNameUuuid,
-  colNameRecordUuuid,
-  colNameRecordCycle,
-  colNameParentUuuid,
+  columnNameUuuid,
+  columnNameRecordUuuid,
+  columnNameRecordCycle,
+  columnNameParentUuuid,
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames)),
 ]
 
@@ -63,9 +63,9 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
 
   return [
     Node.getUuid(nodeRow),
-    nodeRow[colNameRecordUuuid],
-    nodeRow[colNameRecordCycle],
-    nodeRow[colNameParentUuuid],
+    nodeRow[columnNameRecordUuuid],
+    nodeRow[columnNameRecordCycle],
+    nodeRow[columnNameParentUuuid],
     ...rowValues,
   ]
 }

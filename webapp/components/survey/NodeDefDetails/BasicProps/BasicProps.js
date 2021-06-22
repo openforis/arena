@@ -17,6 +17,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import AnalysisCodeProps from '../AnalysisCodeProps'
 
 import { useBasicProps } from './store'
 
@@ -182,6 +183,8 @@ const BasicProps = (props) => {
           />
         </>
       )}
+
+      {NodeDef.isAnalysis(nodeDef) && <AnalysisCodeProps state={state} Actions={Actions} nodeDef={nodeDef} />}
     </div>
   )
 }
