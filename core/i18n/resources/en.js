@@ -229,7 +229,9 @@ PLEASE also give us a few moments to process your request.
 This is not an automated service and sometimes it takes us a little time to enter your information.
 For more information please visit our website: http://www.openforis.org`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
-    requestSent: 'Access Request sent correctly',
+    requestSent: `Access Request sent correctly to the address {{email}}.
+Please give us a few moments to process your request.
+We will send soon an email to your address with the instructions on how to access $t(common.appName).`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     title: 'Requesting access to $t(common.appNameFull)',

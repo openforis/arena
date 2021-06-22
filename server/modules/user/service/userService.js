@@ -5,7 +5,6 @@ import { db } from '@server/db/db'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userInvite'
-import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
@@ -14,12 +13,13 @@ import * as Validation from '@core/validation/validation'
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
+import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
+
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
-import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 
 // ====== CREATE
 
@@ -160,7 +160,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   }
 }
 
-export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) => {
+const _checkUserAccessRequest = async ({ userAccessRequest }) => {
   // verify reCaptcha
   const { reCaptchaToken } = userAccessRequest
   const reCaptchaVerified = await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken })
@@ -176,17 +176,25 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
   const { email } = userAccessRequest
   const existingUser = await UserManager.fetchUserByEmail(email)
   if (existingUser) {
-    return { error: 'validationErrors.userAccessRequest.userAlreadyExisting' }
+    return { error: 'validationErrors.userAccessRequest.userAlreadyExisting', errorParams: { email } }
   }
   // verify request not already existing
   const existingRequest = await UserManager.fetchUserAccessRequestByEmail({ email })
   if (existingRequest) {
     return { error: 'validationErrors.userAccessRequest.requestAlreadySent', errorParams: { email } }
   }
+  return { ok: true }
+}
 
+export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) => {
+  const requestCheck = await _checkUserAccessRequest({ userAccessRequest })
+  if (requestCheck.error) {
+    return requestCheck
+  }
   try {
     return await db.tx(async (t) => {
       const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail(t)
+      const { email } = userAccessRequest
       const { firstName, lastName, institution = '', country = '', purpose = '' } = userAccessRequest.props
       await Mailer.sendEmail({
         to: systemAdminEmails,

@@ -47,17 +47,26 @@ export const useAccessRequest = () => {
     const onSubmitConfirm = async () => {
       const reCaptchaToken = reCaptchaRef.current?.getValue()
 
-      const { error, validation: validationServer } = await API.createAccessRequest({
+      const {
+        error,
+        errorParams,
+        validation: validationServer,
+      } = await API.createAccessRequest({
         accessRequest: { ...request, reCaptchaToken },
       })
       setValidation(validationServer)
 
       if (error) {
-        dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: i18n.t(error) } }))
+        const errorMessage = i18n.t(error, errorParams)
+        dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: errorMessage } }))
         reCaptchaRef.current.reset()
       } else {
         dispatch(
-          NotificationActions.notifyInfo({ key: 'accessRequestView.requestSent', params: { email: request.email } })
+          NotificationActions.notifyInfo({
+            key: 'accessRequestView.requestSent',
+            params: { email: request.email },
+            timeout: 10000, // 10 seconds
+          })
         )
         history.goBack()
       }
