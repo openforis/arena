@@ -28,41 +28,30 @@ export const init = (app) => {
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
+      const { surveyId, surveyCycleKey, repeatInvitation = false } = Request.getParams(req)
+      const userToInvite = Request.getBody(req)
 
-      const { surveyId, surveyCycleKey } = Request.getParams(req)
-      const userInvite = Request.getBody(req)
-      const validation = await UserValidator.validateInvitation(userInvite)
+      if (!repeatInvitation) {
+        const validation = await UserValidator.validateInvitation(userToInvite)
 
-      if (!Validation.isValid(validation)) {
-        throw new SystemError('appErrors.userInvalid')
+        if (!Validation.isValid(validation)) {
+          res.json({ error: 'appErrors.userInvalid' })
+          return
+        }
       }
 
+      const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
-      await UserService.inviteUser(user, surveyId, surveyCycleKey, userInvite, serverUrl)
-      Response.sendOk(res)
+      try {
+        await UserService.inviteUser({ user, surveyId, surveyCycleKey, userToInvite, serverUrl, repeatInvitation })
+        Response.sendOk(res)
+      } catch (e) {
+        res.json({ errorKey: e.key, errorParams: e.params })
+      }
     } catch (error) {
       next(error)
     }
   })
-
-  app.post(
-    '/survey/:surveyId/users/inviteRepeat',
-    AuthMiddleware.requireUserInvitePermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, surveyCycleKey } = Request.getParams(req)
-        const userInvite = Request.getBody(req)
-        const serverUrl = Request.getServerUrl(req)
-
-        await UserService.inviteUser(user, surveyId, surveyCycleKey, userInvite, serverUrl, true)
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   // ==== READ
 

@@ -342,13 +342,21 @@ Do you want to proceed?`,
     startCsvExport: 'Start CSV export',
   },
   dataView: {
+    aggregateMode: 'Aggregate Mode',
+    editMode: 'Edit Mode',
+    filter: 'Filter records',
+    invalidRecord: 'Invalid record',
+    nodeDefsSelector: {
+      hide: 'Hide Node Definitions Selector',
+      show: 'Show Node Definitions Selector',
+    },
     records: {
       owner: 'Owner',
       step: 'Step',
       noRecordsAdded: 'No records added',
     },
     rowNum: 'Row #',
-    invalidRecord: 'Invalid record',
+    sort: 'Sort records',
     dataVis: {
       noData: 'This query returned no data',
     },
@@ -854,7 +862,7 @@ $t(common.cantUndoWarning)`,
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
-    userHasPendingInvitation: `There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted`,
+    userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
@@ -927,6 +935,13 @@ $t(common.cantUndoWarning)`,
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
              <p><a href="{{urlResetPassword}}">Click here to access OpenForis Arena</a></p>
              $t(emails.temporaryMsg)
+             $t(emails.signature)`,
+    },
+    existingUserInvite: {
+      subject: 'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in OpenForis Arena!',
+      body: `<p>Hello,</p>
+             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
              $t(emails.signature)`,
     },
     userInviteRepeatConfirmation:
