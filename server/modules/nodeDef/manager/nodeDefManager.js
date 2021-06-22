@@ -7,7 +7,6 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -25,15 +24,7 @@ export {
 // ======= CREATE
 
 export const insertNodeDef = async (
-  {
-    user,
-    surveyId,
-    cycle = Survey.cycleOneKey,
-    nodeDef: nodeDefParam,
-    system = false,
-    addLogs = true,
-    chainNodeDef = null,
-  },
+  { user, surveyId, cycle = Survey.cycleOneKey, nodeDef: nodeDefParam, system = false, addLogs = true },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -47,13 +38,6 @@ export const insertNodeDef = async (
       markSurveyDraft(surveyId, t),
       insertLog,
     ])
-
-    if (chainNodeDef) {
-      await t.batch([
-        ChainNodeDefRepository.insert({ chainNodeDef, surveyId }, t),
-        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainNodeDefCreate, chainNodeDef, system, t),
-      ])
-    }
 
     return {
       ...nodeDefsParentUpdated,

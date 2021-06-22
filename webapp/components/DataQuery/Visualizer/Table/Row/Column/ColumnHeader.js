@@ -17,8 +17,8 @@ import PanelRight from '@webapp/components/PanelRight'
 import { useColumn } from './store'
 import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor/CustomAggregateFunctionsEditor'
 
-const getColLabelKey = ({ colName, nodeDef }) => {
-  const col = ColumnNodeDef.extractColName({ nodeDef, colName })
+const getColLabelKey = ({ columnName, nodeDef }) => {
+  const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
   return `surveyForm.${nodeDefTypePrefix}.${col}`
 }
@@ -31,7 +31,7 @@ const ColumnHeader = (props) => {
 
   const {
     modeEdit,
-    colNames,
+    columnNames,
     isMeasure,
     aggregateFunctions,
     customAggregateFunction,
@@ -73,9 +73,9 @@ const ColumnHeader = (props) => {
 
       {noCols > 1 && !modeEdit && !isMeasure && (
         <div className="table__inner-cell">
-          {colNames.map((colName) => (
-            <div key={colName} style={{ width: widthInner }}>
-              {i18n.t(getColLabelKey({ colName, nodeDef }))}
+          {columnNames.map((columnName) => (
+            <div key={columnName} style={{ width: widthInner }}>
+              {i18n.t(getColLabelKey({ columnName, nodeDef }))}
             </div>
           ))}
         </div>

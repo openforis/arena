@@ -154,12 +154,12 @@ export const userModules = {
 }
 
 export const analysisModules = {
-  processingChains: {
-    key: 'processingChain_plural',
+  chains: {
+    key: 'chain_plural',
     path: `${appModules.analysis.path}/chains`,
   },
-  processingChain: {
-    key: 'processingChain',
+  chain: {
+    key: 'chain',
     path: `${appModules.analysis.path}/chain`,
   },
   entities: {

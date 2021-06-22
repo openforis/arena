@@ -32,13 +32,13 @@ const _getType = (nodeDef, node) => {
   return null
 }
 
-const _getColNames = (nodeDef, type) =>
+const _getColumnNames = (nodeDef, type) =>
   type === types.insert
     ? [
-        DataTable.colNameUuuid,
-        DataTable.colNameRecordUuuid,
-        DataTable.colNameRecordCycle,
-        DataTable.colNameParentUuuid,
+        DataTable.columnNameUuuid,
+        DataTable.columnNameRecordUuuid,
+        DataTable.columnNameRecordCycle,
+        DataTable.columnNameParentUuuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getNames(nodeDef)
           : []),
@@ -74,7 +74,7 @@ const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
         type,
         schemaName: SchemaRdb.getName(Survey.getId(survey)),
         tableName: DataTable.getName(nodeDef, nodeDefParent),
-        colNames: _getColNames(nodeDef, type),
+        columnNames: _getColumnNames(nodeDef, type),
         colValues: _getColValues(survey, cycle, nodeDef, node, type),
         rowUuid: _getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)]),
       })
@@ -88,7 +88,7 @@ const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
 const _update = (update, client) =>
   client.query(
     `UPDATE ${update.schemaName}.${update.tableName}
-      SET ${update.colNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
+      SET ${update.columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
       WHERE uuid = $1`,
     [update.rowUuid, ...update.colValues]
   )
@@ -96,9 +96,9 @@ const _update = (update, client) =>
 const _insert = (update, client) =>
   client.query(
     `INSERT INTO ${update.schemaName}.${update.tableName}
-      (${update.colNames.join(',')})
+      (${update.columnNames.join(',')})
       VALUES 
-      (${update.colNames.map((_col, i) => `$${i + 1}`).join(',')})`,
+      (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})`,
     update.colValues
   )
 

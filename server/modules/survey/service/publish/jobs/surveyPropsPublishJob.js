@@ -8,7 +8,6 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
-import * as AnalysisService from '@server/modules/analysis/service'
 
 const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true, validate: false }, t)
@@ -48,9 +47,6 @@ export default class SurveyPropsPublishJob extends Job {
     this.incrementProcessedItems()
 
     await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
-    this.incrementProcessedItems()
-
-    await AnalysisService.updateIndexesChainNodeDefs({ surveyId }, tx)
     this.incrementProcessedItems()
   }
 }

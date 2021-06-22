@@ -27,6 +27,7 @@ const ButtonSort = (props) => {
       <Tooltip messages={tooltipMessages}>
         <button
           type="button"
+          title={i18n.t('dataView.sort')}
           className={classNames('btn', 'btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
           onClick={Actions.togglePanelSort}
           aria-disabled={disabled}

@@ -16,15 +16,15 @@ export const deleteChain = ({ chain, history }) => async (dispatch, getState) =>
     await axios.delete(`/api/survey/${surveyId}/chain/${chain.uuid}`)
 
     dispatch(SurveyActions.metaUpdated())
-    dispatch(NotificationActions.notifyInfo({ key: 'processingChainView.deleteComplete' }))
+    dispatch(NotificationActions.notifyInfo({ key: 'chainView.deleteComplete' }))
     dispatch(LoaderActions.hideLoader())
 
-    history.push(appModuleUri(analysisModules.processingChains))
+    history.push(appModuleUri(analysisModules.chains))
   }
 
   dispatch(
     DialogConfirmActions.showDialogConfirm({
-      key: 'processingChainView.deleteConfirm',
+      key: 'chainView.deleteConfirm',
       onOk: action,
     })
   )

@@ -5,9 +5,13 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import DownloadButton from '@webapp/components/form/downloadButton'
 import { Query } from '@common/model/query'
+import { useI18n } from '@webapp/store/system'
 
 const ButtonDownload = (props) => {
   const { disabled, query } = props
+
+  const i18n = useI18n()
+
   const entityDefUuid = Query.getEntityDefUuid(query)
 
   const surveyId = useSurveyId()
@@ -27,6 +31,7 @@ const ButtonDownload = (props) => {
       requestParams={requestParams}
       showLabel={false}
       disabled={disabled}
+      title={i18n.t('common.csvExport')}
     />
   )
 }
