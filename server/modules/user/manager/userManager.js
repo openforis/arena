@@ -80,6 +80,9 @@ export const generateResetPasswordUuid = async (email, client = db) => {
 
   throw new Error(Validation.messageKeys.user.emailNotFound)
 }
+
+export { insertUserAccessRequest } from '../repository/userAccessRequestRepository'
+
 // ==== READ
 
 const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
@@ -145,6 +148,10 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 
   return null
 }
+
+export { fetchUserAccessRequestByEmail } from '../repository/userAccessRequestRepository'
+
+export { fetchSystemAdministratorsEmail } from '../repository/userRepository'
 
 // ==== UPDATE
 

@@ -1,7 +1,8 @@
 @import 'webapp/style/vars';
 
+.guest-login__btn-request-access,
 .guest-login__btn-forgot-pwd {
-  justify-self: end;
+  justify-self: center;
   display: flex;
   align-items: center;
   font-weight: 600;

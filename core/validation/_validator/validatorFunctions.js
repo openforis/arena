@@ -9,6 +9,9 @@ import * as ValidatorNameKeywords from './validatorNameKeywords'
  */
 const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
+const validEmailRegex =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
 const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 
 export const validateRequired = (errorKey) => (propName, obj) => {
@@ -35,21 +38,32 @@ export const validateName = (errorKey) => (propName, item) => {
   return prop && !validNameRegex.test(prop) ? { key: errorKey } : null
 }
 
-export const validateNumber = (errorKey = ValidatorErrorKeys.invalidNumber, params = {}) => (propName, item) => {
-  const value = getProp(propName)(item)
+export const validateNumber =
+  (errorKey = ValidatorErrorKeys.invalidNumber, params = {}) =>
+  (propName, item) => {
+    const value = getProp(propName)(item)
 
-  return value && isNaN(value) ? { key: errorKey, params } : null
-}
-
-export const validatePositiveNumber = (errorKey, params = {}) => (propName, item) => {
-  const validateNumberResult = validateNumber(errorKey, params)(propName, item)
-  if (validateNumberResult) {
-    return validateNumberResult
+    return value && isNaN(value) ? { key: errorKey, params } : null
   }
 
-  const value = getProp(propName)(item)
+export const validatePositiveNumber =
+  (errorKey, params = {}) =>
+  (propName, item) => {
+    const validateNumberResult = validateNumber(errorKey, params)(propName, item)
+    if (validateNumberResult) {
+      return validateNumberResult
+    }
 
-  return value && value <= 0 ? { key: errorKey, params } : null
-}
+    const value = getProp(propName)(item)
 
-export const isKeyword = ValidatorNameKeywords.isKeyword
+    return value && value <= 0 ? { key: errorKey, params } : null
+  }
+
+export const validateEmail =
+  ({ errorKey }) =>
+  (propName, item) => {
+    const email = getProp(propName)(item)
+    return email && !validEmailRegex.test(email) ? { key: errorKey } : null
+  }
+
+export const { isKeyword } = ValidatorNameKeywords

@@ -1,0 +1,1 @@
+export { ReCaptcha } from './ReCaptcha'
