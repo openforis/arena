@@ -1,9 +1,9 @@
-import * as Chain from '@common/analysis/chain'
-
 import * as pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { TableNode } from '@common/model/db'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
@@ -13,9 +13,8 @@ const { Column } = pgp.helpers
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
-    const chainNodeDefsInEntity = Chain.getChainNodeDefsInEntity({ entity })(chain)
-    const columnsNames = Chain.getColumnsNamesInEntity({ entity })(chain)
-    const nodeDefsByColumnName = Chain.getNodeDefsByColumnNameInEntity({ entity })(chain)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
@@ -40,17 +39,8 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     this.survey = survey
     this.entity = entity
     this.chain = chain
-    this.chainNodeDefsInEntity = chainNodeDefsInEntity
+
     this.nodeDefsByColumnName = nodeDefsByColumnName
-    this.columnsNames = columnsNames
-  }
-
-  get chainNodeDefsWithNodeDef() {
-    return this.chain.chain_node_defs
-  }
-
-  get chainNodeDefsInEnity() {
-    return this.chainNodeDefsInEntity
   }
 
   async push(rowResult) {

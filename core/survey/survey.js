@@ -14,6 +14,7 @@ import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
 import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
+import * as SurveyAnalysis from './_survey/surveyAnalysis'
 
 /**
  * Creates a new survey info object with the specified parameters.
@@ -209,3 +210,6 @@ export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCa
 // Taxon index
 export const { getTaxonUuid, getTaxonVernacularNameUuid, getTaxonByUuid, includesTaxonVernacularName, assocRefData } =
   SurveyRefDataIndex
+
+// Analysis
+export const { getAnalysisNodeDefs } = SurveyAnalysis

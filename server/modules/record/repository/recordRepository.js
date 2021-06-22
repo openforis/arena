@@ -102,12 +102,12 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
-  const getNodeDefKeyColName = NodeDefTable.getColName
+  const getNodeDefKeyColumnName = NodeDefTable.getColumnName
   const getNodeDefKeyColAlias = NodeDef.getName
   const nodeDefKeysSelect = nodeDefKeys
     .map(
       (nodeDefKey) =>
-        `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
+        `${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
     )
     .join(', ')
 

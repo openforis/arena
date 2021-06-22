@@ -1,5 +1,3 @@
-import { ChainNodeDefRepository } from '../repository/chainNodeDef'
-
 export { create } from './create'
 export { update } from './update'
 
@@ -16,7 +14,3 @@ export {
 
 export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'
-
-// chain node def
-export { updateChainNodeDef } from './updateChainNodeDef'
-export const updateIndexesChainNodeDefs = ChainNodeDefRepository.updateIndexes

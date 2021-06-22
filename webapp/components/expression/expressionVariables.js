@@ -28,13 +28,14 @@ const getJsVariables = (nodeDef) => [
 ]
 
 const getSqlVariables = (nodeDef, lang) => {
-  const colNames = NodeDefTable.getColNames(nodeDef)
+  const columnNames = NodeDefTable.getColumnNames(nodeDef)
 
   // Returns the label of the nodeDef with the col name as suffix (when there are multiple columns)
   const getLabel = (col) =>
-    NodeDef.getLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ` - ${NodeDefTable.extractColName(nodeDef, col)}`)
+    NodeDef.getLabel(nodeDef, lang) +
+    (columnNames.length === 1 ? '' : ` - ${NodeDefTable.extractColumnName(nodeDef, col)}`)
 
-  return colNames.map((col) => ({
+  return columnNames.map((col) => ({
     value: col,
     label: getLabel(col),
     type: toSqlType(nodeDef),

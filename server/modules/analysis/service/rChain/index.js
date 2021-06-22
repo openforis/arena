@@ -1,6 +1,4 @@
 import * as PromiseUtils from '@core/promiseUtils'
-import * as Chain from '@common/analysis/chain'
-import { ChainNodeDefRepository } from '@server/modules/analysis/repository/chainNodeDef'
 
 import { db } from '../../../../db/db'
 
@@ -14,6 +12,7 @@ import { TableChain } from '../../../../../common/model/db'
 import { Query } from '../../../../../common/model/query'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as NodeDefManager from '../../../nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
@@ -40,7 +39,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
-    includeChainNodeDefs: true,
   })
 
   const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
@@ -76,7 +74,7 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   fileZip.close()
 }
 
-export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
+export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 
@@ -107,26 +105,29 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
       }
     })
 
-    const chainNodeDefs = Chain.getChainNodeDefs(chain)
-    const chainNodeDefsWithNodeDef = chainNodeDefs.map((chainNodeDef) => ({
-      ...chainNodeDef,
-      nodeDef: Survey.getNodeDefByUuid(chainNodeDef.node_def_uuid)(survey),
-    }))
-
     await PromiseUtils.each(entities, async (entity, entityIndex) => {
-      const chainNodeDefsInEntity = chainNodeDefsWithNodeDef.filter(
-        (chainNodeDef) => NodeDef.getParentUuid(chainNodeDef.nodeDef) === NodeDef.getUuid(entity)
-      )
+      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
 
-      if (chainNodeDefsInEntity.length > 0) {
-        await PromiseUtils.each(chainNodeDefsInEntity, async (chainNodeDef) => {
-          const chainNodeDefName = NodeDef.getName(chainNodeDef.nodeDef)
+      if (analysisNodeDefsInEntity.length > 0) {
+        await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
+          const nodeDefName = NodeDef.getName(nodeDef)
 
           const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
 
-          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, chainNodeDefName)))?.trim()
+          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
-          await ChainNodeDefRepository.updateScript({ surveyId, uuid: chainNodeDef.uuid, newSript: script }, tx)
+          await NodeDefManager.updateNodeDefProps(
+            user,
+            surveyId,
+            NodeDef.getUuid(nodeDef),
+            NodeDef.getParentUuid(nodeDef),
+            {},
+            {
+              script,
+            },
+            false,
+            tx
+          )
         })
       }
     })

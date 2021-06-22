@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Chain from '@common/analysis/chain'
 import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 /**
@@ -48,7 +48,8 @@ export default class DfResults {
   }
 
   initDf() {
-    const columnNames = Chain.getColumnsNamesInEntity({ entity: this.entity })(this.chain)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
+    const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
 
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
@@ -65,7 +66,7 @@ export default class DfResults {
       },
       {
         name: TableNode.columnSet.parentUuid,
-        value: dfVar(this.dfSourceName, ColumnNodeDef.getColName(columnNodeDef)),
+        value: dfVar(this.dfSourceName, ColumnNodeDef.getColumnName(columnNodeDef)),
       },
     ].map((uuidMapping) => setVar(dfVar(this.name, uuidMapping.name), uuidMapping.value))
 
@@ -73,13 +74,12 @@ export default class DfResults {
   }
 
   initCodeAttributes() {
-    const chainNodeDefsWithNodeDefInEntity = Chain.getChainNodeDefsInEntity({
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({
       entity: this.entity,
-    })(this.rChain.chain)
+      chain: this.rChain.chain,
+    })(this.survey)
 
-    chainNodeDefsWithNodeDefInEntity.forEach((chainNodeDef) => {
-      const { nodeDef } = chainNodeDef
-
+    analysisNodeDefsInEntity.forEach((nodeDef) => {
       if (NodeDef.isCode(nodeDef)) {
         const nodeVarName = NodeDef.getName(nodeDef)
         const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
