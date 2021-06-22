@@ -5,6 +5,8 @@ export const enTranslation = {
   common: {
     active: 'Active',
     add: 'Add',
+    appName: 'Arena',
+    appNameFull: '$t(common.openForis) Arena',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
     aggregateFunction_plural: 'Aggregate functions',
@@ -82,6 +84,8 @@ Do you want to proceed?`,
     orderBy: 'Order by',
     of: 'of',
     ok: 'Ok',
+    openForis: 'Open Foris',
+    openForisShort: 'OF',
     owner: 'Owner',
     path: 'Path',
     publish: 'Publish',
@@ -200,10 +204,37 @@ Do you want to proceed?`,
     yourPassword: 'Your password',
     yourNewPassword: 'Your new password',
     repeatYourNewPassword: 'Repeat your new password',
+    requestAccess: 'New to $t(common.appNameFull)? Request access',
     resetPassword: 'Reset password',
     login: 'Login',
     forgotPassword: 'Forgot password',
     sendPasswordResetEmail: 'Send password reset email',
+  },
+
+  accessRequestView: {
+    error: 'Error requesting access: {{error}}',
+    fields: {
+      email: '$t(common.email)',
+      props: {
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        institution: 'Institution',
+        country: 'Country',
+        purpose: 'What do you need it for?',
+      },
+    },
+    introduction: `The platform is still beta, so if you want access, you have to request here.  
+We are also interested in what you want to do with it so please let us know!
+PLEASE also give us a few moments to process your request.
+This is not an automated service and sometimes it takes us a little time to enter your information.
+For more information please visit our website: http://www.openforis.org`,
+    reCaptchaNotAnswered: 'ReCaptcha not answered',
+    requestSent: `Access Request sent correctly to the address {{email}}.
+Please give us a few moments to process your request.
+We will send soon an email to your address with the instructions on how to access $t(common.appName).`,
+    sendRequest: 'Send Request',
+    sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
+    title: 'Requesting access to $t(common.appNameFull)',
   },
 
   resetPasswordView: {
@@ -666,6 +697,7 @@ $t(common.cantUndoWarning)`,
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
     nameRequired: 'Name is required',
+    requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     analysis: {
@@ -787,6 +819,16 @@ $t(common.cantUndoWarning)`,
 
       userNotFound: 'User not found. Make sure email and password are correct',
       passwordChangeRequired: 'Password change required',
+    },
+
+    userAccessRequest: {
+      emailRequired: 'Email is required',
+      firstNameRequired: 'First name is required',
+      lastNameRequired: 'Last name is required',
+      invalidRequest: 'Invalid user access request',
+      userAlreadyExisting: 'User with email {{email}} already existing',
+      requestAlreadySent: `Access request for user with email {{email}} already sent`,
+      invalidReCaptcha: 'Invalid ReCaptcha',
     },
   },
 
@@ -927,30 +969,49 @@ $t(common.cantUndoWarning)`,
 
   emails: {
     signature: `<p>Thank you,<br>
-      The OpenForis Arena team
+      The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     userInvite: {
-      subject: 'You have been invited to OpenForis Arena!',
+      subject: 'You have been invited to $t(common.appNameFull)!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             <p><a href="{{urlResetPassword}}">Click here to access OpenForis Arena</a></p>
+             <p><a href="{{urlResetPassword}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.temporaryMsg)
              $t(emails.signature)`,
     },
     existingUserInvite: {
-      subject: 'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in OpenForis Arena!',
+      subject:
+        'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
+             <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.signature)`,
+    },
+    userAccessRequest: {
+      subject: '$t(common.appNameFull) - User Access Request',
+      body: `<p>Hello,</p>
+      <p>The following user has requested access to $t(common.appNameFull).</p>
+      <p>
+        <ul>
+          <li>$t(accessRequestView.fields.email): {{email}}</li>
+          <li>$t(accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
+        </ul>
+      </p>
+      <p>Please evaluate this request and get back to the user as soon as possible.</p>
+      <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+      $t(emails.signature)`,
     },
     userInviteRepeatConfirmation:
       'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
     userResetPassword: {
-      subject: 'OpenForis Arena. Password reset',
+      subject: '$t(common.appNameFull). Password reset',
       body: `<p>Hello {{name}},</p>
-             <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
+             <p>You recently requested to reset your password for your $t(common.appNameFull) account. Click the link below to reset it.</p>
              <p><a href="{{url}}">Reset your password</a></p>
              $t(emails.temporaryMsg)
              <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>

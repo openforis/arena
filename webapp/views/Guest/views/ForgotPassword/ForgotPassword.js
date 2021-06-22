@@ -21,7 +21,12 @@ const ForgotPassword = () => {
     return () => dispatch(LoginActions.setLoginError(null))
   }, [])
 
-  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
+  const {
+    object: formObject,
+    setObjectField,
+    objectValid,
+    validation,
+  } = useFormObject(
     {
       email: initialEmail,
     },
@@ -38,7 +43,7 @@ const ForgotPassword = () => {
   }
 
   return (
-    <>
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <input
         value={formObject.email}
         onChange={(event) => {
@@ -58,7 +63,7 @@ const ForgotPassword = () => {
       </div>
 
       <Error error={error} />
-    </>
+    </form>
   )
 }
 

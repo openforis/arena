@@ -53,6 +53,21 @@ export const init = (app) => {
     }
   })
 
+  app.post('/user/request-access', async (req, res, next) => {
+    try {
+      const userAccessRequest = Request.getBody(req)
+      const serverUrl = Request.getServerUrl(req)
+
+      const { error, errorParams, requestInserted } = await UserService.insertUserAccessRequest({
+        userAccessRequest,
+        serverUrl,
+      })
+      res.json({ error, errorParams, requestInserted })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== READ
 
   const _getUser = async (req, res) => {
