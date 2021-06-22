@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as R from 'ramda'
 
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -24,18 +23,23 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
         dispatch(LoaderActions.showLoader())
 
         const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
-        const userInviteParams = R.assoc('surveyCycleKey', surveyCycleKey)(userInvite)
+        const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
 
-        await axios.post(`/api/survey/${surveyId}/users/inviteRepeat`, userInviteParams)
+        const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
+        const { errorKey, errorParams } = data
 
-        dispatch(
-          NotificationActions.notifyInfo({
-            key: 'emails.userInviteRepeatConfirmation',
-            params: { email: UserInvite.getEmail(userInvite) },
-          })
-        )
+        if (errorKey) {
+          dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
+        } else {
+          dispatch(
+            NotificationActions.notifyInfo({
+              key: 'emails.userInviteRepeatConfirmation',
+              params: { email: UserInvite.getEmail(userInvite) },
+            })
+          )
 
-        history.push(appModuleUri(userModules.users))
+          history.push(appModuleUri(userModules.users))
+        }
       } finally {
         dispatch(LoaderActions.hideLoader())
       }

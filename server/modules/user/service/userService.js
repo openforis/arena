@@ -20,13 +20,13 @@ import * as UserPasswordUtils from './userPasswordUtils'
 // ====== CREATE
 
 const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) => {
-  const { urlServer } = emailParams
+  const { serverUrl } = emailParams
   // Add user to reset password table
   const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
   // Add reset password url to message params
   const msgParams = {
     ...emailParams,
-    urlResetPassword: `${urlServer}/guest/resetPassword/${uuid}`,
+    urlResetPassword: `${serverUrl}/guest/resetPassword/${uuid}`,
   }
   // Send email
   await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
@@ -49,14 +49,37 @@ const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   }
 }
 
-export const inviteUser = async (
+const _inviteNewUserAndSendEmail = async ({ user, email, groupUuid, survey, surveyCycleKey, emailParams, lang }, t) => {
+  const surveyId = Survey.getId(survey)
+  // Add user to db
+  const userToInvite = await UserManager.insertUser(
+    {
+      user,
+      surveyId,
+      surveyCycleKey,
+      email,
+      password: null,
+      status: User.userStatus.INVITED,
+      groupUuid,
+    },
+    t
+  )
+  // Generate reset password and send email
+  await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+
+  await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
+
+  return userToInvite
+}
+
+export const inviteUser = async ({
   user,
   surveyId,
   surveyCycleKey,
-  userToInviteParam,
-  urlServer,
-  repeatInvitation = false
-) => {
+  userToInvite: userToInviteParam,
+  serverUrl,
+  repeatInvitation = false,
+}) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
@@ -77,10 +100,10 @@ export const inviteUser = async (
   }
 
   const email = UserInvite.getEmail(userToInviteParam)
-  let userToInvite = await UserManager.fetchUserByEmail(email)
+  const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const emailParams = {
-    urlServer,
+    serverUrl,
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${AuthGroup.getName(group)}.label)`,
   }
@@ -88,38 +111,28 @@ export const inviteUser = async (
     if (userToInvite) {
       // User to invite already exists
 
-      if (repeatInvitation) {
-        // Generate reset password and send email again
-        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
-      } else {
+      if (User.hasAccepted(userToInvite)) {
+        // User has already accepted an invitation previously
         // Check can be invited
         _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
-        // Add user to group
+
+        // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
         // Send email
-        await Mailer.sendEmail(email, 'emails.userInvite', emailParams, lang)
+        await Mailer.sendEmail(email, 'emails.existingUserInvite', emailParams, lang)
+      } else if (repeatInvitation) {
+        // User has a pending invitation still
+        // Generate reset password and send email again
+        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+        await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
+      } else {
+        throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
       }
     } else {
-      // User to invite does not exist
-
-      // Add user to db
-      userToInvite = await UserManager.insertUser(
-        {
-          user,
-          surveyId,
-          surveyCycleKey,
-          email,
-          password: null,
-          status: User.userStatus.INVITED,
-          groupUuid,
-        },
-        t
-      )
-      // Generate reset password and send email
-      await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+      // User to invite does not exist, he has never been invited
+      // Check if he can be invited
+      await _inviteNewUserAndSendEmail({ user, email, groupUuid, survey, surveyCycleKey, emailParams, lang }, t)
     }
-
-    await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
   })
 }
 

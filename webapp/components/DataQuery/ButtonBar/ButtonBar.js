@@ -7,6 +7,7 @@ import { Query } from '@common/model/query'
 
 import { useIsAppSaving } from '@webapp/store/app'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import { useButtonBar } from './store'
 import ButtonDownload from './ButtonDownload'
@@ -24,6 +25,7 @@ const ButtonBar = (props) => {
     setNodeDefsSelectorVisible,
   } = props
 
+  const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const modeEdit = Query.isModeRawEdit(query)
@@ -37,6 +39,7 @@ const ButtonBar = (props) => {
       <div>
         <button
           type="button"
+          title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
           className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
           onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
         >
@@ -44,6 +47,7 @@ const ButtonBar = (props) => {
         </button>
         <button
           type="button"
+          title={i18n.t('dataView.aggregateMode')}
           className={classNames('btn', 'btn-s', 'btn-edit', { highlight: Query.isModeAggregate(query) })}
           onClick={() => onChangeQuery(Query.toggleModeAggregate(query))}
           aria-disabled={appSaving || modeEdit || !nodeDefsSelectorVisible}
@@ -53,6 +57,7 @@ const ButtonBar = (props) => {
         {canEdit && hasSelection && (
           <button
             type="button"
+            title={i18n.t('dataView.editMode')}
             className={classNames('btn', 'btn-s', 'btn-edit', { highlight: modeEdit })}
             onClick={() => onChangeQuery(Query.toggleModeEdit(query))}
             aria-disabled={appSaving || modeAggregate || dataEmpty || !dataLoaded}
