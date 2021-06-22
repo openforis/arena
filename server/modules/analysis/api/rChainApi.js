@@ -89,8 +89,9 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
+        const user = Request.getUser(req)
 
-        await AnalysisService.persistUserScripts({ surveyId, chainUuid, filePath })
+        await AnalysisService.persistUserScripts({ user, surveyId, chainUuid, filePath })
 
         Response.sendOk(res)
       } catch (e) {

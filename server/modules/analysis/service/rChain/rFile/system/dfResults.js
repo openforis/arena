@@ -1,6 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 /**
@@ -48,7 +49,7 @@ export default class DfResults {
 
   initDf() {
     const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
-    const columnNames = NodeDef.getNodeDefsColumnNames(analysisNodeDefsInEntity)
+    const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
 
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
@@ -65,7 +66,7 @@ export default class DfResults {
       },
       {
         name: TableNode.columnSet.parentUuid,
-        value: dfVar(this.dfSourceName, ColumnNodeDef.getColName(columnNodeDef)),
+        value: dfVar(this.dfSourceName, ColumnNodeDef.getColumnName(columnNodeDef)),
       },
     ].map((uuidMapping) => setVar(dfVar(this.name, uuidMapping.name), uuidMapping.value))
 

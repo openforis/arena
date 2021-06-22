@@ -29,7 +29,7 @@ export default class RFileReadData extends RFileSystem {
         Survey.getNodeDefChildren(ancestorDef)(survey)
           .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
           .forEach((nodeDef) => {
-            const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColName(nodeDef))
+            const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColumnName(nodeDef))
             contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
           })
       })(survey)

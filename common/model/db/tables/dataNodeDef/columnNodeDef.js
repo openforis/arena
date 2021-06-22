@@ -7,7 +7,7 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
-const colNamesSuffixByType = {
+const columnNamesSuffixByType = {
   [nodeDefType.code]: ['code', 'label'],
   [nodeDefType.taxon]: ['code', 'scientific_name'],
   [nodeDefType.file]: ['file_uuid', 'file_name'],
@@ -27,9 +27,9 @@ const colTypesByType = {
   [nodeDefType.time]: [SQL.types.time],
 }
 
-const getColNames = (nodeDef) => {
+const getColumnNames = (nodeDef) => {
   const nodeDefName = NodeDef.getName(nodeDef)
-  const colsSuffix = colNamesSuffixByType[NodeDef.getType(nodeDef)]
+  const colsSuffix = columnNamesSuffixByType[NodeDef.getType(nodeDef)]
   if (colsSuffix) {
     return colsSuffix.map((col) => `${nodeDefName}_${col}`)
   }
@@ -39,8 +39,8 @@ const getColNames = (nodeDef) => {
   return [nodeDefName]
 }
 
-const extractColName = ({ nodeDef, colName }) =>
-  camelize(colName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
+const extractColumnName = ({ nodeDef, columnName }) =>
+  camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
 
 /**
  * A nodeDef data table column.
@@ -51,7 +51,7 @@ export default class ColumnNodeDef {
   constructor(table, nodeDef) {
     this._table = table
     this._nodeDef = nodeDef
-    this._names = getColNames(nodeDef)
+    this._names = getColumnNames(nodeDef)
     this._types = colTypesByType[NodeDef.getType(nodeDef)]
   }
 
@@ -84,6 +84,6 @@ export default class ColumnNodeDef {
   }
 }
 
-ColumnNodeDef.getColNames = getColNames
-ColumnNodeDef.getColName = R.pipe(ColumnNodeDef.getColNames, R.head)
-ColumnNodeDef.extractColName = extractColName
+ColumnNodeDef.getColumnNames = getColumnNames
+ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+ColumnNodeDef.extractColumnName = extractColumnName

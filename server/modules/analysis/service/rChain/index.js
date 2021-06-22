@@ -74,7 +74,7 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
   fileZip.close()
 }
 
-export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
+export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 
@@ -106,17 +106,28 @@ export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
     })
 
     await PromiseUtils.each(entities, async (entity, entityIndex) => {
-      const AnalysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
 
-      if (AnalysisNodeDefsInEntity.length > 0) {
-        await PromiseUtils.each(AnalysisNodeDefsInEntity, async (nodeDef) => {
+      if (analysisNodeDefsInEntity.length > 0) {
+        await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
           const nodeDefName = NodeDef.getName(nodeDef)
 
           const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
 
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
-          await NodeDefManager.updateNodeDefAnalysisScript({ surveyId, script, nodeDef }, tx)
+          await NodeDefManager.updateNodeDefProps(
+            user,
+            surveyId,
+            NodeDef.getUuid(nodeDef),
+            NodeDef.getParentUuid(nodeDef),
+            {},
+            {
+              script,
+            },
+            false,
+            tx
+          )
         })
       }
     })

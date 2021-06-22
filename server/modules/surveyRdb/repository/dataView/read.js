@@ -20,10 +20,10 @@ import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilde
 import * as DataCol from '../../schemaRdb/dataCol'
 import * as DataTable from '../../schemaRdb/dataTable'
 
-const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
+const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  return ColumnNodeDef.getColName(nodeDefParent)
+  return ColumnNodeDef.getColumnName(nodeDefParent)
 }
 
 const _selectsByNodeDefType =
@@ -91,13 +91,13 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
     queryBuilder.from(
       // Node table; one join per column def
       ...nodeDefCols.map((nodeDefCol, idx) => {
-        const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+        const nodeDefParentUuidColumnName = _getParentNodeUuidColumnName(viewDataNodeDef, nodeDefCol)
         const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
         const tableNode = new TableNode(surveyId)
         tableNode.alias = `n${idx + 1}`
 
         return `LEFT JOIN LATERAL ( 
-          ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
+          ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColumnName}`, nodeDefUuid })}
         ) AS ${tableNode.alias} ON TRUE`
       }),
       // Record table
@@ -120,7 +120,7 @@ const _dbTransformCallbackSelect =
     nodeDefCols.forEach((nodeDefCol) => {
       const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
       const nodeJson = rowUpdated[nodeDefColUuid]
-      const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+      const nodeDefParentColumnUuid = _getParentNodeUuidColumnName(viewDataNodeDef, nodeDefCol)
       const parentUuid = rowUpdated[nodeDefParentColumnUuid]
       rowUpdated.cols[nodeDefColUuid] = {
         node: TableNode.dbTransformCallback(nodeJson),
@@ -131,7 +131,7 @@ const _dbTransformCallbackSelect =
     // Record column
     rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
     // Parent node uuid column
-    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
+    const nodeDefParentColumnUuid = _getParentNodeUuidColumnName(viewDataNodeDef, viewDataNodeDef.nodeDef)
     rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
 
     return rowUpdated
@@ -222,7 +222,7 @@ export const runCount = async ({ surveyId, cycle, tableName, filter }, client = 
     FROM 
         $/schemaName:name/.$/tableName:name/
     WHERE 
-      ${DataTable.colNameRecordCycle} = $/cycle/
+      ${DataTable.columnNameRecordCycle} = $/cycle/
       ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
     {
@@ -244,7 +244,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
   const recordNotEqualCondition = Expression.newBinary(
-    Expression.newIdentifier(DataTable.colNameRecordUuuid),
+    Expression.newIdentifier(DataTable.columnNameRecordUuuid),
     Expression.newLiteral(Record.getUuid(record)),
     Expression.operators.comparison.notEq.key
   )
@@ -253,7 +253,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
     (whereExprAcc, nodeDefUnique) => {
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
-      const identifier = Expression.newIdentifier(NodeDefTable.getColName(nodeDefUnique))
+      const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
 
       const condition = Expression.newBinary(identifier, value, Expression.operators.comparison.eq.key)
@@ -295,13 +295,13 @@ export const fetchRecordsCountByRootNodesValue = async (
   const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
   const rootTableAlias = 'r'
 
-  const filterColumns = nodeDefs.map(NodeDefTable.getColName)
+  const filterColumns = nodeDefs.map(NodeDefTable.getColumnName)
   const filterColumnsString = filterColumns.join(', ')
   const filterCondition = nodeDefs
     .map((nodeDef, idx) => {
       const node = nodes[idx]
       const value = DataCol.getValue(survey, nodeDef, node)
-      return `${rootTableAlias}.${NodeDefTable.getColName(nodeDef)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+      return `${rootTableAlias}.${NodeDefTable.getColumnName(nodeDef)} ${value === null ? ' IS NULL' : `= '${value}'`}`
     })
     .join(' AND ')
 
@@ -313,13 +313,13 @@ export const fetchRecordsCountByRootNodesValue = async (
       FROM
         ${rootTable}
       WHERE 
-        ${DataTable.colNameRecordCycle} = $2
-        ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != $1` : ''} 
+        ${DataTable.columnNameRecordCycle} = $2
+        ${excludeRecordFromCount ? ` AND ${DataTable.columnNameRecordUuuid} != $1` : ''} 
       GROUP BY 
         ${filterColumnsString}
     )
     SELECT
-      ${rootTableAlias}.${DataTable.colNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
+      ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
@@ -328,10 +328,10 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON n.record_uuid = r.record_uuid
       AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
-      ${rootTableAlias}.${DataTable.colNameRecordCycle} = $2
+      ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $2
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
-    GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
+      AND ${rootTableAlias}.${DataTable.columnNameRecordUuuid} != $1
+    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, cr.count
   `,
     [recordUuidExcluded, cycle],
     camelize

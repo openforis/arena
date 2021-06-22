@@ -1,10 +1,10 @@
 import * as pgPromise from 'pg-promise'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import { db } from '@server/db/db'
 import { TableDataNodeDef } from '@common/model/db'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 /**
  * Deletes the nodes of the result node table for the specified processing chain.
@@ -19,7 +19,7 @@ export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycl
   const tableData = new TableDataNodeDef(survey, entity)
 
   const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
-  const columnNames = NodeDef.getNodeDefsColumnNames(analysisNodeDefsInEntity)
+  const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
 
   return client.query(
     `UPDATE ${tableData.nameQualified}
