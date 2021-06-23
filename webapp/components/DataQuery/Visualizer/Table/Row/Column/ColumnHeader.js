@@ -117,10 +117,10 @@ const ColumnHeader = (props) => {
           <CustomAggregateFunctionsEditor
             nodeDef={nodeDef}
             selectedUuids={customAggregateFunctionUuids}
-            onSelectionChange={(selection) => {
-              // Object.keys(selection).forEach((uuid) =>
-              //   onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn: uuid })(query))
-              // )
+            onSelectionChange={(selectedAggregateFunctionsByUuid) => {
+              Object.keys(selectedAggregateFunctionsByUuid).forEach((uuid) =>
+                onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn: uuid })(query))
+              )
             }}
           />
         </PanelRight>

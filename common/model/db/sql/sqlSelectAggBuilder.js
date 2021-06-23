@@ -50,7 +50,7 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     this._viewDataNodeDef = viewDataNodeDef
   }
 
-  selectMeasure({ aggFunctions, nodeDefUuid, index, cycle, filter }) {
+  selectMeasure({ aggFunctions, nodeDefUuid, index }) {
     const paramName = `measure_field_${index}`
     const { survey } = this._viewDataNodeDef
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -66,12 +66,12 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
         this.addParams({ [paramNameAlias]: `${columnMeasure}_${aggFn}` })
       } else {
         // custom aggregate function
-        const { clause: aggFnClause, params: aggFnParams } = aggFn
-        const paramNameAlias = `${paramName}_agg_alias`
-        const fieldAlias = `$/${paramNameAlias}:name/`
-        const field = getCustomAggregateMeasureField({ survey, cycle, nodeDefMeasure, aggFnClause, filter })
-        this.select(`( ${field} ) AS ${fieldAlias}`)
-        this.addParams({ ...aggFnParams, [paramNameAlias]: `${columnMeasure}_agg` })
+        const aggregateFn = NodeDef.getAggregateFunctionByUuid(aggFn)(nodeDefMeasure)
+        const { name, expression } = aggregateFn
+        if (name && expression) {
+          const fieldAlias = `${paramName}_agg_${name}`
+          this.select(`( ${expression} ) AS ${fieldAlias}`)
+        }
       }
     })
     this.addParams({ [paramName]: columnMeasure })

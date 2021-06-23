@@ -22,7 +22,7 @@ export const CustomAggregateFunctionEditor = (props) => {
       <FormItem label={i18n.t('common.name')}>
         <Input value={name} onChange={(value) => setName(StringUtils.normalizeName(value))} />
       </FormItem>
-      <FormItem label={i18n.t('common.expression')}>
+      <FormItem label={i18n.t('dataExplorerView.customAggregateFunction.sqlExpression')}>
         <textarea rows="4" value={expression} onChange={(e) => setExpression(e.target.value)} />
       </FormItem>
       <div className="button-bar">

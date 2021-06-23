@@ -1,27 +1,37 @@
 import { useCallback } from 'react'
+import axios from 'axios'
 
 import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { usePost } from '@webapp/components/hooks'
 
 export const throttleTime = 250
 export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
+const initialState = { data: null, loading: false, loaded: false }
+
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setData, throttle: throttleTime })
 
   return {
     fetchData: useCallback(
-      ({ offset, limit, query }) =>
-        post({
-          url: getUrl({ surveyId, query }),
-          body: { cycle, query: A.stringify(query), limit, offset },
-        }),
-      [cycle, surveyId, post]
+      async ({ offset, limit, query }) => {
+        setData({ ...initialState, loading: true })
+        try {
+          const { data } = await axios.post(getUrl({ surveyId, query }), {
+            cycle,
+            query: A.stringify(query),
+            limit,
+            offset,
+          })
+          setData({ data, loading: false, loaded: true })
+        } catch (e) {}
+      },
+      [cycle, surveyId, setData]
     ),
-    resetData: useCallback(reset, [reset]),
+    resetData: useCallback(() => {
+      setData(initialState)
+    }, [setData]),
   }
 }

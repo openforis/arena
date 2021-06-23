@@ -374,6 +374,7 @@ We will send soon an email to your address with the instructions on how to acces
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Delete this custom aggregate function?',
+      sqlExpression: 'SQL Expression',
     },
   },
 
