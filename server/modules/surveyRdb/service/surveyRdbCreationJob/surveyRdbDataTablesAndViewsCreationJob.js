@@ -17,7 +17,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const survey = await this.fetchSurvey()
 
     // Get entities or multiple attributes tables
-    const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
+    const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
 
     this.total = length + 3
 
