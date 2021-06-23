@@ -19,7 +19,7 @@ const EntitySelectorTreeNode = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
-  const childDefs = Survey.getNodeDefChildren(nodeDef, true)(survey)
+  const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
   const childEntityDefs = onlyPages
     ? NodeDefLayout.filterNodeDefsWithPage(cycle)(childDefs)
     : childDefs.filter(NodeDef.isEntity)

@@ -27,9 +27,9 @@ export const getNodeDefsByUuids = (uuids = []) => (survey) => {
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
-export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
+export const getNodeDefChildren = (nodeDef) => (survey) => {
   const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
-  return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef, includeAnalysis)(surveyIndexed)
+  return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
 }
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
@@ -112,12 +112,12 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => (survey
     : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
 }
 
-export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) => (survey) => {
+export const getHierarchy = (filterFn = NodeDef.isEntity) => (survey) => {
   let length = 1
   const h = (array, nodeDef) => {
     const childDefs = [
       ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
-        ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
+        ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
         : []),
     ]
 

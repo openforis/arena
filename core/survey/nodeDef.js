@@ -156,6 +156,7 @@ export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
+export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
 export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)

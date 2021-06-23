@@ -35,7 +35,7 @@ const ColumnDataEdit = (props) => {
 
   return (
     <div
-      className={classNames('table__cell', { readonly: NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef) })}
+      className={classNames('table__cell', { readonly: NodeDef.isReadOnlyOrAnalysis(nodeDef) })}
       style={{ width: widthOuter }}
     >
       {cell && (

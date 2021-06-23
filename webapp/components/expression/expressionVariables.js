@@ -67,8 +67,6 @@ const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) 
 
 const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang }) => {
   const variables = []
-
-  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
   const stack = []
   const entitiesVisitedByUuid = {}
 
@@ -93,7 +91,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
       visitNext(source)
     } else {
       // get variables from every child def
-      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
       nodeDefChildren.forEach((childDef) => {
         variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
 
@@ -167,8 +165,7 @@ export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, m
   if (!NodeDef.isEntity(nodeDefContext)) {
     return []
   }
-  const includeAnalysis = Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)
-  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
+  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext)(survey)
 
   const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
     variablesAcc.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))

@@ -27,7 +27,7 @@ export const verifyNodeDefs = (survey) => {
   test(`Verify ${survey.name} nodeDefs`, async () => {
     const surveyExport = getSurveyEntry(survey, ExportFile.survey)
     const clusterExport = getNodeDefRoot(surveyExport)
-    const clusterExportChildDefs = getNodeDefChildren(clusterExport, true)(surveyExport)
+    const clusterExportChildDefs = getNodeDefChildren(clusterExport)(surveyExport)
 
     await expect(R.isNil(clusterExport.parentUuid)).toBe(true)
     await expect(getProps(clusterExport).name).toBe(cluster.name)
@@ -52,14 +52,14 @@ export const verifyNodeDefs = (survey) => {
 
     // PLOT
     const plotExport = _findNodeDefByName(clusterExportChildDefs, plot.name)
-    const plotExportChildDefs = getNodeDefChildren(plotExport, true)(surveyExport)
+    const plotExportChildDefs = getNodeDefChildren(plotExport)(surveyExport)
     await PromiseUtils.each(plotExportChildDefs, async (childDef) =>
       verifyNodeDef(childDef, plot.children[_getNodeDefName(childDef)])
     )
 
     // TREE
     const treeExport = _findNodeDefByName(plotExportChildDefs, tree.name)
-    const treeExportChildDefs = getNodeDefChildren(treeExport, true)(surveyExport)
+    const treeExportChildDefs = getNodeDefChildren(treeExport)(surveyExport)
     await PromiseUtils.each(treeExportChildDefs, async (childDef) =>
       verifyNodeDef(childDef, tree.children[_getNodeDefName(childDef)])
     )

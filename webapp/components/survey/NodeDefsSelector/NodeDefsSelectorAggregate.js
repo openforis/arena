@@ -38,7 +38,7 @@ const NodeDefsSelectorAggregate = (props) => {
 
   const survey = useSurvey()
   const lang = useSurveyLang()
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
 

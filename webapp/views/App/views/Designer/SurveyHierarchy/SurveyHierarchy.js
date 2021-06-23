@@ -18,7 +18,7 @@ const SurveyHierarchy = () => {
   const survey = useSurvey()
 
   const { lang } = i18n
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
