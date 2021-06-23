@@ -91,6 +91,10 @@
     .binary-right {
       display: flex;
       flex-grow: 1;
+
+      .identifier {
+        max-width: 40rem;
+      }
     }
 
     .btns {
