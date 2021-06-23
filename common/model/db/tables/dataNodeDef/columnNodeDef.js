@@ -3,6 +3,8 @@ import camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '../../../../../core/survey/nodeDef'
+import { Query } from '../../../query'
+
 import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
@@ -86,4 +88,13 @@ export default class ColumnNodeDef {
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
+  const columnName = ColumnNodeDef.getColumnName(nodeDef)
+  if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {
+    return `${columnName}_${aggregateFn}`
+  }
+  // custom aggregate function
+  const customAggregateFunction = NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
+  return `${columnName}_custom_agg_${customAggregateFunction.name}`
+}
 ColumnNodeDef.extractColumnName = extractColumnName

@@ -38,7 +38,10 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
         const aggregateFn = NodeDef.getAggregateFunctionByUuid(aggFn)(nodeDefMeasure)
         const { name, expression } = aggregateFn
         if (name && expression) {
-          const fieldAlias = `${paramName}_agg_${name}`
+          const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
+            nodeDef: nodeDefMeasure,
+            aggregateFn: aggFn,
+          })
           this.select(`( ${expression} ) AS ${fieldAlias}`)
         }
       }
