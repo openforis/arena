@@ -19,7 +19,7 @@ const NodeDefTableCellBody = (props) => {
 
   const i18n = useI18n()
   const surveyLanguage = Survey.getLanguage(i18n.lang)(surveyInfo)
-  const readOnly = NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)
+  const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
 
   const propsNodeDefComponent = {
     ...props,

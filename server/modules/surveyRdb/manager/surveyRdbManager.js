@@ -103,7 +103,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
     const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+      ? Survey.getNodeDefChildren(nodeDefContext)(survey)
       : [nodeDefContext] // Multiple attribute
 
     let parentKeys = []

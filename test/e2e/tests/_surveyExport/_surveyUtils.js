@@ -32,12 +32,12 @@ export const getNodeDefByName = (name) =>
 
 export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)
 
-export const getNodeDefChildren = (nodeDef, _includeAnalysis = false) => (survey) => {
+export const getNodeDefChildren = (nodeDef) => (survey) => {
   const children = []
   if (nodeDef.virtual) {
     // If nodeDef is virtual, get children from its source
     const entitySource = getNodeDefSource(nodeDef)(survey)
-    children.push(...getNodeDefChildren(entitySource, _includeAnalysis)(survey))
+    children.push(...getNodeDefChildren(entitySource)(survey))
   }
 
   const { uuid: nodeDefUuid } = nodeDef
@@ -45,7 +45,7 @@ export const getNodeDefChildren = (nodeDef, _includeAnalysis = false) => (survey
     ...R.pipe(
       getNodeDefsArray,
       R.filter((nodeDefCurrent) => {
-        if (nodeDefCurrent.analysis && !_includeAnalysis) {
+        if (nodeDefCurrent.analysis) {
           return false
         }
         if (nodeDefCurrent.virtual) {

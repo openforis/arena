@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, NodeDefsActions } from '@webapp/store/survey'
+import { useSurvey, useSurveyInfo, NodeDefsActions } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
@@ -20,6 +20,8 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
 
@@ -49,7 +51,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
         </button>
       </div>
       <div>{NodeDef.getName(nodeDef)}</div>
-      <div>{NodeDef.getLabel(nodeDef)}</div>
+      <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
       </div>
