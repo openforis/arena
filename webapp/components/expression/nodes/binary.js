@@ -14,7 +14,7 @@ const Binary = (props) => {
 
   const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
 
-  const showOperator = (isBoolean && !NodeDef.isBoolean(nodeDefCurrent)) || !isLeftLiteral
+  const showOperator = isBoolean && (!NodeDef.isBoolean(nodeDefCurrent) || !isLeftLiteral)
 
   const createOperand = (type) => (
     <BinaryOperand
