@@ -1,6 +1,8 @@
 import './CustomAggregateFunctionsEditor.scss'
 
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import { useI18n } from '@webapp/store/system'
 
 import { ButtonNew } from '@webapp/components'
@@ -9,7 +11,7 @@ import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 import { useCustomAggregateFunctionsEditor } from './useCustomAggregateFunctionsEditor'
 
 export const CustomAggregateFunctionsEditor = (props) => {
-  const { selectedUuids, onSelectionChange } = props
+  const { nodeDef, selectedUuids, onSelectionChange } = props
 
   const i18n = useI18n()
   const { customAggregateFunctions, editedUuid, setEditedUuid, onDelete, onNew, onSave, onEditCancel } =
@@ -26,22 +28,23 @@ export const CustomAggregateFunctionsEditor = (props) => {
             <div>{i18n.t('common.edit')}</div>
           </div>
           <div className="table__rows">
-            {customAggregateFunctions.map((fn) => {
-              const { uuid } = fn
+            {customAggregateFunctions.map((aggregateFunction) => {
+              const { uuid } = aggregateFunction
               const editing = editedUuid === uuid
 
               return (
                 <div key={uuid} className="table__row">
                   {editing ? (
                     <CustomAggregateFunctionEditor
-                      fn={fn}
+                      aggregateFunction={aggregateFunction}
+                      nodeDef={nodeDef}
                       onCancel={onEditCancel}
                       onDelete={onDelete}
                       onSave={onSave}
                     />
                   ) : (
                     <CustomAggregateFunctionViewer
-                      fn={fn}
+                      fn={aggregateFunction}
                       selected={selectedUuids.includes(uuid)}
                       onSelectionChange={onSelectionChange}
                       setEditedUuid={setEditedUuid}
@@ -56,6 +59,12 @@ export const CustomAggregateFunctionsEditor = (props) => {
       <ButtonNew onClick={onNew} />
     </fieldset>
   )
+}
+
+CustomAggregateFunctionsEditor.propTypes = {
+  nodeDef: PropTypes.object.isRequired,
+  selectedUuids: PropTypes.array,
+  onSelectionChange: PropTypes.func,
 }
 
 CustomAggregateFunctionsEditor.defaultProps = {
