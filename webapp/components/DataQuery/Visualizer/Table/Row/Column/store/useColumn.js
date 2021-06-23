@@ -16,12 +16,6 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
       aggregateFunctions.map((aggregateFn) => `${ColumnNodeDef.getColumnName(nodeDef)}_${aggregateFn}`)
     : ColumnNodeDef.getColumnNames(nodeDef)
 
-  // TODO check where and how it's used
-  const customAggregateFunction =
-    isMeasure && !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFunctions[0])
-      ? aggregateFunctions[0].clause
-      : null
-
   const customAggregateFunctionUuids = isMeasure
     ? aggregateFunctions.filter((fn) => !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(fn))
     : []
@@ -36,7 +30,6 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
     columnNames,
     isMeasure,
     aggregateFunctions,
-    customAggregateFunction,
     customAggregateFunctionUuids,
     noCols,
     widthInner,

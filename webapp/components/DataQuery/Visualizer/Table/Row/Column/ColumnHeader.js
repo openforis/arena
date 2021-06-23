@@ -34,7 +34,6 @@ const ColumnHeader = (props) => {
     columnNames,
     isMeasure,
     aggregateFunctions,
-    customAggregateFunction,
     customAggregateFunctionUuids,
     noCols,
     widthInner,
@@ -58,7 +57,7 @@ const ColumnHeader = (props) => {
         ) : (
           <div>
             {nodeDefLabel}
-            {isMeasure && !customAggregateFunction && (
+            {isMeasure && (
               <button
                 type="button"
                 className="btn btn-s btn-transparent btn-aggregates"
@@ -82,17 +81,20 @@ const ColumnHeader = (props) => {
       )}
       {isMeasure && (
         <div className="table__inner-cell">
-          {customAggregateFunction ? (
-            <div key={`${nodeDefUuid}_agg_fn`} style={{ width: widthInner }}>
-              {customAggregateFunction}
-            </div>
-          ) : (
-            aggregateFunctions.map((aggregateFn) => (
+          {aggregateFunctions.map((aggregateFn) => {
+            const isCustomAggregateFunction = !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)
+            const customAggregateFunction = isCustomAggregateFunction
+              ? NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
+              : null
+            const aggregateFunctionLabel = isCustomAggregateFunction
+              ? customAggregateFunction.name
+              : i18n.t(`common.${aggregateFn}`)
+            return (
               <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-                {i18n.t(`common.${aggregateFn}`)}
+                {aggregateFunctionLabel}
               </div>
-            ))
-          )}
+            )
+          })}
         </div>
       )}
 
