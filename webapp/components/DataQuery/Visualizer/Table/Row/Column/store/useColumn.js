@@ -16,10 +16,6 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
       aggregateFunctions.map((aggregateFn) => `${ColumnNodeDef.getColumnName(nodeDef)}_${aggregateFn}`)
     : ColumnNodeDef.getColumnNames(nodeDef)
 
-  const customAggregateFunctionUuids = isMeasure
-    ? aggregateFunctions.filter((fn) => !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(fn))
-    : []
-
   const noCols = modeEdit ? NodeDefUIProps.getFormFields(nodeDef).length : columnNames.length
 
   const widthOuter = colWidth * noCols
@@ -30,7 +26,6 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
     columnNames,
     isMeasure,
     aggregateFunctions,
-    customAggregateFunctionUuids,
     noCols,
     widthInner,
     widthOuter,
