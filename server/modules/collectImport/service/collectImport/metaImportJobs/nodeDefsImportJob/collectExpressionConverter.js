@@ -129,7 +129,10 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     selfReferenceAllowed: true,
   })
 
-  return validationResult ? null : converted
+  if (validationResult) {
+    return null
+  }
+  return converted
 }
 
 export const CollectExpressionConverter = {

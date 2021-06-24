@@ -24,6 +24,11 @@ describe('CollectExpressionConverter Test', () => {
     { q: '1 = 1 AND 2 = 2', r: '1 == 1 && 2 == 2' },
     { q: '1 = 1 or 2 = 2', r: '1 == 1 || 2 == 2' },
     { q: '1 = 1 OR 2 = 2', r: '1 == 1 || 2 == 2' },
+    {
+      q: `tree_status='L' and tree_type='T' and dbh >= 40`,
+      r: `tree_status=='L' && tree_type=='T' && dbh >= 40`,
+      n: 'tree_id',
+    },
     // predefined variables
     { q: '$this', r: 'cluster_id' },
     { q: '$this < 10 and $this > 0', r: 'cluster_id < 10 && cluster_id > 0' },

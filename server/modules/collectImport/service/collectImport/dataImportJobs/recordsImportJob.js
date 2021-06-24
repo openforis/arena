@@ -293,20 +293,24 @@ export default class RecordsImportJob extends Job {
         const childrenApplicability = {}
         const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
         nodeDefChildren.forEach((childDef) => {
-          if (!R.isEmpty(NodeDef.getApplicable(childDef))) {
-            const childDefUuid = NodeDef.getUuid(childDef)
+          let applicable = true
+          const expressionsApplicable = NodeDef.getApplicable(childDef)
+
+          if (!R.isEmpty(expressionsApplicable)) {
             const exprEval = RecordExpressionParser.evalApplicableExpression(
               survey,
               record,
               node,
-              NodeDef.getApplicable(childDef)
+              expressionsApplicable
             )
-            const applicable = R.propOr(false, 'value', exprEval)
-            childrenApplicability[childDefUuid] = applicable
+            applicable = R.propOr(false, 'value', exprEval)
+          }
+          const childDefUuid = NodeDef.getUuid(childDef)
+          childrenApplicability[childDefUuid] = applicable
 
-            if (applicable) {
-              stack.push(...Record.getNodeChildrenByDefUuid(node, childDefUuid)(record))
-            }
+          if (applicable) {
+            const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)
+            stack.push(...nodeChildren)
           }
         })
         const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
