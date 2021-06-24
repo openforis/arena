@@ -87,6 +87,7 @@ export const Input = React.forwardRef((props, ref) => {
           type={type}
           value={value}
           title={value}
+          autoComplete="off"
         />
       )}
     </ValidationTooltip>

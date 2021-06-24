@@ -1,26 +1,34 @@
 import { useCallback } from 'react'
+import axios from 'axios'
 
 import * as A from '@core/arena'
 
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { usePost } from '@webapp/components/hooks'
 
-import { getUrl, throttleTime } from './useFetchData'
+import { getUrl } from './useFetchData'
+
+const initialState = { data: null, loading: false, loaded: false }
 
 export const useFetchCount = ({ setCount }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setCount, throttle: throttleTime })
 
   return {
     fetchCount: useCallback(
-      ({ query }) =>
-        post({
-          url: `${getUrl({ surveyId, query })}/count`,
-          body: { cycle, query: A.stringify(query) },
-        }),
-      [cycle, surveyId, post]
+      async ({ query }) => {
+        setCount({ ...initialState, loading: true })
+        try {
+          const { data } = await axios.post(`${getUrl({ surveyId, query })}/count`, {
+            cycle,
+            query: A.stringify(query),
+          })
+          setCount({ data, loading: false, loaded: true })
+        } catch (e) {}
+      },
+      [cycle, surveyId, setCount]
     ),
-    resetCount: useCallback(reset, [reset]),
+    resetCount: useCallback(() => {
+      setCount(initialState)
+    }, [setCount]),
   }
 }

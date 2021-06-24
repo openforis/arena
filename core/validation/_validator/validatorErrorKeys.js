@@ -6,6 +6,10 @@ export const ValidatorErrorKeys = {
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
   nameRequired: 'validationErrors.nameRequired',
 
+  aggregateFunction: {
+    expressionRequired: 'validationErrors.aggregateFunction.expressionRequired',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'validationErrors.analysis.labelDefaultLangRequired',
     analysisNodeDefsRequired: 'validationErrors.analysis.analysisNodeDefsRequired',

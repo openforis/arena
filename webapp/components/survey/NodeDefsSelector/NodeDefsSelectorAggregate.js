@@ -26,7 +26,7 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
     const children = Survey.getNodeDefChildren(ancestorDef)(survey)
     const analysisChildren = children.filter(NodeDef.isAnalysis).map((object) => ({
       ...object,
-      aggregate: Query.aggregateFunctions.sum, // TODO_ADD_AGGREGATE_EXPRESSION
+      aggregate: Query.DEFAULT_AGGREGATE_FUNCTIONS.sum, // TODO_ADD_AGGREGATE_EXPRESSION
     }))
     variablesPrevCalculations.push(...analysisChildren)
   })(survey)
@@ -53,7 +53,7 @@ const NodeDefsSelectorAggregate = (props) => {
         const expr = Expression.fromString(StepVariable.getAggregate(variablePrevStep))
         aggregateFn = Expression.toSql(expr)
       } else {
-        aggregateFn = Query.aggregateFunctions.sum
+        aggregateFn = Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
       }
       measuresUpdate.set(nodeDefUuid, [aggregateFn])
     }

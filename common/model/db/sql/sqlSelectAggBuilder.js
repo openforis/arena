@@ -1,47 +1,16 @@
 import * as Survey from '../../../../core/survey/survey'
 import * as NodeDef from '../../../../core/survey/nodeDef'
-import * as Expression from '../../../../core/expressionParser/expression'
-import ViewDataNodeDef from '../views/dataNodeDef'
 import { ColumnNodeDef } from '../tables/dataNodeDef'
 import { Query } from '../../query'
 import SqlSelectBuilder from './sqlSelectBuilder'
 
 const sqlFunctionByAggregateFunction = {
-  [Query.aggregateFunctions.avg]: 'AVG',
-  [Query.aggregateFunctions.cnt]: 'COUNT',
-  [Query.aggregateFunctions.max]: 'MAX',
-  [Query.aggregateFunctions.med]: 'MEDIAN',
-  [Query.aggregateFunctions.min]: 'MIN',
-  [Query.aggregateFunctions.sum]: 'SUM',
-}
-
-/**
- * Get the custom aggregate measure with a sub-select from the view associated to the node def related to the measure.
- *
- * @param {!object} params - The parameters object.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!NodeDef} [params.nodeDefMeasure] - The node definition associated to the measure.
- * @param {!string} [params.aggFnClause] - The custom aggregate function query part.
- * @param {!Expression} [params.filter] - The query filter expression.
- *
- * @returns {string} - The sub-select query string (with named parameters).
- */
-const getCustomAggregateMeasureField = (params) => {
-  const { survey, cycle, nodeDefMeasure, aggFnClause, filter } = params
-  const entityDefPrevStep = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDefMeasure))(survey)
-  const viewDataNodeDefPrevStep = new ViewDataNodeDef(survey, entityDefPrevStep)
-  const subselectBuilder = new SqlSelectBuilder()
-    .select(`${aggFnClause}`)
-    .from(viewDataNodeDefPrevStep.nameQualified)
-    .where(`${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/`)
-    .addParams({ cycle })
-
-  const { clause: filterClause } = filter ? Expression.toSql(filter) : {}
-  if (filterClause) {
-    subselectBuilder.where(` AND ${filterClause}`)
-  }
-  return subselectBuilder.build()
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.avg]: 'AVG',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt]: 'COUNT',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.max]: 'MAX',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.med]: 'MEDIAN',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.min]: 'MIN',
+  [Query.DEFAULT_AGGREGATE_FUNCTIONS.sum]: 'SUM',
 }
 
 class SqlSelectAggBuilder extends SqlSelectBuilder {
@@ -50,7 +19,7 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     this._viewDataNodeDef = viewDataNodeDef
   }
 
-  selectMeasure({ aggFunctions, nodeDefUuid, index, cycle, filter }) {
+  selectMeasure({ aggFunctions, nodeDefUuid, index }) {
     const paramName = `measure_field_${index}`
     const { survey } = this._viewDataNodeDef
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -66,12 +35,15 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
         this.addParams({ [paramNameAlias]: `${columnMeasure}_${aggFn}` })
       } else {
         // custom aggregate function
-        const { clause: aggFnClause, params: aggFnParams } = aggFn
-        const paramNameAlias = `${paramName}_agg_alias`
-        const fieldAlias = `$/${paramNameAlias}:name/`
-        const field = getCustomAggregateMeasureField({ survey, cycle, nodeDefMeasure, aggFnClause, filter })
-        this.select(`( ${field} ) AS ${fieldAlias}`)
-        this.addParams({ ...aggFnParams, [paramNameAlias]: `${columnMeasure}_agg` })
+        const aggregateFn = NodeDef.getAggregateFunctions(nodeDefMeasure)[aggFn]
+        const { name, expression } = aggregateFn
+        if (name && expression) {
+          const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
+            nodeDef: nodeDefMeasure,
+            aggregateFn: aggFn,
+          })
+          this.select(`( ${expression} ) AS ${fieldAlias}`)
+        }
       }
     })
     this.addParams({ [paramName]: columnMeasure })
