@@ -156,7 +156,6 @@ export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
-export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
 export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
@@ -183,6 +182,7 @@ export const isBooleanLabelYesNo = (nodeDef) =>
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
+export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -258,9 +258,7 @@ export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
-export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, [])
-export const getAggregateFunctionByUuid = (uuid) =>
-  R.pipe(getAggregateFunctions, (functions) => functions.find((func) => func.uuid === uuid))
+export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
 
 // ==== CREATE
 

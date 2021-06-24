@@ -93,8 +93,8 @@ ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
   if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {
     return `${columnName}_${aggregateFn}`
   }
-  // custom aggregate function
-  const customAggregateFunction = NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
-  return `${columnName}_custom_agg_${customAggregateFunction.name}`
+  // custom aggregate function: aggregateFn is the uuid of the custom aggregate function
+  const customAggregateFunction = NodeDef.getAggregateFunctions(nodeDef)[aggregateFn]
+  return `${columnName}_custom_agg_${customAggregateFunction?.name}`
 }
 ColumnNodeDef.extractColumnName = extractColumnName

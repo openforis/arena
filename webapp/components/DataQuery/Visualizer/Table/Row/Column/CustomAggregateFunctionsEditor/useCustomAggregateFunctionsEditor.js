@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as A from '@core/arena'
 import { AggregateFunction } from '@core/survey/aggregateFunction'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -14,34 +15,32 @@ export const useCustomAggregateFunctionsEditor = (props) => {
   const [editedUuid, setEditedUuid] = useState(null)
 
   const [customAggregateFunctions, setCustomAggregateFunctions] = useState(NodeDef.getAggregateFunctions(nodeDef))
-
+  const customAggregateFunctionsArray = Object.values(customAggregateFunctions).sort(
+    (fn1, fn2) => fn1.dateCreated - fn2.dateCreated
+  )
   const onNew = () => {
     const newFn = AggregateFunction.newAggregateFunction()
-    setCustomAggregateFunctions([...customAggregateFunctions, newFn])
+    setCustomAggregateFunctions({ ...customAggregateFunctions, [newFn.uuid]: newFn })
     setEditedUuid(newFn.uuid)
   }
 
   const onEditCancel = (fn) => {
-    const { uuid, placeholder } = fn
-    if (placeholder) {
-      const functionsUpdated = customAggregateFunctions.filter((f) => f.uuid !== uuid)
-      setCustomAggregateFunctions(functionsUpdated)
+    if (fn.placeholder) {
+      setCustomAggregateFunctions(A.dissoc(fn.uuid)(customAggregateFunctions))
     }
     setEditedUuid(null)
   }
 
   const onSave = (fnUpdated) => {
     const { placeholder, ...fnToSave } = fnUpdated
-    const fnIndex = customAggregateFunctions.findIndex((fn) => fn.uuid === fnToSave.uuid)
-    const functionsUpdated = [...customAggregateFunctions]
-    functionsUpdated.splice(fnIndex, 1, fnToSave)
-    setCustomAggregateFunctions(functionsUpdated)
+    const customAggregateFunctionsUpdated = { ...customAggregateFunctions, [fnToSave.uuid]: fnToSave }
+    setCustomAggregateFunctions(customAggregateFunctionsUpdated)
     setEditedUuid(null)
 
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-    const propsAdvancedToUpdate = { [NodeDef.keysPropsAdvanced.aggregateFunctions]: functionsUpdated }
+    const propsAdvancedToUpdate = { [NodeDef.keysPropsAdvanced.aggregateFunctions]: customAggregateFunctionsUpdated }
 
     // update node def server side
     dispatch(
@@ -63,10 +62,7 @@ export const useCustomAggregateFunctionsEditor = (props) => {
       DialogConfirmActions.showDialogConfirm({
         key: 'dataExplorerView.customAggregateFunction.confirmDelete',
         onOk: async () => {
-          const fnIndex = customAggregateFunctions.findIndex((fn) => fn.uuid === fnToDelete.uuid)
-          const functionsUpdated = [...customAggregateFunctions]
-          functionsUpdated.splice(fnIndex, 1)
-          setCustomAggregateFunctions(functionsUpdated)
+          setCustomAggregateFunctions(A.dissoc(fnToDelete.uuid)(customAggregateFunctions))
           setEditedUuid(null)
         },
       })
@@ -74,7 +70,7 @@ export const useCustomAggregateFunctionsEditor = (props) => {
   }
 
   return {
-    customAggregateFunctions,
+    customAggregateFunctionsArray,
     editedUuid,
     setEditedUuid,
     onDelete,

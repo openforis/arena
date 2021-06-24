@@ -14,7 +14,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
   const { nodeDef, selectedUuids, onSelectionChange } = props
 
   const i18n = useI18n()
-  const { customAggregateFunctions, editedUuid, setEditedUuid, onDelete, onNew, onSave, onEditCancel } =
+  const { customAggregateFunctionsArray, editedUuid, setEditedUuid, onDelete, onNew, onSave, onEditCancel } =
     useCustomAggregateFunctionsEditor(props)
 
   return (
@@ -28,7 +28,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
             <div>{i18n.t('common.edit')}</div>
           </div>
           <div className="table__rows">
-            {customAggregateFunctions.map((aggregateFunction) => {
+            {customAggregateFunctionsArray.map((aggregateFunction) => {
               const { uuid } = aggregateFunction
               const editing = editedUuid === uuid
 
