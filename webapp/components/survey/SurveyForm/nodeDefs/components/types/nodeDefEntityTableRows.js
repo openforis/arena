@@ -58,7 +58,7 @@ const NodeDefEntityTableRows = (props) => {
 
   const onScrollTableRows = () => {
     const onScroll = () => {
-      const { scrollLeft } = tableRowsRef.current
+      const scrollLeft = tableRowsRef?.current?.scrollLeft || false
       if (scrollLeft !== gridSize.left) {
         setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
