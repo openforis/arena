@@ -19,6 +19,7 @@ const tableColumns = [
   Record.keys.preview,
   'owner_uuid',
   'date_created',
+  'validation'
 ]
 const tableName = 'record'
 
@@ -76,6 +77,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         ...record,
         owner_uuid: userUuid || Record.getOwnerUuid(record),
         date_created: Record.getDateCreated(record),
+        validation: Record.getValidation(record) ? JSON.stringify(Record.getValidation(record)) : null,
       }))
     )
   )
