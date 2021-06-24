@@ -8,6 +8,7 @@ export const ButtonSave = (props) => {
 
   return (
     <Button
+      {...props}
       id={id}
       data-testid={testId}
       disabled={disabled}

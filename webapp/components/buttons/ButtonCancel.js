@@ -1,33 +1,13 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import { Button } from './Button'
 
-export const ButtonCancel = (props) => {
-  const { disabled, id, onClick, testId } = props
-
-  return (
-    <Button
-      id={id}
-      data-testid={testId}
-      disabled={disabled}
-      aria-disabled={disabled}
-      className="btn-secondary"
-      label="common.cancel"
-      onClick={onClick}
-    />
-  )
-}
+export const ButtonCancel = (props) => <Button {...props} className="btn-secondary" label="common.cancel" />
 
 ButtonCancel.propTypes = {
-  disabled: PropTypes.bool,
-  id: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-  testId: PropTypes.string,
+  ...Button.propTypes,
 }
 
 ButtonCancel.defaultProps = {
-  disabled: false,
-  id: null,
-  testId: null,
+  ...Button.defaultProps,
 }
