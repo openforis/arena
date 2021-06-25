@@ -1,13 +1,11 @@
-import * as Survey from '../../../../core/survey/survey'
 import { Query } from '../../../../common/model/query'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
 const _fetchSurvey = async (surveyId, cycle) => {
-  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId, draft: true }))
-  const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
-  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: loadDraftDefs })
+  const draft = true // always load draft node defs (needed for custom aggregate functions)
+  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
 }
 
 /**
