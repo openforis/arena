@@ -30,18 +30,22 @@ const AnalysisCodeProps = (props) => {
     const langTools = ace.require('ace/ext/language_tools')
 
     // data stub:
-    const otherNodeDefs = Survey.getNodeDefsArray(survey).map((_nodeDef) => ({
-      name: NodeDef.getName(_nodeDef),
-      description: NodeDef.getLabel(_nodeDef),
-    }))
+    const otherNodeDefs = Survey.getNodeDefsArray(survey).map((_nodeDef) => {
+      const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)
+      return {
+        name: NodeDef.getName(_nodeDef),
+        description: NodeDef.getLabel(_nodeDef),
+        parent,
+      }
+    })
 
     const sqlTablesCompleter = {
       getCompletions: (editor, session, pos, prefix, callback) => {
         callback(
           null,
-          otherNodeDefs.map((table) => ({
-            caption: `${table.name}: ${table.description}`,
-            value: table.name,
+          otherNodeDefs.map((_nodeDef) => ({
+            caption: `${_nodeDef.name}: ${_nodeDef.description}`,
+            value: `${NodeDef.getName(_nodeDef.parent)}$${_nodeDef.name}`,
             meta: 'Table',
           }))
         )
