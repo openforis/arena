@@ -30,6 +30,13 @@ class NodeDefSwitch extends React.Component {
     super(props)
 
     this.element = React.createRef()
+
+    this.state = {
+      isHovering: false,
+    }
+
+    this.onMouseEnter = this.onMouseEnter.bind(this)
+    this.onMouseLeave = this.onMouseLeave.bind(this)
   }
 
   checkNodePlaceholder() {
@@ -54,8 +61,19 @@ class NodeDefSwitch extends React.Component {
     this.checkNodePlaceholder()
   }
 
+  onMouseEnter() {
+    this.setState({ isHovering: true })
+  }
+
+  onMouseLeave() {
+    this.setState({ isHovering: false })
+  }
+
   render() {
     const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
+    const { isHovering } = this.state
+
+    const editButtonsVisible = edit && canEditDef && isHovering
 
     const className =
       'survey-form__node-def-page' +
@@ -63,9 +81,16 @@ class NodeDefSwitch extends React.Component {
       (applicable ? '' : ' not-applicable')
 
     return (
-      <div className={className} data-testid={NodeDef.getName(nodeDef)} ref={this.element}>
-        <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
-
+      <div
+        className={className}
+        data-testid={NodeDef.getName(nodeDef)}
+        ref={this.element}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      >
+        {editButtonsVisible && (
+          <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
+        )}
         {renderType === NodeDefLayout.renderType.tableHeader ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={label} />
         ) : renderType === NodeDefLayout.renderType.tableBody ? (
