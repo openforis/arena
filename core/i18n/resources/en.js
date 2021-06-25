@@ -51,6 +51,7 @@ Do you want to cancel them?`,
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    expression: 'Expression',
     false: 'False',
     formContainsErrors: 'Form contains errors',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
@@ -370,9 +371,17 @@ We will send soon an email to your address with the instructions on how to acces
     sessionExpired: 'Record session has expired',
   },
 
+  dataExplorerView: {
+    customAggregateFunction: {
+      confirmDelete: 'Delete this custom aggregate function?',
+      sqlExpression: 'SQL Expression',
+    },
+  },
+
   dataExportView: {
     startCsvExport: 'Start CSV export',
   },
+
   dataView: {
     aggregateMode: 'Aggregate Mode',
     editMode: 'Edit Mode',

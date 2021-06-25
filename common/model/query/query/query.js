@@ -3,7 +3,7 @@ import * as A from '@core/arena'
 import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
 
-export const aggregateFunctions = {
+export const DEFAULT_AGGREGATE_FUNCTIONS = {
   avg: 'avg',
   cnt: 'cnt',
   max: 'max',

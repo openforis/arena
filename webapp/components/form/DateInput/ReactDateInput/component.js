@@ -227,8 +227,8 @@ const DateInput = React.forwardRef(
       if (el) {
         const rect = el.getBoundingClientRect()
 
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        const scrollLeft = window.pageXOffset || document.documentElement?.scrollLeft
+        const scrollTop = window.pageYOffset || document.documentElement?.scrollTop
 
         return {
           top: rect.top + scrollTop + rect.height,

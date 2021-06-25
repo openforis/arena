@@ -35,7 +35,7 @@ export const init = app => {
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
 
         const item = R.pipe(
-          R.find(item => CategoryItem.getCode(item) === value),
+          R.find((_item) => CategoryItem.getCode(_item) === value),
           toItem(type, lang),
         )(itemsDb)
 
@@ -67,12 +67,13 @@ export const init = app => {
           R.ifElse(
             R.always(isBlank(value)),
             R.identity,
-            R.filter(item => {
+            R.filter((item) => {
               const code = CategoryItem.getCode(item)
               const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
             }),
           ),
+          R.sort((a, b) => Number(a.id) - Number(b.id)),
           R.take(25),
           R.map(toItem(type, lang)),
         )(itemsDb)
