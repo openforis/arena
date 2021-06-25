@@ -5,6 +5,7 @@ import * as ObjectUtils from '@core/objectUtils'
 export const keys = {
   layout: 'layout',
   // Layout keys
+  index: 'index',
   pageUuid: 'pageUuid', // Page uuid
   renderType: 'renderType', // RenderType
   columnsNo: 'columnsNo', // Number of columns
@@ -45,6 +46,8 @@ export const getLayoutCycle = (cycle) => R.pipe(getLayout, R.prop(cycle))
 
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayoutCycle(cycle), R.propOr(defaultTo, prop))
 
+export const getIndex = (cycle) => _getPropLayout(cycle, keys.index)
+
 export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
@@ -81,6 +84,7 @@ export const isRenderDropdown = (cycle) => isRenderType(cycle, renderType.dropdo
 export const isRenderCheckbox = (cycle) => isRenderType(cycle, renderType.checkbox)
 
 export const isDisplayInParentPage = (cycle) => R.pipe(getDisplayIn(cycle), R.propEq(displayIn.parentPage))
+export const isDisplayInOwnPage = (cycle) => R.pipe(getDisplayIn(cycle), R.propEq(displayIn.ownPage))
 
 // ====== UPDATE
 export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
@@ -89,6 +93,8 @@ export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCyc
 
 export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
 
+export const assocIndex = (cycle, index) => assocLayoutProp(cycle, keys.index, index)
+
 export const assocLayoutChildren = (cycle, layoutChildren) =>
   assocLayoutProp(cycle, keys.layoutChildren, layoutChildren)
 
@@ -96,13 +102,15 @@ export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutC
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
-export const copyLayout = ({ cycleFrom, cyclesTo }) => (nodeDef) => {
-  const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
-  const layoutUpdated = cyclesTo
-    .filter((cycleKey) => cycleKey !== cycleFrom)
-    .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
-  return assocLayout(layoutUpdated)(nodeDef)
-}
+export const copyLayout =
+  ({ cycleFrom, cyclesTo }) =>
+  (nodeDef) => {
+    const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
+    const layoutUpdated = cyclesTo
+      .filter((cycleKey) => cycleKey !== cycleFrom)
+      .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
+    return assocLayout(layoutUpdated)(nodeDef)
+  }
 
 // ====== UTILS
 
