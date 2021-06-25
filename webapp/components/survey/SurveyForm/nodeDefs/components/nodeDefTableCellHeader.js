@@ -34,6 +34,17 @@ const LabelWithTooltip = (props) => {
   )
 }
 
+LabelWithTooltip.propTypes = {
+  label: PropTypes.string.isRequired,
+  style: PropTypes.object,
+  children: PropTypes.node,
+}
+
+LabelWithTooltip.defaultProps = {
+  style: {},
+  children: null,
+}
+
 const NodeDefTableCellHeader = (props) => {
   const { label, nodeDef } = props
 

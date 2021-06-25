@@ -103,8 +103,6 @@ const NodeDefEditButtons = (props) => {
 NodeDefEditButtons.propTypes = {
   surveyCycleKey: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
-  edit: PropTypes.bool.isRequired,
-  canEditDef: PropTypes.bool.isRequired,
 }
 
 export default NodeDefEditButtons
