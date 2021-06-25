@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
 
@@ -36,10 +37,20 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     return this
   }
 
+  category(categoryName) {
+    this._categoryName = categoryName
+    return this
+  }
+
   build(survey, parentDef = null) {
     const def = this._createNodeDef(parentDef)
+
     def[NodeDef.keys.analysis] = this._analysis
 
+    if (this.categoryName) {
+      const category = Survey.getCategoryByName(this.categoryName)(survey)
+      def.props[NodeDef.propKeys.categoryUuid] = category?.uuid
+    }
     return {
       [NodeDef.getUuid(def)]: def,
     }

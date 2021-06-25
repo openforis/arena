@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
@@ -12,9 +11,9 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyLang } from '@webapp/store/survey'
 
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
-import PanelRight from '@webapp/components/PanelRight'
 
 import { useColumn } from './store'
+import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
@@ -28,16 +27,7 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyLang()
 
-  const {
-    modeEdit,
-    columnNames,
-    isMeasure,
-    aggregateFunctions,
-    customAggregateFunction,
-    noCols,
-    widthInner,
-    widthOuter,
-  } = useColumn({
+  const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
     query,
     colWidth,
     nodeDef,
@@ -56,7 +46,7 @@ const ColumnHeader = (props) => {
         ) : (
           <div>
             {nodeDefLabel}
-            {isMeasure && !customAggregateFunction && (
+            {isMeasure && (
               <button
                 type="button"
                 className="btn btn-s btn-transparent btn-aggregates"
@@ -80,38 +70,31 @@ const ColumnHeader = (props) => {
       )}
       {isMeasure && (
         <div className="table__inner-cell">
-          {customAggregateFunction ? (
-            <div key={`${nodeDefUuid}_agg_fn`} style={{ width: widthInner }}>
-              {customAggregateFunction}
-            </div>
-          ) : (
-            aggregateFunctions.map((aggregateFn) => (
+          {aggregateFunctions.map((aggregateFn) => {
+            const isCustomAggregateFunction = !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)
+            const customAggregateFunction = isCustomAggregateFunction
+              ? NodeDef.getAggregateFunctions(nodeDef)[aggregateFn]
+              : null
+            const aggregateFunctionLabel = isCustomAggregateFunction
+              ? customAggregateFunction?.name
+              : i18n.t(`common.${aggregateFn}`)
+            return (
               <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-                {i18n.t(`common.${aggregateFn}`)}
+                {aggregateFunctionLabel}
               </div>
-            ))
-          )}
+            )
+          })}
         </div>
       )}
 
       {showAggregateFunctionsPanel && (
-        <PanelRight
-          header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
+        <AggregateFunctionsPanel
+          nodeDef={nodeDef}
+          aggregateFunctions={aggregateFunctions}
+          onChangeQuery={onChangeQuery}
           onClose={() => setShowAggregateFunctionsPanel(false)}
-        >
-          {Object.keys(Query.aggregateFunctions).map((aggregateFn) => (
-            <button
-              key={aggregateFn}
-              type="button"
-              className={classNames('btn btn-aggregate-fn deselectable', {
-                active: aggregateFunctions.indexOf(aggregateFn) >= 0,
-              })}
-              onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
-            >
-              {i18n.t(`common.${aggregateFn}`)}
-            </button>
-          ))}
-        </PanelRight>
+          query={query}
+        />
       )}
     </div>
   )

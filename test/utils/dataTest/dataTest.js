@@ -26,6 +26,8 @@ export const createTestSurvey = ({ user }) =>
         SB.entity(
           'tree',
           SB.attribute('tree_id', NodeDef.nodeDefType.integer).key(),
+          SB.attribute('tree_status', NodeDef.nodeDefType.code).category('tree_status'),
+          SB.attribute('tree_type', NodeDef.nodeDefType.code).category('tree_type'),
           SB.attribute('tree_height', NodeDef.nodeDefType.integer),
           SB.attribute('dbh', NodeDef.nodeDefType.decimal),
           SB.attribute('tree_species', NodeDef.nodeDefType.taxon)
@@ -79,7 +81,15 @@ export const createTestSurvey = ({ user }) =>
               SB.categoryItem('3').extra({ location: 'SRID=EPSG:4326;POINT(13.09963 42.00548)', region: 'Region 3' }),
               SB.categoryItem('4').extra({ location: 'SRID=EPSG:4326;POINT(13.09963 41.99548)', region: 'Region 3' })
             )
-        )
+        ),
+      SB.category('tree_status', SB.categoryItem('L').label('Live'), SB.categoryItem('D').label('Dead')),
+      SB.category(
+        'tree_type',
+        SB.categoryItem('T').label('Tree'),
+        SB.categoryItem('F').label('Fern'),
+        SB.categoryItem('L').label('Liana'),
+        SB.categoryItem('P').label('Palm')
+      )
     )
     .build()
 

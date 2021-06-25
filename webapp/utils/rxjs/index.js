@@ -1,1 +1,0 @@
-export { fromAjax } from './fromAjax'
