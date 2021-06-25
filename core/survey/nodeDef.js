@@ -259,6 +259,7 @@ export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
+export const getAggregateFunctionByUuid = (uuid) => R.pipe(getAggregateFunctions, R.propOr(null, uuid))
 
 // ==== CREATE
 

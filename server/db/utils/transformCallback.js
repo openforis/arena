@@ -12,19 +12,23 @@ export const transformCallback = (row, draft = false, assocPublishedDraft = fals
     return null
   }
 
-  const rowUpdated = A.pipe(
-    // Assoc published and draft properties based on props
-    (rowCurrent) => (backup || assocPublishedDraft ? _assocPublishedDraft(rowCurrent) : rowCurrent),
-    A.camelizePartial({ skip: ['validation', 'props', 'props_draft'] })
-  )(row)
+  let rowUpdated = row
+  // Assoc published and draft properties based on props
+  if (backup || assocPublishedDraft) {
+    rowUpdated = _assocPublishedDraft(rowUpdated)
+  }
+  rowUpdated = A.camelizePartial({
+    skip: ['validation', 'props', 'props_draft'],
+    limitToLevel: 1,
+  })(rowUpdated)
 
   if (!backup) {
     return mergeProps({ draft })(rowUpdated)
   }
-
   // backup
-  // camelize props_draft column into propsDraft
+  // keep props_draft and camelize props_draft column into propsDraft
   rowUpdated.propsDraft = row.props_draft
   delete rowUpdated.props_draft
+
   return rowUpdated
 }

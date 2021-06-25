@@ -73,7 +73,7 @@ const ColumnHeader = (props) => {
           {aggregateFunctions.map((aggregateFn) => {
             const isCustomAggregateFunction = !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)
             const customAggregateFunction = isCustomAggregateFunction
-              ? NodeDef.getAggregateFunctions(nodeDef)[aggregateFn]
+              ? NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
               : null
             const aggregateFunctionLabel = isCustomAggregateFunction
               ? customAggregateFunction?.name
