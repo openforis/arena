@@ -94,7 +94,7 @@ ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
     return `${columnName}_${aggregateFn}`
   }
   // custom aggregate function: aggregateFn is the uuid of the custom aggregate function
-  const customAggregateFunction = NodeDef.getAggregateFunctions(nodeDef)[aggregateFn]
+  const customAggregateFunction = NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
   return `${columnName}_custom_agg_${customAggregateFunction?.name}`
 }
 ColumnNodeDef.extractColumnName = extractColumnName
