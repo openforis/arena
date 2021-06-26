@@ -17,6 +17,7 @@ import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import * as NodeDefUiProps from './nodeDefUIProps'
 
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 // Edit actions
 // Entry actions
@@ -83,10 +84,11 @@ class NodeDefSwitch extends React.Component {
     return (
       <div
         className={className}
-        data-testid={NodeDef.getName(nodeDef)}
+        data-testid={DataTestId.surveyForm.nodeDefWrapper(NodeDef.getName(nodeDef))}
         ref={this.element}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
+        onMouseMove={this.onMouseEnter}
       >
         {editButtonsVisible && (
           <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
