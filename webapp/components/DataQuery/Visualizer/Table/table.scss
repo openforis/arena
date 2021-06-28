@@ -25,11 +25,16 @@ $rowHeaderHeight: 45px;
     .table__cell {
       display: flex;
       flex-direction: column;
+
+      .table__cell-content-wrapper {
+        display: flex;
+        justify-content: center;
+      }
     }
 
     .btn-aggregates {
       color: white;
-      margin: 0;
+      margin: 0 0.5rem 0 0.5rem;
       padding: 0;
     }
   }

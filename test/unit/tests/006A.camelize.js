@@ -45,12 +45,18 @@ const tests = [
     skip: ['third_prop'],
     expected: { firstProp: 1, secondProp: 2, third_prop: { third_prop_a: 11, third_prop_b: 12 } },
   },
+  // complex object limit to first level
+  {
+    object: { first_prop: 1, second_prop: 2, third_prop: { third_prop_a: 11, third_prop_b: 12 } },
+    limitToLevel: 1,
+    expected: { firstProp: 1, secondProp: 2, thirdProp: { third_prop_a: 11, third_prop_b: 12 } },
+  },
 ]
 
 describe('A.camelize', () => {
-  tests.forEach(({ object, expected, skip = [] }) => {
+  tests.forEach(({ object, expected, skip = [], limitToLevel = null }) => {
     it(`${JSON.stringify(object)} ->  ${JSON.stringify(expected)}`, () => {
-      const valueCamelized = A.camelizePartial({ skip }, object)
+      const valueCamelized = A.camelizePartial({ skip, limitToLevel }, object)
       expect(valueCamelized).toEqual(expected)
     })
   })
