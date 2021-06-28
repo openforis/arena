@@ -38,11 +38,7 @@ const AttributesSelector = (props) => {
 
   return (
     <div className="attributes-selector">
-      <ExpansionPanel
-        buttonLabel={NodeDef.getLabel(nodeDefContext, lang)}
-        showHeader={showLabel}
-        buttonLabelParams={{ count: 2 }}
-      >
+      <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
         {childDefs.map((childDef) => (
           <AttributeSelector
             key={NodeDef.getUuid(childDef)}
