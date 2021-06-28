@@ -65,7 +65,7 @@ export default () =>
       gotoFormPage(plot)
 
       test(`Verify ${plot.name} not required and not applicable`, async () => {
-        const plotEl = await page.$(getSelector(plot.name))
+        const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
         await expect(await plotEl.getAttribute('class')).toContain('not-applicable')
 
         await page.hover(`text="${plot_id.label}"`)
@@ -87,7 +87,7 @@ export default () =>
     gotoFormPage(plot)
 
     test(`Verify ${plot.name} required and applicable`, async () => {
-      const plotEl = await page.$(getSelector(plot.name))
+      const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
       await expect(await plotEl.getAttribute('class')).not.toContain('not-applicable')
 
       await page.hover(`text="${plot_id.label}"`)

@@ -137,6 +137,7 @@ export const DataTestId = {
     nodeDefAddChildBtn: (name) => `${name}-add-child-btn`,
     nodeDefEditBtn: (name) => `${name}-edit-btn`,
     nodeDefErrorBadge: (name) => `${name}-error-badge`,
+    nodeDefWrapper: (name) => `node-def-wrapper-${name}`,
     pageLinkBtn: (name) => `${name}-page-link-btn`,
     previewCloseBtn: 'preview-close-btn',
     previewOpenBtn: 'preview-open-btn',

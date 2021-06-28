@@ -1,12 +1,22 @@
 @import '~@webapp/style/vars';
 
+.survey-form__node-def-entity-table-row-header {
+  .react-grid-item {
+    .survey-form__node-def-page-item {
+      display: flex;
+    }
+  }
+}
+
 .survey-form__node-def-table-cell-header {
-  display: grid;
+  display: flex;
+  width: 100%;
   background-color: $black;
 
   .label {
-    justify-self: center;
+    width: 100%;
     align-self: center;
+    justify-self: center;
     font-weight: 600;
     font-size: 0.8rem;
     text-align: center;
