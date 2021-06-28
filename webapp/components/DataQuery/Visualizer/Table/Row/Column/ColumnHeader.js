@@ -14,6 +14,7 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 
 import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
+import { ButtonIconCog } from '@webapp/components/buttons/ButtonIconCog'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
@@ -40,22 +41,20 @@ const ColumnHeader = (props) => {
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
-      <div className="width100">
+      <div className="table__cell-content-wrapper width100">
         {modeEdit ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} />
         ) : (
-          <div>
-            {nodeDefLabel}
+          <>
+            <span className="ellipsis">{nodeDefLabel}</span>
             {isMeasure && (
-              <button
-                type="button"
+              <ButtonIconCog
                 className="btn btn-s btn-transparent btn-aggregates"
                 onClick={() => setShowAggregateFunctionsPanel(true)}
-              >
-                <span className="icon icon-cog icon-14px" />
-              </button>
+                title={i18n.t('common.aggregateFunction', { count: 2 })}
+              />
             )}
-          </div>
+          </>
         )}
       </div>
 
@@ -73,7 +72,7 @@ const ColumnHeader = (props) => {
           {aggregateFunctions.map((aggregateFn) => {
             const isCustomAggregateFunction = !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)
             const customAggregateFunction = isCustomAggregateFunction
-              ? NodeDef.getAggregateFunctions(nodeDef)[aggregateFn]
+              ? NodeDef.getAggregateFunctionByUuid(aggregateFn)(nodeDef)
               : null
             const aggregateFunctionLabel = isCustomAggregateFunction
               ? customAggregateFunction?.name
