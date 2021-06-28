@@ -6,7 +6,7 @@ export const parseValue = (value) => (typeof value === 'function' ? value() : va
 
 // ==== selector utils
 export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
-  `${parentSelector} ${getSelector(nodeDef.name)}`.trim()
+  `${parentSelector} ${getSelector(DataTestId.surveyForm.nodeDefWrapper(nodeDef.name))}`.trim()
 
 export const getBooleanSelector = (nodeDef, parentSelector, value) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
