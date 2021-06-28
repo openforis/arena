@@ -17,7 +17,6 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
-import AnalysisCodeProps from '../AnalysisCodeProps'
 
 import { useBasicProps } from './store'
 
@@ -27,6 +26,7 @@ import TaxonProps from '../TaxonProps'
 import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
 import FileProps from '../FileProps'
+import AnalysisProps from '../AnalysisProps'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -184,7 +184,7 @@ const BasicProps = (props) => {
         </>
       )}
 
-      {NodeDef.isAnalysis(nodeDef) && <AnalysisCodeProps state={state} Actions={Actions} nodeDef={nodeDef} />}
+      {NodeDef.isAnalysis(nodeDef) && <AnalysisProps state={state} Actions={Actions} nodeDef={nodeDef} />}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { ViewDataNodeDef } from '@common/model/db'
@@ -33,6 +34,13 @@ export const AggregateFunctionExpressionEditor = (props) => {
       script={expression}
       onChange={onChange}
       completer={columnNamesCompleter}
+      height="150px"
     />
   )
+}
+
+AggregateFunctionExpressionEditor.propTypes = {
+  expression: PropTypes.string.isRequired,
+  entityDef: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
 }
