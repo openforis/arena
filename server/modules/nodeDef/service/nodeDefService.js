@@ -70,7 +70,7 @@ export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey
     const nodeDefsUpdated = await NodeDefManager.insertNodeDef(
       {
         user,
-        surveyId,
+        survey,
         cycle,
         nodeDef,
       },
@@ -93,13 +93,15 @@ export const updateNodeDefProps = async (
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
 
     const nodeDefsUpdated = await NodeDefManager.updateNodeDefProps(
-      user,
-      surveyId,
-      nodeDefUuid,
-      parentUuid,
-      props,
-      propsAdvanced,
-      system,
+      {
+        user,
+        survey,
+        nodeDefUuid,
+        parentUuid,
+        props,
+        propsAdvanced,
+        system,
+      },
       t
     )
     const nodeDef = nodeDefsUpdated[nodeDefUuid]

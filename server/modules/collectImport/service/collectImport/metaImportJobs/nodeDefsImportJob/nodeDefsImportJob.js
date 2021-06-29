@@ -145,7 +145,10 @@ export default class NodeDefsImportJob extends Job {
 
     Object.assign(
       nodeDefsUpdated,
-      await NodeDefManager.insertNodeDef({ user: this.user, surveyId, nodeDef: nodeDefParam, system: true }, this.tx)
+      await NodeDefManager.insertNodeDef(
+        { user: this.user, survey: this.survey, nodeDef: nodeDefParam, system: true },
+        this.tx
+      )
     )
     Object.assign(this.nodeDefs, nodeDefsUpdated)
 
@@ -183,19 +186,23 @@ export default class NodeDefsImportJob extends Job {
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
 
+    Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
+
     // 4. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
 
     Object.assign(
       nodeDefsUpdated,
       await NodeDefManager.updateNodeDefProps(
-        this.user,
-        surveyId,
-        nodeDefUuid,
-        NodeDef.getParentUuid(nodeDef),
-        propsUpdated,
-        propsAdvanced,
-        true,
+        {
+          user: this.user,
+          survey: this.survey,
+          nodeDefUuid,
+          parentUuid: NodeDef.getParentUuid(nodeDef),
+          props: propsUpdated,
+          propsAdvanced,
+          system: true,
+        },
         this.tx
       )
     )
@@ -451,7 +458,7 @@ export default class NodeDefsImportJob extends Job {
       const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
         {
           user: this.user,
-          surveyId: this.surveyId,
+          survey: this.survey,
           nodeDef: qualifierNodeDefParam,
           system: true,
         },

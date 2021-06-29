@@ -110,22 +110,16 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
       if (analysisNodeDefsInEntity.length > 0) {
         await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
+          const nodeDefUuid = NodeDef.getUuid(nodeDef)
           const nodeDefName = NodeDef.getName(nodeDef)
+          const parentUuid = NodeDef.getParentUuid(nodeDef)
 
           const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
 
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
 
           await NodeDefManager.updateNodeDefProps(
-            user,
-            surveyId,
-            NodeDef.getUuid(nodeDef),
-            NodeDef.getParentUuid(nodeDef),
-            {},
-            {
-              script,
-            },
-            false,
+            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
             tx
           )
         })

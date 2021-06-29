@@ -3,6 +3,8 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -24,10 +26,12 @@ export {
 // ======= CREATE
 
 export const insertNodeDef = async (
-  { user, surveyId, cycle = Survey.cycleOneKey, nodeDef: nodeDefParam, system = false, addLogs = true },
+  { user, survey, cycle = Survey.cycleOneKey, nodeDef: nodeDefParam, system = false, addLogs = true },
   client = db
 ) =>
   client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
+
     const insertLog = addLogs
       ? ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
       : null
@@ -38,6 +42,26 @@ export const insertNodeDef = async (
       markSurveyDraft(surveyId, t),
       insertLog,
     ])
+
+    // TODO move it into NodeDefLayoutManager.updateParentLayout
+    if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
+      const surveyUpdated = Survey.assocNodeDefs({
+        nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsParentUpdated },
+      })(survey)
+      const nodeDefParentUpdated = Survey.updateNodeDefParentLayout({
+        survey: surveyUpdated,
+        surveyCycleKey: cycle,
+        nodeDef,
+      })
+      await NodeDefRepository.updateNodeDefProps(
+        surveyId,
+        NodeDef.getUuid(nodeDefParentUpdated),
+        NodeDef.getParentUuid(nodeDefParentUpdated),
+        NodeDef.getProps(nodeDefParentUpdated),
+        NodeDef.getPropsAdvanced(nodeDef),
+        t
+      )
+    }
 
     return {
       ...nodeDefsParentUpdated,
@@ -63,19 +87,15 @@ export const fetchNodeDefsBySurveyId = async (
 // ======= UPDATE
 
 export const updateNodeDefProps = async (
-  user,
-  surveyId,
-  nodeDefUuid,
-  parentUuid,
-  props,
-  propsAdvanced = {},
-  system = false,
+  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
 ) =>
   client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
+
     const updatingCycles = NodeDef.propKeys.cycles in props
 
-    const nodeDefsUpdated = updatingCycles
+    let nodeDefsUpdated = updatingCycles
       ? await NodeDefLayoutManager.updateNodeDefLayoutOnCyclesUpdate(
           {
             surveyId,
@@ -86,14 +106,51 @@ export const updateNodeDefProps = async (
         )
       : {}
 
+    let nodeDefsToUpdate = {} // node defs with changes to be stored in the db
+
+    if (NodeDefLayout.keys.layout in props) {
+      let surveyUpdated = Survey.assocNodeDefs({ nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated } })(
+        survey
+      )
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const layoutToUpdate = props[NodeDefLayout.keys.layout]
+      const layoutEntries = Object.entries(layoutToUpdate)
+
+      layoutEntries.forEach(([surveyCycleKey, layoutCycle]) => {
+        Object.entries(layoutCycle).forEach(([key, value]) => {
+          nodeDefsToUpdate = {
+            ...nodeDefsToUpdate,
+            ...Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(surveyUpdated),
+          }
+          nodeDefsUpdated = {
+            ...nodeDefsUpdated,
+            ...nodeDefsToUpdate,
+          }
+          surveyUpdated = Survey.assocNodeDefs({
+            nodeDefs: { ...Survey.getNodeDefs(surveyUpdated), ...nodeDefsUpdated },
+          })(surveyUpdated)
+        })
+      })
+    }
+
     const logContent = {
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
-    const [nodeDef] = await Promise.all([
+    const [nodeDef] = await t.batch([
       NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, t),
+      ...Object.values(nodeDefsToUpdate).map((nodeDefToUpdate) =>
+        NodeDefRepository.updateNodeDefProps(
+          surveyId,
+          nodeDefToUpdate.uuid,
+          nodeDefToUpdate.parentUuid,
+          nodeDefToUpdate.props,
+          nodeDefToUpdate.propsAdvanced,
+          t
+        )
+      ),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
