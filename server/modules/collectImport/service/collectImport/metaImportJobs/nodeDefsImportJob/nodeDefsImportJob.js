@@ -94,7 +94,7 @@ export default class NodeDefsImportJob extends Job {
    * @returns {object} - Inserted node definitions.
    */
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
-    const { surveyId, defaultLanguage } = this.context
+    const { defaultLanguage } = this.context
 
     const nodeDefsUpdated = {}
     const nodeDefsInserted = {}
