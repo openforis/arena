@@ -10,10 +10,9 @@ export const getAnalysisNodeDefs =
     let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter(NodeDef.isAnalysis)
 
     if (chain) {
-      nodeDefs = nodeDefs.filter(
-        (nodeDef) =>
-          NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) === Chain.getUuid(chain)
-      )
+      nodeDefs = nodeDefs.filter((nodeDef) => {
+        return NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) === Chain.getUuid(chain)
+      })
     }
 
     if (entity) {
