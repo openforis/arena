@@ -63,11 +63,19 @@ class NodeDefSwitch extends React.Component {
   }
 
   onMouseEnter() {
-    this.setState({ isHovering: true })
+    this.setIsHovering(true)
   }
 
   onMouseLeave() {
-    this.setState({ isHovering: false })
+    this.setIsHovering(false)
+  }
+
+  setIsHovering(isHovering) {
+    const { edit, canEditDef } = this.props
+
+    if (edit && canEditDef) {
+      this.setState({ isHovering })
+    }
   }
 
   render() {
