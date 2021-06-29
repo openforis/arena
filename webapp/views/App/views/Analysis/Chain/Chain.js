@@ -51,13 +51,16 @@ const ChainComponent = () => {
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
-      <Prompt when={!Validation.isValid(validation)} message={i18n.t('chainView.errorNoLabel')} />
+      <Prompt
+        when={!Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation))}
+        message={i18n.t('chainView.errorNoLabel')}
+      />
 
       <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
 
       <div className="form">
         <LabelsEditor
-          labels={chain.props.labels}
+          labels={chain?.props?.labels}
           formLabelKey="chainView.formLabel"
           readOnly={false}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}

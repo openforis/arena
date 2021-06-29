@@ -98,9 +98,16 @@ export const init = (app) => {
       const user = Request.getUser(req)
 
       const { chain } = Request.getBody(req)
-      await AnalysisService.update({ user, surveyId, chain })
 
-      Response.sendOk(res)
+      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+      const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+      const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
+
+      const chainWithValdidation = Chain.assocValidation(validation)(chain)
+
+      await AnalysisService.update({ user, surveyId, chain: chainWithValdidation })
+
+      res.json(chainWithValdidation)
     } catch (error) {
       next(error)
     }
