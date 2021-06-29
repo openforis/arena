@@ -59,7 +59,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
         _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
       )
     )
-    // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead)
+    // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {

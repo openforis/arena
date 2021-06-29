@@ -11,7 +11,7 @@ import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 import { useCustomAggregateFunctionsEditor } from './useCustomAggregateFunctionsEditor'
 
 export const CustomAggregateFunctionsEditor = (props) => {
-  const { nodeDef, selectedUuids, onSelectionChange } = props
+  const { entityDef, nodeDef, selectedUuids, onSelectionChange } = props
 
   const i18n = useI18n()
   const { customAggregateFunctionsArray, editedUuid, setEditedUuid, onDelete, onNew, onSave, onEditCancel } =
@@ -37,6 +37,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
                   {editing ? (
                     <CustomAggregateFunctionEditor
                       aggregateFunction={aggregateFunction}
+                      entityDef={entityDef}
                       nodeDef={nodeDef}
                       onCancel={onEditCancel}
                       onDelete={onDelete}
@@ -62,6 +63,7 @@ export const CustomAggregateFunctionsEditor = (props) => {
 }
 
 CustomAggregateFunctionsEditor.propTypes = {
+  entityDef: PropTypes.object.isRequired,
   nodeDef: PropTypes.object.isRequired,
   selectedUuids: PropTypes.array,
   onSelectionChange: PropTypes.func,

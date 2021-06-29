@@ -84,7 +84,11 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return columns
   }
 
-  get columnNodeDefNamesRead() {
+  get columnNodeDefNames() {
+    return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).names)
+  }
+
+  get columnNodeDefNamesFull() {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
   }
 
