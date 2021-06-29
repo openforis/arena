@@ -55,7 +55,10 @@ const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLangua
   return {
     importIssue,
     defaultValue: success
-      ? NodeDefExpression.createExpression(exprConverted, applyIfConverted === null ? '' : applyIfConverted)
+      ? NodeDefExpression.createExpression({
+          expression: exprConverted,
+          applyIf: applyIfConverted === null ? '' : applyIfConverted,
+        })
       : null,
   }
 }
