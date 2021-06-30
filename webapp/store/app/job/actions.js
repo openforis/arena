@@ -13,7 +13,7 @@ export const showJobMonitor =
     dispatch({ type: JOB_START, job, onComplete, autoHide, closeButton })
 
 export const updateJob =
-  ({ job, hasToRefresh = false }) =>
+  ({ job }) =>
   (dispatch, getState) => {
     dispatch({ type: JOB_UPDATE, job })
 
@@ -26,12 +26,9 @@ export const updateJob =
         dispatch({ type: JOB_UPDATE, job: null })
       }
     }
-    if (hasToRefresh) {
-      window?.location.reload()
-    }
   }
 
-export const hideJobMonitor = () => updateJob({ job: null, hasToRefresh: true })
+export const hideJobMonitor = () => updateJob({ job: null })
 
 export const cancelJob = () => async (dispatch) => {
   await axios.delete('/api/jobs/active')
