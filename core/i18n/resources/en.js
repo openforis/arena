@@ -435,6 +435,7 @@ We will send soon an email to your address with the instructions on how to acces
 
   chainView: {
     formLabel: 'Processing chain label',
+    errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     status: 'Status',
     deleteConfirm: `Delete this processing chain?
