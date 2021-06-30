@@ -313,7 +313,7 @@ export default class NodeDefsImportJob extends Job {
 
       if (success) {
         propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
-          NodeDefExpression.createExpression(relevantExprConverted),
+          NodeDefExpression.createExpression({ expression: relevantExprConverted }),
         ]
       }
     }
@@ -445,7 +445,7 @@ export default class NodeDefsImportJob extends Job {
         `
 
       const propsAdvanced = {
-        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(applicableIfExpr)],
+        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression({ expression: applicableIfExpr })],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
       const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(

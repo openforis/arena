@@ -3,6 +3,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
@@ -114,7 +115,11 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
 
   return {
     validationRule: success
-      ? NodeDefExpression.createExpression(exprConverted, applyIfConverted === null ? '' : applyIfConverted)
+      ? NodeDefExpression.createExpression({
+          expression: exprConverted,
+          applyIf: applyIfConverted === null ? '' : applyIfConverted,
+          severity: flag === 'error' ? ValidationResult.severity.error : ValidationResult.severity.warning,
+        })
       : null,
     importIssue,
   }
