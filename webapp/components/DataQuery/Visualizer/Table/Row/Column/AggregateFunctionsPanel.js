@@ -2,10 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 
 import PanelRight from '@webapp/components/PanelRight'
+
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n, useLang } from '@webapp/store/system'
 
 import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor'
@@ -15,10 +18,14 @@ export const AggregateFunctionsPanel = (props) => {
 
   const lang = useLang()
   const i18n = useI18n()
+  const survey = useSurvey()
 
   const customAggregateFunctionUuids = aggregateFunctions.filter(
     (fn) => !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(fn)
   )
+
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
@@ -42,6 +49,7 @@ export const AggregateFunctionsPanel = (props) => {
         </button>
       ))}
       <CustomAggregateFunctionsEditor
+        entityDef={entityDef}
         nodeDef={nodeDef}
         selectedUuids={customAggregateFunctionUuids}
         onSelectionChange={(selectedAggregateFunctionsByUuid) => {
