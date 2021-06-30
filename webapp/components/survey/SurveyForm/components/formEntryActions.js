@@ -1,31 +1,36 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
+import ErrorBadge from '@webapp/components/errorBadge'
+
+import { useAuthCanDeleteRecord, useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { RecordActions, RecordState } from '@webapp/store/ui/record'
-import { DataTestId } from '@webapp/utils/dataTestId'
 
-import ErrorBadge from '@webapp/components/errorBadge'
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
-  const record = useSelector(RecordState.getRecord)
+  const record = useRecord()
 
   const stepId = Record.getStep(record)
   const step = RecordStep.getStep(stepId)
   const stepNext = RecordStep.getNextStep(stepId)
   const stepPrev = RecordStep.getPreviousStep(stepId)
   const valid = Validation.isObjValid(record)
-  const analysis = Record.isInAnalysisStep(record)
+
+  const canPromote = useAuthCanPromoteRecord(record)
+  const canDemote = useAuthCanDemoteRecord(record)
+  const canDelete = useAuthCanDeleteRecord(record)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
@@ -34,7 +39,7 @@ const RecordEntryButtons = () => {
       <ErrorBadge id={DataTestId.record.errorBadge} validation={{ valid }} labelKey="dataView.invalidRecord" />
 
       <div className="survey-form-header__record-actions-steps">
-        {stepPrev && (
+        {canDemote && (
           <button
             className="btn-s btn-transparent"
             onClick={() =>
@@ -47,6 +52,7 @@ const RecordEntryButtons = () => {
               )
             }
             type="button"
+            title={i18n.t('surveyForm.formEntryActions.demoteTo', { stepPrev: getStepLabel(stepPrev) })}
           >
             <span className="icon icon-reply icon-12px" />
           </button>
@@ -59,7 +65,7 @@ const RecordEntryButtons = () => {
           })}
         </span>
 
-        {stepNext && (
+        {canPromote && (
           <button
             className="btn-s btn-transparent"
             aria-disabled={!valid}
@@ -73,13 +79,14 @@ const RecordEntryButtons = () => {
               )
             }
             type="button"
+            title={i18n.t('surveyForm.formEntryActions.promoteTo', { stepNext: getStepLabel(stepNext) })}
           >
             <span className="icon icon-redo2 icon-12px" />
           </button>
         )}
       </div>
 
-      {!analysis && (
+      {canDelete && (
         <button
           className="btn-s btn-danger"
           data-testid={DataTestId.record.deleteBtn}
@@ -103,7 +110,7 @@ const RecordEntryButtons = () => {
 }
 
 const FormEntryActions = (props) => {
-  const { preview, entry, analysis } = props
+  const { preview, entry } = props
 
   const i18n = useI18n()
   const dispatch = useDispatch()
@@ -121,7 +128,7 @@ const FormEntryActions = (props) => {
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>
       ) : (
-        (entry || analysis) && <RecordEntryButtons />
+        entry && <RecordEntryButtons />
       )}
     </div>
   )
@@ -130,13 +137,11 @@ const FormEntryActions = (props) => {
 FormEntryActions.propTypes = {
   preview: PropTypes.bool,
   entry: PropTypes.bool,
-  analysis: PropTypes.bool,
 }
 
 FormEntryActions.defaultProps = {
   preview: false,
   entry: false,
-  analysis: false,
 }
 
 export default FormEntryActions
