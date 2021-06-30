@@ -16,7 +16,7 @@ import { getContextUser, fetchFullContextSurvey } from '../../config/context'
 import * as RecordUtils from '../../../utils/recordUtils'
 
 // ==== helper methods
-const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
+const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression({ expression, applyIf })
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {

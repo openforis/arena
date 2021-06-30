@@ -53,10 +53,6 @@
   background-color: rgba($blueLight, 0.3);
   border-right: 1px solid transparent;
 
-  .react-grid-item {
-    display: grid;
-  }
-
   &.drag-in-progress .draggable-item * {
     pointer-events: none;
 

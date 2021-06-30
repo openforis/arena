@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
@@ -13,18 +14,17 @@ import NodeDefIconKey from './NodeDefIconKey'
 const NodeDefTableCellHeader = (props) => {
   const { label, nodeDef } = props
 
-  const fields = NodeDefUiProps.getFormFields(nodeDef)
-
   const i18n = useI18n()
+
+  const fields = NodeDefUiProps.getFormFields(nodeDef)
 
   return (
     <div
       className={`survey-form__node-def-table-cell-header survey-form__node-def-table-cell-${NodeDef.getType(nodeDef)}`}
     >
-      <div className="label" style={{ gridColumn: `1 / span ${fields.length}` }}>
+      <LabelWithTooltip label={label} style={{ gridColumn: `1 / span ${fields.length}` }}>
         <NodeDefIconKey nodeDef={nodeDef} />
-        {label}
-      </div>
+      </LabelWithTooltip>
 
       {fields.length > 1 &&
         fields.map((field) => (
