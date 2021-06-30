@@ -30,7 +30,7 @@ export const createExpression = ({
   severity,
 })
 
-export const createExpressionPlaceholder = () => createExpression('', '', true)
+export const createExpressionPlaceholder = () => createExpression({ placeholder: true })
 
 // ====== READ
 
