@@ -25,7 +25,7 @@ import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 
 const FormHeader = (props) => {
-  const { canEditRecord, edit, entry, preview, canEditDef, analysis } = props
+  const { edit, entry, preview, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -98,11 +98,7 @@ const FormHeader = (props) => {
         <div> | </div>
       </div>
       {analysis && <FormEntryActions analysis={analysis} />}
-      {edit && canEditDef ? (
-        <FormEditActions />
-      ) : (
-        <FormEntryActions preview={preview} entry={entry} canEditRecord={canEditRecord} />
-      )}
+      {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
     </div>
   )
 }
