@@ -25,7 +25,11 @@ export default class NodeDefBuilder {
   }
 
   applyIf(expr) {
-    return this._setProp(NodeDef.keysPropsAdvanced.applicable, [NodeDefExpression.createExpression(expr)], true)
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.applicable,
+      [NodeDefExpression.createExpression({ expression: expr })],
+      true
+    )
   }
 
   multiple() {

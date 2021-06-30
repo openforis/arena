@@ -132,7 +132,7 @@ describe('Record Validation Test', () => {
             SB.attribute('tree_num', NodeDef.nodeDefType.integer).key().required(),
             SB.attribute('tree_start_time', NodeDef.nodeDefType.time)
               .required()
-              .expressions(NodeDefExpression.createExpression('tree_start_time > cluster_start_time'))
+              .expressions(NodeDefExpression.createExpression({ expression: 'tree_start_time > cluster_start_time' }))
           )
             .multiple()
             .minCount(1)
@@ -141,8 +141,8 @@ describe('Record Validation Test', () => {
           .minCount(3)
           .maxCount(4),
         SB.attribute('percent_attr', NodeDef.nodeDefType.integer).expressions(
-          NodeDefExpression.createExpression('percent_attr > 0'),
-          NodeDefExpression.createExpression('percent_attr <= 100')
+          NodeDefExpression.createExpression({ expression: 'percent_attr > 0' }),
+          NodeDefExpression.createExpression({ expression: 'percent_attr <= 100' })
         )
       )
     ).buildAndStore()
