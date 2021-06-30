@@ -57,7 +57,7 @@ export default class Job {
 
     this.eventListener = null
 
-    this._logger = Log.getLogger(`Job ${this.constructor.name}`)
+    this._logger = Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`)
   }
 
   /**
@@ -319,7 +319,7 @@ export default class Job {
       }
     }
 
-    this.logDebug(`- ${this.processed} inner jobs processed successfully`)
+    this.logDebug(`- ${this.processed}/${this.total} inner jobs processed successfully`)
   }
 
   async _handleInnerJobEvent(event) {
@@ -327,7 +327,9 @@ export default class Job {
       case jobStatus.failed:
       case jobStatus.canceled:
         // Cancel or fail even parent job
-        await this._setStatus(event.status)
+        if (!this.isCanceled()) {
+          await this._setStatus(jobStatus.canceled)
+        }
         break
       case jobStatus.running:
         // Propagate progress event to parent job

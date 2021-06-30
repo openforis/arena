@@ -48,7 +48,9 @@ export default class CollectImportJob extends Job {
     }
 
     if (!this.isSucceeded() && surveyId) {
+      this.logDebug(`dropping schema for survey ${surveyId}...`)
       await SurveyManager.dropSurveySchema(surveyId)
+      this.logDebug(`dropping schema for survey ${surveyId} complete!`)
     }
   }
 }
