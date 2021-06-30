@@ -52,17 +52,17 @@ describe('Calculated value test', () => {
         SB.attribute('num', NodeDef.nodeDefType.decimal),
         SB.attribute('num_double', NodeDef.nodeDefType.decimal)
           .readOnly()
-          .defaultValues(NodeDefExpression.createExpression('num * 2')),
+          .defaultValues(NodeDefExpression.createExpression({ expression: 'num * 2' })),
         SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
           .readOnly()
-          .defaultValues(NodeDefExpression.createExpression('num_double * num_double')),
+          .defaultValues(NodeDefExpression.createExpression({ expression: 'num_double * num_double' })),
         SB.attribute('num_range')
           .readOnly()
           .defaultValues(
-            NodeDefExpression.createExpression('"a"', 'num <= 0'),
-            NodeDefExpression.createExpression('"b"', 'num <= 10'),
-            NodeDefExpression.createExpression('"c"', 'num <= 20'),
-            NodeDefExpression.createExpression('"z"')
+            NodeDefExpression.createExpression({ expression: '"a"', applyIf: 'num <= 0' }),
+            NodeDefExpression.createExpression({ expression: '"b"', applyIf: 'num <= 10' }),
+            NodeDefExpression.createExpression({ expression: '"c"', applyIf: 'num <= 20' }),
+            NodeDefExpression.createExpression({ expression: '"z"' })
           )
       )
     ).buildAndStore()
