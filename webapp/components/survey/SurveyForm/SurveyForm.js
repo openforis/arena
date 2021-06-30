@@ -112,7 +112,8 @@ const SurveyForm = (props) => {
       <FormHeader
         edit={edit}
         analysis={analysis}
-        entry={entry && canEditRecord}
+        entry={entry}
+        canEditRecord={canEditRecord}
         preview={preview}
         canEditDef={canEditDef}
       />

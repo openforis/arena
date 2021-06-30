@@ -588,6 +588,8 @@ $t(common.cantUndoWarning)`,
       confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
+      demoteTo: 'Demote to {{stepPrev}}',
+      promoteTo: 'Promote to {{stepNext}}',
       step: 'Step {{id}} ({{name}})',
     },
     nodeDefEditFormActions: {
