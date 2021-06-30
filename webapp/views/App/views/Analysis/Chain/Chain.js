@@ -60,7 +60,7 @@ const ChainComponent = () => {
 
       <div className="form">
         <LabelsEditor
-          labels={chain?.props?.labels}
+          labels={chain.props?.labels}
           formLabelKey="chainView.formLabel"
           readOnly={false}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
