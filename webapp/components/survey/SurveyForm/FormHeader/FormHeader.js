@@ -105,7 +105,6 @@ const FormHeader = (props) => {
 
 FormHeader.propTypes = {
   canEditDef: PropTypes.bool.isRequired,
-  canEditRecord: PropTypes.bool.isRequired,
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,
   preview: PropTypes.bool.isRequired,
