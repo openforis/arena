@@ -4,6 +4,8 @@ import { matchPath, useParams, Prompt } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
+import * as A from '@core/arena'
+
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/chain'
@@ -47,12 +49,14 @@ const ChainComponent = () => {
     }
   }, [])
 
-  if (!chain) return null
+  if (!chain || A.isEmpty(chain)) return null
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
       <Prompt
-        when={!Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation))}
+        when={
+          !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
+        }
         message={i18n.t('chainView.errorNoLabel')}
       />
 
