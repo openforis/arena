@@ -18,8 +18,11 @@ export const useUpdate = ({ setState }) => {
     const taxonomy = State.getTaxonomy(state)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
-    const taxonomyUpdated = State.assocTaxonomyProp({ key, value })(taxonomy)
-    setState(State.assocTaxonomy(taxonomyUpdated)(state))
+    setState((statePrev) => {
+      const taxonomyPrev = State.getTaxonomy(statePrev)
+      const taxonomyUpdated = State.assocTaxonomyProp({ key, value })(taxonomyPrev)
+      return State.assocTaxonomy(taxonomyUpdated)(statePrev)
+    })
 
     const action = async () => {
       await API.updateTaxonomy({
