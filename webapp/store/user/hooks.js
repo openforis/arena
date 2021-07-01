@@ -24,14 +24,17 @@ export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), us
 export const useAuthCanEditRecord = (record) => {
   const canEdit = Authorizer.canEditRecord(useUser(), record)
   const surveyInfo = useSurveyInfo()
-  return Survey.isPublished(surveyInfo) && canEdit
+  return canEdit && !Record.isInAnalysisStep(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 }
 export const useAuthCanDeleteRecord = (record) => useAuthCanEditRecord(record) && !Record.isInAnalysisStep(record)
 export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUser(), useSurveyInfo())
 export const useAuthCanPromoteRecord = (record) =>
   useAuthCanEditRecord(record) && RecordStep.getNextStep(Record.getStep(record))
-export const useAuthCanDemoteRecord = (record) =>
-  useAuthCanEditRecord(record) && RecordStep.getPreviousStep(Record.getStep(record))
+export const useAuthCanDemoteRecord = (record) => {
+  const canEdit = Authorizer.canEditRecord(useUser(), record)
+  const surveyInfo = useSurveyInfo()
+  return canEdit && Survey.isPublished(surveyInfo)
+}
 
 // ====== Auth / Users
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
