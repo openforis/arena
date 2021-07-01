@@ -318,6 +318,8 @@ export default class Job {
   async _handleInnerJobEvent(event) {
     switch (event.status) {
       case jobStatus.failed:
+        await this._setStatus(jobStatus.failed)
+        break
       case jobStatus.canceled:
         // Cancel or fail even parent job
         if (!this.isCanceled()) {
