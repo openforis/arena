@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -24,6 +24,7 @@ const Surveys = (props) => {
   const history = useHistory()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
+  const [tableKey, setTableKey] = useState(-1)
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -31,7 +32,7 @@ const Surveys = (props) => {
   }, [Survey.getUuid(surveyInfo)])
 
   useOnUpdate(() => {
-    window?.location.reload()
+    setTableKey(String(Survey.getStatus(surveyInfo)))
   }, [Survey.getStatus(surveyInfo)])
 
   const onRowClick = (surveyRow) => {
@@ -43,6 +44,7 @@ const Surveys = (props) => {
 
   return (
     <Table
+      key={tableKey}
       module={module}
       moduleApiUri={moduleApiUri}
       restParams={{ template }}
