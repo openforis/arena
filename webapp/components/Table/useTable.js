@@ -31,7 +31,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     fetchCount()
   }, [])
 
-  useEffect(initData, [])
+  useEffect(initData, [restParams])
 
   useOnUpdate(() => {
     fetchData()
