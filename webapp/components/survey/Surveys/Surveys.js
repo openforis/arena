@@ -30,6 +30,10 @@ const Surveys = (props) => {
     history.push(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
+  useOnUpdate(() => {
+    window?.location.reload()
+  }, [Survey.getStatus(surveyInfo)])
+
   const onRowClick = (surveyRow) => {
     const canEdit = Authorizer.canEditSurvey(user, surveyRow)
     dispatch(SurveyActions.setActiveSurvey(Survey.getId(surveyRow), canEdit))

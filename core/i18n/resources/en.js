@@ -435,6 +435,7 @@ We will send soon an email to your address with the instructions on how to acces
 
   chainView: {
     formLabel: 'Processing chain label',
+    errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     status: 'Status',
     deleteConfirm: `Delete this processing chain?
@@ -588,6 +589,8 @@ $t(common.cantUndoWarning)`,
       confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
+      demoteTo: 'Demote to {{stepPrev}}',
+      promoteTo: 'Promote to {{stepNext}}',
       step: 'Step {{id}} ({{name}})',
     },
     nodeDefEditFormActions: {

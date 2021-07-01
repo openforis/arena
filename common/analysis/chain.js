@@ -20,6 +20,7 @@ export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
   cycles: ObjectUtils.keysProps.cycles,
+  analysisNodeDefs: 'analysisNodeDefs'
 }
 
 export const statusExec = {
