@@ -872,6 +872,7 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    UserPreferredSurveyUpdateJob: 'User preferred survey update',
     // export csv data
     ExportCsvDataJob: 'Export CSV data',
     CSVDataExtraction: 'Data export',
