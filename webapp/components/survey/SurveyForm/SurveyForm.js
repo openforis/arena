@@ -109,13 +109,7 @@ const SurveyForm = (props) => {
 
   return nodeDef ? (
     <div>
-      <FormHeader
-        edit={edit}
-        analysis={analysis}
-        entry={entry && canEditRecord}
-        preview={preview}
-        canEditDef={canEditDef}
-      />
+      <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
       <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
         {showPageNavigation && (

@@ -3,6 +3,10 @@ import { ChainFactory } from '@openforis/arena-core'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Survey from '@core/survey/survey'
+import * as Chain from '@common/analysis/chain'
+import * as ChainValidator from '@common/analysis/chainValidator'
 
 import * as AnalysisService from '../service'
 
@@ -13,10 +17,18 @@ export const init = (app) => {
     try {
       const { cycle, surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
+      let newChain = ChainFactory.createInstance({ cycles: [cycle] })
+
+      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+      const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+      const validation = await ChainValidator.validateChain({ chain: newChain, defaultLang, survey })
+
+      newChain = Chain.assocValidation(validation)(newChain)
+
       const chain = await AnalysisService.create({
         surveyId,
         user,
-        chain: ChainFactory.createInstance({ cycles: [cycle] }),
+        chain: newChain,
       })
 
       res.json(chain)
@@ -86,9 +98,16 @@ export const init = (app) => {
       const user = Request.getUser(req)
 
       const { chain } = Request.getBody(req)
-      await AnalysisService.update({ user, surveyId, chain })
 
-      Response.sendOk(res)
+      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+      const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+      const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
+
+      const chainWithValdidation = Chain.assocValidation(validation)(chain)
+
+      await AnalysisService.update({ user, surveyId, chain: chainWithValdidation })
+
+      res.json(chainWithValdidation)
     } catch (error) {
       next(error)
     }
