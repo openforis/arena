@@ -25,10 +25,10 @@ const Surveys = (props) => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   /**
-   * Random parameter passed to table rest params
+   * Parameter passed to table rest params
    * (used to reload table data on survey publish).
    */
-  const [randomParam, setRandomParam] = useState(null)
+  const [requestedAt, setRequestedAt] = useState(Date.now())
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -37,7 +37,7 @@ const Surveys = (props) => {
 
   // reload table data on survey publish
   useOnUpdate(() => {
-    setRandomParam(Date.now())
+    setRequestedAt(Date.now())
   }, [Survey.getStatus(surveyInfo)])
 
   const onRowClick = (surveyRow) => {
@@ -47,13 +47,11 @@ const Surveys = (props) => {
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
 
-  const restParams = { template, r: randomParam }
-
   return (
     <Table
       module={module}
       moduleApiUri={moduleApiUri}
-      restParams={restParams}
+      restParams={{ template, requestedAt }}
       gridTemplateColumns="50px repeat(6, 1.5fr)"
       headerLeftComponent={() => HeaderLeft({ title })}
       rowHeaderComponent={RowHeader}
