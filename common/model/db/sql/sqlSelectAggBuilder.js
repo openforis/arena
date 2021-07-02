@@ -19,20 +19,21 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     this._viewDataNodeDef = viewDataNodeDef
   }
 
-  selectMeasure({ aggFunctions, nodeDefUuid, index }) {
-    const paramName = `measure_field_${index}`
+  selectMeasure({ aggFunctions, nodeDefUuid }) {
     const { survey } = this._viewDataNodeDef
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const columnMeasure = new ColumnNodeDef(this._viewDataNodeDef, nodeDefMeasure).name
 
     aggFunctions.forEach((aggFnNameOrUuid) => {
       const fieldAggFn = sqlFunctionByAggregateFunction[aggFnNameOrUuid]
+
+      const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
+        nodeDef: nodeDefMeasure,
+        aggregateFn: aggFnNameOrUuid,
+      })
       if (fieldAggFn) {
         // standard aggregate function
-        const paramNameAlias = `${paramName}_${aggFnNameOrUuid}_alias`
-        const fieldAlias = `$/${paramNameAlias}:name/`
-        this.select(`${fieldAggFn}($/${paramName}:name/) AS ${fieldAlias}`)
-        this.addParams({ [paramNameAlias]: `${columnMeasure}_${aggFnNameOrUuid}` })
+        this.select(`${fieldAggFn}(${columnMeasure}) AS ${fieldAlias}`)
       } else {
         // custom aggregate function
         const aggregateFnUuid = aggFnNameOrUuid
@@ -40,16 +41,11 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
         if (aggregateFn) {
           const { name, expression } = aggregateFn
           if (name && expression) {
-            const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
-              nodeDef: nodeDefMeasure,
-              aggregateFn: aggregateFnUuid,
-            })
             this.select(`( ${expression} ) AS ${fieldAlias}`)
           }
         }
       }
     })
-    this.addParams({ [paramName]: columnMeasure })
     return this
   }
 
