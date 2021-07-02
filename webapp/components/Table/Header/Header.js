@@ -21,7 +21,8 @@ const Header = (props) => {
           offset={offset}
           limit={limit}
           count={count}
-          setOffset={(offsetUpdated) => history.replace(getLink(offsetUpdated))}
+          setLimit={(limitUpdated) => history.replace(getLink({ offset, limit: limitUpdated }))}
+          setOffset={(offsetUpdated) => history.replace(getLink({ offset: offsetUpdated, limit }))}
         />
       )}
     </div>

@@ -5,8 +5,9 @@ export const getOffset = () => {
   return Number(url.searchParams.get('offset'))
 }
 
-export const getLink = (offsetLink) => {
+export const getLink = ({ limit, offset }) => {
   const url = new URL(window.location.href)
-  url.searchParams.set('offset', String(offsetLink))
+  url.searchParams.set('limit', String(limit))
+  url.searchParams.set('offset', String(offset))
   return `${url.pathname}${url.search}`
 }
