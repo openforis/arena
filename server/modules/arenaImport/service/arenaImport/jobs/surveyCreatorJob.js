@@ -20,6 +20,8 @@ export default class SurveyCreatorJob extends Job {
     const { arenaSurvey, backup, surveyInfoTarget } = this.context
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
+    // merge survey info props with draft props (Arena survey backup file could have only draft props)
+    surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
 
     const name = backup
       ? `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
