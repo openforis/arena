@@ -33,6 +33,6 @@ export const useUpdate = ({ setState }) => {
     }
 
     dispatch(SurveyActions.metaUpdated())
-    dispatch(debounceAction(action, `taxonomy_updated_${taxonomyUuid}`))
+    dispatch(debounceAction(action, `taxonomy_updated_${taxonomyUuid}_${key}`))
   }, [])
 }
