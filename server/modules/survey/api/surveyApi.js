@@ -40,7 +40,7 @@ export const init = (app) => {
           res.json({ job })
           return
         }
-        const survey = await SurveyService.insertSurvey({ user, surveyInfo: surveyInfoTarget })
+        const survey = await SurveyService.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: true })
 
         res.json({ survey })
       } else {

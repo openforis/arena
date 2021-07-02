@@ -5,27 +5,31 @@ import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
 import { SurveyActions, SurveyState } from '@webapp/store/survey'
+import { ChainActions } from '@webapp/store/ui/chain'
 
-export const deleteChain = ({ chain, history }) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
+export const deleteChain =
+  ({ chain, history }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
 
-  const action = async () => {
-    dispatch(LoaderActions.showLoader())
+    const action = async () => {
+      dispatch(LoaderActions.showLoader())
 
-    await axios.delete(`/api/survey/${surveyId}/chain/${chain.uuid}`)
+      await axios.delete(`/api/survey/${surveyId}/chain/${chain.uuid}`)
 
-    dispatch(SurveyActions.metaUpdated())
-    dispatch(NotificationActions.notifyInfo({ key: 'chainView.deleteComplete' }))
-    dispatch(LoaderActions.hideLoader())
+      dispatch(SurveyActions.metaUpdated())
+      dispatch(NotificationActions.notifyInfo({ key: 'chainView.deleteComplete' }))
+      dispatch(ChainActions.updateChain({ chain: { ...chain, isDeleted: true } }))
+      dispatch(LoaderActions.hideLoader())
 
-    history.push(appModuleUri(analysisModules.chains))
+      history.push(appModuleUri(analysisModules.chains))
+    }
+
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'chainView.deleteConfirm',
+        onOk: action,
+      })
+    )
   }
-
-  dispatch(
-    DialogConfirmActions.showDialogConfirm({
-      key: 'chainView.deleteConfirm',
-      onOk: action,
-    })
-  )
-}

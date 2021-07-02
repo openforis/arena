@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -24,11 +24,21 @@ const Surveys = (props) => {
   const history = useHistory()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
+  /**
+   * Parameter passed to table rest params
+   * (used to reload table data on survey publish).
+   */
+  const [requestedAt, setRequestedAt] = useState(Date.now())
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
     history.push(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
+
+  // reload table data on survey publish
+  useOnUpdate(() => {
+    setRequestedAt(Date.now())
+  }, [Survey.getStatus(surveyInfo)])
 
   const onRowClick = (surveyRow) => {
     const canEdit = Authorizer.canEditSurvey(user, surveyRow)
@@ -41,7 +51,7 @@ const Surveys = (props) => {
     <Table
       module={module}
       moduleApiUri={moduleApiUri}
-      restParams={{ template }}
+      restParams={{ template, requestedAt }}
       gridTemplateColumns="50px repeat(6, 1.5fr)"
       headerLeftComponent={() => HeaderLeft({ title })}
       rowHeaderComponent={RowHeader}

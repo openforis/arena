@@ -3,6 +3,7 @@ import Job from '@server/job/job'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
+import UserPreferredSurveyUpdateJob from '@server/modules/user/service/userPreferredSurveyUpdateJob'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 
@@ -27,6 +28,7 @@ export default class CollectImportJob extends Job {
       new RecordsImportJob(),
       new RecordCheckJob(),
       new SurveyRdbCreationJob(),
+      new UserPreferredSurveyUpdateJob(),
     ])
   }
 
@@ -48,7 +50,9 @@ export default class CollectImportJob extends Job {
     }
 
     if (!this.isSucceeded() && surveyId) {
+      this.logDebug(`dropping schema for survey ${surveyId}...`)
       await SurveyManager.dropSurveySchema(surveyId)
+      this.logDebug(`dropping schema for survey ${surveyId} complete!`)
     }
   }
 }

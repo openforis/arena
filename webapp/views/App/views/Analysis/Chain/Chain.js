@@ -1,8 +1,10 @@
 import './Chain.scss'
 import React, { useEffect } from 'react'
-import { matchPath, useParams } from 'react-router'
+import { matchPath, useParams, Prompt } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
+
+import * as A from '@core/arena'
 
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
@@ -11,6 +13,8 @@ import * as Chain from '@common/analysis/chain'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
+
+import { useI18n } from '@webapp/store/system'
 
 import { useHistoryListen } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
@@ -21,6 +25,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 
 const ChainComponent = () => {
+  const i18n = useI18n()
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
   const surveyInfo = useSurveyInfo()
@@ -44,15 +49,22 @@ const ChainComponent = () => {
     }
   }, [])
 
-  if (!chain) return null
+  if (!chain || A.isEmpty(chain)) return null
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
+      <Prompt
+        when={
+          !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
+        }
+        message={i18n.t('chainView.errorNoLabel')}
+      />
+
       <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
 
       <div className="form">
         <LabelsEditor
-          labels={chain.props.labels}
+          labels={chain.props?.labels}
           formLabelKey="chainView.formLabel"
           readOnly={false}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}

@@ -17,14 +17,20 @@ export const keys = {
 
 // ====== CREATE
 
-export const createExpression = (expression = '', applyIf = '', placeholder = false) => ({
+export const createExpression = ({
+  expression = '',
+  applyIf = '',
+  placeholder = false,
+  severity = ValidationResult.severity.error,
+}) => ({
   uuid: uuidv4(),
   expression,
   applyIf,
   placeholder,
+  severity,
 })
 
-export const createExpressionPlaceholder = () => createExpression('', '', true)
+export const createExpressionPlaceholder = () => createExpression({ placeholder: true })
 
 // ====== READ
 

@@ -25,7 +25,12 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) 
 
 // ==== READ
 export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid }) => {
-  const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId,
+    cycle,
+    advanced: true,
+    draft: true,
+  })
 
   const query = Query.create({ entityDefUuid })
 
@@ -35,7 +40,7 @@ export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid }) => {
 // ==== UPDATE
 
 export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true })
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
@@ -93,7 +98,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
     const [chain, survey] = await Promise.all([
       AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true }, tx),
-      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true, draft: true }),
     ])
 
     const { root } = Survey.getHierarchy()(survey)

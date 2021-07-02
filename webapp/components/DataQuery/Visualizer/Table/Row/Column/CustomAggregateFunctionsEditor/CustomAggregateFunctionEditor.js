@@ -11,9 +11,17 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
 import { NotificationActions } from '@webapp/store/ui'
+import { AggregateFunctionExpressionEditor } from './AggregateFunctionExpressionEditor'
 
 export const CustomAggregateFunctionEditor = (props) => {
-  const { aggregateFunction: aggregateFunctionParam, nodeDef, onCancel, onDelete, onSave: onSaveParam } = props
+  const {
+    aggregateFunction: aggregateFunctionParam,
+    entityDef,
+    nodeDef,
+    onCancel,
+    onDelete,
+    onSave: onSaveParam,
+  } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -59,13 +67,14 @@ export const CustomAggregateFunctionEditor = (props) => {
         />
       </FormItem>
       <FormItem label={i18n.t('dataExplorerView.customAggregateFunction.sqlExpression')}>
-        <textarea
-          rows="4"
-          value={expression}
-          onChange={(e) =>
+        <AggregateFunctionExpressionEditor
+          entityDef={entityDef}
+          nodeDef={nodeDef}
+          expression={expression}
+          onChange={(value) =>
             updateAggregateFunction({
               propName: AggregateFunction.keys.expression,
-              value: e.target.value,
+              value,
             })
           }
         />

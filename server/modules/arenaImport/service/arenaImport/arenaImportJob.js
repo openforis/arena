@@ -4,18 +4,19 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import UserPreferredSurveyUpdateJob from '@server/modules/user/service/userPreferredSurveyUpdateJob'
 
-import ActivityLogImportJob from './metaImportJobs/activityLogImportJob'
-import ArenaSurveyReaderJob from './metaImportJobs/arenaSurveyReaderJob'
-import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
-import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
-import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
-import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
-import RecordsImportJob from './metaImportJobs/recordsImportJob'
-import FilesImportJob from './metaImportJobs/filesImportJob'
-import UsersImportJob from './metaImportJobs/usersImportJob'
-import ChainsImportJob from './metaImportJobs/chainsImportJob'
-import CreateRdbJob from './metaImportJobs/createRdb'
+import ActivityLogImportJob from './jobs/activityLogImportJob'
+import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
+import SurveyCreatorJob from './jobs/surveyCreatorJob'
+import CategoriesImportJob from './jobs/categoriesImportJob'
+import TaxonomiesImportJob from './jobs/taxonomiesImportJob'
+import NodeDefsImportJob from './jobs/nodeDefsImportJob'
+import RecordsImportJob from './jobs/recordsImportJob'
+import FilesImportJob from './jobs/filesImportJob'
+import UsersImportJob from './jobs/usersImportJob'
+import ChainsImportJob from './jobs/chainsImportJob'
+import CreateRdbJob from './jobs/createRdb'
 
 const createInnerJobs = (params) => {
   const { backup = true } = params
@@ -31,6 +32,7 @@ const createInnerJobs = (params) => {
     ...(backup ? [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
+    new UserPreferredSurveyUpdateJob(),
   ]
 }
 
