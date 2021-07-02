@@ -35,7 +35,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useOnUpdate(() => {
     fetchData()
-  }, [offset])
+  }, [limit, offset])
 
   return { loadingData, loadingCount, list, offset, limit, count: Number(count), initData }
 }
