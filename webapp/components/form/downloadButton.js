@@ -49,7 +49,7 @@ const DownloadButton = (props) => {
       }}
     >
       <span className={`icon icon-download2 icon-14px${showLabel && label ? ' icon-left' : ''}`} />
-      {showLabel && label}
+      {showLabel && i18n.t(label)}
     </button>
   )
 }
