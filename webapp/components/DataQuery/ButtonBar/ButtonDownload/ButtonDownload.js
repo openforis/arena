@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
+
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import DownloadButton from '@webapp/components/form/downloadButton'
@@ -19,7 +21,7 @@ const ButtonDownload = (props) => {
 
   const requestParams = {
     cycle: surveyCycleKey,
-    query,
+    query: A.stringify(query),
   }
 
   const href = `/api/surveyRdb/${surveyId}/${entityDefUuid}/export`
