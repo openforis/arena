@@ -43,7 +43,7 @@ const AnalysisNodeDefs = () => {
   const prevAnalysisNodeDefs = usePrevious(_analysisNodeDefsToShow)
 
   useEffect(() => {
-    if (A.isNull(prevAnalysisNodeDefs)) {
+    if (A.isNull(prevAnalysisNodeDefs) && !chain.isDeleted) {
       dispatch(ChainActions.updateChain({ chain }))
     }
   }, [_analysisNodeDefsToShow, chain])
