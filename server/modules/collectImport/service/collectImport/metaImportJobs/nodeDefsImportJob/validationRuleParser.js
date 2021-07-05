@@ -100,7 +100,9 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
 
   const success = exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null)
 
-  // if expression has been converted without errors, mark the import issue as resolved
+  const messages = CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule)
+
+  // store import issue in any case: if expression has been converted without errors, mark it as resolved
   const importIssue = CollectImportReportItem.newReportItem({
     nodeDefUuid: NodeDef.getUuid(nodeDefCurrent),
     expressionType:
@@ -109,7 +111,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
         : CollectImportReportItem.exprTypes.validationRuleWarning,
     expression: collectExpr,
     applyIf: collectApplyIf,
-    messages: CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule),
+    messages,
     resolved: success,
   })
 
@@ -119,6 +121,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
           expression: exprConverted,
           applyIf: applyIfConverted === null ? '' : applyIfConverted,
           severity: flag === 'error' ? ValidationResult.severity.error : ValidationResult.severity.warning,
+          messages,
         })
       : null,
     importIssue,
