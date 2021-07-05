@@ -714,7 +714,8 @@ $t(common.cantUndoWarning)`,
 
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
-      analysisNodeDefsRequired: 'At least one calculated attribute is required',
+      analysisNodeDefsRequired:
+        'At least one calculated attribute is required, click the entity in the left side panel which contains a new result variable',
     },
 
     categoryEdit: {

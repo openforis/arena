@@ -2,9 +2,7 @@ import './ButtonRStudio.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const ButtonRStudio = (props) => {
-  const { disabled, onClick } = props
-
+const ButtonRStudio = ({ disabled, onClick }) => {
   return (
     <button type="button" className="btn btn-s btn-rstudio" onClick={onClick} aria-disabled={disabled}>
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1784.1 625.9">
