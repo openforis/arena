@@ -40,24 +40,24 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      await page.waitForSelector(getSelector(DataTestId.dataExport.prepareExport, 'button'))
+      const prepareExportBtnSelector = getSelector(DataTestId.dataExport.prepareExport, 'button')
+      await page.waitForSelector(prepareExportBtnSelector)
 
+      // click on the export button and wait for the job dialog to open
       await Promise.all([
         page.waitForSelector(getSelector(DataTestId.modal.modal)),
-        page.click(getSelector(DataTestId.dataExport.prepareExport, 'button')),
+        page.click(prepareExportBtnSelector),
       ])
 
-      await page.waitForSelector(DataTestId.modal.close)
-      await page.click(DataTestId.modal.close)
+      // wait for the job to complete: export button will appear
+      const downloadBtnSelector = getSelector(DataTestId.dataExport.exportCSV, 'button')
+      await page.waitForSelector(downloadBtnSelector)
 
-      await expect(getSelector(DataTestId.dataExport.exportCSV, 'button')).toBeTruthy()
+      await expect(downloadBtnSelector).toBeTruthy()
     })
 
     test(`Download data`, async () => {
-      const exportButton = await page.waitForSelector(getSelector(DataTestId.dataExport.exportCSV, 'button'))
-      const exportZipName = await exportButton.innerText()
-
-      const filename = exportZipName.replace(/ /g, '').split(/-(.+)/)[1]
+      const filename = `${survey.name}_export`
       const zipFileName = `${filename}.zip`
 
       const [download] = await Promise.all([
