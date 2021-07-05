@@ -17,7 +17,9 @@ const DataQuery = (props) => {
   const { query, onChangeQuery } = props
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
-  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setOffset, setData } = useDataQuery({ query })
+  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData } = useDataQuery(
+    { query }
+  )
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
@@ -43,7 +45,7 @@ const DataQuery = (props) => {
           />
 
           {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
-            <Paginator count={count} limit={limit} offset={offset} setOffset={setOffset} />
+            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
           )}
         </div>
 
