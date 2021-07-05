@@ -466,6 +466,8 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
+    emptyNodeDefs:
+      '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
   },
 
   itemsTable: {
@@ -721,8 +723,7 @@ $t(common.cantUndoWarning)`,
 
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
-      analysisNodeDefsRequired:
-        'At least one calculated attribute is required, click the entity in the left side panel which contains a new result variable',
+      analysisNodeDefsRequired: 'At least one calculated attribute is required',
     },
 
     categoryEdit: {
