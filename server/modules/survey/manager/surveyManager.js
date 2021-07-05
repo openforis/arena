@@ -51,12 +51,20 @@ const validateSurveyInfo = async (surveyInfo) =>
  * @param {!object} params.user - The user creating the survey.
  * @param {!object} params.surveyInfo - The survey info to insert.
  * @param {boolean} [params.createRootEntityDef=true] - Whether to create the root entity definition.
- * @param {boolean} [params.system=true] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {boolean} [params.system=false] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {boolean} [params.updateUserPrefs=false] - Whether to update the user preferred survey after the creation.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
+  const {
+    user,
+    surveyInfo: surveyInfoParam,
+    createRootEntityDef = true,
+    system = false,
+    updateUserPrefs = true,
+  } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(
@@ -90,9 +98,10 @@ export const insertSurvey = async (params, client = db) => {
       await NodeDefManager.insertNodeDef({ user, surveyId, nodeDef: rootEntityDef, system: true }, t)
     }
 
-    // Update user prefs
-    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
-    await UserRepository.updateUserPrefs(userUpdated, t)
+    if (updateUserPrefs) {
+      const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+      await UserRepository.updateUserPrefs(userUpdated, t)
+    }
 
     // Create default groups for this survey
     surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
@@ -131,10 +140,6 @@ export const importSurvey = async (params, client = db) => {
 
     // Create survey data schema
     await DBMigrator.migrateSurveySchema(surveyId)
-
-    // Update user prefs
-    const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
-    await UserRepository.updateUserPrefs(userUpdated, t)
 
     // Create default groups for this survey
     surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)

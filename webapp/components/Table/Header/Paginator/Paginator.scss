@@ -1,0 +1,20 @@
+.table__paginator-items-per-page {
+  display: flex;
+  align-items: center;
+
+  .label {
+    font-size: 0.8rem;
+  }
+
+  .dropdown {
+    width: 65px;
+    grid-template-columns: 50px 15px;
+
+    .form-input-container {
+      input {
+        text-align: right;
+        width: 100%;
+      }
+    }
+  }
+}

@@ -63,6 +63,8 @@ export default class TaxonomiesImportJob extends Job {
   async importTaxonomyFromSpeciesFile(speciesFileName, tx) {
     const { collectSurveyFileZip, surveyId } = this.context
 
+    this.logDebug(`importing file ${speciesFileName}`)
+
     // 1. reset duplicate values indexes
     this.rowsByCode = {}
     this.rowsByScientificName = {}
@@ -84,14 +86,25 @@ export default class TaxonomiesImportJob extends Job {
 
     const totalPrevious = this.total
 
-    await CSVReader.createReaderFromStream(
+    const csvReader = CSVReader.createReaderFromStream(
       speciesFileStream,
       (headers) => this.onHeaders(headers),
-      async (row) => this.onRow(speciesFileName, taxonomyUuid, row),
+      async (row) => {
+        if (this.isCanceled()) {
+          csvReader.cancel()
+          return
+        }
+        await this.onRow(speciesFileName, taxonomyUuid, row)
+      },
       (total) => {
         this.total = totalPrevious + total
       }
-    ).start()
+    )
+    await csvReader.start()
+
+    if (this.isRunning()) {
+      this.logDebug(`file ${speciesFileName} read correctly`)
+    }
 
     if (this.hasErrors()) {
       await this.setStatusFailed()

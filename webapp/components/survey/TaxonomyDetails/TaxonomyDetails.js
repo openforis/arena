@@ -48,17 +48,17 @@ const TaxonomyDetails = (props) => {
     <div className="taxonomy">
       <Header state={state} Actions={Actions} />
 
-      <div key={State.getTaxaVersion(state)} className="taxonomy__table-container">
+      <div className="taxonomy__table-container">
         {!A.isEmpty(taxonomyUuid) && (
           <Table
             module="taxa"
             moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
-            restParams={{ draft: canEdit }}
+            restParams={{ draft: canEdit, taxaVersion: State.getTaxaVersion(state) }}
             gridTemplateColumns={gridTemplateColumns}
             rowHeaderComponent={TaxaTableRowHeader}
             rowComponent={TaxaTableRow}
             noItemsLabelKey="taxonomy.edit.taxaNotImported"
-            rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
+            rowProps={{ surveyId, vernacularLanguageCodes, taxonomyUuid, readOnly: !canEdit }}
           />
         )}
       </div>

@@ -14,10 +14,18 @@ import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobProgress from './JobProgress'
 
+const getCustomCloseButtonComponent = ({ closeButton, job }) => {
+  if (!closeButton || !JobSerialized.isSucceeded(job)) return null
+  if (closeButton instanceof Function) return closeButton({ job })
+  if (closeButton instanceof Object) return closeButton
+  return null
+}
+
 const JobMonitor = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const { job, closeButton } = useJob()
+  const customCloseButtonComponent = getCustomCloseButtonComponent({ closeButton, job })
 
   if (!job || JobSerialized.isCanceled(job)) return null
 
@@ -43,7 +51,7 @@ const JobMonitor = () => {
         </button>
 
         {JobSerialized.isEnded(job) &&
-          ((JobSerialized.isSucceeded(job) && closeButton) || (
+          (customCloseButtonComponent || (
             <button
               type="button"
               className="btn modal-footer__item"
