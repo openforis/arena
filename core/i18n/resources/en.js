@@ -137,6 +137,13 @@ Do you want to proceed?`,
       week_plural: 'weeks',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
     },
+    paginator: {
+      firstPage: 'First page',
+      itemsPerPage: 'Items per page',
+      lastPage: 'Last page',
+      nextPage: 'Next page',
+      previousPage: 'Previous page',
+    },
   },
 
   sidebar: {
