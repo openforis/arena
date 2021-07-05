@@ -47,17 +47,13 @@ export default () =>
         page.click(getSelector(DataTestId.dataExport.prepareExport, 'button')),
       ])
 
-      await page.waitForSelector(DataTestId.modal.close)
-      await page.click(DataTestId.modal.close)
+      await page.waitForSelector(DataTestId.dataExport.exportCSV)
 
       await expect(getSelector(DataTestId.dataExport.exportCSV, 'button')).toBeTruthy()
     })
 
     test(`Download data`, async () => {
-      const exportButton = await page.waitForSelector(getSelector(DataTestId.dataExport.exportCSV, 'button'))
-      const exportZipName = await exportButton.innerText()
-
-      const filename = exportZipName.replace(/ /g, '').split(/-(.+)/)[1]
+      const filename = `${survey.name}_export`
       const zipFileName = `${filename}.zip`
 
       const [download] = await Promise.all([
