@@ -137,6 +137,13 @@ Do you want to proceed?`,
       week_plural: 'weeks',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
     },
+    paginator: {
+      firstPage: 'First page',
+      itemsPerPage: 'Items per page',
+      lastPage: 'Last page',
+      nextPage: 'Next page',
+      previousPage: 'Previous page',
+    },
   },
 
   sidebar: {
@@ -876,6 +883,7 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    UserPreferredSurveyUpdateJob: 'User preferred survey update',
     // export csv data
     ExportCsvDataJob: 'Export CSV data',
     CSVDataExtraction: 'Data export',

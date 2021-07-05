@@ -15,7 +15,7 @@ export const useDataQuery = ({ query }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
   const [data, setData] = useState(null)
   const [count, setCount] = useState(null)
-  const [limit] = useState(defaultValues.limit)
+  const [limit, setLimit] = useState(defaultValues.limit)
   const [offset, setOffset] = useState(defaultValues.offset)
 
   const hasSelection = Query.hasSelection(query)
@@ -55,6 +55,7 @@ export const useDataQuery = ({ query }) => {
     dataLoading,
     limit,
     offset,
+    setLimit,
     setOffset,
     setData: (dataUpdated) => setData({ ...data, data: dataUpdated }),
   }

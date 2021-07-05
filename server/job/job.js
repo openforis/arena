@@ -8,15 +8,7 @@ import { throttle, cancelThrottle } from '@core/functionsDefer'
 
 import SystemError from '@core/systemError'
 import { jobEvents, jobStatus } from './jobUtils'
-
-class JobEvent {
-  constructor(type, status, total, processed) {
-    this.type = type
-    this.status = status
-    this.total = total
-    this.processed = processed
-  }
-}
+import { JobEvent } from './jobEvent'
 
 /**
  * Status workflow:
@@ -57,7 +49,7 @@ export default class Job {
 
     this.eventListener = null
 
-    this._logger = Log.getLogger(`Job ${this.constructor.name}`)
+    this._logger = Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`)
   }
 
   /**
@@ -71,9 +63,12 @@ export default class Job {
   async start(client = db) {
     this.logDebug('start')
 
-    // 1. crates a db transaction and run '_executeInTransaction' into it
+    // 1. crates a db transaction and run '_executeInTransaction' using it
     try {
-      await client.tx((tx) => this._executeInTransaction(tx))
+      await client.tx(async (tx) => {
+        this.tx = tx
+        await this._executeInTransaction()
+      })
 
       // 2. notify job status change to 'succeed' (when transaction has been committed)
       if (this.isRunning()) {
@@ -98,10 +93,8 @@ export default class Job {
     return true
   }
 
-  async _executeInTransaction(tx) {
+  async _executeInTransaction() {
     try {
-      this.tx = tx
-
       // 1. notify start
       await this.onStart()
 
@@ -319,15 +312,19 @@ export default class Job {
       }
     }
 
-    this.logDebug(`- ${this.processed} inner jobs processed successfully`)
+    this.logDebug(`- ${this.processed}/${this.total} inner jobs processed successfully`)
   }
 
   async _handleInnerJobEvent(event) {
     switch (event.status) {
       case jobStatus.failed:
+        await this._setStatus(jobStatus.failed)
+        break
       case jobStatus.canceled:
         // Cancel or fail even parent job
-        await this._setStatus(event.status)
+        if (!this.isCanceled()) {
+          await this._setStatus(jobStatus.canceled)
+        }
         break
       case jobStatus.running:
         // Propagate progress event to parent job

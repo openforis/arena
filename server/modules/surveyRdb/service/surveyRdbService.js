@@ -27,7 +27,7 @@ export const fetchViewData = async (params) => {
   const survey = await _fetchSurvey(surveyId, cycle)
 
   return Query.isModeAggregate(query)
-    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, stream: Boolean(streamOutput) })
+    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, streamOutput })
     : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput })
 }
 
