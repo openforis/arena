@@ -17,4 +17,11 @@
 
 .analysis-node-defs-error {
   height: 2rem;
+  display: flex;
+  flex-direction: row;
+
+  .tooltip-error{
+    position: inherit;
+    margin-right: 16px;
+  }
 }
