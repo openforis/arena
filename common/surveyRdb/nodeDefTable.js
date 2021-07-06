@@ -39,10 +39,13 @@ export const getColumnNames = (nodeDef) => {
 export const getColumnName = R.pipe(getColumnNames, R.head)
 
 export const getNodeDefsWithColumnNames = (nodeDefs) =>
-  nodeDefs.flatMap((nodeDef) => ({ columnName: getColumnNames(nodeDef), nodeDef }))
+  nodeDefs.flatMap((nodeDef) => {
+    const columnNames = getColumnNames(nodeDef)
+    return columnNames.map((colName) => ({ columnName: colName, nodeDef }))
+  })
 
 export const getNodeDefsColumnNames = (nodeDefs) =>
-  getNodeDefsWithColumnNames(nodeDefs).map(({ columnName }) => columnName)
+  getNodeDefsWithColumnNames(nodeDefs).flatMap(({ columnName }) => columnName)
 
 export const getNodeDefsByColumnNames = (nodeDefs) =>
   getNodeDefsWithColumnNames(nodeDefs).reduce(
