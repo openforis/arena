@@ -68,24 +68,28 @@ export default class ArenaImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { arenaSurveyFileZip, surveyId, filePath } = this.context
+    const { arenaSurveyFileZip, backup, filePath, surveyId } = this.context
 
     if (arenaSurveyFileZip) {
       arenaSurveyFileZip.close()
     }
 
     if (surveyId) {
-      if (this.isSucceeded()) {
-        this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
-        await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
-        this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
+      if (backup) {
+        if (this.isSucceeded()) {
+          this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
+          await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
+          this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
+        } else {
+          this.logDebug(`deleting temporary survey ${surveyId}...`)
+          await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
+          this.logDebug(`survey ${surveyId} deleted!`)
+        }
       } else {
-        this.logDebug(`deleting temporary survey ${surveyId}...`)
-        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-        this.logDebug(`survey ${surveyId} deleted!`)
+        // if not backup (cloning) survey temporary flag or delete will be managed by parent SurveyCloneJob
+        this.logDebug(`skipping 'temporary' flag remove for survey ${surveyId}`)
       }
     }
-
     await FileUtils.rmdir(filePath)
   }
 }
