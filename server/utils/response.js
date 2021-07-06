@@ -80,6 +80,19 @@ export const sendZipFile = (res, dir, name) => {
   }
 }
 
+export const sendFilesAsZipWithSize = ({ res, dir, name }) => {
+  const filePath = FileUtils.join(dir, name)
+  const output = fs.createWriteStream(filePath)
+  const zip = Archiver('zip')
+  zip.pipe(output)
+  zip.directory(dir, false)
+  zip.finalize()
+
+  output.on('finish', async () => {
+    sendFile({ res, path: filePath, name })
+  })
+}
+
 export const sendFilesAsZip = (res, zipName, files) => {
   setContentTypeFile(res, zipName, null, contentTypes.zip)
   const zip = Archiver('zip')
