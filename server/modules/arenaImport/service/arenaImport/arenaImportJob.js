@@ -74,14 +74,16 @@ export default class ArenaImportJob extends Job {
       arenaSurveyFileZip.close()
     }
 
-    if (this.isSucceeded()) {
-      this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
-      await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
-      this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
-    } else {
-      this.logDebug(`deleting temporary survey ${surveyId}...`)
-      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-      this.logDebug(`survey ${surveyId} deleted!`)
+    if (surveyId) {
+      if (this.isSucceeded()) {
+        this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
+        await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
+        this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
+      } else {
+        this.logDebug(`deleting temporary survey ${surveyId}...`)
+        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
+        this.logDebug(`survey ${surveyId} deleted!`)
+      }
     }
 
     await FileUtils.rmdir(filePath)
