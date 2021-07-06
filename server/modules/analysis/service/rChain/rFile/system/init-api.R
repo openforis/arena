@@ -73,7 +73,7 @@ arena.login = function(tentative) {
       return(FALSE)
     }
   } else {
-    print(paste('User', user, 'succesfully logged in', sep = ' '))
+    print(paste('User', user, 'successfully logged in', sep = ' '))
     return(TRUE)
   }
 }
