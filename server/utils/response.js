@@ -46,6 +46,7 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   }
 
   if (contentType) {
+    res.setHeader('Content-Type', contentType)
     res.set('Content-Type', contentType)
   }
 }

@@ -34,7 +34,7 @@ export const isNa = (x) => `is.na(${x})`
 
 export const unlink = (path) => `unlink('${path}' , recursive = T)`
 
-export const unlinkWd = `unlink(getwd(), recursive = T)`
+export const unlinkWd = `# unlink(getwd(), recursive = T)`
 
 export const dirCreate = (path) => `dir.create(path = '${path}', showWarnings = F, recursive = T)`
 
