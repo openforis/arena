@@ -4,7 +4,6 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
-import UserPreferredSurveyUpdateJob from '@server/modules/user/service/userPreferredSurveyUpdateJob'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
@@ -32,7 +31,6 @@ const createInnerJobs = (params) => {
     ...(backup ? [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
-    new UserPreferredSurveyUpdateJob(),
   ]
 }
 
@@ -76,8 +74,14 @@ export default class ArenaImportJob extends Job {
       arenaSurveyFileZip.close()
     }
 
-    if (!this.isSucceeded() && surveyId) {
-      await SurveyManager.dropSurveySchema(surveyId)
+    if (this.isSucceeded()) {
+      this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
+      await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
+      this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
+    } else {
+      this.logDebug(`deleting temporary survey ${surveyId}...`)
+      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
+      this.logDebug(`survey ${surveyId} deleted!`)
     }
 
     await FileUtils.rmdir(filePath)

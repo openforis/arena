@@ -48,7 +48,6 @@ export default class CollectImportJob extends Job {
     }
 
     if (surveyId) {
-      this.logDebug(`transaction: ${this.tx}`)
       if (this.isSucceeded()) {
         this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
         await SurveyManager.removeSurveyTemporaryFlag({ surveyId })

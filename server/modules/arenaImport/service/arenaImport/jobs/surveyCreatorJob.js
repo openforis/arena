@@ -44,12 +44,16 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.published]: published,
       [Survey.infoKeys.draft]: draft,
       [Survey.infoKeys.template]: template,
+      [Survey.infoKeys.temporary]: true,
     })
 
-    const survey = await SurveyManager.importSurvey(
-      { user: this.user, surveyInfo: newSurveyInfo, authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey), backup },
-      this.tx
-    )
+    // do not insert survey in transaction to avoid survey table lock: insert it as temporary survey
+    const survey = await SurveyManager.importSurvey({
+      user: this.user,
+      surveyInfo: newSurveyInfo,
+      authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey),
+      backup,
+    })
 
     const surveyId = Survey.getId(survey)
 
