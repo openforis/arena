@@ -157,7 +157,7 @@ export const init = (app) => {
       const serverUrl = Request.getServerUrl(req)
       const rChain = await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
       const name = `${chainUuid}.zip`
-      Response.sendZipFile(res, rChain._dir, name)
+      Response.sendFilesAsZipWithSize({ res, dir: rChain._dir, name })
     } catch (error) {
       next(error)
     }
