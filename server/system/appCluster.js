@@ -9,6 +9,7 @@ import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
 
 import * as apiRouter from './apiRouter'
+import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
@@ -45,7 +46,8 @@ export const run = async () => {
   await ArenaServer.start(arenaApp)
 
   // ====== schedulers
-  await RecordPreviewCleanup.init()
   await TempFilesCleanup.init()
   await UserResetPasswordCleanup.init()
+  await TemporarySurveysCleanup.init()
+  await RecordPreviewCleanup.init()
 }

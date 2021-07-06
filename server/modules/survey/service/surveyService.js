@@ -56,6 +56,7 @@ export const {
   updateSurveyProps,
   // DELETE
   deleteSurvey,
+  deleteTemporarySurveys,
   // UTILS
   validateNewSurvey,
 } = SurveyManager

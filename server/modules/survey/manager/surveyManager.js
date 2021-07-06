@@ -275,14 +275,21 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE
-export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}) =>
-  db.tx(async (t) =>
-    Promise.all([
-      ...(deleteUserPrefs ? [UserRepository.deleteUsersPrefsSurvey(surveyId, t)] : []),
-      SurveyRepository.dropSurveySchema(surveyId, t),
-      SchemaRdbRepository.dropSchema(surveyId, t),
-      SurveyRepository.deleteSurvey(surveyId, t),
-    ])
-  )
+export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) =>
+  client.tx(async (t) => {
+    if (deleteUserPrefs) {
+      await UserRepository.deleteUsersPrefsSurvey(surveyId, t)
+    }
+    await SurveyRepository.deleteSurvey(surveyId, t)
+    await SurveyRepository.dropSurveySchema(surveyId, t)
+    await SchemaRdbRepository.dropSchema(surveyId, t)
+  })
+
+export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
+  client.tx(async (t) => {
+    const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
+    await PromiseUtils.each(surveyIds, async (surveyId) => deleteSurvey(surveyId, { deleteUserPrefs: true }, t))
+    return surveyIds.length
+  })
 
 export const { dropSurveySchema } = SurveyRepository

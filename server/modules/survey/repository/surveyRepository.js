@@ -70,8 +70,8 @@ export const fetchUserSurveys = async (
     WHERE 
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
-      ((s.props || s.props_draft) ->> 'temporary' IS NULL OR (s.props || s.props_draft) ->> 'temporary' <> 'true') AND
-      s.template = $2
+      (s.props || s.props_draft) ->> 'temporary' IS NULL 
+      AND s.template = $2
     ORDER BY s.date_modified DESC
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
@@ -98,8 +98,8 @@ export const countUserSurveys = async ({ user, template = false }, client = db) 
         : ''
     }
     WHERE 
-    ((s.props || s.props_draft) ->> 'temporary' IS NULL OR (s.props || s.props_draft) ->> 'temporary' <> 'true') AND 
-      s.template = $2
+    (s.props || s.props_draft) ->> 'temporary' IS NULL 
+    AND s.template = $2
     `,
     [User.getUuid(user), template]
   )
@@ -122,6 +122,17 @@ export const fetchDependencies = async (surveyId, client = db) =>
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
     R.prop('dependencies')
+  )
+
+export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
+  client.map(
+    `SELECT id 
+     FROM survey 
+     WHERE (props || props_draft) ->> 'temporary' = 'true'
+     ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
+    `,
+    [],
+    R.prop('id')
   )
 
 // ============== UPDATE
