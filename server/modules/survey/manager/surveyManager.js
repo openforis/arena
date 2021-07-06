@@ -64,11 +64,12 @@ export const insertSurvey = async (params, client = db) => {
     createRootEntityDef = true,
     system = false,
     updateUserPrefs = true,
+    temporary = false,
   } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(
-      { survey: surveyInfoParam, propsDraft: Survey.getProps(surveyInfoParam) },
+      { survey: surveyInfoParam, propsDraft: { ...Survey.getProps(surveyInfoParam), temporary } },
       t
     )
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
@@ -271,17 +272,17 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
     }
   })
 
-export const { updateSurveyDependencyGraphs } = SurveyRepository
+export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE
-export const deleteSurvey = async (surveyId) =>
-  db.tx(async (t) => {
-    await Promise.all([
-      UserRepository.deleteUsersPrefsSurvey(surveyId, t),
+export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}) =>
+  db.tx(async (t) =>
+    Promise.all([
+      ...(deleteUserPrefs ? [UserRepository.deleteUsersPrefsSurvey(surveyId, t)] : []),
       SurveyRepository.dropSurveySchema(surveyId, t),
       SchemaRdbRepository.dropSchema(surveyId, t),
       SurveyRepository.deleteSurvey(surveyId, t),
     ])
-  })
+  )
 
 export const { dropSurveySchema } = SurveyRepository
