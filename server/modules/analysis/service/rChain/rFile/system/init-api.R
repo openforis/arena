@@ -70,8 +70,10 @@ arena.login = function(tentative) {
       arena.login(tentative + 1)
     } else {
       stop(respParsed$message)
+      return(FALSE)
     }
   } else {
     print(paste('User', user, 'succesfully logged in', sep = ' '))
+    return(TRUE)
   }
 }
