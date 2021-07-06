@@ -466,6 +466,8 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
+    emptyNodeDefs:
+      '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
   },
 
   itemsTable: {
