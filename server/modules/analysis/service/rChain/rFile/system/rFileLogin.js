@@ -8,6 +8,7 @@ export default class RFileLogin extends RFileSystem {
   async init() {
     await super.init()
 
-    await this.appendContent('arena.login()')
+    await this.appendContent('if (!exists("arenaLogin")) arenaLogin=FALSE')
+    await this.appendContent('if (arenaLogin==FALSE) arenaLogin = arena.login()')
   }
 }

@@ -68,10 +68,11 @@ export const insertSurvey = async (params, client = db) => {
   } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(
-      { survey: surveyInfoParam, propsDraft: { ...Survey.getProps(surveyInfoParam), temporary } },
-      t
-    )
+    const surveyProps = { ...Survey.getProps(surveyInfoParam) }
+    if (temporary) {
+      surveyProps.temporary = true
+    }
+    const surveyInfo = await SurveyRepository.insertSurvey({ survey: surveyInfoParam, propsDraft: surveyProps }, t)
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema

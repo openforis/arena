@@ -30,7 +30,6 @@ function* initPersistChainEntitiesResults() {
 
   for (let i = 0; i < entities.length; i += 1) {
     const entity = entities[i]
-    // TODO FIX to persist changes on scripts
     const dfResults = new DfResults(this.rChain, entity)
 
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
