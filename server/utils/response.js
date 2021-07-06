@@ -43,10 +43,10 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)
-    res.setHeader('Content-Type', contentType)
   }
 
   if (contentType) {
+    res.setHeader('Content-Type', contentType)
     res.set('Content-Type', contentType)
   }
 }
