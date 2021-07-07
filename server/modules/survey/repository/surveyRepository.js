@@ -70,7 +70,8 @@ export const fetchUserSurveys = async (
     WHERE 
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
-      s.template = $2
+      (s.props || s.props_draft) ->> 'temporary' IS NULL 
+      AND s.template = $2
     ORDER BY s.date_modified DESC
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
@@ -96,7 +97,9 @@ export const countUserSurveys = async ({ user, template = false }, client = db) 
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
         : ''
     }
-    WHERE s.template = $2
+    WHERE 
+    (s.props || s.props_draft) ->> 'temporary' IS NULL 
+    AND s.template = $2
     `,
     [User.getUuid(user), template]
   )
@@ -119,6 +122,17 @@ export const fetchDependencies = async (surveyId, client = db) =>
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
     R.prop('dependencies')
+  )
+
+export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
+  client.map(
+    `SELECT id 
+     FROM survey 
+     WHERE (props || props_draft) ->> 'temporary' = 'true'
+     ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
+    `,
+    [],
+    R.prop('id')
   )
 
 // ============== UPDATE
@@ -168,6 +182,18 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
     [meta, surveyId]
   )
 }
+
+export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
+  client.none(
+    `
+    UPDATE survey 
+    SET 
+       props = props - 'temporary',
+       props_draft = props_draft - 'temporary'
+    WHERE id = $1
+    `,
+    [surveyId]
+  )
 
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])

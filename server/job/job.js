@@ -20,11 +20,11 @@ import { JobEvent } from './jobEvent'
  * -- canceled
  *
  * Methods that can be overwritten by subclasses:
- * - onStart
- * - execute
- * - beforeSuccess
- * - beforeEnd
- * - onEnd
+ * - onStart (in tx)
+ * - execute (in tx)
+ * - beforeSuccess (in tx)
+ * - beforeEnd (in tx)
+ * - onEnd (out of tx)
  */
 export default class Job {
   constructor(type, params = {}, innerJobs = []) {
@@ -75,7 +75,7 @@ export default class Job {
         await this._setStatusSucceeded()
       }
     } catch (error) {
-      if (this.isRunning()) {
+      if (!this.isFailed() && (this.isRunning() || this.isSucceeded())) {
         // Error found, change status only if not changed already
         this.logError(`${error.stack || error}`)
         this.addError({
@@ -86,6 +86,8 @@ export default class Job {
         })
         await this.setStatusFailed()
       }
+    } finally {
+      this.tx = null
     }
   }
 
@@ -120,9 +122,9 @@ export default class Job {
     } finally {
       if (!this.isCanceled()) {
         // 4. flush/clean resources
-        this.logDebug('beforeEnd...')
+        this.logDebug('beforeEnd (committing transaction)...')
         await this.beforeEnd()
-        this.logDebug('beforeEnd run')
+        this.logDebug('beforeEnd run (transaction committed)')
       }
 
       this.tx = null
