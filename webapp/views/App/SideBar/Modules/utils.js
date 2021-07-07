@@ -55,6 +55,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
       dataModules.records,
       dataModules.explorer,
       dataModules.export,
+      ...(Authorizer.canEditSurvey(user, surveyInfo) ? [dataModules.import] : []),
       ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
     ],
     hidden: Survey.isTemplate(surveyInfo),
