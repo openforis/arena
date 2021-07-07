@@ -1,9 +1,8 @@
 import Job from '@server/job/job'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import SurveyExportJob from '../surveyExport/surveyExportJob'
 import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImportJob'
+import { SurveyCreatorJobHelper } from '../surveyCreatorJobHelper'
 
 export default class SurveyCloneJob extends Job {
   constructor(params) {
@@ -24,15 +23,7 @@ export default class SurveyCloneJob extends Job {
     const { surveyId } = this.context
 
     if (surveyId) {
-      if (this.isSucceeded()) {
-        this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
-        await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
-        this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
-      } else {
-        this.logDebug(`deleting temporary survey ${surveyId}...`)
-        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-        this.logDebug(`survey ${surveyId} deleted!`)
-      }
+      await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
     }
   }
 }

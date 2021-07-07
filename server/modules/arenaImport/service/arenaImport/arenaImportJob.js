@@ -2,7 +2,7 @@ import { SRSs } from '@openforis/arena-core'
 
 import Job from '@server/job/job'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
@@ -76,15 +76,7 @@ export default class ArenaImportJob extends Job {
 
     if (surveyId) {
       if (backup) {
-        if (this.isSucceeded()) {
-          this.logDebug(`removing 'temporary' flag from survey ${surveyId}...`)
-          await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
-          this.logDebug(`'temporary' flag removed from survey ${surveyId}`)
-        } else {
-          this.logDebug(`deleting temporary survey ${surveyId}...`)
-          await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-          this.logDebug(`survey ${surveyId} deleted!`)
-        }
+        await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       } else {
         // if not backup (cloning) survey temporary flag or delete will be managed by parent SurveyCloneJob
         this.logDebug(`skipping 'temporary' flag remove for survey ${surveyId}`)
