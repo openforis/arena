@@ -392,7 +392,8 @@ We will send soon an email to your address with the instructions on how to acces
   dataView: {
     aggregateMode: 'Aggregate Mode',
     editMode: 'Edit Mode',
-    filter: 'Filter records',
+    filterAttributeTypes: 'Filter attribute types',
+    filterRecords: 'Filter records',
     invalidRecord: 'Invalid record',
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
