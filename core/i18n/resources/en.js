@@ -189,6 +189,7 @@ Do you want to proceed?`,
     records: 'Records',
     explorer: 'Explorer',
     export: 'Export',
+    import: 'Import',
     validationReport: 'Validation report',
 
     users: 'Users',
@@ -305,7 +306,7 @@ We will send soon an email to your address with the instructions on how to acces
     },
     recordsImport: {
       deleteAllRecordsBeforeImport: 'Delete all records before import',
-      importFromCollect: 'Import from Collect',
+      importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
     },
   },
@@ -953,8 +954,8 @@ $t(common.cantUndoWarning)`,
 
   authGroups: {
     systemAdmin: {
-      label: 'System Administrator',
-      label_plural: 'System Administrators',
+      label: 'System administrator',
+      label_plural: 'System administrators',
       description: 'OF Arena system administrators',
     },
     surveyAdmin: {
