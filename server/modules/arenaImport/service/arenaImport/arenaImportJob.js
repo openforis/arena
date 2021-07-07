@@ -2,9 +2,8 @@ import { SRSs } from '@openforis/arena-core'
 
 import Job from '@server/job/job'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
 import * as FileUtils from '@server/utils/file/fileUtils'
-import UserPreferredSurveyUpdateJob from '@server/modules/user/service/userPreferredSurveyUpdateJob'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
@@ -32,7 +31,6 @@ const createInnerJobs = (params) => {
     ...(backup ? [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
-    new UserPreferredSurveyUpdateJob(),
   ]
 }
 
@@ -70,16 +68,20 @@ export default class ArenaImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { arenaSurveyFileZip, surveyId, filePath } = this.context
+    const { arenaSurveyFileZip, backup, filePath, surveyId } = this.context
 
     if (arenaSurveyFileZip) {
       arenaSurveyFileZip.close()
     }
 
-    if (!this.isSucceeded() && surveyId) {
-      await SurveyManager.dropSurveySchema(surveyId)
+    if (surveyId) {
+      if (backup) {
+        await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
+      } else {
+        // if not backup (cloning) survey temporary flag or delete will be managed by parent SurveyCloneJob
+        this.logDebug(`skipping 'temporary' flag remove for survey ${surveyId}`)
+      }
     }
-
     await FileUtils.rmdir(filePath)
   }
 }

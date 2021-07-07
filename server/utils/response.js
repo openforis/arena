@@ -46,6 +46,7 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   }
 
   if (contentType) {
+    res.setHeader('Content-Type', contentType)
     res.set('Content-Type', contentType)
   }
 }
@@ -78,6 +79,19 @@ export const sendZipFile = (res, dir, name) => {
   } else {
     sendErr(res, 'File not found')
   }
+}
+
+export const sendFilesAsZipWithSize = ({ res, dir, name }) => {
+  const filePath = FileUtils.join(dir, name)
+  const output = fs.createWriteStream(filePath)
+  const zip = Archiver('zip')
+  zip.pipe(output)
+  zip.directory(dir, false)
+  zip.finalize()
+
+  output.on('finish', async () => {
+    sendFile({ res, path: filePath, name })
+  })
 }
 
 export const sendFilesAsZip = (res, zipName, files) => {
