@@ -189,6 +189,7 @@ Do you want to proceed?`,
     records: 'Records',
     explorer: 'Explorer',
     export: 'Export',
+    import: 'Import',
     validationReport: 'Validation report',
 
     users: 'Users',
@@ -305,7 +306,7 @@ We will send soon an email to your address with the instructions on how to acces
     },
     recordsImport: {
       deleteAllRecordsBeforeImport: 'Delete all records before import',
-      importFromCollect: 'Import from Collect',
+      importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
     },
   },
@@ -392,7 +393,8 @@ We will send soon an email to your address with the instructions on how to acces
   dataView: {
     aggregateMode: 'Aggregate Mode',
     editMode: 'Edit Mode',
-    filter: 'Filter records',
+    filterAttributeTypes: 'Filter attribute types',
+    filterRecords: 'Filter records',
     invalidRecord: 'Invalid record',
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
@@ -452,9 +454,13 @@ $t(common.cantUndoWarning)`,
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####
+    
+    \n
 
-###### Once RStudio Server is opened, copy the code below to import the chain code.  ######
- 
+###### Clicking the Ok button a RStudio Server is opened and these commands are copied to your clipboard. ######
+###### Once the RStudio console is active, paste and run these lines to import the chain code.  ######
+\n
+
 {{rStudioCode}}
 
 `,
@@ -952,8 +958,8 @@ $t(common.cantUndoWarning)`,
 
   authGroups: {
     systemAdmin: {
-      label: 'System Administrator',
-      label_plural: 'System Administrators',
+      label: 'System administrator',
+      label_plural: 'System administrators',
       description: 'OF Arena system administrators',
     },
     surveyAdmin: {
