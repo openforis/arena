@@ -20,11 +20,17 @@ const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   (User.isSystemAdmin(user) ||
     R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo)))
 
+// CREATE
+export const canCreateSurvey = _hasSurveyPermission(permissions.surveyCreate)
+export const canCreateTemplate = (user) => User.isSystemAdmin(user)
+
 // READ
 export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))
+export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditTemplates = (user) => User.isSystemAdmin(user)
 
 // ======
 // ====== Record
