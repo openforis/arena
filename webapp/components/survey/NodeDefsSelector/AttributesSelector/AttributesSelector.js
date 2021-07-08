@@ -50,6 +50,7 @@ const AttributesSelector = (props) => {
             nodeDefContext={nodeDefContext}
             onToggleAttribute={onToggleAttribute}
             showMultipleAttributes={showMultipleAttributes}
+            showNodeDefPath={!showAncestorsLabel}
             nodeDefLabelType={nodeDefLabelType}
           />
         ))}

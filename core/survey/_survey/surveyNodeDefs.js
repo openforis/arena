@@ -17,12 +17,14 @@ export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(NodeDef.isRoot))
 
 export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
-export const getNodeDefsByUuids = (uuids = []) => (survey) => {
-  if (R.isEmpty(uuids)) {
-    return []
+export const getNodeDefsByUuids =
+  (uuids = []) =>
+  (survey) => {
+    if (R.isEmpty(uuids)) {
+      return []
+    }
+    return uuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
   }
-  return uuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
-}
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
@@ -112,25 +114,40 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => (survey
     : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
 }
 
-export const getHierarchy = (filterFn = NodeDef.isEntity) => (survey) => {
-  let length = 1
-  const h = (array, nodeDef) => {
-    const childDefs = [
-      ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
-        ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
-        : []),
-    ]
+export const getNodeDefPath =
+  ({ nodeDef, showLabels = false, labelLang = null }) =>
+  (survey) => {
+    const pathParts = []
 
-    length += childDefs.length
-    const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }
-    return R.append(item, array)
+    visitAncestorsAndSelf(nodeDef, (currentNodeDef) => {
+      const pathPart = showLabels ? NodeDef.getLabel(currentNodeDef, labelLang) : NodeDef.getName(currentNodeDef)
+      pathParts.unshift(pathPart)
+    })(survey)
+
+    return pathParts.join(' / ')
   }
 
-  return {
-    root: h([], getNodeDefRoot(survey))[0],
-    length,
+export const getHierarchy =
+  (filterFn = NodeDef.isEntity) =>
+  (survey) => {
+    let length = 1
+    const h = (array, nodeDef) => {
+      const childDefs = [
+        ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
+          ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
+          : []),
+      ]
+
+      length += childDefs.length
+      const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }
+      return R.append(item, array)
+    }
+
+    return {
+      root: h([], getNodeDefRoot(survey))[0],
+      length,
+    }
   }
-}
 
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   await visitorFn(nodeDefItem, depth)
@@ -162,34 +179,36 @@ export const getNodeDefCategoryLevelIndex = (nodeDef) => (survey) => {
   return parentCodeNodeDef ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey) : 0
 }
 
-export const getNodeDefCodeCandidateParents = ({ nodeDef, category }) => (survey) => {
-  if (!category || !nodeDef) {
-    return []
-  }
-  const levelsLength = Category.getLevelsArray(category).length
-  const candidates = []
-  visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
-    if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
-      const candidatesAncestor = R.pipe(
-        getNodeDefChildren(nodeDefAncestor),
-        R.reject(
-          (n) =>
-            // Reject multiple attributes
-            NodeDef.isMultiple(n) ||
-            // Or different category nodeDef
-            NodeDef.getCategoryUuid(n) !== NodeDef.getCategoryUuid(nodeDef) ||
-            // Or itself
-            NodeDef.isEqual(n)(nodeDef) ||
-            // Or leaves nodeDef
-            getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
-        )
-      )(survey)
-
-      candidates.push(...candidatesAncestor)
+export const getNodeDefCodeCandidateParents =
+  ({ nodeDef, category }) =>
+  (survey) => {
+    if (!category || !nodeDef) {
+      return []
     }
-  })(survey)
-  return candidates
-}
+    const levelsLength = Category.getLevelsArray(category).length
+    const candidates = []
+    visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
+      if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
+        const candidatesAncestor = R.pipe(
+          getNodeDefChildren(nodeDefAncestor),
+          R.reject(
+            (n) =>
+              // Reject multiple attributes
+              NodeDef.isMultiple(n) ||
+              // Or different category nodeDef
+              NodeDef.getCategoryUuid(n) !== NodeDef.getCategoryUuid(nodeDef) ||
+              // Or itself
+              NodeDef.isEqual(n)(nodeDef) ||
+              // Or leaves nodeDef
+              getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
+          )
+        )(survey)
+
+        candidates.push(...candidatesAncestor)
+      }
+    })(survey)
+    return candidates
+  }
 
 export const canUpdateCategory = (nodeDef) => (survey) =>
   !(NodeDef.isPublished(nodeDef) || isNodeDefParentCode(nodeDef)(survey))
