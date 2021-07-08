@@ -16,9 +16,8 @@ const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
 
 const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user &&
-  surveyInfo &&
   (User.isSystemAdmin(user) ||
-    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo)))
+    (surveyInfo && R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))))
 
 // CREATE
 export const canCreateSurvey = _hasSurveyPermission(permissions.surveyCreate)

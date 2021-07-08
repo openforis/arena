@@ -67,6 +67,15 @@ export const requireAdminPermission = async (req, _res, next) => {
 }
 
 // Survey
+export const requireSurveyCreatePermission = async (req, _res, next) => {
+  const user = Request.getUser(req)
+  const userUuid = User.getUuid(user)
+  if (User.isSystemAdmin(user) || (await UserService.hasUserPermissionSurveyCreate({ userUuid }))) {
+    next()
+  } else {
+    next(new UnauthorizedError(User.getName(user)))
+  }
+}
 export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
 export const requireRecordCleansePermission = requireSurveyPermission(Authorizer.canCleanseRecords)

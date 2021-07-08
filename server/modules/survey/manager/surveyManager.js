@@ -111,10 +111,7 @@ export const insertSurvey = async (params, client = db) => {
     // Add user to survey admins group (if not system admin)
     if (!User.isSystemAdmin(user)) {
       await UserManager.addUserToGroup(
-        user,
-        surveyId,
-        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
-        User.getUuid(user),
+        { user, surveyId, groupUuid: AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), userToAdd: user },
         t
       )
     }
@@ -149,10 +146,7 @@ export const importSurvey = async (params, client = db) => {
     // Add user to survey admins group (if not system admin)
     if (!User.isSystemAdmin(user)) {
       await UserManager.addUserToGroup(
-        user,
-        surveyId,
-        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
-        User.getUuid(user),
+        { user, surveyId, groupUuid: AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), userToAdd: user },
         t
       )
     }

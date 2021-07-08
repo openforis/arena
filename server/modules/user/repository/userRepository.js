@@ -138,11 +138,26 @@ export const fetchSystemAdministratorsEmail = async (client = db) =>
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-    WHERE g.name = 'systemAdmin'
+    WHERE g.name = $1
   `,
-    [],
+    [AuthGroup.groupNames.systemAdmin],
     (row) => row.email
   )
+
+export const hasUserPermissionSurveyCreate = async ({ userUuid }, client = db) => {
+  const count = await client.one(
+    `
+    SELECT COUNT(*) as count
+    FROM auth_group g 
+    JOIN auth_group_user gu ON gu.group_uuid = g.uuid
+    WHERE g.permissions::jsonb ? $1 
+    AND gu.user_uuid = $2
+    `,
+    [AuthGroup.permissions.surveyCreate, userUuid],
+    (row) => row.count
+  )
+  return Number(count) > 0
+}
 
 // ==== UPDATE
 
