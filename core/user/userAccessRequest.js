@@ -1,4 +1,5 @@
 import * as ObjectUtils from '@core/objectUtils'
+import { normalizeName } from '@core/stringUtils'
 
 export const keys = {
   email: 'email',
@@ -11,6 +12,8 @@ export const keysProps = {
   country: 'country',
   institution: 'institution',
   purpose: 'purpose',
+  surveyName: 'surveyName',
+  template: 'template',
 }
 
 export const editableFields = [
@@ -19,5 +22,12 @@ export const editableFields = [
   { name: `props.${keysProps.lastName}`, required: true },
   { name: `props.${keysProps.institution}` },
   { name: `props.${keysProps.country}` },
-  { name: `props.${keysProps.purpose}` },
+  { name: `props.${keysProps.purpose}`, required: true },
+  { name: `props.${keysProps.surveyName}`, required: true, normalizeFn: normalizeName },
+  // {
+  //   name: `props.${keysProps.template}`,
+  //   required: true,
+  //   items: ['none', 'templateA', 'templateB'],
+  //   defaultValue: 'none',
+  // },
 ]
