@@ -36,7 +36,13 @@ const SurveyInfo = () => {
     <>
       <div className="home-dashboard__survey-info">
         <Header>
-          <h3 data-testid={DataTestId.dashboard.surveyLabel}>{surveyLabel}</h3>
+          <Link
+            data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
+            to={appModuleUri(homeModules.surveyInfo)}
+            className="btn-s btn-transparent"
+          >
+            <h3 data-testid={DataTestId.dashboard.surveyLabel}>{surveyLabel}</h3>
+          </Link>
 
           <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
             ({Survey.getStatus(surveyInfo)})
