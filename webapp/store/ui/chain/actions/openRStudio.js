@@ -43,9 +43,9 @@ const _getRStudioUrl = async ({ userUuid }) => {
  */
 const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl }) =>
   `
-  url <- \'${
+  url <- "${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}\';\n
+  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}";\n
   download.file(url,"./${token}.zip");\n
   unzip("./${token}.zip",exdir=".");\n
   file.remove("./${token}.zip");\n
