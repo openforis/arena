@@ -1,7 +1,7 @@
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
-
+  
   # Check whether response containts error
   respNames <- names(respJson)
   error <- NA
@@ -14,10 +14,9 @@ arena.parseResponse = function(resp) {
   if (!is.na(error)) {
     stop(error)
   }
-
+  
   return(respJson)
 }
-
 
 arena.getApiUrl = function(url) {
   apiUrl <- paste0(arena.host, 'api', url)
@@ -56,24 +55,32 @@ arena.login = function(tentative) {
   }
   print('TYPE YOUR EMAIL')
   user <- readLines(stdin(), 1)
+  user <- trimws(user)
   print('TYPE YOUR PASSWORD')
   password <- readLines(stdin(), 1)
+  password <- trimws(password)
+  
   resp <- httr::POST(
     paste0(arena.host, 'auth/login'),
     body = list(email = user, password = password)
   )
   respParsed <- arena.parseResponse(resp)
-
-  if ("message" %in% names(respParsed) && respParsed$message == 'validationErrors.user.userNotFound') {
+  
+  if ("message" %in% names(respParsed) && (
+    (respParsed$message == 'validationErrors.user.userNotFound') | 
+    (respParsed$message == 'validationErrors.user.emailInvalid') | 
+    (respParsed$message == 'Missing credentials')
+    )) 
+  {
     if (tentative < 3) {
-      print('Invalid email or password specified, try again')
+      print('*** Invalid email or password specified, try again')
       arena.login(tentative + 1)
-    } else {
-      stop(respParsed$message)
+    } else if (tentative >= 3) {
+      print(paste("*** Login failed:",respParsed$message, sep = ' '))
       return(FALSE)
     }
   } else {
-    print(paste('User', user, 'successfully logged in', sep = ' '))
+    print(paste('*** User', user, 'successfully logged in', sep = ' '))
     return(TRUE)
   }
 }
