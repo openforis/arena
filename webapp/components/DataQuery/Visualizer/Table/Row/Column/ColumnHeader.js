@@ -14,7 +14,7 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 
 import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
-import { ButtonIconCog } from '@webapp/components/buttons/ButtonIconCog'
+import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
@@ -48,7 +48,7 @@ const ColumnHeader = (props) => {
           <>
             <span className="ellipsis">{nodeDefLabel}</span>
             {isMeasure && (
-              <ButtonIconCog
+              <ButtonIconGear
                 className="btn btn-s btn-transparent btn-aggregates"
                 onClick={() => setShowAggregateFunctionsPanel(true)}
                 title={i18n.t('common.aggregateFunction', { count: 2 })}

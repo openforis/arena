@@ -4,12 +4,15 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
-import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { ButtonIconFilter } from '@webapp/components/buttons'
+
+import { useI18n } from '@webapp/store/system'
+import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -51,14 +54,12 @@ const NodeDefsSelector = (props) => {
         nodeDefLabelType={nodeDefLabelType}
       />
 
-      <button
-        type="button"
-        className={classNames('btn', 'btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
-        aria-disabled={A.isEmpty(nodeDefUuidEntity)}
+      <ButtonIconFilter
+        className={classNames('btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
+        disabled={A.isEmpty(nodeDefUuidEntity)}
         onClick={() => setShowFilter(!showFilter)}
-      >
-        <span className="icon icon-filter icon-12px" />
-      </button>
+        title="dataView.filterAttributeTypes"
+      />
 
       {showFilter && (
         <div className="node-defs-selector__settings">

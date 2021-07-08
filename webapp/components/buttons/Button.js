@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 
 export const Button = (props) => {
-  const { className, disabled, iconClassName, id, label, onClick, testId, ...otherProps } = props
+  const { className, disabled, iconClassName, id, label, onClick, testId, title, ...otherProps } = props
 
   const i18n = useI18n()
 
@@ -17,6 +17,7 @@ export const Button = (props) => {
       type="button"
       className={`btn ${className || ''}`}
       onClick={onClick}
+      title={title ? i18n.t(title) : null}
       {...otherProps}
     >
       {iconClassName && <span className={`icon ${iconClassName}`} />}
@@ -33,6 +34,7 @@ Button.propTypes = {
   label: PropTypes.string,
   onClick: PropTypes.func.isRequired,
   testId: PropTypes.string,
+  title: PropTypes.string,
 }
 
 Button.defaultProps = {
@@ -42,4 +44,5 @@ Button.defaultProps = {
   id: null,
   label: null,
   testId: null,
+  title: null,
 }
