@@ -247,9 +247,10 @@ For more information please visit our website: *http://www.openforis.org/tools/a
 **Once you send the request, please wait for an invitation email to access Arena.**
 \\* = required field`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
-    requestSent: `Access Request sent correctly to the address {{email}}.
-Please give us a few moments to process your request.
-We will send soon an email to your address with the instructions on how to access $t(common.appName).`,
+    requestSent: 'Access Request sent correctly',
+    requestSentMessage: `Please give us a couple of days to process your request.
+We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     title: 'Requesting access to $t(common.appNameFull)',

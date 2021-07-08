@@ -16,8 +16,22 @@ import { useAccessRequest } from './useAccessRequest'
 
 const AccessRequest = () => {
   const i18n = useI18n()
-  const { request, validation, onFieldValueChange, onSubmit, reCaptchaRef } = useAccessRequest()
+  const { request, requestSentSuccessfully, onFieldValueChange, onSubmit, reCaptchaRef, validation } =
+    useAccessRequest()
 
+  if (requestSentSuccessfully) {
+    return (
+      <div className="access-request">
+        <div className="title">{i18n.t('accessRequestView.requestSent')}</div>
+        <div className="content">
+          <Markdown
+            className="request-sent-message"
+            source={i18n.t('accessRequestView.requestSentMessage', { email: request.email })}
+          />
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="access-request">
       <div className="title">{i18n.t('accessRequestView.title')}</div>
