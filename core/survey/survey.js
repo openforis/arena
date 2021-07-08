@@ -131,6 +131,7 @@ export const {
 export const {
   isNodeDefAncestor,
   visitAncestorsAndSelf,
+  getNodeDefPath,
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
