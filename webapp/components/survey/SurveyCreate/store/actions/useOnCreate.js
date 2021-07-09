@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { useDispatch } from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -8,12 +7,11 @@ import { JobActions } from '@webapp/store/app'
 import * as JobSerialized from '@common/job/jobSerialized'
 import { NotificationActions } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
+import * as API from '@webapp/service/api'
 
 const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
-  const { name, label, lang, cloneFrom = false, template = false } = newSurvey
   try {
-    const { data } = await axios.post('/api/survey', { name, label, lang, cloneFrom, template })
-    return data
+    return await API.insertSurvey({ newSurvey })
   } catch (e) {
     const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
     const errorKey = Number.isNaN(maxSurveysCount)
