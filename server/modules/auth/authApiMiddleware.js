@@ -56,21 +56,10 @@ const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   }
 }
 
-// Admin
-export const requireAdminPermission = async (req, _res, next) => {
-  const user = Request.getUser(req)
-  if (User.isSystemAdmin(user)) {
-    next()
-  } else {
-    next(new UnauthorizedError(User.getName(user)))
-  }
-}
-
 // Survey
 export const requireSurveyCreatePermission = async (req, _res, next) => {
   const user = Request.getUser(req)
-  const userUuid = User.getUuid(user)
-  if (User.isSystemAdmin(user) || (await UserService.hasUserPermissionSurveyCreate({ userUuid }))) {
+  if (Authorizer.canCreateSurvey(user)) {
     next()
   } else {
     next(new UnauthorizedError(User.getName(user)))

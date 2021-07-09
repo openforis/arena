@@ -22,7 +22,6 @@ export const {
   updateNamePasswordAndStatus,
   resetUsersPrefsSurveyCycle,
   importNewUser,
-  hasUserPermissionSurveyCreate,
 } = UserRepository
 
 export const {

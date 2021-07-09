@@ -144,21 +144,6 @@ export const fetchSystemAdministratorsEmail = async (client = db) =>
     (row) => row.email
   )
 
-export const hasUserPermissionSurveyCreate = async ({ userUuid }, client = db) => {
-  const count = await client.one(
-    `
-    SELECT COUNT(*) as count
-    FROM auth_group g 
-    JOIN auth_group_user gu ON gu.group_uuid = g.uuid
-    WHERE g.permissions::jsonb ? $1 
-    AND gu.user_uuid = $2
-    `,
-    [AuthGroup.permissions.surveyCreate, userUuid],
-    (row) => row.count
-  )
-  return Number(count) > 0
-}
-
 // ==== UPDATE
 
 export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
