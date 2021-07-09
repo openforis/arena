@@ -157,7 +157,7 @@ export const importSurvey = async (params, client = db) => {
   return assocSurveyInfo(survey)
 }
 // ====== READ
-export const { countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
+export const { countOwnedSurveys, countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([

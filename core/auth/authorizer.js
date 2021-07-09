@@ -7,6 +7,8 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 const { permissions, keys } = AuthGroup
 
+const MAX_SURVEYS_CREATED_BY_USER = 5
+
 // ======
 // ====== Survey
 // ======
@@ -28,6 +30,11 @@ const _hasPermissionInSomeGroup = (permission) => (user) => {
 // CREATE
 export const canCreateSurvey = _hasPermissionInSomeGroup(permissions.surveyCreate)
 export const canCreateTemplate = (user) => User.isSystemAdmin(user)
+export const getMaxSurveysUserCanCreate = (user) => {
+  if (User.isSystemAdmin(user)) return NaN
+  if (canCreateSurvey(user)) return MAX_SURVEYS_CREATED_BY_USER
+  return 0
+}
 
 // READ
 export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))

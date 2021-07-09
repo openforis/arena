@@ -48,6 +48,7 @@ export const {
   insertSurvey,
   // READ
   fetchUserSurveysInfo,
+  countOwnedSurveys,
   countUserSurveys,
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,

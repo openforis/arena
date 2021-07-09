@@ -60,10 +60,14 @@ const requireUserPermission = (permissionFn) => async (req, _res, next) => {
 export const requireSurveyCreatePermission = async (req, _res, next) => {
   const user = Request.getUser(req)
   if (Authorizer.canCreateSurvey(user)) {
-    next()
-  } else {
-    next(new UnauthorizedError(User.getName(user)))
+    const ownedSurveys = await SurveyManager.countOwnedSurveys({ user })
+    const maxSurveys = Authorizer.getMaxSurveysUserCanCreate(user)
+    if (Number.isNaN(maxSurveys) || maxSurveys > ownedSurveys) {
+      next()
+      return
+    }
   }
+  next(new UnauthorizedError(User.getName(user)))
 }
 export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
