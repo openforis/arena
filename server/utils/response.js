@@ -57,11 +57,11 @@ export const sendFileContent = (res, name, content, size) => {
   res.end(null, 'binary')
 }
 
-export const sendFile = ({ res, path: filePath, name = null }) => {
+export const sendFile = ({ res, path: filePath, name = null, contentType = null }) => {
   const stats = fs.statSync(filePath)
   const { size } = stats
   const fileName = name || path.basename(filePath)
-  setContentTypeFile(res, fileName, size)
+  setContentTypeFile(res, fileName, size, contentType)
   fs.createReadStream(filePath).pipe(res)
 }
 
@@ -90,7 +90,7 @@ export const sendFilesAsZipWithSize = ({ res, dir, name }) => {
   zip.finalize()
 
   output.on('finish', async () => {
-    sendFile({ res, path: filePath, name })
+    sendFile({ res, path: filePath, name, contentType: contentTypes.zip })
   })
 }
 
