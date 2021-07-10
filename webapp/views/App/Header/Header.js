@@ -2,6 +2,7 @@ import './Header.scss'
 
 import React, { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -11,6 +12,8 @@ import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useLang } from '@webapp/store/system'
 import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
+
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { usePrevious } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
@@ -51,9 +54,15 @@ const Header = () => {
             <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
           ) : (
             <>
-              <div data-testid={DataTestId.header.surveyTitle} className="header__survey-title">
-                {Survey.getName(surveyInfo)} - {Survey.getLabel(surveyInfo, lang)}
-              </div>
+              <Link
+                data-testid={DataTestId.header.surveyTitle}
+                to={appModuleUri(homeModules.surveyInfo)}
+                className="btn-s btn-transparent"
+              >
+                <div className="header__survey-title">
+                  {Survey.getName(surveyInfo)} - {Survey.getLabel(surveyInfo, lang)}
+                </div>
+              </Link>
               <CycleSelector
                 surveyInfo={surveyInfo}
                 surveyCycleKey={surveyCycleKey}
