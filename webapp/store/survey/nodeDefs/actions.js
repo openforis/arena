@@ -142,30 +142,29 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   const nodeDefDependentsUuids = R.pipe(
     Survey.buildAndAssocDependencyGraph,
     Survey.getNodeDefDependencies(nodeDefUuid),
+    // exclude self-dependencies
     R.without(nodeDefUuid)
   )(survey)
 
-  if (R.isEmpty(nodeDefDependentsUuids)) {
+  const nodeDefDependents = nodeDefDependentsUuids
+    .map((uuid) => Survey.getNodeDefByUuid(uuid)(survey))
+    // exclude dependents that are descendants of the node def being deleted
+    .filter((dependent) => !NodeDef.isDescendantOf(nodeDef)(dependent))
+
+  if (R.isEmpty(nodeDefDependents)) {
     return true
   }
 
-  // Node has not dependencies or it has expressions that depend on itself
-  const nodeDefDependents = R.pipe(
-    R.map(
-      R.pipe(
-        (nodeDefDependentUuid) => Survey.getNodeDefByUuid(nodeDefDependentUuid)(survey),
-        (nodeDefDependent) => NodeDef.getLabel(nodeDefDependent, i18n.lang)
-      )
-    ),
-    R.join(', ')
-  )(nodeDefDependentsUuids)
+  const nodeDefDependentsText = nodeDefDependents
+    .map((dependent) => `${NodeDef.getLabel(dependent, i18n.lang)} (${NodeDef.getName(dependent)})`)
+    .join(', ')
 
   dispatch(
     NotificationActions.notifyWarning({
       key: 'nodeDefEdit.cannotDeleteNodeDefReferenced',
       params: {
         nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
-        nodeDefDependents,
+        nodeDefDependents: nodeDefDependentsText,
       },
     })
   )

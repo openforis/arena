@@ -46,6 +46,7 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   }
 
   if (contentType) {
+    res.setHeader('Content-Type', contentType)
     res.set('Content-Type', contentType)
   }
 }
@@ -56,11 +57,11 @@ export const sendFileContent = (res, name, content, size) => {
   res.end(null, 'binary')
 }
 
-export const sendFile = ({ res, path: filePath, name = null }) => {
+export const sendFile = ({ res, path: filePath, name = null, contentType = null }) => {
   const stats = fs.statSync(filePath)
   const { size } = stats
   const fileName = name || path.basename(filePath)
-  setContentTypeFile(res, fileName, size)
+  setContentTypeFile(res, fileName, size, contentType)
   fs.createReadStream(filePath).pipe(res)
 }
 
@@ -78,6 +79,19 @@ export const sendZipFile = (res, dir, name) => {
   } else {
     sendErr(res, 'File not found')
   }
+}
+
+export const sendFilesAsZipWithSize = ({ res, dir, name }) => {
+  const filePath = FileUtils.join(dir, name)
+  const output = fs.createWriteStream(filePath)
+  const zip = Archiver('zip')
+  zip.pipe(output)
+  zip.directory(dir, false)
+  zip.finalize()
+
+  output.on('finish', async () => {
+    sendFile({ res, path: filePath, name, contentType: contentTypes.zip })
+  })
 }
 
 export const sendFilesAsZip = (res, zipName, files) => {

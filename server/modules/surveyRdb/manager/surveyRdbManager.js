@@ -27,7 +27,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, countViewDataAgg, fetchViewDataAgg } = DataViewRepository
+export const { createDataView, countViewDataAgg } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -40,8 +40,8 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 // ==== DML
 
 const _getExportFields = ({ survey, query }) => {
-  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+  const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
@@ -81,6 +81,68 @@ export const fetchViewData = async (params) => {
       const fields = _getExportFields({ survey, query })
       stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
+    return null
+  }
+  return result
+}
+
+const _getExportFieldsAgg = ({ survey, query }) => {
+  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const fields = []
+  // dimensions
+  Query.getDimensions(query).forEach((dimension) => {
+    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(viewDataNodeDef.survey)
+    fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
+  })
+  // measures
+  Array.from(Query.getMeasures(query).entries()).forEach(([nodeDefUuid, aggFunctions]) => {
+    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    aggFunctions.forEach((aggregateFnOrUuid) => {
+      const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
+        nodeDef: nodeDefMeasure,
+        aggregateFn: aggregateFnOrUuid,
+      })
+      fields.push(fieldAlias)
+    })
+  })
+  return fields
+}
+
+/**
+ * Runs a select query on a data view associated to an entity node definition,
+ * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!Query} [params.query] - The query object.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewDataAgg = async (params) => {
+  const { survey, cycle, query, limit, offset, streamOutput } = params
+
+  // Fetch data
+  const result = await DataViewRepository.fetchViewDataAgg({
+    survey,
+    cycle,
+    query,
+    limit,
+    offset,
+    stream: Boolean(streamOutput),
+  })
+
+  if (streamOutput) {
+    await db.stream(result, (stream) => {
+      const fields = _getExportFieldsAgg({ survey, query })
+      stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
+    })
+    return null
   }
   return result
 }

@@ -8,10 +8,10 @@ import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
-  placeholder: 'placeholder',
-  expression: 'expression',
   applyIf: 'applyIf',
+  expression: 'expression',
   messages: 'messages',
+  placeholder: 'placeholder',
   severity: 'severity',
 }
 
@@ -20,14 +20,16 @@ export const keys = {
 export const createExpression = ({
   expression = '',
   applyIf = '',
-  placeholder = false,
   severity = ValidationResult.severity.error,
+  messages = {},
+  placeholder = false,
 }) => ({
-  uuid: uuidv4(),
-  expression,
   applyIf,
+  expression,
   placeholder,
+  messages,
   severity,
+  uuid: uuidv4(),
 })
 
 export const createExpressionPlaceholder = () => createExpression({ placeholder: true })

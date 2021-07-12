@@ -43,7 +43,7 @@ const AnalysisNodeDefs = () => {
   const prevAnalysisNodeDefs = usePrevious(_analysisNodeDefsToShow)
 
   useEffect(() => {
-    if (A.isNull(prevAnalysisNodeDefs)) {
+    if (A.isNull(prevAnalysisNodeDefs) && !chain.isDeleted) {
       dispatch(ChainActions.updateChain({ chain }))
     }
   }, [_analysisNodeDefsToShow, chain])
@@ -55,9 +55,10 @@ const AnalysisNodeDefs = () => {
       <EntitySelectorTree getLabelSuffix={getLabelSuffix} nodeDefUuidActive={entityDefUuid} onSelect={selectEntity} />
 
       <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
-        {Survey.getAnalysisNodeDefs({ chain })(survey).length <= 0 && (
+        {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain })(survey).length <= 0 && (
           <div className="analysis-node-defs-error">
             <ErrorBadge validation={validation} showLabel={false} showIcon />
+            <p>{i18n.t('chain.emptyNodeDefs')}</p>
           </div>
         )}
         {entityDefUuid && (

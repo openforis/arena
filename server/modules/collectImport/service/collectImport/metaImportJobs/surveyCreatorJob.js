@@ -44,12 +44,19 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.labels]: labels,
     })
 
-    const survey = await SurveyManager.insertSurvey(
-      { user: this.user, surveyInfo, createRootEntityDef: false, system: true, updateUserPrefs: false },
-      this.tx
-    )
+    // insert survey out of transaction to avoid lock and do not update user prefs for the same reason
+    const survey = await SurveyManager.insertSurvey({
+      user: this.user,
+      surveyInfo,
+      createRootEntityDef: false,
+      system: true,
+      updateUserPrefs: false,
+      temporary: true,
+    })
 
     const surveyId = Survey.getId(survey)
+
+    this.logDebug(`survey ${surveyId} created`)
 
     await ActivityLogManager.insert(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
 

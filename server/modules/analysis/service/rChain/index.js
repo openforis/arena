@@ -57,7 +57,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
 
     // Insert node results
     const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entity, chain, chainUuid, cycle }, tx)
-
     const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes(
       { survey, surveyId, entity, chain, chainUuid, cycle },
       tx

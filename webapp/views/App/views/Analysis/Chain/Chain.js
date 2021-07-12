@@ -7,12 +7,11 @@ import classNames from 'classnames'
 import * as A from '@core/arena'
 
 import * as Validation from '@core/validation/validation'
-import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyCycleKeys } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -28,7 +27,6 @@ const ChainComponent = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
-  const surveyInfo = useSurveyInfo()
   const cycleKeys = useSurveyCycleKeys()
   const chain = useChain()
   const validation = Chain.getValidation(chain)
@@ -60,7 +58,7 @@ const ChainComponent = () => {
         message={i18n.t('chainView.errorNoLabel')}
       />
 
-      <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
+      <ButtonRStudio onClick={_openRStudio} />
 
       <div className="form">
         <LabelsEditor

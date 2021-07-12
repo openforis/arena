@@ -27,6 +27,7 @@ export const keys = {
   srs: 'srs',
   steps: 'steps',
   template: 'template',
+  temporary: 'temporary',
 }
 
 export const collectReportKeys = {

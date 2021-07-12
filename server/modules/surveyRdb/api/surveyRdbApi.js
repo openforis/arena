@@ -43,7 +43,9 @@ export const init = (app) => {
 
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, query } = Request.getParams(req)
+      const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+
+      const query = A.parse(queryParam)
 
       const outputFileName = `data-export-${DateUtils.nowFormatDefault()}.csv`
       Response.setContentTypeFile(res, outputFileName, null, Response.contentTypes.csv)
