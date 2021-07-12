@@ -14,8 +14,9 @@ import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
-
 import ProfilePicture from '@webapp/components/profilePicture'
+
+import { useAuthCanCreateSurvey, useAuthCanCreateTemplate, useAuthCanEditTemplates } from '@webapp/store/user/hooks'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 const Separator = () => <div className="user-popup-menu__sep" />
@@ -28,6 +29,9 @@ const UserPopupMenu = (props) => {
   const elementRef = useRef(null)
 
   const user = useUser()
+  const canCreateSurvey = useAuthCanCreateSurvey()
+  const canCreateTemplate = useAuthCanCreateTemplate()
+  const canEditTemplates = useAuthCanEditTemplates()
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -76,7 +80,7 @@ const UserPopupMenu = (props) => {
         {i18n.t('appModules.surveyList')}
       </Link>
 
-      {User.isSystemAdmin(user) && (
+      {canCreateSurvey && (
         <Link
           data-testid={DataTestId.header.surveyCreateBtn}
           to={appModuleUri(homeModules.surveyNew)}
@@ -88,28 +92,32 @@ const UserPopupMenu = (props) => {
         </Link>
       )}
 
-      <Separator />
-
-      <Link
-        data-testid={DataTestId.header.templateListBtn}
-        to={appModuleUri(homeModules.templateList)}
-        onClick={onClose}
-        className="btn-s btn-transparent"
-      >
-        <span className="icon icon-paragraph-justify icon-12px icon-left" />
-        {i18n.t('appModules.templateList')}
-      </Link>
-
-      {User.isSystemAdmin(user) && (
-        <Link
-          data-testid={DataTestId.header.templateCreateBtn}
-          to={appModuleUri(homeModules.templateNew)}
-          onClick={onClose}
-          className="btn-s btn-transparent"
-        >
-          <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('homeView.surveyCreate.newTemplate')}
-        </Link>
+      {(canEditTemplates || canCreateTemplate) && (
+        <>
+          <Separator />
+          {canEditTemplates && (
+            <Link
+              data-testid={DataTestId.header.templateListBtn}
+              to={appModuleUri(homeModules.templateList)}
+              onClick={onClose}
+              className="btn-s btn-transparent"
+            >
+              <span className="icon icon-paragraph-justify icon-12px icon-left" />
+              {i18n.t('appModules.templateList')}
+            </Link>
+          )}
+          {canCreateTemplate && (
+            <Link
+              data-testid={DataTestId.header.templateCreateBtn}
+              to={appModuleUri(homeModules.templateNew)}
+              onClick={onClose}
+              className="btn-s btn-transparent"
+            >
+              <span className="icon icon-plus icon-12px icon-left" />
+              {i18n.t('homeView.surveyCreate.newTemplate')}
+            </Link>
+          )}
+        </>
       )}
 
       <Separator />
