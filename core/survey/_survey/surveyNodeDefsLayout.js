@@ -12,6 +12,7 @@ export const updateNodeDefParentLayout = ({ survey, surveyCycleKey, nodeDef }) =
   const childrenFormsInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
     (sibling) =>
       !NodeDef.isEqual(sibling)(nodeDef) &&
+      !NodeDef.isDeleted(sibling) &&
       NodeDef.isEntity(sibling) &&
       NodeDefLayout.isDisplayInOwnPage(surveyCycleKey)(sibling)
   )

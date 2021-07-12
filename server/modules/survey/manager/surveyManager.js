@@ -66,13 +66,15 @@ export const insertSurvey = async (params, client = db) => {
     updateUserPrefs = true,
     temporary = false,
   } = params
-  const survey = await client.tx(async (t) => {
+
+  return client.tx(async (t) => {
     // Insert survey into db
     const surveyProps = { ...Survey.getProps(surveyInfoParam) }
     if (temporary) {
       surveyProps.temporary = true
     }
     const surveyInfo = await SurveyRepository.insertSurvey({ survey: surveyInfoParam, propsDraft: surveyProps }, t)
+    const survey = assocSurveyInfo(surveyInfo)
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
@@ -97,7 +99,7 @@ export const insertSurvey = async (params, client = db) => {
           ),
         }
       )
-      await NodeDefManager.insertNodeDef({ user, surveyId, nodeDef: rootEntityDef, system: true }, t)
+      await NodeDefManager.insertNodeDef({ user, survey, nodeDef: rootEntityDef, system: true }, t)
     }
 
     if (updateUserPrefs) {
@@ -119,16 +121,14 @@ export const insertSurvey = async (params, client = db) => {
       )
     }
 
-    return surveyInfo
+    return assocSurveyInfo(surveyInfo)
   })
-
-  return assocSurveyInfo(survey)
 }
 
 export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
 
-  const survey = await client.tx(async (t) => {
+  return client.tx(async (t) => {
     // Insert survey into db
     const surveyInfo = await SurveyRepository.insertSurvey(
       {
@@ -157,11 +157,10 @@ export const importSurvey = async (params, client = db) => {
       )
     }
 
-    return surveyInfo
+    return assocSurveyInfo(surveyInfo)
   })
-
-  return assocSurveyInfo(survey)
 }
+
 // ====== READ
 export const { countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
 

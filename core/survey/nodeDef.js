@@ -304,6 +304,7 @@ export const assocValidations = (validations) => mergePropsAdvanced({ [keysProps
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
+export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>

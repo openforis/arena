@@ -24,9 +24,7 @@ const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
 
 const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nodeDefsUpdated }, client = db) => {
   // merge node defs with existing ones
-  let surveyUpdated = Survey.assocNodeDefs({
-    nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated },
-  })(survey)
+  let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
 
   // add dependent node defs to dependency graph
   surveyUpdated = Survey.addNodeDefDependencies(nodeDef)(surveyUpdated)
@@ -115,7 +113,7 @@ export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid },
 
     const nodeDefsDependent = Survey.getNodeDefDependencies(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, t)
+    const nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, survey, cycle, nodeDefUuid }, t)
 
     // remove dependent node defs from dependency graph (add them back later)
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)

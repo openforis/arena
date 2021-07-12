@@ -36,36 +36,50 @@ export const insertNodeDef = async (
       ? ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
       : null
 
-    const [nodeDef, nodeDefsParentUpdated] = await t.batch([
+    const nodeDefParentUpdated = NodeDefLayoutManager.updateParentLayout({
+      survey,
+      nodeDef: nodeDefParam,
+      cyclesAdded: [cycle],
+    })
+    const [nodeDef] = await t.batch([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
-      NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef: nodeDefParam, cyclesAdded: [cycle] }, t),
+      ...(nodeDefParentUpdated
+        ? [
+            NodeDefRepository.updateNodeDefProps(
+              surveyId,
+              NodeDef.getUuid(nodeDefParentUpdated),
+              NodeDef.getParentUuid(nodeDefParentUpdated),
+              NodeDef.getProps(nodeDefParentUpdated),
+              NodeDef.getPropsAdvanced(nodeDefParentUpdated),
+              t
+            ),
+          ]
+        : []),
       markSurveyDraft(surveyId, t),
       insertLog,
     ])
 
     // TODO move it into NodeDefLayoutManager.updateParentLayout
-    if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
-      const surveyUpdated = Survey.assocNodeDefs({
-        nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsParentUpdated },
-      })(survey)
-      const nodeDefParentUpdated = Survey.updateNodeDefParentLayout({
-        survey: surveyUpdated,
-        surveyCycleKey: cycle,
-        nodeDef,
-      })
-      await NodeDefRepository.updateNodeDefProps(
-        surveyId,
-        NodeDef.getUuid(nodeDefParentUpdated),
-        NodeDef.getParentUuid(nodeDefParentUpdated),
-        NodeDef.getProps(nodeDefParentUpdated),
-        NodeDef.getPropsAdvanced(nodeDef),
-        t
-      )
-    }
+    // if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderForm(cycle)(nodeDef) && !NodeDef.isRoot(nodeDef)) {
+    //   const surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsParentUpdated })(survey)
+    //   const nodeDefParentUpdated = Survey.updateNodeDefParentLayout({
+    //     survey: surveyUpdated,
+    //     surveyCycleKey: cycle,
+    //     nodeDef,
+    //   })
+    //   await NodeDefRepository.updateNodeDefProps(
+    //     surveyId,
+    //     NodeDef.getUuid(nodeDefParentUpdated),
+    //     NodeDef.getParentUuid(nodeDefParentUpdated),
+    //     NodeDef.getProps(nodeDefParentUpdated),
+    //     NodeDef.getPropsAdvanced(nodeDef),
+    //     t
+    //   )
+    // }
 
     return {
-      ...nodeDefsParentUpdated,
       [NodeDef.getUuid(nodeDef)]: nodeDef,
+      ...(nodeDefParentUpdated ? { [NodeDef.getUuid(nodeDefParentUpdated)]: nodeDefParentUpdated } : {}),
     }
   })
 
@@ -95,40 +109,28 @@ export const updateNodeDefProps = async (
 
     const updatingCycles = NodeDef.propKeys.cycles in props
 
-    let nodeDefsUpdated = updatingCycles
-      ? await NodeDefLayoutManager.updateNodeDefLayoutOnCyclesUpdate(
-          {
-            surveyId,
-            nodeDefUuid,
-            cycles: props[NodeDef.propKeys.cycles],
-          },
-          t
-        )
+    // node defs with changes to be stored in the db
+    const nodeDefsUpdated = updatingCycles
+      ? NodeDefLayoutManager.updateNodeDefLayoutOnCyclesUpdate({
+          survey,
+          nodeDefUuid,
+          cycles: props[NodeDef.propKeys.cycles],
+        })
       : {}
 
-    let nodeDefsToUpdate = {} // node defs with changes to be stored in the db
-
     if (NodeDefLayout.keys.layout in props) {
-      let surveyUpdated = Survey.assocNodeDefs({ nodeDefs: { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated } })(
-        survey
-      )
+      let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const layoutToUpdate = props[NodeDefLayout.keys.layout]
       const layoutEntries = Object.entries(layoutToUpdate)
 
       layoutEntries.forEach(([surveyCycleKey, layoutCycle]) => {
         Object.entries(layoutCycle).forEach(([key, value]) => {
-          nodeDefsToUpdate = {
-            ...nodeDefsToUpdate,
-            ...Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(surveyUpdated),
-          }
-          nodeDefsUpdated = {
-            ...nodeDefsUpdated,
-            ...nodeDefsToUpdate,
-          }
-          surveyUpdated = Survey.assocNodeDefs({
-            nodeDefs: { ...Survey.getNodeDefs(surveyUpdated), ...nodeDefsUpdated },
-          })(surveyUpdated)
+          Object.assign(
+            nodeDefsUpdated,
+            Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(surveyUpdated)
+          )
+          surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(surveyUpdated)
         })
       })
     }
@@ -139,9 +141,10 @@ export const updateNodeDefProps = async (
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
+    // persist changes in db
     const [nodeDef] = await t.batch([
       NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, t),
-      ...Object.values(nodeDefsToUpdate).map((nodeDefToUpdate) =>
+      ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
         NodeDefRepository.updateNodeDefProps(
           surveyId,
           nodeDefToUpdate.uuid,
@@ -176,14 +179,15 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
 // ======= DELETE
 
-export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid }, client = db) =>
+export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, client = db) =>
   client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
     const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
     const [nodeDefsUpdated] = await Promise.all([
-      NodeDefLayoutManager.updateParentLayout({ surveyId, nodeDef, cyclesDeleted: [cycle] }, t),
+      NodeDefLayoutManager.updateParentLayout({ survey, nodeDef, cyclesDeleted: [cycle] }, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t),
     ])

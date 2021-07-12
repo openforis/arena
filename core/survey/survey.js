@@ -148,6 +148,7 @@ export const {
 } = SurveyDependencies
 
 // ====== UPDATE
+// replace all the node defs in the survey with the specified ones
 export const assocNodeDefs =
   ({ nodeDefs, updateDependencyGraph = false }) =>
   (survey) => {
@@ -160,6 +161,14 @@ export const assocNodeDefs =
       surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
     }
     return surveyUpdated
+  }
+
+// merge the specified node defs with the ones already in the survey
+export const mergeNodeDefs =
+  ({ nodeDefs, updateDependencyGraph = false }) =>
+  (survey) => {
+    const nodeDefsPrev = getNodeDefs(survey)
+    return assocNodeDefs({ nodeDefs: { ...nodeDefsPrev, ...nodeDefs }, updateDependencyGraph })(survey)
   }
 
 export const assocNodeDef =

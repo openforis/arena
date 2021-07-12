@@ -1,12 +1,9 @@
 import * as R from 'ramda'
 
-import * as ObjectUtils from '@core/objectUtils'
 import { uuidv4 } from '@core/uuid'
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { db } from '@server/db/db'
-import * as NodeDefRepository from '../../repository/nodeDefRepository'
 
 const nodeDefLayoutHeights = {
   [NodeDef.nodeDefType.coordinate]: 2,
@@ -19,34 +16,32 @@ const nodeDefLayoutHeights = {
  * into the new one, otherwise it sets default layout props to the new cycle.
  *
  * @param {!object} params - The update parameters.
- * @param {!number} [params.surveyId] - The survey ID.
+ * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.nodeDef] - The node definition to update.
  * @param {!string} [params.cycle] - The survey cycle to add to the nodeDef.
  * @param {string} [params.cyclePrev=null] - The previous survey cycle (if any).
- * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
- * @returns {Promise<null>} - The result promise.
+ * @returns {object} - The updated node def.
  * */
-const _addCycle = async ({ surveyId, nodeDef, cycle, cyclePrev = null }, client = db) => {
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+const _addCycle = async ({ nodeDef, cycle, cyclePrev = null }) => {
   if (cyclePrev) {
     // If cycle prev exists, copy layout from previous cycle
-    await NodeDefRepository.copyNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclePrev, [cycle], client)
-  } else {
-    // Otherwise set the default layout
-    const props = {
-      [NodeDefLayout.keys.layout]: R.pipe(
-        NodeDefLayout.getLayout,
-        R.mergeLeft(
-          // TODO use NodeDefLayout default props layout
-          NodeDef.isEntity(nodeDef)
-            ? NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4())
-            : NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox)
-        )
-      )(nodeDef),
-    }
-    await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, NodeDef.getParentUuid(nodeDef), props, {}, client)
+    const layout = NodeDefLayout.getLayout(nodeDef)
+    const layoutCyclePrev = NodeDefLayout.getLayoutCycle(cyclePrev)(nodeDef)
+    const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCyclePrev)(layout)
+    return NodeDefLayout.assocLayout(layoutUpdated)(nodeDef)
   }
+  // Otherwise set the default layout
+  const layoutUpdated = R.pipe(
+    NodeDefLayout.getLayout,
+    R.mergeLeft(
+      // TODO use NodeDefLayout default props layout
+      NodeDef.isEntity(nodeDef)
+        ? NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4())
+        : NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox)
+    )
+  )(nodeDef)
+  return NodeDefLayout.assocLayout(layoutUpdated)(nodeDef)
 }
 
 /**
@@ -73,24 +68,18 @@ const _updateLayoutChildren = ({ nodeDef, cycle, updateFn }) => {
  * Updates the parent node definition layout after survey cycles have been added or removed from a node definition.
  *
  * @param {!object} params - The update parameters.
- * @param {!number} [params.surveyId] - The survey ID.
+ * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.nodeDef] - The node definition that has just been updated.
  * @param {Array.<string>} [params.cyclesAdded = []] - The survey cycles added to the nodeDef.
  * @param {Array.<string>} [params.cyclesDeleted = []] - The survey cycles removed from the nodeDef.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
- * @returns {Promise<object>} - The updated parent node definition, returned as an object index by UUID.
+ * @returns {object} - The updated parent node definition, if changes have been applied.
  * */
-export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], cyclesDeleted = [] }, client = db) => {
+export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDeleted = [] }) => {
   if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
 
-  const nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
-    surveyId,
-    NodeDef.getParentUuid(nodeDef),
-    true,
-    false,
-    client
-  )
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+
   let nodeDefParentUpdated = nodeDefParent
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -142,25 +131,28 @@ export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], 
     nodeDefParentUpdated
   )
 
+  if (
+    cyclesDeleted.length > 0 &&
+    NodeDef.isDeleted(nodeDef) &&
+    NodeDefLayout.isRenderFromInOwnPage(cyclesDeleted[0])(nodeDef)
+  ) {
+    const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefParentUpdated })(survey)
+    nodeDefParentUpdated = Survey.updateNodeDefParentLayout({
+      survey: surveyUpdated,
+      surveyCycleKey: cyclesDeleted[0],
+      nodeDef,
+    })
+  }
+
   // Update parent node def layout in DB (if changed)
   const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
   const nodeDefParentLayoutUpdated = NodeDefLayout.getLayout(nodeDefParentUpdated)
 
   if (R.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
     // no changes applied
-    return {}
+    return null
   }
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParentUpdated)
-  return {
-    [nodeDefParentUuid]: await NodeDefRepository.updateNodeDefProps(
-      surveyId,
-      nodeDefParentUuid,
-      NodeDef.getParentUuid(nodeDefParentUpdated),
-      { [NodeDefLayout.keys.layout]: nodeDefParentLayoutUpdated },
-      {},
-      client
-    ),
-  }
+  return nodeDefParentUpdated
 }
 
 /**
@@ -168,20 +160,21 @@ export const updateParentLayout = async ({ surveyId, nodeDef, cyclesAdded = [], 
  * If the node definition is an entity, updates even the cycles of the descendant node definitions.
  *
  * @param {!object} params - The update parameters.
- * @param {!number} [params.surveyId] - The survey ID.
+ * @param {!object} [params.survey] - The survey object.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition to update.
  * @param {Array.<string>} [params.cycles] - The survey cycles associated to the node definition.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
- * @returns {Promise<object>} - The updated parent node definition, returned as an object index by UUID.
+ * @returns {object} - The updated node defs, returned as an object index by UUID.
  * */
-export const updateNodeDefLayoutOnCyclesUpdate = async ({ surveyId, nodeDefUuid, cycles }, client = db) => {
-  const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, client)
+export const updateNodeDefLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles }) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const cyclesPrev = NodeDef.getCycles(nodeDef)
   const cyclesAdded = R.difference(cycles, cyclesPrev)
   const cyclesDeleted = R.difference(cyclesPrev, cycles)
   const add = !R.isEmpty(cyclesAdded)
+
+  const nodeDefsUpdated = {}
 
   // Update nodeDef cycles layout
   if (add) {
@@ -189,26 +182,41 @@ export const updateNodeDefLayoutOnCyclesUpdate = async ({ surveyId, nodeDefUuid,
       .map((cycle, i) => ({ cycle, cyclePrev: cycles[i - 1] }))
       .filter((cycleInfo) => R.includes(cycleInfo.cycle, cyclesAdded))
 
-    await Promise.all(
-      cyclesAddedInfo.map((cycleInfo) =>
-        _addCycle({ surveyId, nodeDef, cycle: cycleInfo.cycle, cyclePrev: cycleInfo.cyclePrev }, client)
-      )
+    const nodeDefUpdated = cyclesAddedInfo.reduce(
+      (nodeDefUpdatedAcc, cycleInfo) =>
+        _addCycle({ nodeDef: nodeDefUpdatedAcc, cycle: cycleInfo.cycle, cyclePrev: cycleInfo.cyclePrev }),
+      nodeDef
     )
+    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
   } else {
-    await NodeDefRepository.deleteNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclesDeleted, client)
+    Survey.getNodeDefsArray(survey).forEach((nodeDefCurrent) => {
+      if (cyclesDeleted.some((cycleDeleted) => NodeDefLayout.hasLayoutCycle(cycleDeleted)(nodeDefCurrent))) {
+        const layout = NodeDefLayout.getLayout(nodeDefCurrent)
+        const layoutUpdated = NodeDefLayout.dissocLayoutCycles(cyclesDeleted)(layout)
+        const nodeDefUpdated = NodeDefLayout.assocLayout(layoutUpdated)(nodeDefCurrent)
+        nodeDefsUpdated[nodeDefUpdated.uuid] = nodeDefUpdated
+      }
+    })
   }
 
-  let nodeDefsUpdated = await updateParentLayout({ surveyId, nodeDef, cyclesAdded, cyclesDeleted }, client)
+  let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+
+  const nodeDefParentUpdated = updateParentLayout({ survey: surveyUpdated, nodeDef, cyclesAdded, cyclesDeleted })
+  if (nodeDefParentUpdated) {
+    nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
+    surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+  }
 
   if (NodeDef.isEntity(nodeDef)) {
     // Update nodeDef descendants cycles
-    const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
-    nodeDefsUpdated = {
-      ...nodeDefsUpdated,
-      ...ObjectUtils.toUuidIndexedObj(
-        await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
-      ),
-    }
+    Survey.getNodeDefsArray(nodeDef)(surveyUpdated)
+      .filter(NodeDef.isDescendantOf(nodeDef))
+      .forEach((nodeDefDescendant) => {
+        const cyclesOld = NodeDef.getCycles(nodeDefDescendant)
+        const cyclesNew = [...cyclesOld, ...cyclesAdded].filter((cycle) => !cyclesDeleted.includes(cycle))
+        const nodeDefDescendantUpdate = NodeDef.assocCycles(cyclesNew)(nodeDefDescendant)
+        nodeDefsUpdated[nodeDefDescendantUpdate.uuid] = nodeDefDescendantUpdate
+      })
   }
 
   return nodeDefsUpdated

@@ -44,6 +44,8 @@ export const getLayout = ObjectUtils.getProp(keys.layout, {})
 
 export const getLayoutCycle = (cycle) => R.pipe(getLayout, R.prop(cycle))
 
+export const hasLayoutCycle = (cycle) => (nodeDef) => Boolean(getLayoutCycle(cycle)(nodeDef))
+
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayoutCycle(cycle), R.propOr(defaultTo, prop))
 
 export const getIndexChildren = (cycle) => _getPropLayout(cycle, keys.indexChildren)
@@ -86,11 +88,18 @@ export const isRenderCheckbox = (cycle) => isRenderType(cycle, renderType.checkb
 const isDisplayIn = (cycle, value) => R.pipe(getDisplayIn(cycle), R.equals(value))
 export const isDisplayInParentPage = (cycle) => isDisplayIn(cycle, displayIn.parentPage)
 export const isDisplayInOwnPage = (cycle) => isDisplayIn(cycle, displayIn.ownPage)
+export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
+  isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
 // ====== UPDATE
 export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
 
 export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCycle)
+
+export const dissocLayoutCycle = (cycle) => R.dissoc(cycle)
+
+export const dissocLayoutCycles = (cycles) => (nodeDefLayout) =>
+  cycles.reduce((nodeDefLayoutUpdated, cycle) => dissocLayoutCycle(cycle)(nodeDefLayoutUpdated), nodeDefLayout)
 
 export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
 
