@@ -1,43 +1,56 @@
 .access-request {
   z-index: 2;
   width: 60rem;
+  height: calc(100% - 4rem);
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
-  margin: auto;
-  margin-top: 3rem;
+  margin: 3rem auto 1rem auto;
 
   .title {
     font-size: 1.5rem;
     text-align: center;
   }
-  .introduction {
-    white-space: pre-line;
-  }
 
-  form {
-    display: flex;
-    flex-direction: column;
-    row-gap: 1rem;
+  .content {
+    height: 100%;
+    overflow: auto;
 
-    .form-item {
-      height: 3rem;
-    }
-    input {
-      text-align: left;
+    .introduction,
+    .request-sent-message {
+      white-space: pre-line;
     }
 
-    .recaptcha-wrapper {
-      display: block;
-      width: auto;
-      height: auto;
-      margin: auto;
+    form {
+      display: flex;
+      flex-direction: column;
+
+      .form-item {
+        height: 3rem;
+      }
+
+      input {
+        text-align: left;
+      }
+
+      .recaptcha-wrapper {
+        display: block;
+        width: auto;
+        height: auto;
+        margin: auto;
+      }
+
+      .guest__buttons {
+        width: inherit;
+        margin: 1rem auto auto auto;
+        justify-items: center;
+      }
     }
 
-    .guest__buttons {
-      width: inherit;
-      margin: auto;
-      justify-items: center;
+    .request-sent-message {
+      text-align: center;
+      line-height: 3rem;
+      font-size: 1.2rem;
     }
   }
 }
