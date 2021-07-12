@@ -230,17 +230,27 @@ Do you want to proceed?`,
         institution: 'Institution',
         country: 'Country',
         purpose: 'What do you need it for?',
+        surveyName: 'Propose a Survey Name',
+        template: 'Start from a template?',
+        template_value: {
+          none: 'None (start from scratch)',
+          templateA: 'Template A',
+          templateB: 'Template B',
+        },
       },
     },
-    introduction: `The platform is still beta, so if you want access, you have to request here.  
+    introduction: `The platform is still beta, so if you want access, you have to request here.
 We are also interested in what you want to do with it so please let us know!
-PLEASE also give us a few moments to process your request.
-This is not an automated service and sometimes it takes us a little time to enter your information.
-For more information please visit our website: http://www.openforis.org`,
+**A new blank survey** will be created, so please provide a name for it.
+You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it. You can also create new surveys (up to 5) if needed.
+For more information please visit our website: *http://www.openforis.org/tools/arena/*
+**Once you send the request, please wait for an invitation email to access Arena.**
+\\* = required field`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
-    requestSent: `Access Request sent correctly to the address {{email}}.
-Please give us a few moments to process your request.
-We will send soon an email to your address with the instructions on how to access $t(common.appName).`,
+    requestSent: 'Access Request sent correctly',
+    requestSentMessage: `Please give us a couple of days to process your request.
+We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     title: 'Requesting access to $t(common.appNameFull)',
@@ -854,6 +864,8 @@ $t(common.cantUndoWarning)`,
       emailRequired: 'Email is required',
       firstNameRequired: 'First name is required',
       lastNameRequired: 'Last name is required',
+      purposeRequired: 'Purpose is required',
+      surveyNameRequired: 'Survey name is required',
       invalidRequest: 'Invalid user access request',
       userAlreadyExisting: 'User with email {{email}} already existing',
       requestAlreadySent: `Access request for user with email {{email}} already sent`,

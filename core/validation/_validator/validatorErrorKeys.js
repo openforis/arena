@@ -130,5 +130,7 @@ export const ValidatorErrorKeys = {
     emailRequired: 'validationErrors.userAccessRequest.emailRequired',
     firstNameRequired: 'validationErrors.userAccessRequest.firstNameRequired',
     lastNameRequired: 'validationErrors.userAccessRequest.lastNameRequired',
+    purposeRequired: 'validationErrors.userAccessRequest.purposeRequired',
+    surveyNameRequired: 'validationErrors.userAccessRequest.surveyNameRequired',
   },
 }
