@@ -138,9 +138,9 @@ export const fetchSystemAdministratorsEmail = async (client = db) =>
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-    WHERE g.name = 'systemAdmin'
+    WHERE g.name = $1
   `,
-    [],
+    [AuthGroup.groupNames.systemAdmin],
     (row) => row.email
   )
 

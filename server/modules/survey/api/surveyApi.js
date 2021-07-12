@@ -18,7 +18,7 @@ import * as UserService from '../../user/service/userService'
 
 export const init = (app) => {
   // ==== CREATE
-  app.post('/survey', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+  app.post('/survey', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const surveyReq = Request.getBody(req)

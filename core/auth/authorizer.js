@@ -7,6 +7,8 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 const { permissions, keys } = AuthGroup
 
+const MAX_SURVEYS_CREATED_BY_USER = 5
+
 // ======
 // ====== Survey
 // ======
@@ -16,15 +18,31 @@ const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
 
 const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user &&
-  surveyInfo &&
   (User.isSystemAdmin(user) ||
-    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo)))
+    (surveyInfo && R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))))
+
+const _hasPermissionInSomeGroup = (permission) => (user) => {
+  if (User.isSystemAdmin(user)) return true
+  const groups = User.getAuthGroups(user)
+  return groups.some((group) => AuthGroup.getPermissions(group).includes(permission))
+}
+
+// CREATE
+export const canCreateSurvey = _hasPermissionInSomeGroup(permissions.surveyCreate)
+export const canCreateTemplate = (user) => User.isSystemAdmin(user)
+export const getMaxSurveysUserCanCreate = (user) => {
+  if (User.isSystemAdmin(user)) return NaN
+  if (canCreateSurvey(user)) return MAX_SURVEYS_CREATED_BY_USER
+  return 0
+}
 
 // READ
 export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))
+export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditTemplates = (user) => User.isSystemAdmin(user)
 
 // ======
 // ====== Record
