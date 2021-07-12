@@ -18,7 +18,11 @@ export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 
 // ====== Auth
 // ====== Auth / Surveys
+export const useAuthCanCreateSurvey = () => Authorizer.canCreateSurvey(useUser(), useSurveyInfo())
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
+export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
+export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
+export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
 
 // ====== Auth / Records
 export const useAuthCanEditRecord = (record) => {

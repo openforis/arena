@@ -105,6 +105,17 @@ export const countUserSurveys = async ({ user, template = false }, client = db) 
   )
 }
 
+export const countOwnedSurveys = async ({ user }, client = db) =>
+  client.one(
+    `
+    SELECT COUNT(*)
+    FROM survey s
+    WHERE s.owner_uuid = $1
+    `,
+    [User.getUuid(user)],
+    (row) => Number(row.count)
+  )
+
 export const fetchSurveysByName = async (surveyName, client = db) =>
   client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
