@@ -7,8 +7,8 @@
   },
   "scripts": {
     "build-dev": "cross-env NODE_ENV=development webpack --mode development --config webpack.config.babel.js",
-    "build-prod-report": "cross-env NODE_ENV=production BUILD_REPORT=true webpack -p --config webpack.config.babel.js",
-    "build-prod": "cross-env NODE_ENV=production webpack -p --config webpack.config.babel.js",
+    "build-prod-report": "cross-env NODE_ENV=production BUILD_REPORT=true webpack --mode production --config webpack.config.babel.js",
+    "build-prod": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.babel.js",
     "build:server:dev": "cross-env NODE_ENV=development webpack --config webpack.config.server.babel.js",
     "build:server:prod": "cross-env NODE_ENV=production webpack  --config webpack.config.server.babel.js",
     "build:watch": "npm run build-dev --watch",
