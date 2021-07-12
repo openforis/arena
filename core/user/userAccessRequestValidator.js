@@ -14,4 +14,10 @@ export const validateUserAccessRequest = async (userAccessRequest) =>
     [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.lastName}`]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.lastNameRequired),
     ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.purpose}`]: [
+      Validator.validateRequired(Validation.messageKeys.userAccessRequest.purposeRequired),
+    ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.surveyName}`]: [
+      Validator.validateRequired(Validation.messageKeys.userAccessRequest.surveyNameRequired),
+    ],
   })

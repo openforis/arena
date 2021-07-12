@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
@@ -12,10 +11,10 @@ import * as API from '@webapp/service/api'
 
 export const useAccessRequest = () => {
   const dispatch = useDispatch()
-  const history = useHistory()
   const i18n = useI18n()
 
   const [request, setRequestState] = useState({})
+  const [requestSentSuccessfully, setRequestSentSuccessfully] = useState(false)
   const [validation, setValidation] = useState(null)
   const reCaptchaRef = useRef(null)
 
@@ -61,14 +60,7 @@ export const useAccessRequest = () => {
         dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: errorMessage } }))
         reCaptchaRef.current.reset()
       } else {
-        dispatch(
-          NotificationActions.notifyInfo({
-            key: 'accessRequestView.requestSent',
-            params: { email: request.email },
-            timeout: 10000, // 10 seconds
-          })
-        )
-        history.goBack()
+        setRequestSentSuccessfully(true)
       }
     }
 
@@ -82,5 +74,5 @@ export const useAccessRequest = () => {
     }
   }
 
-  return { request, validation, onFieldValueChange, onSubmit, reCaptchaRef }
+  return { request, requestSentSuccessfully, onFieldValueChange, onSubmit, reCaptchaRef, validation }
 }
