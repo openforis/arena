@@ -6,7 +6,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
-export const updateNodeDefParentLayout = ({ survey, surveyCycleKey, nodeDef }) => {
+const _updateNodeDefParentLayout = ({ survey, surveyCycleKey, nodeDef }) => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
   const childrenFormsInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
@@ -59,7 +59,7 @@ const _updateRenderType = ({ survey, surveyCycleKey, nodeDef }) => {
     nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
   }
   // update parent layout
-  const nodeDefParentUpdated = updateNodeDefParentLayout({
+  const nodeDefParentUpdated = _updateNodeDefParentLayout({
     survey,
     surveyCycleKey,
     nodeDef,

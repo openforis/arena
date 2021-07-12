@@ -190,7 +190,7 @@ export const assocNodeDef =
     return surveyUpdated
   }
 
-export const { updateNodeDefLayoutProp, updateNodeDefParentLayout } = SurveyNodeDefsLayout
+export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies

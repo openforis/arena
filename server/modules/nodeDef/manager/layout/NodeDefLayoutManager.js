@@ -44,24 +44,91 @@ const _addCycle = async ({ nodeDef, cycle, cyclePrev = null }) => {
   return NodeDefLayout.assocLayout(layoutUpdated)(nodeDef)
 }
 
-/**
- * Updates the layout children prop using the specified update function.
- *
- * @param {!object} params - The update parameters.
- * @param {!object} [params.nodeDef] - The node definition to update.
- * @param {!string} [params.cycle] - The survey cycle to update in the node definition layout.
- * @param {!Function} [params.updateFn] - The update function.
- *
- * @returns {object} - The updated node definition.
- * */
-const _updateLayoutChildren = ({ nodeDef, cycle, updateFn }) => {
-  const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
-  const layoutChildrenUpdated = updateFn(layoutChildren)
+const _updateLayoutForCycle = ({ survey, nodeDefParent, nodeDef, cycle, updateFn }) => {
+  const layoutCycleUpdated = updateFn({ survey, cycle, nodeDefParent, nodeDef })
   const layoutUpdated = R.pipe(
     NodeDefLayout.getLayout,
-    NodeDefLayout.assocLayoutChildren(cycle, layoutChildrenUpdated)
+    NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)
   )(nodeDef)
   return NodeDefLayout.assocLayout(layoutUpdated)(nodeDef)
+}
+
+const _calculateChildrenFormsIndex = ({ survey, cycle, nodeDefParent }) => {
+  const childrenFormsInOwnPage = Survey.getNodeDefChildren(nodeDefParent)(survey).filter(
+    (sibling) =>
+      !NodeDef.isDeleted(sibling) && NodeDef.isEntity(sibling) && NodeDefLayout.isDisplayInOwnPage(cycle)(sibling)
+  )
+  return childrenFormsInOwnPage.map(NodeDef.getUuid)
+}
+
+const _getOrInitializeChildrenPagesIndex = ({ survey, cycle, nodeDefParent }) => {
+  const childrenFormsIndexPrev = NodeDefLayout.getIndexChildren(cycle)(nodeDefParent)
+  if (childrenFormsIndexPrev.length > 0) {
+    return childrenFormsIndexPrev
+  }
+  // initialize children forms index, if empty
+  return _calculateChildrenFormsIndex({ survey, cycle, nodeDefParent })
+}
+
+const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDefParent, nodeDef }) => {
+  const layoutForCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  const childrenFormsIndexPrev = _getOrInitializeChildrenPagesIndex({ survey, cycle, nodeDefParent })
+
+  const layoutChildrenPrev = NodeDefLayout.getLayoutChildren(cycle)(nodeDefParent)
+
+  if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
+    // Add or node def to children (render as table)
+    return {
+      ...layoutForCycle,
+      [NodeDefLayout.keys.layoutChildren]: R.append(nodeDefUuid)(layoutChildrenPrev),
+    }
+  }
+  // render as form
+  if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
+    // Node def displayed in its own page
+    const childrenFormsIndexUpdated = [...childrenFormsIndexPrev, nodeDefUuid]
+    return { ...layoutForCycle, [NodeDefLayout.keys.indexChildren]: childrenFormsIndexUpdated }
+  }
+  // render as form in current page (grid layout)
+  // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
+  const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutForCycle)
+  // New node def height depends on its type
+  const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
+  return {
+    ...layoutForCycle,
+    [NodeDefLayout.keys.layoutChildren]: R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildrenPrev),
+  }
+}
+
+const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDefParent, nodeDef }) => {
+  const layoutForCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  const childrenPaegsIndexPrev = _getOrInitializeChildrenPagesIndex({ survey, cycle, nodeDefParent })
+
+  const layoutChildrenPrev = NodeDefLayout.getLayoutChildren(cycle)(nodeDefParent)
+
+  if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
+    // Remove node def from children (render as table)
+    const layoutChildrenUpdated = R.without([nodeDefUuid])(layoutChildrenPrev)
+    return { ...layoutForCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated }
+  }
+  // render as form
+  if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
+    // Node def displayed in its own page
+    const childrenPagesIndexUpdated = R.without([nodeDefUuid])(childrenPaegsIndexPrev)
+    return { ...layoutForCycle, [NodeDefLayout.keys.indexChildren]: childrenPagesIndexUpdated }
+  }
+  // render as form in current page (grid layout)
+  // Remove node def from children
+  return {
+    ...layoutForCycle,
+    [NodeDefLayout.keys.layoutChildren]: R.reject(R.propEq('i', nodeDefUuid), layoutChildrenPrev),
+  }
 }
 
 /**
@@ -79,70 +146,32 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
   if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  let surveyUpdated = { ...survey }
 
   let nodeDefParentUpdated = nodeDefParent
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-
   // update layout in added cycles
-  nodeDefParentUpdated = cyclesAdded.reduce(
-    (nodeDefParentAcc, cycle) =>
-      _updateLayoutChildren({
-        nodeDef: nodeDefParentAcc,
-        cycle,
-        updateFn: (layoutChildren) => {
-          if (NodeDefLayout.isRenderTable(cycle)(nodeDefParentAcc)) {
-            // Add or node def to children (render as table)
-            return R.append(nodeDefUuid)(layoutChildren)
-          }
-          if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
-            // Node def displayed in its own page, node def parent layout must not be changed
-            return layoutChildren
-          }
-          // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
-          const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutChildren)
-          // New node def height depends on its type
-          const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
-          return R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildren)
-        },
-      }),
-    nodeDefParentUpdated
-  )
+  cyclesAdded.forEach((cycle) => {
+    nodeDefParentUpdated = _updateLayoutForCycle({
+      survey: surveyUpdated,
+      cycle,
+      nodeDefParent: nodeDefParentUpdated,
+      nodeDef,
+      updateFn: _addNodeDefInParentLayoutCycle,
+    })
+    surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefParentUpdated })
+  })
 
   // update layout of removed cycles
-  nodeDefParentUpdated = cyclesDeleted.reduce(
-    (nodeDefParentAcc, cycle) =>
-      _updateLayoutChildren({
-        nodeDef: nodeDefParentAcc,
-        cycle,
-        updateFn: (layoutChildren) => {
-          if (NodeDefLayout.isRenderTable(cycle)(nodeDefParentAcc)) {
-            // Remove node def from children (render as table)
-            return R.without([nodeDefUuid])(layoutChildren)
-          }
-          if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
-            // Node def displayed in its own page, node def parent layout must not be changed
-            return layoutChildren
-          }
-          // Remove node def from children (render as form)
-          return R.reject(R.propEq('i', nodeDefUuid), layoutChildren)
-        },
-      }),
-    nodeDefParentUpdated
-  )
-
-  if (
-    cyclesDeleted.length > 0 &&
-    NodeDef.isDeleted(nodeDef) &&
-    NodeDefLayout.isRenderFromInOwnPage(cyclesDeleted[0])(nodeDef)
-  ) {
-    const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefParentUpdated })(survey)
-    nodeDefParentUpdated = Survey.updateNodeDefParentLayout({
+  cyclesDeleted.forEach((cycle) => {
+    nodeDefParentUpdated = _updateLayoutForCycle({
       survey: surveyUpdated,
-      surveyCycleKey: cyclesDeleted[0],
-      nodeDef,
+      nodeDef: nodeDefParentUpdated,
+      cycle,
+      updateFn: _removeNodeDefFromParentLayoutCycle,
     })
-  }
+    surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefParentUpdated })
+  })
 
   // Update parent node def layout in DB (if changed)
   const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
