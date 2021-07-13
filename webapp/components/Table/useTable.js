@@ -1,15 +1,18 @@
 import { useEffect, useCallback } from 'react'
+import { useHistory } from 'react-router'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
-import { getLimit, getOffset } from '@webapp/components/Table/tableLink'
+import { getLimit, getOffset, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 
 export const useTable = ({ moduleApiUri, module, restParams }) => {
+  const history = useHistory()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
   const limit = getLimit()
+  const sort = getSort()
 
   const {
     data: { list } = { list: [] },
@@ -35,7 +38,17 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useOnUpdate(() => {
     fetchData()
-  }, [limit, offset])
+  }, [limit, offset, sort.by, sort.order])
 
-  return { loadingData, loadingCount, list, offset, limit, count: Number(count), initData }
+  const handleSortBy = useCallback(
+    (orderByField) => {
+      updateQuery(history)({
+        value: { by: orderByField, order: sort.by !== orderByField || sort.order === 'asc' ? 'desc' : 'asc' },
+        key: 'sort',
+      })
+    },
+    [sort]
+  )
+
+  return { loadingData, loadingCount, list, offset, limit, sort, handleSortBy, count: Number(count), initData }
 }

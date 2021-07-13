@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 import { useHistory } from 'react-router'
 
-import { getLink } from '@webapp/components/Table/tableLink'
+import { updateQuery } from '@webapp/components/Table/tableLink'
 
 import Paginator from './Paginator'
 
@@ -21,8 +21,8 @@ const Header = (props) => {
           offset={offset}
           limit={limit}
           count={count}
-          setLimit={(limitUpdated) => history.replace(getLink({ offset, limit: limitUpdated }))}
-          setOffset={(offsetUpdated) => history.replace(getLink({ offset: offsetUpdated, limit }))}
+          setLimit={(limitUpdated) => updateQuery(history)({ value: limitUpdated, key: 'limit' })}
+          setOffset={(offsetUpdated) => updateQuery(history)({ value: offsetUpdated, key: 'offset' })}
         />
       )}
     </div>
