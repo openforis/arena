@@ -48,7 +48,7 @@ export const hasLayoutCycle = (cycle) => (nodeDef) => Boolean(getLayoutCycle(cyc
 
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayoutCycle(cycle), R.propOr(defaultTo, prop))
 
-export const getIndexChildren = (cycle) => _getPropLayout(cycle, keys.indexChildren)
+export const getIndexChildren = (cycle) => _getPropLayout(cycle, keys.indexChildren, [])
 
 export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 

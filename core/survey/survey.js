@@ -6,7 +6,7 @@ import * as Srs from '@core/geo/srs'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
-import * as SurveyNodeDefsLayout from './_survey/surveyNodeDefsLayout'
+import * as NodeDefLayoutUpdater from './nodeDefLayoutUpdater'
 import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
 import * as SurveyCategories from './_survey/surveyCategories'
 import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
@@ -148,6 +148,8 @@ export const {
 } = SurveyDependencies
 
 // ====== UPDATE
+export const { mergeNodeDefs } = SurveyNodeDefs
+
 // replace all the node defs in the survey with the specified ones
 export const assocNodeDefs =
   ({ nodeDefs, updateDependencyGraph = false }) =>
@@ -161,14 +163,6 @@ export const assocNodeDefs =
       surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
     }
     return surveyUpdated
-  }
-
-// merge the specified node defs with the ones already in the survey
-export const mergeNodeDefs =
-  ({ nodeDefs, updateDependencyGraph = false }) =>
-  (survey) => {
-    const nodeDefsPrev = getNodeDefs(survey)
-    return assocNodeDefs({ nodeDefs: { ...nodeDefsPrev, ...nodeDefs }, updateDependencyGraph })(survey)
   }
 
 export const assocNodeDef =
@@ -190,7 +184,7 @@ export const assocNodeDef =
     return surveyUpdated
   }
 
-export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
+export const { updateNodeDefLayoutProp } = NodeDefLayoutUpdater
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies

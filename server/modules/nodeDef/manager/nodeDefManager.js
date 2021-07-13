@@ -4,6 +4,7 @@ import { db } from '@server/db/db'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -11,8 +12,6 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
-
-import * as NodeDefLayoutManager from './layout'
 
 export {
   addNodeDefsCycles,
@@ -36,7 +35,7 @@ export const insertNodeDef = async (
       ? ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
       : null
 
-    const nodeDefParentUpdated = NodeDefLayoutManager.updateParentLayout({
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({
       survey,
       nodeDef: nodeDefParam,
       cyclesAdded: [cycle],
@@ -103,7 +102,7 @@ export const updateNodeDefProps = async (
 
     // node defs with changes to be stored in the db
     const nodeDefsUpdated = updatingCycles
-      ? NodeDefLayoutManager.updateNodeDefLayoutOnCyclesUpdate({
+      ? NodeDefLayoutUpdater.updateNodeDefLayoutOnCyclesUpdate({
           survey,
           nodeDefUuid,
           cycles: props[NodeDef.propKeys.cycles],
@@ -171,7 +170,7 @@ export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, c
 
     const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
-    const nodeDefParentUpdated = NodeDefLayoutManager.updateParentLayout({ survey, nodeDef, cyclesDeleted: [cycle] })
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesDeleted: [cycle] })
 
     await Promise.all([
       ...(nodeDefParentUpdated ? [_updateNodeDef({ surveyId, nodeDef: nodeDefParentUpdated }, t)] : []),

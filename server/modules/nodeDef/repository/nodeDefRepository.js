@@ -196,7 +196,7 @@ export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycl
   )
 }
 
-export const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
+const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
   const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
   await client.query(
     `

@@ -93,6 +93,12 @@ export const assocNodeDefs = (nodeDefs) => R.assoc(nodeDefsKey, nodeDefs)
 
 export const assocNodeDef = (nodeDef) => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 
+// merge the specified node defs with the ones already in the survey
+export const mergeNodeDefs = (nodeDefs) => (survey) => {
+  const nodeDefsPrev = getNodeDefs(survey)
+  return assocNodeDefs({ ...nodeDefsPrev, ...nodeDefs })(survey)
+}
+
 // ====== HIERARCHY
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => (survey) => {
