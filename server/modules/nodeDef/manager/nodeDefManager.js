@@ -108,7 +108,7 @@ export const updateNodeDefProps = async (
         Object.entries(layoutCycle).forEach(([key, value]) => {
           Object.assign(
             nodeDefsUpdated,
-            Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(surveyUpdated)
+            Survey.updateLayoutProp({ surveyCycleKey, nodeDef, key, value })(surveyUpdated)
           )
           surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(surveyUpdated)
         })

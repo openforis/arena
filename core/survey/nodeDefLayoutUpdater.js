@@ -49,13 +49,13 @@ const _updateRenderType = ({ survey, surveyCycleKey, nodeDef }) => {
   } else if (NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)) {
     const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
       // dissoc layout children (valid only for table)
-      let nodeDefLayoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
+      let layoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
 
       // Entity rendered as form can only exists in its own page: assign pageUuid
       if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
-        nodeDefLayoutUpdated = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(nodeDefLayoutUpdated)
+        layoutUpdated = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(layoutUpdated)
       }
-      return nodeDefLayoutUpdated
+      return layoutUpdated
     })(nodeDef)
     nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
   }
@@ -70,7 +70,7 @@ const _updateRenderType = ({ survey, surveyCycleKey, nodeDef }) => {
   return nodeDefsUpdated
 }
 
-export const updateNodeDefLayoutProp =
+export const updateLayoutProp =
   ({ surveyCycleKey, nodeDef, key, value }) =>
   (survey) => {
     const nodeDefLayoutUpdated = R.pipe(
@@ -134,9 +134,10 @@ const _addLayoutForCycle = async ({ nodeDef, cycle, cyclePrev = null }) => {
   return nodeDefUpdated
 }
 
-const _updateParentLayoutForCycle = ({ survey, nodeDefParent, nodeDef, cycle, updateFn }) => {
+const _updateParentLayoutForCycle = ({ survey, nodeDef, cycle, updateFn }) => {
+  const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
   const nodeDefParentUpdated = NodeDefLayout.updateLayout((layout) => {
-    const layoutCycleUpdated = updateFn({ survey, cycle, nodeDefParent, nodeDef })
+    const layoutCycleUpdated = updateFn({ survey, cycle, nodeDef })
     const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)(layout)
     return layoutUpdated
   })(nodeDefParent)
@@ -169,7 +170,9 @@ export const initializeParentLayout = ({ survey, cycle, nodeDefParent }) => {
   return nodeDefParentUpdated
 }
 
-const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDefParent, nodeDef }) => {
+const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
+  const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
+
   const layoutForCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -202,7 +205,9 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDefParent, nodeDef 
   }
 }
 
-const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDefParent, nodeDef }) => {
+const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
+  const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
+
   const layoutForCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -241,10 +246,12 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDefParent, nod
  * @param {Array.<string>} [params.cyclesAdded = []] - The survey cycles added to the nodeDef.
  * @param {Array.<string>} [params.cyclesDeleted = []] - The survey cycles removed from the nodeDef.
  *
- * @returns {object} - The updated parent node definition, if changes have been applied.
+ * @returns {object} - The updated parent node definition, if changed.
  * */
 export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDeleted = [] }) => {
-  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
+  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) {
+    return null
+  }
 
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
@@ -256,7 +263,6 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
     nodeDefParentUpdated = _updateParentLayoutForCycle({
       survey: surveyUpdated,
       cycle,
-      nodeDefParent: nodeDefParentUpdated,
       nodeDef,
       updateFn: _addNodeDefInParentLayoutCycle,
     })
@@ -268,7 +274,6 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
     nodeDefParentUpdated = _updateParentLayoutForCycle({
       survey: surveyUpdated,
       cycle,
-      nodeDefParent: nodeDefParentUpdated,
       nodeDef,
       updateFn: _removeNodeDefFromParentLayoutCycle,
     })

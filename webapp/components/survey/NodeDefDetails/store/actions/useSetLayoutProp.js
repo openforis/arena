@@ -15,7 +15,7 @@ export const useSetLayoutProp = ({ setState }) => {
   return useCallback(({ state, key, value }) => {
     const nodeDef = State.getNodeDef(state)
 
-    const nodeDefsUpdated = Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
+    const nodeDefsUpdated = Survey.updateLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
     Object.values(nodeDefsUpdated).forEach((nodeDefUpdated) => validateNodeDef({ state, nodeDefUpdated }))
   }, [])
 }

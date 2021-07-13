@@ -35,7 +35,7 @@ const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, multiple }) => {
   const nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
 
   if (NodeDef.isEntity(nodeDefUpdated) && !multiple && NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
-    const nodeDefsUpdated = Survey.updateNodeDefLayoutProp({
+    const nodeDefsUpdated = Survey.updateLayoutProp({
       surveyCycleKey,
       nodeDef: nodeDefUpdated,
       key: NodeDefLayout.keys.renderType,
