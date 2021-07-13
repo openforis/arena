@@ -22,6 +22,16 @@ export {
   insertNodeDefsBatch,
 } from '../repository/nodeDefRepository'
 
+const _updateNodeDef = ({ surveyId, nodeDef }, client = db) =>
+  NodeDefRepository.updateNodeDefProps(
+    surveyId,
+    nodeDef.uuid,
+    nodeDef.parentUuid,
+    nodeDef.props,
+    nodeDef.propsAdvanced,
+    client
+  )
+
 // ======= CREATE
 
 export const insertNodeDef = async (
@@ -31,32 +41,21 @@ export const insertNodeDef = async (
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
 
-    const insertLog = addLogs
-      ? ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
-      : null
+    const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
     const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({
       survey,
-      nodeDef: nodeDefParam,
+      nodeDef,
       cyclesAdded: [cycle],
     })
-    const [nodeDef] = await t.batch([
-      NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
-      ...(nodeDefParentUpdated
-        ? [
-            NodeDefRepository.updateNodeDefProps(
-              surveyId,
-              NodeDef.getUuid(nodeDefParentUpdated),
-              NodeDef.getParentUuid(nodeDefParentUpdated),
-              NodeDef.getProps(nodeDefParentUpdated),
-              NodeDef.getPropsAdvanced(nodeDefParentUpdated),
-              t
-            ),
-          ]
-        : []),
-      markSurveyDraft(surveyId, t),
-      insertLog,
-    ])
+    if (nodeDefParentUpdated) {
+      await _updateNodeDef({ surveyId, nodeDef: nodeDefParentUpdated }, t)
+    }
+    if (addLogs) {
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
+    }
+
+    await markSurveyDraft(surveyId, t)
 
     return {
       [NodeDef.getUuid(nodeDef)]: nodeDef,
@@ -80,16 +79,6 @@ export const fetchNodeDefsBySurveyId = async (
 }
 
 // ======= UPDATE
-
-const _updateNodeDef = ({ surveyId, nodeDef }, client = db) =>
-  NodeDefRepository.updateNodeDefProps(
-    surveyId,
-    nodeDef.uuid,
-    nodeDef.parentUuid,
-    nodeDef.props,
-    nodeDef.propsAdvanced,
-    client
-  )
 
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
@@ -168,15 +157,15 @@ export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, c
     const surveyId = Survey.getId(survey)
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
-    const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
-
     const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesDeleted: [cycle] })
+    if (nodeDefParentUpdated) {
+      await _updateNodeDef({ surveyId, nodeDef: nodeDefParentUpdated }, t)
+    }
 
-    await Promise.all([
-      ...(nodeDefParentUpdated ? [_updateNodeDef({ surveyId, nodeDef: nodeDefParentUpdated }, t)] : []),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t),
-    ])
+    await markSurveyDraft(surveyId, t)
+
+    const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t)
 
     return {
       [nodeDefUuid]: nodeDef,
