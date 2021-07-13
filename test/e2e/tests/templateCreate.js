@@ -11,9 +11,9 @@ export default () =>
 
     // verify template
     gotoTemplateList()
-    selectSurvey(template, template.label)
+    selectSurvey(template)
 
     // verify template2
     gotoTemplateList()
-    selectSurvey(template2, template2.label)
+    selectSurvey(template2)
   })
