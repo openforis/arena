@@ -89,7 +89,14 @@ export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predic
 
 // ====== UPDATE
 
-export const assocNodeDefs = (nodeDefs) => R.assoc(nodeDefsKey, nodeDefs)
+export const assocNodeDefs = (nodeDefs) => (survey) => {
+  const surveyUpdated = R.assoc(nodeDefsKey, nodeDefs)(survey)
+  const nodeDefsIndex = SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated)
+  return {
+    ...surveyUpdated,
+    nodeDefsIndex,
+  }
+}
 
 export const assocNodeDef = (nodeDef) => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 

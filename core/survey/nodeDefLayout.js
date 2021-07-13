@@ -92,8 +92,17 @@ export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
   isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
 // ====== UPDATE
+// invoked on node def
 export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
 
+export const updateLayout = (updateFn) => (nodeDef) => {
+  const layout = getLayout(nodeDef)
+  const layoutUpdated = updateFn(layout)
+  const nodeDefUpdated = assocLayout(layoutUpdated)(nodeDef)
+  return nodeDefUpdated
+}
+
+// invoked on "layout"
 export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCycle)
 
 export const dissocLayoutCycle = (cycle) => R.dissoc(cycle)

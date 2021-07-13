@@ -102,7 +102,7 @@ export const updateNodeDefProps = async (
 
     // node defs with changes to be stored in the db
     const nodeDefsUpdated = updatingCycles
-      ? NodeDefLayoutUpdater.updateNodeDefLayoutOnCyclesUpdate({
+      ? NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({
           survey,
           nodeDefUuid,
           cycles: props[NodeDef.propKeys.cycles],
@@ -179,7 +179,7 @@ export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, c
     ])
 
     return {
-      [NodeDef.getUuid(nodeDef)]: nodeDef,
+      [nodeDefUuid]: nodeDef,
       ...(nodeDefParentUpdated ? [nodeDefParentUpdated.uuid] : nodeDefParentUpdated),
     }
   })

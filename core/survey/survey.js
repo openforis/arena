@@ -155,10 +155,6 @@ export const assocNodeDefs =
   ({ nodeDefs, updateDependencyGraph = false }) =>
   (survey) => {
     let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
-    surveyUpdated = {
-      ...surveyUpdated,
-      nodeDefsIndex: SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated),
-    }
     if (updateDependencyGraph) {
       surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
     }
