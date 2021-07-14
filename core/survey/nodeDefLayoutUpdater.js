@@ -183,9 +183,10 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
 
   if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
     // Add or node def to children (render as table)
+    const layoutChildrenUpdated = R.append(nodeDefUuid)(layoutChildrenPrev)
     return {
       ...layoutForCycle,
-      [NodeDefLayout.keys.layoutChildren]: R.append(nodeDefUuid)(layoutChildrenPrev),
+      [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated,
     }
   }
   // render as form
@@ -196,12 +197,14 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   }
   // render as form in current page (grid layout)
   // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
-  const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutForCycle)
+  const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
   // New node def height depends on its type
   const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
+  const layoutChildrenUpdated = R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildrenPrev)
+
   return {
     ...layoutForCycle,
-    [NodeDefLayout.keys.layoutChildren]: R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildrenPrev),
+    [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated,
   }
 }
 
