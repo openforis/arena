@@ -11,40 +11,27 @@ import * as SideBarModule from '../utils'
 const ModuleLink = (props) => {
   const { module, pathname, showLabel, disabled } = props
 
+  const key = SideBarModule.getKey(module)
   const active = SideBarModule.isActive(pathname)(module)
   const root = SideBarModule.isRoot(module)
-  const icon = SideBarModule.getIcon(module)
-  const uri = SideBarModule.getUri(module)
-  const key = SideBarModule.getKey(module)
   const external = SideBarModule.isExternal(module)
 
-  const i18n = useI18n()
+  const icon = SideBarModule.getIcon(module)
+  const uri = SideBarModule.getUri(module)
+  const to = external ? { pathname: uri } : uri
+  const target = external ? `openforis_arena_${key}` : null
 
   const className = classNames('sidebar__module-btn', 'text-uppercase', {
     'sidebar__module-child-btn': !root,
     active,
   })
 
-  if (external) {
-    // opens the uri into a new tab
-    return (
-      <a
-        href={uri}
-        target={`openforis_arena_${key}`}
-        className={className}
-        aria-disabled={disabled || active}
-        data-testid={DataTestId.sidebar.moduleBtn(key)}
-      >
-        {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}
-        {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
-      </a>
-    )
-  }
+  const i18n = useI18n()
 
-  // internal (relative) link
   return (
     <Link
-      to={uri}
+      to={to}
+      target={target}
       className={className}
       aria-disabled={disabled || active}
       data-testid={DataTestId.sidebar.moduleBtn(key)}
