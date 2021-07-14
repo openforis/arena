@@ -52,8 +52,10 @@ const AnalysisProps = (props) => {
       NodeDef.getName(nodeDef) || 'NAME'
     } <- NA`
 
+  const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
+
   const generatePreScriptWithCategories = async () => {
-    const { request } = await API.fetchCategoryItems({
+    const { request } = API.fetchCategoryItems({
       surveyId: Survey.getId(survey),
       categoryUuid: NodeDef.getCategoryUuid(nodeDef),
     })
@@ -61,9 +63,19 @@ const AnalysisProps = (props) => {
       data: { items },
     } = await request
 
-    const newScript = `# ${(Object.values(items || {}) || [])
-      .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
-      .join(';')}\n${getDefaultScript({ nodeDef, survey })}`
+    const currentScript = NodeDef.getScript(nodeDef)
+    let newScript = ''
+    if (/^# __CODES__/.test(currentScript)) {
+      const scriptSplitted = currentScript.split('\n')
+      scriptSplitted[0] = `# __CODES__ ${(Object.values(items) || [])
+        .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
+        .join('; ')}`
+      newScript = scriptSplitted.join('\n')
+    } else {
+      newScript = `# __CODES__ ${(Object.values(items) || [])
+        .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
+        .join('; ')}\n${getScriptOrDefault()}`
+    }
 
     onChange(newScript)
     setEditorkey(new Date().getTime())
@@ -81,17 +93,13 @@ const AnalysisProps = (props) => {
     }
   }, [NodeDef.getScript(nodeDef)])
 
-  const getInitialScript = () => {
-    return NodeDef.getScript(nodeDef) || getDefaultScript({ nodeDef })
-  }
-
   return (
     <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form">
       <ScriptEditor
         key={editorKey}
         name="node_def_analysis_script"
         mode="r"
-        script={getInitialScript()}
+        script={getScriptOrDefault()}
         onChange={onChange}
         completer={variableNamesCompleter}
       />
