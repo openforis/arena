@@ -32,7 +32,7 @@ const _updateParentLayoutChildrenFormsIndex = ({ survey, surveyCycleKey, nodeDef
   return nodeDefParentUpdated
 }
 
-const _updateRenderType = ({ survey, surveyCycleKey, nodeDef }) => {
+const _onRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) => {
   const nodeDefsUpdated = {}
 
   if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
@@ -71,19 +71,23 @@ const _updateRenderType = ({ survey, surveyCycleKey, nodeDef }) => {
 }
 
 export const updateLayoutProp =
-  ({ surveyCycleKey, nodeDef, key, value }) =>
+  ({ surveyCycleKey, nodeDef, nodeDefPrev = null, key, value }) =>
   (survey) => {
-    const nodeDefLayoutUpdated = R.pipe(
-      NodeDefLayout.getLayout,
-      NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)
-    )(nodeDef)
-    const nodeDefUpdated = NodeDefLayout.assocLayout(nodeDefLayoutUpdated)(nodeDef)
+    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+      const layoutUpdated = NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)(layout)
+      return layoutUpdated
+    })(nodeDef)
     let nodeDefsUpdated = { [nodeDefUpdated.uuid]: nodeDefUpdated }
 
-    if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef)) {
+    if (
+      key === NodeDefLayout.keys.renderType &&
+      NodeDef.isEntity(nodeDef) &&
+      (value !== NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ||
+        (nodeDefPrev && value !== NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev)))
+    ) {
       nodeDefsUpdated = {
         ...nodeDefsUpdated,
-        ..._updateRenderType({
+        ..._onRenderTypeUpdate({
           survey,
           surveyCycleKey,
           nodeDef: nodeDefUpdated,
@@ -92,6 +96,24 @@ export const updateLayoutProp =
     }
     return nodeDefsUpdated
   }
+
+export const updateLayout = ({ survey, nodeDefUuid, layout, nodeDefPrev = null }) => {
+  let surveyUpdated = { ...survey }
+  const nodeDefsUpdated = {}
+  const layoutEntries = Object.entries(layout)
+
+  layoutEntries.forEach(([surveyCycleKey, layoutCycle]) => {
+    Object.entries(layoutCycle).forEach(([key, value]) => {
+      const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(surveyUpdated)
+      Object.assign(
+        nodeDefsUpdated,
+        updateLayoutProp({ surveyCycleKey, nodeDef, nodeDefPrev, key, value })(surveyUpdated)
+      )
+      surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(surveyUpdated)
+    })
+  })
+  return nodeDefsUpdated
+}
 
 const nodeDefLayoutHeights = {
   [NodeDef.nodeDefType.coordinate]: 2,
@@ -111,18 +133,15 @@ const nodeDefLayoutHeights = {
  *
  * @returns {object} - The updated node def.
  * */
-const _addLayoutForCycle = async ({ nodeDef, cycle, cyclePrev = null }) => {
-  if (cyclePrev) {
-    // If cycle prev exists, copy layout from previous cycle
-    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) => {
+  const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+    if (cyclePrev) {
+      // If cycle prev exists, copy layout from previous cycle
       const layoutCyclePrev = NodeDefLayout.getLayoutCycle(cyclePrev)(nodeDef)
       const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCyclePrev)(layout)
       return layoutUpdated
-    })(nodeDef)
-    return nodeDefUpdated
-  }
-  // previous cycle does not exist: set the default layout
-  const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+    }
+    // previous cycle does not exist: set the default layout
     const layoutUpdated = R.mergeLeft(
       // TODO use NodeDefLayout default props layout
       NodeDef.isEntity(nodeDef)
@@ -305,10 +324,9 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
  *
  * @returns {object} - The updated node defs, returned as an object index by UUID.
  * */
-export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles }) => {
+export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cyclesPrev }) => {
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  const cyclesPrev = NodeDef.getCycles(nodeDef)
   const cyclesAdded = R.difference(cycles, cyclesPrev)
   const cyclesDeleted = R.difference(cyclesPrev, cycles)
 
@@ -324,7 +342,7 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles }) => {
       (nodeDefUpdatedAcc, { cycle, cyclePrev }) => _addLayoutForCycle({ nodeDef: nodeDefUpdatedAcc, cycle, cyclePrev }),
       nodeDef
     )
-    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
+    nodeDefsUpdated[nodeDefUuid] = nodeDefUpdated
   }
   // remove layout for deleted cycles
   if (cyclesDeleted.some((cycleDeleted) => NodeDefLayout.hasLayoutCycle(cycleDeleted)(nodeDef))) {
@@ -332,7 +350,7 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles }) => {
       const layoutUpdated = NodeDefLayout.dissocLayoutCycles(cyclesDeleted)(layout)
       return layoutUpdated
     })(nodeDef)
-    nodeDefsUpdated[nodeDefUpdated.uuid] = nodeDefUpdated
+    nodeDefsUpdated[nodeDefUuid] = nodeDefUpdated
   }
 
   let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
@@ -342,18 +360,6 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles }) => {
   if (nodeDefParentUpdated) {
     nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
     surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
-  }
-
-  if (NodeDef.isEntity(nodeDef)) {
-    // Update nodeDef descendants cycles
-    SurveyNodeDefs.getNodeDefsArray(nodeDef)(surveyUpdated)
-      .filter(NodeDef.isDescendantOf(nodeDef))
-      .forEach((nodeDefDescendant) => {
-        const cyclesOld = NodeDef.getCycles(nodeDefDescendant)
-        const cyclesNew = [...cyclesOld, ...cyclesAdded].filter((cycle) => !cyclesDeleted.includes(cycle))
-        const nodeDefDescendantUpdate = NodeDef.assocCycles(cyclesNew)(nodeDefDescendant)
-        nodeDefsUpdated[nodeDefDescendantUpdate.uuid] = nodeDefDescendantUpdate
-      })
   }
 
   return nodeDefsUpdated
