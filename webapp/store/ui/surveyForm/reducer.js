@@ -26,8 +26,11 @@ const actionHandlers = {
   [SurveyFormActions.formNodeDefAddChildToUpdate]: (state, { nodeDef }) =>
     SurveyFormState.assocNodeDefAddChildTo(nodeDef)(state),
 
-  [SurveyFormActions.formActivePageNodeDefUpdate]: (state, { nodeDef }) =>
-    R.pipe(SurveyFormState.assocFormActivePage(nodeDef), SurveyFormState.assocNodeDefAddChildTo(null))(state),
+  [SurveyFormActions.formActivePageNodeDefUpdate]: (state, { nodeDef, showAddChildTo = false }) =>
+    R.pipe(
+      SurveyFormState.assocFormActivePage(nodeDef),
+      SurveyFormState.assocNodeDefAddChildTo(showAddChildTo ? nodeDef : null)
+    )(state),
 
   [SurveyFormActions.formPageNodeUpdate]: (state, { nodeDef, node }) =>
     SurveyFormState.assocFormPageNode(NodeDef.getUuid(nodeDef), node)(state),
@@ -45,9 +48,9 @@ const actionHandlers = {
 
   [NodeDefsActions.nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
     if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-      const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
-      // When changing displayIn (pageUuid) change form active page
-      const activePageNodeDef = pageUuid ? nodeDef : nodeDefParent
+      const displayInParentPage = NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)
+      // When changing displayIn change form active page
+      const activePageNodeDef = displayInParentPage ? nodeDefParent : nodeDef
       return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
     }
 

@@ -9,6 +9,7 @@ import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
@@ -111,6 +112,16 @@ const SurveyForm = (props) => {
     return null
   }
 
+  const hasChildrenInCurrentPage =
+    Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
+      NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
+    ).length > 0
+
+  if (editAllowed && !hasNodeDefAddChildTo && NodeDef.isEntity(nodeDef) && !hasChildrenInCurrentPage) {
+    // node def is empty: show add child to side bar
+    dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))
+  }
+
   return (
     <div>
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
@@ -129,7 +140,11 @@ const SurveyForm = (props) => {
             }}
             nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
             onlyPages
-            onSelect={(nodeDefToSelect) => dispatch(SurveyFormActions.setFormActivePage(nodeDefToSelect))}
+            onSelect={(nodeDefToSelect) => {
+              const emptyChildren = Survey.getNodeDefChildren(nodeDefToSelect)(survey).length === 0
+              const showAddChildTo = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && emptyChildren
+              dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
+            }}
           />
         )}
 
