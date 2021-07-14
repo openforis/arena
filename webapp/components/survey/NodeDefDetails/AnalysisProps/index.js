@@ -67,12 +67,12 @@ const AnalysisProps = (props) => {
     let newScript = ''
     if (/^# __CODES__/.test(currentScript)) {
       const scriptSplitted = currentScript.split('\n')
-      scriptSplitted[0] = `# __CODES__ ${(Object.values(items) || [])
+      scriptSplitted[0] = `# __CODES__ ${Object.values(items)
         .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
         .join('; ')}`
       newScript = scriptSplitted.join('\n')
     } else {
-      newScript = `# __CODES__ ${(Object.values(items) || [])
+      newScript = `# __CODES__ ${Object.values(items)
         .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
         .join('; ')}\n${getScriptOrDefault()}`
     }
