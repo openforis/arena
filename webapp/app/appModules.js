@@ -43,6 +43,11 @@ export const appModules = {
     path: 'analysis',
     icon: 'stats-dots',
   },
+  help: {
+    key: 'help',
+    path: 'help',
+    icon: 'question',
+  },
 }
 
 // ==== Inner modules
@@ -176,6 +181,14 @@ export const analysisModules = {
   category: {
     key: 'category',
     path: `${appModules.analysis.path}/category`,
+  },
+}
+
+export const helpModules = {
+  userManual: {
+    key: 'userManual',
+    uri: 'https://docs.google.com/document/d/1GWerrExvbdT5oOOlwdkE9pptK4pVbQxwtgaSNPasmKA/view',
+    external: true,
   },
 }
 
