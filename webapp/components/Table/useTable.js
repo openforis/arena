@@ -19,7 +19,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     dispatch: fetchData,
     loading: loadingData,
   } = useAsyncGetRequest(apiUri, {
-    params: { offset, limit, ...restParams },
+    params: { offset, limit, sortBy: sort.by, sortOrder: sort.order, ...restParams },
   })
   const {
     data: { count } = { count: 0 },

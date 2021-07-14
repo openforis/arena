@@ -18,18 +18,21 @@ const RowHeader = (props) => {
     <>
       <div>#</div>
       {nodeDefKeys.map((nodeDef) => (
-        <div key={NodeDef.getUuid(nodeDef)}>{NodeDef.getLabel(nodeDef, lang)}</div>
+        <div key={NodeDef.getUuid(nodeDef)}>
+          <SortToggle sort={sort} handleSortBy={handleSortBy} field={NodeDef.getName(nodeDef)} />
+          {NodeDef.getLabel(nodeDef, lang)}
+        </div>
       ))}
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.dateCreated} />
         {i18n.t('common.dateCreated')}
       </div>
       <div>{i18n.t('common.dateLastModified')}</div>
+      <div>{i18n.t('dataView.records.owner')}</div>
       <div>
-        <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.ownerName} />
-        {i18n.t('dataView.records.owner')}
+        <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.step} />
+        {i18n.t('dataView.records.step')}
       </div>
-      <div>{i18n.t('dataView.records.step')}</div>
       <div>{i18n.t('common.error_plural')}</div>
       <div>{i18n.t('common.warning_plural')}</div>
     </>

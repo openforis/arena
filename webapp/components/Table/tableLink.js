@@ -8,8 +8,8 @@ export const getLimit = () => Number(_getUrlSearchParam({ param: 'limit', defaul
 export const getOffset = () => Number(_getUrlSearchParam({ param: 'offset' }))
 
 export const getSort = () => ({
-  by: _getUrlSearchParam({ param: 'sort_by' }),
-  order: _getUrlSearchParam({ param: 'sort_order' }),
+  by: _getUrlSearchParam({ param: 'sortBy' }),
+  order: _getUrlSearchParam({ param: 'sortOrder' }),
 })
 
 export const getLink = ({ limit, offset, sort }) => {
@@ -18,8 +18,8 @@ export const getLink = ({ limit, offset, sort }) => {
   if (limit) url.searchParams.set('limit', String(limit))
   if (offset) url.searchParams.set('offset', String(offset))
   if (sort) {
-    url.searchParams.set('sort_by', String(sort?.by))
-    url.searchParams.set('sort_order', String(sort?.order))
+    url.searchParams.set('sortBy', String(sort.by))
+    url.searchParams.set('sortOrder', String(sort.order))
     url.searchParams.set('offset', String(0))
   }
   return `${url.pathname}${url.search}`
