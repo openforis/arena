@@ -29,8 +29,7 @@ const SurveyInfo = () => {
 
   const canEditDef = useAuthCanEditSurvey()
 
-  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
-  const surveyLabel = Survey.getLabel(surveyInfo, lang)
+  const surveyName = Survey.getName(surveyInfo)
 
   return (
     <>
@@ -41,7 +40,7 @@ const SurveyInfo = () => {
             to={appModuleUri(homeModules.surveyInfo)}
             className="btn-s btn-transparent"
           >
-            <h3 data-testid={DataTestId.dashboard.surveyLabel}>{surveyLabel}</h3>
+            <h3 data-testid={DataTestId.dashboard.surveyName}>{surveyName}</h3>
           </Link>
 
           <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>

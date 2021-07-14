@@ -11,5 +11,5 @@ export default () =>
 
     gotoSurveyList()
 
-    selectSurvey(survey, survey.label)
+    selectSurvey(survey)
   })
