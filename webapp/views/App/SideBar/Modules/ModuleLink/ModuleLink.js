@@ -16,16 +16,36 @@ const ModuleLink = (props) => {
   const icon = SideBarModule.getIcon(module)
   const uri = SideBarModule.getUri(module)
   const key = SideBarModule.getKey(module)
+  const outside = SideBarModule.isOutside(module)
 
   const i18n = useI18n()
 
+  const className = classNames('sidebar__module-btn', 'text-uppercase', {
+    'sidebar__module-child-btn': !root,
+    active,
+  })
+
+  if (outside) {
+    // opens the uri into a new tab
+    return (
+      <a
+        href={uri}
+        target={`openforis_arena_${key}`}
+        className={className}
+        aria-disabled={disabled || active}
+        data-testid={DataTestId.sidebar.moduleBtn(key)}
+      >
+        {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}
+        {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
+      </a>
+    )
+  }
+
+  // internal (relative) link
   return (
     <Link
       to={uri}
-      className={classNames('sidebar__module-btn', 'text-uppercase', {
-        'sidebar__module-child-btn': !root,
-        active,
-      })}
+      className={className}
       aria-disabled={disabled || active}
       data-testid={DataTestId.sidebar.moduleBtn(key)}
       id={`sidebar_btn_${key}`}

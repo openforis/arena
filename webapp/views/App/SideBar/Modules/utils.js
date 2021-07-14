@@ -12,6 +12,7 @@ import {
   designerModules,
   homeModules,
   userModules,
+  helpModules,
 } from '@webapp/app/appModules'
 
 const keys = {
@@ -22,17 +23,19 @@ const keys = {
   elementRef: 'elementRef',
   children: 'children',
   hidden: 'hidden',
+  outside: 'outside',
 }
 
 // ==== Modules hierarchy
 const getModule = ({ module, children = null, root = true, hidden = false }) => ({
   [keys.key]: module.key,
-  [keys.uri]: appModuleUri(module),
+  [keys.uri]: module.uri ? module.uri : appModuleUri(module),
   [keys.icon]: module.icon,
   [keys.root]: root,
   [keys.elementRef]: useRef(null),
   [keys.children]: children ? children.map((childModule) => getModule({ module: childModule, root: false })) : [],
   [keys.hidden]: hidden,
+  [keys.outside]: module.outside,
 })
 
 export const getModulesHierarchy = (user, surveyInfo) => [
@@ -71,6 +74,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   }),
   // users
   getModule({ module: appModules.users, children: [userModules.users], hidden: Survey.isTemplate(surveyInfo) }),
+  getModule({ module: appModules.help, children: [helpModules.userManual] }),
 ]
 
 export const getKey = R.prop(keys.key)
@@ -80,6 +84,7 @@ export const getChildren = R.prop(keys.children)
 
 export const isRoot = R.propEq(keys.root, true)
 export const isHidden = R.propEq(keys.hidden, true)
+export const isOutside = R.propEq(keys.outside, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on dashboard
