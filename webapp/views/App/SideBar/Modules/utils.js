@@ -23,7 +23,7 @@ const keys = {
   elementRef: 'elementRef',
   children: 'children',
   hidden: 'hidden',
-  outside: 'outside',
+  external: 'external',
 }
 
 // ==== Modules hierarchy
@@ -35,7 +35,7 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.elementRef]: useRef(null),
   [keys.children]: children ? children.map((childModule) => getModule({ module: childModule, root: false })) : [],
   [keys.hidden]: hidden,
-  [keys.outside]: module.outside,
+  [keys.external]: module.external,
 })
 
 export const getModulesHierarchy = (user, surveyInfo) => [
@@ -84,7 +84,7 @@ export const getChildren = R.prop(keys.children)
 
 export const isRoot = R.propEq(keys.root, true)
 export const isHidden = R.propEq(keys.hidden, true)
-export const isOutside = R.propEq(keys.outside, true)
+export const isExternal = R.propEq(keys.external, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on dashboard

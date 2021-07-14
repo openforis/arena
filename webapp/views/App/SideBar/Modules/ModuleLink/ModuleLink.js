@@ -16,7 +16,7 @@ const ModuleLink = (props) => {
   const icon = SideBarModule.getIcon(module)
   const uri = SideBarModule.getUri(module)
   const key = SideBarModule.getKey(module)
-  const outside = SideBarModule.isOutside(module)
+  const external = SideBarModule.isExternal(module)
 
   const i18n = useI18n()
 
@@ -25,7 +25,7 @@ const ModuleLink = (props) => {
     active,
   })
 
-  if (outside) {
+  if (external) {
     // opens the uri into a new tab
     return (
       <a

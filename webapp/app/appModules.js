@@ -188,7 +188,7 @@ export const helpModules = {
   userManual: {
     key: 'userManual',
     uri: 'https://docs.google.com/document/d/1GWerrExvbdT5oOOlwdkE9pptK4pVbQxwtgaSNPasmKA/view',
-    outside: true,
+    external: true,
   },
 }
 
