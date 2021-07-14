@@ -107,7 +107,11 @@ const SurveyForm = (props) => {
     }
   }, [])
 
-  return nodeDef ? (
+  if (!nodeDef) {
+    return null
+  }
+
+  return (
     <div>
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
@@ -145,7 +149,7 @@ const SurveyForm = (props) => {
         {editAllowed && hasNodeDefAddChildTo && <AddNodeDefPanel />}
       </div>
     </div>
-  ) : null
+  )
 }
 
 SurveyForm.defaultProps = {
