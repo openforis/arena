@@ -201,6 +201,9 @@ Do you want to proceed?`,
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
     virtualEntity_plural: '$t(appModules.entities)',
+
+    help: 'help',
+    userManual: 'User Manual',
   },
 
   surveyDefsLoader: {
