@@ -194,20 +194,11 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
   try {
     return await db.tx(async (t) => {
       const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail(t)
-      const { email } = userAccessRequest
-      const { firstName, lastName, institution = '', country = '', purpose = '' } = userAccessRequest.props
+      const { email, props } = userAccessRequest
       await Mailer.sendEmail({
         to: systemAdminEmails,
         msgKey: 'emails.userAccessRequest',
-        msgParams: {
-          email,
-          firstName,
-          lastName,
-          institution,
-          country,
-          purpose,
-          serverUrl,
-        },
+        msgParams: { ...props, email, serverUrl },
       })
 
       const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest }, t)
