@@ -5,8 +5,7 @@ import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
-import GoogleFontsPlugin from 'google-fonts-plugin'
-import GitRevisionPlugin from 'git-revision-webpack-plugin'
+import { GitRevisionPlugin } from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
@@ -14,7 +13,6 @@ import { uuidv4 } from './core/uuid'
 import * as ProcessUtils from './core/processUtils'
 
 const { buildReport } = ProcessUtils.ENV
-const fontCssFileName = 'woff2.css'
 
 const config = {
   mode: process.env.NODE_ENV || 'development',
@@ -65,16 +63,6 @@ const plugins = [
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
       },
     },
-  }),
-  new GoogleFontsPlugin({
-    fonts: [
-      {
-        family: 'Montserrat',
-        variants: ['200', '400', '600', '800'],
-      },
-    ],
-    formats: ['woff2'],
-    filename: fontCssFileName,
   }),
   new CleanUpStatsPlugin(),
 ]
@@ -168,11 +156,6 @@ const webPackConfig = {
                 return true
               },
               import: (url) => {
-                // Don't handle font css file import
-                if (url.includes(fontCssFileName)) {
-                  return false
-                }
-
                 return true
               },
             },
@@ -183,22 +166,19 @@ const webPackConfig = {
     ],
   },
   plugins,
-}
-
-// If (prodBuild) {
-
-webpack.optimization = {
-  minimizer: [
-    new UglifyJsPlugin({
-      parallel: true,
-      uglifyOptions: {
-        compress: true,
-        output: { comments: false },
-      },
-      sourceMap: true,
-    }),
-    new OptimizeCSSAssetsPlugin({}),
-  ],
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        parallel: true,
+        uglifyOptions: {
+          compress: true,
+          output: { comments: false },
+        },
+        sourceMap: true,
+      }),
+      new OptimizeCSSAssetsPlugin({}),
+    ],
+  },
 }
 
 export default webPackConfig
