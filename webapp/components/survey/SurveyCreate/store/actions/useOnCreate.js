@@ -5,7 +5,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 import * as JobSerialized from '@common/job/jobSerialized'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
 import * as API from '@webapp/service/api'
 
@@ -33,7 +33,9 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
 
   return () => {
     ;(async () => {
+      dispatch(LoaderActions.showLoader())
       const data = await sendSurveyCreateRequest({ dispatch, newSurvey, user })
+      dispatch(LoaderActions.hideLoader())
       if (!data) {
         return
       }
