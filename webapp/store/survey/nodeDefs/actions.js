@@ -119,13 +119,14 @@ export const putNodeDefLayoutProp =
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
     const nodeDefsUpdated = Survey.updateLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
 
-    // for each node defs updated, update dispatch nodeDefUpdate event and update the props server side
+    // for each node defs updated, update dispatch nodeDefUpdate event
     Object.values(nodeDefsUpdated).forEach((nodeDefUpdated) => {
       dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
-
-      const props = { [NodeDefLayout.keys.layout]: NodeDef.getLayout(nodeDefUpdated) }
-      dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, props))
     })
+    // update the props server side
+    const nodeDefUpdated = nodeDefsUpdated[nodeDef.uuid]
+    const propsToPersist = { [NodeDefLayout.keys.layout]: NodeDef.getLayout(nodeDefUpdated) }
+    dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, propsToPersist))
   }
 
 // ==== DELETE

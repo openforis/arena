@@ -84,16 +84,16 @@ export const updateLayoutProp =
     }
     nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
 
-    surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(surveyUpdated)
-
-    // update parent layout (children forms index)
-    const nodeDefParentUpdated = _updateParentLayoutChildrenIndex({
-      survey: surveyUpdated,
-      surveyCycleKey,
-      nodeDef: nodeDefUpdated,
-    })
-    nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
-
+    if (!NodeDef.isRoot(nodeDef)) {
+      surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(surveyUpdated)
+      // update parent layout (children forms index)
+      const nodeDefParentUpdated = _updateParentLayoutChildrenIndex({
+        survey: surveyUpdated,
+        surveyCycleKey,
+        nodeDef: nodeDefUpdated,
+      })
+      nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
+    }
     return nodeDefsUpdated
   }
 

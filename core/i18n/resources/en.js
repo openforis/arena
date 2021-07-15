@@ -596,6 +596,8 @@ $t(common.cantUndoWarning)`,
     schemaSummary: 'Schema Summary',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
+    movePageUp: 'Move page up',
+    movePageDown: 'Move page down',
     formEditActions: {
       preview: 'Preview',
     },
