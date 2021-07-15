@@ -1044,6 +1044,7 @@ $t(common.cantUndoWarning)`,
           <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
           <li>$t(accessRequestView.fields.props.country): {{country}}</li>
           <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
       </p>
       <p>Please evaluate this request and get back to the user as soon as possible.</p>
