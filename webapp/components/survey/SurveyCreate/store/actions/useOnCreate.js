@@ -58,7 +58,6 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
           validation,
         })
       }
-      dispatch(LoaderActions.hideLoader())
     })()
   }
 }
