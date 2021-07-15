@@ -82,7 +82,8 @@ class NodeDefSwitch extends React.Component {
     const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
     const { isHovering } = this.state
 
-    const editButtonsVisible = edit && canEditDef && isHovering
+    const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+    const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
 
     const className =
       'survey-form__node-def-page' +
