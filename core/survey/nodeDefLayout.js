@@ -80,7 +80,10 @@ export const isRenderForm = (cycle) => isRenderType(cycle, renderType.form)
 export const isRenderDropdown = (cycle) => isRenderType(cycle, renderType.dropdown)
 export const isRenderCheckbox = (cycle) => isRenderType(cycle, renderType.checkbox)
 
-export const isDisplayInParentPage = (cycle) => R.pipe(getDisplayIn(cycle), R.propEq(displayIn.parentPage))
+export const isDisplayInParentPage = (cycle) => (nodeDef) => {
+  const displayInValue = getDisplayIn(cycle)(nodeDef)
+  return displayInValue === displayIn.parentPage
+}
 
 // ====== UPDATE
 export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
@@ -96,13 +99,15 @@ export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutC
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
-export const copyLayout = ({ cycleFrom, cyclesTo }) => (nodeDef) => {
-  const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
-  const layoutUpdated = cyclesTo
-    .filter((cycleKey) => cycleKey !== cycleFrom)
-    .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
-  return assocLayout(layoutUpdated)(nodeDef)
-}
+export const copyLayout =
+  ({ cycleFrom, cyclesTo }) =>
+  (nodeDef) => {
+    const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
+    const layoutUpdated = cyclesTo
+      .filter((cycleKey) => cycleKey !== cycleFrom)
+      .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
+    return assocLayout(layoutUpdated)(nodeDef)
+  }
 
 // ====== UTILS
 

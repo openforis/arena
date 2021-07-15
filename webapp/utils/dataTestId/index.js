@@ -35,6 +35,7 @@ export const DataTestId = {
     surveyInfoBtnHeader: 'survey-info-btn-header',
     surveyInfoBtn: 'survey-info-btn',
     surveyLabel: 'survey-label',
+    surveyName: 'survey-name',
     surveyStatus: 'survey-status',
   },
   dataExport: {
