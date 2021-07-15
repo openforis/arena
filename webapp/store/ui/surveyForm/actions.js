@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 
@@ -28,7 +29,10 @@ export const setFormNodeDefAddChildTo = (nodeDef) => (dispatch) =>
 // Current nodeDef of active form page
 export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
 
-export const setFormActivePage = (nodeDef) => (dispatch) => dispatch({ type: formActivePageNodeDefUpdate, nodeDef })
+export const setFormActivePage =
+  ({ nodeDef, showAddChildTo = false }) =>
+  (dispatch) =>
+    dispatch({ type: formActivePageNodeDefUpdate, nodeDef, showAddChildTo })
 
 // Current node of active form page
 export const formPageNodeUpdate = 'survey/form/pageNode/update'
