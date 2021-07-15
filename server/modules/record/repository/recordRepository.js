@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
+import * as toSnakeCase from 'to-snake-case'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -19,7 +20,7 @@ const tableColumns = [
   Record.keys.preview,
   'owner_uuid',
   'date_created',
-  'validation'
+  'validation',
 ]
 const tableName = 'record'
 
@@ -95,17 +96,16 @@ export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
   )
 
 export const fetchRecordsSummaryBySurveyId = async (
-  surveyId,
-  cycle,
-  nodeDefRoot,
-  nodeDefKeys,
-  offset = 0,
-  limit = null,
+  { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, sortBy = 'date_created', sortOrder = 'DESC' },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColumnName = NodeDefTable.getColumnName
   const getNodeDefKeyColAlias = NodeDef.getName
+  const nodeDefKeysColumnNamesByAlias = nodeDefKeys.reduce(
+    (acc, key) => ({ ...acc, [getNodeDefKeyColAlias(key)]: getNodeDefKeyColumnName(key) }),
+    {}
+  )
   const nodeDefKeysSelect = nodeDefKeys
     .map(
       (nodeDefKey) =>
@@ -156,7 +156,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
-    ORDER BY r.date_created DESC
+    ORDER BY ${
+      Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
+        ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
+        : `r.${toSnakeCase(sortBy)}`
+    } ${sortOrder}
   `,
     [surveyId, cycle],
     dbTransformCallback(surveyId, false)
