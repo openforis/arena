@@ -6,17 +6,35 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 
-const _updateParentLayoutChildrenIndex = ({ survey, surveyCycleKey, nodeDef }) => {
-  const isEntityInOwnPage = ({ nodeDef: def }) =>
-    !NodeDef.isDeleted(def) && NodeDef.isEntity(def) && NodeDefLayout.isDisplayInOwnPage(surveyCycleKey)(def)
+const DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE = {
+  [NodeDef.nodeDefType.coordinate]: 2,
+  [NodeDef.nodeDefType.taxon]: 2,
+}
 
+const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
+  const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
+    (childDef) =>
+      !NodeDef.isDeleted(childDef) && NodeDef.isEntity(childDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(childDef)
+  )
+  const childEntitiesInOwnPageUuids = childEntitiesInOwnPage.map(NodeDef.getUuid)
+
+  // calculate new index starting from the existing one (if any)
+  const index = NodeDefLayout.getIndexChildren(cycle)(nodeDefParent)
+    // exlclude missing nodeDefs
+    .filter((uuid) => childEntitiesInOwnPageUuids.includes(uuid))
+
+  childEntitiesInOwnPageUuids.forEach((childUuid) => {
+    if (!index.includes(childUuid)) {
+      index.push(childUuid)
+    }
+  })
+  return index
+}
+
+const _updateParentLayoutChildrenIndex = ({ survey, surveyCycleKey, nodeDef }) => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
-  const childrenInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter((sibling) =>
-    isEntityInOwnPage({ nodeDef: sibling })
-  )
-
-  const indexChildren = childrenInOwnPage.map(NodeDef.getUuid)
+  const indexChildren = _calculateChildPagesIndex({ survey, cycle: surveyCycleKey, nodeDefParent })
 
   return NodeDef.updateLayout((layout) => {
     const layoutUpdated = NodeDefLayout.assocIndexChildren(surveyCycleKey, indexChildren)(layout)
@@ -24,25 +42,22 @@ const _updateParentLayoutChildrenIndex = ({ survey, surveyCycleKey, nodeDef }) =
   })(nodeDefParent)
 }
 
-const _onRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) =>
+const _onEntityRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) =>
   NodeDef.updateLayout((layout) => {
-    let layoutUpdated = null
-
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
       // render type changed from 'form' to 'table':
       // Assoc layout children
       const nodeDefChildren = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey)
 
-      layoutUpdated = NodeDefLayout.assocLayoutChildren(surveyCycleKey, nodeDefChildren.map(NodeDef.getUuid))(layout)
-    } else {
-      // render type changed from 'table' to 'form':
-      // dissoc layout children (valid only for table)
-      layoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
+      return NodeDefLayout.assocLayoutChildren(surveyCycleKey, nodeDefChildren.map(NodeDef.getUuid))(layout)
+    }
+    // render type changed from 'table' to 'form':
+    // dissoc layout children (valid only for table)
+    let layoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
 
-      // Entity rendered as form can only exists in its own page: assign pageUuid
-      if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
-        layoutUpdated = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(layoutUpdated)
-      }
+    // Entity rendered as form can only exists in its own page: assign pageUuid
+    if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+      layoutUpdated = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(layoutUpdated)
     }
     return layoutUpdated
   })(nodeDef)
@@ -52,11 +67,6 @@ export const updateLayoutProp =
   (survey) => {
     const renderTypePrev = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev || nodeDef)
 
-    // throw new Error(
-    //   `children ${SurveyNodeDefs.getNodeDefsArray(survey).map(
-    //     (child) => `${NodeDef.getName(child)} - ${NodeDefLayout.getPageUuid(surveyCycleKey)(child)}`
-    //   )}`
-    // )
     let nodeDefUpdated = NodeDef.updateLayout((layout) => {
       const layoutUpdated = NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)(layout)
       return layoutUpdated
@@ -65,7 +75,8 @@ export const updateLayoutProp =
     let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 
     if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef) && value !== renderTypePrev) {
-      nodeDefUpdated = _onRenderTypeUpdate({
+      // entity render type changed
+      nodeDefUpdated = _onEntityRenderTypeUpdate({
         survey: surveyUpdated,
         surveyCycleKey,
         nodeDef: nodeDefUpdated,
@@ -102,11 +113,6 @@ export const updateLayout = ({ survey, nodeDefUuid, layout, nodeDefPrev = null }
     })
   })
   return nodeDefsUpdated
-}
-
-const nodeDefLayoutHeights = {
-  [NodeDef.nodeDefType.coordinate]: 2,
-  [NodeDef.nodeDefType.taxon]: 2,
 }
 
 /**
@@ -147,14 +153,6 @@ const _updateParentLayoutForCycle = ({ survey, nodeDef, cycle, updateFn }) => {
     const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)(layout)
     return layoutUpdated
   })(nodeDefParent)
-}
-
-const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
-  const childrenFormsInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
-    (sibling) =>
-      !NodeDef.isDeleted(sibling) && NodeDef.isEntity(sibling) && NodeDefLayout.isDisplayInOwnPage(cycle)(sibling)
-  )
-  return childrenFormsInOwnPage.map(NodeDef.getUuid)
 }
 
 const _getOrInitializeChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
@@ -203,7 +201,7 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
   // New node def height depends on its type
-  const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
+  const h = R.propOr(1, NodeDef.getType(nodeDef), DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE)
   const layoutChildrenUpdated = R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildrenPrev)
 
   return {

@@ -16,6 +16,9 @@ export const useSetLayoutProp = ({ setState }) => {
     const nodeDef = State.getNodeDef(state)
 
     const nodeDefsUpdated = Survey.updateLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
-    Object.values(nodeDefsUpdated).forEach((nodeDefUpdated) => validateNodeDef({ state, nodeDefUpdated }))
+
+    // validate current node def
+    const nodeDefUpdated = nodeDefsUpdated[nodeDef.uuid]
+    validateNodeDef({ state, nodeDefUpdated })
   }, [])
 }

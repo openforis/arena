@@ -114,6 +114,7 @@ export const {
   getNodeDefsRootUnique,
   getNodeDefByUuid,
   getNodeDefChildren,
+  getNodeDefChildrenInOwnPage,
   hasNodeDefChildrenEntities,
   getNodeDefChildByName,
   getNodeDefSiblingByName,

@@ -115,5 +115,3 @@ export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pa
 // ====== UTILS
 
 export const rejectNodeDefsWithPage = (cycle) => R.reject(hasPage(cycle))
-
-export const filterNodeDefsWithPage = (cycle) => R.filter(hasPage(cycle))

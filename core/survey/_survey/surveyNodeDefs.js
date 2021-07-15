@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
+import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
@@ -33,6 +34,27 @@ export const getNodeDefChildren = (nodeDef) => (survey) => {
   const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
   return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
 }
+
+export const getNodeDefChildrenInOwnPage =
+  ({ nodeDef, cycle }) =>
+  (survey) => {
+    const children = getNodeDefChildren(nodeDef)(survey)
+    const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
+    const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
+    if (childrenIndex.length === 0) return childrenInOwnPage
+
+    // sort children following order in layout children index
+    childrenInOwnPage.sort((childA, childB) => {
+      const positionInIndexA = childrenIndex.indexOf(childA.uuid)
+      const positionInIndexB = childrenIndex.indexOf(childB.uuid)
+      if (positionInIndexA >= 0 && positionInIndexB >= 0) return positionInIndexA - positionInIndexB
+      if (positionInIndexA < 0) return -1
+      if (positionInIndexB < 0) return 1
+      // otherwise keep creation order
+      return childA.id - childB.id
+    })
+    return childrenInOwnPage
+  }
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   if (NodeDef.isAttribute(nodeDef)) {
