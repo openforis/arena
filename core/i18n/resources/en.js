@@ -441,7 +441,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     rotate: 'Rotate',
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload',
-    sendInvitation: 'Send invitation',
+    invitation: {
+      sendInvitation: 'Send invitation',
+      surveyNotPublishedWarning: `**Warning**: survey is not published
+        Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+        If you want to invite users with other roles you should first publish the survey.`,
+    },
     sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
@@ -1044,6 +1049,7 @@ $t(common.cantUndoWarning)`,
           <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
           <li>$t(accessRequestView.fields.props.country): {{country}}</li>
           <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
       </p>
       <p>Please evaluate this request and get back to the user as soon as possible.</p>

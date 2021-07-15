@@ -15,7 +15,6 @@ const plugins = [
     'process.env.ARENA_ROOT': JSON.stringify(arenaRoot),
     'process.env.ARENA_DIST': JSON.stringify(arenaDist),
   }),
-  new webpack.NamedModulesPlugin(),
   ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
 ]
 
@@ -62,10 +61,7 @@ export default {
     ],
   },
   node: {
-    console: false,
     global: false,
-    process: false,
-    Buffer: false,
     __filename: true,
     __dirname: true,
   },
