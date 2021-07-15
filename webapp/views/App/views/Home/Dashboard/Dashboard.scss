@@ -5,3 +5,33 @@
   grid-template-rows: 120px 500px 1fr;
   grid-column-gap: 10px;
 }
+
+.home-dashboard__first_time_help {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: Min(100%, 500px);
+  margin: auto;
+  text-align: left;
+}
+
+.home-dashboard__first_time_help__container {
+  padding: 2rem 1rem 0rem 1rem;
+
+  .inline-link {
+    padding: unset;
+    color: unset;
+  }
+
+  &.with-background {
+    background: white;
+    border: 1px solid #d1d1dd;
+
+    .home-dashboard__first_time_help-survey-info {
+      padding: 1rem 2rem 1rem 1rem;
+      background: #f6f7f9;
+      margin: 1rem 0rem;
+    }
+  }
+}
