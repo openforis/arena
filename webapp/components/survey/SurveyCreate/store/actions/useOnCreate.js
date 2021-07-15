@@ -35,6 +35,7 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
     ;(async () => {
       dispatch(LoaderActions.showLoader())
       const data = await sendSurveyCreateRequest({ dispatch, newSurvey, user })
+      dispatch(LoaderActions.hideLoader())
       if (!data) {
         return
       }
