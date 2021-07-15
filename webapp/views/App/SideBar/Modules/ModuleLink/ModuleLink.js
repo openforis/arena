@@ -11,21 +11,28 @@ import * as SideBarModule from '../utils'
 const ModuleLink = (props) => {
   const { module, pathname, showLabel, disabled } = props
 
+  const key = SideBarModule.getKey(module)
   const active = SideBarModule.isActive(pathname)(module)
   const root = SideBarModule.isRoot(module)
+  const external = SideBarModule.isExternal(module)
+
   const icon = SideBarModule.getIcon(module)
   const uri = SideBarModule.getUri(module)
-  const key = SideBarModule.getKey(module)
+  const to = external ? { pathname: uri } : uri
+  const target = external ? `openforis_arena_${key}` : null
+
+  const className = classNames('sidebar__module-btn', 'text-uppercase', {
+    'sidebar__module-child-btn': !root,
+    active,
+  })
 
   const i18n = useI18n()
 
   return (
     <Link
-      to={uri}
-      className={classNames('sidebar__module-btn', 'text-uppercase', {
-        'sidebar__module-child-btn': !root,
-        active,
-      })}
+      to={to}
+      target={target}
+      className={className}
       aria-disabled={disabled || active}
       data-testid={DataTestId.sidebar.moduleBtn(key)}
       id={`sidebar_btn_${key}`}

@@ -1,0 +1,15 @@
+.btn-sort-toggle {
+  color: white;
+
+  &.asc {
+    transform: rotate(270deg);
+  }
+
+  &.desc {
+    transform: rotate(90deg);
+  }
+
+  &.inactive {
+    transform: rotate(0deg);
+  }
+}

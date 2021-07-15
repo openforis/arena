@@ -23,7 +23,7 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { loadingData, loadingCount, list, offset, limit, count, initData } = useTable({
+  const { loadingData, loadingCount, list, offset, limit, sort, handleSortBy, count, initData } = useTable({
     moduleApiUri,
     module,
     restParams,
@@ -58,6 +58,8 @@ const Table = (props) => {
         rowHeaderComponent={rowHeaderComponent}
         rowProps={rowProps}
         initData={initData}
+        sort={sort}
+        handleSortBy={handleSortBy}
       />
     </div>
   )

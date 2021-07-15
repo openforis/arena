@@ -1,11 +1,9 @@
 import React from 'react'
 
-import * as User from '@core/user/user'
-
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useUser } from '@webapp/store/user'
+import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
 import Dashboard from './Dashboard'
 import CollectImportReport from './CollectImportReport'
@@ -16,7 +14,8 @@ import TemplateList from './TemplateList'
 import TemplateCreate from './TemplateCreate'
 
 const Home = () => {
-  const user = useUser()
+  const canCreateSurvey = useAuthCanCreateSurvey()
+  const canCreateTemplate = useAuthCanCreateTemplate()
 
   return (
     <ModuleSwitch
@@ -35,12 +34,16 @@ const Home = () => {
           component: TemplateList,
           path: appModuleUri(homeModules.templateList),
         },
-        ...(User.isSystemAdmin(user)
+        ...(canCreateSurvey
           ? [
               {
                 component: SurveyCreate,
                 path: appModuleUri(homeModules.surveyNew),
               },
+            ]
+          : []),
+        ...(canCreateTemplate
+          ? [
               {
                 component: TemplateCreate,
                 path: appModuleUri(homeModules.templateNew),

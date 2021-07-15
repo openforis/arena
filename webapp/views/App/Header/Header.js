@@ -59,9 +59,7 @@ const Header = () => {
                 to={appModuleUri(homeModules.surveyInfo)}
                 className="btn-s btn-transparent"
               >
-                <div className="header__survey-title">
-                  {Survey.getName(surveyInfo)} - {Survey.getLabel(surveyInfo, lang)}
-                </div>
+                <div className="header__survey-title">{Survey.getLabel(surveyInfo, lang)}</div>
               </Link>
               <CycleSelector
                 surveyInfo={surveyInfo}

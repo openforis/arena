@@ -201,6 +201,9 @@ Do you want to proceed?`,
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
     virtualEntity_plural: '$t(appModules.entities)',
+
+    help: 'help',
+    userManual: 'User Manual',
   },
 
   surveyDefsLoader: {
@@ -230,17 +233,27 @@ Do you want to proceed?`,
         institution: 'Institution',
         country: 'Country',
         purpose: 'What do you need it for?',
+        surveyName: 'Propose a Survey Name',
+        template: 'Start from a template?',
+        template_value: {
+          none: 'None (start from scratch)',
+          templateA: 'Template A',
+          templateB: 'Template B',
+        },
       },
     },
-    introduction: `The platform is still beta, so if you want access, you have to request here.  
+    introduction: `The platform is still beta, so if you want access, you have to request here.
 We are also interested in what you want to do with it so please let us know!
-PLEASE also give us a few moments to process your request.
-This is not an automated service and sometimes it takes us a little time to enter your information.
-For more information please visit our website: http://www.openforis.org`,
+**A new blank survey** will be created, so please provide a name for it.
+You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it. You can also create new surveys (up to 5) if needed.
+For more information please visit our website: *http://www.openforis.org/tools/arena/*
+**Once you send the request, please wait for an invitation email to access Arena.**
+\\* = required field`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
-    requestSent: `Access Request sent correctly to the address {{email}}.
-Please give us a few moments to process your request.
-We will send soon an email to your address with the instructions on how to access $t(common.appName).`,
+    requestSent: 'Access Request sent correctly',
+    requestSentMessage: `Please give us a couple of days to process your request.
+We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     title: 'Requesting access to $t(common.appNameFull)',
@@ -282,6 +295,8 @@ We will send soon an email to your address with the instructions on how to acces
       survey_plural: 'Surveys',
       template: 'Template',
       template_plural: 'Templates',
+      error: 'Error creating new survey',
+      errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
     },
     collectImportReport: {
       expression: 'Expression',
@@ -426,7 +441,12 @@ We will send soon an email to your address with the instructions on how to acces
     rotate: 'Rotate',
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload',
-    sendInvitation: 'Send invitation',
+    invitation: {
+      sendInvitation: 'Send invitation',
+      surveyNotPublishedWarning: `**Warning**: survey is not published
+        Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+        If you want to invite users with other roles you should first publish the survey.`,
+    },
     sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
@@ -854,6 +874,8 @@ $t(common.cantUndoWarning)`,
       emailRequired: 'Email is required',
       firstNameRequired: 'First name is required',
       lastNameRequired: 'Last name is required',
+      purposeRequired: 'Purpose is required',
+      surveyNameRequired: 'Survey name is required',
       invalidRequest: 'Invalid user access request',
       userAlreadyExisting: 'User with email {{email}} already existing',
       requestAlreadySent: `Access request for user with email {{email}} already sent`,
@@ -1029,6 +1051,7 @@ $t(common.cantUndoWarning)`,
           <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
           <li>$t(accessRequestView.fields.props.country): {{country}}</li>
           <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
       </p>
       <p>Please evaluate this request and get back to the user as soon as possible.</p>

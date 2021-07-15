@@ -18,6 +18,7 @@ import * as UserInvitationManager from './userInvitationManager'
 export const {
   countUsersBySurveyId,
   fetchUserProfilePicture,
+  fetchSystemAdministratorsEmail,
   updateNamePasswordAndStatus,
   resetUsersPrefsSurveyCycle,
   importNewUser,
@@ -31,7 +32,7 @@ export const {
 
 // ==== CREATE
 
-export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
+export const addUserToGroup = async ({ user, surveyId, groupUuid, userToAdd }, client = db) =>
   client.tx(async (t) => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     const group = await AuthGroupRepository.fetchGroupByUuid(groupUuid, t)
@@ -67,7 +68,7 @@ export const insertUser = async (
       },
       t
     )
-    await addUserToGroup(user, surveyId, groupUuid, newUser, t)
+    await addUserToGroup({ user, surveyId, groupUuid, userToAdd: newUser }, t)
     return newUser
   })
 
@@ -150,8 +151,6 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 }
 
 export { fetchUserAccessRequestByEmail } from '../repository/userAccessRequestRepository'
-
-export { fetchSystemAdministratorsEmail } from '../repository/userRepository'
 
 // ==== UPDATE
 

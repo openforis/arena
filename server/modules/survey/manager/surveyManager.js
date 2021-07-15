@@ -44,6 +44,17 @@ const validateSurveyInfo = async (surveyInfo) =>
 
 // ====== CREATE
 
+const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
+  if (!User.isSystemAdmin(user)) {
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+    const surveyAdminsGroup = Survey.getAuthGroupAdmin(surveyInfo)
+    await UserManager.addUserToGroup(
+      { user, surveyId, groupUuid: AuthGroup.getUuid(surveyAdminsGroup), userToAdd: user },
+      client
+    )
+  }
+}
+
 /**
  * Creates a new survey given the specified parameters.
  *
@@ -110,16 +121,7 @@ export const insertSurvey = async (params, client = db) => {
     // Create default groups for this survey
     surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
-    // Add user to survey admins group (if not system admin)
-    if (!User.isSystemAdmin(user)) {
-      await UserManager.addUserToGroup(
-        user,
-        surveyId,
-        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
-        User.getUuid(user),
-        t
-      )
-    }
+    await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
     return assocSurveyInfo(surveyInfo)
   })
@@ -146,23 +148,14 @@ export const importSurvey = async (params, client = db) => {
     // Create default groups for this survey
     surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
 
-    // Add user to survey admins group (if not system admin)
-    if (!User.isSystemAdmin(user)) {
-      await UserManager.addUserToGroup(
-        user,
-        surveyId,
-        AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)),
-        User.getUuid(user),
-        t
-      )
-    }
+    await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
     return assocSurveyInfo(surveyInfo)
   })
 }
 
 // ====== READ
-export const { countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
+export const { countOwnedSurveys, countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([
