@@ -40,15 +40,14 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
     }
 
     // layout props
-    let defUpdated = NodeDefLayout.updateLayout((layout) => {
+    let defUpdated = NodeDef.updateLayout((layout) => {
       const layoutCycle = layout[Survey.cycleOneKey] || {}
       const layoutCycleUpdated = {
         ...layoutCycle,
         [NodeDefLayout.keys.renderType]: this._renderType,
         [NodeDefLayout.keys.pageUuid]: this._displayIn === NodeDefLayout.displayIn.ownPage ? uuidv4() : null,
       }
-      const layoutUpdated = NodeDefLayout.assocLayoutCycle(Survey.cycleOneKey, layoutCycleUpdated)(layout)
-      return layoutUpdated
+      return NodeDefLayout.assocLayoutCycle(Survey.cycleOneKey, layoutCycleUpdated)(layout)
     })(def)
 
     const defUuid = NodeDef.getUuid(def)

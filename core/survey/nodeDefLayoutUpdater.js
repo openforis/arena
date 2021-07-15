@@ -6,94 +6,83 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 
-const _updateParentLayoutChildrenFormsIndex = ({ survey, surveyCycleKey, nodeDef }) => {
+const _updateParentLayoutChildrenIndex = ({ survey, surveyCycleKey, nodeDef }) => {
+  const isEntityInOwnPage = ({ nodeDef: def }) =>
+    !NodeDef.isDeleted(def) && NodeDef.isEntity(def) && NodeDefLayout.isDisplayInOwnPage(surveyCycleKey)(def)
+
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
-  const childrenFormsInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
-    (sibling) =>
-      !NodeDef.isEqual(sibling)(nodeDef) &&
-      !NodeDef.isDeleted(sibling) &&
-      NodeDef.isEntity(sibling) &&
-      NodeDefLayout.isDisplayInOwnPage(surveyCycleKey)(sibling)
+  const childrenInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter((sibling) =>
+    isEntityInOwnPage({ nodeDef: sibling })
   )
-  if (
-    !NodeDef.isDeleted(nodeDef) &&
-    NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) &&
-    NodeDefLayout.isDisplayInOwnPage(surveyCycleKey)(nodeDef)
-  ) {
-    childrenFormsInOwnPage.push(nodeDef)
-  }
-  const indexChildren = childrenFormsInOwnPage.map(NodeDef.getUuid)
 
-  const nodeDefParentUpdated = NodeDefLayout.updateLayout((layout) => {
+  const indexChildren = childrenInOwnPage.map(NodeDef.getUuid)
+
+  return NodeDef.updateLayout((layout) => {
     const layoutUpdated = NodeDefLayout.assocIndexChildren(surveyCycleKey, indexChildren)(layout)
     return layoutUpdated
   })(nodeDefParent)
-  return nodeDefParentUpdated
 }
 
-const _onRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) => {
-  const nodeDefsUpdated = {}
+const _onRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) =>
+  NodeDef.updateLayout((layout) => {
+    let layoutUpdated = null
 
-  if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
-    // Assoc layout children
-    const nodeDefChildren = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey)
-    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
-      const layoutUpdated = NodeDefLayout.assocLayoutChildren(
-        surveyCycleKey,
-        nodeDefChildren.map(NodeDef.getUuid)
-      )(layout)
-      return layoutUpdated
-    })(nodeDef)
-    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
-  } else if (NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)) {
-    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+    if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
+      // render type changed from 'form' to 'table':
+      // Assoc layout children
+      const nodeDefChildren = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey)
+
+      layoutUpdated = NodeDefLayout.assocLayoutChildren(surveyCycleKey, nodeDefChildren.map(NodeDef.getUuid))(layout)
+    } else {
+      // render type changed from 'table' to 'form':
       // dissoc layout children (valid only for table)
-      let layoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
+      layoutUpdated = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(layout)
 
       // Entity rendered as form can only exists in its own page: assign pageUuid
       if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
         layoutUpdated = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(layoutUpdated)
       }
-      return layoutUpdated
-    })(nodeDef)
-    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
-  }
-  // update parent layout (children forms index)
-  const nodeDefParentUpdated = _updateParentLayoutChildrenFormsIndex({
-    survey,
-    surveyCycleKey,
-    nodeDef,
-  })
-  nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
-
-  return nodeDefsUpdated
-}
+    }
+    return layoutUpdated
+  })(nodeDef)
 
 export const updateLayoutProp =
   ({ surveyCycleKey, nodeDef, nodeDefPrev = null, key, value }) =>
   (survey) => {
-    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+    const renderTypePrev = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev || nodeDef)
+
+    // throw new Error(
+    //   `children ${SurveyNodeDefs.getNodeDefsArray(survey).map(
+    //     (child) => `${NodeDef.getName(child)} - ${NodeDefLayout.getPageUuid(surveyCycleKey)(child)}`
+    //   )}`
+    // )
+    let nodeDefUpdated = NodeDef.updateLayout((layout) => {
       const layoutUpdated = NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)(layout)
       return layoutUpdated
     })(nodeDef)
-    let nodeDefsUpdated = { [nodeDefUpdated.uuid]: nodeDefUpdated }
+    const nodeDefsUpdated = { [nodeDef.uuid]: nodeDefUpdated }
+    let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 
-    if (
-      key === NodeDefLayout.keys.renderType &&
-      NodeDef.isEntity(nodeDef) &&
-      (value !== NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ||
-        (nodeDefPrev && value !== NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev)))
-    ) {
-      nodeDefsUpdated = {
-        ...nodeDefsUpdated,
-        ..._onRenderTypeUpdate({
-          survey,
-          surveyCycleKey,
-          nodeDef: nodeDefUpdated,
-        }),
-      }
+    if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef) && value !== renderTypePrev) {
+      nodeDefUpdated = _onRenderTypeUpdate({
+        survey: surveyUpdated,
+        surveyCycleKey,
+        nodeDef: nodeDefUpdated,
+      })
     }
+    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
+
+    surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(surveyUpdated)
+
+    // update parent layout (children forms index)
+    const nodeDefParentUpdated = _updateParentLayoutChildrenIndex({
+      survey: surveyUpdated,
+      surveyCycleKey,
+      nodeDef: nodeDefUpdated,
+    })
+    nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
+
     return nodeDefsUpdated
   }
 
@@ -133,8 +122,8 @@ const nodeDefLayoutHeights = {
  *
  * @returns {object} - The updated node def.
  * */
-const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) => {
-  const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) =>
+  NodeDef.updateLayout((layout) => {
     if (cyclePrev) {
       // If cycle prev exists, copy layout from previous cycle
       const layoutCyclePrev = NodeDefLayout.getLayoutCycle(cyclePrev)(nodeDef)
@@ -150,17 +139,14 @@ const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) => {
     )(layout)
     return layoutUpdated
   })(nodeDef)
-  return nodeDefUpdated
-}
 
 const _updateParentLayoutForCycle = ({ survey, nodeDef, cycle, updateFn }) => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
-  const nodeDefParentUpdated = NodeDefLayout.updateLayout((layout) => {
+  return NodeDef.updateLayout((layout) => {
     const layoutCycleUpdated = updateFn({ survey, cycle, nodeDef })
     const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)(layout)
     return layoutUpdated
   })(nodeDefParent)
-  return nodeDefParentUpdated
 }
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
@@ -182,11 +168,10 @@ const _getOrInitializeChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
 
 export const initializeParentLayout = ({ survey, cycle, nodeDefParent }) => {
   const index = _calculateChildPagesIndex({ survey, cycle, nodeDefParent })
-  const nodeDefParentUpdated = NodeDefLayout.updateLayout((layout) => {
+  return NodeDef.updateLayout((layout) => {
     const layoutUpdated = NodeDefLayout.assocIndexChildren(cycle, index)(layout)
     return layoutUpdated
   })(nodeDefParent)
-  return nodeDefParentUpdated
 }
 
 const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
@@ -303,8 +288,8 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
   })
 
   // Update parent node def layout in DB (if changed)
-  const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
-  const nodeDefParentLayoutUpdated = NodeDefLayout.getLayout(nodeDefParentUpdated)
+  const nodeDefParentLayout = NodeDef.getLayout(nodeDefParent)
+  const nodeDefParentLayoutUpdated = NodeDef.getLayout(nodeDefParentUpdated)
 
   if (R.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
     // no changes applied
@@ -346,20 +331,19 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cycles
   }
   // remove layout for deleted cycles
   if (cyclesDeleted.some((cycleDeleted) => NodeDefLayout.hasLayoutCycle(cycleDeleted)(nodeDef))) {
-    const nodeDefUpdated = NodeDefLayout.updateLayout((layout) => {
+    const nodeDefUpdated = NodeDef.updateLayout((layout) => {
       const layoutUpdated = NodeDefLayout.dissocLayoutCycles(cyclesDeleted)(layout)
       return layoutUpdated
     })(nodeDef)
     nodeDefsUpdated[nodeDefUuid] = nodeDefUpdated
   }
 
-  let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
+  const surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 
   // update parent layout
   const nodeDefParentUpdated = updateParentLayout({ survey: surveyUpdated, nodeDef, cyclesAdded, cyclesDeleted })
   if (nodeDefParentUpdated) {
     nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
-    surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
   }
 
   return nodeDefsUpdated

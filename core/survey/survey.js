@@ -148,7 +148,7 @@ export const {
 } = SurveyDependencies
 
 // ====== UPDATE
-export const { mergeNodeDefs } = SurveyNodeDefs
+export const { dissocNodeDef, mergeNodeDefs } = SurveyNodeDefs
 
 // replace all the node defs in the survey with the specified ones
 export const assocNodeDefs =

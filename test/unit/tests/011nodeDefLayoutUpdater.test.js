@@ -13,16 +13,18 @@ const FORM_IN_NEW_PAGE_NAME = 'form_in_new_page'
 
 let survey = {}
 
-const _updateRenderTypeAndExpectParentChildrenIndexToBe = ({ nodeDef, renderType, expectedIndex }) => {
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const nodeDefsUpdated = NodeDefLayoutUpdater.updateLayoutProp({
-    surveyCycleKey: Survey.cycleOneKey,
-    nodeDef,
-    key: NodeDefLayout.keys.renderType,
-    value: renderType,
-  })(survey)
+const _updateLayoutAndExpectParentChildrenIndexToBe = ({ nodeDefName, layout, expectedIndex }) => {
+  const nodeDef = Survey.getNodeDefByName(nodeDefName)(survey)
 
-  expect(Object.keys(nodeDefsUpdated).sort()).toStrictEqual([nodeDefParent.uuid, nodeDef.uuid].sort())
+  const nodeDefsUpdated = NodeDefLayoutUpdater.updateLayout({ survey, nodeDefUuid: nodeDef.uuid, layout })
+
+  // expect updated node defs to be the specified node def and its parent
+  const nodeDefsUpdatedNames = Object.values(nodeDefsUpdated).map(NodeDef.getName)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+
+  expect(nodeDefsUpdatedNames.length).toBe(2)
+  expect(nodeDefsUpdatedNames).toContain(NodeDef.getName(nodeDef))
+  expect(nodeDefsUpdatedNames).toContain(NodeDef.getName(nodeDefParent))
 
   survey = Survey.mergeNodeDefs(nodeDefsUpdated)(survey)
 
@@ -41,7 +43,6 @@ describe('NodeDefLayoutUpdater Test', () => {
   }, 10000)
 
   it('Layout initialized', () => {
-    // expect(survey).toStrictEqual({})
     const cluster = Survey.getNodeDefByName('cluster')(survey)
     const indexChildren = NodeDefLayout.getIndexChildren(Survey.cycleOneKey)(cluster)
 
@@ -102,6 +103,8 @@ describe('NodeDefLayoutUpdater Test', () => {
     expect(indexChildren).toStrictEqual([plot.uuid])
 
     survey = Survey.assocNodeDef({ nodeDef: clusterUpdated })(survey)
+
+    survey = Survey.dissocNodeDef(nodeDefUpdated.uuid)(survey)
   })
 
   it('Index children updated on node def render type change', () => {
@@ -137,16 +140,16 @@ describe('NodeDefLayoutUpdater Test', () => {
     expect(indexChildren).toStrictEqual([plot.uuid, nodeDef.uuid])
 
     // update render type of added node def into "table" (it should be removed from parent children index)
-    _updateRenderTypeAndExpectParentChildrenIndexToBe({
-      nodeDef,
-      renderType: NodeDefLayout.renderType.table,
+    _updateLayoutAndExpectParentChildrenIndexToBe({
+      nodeDefName: FORM_IN_NEW_PAGE_NAME,
+      layout: { [cycle]: { renderType: NodeDefLayout.renderType.table, pageUuid: null } },
       expectedIndex: [plot.uuid],
     })
 
     // update render type of added node def into "form" (it should be added to parent children index)
-    _updateRenderTypeAndExpectParentChildrenIndexToBe({
-      nodeDef,
-      renderType: NodeDefLayout.renderType.form,
+    _updateLayoutAndExpectParentChildrenIndexToBe({
+      nodeDefName: FORM_IN_NEW_PAGE_NAME,
+      layout: { [cycle]: { renderType: NodeDefLayout.renderType.form, pageUuid: uuidv4() } },
       expectedIndex: [plot.uuid, nodeDef.uuid],
     })
   })

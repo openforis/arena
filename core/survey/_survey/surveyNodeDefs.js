@@ -98,13 +98,18 @@ export const assocNodeDefs = (nodeDefs) => (survey) => {
   }
 }
 
-export const assocNodeDef = (nodeDef) => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
+const updateNodeDefs = (updateFn) => (survey) => {
+  const nodeDefsPrev = getNodeDefs(survey)
+  const nodeDefsUpdated = updateFn(nodeDefsPrev)
+  return assocNodeDefs(nodeDefsUpdated)(survey)
+}
+
+export const assocNodeDef = (nodeDef) => updateNodeDefs(R.assoc(NodeDef.getUuid(nodeDef), nodeDef))
 
 // merge the specified node defs with the ones already in the survey
-export const mergeNodeDefs = (nodeDefs) => (survey) => {
-  const nodeDefsPrev = getNodeDefs(survey)
-  return assocNodeDefs({ ...nodeDefsPrev, ...nodeDefs })(survey)
-}
+export const mergeNodeDefs = (nodeDefs) => updateNodeDefs((nodeDefsPrev) => ({ ...nodeDefsPrev, ...nodeDefs }))
+
+export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUuid))
 
 // ====== HIERARCHY
 

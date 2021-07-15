@@ -92,15 +92,6 @@ export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
   isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
 // ====== UPDATE
-// invoked on node def
-export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
-
-export const updateLayout = (updateFn) => (nodeDef) => {
-  const layout = getLayout(nodeDef)
-  const layoutUpdated = updateFn(layout)
-  const nodeDefUpdated = assocLayout(layoutUpdated)(nodeDef)
-  return nodeDefUpdated
-}
 
 // invoked on "layout"
 export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCycle)
@@ -120,16 +111,6 @@ export const assocLayoutChildren = (cycle, layoutChildren) =>
 export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutChildren])
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
-
-export const copyLayout =
-  ({ cycleFrom, cyclesTo }) =>
-  (nodeDef) => {
-    const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
-    const layoutUpdated = cyclesTo
-      .filter((cycleKey) => cycleKey !== cycleFrom)
-      .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
-    return assocLayout(layoutUpdated)(nodeDef)
-  }
 
 // ====== UTILS
 

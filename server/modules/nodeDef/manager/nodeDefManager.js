@@ -183,7 +183,6 @@ export const updateNodeDefProps = async (
         nodeDefsUpdated,
         NodeDefLayoutUpdater.updateLayout({ survey: surveyUpdated, nodeDefUuid, layout, nodeDefPrev })
       )
-      surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(surveyUpdated)
     }
 
     const logContent = {

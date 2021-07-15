@@ -123,8 +123,8 @@ export const putNodeDefLayoutProp =
     Object.values(nodeDefsUpdated).forEach((nodeDefUpdated) => {
       dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
 
-      const props = { [NodeDefLayout.keys.layout]: NodeDefLayout.getLayout(nodeDefUpdated) }
-      dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
+      const props = { [NodeDefLayout.keys.layout]: NodeDef.getLayout(nodeDefUpdated) }
+      dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, props))
     })
   }
 
