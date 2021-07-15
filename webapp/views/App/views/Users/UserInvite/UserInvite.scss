@@ -1,3 +1,5 @@
+@import '~@webapp/style/vars';
+
 .user-invite {
   width: 50%;
   margin: auto;
@@ -13,6 +15,12 @@
       }
     }
   }
+}
+
+.user-invite__warning-message {
+  color: $orange;
+  white-space: pre-line;
+  text-align: center;
 }
 
 .user-invite__buttons {
