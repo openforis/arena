@@ -89,9 +89,16 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, limit, offset } = Request.getParams(req)
+      const { surveyId, cycle, limit, offset, sortBy, sortOrder } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, cycle, offset, limit)
+      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
+        surveyId,
+        cycle,
+        offset,
+        limit,
+        sortBy,
+        sortOrder,
+      })
       res.json(recordsSummary)
     } catch (error) {
       next(error)
