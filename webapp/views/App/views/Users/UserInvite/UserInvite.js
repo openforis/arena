@@ -2,11 +2,15 @@ import './UserInvite.scss'
 
 import React from 'react'
 
+import * as Survey from '@core/survey/survey'
 import * as UserInvite from '@core/user/userInvite'
 import * as Validation from '@core/validation/validation'
 
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import Markdown from '@webapp/components/markdown'
+
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import DropdownUserGroup from '../DropdownUserGroup'
@@ -17,6 +21,7 @@ const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
 
   const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
 
   const validation = UserInvite.getValidation(userInvite)
 
@@ -39,6 +44,13 @@ const UserInviteComponent = () => {
         />
       </FormItem>
 
+      {!Survey.isPublished(surveyInfo) && (
+        <Markdown
+          className="user-invite__warning-message"
+          source={i18n.t('userView.invitation.surveyNotPublishedWarning')}
+        />
+      )}
+
       <div className="user-invite__buttons">
         <button
           data-testid={DataTestId.userInvite.submitBtn}
@@ -48,7 +60,7 @@ const UserInviteComponent = () => {
           onClick={onInvite}
         >
           <span className="icon icon-envelop icon-left icon-12px" />
-          {i18n.t('userView.sendInvitation')}
+          {i18n.t('userView.invitation.sendInvitation')}
         </button>
       </div>
     </div>
