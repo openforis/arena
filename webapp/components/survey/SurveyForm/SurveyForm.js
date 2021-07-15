@@ -9,6 +9,7 @@ import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
@@ -24,6 +25,11 @@ import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import FormHeader from './FormHeader'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+
+const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
+  Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
+    NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
+  ).length > 0
 
 const SurveyForm = (props) => {
   const {
@@ -74,6 +80,16 @@ const SurveyForm = (props) => {
   }, [surveyCycleKey])
 
   useEffect(() => {
+    // on mount, if edit is allowed and node def is empty, show add child to sidebar
+    if (
+      editAllowed &&
+      !hasNodeDefAddChildTo &&
+      NodeDef.isEntity(nodeDef) &&
+      !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef })
+    ) {
+      dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))
+    }
+
     // OnUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
     return () => {
       if (editAllowed) {
@@ -107,7 +123,11 @@ const SurveyForm = (props) => {
     }
   }, [])
 
-  return nodeDef ? (
+  if (!nodeDef) {
+    return null
+  }
+
+  return (
     <div>
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
@@ -125,7 +145,12 @@ const SurveyForm = (props) => {
             }}
             nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
             onlyPages
-            onSelect={(nodeDefToSelect) => dispatch(SurveyFormActions.setFormActivePage(nodeDefToSelect))}
+            onSelect={(nodeDefToSelect) => {
+              const showAddChildTo =
+                NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
+                !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: nodeDefToSelect })
+              dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
+            }}
           />
         )}
 
@@ -145,7 +170,7 @@ const SurveyForm = (props) => {
         {editAllowed && hasNodeDefAddChildTo && <AddNodeDefPanel />}
       </div>
     </div>
-  ) : null
+  )
 }
 
 SurveyForm.defaultProps = {
