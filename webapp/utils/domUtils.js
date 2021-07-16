@@ -32,6 +32,14 @@ export const isElementInViewport = (el) => {
   return rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportDim.height && rect.right <= viewportDim.width
 }
 
+export const isMouseEventOverElement = ({ event, el }) => {
+  const { clientX: x, clientY: y } = event
+  const rect = el.getBoundingClientRect()
+  const { x: rectX, y: rectY, height: rectH, width: rectW } = rect
+
+  return x >= rectX && x <= rectX + rectW && y >= rectY && y <= rectY + rectH
+}
+
 export const dispatchWindowResize = () => {
   window.dispatchEvent(new Event('resize'))
 }
