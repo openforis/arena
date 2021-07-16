@@ -9,16 +9,22 @@ import { useI18n } from '@webapp/store/system'
 import * as DateUtils from '@core/dateUtils'
 import PropTypes from 'prop-types'
 
-const DataPointTooltip = ({ dataPoint, i18n }) => (
-  <>
-    <div className="date">{DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}</div>
-    <div className="count">
-      {i18n.t('homeView.recordsSummary.record', {
-        count: Number(dataPoint.count),
-      })}
-    </div>
-  </>
-)
+const DataPointTooltip = ({ dataPoint, i18n }) => {
+  const { __data__: data } = dataPoint
+  const { date, count } = data
+  const dateFormatted = DateUtils.convertDate({ dateStr: date, formatTo: 'dd MMMM yyyy' })
+
+  return (
+    <>
+      <div className="date">{dateFormatted}</div>
+      <div className="count">
+        {i18n.t('homeView.recordsSummary.record', {
+          count: Number(count),
+        })}
+      </div>
+    </>
+  )
+}
 
 const DataPoints = (props) => {
   const i18n = useI18n()
@@ -34,7 +40,7 @@ const DataPoints = (props) => {
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html((d) => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={d} i18n={i18n} />))
+      .html((event) => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={event.target} i18n={i18n} />))
 
     d3.select(elementRef.current).call(tooltipRef.current)
 
