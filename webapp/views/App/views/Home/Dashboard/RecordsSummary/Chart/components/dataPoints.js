@@ -14,15 +14,12 @@ const DataPointTooltip = ({ dataPoint, i18n }) => {
   const { date, count } = data
 
   const dateFormatted = DateUtils.convertDate({ dateStr: date, formatTo: 'dd MMMM yyyy' })
+  const recordsCountText = i18n.t('homeView.recordsSummary.record', { count: Number(count) })
 
   return (
     <>
       <div className="date">{dateFormatted}</div>
-      <div className="count">
-        {i18n.t('homeView.recordsSummary.record', {
-          count: Number(count),
-        })}
-      </div>
+      <div className="count">{recordsCountText}</div>
     </>
   )
 }
