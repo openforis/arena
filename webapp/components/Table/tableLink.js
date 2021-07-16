@@ -12,7 +12,12 @@ export const getSort = () => ({
   order: _getUrlSearchParam({ param: 'sortOrder' }),
 })
 
-export const getLink = ({ limit, offset, sort }) => {
+export const getSearch = () => ({
+  by: _getUrlSearchParam({ param: 'searchBy' }),
+  text: _getUrlSearchParam({ param: 'search' }),
+})
+
+export const getLink = ({ limit, offset, sort, search }) => {
   const url = new URL(window.location.href)
 
   if (limit) url.searchParams.set('limit', String(limit))
@@ -20,6 +25,11 @@ export const getLink = ({ limit, offset, sort }) => {
   if (sort) {
     url.searchParams.set('sortBy', String(sort.by))
     url.searchParams.set('sortOrder', String(sort.order))
+    url.searchParams.set('offset', String(0))
+  }
+  if (search) {
+    url.searchParams.set('searchBy', String(search.by))
+    url.searchParams.set('search', String(search.text))
     url.searchParams.set('offset', String(0))
   }
   return `${url.pathname}${url.search}`

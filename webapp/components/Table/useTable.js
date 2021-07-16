@@ -3,7 +3,7 @@ import { useHistory } from 'react-router'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
-import { getLimit, getOffset, getSort, updateQuery } from '@webapp/components/Table/tableLink'
+import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 
 export const useTable = ({ moduleApiUri, module, restParams }) => {
   const history = useHistory()
@@ -13,13 +13,14 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
   const offset = getOffset()
   const limit = getLimit()
   const sort = getSort()
+  const search = getSearch()
 
   const {
     data: { list } = { list: [] },
     dispatch: fetchData,
     loading: loadingData,
   } = useAsyncGetRequest(apiUri, {
-    params: { offset, limit, sortBy: sort.by, sortOrder: sort.order, ...restParams },
+    params: { offset, limit, sortBy: sort.by, sortOrder: sort.order, searchBy: search.by, search: search.text, ...restParams },
   })
   const {
     data: { count } = { count: 0 },
@@ -38,7 +39,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useOnUpdate(() => {
     fetchData()
-  }, [limit, offset, sort.by, sort.order])
+  }, [limit, offset, sort.by, sort.order, search.by, search.text ])
 
   const handleSortBy = useCallback(
     (orderByField) => {
@@ -50,5 +51,5 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     [sort]
   )
 
-  return { loadingData, loadingCount, list, offset, limit, sort, handleSortBy, count: Number(count), initData }
+  return { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, count: Number(count), initData }
 }
