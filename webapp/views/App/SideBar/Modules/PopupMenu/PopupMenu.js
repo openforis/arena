@@ -31,7 +31,7 @@ const PopupMenu = (props) => {
   }
 
   // If after 200 ms mouse is neither within popup-menu or module link closes popup menu
-  const closePopupMenu = () => {
+  const closePopup = () => {
     if (closeTimeoutRef.current) {
       // popup will be closed soon
       return
@@ -39,7 +39,7 @@ const PopupMenu = (props) => {
     closeTimeoutRef.current = setTimeout(() => {
       closeTimeoutRef.current = null
       if (canClosePopup()) {
-        onClose(null)
+        onClose()
       }
     }, 200)
   }
@@ -50,7 +50,7 @@ const PopupMenu = (props) => {
       overSidebarRef.current = isMouseEventOverElement({ event, el: moduleElement.parentElement })
 
       if (canClosePopup()) {
-        closePopupMenu()
+        closePopup()
       } else {
         clearCloseTimeout()
       }
@@ -63,6 +63,13 @@ const PopupMenu = (props) => {
     overSidebarRef.current = true
   }, [key])
 
+  // close popup when module link is clicked (and path changes)
+  useEffect(() => {
+    if (overPopupRef.current) {
+      onClose()
+    }
+  }, [pathname])
+
   return ReactDOM.createPortal(
     <div
       className="sidebar__popup-menu"
@@ -72,7 +79,7 @@ const PopupMenu = (props) => {
       }}
       onMouseLeave={() => {
         overPopupRef.current = false
-        closePopupMenu()
+        closePopup()
       }}
     >
       <SubModules module={module} pathname={pathname} sideBarOpened disabled={false} />
