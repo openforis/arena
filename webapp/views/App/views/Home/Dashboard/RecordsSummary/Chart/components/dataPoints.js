@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 const DataPointTooltip = ({ dataPoint, i18n }) => {
   const { __data__: data } = dataPoint
   const { date, count } = data
+
   const dateFormatted = DateUtils.convertDate({ dateStr: date, formatTo: 'dd MMMM yyyy' })
 
   return (
