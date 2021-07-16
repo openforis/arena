@@ -184,6 +184,7 @@ export const removeNodeDef =
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
+          params: { name: NodeDef.getName(nodeDef)},
           onOk: async () => {
             const surveyId = Survey.getId(survey)
             const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
