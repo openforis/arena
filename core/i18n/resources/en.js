@@ -266,6 +266,30 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   homeView: {
+    dashboard: {
+      surveyPropUpdate: {
+        main: `<title>Welcome to Arena</title>
+  
+        <p>First you need to set the <strong>name</strong> and <strong>label</strong> of the survey.</p>
+        
+        <p>Click below on <linkWithIcon> $t(homeView.surveyInfo.editInfo)</linkWithIcon>or into the survey name:<basicLink>{{surveyName}}</basicLink></p>
+        `,
+        secondary: `
+        <p>If the name and label are right then create the first attribute
+        <linkWithIcon>Survey \> Form Designer</linkWithIcon>
+        </p>
+        `,
+      },
+      nodeDefCreate: {
+        main: `<title>Let's create the first attribute of {{surveyName}} </title>
+        
+        <p>Go to <linkWithIcon>Survey \> Form Designer</linkWithIcon></p>
+        <br />
+        `,
+        
+        
+      }
+    },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',

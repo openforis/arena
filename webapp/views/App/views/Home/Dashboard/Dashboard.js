@@ -1,6 +1,8 @@
 import './Dashboard.scss'
 
 import React, { useState, useEffect } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { Trans } from 'react-i18next'
 
 import * as Survey from '@core/survey/survey'
 import * as ActivityLogObject from '@common/activityLog/activityLog'
@@ -8,17 +10,13 @@ import * as ActivityLogObject from '@common/activityLog/activityLog'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
 
 import SurveyInfo from './SurveyInfo'
 import ActivityLog from './ActivityLog'
 import RecordsSummary from './RecordsSummary'
 
-import { Link, useHistory } from 'react-router-dom'
-
-import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
-
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
-import { DataTestId } from '@webapp/utils/dataTestId'
 
 const useShouldShowFirstTimeHelp = () => {
   const [messages, setMessages] = useState([])
@@ -50,6 +48,15 @@ const useShouldShowFirstTimeHelp = () => {
   return help
 }
 
+const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => {
+  return (
+    <Link to={to} className="btn-s btn-transparent">
+      {iconLeft && iconLeft}
+      {children}
+      {iconRight && iconRight}
+    </Link>
+  )
+}
 const FirstTimeHelp = ({ showFirstTimeHelp }) => {
   const surveyInfo = useSurveyInfo()
 
@@ -57,70 +64,64 @@ const FirstTimeHelp = ({ showFirstTimeHelp }) => {
     return (
       <div className="home-dashboard__first_time_help">
         <div className="home-dashboard__first_time_help__container with-background">
-          <h2>Welcome to Arena. </h2>
-          <p>
-            First you need to set the <b>name</b> and <b>Label</b> of the survey.
-          </p>
-          <br></br>
+          <Trans
+            i18nKey="homeView.dashboard.surveyPropUpdate.main"
+            values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
+            components={{
+              title: <h2 />,
+              linkWithIcon: (
+                <LinkWithIcon
+                  to={appModuleUri(homeModules.surveyInfo)}
+                  className="btn-s btn-transparent"
+                  iconLeft={<span className="icon icon-pencil icon-14px" />}
+                />
+              ),
+              basicLink: <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent" />,
+            }}
+          ></Trans>
 
-          <p>
-            Click below on{' '}
-            <Link
-              data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
-              to={appModuleUri(homeModules.surveyInfo)}
-              className="btn-s btn-transparent "
-            >
-              {' '}
-              <span className="icon icon-pencil icon-14px" /> Edit info
-            </Link>
-            or into the survey name:
-            <Link
-              data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
-              to={appModuleUri(homeModules.surveyInfo)}
-              className="btn-s btn-transparent "
-            >
-              {Survey.getName(surveyInfo).toUpperCase()}
-            </Link>
-          </p>
           <div className="home-dashboard__first_time_help-survey-info">
             <SurveyInfo />
           </div>
         </div>
 
         <div className="home-dashboard__first_time_help__container">
-          <p>
-            If the name and label are right then create the first attribute
-            <Link
-              data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
-              to={appModuleUri(designerModules.formDesigner)}
-              className="btn-s btn-transparent "
-            >
-              {' '}
-              <span className="icon icon-quill icon-14px" /> Survey > Form Designer{' '}
-            </Link>
-          </p>
+          <Trans
+            i18nKey="homeView.dashboard.surveyPropUpdate.secondary"
+            values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
+            components={{
+              linkWithIcon: (
+                <LinkWithIcon
+                  to={appModuleUri(designerModules.formDesigner)}
+                  className="btn-s btn-transparent"
+                  iconLeft={<span className="icon icon-quill icon-14px" />}
+                />
+              ),
+            }}
+          ></Trans>
         </div>
       </div>
     )
   }
+
   if (showFirstTimeHelp === ActivityLogObject.type.nodeDefCreate) {
     return (
       <div className="home-dashboard__first_time_help">
         <div className="home-dashboard__first_time_help__container with-background">
-          <h2>Let's create the first attribute of {Survey.getName(surveyInfo).toUpperCase()} </h2>
-
-          <p>
-            Go to{' '}
-            <Link
-              data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
-              to={appModuleUri(designerModules.formDesigner)}
-              className="btn-s btn-transparent "
-            >
-              {' '}
-              <span className="icon icon-quill icon-14px" /> Survey > Form Designer{' '}
-            </Link>
-          </p>
-          <br></br>
+          <Trans
+            i18nKey="homeView.dashboard.nodeDefCreate.main"
+            values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
+            components={{
+              title: <h2 />,
+              linkWithIcon: (
+                <LinkWithIcon
+                  to={appModuleUri(homeModules.surveyInfo)}
+                  className="btn-s btn-transparent"
+                  iconLeft={<span className="icon icon-pencil icon-14px" />}
+                />
+              ),
+            }}
+          ></Trans>
         </div>
       </div>
     )
