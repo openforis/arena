@@ -61,30 +61,28 @@ const HelperWithoutAttributes = () => {
   const surveyInfo = useSurveyInfo()
 
   return (
-      <>
-    <div className="helper__survey_info">
-    <SurveyInfo />
-    </div>
-    <div className="helper__first_time_help">
-        
-
-      <div className="helper__first_time_help__container with-background">
-        <Trans
-          i18nKey="homeView.dashboard.nodeDefCreate.main"
-          values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
-          components={{
-            title: <h2 />,
-            linkWithIcon: (
-              <LinkWithIcon
-                to={appModuleUri(designerModules.formDesigner)}
-                className="btn-s btn-transparent"
-                iconLeft={<span className="icon icon-pencil icon-14px" />}
-              />
-            ),
-          }}
-        ></Trans>
+    <>
+      <div className="helper__survey_info">
+        <SurveyInfo />
       </div>
-    </div>
+      <div className="helper__first_time_help">
+        <div className="helper__first_time_help__container with-background">
+          <Trans
+            i18nKey="homeView.dashboard.nodeDefCreate.main"
+            values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
+            components={{
+              title: <h2 />,
+              linkWithIcon: (
+                <LinkWithIcon
+                  to={appModuleUri(designerModules.formDesigner)}
+                  className="btn-s btn-transparent"
+                  iconLeft={<span className="icon icon-pencil icon-14px" />}
+                />
+              ),
+            }}
+          ></Trans>
+        </div>
+      </div>
     </>
   )
 }
