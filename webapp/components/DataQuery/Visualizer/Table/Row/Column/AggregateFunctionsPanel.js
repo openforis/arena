@@ -8,7 +8,7 @@ import { Query } from '@common/model/query'
 
 import PanelRight from '@webapp/components/PanelRight'
 
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor'

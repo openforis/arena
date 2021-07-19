@@ -6,11 +6,12 @@ import PropTypes from 'prop-types'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+
 /* eslint-disable import/no-cycle */
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefTableCellBody = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey } = props
