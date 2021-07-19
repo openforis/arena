@@ -4,8 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
-import { I18nState } from '@webapp/store/system'
-
 import * as UserState from '@webapp/store/user/state'
 
 const survey = 'survey'

@@ -37,7 +37,7 @@ export const SurveyPreferredLanguageSelector = () => {
         const userUpdated = User.assocPrefSurveyLang({ surveyId, lang })(user)
         dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
       }}
-      title={`${i18n.t('homeView.surveyInfo.preferredLanguage')} (${selection?.value})`}
+      title={`${i18n.t('homeView.surveyInfo.preferredLanguage')} (${selection.value})`}
     />
   )
 }

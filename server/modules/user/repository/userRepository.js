@@ -207,7 +207,7 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  */
 export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
-  const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysSur.cycle}}'`
+  const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysSurveyPrefs.cycle}}'`
   await client.query(
     `
       UPDATE "user" u

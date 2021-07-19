@@ -8,7 +8,6 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 import * as SurveyFormState from './state'
