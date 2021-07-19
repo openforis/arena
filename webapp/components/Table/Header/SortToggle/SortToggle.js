@@ -8,17 +8,13 @@ const SortToggle = ({ sort, field, handleSortBy }) => {
     <button
       type="button"
       className={`
-    btn-xs btn-transparent btn-toggle
-    ${sort.order || ''}
-        ${sort.by === field ? '' : 'innactive'}
-
-   `}
+        btn-xs btn-transparent btn-sort-toggle
+        ${sort.order || ''}
+        ${sort.by === field ? '' : 'inactive'}
+      `}
       onClick={() => handleSortBy(field)}
     >
-      <span
-        className={`icon icon-play3 icon-10px arrow-toggle
-        `}
-      />
+      <span className="icon icon-play3 icon-10px arrow-toggle" />
     </button>
   )
 }

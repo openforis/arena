@@ -6,6 +6,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
+import * as NodeDefLayout from './nodeDefLayout'
 import * as NodeDefValidations from './nodeDefValidations'
 
 // ======== NODE DEF PROPERTIES
@@ -55,6 +56,7 @@ export const propKeys = {
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
+  layout: 'layout',
 
   // Text
   textTransform: 'textTransform',
@@ -156,6 +158,8 @@ export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
+
+export const getLayout = getProp(propKeys.layout, {})
 
 export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
@@ -304,6 +308,26 @@ export const assocValidations = (validations) => mergePropsAdvanced({ [keysProps
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
+export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
+// layout
+export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)
+
+export const updateLayout = (updateFn) => (nodeDef) => {
+  const layout = getLayout(nodeDef)
+  const layoutUpdated = updateFn(layout)
+  return assocLayout(layoutUpdated)(nodeDef)
+}
+
+export const copyLayout =
+  ({ cycleFrom, cyclesTo }) =>
+  (nodeDef) =>
+    updateLayout((layout) => {
+      const layoutCycle = NodeDefLayout.getLayoutCycle(cycleFrom)(nodeDef)
+      const layoutUpdated = cyclesTo
+        .filter((cycleKey) => cycleKey !== cycleFrom)
+        .reduce((layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), layout)
+      return layoutUpdated
+    })(nodeDef)
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>

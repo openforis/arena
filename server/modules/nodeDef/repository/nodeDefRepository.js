@@ -182,21 +182,8 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, prop
   )
 
 // CYCLES
-export const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add, client = DB) => {
-  const op = add ? `|| '[${cycles.map(JSON.stringify).join(',')}]'` : cycles.map((c) => `- '${c}'`).join(' ')
 
-  return client.map(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{"cycles"}', (SELECT jsonb_agg( value order by value::int ) FROM jsonb_array_elements_text((((props||props_draft)->'cycles') ${op}))))
-    WHERE meta->'h' @> $1
-    RETURNING ${nodeDefSelectFields}`,
-    [JSON.stringify(nodeDefUuid)],
-    (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
-  )
-}
-
-export const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
+const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
   const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
   await client.query(
     `
