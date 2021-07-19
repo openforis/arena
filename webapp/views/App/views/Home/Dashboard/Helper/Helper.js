@@ -2,8 +2,8 @@ import './Helper.scss'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Trans } from 'react-i18next'
 
+import { Trans } from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
 import * as ActivityLogObject from '@common/activityLog/activityLog'
 

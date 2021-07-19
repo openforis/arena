@@ -6,11 +6,10 @@ export const SYSTEM_INIT = 'system/init'
 export const SYSTEM_RESET = 'system/reset'
 
 export const initSystem = () => async (dispatch) => {
-  const i18n = await i18nFactory.createI18nPromise('en')
   const { user, survey } = await API.fetchUserAndSurvey()
+
   dispatch({
     type: SYSTEM_INIT,
-    i18n,
     user,
     survey,
   })

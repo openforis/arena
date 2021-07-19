@@ -1,7 +1,6 @@
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next';
-import * as I18nState from './state'
+import i18n from '@core/i18n/i18nFactory'
 
-export const useI18n = useTranslation
+export const useI18n = () => i18n
 
-export const useLang = () => useSelector(I18nState.getLang)
+export const useLang = () => i18n.language
+
