@@ -1,4 +1,4 @@
-.btn-toggle {
+.btn-sort-toggle {
   color: white;
 
   &.asc {
@@ -9,7 +9,7 @@
     transform: rotate(90deg);
   }
 
-  &.innactive {
+  &.inactive {
     transform: rotate(0deg);
   }
 }
