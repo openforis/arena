@@ -61,7 +61,13 @@ const HelperWithoutAttributes = () => {
   const surveyInfo = useSurveyInfo()
 
   return (
+      <>
+    <div className="helper__survey_info">
+    <SurveyInfo />
+    </div>
     <div className="helper__first_time_help">
+        
+
       <div className="helper__first_time_help__container with-background">
         <Trans
           i18nKey="homeView.dashboard.nodeDefCreate.main"
@@ -79,6 +85,7 @@ const HelperWithoutAttributes = () => {
         ></Trans>
       </div>
     </div>
+    </>
   )
 }
 
