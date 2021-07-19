@@ -17,7 +17,7 @@ const easeExit = d3.easeExpOut
 export default class Tree {
   constructor(domElement, data, lang, onEntityClick) {
     this.nodesByUuidMap = {}
-    this.lang = lang
+    this._lang = lang
     this.data = data
     this.domElement = domElement
     this.onEntityClick = (nodeDefUuid) => {
@@ -31,7 +31,7 @@ export default class Tree {
 
     this.rootG = null
     this.resizeObserver = null
-    this.nodeDefLabelType = NodeDef.NodeDefLabelTypes.label
+    this._nodeDefLabelType = NodeDef.NodeDefLabelTypes.label
 
     this.initSvg()
   }
@@ -292,11 +292,28 @@ export default class Tree {
       .classed('highlight', true)
   }
 
-  changeNodeDefLabelType(nodeDefLabelType) {
+  _updateLabels() {
     this.svg
       .selectAll('.node-grid')
       .selectAll('a')
-      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: nodeDefLabelType }))
-    this.nodeDefLabelType = nodeDefLabelType
+      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+  }
+
+  get nodeDefLabelType() {
+    return this._nodeDefLabelType
+  }
+
+  set nodeDefLabelType(nodeDefLabelType) {
+    this._nodeDefLabelType = nodeDefLabelType
+    this._updateLabels()
+  }
+
+  get lang() {
+    return this._lang
+  }
+
+  set nodeDefLabelLang(lang) {
+    this._lang = lang
+    this._updateLabels()
   }
 }

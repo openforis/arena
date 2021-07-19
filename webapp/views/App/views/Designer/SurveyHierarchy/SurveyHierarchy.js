@@ -5,8 +5,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
@@ -14,10 +13,8 @@ import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {
-  const i18n = useI18n()
   const survey = useSurvey()
-
-  const { lang } = i18n
+  const lang = useSurveyPreferredLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
@@ -29,15 +26,19 @@ const SurveyHierarchy = () => {
   useEffect(() => {
     const treeElement = treeRef.current
     setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
-  }, [lang])
+  }, [])
 
   useEffect(() => {
     return () => tree?.disconnect()
   }, [tree])
 
   useEffect(() => {
-    tree?.changeNodeDefLabelType(nodeDefLabelType)
+    if (tree) tree.nodeDefLabelType = nodeDefLabelType
   }, [nodeDefLabelType, tree])
+
+  useEffect(() => {
+    if (tree) tree.nodeDefLabelLang = lang
+  }, [lang, tree])
 
   const toggleLabelFunction = () => {
     setNodeDefLabelType(
