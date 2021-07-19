@@ -101,12 +101,12 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, surveyCycleKey, nodeDefUuid } = Request.getParams(req)
+        const { surveyId, surveyCycleKey: cycle, nodeDefUuid } = Request.getParams(req)
 
         const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefDeleted({
           user,
           surveyId,
-          surveyCycleKey,
+          cycle,
           nodeDefUuid,
         })
 
