@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
@@ -37,9 +36,7 @@ export const useSaveEdits = ({ setState }) => {
     if (isNodeDefNew) {
       if (nodeDefCycleKeys.length > 1) {
         // copy layout of current cycle to all selected cycles
-        nodeDefUpdated = NodeDefLayout.copyLayout({ cycleFrom: surveyCycleKey, cyclesTo: nodeDefCycleKeys })(
-          nodeDefUpdated
-        )
+        nodeDefUpdated = NodeDef.copyLayout({ cycleFrom: surveyCycleKey, cyclesTo: nodeDefCycleKeys })(nodeDefUpdated)
       }
 
       await dispatch(NodeDefsActions.postNodeDef({ nodeDef: nodeDefUpdated }))

@@ -31,8 +31,12 @@ export const createTestSurvey = ({ user }) =>
           SB.attribute('tree_height', NodeDef.nodeDefType.integer),
           SB.attribute('dbh', NodeDef.nodeDefType.decimal),
           SB.attribute('tree_species', NodeDef.nodeDefType.taxon)
-        ).multiple()
-      ).multiple()
+        )
+          .multiple()
+          .renderAsTable()
+      )
+        .multiple()
+        .displayInOwnPage()
     )
   )
     .categories(
