@@ -63,9 +63,21 @@
 
 // entity-selector-tree
 .survey-form {
-  .entity-selector-tree {
-    border: $formBorder;
-    background-color: $white;
+  .survey-form__sidebar {
+    height: 100%;
+    position: relative;
+
+    .entity-selector-tree {
+      height: 100%;
+      border: $formBorder;
+      background-color: $white;
+    }
+
+    .survey-form__page-edit-buttons {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
   }
 
   &.edit {
