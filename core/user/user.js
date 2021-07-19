@@ -14,7 +14,7 @@ export { userStatus } from './_user/userStatus'
 
 export const nameMaxLength = 128
 
-export const { keysPrefs } = UserPrefs
+export const { keysPrefs, keysSurveyPrefs } = UserPrefs
 export const { keysProps } = UserProps
 
 // ====== READ
@@ -75,7 +75,7 @@ export const dissocAuthGroup = (authGroup) => _updateAuthGroups(R.reject(AuthGro
 // PREFS
 export const { newPrefs } = UserPrefs
 export const { getPrefSurveyCurrent } = UserPrefs
-export const { getPrefSurveyCycle } = UserPrefs
+export const { getPrefSurveyCycle, getPrefSurveyLanguage } = UserPrefs
 export const { getPrefSurveyCurrentCycle } = UserPrefs
 
 export const { assocPrefSurveyCurrent } = UserPrefs
