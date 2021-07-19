@@ -5,7 +5,6 @@ import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
@@ -19,10 +18,9 @@ const EntitySelectorTreeNode = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
-  const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
   const childEntityDefs = onlyPages
-    ? NodeDefLayout.filterNodeDefsWithPage(cycle)(childDefs)
-    : childDefs.filter(NodeDef.isEntity)
+    ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+    : Survey.getNodeDefChildren(nodeDef)(survey).filter(NodeDef.isEntity)
   const root = NodeDef.isRoot(nodeDef)
 
   const [showChildren, setShowChildren] = useState(root || expanded)
