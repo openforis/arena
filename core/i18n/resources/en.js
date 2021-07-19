@@ -654,7 +654,7 @@ $t(common.cantUndoWarning)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
-      confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
+      confirmDelete: 'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
