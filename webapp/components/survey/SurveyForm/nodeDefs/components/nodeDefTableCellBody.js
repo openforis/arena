@@ -3,9 +3,6 @@ import './nodeDefTableCellBody.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
@@ -13,12 +10,12 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefTableCellBody = (props) => {
-  const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey, surveyInfo } = props
+  const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey } = props
 
-  const i18n = useI18n()
-  const surveyLanguage = Survey.getLanguage(i18n.lang)(surveyInfo)
+  const surveyLanguage = useSurveyPreferredLang()
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
 
   const propsNodeDefComponent = {
