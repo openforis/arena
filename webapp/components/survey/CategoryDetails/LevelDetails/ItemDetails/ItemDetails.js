@@ -16,7 +16,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyLang } from '@webapp/store/survey'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State, useActions } from '../../store'
@@ -28,7 +28,7 @@ const ItemDetails = (props) => {
 
   const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
-  const lang = useSurveyLang()
+  const lang = useSurveyPreferredLang()
 
   const category = State.getCategory(state)
   const categoryUuid = Category.getUuid(category)

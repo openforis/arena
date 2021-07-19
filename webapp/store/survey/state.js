@@ -28,16 +28,14 @@ export const getSurveyCycleKey = (state) => {
 
 export const getSurveyCyclesKeys = R.pipe(getSurvey, Survey.getSurveyInfo, Survey.getCycleKeys)
 
-export const getNodeDefLabel = (nodeDef) => (state) => {
-  const surveyInfo = getSurveyInfo(state)
-  const langApp = I18nState.getLang(state)
-  const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
-  return NodeDef.getLabel(nodeDef, langSurvey)
-}
-
-export const getSurveyPreferredLanguage = (state) => {
+export const getSurveyPreferredLang = (state) => {
   const surveyId = getSurveyId(state)
   const user = UserState.getUser(state)
-  const preferredLanguage = User.getPrefSurveyLanguage(surveyId)(user)
+  const preferredLanguage = User.getPrefSurveyLang(surveyId)(user)
   return preferredLanguage || getSurveyDefaultLang(state)
+}
+
+export const getNodeDefLabel = (nodeDef) => (state) => {
+  const prefLang = getSurveyPreferredLang(state)
+  return NodeDef.getLabel(nodeDef, prefLang)
 }

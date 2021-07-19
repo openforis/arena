@@ -271,6 +271,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
       editInfo: 'Edit info',
       viewInfo: 'View info',
+      preferredLanguage: 'Preferred language',
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',

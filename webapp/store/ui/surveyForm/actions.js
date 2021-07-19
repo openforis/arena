@@ -86,14 +86,14 @@ const _getNodeValueString = ({ nodeDef, node, lang }) => {
 export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getState) => {
   const state = getState()
 
-  const lang = I18nState.getLang(state)
   const survey = SurveyState.getSurvey(state)
+  const lang = SurveyState.getSurveyPreferredLang(state)
   const record = RecordState.getRecord(state)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
 
   const getNodeDefKeyLabelValue = (nodeDefKey) => {
     const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
-    const label = SurveyState.getNodeDefLabel(nodeDefKey)(state)
+    const label = NodeDef.getLabel(nodeDef, lang)
     const value = _getNodeValueString({ nodeDef: nodeDefKey, node: nodeKey, lang })
     return `${label} - ${value}`
   }

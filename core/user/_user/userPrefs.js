@@ -20,7 +20,7 @@ const surveyPrefsPath = ({ surveyId }) => [keys.prefs, keysPrefs.surveys, String
 const surveyPrefPath = ({ surveyId, key }) => [...surveyPrefsPath({ surveyId }), key]
 
 const surveyCyclePrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
-const surveyLanguagePrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
+const surveyLangPrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
 
 // ====== CREATE
 export const newPrefs = (surveyId, surveyCycleKey) => ({
@@ -36,7 +36,7 @@ export const newPrefs = (surveyId, surveyCycleKey) => ({
 export const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
 
 export const getPrefSurveyCycle = (surveyId) => R.path(surveyCyclePrefPath(surveyId))
-export const getPrefSurveyLanguage = (surveyId) => R.path(surveyLanguagePrefPath(surveyId))
+export const getPrefSurveyLang = (surveyId) => R.path(surveyLangPrefPath(surveyId))
 
 export const getPrefSurveyCurrentCycle = (user) => {
   const surveyId = getPrefSurveyCurrent(user)
@@ -45,11 +45,12 @@ export const getPrefSurveyCurrentCycle = (user) => {
 
 export const getPrefSurveyCurrentLanguage = (user) => {
   const surveyId = getPrefSurveyCurrent(user)
-  return getPrefSurveyLanguage(surveyId)(user)
+  return getPrefSurveyLang(surveyId)(user)
 }
 
 // ====== UPDATE
 export const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(surveyCyclePrefPath(surveyId), cycle)
+export const assocPrefSurveyLang = ({ surveyId, lang }) => R.assocPath(surveyLangPrefPath(surveyId), lang)
 
 export const assocPrefSurveyCurrent = (surveyId) => (user) =>
   R.pipe(

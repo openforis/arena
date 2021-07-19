@@ -4,26 +4,17 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { useLang } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefCodeDropdown = (props) => {
-  const {
-    canEditRecord,
-    edit,
-    entryDataQuery,
-    items,
-    nodeDef,
-    onItemAdd,
-    onItemRemove,
-    readOnly,
-    selectedItems,
-  } = props
+  const { canEditRecord, edit, entryDataQuery, items, nodeDef, onItemAdd, onItemRemove, readOnly, selectedItems } =
+    props
 
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
