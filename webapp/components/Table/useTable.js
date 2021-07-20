@@ -20,7 +20,14 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     dispatch: fetchData,
     loading: loadingData,
   } = useAsyncGetRequest(apiUri, {
-    params: { offset, limit, sortBy: sort.by, sortOrder: sort.order, searchBy: search.by, search: search.text, ...restParams },
+    params: {
+      offset,
+      limit,
+      sortBy: sort.by,
+      sortOrder: sort.order,
+      search,
+      ...restParams,
+    },
   })
   const {
     data: { count } = { count: 0 },
@@ -39,7 +46,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useOnUpdate(() => {
     fetchData()
-  }, [limit, offset, sort.by, sort.order, search.by, search.text ])
+  }, [limit, offset, sort.by, sort.order, search])
 
   const handleSortBy = useCallback(
     (orderByField) => {
@@ -51,5 +58,27 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     [sort]
   )
 
-  return { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, count: Number(count), initData }
+  const handleSearch = useCallback(
+    (searchText) => {
+      updateQuery(history)({
+        value: searchText,
+        key: 'search',
+      })
+    },
+    [sort]
+  )
+
+  return {
+    loadingData,
+    loadingCount,
+    list,
+    offset,
+    limit,
+    sort,
+    search,
+    handleSearch,
+    handleSortBy,
+    count: Number(count),
+    initData,
+  }
 }

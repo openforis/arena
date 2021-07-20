@@ -1,3 +1,4 @@
+import './HeaderLeft.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -9,14 +10,14 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const HeaderLeft = ({ props }) => {
+const HeaderLeft = ({ handleSearch }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
 
   return Survey.isPublished(surveyInfo) ? (
-    <div>
+    <div className="records__header-left">
       <button
         data-testid={DataTestId.records.addBtn}
         type="button"
@@ -27,9 +28,11 @@ const HeaderLeft = ({ props }) => {
         {i18n.t('common.new')}
       </button>
 
-      <div>
-        <input onChange={(e) => console.log(3)}></input>
-      </div>
+      <input
+        className="records__header-left__input-search"
+        placeholder="search..."
+        onChange={(e) => handleSearch(e.target.value)}
+      />
     </div>
   ) : (
     <div />
