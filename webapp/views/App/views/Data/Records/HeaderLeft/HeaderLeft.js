@@ -10,7 +10,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const HeaderLeft = ({ handleSearch }) => {
+const HeaderLeft = ({ handleSearch, search }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
@@ -31,6 +31,7 @@ const HeaderLeft = ({ handleSearch }) => {
       <input
         className="records__header-left__input-search"
         placeholder="search..."
+        defaultValue={search}
         onChange={(e) => handleSearch(e.target.value)}
       />
     </div>

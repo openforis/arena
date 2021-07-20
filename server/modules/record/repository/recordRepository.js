@@ -96,7 +96,17 @@ export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
   )
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, sortBy = 'date_created', sortOrder = 'DESC' },
+  {
+    surveyId,
+    cycle,
+    nodeDefRoot,
+    nodeDefKeys,
+    offset = 0,
+    limit = null,
+    sortBy = 'date_created',
+    sortOrder = 'DESC',
+    search = false,
+  },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
@@ -112,6 +122,10 @@ export const fetchRecordsSummaryBySurveyId = async (
         `${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
     )
     .join(', ')
+
+  const nodeDefKeysSelectSearch = nodeDefKeys
+    .map((nodeDefKey) => ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%${search}%'`)
+    .join('AND ')
 
   const recordsSelect = `
     SELECT 
@@ -156,6 +170,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
+    ${search && search !== 'null' ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
     ORDER BY ${
       Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
         ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
