@@ -65,7 +65,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
         key: 'search',
       })
     },
-    [sort]
+    []
   )
 
   return {
