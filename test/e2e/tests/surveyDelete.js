@@ -28,7 +28,7 @@ export default () =>
 
     test('Delete surveys', async () => {
       await PromiseUtils.each([survey2, surveyImport, surveyFromTemplate, survey], deleteSurvey)
-    })
+    }, 30000)
 
     test('Verify survey list empty', async () => {
       await expectNoItems()
