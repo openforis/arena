@@ -22,6 +22,7 @@ import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import FormHeader from './FormHeader'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
@@ -133,25 +134,29 @@ const SurveyForm = (props) => {
 
       <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
         {showPageNavigation && (
-          <EntitySelectorTree
-            isDisabled={(nodeDefArg) => {
-              const parentNodeArg = SurveyFormState.getFormPageParentNode(nodeDefArg)(state)
-              return !(
-                edit ||
-                NodeDef.isRoot(nodeDefArg) ||
-                NodeDef.getUuid(nodeDefRoot) === NodeDef.getParentUuid(nodeDefArg) ||
-                Boolean(parentNodeArg)
-              )
-            }}
-            nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
-            onlyPages
-            onSelect={(nodeDefToSelect) => {
-              const showAddChildTo =
-                NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
-                !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: nodeDefToSelect })
-              dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
-            }}
-          />
+          <div className="survey-form__sidebar">
+            <EntitySelectorTree
+              isDisabled={(nodeDefArg) => {
+                const parentNodeArg = SurveyFormState.getFormPageParentNode(nodeDefArg)(state)
+                return !(
+                  edit ||
+                  NodeDef.isRoot(nodeDefArg) ||
+                  NodeDef.getUuid(nodeDefRoot) === NodeDef.getParentUuid(nodeDefArg) ||
+                  Boolean(parentNodeArg)
+                )
+              }}
+              nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
+              onlyPages
+              onSelect={(nodeDefToSelect) => {
+                const showAddChildTo =
+                  NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
+                  !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: nodeDefToSelect })
+                dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
+              }}
+            />
+
+            {edit && canEditDef && <FormPagesEditButtons />}
+          </div>
         )}
 
         <NodeDefSwitch
