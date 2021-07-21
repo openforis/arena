@@ -124,8 +124,8 @@ export const fetchRecordsSummaryBySurveyId = async (
     .join(', ')
 
   const nodeDefKeysSelectSearch = nodeDefKeys
-    .map((nodeDefKey) => ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%${search}%'`)
-    .join('AND ')
+    .map((nodeDefKey) => ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$3:value%'`)
+    .join('OR ')
 
   const recordsSelect = `
     SELECT 
@@ -170,14 +170,14 @@ export const fetchRecordsSummaryBySurveyId = async (
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
-    ${search && search !== 'null' ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
+    ${search ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
     ORDER BY ${
       Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
         ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
   `,
-    [surveyId, cycle],
+    [surveyId, cycle, search ],
     dbTransformCallback(surveyId, false)
   )
 }

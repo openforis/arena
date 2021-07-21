@@ -14,7 +14,7 @@ export const getSort = () => ({
   order: _getUrlSearchParam({ param: 'sortOrder' }),
 })
 
-export const getSearch = () => String(_getUrlSearchParam({ param: 'search' }))
+export const getSearch = () => String(_getUrlSearchParam({ param: 'search', defaultValue: ''}))
 
 export const getLink = ({ limit, offset, sort, search }) => {
   const url = new URL(window.location.href)
