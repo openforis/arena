@@ -87,9 +87,14 @@ const HelperWithoutAttributes = () => {
   )
 }
 
+export const helperTypes = {
+  firstTimeSurvey: 'firstTimeSurvey',
+  surveyWithoutNodeDefs: 'surveyWithoutNodeDefs'
+}
+
 const HelpersByType = {
-  [ActivityLogObject.type.surveyPropUpdate]: HelperFirstTimeSurvey,
-  [ActivityLogObject.type.nodeDefCreate]: HelperWithoutAttributes,
+  [helperTypes.firstTimeSurvey]: HelperFirstTimeSurvey,
+  [helperTypes.surveyWithoutNodeDefs]: HelperWithoutAttributes,
 }
 
 const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => {

@@ -11,13 +11,13 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyInfo from './SurveyInfo'
 import ActivityLog from './ActivityLog'
 import RecordsSummary from './RecordsSummary'
-import Helper from './Helper'
+import Helper, { helperTypes } from './Helper'
 
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 
 const Dashboard = () => {
-  const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages })
+  const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
 
   const canEditDef = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
