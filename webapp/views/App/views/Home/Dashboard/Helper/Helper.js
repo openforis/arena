@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 
 import { Trans } from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
-import * as ActivityLogObject from '@common/activityLog/activityLog'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
