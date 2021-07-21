@@ -37,7 +37,7 @@ const SurveyHierarchy = () => {
   }, [nodeDefLabelType, tree])
 
   useEffect(() => {
-    if (tree) tree.nodeDefLabelLang = lang
+    if (tree) tree.lang = lang
   }, [lang, tree])
 
   const toggleLabelFunction = () => {

@@ -312,7 +312,7 @@ export default class Tree {
     return this._lang
   }
 
-  set nodeDefLabelLang(lang) {
+  set lang(lang) {
     this._lang = lang
     this._updateLabels()
   }
