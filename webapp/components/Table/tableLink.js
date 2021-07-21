@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 const _getUrlSearchParam = ({ param, defaultValue = null }) => {
   const url = new URL(window.location.href)
   return url.searchParams.get(param) || defaultValue
@@ -12,7 +14,9 @@ export const getSort = () => ({
   order: _getUrlSearchParam({ param: 'sortOrder' }),
 })
 
-export const getLink = ({ limit, offset, sort }) => {
+export const getSearch = () => String(_getUrlSearchParam({ param: 'search', defaultValue: ''}))
+
+export const getLink = ({ limit, offset, sort, search }) => {
   const url = new URL(window.location.href)
 
   if (limit) url.searchParams.set('limit', String(limit))
@@ -22,11 +26,15 @@ export const getLink = ({ limit, offset, sort }) => {
     url.searchParams.set('sortOrder', String(sort.order))
     url.searchParams.set('offset', String(0))
   }
+  if (!A.isNull(search)) {
+    url.searchParams.set('search', String(search))
+    url.searchParams.set('offset', String(0))
+  }
   return `${url.pathname}${url.search}`
 }
 
 export const updateQuery =
   (history) =>
   ({ key, value }) => {
-    history.replace(getLink({ [key]: value }))
+    history.replace(getLink({ [key]: value || '' }))
   }

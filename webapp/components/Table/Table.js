@@ -23,7 +23,7 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { loadingData, loadingCount, list, offset, limit, sort, handleSortBy, count, initData } = useTable({
+  const { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, handleSearch, count, initData } = useTable({
     moduleApiUri,
     module,
     restParams,
@@ -40,8 +40,10 @@ const Table = (props) => {
         list={list}
         limit={limit}
         count={count}
+        search={search}
         headerLeftComponent={headerLeftComponent}
         headerProps={headerProps}
+        handleSearch={handleSearch}
       />
 
       <Content
