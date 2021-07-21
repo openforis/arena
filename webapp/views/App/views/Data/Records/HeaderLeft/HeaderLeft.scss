@@ -1,0 +1,14 @@
+@import 'webapp/style/vars';
+
+$tableHeaderHeight: 30px;
+
+.records__header-left {
+  display: flex;
+  height: $tableHeaderHeight;
+}
+
+.records__header-left__input-search {
+  padding: 0px 5px;
+  border: 1px solid $greyBorder;
+  background: white;
+}
