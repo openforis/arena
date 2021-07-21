@@ -1,14 +1,14 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as User from '@core/user/user'
 import { getLanguageLabel } from '@core/app/languages'
 
-import Dropdown from '@webapp/components/form/Dropdown'
-
+import { useI18n } from '@webapp/store/system'
 import { useSurveyId, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
 import { UserActions, useUser } from '@webapp/store/user'
-import { useDispatch } from 'react-redux'
-import { useI18n } from '@webapp/store/system'
+
+import Dropdown from '@webapp/components/form/Dropdown'
 
 export const SurveyPreferredLanguageSelector = () => {
   const dispatch = useDispatch()
