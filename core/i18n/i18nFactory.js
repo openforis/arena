@@ -1,8 +1,10 @@
 import i18next from 'i18next'
-
+import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
 import * as ProcessUtils from '@core/processUtils'
 
 import { enTranslation } from './resources/en'
+
+export const Trans = i18nTrans
 
 const createParams = (lang) => ({
   fallbackLng: 'en',
@@ -36,3 +38,8 @@ export const createI18nPromise = (lang) => {
     })
   })
 }
+
+const i18n = i18next.createInstance()
+i18n.use(initReactI18next).init(createParams('en'))
+
+export default i18n

@@ -18,4 +18,5 @@ export { useIsInRoute, useIsCategoriesRoute, useIsDesignerNodeDefRoute, useIsTax
 export { useOnBrowserBack } from './useOnBrowserBack'
 export { useOnPageUnload } from './useOnPageUnload'
 export { useRequest } from './useRequest'
+export { useShouldShowFirstTimeHelp} from './useShouldShowFirstTimeHelp'
 export { useQuery } from './useQuery'
