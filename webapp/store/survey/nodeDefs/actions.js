@@ -117,12 +117,16 @@ export const putNodeDefLayoutProp =
     const state = getState()
     const survey = SurveyState.getSurvey(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-    const surveyUpdated = Survey.updateNodeDefLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
-    const nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDef))(surveyUpdated)
-    dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
+    const nodeDefsUpdated = Survey.updateLayoutProp({ surveyCycleKey, nodeDef, key, value })(survey)
 
-    const props = { [NodeDefLayout.keys.layout]: NodeDefLayout.getLayout(nodeDefUpdated) }
-    dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
+    // for each node defs updated, update dispatch nodeDefUpdate event
+    Object.values(nodeDefsUpdated).forEach((nodeDefUpdated) => {
+      dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
+    })
+    // update the props server side
+    const nodeDefUpdated = nodeDefsUpdated[nodeDef.uuid]
+    const propsToPersist = { [NodeDefLayout.keys.layout]: NodeDef.getLayout(nodeDefUpdated) }
+    dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, propsToPersist))
   }
 
 // ==== DELETE
@@ -180,6 +184,7 @@ export const removeNodeDef =
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
+          params: { name: NodeDef.getName(nodeDef)},
           onOk: async () => {
             const surveyId = Survey.getId(survey)
             const surveyCycleKey = SurveyState.getSurveyCycleKey(state)

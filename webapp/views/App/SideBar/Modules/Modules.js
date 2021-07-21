@@ -9,6 +9,8 @@ import PopupMenu from './PopupMenu'
 const Modules = (props) => {
   const { user, surveyInfo, pathname, sideBarOpened } = props
 
+  const [overSidebar, setOverSidebar] = useState(false)
+
   const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
     (module) => !SideBarModule.isHidden(module)
   )
@@ -17,7 +19,15 @@ const Modules = (props) => {
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
   return (
-    <div className={`sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}>
+    <div
+      className={`sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}
+      onMouseEnter={() => {
+        setOverSidebar(true)
+      }}
+      onMouseLeave={() => {
+        setOverSidebar(false)
+      }}
+    >
       <div className="sidebar__module-placeholder" />
       {modulesHierarchy.map((module) => (
         <Module
@@ -38,6 +48,7 @@ const Modules = (props) => {
         <PopupMenu
           module={modulePopupMenu}
           pathname={pathname}
+          overSidebar={overSidebar}
           onClose={() => {
             setModulePopupMenu(null)
           }}

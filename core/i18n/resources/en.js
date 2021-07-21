@@ -616,6 +616,8 @@ $t(common.cantUndoWarning)`,
     schemaSummary: 'Schema Summary',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
+    movePageUp: 'Move page up',
+    movePageDown: 'Move page down',
     formEditActions: {
       preview: 'Preview',
     },
@@ -630,7 +632,7 @@ $t(common.cantUndoWarning)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
-      confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
+      confirmDelete: 'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
