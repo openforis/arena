@@ -58,7 +58,10 @@ const ChainComponent = () => {
         message={i18n.t('chainView.errorNoLabel')}
       />
 
-      <ButtonRStudio onClick={_openRStudio} />
+      <ButtonRStudio
+        onClick={_openRStudio}
+        disabled={!Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation))}
+      />
 
       <div className="form">
         <LabelsEditor
