@@ -29,6 +29,7 @@ const Dropdown = (props) => {
     readOnlyInput,
     selection,
     sourceElement,
+    title,
     validation,
   } = props
 
@@ -45,6 +46,7 @@ const Dropdown = (props) => {
     onChange,
     readOnly,
     selection,
+    title,
   })
   const showDialog = State.getShowDialog(state)
   const itemsDialog = State.getItemsDialog(state)
@@ -75,6 +77,7 @@ const Dropdown = (props) => {
           await Actions.onBlurInput({ value: e.target.value, state, selection })
         }}
         onFocus={async () => Actions.openDialog({ state })}
+        title={title}
       />
 
       <button
@@ -131,6 +134,7 @@ Dropdown.propTypes = {
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
+  title: PropTypes.string,
   validation: PropTypes.object,
 }
 
@@ -148,6 +152,7 @@ Dropdown.defaultProps = {
   readOnlyInput: false,
   selection: null,
   sourceElement: null,
+  title: null,
   validation: {},
 }
 

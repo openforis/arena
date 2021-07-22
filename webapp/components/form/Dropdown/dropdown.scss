@@ -11,11 +11,15 @@
     justify-self: center;
     align-self: center;
     transform: rotate(90deg) scale(0.8, 1.1);
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .form-input,
   .form-input[readonly] {
     border-bottom: none;
+    padding-right: 0;
+    width: 100%;
   }
 
   &:focus-within {

@@ -130,7 +130,7 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
   const nodeDefLabelType = SurveyFormState.getNodeDefLabelType(state)
-  const lang = SurveyState.getSurveyDefaultLang(state)
+  const lang = SurveyState.getSurveyPreferredLang(state)
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
 
   const mapEntryProps = () => {

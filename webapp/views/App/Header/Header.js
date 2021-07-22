@@ -19,6 +19,7 @@ import { usePrevious } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 
 import UserPopupMenu from './UserPopupMenu'
 import CycleSelector from './CycleSelector'
@@ -70,6 +71,7 @@ const Header = () => {
                   dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
                 }}
               />
+              <SurveyPreferredLanguageSelector />
               {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
             </>
           ))}

@@ -3,8 +3,6 @@ import { useSelector } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useLang } from '@webapp/store/system'
-
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import * as SurveyState from '../state'
@@ -17,8 +15,8 @@ export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
 export const useSurveyInfo = () => useSelector(SurveyState.getSurveyInfo)
 export const useSurveyCycleKey = () => useSelector(SurveyState.getSurveyCycleKey)
 export const useSurveyCycleKeys = () => useSelector(SurveyState.getSurveyCyclesKeys)
+export const useSurveyPreferredLang = () => useSelector(SurveyState.getSurveyPreferredLang)
 
-export const useSurveyLang = () => Survey.getLanguage(useLang())(useSurveyInfo())
 export const useSurveyLangs = () => Survey.getLanguages(useSurveyInfo())
 
 export const useOnSurveyCycleUpdate = (effect) => {
@@ -31,4 +29,4 @@ export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
-export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyLang(), type)
+export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
