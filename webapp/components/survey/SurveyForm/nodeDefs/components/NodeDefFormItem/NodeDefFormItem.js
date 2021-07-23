@@ -9,14 +9,23 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 const NodeDefFormItem = (props) => {
-  const { edit, entry, label, nodeDef, nodes, parentNode } = props
+  const { edit, entry, label, lang, nodeDef, nodes, parentNode } = props
   const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
 
   return NodeDef.isEntity(nodeDef) ? (
     nodeDefComponent
   ) : (
     <FormItem
-      label={<NodeDefFormItemLabel nodeDef={nodeDef} label={label} edit={edit} nodes={nodes} parentNode={parentNode} />}
+      label={
+        <NodeDefFormItemLabel
+          nodeDef={nodeDef}
+          label={label}
+          lang={lang}
+          edit={edit}
+          nodes={nodes}
+          parentNode={parentNode}
+        />
+      }
       className="survey-form__node-def-form-item"
     >
       <div className={`${entry && NodeDef.isMultiple(nodeDef) ? 'survey-form__node-def-multiple-container' : ''}`}>

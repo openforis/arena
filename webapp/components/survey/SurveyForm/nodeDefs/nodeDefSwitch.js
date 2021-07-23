@@ -166,6 +166,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     label,
+    lang,
     applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
     ...(entry ? mapEntryProps() : {}),
   }
