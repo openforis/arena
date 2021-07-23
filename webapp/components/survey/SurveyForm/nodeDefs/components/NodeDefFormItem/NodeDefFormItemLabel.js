@@ -1,22 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as NodeDef from '@core/survey/nodeDef'
-
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
+import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 
 const NodeDefFormItemLabel = (props) => {
   const { nodeDef, label, lang, edit, parentNode, nodes } = props
-
-  const description = NodeDef.getDescription(lang)(nodeDef)
 
   return (
     <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
       <div>
         <NodeDefIconKey nodeDef={nodeDef} />
         {label}
-        {description ? <span className="icon icon-info icon-12px" title={description} /> : null}
+        <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
       </div>
     </NodeDefErrorBadge>
   )

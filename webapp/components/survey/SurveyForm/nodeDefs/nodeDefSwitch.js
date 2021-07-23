@@ -79,7 +79,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
+    const { surveyCycleKey, nodeDef, label, lang, edit, canEditDef, renderType, applicable } = this.props
     const { isHovering } = this.state
 
     const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
@@ -103,7 +103,7 @@ class NodeDefSwitch extends React.Component {
           <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
         )}
         {renderType === NodeDefLayout.renderType.tableHeader ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={label} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
         ) : renderType === NodeDefLayout.renderType.tableBody ? (
           <NodeDefTableCellBody {...this.props} label={label} />
         ) : (

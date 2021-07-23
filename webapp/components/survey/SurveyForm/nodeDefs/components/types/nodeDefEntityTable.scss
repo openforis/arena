@@ -26,6 +26,15 @@
       color: $orange;
     }
   }
+
+  .label-wrapper {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      padding: 5px;
+    }
+  }
 }
 
 .survey-form__node-def-entity-table-rows {

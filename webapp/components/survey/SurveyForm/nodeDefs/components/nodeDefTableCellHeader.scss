@@ -10,16 +10,38 @@
 
 .survey-form__node-def-table-cell-header {
   display: flex;
+  flex-direction: column;
   width: 100%;
   background-color: $black;
 
-  .label {
+  .label-wrapper {
     width: 100%;
-    align-self: center;
-    justify-self: center;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-align: center;
-    color: white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      color: white;
+    }
+    .icon-info {
+      padding-right: 5px;
+    }
+  }
+
+  .subfields-labels-wrapper {
+    display: grid;
+  }
+
+  .label-wrapper,
+  .subfields-labels-wrapper {
+    .label {
+      width: 100%;
+      align-self: center;
+      justify-self: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-align: center;
+      color: white;
+    }
   }
 }

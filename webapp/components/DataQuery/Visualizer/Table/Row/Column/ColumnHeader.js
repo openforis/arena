@@ -43,7 +43,7 @@ const ColumnHeader = (props) => {
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="table__cell-content-wrapper width100">
         {modeEdit ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} lang={lang} />
         ) : (
           <>
             <span className="ellipsis">{nodeDefLabel}</span>
