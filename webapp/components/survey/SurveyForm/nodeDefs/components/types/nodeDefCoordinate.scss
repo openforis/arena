@@ -8,6 +8,7 @@
 }
 
 .survey-form__node-def-table-cell-coordinate {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
+  .subfields-labels-wrapper {
+    grid-template-columns: repeat(3, auto);
+  }
 }
