@@ -19,7 +19,7 @@ const CollectImportReport = () => {
     <SurveyDefsLoader draft validate>
       <Table
         className="collect-import-report"
-        module="surveys"
+        module="collect-import-report"
         moduleApiUri={`/api/survey/${surveyId}/collect-import/report`}
         gridTemplateColumns="60px repeat(5, 0.2fr) 0.1fr 30px"
         headerLeftComponent={HeaderLeft}
