@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import * as ActivityLogObject from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyInfo } from '@webapp/store/survey'
 
 const hasActivityOfType = ({ messages, activityType }) => messages.some((message) => activityType === message.type)
 
@@ -17,7 +17,6 @@ const determineHelperType = ({ messages, helperTypes }) => {
 }
 
 export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) => {
-  const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
   const [messages, setMessages] = useState([])
   const [help, setHelp] = useState(false)
