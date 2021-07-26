@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
-import * as A from '@core/arena'
 
 import LoadingBar from '@webapp/components/LoadingBar'
 
@@ -34,7 +33,6 @@ const Content = (props) => {
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
-    count,
     totalCount,
     onRowClick,
     rowHeaderComponent,
