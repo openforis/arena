@@ -1,5 +1,3 @@
-import * as camelize from 'camelize'
-
 import { db } from '@server/db/db'
 import * as RecordFile from '@core/record/recordFile'
 
@@ -21,12 +19,12 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-export const fetchFilesBySurveyId = async (surveyId, client = db) =>
+export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
   client.map(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.file`,
+    SELECT uuid FROM ${getSurveyDBSchema(surveyId)}.file`,
     [],
-    camelize
+    (row) => row.uuid
   )
 
 export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
