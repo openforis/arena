@@ -8,17 +8,17 @@ import { Query } from '@common/model/query'
 
 import PanelRight from '@webapp/components/PanelRight'
 
-import { useSurvey } from '@webapp/store/survey'
-import { useI18n, useLang } from '@webapp/store/system'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor'
 
 export const AggregateFunctionsPanel = (props) => {
   const { aggregateFunctions, nodeDef, onChangeQuery, onClose, query } = props
 
-  const lang = useLang()
   const i18n = useI18n()
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
 
   const customAggregateFunctionUuids = aggregateFunctions.filter(
     (fn) => !Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(fn)

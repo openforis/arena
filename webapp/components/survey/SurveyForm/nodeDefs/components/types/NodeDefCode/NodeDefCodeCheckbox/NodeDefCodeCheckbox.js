@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { useI18n, useLang } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefCodeCheckbox = (props) => {
   const { canEditRecord, edit, items, onItemAdd, onItemRemove, readOnly, selectedItems } = props
 
   const i18n = useI18n()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
 
   const disabled = edit || !canEditRecord || readOnly
 

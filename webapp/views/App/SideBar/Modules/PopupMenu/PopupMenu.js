@@ -41,6 +41,9 @@ const PopupMenu = (props) => {
 
   // OnMount or module change, reset internal state variables
   useEffect(() => {
+    // prevent popup close
+    clearCloseTimeout()
+    // reset internal variables
     overPopupRef.current = false
   }, [key])
 

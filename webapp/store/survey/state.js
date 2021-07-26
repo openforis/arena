@@ -4,8 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
-import { I18nState } from '@webapp/store/system'
-
 import * as UserState from '@webapp/store/user/state'
 
 const survey = 'survey'
@@ -20,14 +18,22 @@ export const getSurveyDefaultLang = R.pipe(getSurveyInfo, Survey.getDefaultLangu
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
-export const getSurveyCycleKey = (state) =>
-  R.pipe(UserState.getUser, User.getPrefSurveyCycle(getSurveyId(state)))(state)
+export const getSurveyCycleKey = (state) => {
+  const surveyId = getSurveyId(state)
+  const user = UserState.getUser(state)
+  return User.getPrefSurveyCycle(surveyId)(user)
+}
 
 export const getSurveyCyclesKeys = R.pipe(getSurvey, Survey.getSurveyInfo, Survey.getCycleKeys)
 
+export const getSurveyPreferredLang = (state) => {
+  const surveyId = getSurveyId(state)
+  const user = UserState.getUser(state)
+  const preferredLanguage = User.getPrefSurveyLang(surveyId)(user)
+  return preferredLanguage || getSurveyDefaultLang(state)
+}
+
 export const getNodeDefLabel = (nodeDef) => (state) => {
-  const surveyInfo = getSurveyInfo(state)
-  const langApp = I18nState.getLang(state)
-  const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
-  return NodeDef.getLabel(nodeDef, langSurvey)
+  const prefLang = getSurveyPreferredLang(state)
+  return NodeDef.getLabel(nodeDef, prefLang)
 }

@@ -6,7 +6,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import { useSurvey, useSurveyLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useNodeDefLabelType, useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
 
@@ -26,7 +26,7 @@ export const usePath = (entry) => {
   const survey = useSurvey()
   let nodeDefCurrent = useNodeDefPage()
   const pagesUuidMap = usePagesUuidMap()
-  const lang = useSurveyLang()
+  const lang = useSurveyPreferredLang()
   const labelType = useNodeDefLabelType()
   const record = useRecord()
 

@@ -11,7 +11,7 @@ const deleteSurvey = async (surveyToDelete) => {
   await clickSurvey(surveyToDelete)
 
   await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
-  await page.fill('input[type="text"]', name)
+  await page.fill(getSelector(DataTestId.surveyDelete.confirmNameInput), name)
 
   // Click div[role="dialog"] >> text="Delete"
   await Promise.all([
@@ -28,7 +28,7 @@ export default () =>
 
     test('Delete surveys', async () => {
       await PromiseUtils.each([survey2, surveyImport, surveyFromTemplate, survey], deleteSurvey)
-    })
+    }, 30000)
 
     test('Verify survey list empty', async () => {
       await expectNoItems()

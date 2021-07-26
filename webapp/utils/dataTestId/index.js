@@ -124,6 +124,9 @@ export const DataTestId = {
     surveyName: 'survey-name',
     surveyLabel: 'survey-label',
   },
+  surveyDelete: {
+    confirmNameInput: 'survey-delete-confirm-name',
+  },
   surveyExport: {
     downloadBtn: 'text="Download"',
   },
