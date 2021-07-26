@@ -34,9 +34,14 @@ const assocSurveyInfo = (info) => ({ info })
 
 // ====== VALIDATION
 
-export const validateNewSurvey = async (newSurvey) => {
+export const validateNewSurvey = async ({ newSurvey }) => {
   const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name) // TODO add object model for newSurvey
-  return SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
+  return SurveyValidator.validateNewSurvey({ newSurvey, surveyInfos })
+}
+
+export const validateSurveyClone = async ({ newSurvey }) => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
+  return SurveyValidator.validateSurveyClone({ newSurvey, surveyInfos })
 }
 
 const validateSurveyInfo = async (surveyInfo) =>
@@ -155,7 +160,14 @@ export const importSurvey = async (params, client = db) => {
 }
 
 // ====== READ
-export const { countOwnedSurveys, countUserSurveys, fetchAllSurveyIds, fetchDependencies } = SurveyRepository
+export const {
+  countOwnedSurveys,
+  countUserSurveys,
+  fetchAllSurveyIds,
+  fetchSurveysByName,
+  fetchSurveyIdsAndNames,
+  fetchDependencies,
+} = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([

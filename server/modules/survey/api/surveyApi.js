@@ -22,7 +22,7 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const surveyReq = Request.getBody(req)
-      const validation = await SurveyService.validateNewSurvey(surveyReq)
+      const validation = await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
 
       if (Validation.isValid(validation)) {
         const { name, label, lang, cloneFrom = null, template = false } = surveyReq
