@@ -34,7 +34,8 @@ const Records = () => {
       headerLeftComponent={HeaderLeft}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
-      noItemsLabelKey="dataView.records.noRecordsAdded"
+      noItemsLabelKey={"dataView.records.noRecordsAdded"}
+      noItemsLabelForSearchKey={"dataView.records.noRecordsAddedForThisSearch" }
       onRowClick={onRowClick}
     />
   )

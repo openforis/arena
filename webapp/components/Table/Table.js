@@ -15,6 +15,7 @@ const Table = (props) => {
     module,
     moduleApiUri,
     noItemsLabelKey,
+    noItemsLabelForSearchKey,
     onRowClick,
     restParams,
     rowComponent,
@@ -53,7 +54,9 @@ const Table = (props) => {
         loading={loadingData}
         maxRows={limit}
         module={module}
+        count={count}
         noItemsLabelKey={noItemsLabelKey}
+        noItemsLabelForSearchKey={noItemsLabelForSearchKey}
         offset={offset}
         onRowClick={onRowClick}
         rowComponent={rowComponent}
@@ -77,6 +80,7 @@ Table.propTypes = {
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,
   noItemsLabelKey: PropTypes.string,
+  noItemsLabelForSearchKey: PropTypes.string,
   onRowClick: PropTypes.func, // Row click handler
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
@@ -92,6 +96,7 @@ Table.defaultProps = {
   isRowActive: null,
   moduleApiUri: null,
   noItemsLabelKey: 'common.noItems',
+  noItemsLabelForSearchKey: 'common.noItems',
   onRowClick: null,
   restParams: {},
   rowHeaderComponent: DummyComponent,

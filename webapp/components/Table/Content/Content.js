@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import LoadingBar from '@webapp/components/LoadingBar'
 
@@ -31,7 +32,9 @@ const Content = (props) => {
     maxRows,
     module,
     noItemsLabelKey,
+    noItemsLabelForSearchKey,
     offset,
+    count,
     onRowClick,
     rowHeaderComponent,
     rowComponent,
@@ -52,7 +55,7 @@ const Content = (props) => {
   if (!loading && R.isEmpty(list)) {
     return (
       <div className="table__empty-rows" data-testid={DataTestId.table.noItems}>
-        {i18n.t(noItemsLabelKey)}
+        {Number(count) <= 0 || A.isEmpty(count) ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}
       </div>
     )
   }
@@ -109,6 +112,7 @@ Content.propTypes = {
   maxRows: PropTypes.number.isRequired,
   module: PropTypes.string.isRequired,
   noItemsLabelKey: PropTypes.string.isRequired,
+  noItemsLabelForSearchKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
   initData: PropTypes.func,
