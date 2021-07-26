@@ -16,6 +16,15 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
+const valueFormattersByType = {
+  [NodeDef.nodeDefType.date]: ({ value }) =>
+    DateUtils.convertDate({
+      dateStr: value,
+      formatFrom: DateUtils.formats.datetimeISO,
+      formatTo: DateUtils.formats.dateDefault,
+    }),
+}
+
 const Row = (props) => {
   const { row: record, rowNo } = props
   const nodeDefKeys = useNodeDefRootKeys()
@@ -35,9 +44,11 @@ const Row = (props) => {
         const name = NodeDef.getName(nodeDef)
         const uuid = NodeDef.getUuid(nodeDef)
         const value = record[camelize(name)]
+        const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
+        const valueFormatted = value && formatter ? formatter({ value }) : value
         return (
           <div key={uuid} data-testid={DataTestId.records.cellNodeDef(name)} data-value={value}>
-            {value}
+            {valueFormatted}
           </div>
         )
       })}
