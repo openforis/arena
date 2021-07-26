@@ -31,12 +31,28 @@ const Instances = () => {
 
   const requestRStudioInstances = async () => {
     try {
+      setLoading(true)
       const { data = {} } = await axios.post('/api/rstudio')
       const { instanceId = false, rStudioProxyUrl = false } = data
       setInstance({ instanceId })
       setUrl(`${rStudioProxyUrl}${instanceId}_${User.getUuid(user)}`)
     } catch (err) {
       return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const closeRStudioInstance = async () => {
+    try {
+      setLoading(true)
+      await axios.delete('/api/rstudio', { params: { instanceId } })
+      setInstance(false)
+      setUrl(false)
+    } catch (err) {
+      return false
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -49,11 +65,14 @@ const Instances = () => {
     <div className="instances-container">
       <p>Instances</p>
       {!A.isEmpty(instance) ? (
-        <a href={url} target="_blank">
-          <p>
-            {instance.Purpose || RStudio} - {instance.instanceId}{' '}
-          </p>
-        </a>
+        <div>
+          <a href={url} target="_blank">
+            <p>
+              {instance.Purpose || 'RStudio'} - {instance.instanceId}{' '}
+            </p>
+          </a>
+          <button onClick={closeRStudioInstance}>terminate instance</button>
+        </div>
       ) : (
         <ButtonRStudio onClick={requestRStudioInstances} />
       )}

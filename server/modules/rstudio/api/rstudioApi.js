@@ -8,6 +8,7 @@ import * as ProcessUtils from '@core/processUtils'
 const RStudioCommands = {
   requestInstance: ({ payload }) => ({ command: 'REQUEST_RSTUDIO', payload }),
   checkInstances: ({ payload }) => ({ command: 'CHECK_INSTANCES', payload }),
+  closeInstance: ({ payload }) => ({ command: 'DELETE', payload }),
 }
 
 const RStudioApi = async ({ command }) =>
@@ -35,6 +36,22 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const userUuid = User.getUuid(user)
       const { data } = await RStudioApi({ command: RStudioCommands.checkInstances({ payload: { userId: userUuid } }) })
+      res.json(data)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.delete('/rstudio', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const userUuid = User.getUuid(user)
+
+      const { instanceId } = Request.getParams(req)
+
+      const { data } = await RStudioApi({
+        command: RStudioCommands.closeInstance({ payload: { userId: userUuid, instanceId } }),
+      })
       res.json(data)
     } catch (error) {
       next(error)

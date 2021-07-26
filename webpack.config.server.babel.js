@@ -44,7 +44,7 @@ export default {
     filename: 'dist/[id].js',
     // LibraryTarget: 'commonjs2',
     hotUpdateChunkFilename: 'dist/hot-update-[id].js',
-    hotUpdateMainFilename: 'dist/hot-update-[hash].json',
+    hotUpdateMainFilename: 'dist/hot-update-[fullhash].json',
   },
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
