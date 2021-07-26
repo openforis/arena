@@ -75,10 +75,24 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 }
 
+export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
+  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+
+  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
+    surveyId,
+    NodeDef.getUuid(nodeDefRoot),
+    nodeDefsDraft,
+    client
+  )
+
+  return RecordRepository.countRecordsBySurveyId({ surveyId, cycle, search, nodeDefKeys, nodeDefRoot }, client)
+}
+
 export {
   fetchRecordByUuid,
   fetchRecordsUuidAndCycle,
-  countRecordsBySurveyId,
   fetchRecordCreatedCountsByDates,
   insertRecordsInBatch,
 } from '../repository/recordRepository'
