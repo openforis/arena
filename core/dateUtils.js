@@ -118,6 +118,9 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
     return null
   }
   const dateParsed = parse(dateStr, formatFrom)
+  if (!dateParsed || Number.isNaN(dateParsed.getTime())) {
+    return null
+  }
   return format(dateParsed, formatTo)
 }
 
