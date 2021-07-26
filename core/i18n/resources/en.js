@@ -286,9 +286,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <p>Go to <linkWithIcon>Survey \> Form Designer</linkWithIcon></p>
         <br />
         `,
-        
-        
-      }
+      },
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
@@ -657,7 +655,8 @@ $t(common.cantUndoWarning)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
-      confirmDelete: 'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
+      confirmDelete:
+        'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
@@ -910,6 +909,7 @@ $t(common.cantUndoWarning)`,
 
   // ====== Jobs
   jobs: {
+    ActivityLogImportJob: 'Activity Log Import',
     CategoriesImportJob: 'Categories Import',
     CategoryImportJob: 'Category Import',
     CategoriesValidationJob: 'Categories Validation',

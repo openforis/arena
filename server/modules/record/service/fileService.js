@@ -4,7 +4,7 @@ export const {
   // CREATE
   insertFile,
   // READ
-  fetchFilesBySurveyId,
+  fetchFileUuidsBySurveyId,
   fetchFileByUuid,
   fetchFileByNodeUuid,
 } = FileManager
