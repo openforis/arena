@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 
 import { useSurveyId } from '@webapp/store/survey'
@@ -6,6 +6,7 @@ import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 
 export const useTable = ({ moduleApiUri, module, restParams }) => {
+  const [totalCount, setTotalCount] = useState(0)
   const history = useHistory()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
@@ -34,7 +35,10 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     dispatch: fetchCount,
     loading: loadingCount,
   } = useAsyncGetRequest(`${apiUri}/count`, {
-    params: restParams,
+    params: {
+      search,
+      ...restParams,
+    },
   })
 
   const initData = useCallback(() => {
@@ -44,9 +48,19 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useEffect(initData, [JSON.stringify(restParams)])
 
+  useEffect(() => {
+    if (totalCount < count) {
+      setTotalCount(count)
+    }
+  }, [count, totalCount])
+
   useOnUpdate(() => {
     fetchData()
   }, [limit, offset, sort.by, sort.order, search])
+
+  useEffect(() => {
+    fetchCount()
+  }, [search])
 
   const handleSortBy = useCallback(
     (orderByField) => {
@@ -58,15 +72,12 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     [sort]
   )
 
-  const handleSearch = useCallback(
-    (searchText) => {
-      updateQuery(history)({
-        value: searchText,
-        key: 'search',
-      })
-    },
-    []
-  )
+  const handleSearch = useCallback((searchText) => {
+    updateQuery(history)({
+      value: searchText,
+      key: 'search',
+    })
+  }, [])
 
   return {
     loadingData,
@@ -79,6 +90,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     handleSearch,
     handleSortBy,
     count: Number(count),
+    totalCount: Number(totalCount),
     initData,
   }
 }

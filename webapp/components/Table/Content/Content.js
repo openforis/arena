@@ -35,6 +35,7 @@ const Content = (props) => {
     noItemsLabelForSearchKey,
     offset,
     count,
+    totalCount,
     onRowClick,
     rowHeaderComponent,
     rowComponent,
@@ -55,7 +56,7 @@ const Content = (props) => {
   if (!loading && R.isEmpty(list)) {
     return (
       <div className="table__empty-rows" data-testid={DataTestId.table.noItems}>
-        {Number(count) <= 0 || A.isEmpty(count) ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}
+        {Number(totalCount) <= 0 ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}
       </div>
     )
   }

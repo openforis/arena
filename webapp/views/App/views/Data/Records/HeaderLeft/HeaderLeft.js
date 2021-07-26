@@ -10,7 +10,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const HeaderLeft = ({ handleSearch, search, count }) => {
+const HeaderLeft = ({ handleSearch, search, totalCount }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
@@ -28,7 +28,7 @@ const HeaderLeft = ({ handleSearch, search, count }) => {
         {i18n.t('common.new')}
       </button>
 
-      { count > 0 && <input
+      { totalCount > 0 && <input
         className="records__header-left__input-search"
         placeholder="search..."
         defaultValue={search}

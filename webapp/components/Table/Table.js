@@ -24,13 +24,13 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, handleSearch, count, initData } = useTable({
+  const { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, handleSearch, count, totalCount, initData } = useTable({
     moduleApiUri,
     module,
     restParams,
   })
 
-  if (loadingCount) {
+  if (loadingCount && totalCount <= 0) {
     return <LoadingBar />
   }
 
@@ -41,6 +41,7 @@ const Table = (props) => {
         list={list}
         limit={limit}
         count={count}
+        totalCount={totalCount}
         search={search}
         headerLeftComponent={headerLeftComponent}
         headerProps={headerProps}
@@ -55,6 +56,7 @@ const Table = (props) => {
         maxRows={limit}
         module={module}
         count={count}
+        totalCount={totalCount}
         noItemsLabelKey={noItemsLabelKey}
         noItemsLabelForSearchKey={noItemsLabelForSearchKey}
         offset={offset}
