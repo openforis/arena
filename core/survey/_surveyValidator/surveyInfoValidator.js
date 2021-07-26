@@ -6,20 +6,27 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyCyclesValidator from './surveyCyclesValidator'
 
-const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
-  return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
+const validateSurveyNameUniqueness = (surveyInfos) => (propName, survey) =>
+  !R.isEmpty(surveyInfos) && R.find((s) => s.id !== survey.id, surveyInfos)
     ? { key: Validation.messageKeys.nameDuplicate }
     : null
-}
 
-export const validateNewSurvey = async (survey, surveyInfos) =>
-  await Validator.validate(survey, {
+export const validateNewSurvey = async ({ newSurvey, surveyInfos }) =>
+  Validator.validate(newSurvey, {
     name: [
       Validator.validateRequired(Validation.messageKeys.nameRequired),
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos),
     ],
     lang: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
+  })
+
+export const validateSurveyClone = async ({ newSurvey, surveyInfos }) =>
+  Validator.validate(newSurvey, {
+    name: [
+      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+      validateSurveyNameUniqueness(surveyInfos),
+    ],
   })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
