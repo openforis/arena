@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid'
-import * as StringUtils from '@core/stringUtils'
+import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -71,14 +71,11 @@ const extractCoordinateValueAndMeta = (collectNode) => {
 const extractDateValueAndMeta = (collectNode) => {
   const { day, month, year } = CollectRecord.getTextValues(collectNode)
 
-  const date =
-    StringUtils.isBlank(year) || StringUtils.isBlank(month) || StringUtils.isBlank(day)
-      ? null
-      : new Date(year, month - 1, day)
-
-  return {
-    value: DateUtils.formatDateISO(date),
+  if (!NumberUtils.isInteger(year) || !NumberUtils.isInteger(month) || !NumberUtils.isInteger(day)) {
+    return { value: null }
   }
+  const date = new Date(year, month - 1, day)
+  return { value: DateUtils.formatDateISO(date) }
 }
 
 const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNodeDef, tx) => async (collectNode) => {
@@ -112,9 +109,11 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 }
 
 const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
-  const { code, scientific_name: scientificName, vernacular_name: vernacularName } = CollectRecord.getTextValues(
-    collectNode
-  )
+  const {
+    code,
+    scientific_name: scientificName,
+    vernacular_name: vernacularName,
+  } = CollectRecord.getTextValues(collectNode)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
 
   if (taxonUuid) {
