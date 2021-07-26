@@ -30,6 +30,7 @@ export const formats = {
   dateDefault: 'dd/MM/yyyy',
   dateISO: 'yyyy-MM-dd',
   datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
+  datetimeISO: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`,
   timeStorage: 'HH:mm',
 }
 
