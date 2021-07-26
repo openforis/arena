@@ -78,9 +78,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, search } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId(surveyId, cycle)
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
       res.json(count)
     } catch (error) {
       next(error)
