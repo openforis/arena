@@ -104,7 +104,7 @@ export const isValidTime = (hour = '', minutes = '') =>
 
 export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)
-  return !isNaN(parsed.getTime())
+  return fnsIsValid(parsed)
 }
 
 export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
@@ -118,6 +118,9 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
     return null
   }
   const dateParsed = parse(dateStr, formatFrom)
+  if (!fnsIsValid(dateParsed)) {
+    return null
+  }
   return format(dateParsed, formatTo)
 }
 

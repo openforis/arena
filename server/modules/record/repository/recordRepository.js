@@ -2,6 +2,7 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
+import * as A from '@core/arena'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -85,15 +86,29 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 }
 // ============== READ
 
-export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
-  client.one(
+export const countRecordsBySurveyId = async (
+  {
+    surveyId,
+    cycle,
+    nodeDefRoot,
+    nodeDefKeys,
+    search = false,
+  },
+  client = db
+) => {
+  if (!A.isEmpty(search)) {
+    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, nodeDefRoot, nodeDefKeys, search })
+    return { count: recordsWithSearch.length }
+  }
+  return client.one(
     `
-      SELECT count(*) 
-      FROM ${getSurveyDBSchema(surveyId)}.record 
-      WHERE preview = FALSE AND cycle = $1
-    `,
+        SELECT count(*) 
+        FROM ${getSurveyDBSchema(surveyId)}.record 
+        WHERE preview = FALSE AND cycle = $1
+      `,
     [cycle]
   )
+}
 
 export const fetchRecordsSummaryBySurveyId = async (
   {
@@ -177,7 +192,7 @@ export const fetchRecordsSummaryBySurveyId = async (
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
   `,
-    [surveyId, cycle, search ],
+    [surveyId, cycle, search],
     dbTransformCallback(surveyId, false)
   )
 }
