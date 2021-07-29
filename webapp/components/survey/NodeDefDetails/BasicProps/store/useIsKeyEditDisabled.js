@@ -10,7 +10,6 @@ export const useIsKeyEditDisabled = ({ nodeDef }) => {
     NodeDef.isRoot(nodeDef) ||
     NodeDef.isMultiple(nodeDef) ||
     (!NodeDef.isKey(nodeDef) &&
-      Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes) ||
-    NodeDef.isReadOnly(nodeDef)
+      Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes)
   )
 }

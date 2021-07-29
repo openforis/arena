@@ -31,7 +31,7 @@ const AdvancedProps = (props) => {
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
             <Checkbox
               checked={NodeDef.isReadOnly(nodeDef)}
-              disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
+              disabled={readOnly || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
             />
