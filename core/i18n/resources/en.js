@@ -465,16 +465,33 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     rotate: 'Rotate',
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload',
-    invitation: {
-      sendInvitation: 'Send invitation',
-      surveyNotPublishedWarning: `**Warning**: survey is not published
-        Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
-        If you want to invite users with other roles you should first publish the survey.`,
-    },
     sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  userInviteView: {
+    groupPermissions: {
+      label: 'Permissions',
+      systemAdmin: `- Full system access rights.
+- Surveys: create, delete, clone, edit, create template`,
+      surveyAdmin: `- Surveys: create, edit, delete
+- Data: full data access rights to own surveys
+- Analysis: full access rights to all tools
+- Users: can invite users to own surveys`,
+      surveyEditor: `- Surveys: edit own surveys
+- Data: full data access rights to own surveys
+- Analysis: full access rights to all tools`,
+      dataAnalyst: `- Data: full data access rights to own surveys
+- Analysis: full access rights to all tools`,
+      dataCleanser: `- Data: can add and edit data (own surveys), access to data Validation tools, submit data to “Analysis” phase`,
+      dataEditor: `- Data: can add and edit data (own surveys)`,
+    },
+    sendInvitation: 'Send invitation',
+    surveyNotPublishedWarning: `**Warning**: survey is not published.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      If you want to invite users with other roles you should first publish the survey.`,
   },
 
   user: {
