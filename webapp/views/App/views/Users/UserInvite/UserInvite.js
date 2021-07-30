@@ -62,10 +62,7 @@ const UserInviteComponent = () => {
 
       {selectedGroupName && (
         <FormItem label={i18n.t('userInviteView.groupPermissions.label')}>
-          <Markdown
-            className="user-invite__role-permissions"
-            source={i18n.t(`userInviteView.groupPermissions.${selectedGroupName}`)}
-          />
+          <ul dangerouslySetInnerHTML={{ __html: i18n.t(`userInviteView.groupPermissions.${selectedGroupName}`) }} />
         </FormItem>
       )}
 

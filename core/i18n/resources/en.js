@@ -474,19 +474,25 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   userInviteView: {
     groupPermissions: {
       label: 'Permissions',
-      systemAdmin: `- Full system access rights.
-- Surveys: create, delete, clone, edit, create template`,
-      surveyAdmin: `- Surveys: create, edit, delete
-- Data: full data access rights to own surveys
-- Analysis: full access rights to all tools
-- Users: can invite users to own surveys`,
-      surveyEditor: `- Surveys: edit own surveys
-- Data: full data access rights to own surveys
-- Analysis: full access rights to all tools`,
-      dataAnalyst: `- Data: full data access rights to own surveys
-- Analysis: full access rights to all tools`,
-      dataCleanser: `- Data: can add and edit data (own surveys), access to data Validation tools, submit data to “Analysis” phase`,
-      dataEditor: `- Data: can add and edit data (own surveys)`,
+      systemAdmin: `
+        <li>Full system access rights.</li>
+        <li>Surveys: create, delete, clone, edit, create template</li>`,
+      surveyAdmin: `
+        <li>Surveys: create, edit, delete</li>
+        <li>Data: full data access rights to own surveys</li>
+        <li>Analysis: full access rights to all tools</li>
+        <li>Users: can invite users to own surveys</li>`,
+      surveyEditor: `
+        <li>Surveys: edit own surveys</li>
+        <li>Data: full data access rights to own surveys</li>
+        <li>Analysis: full access rights to all tools</li>`,
+      dataAnalyst: `
+        <li>Data: full data access rights to own surveys</li>
+        <li>Analysis: full access rights to all tools</li>`,
+      dataCleanser: `
+        <li>Data: can add and edit data (own surveys), access to data Validation tools, submit data to “Analysis” phase</li>`,
+      dataEditor: `
+        <li>Data: can add and edit data (own surveys), submit data to “Cleansing” phase</li>`,
     },
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
@@ -1070,6 +1076,8 @@ $t(common.cantUndoWarning)`,
       subject: 'You have been invited to $t(common.appNameFull)!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             <p>With this role you can: <ul>{{groupPermissions}}</ul>
+             </p>
              <p><a href="{{urlResetPassword}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.temporaryMsg)
              $t(emails.signature)`,
