@@ -475,24 +475,58 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
-        <li>Full system access rights.</li>
-        <li>Surveys: create, delete, clone, edit, create template</li>`,
+        <li>Full system access rights</li>`,
       surveyAdmin: `
-        <li>Surveys: create, edit, delete</li>
-        <li>Data: full data access rights to own surveys</li>
-        <li>Analysis: full access rights to all tools</li>
-        <li>Users: can invite users to own surveys</li>`,
+        <li>Surveys: 
+          <ul>
+            <li>create</li>
+            <li>clone</li>
+            <li>edit own surveys</li>
+            <li>delete own surveys</li>
+          </ul>
+        </li>
+        <li>Users:
+          <ul>
+            <li>invite users to own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
       surveyEditor: `
-        <li>Surveys: edit own surveys</li>
-        <li>Data: full data access rights to own surveys</li>
-        <li>Analysis: full access rights to all tools</li>`,
+        <li>Surveys: 
+          <ul>
+            <li>edit own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
       dataAnalyst: `
-        <li>Data: full data access rights to own surveys</li>
-        <li>Analysis: full access rights to all tools</li>`,
+        <li>Data: 
+          <ul>
+            $t(userInviteView.groupPermissions.dataCleanserData)
+          </ul>
+        </li>
+        <li>Analysis:
+          <ul>
+            <li>full access rights to all tools</li>
+          </ul>
+        </li>`,
       dataCleanser: `
-        <li>Data: can add and edit data (own surveys), access to data Validation tools, submit data to “Analysis” phase</li>`,
+        <li>Data: 
+          <ul>
+            $t(userInviteView.groupPermissions.dataCleanserData)
+          </ul>
+        </li>`,
+      dataCleanserData: `
+        $t(userInviteView.groupPermissions.dataEditorData)
+        <li>access data Validation tools</li>
+        <li>submit records to “Analysis” phase</li>`,
       dataEditor: `
-        <li>Data: can add and edit data (own surveys), submit data to “Cleansing” phase</li>`,
+        <li>Data: 
+          <ul>$t(userInviteView.groupPermissions.dataEditorData)</ul>
+        </li>`,
+      dataEditorData: `
+        <li>add new records (own surveys)</li>
+        <li>edit existing records (own surveys)</li>
+        <li>submit records to “Cleansing” phase</li>`,
     },
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
@@ -1072,21 +1106,22 @@ $t(common.cantUndoWarning)`,
       The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
+    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+      <p>With the role of {{groupLabel}} you have the following permissions: <br/> 
+        <ul>{{groupPermissions}}</ul>
+      </p>`,
     userInvite: {
       subject: 'You have been invited to $t(common.appNameFull)!',
       body: `<p>Hello,</p>
-             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             <p>With this role you can: <ul>{{groupPermissions}}</ul>
-             </p>
+             $t(emails.userInviteCommon)
              <p><a href="{{urlResetPassword}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.temporaryMsg)
              $t(emails.signature)`,
     },
-    existingUserInvite: {
-      subject:
-        'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
+    userInviteExistingUser: {
+      subject: 'You have been invited to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
       body: `<p>Hello,</p>
-             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             $t(emails.userInviteCommon)
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.signature)`,
     },

@@ -126,7 +126,7 @@ export const inviteUser = async ({
         // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
         // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails.existingUserInvite', msgParams: emailParams, lang })
+        await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
       } else if (repeatInvitation) {
         // User has a pending invitation still
         // Generate reset password and send email again
