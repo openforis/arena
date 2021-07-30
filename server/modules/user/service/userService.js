@@ -124,7 +124,7 @@ export const inviteUser = async ({
         _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
 
         // Add user to group (accept automatically the invitation)
-        await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
+        await UserManager.addUserToGroup({ user, surveyId, groupUuid, userToAdd: userToInvite }, t)
         // Send email
         await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
       } else if (repeatInvitation) {

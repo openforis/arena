@@ -20,6 +20,7 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
+import { Button } from '@webapp/components'
 
 const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
@@ -67,16 +68,14 @@ const UserInviteComponent = () => {
       )}
 
       <div className="user-invite__buttons">
-        <button
-          data-testid={DataTestId.userInvite.submitBtn}
-          type="button"
-          className="btn btn-invite"
-          aria-disabled={!Validation.isValid(validation)}
+        <Button
+          testId={DataTestId.userInvite.submitBtn}
+          className="btn-invite"
+          disabled={Validation.isNotValid(validation)}
           onClick={onInvite}
-        >
-          <span className="icon icon-envelop icon-left icon-12px" />
-          {i18n.t('userInviteView.sendInvitation')}
-        </button>
+          iconClassName="icon-envelop icon-left icon-12px"
+          label="userInviteView.sendInvitation"
+        />
       </div>
     </div>
   )

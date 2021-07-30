@@ -472,6 +472,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   userInviteView: {
+    confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -1026,7 +1027,7 @@ $t(common.cantUndoWarning)`,
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     cantUpdateStep: `Can't update step`,
     entryDataNotFound: 'Entry data not found: {{entryName}}',
-    generic: '{{text}}',
+    generic: 'Unexpected error: {{text}}',
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
