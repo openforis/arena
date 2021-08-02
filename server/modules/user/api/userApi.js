@@ -35,7 +35,7 @@ export const init = (app) => {
         const validation = await UserValidator.validateInvitation(userToInvite)
 
         if (!Validation.isValid(validation)) {
-          res.json({ error: 'appErrors.userInvalid' })
+          res.json({ errorKey: 'appErrors.userInvalid' })
           return
         }
       }
@@ -46,7 +46,9 @@ export const init = (app) => {
         await UserService.inviteUser({ user, surveyId, surveyCycleKey, userToInvite, serverUrl, repeatInvitation })
         Response.sendOk(res)
       } catch (e) {
-        res.json({ errorKey: e.key, errorParams: e.params })
+        const errorKey = e.key || 'appErrors.generic'
+        const errorParams = e.params || { text: e.message }
+        res.json({ errorKey, errorParams })
       }
     } catch (error) {
       next(error)
