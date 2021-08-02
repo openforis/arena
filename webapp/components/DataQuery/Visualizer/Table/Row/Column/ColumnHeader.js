@@ -8,13 +8,13 @@ import { Query } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyLang } from '@webapp/store/survey'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
-import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
@@ -26,7 +26,7 @@ const ColumnHeader = (props) => {
   const { colWidth, nodeDef, onChangeQuery, query } = props
 
   const i18n = useI18n()
-  const lang = useSurveyLang()
+  const lang = useSurveyPreferredLang()
 
   const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
     query,
@@ -43,7 +43,7 @@ const ColumnHeader = (props) => {
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="table__cell-content-wrapper width100">
         {modeEdit ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} lang={lang} />
         ) : (
           <>
             <span className="ellipsis">{nodeDefLabel}</span>

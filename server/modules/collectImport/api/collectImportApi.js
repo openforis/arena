@@ -1,14 +1,15 @@
-import * as Request from '@server/utils/request'
-
-import * as JobUtils from '@server/job/jobUtils'
-
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as Response from '@server/utils/response'
-
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+
+import { db } from '@server/db/db'
+import * as JobUtils from '@server/job/jobUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as CSVWriter from '@server/utils/file/csvWriter'
+
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+
 import * as CollectImportService from '../service/collectImportService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -19,10 +20,15 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const file = Request.getFile(req)
+      const newSurvey = Request.getJsonParam(req, 'survey')
+      const validation = await SurveyService.validateSurveyClone({ newSurvey })
 
-      const job = CollectImportService.startCollectImportJob(user, file.tempFilePath)
-
-      res.json({ job: JobUtils.jobToJSON(job) })
+      if (Validation.isValid(validation)) {
+        const job = CollectImportService.startCollectImportJob({ user, filePath: file.tempFilePath, newSurvey })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ validation })
+      }
     } catch (error) {
       next(error)
     }

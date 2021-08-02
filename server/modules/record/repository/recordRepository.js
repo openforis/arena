@@ -2,6 +2,7 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
+import * as A from '@core/arena'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -85,18 +86,42 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 }
 // ============== READ
 
-export const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
-  client.one(
+export const countRecordsBySurveyId = async (
+  {
+    surveyId,
+    cycle,
+    nodeDefRoot,
+    nodeDefKeys,
+    search = false,
+  },
+  client = db
+) => {
+  if (!A.isEmpty(search)) {
+    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, nodeDefRoot, nodeDefKeys, search })
+    return { count: recordsWithSearch.length }
+  }
+  return client.one(
     `
-      SELECT count(*) 
-      FROM ${getSurveyDBSchema(surveyId)}.record 
-      WHERE preview = FALSE AND cycle = $1
-    `,
+        SELECT count(*) 
+        FROM ${getSurveyDBSchema(surveyId)}.record 
+        WHERE preview = FALSE AND cycle = $1
+      `,
     [cycle]
   )
+}
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, sortBy = 'date_created', sortOrder = 'DESC' },
+  {
+    surveyId,
+    cycle,
+    nodeDefRoot,
+    nodeDefKeys,
+    offset = 0,
+    limit = null,
+    sortBy = 'date_created',
+    sortOrder = 'DESC',
+    search = false,
+  },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
@@ -112,6 +137,10 @@ export const fetchRecordsSummaryBySurveyId = async (
         `${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
     )
     .join(', ')
+
+  const nodeDefKeysSelectSearch = nodeDefKeys
+    .map((nodeDefKey) => ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$3:value%'`)
+    .join('OR ')
 
   const recordsSelect = `
     SELECT 
@@ -156,13 +185,14 @@ export const fetchRecordsSummaryBySurveyId = async (
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
+    ${search ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
     ORDER BY ${
       Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
         ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
   `,
-    [surveyId, cycle],
+    [surveyId, cycle, search],
     dbTransformCallback(surveyId, false)
   )
 }

@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n, useLang } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import { useNodeDefRootKeys } from '@webapp/store/survey'
+import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
 import { SortToggle } from '@webapp/components/Table'
 
 const RowHeader = (props) => {
@@ -13,7 +13,8 @@ const RowHeader = (props) => {
   const { handleSortBy, sort } = tableProps
   const nodeDefKeys = useNodeDefRootKeys()
   const i18n = useI18n()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
+
   return (
     <>
       <div>#</div>

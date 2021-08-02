@@ -7,16 +7,20 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = (props) => {
-  const { entry, edit, nodeDef, nodes, parentNode, label, updateNode, canEditRecord, canAddNode } = props
+  const { entry, edit, lang, nodeDef, nodes, parentNode, label, updateNode, canEditRecord, canAddNode } = props
 
   return (
     <div className="survey-form__node-def-entity-table">
       <div className="survey-form__node-def-entity-table-header">
         <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
-          <div>{label}</div>
+          <div className="label-wrapper">
+            {label}
+            <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
+          </div>
 
           {entry && canEditRecord && (
             <button

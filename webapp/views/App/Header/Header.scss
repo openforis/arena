@@ -27,13 +27,17 @@
 
   .dropdown {
     margin-left: 10px;
-    grid-template-columns: 60px 40px;
+    grid-template-columns: 60px 20px;
     border-bottom: none;
 
     input {
       font-size: 0.85rem;
       color: lighten($black, 20%);
     }
+  }
+
+  .survey-preferred-language {
+    grid-template-columns: 80px 20px;
   }
 
   .progress-bar {

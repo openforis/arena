@@ -15,7 +15,7 @@ const Header = (props) => {
   return (
     <div className="table__header">
       {React.createElement(headerLeftComponent, props)}
-
+      
       {!R.isEmpty(list) && (
         <Paginator
           offset={offset}

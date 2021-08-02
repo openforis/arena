@@ -15,6 +15,7 @@ const Table = (props) => {
     module,
     moduleApiUri,
     noItemsLabelKey,
+    noItemsLabelForSearchKey,
     onRowClick,
     restParams,
     rowComponent,
@@ -23,13 +24,13 @@ const Table = (props) => {
     rowProps,
   } = props
 
-  const { loadingData, loadingCount, list, offset, limit, sort, handleSortBy, count, initData } = useTable({
+  const { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, handleSearch, count, totalCount, initData } = useTable({
     moduleApiUri,
     module,
     restParams,
   })
 
-  if (loadingCount) {
+  if (loadingCount && totalCount <= 0) {
     return <LoadingBar />
   }
 
@@ -40,8 +41,11 @@ const Table = (props) => {
         list={list}
         limit={limit}
         count={count}
+        totalCount={totalCount}
+        search={search}
         headerLeftComponent={headerLeftComponent}
         headerProps={headerProps}
+        handleSearch={handleSearch}
       />
 
       <Content
@@ -51,7 +55,10 @@ const Table = (props) => {
         loading={loadingData}
         maxRows={limit}
         module={module}
+        count={count}
+        totalCount={totalCount}
         noItemsLabelKey={noItemsLabelKey}
+        noItemsLabelForSearchKey={noItemsLabelForSearchKey}
         offset={offset}
         onRowClick={onRowClick}
         rowComponent={rowComponent}
@@ -75,6 +82,7 @@ Table.propTypes = {
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,
   noItemsLabelKey: PropTypes.string,
+  noItemsLabelForSearchKey: PropTypes.string,
   onRowClick: PropTypes.func, // Row click handler
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
@@ -90,6 +98,7 @@ Table.defaultProps = {
   isRowActive: null,
   moduleApiUri: null,
   noItemsLabelKey: 'common.noItems',
+  noItemsLabelForSearchKey: 'common.noItems',
   onRowClick: null,
   restParams: {},
   rowHeaderComponent: DummyComponent,

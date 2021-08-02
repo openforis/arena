@@ -17,6 +17,7 @@ export const Input = React.forwardRef((props, ref) => {
     onBlur,
     placeholder,
     readOnly,
+    title: titleProp,
     type,
     validation,
     value,
@@ -31,6 +32,7 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
   const valueText = value === null || Number.isNaN(value) ? '' : String(value)
+  const title = titleProp || valueText
 
   const handleValueChange = (newValue) => {
     const input = inputRef.current
@@ -67,7 +69,7 @@ export const Input = React.forwardRef((props, ref) => {
           readOnly,
           type,
           value,
-          title: value,
+          title,
           ...numberFormat,
         })
       ) : (
@@ -86,7 +88,7 @@ export const Input = React.forwardRef((props, ref) => {
           readOnly={readOnly}
           type={type}
           value={value}
-          title={value}
+          title={title}
           autoComplete="off"
         />
       )}
@@ -103,6 +105,7 @@ Input.propTypes = {
   onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
+  title: PropTypes.string,
   type: PropTypes.oneOf(['text', 'number']),
   validation: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -125,6 +128,7 @@ Input.defaultProps = {
   onBlur: () => {},
   placeholder: null,
   readOnly: false,
+  title: null, // defaults to value
   type: 'text',
   validation: null,
   value: '',

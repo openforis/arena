@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, useSurveyInfo, NodeDefsActions } from '@webapp/store/survey'
+import { useSurvey, NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
@@ -20,8 +20,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const surveyInfo = useSurveyInfo()
-  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
+  const lang = useSurveyPreferredLang()
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
 

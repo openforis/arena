@@ -12,6 +12,7 @@ import * as ActivityLogManager from '../../../../activityLog/manager/activityLog
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 
 import * as CollectSurvey from '../model/collectSurvey'
+import { findUniqueSurveyName } from './surveyUniqueNameGenerator'
 
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
@@ -19,11 +20,12 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { collectSurvey } = this.context
+    const { collectSurvey, newSurvey: newSurveyParam } = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
 
-    const name = R.pipe(R.split('/'), R.last)(collectUri)
+    const startingName = newSurveyParam.name || R.pipe(R.split('/'), R.last)(collectUri)
+    const name = await findUniqueSurveyName({ startingName })
 
     const languages = R.pipe(CollectSurvey.getElementsByName('language'), R.map(CollectSurvey.getText))(collectSurvey)
 

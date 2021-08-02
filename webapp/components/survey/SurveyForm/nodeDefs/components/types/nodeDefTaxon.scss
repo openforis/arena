@@ -9,7 +9,7 @@
 
 .survey-form__node-def-taxon-autocomplete-list .item {
   display: grid;
-  grid-template-columns: .3fr .7fr;
+  grid-template-columns: 0.3fr 0.7fr;
 
   div {
     white-space: nowrap;
@@ -23,8 +23,8 @@
   }
 }
 
-
 .survey-form__node-def-table-cell-taxon {
-  display: grid;
-  grid-template-columns: .2fr .5fr .3fr;
+  .subfields-labels-wrapper {
+    grid-template-columns: 0.2fr 0.5fr 0.3fr;
+  }
 }

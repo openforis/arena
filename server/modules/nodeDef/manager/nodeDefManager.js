@@ -235,6 +235,6 @@ export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, c
 
     return {
       [nodeDefUuid]: nodeDef,
-      ...(nodeDefParentUpdated ? [nodeDefParentUpdated.uuid] : nodeDefParentUpdated),
+      ...(nodeDefParentUpdated ? { [nodeDefParentUpdated.uuid]: nodeDefParentUpdated } : {}),
     }
   })

@@ -79,7 +79,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
+    const { surveyCycleKey, nodeDef, label, lang, edit, canEditDef, renderType, applicable } = this.props
     const { isHovering } = this.state
 
     const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
@@ -103,7 +103,7 @@ class NodeDefSwitch extends React.Component {
           <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
         )}
         {renderType === NodeDefLayout.renderType.tableHeader ? (
-          <NodeDefTableCellHeader nodeDef={nodeDef} label={label} />
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
         ) : renderType === NodeDefLayout.renderType.tableBody ? (
           <NodeDefTableCellBody {...this.props} label={label} />
         ) : (
@@ -130,7 +130,7 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
   const nodeDefLabelType = SurveyFormState.getNodeDefLabelType(state)
-  const lang = SurveyState.getSurveyDefaultLang(state)
+  const lang = SurveyState.getSurveyPreferredLang(state)
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
 
   const mapEntryProps = () => {
@@ -166,6 +166,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     label,
+    lang,
     applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
     ...(entry ? mapEntryProps() : {}),
   }

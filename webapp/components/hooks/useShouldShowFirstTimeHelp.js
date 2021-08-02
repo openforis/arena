@@ -4,7 +4,18 @@ import * as ActivityLogObject from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 import { useSurveyInfo } from '@webapp/store/survey'
 
-const hasActivityOfType = ({messages, activityType}) => messages.some((message) => (activityType === message.type))
+const hasActivityOfType = ({ messages, activityType }) => messages.some((message) => activityType === message.type)
+
+const determineHelperType = ({ messages, helperTypes }) => {
+  if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.nodeDefCreate })) {
+    return false
+  }
+  if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.surveyPropUpdate })) {
+    return helperTypes.surveyWithoutNodeDefs
+  }
+  return helperTypes.firstTimeSurvey
+}
+
 
 export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) => {
   const surveyInfo = useSurveyInfo()
@@ -14,27 +25,17 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
   const fetchMessages = useFetchMessages({ messages, setMessages })
 
   useEffect(() => {
-    if(Survey.getUuid(surveyInfo))
-    fetchMessages({ newest: true })
+    if (Survey.getUuid(surveyInfo) && !Survey.isFromCollect(surveyInfo) && !Survey.isTemplate(surveyInfo)) {
+      fetchMessages()
+    }
   }, [surveyInfo])
 
   useEffect(() => {
     if (messages.length > 0 && messages.length < 10) {
-      let _help = false
 
-      if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.nodeDefCreate})) {
-        setHelp(_help)
-        return
-      }
-      _help = helperTypes.surveyWithoutNodeDefs
+      const helperType = determineHelperType({ messages, helperTypes })
+      setHelp(helperType)
 
-      if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.surveyPropUpdate})) {
-        setHelp(_help)
-        return
-      }
-      _help = helperTypes.firstTimeSurvey
-
-      setHelp(_help)
     }
   }, [messages])
 

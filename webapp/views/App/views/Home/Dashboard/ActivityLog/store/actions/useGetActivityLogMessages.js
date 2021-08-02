@@ -56,7 +56,7 @@ export const useFetchMessages = ({ messages, setMessages }) => {
     dependencies: [params],
   })
 
-  return ({ newest: _newest }) => {
+  return ({ newest: _newest } = {}) => {
     const _params = {}
     const initialized = messages.length > 0
 
