@@ -117,3 +117,24 @@ export const canRemoveUser = (user, surveyInfo, userToRemove) =>
   !User.isEqual(user)(userToRemove) &&
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
+
+// INVITE
+export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedUser = false }) => {
+  let surveyGroups
+  if (editingLoggedUser && !surveyInfo) {
+    // This can happen for system administrators when they don't have an active survey
+    surveyGroups = []
+  } else if (Survey.isPublished(surveyInfo)) {
+    surveyGroups = Survey.getAuthGroups(surveyInfo)
+  } else {
+    surveyGroups = [Survey.getAuthGroupAdmin(surveyInfo)]
+  }
+
+  const groups = []
+  if (User.isSystemAdmin(user)) {
+    // Add SystemAdmin group if current user is a SystemAdmin himself
+    groups.push(...User.getAuthGroups(user))
+  }
+  groups.push(...surveyGroups)
+  return groups
+}
