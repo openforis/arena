@@ -50,7 +50,8 @@ export const enterTrees = (record) => {
     // verify default values before entering
     test(`Verify ${tree_id.name} required`, async () => {
       await page.hover(`${treeSelector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`)
-      await expect(page).toHaveText('Required value')
+      const tooltipEl = await page.waitForSelector('.tooltip__message-error')
+      await expect(tooltipEl).toHaveText('Required value')
       await page.mouse.move(0, 0, { steps: 1 })
     })
 
