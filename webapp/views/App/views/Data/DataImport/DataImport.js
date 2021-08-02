@@ -23,7 +23,7 @@ const DataImport = () => {
   const surveyId = useSurveyId()
   const dispatch = useDispatch()
 
-  const [deleteAllRecords, setDeleteAllRecords] = useState(true)
+  const [deleteAllRecords, setDeleteAllRecords] = useState(false)
 
   const onFileChange = async (file) => {
     const job = await API.importRecordsFromCollect({ surveyId, file, deleteAllRecords })
