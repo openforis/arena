@@ -2,12 +2,16 @@ import './UserInvite.scss'
 
 import React from 'react'
 
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as UserInvite from '@core/user/userInvite'
 import * as Validation from '@core/validation/validation'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Markdown from '@webapp/components/markdown'
 
@@ -16,14 +20,20 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
+import { Button } from '@webapp/components'
 
 const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
 
   const i18n = useI18n()
+  const user = useUser()
   const surveyInfo = useSurveyInfo()
 
   const validation = UserInvite.getValidation(userInvite)
+  const selectedGroupUuid = UserInvite.getGroupUuid(userInvite)
+  const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo })
+  const selectedGroup = groups.find((group) => group.uuid === selectedGroupUuid)
+  const selectedGroupName = AuthGroup.getName(selectedGroup)
 
   return (
     <div className="user-invite form">
@@ -39,7 +49,7 @@ const UserInviteComponent = () => {
       <FormItem label={i18n.t('common.group')}>
         <DropdownUserGroup
           validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
-          groupUuid={UserInvite.getGroupUuid(userInvite)}
+          groupUuid={selectedGroupUuid}
           onChange={(value) => onUpdate({ name: UserInvite.keys.groupUuid, value })}
         />
       </FormItem>
@@ -47,21 +57,25 @@ const UserInviteComponent = () => {
       {!Survey.isPublished(surveyInfo) && (
         <Markdown
           className="user-invite__warning-message"
-          source={i18n.t('userView.invitation.surveyNotPublishedWarning')}
+          source={i18n.t('userInviteView.surveyNotPublishedWarning')}
         />
       )}
 
+      {selectedGroupName && (
+        <FormItem label={i18n.t('userInviteView.groupPermissions.label')}>
+          <ul dangerouslySetInnerHTML={{ __html: i18n.t(`userInviteView.groupPermissions.${selectedGroupName}`) }} />
+        </FormItem>
+      )}
+
       <div className="user-invite__buttons">
-        <button
-          data-testid={DataTestId.userInvite.submitBtn}
-          type="button"
-          className="btn btn-invite"
-          aria-disabled={!Validation.isValid(validation)}
+        <Button
+          testId={DataTestId.userInvite.submitBtn}
+          className="btn-invite"
+          disabled={Validation.isNotValid(validation)}
           onClick={onInvite}
-        >
-          <span className="icon icon-envelop icon-left icon-12px" />
-          {i18n.t('userView.invitation.sendInvitation')}
-        </button>
+          iconClassName="icon-envelop icon-left icon-12px"
+          label="userInviteView.sendInvitation"
+        />
       </div>
     </div>
   )
