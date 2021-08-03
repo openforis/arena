@@ -131,8 +131,8 @@ export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedU
   }
 
   const groups = []
-  if (User.isSystemAdmin(user)) {
-    // Add SystemAdmin group if current user is a SystemAdmin himself
+  if (User.isSystemAdmin(user) || User.isSurveyManager(user)) {
+    // Add SystemAdmin or SurveyManager group if current user is a SystemAdmin or SurveyManager himself
     groups.push(...User.getAuthGroups(user))
   }
   groups.push(...surveyGroups)

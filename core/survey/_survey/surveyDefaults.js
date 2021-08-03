@@ -5,7 +5,6 @@ export const getDefaultAuthGroups = () => [
     name: AuthGroup.groupNames.surveyAdmin,
     permissions: [
       AuthGroup.permissions.permissionsEdit,
-      AuthGroup.permissions.surveyCreate,
       AuthGroup.permissions.surveyEdit,
       AuthGroup.permissions.recordView,
       AuthGroup.permissions.recordCreate,
