@@ -9,91 +9,80 @@
 
     <style>
       #preloader-wrapper {
-        position: fixed;
+        width: 100vw;
+        height: 100vh;
         display: flex;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1000;
+        background: wh;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
       }
-      #preloader {
-        display: block;
+      
+      #preloader-loader-container{
+        height: min(128px, 30vw);
+        width: min(128px, 30vw);
         position: relative;
-        left: 50%;
-        top: 50%;
-        width: 150px;
-        height: 150px;
-        margin: -75px 0 0 -75px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #3498db;
-        -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-        animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
       }
-      
-      #preloader:before {
-        content: "";
+    
+      .preloader-loader__ball {
         position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #e74c3c;
-        -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-          animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        left: 0; 
+        right: 0; 
+        margin-left: auto; 
+        margin-right: auto; 
+        opacity: 0;
+        width: 80px;
+        height: 80px;
+        background-color:#84ac67;
+        border-radius: 100%;
+        -webkit-animation: ball-scale-multiple 1s 0s linear infinite;
+        animation: ball-scale-multiple 1s 0s linear infinite; 
+      }
+
+      .preloader-loader__ball:nth-child(2) {
+        -webkit-animation-delay: -0.4s;
+        animation-delay: -0.4s;
+      }
+
+      .preloader-loader__ball:nth-child(3) {
+        -webkit-animation-delay: -0.2s;
+        animation-delay: -0.2s;
       }
       
-      #preloader:after {
-        content: "";
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #f9c922;
-        -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-          animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-      }
-      
-      @-webkit-keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-      }
-      @keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-      }
-      #preloader-wrapper span {
-        margin: auto;
-        padding-top: 200px;
-      }
+
+@keyframes ball-scale-multiple {
+  0% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+
     </style>
 </head>
 <body>
   <!-- Preloader container -->
   <div id="preloader-wrapper">
-      <div id="preloader"></div>
+    
+    
+      <div id="preloader-loader-container">
+        <div class="preloader-loader__ball"></div>
+        <div class="preloader-loader__ball"></div>
+        <div class="preloader-loader__ball"></div>
+      </div>
+      
+      
       <span>Open Foris Arena is loading, please wait...</span>
   </div>
   <!-- React app container-->
