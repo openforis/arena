@@ -16,9 +16,11 @@
     align-self: center;
   }
 
-  .btn-rstudio {
+  .btn-rstudio-container {
     position: absolute;
     right: 16px;
+    display: flex;
+    flex-direction: column;
   }
 }
 

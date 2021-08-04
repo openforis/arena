@@ -34,6 +34,9 @@ const ChainComponent = () => {
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
   }
+  const _openRStudioLocal = () => {
+    dispatch(ChainActions.openRStudio({ chain, isLocal: true }))
+  }
   const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
   useEffect(() => {
@@ -58,7 +61,10 @@ const ChainComponent = () => {
         message={i18n.t('chainView.errorNoLabel')}
       />
 
+<div className="btn-rstudio-container">
       <ButtonRStudio onClick={_openRStudio} />
+      <ButtonRStudio isLocal onClick={_openRStudioLocal} />
+      </div>
 
       <div className="form">
         <LabelsEditor
