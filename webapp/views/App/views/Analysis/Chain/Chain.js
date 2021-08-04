@@ -66,7 +66,6 @@ const ChainComponent = () => {
       <ButtonRStudio isLocal onClick={_openRStudioLocal} />
       </div>
 
-
       <div className="form">
         <LabelsEditor
           labels={chain.props?.labels}
