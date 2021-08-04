@@ -51,6 +51,7 @@ const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = fals
   url <- "${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
   }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}";\n
+  ${isLocal ? `setwd(Sys.getenv("HOME"))` : ''};\n
   download.file(url,"./${token}.zip" ${isLocal ? `, mode="wb"` : ''});\n
   ${
     isLocal
