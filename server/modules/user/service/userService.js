@@ -86,6 +86,7 @@ export const inviteUser = async ({
 }) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
+  const groupName = AuthGroup.getName(group)
 
   // Only system admins can invite new system admins
   if (!User.isSystemAdmin(user) && AuthGroup.isSystemAdminGroup(group)) {
@@ -109,8 +110,10 @@ export const inviteUser = async ({
   const emailParams = {
     serverUrl,
     surveyLabel: Survey.getLabel(surveyInfo, lang),
-    groupLabel: `$t(authGroups.${AuthGroup.getName(group)}.label)`,
+    groupLabel: `$t(authGroups.${groupName}.label)`,
+    groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
   }
+
   await db.tx(async (t) => {
     if (userToInvite) {
       // User to invite already exists
@@ -121,9 +124,9 @@ export const inviteUser = async ({
         _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
 
         // Add user to group (accept automatically the invitation)
-        await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
+        await UserManager.addUserToGroup({ user, surveyId, groupUuid, userToAdd: userToInvite }, t)
         // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails.existingUserInvite', msgParams: emailParams, lang })
+        await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
       } else if (repeatInvitation) {
         // User has a pending invitation still
         // Generate reset password and send email again
