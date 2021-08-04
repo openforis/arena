@@ -182,6 +182,10 @@ export const analysisModules = {
     key: 'category',
     path: `${appModules.analysis.path}/category`,
   },
+  instances: {
+    key: 'instances',
+    path: `${appModules.analysis.path}/instances`,
+  },
 }
 
 export const helpModules = {

@@ -46,7 +46,7 @@ class CleanUpStatsPlugin {
 const plugins = [
   ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
-    filename: 'styles-[hash].css',
+    filename: 'styles-[fullhash].css',
   }),
   new HtmlWebpackPlugin({
     template: './web-resources/index.html',
@@ -92,7 +92,7 @@ const webPackConfig = {
     },
   },
   output: {
-    filename: 'bundle-[hash].js',
+    filename: 'bundle-[fullhash].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },

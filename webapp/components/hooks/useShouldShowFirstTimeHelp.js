@@ -16,6 +16,7 @@ const determineHelperType = ({ messages, helperTypes }) => {
   return helperTypes.firstTimeSurvey
 }
 
+
 export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) => {
   const surveyInfo = useSurveyInfo()
   const [messages, setMessages] = useState([])
@@ -31,8 +32,10 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
 
   useEffect(() => {
     if (messages.length > 0 && messages.length < 10) {
+
       const helperType = determineHelperType({ messages, helperTypes })
       setHelp(helperType)
+
     }
   }, [messages])
 
