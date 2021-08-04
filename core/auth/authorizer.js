@@ -136,5 +136,5 @@ export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedU
     groups.push(...User.getAuthGroups(user))
   }
   groups.push(...surveyGroups)
-  return groups
+  return AuthGroup.sortGroups(groups)
 }

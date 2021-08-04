@@ -53,16 +53,14 @@ export const isInvitationExpired = R.propEq(keys.invitationExpired, true)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid =
-  (surveyUuid, includeSystemAdmin = true) =>
-  (user) =>
-    R.pipe(
-      getAuthGroups,
-      R.ifElse(
-        R.always(includeSystemAdmin && isSystemAdmin(user)),
-        R.head,
-        R.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
-      )
-    )(user)
+  (surveyUuid, includeNonSurveyGroups = true) =>
+  (user) => {
+    const authGroups = getAuthGroups(user)
+    if (includeNonSurveyGroups && (isSystemAdmin(user) || isSurveyManager(user))) {
+      return R.head(authGroups)
+    }
+    return authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
+  }
 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 

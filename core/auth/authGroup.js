@@ -95,6 +95,17 @@ const permissionsByGroupName = {
   [groupNames.dataEditor]: [permissions.recordView, permissions.recordCreate, permissions.recordEdit],
 }
 
+const sortedGroupNames = [
+  groupNames.systemAdmin,
+  groupNames.surveyManager,
+  groupNames.surveyAdmin,
+  groupNames.surveyEditor,
+  groupNames.dataAnalyst,
+  groupNames.dataCleanser,
+  groupNames.dataEditor,
+  groupNames.surveyGuest,
+]
+
 export const getUuid = R.prop(keys.uuid)
 
 export const getName = R.prop(keys.name)
@@ -113,4 +124,16 @@ export const isSystemAdminGroup = (group) => getName(group) === groupNames.syste
 
 export const isSurveyManagerGroup = (group) => getName(group) === groupNames.surveyManager
 
+export const isSurveyGroup = (group) => !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
+
 export const { isEqual } = ObjectUtils
+
+export const sortGroups = (groups) => {
+  const sortedGroups = [...groups]
+  sortedGroups.sort((group1, group2) => {
+    const sortOrder1 = sortedGroupNames.indexOf(getName(group1))
+    const sortOrder2 = sortedGroupNames.indexOf(getName(group2))
+    return sortOrder1 - sortOrder2
+  })
+  return sortedGroups
+}

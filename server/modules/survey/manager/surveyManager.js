@@ -51,12 +51,8 @@ const validateSurveyInfo = async (surveyInfo) =>
 
 const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
   if (!User.isSystemAdmin(user)) {
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
     const surveyAdminsGroup = Survey.getAuthGroupAdmin(surveyInfo)
-    await UserManager.addUserToGroup(
-      { user, surveyId, groupUuid: AuthGroup.getUuid(surveyAdminsGroup), userToAdd: user },
-      client
-    )
+    await UserManager.addUserToGroup({ user, surveyInfo, group: surveyAdminsGroup, userToAdd: user }, client)
   }
 }
 
