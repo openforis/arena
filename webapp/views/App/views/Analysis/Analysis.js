@@ -10,6 +10,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import Chains from './Chains'
 import Chain from './Chain'
+import Instances from './Instances'
 // import Entities from './Entities'
 
 const Analysis = () => {
@@ -49,6 +50,10 @@ const Analysis = () => {
             component: CategoryDetails,
             path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
             props: { analysis: true },
+          },
+          {
+            component: Instances,
+            path: `${appModuleUri(analysisModules.instances)}`,
           },
         ]}
       />

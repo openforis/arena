@@ -201,6 +201,7 @@ Do you want to proceed?`,
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
     virtualEntity_plural: '$t(appModules.entities)',
+    instances: 'Instances',
 
     help: 'help',
     userManual: 'User Manual',
@@ -585,6 +586,10 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  instancesView: {
+    title: 'Instances',
+    terminate: 'Terminate',
+  },
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
