@@ -14,8 +14,6 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import * as AuthGroup from '@core/auth/authGroup'
-
 import { db } from '@server/db/db'
 import { DBMigrator } from '@openforis/arena-server'
 
