@@ -223,8 +223,8 @@ const DateInput = React.forwardRef(
     }
 
     const calculatedPosition = useMemo(() => {
-      const el = dateInputContainerRef && dateInputContainerRef.current
-      if (el) {
+      const el = dateInputContainerRef?.current
+      if (isCalendarOpen && el) {
         const rect = el.getBoundingClientRect()
 
         const scrollLeft = window.pageXOffset || document.documentElement?.scrollLeft
@@ -233,12 +233,12 @@ const DateInput = React.forwardRef(
         return {
           top: rect.top + scrollTop + rect.height,
           left: rect.left + scrollLeft,
-          position: 'absolute',
+          position: 'fixed',
         }
       }
 
       return {}
-    }, [dateInputContainerRef])
+    }, [dateInputContainerRef, isCalendarOpen])
 
     const handleChangeDateCalendar = (newDate) => {
       const year = String(newDate.getFullYear())

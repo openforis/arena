@@ -16,7 +16,7 @@ const ExpansionPanel = (props) => {
     content.style.maxHeight = `${closed ? 0 : content.scrollHeight}px`
   }
 
-  useLayoutEffect(setContentHeight, [])
+  useLayoutEffect(setContentHeight, [children])
 
   return (
     <div className="expansion-panel" ref={panelRef}>
