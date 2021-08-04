@@ -201,6 +201,7 @@ Do you want to proceed?`,
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
     virtualEntity_plural: '$t(appModules.entities)',
+    instances: 'Instances',
 
     help: 'help',
     userManual: 'User Manual',
@@ -465,16 +466,74 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     rotate: 'Rotate',
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload',
-    invitation: {
-      sendInvitation: 'Send invitation',
-      surveyNotPublishedWarning: `**Warning**: survey is not published
-        Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
-        If you want to invite users with other roles you should first publish the survey.`,
-    },
     sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  userInviteView: {
+    confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
+    groupPermissions: {
+      label: 'Permissions',
+      systemAdmin: `
+        <li>Full system access rights</li>`,
+      surveyAdmin: `
+        <li>Surveys: 
+          <ul>
+            <li>create</li>
+            <li>clone</li>
+            <li>edit own surveys</li>
+            <li>delete own surveys</li>
+          </ul>
+        </li>
+        <li>Users:
+          <ul>
+            <li>invite users to own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
+      surveyEditor: `
+        <li>Surveys: 
+          <ul>
+            <li>edit own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
+      dataAnalyst: `
+        <li>Data: 
+          <ul>
+            $t(userInviteView.groupPermissions.dataCleanserData)
+          </ul>
+        </li>
+        <li>Analysis:
+          <ul>
+            <li>full access rights to all tools</li>
+          </ul>
+        </li>`,
+      dataCleanser: `
+        <li>Data: 
+          <ul>
+            $t(userInviteView.groupPermissions.dataCleanserData)
+          </ul>
+        </li>`,
+      dataCleanserData: `
+        $t(userInviteView.groupPermissions.dataEditorData)
+        <li>access data Validation tools</li>
+        <li>submit records to “Analysis” phase</li>`,
+      dataEditor: `
+        <li>Data: 
+          <ul>$t(userInviteView.groupPermissions.dataEditorData)</ul>
+        </li>`,
+      dataEditorData: `
+        <li>add new records (own surveys)</li>
+        <li>edit existing records (own surveys)</li>
+        <li>submit records to “Cleansing” phase</li>`,
+    },
+    sendInvitation: 'Send invitation',
+    surveyNotPublishedWarning: `**Warning**: survey is not published.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      If you want to invite users with other roles you should first publish the survey.`,
   },
 
   user: {
@@ -513,6 +572,10 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  instancesView: {
+    title: 'Instances',
+    terminate: 'Terminate',
+  },
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
@@ -969,7 +1032,7 @@ $t(common.cantUndoWarning)`,
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     cantUpdateStep: `Can't update step`,
     entryDataNotFound: 'Entry data not found: {{entryName}}',
-    generic: '{{text}}',
+    generic: 'Unexpected error: {{text}}',
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
@@ -1049,19 +1112,22 @@ $t(common.cantUndoWarning)`,
       The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
+    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+      <p>With the role of {{groupLabel}} you have the following permissions: <br/> 
+        <ul>{{groupPermissions}}</ul>
+      </p>`,
     userInvite: {
       subject: 'You have been invited to $t(common.appNameFull)!',
       body: `<p>Hello,</p>
-             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             $t(emails.userInviteCommon)
              <p><a href="{{urlResetPassword}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.temporaryMsg)
              $t(emails.signature)`,
     },
-    existingUserInvite: {
-      subject:
-        'You have been invited to to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
+    userInviteExistingUser: {
+      subject: 'You have been invited to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
       body: `<p>Hello,</p>
-             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             $t(emails.userInviteCommon)
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
              $t(emails.signature)`,
     },
