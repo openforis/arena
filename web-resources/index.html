@@ -6,9 +6,86 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <style>
+      #preloader-wrapper {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      
+      #preloader-loader-container{
+        height: min(128px, 30vw);
+        width: min(128px, 30vw);
+        position: relative;
+      }
+    
+      .preloader-loader__ball {
+        position: absolute;
+        left: 0; 
+        right: 0; 
+        margin-left: auto; 
+        margin-right: auto; 
+        opacity: 0;
+        width: 80px;
+        height: 80px;
+        background-color:#84ac67;
+        border-radius: 100%;
+        -webkit-animation: ball-scale-multiple 1s 0s linear infinite;
+        animation: ball-scale-multiple 1s 0s linear infinite; 
+      }
+
+      .preloader-loader__ball:nth-child(2) {
+        -webkit-animation-delay: -0.4s;
+        animation-delay: -0.4s;
+      }
+
+      .preloader-loader__ball:nth-child(3) {
+        -webkit-animation-delay: -0.2s;
+        animation-delay: -0.2s;
+      }
+      
+
+@keyframes ball-scale-multiple {
+  0% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+
+    </style>
 </head>
 <body>
-<div id="main"></div>
+  <!-- Preloader container -->
+  <div id="preloader-wrapper">
+    
+    
+      <div id="preloader-loader-container">
+        <div class="preloader-loader__ball"></div>
+        <div class="preloader-loader__ball"></div>
+        <div class="preloader-loader__ball"></div>
+      </div>
+      
+      
+      <span>Open Foris Arena is loading, please wait...</span>
+  </div>
+  <!-- React app container-->
+  <div id="main"></div>
 </body>
 <script>
     !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="341GM5a42C5YvtBclvmqDJC8qfAye9tq";analytics.SNIPPET_VERSION="4.13.2";
