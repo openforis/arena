@@ -12,17 +12,17 @@ import Arena from '@webapp/views/Arena'
 
 import i18n from '@core/i18n/i18nFactory'
 
-function renderApp() {
-  ReactDOM.render(
-    <Provider store={store}>
-      <I18nextProvider i18n={i18n}>
-        <BrowserRouter>
-          <Arena />
-        </BrowserRouter>
-      </I18nextProvider>
-    </Provider>,
-    document.querySelector('#main')
-  )
-}
+// remove preloader
+document.getElementById('preloader-wrapper').remove()
 
-renderApp()
+// render React app
+ReactDOM.render(
+  <Provider store={store}>
+    <I18nextProvider i18n={i18n}>
+      <BrowserRouter>
+        <Arena />
+      </BrowserRouter>
+    </I18nextProvider>
+  </Provider>,
+  document.getElementById('main')
+)
