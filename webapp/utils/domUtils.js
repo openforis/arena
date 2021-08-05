@@ -37,7 +37,7 @@ export const dispatchWindowResize = () => {
 }
 
 export const copyToClipboard = (text) => {
-  const input = document.body.appendChild(document.createElement('input'))
+  const input = document.body.appendChild(document.createElement('textarea'))
   input.value = text
   input.focus()
   input.select()

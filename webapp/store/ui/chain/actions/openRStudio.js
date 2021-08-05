@@ -50,22 +50,22 @@ const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = fals
   `
   url <- "${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}";\n
-  ${isLocal ? `setwd(Sys.getenv("HOME"))` : ''};\n
-  download.file(url,"./${token}.zip" ${isLocal ? `, mode="wb"` : ''});\n
+  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}";\r\n
+  ${isLocal ? `setwd(Sys.getenv("HOME"));` : ''}\r\n
+  download.file(url,"./${token}.zip" ${isLocal ? `, mode="wb"` : ''});\r\n
   ${
     isLocal
       ? `dir.create("./arena/arena-${Survey.getName(
           surveyInfo
-        )}-${DateUtils.nowFormatDefault()}", mode="0777", recursive=TRUE);\n`
+        )}-${DateUtils.nowFormatDefault()}", mode="0777", recursive=TRUE);\r\n`
       : ''
   }
   unzip("./${token}.zip",exdir=".${
     isLocal ? `/arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}` : ''
-  }");\n
-  file.remove("./${token}.zip");\n
-  ${isLocal ? `setwd('./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}')` : ''};\n
-  ${isLocal ? `rstudioapi::filesPaneNavigate(getwd())` : ''};\n
+  }");\r\n
+  file.remove("./${token}.zip");\r\n
+  ${isLocal ? `setwd('./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}');` : ''}\r\n
+  ${isLocal ? `rstudioapi::filesPaneNavigate(getwd());` : ''}\r\n
   `
 
 const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
@@ -95,7 +95,7 @@ export const openRStudio =
     dispatch(LoaderActions.hideLoader())
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'chainView.copyRStudioCode',
+        key: isLocal ? 'chainView.copyRStudioCodeLocal' : 'chainView.copyRStudioCode',
         params: { rStudioCode },
         onOk: () => {
           _copyRStudioCode({ rStudioCode })
