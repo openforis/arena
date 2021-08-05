@@ -574,8 +574,24 @@ $t(common.cantUndoWarning)`,
     
     \n
 
-###### Clicking the Ok button a RStudio Server is opened and these commands are copied to your clipboard. ######
-###### Once the RStudio console is active, paste and run these lines to import the chain code.  ######
+###### Click then OK button a RStudio Server is opened and these commands are copied to your clipboard. ######  
+
+###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
+
+\n
+
+{{rStudioCode}}
+
+`,
+copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
+
+\n
+
+###### Click then OK button and these commands are copied to your clipboard. ###### 
+
+###### Start RStudio in your machine. You should have package 'rstudioapi' installed. ###### 
+
+###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
 \n
 
 {{rStudioCode}}
