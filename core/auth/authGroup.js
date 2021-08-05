@@ -46,7 +46,7 @@ export const groupNames = {
   surveyGuest: 'surveyGuest',
 }
 
-const permissionsByGroupName = {
+export const permissionsByGroupName = {
   [groupNames.systemAdmin]: Object.values(permissions),
   [groupNames.surveyManager]: [
     permissions.permissionsEdit,
