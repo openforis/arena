@@ -46,22 +46,21 @@ export const assocProfilePicture = R.assoc(keys.profilePicture)
 
 // ====== CHECK
 export const isSystemAdmin = (user) => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
+export const isSurveyManager = (user) => user && R.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
 export const hasAccepted = R.propEq(keys.status, userStatus.ACCEPTED)
 export const isInvited = R.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = R.propEq(keys.invitationExpired, true)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid =
-  (surveyUuid, includeSystemAdmin = true) =>
-  (user) =>
-    R.pipe(
-      getAuthGroups,
-      R.ifElse(
-        R.always(includeSystemAdmin && isSystemAdmin(user)),
-        R.head,
-        R.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
-      )
-    )(user)
+  (surveyUuid, includeNonSurveyGroups = true) =>
+  (user) => {
+    const authGroups = getAuthGroups(user)
+    if (includeNonSurveyGroups && (isSystemAdmin(user) || isSurveyManager(user))) {
+      return R.head(authGroups)
+    }
+    return authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
+  }
 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 

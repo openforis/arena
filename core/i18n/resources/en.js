@@ -478,10 +478,24 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       label: 'Permissions',
       systemAdmin: `
         <li>Full system access rights</li>`,
-      surveyAdmin: `
+      surveyManager: `
         <li>Surveys: 
           <ul>
             <li>create</li>
+            <li>clone</li>
+            <li>edit own surveys</li>
+            <li>delete own surveys</li>
+          </ul>
+        </li>
+        <li>Users:
+          <ul>
+            <li>invite users to own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
+      surveyAdmin: `
+        <li>Surveys: 
+          <ul>
             <li>clone</li>
             <li>edit own surveys</li>
             <li>delete own surveys</li>
@@ -532,7 +546,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
-      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)***, ***$t(authGroups.surveyManager.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
   },
 
@@ -1076,6 +1090,11 @@ $t(common.cantUndoWarning)`,
       label: 'System administrator',
       label_plural: 'System administrators',
       description: 'OF Arena system administrators',
+    },
+    surveyManager: {
+      label: 'Survey manager',
+      label_plural: 'Survey managers',
+      description: 'OF Arena survey managers',
     },
     surveyAdmin: {
       label: 'Survey administrator',

@@ -3,18 +3,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 export const getDefaultAuthGroups = () => [
   {
     name: AuthGroup.groupNames.surveyAdmin,
-    permissions: [
-      AuthGroup.permissions.permissionsEdit,
-      AuthGroup.permissions.surveyCreate,
-      AuthGroup.permissions.surveyEdit,
-      AuthGroup.permissions.recordView,
-      AuthGroup.permissions.recordCreate,
-      AuthGroup.permissions.recordEdit,
-      AuthGroup.permissions.recordCleanse,
-      AuthGroup.permissions.recordAnalyse,
-      AuthGroup.permissions.userEdit,
-      AuthGroup.permissions.userInvite,
-    ],
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.surveyAdmin]],
     recordSteps: {
       1: AuthGroup.keys.all,
       2: AuthGroup.keys.all,
@@ -23,14 +12,7 @@ export const getDefaultAuthGroups = () => [
   },
   {
     name: AuthGroup.groupNames.surveyEditor,
-    permissions: [
-      AuthGroup.permissions.surveyEdit,
-      AuthGroup.permissions.recordView,
-      AuthGroup.permissions.recordCreate,
-      AuthGroup.permissions.recordEdit,
-      AuthGroup.permissions.recordCleanse,
-      AuthGroup.permissions.recordAnalyse,
-    ],
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.surveyEditor]],
     recordSteps: {
       1: AuthGroup.keys.all,
       2: AuthGroup.keys.all,
@@ -39,13 +21,7 @@ export const getDefaultAuthGroups = () => [
   },
   {
     name: AuthGroup.groupNames.dataAnalyst,
-    permissions: [
-      AuthGroup.permissions.recordView,
-      AuthGroup.permissions.recordCreate,
-      AuthGroup.permissions.recordEdit,
-      AuthGroup.permissions.recordCleanse,
-      AuthGroup.permissions.recordAnalyse,
-    ],
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.dataAnalyst]],
     recordSteps: {
       1: AuthGroup.keys.all,
       2: AuthGroup.keys.all,
@@ -54,12 +30,7 @@ export const getDefaultAuthGroups = () => [
   },
   {
     name: AuthGroup.groupNames.dataCleanser,
-    permissions: [
-      AuthGroup.permissions.recordView,
-      AuthGroup.permissions.recordCreate,
-      AuthGroup.permissions.recordEdit,
-      AuthGroup.permissions.recordCleanse,
-    ],
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.dataCleanser]],
     recordSteps: {
       1: AuthGroup.keys.all,
       2: AuthGroup.keys.all,
@@ -67,11 +38,7 @@ export const getDefaultAuthGroups = () => [
   },
   {
     name: AuthGroup.groupNames.dataEditor,
-    permissions: [
-      AuthGroup.permissions.recordView,
-      AuthGroup.permissions.recordCreate,
-      AuthGroup.permissions.recordEdit,
-    ],
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.dataEditor]],
     recordSteps: {
       1: AuthGroup.keys.own,
     },
