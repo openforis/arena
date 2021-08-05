@@ -760,8 +760,10 @@ copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
       y: 'Y',
     },
     nodeDefEntityForm: {
+      addNewEntity: 'Add new {{name}}',
       confirmDelete: 'Are you sure you want to delete this entity?',
-      select: 'Select',
+      select: 'Select a {{name}}:',
+      selectedEntity: 'Selected {{name}}:',
     },
     nodeDefTaxon: {
       code: '$t(common.code)',
