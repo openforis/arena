@@ -13,10 +13,11 @@ const Module = (props) => {
 
   const elementRef = SideBarModule.getElementRef(module)
   const isModuleHome = SideBarModule.isHome(module)
+  const isSurveySelectionRequired = SideBarModule.isSurveySelectionRequired(module)
 
   const active = SideBarModule.isActive(pathname)(module)
   // All modules except home require the survey
-  const disabledRequiredSurvey = !isModuleHome && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
+  const disabledRequiredSurvey = isSurveySelectionRequired && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
   // Module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
   const disabledModule = isModuleHome ? active : disabledRequiredSurvey
   // Link to home is disabled when page is on dashboard, other root module links are always disabled
