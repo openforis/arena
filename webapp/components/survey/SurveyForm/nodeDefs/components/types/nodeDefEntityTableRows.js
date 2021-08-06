@@ -154,7 +154,7 @@ const NodeDefEntityTableRows = (props) => {
 
   return (
     <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
-      {(edit || !R.isEmpty(nodes)) && createRow(NodeDefLayout.renderType.tableHeader)}
+      {(edit || !R.isEmpty(nodes)) && createRow({ renderType: NodeDefLayout.renderType.tableHeader })}
 
       {entry && (
         <div
@@ -164,13 +164,13 @@ const NodeDefEntityTableRows = (props) => {
         >
           {gridSize.height > 0 &&
             gridSize.width > 0 &&
-            nodes.map((node, i) =>
+            nodes.map((node, index) =>
               createRow({
                 renderType: NodeDefLayout.renderType.tableBody,
                 node,
                 key: `entity-table-row-${Node.getUuid(node)}`,
                 canDelete: canDeleteRows,
-                index: i,
+                index,
               })
             )}
         </div>
