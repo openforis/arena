@@ -9,6 +9,7 @@ usePackage <- function(name) {
 
 usePackage("sqldf")
 usePackage("httr")
+usePackage("getPass")
 usePackage("jsonlite")
 usePackage('zip')
 usePackage('data.table')
