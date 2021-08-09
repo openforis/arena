@@ -8,6 +8,7 @@ import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
@@ -32,31 +33,44 @@ export const {
 
 // ==== CREATE
 
-export const addUserToGroup = async ({ user, surveyId, groupUuid, userToAdd }, client = db) =>
+export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
-    await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
-    const group = await AuthGroupRepository.fetchGroupByUuid(groupUuid, t)
-
-    if (!AuthGroup.isSystemAdminGroup(group)) {
-      await ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.userInvite,
-        {
-          [ActivityLog.keysContent.uuid]: User.getUuid(userToAdd),
-          [ActivityLog.keysContent.groupUuid]: groupUuid,
-        },
-        false,
-        t
-      )
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+    const groupsToAdd = []
+    if (!AuthGroup.isSurveyManagerGroup(group) || !User.isSurveyManager(userToAdd)) {
+      groupsToAdd.push(group)
     }
+    if (AuthGroup.isSurveyManagerGroup(group)) {
+      // when adding user to survey manager group, make him survey admin of the specified survey
+      groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
+    }
+    await PromiseUtils.each(groupsToAdd, async (groupToAdd) => {
+      const groupUuid = groupToAdd.uuid
+      await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
+
+      if (AuthGroup.isSurveyGroup(groupToAdd)) {
+        await ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.userInvite,
+          {
+            [ActivityLog.keysContent.uuid]: User.getUuid(userToAdd),
+            [ActivityLog.keysContent.groupUuid]: groupUuid,
+          },
+          false,
+          t
+        )
+      }
+    })
   })
 
 export const insertUser = async (
-  { user, surveyId, surveyCycleKey, email, password, status, groupUuid, title },
+  { user, surveyInfo, surveyCycleKey, email, password, status, group, title },
   client = db
 ) =>
   client.tx(async (t) => {
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
     const newUser = await UserRepository.insertUser(
       {
         surveyId,
@@ -68,7 +82,8 @@ export const insertUser = async (
       },
       t
     )
-    await addUserToGroup({ user, surveyId, groupUuid, userToAdd: newUser }, t)
+    await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
+
     return newUser
   })
 
