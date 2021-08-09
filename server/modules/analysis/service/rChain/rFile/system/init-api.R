@@ -53,11 +53,16 @@ arena.login = function(tentative) {
   if (missing(tentative)) {
     tentative <- 1
   }
-  print('TYPE YOUR EMAIL')
-  user <- readLines(stdin(), 1)
+  if (tentative==1) 
+      user <- getPass::getPass("Enter your username (email): ")
+    else 
+    {
+      sText <- "Invalid email or password specified, try again! \n\nEnter your username (email): "
+      user <- getPass::getPass( sText )
+    }
   user <- trimws(user)
-  print('TYPE YOUR PASSWORD')
-  password <- readLines(stdin(), 1)
+  
+  password <- getPass::getPass("Enter your password: ")
   password <- trimws(password)
   
   resp <- httr::POST(
