@@ -382,6 +382,10 @@ export default class Job {
     this._logger.debug(...msgs)
   }
 
+  logInfo(...msgs) {
+    this._logger.info(...msgs)
+  }
+
   logError(...msgs) {
     this._logger.error(...msgs)
   }

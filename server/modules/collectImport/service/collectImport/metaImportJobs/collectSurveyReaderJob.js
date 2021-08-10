@@ -21,7 +21,7 @@ export default class CollectSurveyReaderJob extends Job {
     const collectSurveyFileZip = new FileZip(filePath)
     await collectSurveyFileZip.init()
 
-    const idmlXml = await collectSurveyFileZip.getEntryAsText(idmlXmlFileName)
+    const idmlXml = collectSurveyFileZip.getEntryAsText(idmlXmlFileName)
     const idmlJsonObj = FileXml.parseToJson(idmlXml, false)
     const collectSurvey = CollectSurvey.getElementByName('survey')(idmlJsonObj)
 
