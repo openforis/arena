@@ -37,34 +37,35 @@ const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) =
 }
 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
-  const authGroups = User.getAuthGroups(userToInvite)
-  const hasRoleInSurvey = authGroups.some((g) => AuthGroup.getSurveyUuid(g) === surveyUuid)
-
   if (!User.hasAccepted(userToInvite)) {
     throw new SystemError(
       'appErrors.userHasPendingInvitation',
       { email: User.getEmail(userToInvite) },
       StatusCodes.CONFLICT
     )
-  } else if (hasRoleInSurvey) {
+  }
+  const authGroups = User.getAuthGroups(userToInvite)
+  const hasRoleInSurvey = Boolean(authGroups.some((g) => AuthGroup.getSurveyUuid(g) === surveyUuid))
+
+  if (hasRoleInSurvey) {
     throw new SystemError('appErrors.userHasRole')
-  } else if (User.isSystemAdmin(userToInvite)) {
+  }
+  if (User.isSystemAdmin(userToInvite)) {
     throw new SystemError('appErrors.userIsAdmin')
   }
 }
 
-const _inviteNewUserAndSendEmail = async ({ user, email, groupUuid, survey, surveyCycleKey, emailParams, lang }, t) => {
-  const surveyId = Survey.getId(survey)
+const _inviteNewUserAndSendEmail = async ({ user, email, group, survey, surveyCycleKey, emailParams, lang }, t) => {
   // Add user to db
   const userToInvite = await UserManager.insertUser(
     {
       user,
-      surveyId,
+      surveyInfo: Survey.getSurveyInfo(survey),
       surveyCycleKey,
       email,
       password: null,
       status: User.userStatus.INVITED,
-      groupUuid,
+      group,
     },
     t
   )
@@ -74,6 +75,26 @@ const _inviteNewUserAndSendEmail = async ({ user, email, groupUuid, survey, surv
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 
   return userToInvite
+}
+
+const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
+  // Only system admins can invite new system admins
+  if (!User.isSystemAdmin(user) && AuthGroup.isSystemAdminGroup(group)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+  // Only system admins or survey managers can invite new survey managers
+  if (AuthGroup.isSurveyManagerGroup(group) && !(User.isSystemAdmin(user) || User.isSurveyManager(user))) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  // If the survey is not published, only system admins, survey managers and survey admins can be invited
+  if (
+    !Survey.isPublished(surveyInfo) &&
+    AuthGroup.isSurveyGroup(group) &&
+    !Survey.isAuthGroupAdmin(group)(surveyInfo)
+  ) {
+    throw new UnauthorizedError(User.getName(user))
+  }
 }
 
 export const inviteUser = async ({
@@ -88,21 +109,10 @@ export const inviteUser = async ({
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
   const groupName = AuthGroup.getName(group)
 
-  // Only system admins can invite new system admins
-  if (!User.isSystemAdmin(user) && AuthGroup.isSystemAdminGroup(group)) {
-    throw new UnauthorizedError(User.getName(user))
-  }
-
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
   const surveyInfo = Survey.getSurveyInfo(survey)
 
-  // If the survey is not published, only survey admins and system admins can be invited
-  if (
-    !Survey.isPublished(surveyInfo) &&
-    !(AuthGroup.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))
-  ) {
-    throw new UnauthorizedError(User.getName(user))
-  }
+  _checkCanInviteToGroup({ user, group, surveyInfo })
 
   const email = UserInvite.getEmail(userToInviteParam)
   const userToInvite = await UserManager.fetchUserByEmail(email)
@@ -124,7 +134,7 @@ export const inviteUser = async ({
         _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
 
         // Add user to group (accept automatically the invitation)
-        await UserManager.addUserToGroup({ user, surveyId, groupUuid, userToAdd: userToInvite }, t)
+        await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
         // Send email
         await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
       } else if (repeatInvitation) {
@@ -138,7 +148,7 @@ export const inviteUser = async ({
     } else {
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
-      await _inviteNewUserAndSendEmail({ user, email, groupUuid, survey, surveyCycleKey, emailParams, lang }, t)
+      await _inviteNewUserAndSendEmail({ user, email, group, survey, surveyCycleKey, emailParams, lang }, t)
     }
   })
 }

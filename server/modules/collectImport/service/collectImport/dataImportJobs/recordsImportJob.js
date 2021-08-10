@@ -92,13 +92,18 @@ export default class RecordsImportJob extends Job {
     await this.batchPersister.flush(this.tx)
   }
 
+  getEntriesPath({ step }) {
+    const { collectSurvey } = this.context
+    return CollectSurvey.isCollectEarthSurvey(collectSurvey) ? `${step}/` : `data/${step}/`
+  }
+
   getEntryNames() {
     const { collectSurveyFileZip } = this.context
 
     const steps = [1, 2, 3]
 
     for (const step of steps) {
-      const entryNames = collectSurveyFileZip.getEntryNames(`data/${step}/`)
+      const entryNames = collectSurveyFileZip.getEntryNames(this.getEntriesPath({ step }))
       if (!R.isEmpty(entryNames)) {
         return entryNames
       }
@@ -113,7 +118,8 @@ export default class RecordsImportJob extends Job {
     const steps = [3, 2, 1]
 
     for (const step of steps) {
-      const collectRecordXml = collectSurveyFileZip.getEntryAsText(`data/${step}/${entryName}`)
+      const entryPath = `${this.getEntriesPath({ step })}${entryName}`
+      const collectRecordXml = collectSurveyFileZip.getEntryAsText(entryPath)
       if (collectRecordXml) {
         return { collectRecordXml, step }
       }
@@ -153,6 +159,10 @@ export default class RecordsImportJob extends Job {
 
       for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+        if (!nodeDef) {
+          this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+          continue
+        }
 
         let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 

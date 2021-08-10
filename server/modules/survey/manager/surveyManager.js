@@ -14,8 +14,6 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import * as AuthGroup from '@core/auth/authGroup'
-
 import { db } from '@server/db/db'
 import { DBMigrator } from '@openforis/arena-server'
 
@@ -51,12 +49,8 @@ const validateSurveyInfo = async (surveyInfo) =>
 
 const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
   if (!User.isSystemAdmin(user)) {
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
     const surveyAdminsGroup = Survey.getAuthGroupAdmin(surveyInfo)
-    await UserManager.addUserToGroup(
-      { user, surveyId, groupUuid: AuthGroup.getUuid(surveyAdminsGroup), userToAdd: user },
-      client
-    )
+    await UserManager.addUserToGroup({ user, surveyInfo, group: surveyAdminsGroup, userToAdd: user }, client)
   }
 }
 

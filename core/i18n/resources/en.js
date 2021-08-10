@@ -201,6 +201,7 @@ Do you want to proceed?`,
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
     virtualEntity_plural: '$t(appModules.entities)',
+    instances: 'Instances',
 
     help: 'help',
     userManual: 'User Manual',
@@ -477,10 +478,24 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       label: 'Permissions',
       systemAdmin: `
         <li>Full system access rights</li>`,
-      surveyAdmin: `
+      surveyManager: `
         <li>Surveys: 
           <ul>
             <li>create</li>
+            <li>clone</li>
+            <li>edit own surveys</li>
+            <li>delete own surveys</li>
+          </ul>
+        </li>
+        <li>Users:
+          <ul>
+            <li>invite users to own surveys</li>
+          </ul>
+        </li>
+        $t(userInviteView.groupPermissions.dataAnalyst)`,
+      surveyAdmin: `
+        <li>Surveys: 
+          <ul>
             <li>clone</li>
             <li>edit own surveys</li>
             <li>delete own surveys</li>
@@ -531,7 +546,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
-      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)***, ***$t(authGroups.surveyManager.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
   },
 
@@ -559,8 +574,24 @@ $t(common.cantUndoWarning)`,
     
     \n
 
-###### Clicking the Ok button a RStudio Server is opened and these commands are copied to your clipboard. ######
-###### Once the RStudio console is active, paste and run these lines to import the chain code.  ######
+###### Click then OK button a RStudio Server is opened and these commands are copied to your clipboard. ######  
+
+###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
+
+\n
+
+{{rStudioCode}}
+
+`,
+copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
+
+\n
+
+###### Click then OK button and these commands are copied to your clipboard. ###### 
+
+###### Start RStudio in your machine. You should have package 'rstudioapi' installed. ###### 
+
+###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
 \n
 
 {{rStudioCode}}
@@ -571,6 +602,10 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  instancesView: {
+    title: 'Instances',
+    terminate: 'Terminate',
+  },
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
@@ -739,8 +774,10 @@ $t(common.cantUndoWarning)`,
       y: 'Y',
     },
     nodeDefEntityForm: {
+      addNewEntity: 'Add new {{name}}',
       confirmDelete: 'Are you sure you want to delete this entity?',
-      select: 'Select',
+      select: 'Select a {{name}}:',
+      selectedEntity: 'Selected {{name}}:',
     },
     nodeDefTaxon: {
       code: '$t(common.code)',
@@ -1069,6 +1106,11 @@ $t(common.cantUndoWarning)`,
       label: 'System administrator',
       label_plural: 'System administrators',
       description: 'OF Arena system administrators',
+    },
+    surveyManager: {
+      label: 'Survey manager',
+      label_plural: 'Survey managers',
+      description: 'OF Arena survey managers',
     },
     surveyAdmin: {
       label: 'Survey administrator',

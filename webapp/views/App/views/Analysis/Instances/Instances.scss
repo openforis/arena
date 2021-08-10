@@ -1,0 +1,17 @@
+@import 'webapp/style/vars';
+
+.instances-container {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+
+  .instance-row {
+    border: 1px solid $greyBorder;
+
+    a {
+      margin: 0 16px;
+      margin-right: 32px;
+    }
+  }
+}

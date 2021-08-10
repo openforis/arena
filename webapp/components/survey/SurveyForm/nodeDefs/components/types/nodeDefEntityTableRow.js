@@ -18,6 +18,7 @@ const NodeDefEntityTableRow = (props) => {
     nodeDef,
     nodeDefColumns,
     node,
+    canDelete,
     canEditRecord,
     canEditDef,
     renderType,
@@ -113,7 +114,7 @@ const NodeDefEntityTableRow = (props) => {
       {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
 
       {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
-        <NodeDeleteButton nodeDef={nodeDef} node={node} />
+        <NodeDeleteButton nodeDef={nodeDef} node={node} disabled={!canDelete} />
       )}
     </div>
   )
@@ -124,6 +125,7 @@ NodeDefEntityTableRow.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodeDefColumns: PropTypes.array,
   node: PropTypes.object,
+  canDelete: PropTypes.bool,
   canEditDef: PropTypes.bool.isRequired,
   canEditRecord: PropTypes.bool.isRequired,
   renderType: PropTypes.string.isRequired,
@@ -134,6 +136,7 @@ NodeDefEntityTableRow.defaultProps = {
   nodeDefColumns: [],
   node: null,
   i: 'header',
+  canDelete: true,
 }
 
 export default NodeDefEntityTableRow

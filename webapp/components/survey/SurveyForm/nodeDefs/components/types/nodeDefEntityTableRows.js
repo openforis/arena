@@ -6,6 +6,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
@@ -32,6 +33,9 @@ const NodeDefEntityTableRows = (props) => {
 
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+  const nodeDefValidations = NodeDef.getValidations(nodeDef)
+  const minCount = NodeDefValidations.getMinCount(nodeDefValidations)
+  const canDeleteRows = !minCount || nodes.length > minCount
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
@@ -117,22 +121,23 @@ const NodeDefEntityTableRows = (props) => {
     }, [NodeDef.getUuid(nodeDef)])
   }
 
-  const createRow = (renderType, node = null, key = undefined, i = undefined) => {
+  const createRow = ({ renderType, node = null, key = undefined, canDelete = true, index = undefined }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return (
       <NodeDefEntityTableRow
         id={
           renderType === NodeDefLayout.renderType.tableHeader
             ? DataTestId.surveyForm.entityRowHeader(nodeDefName)
-            : DataTestId.surveyForm.entityRowData(nodeDefName, i)
+            : DataTestId.surveyForm.entityRowData(nodeDefName, index)
         }
         key={key}
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
+        canDelete={canDelete}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
-        i={i}
+        i={index}
         node={node}
         nodeDef={nodeDef}
         nodeDefColumns={nodeDefColumns}
@@ -149,7 +154,7 @@ const NodeDefEntityTableRows = (props) => {
 
   return (
     <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
-      {(edit || !R.isEmpty(nodes)) && createRow(NodeDefLayout.renderType.tableHeader)}
+      {(edit || !R.isEmpty(nodes)) && createRow({ renderType: NodeDefLayout.renderType.tableHeader })}
 
       {entry && (
         <div
@@ -159,8 +164,14 @@ const NodeDefEntityTableRows = (props) => {
         >
           {gridSize.height > 0 &&
             gridSize.width > 0 &&
-            nodes.map((node, i) =>
-              createRow(NodeDefLayout.renderType.tableBody, node, `entity-table-row-${Node.getUuid(node)}`, i)
+            nodes.map((node, index) =>
+              createRow({
+                renderType: NodeDefLayout.renderType.tableBody,
+                node,
+                key: `entity-table-row-${Node.getUuid(node)}`,
+                canDelete: canDeleteRows,
+                index,
+              })
             )}
         </div>
       )}

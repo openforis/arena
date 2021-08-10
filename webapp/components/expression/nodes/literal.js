@@ -6,6 +6,7 @@ import axios from 'axios'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -15,6 +16,7 @@ import { useI18n, useLang } from '@webapp/store/system'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Input } from '@webapp/components/form/Input'
+import DateInput from '@webapp/components/form/DateInput'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { useAsyncGetRequest } from '../../hooks'
@@ -90,31 +92,61 @@ const Literal = (props) => {
         />
       )
     }
-    if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef))) {
-      return (
-        <Input
-          numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
-          onChange={onChangeValue}
-          value={nodeValueString}
-        />
-      )
+    if (BinaryOperandType.isLeft(type)) {
+      switch (NodeDef.getType(nodeDef)) {
+        case NodeDef.nodeDefType.integer:
+        case NodeDef.nodeDefType.decimal:
+          return (
+            <Input
+              numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
+              onChange={onChangeValue}
+              value={nodeValueString}
+            />
+          )
+        case NodeDef.nodeDefType.boolean:
+          return (
+            <ButtonGroup
+              className="literal-btn-group-boolean"
+              selectedItemKey={nodeValue}
+              onChange={onChangeValue}
+              items={['true', 'false'].map((value) => ({
+                key: value,
+                label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
+              }))}
+            />
+          )
+        case NodeDef.nodeDefType.date: {
+          const formatStorage = DateUtils.formats.dateISO
+          const formatDisplay = DateUtils.formats.dateDefault
+          return (
+            <DateInput
+              onChange={(selectedDate) => {
+                const dateConverted = DateUtils.convertDate({
+                  dateStr: selectedDate,
+                  formatFrom: formatDisplay,
+                  formatTo: formatStorage,
+                })
+                onChangeValue(dateConverted)
+              }}
+              value={DateUtils.convertDate({
+                dateStr: nodeValueString,
+                formatFrom: formatStorage,
+                formatTo: formatDisplay,
+              })}
+            />
+          )
+        }
+        default:
+          return (
+            <input
+              className="form-input"
+              value={nodeValueString}
+              size={25}
+              onChange={(e) => onChangeValue(e.target.value)}
+            />
+          )
+      }
     }
-    if (BinaryOperandType.isLeft(type) && NodeDef.isBoolean(nodeDef)) {
-      return (
-        <ButtonGroup
-          className="literal-btn-group-boolean"
-          selectedItemKey={nodeValue}
-          onChange={onChangeValue}
-          items={['true', 'false'].map((value) => ({
-            key: value,
-            label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
-          }))}
-        />
-      )
-    }
-    return (
-      <input className="form-input" value={nodeValueString} size={25} onChange={(e) => onChangeValue(e.target.value)} />
-    )
   }
 
   return <div className="literal">{getRenderer()}</div>
