@@ -9,7 +9,7 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import useValidation from './useValidation'
 
 const NodeDefErrorBadge = (props) => {
-  const { children, edit, node, nodeDef, nodes, parentNode, isCell} = props
+  const { children, edit, node, nodeDef, nodes, parentNode, insideTable} = props
   const validation = useValidation({ edit, node, nodeDef, nodes, parentNode })
 
   return (
@@ -20,7 +20,7 @@ const NodeDefErrorBadge = (props) => {
       showKeys={false}
       className="error-badge-inverse survey-form__node-def-error-badge"
       id={DataTestId.surveyForm.nodeDefErrorBadge(NodeDef.getName(nodeDef))}
-      isCell={isCell}
+      insideTable={insideTable}
     >
       {children}
     </ErrorBadge>

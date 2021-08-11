@@ -31,7 +31,7 @@ const NodeDefTableCellBody = (props) => {
         parentNode={parentNode}
         nodes={nodes}
         edit={edit}
-        isCell={true}
+        insideTable={true}
       ></NodeDefErrorBadge>
       {(NodeDef.isMultiple(nodeDef) ||
         (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) &&

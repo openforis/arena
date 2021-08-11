@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = (props) => {
-  const { children, className, id, labelKey, showIcon, showLabel, showKeys, validation, isCell } = props
+  const { children, className, id, labelKey, showIcon, showLabel, showKeys, validation, insideTable } = props
 
   const i18n = useI18n()
   const valid = Validation.isValid(validation)
@@ -25,7 +25,7 @@ const ErrorBadge = (props) => {
         warning: Validation.isWarning(validation),
       })}
       id={id}
-      isCell={isCell}
+      insideTable={insideTable}
     >
       <div className="badge__content">
         {children}

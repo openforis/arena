@@ -45,12 +45,12 @@ class Tooltip extends React.Component {
   }
 
   render() {
-    const { children, className, id, type, showContent, isCell} = this.props
+    const { children, className, id, type, showContent, insideTable} = this.props
     const { messageElement } = this.state
 
     const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
       showContent ? ' hoverable' : ''
-    } ${isCell ? 'into-cell' : ''}`
+    } ${insideTable ? 'inside-table' : ''}`
 
     return (
       <div
