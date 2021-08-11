@@ -24,6 +24,16 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
 .sidebar__modules {
   display: grid;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar.opened {
+  .sidebar__modules {
+    max-height: calc(100vh - 140px);
+    margin-bottom: 45px;
+  }
 }
 
 .sidebar__module,
