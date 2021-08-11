@@ -24,7 +24,15 @@ const NodeDefTableCellBody = (props) => {
     readOnly,
   }
   return (
-    <NodeDefErrorBadge nodeDef={nodeDef} parentNode={parentNode} nodes={nodes} edit={edit}>
+    <>
+      <NodeDefErrorBadge
+        key={`node-error-badge-${NodeDef.getUuid(nodeDef)}`}
+        nodeDef={nodeDef}
+        parentNode={parentNode}
+        nodes={nodes}
+        edit={edit}
+        isCell={true}
+      ></NodeDefErrorBadge>
       {(NodeDef.isMultiple(nodeDef) ||
         (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) &&
       !entryDataQuery ? (
@@ -33,7 +41,7 @@ const NodeDefTableCellBody = (props) => {
       ) : (
         React.createElement(NodeDefUiProps.getComponent(nodeDef), propsNodeDefComponent)
       )}
-    </NodeDefErrorBadge>
+    </>
   )
 }
 

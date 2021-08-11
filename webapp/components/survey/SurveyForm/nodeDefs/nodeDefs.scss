@@ -141,6 +141,13 @@
     height: 100%;
     width: 100%;
 
+    &.into-cell{
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: 36px;
+      }
+      
     .badge__content {
       height: 100%;
       font-weight: 400;
@@ -157,4 +164,5 @@
       }
     }
   }
+ 
 }

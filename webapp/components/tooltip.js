@@ -12,6 +12,9 @@ class Tooltip extends React.Component {
 
     this.state = { messageElement: null }
     this.tooltipRef = React.createRef()
+
+    this.mouseEnter = this.mouseEnter.bind(this)
+    this.mouseLeave = this.mouseLeave.bind(this)
   }
 
   getStyle() {
@@ -42,19 +45,19 @@ class Tooltip extends React.Component {
   }
 
   render() {
-    const { children, className, id, type, showContent } = this.props
+    const { children, className, id, type, showContent, isCell} = this.props
     const { messageElement } = this.state
 
     const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
       showContent ? ' hoverable' : ''
-    }`
+    } ${isCell ? 'into-cell' : ''}`
 
     return (
       <div
         className={tooltipClass}
         data-testid={id}
-        onMouseEnter={() => this.mouseEnter()}
-        onMouseLeave={() => this.mouseLeave()}
+        onMouseEnter={this.mouseEnter}
+        onMouseLeave={this.mouseLeave}
         ref={this.tooltipRef}
         onBlur={() => this.setState({ messageElement: null })}
       >
