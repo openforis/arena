@@ -105,7 +105,7 @@ class NodeDefSwitch extends React.Component {
         {renderType === NodeDefLayout.renderType.tableHeader ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
         ) : renderType === NodeDefLayout.renderType.tableBody ? (
-          <NodeDefTableCellBody {...this.props} label={label} />
+          <NodeDefTableCellBody {...this.props} label={label}/>
         ) : (
           <NodeDefFormItem {...this.props} label={label} />
         )}
