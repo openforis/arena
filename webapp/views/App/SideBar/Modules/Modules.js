@@ -28,7 +28,6 @@ const Modules = (props) => {
         setOverSidebar(false)
       }}
     >
-      <div className="sidebar__module-placeholder" />
       {modulesHierarchy.map((module) => (
         <Module
           key={SideBarModule.getKey(module)}
@@ -42,7 +41,6 @@ const Modules = (props) => {
           }}
         />
       ))}
-      <div className="sidebar__module-placeholder" />
 
       {modulePopupMenu && (
         <PopupMenu
