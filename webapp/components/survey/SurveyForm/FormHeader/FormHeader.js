@@ -84,7 +84,7 @@ const FormHeader = (props) => {
 
       <div className="survey-form-header__options">
         {edit &&
-          canEditSurvey(
+          canEditSurvey && (
             <DownloadButton
               id={DataTestId.surveyForm.schemaSummary}
               href={`/api/survey/${surveyId}/schema-summary/`}
