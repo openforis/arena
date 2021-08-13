@@ -52,26 +52,26 @@ export const Input = React.forwardRef((props, ref) => {
   }, [value])
 
   return (
-    <ValidationTooltip validation={validation} className="form-input-container">
+    <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
-        React.createElement(NumberFormat, {
-          disabled,
-          className: 'form-input',
-          getInputRef: (el) => {
+        <NumberFormat
+          disabled={disabled}
+          className="form-input"
+          getInputRef={(el) => {
             inputRef.current = el
-          },
-          id,
-          'data-testid': id,
-          onValueChange: ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
-          onFocus,
-          onBlur,
-          placeholder,
-          readOnly,
-          type,
-          value,
-          title,
-          ...numberFormat,
-        })
+          }}
+          id={id}
+          data-testid={id}
+          onValueChange={({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue)}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          type={type}
+          value={value}
+          title={title}
+          {...numberFormat}
+        />
       ) : (
         <input
           ref={inputRef}
