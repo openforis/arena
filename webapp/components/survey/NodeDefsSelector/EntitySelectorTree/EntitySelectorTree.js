@@ -12,7 +12,7 @@ const EntitySelectorTree = (props) => {
   const { getLabelSuffix, isDisabled, nodeDefUuidActive, onlyPages, onSelect } = props
   const survey = useSurvey()
 
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(true)
   const toggleExpanded = () => setExpanded((prevState) => !prevState)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
 
