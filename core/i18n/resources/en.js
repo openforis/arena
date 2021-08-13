@@ -18,7 +18,7 @@ export const enTranslation = {
     copy: 'Copy',
     cancelConfirm: `**There are unsaved changes**.
 
-Do you want to cancel them?`,
+Do you want to ignore them?`,
     cantUndoWarning: 'This operation cannot be undone',
     cantBeDeletedUsedItem: 'This {{item}} is used by some node definitions and cannot be deleted',
     close: 'Close',
