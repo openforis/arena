@@ -9,6 +9,7 @@ import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
   useNodeDefLabelType,
@@ -36,6 +37,7 @@ const FormHeader = (props) => {
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
   const showPageNavigation = useShowPageNavigation()
+  const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
 
   return (
@@ -81,13 +83,14 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        {edit && (
-          <DownloadButton
-            id={DataTestId.surveyForm.schemaSummary}
-            href={`/api/survey/${surveyId}/schema-summary/`}
-            label={i18n.t('surveyForm.schemaSummary')}
-          />
-        )}
+        {edit &&
+          canEditSurvey && (
+            <DownloadButton
+              id={DataTestId.surveyForm.schemaSummary}
+              href={`/api/survey/${surveyId}/schema-summary/`}
+              label={i18n.t('surveyForm.schemaSummary')}
+            />
+          )}
         <NodeDefLabelSwitch
           className="btn-s btn-transparent"
           labelType={nodeDefLabelType}
