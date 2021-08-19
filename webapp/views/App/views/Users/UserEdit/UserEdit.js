@@ -19,6 +19,8 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 
 const UserEdit = () => {
+  const { userUuid } = useParams()
+
   const {
     ready,
     user,
@@ -36,15 +38,15 @@ const UserEdit = () => {
     onSave,
     onRemove,
     onInviteRepeat,
-  } = useEditUser()
-  const { userUuid } = useParams()
+  } = useEditUser({userUuid})
+  
   const i18n = useI18n()
   const validation = User.getValidation(userToUpdate)
 
   if (!ready) return null
 
   return (
-    <div className="user-edit form">
+    <div className="user-edit form" key={userUuid}>
       {canEdit ? (
         <ProfilePictureEditor
           userUuid={userUuid}
