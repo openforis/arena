@@ -12,7 +12,7 @@ import {
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
 
-  if (advanced) {
+  if (advanced || backup ) {
     if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
       // there are draft advanced props to merge with "published" advanced props
       rowUpdated.draft_advanced = true
