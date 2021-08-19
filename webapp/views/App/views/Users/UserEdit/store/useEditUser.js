@@ -35,7 +35,7 @@ const getEditCapabilities = ({ user, userToUpdate, surveyInfo, ready }) => {
   }
 }
 
-export const useEditUser = () => {
+export const useEditUser = ({ userUuid }) => {
   const user = useUser()
 
   const [userToUpdate, setUserToUpdate] = useState({})
@@ -51,7 +51,7 @@ export const useEditUser = () => {
 
   useEffect(() => {
     onGetUser()
-  }, [])
+  }, [userUuid])
 
   return {
     ready,
