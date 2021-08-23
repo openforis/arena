@@ -22,7 +22,7 @@ export default class SurveyCreatorJob extends Job {
   async execute() {
     const { collectSurvey, newSurvey: newSurveyParam } = this.context
 
-    const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
+    const collectUri = CollectSurvey.getUri(collectSurvey)
 
     const startingName = newSurveyParam.name || R.pipe(R.split('/'), R.last)(collectUri)
     const name = await findUniqueSurveyName({ startingName })

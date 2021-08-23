@@ -78,10 +78,12 @@ export default class Job {
       if (!this.isFailed() && (this.isRunning() || this.isSucceeded())) {
         // Error found, change status only if not changed already
         this.logError(`${error.stack || error}`)
+        const errorKey = `appErrors.${error instanceof SystemError ? error.key : 'generic'}`
+        const errorParams = error instanceof SystemError ? error.params : { text: error.toString() }
         this.addError({
           error: {
             valid: false,
-            errors: [{ key: 'appErrors.generic', params: { text: error.toString() } }],
+            errors: [{ key: errorKey, params: errorParams }],
           },
         })
         await this.setStatusFailed()
