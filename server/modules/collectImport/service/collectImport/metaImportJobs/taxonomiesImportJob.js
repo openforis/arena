@@ -26,8 +26,9 @@ export default class TaxonomiesImportJob extends Job {
 
     this.taxonomyCurrent = null // Current taxonomy being imported
     this.taxonomyImportManager = null // Import manager associated to the current taxonomy
-    this.rowsByCode = {} // Used to detect duplicate codes
-    this.rowsByScientificName = {} // Used to detect duplicate scientific names
+    this.rowById = {} // Rows cache: used to get family name
+    this.rowNumberByCode = {} // Used to detect duplicate codes
+    this.rowNumberByScientificName = {} // Used to detect duplicate scientific names
     this.currentRow = 0 // Current file row number
   }
 
@@ -66,8 +67,8 @@ export default class TaxonomiesImportJob extends Job {
     this.logDebug(`importing file ${speciesFileName}`)
 
     // 1. reset duplicate values indexes
-    this.rowsByCode = {}
-    this.rowsByScientificName = {}
+    this.rowNumberByCode = {}
+    this.rowNumberByScientificName = {}
 
     // 2. insert taxonomy
     const taxonomyName = speciesFileName.slice(0, speciesFileName.length - 4)
@@ -130,10 +131,12 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async onRow(speciesFileName, taxonomyUuid, row) {
-    if (this.validateRow(speciesFileName, row)) {
-      const { code, family, scientific_name: scientificName } = row
+    const { id, parent_id: parentId, code, rank, scientific_name: scientificName } = row
+    this.rowById[id] = { id, parent_id: parentId, rank, scientific_name: scientificName } // skip vernacular names in rows cache
 
+    if (this.validateRow(speciesFileName, row)) {
       const genus = R.pipe(R.split(' '), R.head)(scientificName)
+      const family = this.extractFamily({ row })
 
       const vernacularNames = R.reduce(
         (accVernacularNames, lang) =>
@@ -166,7 +169,7 @@ export default class TaxonomiesImportJob extends Job {
     }
 
     // Check if code is duplicate
-    const rowDuplicateCode = this.rowsByCode[code]
+    const rowDuplicateCode = this.rowNumberByCode[code]
     if (rowDuplicateCode) {
       this.addError(
         {
@@ -187,11 +190,11 @@ export default class TaxonomiesImportJob extends Job {
         speciesFileName
       )
     } else {
-      this.rowsByCode[code] = this.currentRow
+      this.rowNumberByCode[code] = this.currentRow
     }
 
     // Check if scientific name is duplicate
-    const rowDuplicateScientificName = this.rowsByScientificName[scientificName]
+    const rowDuplicateScientificName = this.rowNumberByScientificName[scientificName]
     if (rowDuplicateScientificName) {
       this.addError(
         {
@@ -212,9 +215,22 @@ export default class TaxonomiesImportJob extends Job {
         speciesFileName
       )
     } else {
-      this.rowsByScientificName[scientificName] = this.currentRow
+      this.rowNumberByScientificName[scientificName] = this.currentRow
     }
 
     return !(rowDuplicateCode || rowDuplicateScientificName)
+  }
+
+  extractFamily({ row }) {
+    if (row.rank === 'family') {
+      return row.scientific_name
+    }
+
+    // find ancestor row with rank 'family'
+    let currentRow = row
+    while (currentRow && currentRow.rank !== 'family') {
+      currentRow = this.rowById[currentRow.parent_id]
+    }
+    return currentRow?.scientific_name
   }
 }
