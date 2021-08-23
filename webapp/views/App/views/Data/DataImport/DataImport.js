@@ -12,9 +12,10 @@ import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
+import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
-import { NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 
@@ -22,11 +23,16 @@ const DataImport = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const dispatch = useDispatch()
+  const canDeleteAllRecords = useAuthCanDeleteAllRecords()
 
   const [deleteAllRecords, setDeleteAllRecords] = useState(false)
 
-  const onFileChange = async (file) => {
-    const job = await API.importRecordsFromCollect({ surveyId, file, deleteAllRecords })
+  const startImportJob = async (file) => {
+    const job = await API.importRecordsFromCollect({
+      surveyId,
+      file,
+      deleteAllRecords: canDeleteAllRecords && deleteAllRecords,
+    })
     dispatch(
       JobActions.showJobMonitor({
         job,
@@ -44,11 +50,26 @@ const DataImport = () => {
     )
   }
 
+  const onFileChange = async (file) => {
+    if (deleteAllRecords) {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'homeView.recordsImport.confirmDeleteAllRecords',
+          onOk: async () => startImportJob(file),
+        })
+      )
+    } else {
+      await startImportJob(file)
+    }
+  }
+
   return (
     <div className="data-import">
-      <FormItem label={i18n.t('homeView.recordsImport.deleteAllRecordsBeforeImport')}>
-        <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
-      </FormItem>
+      {canDeleteAllRecords && (
+        <FormItem label={i18n.t('homeView.recordsImport.deleteAllRecordsBeforeImport')}>
+          <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
+        </FormItem>
+      )}
       <UploadButton
         inputFieldId={DataTestId.recordsImport.importDataBtn}
         label={i18n.t('homeView.recordsImport.importFromCollect')}
