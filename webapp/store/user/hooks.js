@@ -39,6 +39,7 @@ export const useAuthCanDemoteRecord = (record) => {
   const surveyInfo = useSurveyInfo()
   return canEdit && Survey.isPublished(surveyInfo)
 }
+export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
 
 // ====== Auth / Users
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)

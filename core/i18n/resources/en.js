@@ -344,6 +344,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       year_plural: '{{count}} Years',
     },
     recordsImport: {
+      confirmDeleteAllRecords: 'Delete all records before import?',
       deleteAllRecordsBeforeImport: 'Delete all records before import',
       importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
@@ -583,7 +584,7 @@ $t(common.cantUndoWarning)`,
 {{rStudioCode}}
 
 `,
-copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
+    copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
 
 \n
 
@@ -1065,6 +1066,7 @@ $t(common.cantUndoWarning)`,
     cantUpdateStep: `Can't update step`,
     entryDataNotFound: 'Entry data not found: {{entryName}}',
     generic: 'Unexpected error: {{text}}',
+    importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
