@@ -344,6 +344,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       year_plural: '{{count}} Years',
     },
     recordsImport: {
+      confirmDeleteAllRecords: 'Delete all records before import?',
       deleteAllRecordsBeforeImport: 'Delete all records before import',
       importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
