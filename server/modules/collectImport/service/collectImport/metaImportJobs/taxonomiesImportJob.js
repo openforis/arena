@@ -228,12 +228,9 @@ export default class TaxonomiesImportJob extends Job {
 
     // find ancestor row with rank 'family'
     let currentRow = row
-    while (currentRow.parent_id) {
+    while (currentRow && currentRow.rank !== 'family') {
       currentRow = this.rowById[currentRow.parent_id]
-      if (currentRow?.rank === 'family') {
-        return currentRow.scientific_name
-      }
     }
-    return null
+    return currentRow?.scientific_name
   }
 }
