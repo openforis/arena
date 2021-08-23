@@ -158,3 +158,5 @@ export const getNodeDefChildren = (collectNodeDef) => R.pipe(getElements, R.filt
 const _isNodeDefElement = R.pipe(getElementName, (name) => R.includes(name, R.keys(collectNodeDefTypes)))
 
 export const isCollectEarthSurvey = (collectSurvey) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
+
+export const getUri = (collectSurvey) => getChildElementText('uri')(collectSurvey)
