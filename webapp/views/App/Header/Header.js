@@ -20,9 +20,9 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 import UserPopupMenu from './UserPopupMenu'
-import CycleSelector from './CycleSelector'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -63,7 +63,6 @@ const Header = () => {
                 <div className="header__survey-title">{Survey.getLabel(surveyInfo, lang)}</div>
               </Link>
               <CycleSelector
-                surveyInfo={surveyInfo}
                 surveyCycleKey={surveyCycleKey}
                 onChange={(cycle) => {
                   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
