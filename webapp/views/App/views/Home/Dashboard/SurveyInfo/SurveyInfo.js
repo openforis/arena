@@ -15,6 +15,7 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import DownloadButton from '@webapp/components/form/downloadButton'
+import { Button } from '@webapp/components'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
 
@@ -27,7 +28,7 @@ const SurveyInfo = () => {
 
   const surveyInfo = useSurveyInfo()
 
-  const canEditDef = useAuthCanEditSurvey()
+  const canEditSurvey = useAuthCanEditSurvey()
 
   const surveyName = Survey.getName(surveyInfo)
 
@@ -54,12 +55,11 @@ const SurveyInfo = () => {
             to={appModuleUri(homeModules.surveyInfo)}
             className="btn-s btn-transparent"
           >
-            <div className="triangle-left" />
-            <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`} />
-            {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
+            <span className={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`} />
+            {i18n.t(canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
+          {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           <DownloadButton
             id={DataTestId.dashboard.surveyExportBtn}
@@ -68,26 +68,22 @@ const SurveyInfo = () => {
             label={i18n.t('common.export')}
           />
 
-          {canEditDef && (
-            <button
+          {canEditSurvey && (
+            <Button
               className="btn-s btn-transparent"
-              data-testid={DataTestId.dashboard.surveyDeleteBtn}
-              type="button"
+              testId={DataTestId.dashboard.surveyDeleteBtn}
               onClick={() => setShowDeleteDialog(true)}
-            >
-              <div className="triangle-left" />
-              <span className="icon icon-bin icon-12px icon-left" />
-              {i18n.t('common.delete')}
-            </button>
+              iconClassName="icon-bin icon-12px icon-left"
+              label="common.delete"
+            />
           )}
 
-          {Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
+          {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
             <Link
               data-testid={DataTestId.dashboard.collectReportBtn}
               to={appModuleUri(homeModules.collectImportReport)}
               className="btn-s btn-transparent"
             >
-              <div className="triangle-left" />
               <span className="icon icon-clipboard icon-12px icon-left" />
               {i18n.t('appModules.collectImportReport')}
             </Link>
