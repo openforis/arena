@@ -44,7 +44,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
   const initData = useCallback(() => {
     fetchData()
     fetchCount()
-  }, [])
+  }, [fetchData, fetchCount])
 
   useEffect(initData, [JSON.stringify(restParams)])
 
