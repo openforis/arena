@@ -71,7 +71,7 @@ const SurveyInfo = () => {
           {canEditSurvey && (
             <Button
               className="btn-s btn-transparent"
-              testid={DataTestId.dashboard.surveyDeleteBtn}
+              testId={DataTestId.dashboard.surveyDeleteBtn}
               onClick={() => setShowDeleteDialog(true)}
               iconClassName="icon-bin icon-12px icon-left"
               label="common.delete"
