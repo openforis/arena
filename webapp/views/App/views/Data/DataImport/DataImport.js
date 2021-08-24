@@ -69,22 +69,24 @@ const DataImport = () => {
 
   return (
     <div className="data-import">
-      {canDeleteAllRecords && (
-        <FormItem label={i18n.t('homeView.recordsImport.deleteAllRecordsBeforeImport')}>
-          <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
+      <div className="form">
+        {canDeleteAllRecords && (
+          <FormItem label={i18n.t('homeView.recordsImport.deleteAllRecordsBeforeImport')}>
+            <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
+          </FormItem>
+        )}
+
+        <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
+          <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
         </FormItem>
-      )}
 
-      <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
-        <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
-      </FormItem>
-
-      <UploadButton
-        inputFieldId={DataTestId.recordsImport.importDataBtn}
-        label={i18n.t('homeView.recordsImport.importFromCollect')}
-        accept=".collect-backup,.collect-data"
-        onChange={(files) => onFileChange(files[0])}
-      />
+        <UploadButton
+          inputFieldId={DataTestId.recordsImport.importDataBtn}
+          label={i18n.t('homeView.recordsImport.importFromCollect')}
+          accept=".collect-backup,.collect-data"
+          onChange={(files) => onFileChange(files[0])}
+        />
+      </div>
     </div>
   )
 }
