@@ -44,6 +44,7 @@ export default class SurveyCreatorJob extends Job {
       [Survey.infoKeys.published]: published,
       [Survey.infoKeys.draft]: draft,
       [Survey.infoKeys.template]: template,
+      ...(backup ? { [Survey.infoKeys.cycles]: Survey.getCycles(surveyInfoArenaSurvey) } : {}),
       [Survey.infoKeys.temporary]: true,
     })
 
