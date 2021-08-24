@@ -348,6 +348,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       deleteAllRecordsBeforeImport: 'Delete all records before import',
       importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
+      importIntoCycle: 'Import into cycle',
     },
   },
 

@@ -11,27 +11,31 @@ import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
+import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 const DataImport = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const surveyCycle = useSurveyCycleKey()
   const dispatch = useDispatch()
   const canDeleteAllRecords = useAuthCanDeleteAllRecords()
 
   const [deleteAllRecords, setDeleteAllRecords] = useState(false)
+  const [cycle, setCycle] = useState(surveyCycle)
 
   const startImportJob = async (file) => {
     const job = await API.importRecordsFromCollect({
       surveyId,
       file,
       deleteAllRecords: canDeleteAllRecords && deleteAllRecords,
+      cycle,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -70,6 +74,11 @@ const DataImport = () => {
           <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
         </FormItem>
       )}
+
+      <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
+        <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+      </FormItem>
+
       <UploadButton
         inputFieldId={DataTestId.recordsImport.importDataBtn}
         label={i18n.t('homeView.recordsImport.importFromCollect')}

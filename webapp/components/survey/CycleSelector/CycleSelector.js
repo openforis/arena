@@ -2,15 +2,15 @@ import React from 'react'
 import * as R from 'ramda'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-
 import { useI18n } from '@webapp/store/system'
+import { useSurveyCycleKeys } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const CycleSelector = (props) => {
-  const { surveyInfo, surveyCycleKey, onChange } = props
-  const cycleKeys = Survey.getCycleKeys(surveyInfo)
+  const { surveyCycleKey, onChange } = props
+
+  const cycleKeys = useSurveyCycleKeys()
 
   if (cycleKeys.length === 1) {
     return null
@@ -35,13 +35,11 @@ const CycleSelector = (props) => {
 }
 
 CycleSelector.propTypes = {
-  surveyInfo: PropTypes.object,
   surveyCycleKey: PropTypes.string,
   onChange: PropTypes.func,
 }
 
 CycleSelector.defaultProps = {
-  surveyInfo: null,
   surveyCycleKey: null,
   onChange: () => ({}),
 }
