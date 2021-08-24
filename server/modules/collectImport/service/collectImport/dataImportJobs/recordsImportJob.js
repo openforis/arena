@@ -38,13 +38,20 @@ export default class RecordsImportJob extends Job {
   async execute() {
     const { surveyId, user, tx } = this
 
-    const { deleteAllRecords } = this.context
+    const { deleteAllRecords, collectSurvey } = this.context
 
     const cycle = Survey.cycleOneKey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: true, advanced: true },
       tx
     )
+    const surveyInfo = Survey.getSurveyInfo(survey)
+
+    // check survey URI
+    const collectSurveyUri = CollectSurvey.getUri(collectSurvey)
+    if (Survey.getCollectUri(surveyInfo) !== collectSurveyUri) {
+      throw new SystemError('importingDataIntoWrongCollectSurvey', { collectSurveyUri })
+    }
 
     if (deleteAllRecords) {
       this.logDebug('deleting all records before import')
