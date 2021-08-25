@@ -92,60 +92,58 @@ const Literal = (props) => {
         />
       )
     }
-    if (BinaryOperandType.isLeft(type)) {
-      switch (NodeDef.getType(nodeDef)) {
-        case NodeDef.nodeDefType.integer:
-        case NodeDef.nodeDefType.decimal:
-          return (
-            <Input
-              numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
-              onChange={onChangeValue}
-              value={nodeValueString}
-            />
-          )
-        case NodeDef.nodeDefType.boolean:
-          return (
-            <ButtonGroup
-              className="literal-btn-group-boolean"
-              selectedItemKey={nodeValue}
-              onChange={onChangeValue}
-              items={['true', 'false'].map((value) => ({
-                key: value,
-                label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
-              }))}
-            />
-          )
-        case NodeDef.nodeDefType.date: {
-          const formatStorage = DateUtils.formats.dateISO
-          const formatDisplay = DateUtils.formats.dateDefault
-          return (
-            <DateInput
-              onChange={(selectedDate) => {
-                const dateConverted = DateUtils.convertDate({
-                  dateStr: selectedDate,
-                  formatFrom: formatDisplay,
-                  formatTo: formatStorage,
-                })
-                onChangeValue(dateConverted)
-              }}
-              value={DateUtils.convertDate({
-                dateStr: nodeValueString,
-                formatFrom: formatStorage,
-                formatTo: formatDisplay,
-              })}
-            />
-          )
-        }
-        default:
-          return (
-            <input
-              className="form-input"
-              value={nodeValueString}
-              size={25}
-              onChange={(e) => onChangeValue(e.target.value)}
-            />
-          )
+    switch (NodeDef.getType(nodeDef)) {
+      case NodeDef.nodeDefType.integer:
+      case NodeDef.nodeDefType.decimal:
+        return (
+          <Input
+            numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
+            onChange={onChangeValue}
+            value={nodeValueString}
+          />
+        )
+      case NodeDef.nodeDefType.boolean:
+        return (
+          <ButtonGroup
+            className="literal-btn-group-boolean"
+            selectedItemKey={nodeValue}
+            onChange={onChangeValue}
+            items={['true', 'false'].map((value) => ({
+              key: value,
+              label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
+            }))}
+          />
+        )
+      case NodeDef.nodeDefType.date: {
+        const formatStorage = DateUtils.formats.dateISO
+        const formatDisplay = DateUtils.formats.dateDefault
+        return (
+          <DateInput
+            onChange={(selectedDate) => {
+              const dateConverted = DateUtils.convertDate({
+                dateStr: selectedDate,
+                formatFrom: formatDisplay,
+                formatTo: formatStorage,
+              })
+              onChangeValue(dateConverted)
+            }}
+            value={DateUtils.convertDate({
+              dateStr: nodeValueString,
+              formatFrom: formatStorage,
+              formatTo: formatDisplay,
+            })}
+          />
+        )
       }
+      default:
+        return (
+          <input
+            className="form-input"
+            value={nodeValueString}
+            size={25}
+            onChange={(e) => onChangeValue(e.target.value)}
+          />
+        )
     }
   }
 
