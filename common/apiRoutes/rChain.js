@@ -11,6 +11,9 @@ export const chainUserScripts = (surveyId, chainUuid) => `${getRChainPath(survey
 // category
 export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`
 
+// taxonomy
+export const taxonomyItemsData = (surveyId, taxonomyUuid) => `${getRChainPath(surveyId)}/taxonomies/${taxonomyUuid}`
+
 // entity
 export const entityData = (surveyId, cycle, chainUuid, entityUuid) =>
   `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/entities/${entityUuid}/data`

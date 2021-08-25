@@ -15,7 +15,7 @@ export default class SurveyInfoExportJob extends Job {
 
     // fetch survey with props and propsDraft not combined together to get a full export
     const surveyFull = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-      { surveyId, advanced: true, backup },
+      { surveyId, advanced: true, backup, draft: true },
       this.tx
     )
     archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })
