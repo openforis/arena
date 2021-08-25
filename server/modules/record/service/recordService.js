@@ -107,8 +107,8 @@ export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
 export const { fetchValidationReport, countValidationReports } = RecordManager
 
-export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords }) => {
-  const job = new CollectDataImportJob({ user, surveyId, filePath, deleteAllRecords })
+export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle }) => {
+  const job = new CollectDataImportJob({ user, surveyId, filePath, deleteAllRecords, cycle })
   JobManager.executeJobThread(job)
   return job
 }

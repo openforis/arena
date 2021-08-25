@@ -38,9 +38,8 @@ export default class RecordsImportJob extends Job {
   async execute() {
     const { surveyId, user, tx } = this
 
-    const { deleteAllRecords, collectSurvey } = this.context
+    const { deleteAllRecords, collectSurvey, cycle = Survey.cycleOneKey } = this.context
 
-    const cycle = Survey.cycleOneKey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: true, advanced: true },
       tx
