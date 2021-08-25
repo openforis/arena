@@ -5,24 +5,12 @@ import * as ApiRoutes from '@common/apiRoutes'
 
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
-const getCategoryUuidsInChain = ({ chain, survey }) => {
-  // Get unique category uuids for AnalysisNodeDefs
-  const categoryUuids = new Set()
-
-  Survey.getAnalysisNodeDefs({ chain })(survey).forEach((nodeDef) => {
-    if (NodeDef.isCode(nodeDef)) {
-      categoryUuids.add(NodeDef.getCategoryUuid(nodeDef))
-    }
-  })
-  return categoryUuids
-}
-
 export default class ListCategories {
   constructor(rChain) {
     this._rChain = rChain
     this._scripts = []
     this._name = 'categories'
-    this._categoryUuids = []
+    this._categories = []
 
     this.initList()
   }
@@ -43,10 +31,10 @@ export default class ListCategories {
     return dfVar(this.name, Category.getName(category))
   }
 
-  initCategory(categoryUuid) {
+  initCategory(category) {
     const { survey } = this.rChain
     const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-    const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+    const categoryUuid = Category.getUuid(category)
 
     // get category items
     const dfCategoryItems = this.getDfCategoryItems(category)
@@ -60,12 +48,12 @@ export default class ListCategories {
   initCategories() {
     // Init categories named list
     this.scripts.push(setVar(this.name, 'list()'))
-    this._categoryUuids.forEach((categoryUuid) => this.initCategory(categoryUuid))
+    this._categories.forEach((category) => this.initCategory(category))
   }
 
   initList() {
-    const { chain, survey } = this.rChain
-    this._categoryUuids = getCategoryUuidsInChain({ chain, survey })
+    const { survey } = this.rChain
+    this._categories = Survey.getCategoriesArray(survey)
     this.initCategories()
   }
 }

@@ -1,10 +1,12 @@
 import * as CategoryItem from '../../../../core/survey/categoryItem'
+import * as Taxon from '../../../../core/survey/taxon'
 import * as ApiRoutes from '../../../../common/apiRoutes'
 
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as CategoryService from '../../category/service/categoryService'
+import * as TaxonmyService from '../../taxonomy/service/taxonomyService'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
@@ -16,7 +18,7 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid })
+        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false })
 
         res.json(data)
       } catch (error) {
@@ -39,6 +41,29 @@ export const init = (app) => {
           uuid: CategoryItem.getUuid(item),
           code: CategoryItem.getCode(item),
           label: CategoryItem.getLabel(language)(item),
+        }))
+        res.json(itemsSummary)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // ====== READ - Taxonomy items
+  app.get(
+    ApiRoutes.rChain.taxonomyItemsData(':surveyId', ':taxonomyUuid'),
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, taxonomyUuid } = Request.getParams(req)
+
+        const items = await TaxonmyService.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid })
+
+        const itemsSummary = items.map((item) => ({
+          uuid: Taxon.getUuid(item),
+          code: Taxon.getCode(item),
+          family: Taxon.getFamily(item),
+          scientific_name: Taxon.getScientificName(item),
         }))
         res.json(itemsSummary)
       } catch (error) {

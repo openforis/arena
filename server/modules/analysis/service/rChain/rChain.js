@@ -9,10 +9,11 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisManager from '../../manager'
 import * as StringUtils from '../../../../../core/stringUtils'
 
-import { ListCategories, RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
+import { ListCategories, ListTaxonomies, RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
 import { RFileCommon } from './rFile/user'
 import RFile, { padStart } from './rFile'
 
@@ -49,6 +50,9 @@ class RChain {
 
     // Categories
     this._listCategories = null
+
+    // Taxonomies
+    this._listTaxonomies = null
 
     this._counter = new Counter()
 
@@ -111,6 +115,10 @@ class RChain {
     return this._listCategories
   }
 
+  get listTaxonomies() {
+    return this._listTaxonomies
+  }
+
   get entities() {
     return this._entities
   }
@@ -144,13 +152,17 @@ class RChain {
     })
 
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId: this.surveyId })
+    const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId: this.surveyId })
+
     this._survey = Survey.assocCategories(categories)(this.survey)
+    this._survey = Survey.assocTaxonomies(taxonomies)(this.survey)
     this._chain = await AnalysisManager.fetchChain({
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
       includeScript: true,
     })
     this._listCategories = new ListCategories(this)
+    this._listTaxonomies = new ListTaxonomies(this)
     await this._initEntities()
   }
 
