@@ -58,7 +58,9 @@ const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) 
 }
 
 const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
-  !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
+  !isLeaf && R.isEmpty(itemChildren)
+    ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
+    : null
 
 const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
