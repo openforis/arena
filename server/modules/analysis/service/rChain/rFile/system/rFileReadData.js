@@ -41,12 +41,13 @@ export default class RFileReadData extends RFileSystem {
     await super.init()
     this.initEntitiesNodeDefs = this.initEntitiesNodeDefs.bind(this)
 
-    const { listCategories, entities } = this.rChain
+    const { listCategories, listTaxonomies, entities } = this.rChain
 
     await this.initEntitiesNodeDefs(entities)
 
-    // Append categories initialization
+    // Append categories and taxoniomies initialization
     await this.appendContent(...listCategories.scripts)
+    await this.appendContent(...listTaxonomies.scripts)
 
     return this
   }
