@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
-import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import * as CSVReader from '@server/utils/file/csvReader'
@@ -15,8 +14,8 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
     async (row) => {
       const codes = []
       const extra = {}
-      const labelsByLevel = {}
-      const descriptionsByLevel = {}
+      const labelsByLang = {}
+      const descriptionsByLang = {}
 
       Object.entries(columns).forEach(([columnName, column]) => {
         const columnValue = row[columnName]
@@ -29,14 +28,11 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
           } else {
             // Label or description
             const lang = CategoryImportSummary.getColumnLang(column)
-            const levelName =
-              CategoryImportSummary.getColumnLevelName(column) ||
-              `level${R.findLastIndex(StringUtils.isNotBlank)(codes) + 1}`
 
             if (CategoryImportSummary.isColumnLabel(column)) {
-              ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
+              labelsByLang[lang] = columnValue
             } else if (CategoryImportSummary.isColumnDescription(column)) {
-              ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
+              descriptionsByLang[lang] = columnValue
             }
           }
         }
@@ -48,8 +44,8 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
       await onRowItem({
         levelIndex,
         codes: codes.slice(0, levelIndex + 1),
-        labelsByLevel,
-        descriptionsByLevel,
+        labelsByLang,
+        descriptionsByLang,
         extra,
       })
     },
