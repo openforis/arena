@@ -14,7 +14,8 @@ import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImpo
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
-const speciesFilesPath = 'species/'
+const SPECIES_FILES_PATH = 'species/'
+const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
 
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
@@ -38,7 +39,7 @@ export default class TaxonomiesImportJob extends Job {
 
     const taxonomies = []
 
-    const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
+    const speciesFileNames = collectSurveyFileZip.getEntryNames(SPECIES_FILES_PATH)
 
     for (const speciesFileName of speciesFileNames) {
       if (this.isCanceled()) {
@@ -83,7 +84,7 @@ export default class TaxonomiesImportJob extends Job {
     const taxonomyUuid = Taxonomy.getUuid(this.taxonomyCurrent)
 
     // 3. parse CSV file
-    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
+    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${SPECIES_FILES_PATH}${speciesFileName}`)
 
     const totalPrevious = this.total
 
@@ -139,13 +140,14 @@ export default class TaxonomiesImportJob extends Job {
       const family = this.extractFamily({ row })
 
       const vernacularNames = R.reduce(
-        (accVernacularNames, lang) =>
-          R.pipe(
-            R.prop(lang),
-            R.split(/[,/]/),
-            R.map((name) => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
-            R.ifElse(R.isEmpty, R.always(accVernacularNames), (names) => R.assoc(lang, names)(accVernacularNames))
-          )(row),
+        (accVernacularNames, lang) => {
+          const vernacularNames = this.extractVernacularNames({ row, lang })
+          const vernacularNamesObjects = vernacularNames.map((name) =>
+            TaxonVernacularName.newTaxonVernacularName(lang, name)
+          )
+          if (vernacularNamesObjects.length === 0) return accVernacularNames
+          return { ...accVernacularNames, [lang]: vernacularNamesObjects }
+        },
         {},
         this.vernacularLangCodes
       )
@@ -218,7 +220,7 @@ export default class TaxonomiesImportJob extends Job {
       this.rowNumberByScientificName[scientificName] = this.currentRow
     }
 
-    return !(rowDuplicateCode || rowDuplicateScientificName)
+    return !rowDuplicateCode && !rowDuplicateScientificName
   }
 
   extractFamily({ row }) {
@@ -232,5 +234,12 @@ export default class TaxonomiesImportJob extends Job {
       currentRow = this.rowById[currentRow.parent_id]
     }
     return currentRow?.scientific_name
+  }
+
+  extractVernacularNames({ row, lang }) {
+    const vernacularNamesStr = row[lang] || ''
+    const vernacularNames = vernacularNamesStr.split(VERNACULAR_NAMES_SEPARATOR_REGEX)
+    const vernacularNamesTrimmed = vernacularNames.map((vernacularName) => StringUtils.trim(vernacularName))
+    return R.uniq(vernacularNamesTrimmed)
   }
 }
