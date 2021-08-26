@@ -14,6 +14,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
 import DownloadButton from '@webapp/components/form/downloadButton'
@@ -80,24 +81,20 @@ const CategoryDetails = (props) => {
           ))}
 
           {!readOnly && (
-            <button
-              type="button"
-              className="btn btn-s btn-add-level"
-              data-testid={DataTestId.categoryDetails.addLevelBtn}
+            <Button
+              className="btn-s btn-add-level"
+              testId={DataTestId.categoryDetails.addLevelBtn}
               onClick={() => Actions.createLevel({ category })}
-              aria-disabled={levels.length === 5}
-            >
-              <span className="icon icon-plus icon-16px icon-left" />
-              {i18n.t('categoryEdit.addLevel')}
-            </button>
+              disabled={levels.length === 5}
+              iconClassName="icon icon-plus icon-16px icon-left"
+              label="categoryEdit.addLevel"
+            />
           )}
         </div>
 
         {showClose && (
           <div className="button-bar">
-            <button type="button" className="btn" onClick={Actions.onDoneClick}>
-              {i18n.t('common.done')}
-            </button>
+            <Button onClick={Actions.onDoneClick} label="common.done" />
           </div>
         )}
       </div>
