@@ -16,12 +16,12 @@ export const useOnBrowserBack = (params) => {
   // use a ref to know if the temporary location has been set to avoid going back too many times
   const tempLocationSetRef = useRef(false)
 
-  const pushTempLocation = (history) => {
+  const addTempLocationToHistory = (history) => {
     history.push(history.location.pathname, null)
     tempLocationSetRef.current = true
   }
 
-  const goBackFromTempLocation = (history) => {
+  const removeFromTempLocationFromHistory = (history) => {
     tempLocationSetRef.current = false
     history.goBack()
   }
@@ -36,22 +36,22 @@ export const useOnBrowserBack = (params) => {
 
     const wentBack = await onBack()
     if (!wentBack) {
-      pushTempLocation(history)
+      addTempLocationToHistory(history)
     }
   }
 
   useEffect(() => {
     if (active) {
       if (!tempLocationSetRef.current) {
-        pushTempLocation(history)
+        addTempLocationToHistory(history)
+        window.addEventListener('popstate', onBackButtonEvent)
       }
-      window.addEventListener('popstate', onBackButtonEvent)
 
       return () => {
         window.removeEventListener('popstate', onBackButtonEvent)
       }
     } else if (tempLocationSetRef.current) {
-      goBackFromTempLocation(history)
+      removeFromTempLocationFromHistory(history)
     }
   }, [active, onBack])
 }
