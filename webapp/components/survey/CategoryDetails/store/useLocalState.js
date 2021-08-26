@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import * as StringUtils from '@core/stringUtils'
-import * as Category from '@core/survey/category'
-
 import { useActions } from './actions'
 import { State } from './state'
 import { useOnBrowserBack } from '@webapp/components/hooks'
@@ -17,16 +14,10 @@ export const useLocalState = (props) => {
 
   const Actions = useActions({ setState })
 
-  const category = State.getCategory(state)
-
-  const categoryEmpty =
-    category &&
-    StringUtils.isBlank(Category.getName(category)) &&
-    Category.getLevelsArray(category).length === 1 &&
-    State.getItemsArray({ levelIndex: 1 })(state).length === 0
+  const categoryEmpty = State.isCategoryEmpty(state)
 
   const deleteCategoryIfEmpty = useCallback(async () => {
-    await Actions.deleteCategoryIfEmpty()
+    await Actions.deleteCategoryIfEmpty({ categoryUuid })
     setState({})
     history.goBack()
     return true

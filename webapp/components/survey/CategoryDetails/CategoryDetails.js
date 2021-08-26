@@ -2,7 +2,7 @@ import './CategoryDetails.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useHistory, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
@@ -14,7 +14,6 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
 import DownloadButton from '@webapp/components/form/downloadButton'
@@ -29,7 +28,6 @@ const CategoryDetails = (props) => {
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
-  const history = useHistory()
   const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
@@ -38,7 +36,6 @@ const CategoryDetails = (props) => {
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
-  const inCategoriesPath = useIsCategoriesRoute()
   const importSummary = State.getImportSummary(state)
 
   const validation = Validation.getValidation(category)
@@ -98,15 +95,7 @@ const CategoryDetails = (props) => {
 
         {showClose && (
           <div className="button-bar">
-            <button
-              type="button"
-              className="btn"
-              onClick={() => {
-                if (inCategoriesPath) {
-                  history.goBack()
-                }
-              }}
-            >
+            <button type="button" className="btn" onClick={Actions.onDoneClick}>
               {i18n.t('common.done')}
             </button>
           </div>
