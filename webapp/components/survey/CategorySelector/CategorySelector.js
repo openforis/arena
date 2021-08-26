@@ -1,6 +1,6 @@
 import './CategorySelector.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -40,6 +40,19 @@ const CategorySelector = (props) => {
       }
     })()
   }, [categoryUuid, showCategoriesPanel])
+
+  const onCategoryEditPanelClose = useCallback(async () => {
+    const categoryEditedUuid = categoryToEdit.uuid
+    if (await API.deleteCategoryIfEmpty({ surveyId, categoryUuid: categoryEditedUuid })) {
+      if (categoryUuid === categoryEditedUuid) {
+        // previously selected category has been deleted
+        onChange(null)
+      }
+    } else {
+      onChange(categoryToEdit)
+    }
+    setCategoryToEdit(null)
+  }, [categoryToEdit])
 
   return (
     <div className="category-selector">
@@ -87,14 +100,7 @@ const CategorySelector = (props) => {
         </PanelRight>
       )}
       {categoryToEdit && (
-        <PanelRight
-          width="100vw"
-          onClose={() => {
-            onChange(categoryToEdit)
-            setCategoryToEdit(null)
-          }}
-          header={i18n.t('categoryEdit.header')}
-        >
+        <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')}>
           <CategoryDetails categoryUuid={Category.getUuid(categoryToEdit)} showClose={false} />
         </PanelRight>
       )}

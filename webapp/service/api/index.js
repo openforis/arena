@@ -1,6 +1,13 @@
 export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
-export { fetchCategories, fetchCategory, createCategory, fetchCategoryItems, deleteCategory } from './categories'
+export {
+  fetchCategories,
+  fetchCategory,
+  createCategory,
+  fetchCategoryItems,
+  deleteCategory,
+  deleteCategoryIfEmpty,
+} from './categories'
 export { fetchTaxonomies, fetchTaxonomy, createTaxonomy, uploadTaxa, updateTaxonomy } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export { importRecordsFromCollect } from './data'

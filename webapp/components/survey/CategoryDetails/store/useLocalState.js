@@ -17,20 +17,16 @@ export const useLocalState = (props) => {
 
   const Actions = useActions({ setState })
 
-  const isCategoryEmpty = () => {
-    const category = State.getCategory(state)
-    return (
-      category &&
-      StringUtils.isBlank(Category.getName(category)) &&
-      Category.getLevelsArray(category).length === 1 &&
-      State.getItemsArray({ levelIndex: 1 })(state).length === 0
-    )
-  }
+  const category = State.getCategory(state)
 
-  const categoryEmpty = isCategoryEmpty()
+  const categoryEmpty =
+    category &&
+    StringUtils.isBlank(Category.getName(category)) &&
+    Category.getLevelsArray(category).length === 1 &&
+    State.getItemsArray({ levelIndex: 1 })(state).length === 0
 
-  const deleteCategory = useCallback(async () => {
-    await Actions.deleteCategory()
+  const deleteCategoryIfEmpty = useCallback(async () => {
+    await Actions.deleteCategoryIfEmpty()
     setState({})
     history.goBack()
     return true
@@ -44,7 +40,7 @@ export const useLocalState = (props) => {
 
   useOnBrowserBack({
     active: categoryEmpty,
-    onBack: deleteCategory,
+    onBack: deleteCategoryIfEmpty,
   })
 
   return { state, setState }

@@ -1,7 +1,7 @@
 import { useInit } from './category/useInit'
 import { useUpdateCategoryProp } from './category/useUpdateCategoryProp'
 import { useUploadCategory } from './category/useUploadCategory'
-import { useDeleteCategory } from './category/useDeleteCategory'
+import { useDeleteCategoryIfEmpty } from './category/useDeleteCategory'
 import { useImportCategory } from './importSummary/useImportCategory'
 import { useHideImportSummary } from './importSummary/useHideImportSummary'
 import { useSetImportSummaryColumnDataType } from './importSummary/useSetImportSummaryColumnDataType'
@@ -24,7 +24,7 @@ export const useActions = ({ setState }) => ({
   hideImportSummary: useHideImportSummary({ setState }),
   setImportSummaryColumnDataType: useSetImportSummaryColumnDataType({ setState }),
   importCategory: useImportCategory({ setState }),
-  deleteCategory: useDeleteCategory(),
+  deleteCategoryIfEmpty: useDeleteCategoryIfEmpty(),
 
   // Levels
   fetchLevelItems: useFetchLevelItems({ setState }),
