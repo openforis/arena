@@ -16,14 +16,14 @@ const ErrorBadge = (props) => {
 
   if (valid) return children
 
+  const error = Validation.isError(validation)
+  const warning = !error && Validation.isWarning(validation)
+
   return (
     <ValidationTooltip
       validation={validation}
       showKeys={showKeys}
-      className={classNames(className, 'badge', 'error-badge', {
-        error: Validation.isError(validation),
-        warning: Validation.isWarning(validation),
-      })}
+      className={classNames(className, 'badge', 'error-badge', { error, warning })}
       id={id}
       insideTable={insideTable}
     >
