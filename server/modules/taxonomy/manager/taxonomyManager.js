@@ -5,6 +5,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { db } from '@server/db/db'
 
@@ -163,12 +164,8 @@ export const findTaxaByVernacularName = async (
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
-export const {
-  fetchTaxonByUuid,
-  fetchTaxonByCode,
-  fetchTaxonVernacularNameByUuid,
-  fetchTaxaWithVernacularNames,
-} = TaxonomyRepository
+export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
+  TaxonomyRepository
 
 export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
   const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft })
@@ -243,8 +240,14 @@ export const updateTaxa = async (user, surveyId, taxa, client = db) =>
 
 // ============== DELETE
 
-export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
+export const deleteTaxonomy = async ({ user, surveyId, taxonomyUuid, onlyIfEmpty = false }, client = db) =>
   client.tx(async (t) => {
+    if (onlyIfEmpty) {
+      const taxonomyOld = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, t)
+      const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, taxonomyUuid, draft, t)
+      const taxonomyEmpty = StringUtils.isEmpty(Taxonomy.getName(taxonomyOld)) && taxaCount === 0
+      if (!taxonomyEmpty) return false
+    }
     const taxonomy = await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: taxonomyUuid,
@@ -254,6 +257,7 @@ export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) 
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyDelete, logContent, false, t),
     ])
+    return true
   })
 
 export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, t) =>
