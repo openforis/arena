@@ -206,26 +206,21 @@ export default class CategoryImportJob extends Job {
   }
 
   async _onRow(itemRow) {
-    const { levelIndex: levelIndexItem, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
+    const { levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
 
     const levels = Category.getLevelsArray(this.category)
 
     if (this._checkCodesNotEmpty(codes)) {
-      // For each level insert an item or replace its props if already parsed
-      for (let levelIndex = 0; levelIndex <= levelIndexItem; levelIndex++) {
-        const level = levels[levelIndex]
-        const placeholder = levelIndex !== levelIndexItem
-        const itemCodes = codes.slice(0, levelIndex + 1)
-        const itemCodeKey = String(itemCodes)
-        const itemCached = this._getItemCachedByCodes(itemCodes)
+      const itemCodeKey = String(codes)
+      const itemCached = this._getItemCachedByCodes(codes)
 
-        if (itemCached && !placeholder && !itemCached.placeholder) {
-          this._addErrorCodeDuplicate(levelIndex, itemCodeKey)
-        } else if (!itemCached || !placeholder) {
-          // Insert new items if not inserted already
-          // update existing items (only when last level is reached)
-          await this._insertOrUpdateItem(itemCodes, level, placeholder, labelsByLevel, descriptionsByLevel, extra)
-        }
+      if (itemCached && !itemCached.placeholder) {
+        this._addErrorCodeDuplicate(levelIndex, itemCodeKey)
+      } else if (!itemCached) {
+        const level = levels[levelIndex]
+        // Insert new items if not inserted already
+        // update existing items (only when last level is reached)
+        await this._insertOrUpdateItem(codes, level, false, labelsByLang, descriptionsByLang, extra)
       }
     }
 
@@ -235,7 +230,7 @@ export default class CategoryImportJob extends Job {
   /**
    * Insert new item if not already created or update already inserted item if in last level
    */
-  async _insertOrUpdateItem(itemCodes, level, placeholder, labelsByLevel, descriptionsByLevel, extra) {
+  async _insertOrUpdateItem(itemCodes, level, placeholder, labelsByLang, descriptionsByLang, extra) {
     const itemCached = this._getItemCachedByCodes(itemCodes)
 
     let item = null
@@ -243,9 +238,8 @@ export default class CategoryImportJob extends Job {
     const itemProps = {
       [CategoryItem.keysProps.code]: itemCodes[itemCodes.length - 1],
     }
-    const levelName = CategoryLevel.getName(level)
-    ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
-    ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
+    ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLang, false)(itemProps)
+    ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLang, false)(itemProps)
     if (!placeholder) {
       ObjectUtils.setInPath([CategoryItem.keysProps.extra], this.extractItemExtraProps(extra), false)(itemProps)
     }
