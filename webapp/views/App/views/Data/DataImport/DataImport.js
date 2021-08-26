@@ -29,6 +29,7 @@ const DataImport = () => {
 
   const [deleteAllRecords, setDeleteAllRecords] = useState(false)
   const [cycle, setCycle] = useState(surveyCycle)
+  const [forceImport, setForceImport] = useState(false)
 
   const startImportJob = async (file) => {
     const job = await API.importRecordsFromCollect({
@@ -36,6 +37,7 @@ const DataImport = () => {
       file,
       deleteAllRecords: canDeleteAllRecords && deleteAllRecords,
       cycle,
+      forceImport,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -78,6 +80,10 @@ const DataImport = () => {
 
         <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
           <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+        </FormItem>
+
+        <FormItem label={i18n.t('homeView.recordsImport.forceImportFromAnotherSurvey')}>
+          <Checkbox checked={forceImport} onChange={setForceImport} />
         </FormItem>
 
         <UploadButton

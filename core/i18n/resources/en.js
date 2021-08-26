@@ -346,6 +346,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     recordsImport: {
       confirmDeleteAllRecords: 'Delete all records before import?',
       deleteAllRecordsBeforeImport: 'Delete all records before import',
+      forceImportFromAnotherSurvey: 'Force import from another survey',
       importFromCollect: 'Import data from Collect / Collect Mobile',
       importComplete: 'Import complete. {{insertedRecords}} records imported',
       importIntoCycle: 'Import into cycle',
