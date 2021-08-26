@@ -21,7 +21,7 @@ export const useOnBrowserBack = (params) => {
     tempLocationSetRef.current = true
   }
 
-  const removeFromTempLocationFromHistory = (history) => {
+  const removeTempLocationFromHistory = (history) => {
     tempLocationSetRef.current = false
     history.goBack()
   }
@@ -51,7 +51,7 @@ export const useOnBrowserBack = (params) => {
         window.removeEventListener('popstate', onBackButtonEvent)
       }
     } else if (tempLocationSetRef.current) {
-      removeFromTempLocationFromHistory(history)
+      removeTempLocationFromHistory(history)
     }
   }, [active, onBack])
 }
