@@ -21,30 +21,37 @@ export const useOnBrowserBack = (params) => {
     tempLocationSetRef.current = true
   }
 
+  const goBackFromTempLocation = (history) => {
+    tempLocationSetRef.current = false
+    history.goBack()
+  }
+
   const history = useHistory()
 
   const onBackButtonEvent = async (event) => {
     event.preventDefault()
 
-    if (active) {
-      const wentBack = await onBack()
-      if (!wentBack) {
-        pushTempLocation(history)
-      }
-    } else if (tempLocationSetRef.current) {
-      tempLocationSetRef.current = false
-      history.goBack()
+    // the browser went back from the temp location
+    tempLocationSetRef.current = false
+
+    const wentBack = await onBack()
+    if (!wentBack) {
+      pushTempLocation(history)
     }
   }
 
   useEffect(() => {
-    if (!tempLocationSetRef.current) {
-      pushTempLocation(history)
-    }
-    window.addEventListener('popstate', onBackButtonEvent)
+    if (active) {
+      if (!tempLocationSetRef.current) {
+        pushTempLocation(history)
+      }
+      window.addEventListener('popstate', onBackButtonEvent)
 
-    return () => {
-      window.removeEventListener('popstate', onBackButtonEvent)
+      return () => {
+        window.removeEventListener('popstate', onBackButtonEvent)
+      }
+    } else if (tempLocationSetRef.current) {
+      goBackFromTempLocation(history)
     }
   }, [active, onBack])
 }

@@ -44,7 +44,9 @@ const CategoryDetails = (props) => {
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
-  return category ? (
+  if (!category) return null
+
+  return (
     <>
       <div className="category">
         <div className="category__header">
@@ -113,7 +115,7 @@ const CategoryDetails = (props) => {
 
       {importSummary && <ImportSummary state={state} setState={setState} />}
     </>
-  ) : null
+  )
 }
 
 CategoryDetails.propTypes = {
