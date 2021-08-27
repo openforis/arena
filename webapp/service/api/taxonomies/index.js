@@ -40,9 +40,7 @@ export const updateTaxonomy = async ({ surveyId, taxonomyUuid, data }) =>
 export const deleteTaxonomyIfEmpty = async ({ surveyId, taxonomyUuid }) => {
   const {
     data: { taxonomies: updatedTaxonomies },
-  } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, {
-    onlyIfEmpty: true,
-  })
+  } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, { data: { onlyIfEmpty: true } })
   const deleted = !Boolean(updatedTaxonomies[taxonomyUuid])
   return deleted
 }

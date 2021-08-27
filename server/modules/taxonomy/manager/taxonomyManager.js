@@ -5,7 +5,6 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as ObjectUtils from '@core/objectUtils'
-import * as StringUtils from '@core/stringUtils'
 
 import { db } from '@server/db/db'
 
@@ -243,9 +242,11 @@ export const updateTaxa = async (user, surveyId, taxa, client = db) =>
 export const deleteTaxonomy = async ({ user, surveyId, taxonomyUuid, onlyIfEmpty = false }, client = db) =>
   client.tx(async (t) => {
     if (onlyIfEmpty) {
-      const taxonomyOld = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, t)
+      const draft = true
+      const validate = false
+      const taxonomyOld = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft, validate, t)
       const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, taxonomyUuid, draft, t)
-      const taxonomyEmpty = StringUtils.isEmpty(Taxonomy.getName(taxonomyOld)) && taxaCount === 0
+      const taxonomyEmpty = Taxonomy.isEmpty(taxonomyOld) && taxaCount === 0
       if (!taxonomyEmpty) return false
     }
     const taxonomy = await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t)
