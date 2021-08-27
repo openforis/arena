@@ -53,6 +53,8 @@ const TaxonProps = (props) => {
 
   const onTaxonomyEditPanelClose = useCallback(async () => {
     const taxonomyEditedUuid = taxonomyToEdit.uuid
+
+    // on edit panel close, delete the taxonomy if empty
     if (await API.deleteTaxonomyIfEmpty({ surveyId, taxonomyUuid: taxonomyEditedUuid })) {
       if (taxonomyUuid === taxonomyEditedUuid) {
         // previously selected taxonomy has been deleted
