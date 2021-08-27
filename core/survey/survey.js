@@ -32,6 +32,7 @@ export const newSurvey = ({
   name,
   label = null,
   languages,
+  srs = null,
   published = false,
   draft = true,
   template = false,
@@ -42,7 +43,7 @@ export const newSurvey = ({
     [SurveyInfo.keys.name]: name,
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
-    [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
+    [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
     [SurveyInfo.keys.cycles]: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
     },
