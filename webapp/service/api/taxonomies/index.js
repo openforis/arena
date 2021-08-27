@@ -36,3 +36,11 @@ export const uploadTaxa = async ({ surveyId, taxonomyUuid, formData }) =>
 //  ==== UPDATE
 export const updateTaxonomy = async ({ surveyId, taxonomyUuid, data }) =>
   axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, data)
+
+export const deleteTaxonomyIfEmpty = async ({ surveyId, taxonomyUuid }) => {
+  const {
+    data: { taxonomies: updatedTaxonomies },
+  } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, { data: { onlyIfEmpty: true } })
+  const deleted = !Boolean(updatedTaxonomies[taxonomyUuid])
+  return deleted
+}
