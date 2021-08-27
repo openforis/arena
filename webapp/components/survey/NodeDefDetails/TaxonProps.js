@@ -60,6 +60,9 @@ const TaxonProps = (props) => {
         // previously selected taxonomy has been deleted
         onTaxonomySelect(null)
       }
+    } else if (!taxonomyUuid) {
+      // new taxonomy added, select it
+      onTaxonomySelect(taxonomyToEdit)
     }
     setTaxonomyToEdit(null)
   }, [taxonomyToEdit])
