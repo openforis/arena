@@ -7,6 +7,7 @@ import {
   getItemActiveLastLevelIndex,
   getItemsArray,
   isItemActiveLeaf,
+  isCategoryEmpty,
 } from './read'
 
 import {
@@ -35,6 +36,7 @@ export const State = {
   getItemActiveLastLevelIndex,
   getItemsArray,
   isItemActiveLeaf,
+  isCategoryEmpty,
 
   assocCategory,
   assocCategoryProp,

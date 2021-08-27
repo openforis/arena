@@ -827,6 +827,7 @@ $t(common.cantUndoWarning)`,
     cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
     cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
     confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
+    confirmDeleteEmptyCategory: 'The category is **empty** and will be deleted. Continue?',
     confirmDeleteLevel: `Delete the category level '{{levelName}}' with all items?\n$t(common.cantUndoWarning)`,
     confirmDeleteItem: `Delete the item?
 
