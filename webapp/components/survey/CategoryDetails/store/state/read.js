@@ -1,7 +1,9 @@
 import * as R from 'ramda'
 
 import * as A from '@core/arena'
+import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as StringUtils from '@core/stringUtils'
 
 import { keys } from './keys'
 
@@ -18,16 +20,20 @@ export const getItemsArray = ({ levelIndex }) =>
     R.sort((a, b) => Number(a.id) - Number(b.id))
   )
 
-export const getItemActive = ({ levelIndex }) => (state) => {
-  const itemActiveUuid = R.path([keys.itemsActive, String(levelIndex)])(state)
-  const items = getItemsArray({ levelIndex })(state)
-  return items.find((item) => CategoryItem.getUuid(item) === itemActiveUuid)
-}
+export const getItemActive =
+  ({ levelIndex }) =>
+  (state) => {
+    const itemActiveUuid = R.path([keys.itemsActive, String(levelIndex)])(state)
+    const items = getItemsArray({ levelIndex })(state)
+    return items.find((item) => CategoryItem.getUuid(item) === itemActiveUuid)
+  }
 
-export const isItemActiveLeaf = ({ levelIndex }) => (state) => {
-  const itemsChildren = getItemsArray({ levelIndex: levelIndex + 1 })(state)
-  return A.isEmpty(itemsChildren)
-}
+export const isItemActiveLeaf =
+  ({ levelIndex }) =>
+  (state) => {
+    const itemsChildren = getItemsArray({ levelIndex: levelIndex + 1 })(state)
+    return A.isEmpty(itemsChildren)
+  }
 
 export const getItemActiveLastLevelIndex = A.pipe(
   A.prop(keys.itemsActive),
@@ -36,3 +42,13 @@ export const getItemActiveLastLevelIndex = A.pipe(
   R.sort((a, b) => a - b),
   R.last
 )
+
+export const isCategoryEmpty = (state) => {
+  const category = getCategory(state)
+  return (
+    category &&
+    StringUtils.isBlank(Category.getName(category)) &&
+    Category.getLevelsArray(category).length === 1 &&
+    getItemsArray({ levelIndex: 1 })(state).length === 0
+  )
+}

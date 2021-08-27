@@ -1,5 +1,6 @@
 import axios from 'axios'
 import * as Category from '@core/survey/category'
+import * as StringUtils from '@core/stringUtils'
 import { cancelableGetRequest } from '../cancelableRequest'
 
 export const fetchCategories = async ({ surveyId, draft = true, validate = false, search = '' }) => {
@@ -41,3 +42,21 @@ export const createCategory = async ({ surveyId }) => {
 // DELETE
 export const deleteCategory = async ({ surveyId, categoryUuid }) =>
   axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
+
+export const deleteCategoryIfEmpty = async ({ surveyId, categoryUuid }) => {
+  const category = await fetchCategory({ surveyId, categoryUuid, validate: false })
+  const { request: fetchFirstLevelItemsRequest } = fetchCategoryItems({ surveyId, categoryUuid })
+  const {
+    data: { items: firstLevelItems },
+  } = await fetchFirstLevelItemsRequest
+
+  if (
+    StringUtils.isBlank(Category.getName(category)) &&
+    Category.getLevelsArray(category).length === 1 &&
+    Object.values(firstLevelItems).length === 0
+  ) {
+    await deleteCategory({ surveyId, categoryUuid })
+    return true
+  }
+  return false
+}
