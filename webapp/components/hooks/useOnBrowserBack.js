@@ -13,20 +13,38 @@ import { useHistory } from 'react-router'
 export const useOnBrowserBack = (params) => {
   const { active = false, onBack } = params
 
-  // use a ref to know if the temporary location has been set to avoid going back too many times
-  const tempLocationSetRef = useRef(false)
-
-  const addTempLocationToHistory = (history) => {
-    history.push(history.location.pathname, null)
-    tempLocationSetRef.current = true
-  }
-
-  const removeTempLocationFromHistory = (history) => {
-    tempLocationSetRef.current = false
-    history.goBack()
-  }
-
   const history = useHistory()
+
+  // used to know if the temporary location has been set to avoid going back too many times
+  const tempLocationSetRef = useRef(false)
+  // used to know if the popstate event listener has been added
+  const listenerAddedRef = useRef(false)
+
+  const addPopStateEventListener = () => {
+    if (!listenerAddedRef.current) {
+      window.addEventListener('popstate', onBackButtonEvent)
+      listenerAddedRef.current = true
+    }
+  }
+
+  const removePopStateEventListener = () => {
+    window.removeEventListener('popstate', onBackButtonEvent)
+    listenerAddedRef.current = false
+  }
+
+  const addTempLocationToHistory = () => {
+    if (!tempLocationSetRef.current) {
+      history.push(history.location.pathname, null)
+      tempLocationSetRef.current = true
+    }
+  }
+
+  const removeTempLocationFromHistory = () => {
+    if (tempLocationSetRef.current) {
+      tempLocationSetRef.current = false
+      history.goBack()
+    }
+  }
 
   const onBackButtonEvent = async (event) => {
     event.preventDefault()
@@ -34,24 +52,21 @@ export const useOnBrowserBack = (params) => {
     // the browser went back from the temp location
     tempLocationSetRef.current = false
 
-    const wentBack = await onBack()
-    if (!wentBack) {
-      addTempLocationToHistory(history)
+    const wentBackSuccessfully = await onBack()
+    if (!wentBackSuccessfully) {
+      // add again a temp location to prevent browser back
+      addTempLocationToHistory()
     }
   }
 
   useEffect(() => {
     if (active) {
-      if (!tempLocationSetRef.current) {
-        addTempLocationToHistory(history)
-        window.addEventListener('popstate', onBackButtonEvent)
-      }
+      addTempLocationToHistory()
+      addPopStateEventListener()
 
-      return () => {
-        window.removeEventListener('popstate', onBackButtonEvent)
-      }
-    } else if (tempLocationSetRef.current) {
-      removeTempLocationFromHistory(history)
+      return removePopStateEventListener
+    } else {
+      removeTempLocationFromHistory()
     }
   }, [active, onBack])
 }

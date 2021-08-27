@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
@@ -50,6 +50,22 @@ const TaxonProps = (props) => {
       }
     })()
   }, [taxonomyUuid, showTaxonomiesPanel])
+
+  const onTaxonomyEditPanelClose = useCallback(async () => {
+    const taxonomyEditedUuid = taxonomyToEdit.uuid
+
+    // on edit panel close, delete the taxonomy if empty
+    if (await API.deleteTaxonomyIfEmpty({ surveyId, taxonomyUuid: taxonomyEditedUuid })) {
+      if (taxonomyUuid === taxonomyEditedUuid) {
+        // previously selected taxonomy has been deleted
+        onTaxonomySelect(null)
+      }
+    } else if (!taxonomyUuid) {
+      // new taxonomy added, select it
+      onTaxonomySelect(taxonomyToEdit)
+    }
+    setTaxonomyToEdit(null)
+  }, [taxonomyToEdit])
 
   return (
     <>
@@ -105,14 +121,7 @@ const TaxonProps = (props) => {
         )}
 
         {taxonomyToEdit && (
-          <PanelRight
-            width="100vw"
-            onClose={() => {
-              onTaxonomySelect(taxonomyToEdit)
-              setTaxonomyToEdit(null)
-            }}
-            header={i18n.t('taxonomy.header')}
-          >
+          <PanelRight width="100vw" onClose={onTaxonomyEditPanelClose} header={i18n.t('taxonomy.header')}>
             <TaxonomyDetails showClose={false} taxonomyUuid={Taxonomy.getUuid(taxonomyToEdit)} />
           </PanelRight>
         )}

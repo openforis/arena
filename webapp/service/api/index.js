@@ -8,7 +8,14 @@ export {
   deleteCategory,
   deleteCategoryIfEmpty,
 } from './categories'
-export { fetchTaxonomies, fetchTaxonomy, createTaxonomy, uploadTaxa, updateTaxonomy } from './taxonomies'
+export {
+  fetchTaxonomies,
+  fetchTaxonomy,
+  createTaxonomy,
+  uploadTaxa,
+  updateTaxonomy,
+  deleteTaxonomyIfEmpty,
+} from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export { importRecordsFromCollect } from './data'
 export { fetchSurveys, insertSurvey } from './survey'

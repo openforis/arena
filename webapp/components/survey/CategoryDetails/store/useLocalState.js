@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useIsCategoriesRoute, useOnBrowserBack } from '@webapp/components/hooks'
 
@@ -23,9 +23,11 @@ export const useLocalState = (props) => {
   }, [])
 
   if (inCategoriesPath) {
+    const deleteCategoryIfEmpty = useCallback(async () => Actions.deleteCategoryIfEmpty({ categoryUuid }), [])
+
     useOnBrowserBack({
       active: categoryEmpty,
-      onBack: async () => Actions.deleteCategoryIfEmpty({ categoryUuid }),
+      onBack: deleteCategoryIfEmpty,
     })
   }
 

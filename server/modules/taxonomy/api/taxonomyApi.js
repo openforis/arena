@@ -225,10 +225,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, taxonomyUuid } = Request.getParams(req)
+        const { surveyId, taxonomyUuid, onlyIfEmpty = false } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await TaxonomyService.deleteTaxonomy(user, surveyId, taxonomyUuid)
+        await TaxonomyService.deleteTaxonomy({ user, surveyId, taxonomyUuid, onlyIfEmpty })
 
         await sendTaxonomies(res, surveyId, true, true)
       } catch (error) {
