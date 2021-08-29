@@ -11,7 +11,7 @@ import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
@@ -24,6 +24,7 @@ const DataImport = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
+  const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
   const canDeleteAllRecords = useAuthCanDeleteAllRecords()
 
@@ -78,9 +79,11 @@ const DataImport = () => {
           </FormItem>
         )}
 
-        <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
-          <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
-        </FormItem>
+        {surveyCycleKeys.length > 1 && (
+          <FormItem label={i18n.t('homeView.recordsImport.importIntoCycle')}>
+            <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+          </FormItem>
+        )}
 
         <FormItem label={i18n.t('homeView.recordsImport.forceImportFromAnotherSurvey')}>
           <Checkbox checked={forceImport} onChange={setForceImport} />

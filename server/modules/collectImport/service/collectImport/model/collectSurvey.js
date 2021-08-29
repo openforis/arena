@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import { nodeDefType } from '@core/survey/nodeDef'
+import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
 
 const keys = {
   attributes: 'attributes',
@@ -160,3 +161,54 @@ const _isNodeDefElement = R.pipe(getElementName, (name) => R.includes(name, R.ke
 export const isCollectEarthSurvey = (collectSurvey) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
 
 export const getUri = (collectSurvey) => getChildElementText('uri')(collectSurvey)
+
+export const visitNodeDefs = ({ collectSurvey, visitor }) => {
+  const stack = []
+  const rootDef = getNodeDefRoot(collectSurvey)
+  stack.push({ def: rootDef, parentPath: '' })
+
+  while (stack.length > 0) {
+    const { def, parentPath } = stack.pop()
+
+    const collectNodeDefDefFields = getNodeDefFieldsByCollectNodeDef(def)
+    if (collectNodeDefDefFields) {
+      const name = getAttribute('name')(def)
+      const path = `${parentPath}/${name}`
+
+      collectNodeDefDefFields.forEach((collectNodeDefField) => {
+        const { type, field = null } = collectNodeDefField
+
+        visitor({ def, name, path, parentPath, field })
+
+        if (type === nodeDefType.entity) {
+          def.elements.forEach((collectNodeDefChild) => {
+            stack.push({ def: collectNodeDefChild, parentPath: path })
+          })
+        }
+      })
+    }
+  }
+}
+
+export const generateArenaNodeDefNamesByPath = (collectSurvey) => {
+  const namesByPath = {}
+  const nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
+
+  visitNodeDefs({
+    collectSurvey,
+    visitor: ({ name, path, parentPath, field }) => {
+      const nodeDefNameSuffix = field ? `_${field}` : ''
+
+      const parentName = namesByPath[parentPath]
+
+      const nodeDefName = nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+        parentNodeDefName: parentName,
+        nodeDefName: name + nodeDefNameSuffix,
+      })
+
+      namesByPath[path] = nodeDefName
+    },
+  })
+
+  return namesByPath
+}

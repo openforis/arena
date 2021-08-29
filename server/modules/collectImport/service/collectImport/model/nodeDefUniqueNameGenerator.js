@@ -1,4 +1,3 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Validator from '@core/validation/validator'
 
 export default class NodeDefUniqueNameGenerator {
@@ -6,7 +5,7 @@ export default class NodeDefUniqueNameGenerator {
     this.names = []
   }
 
-  getUniqueNodeDefName({ parentNodeDef, nodeDefName }) {
+  getUniqueNodeDefName({ parentNodeDefName, nodeDefName }) {
     let finalName = nodeDefName
 
     const isDuplicateOrKeyword = () => this.names.includes(finalName) || Validator.isKeyword(finalName)
@@ -15,8 +14,8 @@ export default class NodeDefUniqueNameGenerator {
       // Name is in use or is a keyword
 
       // try to add parent node def name as prefix
-      if (parentNodeDef) {
-        finalName = `${NodeDef.getName(parentNodeDef)}_${finalName}`
+      if (parentNodeDefName) {
+        finalName = `${parentNodeDefName}_${finalName}`
       }
 
       if (isDuplicateOrKeyword()) {
