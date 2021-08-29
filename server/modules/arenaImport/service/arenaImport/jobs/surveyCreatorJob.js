@@ -32,19 +32,15 @@ export default class SurveyCreatorJob extends Job {
     // always import as draft when not backup
     const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
     const draft = !published
-
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
     const newSurveyInfo = Survey.newSurvey({
+      ...surveyInfoArenaSurvey.props,
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
-      [Survey.infoKeys.languages]: Survey.getLanguages(surveyInfoArenaSurvey),
-      [Survey.infoKeys.descriptions]: Survey.getDescriptions(surveyInfoArenaSurvey),
-      [Survey.infoKeys.labels]: Survey.getLabels(surveyInfoArenaSurvey),
       [Survey.infoKeys.published]: published,
       [Survey.infoKeys.draft]: draft,
       [Survey.infoKeys.template]: template,
-      ...(backup ? { [Survey.infoKeys.cycles]: Survey.getCycles(surveyInfoArenaSurvey) } : {}),
       [Survey.infoKeys.temporary]: true,
     })
 
