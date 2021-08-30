@@ -35,6 +35,8 @@ export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUs
 export const useAuthCanPromoteRecord = (record) =>
   useAuthCanEditRecord(record) && RecordStep.getNextStep(Record.getStep(record))
 export const useAuthCanDemoteRecord = (record) => {
+  if (!RecordStep.getPreviousStep(Record.getStep(record))) return false
+
   const canEdit = Authorizer.canEditRecord(useUser(), record)
   const surveyInfo = useSurveyInfo()
   return canEdit && Survey.isPublished(surveyInfo)
