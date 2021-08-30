@@ -63,6 +63,8 @@ export default class RecordsImportJob extends Job {
 
     this.total = entryNames.length
 
+    const nodeDefNamesByPath = CollectSurvey.generateArenaNodeDefNamesByPath(collectSurvey)
+
     for (const entryName of entryNames) {
       if (this.isCanceled()) {
         break
@@ -85,7 +87,7 @@ export default class RecordsImportJob extends Job {
       // This.logDebug(`${entryName} recordToCreate end`)
 
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
-      await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
+      await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath })
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
 
       // this.logDebug(`-- end import record ${entryName}`)
@@ -136,11 +138,8 @@ export default class RecordsImportJob extends Job {
     throw new SystemError('entryDataNotFound', { entryName })
   }
 
-  async traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson) {
+  async traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) {
     const { collectSurveyFileZip, collectSurvey } = this.context
-
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
     const recordUuid = Record.getUuid(record)
     let recordUpdated = { ...record }
@@ -163,48 +162,53 @@ export default class RecordsImportJob extends Job {
       const item = queue.dequeue()
       const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
-      const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+      let nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
 
-      for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
-        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        if (!nodeDef) {
-          this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-          continue
-        }
+      if (!nodeDefsInfo) {
+        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+      } else {
+        for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
+          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+          if (!nodeDef) {
+            this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+            continue
+          }
 
-        let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
+          let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 
-        const valueAndMeta = NodeDef.isAttribute(nodeDef)
-          ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
+          const valueAndMeta = NodeDef.isAttribute(nodeDef)
+            ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
+                survey,
+                nodeDef,
+                record: recordUpdated,
+                node: nodeToInsert,
+                collectSurveyFileZip,
+                collectNodeDef,
+                collectNode,
+                collectNodeField: field,
+                tx: this.tx,
+              })
+            : {}
+
+          const { value = null, meta = {} } = valueAndMeta || {}
+
+          nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+
+          await this._insertNode(nodeDef, nodeToInsert)
+          recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
+
+          if (NodeDef.isEntity(nodeDef)) {
+            // Create child nodes to insert
+            const { nodesToInsert } = this._createNodeChildrenToInsert({
               survey,
-              nodeDef,
-              record: recordUpdated,
-              node: nodeToInsert,
-              collectSurveyFileZip,
+              nodeDefNamesByPath,
               collectNodeDef,
+              collectNodeDefPath,
               collectNode,
-              collectNodeField: field,
-              tx: this.tx,
+              node: nodeToInsert,
             })
-          : {}
-
-        const { value = null, meta = {} } = valueAndMeta || {}
-
-        nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
-
-        await this._insertNode(nodeDef, nodeToInsert)
-        recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
-
-        if (NodeDef.isEntity(nodeDef)) {
-          // Create child nodes to insert
-          const { nodesToInsert } = this._createNodeChildrenToInsert(
-            survey,
-            collectNodeDef,
-            collectNodeDefPath,
-            collectNode,
-            nodeToInsert
-          )
-          queue.enqueueItems(nodesToInsert)
+            queue.enqueueItems(nodesToInsert)
+          }
         }
       }
     }
@@ -212,10 +216,19 @@ export default class RecordsImportJob extends Job {
     await this._updateRelevance(survey, recordUpdated)
   }
 
-  _createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, node) {
+  _extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath }) {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
+    let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+    if (nodeDefsInfo) return nodeDefsInfo
+
+    const nodeDefName = nodeDefNamesByPath[collectNodeDefPath]
+    const nodeDef = nodeDefName ? Survey.getNodeDefByName(nodeDefName)(survey) : null
+    return nodeDef ? [{ uuid: nodeDef.uuid }] : null
+  }
+
+  _createNodeChildrenToInsert({ survey, nodeDefNamesByPath, collectNodeDef, collectNodeDefPath, collectNode, node }) {
     // Output
     const nodesToInsert = []
 
@@ -227,7 +240,11 @@ export default class RecordsImportJob extends Job {
 
       const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
       const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
-      const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefChildPath]
+      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({
+        survey,
+        nodeDefNamesByPath,
+        collectNodeDefPath: collectNodeDefChildPath,
+      })
 
       if (nodeDefsInfo) {
         const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNode)

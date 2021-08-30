@@ -19,11 +19,11 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as CollectImportJobContext from '../../collectImportJobContext'
 import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../../model/collectSurvey'
+import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
 import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 import { parseValidationRules } from './validationRuleParser'
 import { parseDefaultValues } from './defaultValueParser'
-import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
 
 const specifyAttributeSuffix = 'specify'
 
@@ -116,7 +116,7 @@ export default class NodeDefsImportJob extends Job {
 
     const props = {
       [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
-        parentNodeDef,
+        parentNodeDefName: NodeDef.getName(parentNodeDef),
         nodeDefName: collectNodeDefName + nodeDefNameSuffix,
       }),
       [NodeDef.propKeys.multiple]: multiple,
@@ -437,7 +437,7 @@ export default class NodeDefsImportJob extends Job {
       const nodeDefName = NodeDef.getName(nodeDef)
       const props = {
         [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
-          parentNodeDef,
+          parentNodeDefName: NodeDef.getName(parentNodeDef),
           nodeDefName: `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`,
         }),
         [NodeDef.propKeys.labels]: R.pipe(
