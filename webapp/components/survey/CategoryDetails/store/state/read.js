@@ -49,6 +49,13 @@ export const isCategoryEmpty = (state) => {
     category &&
     StringUtils.isBlank(Category.getName(category)) &&
     Category.getLevelsArray(category).length === 1 &&
-    getItemsArray({ levelIndex: 1 })(state).length === 0
+    getItemsArray({ levelIndex: 0 })(state).length === 0
   )
 }
+
+export const hasEmptyLevels = (state) => {
+  const category = getCategory(state)
+  Category.getLevelsArray(category).find()
+}
+
+export const isCleaned = A.propOr(false, keys.cleaned)

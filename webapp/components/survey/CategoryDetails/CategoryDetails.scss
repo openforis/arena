@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 $borderColor: $greyBorder;
 
@@ -10,12 +10,12 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: grid;
-  grid-template-columns: .8fr .1fr .1fr;
+  grid-template-columns: 0.8fr 0.1fr 0.1fr;
 }
 
 .category__levels {
   display: flex;
-  //justify-content: center;
+  justify-content: center;
   overflow-x: auto;
 
   .btn-add-level {
@@ -28,7 +28,7 @@ $borderColor: $greyBorder;
   width: 420px;
   display: grid;
   align-content: start;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border-right: 1px dashed $borderColor;
   border-top: 1px dashed $borderColor;
   border-bottom: 1px dashed $borderColor;
@@ -36,27 +36,38 @@ $borderColor: $greyBorder;
   &:first-child {
     border-left: 1px dashed $borderColor;
   }
-}
 
-.category__level-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.category__level-items-header {
-  display: flex;
-  justify-content: center;
-  margin-top: 3rem;
-  align-items: center;
-
-  .btn-add-item {
-    margin-left: 1rem;
+  .category__level-header {
+    display: flex;
+    justify-content: space-between;
   }
-}
 
-.category__level-items {
-  height: calc(100vh - 25rem);
-  overflow-y: auto;
+  .category__level-items-header {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    align-items: center;
+
+    .btn-add-item {
+      margin-left: 1rem;
+    }
+  }
+
+  .category__level-items {
+    height: calc(100vh - 25rem);
+    overflow-y: auto;
+  }
+
+  &.single {
+    width: 600px;
+
+    .category__level-items-header {
+      margin-top: 0;
+    }
+    .category__level-items {
+      height: calc(100vh - 20rem);
+    }
+  }
 }
 
 .category__item {
@@ -67,7 +78,7 @@ $borderColor: $greyBorder;
   grid-template-columns: 80px 35px 1fr;
   min-height: 35px;
   grid-row-gap: 2rem;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   &.active {
     grid-template-columns: 1fr;
@@ -77,12 +88,12 @@ $borderColor: $greyBorder;
   }
 
   &:not(.active):hover {
-    background-color: rgba($greenLight, .6);
+    background-color: rgba($greenLight, 0.6);
     cursor: pointer;
   }
 
   .labels-editor.with-label {
-    grid-template-columns: .3fr .65fr;
+    grid-template-columns: 0.3fr 0.65fr;
   }
 
   .btn-close {
@@ -95,4 +106,3 @@ $borderColor: $greyBorder;
     justify-self: center;
   }
 }
-

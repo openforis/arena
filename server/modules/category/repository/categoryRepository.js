@@ -232,6 +232,15 @@ export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = 
     (r) => parseInt(r.count, 10)
   )
 
+export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+    FROM ${getSurveyDBSchema(surveyId)}.category_item i
+    WHERE i.level_uuid = $1`,
+    [levelUuid],
+    (r) => parseInt(r.count, 10)
+  )
+
 export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
   const items = await client.map(
     `

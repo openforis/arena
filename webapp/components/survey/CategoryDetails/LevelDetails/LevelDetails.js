@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -19,7 +20,7 @@ import ItemDetails from './ItemDetails'
 import { State, useActions } from '../store'
 
 const LevelDetails = (props) => {
-  const { level, state, setState } = props
+  const { level, single, state, setState } = props
 
   const readOnly = !useAuthCanEditSurvey()
   const i18n = useI18n()
@@ -37,43 +38,47 @@ const LevelDetails = (props) => {
   return (
     <div
       id={`category-level-${levelIndex}`}
-      className="category__level"
+      className={classNames('category__level', { single })}
       data-testid={DataTestId.categoryDetails.level(levelIndex)}
     >
-      <div className="category__level-header">
-        <h4 className="label">
-          <ErrorBadge
-            id={DataTestId.categoryDetails.levelErrorBadge(levelIndex)}
-            validation={validation}
-            showLabel={false}
-            showIcon
-          />
-          {i18n.t('categoryEdit.level')} {level.index + 1}
-        </h4>
-        {!readOnly && (
-          <button
-            type="button"
-            className="btn btn-s"
-            data-testid={DataTestId.categoryDetails.levelDeleteBtn(levelIndex)}
-            onClick={() => Actions.deleteLevel({ category, level })}
-            aria-disabled={!canBeDeleted}
-          >
-            <span className="icon icon-bin2 icon-12px" />
-          </button>
-        )}
-      </div>
+      <ErrorBadge
+        id={DataTestId.categoryDetails.levelErrorBadge(levelIndex)}
+        validation={validation}
+        showLabel={false}
+        showIcon
+      />
+      {!single && (
+        <>
+          <div className="category__level-header">
+            <h4 className="label">
+              {i18n.t('categoryEdit.level')} {level.index + 1}
+            </h4>
+            {!readOnly && (
+              <button
+                type="button"
+                className="btn btn-s"
+                data-testid={DataTestId.categoryDetails.levelDeleteBtn(levelIndex)}
+                onClick={() => Actions.deleteLevel({ category, level })}
+                aria-disabled={!canBeDeleted}
+              >
+                <span className="icon icon-bin2 icon-12px" />
+              </button>
+            )}
+          </div>
 
-      <FormItem label={i18n.t('common.name')}>
-        <Input
-          id={DataTestId.categoryDetails.levelName(levelIndex)}
-          value={CategoryLevel.getName(level)}
-          validation={Validation.getFieldValidation('name')(validation)}
-          onChange={(value) =>
-            Actions.updateLevelProp({ category, level, key: 'name', value: StringUtils.normalizeName(value) })
-          }
-          readOnly={readOnly}
-        />
-      </FormItem>
+          <FormItem label={i18n.t('common.name')}>
+            <Input
+              id={DataTestId.categoryDetails.levelName(levelIndex)}
+              value={CategoryLevel.getName(level)}
+              validation={Validation.getFieldValidation('name')(validation)}
+              onChange={(value) =>
+                Actions.updateLevelProp({ category, level, key: 'name', value: StringUtils.normalizeName(value) })
+              }
+              readOnly={readOnly}
+            />
+          </FormItem>
+        </>
+      )}
 
       <div className="category__level-items-header">
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
@@ -110,8 +115,13 @@ const LevelDetails = (props) => {
 
 LevelDetails.propTypes = {
   level: PropTypes.object.isRequired,
+  single: PropTypes.bool,
   state: PropTypes.object.isRequired,
   setState: PropTypes.func.isRequired,
+}
+
+LevelDetails.defaultProps = {
+  single: false,
 }
 
 export default LevelDetails

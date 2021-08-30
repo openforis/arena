@@ -12,15 +12,23 @@ export const editCategoryProps = (category) =>
   })
 
 export const addLevels = (category) => {
+  // add levels
   category.levels.forEach((level, idx) =>
     test(`Add level ${level.name}`, async () => {
       if (idx !== 0) {
         await waitForApi(page.click(getSelector(DataTestId.categoryDetails.addLevelBtn, 'button')))
       }
-      await waitForApi(page.fill(getSelector(DataTestId.categoryDetails.levelName(idx), 'input'), level.name))
       await expect(page).toHaveSelector(getSelector(DataTestId.categoryDetails.level(idx)))
     })
   )
+  // set level name (name of first level is visible only when there are multiple levels)
+  if (category.levels.length > 1) {
+    category.levels.forEach((level, idx) =>
+      test(`Set level name for level ${idx}`, async () => {
+        await waitForApi(page.fill(getSelector(DataTestId.categoryDetails.levelName(idx), 'input'), level.name))
+      })
+    )
+  }
 }
 
 const addItem = (level, levelIdx, itemIdx, codePrefix) => {
