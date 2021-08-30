@@ -15,6 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
+import { Button } from '@webapp/components/buttons'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
@@ -66,23 +67,20 @@ const RecordEntryButtons = () => {
         </span>
 
         {canPromote && (
-          <button
+          <Button
             className="btn-s btn-transparent"
-            aria-disabled={!valid}
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
-                  key: 'surveyForm.formEntryActions.confirmPromote',
+                  key: `surveyForm.formEntryActions.confirmPromote${valid ? '' : 'WithErrors'}`,
                   params: { name: getStepLabel(stepNext) },
                   onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), history)),
                 })
               )
             }
-            type="button"
             title={i18n.t('surveyForm.formEntryActions.promoteTo', { stepNext: getStepLabel(stepNext) })}
-          >
-            <span className="icon icon-redo2 icon-12px" />
-          </button>
+            iconClassName="icon-redo2 icon-12px"
+          />
         )}
       </div>
 
