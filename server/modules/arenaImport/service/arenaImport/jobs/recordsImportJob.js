@@ -13,7 +13,7 @@ export default class RecordsImportJob extends Job {
 
   async execute() {
     const { surveyId, arenaSurveyFileZip } = this.context
-
+    
     const records = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
 
     const recordsToInsert = await Promise.all(
