@@ -7,6 +7,7 @@ import { useIsCategoriesRoute } from '@webapp/components/hooks'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State } from '../store'
 
@@ -16,6 +17,7 @@ const TableHeaderLeft = (props) => {
   const history = useHistory()
 
   const inCategoriesPath = useIsCategoriesRoute()
+  const canEditSurvey = useAuthCanEditSurvey()
 
   const onAdd = (categoryCreated) => {
     if (inCategoriesPath) {
@@ -26,6 +28,11 @@ const TableHeaderLeft = (props) => {
         onCreate(categoryCreated)
       }
     }
+  }
+
+  if (!canEditSurvey) {
+    // placeholder to avoid breaking the header layout
+    return <div></div>
   }
 
   return <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />

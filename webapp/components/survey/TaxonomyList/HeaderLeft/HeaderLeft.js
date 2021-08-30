@@ -7,6 +7,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const HeaderLeft = (props) => {
   const { headerProps } = props
@@ -16,6 +17,8 @@ const HeaderLeft = (props) => {
 
   const inTaxonomiesPath = useIsTaxonomiesRoute()
 
+  const canEditSurvey = useAuthCanEditSurvey()
+
   const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {
       history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomyCreated)}`)
@@ -24,11 +27,12 @@ const HeaderLeft = (props) => {
     }
   }
 
-  return (
-    <div>
-      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.taxonomy} />
-    </div>
-  )
+  if (!canEditSurvey) {
+    // placeholder to avoid breaking the header layout
+    return <div></div>
+  }
+
+  return <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.taxonomy} />
 }
 
 HeaderLeft.propTypes = {
