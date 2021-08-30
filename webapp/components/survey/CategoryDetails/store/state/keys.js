@@ -3,4 +3,5 @@ export const keys = {
   importSummary: 'importSummary',
   items: 'items',
   itemsActive: 'itemsActive',
+  cleaned: 'cleaned',
 }

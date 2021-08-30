@@ -43,14 +43,17 @@ const CategorySelector = (props) => {
 
   const onCategoryEditPanelClose = useCallback(async () => {
     const categoryEditedUuid = categoryToEdit.uuid
-    if (await API.deleteCategoryIfEmpty({ surveyId, categoryUuid: categoryEditedUuid })) {
+    const { deleted } = await API.cleanupCategory({ surveyId, categoryUuid: categoryEditedUuid })
+    if (deleted) {
       if (categoryUuid === categoryEditedUuid) {
-        // previously selected category has been deleted
+        // previously selected category has been deleted, deselect it from dropdown
         onChange(null)
       }
     } else {
+      // update category dropdown with latest changes
       onChange(categoryToEdit)
     }
+    // close edit panel
     setCategoryToEdit(null)
   }, [categoryToEdit])
 

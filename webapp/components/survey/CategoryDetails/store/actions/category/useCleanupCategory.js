@@ -4,13 +4,15 @@ import { useHistory } from 'react-router'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 
-export const useDeleteCategoryIfEmpty = ({ setState }) => {
+import { State } from '../../state'
+
+export const useCleanupCategory = ({ setState }) => {
   const history = useHistory()
   const surveyId = useSurveyId()
 
   return useCallback(async ({ categoryUuid }) => {
-    await API.deleteCategoryIfEmpty({ surveyId, categoryUuid })
-    setState({})
+    await API.cleanupCategory({ surveyId, categoryUuid })
+    setState(State.assocCleaned)
     history.goBack()
     return true // returns true to notify the navigation to the previous page
   }, [])
