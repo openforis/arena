@@ -209,6 +209,7 @@ const DateInput = React.forwardRef(
       })
       onChange(!isValid || isIncomplete ? null : newDate)
       handleValidateDate({ newDate })
+      setIsCalendarOpen(false)
     }
 
     const moveBack = ({ itemIndex }) => {
