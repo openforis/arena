@@ -191,7 +191,7 @@ Input.propTypes = {
   placeholders: PropTypes.object.isRequired,
   labels: PropTypes.object.isRequired,
 
-  date: PropTypes.string.isRequired,
+  date: PropTypes.string,
   format: PropTypes.string.isRequired,
   separator: PropTypes.string.isRequired,
 
