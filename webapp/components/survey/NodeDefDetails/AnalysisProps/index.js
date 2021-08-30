@@ -15,7 +15,8 @@ import { useSurvey } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
 const AnalysisProps = (props) => {
-  const [editorKey, setEditorkey] = useState(new Date().getTime())
+  const [defaultLocalScript, setDefaultLocalScript] = useState('')
+  
   const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
@@ -52,7 +53,7 @@ const AnalysisProps = (props) => {
       NodeDef.getName(nodeDef) || 'NAME'
     } <- NA`
 
-  const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
+    const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
 
   const generatePreScriptWithCategories = async () => {
     const { request } = API.fetchCategoryItems({
@@ -78,7 +79,7 @@ const AnalysisProps = (props) => {
     }
 
     onChange(newScript)
-    setEditorkey(new Date().getTime())
+    setDefaultLocalScript(newScript)
   }
 
   useEffect(() => {
@@ -87,19 +88,18 @@ const AnalysisProps = (props) => {
     }
   }, [NodeDef.getCategoryUuid(nodeDef)])
 
-  useEffect(() => {
-    if (NodeDef.getScript(nodeDef)) {
-      setEditorkey(new Date().getTime())
-    }
-  }, [NodeDef.getScript(nodeDef)])
+  useEffect(() =>{
+    setDefaultLocalScript(getScriptOrDefault())
+  },[])
+
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form">
+    <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form"> 
       <ScriptEditor
-        key={editorKey}
+      key={defaultLocalScript}
         name="node_def_analysis_script"
         mode="r"
-        script={getScriptOrDefault()}
+        script={defaultLocalScript}
         onChange={onChange}
         completer={variableNamesCompleter}
       />
