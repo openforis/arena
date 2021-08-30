@@ -144,9 +144,11 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
 
 const extractTimeValueAndMeta = (collectNode) => {
   const { hour, minute } = CollectRecord.getTextValues(collectNode)
-  return {
-    value: DateUtils.formatTime(hour, minute),
-  }
+
+  const value =
+    !NumberUtils.isInteger(hour) || !NumberUtils.isInteger(minute) ? null : DateUtils.formatTime(hour, minute)
+
+  return { value }
 }
 
 export const extractAttributeValueAndMeta = async ({
