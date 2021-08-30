@@ -4,6 +4,8 @@ import * as pgPromise from 'pg-promise'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as ObjectUtils from '@core/objectUtils'
+import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -263,6 +265,41 @@ export const updateItemsExtra = async (user, surveyId, categoryUuid, items, clie
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
       CategoryRepository.updateItems(surveyId, items, t),
     ])
+  })
+
+export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client = db) =>
+  client.tx(async (t) => {
+    const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft: true })
+    const levels = Category.getLevelsArray(category)
+    const firstLevel = levels[0]
+
+    // delete category, if empty
+    const categoryIsEmpty =
+      StringUtils.isBlank(Category.getName(category)) &&
+      (await CategoryRepository.countItemsByLevelUuid({ surveyId, levelUuid: firstLevel.uuid })) === 0
+    if (categoryIsEmpty) {
+      await deleteCategory(user, surveyId, categoryUuid, t)
+      return { deleted: true }
+    }
+
+    // delete empty levels
+    let followingLevelIsNotEmpty = true
+    let updated = false
+    const levelsToCheck = levels.slice(1)
+    levelsToCheck.reverse()
+
+    await PromiseUtils.each(levelsToCheck, async (level) => {
+      if (followingLevelIsNotEmpty) {
+        if ((await CategoryRepository.countItemsByLevelUuid({ surveyId, levelUuid: level.uuid })) === 0) {
+          await deleteLevel(user, surveyId, categoryUuid, level.uuid)
+          updated = true
+        } else {
+          // breaks the loop
+          followingLevelIsNotEmpty = false
+        }
+      }
+    })
+    return { updated }
   })
 
 // ====== DELETE

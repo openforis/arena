@@ -24,6 +24,8 @@ import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
 
+const MAX_LEVELS = 5
+
 const CategoryDetails = (props) => {
   const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
 
@@ -77,7 +79,13 @@ const CategoryDetails = (props) => {
 
         <div className="category__levels">
           {levels.map((level) => (
-            <LevelDetails key={CategoryLevel.getUuid(level)} level={level} state={state} setState={setState} />
+            <LevelDetails
+              key={CategoryLevel.getUuid(level)}
+              level={level}
+              state={state}
+              setState={setState}
+              single={levels.length === 1}
+            />
           ))}
 
           {!readOnly && (
@@ -85,7 +93,7 @@ const CategoryDetails = (props) => {
               className="btn-s btn-add-level"
               testId={DataTestId.categoryDetails.addLevelBtn}
               onClick={() => Actions.createLevel({ category })}
-              disabled={levels.length === 5}
+              disabled={levels.length === MAX_LEVELS}
               iconClassName="icon icon-plus icon-16px icon-left"
               label="categoryEdit.addLevel"
             />
