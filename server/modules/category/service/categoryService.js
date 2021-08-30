@@ -78,6 +78,7 @@ export const {
   fetchItemsByCategoryUuid,
 
   updateCategoryProp,
+  cleanupCategory,
   updateLevelProp,
   updateItemProp,
 

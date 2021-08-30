@@ -240,6 +240,27 @@ export const init = (app) => {
     }
   )
 
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/cleanup',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const { deleted = false, updated = false } = await CategoryService.cleanupCategory({
+          user,
+          surveyId,
+          categoryUuid,
+        })
+
+        res.json({ deleted, updated })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== DELETE
 
   app.delete(

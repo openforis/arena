@@ -8,6 +8,7 @@ import {
   getItemsArray,
   isItemActiveLeaf,
   isCategoryEmpty,
+  isCleaned,
 } from './read'
 
 import {
@@ -25,6 +26,7 @@ import {
   assocImportSummary,
   assocImportSummaryColumnDataType,
   dissocImportSummary,
+  assocCleaned,
 } from './update'
 
 export const State = {
@@ -37,6 +39,7 @@ export const State = {
   getItemsArray,
   isItemActiveLeaf,
   isCategoryEmpty,
+  isCleaned,
 
   assocCategory,
   assocCategoryProp,
@@ -52,4 +55,5 @@ export const State = {
   assocImportSummary,
   assocImportSummaryColumnDataType,
   dissocImportSummary,
+  assocCleaned,
 }
