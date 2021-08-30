@@ -14,7 +14,7 @@ export const useLocalState = (props) => {
 
   const Actions = useActions({ setState })
 
-  const categoryEmpty = State.isCategoryEmpty(state)
+  const categoryCleaned = State.isCleaned(state)
 
   useEffect(() => {
     ;(async () => {
@@ -23,11 +23,11 @@ export const useLocalState = (props) => {
   }, [])
 
   if (inCategoriesPath) {
-    const deleteCategoryIfEmpty = useCallback(async () => Actions.deleteCategoryIfEmpty({ categoryUuid }), [])
+    const cleanupCategory = useCallback(async () => Actions.cleanupCategory({ categoryUuid }), [])
 
     useOnBrowserBack({
-      active: categoryEmpty,
-      onBack: deleteCategoryIfEmpty,
+      active: !categoryCleaned,
+      onBack: cleanupCategory,
     })
   }
 
