@@ -50,7 +50,7 @@ export const { insertNode } = RecordUpdateManager
 // ==== READ
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, offset, limit, sortBy, sortOrder, search },
+  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null },
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
@@ -65,7 +65,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
-    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search },
+    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step },
     client
   )
 
@@ -110,11 +110,20 @@ export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } fr
 
 export {
   initNewRecord,
-  updateRecordStep,
+  updateRecordStepInTransaction,
   persistNode,
   updateNode,
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
+
+export const updateRecordsStep = async ({ user, surveyId, stepFrom, stepTo }, client = db) =>
+  client.tx(async (t) => {
+    const { list: recordsToMove } = await fetchRecordsSummaryBySurveyId({ surveyId, step: stepFrom }, t)
+    await Promise.all(
+      recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
+    )
+    return { count: recordsToMove.length }
+  })
 
 // ==== DELETE
 
