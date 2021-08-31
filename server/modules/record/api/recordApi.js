@@ -139,9 +139,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
     try {
-      const { surveyId, offset, limit, cycle } = Request.getParams(req)
+      const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
 
-      const list = await RecordService.fetchValidationReport(surveyId, cycle, offset, limit)
+      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid })
 
       res.json({ list })
     } catch (error) {
@@ -151,9 +151,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/validationReport/count', requireRecordCleansePermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, recordUuid } = Request.getParams(req)
 
-      const count = await RecordService.countValidationReports(surveyId, cycle)
+      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
 
       res.json(count)
     } catch (error) {

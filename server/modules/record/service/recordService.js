@@ -107,7 +107,7 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 
 export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
-export const { fetchValidationReport, countValidationReports } = RecordManager
+export const { fetchValidationReport, countValidationReportItems } = RecordManager
 
 export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
   const job = new CollectDataImportJob({
