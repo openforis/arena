@@ -20,9 +20,16 @@ const steps = [
   { id: '3', name: stepNames.analysis },
 ]
 
-export const getDefaultStep = () => R.pipe(R.head, R.prop(keys.id))(steps)
+export const getStepId = R.prop(keys.id)
+
+export const getDefaultStep = () => R.pipe(R.head, getStepId)(steps)
 
 export const getStep = (stepId) => R.find(R.propEq(keys.id, stepId), steps)
+
+export const getStepIdByName = (stepName) => {
+  const step = R.find(R.propEq(keys.name, stepName), steps)
+  return getStepId(step)
+}
 
 const getStepIndex = (stepId) => R.findIndex(R.propEq(keys.id, stepId))
 

@@ -87,13 +87,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  {
-    surveyId,
-    cycle,
-    nodeDefRoot,
-    nodeDefKeys,
-    search = false,
-  },
+  { surveyId, cycle, nodeDefRoot, nodeDefKeys, search = false },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
@@ -113,9 +107,10 @@ export const countRecordsBySurveyId = async (
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    cycle,
     nodeDefRoot,
     nodeDefKeys,
+    cycle = null,
+    step = null,
     offset = 0,
     limit = null,
     sortBy = 'date_created',
@@ -139,7 +134,10 @@ export const fetchRecordsSummaryBySurveyId = async (
     .join(', ')
 
   const nodeDefKeysSelectSearch = nodeDefKeys
-    .map((nodeDefKey) => ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$3:value%'`)
+    .map(
+      (nodeDefKey) =>
+        ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$/search:value/%'`
+    )
     .join('OR ')
 
   const recordsSelect = `
@@ -150,10 +148,13 @@ export const fetchRecordsSummaryBySurveyId = async (
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
         r.validation
     FROM ${getSurveyDBSchema(surveyId)}.record r
-    WHERE r.preview = FALSE AND r.cycle = $2
+    WHERE 
+      r.preview = FALSE 
+      ${A.isNull(cycle) ? '' : 'AND r.cycle = $/cycle/'}
+      ${A.isNull(step) ? '' : 'AND r.step = $/step/'}
     ORDER BY r.date_created DESC
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}
+    ${limit ? 'LIMIT $/limit:value/' : ''}
+    OFFSET $/offset:value/
   `
 
   return client.map(
@@ -167,7 +168,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     FROM  r
     -- GET SURVEY UUID
     JOIN survey s
-      ON s.id = $1 
+      ON s.id = $/surveyId/
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_uuid = u.uuid
@@ -192,7 +193,7 @@ export const fetchRecordsSummaryBySurveyId = async (
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
   `,
-    [surveyId, cycle, search],
+    { surveyId, cycle, step, search, limit, offset },
     dbTransformCallback(surveyId, false)
   )
 }

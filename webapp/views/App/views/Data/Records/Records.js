@@ -1,6 +1,6 @@
 import './Records.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
@@ -20,22 +20,28 @@ const Records = () => {
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
 
+  const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
+
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 50px`
 
   const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
+  const onRecordsUpdate = () => {
+    setRecordsRequestedAt(Date.now())
+  }
+
   return (
     <Table
       module="records"
-      restParams={{ cycle }}
+      restParams={{ cycle, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
-      headerLeftComponent={HeaderLeft}
+      headerLeftComponent={(headerLeftProps) => <HeaderLeft {...headerLeftProps} onRecordsUpdate={onRecordsUpdate} />}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
-      noItemsLabelKey={"dataView.records.noRecordsAdded"}
-      noItemsLabelForSearchKey={"dataView.records.noRecordsAddedForThisSearch" }
+      noItemsLabelKey="dataView.records.noRecordsAdded"
+      noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowClick={onRowClick}
     />
   )
