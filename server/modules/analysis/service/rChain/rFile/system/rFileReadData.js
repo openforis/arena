@@ -28,7 +28,7 @@ export default class RFileReadData extends RFileSystem {
       Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
         Survey.getNodeDefChildren(ancestorDef)(survey)
           .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
-          .filter(!NodeDef.isAnalysis)
+          .filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
           .forEach((nodeDef) => {
             const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColumnName(nodeDef))
             contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
