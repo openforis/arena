@@ -455,6 +455,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       noRecordsAdded: 'No records added',
       noRecordsAddedForThisSearch: 'No records found',
     },
+    recordsUpdated: '{{count}} records updated successfully!',
     rowNum: 'Row #',
     sort: 'Sort records',
     dataVis: {

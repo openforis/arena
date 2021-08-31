@@ -9,7 +9,7 @@ import * as RecordStep from '@core/record/recordStep'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as API from '@webapp/service/api'
 
@@ -39,7 +39,7 @@ const toStepByKey = {
   [keys.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
 }
 
-const UpdateRecordsStepDropdown = ({ keys, placeholder }) => {
+const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
@@ -52,12 +52,20 @@ const UpdateRecordsStepDropdown = ({ keys, placeholder }) => {
       DialogConfirmActions.showDialogConfirm({
         key: 'dataView.confirmUpdateRecordsStep',
         params: { stepFrom: i18n.t(`surveyForm.step.${stepFrom}`), stepTo: i18n.t(`surveyForm.step.${stepTo}`) },
-        onOk: async () =>
-          API.updateRecordsStep({
+        onOk: async () => {
+          dispatch(LoaderActions.showLoader())
+
+          const { count } = await API.updateRecordsStep({
             surveyId,
             stepFrom: RecordStep.getStepIdByName(stepFrom),
             stepTo: RecordStep.getStepIdByName(stepTo),
-          }),
+          })
+          dispatch(LoaderActions.hideLoader())
+
+          dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
+
+          onRecordsUpdate()
+        },
       })
     )
   }
@@ -70,11 +78,12 @@ const UpdateRecordsStepDropdown = ({ keys, placeholder }) => {
       }))}
       placeholder={i18n.t(placeholder)}
       onChange={(item) => onMoveAllRecords(item.key)}
+      readOnlyInput
     />
   )
 }
 
-const HeaderLeft = ({ handleSearch, search, totalCount }) => {
+const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
@@ -103,11 +112,13 @@ const HeaderLeft = ({ handleSearch, search, totalCount }) => {
       <UpdateRecordsStepDropdown
         keys={[keys.promoteAllRecordsToCleansing, keys.promoteAllRecordsToAnalysis]}
         placeholder="dataView.promoteAllRecords"
+        onRecordsUpdate={onRecordsUpdate}
       />
 
       <UpdateRecordsStepDropdown
         keys={[keys.demoteAllRecordsFromAnalysis, keys.demoteAllRecordsFromCleansing]}
         placeholder="dataView.demoteAllRecords"
+        onRecordsUpdate={onRecordsUpdate}
       />
     </div>
   )

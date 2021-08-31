@@ -212,9 +212,9 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, stepFrom, stepTo } = Request.getParams(req)
 
-      await RecordService.updateRecordsStep({ user, surveyId, stepFrom, stepTo })
+      const { count } = await RecordService.updateRecordsStep({ user, surveyId, stepFrom, stepTo })
 
-      sendOk(res)
+      res.json({ count })
     } catch (error) {
       next(error)
     }

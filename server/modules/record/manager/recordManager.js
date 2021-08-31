@@ -110,7 +110,7 @@ export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } fr
 
 export {
   initNewRecord,
-  updateRecordStep,
+  updateRecordStepInTransaction,
   persistNode,
   updateNode,
   updateNodesDependents,
@@ -122,6 +122,7 @@ export const updateRecordsStep = async ({ user, surveyId, stepFrom, stepTo }, cl
     await Promise.all(
       recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
     )
+    return { count: recordsToMove.length }
   })
 
 // ==== DELETE

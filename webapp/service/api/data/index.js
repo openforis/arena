@@ -20,6 +20,8 @@ export const importRecordsFromCollect = async ({
 }
 
 export const updateRecordsStep = async ({ surveyId, stepFrom, stepTo }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/records/step`, { stepFrom, stepTo })
-  return data
+  const {
+    data: { count },
+  } = await axios.post(`/api/survey/${surveyId}/records/step`, { stepFrom, stepTo })
+  return { count }
 }
