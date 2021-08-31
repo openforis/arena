@@ -4,39 +4,123 @@ import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
+import * as RecordStep from '@core/record/recordStep'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+
+import * as API from '@webapp/service/api'
+
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const HeaderLeft = ({ handleSearch, search, totalCount }) => {
+import { Button } from '@webapp/components'
+import Dropdown from '@webapp/components/form/Dropdown'
+
+const keys = {
+  promoteAllRecordsToCleansing: 'promoteAllRecordsToCleansing',
+  promoteAllRecordsToAnalysis: 'promoteAllRecordsToAnalysis',
+  demoteAllRecordsFromAnalysis: 'demoteAllRecordsFromAnalysis',
+  demoteAllRecordsFromCleansing: 'demoteAllRecordsFromCleansing',
+}
+
+const fromStepByKey = {
+  [keys.promoteAllRecordsToCleansing]: RecordStep.stepNames.entry,
+  [keys.promoteAllRecordsToAnalysis]: RecordStep.stepNames.cleansing,
+  [keys.demoteAllRecordsFromAnalysis]: RecordStep.stepNames.analysis,
+  [keys.demoteAllRecordsFromCleansing]: RecordStep.stepNames.cleansing,
+}
+
+const toStepByKey = {
+  [keys.promoteAllRecordsToCleansing]: RecordStep.stepNames.cleansing,
+  [keys.promoteAllRecordsToAnalysis]: RecordStep.stepNames.analysis,
+  [keys.demoteAllRecordsFromAnalysis]: RecordStep.stepNames.cleansing,
+  [keys.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
+}
+
+const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }) => {
+  const i18n = useI18n()
+  const dispatch = useDispatch()
+  const surveyId = useSurveyId()
+
+  const onMoveAllRecords = (key) => {
+    const stepFrom = fromStepByKey[key]
+    const stepTo = toStepByKey[key]
+
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'dataView.confirmUpdateRecordsStep',
+        params: { stepFrom: i18n.t(`surveyForm.step.${stepFrom}`), stepTo: i18n.t(`surveyForm.step.${stepTo}`) },
+        onOk: async () => {
+          dispatch(LoaderActions.showLoader())
+
+          const { count } = await API.updateRecordsStep({
+            surveyId,
+            stepFrom: RecordStep.getStepIdByName(stepFrom),
+            stepTo: RecordStep.getStepIdByName(stepTo),
+          })
+          dispatch(LoaderActions.hideLoader())
+
+          dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
+
+          onRecordsUpdate()
+        },
+      })
+    )
+  }
+
+  return (
+    <Dropdown
+      items={keys.map((key) => ({
+        key,
+        value: i18n.t(`dataView.${key}`),
+      }))}
+      placeholder={i18n.t(placeholder)}
+      onChange={(item) => onMoveAllRecords(item.key)}
+      readOnlyInput
+    />
+  )
+}
+
+const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
-  const i18n = useI18n()
 
-  return Survey.isPublished(surveyInfo) ? (
+  if (!Survey.isPublished(surveyInfo)) return <div />
+
+  return (
     <div className="records__header-left">
-      <button
-        data-testid={DataTestId.records.addBtn}
-        type="button"
+      <Button
+        testId={DataTestId.records.addBtn}
         onClick={() => dispatch(RecordActions.createRecord(history))}
-        className="btn btn-s"
-      >
-        <span className="icon icon-plus icon-12px icon-left" />
-        {i18n.t('common.new')}
-      </button>
+        className="btn-s"
+        iconClassName="icon-plus icon-12px icon-left"
+        label="common.new"
+      />
 
-      { totalCount > 0 && <input
-        className="records__header-left__input-search"
-        placeholder="search..."
-        defaultValue={search}
-        onChange={(e) => handleSearch(e.target.value)}
-      /> }
+      {totalCount > 0 && (
+        <input
+          className="records__header-left__input-search"
+          placeholder="search..."
+          defaultValue={search}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      )}
+
+      <UpdateRecordsStepDropdown
+        keys={[keys.promoteAllRecordsToCleansing, keys.promoteAllRecordsToAnalysis]}
+        placeholder="dataView.promoteAllRecords"
+        onRecordsUpdate={onRecordsUpdate}
+      />
+
+      <UpdateRecordsStepDropdown
+        keys={[keys.demoteAllRecordsFromAnalysis, keys.demoteAllRecordsFromCleansing]}
+        placeholder="dataView.demoteAllRecords"
+        onRecordsUpdate={onRecordsUpdate}
+      />
     </div>
-  ) : (
-    <div />
   )
 }
 
