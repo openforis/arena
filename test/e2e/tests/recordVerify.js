@@ -17,7 +17,7 @@ export default () =>
       gotoRecord(record)
 
       test(`Verify record valid`, async () => {
-        const invalidRecordBtn = await page.waitForSelector(getSelector(DataTestId.record.invalidBtn))
+        const invalidRecordBtn = await page.$(getSelector(DataTestId.record.invalidBtn))
         await expect(invalidRecordBtn).toBeNull()
       })
 
