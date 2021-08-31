@@ -457,6 +457,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     recordsUpdated: '{{count}} records updated successfully!',
     rowNum: 'Row #',
+    showValidationReport: 'Show validation report',
     sort: 'Sort records',
     dataVis: {
       noData: 'This query returned no data',

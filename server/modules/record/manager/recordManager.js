@@ -144,4 +144,4 @@ export {
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
-export { fetchValidationReport, countValidationReports } from './_recordManager/validationReportManager'
+export { fetchValidationReport, countValidationReportItems } from './_recordManager/validationReportManager'

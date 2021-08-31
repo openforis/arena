@@ -19,9 +19,8 @@ export default () =>
           page.waitForNavigation(),
           page.click(getSelector(DataTestId.records.addBtn, 'button')),
         ])
-        const errorBadge = await page.waitForSelector(getSelector(DataTestId.record.errorBadge))
-        const actual = await errorBadge.innerText()
-        await expect(actual).toBe('Invalid record')
+        const invalidRecordBtn = await page.waitForSelector(getSelector(DataTestId.record.invalidBtn))
+        await expect(invalidRecordBtn).not.toBeNull()
       })
 
       enterCluster(record)
