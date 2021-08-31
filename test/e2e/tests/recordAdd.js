@@ -19,7 +19,7 @@ export default () =>
           page.waitForNavigation(),
           page.click(getSelector(DataTestId.records.addBtn, 'button')),
         ])
-        const invalidRecordBtn = await page.waitForSelector(getSelector(DataTestId.record.invalidBtn))
+        const invalidRecordBtn = await page.$(getSelector(DataTestId.record.invalidBtn))
         await expect(invalidRecordBtn).not.toBeNull()
       })
 
