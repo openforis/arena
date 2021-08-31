@@ -1,7 +1,15 @@
 import './nodeDefCoordinate.scss'
 
 import React from 'react'
-import * as R from 'ramda'
+
+import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Srs from '@core/geo/srs'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -11,26 +19,12 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Srs from '@core/geo/srs'
-
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = (props) => {
   const i18n = useI18n()
 
   const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
-
-  const handleInputChange = (node, field, value) => {
-    const { nodeDef, updateNode } = props
-
-    const newValue = R.assoc(field, value)(node.value)
-
-    updateNode(nodeDef, node, newValue)
-  }
 
   const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
 
@@ -40,15 +34,29 @@ const NodeDefCoordinate = (props) => {
   const value = Node.getValue(node, NodeDefUiProps.getDefaultValue(nodeDef))
 
   const surveySrs = Survey.getSRS(surveyInfo)
-  const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
+  const singleSrs = surveySrs.length === 1
+  const selectedSrs = singleSrs ? surveySrs[0] : surveySrs.find((srs) => srs.code === value.srs)
 
+  const handleInputChange = (field, value) => {
+    const { nodeDef, updateNode } = props
+
+    let newValue = A.assoc(field, value)(node.value)
+
+    if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
+      newValue = null
+    } else if (singleSrs) {
+      newValue[Node.valuePropsCoordinate.srs] = selectedSrs.code
+    }
+
+    updateNode(nodeDef, node, newValue)
+  }
   const xInput = (
     <Input
       id={DataTestId.surveyForm.coordinateX(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.x}
-      onChange={(value) => handleInputChange(node, 'x', value)}
+      onChange={(value) => handleInputChange(Node.valuePropsCoordinate.x, value)}
     />
   )
 
@@ -58,7 +66,7 @@ const NodeDefCoordinate = (props) => {
       numberFormat={numberFormat}
       readOnly={entryDisabled}
       value={value.y}
-      onChange={(value) => handleInputChange(node, 'y', value)}
+      onChange={(value) => handleInputChange(Node.valuePropsCoordinate.y, value)}
     />
   )
 
@@ -70,7 +78,8 @@ const NodeDefCoordinate = (props) => {
       itemKey="code"
       itemLabel={Srs.getNameAndCode}
       selection={selectedSrs}
-      onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}
+      onChange={(selection) => handleInputChange(Node.valuePropsCoordinate.srs, selection?.code)}
+      disabled={singleSrs}
     />
   )
 

@@ -37,8 +37,10 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
 
   await page.fill(xSelector, value.x)
   await page.fill(ySelector, value.y)
-  await page.focus(srsSelector)
-  await page.click(getSelector(DataTestId.dropdown.dropDownItem(value.srs)))
+  if (await page.isEditable(srsSelector)) {
+    await page.focus(srsSelector)
+    await page.click(getSelector(DataTestId.dropdown.dropDownItem(value.srs)))
+  }
 }
 
 const enterTaxon = async (nodeDef, value, parentSelector) => {
