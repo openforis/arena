@@ -40,17 +40,19 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
   return record
 }
 
-export const fetchRecordsUuidAndCycle = RecordManager.fetchRecordsUuidAndCycle
-export const fetchRecordByUuid = RecordManager.fetchRecordByUuid
-export const fetchRecordAndNodesByUuid = RecordManager.fetchRecordAndNodesByUuid
-export const countRecordsBySurveyId = RecordManager.countRecordsBySurveyId
-export const fetchRecordsSummaryBySurveyId = RecordManager.fetchRecordsSummaryBySurveyId
-export const fetchRecordCreatedCountsByDates = RecordManager.fetchRecordCreatedCountsByDates
+export const {
+  fetchRecordsUuidAndCycle,
+  fetchRecordByUuid,
+  fetchRecordAndNodesByUuid,
+  countRecordsBySurveyId,
+  fetchRecordsSummaryBySurveyId,
+  fetchRecordCreatedCountsByDates,
+  updateRecordsStep,
+} = RecordManager
 
 export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
-  return await RecordManager.updateRecordStep(user, survey, record, stepId)
+  return await RecordManager.updateRecordStepInTransaction({ user, surveyId, record, stepId })
 }
 
 export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
