@@ -66,6 +66,7 @@ const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = fals
   file.remove("./${token}.zip");\r\n
   ${isLocal ? `setwd('./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}');` : ''}\r\n
   ${isLocal ? `rstudioapi::filesPaneNavigate(getwd());` : ''}\r\n
+  rstudioapi::navigateToFile("arena.R")\r\n
   `
 
 const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
