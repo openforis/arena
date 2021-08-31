@@ -10,7 +10,7 @@ export default {
   // ====== Chain
   [ActivityLog.type.chainPropUpdate]: (survey, i18n) => (activityLog) => ({
     key: ActivityLog.getContentKey(activityLog),
-    label: _getChainLabel(i18n.lang)(activityLog),
+    label: _getChainLabel(i18n.language)(activityLog),
   }),
 
   [ActivityLog.type.analysisNodeDefPropUpdate]: (survey) => (activityLog) => {
@@ -24,10 +24,10 @@ export default {
   },
 
   [ActivityLog.type.chainStatusExecSuccess]: (survey, i18n) => (activityLog) => ({
-    label: _getChainLabel(i18n.lang)(activityLog),
+    label: _getChainLabel(i18n.language)(activityLog),
   }),
 
   [ActivityLog.type.chainDelete]: (survey, i18n) => (activityLog) => ({
-    label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.lang))(activityLog),
+    label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.language))(activityLog),
   }),
 }

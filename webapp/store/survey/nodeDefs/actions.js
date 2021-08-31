@@ -135,6 +135,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const i18n = I18nState.getI18n(state)
+  const lang = SurveyState.getSurveyPreferredLang(state)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
@@ -157,14 +158,14 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   }
 
   const nodeDefDependentsText = nodeDefDependents
-    .map((dependent) => `${NodeDef.getLabel(dependent, i18n.lang)} (${NodeDef.getName(dependent)})`)
+    .map((dependent) => `${NodeDef.getLabel(dependent, lang)} (${NodeDef.getName(dependent)})`)
     .join(', ')
 
   dispatch(
     NotificationActions.notifyWarning({
       key: 'nodeDefEdit.cannotDeleteNodeDefReferenced',
       params: {
-        nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
+        nodeDef: NodeDef.getLabel(nodeDef, lang),
         nodeDefDependents: nodeDefDependentsText,
       },
     })
@@ -184,7 +185,7 @@ export const removeNodeDef =
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
-          params: { name: NodeDef.getName(nodeDef)},
+          params: { name: NodeDef.getName(nodeDef) },
           onOk: async () => {
             const surveyId = Survey.getId(survey)
             const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
