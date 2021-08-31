@@ -39,7 +39,7 @@ const RecordEntryButtons = () => {
     <>
       {!valid && (
         <Link
-          id={DataTestId.record.errorBadge}
+          data-testid={DataTestId.record.invalidBtn}
           className="btn btn-transparent error"
           to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
           title={i18n.t('dataView.showValidationReport')}

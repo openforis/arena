@@ -100,7 +100,7 @@ export const DataTestId = {
     closeBtn: 'panel-right-close-btn',
   },
   record: {
-    errorBadge: 'record-error-badge',
+    invalidBtn: 'record-invalid-btn',
     deleteBtn: 'record-delete-btn',
   },
   records: {
