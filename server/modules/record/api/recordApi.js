@@ -206,6 +206,20 @@ export const init = (app) => {
     }
   })
 
+  // update records' step in batch from one step into another
+  app.post('/survey/:surveyId/records/step', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, stepFrom, stepTo } = Request.getParams(req)
+
+      const { count } = await RecordService.updateRecordsStep({ user, surveyId, stepFrom, stepTo })
+
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
     try {

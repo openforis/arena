@@ -50,37 +50,37 @@ export const initNewRecord = async (
 
 // ==== UPDATE
 
-export const updateRecordStep = async (user, survey, record, stepId, system = false, client = db) => {
-  await client.tx(async (t) => {
-    // Check if the step exists and that is't adjacent to the current one
-    const currentStepId = Record.getStep(record)
-    const stepCurrent = RecordStep.getStep(currentStepId)
-    const stepUpdate = RecordStep.getStep(stepId)
+export const updateRecordStep = async ({ user, surveyId, record, stepId, system = false }, client = db) => {
+  // Check if the step exists and that is't adjacent to the current one
+  const currentStepId = Record.getStep(record)
+  const stepCurrent = RecordStep.getStep(currentStepId)
+  const stepUpdate = RecordStep.getStep(stepId)
 
-    if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
-      const recordUuid = Record.getUuid(record)
-      const surveyId = Survey.getId(survey)
+  if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+    const recordUuid = Record.getUuid(record)
 
-      await Promise.all([
-        RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
-        ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.recordStepUpdate,
-          {
-            [ActivityLog.keysContent.uuid]: recordUuid,
-            [ActivityLog.keysContent.stepFrom]: currentStepId,
-            [ActivityLog.keysContent.stepTo]: stepId,
-          },
-          system,
-          t
-        ),
-      ])
-    } else {
-      throw new SystemError('cantUpdateStep')
-    }
-  })
+    await Promise.all([
+      RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.recordStepUpdate,
+        {
+          [ActivityLog.keysContent.uuid]: recordUuid,
+          [ActivityLog.keysContent.stepFrom]: currentStepId,
+          [ActivityLog.keysContent.stepTo]: stepId,
+        },
+        system,
+        client
+      ),
+    ])
+  } else {
+    throw new SystemError('cantUpdateStep')
+  }
 }
+
+export const updateRecordStepInTransaction = async ({ user, surveyId, record, stepId, system = false }, client = db) =>
+  client.tx(async (t) => updateRecordStep({ user, surveyId, record, stepId, system }, t))
 
 // ==== DELETE
 export const deleteRecord = async (user, survey, record) =>
