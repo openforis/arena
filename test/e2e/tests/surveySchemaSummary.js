@@ -85,6 +85,7 @@ export default () =>
           'applyIf',
           'required',
           'validations',
+          'cycle',
         ])
         await expect(nodeDefData.uuid).toBeDefined()
         await expect(nodeDefData.path).toBe(nodeDefPath)
