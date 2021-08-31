@@ -67,7 +67,7 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
       applyIf,
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
-      cycle: String(NodeDef.getCycles(nodeDef))
+      cycle: String(NodeDef.getCycles(nodeDef).map((val) => String(Number(val) + 1))), // this is to show the user the value that they see into the UI
     }
   })
 
