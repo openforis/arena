@@ -584,7 +584,12 @@ const iso639part2Names = {
   zza: { en: 'Zaza; Dimili; Dimli; Kirdki; Kirmanjki; Zazaki' },
 }
 
-export const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languagesMap)
+const availableTranslationLanguages = ['en']
+
+export const getLanguageLabel = (lang, translationLang = 'en') => {
+  const translationLanguage = availableTranslationLanguages.includes(translationLang) ? translationLang : 'en'
+  return R.path([lang, translationLanguage], languagesMap)
+}
 
 export const languages = R.pipe(
   R.keys,

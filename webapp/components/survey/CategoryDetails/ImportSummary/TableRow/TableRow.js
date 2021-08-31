@@ -41,7 +41,7 @@ const TableRow = (props) => {
         {i18n.t(columnSummaryKey, {
           type: CategoryImportSummary.getColumnType(column),
           level: CategoryImportSummary.getColumnLevelIndex(column) + 1,
-          language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.lang),
+          language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.language),
         })}
       </div>
       <div>

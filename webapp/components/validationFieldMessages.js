@@ -19,7 +19,7 @@ import { I18nState } from '@webapp/store/system'
 
 const getValidationCountErrorText = (survey, i18n) => (validationResult) => {
   const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
-  const nodeDefName = NodeDef.getLabel(nodeDef, i18n.lang)
+  const nodeDefName = NodeDef.getLabel(nodeDef, i18n.language)
   return i18n.t(ValidationResult.getKey(validationResult), {
     ...ValidationResult.getParams(validationResult),
     nodeDefName,
@@ -28,7 +28,7 @@ const getValidationCountErrorText = (survey, i18n) => (validationResult) => {
 
 const getErrorText = (survey, i18n) => (validationResult) =>
   ValidationResult.hasMessages(validationResult)
-    ? ValidationResult.getMessage(i18n.lang)(validationResult)
+    ? ValidationResult.getMessage(i18n.language)(validationResult)
     : RecordValidation.isValidationResultErrorCount(validationResult)
     ? getValidationCountErrorText(survey, i18n)(validationResult)
     : i18n.t(ValidationResult.getKey(validationResult), ValidationResult.getParams(validationResult))
