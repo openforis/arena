@@ -11,7 +11,6 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { NotificationActions } from '@webapp/store/ui/notification'
-import { I18nState } from '@webapp/store/system'
 
 import * as SurveyState from '../state'
 
@@ -134,7 +133,6 @@ export const putNodeDefLayoutProp =
 const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
-  const i18n = I18nState.getI18n(state)
   const lang = SurveyState.getSurveyPreferredLang(state)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
