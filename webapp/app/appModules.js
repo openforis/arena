@@ -124,6 +124,10 @@ export const dataModules = {
     key: 'record',
     path: `${appModules.data.path}/record`,
   },
+  recordValidationReport: {
+    key: 'recordValidationReport',
+    path: `${appModules.data.path}/recordValidationReport`,
+  },
   records: {
     key: 'records',
     path: `${appModules.data.path}/records`,

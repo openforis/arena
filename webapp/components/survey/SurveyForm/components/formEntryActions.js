@@ -2,12 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
-
-import ErrorBadge from '@webapp/components/errorBadge'
 
 import { useAuthCanDeleteRecord, useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 import { RecordActions, useRecord } from '@webapp/store/ui/record'
@@ -16,6 +15,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 import { Button } from '@webapp/components/buttons'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
@@ -37,11 +37,20 @@ const RecordEntryButtons = () => {
 
   return (
     <>
-      <ErrorBadge id={DataTestId.record.errorBadge} validation={{ valid }} labelKey="dataView.invalidRecord" />
-
+      {!valid && (
+        <Link
+          data-testid={DataTestId.record.invalidBtn}
+          className="btn btn-transparent error"
+          to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
+          title={i18n.t('dataView.showValidationReport')}
+        >
+          <span className="icon icon-12px icon-warning icon-left" />
+          {i18n.t('dataView.invalidRecord')}
+        </Link>
+      )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (
-          <button
+          <Button
             className="btn-s btn-transparent"
             onClick={() =>
               dispatch(
@@ -52,11 +61,9 @@ const RecordEntryButtons = () => {
                 })
               )
             }
-            type="button"
             title={i18n.t('surveyForm.formEntryActions.demoteTo', { stepPrev: getStepLabel(stepPrev) })}
-          >
-            <span className="icon icon-reply icon-12px" />
-          </button>
+            iconClassName="icon-reply icon-12px"
+          />
         )}
 
         <span>
@@ -85,9 +92,9 @@ const RecordEntryButtons = () => {
       </div>
 
       {canDelete && (
-        <button
+        <Button
           className="btn-s btn-danger"
-          data-testid={DataTestId.record.deleteBtn}
+          testId={DataTestId.record.deleteBtn}
           onClick={() =>
             dispatch(
               DialogConfirmActions.showDialogConfirm({
@@ -96,12 +103,9 @@ const RecordEntryButtons = () => {
               })
             )
           }
-          aria-disabled={false}
-          type="button"
-        >
-          <span className="icon icon-bin icon-12px icon-left" />
-          {i18n.t('common.delete')}
-        </button>
+          iconClassName="icon-bin icon-12px icon-left"
+          label="common.delete"
+        />
       )}
     </>
   )
