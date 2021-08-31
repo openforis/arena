@@ -45,6 +45,11 @@ const Data = () => {
             path: `${appModuleUri(dataModules.record)}:recordUuid/`,
             props: { draftDefs },
           },
+          // Record validation report
+          {
+            component: ValidationReport,
+            path: `${appModuleUri(dataModules.recordValidationReport)}:recordUuid`,
+          },
           // Data visualization
           {
             component: Explorer,

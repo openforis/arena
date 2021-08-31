@@ -449,6 +449,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       noRecordsAddedForThisSearch: 'No records found',
     },
     rowNum: 'Row #',
+    showValidationReport: 'Show validation report',
     sort: 'Sort records',
     dataVis: {
       noData: 'This query returned no data',

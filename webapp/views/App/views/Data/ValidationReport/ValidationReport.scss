@@ -1,5 +1,14 @@
 @import 'webapp/style/vars';
 
+.validation-report {
+  display: grid;
+  grid-template-rows: 1fr;
+
+  .btn-back {
+    margin: auto;
+  }
+}
+
 .validation-report__table {
   .table__row {
     height: unset;

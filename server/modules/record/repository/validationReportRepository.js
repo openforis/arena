@@ -13,7 +13,7 @@ const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValida
 
 // ============== READ
 
-const query = (surveyId) =>
+const query = ({ surveyId, recordUuid }) =>
   `SELECT
       r.uuid as record_uuid,
       r.step as record_step,
@@ -49,14 +49,18 @@ const query = (surveyId) =>
       h.record_uuid = r.uuid 
       AND r.cycle = $/cycle/
       AND NOT r.preview
+      ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
     ORDER BY r.date_created, h.node_id`
 
-export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
+export const fetchValidationReport = async (
+  { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
+  client = db
+) =>
   client.map(
-    `${query(surveyId)}
+    `${query({ surveyId, recordUuid })}
       LIMIT $/limit/
       OFFSET $/offset/`,
-    { cycle, limit, offset },
+    { cycle, limit, offset, recordUuid },
 
     R.pipe(
       R.toPairs,
@@ -64,5 +68,5 @@ export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit =
     )
   )
 
-export const countValidationReports = async (surveyId, cycle, client = db) =>
-  client.one(`SELECT COUNT(*) FROM(${query(surveyId)}) AS v`, { cycle })
+export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
+  client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
