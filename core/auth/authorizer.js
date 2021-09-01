@@ -79,6 +79,8 @@ export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
 export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 
+export const canUpdateRecordsStep = canAnalyzeRecords
+
 // ======
 // ====== Users
 // ======

@@ -15,9 +15,10 @@ const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
 export default class Tree {
-  constructor(domElement, data, lang, onEntityClick) {
+  constructor({ domElement, data, lang, i18n, onEntityClick }) {
     this.nodesByUuidMap = {}
     this._lang = lang
+    this.i18n = i18n
     this.data = data
     this.domElement = domElement
     this.onEntityClick = (nodeDefUuid) => {
@@ -184,17 +185,18 @@ export default class Tree {
     const grid = fo
       .append('xhtml:div')
       .attr('class', (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`)
-
-    grid
-      .append('xhtml:a')
-      .on('click', (_, d) => this.onEntityClick(d.data.uuid))
       .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+      .on('click', (_, d) => this.onEntityClick(d.data.uuid))
 
     grid
       .append('xhtml:button')
       .attr('class', 'btn')
+      .attr('title', () => this.i18n.t('common.expandCollapse'))
       .style('display', (d) => (hasChildren(d) ? 'block' : 'none'))
-      .on('click', (_, d) => this.toggleNode(d))
+      .on('click', (event, d) => {
+        event.stopPropagation()
+        this.toggleNode(d)
+      })
       .append('xhtml:span')
       .attr('class', 'icon icon-tree icon-12px')
 

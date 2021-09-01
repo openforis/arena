@@ -11,10 +11,13 @@ import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import Tree from './Tree'
+import { useI18n } from '@webapp/store/system'
 
 const SurveyHierarchy = () => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
+  const i18n = useI18n()
+
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
@@ -25,7 +28,9 @@ const SurveyHierarchy = () => {
 
   useEffect(() => {
     const treeElement = treeRef.current
-    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
+    setTree(
+      new Tree({ domElement: treeElement, data: hierarchy.root, lang, i18n, onEntityClick: setSelectedNodeDefUuid })
+    )
   }, [])
 
   useEffect(() => {
