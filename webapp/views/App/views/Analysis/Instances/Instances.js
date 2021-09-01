@@ -6,6 +6,8 @@ import axios from 'axios'
 import * as User from '@core/user/user'
 import * as A from '@core/arena'
 
+import * as API from '@webapp/service/api'
+
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
@@ -19,10 +21,9 @@ const Instances = () => {
 
   const getRStudioInstances = async () => {
     try {
-      const { data } = await axios.get('/api/rstudio')
-      const { instance, rStudioProxyUrl } = data
+      const { instance, getRStudioUrl } = await API.getCurrentInstance()
       setInstance(instance)
-      setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
+      setUrl(getRStudioUrl({ userUuid: User.getUuid(user) }))
     } catch (err) {
       return false
     } finally {
@@ -34,7 +35,7 @@ const Instances = () => {
     try {
       setLoading(true)
       const { instanceId } = instance
-      await axios.delete('/api/rstudio', { params: { instanceId } })
+      await API.terminateInstance({ instanceId })
       setInstance(null)
       setUrl(false)
     } finally {
@@ -58,6 +59,12 @@ const Instances = () => {
             </p>
           </a>
           <button onClick={closeRStudioInstance}>{i18n.t('instancesView.terminate')}</button>
+        </div>
+      )}
+
+      {A.isEmpty(instance) && (
+        <div className="instance-row">
+          <p>{i18n.t('instancesView.empty')}</p>
         </div>
       )}
     </div>

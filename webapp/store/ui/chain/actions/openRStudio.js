@@ -21,8 +21,8 @@ const _getRStudioParams = async ({ userUuid, isLocal }) => {
     return ProcessUtils.ENV.rStudioServerUrl
   }
 
-  const { instanceId, rStudioProxyUrl } = await API.createInstance()
-  let rStudioUrl = instanceId && rStudioProxyUrl ? `${rStudioProxyUrl}${instanceId}_${userUuid}` : false
+  const { instanceId, getRStudioUrl } = await API.createInstance()
+  let rStudioUrl = getRStudioUrl({ userUuid })
 
   if (rStudioUrl && instanceId) {
     return { rStudioUrl, instanceId }
@@ -77,7 +77,7 @@ export const openRStudio =
 
     let hadInstance = false
 
-    const currentInstance = await API.getCurrentInstance()
+    const { instance: currentInstance } = await API.getCurrentInstance()
     if (currentInstance?.instanceId) {
       hadInstance = true
     }

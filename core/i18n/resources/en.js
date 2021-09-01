@@ -617,6 +617,7 @@ $t(common.cantUndoWarning)`,
   instancesView: {
     title: 'Instances',
     terminate: 'Terminate',
+    empty: 'No RStudio Server instances running',
   },
   chain: {
     quantitative: 'Quantitative',
