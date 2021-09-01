@@ -1,7 +1,6 @@
 import './Instances.scss'
 
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 
 import * as User from '@core/user/user'
 import * as A from '@core/arena'
