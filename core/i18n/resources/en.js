@@ -576,6 +576,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     status: 'Status',
+    surveyShouldBePublished: 'The survey should be published to run analysis',
     deleteConfirm: `Delete this processing chain?
     
 $t(common.cantUndoWarning)`,
