@@ -20,6 +20,7 @@ const InputChips = (props) => {
     readOnly,
     disabled,
     validation,
+    placeholder,
     onChange,
     onItemAdd,
     onItemRemove,
@@ -58,6 +59,7 @@ const InputChips = (props) => {
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
+          placeholder={placeholder}
         />
       )}
     </div>
@@ -77,6 +79,7 @@ InputChips.propTypes = {
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
   validation: PropTypes.object,
+  placeholder: PropTypes.string,
 
   onChange: PropTypes.func,
   onItemAdd: PropTypes.func,
@@ -94,6 +97,7 @@ InputChips.defaultProps = {
   readOnly: false,
   disabled: false,
   validation: {},
+  placeholder: null,
 
   onChange: null, // Callback to receive all selection change
   onItemAdd: null, // Callback to receive added item

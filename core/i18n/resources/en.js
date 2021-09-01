@@ -295,6 +295,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
+      srsPlaceholder: 'Type code or label',
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
