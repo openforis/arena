@@ -11,21 +11,9 @@ import { copyToClipboard } from '@webapp/utils/domUtils'
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 import { UserState } from '@webapp/store/user'
+import * as API from '@webapp/service/api'
 
-const _getRStudioPoolUrl = async ({ userUuid }) => {
-  try {
-    const { data = {} } = await axios.post('/api/rstudio')
-    const { instanceId = false, rStudioProxyUrl = false } = data
-
-    if (instanceId && rStudioProxyUrl) {
-      return `${rStudioProxyUrl}${instanceId}_${userUuid}`
-    }
-    return false
-  } catch (err) {
-    return false
-  }
-}
-const _getRStudioUrl = async ({ userUuid, isLocal }) => {
+const _getRStudioParams = async ({ userUuid, isLocal }) => {
   if (isLocal) {
     return false
   }
@@ -33,13 +21,14 @@ const _getRStudioUrl = async ({ userUuid, isLocal }) => {
     return ProcessUtils.ENV.rStudioServerUrl
   }
 
-  const rStudioPoolUrl = await _getRStudioPoolUrl({ userUuid })
+  const { instanceId, rStudioProxyUrl } = await API.createInstance()
+  let rStudioUrl = instanceId && rStudioProxyUrl ? `${rStudioProxyUrl}${instanceId}_${userUuid}` : false
 
-  if (rStudioPoolUrl) {
-    return rStudioPoolUrl
+  if (rStudioUrl && instanceId) {
+    return { rStudioUrl, instanceId }
   }
 
-  return `${window.location.origin}/rstudio/`
+  return { rStudioUrl: `${window.location.origin}/rstudio/`, instanceId: false }
 }
 
 /*
@@ -85,9 +74,17 @@ export const openRStudio =
 
     const config = { params: { surveyCycleKey } }
     const chainUuid = Chain.getUuid(chain)
+
+    let hadInstance = false
+
+    const currentInstance = await API.getCurrentInstance()
+    if (currentInstance?.instanceId) {
+      hadInstance = true
+    }
+
     const { data } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
-    const rStudioUrl = await _getRStudioUrl({ userUuid, isLocal })
+    const { instanceId, rStudioUrl } = await _getRStudioParams({ userUuid, isLocal })
 
     const { token, serverUrl } = data
 
@@ -102,6 +99,11 @@ export const openRStudio =
           _copyRStudioCode({ rStudioCode })
           if (!isLocal) {
             window.open(rStudioUrl, 'rstudio')
+          }
+        },
+        onCancel: async () => {
+          if (!hadInstance) {
+            await API.terminateInstance({ instanceId })
           }
         },
       })
