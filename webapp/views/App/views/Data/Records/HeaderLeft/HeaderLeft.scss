@@ -5,6 +5,7 @@ $tableHeaderHeight: 30px;
 .records__header-left {
   display: flex;
   height: $tableHeaderHeight;
+  column-gap: 1rem;
 }
 
 .records__header-left__input-search {

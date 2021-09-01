@@ -4,84 +4,15 @@ import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-import * as RecordStep from '@core/record/recordStep'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-
-import * as API from '@webapp/service/api'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { Button } from '@webapp/components'
-import Dropdown from '@webapp/components/form/Dropdown'
-
-const keys = {
-  promoteAllRecordsToCleansing: 'promoteAllRecordsToCleansing',
-  promoteAllRecordsToAnalysis: 'promoteAllRecordsToAnalysis',
-  demoteAllRecordsFromAnalysis: 'demoteAllRecordsFromAnalysis',
-  demoteAllRecordsFromCleansing: 'demoteAllRecordsFromCleansing',
-}
-
-const fromStepByKey = {
-  [keys.promoteAllRecordsToCleansing]: RecordStep.stepNames.entry,
-  [keys.promoteAllRecordsToAnalysis]: RecordStep.stepNames.cleansing,
-  [keys.demoteAllRecordsFromAnalysis]: RecordStep.stepNames.analysis,
-  [keys.demoteAllRecordsFromCleansing]: RecordStep.stepNames.cleansing,
-}
-
-const toStepByKey = {
-  [keys.promoteAllRecordsToCleansing]: RecordStep.stepNames.cleansing,
-  [keys.promoteAllRecordsToAnalysis]: RecordStep.stepNames.analysis,
-  [keys.demoteAllRecordsFromAnalysis]: RecordStep.stepNames.cleansing,
-  [keys.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
-}
-
-const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }) => {
-  const i18n = useI18n()
-  const dispatch = useDispatch()
-  const surveyId = useSurveyId()
-
-  const onMoveAllRecords = (key) => {
-    const stepFrom = fromStepByKey[key]
-    const stepTo = toStepByKey[key]
-
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.confirmUpdateRecordsStep',
-        params: { stepFrom: i18n.t(`surveyForm.step.${stepFrom}`), stepTo: i18n.t(`surveyForm.step.${stepTo}`) },
-        onOk: async () => {
-          dispatch(LoaderActions.showLoader())
-
-          const { count } = await API.updateRecordsStep({
-            surveyId,
-            stepFrom: RecordStep.getStepIdByName(stepFrom),
-            stepTo: RecordStep.getStepIdByName(stepTo),
-          })
-          dispatch(LoaderActions.hideLoader())
-
-          dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
-
-          onRecordsUpdate()
-        },
-      })
-    )
-  }
-
-  return (
-    <Dropdown
-      items={keys.map((key) => ({
-        key,
-        value: i18n.t(`dataView.${key}`),
-      }))}
-      placeholder={i18n.t(placeholder)}
-      onChange={(item) => onMoveAllRecords(item.key)}
-      readOnlyInput
-    />
-  )
-}
+import { useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
+import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const dispatch = useDispatch()
@@ -89,6 +20,8 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const surveyInfo = useSurveyInfo()
 
   if (!Survey.isPublished(surveyInfo)) return <div />
+
+  const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
 
   return (
     <div className="records__header-left">
@@ -109,17 +42,21 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
         />
       )}
 
-      <UpdateRecordsStepDropdown
-        keys={[keys.promoteAllRecordsToCleansing, keys.promoteAllRecordsToAnalysis]}
-        placeholder="dataView.promoteAllRecords"
-        onRecordsUpdate={onRecordsUpdate}
-      />
+      {canUpdateRecordsStep && (
+        <>
+          <UpdateRecordsStepDropdown
+            keys={[updateTypes.promoteAllRecordsToCleansing, updateTypes.promoteAllRecordsToAnalysis]}
+            placeholder="dataView.promoteAllRecords"
+            onRecordsUpdate={onRecordsUpdate}
+          />
 
-      <UpdateRecordsStepDropdown
-        keys={[keys.demoteAllRecordsFromAnalysis, keys.demoteAllRecordsFromCleansing]}
-        placeholder="dataView.demoteAllRecords"
-        onRecordsUpdate={onRecordsUpdate}
-      />
+          <UpdateRecordsStepDropdown
+            keys={[updateTypes.demoteAllRecordsFromAnalysis, updateTypes.demoteAllRecordsFromCleansing]}
+            placeholder="dataView.demoteAllRecords"
+            onRecordsUpdate={onRecordsUpdate}
+          />
+        </>
+      )}
     </div>
   )
 }
