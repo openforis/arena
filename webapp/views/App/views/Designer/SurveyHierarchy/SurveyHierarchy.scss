@@ -27,18 +27,16 @@
   }
 
   .node {
-    a {
-      cursor: pointer;
-      font-size: 0.8rem;
-      letter-spacing: 0;
-      padding: 0.2rem 0.5rem;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 0;
+    padding: 0.2rem 0.5rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .node-grid {
@@ -49,11 +47,11 @@
     transition: background-color 1s ease;
     background-color: white;
     height: 38px;
+    padding: 6px;
 
     .btn {
       transform: rotate(-90deg);
       padding: 0.3rem;
-      margin-right: 0.2rem;
     }
 
     &.node-virtual {
