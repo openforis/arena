@@ -1,13 +1,17 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
+
+import * as Srs from '@core/geo/srs'
 
 import InputChips from '@webapp/components/form/InputChips'
 
-import * as Srs from '@core/geo/srs'
-import PropTypes from 'prop-types'
+import { useI18n } from '@webapp/store/system'
 
 const SrsEditor = (props) => {
   const { srs, validation, readOnly, setSrs } = props
+
+  const i18n = useI18n()
 
   const srsLookupFunction = async (value) => {
     const { data } = await axios.get('/api/geo/srs/find', {
@@ -27,6 +31,7 @@ const SrsEditor = (props) => {
       validation={validation}
       onChange={setSrs}
       readOnly={readOnly}
+      placeholder={i18n.t('homeView.surveyInfo.srsPlaceholder')}
     />
   )
 }
