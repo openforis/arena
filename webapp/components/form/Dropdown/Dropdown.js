@@ -50,6 +50,9 @@ const Dropdown = (props) => {
   })
   const showDialog = State.getShowDialog(state)
   const itemsDialog = State.getItemsDialog(state)
+  const inputValue = State.getInputValue(state) || ''
+
+  const searchMinCharsReached = autocompleteMinChars <= 0 || inputValue.trim().length >= autocompleteMinChars
 
   return (
     <div
@@ -66,7 +69,7 @@ const Dropdown = (props) => {
         id={idInput}
         ref={inputRef}
         placeholder={placeholder}
-        value={State.getInputValue(state) || ''}
+        value={inputValue}
         validation={validation}
         readOnly={readOnly || readOnlyInput}
         disabled={disabled}
@@ -90,7 +93,7 @@ const Dropdown = (props) => {
           if (showDialog) Actions.closeDialog({ selection, state })
           else await Actions.openDialog({ state })
         }}
-        aria-disabled={disabled}
+        aria-disabled={disabled || !searchMinCharsReached}
       >
         <span className="icon icon-play3 icon-12px" />
       </button>
