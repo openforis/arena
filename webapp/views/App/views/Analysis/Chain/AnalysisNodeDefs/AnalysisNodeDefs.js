@@ -1,7 +1,6 @@
 import './AnalysisNodeDefs.scss'
-import React, { useRef, useMemo, useEffect } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
-import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -10,7 +9,6 @@ import { ChainActions, useChainEntityDefUuid, useChain } from '@webapp/store/ui/
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { usePrevious } from '@webapp/components/hooks'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 
@@ -39,14 +37,6 @@ const AnalysisNodeDefs = () => {
     () => Survey.getAnalysisNodeDefs({ chain, entityDefUuid })(survey),
     [chain, survey, entityDefUuid]
   )
-
-  const prevAnalysisNodeDefs = usePrevious(_analysisNodeDefsToShow)
-
-  useEffect(() => {
-    if (A.isNull(prevAnalysisNodeDefs) && !chain.isDeleted) {
-      dispatch(ChainActions.updateChain({ chain }))
-    }
-  }, [_analysisNodeDefsToShow, chain])
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
 
