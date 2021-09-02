@@ -21,5 +21,6 @@ export { importRecordsFromCollect, updateRecordsStep } from './data'
 export { fetchSurveys, insertSurvey } from './survey'
 
 export { cancelableGetRequest } from './cancelableRequest'
+export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
 
 export { createAccessRequest } from './user'
