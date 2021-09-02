@@ -21,6 +21,9 @@
     right: 16px;
     display: flex;
     flex-direction: column;
+    .btn-rstudio-container-message{
+      max-width: 120px;
+    }
   }
 }
 
