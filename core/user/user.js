@@ -78,6 +78,7 @@ export const {
   getPrefSurveyCycle,
   getPrefSurveyLang,
   getPrefSurveyCurrentCycle,
+  getPrefSurveyCurrentLanguage,
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
   assocPrefSurveyLang,

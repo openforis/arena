@@ -12,6 +12,7 @@ import {
   useAuthCanViewOtherUsersEmail,
   useUserIsSystemAdmin,
   useProfilePicture,
+  getPrefSurveyCurrentLanguage
 } from './hooks'
 
 export {
@@ -28,4 +29,5 @@ export {
   useAuthCanViewOtherUsersEmail,
   useUserIsSystemAdmin,
   useProfilePicture,
+  getPrefSurveyCurrentLanguage
 }

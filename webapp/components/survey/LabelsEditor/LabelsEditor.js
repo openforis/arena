@@ -7,6 +7,7 @@ import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import PanelRight from '@webapp/components/PanelRight'
@@ -32,8 +33,9 @@ const LabelsEditor = (props) => {
   const i18n = useI18n()
   const [editingLabels, setEditingLabels] = useState(false)
   const surveyLanguages = useSurveyLangs()
+  const selectedLanguage = usePreferedLang()
   const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages
-  const language = languages[0]
+  const language = selectedLanguage && languages.includes(selectedLanguage) ? selectedLanguage : languages[0]
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
 
