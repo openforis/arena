@@ -7,7 +7,8 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
@@ -37,7 +38,7 @@ const NodeDefsSelectorAggregate = (props) => {
   const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
 
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })

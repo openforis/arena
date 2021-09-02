@@ -5,7 +5,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
@@ -15,7 +16,7 @@ import { useI18n } from '@webapp/store/system'
 
 const SurveyHierarchy = () => {
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
   const i18n = useI18n()
 
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)

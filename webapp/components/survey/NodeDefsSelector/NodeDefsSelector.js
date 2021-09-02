@@ -12,7 +12,8 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -32,7 +33,7 @@ const NodeDefsSelector = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const [filterTypes, setFilterTypes] = useState([])
   const [showFilter, setShowFilter] = useState(false)

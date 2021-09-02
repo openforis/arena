@@ -27,13 +27,13 @@ import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
 import FileProps from '../FileProps'
 import AnalysisProps from '../AnalysisProps'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
 
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const {
     nodeDef,

@@ -15,8 +15,7 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useAuthCanEditSurvey, usePreferedLang } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import { State, useActions } from '../../store'
@@ -28,7 +27,7 @@ const ItemDetails = (props) => {
 
   const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const category = State.getCategory(state)
   const categoryUuid = Category.getUuid(category)

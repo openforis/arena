@@ -8,13 +8,13 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 const NodeDefCodeDropdown = (props) => {
   const { canEditRecord, edit, entryDataQuery, items, nodeDef, onItemAdd, onItemRemove, readOnly, selectedItems } =
     props
 
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const entryDisabled = edit || !canEditRecord || readOnly
 

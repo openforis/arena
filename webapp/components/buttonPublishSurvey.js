@@ -5,7 +5,8 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
@@ -15,7 +16,7 @@ const ButtonPublishSurvey = (props) => {
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 

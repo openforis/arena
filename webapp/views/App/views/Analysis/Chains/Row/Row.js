@@ -5,7 +5,7 @@ import * as Chain from '@common/analysis/chain'
 import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { usePreferedLang } from '@webapp/store/user'
 
 import ProgressBar from '@webapp/components/progressBar'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -19,7 +19,7 @@ const statusComponent = {
 const Row = (props) => {
   const { row } = props
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
+  const lang = usePreferedLang()
 
   const statusExec = Chain.getStatusExec(row)
 
