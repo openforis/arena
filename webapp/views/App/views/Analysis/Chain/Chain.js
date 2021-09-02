@@ -6,12 +6,13 @@ import classNames from 'classnames'
 
 import * as A from '@core/arena'
 
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurveyCycleKeys } from '@webapp/store/survey'
+import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -30,6 +31,7 @@ const ChainComponent = () => {
   const cycleKeys = useSurveyCycleKeys()
   const chain = useChain()
   const validation = Chain.getValidation(chain)
+  const surveyInfo = useSurveyInfo()
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
@@ -61,9 +63,12 @@ const ChainComponent = () => {
         message={i18n.t('chainView.errorNoLabel')}
       />
 
-<div className="btn-rstudio-container">
-      <ButtonRStudio onClick={_openRStudio} />
-      <ButtonRStudio isLocal onClick={_openRStudioLocal} />
+      <div className="btn-rstudio-container">
+        {Survey.isDraft(surveyInfo) && (
+          <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
+        )}
+        <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
+        <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
       </div>
 
       <div className="form">
