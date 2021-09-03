@@ -102,7 +102,7 @@ export const openRStudio =
           }
         },
         onCancel: async () => {
-          if (!hadInstance) {
+          if (!hadInstance && !isLocal) {
             await API.terminateInstance({ instanceId })
           }
         },
