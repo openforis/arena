@@ -8,7 +8,7 @@ import { Query } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db'
 
 import { useI18n } from '@webapp/store/system'
-import { usePreferedLang } from '@webapp/store/user'
+import { usePreferredLang } from '@webapp/store/user'
 
 import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
@@ -26,7 +26,7 @@ const ColumnHeader = (props) => {
   const { colWidth, nodeDef, onChangeQuery, query } = props
 
   const i18n = useI18n()
-  const lang = usePreferedLang()
+  const lang = usePreferredLang()
 
   const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
     query,

@@ -23,7 +23,7 @@ export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), us
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
 export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
-export const usePreferedLang = () => User.getPrefSurveyCurrentLanguage(useUser())
+export const usePreferredLang = () => User.getPrefSurveyCurrentLanguage(useUser())
 
 // ====== Auth / Records
 export const useAuthCanEditRecord = (record) => {

@@ -11,14 +11,14 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { FormItem } from '@webapp/components/form/Input'
 import { Button } from '@webapp/components/buttons'
-import { usePreferedLang } from '@webapp/store/user'
+import { usePreferredLang } from '@webapp/store/user'
 
 const NodeDefEntityFormNodeSelect = (props) => {
   const { nodeDef, nodes, parentNode, selectedNode, updateNode, removeNode, onChange, canEditRecord, canAddNode } =
     props
 
   const i18n = useI18n()
-  const lang = usePreferedLang()
+  const lang = usePreferredLang()
   const dispatch = useDispatch()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)

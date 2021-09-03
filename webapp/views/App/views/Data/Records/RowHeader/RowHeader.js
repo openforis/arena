@@ -6,7 +6,7 @@ import { useI18n } from '@webapp/store/system'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import { useNodeDefRootKeys } from '@webapp/store/survey'
-import { usePreferedLang } from '@webapp/store/user'
+import { usePreferredLang } from '@webapp/store/user'
 import { SortToggle } from '@webapp/components/Table'
 
 const RowHeader = (props) => {
@@ -14,7 +14,7 @@ const RowHeader = (props) => {
   const { handleSortBy, sort } = tableProps
   const nodeDefKeys = useNodeDefRootKeys()
   const i18n = useI18n()
-  const lang = usePreferedLang()
+  const lang = usePreferredLang()
 
   return (
     <>

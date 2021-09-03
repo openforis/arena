@@ -16,7 +16,7 @@ export const getUser = getState
 export const assocUserPropsOnSurveyCreate = (survey) => (userState) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(
-    User.assocPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.cycleOneKey),
+    User.assocPrefSurveyCurrentAndCycleAndLang({ surveyId: Survey.getIdSurveyInfo(surveyInfo), cycle: Survey.cycleOneKey, lang: Survey.getLanguages(surveyInfo)[0]}),
     R.unless(User.isSystemAdmin, User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo)))
   )(userState)
   return user

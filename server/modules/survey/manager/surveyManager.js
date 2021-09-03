@@ -113,7 +113,7 @@ export const insertSurvey = async (params, client = db) => {
     }
 
     if (updateUserPrefs) {
-      const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+      const userUpdated = User.assocPrefSurveyCurrentAndCycleAndLang({surveyId, cycle: Survey.cycleOneKey, lang: Survey.getLanguages(surveyInfo)[0]} )(user)
       await UserRepository.updateUserPrefs(userUpdated, t)
     }
 

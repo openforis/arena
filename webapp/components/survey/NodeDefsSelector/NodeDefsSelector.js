@@ -13,7 +13,7 @@ import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { usePreferedLang } from '@webapp/store/user'
+import { usePreferredLang } from '@webapp/store/user'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -33,7 +33,7 @@ const NodeDefsSelector = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = usePreferedLang()
+  const lang = usePreferredLang()
 
   const [filterTypes, setFilterTypes] = useState([])
   const [showFilter, setShowFilter] = useState(false)

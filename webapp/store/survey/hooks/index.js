@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
-import { usePreferedLang } from '../../user'
+import { usePreferredLang } from '../../user'
 import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
 
@@ -29,4 +29,4 @@ export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
-export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, usePreferedLang(), type)
+export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, usePreferredLang(), type)

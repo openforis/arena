@@ -82,7 +82,7 @@ export const {
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
   assocPrefSurveyLang,
-  assocPrefSurveyCurrentAndCycle,
+  assocPrefSurveyCurrentAndCycleAndLang,
   deletePrefSurvey,
 } = UserPrefs
 

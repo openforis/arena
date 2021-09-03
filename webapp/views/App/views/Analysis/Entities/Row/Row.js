@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useNodeDefByUuid } from '@webapp/store/survey'
-import { usePreferedLang } from '@webapp/store/user'
+import { usePreferredLang } from '@webapp/store/user'
 
 const Row = (props) => {
   const { row: entity } = props
   const parentDef = useNodeDefByUuid(entity?.parentUuid)
-  const lang = usePreferedLang()
+  const lang = usePreferredLang()
 
   return (
     <>
