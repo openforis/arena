@@ -1,6 +1,6 @@
 import './Records.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
@@ -27,9 +27,9 @@ const Records = () => {
 
   const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
-  const onRecordsUpdate = () => {
+  const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())
-  }
+  }, [setRecordsRequestedAt])
 
   return (
     <Table
@@ -37,7 +37,8 @@ const Records = () => {
       restParams={{ cycle, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
-      headerLeftComponent={(headerLeftProps) => <HeaderLeft {...headerLeftProps} onRecordsUpdate={onRecordsUpdate} />}
+      headerLeftComponent={HeaderLeft}
+      headerProps={{ onRecordsUpdate }}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
       noItemsLabelKey="dataView.records.noRecordsAdded"
