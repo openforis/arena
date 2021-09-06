@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
+import * as StringUtils from '@core/stringUtils'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
@@ -33,7 +34,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
         label="common.new"
       />
 
-      {totalCount > 0 && (
+      {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
           className="records__header-left__input-search"
           placeholder="search..."
