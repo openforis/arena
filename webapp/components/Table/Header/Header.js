@@ -8,14 +8,14 @@ import { updateQuery } from '@webapp/components/Table/tableLink'
 import Paginator from './Paginator'
 
 const Header = (props) => {
-  const { headerLeftComponent, list, offset, limit, count } = props
+  const { headerLeftComponent, headerProps, list, offset, limit, count } = props
 
   const history = useHistory()
 
   return (
     <div className="table__header">
-      {React.createElement(headerLeftComponent, props)}
-      
+      {React.createElement(headerLeftComponent, { ...props, ...headerProps })}
+
       {!R.isEmpty(list) && (
         <Paginator
           offset={offset}
@@ -32,9 +32,14 @@ const Header = (props) => {
 Header.propTypes = {
   count: PropTypes.number.isRequired,
   headerLeftComponent: PropTypes.elementType.isRequired,
+  headerProps: PropTypes.object,
   limit: PropTypes.number.isRequired,
   list: PropTypes.array.isRequired,
   offset: PropTypes.number.isRequired,
+}
+
+Header.defaultProps = {
+  headerProps: {},
 }
 
 export default Header
