@@ -153,8 +153,6 @@ export const fetchRecordsSummaryBySurveyId = async (
       ${A.isNull(cycle) ? '' : 'AND r.cycle = $/cycle/'}
       ${A.isNull(step) ? '' : 'AND r.step = $/step/'}
     ORDER BY r.date_created DESC
-    ${limit ? 'LIMIT $/limit:value/' : ''}
-    OFFSET $/offset:value/
   `
 
   return client.map(
@@ -186,12 +184,18 @@ export const fetchRecordsSummaryBySurveyId = async (
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
+
     ${search ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
+
     ORDER BY ${
       Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
         ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
+
+    ${limit ? 'LIMIT $/limit:value/' : ''}
+
+    OFFSET $/offset:value/
   `,
     { surveyId, cycle, step, search, limit, offset },
     dbTransformCallback(surveyId, false)
