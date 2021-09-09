@@ -16,10 +16,11 @@ import * as Node from '../node'
 const { nodeDefType } = NodeDef
 
 const validateDecimal = ({ nodeDef, value }) => {
-  if (!NumberUtils.isFloat(value)) return false
-  const maxNumberDecimalDigits = NodeDef.getMaxNumberDecimalDigits(nodeDef)
-  const numberDecimalDigits = (Number(value).toString().split('.')[1] || '').length
-  return numberDecimalDigits <= maxNumberDecimalDigits
+  return NumberUtils.isFloat(value)
+  // TODO validate max number of decimal digits as warning?
+  // const maxNumberDecimalDigits = NodeDef.getMaxNumberDecimalDigits(nodeDef)
+  // const numberDecimalDigits = (Number(value).toString().split('.')[1] || '').length
+  // return numberDecimalDigits <= maxNumberDecimalDigits
 }
 
 const validateCode = ({ survey, node }) => {
