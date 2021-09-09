@@ -49,6 +49,8 @@ const query = ({ surveyId, recordUuid }) =>
       h.record_uuid = r.uuid 
       AND r.cycle = $/cycle/
       AND NOT r.preview
+      -- exclude analysis variables
+      AND h.node_def_uuid NOT IN (SELECT uuid FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE analysis IS TRUE)
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
     ORDER BY r.date_created, h.node_id`
 
