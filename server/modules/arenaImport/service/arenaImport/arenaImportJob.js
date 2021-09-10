@@ -22,7 +22,7 @@ const createInnerJobs = (params) => {
   return [
     new ArenaSurveyReaderJob(),
     new SurveyCreatorJob(),
-    new UsersImportJob(),
+    ...(backup ? [new UsersImportJob()] : []),
     new TaxonomiesImportJob(),
     new CategoriesImportJob(),
     new NodeDefsImportJob(),
