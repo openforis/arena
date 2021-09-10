@@ -35,7 +35,11 @@ export default class RecordCheckJob extends Job {
     await PromiseUtils.each(recordsUuidAndCycle, async ({ uuid: recordUuid, cycle }) => {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
-      await this._checkRecord(surveyAndNodeDefs, recordUuid)
+      const { noUpdates } = surveyAndNodeDefs
+
+      if (!noUpdates) {
+        await this._checkRecord(surveyAndNodeDefs, recordUuid)
+      }
 
       this.incrementProcessedItems()
     })
@@ -73,6 +77,7 @@ export default class RecordCheckJob extends Job {
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
         nodeDefDeletedUuids,
+        noUpdates: [...nodeDefAddedUuids, ...nodeDefUpdatedUuids, ...nodeDefDeletedUuids].length === 0,
       }
       this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
     }
@@ -82,10 +87,6 @@ export default class RecordCheckJob extends Job {
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
-
-    if (R.all(R.isEmpty)([nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids])) {
-      return
-    } // Nothing to update
 
     // 1. fetch record and nodes
     let record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, true, this.tx)
