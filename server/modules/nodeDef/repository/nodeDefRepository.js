@@ -12,7 +12,7 @@ import {
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
 
-  if (advanced || backup ) {
+  if (advanced || backup) {
     if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
       // there are draft advanced props to merge with "published" advanced props
       rowUpdated.draft_advanced = true
@@ -21,7 +21,7 @@ const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =
         rowUpdated.props_advanced = R.mergeDeepLeft(row.props_advanced_draft, row.props_advanced)
       }
     }
-    if (!backup || !draft) {
+    if (!backup && !draft) {
       // ignore props_advanced_draft
       delete rowUpdated.props_advanced_draft
     }

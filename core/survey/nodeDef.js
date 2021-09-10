@@ -242,7 +242,7 @@ export const getPropOrDraftAdvanced =
   (nodeDef) =>
     getPropAdvancedDraft(prop, getPropAdvanced(prop, defaultTo)(nodeDef))(nodeDef)
 
-export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
+export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
