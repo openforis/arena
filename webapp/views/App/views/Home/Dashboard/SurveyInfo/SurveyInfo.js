@@ -68,6 +68,13 @@ const SurveyInfo = () => {
             label={i18n.t('common.export')}
           />
 
+          <DownloadButton
+            id={DataTestId.dashboard.surveyExportWithDataBtn}
+            className="btn-transparent"
+            onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
+            label={i18n.t('homeView.dashboard.exportWithData')}
+          />
+
           {canEditSurvey && (
             <Button
               className="btn-s btn-transparent"
