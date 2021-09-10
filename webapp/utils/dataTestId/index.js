@@ -32,6 +32,7 @@ export const DataTestId = {
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
     surveyExportBtn: 'survey-export-btn',
+    surveyExportWithDataBtn: 'survey-export-with-data-btn',
     surveyInfoBtnHeader: 'survey-info-btn-header',
     surveyInfoBtn: 'survey-info-btn',
     surveyLabel: 'survey-label',

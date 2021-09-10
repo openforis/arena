@@ -269,6 +269,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   homeView: {
     dashboard: {
+      exportWithData: 'Export with data',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   

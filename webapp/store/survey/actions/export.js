@@ -9,28 +9,30 @@ import { DataTestId } from '@webapp/utils/dataTestId'
 
 import * as SurveyState from '../state'
 
-export const exportSurvey = () => async (dispatch, getState) => {
-  const state = getState()
-  const survey = SurveyState.getSurvey(state)
-  const surveyId = Survey.getId(survey)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyName = Survey.getName(surveyInfo)
+export const exportSurvey =
+  ({ includeData = false } = {}) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const surveyId = Survey.getId(survey)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyName = Survey.getName(surveyInfo)
 
-  const {
-    data: { job, outputFileName: fileName },
-  } = await axios.get(`/api/survey/${surveyId}/export/`)
+    const {
+      data: { job, outputFileName: fileName },
+    } = await axios.get(`/api/survey/${surveyId}/export/`, { params: { includeData } })
 
-  dispatch(
-    JobActions.showJobMonitor({
-      job,
-      closeButton: (
-        <DownloadButton
-          id={DataTestId.surveyExport.downloadBtn}
-          href={`/api/survey/${surveyId}/export/download`}
-          requestParams={{ fileName, surveyName }}
-          onClick={() => dispatch(JobActions.hideJobMonitor())}
-        />
-      ),
-    })
-  )
-}
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        closeButton: (
+          <DownloadButton
+            id={DataTestId.surveyExport.downloadBtn}
+            href={`/api/survey/${surveyId}/export/download`}
+            requestParams={{ fileName, surveyName }}
+            onClick={() => dispatch(JobActions.hideJobMonitor())}
+          />
+        ),
+      })
+    )
+  }
