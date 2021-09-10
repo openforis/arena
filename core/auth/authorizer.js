@@ -120,6 +120,9 @@ export const canRemoveUser = (user, surveyInfo, userToRemove) =>
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
 
+export const canViewAccessRequests = (user) => User.isSystemAdmin(user)
+export const canEditAccessRequests = (user) => User.isSystemAdmin(user)
+
 // INVITE
 export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedUser = false }) => {
   let surveyGroups

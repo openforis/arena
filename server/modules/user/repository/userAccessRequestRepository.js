@@ -1,6 +1,28 @@
 import { db } from '@server/db/db'
 import * as camelize from 'camelize'
 
+export const countUserAccessRequests = (client = db) =>
+  client.one(
+    `
+      SELECT COUNT (*) FROM user_access_request
+    `,
+    [],
+    (row) => Number(row.count)
+  )
+
+export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, client = db) =>
+  client.map(
+    `
+    SELECT * 
+    FROM user_access_request
+    ORDER BY date_created DESC
+    OFFSET $/offset/
+    ${limit ? `LIMIT $/limit/` : ''}
+  `,
+    { offset, limit },
+    camelize
+  )
+
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
   client.oneOrNone(
     `

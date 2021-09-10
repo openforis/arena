@@ -7,6 +7,7 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import UsersList from './UsersList'
 import UserInvite from './UserInvite'
 import UserEdit from './UserEdit'
+import { UsersAccessRequest } from './UsersAccessRequest'
 
 const Users = () => (
   <ModuleSwitch
@@ -24,6 +25,10 @@ const Users = () => (
       {
         component: UserInvite,
         path: `${appModuleUri(userModules.userInvite)}`,
+      },
+      {
+        component: UsersAccessRequest,
+        path: appModuleUri(userModules.usersAccessRequest),
       },
     ]}
   />

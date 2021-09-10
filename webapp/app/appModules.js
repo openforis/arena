@@ -163,6 +163,10 @@ export const userModules = {
     key: 'userInvite',
     path: `${appModules.users.path}/userInvite`,
   },
+  usersAccessRequest: {
+    key: 'usersAccessRequest',
+    path: `${appModules.users.path}/usersAccessRequest`,
+  },
 }
 
 export const analysisModules = {

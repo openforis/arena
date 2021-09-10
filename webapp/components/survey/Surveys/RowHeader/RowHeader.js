@@ -13,7 +13,7 @@ const RowHeader = () => {
       <div>{i18n.t('common.label')}</div>
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
-      <div>{i18n.t('homeView.surveyList.status')}</div>
+      <div>{i18n.t('common.status')}</div>
     </>
   )
 }

@@ -109,6 +109,8 @@ export const isValidDateInFormat = (dateStr, format) => {
 
 export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
 
+export const formatDateTimeDefault = (date) => (date ? format(date, formats.datetimeDefault) : null)
+
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())

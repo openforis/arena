@@ -31,3 +31,5 @@ export const editableFields = [
   //   defaultValue: 'none',
   // },
 ]
+
+export const { getDateCreated } = ObjectUtils
