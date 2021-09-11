@@ -8,6 +8,7 @@ import * as JobSerialized from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
 import { useJob, JobActions } from '@webapp/store/app'
 
+import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
 
 import InnerJobs from './InnerJobs'
@@ -41,25 +42,21 @@ const JobMonitor = () => {
       </ModalBody>
 
       <ModalFooter>
-        <button
-          type="button"
-          className="btn modal-footer__item"
-          onClick={() => dispatch(JobActions.cancelJob())}
-          aria-disabled={!JobSerialized.isRunning(job)}
-        >
-          {i18n.t('common.cancel')}
-        </button>
-
+        {JobSerialized.isRunning(job) && (
+          <Button
+            className="modal-footer__item"
+            onClick={() => dispatch(JobActions.cancelJob())}
+            label="common.cancel"
+          />
+        )}
         {JobSerialized.isEnded(job) &&
           (customCloseButtonComponent || (
-            <button
-              type="button"
-              className="btn modal-footer__item"
+            <Button
+              className="modal-footer__item"
               onClick={() => dispatch(JobActions.hideJobMonitor())}
-              aria-disabled={!JobSerialized.isEnded(job)}
-            >
-              {i18n.t('common.close')}
-            </button>
+              disabled={!JobSerialized.isEnded(job)}
+              label="common.close"
+            />
           ))}
       </ModalFooter>
     </Modal>
