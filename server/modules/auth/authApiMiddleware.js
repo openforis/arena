@@ -94,5 +94,5 @@ export const requireUserViewPermission = requireUserPermission(Authorizer.canVie
 export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
 export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
 // User access requests
-export const requireCanViewAccessRequestsPermission = requirePermission(Authorizer.canViewAccessRequests)
-export const requireCanEditAccessRequestsPermission = requirePermission(Authorizer.canEditAccessRequests)
+export const requireCanViewAccessRequestsPermission = requirePermission(Authorizer.canViewUsersAccessRequests)
+export const requireCanEditAccessRequestsPermission = requirePermission(Authorizer.canEditUsersAccessRequests)

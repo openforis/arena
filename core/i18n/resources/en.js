@@ -179,6 +179,7 @@ Do you want to proceed?`,
     dashboard: 'Dashboard',
     surveyList: 'My Surveys',
     templateList: 'My Templates',
+    usersAccessRequests: 'Users access requests',
     collectImportReport: 'Collect Import Report',
 
     designer: 'Survey',

@@ -16,7 +16,12 @@ import { useUser } from '@webapp/store/user'
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 import ProfilePicture from '@webapp/components/profilePicture'
 
-import { useAuthCanCreateSurvey, useAuthCanCreateTemplate, useAuthCanEditTemplates } from '@webapp/store/user/hooks'
+import {
+  useAuthCanCreateSurvey,
+  useAuthCanCreateTemplate,
+  useAuthCanEditTemplates,
+  useAuthCanViewUsersAccessRequests,
+} from '@webapp/store/user/hooks'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 const Separator = () => <div className="user-popup-menu__sep" />
@@ -32,6 +37,7 @@ const UserPopupMenu = (props) => {
   const canCreateSurvey = useAuthCanCreateSurvey()
   const canCreateTemplate = useAuthCanCreateTemplate()
   const canEditTemplates = useAuthCanEditTemplates()
+  const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests()
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -117,6 +123,21 @@ const UserPopupMenu = (props) => {
               {i18n.t('homeView.surveyCreate.newTemplate')}
             </Link>
           )}
+        </>
+      )}
+
+      {canViewUsersAccessRequests && (
+        <>
+          <Separator />
+          <Link
+            data-testid={DataTestId.header.usersAccessRequstsBtn}
+            to={appModuleUri(userModules.usersAccessRequest)}
+            onClick={onClose}
+            className="btn-s btn-transparent"
+          >
+            <span className="icon icon-paragraph-justify icon-12px icon-left" />
+            {i18n.t('appModules.usersAccessRequests')}
+          </Link>
         </>
       )}
 
