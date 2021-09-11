@@ -1,5 +1,8 @@
-import { db } from '@server/db/db'
 import * as camelize from 'camelize'
+
+import { db } from '@server/db/db'
+
+import * as UserAccessRequest from '@core/user/userAccessRequest'
 
 export const countUserAccessRequests = (client = db) =>
   client.one(
@@ -13,9 +16,18 @@ export const countUserAccessRequests = (client = db) =>
 export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, client = db) =>
   client.map(
     `
-    SELECT * 
-    FROM user_access_request
-    ORDER BY date_created DESC
+    SELECT 
+      ar.*,
+      CASE 
+        WHEN u.uuid IS NULL THEN '${UserAccessRequest.status.CREATED}' 
+        ELSE '${UserAccessRequest.status.ACCEPTED}' 
+        END 
+        AS status 
+    FROM user_access_request ar
+    LEFT OUTER JOIN "user" u
+      ON u.email = ar.email
+    ORDER BY 
+      ar.date_created DESC
     OFFSET $/offset/
     ${limit ? `LIMIT $/limit/` : ''}
   `,

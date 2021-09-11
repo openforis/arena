@@ -475,6 +475,13 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     invitedDate: 'Invited date',
   },
 
+  usersAccessRequestView: {
+    status: {
+      ACCEPTED: 'Accepted',
+      CREATED: 'Pending',
+    },
+  },
+
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
