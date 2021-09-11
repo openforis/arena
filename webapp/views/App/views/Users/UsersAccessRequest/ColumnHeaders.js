@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import * as UsersAccessRequest from '@core/user/userAccessRequest'
 
@@ -17,14 +16,6 @@ const ColumnHeaders = () => {
       <div>{i18n.t('common.status')}</div>
     </>
   )
-}
-
-ColumnHeaders.propTypes = {
-  emailVisible: PropTypes.bool,
-}
-
-ColumnHeaders.defaultProps = {
-  emailVisible: false,
 }
 
 export default ColumnHeaders
