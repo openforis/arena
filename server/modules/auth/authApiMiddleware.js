@@ -19,6 +19,14 @@ const checkPermission = (req, next, permissionFn, ...args) => {
   }
 }
 
+const requirePermission = (permissionFn) => async (req, _res, next) => {
+  try {
+    checkPermission(req, next, permissionFn)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const requireSurveyPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId } = Request.getParams(req)
@@ -85,3 +93,6 @@ export const requireUserInvitePermission = requireSurveyPermission(Authorizer.ca
 export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)
 export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
 export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
+// User access requests
+export const requireCanViewAccessRequestsPermission = requirePermission(Authorizer.canViewUsersAccessRequests)
+export const requireCanEditAccessRequestsPermission = requirePermission(Authorizer.canEditUsersAccessRequests)

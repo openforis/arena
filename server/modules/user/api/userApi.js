@@ -143,6 +143,38 @@ export const init = (app) => {
     }
   })
 
+  // ==== USER ACCESS REQUEST
+
+  app.get(
+    '/users/users-access-request',
+    AuthMiddleware.requireCanViewAccessRequestsPermission,
+    async (req, res, next) => {
+      try {
+        const { offset, limit } = Request.getParams(req)
+
+        const list = await UserService.fetchUserAccessRequests({ offset, limit })
+
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/users/users-access-request/count',
+    AuthMiddleware.requireCanViewAccessRequestsPermission,
+    async (_req, res, next) => {
+      try {
+        const count = await UserService.countUserAccessRequests()
+
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== UPDATE
 
   const _updateUser = async (req, res) => {

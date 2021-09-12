@@ -16,6 +16,12 @@ export const keysProps = {
   template: 'template',
 }
 
+export const status = {
+  ACCEPTED: 'ACCEPTED',
+  CREATED: 'CREATED',
+  REJECTED: 'REJECTED',
+}
+
 export const editableFields = [
   { name: keys.email, required: true },
   { name: `props.${keysProps.firstName}`, required: true },
@@ -31,3 +37,5 @@ export const editableFields = [
   //   defaultValue: 'none',
   // },
 ]
+
+export const { getDateCreated } = ObjectUtils

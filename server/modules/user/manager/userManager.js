@@ -165,7 +165,11 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
   return null
 }
 
-export { fetchUserAccessRequestByEmail } from '../repository/userAccessRequestRepository'
+export {
+  countUserAccessRequests,
+  fetchUserAccessRequests,
+  fetchUserAccessRequestByEmail,
+} from '../repository/userAccessRequestRepository'
 
 // ==== UPDATE
 

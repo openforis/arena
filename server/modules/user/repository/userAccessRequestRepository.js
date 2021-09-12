@@ -1,5 +1,39 @@
-import { db } from '@server/db/db'
 import * as camelize from 'camelize'
+
+import { db } from '@server/db/db'
+
+import * as UserAccessRequest from '@core/user/userAccessRequest'
+
+export const countUserAccessRequests = (client = db) =>
+  client.one(
+    `
+      SELECT COUNT (*) FROM user_access_request
+    `,
+    [],
+    (row) => Number(row.count)
+  )
+
+export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, client = db) =>
+  client.map(
+    `
+    SELECT 
+      ar.*,
+      CASE 
+        WHEN u.uuid IS NULL THEN '${UserAccessRequest.status.CREATED}' 
+        ELSE '${UserAccessRequest.status.ACCEPTED}' 
+        END 
+        AS status 
+    FROM user_access_request ar
+    LEFT OUTER JOIN "user" u
+      ON u.email = ar.email
+    ORDER BY 
+      ar.date_created DESC
+    OFFSET $/offset/
+    ${limit ? `LIMIT $/limit/` : ''}
+  `,
+    { offset, limit },
+    camelize
+  )
 
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
   client.oneOrNone(

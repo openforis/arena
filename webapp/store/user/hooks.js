@@ -49,6 +49,7 @@ export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), us
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>
   Authorizer.canViewOtherUsersEmail({ user: useUser(), surveyInfo: useSurveyInfo() })
+export const useAuthCanViewUsersAccessRequests = () => Authorizer.canViewUsersAccessRequests(useUser())
 
 // ====== Profile picture
 export const useProfilePicture = (userUuid, forceUpdateKey) => {
