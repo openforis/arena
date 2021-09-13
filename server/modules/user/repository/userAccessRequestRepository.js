@@ -55,3 +55,13 @@ export const insertUserAccessRequest = ({ userAccessRequest }, client = db) =>
     [userAccessRequest.email, userAccessRequest.props],
     camelize
   )
+
+export const updateUserAccessRequestStatus = ({ email, status }, client = db) =>
+  client.oneOrNone(
+    `
+    UPDATE user_access_request
+    SET status = $/status/
+    WHERE email = $/email/
+  `,
+    { email, status }
+  )

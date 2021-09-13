@@ -5,6 +5,7 @@ import { db } from '@server/db/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as User from '@core/user/user'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
@@ -14,6 +15,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
+import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
 import * as UserInvitationManager from './userInvitationManager'
 
 export const {
@@ -83,6 +85,11 @@ export const insertUser = async (
       t
     )
     await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
+    // accept user access request (if any)
+    await UserAccessRequestRepository.updateUserAccessRequestStatus({
+      email,
+      status: UserAccessRequest.status.ACCEPTED,
+    })
 
     return newUser
   })
