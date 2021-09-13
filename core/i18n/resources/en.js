@@ -229,7 +229,6 @@ Do you want to proceed?`,
   },
 
   accessRequestView: {
-    accept: 'Accept',
     error: 'Error requesting access: {{error}}',
     fields: {
       email: '$t(common.email)',
@@ -485,6 +484,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       CREATED: 'Pending',
     },
     acceptRequest: {
+      accept: 'Accept',
       acceptRequestAndCreateSurvey: 'Accept request and create survey',
       confirmAcceptRequestAndCreateSurvey:
         'Accept the access request for **{{email}}** as **{{role}}** and create a new survey **{{surveyName}}**?',

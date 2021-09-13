@@ -28,9 +28,8 @@ export const AcceptRequestPanel = (props) => {
     surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
     role: AuthGroup.groupNames.surveyManager,
   })
-  const [validation, setValidation] = useState({})
 
-  const { surveyName, surveyLabel, role } = accessRequestAccept
+  const { surveyName, surveyLabel, role, validation } = accessRequestAccept
 
   const roleLabelFunction = (r) => i18n.t(`authGroups.${r}.label`)
 
@@ -39,8 +38,7 @@ export const AcceptRequestPanel = (props) => {
     const validationUpdated = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
       accessRequestAccept: accessRequestAcceptUpdated,
     })
-    setAccessRequestAccept(accessRequestAcceptUpdated)
-    setValidation(validationUpdated)
+    setAccessRequestAccept({ ...accessRequestAcceptUpdated, validation: validationUpdated })
   }
 
   const onSubmit = () => {

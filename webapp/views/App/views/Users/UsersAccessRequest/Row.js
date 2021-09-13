@@ -39,14 +39,14 @@ const Row = (props) => {
       <div>{iconByStatus({ i18n })[status]}</div>
       <div>
         {status === UserAccessRequest.status.CREATED && (
-          <Button label="accessRequestView.accept" onClick={() => setAcceptPanelVisible(true)} />
+          <Button label="usersAccessRequestView.acceptRequest.accept" onClick={() => setAcceptPanelVisible(true)} />
         )}
       </div>
 
       {acceptPanelVisible && (
         <PanelRight
           onClose={() => setAcceptPanelVisible(false)}
-          header={i18n.t('accessRequestView.accept')}
+          header={i18n.t('usersAccessRequestView.acceptRequest.acceptRequestAndCreateSurvey')}
           width="600px"
         >
           <AcceptRequestPanel userAccessRequest={userAccessRequest} />
