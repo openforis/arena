@@ -44,7 +44,11 @@ const Row = (props) => {
       </div>
 
       {acceptPanelVisible && (
-        <PanelRight onClose={() => setAcceptPanelVisible(false)}>
+        <PanelRight
+          onClose={() => setAcceptPanelVisible(false)}
+          header={i18n.t('accessRequestView.accept')}
+          width="600px"
+        >
           <AcceptRequestPanel userAccessRequest={userAccessRequest} />
         </PanelRight>
       )}

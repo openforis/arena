@@ -1,19 +1,25 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
+import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
+import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Button } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 export const AcceptRequestPanel = (props) => {
   const { userAccessRequest } = props
   const { email, props: requestProps } = userAccessRequest
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
 
   const [accessRequestAccept, setAccessRequestAccept] = useState({
@@ -22,18 +28,34 @@ export const AcceptRequestPanel = (props) => {
     surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
     role: AuthGroup.groupNames.surveyManager,
   })
+  const [validation, setValidation] = useState({})
 
   const { surveyName, surveyLabel, role } = accessRequestAccept
-  const validation = Validation.getValidation(accessRequestAccept)
 
-  const roles = [AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager, AuthGroup.groupNames.surveyAdmin]
+  const roleLabelFunction = (r) => i18n.t(`authGroups.${r}.label`)
 
-  const onUpdate = ({ field, value }) => {
+  const onUpdate = async ({ field, value }) => {
     const accessRequestAcceptUpdated = { ...accessRequestAccept, [field]: value }
+    const validationUpdated = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
+      accessRequestAccept: accessRequestAcceptUpdated,
+    })
     setAccessRequestAccept(accessRequestAcceptUpdated)
+    setValidation(validationUpdated)
   }
 
-  const onSubmit = () => {}
+  const onSubmit = () => {
+    if (Validation.isNotValid(validation)) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
+    } else {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'usersAccessRequestView.acceptRequest.confirmAcceptRequestAndCreateSurvey',
+          params: { email, role: roleLabelFunction(role), surveyName },
+          onOk: async () => {},
+        })
+      )
+    }
+  }
 
   return (
     <div className="user-access-request-accept form">
@@ -43,25 +65,26 @@ export const AcceptRequestPanel = (props) => {
       <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.surveyName')}>
         <Input
           value={surveyName}
-          validation={Validation.getFieldValidation('surveyName')(validation)}
-          onChange={(value) => onUpdate({ field: 'surveyName', value: StringUtils.normalizeName(value) })}
+          validation={Validation.getFieldValidation(UserAccessRequestAccept.keys.surveyName)(validation)}
+          onChange={(value) =>
+            onUpdate({ field: UserAccessRequestAccept.keys.surveyName, value: StringUtils.normalizeName(value) })
+          }
         />
       </FormItem>
       <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.surveyLabel')}>
         <Input
-          placeholder={i18n.t('usersAccessRequestView.acceptRequest.surveyLabel')}
           value={surveyLabel}
-          validation={Validation.getFieldValidation('surveyLabel')(validation)}
-          onChange={(value) => onUpdate({ field: 'surveyLabel', value })}
+          validation={Validation.getFieldValidation(UserAccessRequestAccept.keys.surveyLabel)(validation)}
+          onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.surveyLabel, value })}
         />
       </FormItem>
       <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.role')}>
         <Dropdown
-          items={roles}
+          items={UserAccessRequestAccept.requestAcceptRoles}
           itemKey={A.identity}
-          itemLabel={(item) => i18n.t(`authGroups.${item}.label_plural`)}
+          itemLabel={roleLabelFunction}
           selection={role}
-          onChange={(value) => onUpdate({ field: 'role', value })}
+          onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.role, value })}
           readOnlyInput
         />
       </FormItem>
