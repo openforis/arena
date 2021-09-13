@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import { normalizeName } from '@core/stringUtils'
 
@@ -37,5 +38,7 @@ export const editableFields = [
   //   defaultValue: 'none',
   // },
 ]
+
+export const getEmail = A.prop(keys.email)
 
 export const { getDateCreated } = ObjectUtils
