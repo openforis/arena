@@ -91,7 +91,11 @@ export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 // READ
 export const canViewUser = (user, surveyInfo, userToView) => {
   return (
+    // system admin
     User.isSystemAdmin(user) ||
+    // same user
+    User.isEqual(userToView)(user) ||
+    // 
     (Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
       Boolean(_getSurveyUserGroup(userToView, surveyInfo, false)))
   )

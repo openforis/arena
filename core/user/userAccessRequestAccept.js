@@ -1,6 +1,7 @@
 import * as AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
+  accessRequestUuid: 'accessRequestUuid',
   email: 'email',
   surveyName: 'surveyName',
   surveyLabel: 'surveyLabel',

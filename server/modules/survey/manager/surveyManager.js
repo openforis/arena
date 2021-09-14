@@ -62,7 +62,7 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
  * @param {!object} params.surveyInfo - The survey info to insert.
  * @param {boolean} [params.createRootEntityDef=true] - Whether to create the root entity definition.
  * @param {boolean} [params.system=false] - Whether the creation comes from a real user or it's a system activity (survey import).
- * @param {boolean} [params.updateUserPrefs=false] - Whether to update the user preferred survey after the creation.
+ * @param {boolean} [params.updateUserPrefs=true] - Whether to update the user preferred survey after the creation.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<Survey>} - The newly created survey object.

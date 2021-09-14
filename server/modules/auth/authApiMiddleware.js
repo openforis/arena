@@ -54,8 +54,8 @@ const requireRecordPermission = (permissionFn) => async (req, _res, next) => {
 const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
-    const survey = await SurveyManager.fetchSurveyById({ surveyId })
-    const surveyInfo = Survey.getSurveyInfo(survey)
+    const survey = surveyId ? await SurveyManager.fetchSurveyById({ surveyId }) : null
+    const surveyInfo = survey ? Survey.getSurveyInfo(survey) : null
     const user = await UserService.fetchUserByUuid(userUuid)
 
     checkPermission(req, next, permissionFn, surveyInfo, user)

@@ -62,6 +62,11 @@ export const getAuthGroupBySurveyUuid =
     return authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
   }
 
+export const getAuthGroupByName = (groupName) => (user) => {
+  const authGroups = getAuthGroups(user)
+  return authGroups.find((group) => AuthGroup.getName(group) === groupName)
+}
+
 export const assocAuthGroups = R.assoc(keys.authGroups)
 
 const _updateAuthGroups = (updateFn) => (user) =>

@@ -488,6 +488,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       acceptRequestAndCreateSurvey: 'Accept request and create survey',
       confirmAcceptRequestAndCreateSurvey:
         'Accept the access request for **{{email}}** as **{{role}}** and create a new survey **{{surveyName}}**?',
+      error: 'Error accepting the access request: {{error}}',
       surveyLabel: 'Survey label',
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',
@@ -1041,6 +1042,8 @@ $t(common.cantUndoWarning)`,
     },
 
     userAccessRequestAccept: {
+      accessRequestAlreadyProcessed: 'User access request already processed',
+      accessRequestNotFound: 'User access request not found',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       emailInvalid: '$t(validationErrors.user.emailInvalid)',
       roleRequired: 'Role is required',
@@ -1195,7 +1198,7 @@ $t(common.cantUndoWarning)`,
       The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
-    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyName}} - {{surveyLabel}}</strong> as {{groupLabel}}</p>
       <p>With the role of {{groupLabel}} you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,

@@ -5,10 +5,14 @@ import { db } from '@server/db/db'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userInvite'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
+import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
+import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -97,19 +101,15 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
   }
 }
 
-export const inviteUser = async ({
-  user,
-  surveyId,
-  surveyCycleKey,
-  userToInvite: userToInviteParam,
-  serverUrl,
-  repeatInvitation = false,
-}) => {
+export const inviteUser = async (
+  { user, surveyId, surveyCycleKey, userToInvite: userToInviteParam, serverUrl, repeatInvitation = false },
+  client = db
+) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
-  const group = await AuthManager.fetchGroupByUuid(groupUuid)
+  const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
   const groupName = AuthGroup.getName(group)
 
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   _checkCanInviteToGroup({ user, group, surveyInfo })
@@ -119,12 +119,13 @@ export const inviteUser = async ({
   const lang = User.getLang(user)
   const emailParams = {
     serverUrl,
+    surveyName: Survey.getName(surveyInfo),
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${groupName}.label)`,
     groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
   }
 
-  await db.tx(async (t) => {
+  return client.tx(async (t) => {
     if (userToInvite) {
       // User to invite already exists
 
@@ -145,10 +146,15 @@ export const inviteUser = async ({
       } else {
         throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
       }
+      return { userInvited: userToInvite }
     } else {
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
-      await _inviteNewUserAndSendEmail({ user, email, group, survey, surveyCycleKey, emailParams, lang }, t)
+      const userInvited = await _inviteNewUserAndSendEmail(
+        { user, email, group, survey, surveyCycleKey, emailParams, lang },
+        t
+      )
+      return { userInvited }
     }
   })
 }
@@ -221,6 +227,74 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     return { error: error.message }
   }
 }
+
+export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) =>
+  db.tx(async (t) => {
+    const { accessRequestUuid, surveyName, surveyLabel, role } = accessRequestAccept
+
+    // 1) validation
+    // check access request exists
+    const accessRequestDb = await UserManager.fetchUserAccessRequestByUuid({ uuid: accessRequestUuid }, t)
+    if (!accessRequestDb) {
+      return {
+        validation: Validation.newInstance(false, {}, [
+          Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
+        ]),
+      }
+    }
+
+    const { email, status: accessRequestStatus } = accessRequestDb
+
+    // check access request not processed already
+    if (accessRequestStatus !== UserAccessRequest.status.CREATED) {
+      return {
+        validation: Validation.newInstance(false, {}, [
+          ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestAlreadyProcessed),
+        ]),
+      }
+    }
+
+    // validate survey name
+    const surveyInfosWithSameName = await SurveyManager.fetchSurveysByName(surveyName, t)
+    const validation = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
+      accessRequestAccept,
+      surveyInfosWithSameName,
+    })
+    if (Validation.isNotValid(validation)) {
+      return { validation }
+    }
+
+    // 2) insert survey
+    const surveyInfoTarget = Survey.newSurvey({
+      ownerUuid: User.getUuid(user),
+      name: surveyName,
+      label: surveyLabel,
+      languages: ['en'],
+    })
+    const survey = await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false }, t)
+
+    // 3) find group to associate to the user
+    let group = null
+    if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
+      group = User.getAuthGroupByName(role)(user)
+    } else {
+      const surveyGroups = await AuthManager.fetchSurveyGroups(Survey.getId(survey), t)
+      group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
+    }
+
+    // 4) invite user to that group and send email
+    const { userInvited } = await inviteUser(
+      {
+        user,
+        surveyId: Survey.getId(survey),
+        surveyCycleKey: Survey.cycleOneKey,
+        userToInvite: UserInvite.newUserInvite(email, AuthGroup.getUuid(group)),
+        serverUrl,
+      },
+      t
+    )
+    return { survey, userInvited }
+  })
 
 // ====== READ
 

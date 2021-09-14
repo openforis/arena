@@ -136,6 +136,8 @@ export const ValidatorErrorKeys = {
   },
 
   userAccessRequestAccept: {
+    accessRequestAlreadyProcessed: 'validationErrors.userAccessRequestAccept.accessRequestAlreadyProcessed',
+    accessRequestNotFound: 'validationErrors.userAccessRequestAccept.accessRequestNotFound',
     emailRequired: 'validationErrors.userAccessRequestAccept.emailRequired',
     emailInvalid: 'validationErrors.userAccessRequestAccept.emailInvalid',
     roleRequired: 'validationErrors.userAccessRequestAccept.roleRequired',

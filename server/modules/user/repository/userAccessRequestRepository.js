@@ -46,6 +46,17 @@ export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
     camelize
   )
 
+export const fetchUserAccessRequestByUuid = ({ uuid }, client = db) =>
+  client.oneOrNone(
+    `
+  SELECT * 
+  FROM user_access_request
+  WHERE uuid = $1
+`,
+    [uuid],
+    camelize
+  )
+
 export const insertUserAccessRequest = ({ userAccessRequest }, client = db) =>
   client.one(
     `

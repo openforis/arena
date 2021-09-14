@@ -1,59 +1,25 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
-import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Button } from '@webapp/components/buttons'
 
-import { useI18n } from '@webapp/store/system'
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { useAcceptRequestPanel } from './useAcceptRequestPanel'
 
 export const AcceptRequestPanel = (props) => {
   const { userAccessRequest } = props
-  const { email, props: requestProps } = userAccessRequest
+  const { email } = userAccessRequest
 
-  const dispatch = useDispatch()
-  const i18n = useI18n()
-
-  const [accessRequestAccept, setAccessRequestAccept] = useState({
-    email,
-    surveyName: requestProps.surveyName,
-    surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
-    role: AuthGroup.groupNames.surveyManager,
+  const { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation } = useAcceptRequestPanel({
+    userAccessRequest,
   })
 
-  const { surveyName, surveyLabel, role, validation } = accessRequestAccept
-
-  const roleLabelFunction = (r) => i18n.t(`authGroups.${r}.label`)
-
-  const onUpdate = async ({ field, value }) => {
-    const accessRequestAcceptUpdated = { ...accessRequestAccept, [field]: value }
-    const validationUpdated = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
-      accessRequestAccept: accessRequestAcceptUpdated,
-    })
-    setAccessRequestAccept({ ...accessRequestAcceptUpdated, validation: validationUpdated })
-  }
-
-  const onSubmit = () => {
-    if (Validation.isNotValid(validation)) {
-      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
-    } else {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'usersAccessRequestView.acceptRequest.confirmAcceptRequestAndCreateSurvey',
-          params: { email, role: roleLabelFunction(role), surveyName },
-          onOk: async () => {},
-        })
-      )
-    }
-  }
+  const { surveyName, surveyLabel, role } = accessRequestAccept
 
   return (
     <div className="user-access-request-accept form">
