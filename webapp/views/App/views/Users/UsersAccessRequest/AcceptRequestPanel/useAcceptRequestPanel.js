@@ -8,12 +8,12 @@ import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestA
 import * as API from '@webapp/service/api'
 
 import { useI18n } from '@webapp/store/system'
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as ValidationUtils from '@webapp/utils/validationUtils'
 
 export const useAcceptRequestPanel = (props) => {
-  const { userAccessRequest } = props
+  const { userAccessRequest, onRequestAccepted } = props
   const { uuid: accessRequestUuid, email, props: requestProps } = userAccessRequest
 
   const dispatch = useDispatch()
@@ -42,6 +42,40 @@ export const useAcceptRequestPanel = (props) => {
     setValidation(validationUpdated)
   }
 
+  const performAccept = async () => {
+    dispatch(LoaderActions.showLoader())
+
+    const {
+      errorKey,
+      errorParams,
+      validation: validationServer,
+    } = await API.acceptAccessRequest({ accessRequestAccept })
+
+    dispatch(LoaderActions.hideLoader())
+
+    setValidation(validationServer)
+
+    if (errorKey || Validation.isNotValid(validationServer)) {
+      const error = errorKey
+        ? i18n.t(errorKey, errorParams)
+        : ValidationUtils.getValidationFieldMessages(i18n)(validationServer).join('; ')
+      dispatch(
+        NotificationActions.notifyError({
+          key: 'usersAccessRequestView.acceptRequest.error',
+          params: { error },
+        })
+      )
+    } else {
+      dispatch(
+        NotificationActions.notifyInfo({
+          key: 'usersAccessRequestView.acceptRequest.requestAcceptedSuccessfully',
+          params: { email },
+        })
+      )
+      onRequestAccepted()
+    }
+  }
+
   const onSubmit = () => {
     if (Validation.isNotValid(validation)) {
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
@@ -50,36 +84,7 @@ export const useAcceptRequestPanel = (props) => {
         DialogConfirmActions.showDialogConfirm({
           key: 'usersAccessRequestView.acceptRequest.confirmAcceptRequestAndCreateSurvey',
           params: { email, role: roleLabelFunction(role), surveyName },
-          onOk: async () => {
-            const {
-              errorKey,
-              errorParams,
-              validation: validationServer,
-              userInvited,
-              survey,
-            } = await API.acceptAccessRequest({ accessRequestAccept })
-
-            setValidation(validationServer)
-
-            if (errorKey) {
-              dispatch(
-                NotificationActions.notifyError({
-                  key: 'usersAccessRequestView.acceptRequest.error',
-                  params: { error: i18n.t(errorKey, errorParams) },
-                })
-              )
-            } else if (Validation.isNotValid(validationServer)) {
-              const error = ValidationUtils.getValidationFieldMessages(i18n)(validationServer).join('; ')
-              dispatch(
-                NotificationActions.notifyError({
-                  key: 'usersAccessRequestView.acceptRequest.error',
-                  params: { error },
-                })
-              )
-            } else {
-              dispatch(NotificationActions.notifyInfo({ key: 'common.ok' }))
-            }
-          },
+          onOk: performAccept,
         })
       )
     }

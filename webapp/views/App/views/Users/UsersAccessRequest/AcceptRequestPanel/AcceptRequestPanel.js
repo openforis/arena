@@ -12,11 +12,12 @@ import { Button } from '@webapp/components/buttons'
 import { useAcceptRequestPanel } from './useAcceptRequestPanel'
 
 export const AcceptRequestPanel = (props) => {
-  const { userAccessRequest } = props
+  const { userAccessRequest, onRequestAccepted } = props
   const { email } = userAccessRequest
 
   const { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation } = useAcceptRequestPanel({
     userAccessRequest,
+    onRequestAccepted,
   })
 
   const { surveyName, surveyLabel, role } = accessRequestAccept

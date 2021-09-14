@@ -489,6 +489,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmAcceptRequestAndCreateSurvey:
         'Accept the access request for **{{email}}** as **{{role}}** and create a new survey **{{surveyName}}**?',
       error: 'Error accepting the access request: {{error}}',
+      requestAcceptedSuccessfully: 'Access request accepted successfully. $t(common.emailSentConfirmation)',
       surveyLabel: 'Survey label',
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',

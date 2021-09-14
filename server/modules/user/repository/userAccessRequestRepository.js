@@ -67,12 +67,15 @@ export const insertUserAccessRequest = ({ userAccessRequest }, client = db) =>
     camelize
   )
 
-export const updateUserAccessRequestStatus = ({ email, status }, client = db) =>
+export const updateUserAccessRequestStatus = ({ userUuid, email, status }, client = db) =>
   client.oneOrNone(
     `
     UPDATE user_access_request
-    SET status = $/status/
+    SET 
+      status = $/status/, 
+      date_modified = NOW(), 
+      modified_by = $/userUuid/
     WHERE email = $/email/
   `,
-    { email, status }
+    { email, status, userUuid }
   )

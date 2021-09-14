@@ -22,7 +22,7 @@ const iconByStatus = ({ i18n }) => ({
 })
 
 const Row = (props) => {
-  const { row: userAccessRequest } = props
+  const { row: userAccessRequest, onRowChange } = props
 
   const i18n = useI18n()
 
@@ -49,7 +49,13 @@ const Row = (props) => {
           header={i18n.t('usersAccessRequestView.acceptRequest.acceptRequestAndCreateSurvey')}
           width="600px"
         >
-          <AcceptRequestPanel userAccessRequest={userAccessRequest} />
+          <AcceptRequestPanel
+            userAccessRequest={userAccessRequest}
+            onRequestAccepted={() => {
+              setAcceptPanelVisible(false)
+              onRowChange(userAccessRequest)
+            }}
+          />
         </PanelRight>
       )}
     </>
