@@ -7,6 +7,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -33,7 +34,7 @@ const Row = (props) => {
   return (
     <>
       {UserAccessRequest.editableFields.map(({ name }) => (
-        <div key={name}>{R.pathOr('', name.split('.'), userAccessRequest)}</div>
+        <LabelWithTooltip key={name} label={R.pathOr('', name.split('.'), userAccessRequest)} />
       ))}
       <div>{DateUtils.formatDateTimeDefault(UserAccessRequest.getDateCreated(userAccessRequest))}</div>
       <div>{iconByStatus({ i18n })[status]}</div>
