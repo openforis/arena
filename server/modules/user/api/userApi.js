@@ -70,6 +70,33 @@ export const init = (app) => {
     }
   })
 
+  app.post(
+    '/user/accept-request-access',
+    AuthMiddleware.requireCanEditAccessRequestsPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const accessRequestAccept = Request.getBody(req)
+        const serverUrl = Request.getServerUrl(req)
+
+        try {
+          const { survey, userInvited, validation } = await UserService.acceptUserAccessRequest({
+            user,
+            accessRequestAccept,
+            serverUrl,
+          })
+          res.json({ survey, userInvited, validation })
+        } catch (e) {
+          const errorKey = e.key || 'appErrors.generic'
+          const errorParams = e.params || { text: e.message }
+          res.json({ errorKey, errorParams })
+        }
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== READ
 
   const _getUser = async (req, res) => {
@@ -120,7 +147,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/user/:userUuid/profilePicture', async (req, res, next) => {
+  app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
       const { userUuid } = Request.getParams(req)
 

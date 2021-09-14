@@ -46,6 +46,17 @@ export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
     camelize
   )
 
+export const fetchUserAccessRequestByUuid = ({ uuid }, client = db) =>
+  client.oneOrNone(
+    `
+  SELECT * 
+  FROM user_access_request
+  WHERE uuid = $1
+`,
+    [uuid],
+    camelize
+  )
+
 export const insertUserAccessRequest = ({ userAccessRequest }, client = db) =>
   client.one(
     `
@@ -54,4 +65,17 @@ export const insertUserAccessRequest = ({ userAccessRequest }, client = db) =>
     RETURNING *`,
     [userAccessRequest.email, userAccessRequest.props],
     camelize
+  )
+
+export const updateUserAccessRequestStatus = ({ userUuid, email, status }, client = db) =>
+  client.oneOrNone(
+    `
+    UPDATE user_access_request
+    SET 
+      status = $/status/, 
+      date_modified = NOW(), 
+      modified_by = $/userUuid/
+    WHERE email = $/email/
+  `,
+    { email, status, userUuid }
   )

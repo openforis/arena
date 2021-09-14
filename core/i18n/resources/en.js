@@ -55,6 +55,7 @@ Do you want to ignore them?`,
     expression: 'Expression',
     false: 'False',
     formContainsErrors: 'Form contains errors',
+    formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
     group: 'Group',
@@ -481,6 +482,18 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     status: {
       ACCEPTED: 'Accepted',
       CREATED: 'Pending',
+    },
+    acceptRequest: {
+      accept: 'Accept',
+      acceptRequestAndCreateSurvey: 'Accept request and create survey',
+      confirmAcceptRequestAndCreateSurvey:
+        'Accept the access request for **{{email}}** as **{{role}}** and create a new survey **{{surveyName}}**?',
+      error: 'Error accepting the access request: {{error}}',
+      requestAcceptedSuccessfully: 'Access request accepted successfully. $t(common.emailSentConfirmation)',
+      surveyLabel: 'Survey label',
+      surveyLabelInitial: '(Change survey name and label as needed)',
+      surveyName: 'Survey Name',
+      role: 'Role',
     },
   },
 
@@ -1018,7 +1031,7 @@ $t(common.cantUndoWarning)`,
     },
 
     userAccessRequest: {
-      emailRequired: 'Email is required',
+      emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'First name is required',
       lastNameRequired: 'Last name is required',
       purposeRequired: 'Purpose is required',
@@ -1027,6 +1040,15 @@ $t(common.cantUndoWarning)`,
       userAlreadyExisting: 'User with email {{email}} already existing',
       requestAlreadySent: `Access request for user with email {{email}} already sent`,
       invalidReCaptcha: 'Invalid ReCaptcha',
+    },
+
+    userAccessRequestAccept: {
+      accessRequestAlreadyProcessed: 'User access request already processed',
+      accessRequestNotFound: 'User access request not found',
+      emailRequired: '$t(validationErrors.user.emailRequired)',
+      emailInvalid: '$t(validationErrors.user.emailInvalid)',
+      roleRequired: 'Role is required',
+      surveyNameRequired: 'Survey name is required',
     },
   },
 
@@ -1177,7 +1199,7 @@ $t(common.cantUndoWarning)`,
       The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
-    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyName}} - {{surveyLabel}}</strong> as {{groupLabel}}</p>
       <p>With the role of {{groupLabel}} you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,

@@ -8,3 +8,11 @@ export const createAccessRequest = async ({ accessRequest: accessRequestParam })
 
   return { accessRequest, error, errorParams, validation }
 }
+
+export const acceptAccessRequest = async ({ accessRequestAccept }) => {
+  const {
+    data: { errorKey, errorParams, validation, userInvited, survey },
+  } = await axios.post(`/api/user/accept-request-access`, accessRequestAccept)
+
+  return { errorKey, errorParams, validation, userInvited, survey }
+}

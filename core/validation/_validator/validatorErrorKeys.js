@@ -128,9 +128,19 @@ export const ValidatorErrorKeys = {
 
   userAccessRequest: {
     emailRequired: 'validationErrors.userAccessRequest.emailRequired',
+    emailInvalid: 'validationErrors.userAccessRequest.emailInvalid',
     firstNameRequired: 'validationErrors.userAccessRequest.firstNameRequired',
     lastNameRequired: 'validationErrors.userAccessRequest.lastNameRequired',
     purposeRequired: 'validationErrors.userAccessRequest.purposeRequired',
     surveyNameRequired: 'validationErrors.userAccessRequest.surveyNameRequired',
+  },
+
+  userAccessRequestAccept: {
+    accessRequestAlreadyProcessed: 'validationErrors.userAccessRequestAccept.accessRequestAlreadyProcessed',
+    accessRequestNotFound: 'validationErrors.userAccessRequestAccept.accessRequestNotFound',
+    emailRequired: 'validationErrors.userAccessRequestAccept.emailRequired',
+    emailInvalid: 'validationErrors.userAccessRequestAccept.emailInvalid',
+    roleRequired: 'validationErrors.userAccessRequestAccept.roleRequired',
+    surveyNameRequired: 'validationErrors.userAccessRequestAccept.surveyNameRequired',
   },
 }

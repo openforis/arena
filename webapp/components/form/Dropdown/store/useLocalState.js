@@ -32,7 +32,7 @@ export const useLocalState = ({
 
   // on update selection: call closeDialog to reset input value
   useOnUpdate(() => {
-    Actions.closeDialog({ selection, state })
+    Actions.closeDialog({ selection })
   }, [selection])
 
   useOnUpdate(() => {

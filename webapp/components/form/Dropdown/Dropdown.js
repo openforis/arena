@@ -61,7 +61,7 @@ const Dropdown = (props) => {
       onBlur={(event) => {
         const { className: classNameTarget = '' } = event.relatedTarget || {}
         if (classNameTarget !== ItemDialog.className) {
-          Actions.closeDialog({ selection, state })
+          Actions.closeDialog({ selection })
         }
       }}
     >
@@ -111,7 +111,7 @@ const Dropdown = (props) => {
               await Actions.updateSelection({ item, selection, state })
             }}
             onClose={() => {
-              Actions.closeDialog({ selection, state })
+              Actions.closeDialog({ selection })
             }}
             sourceElement={sourceElement || dropdownRef.current}
           />,
