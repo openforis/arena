@@ -5,6 +5,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 
 import { languageCodesISO639part2 } from '@core/app/languages'
+import * as StringUtils from '@core/stringUtils'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -18,6 +19,9 @@ import TaxonCSVParser from './taxonCSVParser'
 
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = [...requiredColumns, 'family', 'genus']
+
+const filterExtraPropsColumns = (columns) =>
+  columns.filter((column) => !fixedColumns.includes(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
   constructor(params) {
@@ -97,12 +101,17 @@ export default class TaxonomyImportJob extends Job {
   async _onHeaders(headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
+      // vernacular lang codes
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
-      this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
-        if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
-          extraPropsAcc[header] = { key: header }
+      // extra prop defs
+      const extraPropsColumns = filterExtraPropsColumns(headers)
+
+      this.extraPropsDefs = extraPropsColumns.reduce((extraPropsAcc, header) => {
+        const extraPropNameNormalized = StringUtils.normalizeName(header)
+        return {
+          ...extraPropsAcc,
+          [extraPropNameNormalized]: { key: extraPropNameNormalized, originalHeader: header },
         }
-        return extraPropsAcc
       }, {})
       this.taxonomyImportManager = new TaxonomyImportManager({
         user: this.user,
@@ -113,7 +122,7 @@ export default class TaxonomyImportJob extends Job {
         tx: this.tx,
       })
       await this.taxonomyImportManager.init()
-      
+
       this.taxonCSVParser = new TaxonCSVParser({
         taxonomyUuid: this.taxonomyUuid,
         vernacularLanguageCodes: this.vernacularLanguageCodes,
@@ -138,25 +147,41 @@ export default class TaxonomyImportJob extends Job {
     this.incrementProcessedItems()
   }
 
-  _validateHeaders(columns) {
-    this.logDebug('columns', columns)
-    const missingColumns = R.difference(requiredColumns, columns)
-    if (R.isEmpty(missingColumns)) {
-      return true
-    }
-
+  _addHeaderError({ key, params }) {
     this.addError({
       all: {
         valid: false,
-        errors: [
-          {
-            key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
-            params: { columns: R.join(', ', missingColumns) },
-          },
-        ],
+        errors: [{ key, params }],
       },
     })
-    return false
+  }
+
+  _validateHeaders(columns) {
+    this.logDebug('columns', columns)
+    const missingColumns = R.difference(requiredColumns, columns)
+    if (!R.isEmpty(missingColumns)) {
+      this._addHeaderError({
+        key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
+        params: { columns: R.join(', ', missingColumns) },
+      })
+      return false
+    }
+
+    // validate extra props column names (normalized) uniqueness
+    const extraPropsColumns = filterExtraPropsColumns(columns)
+    const extraPropsColumnsNormalized = extraPropsColumns.map(StringUtils.normalizeName)
+    if (extraPropsColumns.length !== new Set(extraPropsColumnsNormalized).size) {
+      const duplicateColumns = Array.from(
+        new Set(extraPropsColumnsNormalized.filter((item, index, arr) => arr.indexOf(item) !== index))
+      ).join(', ')
+
+      this._addHeaderError({
+        key: Validation.messageKeys.taxonomyImportJob.duplicateExtraPropsColumns,
+        params: { duplicateColumns },
+      })
+      return false
+    }
+    return true
   }
 }
 

@@ -95,12 +95,18 @@ export default class TaxonomyImportManager {
       this.tx
     )
 
+    // cleanup extra props defs (remove originalHeader prop)
+    const extraPropsDefsCleaned = Object.entries(this.extraPropsDefs).reduce((extraPropsDefsAcc, [key, extraProp]) => {
+      const { originalHeader, ...extraPropProps } = extraProp
+      return { ...extraPropsDefsAcc, [key]: { ...extraPropProps } }
+    }, {})
+
     await TaxonomyManager.updateTaxonomyProp(
       user,
       surveyId,
       Taxonomy.getUuid(this.taxonomy),
       Taxonomy.keysProps.extraPropsDefs,
-      this.extraPropsDefs,
+      extraPropsDefsCleaned,
       true,
       this.tx
     )

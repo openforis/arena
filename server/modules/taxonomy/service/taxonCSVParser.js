@@ -108,12 +108,13 @@ export default class TaxonCSVParser {
   }
 
   _parseExtraProps(row) {
-    return Object.keys(this.extraPropsDefs).reduce((accExtraProps, extraPropName) => {
-      const value = row[extraPropName]
+    return Object.values(this.extraPropsDefs).reduce((accExtraProps, extraProp) => {
+      const { key, originalHeader } = extraProp
+      const value = row[originalHeader]
       if (StringUtils.isBlank(value)) {
         return accExtraProps
       }
-      return { ...accExtraProps, [extraPropName]: value }
+      return { ...accExtraProps, [key]: value }
     }, {})
   }
 }

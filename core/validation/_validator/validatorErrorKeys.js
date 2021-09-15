@@ -107,6 +107,7 @@ export const ValidatorErrorKeys = {
   },
 
   taxonomyImportJob: {
+    duplicateExtraPropsColumns: 'validationErrors.taxonomyImportJob.duplicateExtraPropsColumns',
     missingRequiredColumns: 'validationErrors.taxonomyImportJob.missingRequiredColumns',
   },
 

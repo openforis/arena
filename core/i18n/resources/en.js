@@ -1011,6 +1011,7 @@ $t(common.cantUndoWarning)`,
     },
 
     taxonomyImportJob: {
+      duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
       missingRequiredColumns: 'Missing required column(s): {{columns}}',
     },
 
