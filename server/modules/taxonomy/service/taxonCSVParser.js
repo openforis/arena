@@ -31,7 +31,7 @@ const _parseVernacularNames = (row) =>
 
 const _parseExtraProps = (row) =>
   Object.entries(row).reduce((accExtraProps, [columnName, value]) => {
-    if (!languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
+    if (languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
       return accExtraProps
     }
     return { ...accExtraProps, [columnName]: value }

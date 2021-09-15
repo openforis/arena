@@ -17,6 +17,7 @@ import TaxonomyImportManager from '../manager/taxonomyImportManager'
 import TaxonCSVParser from './taxonCSVParser'
 
 const requiredColumns = ['code', 'scientific_name']
+const fixedColumns = [...requiredColumns, 'family', 'genus']
 
 export default class TaxonomyImportJob extends Job {
   constructor(params) {
@@ -98,7 +99,7 @@ export default class TaxonomyImportJob extends Job {
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
       this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
-        if (!requiredColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
+        if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
           extraPropsAcc[header] = { key: header }
         }
         return extraPropsAcc

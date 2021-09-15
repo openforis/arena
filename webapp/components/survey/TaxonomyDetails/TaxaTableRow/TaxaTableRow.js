@@ -6,7 +6,7 @@ import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 const TaxaTableRow = (props) => {
-  const { row: taxon, idx, offset, vernacularLanguageCodes } = props
+  const { row: taxon, idx, offset, vernacularLanguageCodes, extraPropsDefs } = props
 
   return (
     <>
@@ -23,6 +23,9 @@ const TaxaTableRow = (props) => {
           </div>
         )
       })}
+      {Object.keys(extraPropsDefs).map((extraProp) => (
+        <div key={`extra_prop_${extraProp}`}>{Taxon.getExtraProp(extraProp)(taxon)}</div>
+      ))}
     </>
   )
 }

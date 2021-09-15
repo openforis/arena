@@ -15,6 +15,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
+import { ButtonBack } from '@webapp/components/buttons'
 import Table from '@webapp/components/Table/Table'
 import Header from './Header'
 import TaxaTableRowHeader from './TaxaTableRowHeader'
@@ -39,10 +40,12 @@ const TaxonomyDetails = (props) => {
   if (A.isEmpty(taxonomy)) return null
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
+  const extraPropsDefs = Taxonomy.getExtraPropsDefs(taxonomy)
 
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${
-    R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`
-  }`
+    R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 80px)`
+  }
+  ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 80px)`}`
 
   return (
     <div className="taxonomy">
@@ -58,16 +61,14 @@ const TaxonomyDetails = (props) => {
             rowHeaderComponent={TaxaTableRowHeader}
             rowComponent={TaxaTableRow}
             noItemsLabelKey="taxonomy.edit.taxaNotImported"
-            rowProps={{ surveyId, vernacularLanguageCodes, taxonomyUuid, readOnly: !canEdit }}
+            rowProps={{ surveyId, taxonomyUuid, vernacularLanguageCodes, extraPropsDefs, readOnly: !canEdit }}
           />
         )}
       </div>
 
       {showClose && (
-        <div className="button-bar" data-testid={DataTestId.taxonomyDetails.doneEditBtn}>
-          <button type="button" className="btn" onClick={history.goBack}>
-            {i18n.t('common.done')}
-          </button>
+        <div className="button-bar">
+          <ButtonBack testId={DataTestId.taxonomyDetails.doneEditBtn} />
         </div>
       )}
     </div>
