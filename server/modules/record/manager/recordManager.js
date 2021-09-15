@@ -116,9 +116,9 @@ export {
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 
-export const updateRecordsStep = async ({ user, surveyId, stepFrom, stepTo }, client = db) =>
+export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo }, client = db) =>
   client.tx(async (t) => {
-    const { list: recordsToMove } = await fetchRecordsSummaryBySurveyId({ surveyId, step: stepFrom }, t)
+    const { list: recordsToMove } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, step: stepFrom }, t)
     await Promise.all(
       recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
     )

@@ -19,9 +19,9 @@ export const importRecordsFromCollect = async ({
   return job
 }
 
-export const updateRecordsStep = async ({ surveyId, stepFrom, stepTo }) => {
+export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) => {
   const {
     data: { count },
-  } = await axios.post(`/api/survey/${surveyId}/records/step`, { stepFrom, stepTo })
+  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
   return { count }
 }

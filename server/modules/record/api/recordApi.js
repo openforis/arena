@@ -210,9 +210,9 @@ export const init = (app) => {
   app.post('/survey/:surveyId/records/step', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, stepFrom, stepTo } = Request.getParams(req)
+      const { surveyId, cycle, stepFrom, stepTo } = Request.getParams(req)
 
-      const { count } = await RecordService.updateRecordsStep({ user, surveyId, stepFrom, stepTo })
+      const { count } = await RecordService.updateRecordsStep({ user, surveyId, cycle, stepFrom, stepTo })
 
       res.json({ count })
     } catch (error) {
