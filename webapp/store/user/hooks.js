@@ -35,10 +35,14 @@ export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUs
 export const useAuthCanPromoteRecord = (record) =>
   useAuthCanEditRecord(record) && RecordStep.getNextStep(Record.getStep(record))
 export const useAuthCanDemoteRecord = (record) => {
+  // always use the same number of hooks in every call
+  const surveyInfo = useSurveyInfo()
+  const user = useUser()
+
+  // when record doesn't have a previous step, it cannot be demoted
   if (!RecordStep.getPreviousStep(Record.getStep(record))) return false
 
-  const canEdit = Authorizer.canEditRecord(useUser(), record)
-  const surveyInfo = useSurveyInfo()
+  const canEdit = Authorizer.canEditRecord(user, record)
   return canEdit && Survey.isPublished(surveyInfo)
 }
 export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
