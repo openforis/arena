@@ -43,7 +43,7 @@ const UserInviteComponent = () => {
           placeholder={i18n.t('common.email')}
           value={UserInvite.getEmail(userInvite)}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
-          onChange={(value) => onUpdate({ name: UserInvite.keys.email, value })}
+          onChange={(value) => onUpdate({ name: UserInvite.keys.email, value: value.trim() })}
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>
@@ -71,7 +71,6 @@ const UserInviteComponent = () => {
         <Button
           testId={DataTestId.userInvite.submitBtn}
           className="btn-invite"
-          disabled={Validation.isNotValid(validation)}
           onClick={onInvite}
           iconClassName="icon-envelop icon-left icon-12px"
           label="userInviteView.sendInvitation"

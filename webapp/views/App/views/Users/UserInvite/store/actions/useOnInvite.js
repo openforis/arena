@@ -81,6 +81,7 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
       }
     } else {
       setUserInvite(userInviteValidated)
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
     }
   }, [userInvite])
 }
