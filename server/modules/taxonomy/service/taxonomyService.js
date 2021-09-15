@@ -11,13 +11,14 @@ export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) 
   const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
     taxonomyUuid,
-    draft,
+    draft
   )
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
+  const extraPropNames = Taxonomy.getExtraPropsNames(taxonomy)
 
-  const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes]
+  const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropNames]
 
-  await db.stream(taxaStream, stream => {
+  await db.stream(taxaStream, (stream) => {
     stream.pipe(CSVWriter.transformToStream(output, headers))
   })
 }

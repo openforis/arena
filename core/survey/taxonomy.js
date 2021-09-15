@@ -29,6 +29,7 @@ export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const { getDescriptions, getDescription } = ObjectUtils
 export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
 export const getExtraPropsDefs = ObjectUtils.getProp(keysProps.extraPropsDefs, {})
+export const getExtraPropsNames = (taxonomy) => Object.keys(getExtraPropsDefs(taxonomy))
 export const isPublished = R.propOr(false, keys.published)
 
 // UTILS

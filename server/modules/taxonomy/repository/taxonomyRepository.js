@@ -234,7 +234,13 @@ export const fetchTaxaWithVernacularNames = async (
     (record) => DB.transformCallback(record, draft, true, backup)
   )
 
-export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
+export const fetchTaxaWithVernacularNamesStream = ({
+  surveyId,
+  taxonomyUuid,
+  vernacularLangCodes,
+  extraPropsDefs,
+  draft = false,
+}) => {
   const vernacularNamesSubSelects = A.pipe(
     R.map(
       (langCode) =>
@@ -257,8 +263,16 @@ export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, verna
     R.join(', ')
   )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
 
+  const extraPropsFields = Object.keys(extraPropsDefs)
+    .map(
+      (extraProp) =>
+        `(t.props${draft ? ` || t.props_draft` : ''})#>>'{${Taxon.propKeys.extra},${extraProp}}' AS ${extraProp}`
+    )
+    .join(', ')
+
   const select = `SELECT
           ${propsFields}
+          ${A.isEmpty(extraPropsFields) ? '' : `, ${extraPropsFields}`}
           ${A.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
