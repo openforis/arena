@@ -14,6 +14,7 @@ export const keysProps = {
   name: ObjectUtils.keys.name,
   descriptions: ObjectUtils.keysProps.descriptions,
   vernacularLanguageCodes: 'vernacularLanguageCodes',
+  extraPropsDefs: 'extraPropsDefs',
 }
 
 // ====== CREATE

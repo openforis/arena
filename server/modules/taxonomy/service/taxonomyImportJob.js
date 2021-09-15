@@ -30,6 +30,7 @@ export default class TaxonomyImportJob extends Job {
     this.csvReader = null
     this.taxonomyImportManager = null // To be initialized in onHeaders
     this.vernacularLanguageCodes = null
+    this.extraPropsDefs = null
     this.taxonCSVParser = null
   }
 
@@ -96,13 +97,20 @@ export default class TaxonomyImportJob extends Job {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
-      this.taxonomyImportManager = new TaxonomyImportManager(
-        this.user,
-        this.surveyId,
-        this.taxonomy,
-        this.vernacularLanguageCodes,
-        this.tx
-      )
+      this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
+        if (!requiredColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
+          extraPropsAcc[header] = { key: header }
+        }
+        return extraPropsAcc
+      }, {})
+      this.taxonomyImportManager = new TaxonomyImportManager({
+        user: this.user,
+        surveyId: this.surveyId,
+        taxonomy: this.taxonomy,
+        vernacularLanguageCodes: this.vernacularLanguageCodes,
+        extraPropsDefs: this.extraPropsDefs,
+        tx: this.tx,
+      })
       await this.taxonomyImportManager.init()
       this.taxonCSVParser = new TaxonCSVParser(this.taxonomyUuid, this.vernacularLanguageCodes)
     } else {

@@ -5,23 +5,37 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 
 import * as StringUtils from '@core/stringUtils'
+import { languageCodesISO639part2 } from '@core/app/languages'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
 
-const _parseVernacularNames = (vernacularNamesByLang) =>
-  Object.entries(vernacularNamesByLang).reduce(
-    (accVernacularNames, [langCode, nameOriginal]) =>
-      R.ifElse(
-        StringUtils.isBlank,
-        R.always(accVernacularNames),
-        R.pipe(
-          R.split(TaxonVernacularName.NAMES_SEPARATOR),
-          R.map((name) => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
-          R.ifElse(R.isEmpty, R.always(accVernacularNames), (names) => R.assoc(langCode, names)(accVernacularNames))
-        )
-      )(nameOriginal),
-    {}
-  )
+const _parseVernacularNames = (row) =>
+  Object.entries(row).reduce((accVernacularNames, [columnName, value]) => {
+    if (!languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
+      return accVernacularNames
+    }
+    const langCode = columnName
+    const vernacularNames = value.split(TaxonVernacularName.NAMES_SEPARATOR).reduce((namesAcc, name) => {
+      const nameTrimmed = StringUtils.trim(name)
+      if (StringUtils.isBlank(nameTrimmed)) {
+        return namesAcc
+      }
+      return [...namesAcc, TaxonVernacularName.newTaxonVernacularName(langCode, nameTrimmed)]
+    }, [])
+
+    if (vernacularNames.length === 0) {
+      return accVernacularNames
+    }
+    return { ...accVernacularNames, [langCode]: vernacularNames }
+  }, {})
+
+const _parseExtraProps = (row) =>
+  Object.entries(row).reduce((accExtraProps, [columnName, value]) => {
+    if (!languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
+      return accExtraProps
+    }
+    return { ...accExtraProps, [columnName]: value }
+  }, {})
 
 export default class TaxonCSVParser {
   constructor(taxonomyUuid, vernacularLanguageCodes) {
@@ -36,21 +50,22 @@ export default class TaxonCSVParser {
   }
 
   async parseTaxon(row) {
-    const { family: familyRow, genus: genusRow, scientific_name: scientificName, code, ...vernacularNamesByLang } = row
+    const { family: familyRow, genus: genusRow, scientific_name: scientificName, code, ...otherProps } = row
 
     const family = familyRow || 'no_data'
 
     // the genus is always the first word of the scientific name
     const genus = scientificName ? scientificName.split(' ')[0] : null
 
-    const taxon = Taxon.newTaxon(
-      this.taxonomyUuid,
+    const taxon = Taxon.newTaxon({
+      taxonomyUuid: this.taxonomyUuid,
       code,
       family,
       genus,
       scientificName,
-      _parseVernacularNames(vernacularNamesByLang)
-    )
+      vernacularNames: _parseVernacularNames(otherProps),
+      extra: _parseExtraProps(otherProps),
+    })
 
     const validation = await this._validateTaxon(taxon)
 

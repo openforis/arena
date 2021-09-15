@@ -118,13 +118,13 @@ export default class TaxonomiesImportJob extends Job {
   async onHeaders(headers) {
     this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
 
-    this.taxonomyImportManager = new TaxonomyImportManager(
-      this.user,
-      this.surveyId,
-      this.taxonomyCurrent,
-      this.vernacularLangCodes,
-      this.tx
-    )
+    this.taxonomyImportManager = new TaxonomyImportManager({
+      user: this.user,
+      surveyId: this.surveyId,
+      taxonomy: this.taxonomyCurrent,
+      vernacularLanguageCodes: this.vernacularLangCodes,
+      tx: this.tx,
+    })
     await this.taxonomyImportManager.init()
 
     this.currentRow = 1
@@ -152,7 +152,7 @@ export default class TaxonomiesImportJob extends Job {
         this.vernacularLangCodes
       )
 
-      const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
+      const taxon = Taxon.newTaxon({ taxonomyUuid, code, family, genus, scientificName, vernacularNames })
 
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     }

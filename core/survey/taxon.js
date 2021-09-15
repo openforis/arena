@@ -19,13 +19,22 @@ export const propKeys = {
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
+  extra: 'extra',
 }
 
 export const unlistedCode = 'UNL'
 export const unknownCode = 'UNK'
 
 // ===== CREATE
-export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
+export const newTaxon = ({
+  taxonomyUuid,
+  code,
+  family,
+  genus,
+  scientificName,
+  vernacularNames = {},
+  extra: {},
+}) => ({
   [keys.uuid]: uuidv4(),
   [keys.taxonomyUuid]: taxonomyUuid,
   [keys.props]: {
@@ -33,6 +42,7 @@ export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vern
     [propKeys.family]: family,
     [propKeys.genus]: genus,
     [propKeys.scientificName]: scientificName,
+    [propKeys.extra]: extra,
   },
   [keys.vernacularNames]: vernacularNames,
 })

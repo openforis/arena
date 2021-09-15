@@ -88,13 +88,26 @@ export const taxaInsertTest = async () => {
   const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyNameDefault, true)
 
   const taxa = [
-    Taxon.newTaxon(taxonomyUuid, 'ALB', 'Fabaceae', 'Albizia', 'Albizia'),
-    Taxon.newTaxon(taxonomyUuid, 'ALB/SCH', 'Fabaceae', 'Albizia', 'Albizia schimperiana'),
-    Taxon.newTaxon(taxonomyUuid, 'ALB/GLA', 'Fabaceae', 'Albizia', 'Albizia glaberrima', {
-      swa: [
-        TaxonVernacularName.newTaxonVernacularName('swa', 'Mgerenge'),
-        TaxonVernacularName.newTaxonVernacularName('swa', 'Mchani'),
-      ],
+    Taxon.newTaxon({ taxonomyUuid, code: 'ALB', family: 'Fabaceae', genus: 'Albizia', scientificName: 'Albizia' }),
+    Taxon.newTaxon({
+      taxonomyUuid,
+      code: 'ALB/SCH',
+      family: 'Fabaceae',
+      genus: 'Albizia',
+      scientificName: 'Albizia schimperiana',
+    }),
+    Taxon.newTaxon({
+      taxonomyUuid,
+      code: 'ALB/GLA',
+      family: 'Fabaceae',
+      genus: 'Albizia',
+      scientificName: 'Albizia glaberrima',
+      vernacularNames: {
+        swa: [
+          TaxonVernacularName.newTaxonVernacularName('swa', 'Mgerenge'),
+          TaxonVernacularName.newTaxonVernacularName('swa', 'Mchani'),
+        ],
+      },
     }),
   ]
 
@@ -116,13 +129,13 @@ export const taxonUpdateTest = async () => {
 
   const taxonCode = 'ALB/GLA'
   const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
-  const taxonNew = Taxon.newTaxon(
+  const taxonNew = Taxon.newTaxon({
     taxonomyUuid,
-    taxonCode,
-    'Fabaceae updated',
-    'Albizia updated',
-    'Albizia glaberrima updated'
-  )
+    code: taxonCode,
+    family: 'Fabaceae updated',
+    genus: 'Albizia updated',
+    scientificName: 'Albizia glaberrima updated',
+  })
 
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
   await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
