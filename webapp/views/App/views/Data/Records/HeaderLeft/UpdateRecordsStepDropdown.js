@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import * as RecordStep from '@core/record/recordStep'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as API from '@webapp/service/api'
@@ -36,6 +36,7 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const cycle = useSurveyCycleKey()
 
   const onMoveAllRecords = (key) => {
     const stepFrom = fromStepByKey[key]
@@ -50,6 +51,7 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
 
           const { count } = await API.updateRecordsStep({
             surveyId,
+            cycle,
             stepFrom: RecordStep.getStepIdByName(stepFrom),
             stepTo: RecordStep.getStepIdByName(stepTo),
           })
