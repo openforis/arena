@@ -4,13 +4,10 @@ import * as A from '@core/arena'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { DataTestId } from '@webapp/utils/dataTestId'
@@ -28,16 +25,13 @@ const TaxonomyDetails = (props) => {
 
   const { state, Actions } = useLocalState(props)
 
-  const history = useHistory()
-
-  const i18n = useI18n()
-
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
 
   const taxonomy = State.getTaxonomy(state)
 
   if (A.isEmpty(taxonomy)) return null
+
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
   const extraPropsDefs = Taxonomy.getExtraPropsDefs(taxonomy)
