@@ -56,7 +56,7 @@ export default class RecordsImportJob extends Job {
 
     if (deleteAllRecords) {
       this.logDebug('deleting all records before import')
-      await RecordManager.deleteRecordsBySurvey({ surveyId }, this.tx)
+      await RecordManager.deleteRecordsByCycles(surveyId, [cycle], this.tx)
     }
 
     const entryNames = this.getEntryNames()

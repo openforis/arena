@@ -304,13 +304,3 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
     [cycles],
     R.prop('uuid')
   )
-
-export const deleteRecordsBySurvey = async ({ surveyId }, client = db) =>
-  client.map(
-    `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
-    RETURNING uuid
-  `,
-    [],
-    R.prop('uuid')
-  )
