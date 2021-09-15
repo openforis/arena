@@ -591,6 +591,11 @@ export const getLanguageLabel = (lang, translationLang = 'en') => {
   return R.path([lang, translationLanguage], languagesMap)
 }
 
+export const getLanguageISO639part2Label = (lang, translationLang = 'en') => {
+  const translationLanguage = availableTranslationLanguages.includes(translationLang) ? translationLang : 'en'
+  return R.path([lang, translationLanguage], iso639part2Names)
+}
+
 export const languages = R.pipe(
   R.keys,
   R.map((lang) => ({ key: lang, value: getLanguageLabel(lang) }))

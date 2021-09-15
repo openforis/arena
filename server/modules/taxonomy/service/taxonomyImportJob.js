@@ -113,7 +113,12 @@ export default class TaxonomyImportJob extends Job {
         tx: this.tx,
       })
       await this.taxonomyImportManager.init()
-      this.taxonCSVParser = new TaxonCSVParser(this.taxonomyUuid, this.vernacularLanguageCodes)
+      
+      this.taxonCSVParser = new TaxonCSVParser({
+        taxonomyUuid: this.taxonomyUuid,
+        vernacularLanguageCodes: this.vernacularLanguageCodes,
+        extraPropsDefs: this.extraPropsDefs,
+      })
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()

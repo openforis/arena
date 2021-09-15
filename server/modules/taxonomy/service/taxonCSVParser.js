@@ -5,42 +5,14 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 
 import * as StringUtils from '@core/stringUtils'
-import { languageCodesISO639part2 } from '@core/app/languages'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
 
-const _parseVernacularNames = (row) =>
-  Object.entries(row).reduce((accVernacularNames, [columnName, value]) => {
-    if (!languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
-      return accVernacularNames
-    }
-    const langCode = columnName
-    const vernacularNames = value.split(TaxonVernacularName.NAMES_SEPARATOR).reduce((namesAcc, name) => {
-      const nameTrimmed = StringUtils.trim(name)
-      if (StringUtils.isBlank(nameTrimmed)) {
-        return namesAcc
-      }
-      return [...namesAcc, TaxonVernacularName.newTaxonVernacularName(langCode, nameTrimmed)]
-    }, [])
-
-    if (vernacularNames.length === 0) {
-      return accVernacularNames
-    }
-    return { ...accVernacularNames, [langCode]: vernacularNames }
-  }, {})
-
-const _parseExtraProps = (row) =>
-  Object.entries(row).reduce((accExtraProps, [columnName, value]) => {
-    if (languageCodesISO639part2.includes(columnName) || StringUtils.isBlank(value)) {
-      return accExtraProps
-    }
-    return { ...accExtraProps, [columnName]: value }
-  }, {})
-
 export default class TaxonCSVParser {
-  constructor(taxonomyUuid, vernacularLanguageCodes) {
+  constructor({ taxonomyUuid, vernacularLanguageCodes, extraPropsDefs }) {
     this.taxonomyUuid = taxonomyUuid
     this.vernacularLanguageCodes = vernacularLanguageCodes
+    this.extraPropsDefs = extraPropsDefs
 
     this.processedRow = 0
     this.rowsByField = {
@@ -63,8 +35,8 @@ export default class TaxonCSVParser {
       family,
       genus,
       scientificName,
-      vernacularNames: _parseVernacularNames(otherProps),
-      extra: _parseExtraProps(otherProps),
+      vernacularNames: this._parseVernacularNames(otherProps),
+      extra: this._parseExtraProps(otherProps),
     })
 
     const validation = await this._validateTaxon(taxon)
@@ -112,5 +84,36 @@ export default class TaxonCSVParser {
     } else {
       this.rowsByField[field][value] = this.processedRow + 1
     }
+  }
+
+  _parseVernacularNames(row) {
+    return this.vernacularLanguageCodes.reduce((accVernacularNames, langCode) => {
+      const value = row[langCode]
+      if (StringUtils.isBlank(value)) {
+        return accVernacularNames
+      }
+      const vernacularNames = value.split(TaxonVernacularName.NAMES_SEPARATOR).reduce((namesAcc, name) => {
+        const nameTrimmed = StringUtils.trim(name)
+        if (StringUtils.isBlank(nameTrimmed)) {
+          return namesAcc
+        }
+        return [...namesAcc, TaxonVernacularName.newTaxonVernacularName(langCode, nameTrimmed)]
+      }, [])
+
+      if (vernacularNames.length === 0) {
+        return accVernacularNames
+      }
+      return { ...accVernacularNames, [langCode]: vernacularNames }
+    }, {})
+  }
+
+  _parseExtraProps(row) {
+    return Object.keys(this.extraPropsDefs).reduce((accExtraProps, extraPropName) => {
+      const value = row[extraPropName]
+      if (StringUtils.isBlank(value)) {
+        return accExtraProps
+      }
+      return { ...accExtraProps, [extraPropName]: value }
+    }, {})
   }
 }

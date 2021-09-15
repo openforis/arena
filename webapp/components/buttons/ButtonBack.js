@@ -18,8 +18,11 @@ export const ButtonBack = (props) => {
   )
 }
 
+// onClick prop is not required in ButtonBack
+const { onClick, ...otherButtonPropTypes } = Button.propTypes
+
 ButtonBack.propTypes = {
-  ...Button.propTypes,
+  ...otherButtonPropTypes,
 }
 
 ButtonBack.defaultProps = {
