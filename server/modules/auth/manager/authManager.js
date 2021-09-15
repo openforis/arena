@@ -1,1 +1,6 @@
-export { fetchGroupByUuid, updateUserGroup, fetchSurveyGroups } from '../repository/authGroupRepository'
+export {
+  fetchGroupByName,
+  fetchGroupByUuid,
+  updateUserGroup,
+  fetchSurveyGroups,
+} from '../repository/authGroupRepository'
