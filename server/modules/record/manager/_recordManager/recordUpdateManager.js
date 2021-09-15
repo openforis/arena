@@ -135,7 +135,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
     return recordUuids.length
   })
 
-export const { deleteRecordsByCycles, deleteRecordsBySurvey } = RecordRepository
+export const { deleteRecordsByCycles } = RecordRepository
 
 /**
  * ======

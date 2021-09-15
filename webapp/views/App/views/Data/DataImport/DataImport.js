@@ -61,7 +61,11 @@ const DataImport = () => {
     if (deleteAllRecords) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'homeView.recordsImport.confirmDeleteAllRecords',
+          key:
+            surveyCycleKeys.length > 1
+              ? 'homeView.recordsImport.confirmDeleteAllRecordsInCycle'
+              : 'homeView.recordsImport.confirmDeleteAllRecords',
+          params: { cycle: Number(cycle) + 1 },
           onOk: async () => startImportJob(file),
         })
       )
