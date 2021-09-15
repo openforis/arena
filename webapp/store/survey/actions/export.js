@@ -29,7 +29,7 @@ export const exportSurvey =
           <DownloadButton
             id={DataTestId.surveyExport.downloadBtn}
             href={`/api/survey/${surveyId}/export/download`}
-            requestParams={{ fileName, surveyName }}
+            requestParams={{ fileName, surveyName, includeData }}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
           />
         ),

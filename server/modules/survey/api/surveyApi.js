@@ -110,10 +110,12 @@ export const init = (app) => {
   // download generated survey export file
   app.get('/survey/:surveyId/export/download', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyName, fileName } = Request.getParams(req)
+      const { surveyName, fileName, includeData } = Request.getParams(req)
 
       const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
-      Response.sendFile({ res, path, name: `survey_${surveyName}.zip` })
+      const prefix = includeData ? 'arena_backup' : 'arena_survey'
+      const date = DateUtils.nowFormatDefault()
+      Response.sendFile({ res, path, name: `${prefix}_${surveyName}_${date}.zip` })
     } catch (error) {
       next(error)
     }
