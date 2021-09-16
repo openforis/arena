@@ -275,7 +275,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
     // 3) find group to associate to the user
     let group = null
     if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
-      group = User.getAuthGroupByName(role)(user)
+      group = await AuthManager.fetchGroupByName({ name: role }, t)
     } else {
       const surveyGroups = await AuthManager.fetchSurveyGroups(Survey.getId(survey), t)
       group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
