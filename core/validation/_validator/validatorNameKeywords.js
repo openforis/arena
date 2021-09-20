@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 const keywords = [
   'asc',
   'date_created',
@@ -22,4 +20,4 @@ const keywords = [
   'value',
 ]
 
-export const isKeyword = (value) => R.includes(value, keywords)
+export const isKeyword = (value) => keywords.includes(value)

@@ -10,6 +10,7 @@ import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as TaxonomyManager from '../manager/taxonomyManager'
@@ -157,14 +158,14 @@ export default class TaxonomyImportJob extends Job {
   }
 
   _validateHeaders(columns) {
-    this.logDebug('columns', columns)
+    let valid = true
     const missingColumns = R.difference(requiredColumns, columns)
     if (!R.isEmpty(missingColumns)) {
       this._addHeaderError({
         key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
         params: { columns: R.join(', ', missingColumns) },
       })
-      return false
+      valid = false
     }
 
     // validate extra props column names (normalized) uniqueness
@@ -179,9 +180,21 @@ export default class TaxonomyImportJob extends Job {
         key: Validation.messageKeys.taxonomyImportJob.duplicateExtraPropsColumns,
         params: { duplicateColumns },
       })
-      return false
+      valid = false
     }
-    return true
+
+    // validate extra prop cannot be keyword
+    extraPropsColumnsNormalized.forEach((columnName) => {
+      if (Validator.isKeyword(columnName)) {
+        this._addHeaderError({
+          key: Validation.messageKeys.taxonomyImportJob.invalidExtraPropColumn,
+          params: { columnName },
+        })
+        valid = false
+      }
+    })
+
+    return valid
   }
 }
 

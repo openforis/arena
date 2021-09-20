@@ -1012,6 +1012,7 @@ $t(common.cantUndoWarning)`,
 
     taxonomyImportJob: {
       duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
+      invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
       missingRequiredColumns: 'Missing required column(s): {{columns}}',
     },
 
