@@ -123,8 +123,7 @@ describe('RecordExpressionParser Test', () => {
     // distance
     { q: 'distance(plot[0].plot_location, plot[1].plot_location).toFixed(2)', r: '2171.94' },
     {
-      q:
-        'distance(plot[0].plot_location, plot[1].plot_location) == distance(plot[1].plot_location, plot[0].plot_location)',
+      q: 'distance(plot[0].plot_location, plot[1].plot_location) == distance(plot[1].plot_location, plot[0].plot_location)',
       r: true,
     },
     // distance (invalid node type)
@@ -139,6 +138,12 @@ describe('RecordExpressionParser Test', () => {
       r: '4311422.21',
       n: 'cluster/plot[1]/plot_id',
     },
+    // taxonProp
+    { q: `taxonProp('trees', 'max_height', 'AFZ/QUA')`, r: '200' },
+    { q: `taxonProp('trees', 'max_dbh', 'OLE/CAP')`, r: '40' },
+    // taxonProp: unexisting prop or code
+    { q: `taxonProp('trees', 'unexisting_prop', 'AFZ/QUA')`, r: null },
+    { q: `taxonProp('trees', 'max_dbh', 'AFZ/QUA/OTHER')`, r: null },
     // global objects (Array)
     { q: 'Array.of(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: [1, 2, 3] },
     // global objects (Date)

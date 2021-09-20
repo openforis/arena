@@ -2,9 +2,13 @@ import pgPromise from 'pg-promise'
 
 import { db } from '../../../server/db/db'
 
+import * as A from '../../../core/arena'
+
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as Category from '../../../core/survey/category'
+import * as Taxonomy from '../../../core/survey/taxonomy'
+import * as Taxon from '../../../core/survey/taxon'
 import * as User from '../../../core/user/user'
 import * as PromiseUtils from '../../../core/promiseUtils'
 
@@ -46,8 +50,7 @@ class SurveyBuilder {
   }
 
   taxonomy(name, ...taxonBuilders) {
-    const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
-    this.taxonomyBuilders.push(taxonomyBuilder)
+    this.taxonomyBuilders.push(new TaxonomyBuilder(name, ...taxonBuilders))
     return this
   }
 
@@ -63,20 +66,43 @@ class SurveyBuilder {
       label: this.label,
       languages: [this.lang],
     })
+
     // categories
     const categories = []
     const categoryItemsRefData = []
     this.categoryBuilders.forEach((categoryBuilder) => {
       const { category, items } = categoryBuilder.build()
       categories.push(category)
+      // add category uuid to category items
       categoryItemsRefData.push(...items.map((item) => ({ ...item, categoryUuid: Category.getUuid(category) })))
     })
-    survey = Survey.assocCategories(categories)(survey)
-    survey = Survey.assocRefData({ categoryItemsRefData })(survey)
 
-    // node defs
-    const nodeDefs = this.rootDefBuilder.build(survey)
-    return Survey.assocNodeDefs({ nodeDefs, updateDependencyGraph: true })(survey)
+    // taxonomies
+    const taxonomies = []
+    const taxaIndexRefData = []
+    this.taxonomyBuilders.forEach((taxonomyBuilder) => {
+      const { taxonomy, taxa } = taxonomyBuilder.build()
+      const extraPropsDefs = {}
+
+      taxaIndexRefData.push(...taxa)
+
+      // extract extra props defs
+      taxa.forEach((taxon) => {
+        const extraPropsKeys = Object.keys(Taxon.getExtra(taxon))
+        extraPropsKeys.forEach((extraPropKey) => {
+          extraPropsDefs[extraPropKey] = { key: extraPropKey }
+        })
+      })
+      taxonomies.push(Taxonomy.assocExtraPropsDefs(extraPropsDefs)(taxonomy))
+    })
+
+    survey = A.pipe(
+      Survey.assocCategories(categories),
+      Survey.assocTaxonomies(taxonomies),
+      Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })
+    )(survey)
+
+    return Survey.assocNodeDefs({ nodeDefs: this.rootDefBuilder.build(survey), updateDependencyGraph: true })(survey)
   }
 
   /**

@@ -96,8 +96,14 @@ export const getCategoryItemByHierarchicalCodes =
 
 // ==== taxonomy index
 
-export const getTaxonByCode = ({ taxonomyUuid, taxonCode }) =>
-  R.path([keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode])
+export const getTaxonByUuid = (taxonUuid) => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
+
+export const getTaxonByCode =
+  ({ taxonomyUuid, taxonCode }) =>
+  (survey) => {
+    const taxonUuid = R.path([keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode])(survey)
+    return taxonUuid ? getTaxonByUuid(taxonUuid)(survey) : null
+  }
 
 export const getTaxonUuid = (nodeDef, taxonCode) => (survey) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
@@ -119,8 +125,6 @@ export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUu
   return Object.values(vernacularNamesUuidByName).includes(vernacularNameUuid)
 }
 
-export const getTaxonByUuid = (taxonUuid) => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
-
 // ====== UPDATE
 
 const _getCategoryIndex = R.reduce((accIndex, row) => {
@@ -140,12 +144,15 @@ const _getCategoryIndex = R.reduce((accIndex, row) => {
 }, {})
 
 const _getTaxonomyIndex = R.reduce((accIndex, row) => {
-  ObjectUtils.setInPath([keys.taxonUuidIndex, Taxon.getTaxonomyUuid(row), Taxon.getCode(row)], {
-    [Taxon.keys.uuid]: Taxon.getUuid(row),
-    [Taxon.keys.vernacularNames]: R.pipe(R.prop(Taxon.keys.vernacularNames), R.mergeAll)(row),
-  })(accIndex)
+  const taxonomyUuid = Taxon.getTaxonomyUuid(row)
+  const taxonUuid = Taxon.getUuid(row)
+  const taxonCode = Taxon.getCode(row)
 
-  ObjectUtils.setInPath([keys.taxonIndex, Taxon.getUuid(row)], row)(accIndex)
+  ObjectUtils.setInPath([keys.taxonUuidIndex, taxonomyUuid, taxonCode], taxonUuid)(accIndex)
+
+  const vernacularNamesMerged = R.pipe(R.prop(Taxon.keys.vernacularNames), R.mergeAll)(row)
+  const taxonUpdated = { ...row, [Taxon.keys.vernacularNames]: vernacularNamesMerged }
+  ObjectUtils.setInPath([keys.taxonIndex, taxonUuid], taxonUpdated)(accIndex)
 
   return accIndex
 }, {})
@@ -157,7 +164,6 @@ export const assocRefData =
       ..._getCategoryIndex(categoryItemsRefData),
       ..._getTaxonomyIndex(taxaIndexRefData),
     }
-
     return {
       ...survey,
       [keys.indexRefData]: refDataIndex,

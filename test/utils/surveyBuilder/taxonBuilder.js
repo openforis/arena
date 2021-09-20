@@ -11,6 +11,7 @@ export class TaxonBuilder {
     this.genus = genus
     this.scientificName = scientificName
     this.vernacularNames = {}
+    this._extra = {}
   }
 
   vernacularName(lang, name) {
@@ -18,6 +19,11 @@ export class TaxonBuilder {
       R.propOr([], lang),
       R.append(TaxonVernacularName.newTaxonVernacularName(lang, name))
     )(this.vernacularNames)
+    return this
+  }
+
+  extra(key, value) {
+    this._extra[key] = value
     return this
   }
 
@@ -29,6 +35,7 @@ export class TaxonBuilder {
       genus: this.genus,
       scientificName: this.scientificName,
       vernacularNames: this.vernacularNames,
+      extra: this._extra,
     })
   }
 }
