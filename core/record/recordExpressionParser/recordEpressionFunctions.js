@@ -60,7 +60,15 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
     const taxon = Survey.getTaxonByCode({ taxonomyUuid: Taxonomy.getUuid(taxonomy), taxonCode })(survey)
     if (!taxon) return null
 
-    const extraProp = Taxon.getExtraProp(propName)(taxon)
-    return A.isEmpty(extraProp) ? null : extraProp
+    const value = [
+      Taxon.propKeys.code,
+      Taxon.propKeys.family,
+      Taxon.propKeys.genus,
+      Taxon.propKeys.scientificName,
+    ].includes(propName)
+      ? Taxon.getProps(taxon)[propName]
+      : Taxon.getExtraProp(propName)(taxon)
+
+    return A.isEmpty(value) ? null : value
   },
 })

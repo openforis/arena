@@ -97,6 +97,12 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'propertyName', cluster_id, plot_id)
       replace: (_, fnArs) => `categoryItemProp('${SamplingPointDataImportJob.categoryName}', ${fnArs})`,
     },
+    {
+      pattern: /idm:speciesListData\(([^)]+)\)/,
+      // change the function name but keep the same arguments.
+      // E.g. idm:speciesListData('trees', 'extra_1', species_code) becomes taxonProp('trees', 'extra_1', species_code)
+      replace: (_, fnArs) => `taxonProp(${fnArs})`,
+    },
     // geo namespace
     // idm:distance is deprecated in Collect
     { pattern: '(geo|idm):distance', replace: 'distance' },

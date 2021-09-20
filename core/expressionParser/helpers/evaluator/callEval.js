@@ -80,17 +80,19 @@ const _callIdentifierEval = ({ evalExpression, expr, ctx }) => {
   throw new SystemError('undefinedFunction', { fnName })
 }
 
-export const callEval = ({ evalExpression }) => (expr, ctx) => {
-  const { callee } = expr
+export const callEval =
+  ({ evalExpression }) =>
+  (expr, ctx) => {
+    const { callee } = expr
 
-  switch (callee.type) {
-    case types.MemberExpression:
-      return _callMemberEval({ evalExpression, expr, ctx })
-    case types.Identifier:
-      return _callIdentifierEval({ evalExpression, expr, ctx })
-    default:
-      // No complex expressions may be put in place of a function body.
-      // Only a plain identifier is allowed.
-      throw new SystemError('invalidSyntax', { fnType: callee.type })
+    switch (callee.type) {
+      case types.MemberExpression:
+        return _callMemberEval({ evalExpression, expr, ctx })
+      case types.Identifier:
+        return _callIdentifierEval({ evalExpression, expr, ctx })
+      default:
+        // No complex expressions may be put in place of a function body.
+        // Only a plain identifier is allowed.
+        throw new SystemError('invalidSyntax', { fnType: callee.type })
+    }
   }
-}
