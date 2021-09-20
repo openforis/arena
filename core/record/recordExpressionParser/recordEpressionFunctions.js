@@ -4,6 +4,8 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
@@ -50,5 +52,15 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
       return null
     }
     return Record.getParentNode(node)(record)
+  },
+  [Expression.functionNames.taxonProp]: (taxonomyName, propName, taxonCode) => {
+    const taxonomy = Survey.getTaxonomyByName(taxonomyName)(survey)
+    if (!taxonomy) return null
+
+    const taxon = Survey.getTaxonByCode({ taxonomyUuid: Taxonomy.getUuid(taxonomy), taxonCode })(survey)
+    if (!taxon) return null
+
+    const extraProp = Taxon.getExtraProp(propName)(taxon)
+    return A.isEmpty(extraProp) ? null : extraProp
   },
 })
