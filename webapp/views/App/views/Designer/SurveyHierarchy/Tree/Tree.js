@@ -297,7 +297,6 @@ export default class Tree {
   _updateLabels() {
     this.svg
       .selectAll('.node-grid')
-      .selectAll('a')
       .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
   }
 
