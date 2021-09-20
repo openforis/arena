@@ -39,6 +39,17 @@ export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
 
 // ==== READ
 
+export const fetchGroupByName = async ({ name }, client = db) =>
+  client.one(
+    `
+      SELECT auth_group.*
+      FROM auth_group
+      WHERE auth_group.name = $1
+        AND auth_group.survey_uuid IS NULL`,
+    [name],
+    dbTransformCallback
+  )
+
 export const fetchGroupByUuid = async (groupUuid, client = db) =>
   client.one(
     `
