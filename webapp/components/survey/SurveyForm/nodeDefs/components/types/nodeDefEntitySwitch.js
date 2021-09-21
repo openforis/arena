@@ -20,10 +20,14 @@ const componentsByRenderType = {
 const NodeDefEntitySwitch = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
+  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
+  if (!renderType) {
+    // node def not in current cycle
+    return null
+  }
+
   const survey = useSurvey()
   const childDefs = Survey.getNodeDefChildren(props.nodeDef)(survey)
-
-  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
