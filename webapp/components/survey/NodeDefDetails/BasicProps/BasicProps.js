@@ -151,14 +151,12 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
-      {cyclesKeysParent.length > 1 && (
-        <CyclesSelector
-          cyclesKeysSelectable={cyclesKeysParent}
-          cyclesKeysSelected={cyclesNodeDef}
-          disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner}
-          onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
-        />
-      )}
+      <CyclesSelector
+        cyclesKeysSelectable={cyclesKeysParent}
+        cyclesKeysSelected={cyclesNodeDef}
+        disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
+        onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
+      />
 
       {NodeDef.isVirtual(nodeDef) && (
         <>
