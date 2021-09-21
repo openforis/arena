@@ -14,27 +14,27 @@ const CyclesSelector = (props) => {
   const cycleKeyCurrent = useSurveyCycleKey()
   const i18n = useI18n()
 
-  const cyclesKeys = cyclesKeysSelectable && cyclesKeysSelectable.length >= 1 ? cyclesKeysSelectable : cyclesKeysSurvey
-
+  if (cyclesKeysSurvey.length === 1) {
+    return null
+  }
   return (
-    cyclesKeys.length > 1 && (
-      <FormItem label={i18n.t('common.cycle_plural')}>
-        <ButtonGroup
-          multiple
-          deselectable
-          selectedItemKey={cyclesKeysSelected}
-          onChange={(cycles) => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
-          items={cyclesKeys.map((cycle) => ({
-            key: cycle,
-            label: Number(cycle) + 1,
-            disabled:
-              (cyclesKeysSelected.length === 1 && cycle === cyclesKeysSelected[0]) || // Disabled if current cycle is the only one selected in nodeDef
-              cycle === cycleKeyCurrent, // Cannot remove nodeDef from current cycle
-          }))}
-          disabled={disabled}
-        />
-      </FormItem>
-    )
+    <FormItem label={i18n.t('common.cycle_plural')}>
+      <ButtonGroup
+        multiple
+        deselectable
+        selectedItemKey={cyclesKeysSelected}
+        onChange={(cycles) => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
+        items={cyclesKeysSurvey.map((cycle) => ({
+          key: cycle,
+          label: Number(cycle) + 1,
+          disabled:
+            (cyclesKeysSelected.length === 1 && cycle === cyclesKeysSelected[0]) || // Disabled if current cycle is the only one selected in nodeDef
+            cycle === cycleKeyCurrent || // Cannot remove nodeDef from current cycle
+            !cyclesKeysSelectable.includes(cycle), // Cycle is not selectable
+        }))}
+        disabled={disabled}
+      />
+    </FormItem>
   )
 }
 
