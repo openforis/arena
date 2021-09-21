@@ -37,9 +37,9 @@ const TaxonomyDetails = (props) => {
   const extraPropsDefs = Taxonomy.getExtraPropsDefs(taxonomy)
 
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${
-    R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 80px)`
+    R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 15rem)`
   }
-  ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 80px)`}`
+  ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 10rem)`}`
 
   return (
     <div className="taxonomy">
