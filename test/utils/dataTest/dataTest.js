@@ -95,6 +95,15 @@ export const createTestSurvey = ({ user }) =>
         SB.categoryItem('P').label('Palm')
       )
     )
+    .taxonomy(
+      'trees',
+      SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+        .vernacularName('eng', 'Mahogany')
+        .vernacularName('swa', 'Mbambakofi')
+        .extra('max_height', '200')
+        .extra('max_dbh', '30'),
+      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis').extra('max_height', '300').extra('max_dbh', '40')
+    )
     .build()
 
 export const createTestRecord = ({ user, survey }) =>

@@ -83,14 +83,13 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        {edit &&
-          canEditSurvey && (
-            <DownloadButton
-              id={DataTestId.surveyForm.schemaSummary}
-              href={`/api/survey/${surveyId}/schema-summary/`}
-              label={i18n.t('surveyForm.schemaSummary')}
-            />
-          )}
+        {edit && canEditSurvey && (
+          <DownloadButton
+            id={DataTestId.surveyForm.schemaSummary}
+            href={`/api/survey/${surveyId}/schema-summary/`}
+            label={'surveyForm.schemaSummary'}
+          />
+        )}
         <NodeDefLabelSwitch
           className="btn-s btn-transparent"
           labelType={nodeDefLabelType}

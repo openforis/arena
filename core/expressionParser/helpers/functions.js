@@ -14,6 +14,7 @@ export const functionNames = {
   parent: 'parent',
   pow: 'pow',
   sum: 'sum',
+  taxonProp: 'taxonProp',
 }
 
 /**
@@ -39,4 +40,5 @@ export const functions = {
   [functionNames.parent]: { minArity: 1, maxArity: 1, evaluateArgsToNodes: true },
   [functionNames.pow]: { minArity: 2 },
   [functionNames.sum]: { minArity: 1, maxArity: 1 },
+  [functionNames.taxonProp]: { minArity: 3, maxArity: 3 },
 }

@@ -17,6 +17,8 @@ import * as CSVReader from '@server/utils/file/csvReader'
 const SPECIES_FILES_PATH = 'species/'
 const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
 
+const fixedColumns = ['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms']
+
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
  * Saves the list of inserted taxonomies in the "taxonomies" context property
@@ -117,14 +119,21 @@ export default class TaxonomiesImportJob extends Job {
 
   async onHeaders(headers) {
     this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
+      if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
+        extraPropsAcc[header] = { key: header }
+      }
+      return extraPropsAcc
+    }, {})
 
-    this.taxonomyImportManager = new TaxonomyImportManager(
-      this.user,
-      this.surveyId,
-      this.taxonomyCurrent,
-      this.vernacularLangCodes,
-      this.tx
-    )
+    this.taxonomyImportManager = new TaxonomyImportManager({
+      user: this.user,
+      surveyId: this.surveyId,
+      taxonomy: this.taxonomyCurrent,
+      vernacularLanguageCodes: this.vernacularLangCodes,
+      extraPropsDefs: this.extraPropsDefs,
+      tx: this.tx,
+    })
     await this.taxonomyImportManager.init()
 
     this.currentRow = 1
@@ -152,7 +161,15 @@ export default class TaxonomiesImportJob extends Job {
         this.vernacularLangCodes
       )
 
-      const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
+      const extra = Object.keys(this.extraPropsDefs).reduce((accExtraProps, extraPropName) => {
+        const value = row[extraPropName]
+        if (StringUtils.isBlank(value)) {
+          return accExtraProps
+        }
+        return { ...accExtraProps, [extraPropName]: value }
+      }, {})
+
+      const taxon = Taxon.newTaxon({ taxonomyUuid, code, family, genus, scientificName, vernacularNames, extra })
 
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     }

@@ -9,16 +9,29 @@ import * as Validation from '@core/validation/validation'
 import * as TaxonomyManager from './taxonomyManager'
 
 const createPredefinedTaxa = (taxonomy) => [
-  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
-  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted'),
+  Taxon.newTaxon({
+    taxonomyUuid: Taxonomy.getUuid(taxonomy),
+    code: Taxon.unknownCode,
+    family: 'Unknown',
+    genus: 'Unknown',
+    scientificName: 'Unknown',
+  }),
+  Taxon.newTaxon({
+    taxonomyUuid: Taxonomy.getUuid(taxonomy),
+    code: Taxon.unlistedCode,
+    family: 'Unlisted',
+    genus: 'Unlisted',
+    scientificName: 'Unlisted',
+  }),
 ]
 
 export default class TaxonomyImportManager {
-  constructor(user, surveyId, taxonomy, vernacularLanguageCodes, tx) {
+  constructor({ user, surveyId, taxonomy, vernacularLanguageCodes, extraPropsDefs, tx }) {
     this.user = user
     this.surveyId = surveyId
     this.taxonomy = taxonomy
     this.vernacularLanguageCodes = vernacularLanguageCodes
+    this.extraPropsDefs = extraPropsDefs
     this.tx = tx
 
     this.batchPersisterInsert = new BatchPersister(async (taxa) =>
@@ -78,6 +91,22 @@ export default class TaxonomyImportManager {
       Taxonomy.getUuid(this.taxonomy),
       Taxonomy.keysProps.vernacularLanguageCodes,
       this.vernacularLanguageCodes,
+      true,
+      this.tx
+    )
+
+    // cleanup extra props defs (remove originalHeader prop)
+    const extraPropsDefsCleaned = Object.entries(this.extraPropsDefs).reduce((extraPropsDefsAcc, [key, extraProp]) => {
+      const { originalHeader, ...extraPropProps } = extraProp
+      return { ...extraPropsDefsAcc, [key]: { ...extraPropProps } }
+    }, {})
+
+    await TaxonomyManager.updateTaxonomyProp(
+      user,
+      surveyId,
+      Taxonomy.getUuid(this.taxonomy),
+      Taxonomy.keysProps.extraPropsDefs,
+      extraPropsDefsCleaned,
       true,
       this.tx
     )

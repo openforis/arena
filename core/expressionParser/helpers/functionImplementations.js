@@ -19,4 +19,5 @@ export const functionImplementations = {
   [functionNames.parent]: () => null,
   [functionNames.pow]: (base, exponent) => base ** exponent,
   [functionNames.sum]: A.identity,
+  [functionNames.taxonProp]: () => null, // To be implemented by evaluator sub classes
 }

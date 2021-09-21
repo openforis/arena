@@ -63,13 +63,13 @@ export const taxonPublishedUpdateTest = async () => {
   const taxonPublished = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, false)
 
   // Update taxon
-  const taxonNew = Taxon.newTaxon(
+  const taxonNew = Taxon.newTaxon({
     taxonomyUuid,
     taxonCode,
-    'Fabaceae updated',
-    'Albizia updated',
-    'Albizia glaberrima updated'
-  )
+    family: 'Fabaceae updated',
+    genus: 'Albizia updated',
+    scientificName: 'Albizia glaberrima updated',
+  })
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxonPublished)
   await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
 

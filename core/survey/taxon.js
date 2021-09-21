@@ -19,13 +19,14 @@ export const propKeys = {
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
+  extra: 'extra',
 }
 
 export const unlistedCode = 'UNL'
 export const unknownCode = 'UNK'
 
 // ===== CREATE
-export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
+export const newTaxon = ({ taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}, extra = {} }) => ({
   [keys.uuid]: uuidv4(),
   [keys.taxonomyUuid]: taxonomyUuid,
   [keys.props]: {
@@ -33,6 +34,7 @@ export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vern
     [propKeys.family]: family,
     [propKeys.genus]: genus,
     [propKeys.scientificName]: scientificName,
+    [propKeys.extra]: extra,
   },
   [keys.vernacularNames]: vernacularNames,
 })
@@ -53,6 +55,12 @@ export const getVernacularNamesByLang = (lang) => R.pipe(getVernacularNames, R.p
 export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 export const getVernacularNameUuid = R.prop(keys.vernacularNameUuid)
 export const getVernacularName = R.propOr('', keys.vernacularName)
+
+export const getExtra = ObjectUtils.getProp(propKeys.extra, {})
+export const getExtraProp = (extraPropKey) => (taxon) => {
+  const extra = getExtra(taxon)
+  return R.propOr(null, extraPropKey)(extra)
+}
 
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))

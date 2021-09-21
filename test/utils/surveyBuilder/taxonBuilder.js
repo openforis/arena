@@ -11,6 +11,7 @@ export class TaxonBuilder {
     this.genus = genus
     this.scientificName = scientificName
     this.vernacularNames = {}
+    this._extra = {}
   }
 
   vernacularName(lang, name) {
@@ -21,14 +22,20 @@ export class TaxonBuilder {
     return this
   }
 
+  extra(key, value) {
+    this._extra[key] = value
+    return this
+  }
+
   build(taxonomy) {
-    return Taxon.newTaxon(
-      Taxonomy.getUuid(taxonomy),
-      this.code,
-      this.family,
-      this.genus,
-      this.scientificName,
-      this.vernacularNames
-    )
+    return Taxon.newTaxon({
+      taxonomyUuid: Taxonomy.getUuid(taxonomy),
+      code: this.code,
+      family: this.family,
+      genus: this.genus,
+      scientificName: this.scientificName,
+      vernacularNames: this.vernacularNames,
+      extra: this._extra,
+    })
   }
 }

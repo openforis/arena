@@ -203,15 +203,21 @@ export const { getCategories, getCategoriesArray, getCategoryByUuid, getCategory
   SurveyCategories
 
 // ====== Taxonomies
-export const { getTaxonomiesArray, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
+export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index
 export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
   SurveyRefDataIndex
 // Taxon index
-export const { getTaxonUuid, getTaxonVernacularNameUuid, getTaxonByUuid, includesTaxonVernacularName, assocRefData } =
-  SurveyRefDataIndex
+export const {
+  getTaxonByCode,
+  getTaxonUuid,
+  getTaxonVernacularNameUuid,
+  getTaxonByUuid,
+  includesTaxonVernacularName,
+  assocRefData,
+} = SurveyRefDataIndex
 
 // Analysis
 export const { getAnalysisNodeDefs } = SurveyAnalysis

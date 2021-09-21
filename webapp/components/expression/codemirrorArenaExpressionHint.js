@@ -21,6 +21,7 @@ const functionExamples = {
     [Expression.functionNames.log10]: 'log10(100) = 2',
     [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [Expression.functionNames.now]: 'now()',
+    [Expression.functionNames.taxonProp]: `taxonProp('taxonomy_name', 'extra_prop', 'taxon_code')`,
   },
   [Expression.modes.sql]: {
     [Expression.functionNames.avg]: 'avg(variable_name)',
@@ -156,25 +157,27 @@ const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextP
   })
 }
 
-export const arenaExpressionHint = ({ mode, i18n, survey, nodeDefCurrent }) => (editor) => {
-  const cur = editor.getCursor()
-  const token = editor.getTokenAt(cur)
+export const arenaExpressionHint =
+  ({ mode, i18n, survey, nodeDefCurrent }) =>
+  (editor) => {
+    const cur = editor.getCursor()
+    const token = editor.getTokenAt(cur)
 
-  const { ch: cursorPosition, line: cursorLine } = cur
+    const { ch: cursorPosition, line: cursorLine } = cur
 
-  const variablePath = token.string.slice(
-    getVariablePathStart({ value: token.string, end: cursorPosition }),
-    cursorPosition
-  )
-  _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
+    const variablePath = token.string.slice(
+      getVariablePathStart({ value: token.string, end: cursorPosition }),
+      cursorPosition
+    )
+    _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
 
-  const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
+    const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
-  const variablesGroupedByParentEntity = _extractVariables({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath })
+    const variablesGroupedByParentEntity = _extractVariables({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath })
 
-  return {
-    list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),
-    from: CodeMirror.Pos(token.line, token.start),
-    to: CodeMirror.Pos(token.line, token.end),
+    return {
+      list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),
+      from: CodeMirror.Pos(token.line, token.start),
+      to: CodeMirror.Pos(token.line, token.end),
+    }
   }
-}
