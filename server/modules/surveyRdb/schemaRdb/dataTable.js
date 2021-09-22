@@ -18,6 +18,10 @@ export const columnNameParentUuuid = 'parent_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
+export const columnNameAncestorUuid = 'ancestor_uuid'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
 export const columnNameRecordUuuid = 'record_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
@@ -65,7 +69,7 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
     Node.getUuid(nodeRow),
     nodeRow[columnNameRecordUuuid],
     nodeRow[columnNameRecordCycle],
-    nodeRow[columnNameParentUuuid],
+    nodeRow[columnNameAncestorUuid],
     ...rowValues,
   ]
 }
