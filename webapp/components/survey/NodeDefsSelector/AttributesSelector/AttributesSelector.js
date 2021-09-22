@@ -22,6 +22,7 @@ const AttributesSelector = (props) => {
     showAncestorsLabel,
     showLabel,
     showMultipleAttributes,
+    showSiblingsInSingleEntities,
     nodeDefLabelType,
   } = props
 
@@ -31,9 +32,15 @@ const AttributesSelector = (props) => {
 
   let childDefs = []
   if (nodeDefContext) {
-    childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
-      : [nodeDefContext] // Multiple attribute
+    if (NodeDef.isEntity(nodeDefContext)) {
+      if (showSiblingsInSingleEntities) {
+        childDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+      } else {
+        childDefs = Survey.getNodeDefChildren(nodeDefContext)(survey)
+      }
+    } else {
+      childDefs = [nodeDefContext] // Multiple attribute
+    }
   }
 
   return (
@@ -85,6 +92,7 @@ AttributesSelector.propTypes = {
   showLabel: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
+  showSiblingsInSingleEntities: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
 }
 
@@ -97,6 +105,7 @@ AttributesSelector.defaultProps = {
   showAncestorsLabel: true,
   showLabel: false,
   showMultipleAttributes: true,
+  showSiblingsInSingleEntities: false,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 

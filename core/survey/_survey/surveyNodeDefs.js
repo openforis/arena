@@ -6,6 +6,7 @@ import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
+import Queue from '@core/queue'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -55,6 +56,24 @@ export const getNodeDefChildrenInOwnPage =
     })
     return childrenInOwnPage
   }
+
+export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) => (survey) => {
+  const descendants = []
+
+  const queue = new Queue()
+  queue.enqueue(nodeDef)
+
+  while (!queue.isEmpty()) {
+    const entityDefCurrent = queue.dequeue()
+    const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
+
+    descendants.push(...entityDefCurrentChildren.filter(NodeDef.isAttribute))
+
+    // visit nodes inside single entities
+    queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
+  }
+  return descendants
+}
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   if (NodeDef.isAttribute(nodeDef)) {

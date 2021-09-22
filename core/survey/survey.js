@@ -137,6 +137,7 @@ export const {
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
+  getNodeDefDescendantAttributesInSingleEntities,
 } = SurveyNodeDefs
 
 // ====== READ dependencies

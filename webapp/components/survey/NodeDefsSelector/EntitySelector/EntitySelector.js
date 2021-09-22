@@ -10,15 +10,17 @@ import * as StringUtils from '@core/stringUtils'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const getDropdownItems = (hierarchy, lang, nodeDefLabelType) => {
+const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntities }) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
-    entities.push({
-      key: NodeDef.getUuid(nodeDef),
-      value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
-    })
+    if (showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) {
+      const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
+      entities.push({
+        key: NodeDef.getUuid(nodeDef),
+        value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
+      })
+    }
   }
 
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
@@ -27,9 +29,9 @@ const getDropdownItems = (hierarchy, lang, nodeDefLabelType) => {
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, nodeDefLabelType } = props
+  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, nodeDefLabelType, onlyMultipleEntities } = props
 
-  const dropdownItems = getDropdownItems(hierarchy, lang, nodeDefLabelType)
+  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, onlyMultipleEntities })
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
@@ -49,6 +51,7 @@ EntitySelector.propTypes = {
   hierarchy: PropTypes.object.isRequired, // Survey hierarchy
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
+  showSingleEntities: PropTypes.bool,
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string,
@@ -56,6 +59,7 @@ EntitySelector.propTypes = {
 
 EntitySelector.defaultProps = {
   nodeDefUuidEntity: null,
+  showSingleEntities: true,
   validation: null,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
