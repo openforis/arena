@@ -29,9 +29,9 @@ const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntitie
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, nodeDefLabelType, onlyMultipleEntities } = props
+  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, nodeDefLabelType, showSingleEntities } = props
 
-  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, onlyMultipleEntities })
+  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, showSingleEntities })
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
