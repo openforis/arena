@@ -13,7 +13,9 @@ export const createNodeKeysView = async (survey, client = db) => {
   const surveyId = Survey.getId(survey)
 
   const selectViews = []
-  const { root } = Survey.getHierarchy()(survey)
+
+  const { root } = Survey.getHierarchy(NodeDef.isMultipleEntity)(survey)
+
   Survey.traverseHierarchyItemSync(root, (nodeDef) => {
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
     selectViews.push(`

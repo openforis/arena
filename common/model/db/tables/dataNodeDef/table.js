@@ -64,8 +64,11 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       R.ifElse(
         NodeDef.isEntity,
         R.pipe(
-          () => Survey.getNodeDefChildren(this.nodeDef, NodeDef.isAnalysis(this.nodeDef))(this.survey),
-          R.filter(NodeDef.isSingleAttribute),
+          () => Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDef)(this.survey),
+          R.filter(
+            (nodeDef) =>
+              NodeDef.isSingleAttribute(nodeDef) && (!NodeDef.isAnalysis(nodeDef) || NodeDef.isAnalysis(this.nodeDef))
+          ),
           R.sortBy(R.ascend(R.prop('id')))
         ),
         (nodeDef) => [nodeDef] // Multiple attr table
@@ -106,8 +109,8 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     if (NodeDef.isRoot(this.nodeDef)) {
       return null
     }
-    const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
-    return this._getConstraintFk(new TableDataNodeDef(this.survey, nodeDefParent), columnSet.parentUuid)
+    const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(this.nodeDef)(this.survey)
+    return this._getConstraintFk(new TableDataNodeDef(this.survey, ancestorMultipleEntity), columnSet.parentUuid)
   }
 
   getConstraintUuidUnique() {

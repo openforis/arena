@@ -41,39 +41,33 @@ export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
 
-export const { getNodes } = RecordReader
-export const { getNodeByUuid } = RecordReader
-export const { getRootNode } = RecordReader
-export const { getNodesByDefUuid } = RecordReader
+export const { getNodes, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
 
 // ==== hierarchy
-export const { getParentNode } = RecordReader
-export const { getAncestorsAndSelf } = RecordReader
-export const { getAncestorByNodeDefUuid } = RecordReader
-
-export const { getNodeChildren } = RecordReader
-export const { getNodeChildrenByDefUuid } = RecordReader
-export const { getNodeChildrenByDefUuidUnsorted } = RecordReader
-export const { getNodeChildByDefUuid } = RecordReader
-export const { visitDescendantsAndSelf } = RecordReader
-export const { isNodeApplicable } = RecordReader
+export const {
+  getParentNode,
+  getAncestorsAndSelf,
+  getAncestorByNodeDefUuid,
+  getNodeChildren,
+  getNodeChildrenByDefUuid,
+  getNodeChildrenByDefUuidUnsorted,
+  getNodeChildByDefUuid,
+  visitAncestorsAndSelf,
+  visitDescendantsAndSelf,
+  isNodeApplicable,
+} = RecordReader
 
 // ==== dependency
-export const { getDependentNodePointers } = RecordReader
-export const { getParentCodeAttribute } = RecordReader
-export const { getDependentCodeAttributes } = RecordReader
+export const { getDependentNodePointers, getParentCodeAttribute, getDependentCodeAttributes } = RecordReader
 
 // ====== Keys
-export const { getEntityKeyNodes } = RecordReader
-export const { getEntityKeyValues } = RecordReader
+export const { getEntityKeyNodes, getEntityKeyValues } = RecordReader
 
 // ====== Unique
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
-export const { assocNodes } = RecordUpdater
-export const { assocNode } = RecordUpdater
-export const { mergeNodes } = RecordUpdater
+export const { assocNodes, assocNode, mergeNodes } = RecordUpdater
 
 // ====== DELETE
 export const { deleteNode } = RecordUpdater

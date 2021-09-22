@@ -14,7 +14,7 @@ const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntitie
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    if (showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) {
+    if (NodeDef.isRoot(nodeDef) || showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) {
       const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
       entities.push({
         key: NodeDef.getUuid(nodeDef),

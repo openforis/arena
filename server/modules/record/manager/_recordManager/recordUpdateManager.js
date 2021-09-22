@@ -289,7 +289,19 @@ const _onNodesUpdate = async (
     const nodeDefs = ObjectUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
-    await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
+    // include ancestor nodes (used to find the correct rdb table to update)
+    const updatedNodesAndDependentsAndAncestors = Object.values(updatedNodesAndDependents).reduce((nodesAcc, node) => {
+      Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
+      return nodesAcc
+    }, {})
+
+    await DataTableUpdateRepository.updateTables(
+      survey,
+      Record.getCycle(record),
+      nodeDefs,
+      updatedNodesAndDependentsAndAncestors,
+      t
+    )
 
     // Merge updated nodes with existing ones (remove created/updated flags nodes)
     record = Record.mergeNodes(updatedNodesAndDependents)(record)

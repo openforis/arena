@@ -24,12 +24,17 @@ export const resolveGenerator = handleGeneratorNext([])
  *
  * @param {Iterable} iterable - The iterable to iterate.
  * @param {Function} callback - The callback function to invoke on each element of the iterable.
+ * @param {Function} stopIfFn - If specified, stops the loop if the call to that function returns true.
  * @returns {Promise<*>} - The returned Promise.
  */
-export const each = async (iterable, callback) => {
+export const each = async (iterable, callback, stopIfFn = null) => {
   function* generator() {
     for (let i = 0; i < iterable.length; i += 1) {
-      yield callback(iterable[i], i)
+      const item = iterable[i]
+      if (stopIfFn && stopIfFn(item)) {
+        return
+      }
+      yield callback(item, i)
     }
   }
 
