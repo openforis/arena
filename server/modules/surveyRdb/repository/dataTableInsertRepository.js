@@ -76,8 +76,8 @@ export const populateTable = async (survey, nodeDef, client) => {
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
 
-  const nodeDefContext = NodeDef.isEntity(nodeDef) ? nodeDef : Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
-  const nodeDefAncestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
+  const nodeDefAncestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  const nodeDefContext = NodeDef.isEntity(nodeDef) ? nodeDef : nodeDefAncestorMultipleEntity
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
 

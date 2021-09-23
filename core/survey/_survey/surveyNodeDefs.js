@@ -67,7 +67,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) => (surv
     const entityDefCurrent = queue.dequeue()
     const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
 
-    descendants.push(...entityDefCurrentChildren.filter(NodeDef.isAttribute))
+    descendants.push(...entityDefCurrentChildren.filter(NodeDef.isSingleAttribute))
 
     // visit nodes inside single entities
     queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
