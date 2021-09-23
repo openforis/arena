@@ -35,11 +35,11 @@ const _getRStudioParams = async ({ userUuid, isLocal }) => {
   ProcessUtils.ENV.rStudioDownloadServerUrl is needed because when you are into localhost you need to connect RStudio to the local server through a tunnel.
   The address of this tunnel should be set into the env vars. In production the serverURL comes from the server.
  */
-const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = false, surveyInfo }) =>
+const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = false, surveyInfo, surveyCycleKey}) =>
   `
   url <- "${
     ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=0&token=${token}";\r\n
+  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=${surveyCycleKey}&token=${token}";\r\n
   ${isLocal ? `setwd(Sys.getenv("HOME"));` : ''}\r\n
   download.file(url,"./${token}.zip" ${isLocal ? `, mode="wb"` : ''});\r\n
   ${
@@ -88,7 +88,7 @@ export const openRStudio =
 
     const { token, serverUrl } = data
 
-    const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl, isLocal, surveyInfo })
+    const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl, isLocal, surveyInfo, surveyCycleKey })
 
     dispatch(LoaderActions.hideLoader())
     dispatch(

@@ -30,7 +30,7 @@ const CyclesSelector = (props) => {
           disabled:
             (cyclesKeysSelected.length === 1 && cycle === cyclesKeysSelected[0]) || // Disabled if current cycle is the only one selected in nodeDef
             cycle === cycleKeyCurrent || // Cannot remove nodeDef from current cycle
-            !cyclesKeysSelectable.includes(cycle), // Cycle is not selectable
+            (cyclesKeysSelectable && !cyclesKeysSelectable.includes(cycle)), // Cycle is not selectable
         }))}
         disabled={disabled}
       />
