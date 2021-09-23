@@ -5,13 +5,15 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { useI18n } from '@webapp/store/system'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { FormItem } from '@webapp/components/form/Input'
 import { Button } from '@webapp/components/buttons'
+
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { useI18n } from '@webapp/store/system'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+
+import { DataTestId } from '@webapp/utils/dataTestId'
 
 const NodeDefEntityFormNodeSelect = (props) => {
   const { nodeDef, nodes, parentNode, selectedNode, updateNode, removeNode, onChange, canEditRecord, canAddNode } =
@@ -27,6 +29,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
     <div className="survey-form__node-def-entity-form-header">
       {canEditRecord && (
         <Button
+          testId={DataTestId.entities.form.addNewNode}
           size="small"
           onClick={() => {
             const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
@@ -50,6 +53,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
           >
             <select
               className="node-select"
+              data-testid={DataTestId.entities.form.nodeSelect}
               value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
               onChange={(e) => onChange(e.target.value)}
               aria-disabled={R.isEmpty(nodes)}
@@ -57,8 +61,12 @@ const NodeDefEntityFormNodeSelect = (props) => {
               <option value="placeholder" disabled hidden={true}>
                 {i18n.t('common.select')}
               </option>
-              {nodes.map((n) => (
-                <option key={Node.getUuid(n)} value={Node.getUuid(n)}>
+              {nodes.map((n, index) => (
+                <option
+                  key={Node.getUuid(n)}
+                  value={Node.getUuid(n)}
+                  data-testid={DataTestId.entities.form.nodeSelectOption(index)}
+                >
                   {dispatch(SurveyFormActions.getNodeKeyLabelValues(nodeDef, n))}
                 </option>
               ))}

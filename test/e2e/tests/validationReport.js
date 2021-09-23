@@ -2,7 +2,7 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { records } from '../mock/records'
-import { gotoFormPage } from './_formDesigner'
+import { gotoFormPage, selectForm } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
@@ -123,6 +123,7 @@ export default () =>
       gotoRecord(record1)
       enterAttribute(cluster_id, '')
       gotoFormPage(plot)
+      selectForm(plot, 0)
       enterAttribute(plot_id, '')
       enterAttribute(tree_id, '', getTreeSelector(0))
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
@@ -135,7 +136,7 @@ export default () =>
       expectMessages([['Cluster[] / Cluster id', 'Required value']])
     })
 
-    describe(`Verify non relevant nodes get validated`, () => {
+    describe(`Verify non relevant nodes becoming relevant and getting validated`, () => {
       gotoNode('Cluster[] / Cluster id')
       enterAttribute(cluster_id, record1[cluster_id.name])
       waitThread()

@@ -96,6 +96,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
+            id={DataTestId.nodeDefDetails.nodeDefMultiple}
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={multipleEditDisabled}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
