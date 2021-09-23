@@ -60,21 +60,14 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   get columnNodeDefs() {
-    return R.pipe(
-      R.ifElse(
-        NodeDef.isEntity,
-        R.pipe(
-          () => Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDef)(this.survey),
-          R.filter(
-            (nodeDef) =>
-              NodeDef.isSingleAttribute(nodeDef) && (!NodeDef.isAnalysis(nodeDef) || NodeDef.isAnalysis(this.nodeDef))
-          ),
-          R.sortBy(R.ascend(R.prop('id')))
-        ),
-        (nodeDef) => [nodeDef] // Multiple attr table
-      ),
-      R.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
-    )(this.nodeDef)
+    let nodeDefs = null
+    if (NodeDef.isAttribute(this.nodeDef)) {
+      nodeDefs = [this.nodeDef] // Multiple attr table
+    } else {
+      const descendants = Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDef)(this.survey)
+      nodeDefs = R.sortBy(R.ascend(R.prop('id')))(descendants)
+    }
+    return nodeDefs.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
   }
 
   getColumnsWithType() {
