@@ -1,3 +1,5 @@
+import { SRSs } from '@openforis/arena-core'
+
 import Job from '../../../../job/job'
 
 import * as Survey from '../../../../../core/survey/survey'
@@ -14,6 +16,9 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
   async execute() {
     const { tx } = this
+
+    // initialize SRSs
+    await SRSs.init()
 
     const survey = await this.fetchSurvey()
 
