@@ -10,6 +10,7 @@ export default class SurveysRdbRefreshJob extends Job {
       { surveyIds },
       surveyIds.map((surveyId) => new SurveyRdbCreationJob({ surveyId }))
     )
+    this.stopOnInnerJobFailure = false
   }
 }
 

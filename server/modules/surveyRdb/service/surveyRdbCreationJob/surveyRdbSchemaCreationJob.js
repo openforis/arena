@@ -10,10 +10,11 @@ export default class SurveyRdbSchemaCreationJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    this.logDebug('drop and create schema - start')
+    const jobDescription = `drop and create schema for survey ${surveyId}`
+    this.logDebug(`${jobDescription} - start`)
     await SurveyRdbManager.dropSchema(surveyId, tx)
     await SurveyRdbManager.createSchema(surveyId, tx)
-    this.logDebug('drop and create schema - end')
+    this.logDebug(`${jobDescription} - end`)
   }
 }
 

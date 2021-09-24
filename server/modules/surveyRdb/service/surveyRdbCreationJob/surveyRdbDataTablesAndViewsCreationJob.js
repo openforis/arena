@@ -21,6 +21,12 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     await SRSs.init()
 
     const survey = await this.fetchSurvey()
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyId = Survey.getId(survey)
+    const surveyName = Survey.getName(surveyInfo)
+
+    const jobDescription = `RDB tables and views creation for survey ${surveyId} (${surveyName})`
+    this.logDebug(`${jobDescription} - start`)
 
     // Get entities or multiple attributes tables
     const descendantMultipleDefs = Survey.findDescendants({
@@ -65,6 +71,8 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     await SurveyRdbManager.createNodeKeysHierarchyView(survey, tx)
     this.incrementProcessedItems()
     this.logDebug('create node keys hierarchy view - end')
+
+    this.logDebug(`${jobDescription} - end`)
   }
 
   async fetchSurvey() {
