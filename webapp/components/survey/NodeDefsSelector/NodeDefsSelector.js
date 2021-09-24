@@ -52,6 +52,7 @@ const NodeDefsSelector = (props) => {
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         nodeDefLabelType={nodeDefLabelType}
+        showSingleEntities={false}
       />
 
       <ButtonIconFilter
@@ -96,6 +97,7 @@ const NodeDefsSelector = (props) => {
           canSelectAttributes={canSelectAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
+          showSiblingsInSingleEntities={true}
           nodeDefLabelType={nodeDefLabelType}
         />
       )}

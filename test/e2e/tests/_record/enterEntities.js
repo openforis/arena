@@ -31,6 +31,15 @@ export const enterCluster = (record) =>
 
 export const enterPlot = (record) =>
   describe(`Enter ${plot.name} values`, () => {
+    test('Add new plot', async () => {
+      await page.click(getSelector(DataTestId.entities.form.addNewNode, 'button'))
+      await expect(page).toHaveSelector(getSelector(DataTestId.entities.form.nodeSelect), 'select')
+    })
+    test(`Test ${plot_id.name} is required`, async () => {
+      await page.hover(getSelector(DataTestId.surveyForm.nodeDefErrorBadge(plot_id.name)))
+      const tooltipEl = await page.waitForSelector('.tooltip__message-error')
+      await expect(tooltipEl).toHaveText('Required value')
+    })
     enterAttribute(plot_id, record[plot_id.name])
     enterAttribute(plot_text, record[plot_text.name])
   })

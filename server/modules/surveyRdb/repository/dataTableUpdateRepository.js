@@ -45,20 +45,29 @@ const _getColumnNames = (nodeDef, type) =>
       ]
     : DataCol.getNames(nodeDef)
 
-const _getColValues = (survey, cycle, nodeDef, node, type) =>
+const _getColValues = ({ survey, cycle, nodeDef, node, ancestorMultipleEntity, type }) =>
   type === types.insert
     ? [
         Node.getUuid(node),
         Node.getRecordUuid(node),
         cycle,
-        Node.getParentUuid(node),
+        Node.getUuid(ancestorMultipleEntity),
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getValues(survey, nodeDef, node)
           : []),
       ]
     : DataCol.getValues(survey, nodeDef, node)
 
-const _getRowUuid = (nodeDef, node, nodeParent) => (_hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(nodeParent))
+const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
+  let currentParent = nodes[Node.getParentUuid(node)]
+  while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
+    currentParent = nodes[Node.getParentUuid(currentParent)]
+  }
+  return currentParent
+}
+
+const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
+  _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
 
 const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
@@ -67,16 +76,23 @@ const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
   )
   return nodesArray.reduce((updatesAcc, node) => {
     const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
-    const nodeDefParent = nodeDefs[NodeDef.getParentUuid(nodeDef)]
+    // skip single entities
+    if (!NodeDef.isRoot(nodeDef) && NodeDef.isSingleEntity(nodeDef)) {
+      return updatesAcc
+    }
+    const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+    const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
+    const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
+
     const type = _getType(nodeDef, node)
     if (type) {
       updatesAcc.push({
         type,
         schemaName: SchemaRdb.getName(Survey.getId(survey)),
-        tableName: DataTable.getName(nodeDef, nodeDefParent),
+        tableName: DataTable.getName(nodeDef, ancestorDef),
         columnNames: _getColumnNames(nodeDef, type),
-        colValues: _getColValues(survey, cycle, nodeDef, node, type),
-        rowUuid: _getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)]),
+        colValues: _getColValues({ survey, cycle, nodeDef, node, ancestorMultipleEntity, type }),
+        rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
       })
     }
     return updatesAcc
@@ -86,24 +102,31 @@ const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
 // ==== execution
 
 const _update = (update, client) =>
-  client.query(
+  client.one(
     `UPDATE ${update.schemaName}.${update.tableName}
       SET ${update.columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
-      WHERE uuid = $1`,
+      WHERE uuid = $1
+      RETURNING uuid`,
     [update.rowUuid, ...update.colValues]
   )
 
 const _insert = (update, client) =>
-  client.query(
+  client.one(
     `INSERT INTO ${update.schemaName}.${update.tableName}
       (${update.columnNames.join(',')})
       VALUES 
-      (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})`,
+      (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})
+      RETURNING uuid`,
     update.colValues
   )
 
 const _delete = (update, client) =>
-  client.query(`DELETE FROM ${update.schemaName}.${update.tableName} WHERE uuid = $1`, update.rowUuid)
+  client.one(
+    `DELETE FROM ${update.schemaName}.${update.tableName} 
+    WHERE uuid = $1
+    RETURNING uuid`,
+    update.rowUuid
+  )
 
 const queryByType = {
   [types.delete]: _delete,
@@ -111,7 +134,7 @@ const queryByType = {
   [types.update]: _update,
 }
 
-export const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
+export const updateTables = async (survey, cycle, nodeDefs, nodes, client) => {
   const updates = _toUpdates(survey, cycle, nodeDefs, nodes)
   await client.batch(updates.map((update) => queryByType[update.type](update, client)))
 }

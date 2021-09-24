@@ -32,8 +32,8 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
     this._viewDataParent = null
     if (!this._root && !this._virtual) {
-      const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
-      this._viewDataParent = new ViewDataNodeDef(this.survey, nodeDefParent)
+      const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(this.nodeDef)(this.survey)
+      this._viewDataParent = new ViewDataNodeDef(this.survey, ancestorMultipleEntityDef)
     }
   }
 

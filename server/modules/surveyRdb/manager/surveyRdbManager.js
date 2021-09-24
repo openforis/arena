@@ -158,14 +158,16 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
   await FileUtils.rmdir(dir)
   await FileUtils.mkdir(dir)
 
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter((node) => NodeDef.isEntity(node) || NodeDef.isMultiple(node))
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
+  )
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext)(survey)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
       : [nodeDefContext] // Multiple attribute
 
     let parentKeys = []

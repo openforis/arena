@@ -3,6 +3,11 @@ import { Query } from '../../../../common/model/query'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
+import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
+
+import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
+
 const _fetchSurvey = async (surveyId, cycle) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
   return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
@@ -49,4 +54,16 @@ export const countTable = async (params) => {
   return Query.isModeAggregate(query)
     ? SurveyRdbManager.countViewDataAgg({ survey, cycle, query })
     : SurveyRdbManager.countTable({ survey, cycle, query })
+}
+
+export const refreshAllRdbs = async () => {
+  const surveySummaries = await SurveyManager.fetchSurveyIdsAndNames()
+  const surveyIds = surveySummaries
+    .filter((surveySummary) => surveySummary.published || surveySummary.collectUri)
+    .map((surveySummary) => surveySummary.id)
+
+  const job = new SurveysRdbRefreshJob({ surveyIds })
+  JobManager.executeJobThread(job)
+
+  return { job: JobUtils.jobToJSON(job) }
 }

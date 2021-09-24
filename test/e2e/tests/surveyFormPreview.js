@@ -26,7 +26,6 @@ const {
   cluster_region,
   cluster_province,
 } = cluster.children
-const { plot_id } = plot.children
 const { tree_id, tree_dec_1, tree_dec_2 } = tree.children
 
 export default () =>
@@ -64,12 +63,9 @@ export default () =>
 
       gotoFormPage(plot)
 
-      test(`Verify ${plot.name} not required and not applicable`, async () => {
+      test(`Verify ${plot.name} not applicable`, async () => {
         const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
         await expect(await plotEl.getAttribute('class')).toContain('not-applicable')
-
-        await page.hover(`text="${plot_id.label}"`)
-        await expect(page).not.toHaveText('Required value')
       })
     })
 
@@ -86,12 +82,9 @@ export default () =>
 
     gotoFormPage(plot)
 
-    test(`Verify ${plot.name} required and applicable`, async () => {
+    test(`Verify ${plot.name} applicable`, async () => {
       const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
       await expect(await plotEl.getAttribute('class')).not.toContain('not-applicable')
-
-      await page.hover(`text="${plot_id.label}"`)
-      await expect(page).toHaveText('Required value')
     })
     enterPlot(recordPreview)
     verifyPlot(recordPreview)

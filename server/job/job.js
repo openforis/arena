@@ -303,6 +303,10 @@ export default class Job {
 
       this.logDebug(`- running inner job ${this.currentInnerJobIndex + 1}`)
 
+      // add inner job params to parent job context
+      if (this.context && innerJob.context) {
+        Object.assign(this.context, innerJob.context)
+      }
       innerJob.context = this.context
 
       innerJob.onEvent(this._handleInnerJobEvent.bind(this))

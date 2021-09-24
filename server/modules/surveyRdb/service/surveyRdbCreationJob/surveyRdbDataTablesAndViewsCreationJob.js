@@ -2,6 +2,7 @@ import Job from '../../../../job/job'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as PromiseUtils from '../../../../../core/promiseUtils'
 
 import * as SurveyRdbManager from '../../manager/surveyRdbManager'
 import * as SurveyManager from '../../../survey/manager/surveyManager'
@@ -17,33 +18,33 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const survey = await this.fetchSurvey()
 
     // Get entities or multiple attributes tables
-    const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
+    const descendantMultipleDefs = Survey.findDescendants({
+      filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+    })(survey)
 
-    this.total = length + 3
+    this.total = descendantMultipleDefs.length + 3
 
-    // Traverse entities to create and populate tables
-    const traverseNodeDef = async (nodeDef) => {
-      if (this.isCanceled()) {
-        return
-      }
+    // Visit entities and multiple attributes to create and populate tables
+    await PromiseUtils.each(
+      descendantMultipleDefs,
+      async (nodeDef) => {
+        const nodeDefName = NodeDef.getName(nodeDef)
 
-      const nodeDefName = NodeDef.getName(nodeDef)
+        // ===== create table and view
+        this.logDebug(`create data table ${nodeDefName} - start`)
+        await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
+        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+        this.logDebug(`create data table ${nodeDefName} - end`)
 
-      // ===== create table and view
-      this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
-      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
-      this.logDebug(`create data table ${nodeDefName} - end`)
+        // ===== insert into table
+        this.logDebug(`insert into table ${nodeDefName} - start`)
+        await SurveyRdbManager.populateTable(survey, nodeDef, tx)
+        this.logDebug(`insert into table ${nodeDefName} - end`)
 
-      // ===== insert into table
-      this.logDebug(`insert into table ${nodeDefName} - start`)
-      await SurveyRdbManager.populateTable(survey, nodeDef, tx)
-      this.logDebug(`insert into table ${nodeDefName} - end`)
-
-      this.incrementProcessedItems()
-    }
-
-    await Survey.traverseHierarchyItem(root, traverseNodeDef)
+        this.incrementProcessedItems()
+      },
+      () => this.isCanceled()
+    )
 
     this.logDebug('create node keys view - start')
     await SurveyRdbManager.createNodeKeysView(survey, tx)

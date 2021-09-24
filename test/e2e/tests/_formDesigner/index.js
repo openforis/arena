@@ -78,3 +78,11 @@ export const gotoFormPage = (nodeDef) => {
     await page.click(getSelector(DataTestId.surveyForm.pageLinkBtn(nodeDef.name), 'button'))
   })
 }
+
+export const selectForm = (nodeDef, keyValue) => {
+  const optionLabel = `${nodeDef.label} - ${keyValue}`
+  test(`Select form ${optionLabel}`, async () => {
+    const nodeSelectSelector = getSelector(DataTestId.entities.form.nodeSelect, 'select')
+    await page.selectOption(nodeSelectSelector, { label: optionLabel })
+  })
+}

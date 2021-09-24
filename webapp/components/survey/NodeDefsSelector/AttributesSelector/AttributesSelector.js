@@ -22,18 +22,28 @@ const AttributesSelector = (props) => {
     showAncestorsLabel,
     showLabel,
     showMultipleAttributes,
+    showSiblingsInSingleEntities,
     nodeDefLabelType,
   } = props
 
   const survey = useSurvey()
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
+
+  if (!nodeDefContext) return null
+
+  const nodeDefAncestor = showSiblingsInSingleEntities
+    ? Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
+    : Survey.getNodeDefParent(nodeDefContext)(survey)
 
   let childDefs = []
-  if (nodeDefContext) {
-    childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
-      : [nodeDefContext] // Multiple attribute
+  if (NodeDef.isEntity(nodeDefContext)) {
+    if (showSiblingsInSingleEntities) {
+      childDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+    } else {
+      childDefs = Survey.getNodeDefChildren(nodeDefContext)(survey)
+    }
+  } else {
+    childDefs = [nodeDefContext] // Multiple attribute
   }
 
   return (
@@ -56,10 +66,10 @@ const AttributesSelector = (props) => {
         ))}
       </ExpansionPanel>
 
-      {showAncestors && nodeDefParent && (
+      {showAncestors && nodeDefAncestor && (
         <AttributesSelector
           lang={lang}
-          nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
+          nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
@@ -67,6 +77,7 @@ const AttributesSelector = (props) => {
           showLabel={showAncestorsLabel}
           showAncestorsLabel={showAncestorsLabel}
           showMultipleAttributes={showMultipleAttributes}
+          showSiblingsInSingleEntities={showSiblingsInSingleEntities}
           nodeDefLabelType={nodeDefLabelType}
         />
       )}
@@ -85,6 +96,7 @@ AttributesSelector.propTypes = {
   showLabel: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
+  showSiblingsInSingleEntities: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
 }
 
@@ -97,6 +109,7 @@ AttributesSelector.defaultProps = {
   showAncestorsLabel: true,
   showLabel: false,
   showMultipleAttributes: true,
+  showSiblingsInSingleEntities: false,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 

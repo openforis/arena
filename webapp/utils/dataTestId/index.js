@@ -50,6 +50,11 @@ export const DataTestId = {
   entities: {
     addBtn: 'entity-add-btn',
     entitySelector: 'entity-selector',
+    form: {
+      addNewNode: 'entity-form-add-new-node-btn',
+      nodeSelect: 'entity-form-node-select',
+      nodeSelectOption: (index) => `entity-form-node-select-option-${index}`,
+    },
   },
   expressionEditor: {
     advancedQuery: 'expression-advanced-query',
@@ -91,6 +96,7 @@ export const DataTestId = {
     nodeDefCodeParent: 'node-def-code-parent',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
+    nodeDefMultiple: 'node-def-multiple',
     nodeDefUnique: 'node-def-unique',
     relevantIf: 'relevant-if',
     saveBtn: 'node-def-save-btn',

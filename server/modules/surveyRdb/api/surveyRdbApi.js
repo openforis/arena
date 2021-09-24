@@ -6,9 +6,19 @@ import * as Response from '../../../utils/response'
 
 import * as SurveyRdbService from '../service/surveyRdbService'
 
-import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
+import { requireRecordListViewPermission, requireSurveyRdbRefreshPermission } from '../../auth/authApiMiddleware'
 
 export const init = (app) => {
+  app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {
+    try {
+      const { job } = await SurveyRdbService.refreshAllRdbs()
+
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, query: queryParam, offset, limit } = Request.getParams(req)

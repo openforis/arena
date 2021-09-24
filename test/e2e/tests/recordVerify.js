@@ -2,10 +2,12 @@ import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
 
 import { plot } from '../mock/nodeDefs'
 import { records } from '../mock/records'
-import { gotoFormPage } from './_formDesigner'
+import { gotoFormPage, selectForm } from './_formDesigner'
 import { gotoHome, gotoRecords } from './_navigation'
 import { verifyCluster, verifyPlot, verifyTrees } from './_record'
 import { gotoRecord } from './_records'
+
+const { plot_id } = plot.children
 
 export default () =>
   describe('Record verify', () => {
@@ -24,6 +26,8 @@ export default () =>
       verifyCluster(record)
 
       gotoFormPage(plot)
+
+      selectForm(plot, record[plot_id.name])
 
       verifyPlot(record)
 

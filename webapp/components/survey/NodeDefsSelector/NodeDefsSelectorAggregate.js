@@ -74,6 +74,7 @@ const NodeDefsSelectorAggregate = (props) => {
         lang={lang}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
+        showSingleEntities={false}
       />
 
       {nodeDefUuidEntity && (

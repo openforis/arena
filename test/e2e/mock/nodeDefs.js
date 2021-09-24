@@ -22,11 +22,12 @@ const createTaxon = (name, label, taxonomy, unique = false) => ({
   taxonomy,
 })
 
-const createEntity = (name, label, children = null) => ({
+const createEntity = (name, label, children = null, multiple = false) => ({
   name,
   label,
   type: 'entity',
   children,
+  multiple,
 })
 
 export const cluster = createEntity('cluster', 'Cluster', {
@@ -49,17 +50,22 @@ export const cluster = createEntity('cluster', 'Cluster', {
     categories.administrative_unit.name,
     'cluster_region'
   ),
-  plot: createEntity('plot', 'Plot', {
-    plot_id: createAttribute('plot_id', 'Plot id', 'integer', true),
-    plot_text: createAttribute('plot_text', 'Plot text', 'text'),
-    plot_file: createAttribute('plot_file', 'Plot file', 'file'),
-    tree: createEntity('tree', 'Tree', {
-      tree_id: createAttribute('tree_id', 'Tree id', 'integer', true),
-      tree_dec_1: createAttribute('tree_dec_1', 'Tree decimal 1', 'decimal'),
-      tree_dec_2: createAttribute('tree_dec_2', 'Tree decimal 2', 'decimal'),
-      tree_species: createTaxon('tree_species', 'Tree Species', taxonomies.species_list.name, true),
-    }),
-  }),
+  plot: createEntity(
+    'plot',
+    'Plot',
+    {
+      plot_id: createAttribute('plot_id', 'Plot id', 'integer', true),
+      plot_text: createAttribute('plot_text', 'Plot text', 'text'),
+      plot_file: createAttribute('plot_file', 'Plot file', 'file'),
+      tree: createEntity('tree', 'Tree', {
+        tree_id: createAttribute('tree_id', 'Tree id', 'integer', true),
+        tree_dec_1: createAttribute('tree_dec_1', 'Tree decimal 1', 'decimal'),
+        tree_dec_2: createAttribute('tree_dec_2', 'Tree decimal 2', 'decimal'),
+        tree_species: createTaxon('tree_species', 'Tree Species', taxonomies.species_list.name, true),
+      }),
+    },
+    true
+  ),
 })
 
 export const { plot } = cluster.children

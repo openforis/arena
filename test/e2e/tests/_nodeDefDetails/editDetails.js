@@ -41,7 +41,12 @@ export const editNodeDefDetails = (nodeDef) => {
   test(`${nodeDef.label} edit details`, async () => {
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
     await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
-    if (nodeDef.key) await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
+    if (nodeDef.key) {
+      await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefKey, 'button'))
+    }
+    if (nodeDef.multiple) {
+      await page.click(getSelector(DataTestId.nodeDefDetails.nodeDefMultiple, 'button'))
+    }
     if (nodeDef.unique) {
       // go to Validations tab
       await page.click(getSelector(DataTestId.tabBar.tabBarBtn(DataTestId.nodeDefDetails.validations), 'button'))

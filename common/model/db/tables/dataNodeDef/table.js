@@ -60,18 +60,14 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   get columnNodeDefs() {
-    return R.pipe(
-      R.ifElse(
-        NodeDef.isEntity,
-        R.pipe(
-          () => Survey.getNodeDefChildren(this.nodeDef, NodeDef.isAnalysis(this.nodeDef))(this.survey),
-          R.filter(NodeDef.isSingleAttribute),
-          R.sortBy(R.ascend(R.prop('id')))
-        ),
-        (nodeDef) => [nodeDef] // Multiple attr table
-      ),
-      R.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
-    )(this.nodeDef)
+    let nodeDefs = null
+    if (NodeDef.isAttribute(this.nodeDef)) {
+      nodeDefs = [this.nodeDef] // Multiple attr table
+    } else {
+      const descendants = Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDef)(this.survey)
+      nodeDefs = R.sortBy(R.ascend(R.prop('id')))(descendants)
+    }
+    return nodeDefs.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
   }
 
   getColumnsWithType() {
@@ -106,8 +102,8 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     if (NodeDef.isRoot(this.nodeDef)) {
       return null
     }
-    const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
-    return this._getConstraintFk(new TableDataNodeDef(this.survey, nodeDefParent), columnSet.parentUuid)
+    const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(this.nodeDef)(this.survey)
+    return this._getConstraintFk(new TableDataNodeDef(this.survey, ancestorMultipleEntity), columnSet.parentUuid)
   }
 
   getConstraintUuidUnique() {

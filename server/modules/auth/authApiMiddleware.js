@@ -80,6 +80,7 @@ export const requireSurveyCreatePermission = async (req, _res, next) => {
 export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
 export const requireRecordCleansePermission = requireSurveyPermission(Authorizer.canCleanseRecords)
+export const requireSurveyRdbRefreshPermission = requirePermission(Authorizer.canRefreshAllSurveyRdbs)
 
 // Record
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)

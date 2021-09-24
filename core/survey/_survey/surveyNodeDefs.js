@@ -6,6 +6,7 @@ import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
+import Queue from '@core/queue'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -56,6 +57,29 @@ export const getNodeDefChildrenInOwnPage =
     return childrenInOwnPage
   }
 
+export const getNodeDefDescendantsInSingleEntities =
+  ({ nodeDef, filterFn }) =>
+  (survey) => {
+    const descendants = []
+
+    const queue = new Queue()
+    queue.enqueue(nodeDef)
+
+    while (!queue.isEmpty()) {
+      const entityDefCurrent = queue.dequeue()
+      const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
+
+      descendants.push(...entityDefCurrentChildren.filter(filterFn))
+
+      // visit nodes inside single entities
+      queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
+    }
+    return descendants
+  }
+
+export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) =>
+  getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isSingleAttribute })
+
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   if (NodeDef.isAttribute(nodeDef)) {
     return false
@@ -71,6 +95,7 @@ export const getNodeDefChildByName = (nodeDef, childName) =>
   )
 
 export const getNodeDefParent = (nodeDef) => (survey) => {
+  if (NodeDef.isRoot(nodeDef)) return null
   const nodeDefParent = getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   return NodeDef.isVirtual(nodeDef) ? getNodeDefParent(nodeDefParent)(survey) : nodeDefParent
 }
@@ -154,6 +179,14 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => (survey
     : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
 }
 
+export const getNodeDefAncestorMultipleEntity = (nodeDef) => (survey) => {
+  let nodeDefCurrent = nodeDef
+  do {
+    nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
+  } while (nodeDefCurrent && !NodeDef.isRoot(nodeDefCurrent) && !NodeDef.isMultipleEntity(nodeDefCurrent))
+  return nodeDefCurrent
+}
+
 export const getNodeDefPath =
   ({ nodeDef, showLabels = false, labelLang = null }) =>
   (survey) => {
@@ -204,6 +237,59 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
     traverseHierarchyItemSync(child, visitorFn, depth + 1)
   })
 }
+
+export const visitDescendants =
+  ({ nodeDef = null, visitorFn }) =>
+  (survey) => {
+    const queue = new Queue()
+
+    queue.enqueue(nodeDef || getNodeDefRoot(survey))
+
+    while (!queue.isEmpty()) {
+      const nodeDefCurrent = queue.dequeue()
+
+      visitorFn(nodeDefCurrent)
+
+      if (NodeDef.isEntity(nodeDefCurrent)) {
+        const childrenDefs = getNodeDefChildren(nodeDefCurrent)(survey)
+        queue.enqueueItems(childrenDefs)
+      }
+    }
+  }
+
+export const findDescendants =
+  ({ nodeDef = null, filterFn }) =>
+  (survey) => {
+    const descendants = []
+    visitDescendants({
+      nodeDef,
+      visitorFn: (nodeDefCurrent) => {
+        if (filterFn(nodeDefCurrent)) {
+          descendants.push(nodeDefCurrent)
+        }
+      },
+    })(survey)
+    return descendants
+  }
+
+export const getDescendants =
+  ({ nodeDef }) =>
+  (survey) => {
+    const descendants = []
+    const queue = new Queue()
+
+    queue.enqueue(nodeDef || getNodeDefRoot(survey))
+
+    while (!queue.isEmpty()) {
+      const nodeDefCurrent = queue.dequeue()
+
+      descendants.push(nodeDefCurrent)
+
+      const childrenDefs = getNodeDefChildren(nodeDefCurrent)(survey)
+      queue.enqueueItems(childrenDefs)
+    }
+    return descendants
+  }
 
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))

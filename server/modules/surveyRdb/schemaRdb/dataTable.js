@@ -18,6 +18,10 @@ export const columnNameParentUuuid = 'parent_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
+export const columnNameAncestorUuid = 'ancestor_uuid'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
 export const columnNameRecordUuuid = 'record_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
@@ -30,7 +34,7 @@ export const columnNameRecordCycle = 'record_cycle'
 export const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? R.pipe(
-        Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef)),
+        Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDef),
         R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id')))
       )(survey)
@@ -65,7 +69,7 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
     Node.getUuid(nodeRow),
     nodeRow[columnNameRecordUuuid],
     nodeRow[columnNameRecordCycle],
-    nodeRow[columnNameParentUuuid],
+    nodeRow[columnNameAncestorUuid],
     ...rowValues,
   ]
 }
