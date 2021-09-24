@@ -36,9 +36,7 @@ export const enterPlot = (record) =>
       await expect(page).toHaveSelector(getSelector(DataTestId.entities.form.nodeSelect), 'select')
     })
     test(`Test ${plot_id.name} is required`, async () => {
-      const plotIdFieldSelector = `text="${plot_id.label}"`
-      await page.waitForSelector(plotIdFieldSelector)
-      await page.hover(plotIdFieldSelector)
+      await page.hover(getSelector(DataTestId.surveyForm.nodeDefErrorBadge(plot_id.name)))
       const tooltipEl = await page.waitForSelector('.tooltip__message-error')
       await expect(tooltipEl).toHaveText('Required value')
     })

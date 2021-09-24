@@ -7,6 +7,8 @@ import { gotoHome, gotoRecords } from './_navigation'
 import { verifyCluster, verifyPlot, verifyTrees } from './_record'
 import { gotoRecord } from './_records'
 
+const { plot_id } = plot.children
+
 export default () =>
   describe('Record verify', () => {
     describe.each(Array.from(Array(records.length).keys()))(`Verify record %s`, (idx) => {
@@ -25,7 +27,7 @@ export default () =>
 
       gotoFormPage(plot)
 
-      selectForm(plot, 0)
+      selectForm(plot, record[plot_id.name])
 
       verifyPlot(record)
 
