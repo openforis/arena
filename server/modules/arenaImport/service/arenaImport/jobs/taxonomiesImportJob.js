@@ -46,6 +46,8 @@ export default class TaxonomiesImportJob extends Job {
       this.tx
     )
     const taxa = await ArenaSurveyFileZip.getTaxa(arenaSurveyFileZip, Taxonomy.getUuid(taxonomyImported))
-    await TaxonomyManager.insertTaxa({ user: this.user, surveyId, taxa, addLogs: false, backup, client: this.tx })
+    if (taxa.length > 0) {
+      await TaxonomyManager.insertTaxa({ user: this.user, surveyId, taxa, addLogs: false, backup, client: this.tx })
+    }
   }
 }

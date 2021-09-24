@@ -1,10 +1,17 @@
 import Job from '@server/job/job'
 import * as User from '@core/user/user'
+import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as PromiseUtils from '@core/promiseUtils'
 
+import BatchPersister from '@server/db/batchPersister'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
+
 import * as Record from '@core/record/record'
+
+const NODES_INSERT_BATCH_SIZE = 10000
 
 export default class RecordsImportJob extends Job {
   constructor(params) {
@@ -12,8 +19,8 @@ export default class RecordsImportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, arenaSurveyFileZip } = this.context
-    
+    const { surveyId, survey, arenaSurveyFileZip } = this.context
+
     const records = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
 
     const recordsToInsert = await Promise.all(
@@ -31,17 +38,22 @@ export default class RecordsImportJob extends Job {
       this.tx
     )
 
-    const nodesToInsert = []
-    recordsToInsert.forEach((record) => {
-      const nodes = Record.getNodes(record)
+    const batchPersister = new BatchPersister(
+      async (nodes) => RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodes }, this.tx),
+      NODES_INSERT_BATCH_SIZE
+    )
 
-      Object.values(nodes || {}).forEach((node) => {
-        nodesToInsert.push(node)
+    await PromiseUtils.each(recordsToInsert, async (record) => {
+      const nodes = Record.getNodes(record)
+      await PromiseUtils.each(nodes, async (node) => {
+        // check that the node definition associated to the node has not been deleted from the survey
+        if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
+          await batchPersister.addItem(node)
+        }
       })
     })
 
-    if (nodesToInsert.length <= 0) return
-    await RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodesToInsert }, this.tx)
+    await batchPersister.flush()
   }
 }
 
