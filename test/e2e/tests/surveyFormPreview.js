@@ -26,7 +26,6 @@ const {
   cluster_region,
   cluster_province,
 } = cluster.children
-const { plot_id } = plot.children
 const { tree_id, tree_dec_1, tree_dec_2 } = tree.children
 
 export default () =>
