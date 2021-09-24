@@ -43,6 +43,7 @@ export const canViewTemplates = (user) => User.isSystemAdmin(user)
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
 export const canEditTemplates = (user) => User.isSystemAdmin(user)
+export const canRefreshAllSurveyRdbs = (user) => User.isSystemAdmin(user)
 
 // ======
 // ====== Record
@@ -95,7 +96,7 @@ export const canViewUser = (user, surveyInfo, userToView) => {
     User.isSystemAdmin(user) ||
     // same user
     User.isEqual(userToView)(user) ||
-    // 
+    //
     (Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
       Boolean(_getSurveyUserGroup(userToView, surveyInfo, false)))
   )

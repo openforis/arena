@@ -1,6 +1,8 @@
+import * as R from 'ramda'
+import camelize from 'camelize'
+
 import { db } from '@server/db/db'
 import * as DB from '@server/db'
-import * as R from 'ramda'
 
 import { selectDate } from '@server/db/dbUtils'
 
@@ -124,12 +126,26 @@ export const fetchSurveysByName = async (surveyName, client = db) =>
   )
 
 export const fetchSurveyIdsAndNames = async (client = db) =>
-  client.any(
-    `SELECT id, props->>'name' as name 
-    FROM survey WHERE props->>'name' IS NOT NULL
+  client.map(
+    `SELECT 
+      id, 
+      published,
+      props->>'${Survey.infoKeys.name}' AS name, 
+      props->>'${Survey.infoKeys.collectUri}' AS collect_uri
+    FROM survey 
+    WHERE 
+      props->>'${Survey.infoKeys.name}' IS NOT NULL
     UNION
-    SELECT id, props_draft->>'name' as name 
-    FROM survey WHERE props_draft->>'name' IS NOT NULL`
+    SELECT 
+      id, 
+      published,
+      props_draft->>'${Survey.infoKeys.name}' AS name, 
+      props_draft->>'${Survey.infoKeys.collectUri}' AS collect_uri
+    FROM survey 
+    WHERE 
+      props_draft->>'${Survey.infoKeys.name}' IS NOT NULL`,
+    [],
+    camelize
   )
 
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
