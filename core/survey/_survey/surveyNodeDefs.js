@@ -57,23 +57,28 @@ export const getNodeDefChildrenInOwnPage =
     return childrenInOwnPage
   }
 
-export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) => (survey) => {
-  const descendants = []
+export const getNodeDefDescendantsInSingleEntities =
+  ({ nodeDef, filterFn }) =>
+  (survey) => {
+    const descendants = []
 
-  const queue = new Queue()
-  queue.enqueue(nodeDef)
+    const queue = new Queue()
+    queue.enqueue(nodeDef)
 
-  while (!queue.isEmpty()) {
-    const entityDefCurrent = queue.dequeue()
-    const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
+    while (!queue.isEmpty()) {
+      const entityDefCurrent = queue.dequeue()
+      const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
 
-    descendants.push(...entityDefCurrentChildren.filter(NodeDef.isSingleAttribute))
+      descendants.push(...entityDefCurrentChildren.filter(filterFn))
 
-    // visit nodes inside single entities
-    queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
+      // visit nodes inside single entities
+      queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
+    }
+    return descendants
   }
-  return descendants
-}
+
+export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) =>
+  getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isSingleAttribute })
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   if (NodeDef.isAttribute(nodeDef)) {

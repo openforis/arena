@@ -140,6 +140,7 @@ export const {
   getDescendants,
   visitDescendants,
   findDescendants,
+  getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,
 } = SurveyNodeDefs

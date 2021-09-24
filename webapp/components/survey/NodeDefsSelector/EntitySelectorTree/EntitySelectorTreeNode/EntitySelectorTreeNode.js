@@ -20,7 +20,7 @@ const EntitySelectorTreeNode = (props) => {
   const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
   const childEntityDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
-    : Survey.getNodeDefChildren(nodeDef)(survey).filter(NodeDef.isEntity)
+    : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
   const root = NodeDef.isRoot(nodeDef)
 
   const [showChildren, setShowChildren] = useState(root || expanded)
