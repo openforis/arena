@@ -47,6 +47,9 @@ export default class Job {
     this.innerJobs = innerJobs
     this.currentInnerJobIndex = -1
 
+    // configuration parameters
+    this._stopOnInnerJobFailure = true
+
     this.eventListener = null
 
     this._logger = Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`)
@@ -283,6 +286,14 @@ export default class Job {
     return User.getUuid(this.user)
   }
 
+  get stopOnInnerJobFailure() {
+    return this._stopOnInnerJobFailure
+  }
+
+  set stopOnInnerJobFailure(value) {
+    this._stopOnInnerJobFailure = value
+  }
+
   getCurrentInnerJob() {
     return this.innerJobs[this.currentInnerJobIndex]
   }
@@ -307,6 +318,7 @@ export default class Job {
       if (this.context && innerJob.context) {
         Object.assign(this.context, innerJob.context)
       }
+      // share the same context object between parent and inner jobs
       innerJob.context = this.context
 
       innerJob.onEvent(this._handleInnerJobEvent.bind(this))
@@ -315,7 +327,7 @@ export default class Job {
 
       if (innerJob.isSucceeded()) {
         this.incrementProcessedItems()
-      } else {
+      } else if (this.stopOnInnerJobFailure) {
         break
       }
     }
