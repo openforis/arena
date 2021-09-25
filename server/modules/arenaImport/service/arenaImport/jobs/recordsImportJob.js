@@ -45,7 +45,7 @@ export default class RecordsImportJob extends Job {
 
     await PromiseUtils.each(recordsToInsert, async (record) => {
       const nodes = Record.getNodes(record)
-      await PromiseUtils.each(nodes, async (node) => {
+      await PromiseUtils.each(Object.values(nodes), async (node) => {
         // check that the node definition associated to the node has not been deleted from the survey
         if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
           await batchPersister.addItem(node)

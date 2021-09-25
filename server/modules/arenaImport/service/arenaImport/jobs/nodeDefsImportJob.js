@@ -10,7 +10,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, backup, surveyId } = this.context
+    const { arenaSurvey, backup, surveyId, survey } = this.context
 
     const nodeDefs = Survey.getNodeDefsArray(arenaSurvey)
     if (nodeDefs.length === 0) return
@@ -21,6 +21,9 @@ export default class NodeDefsImportJob extends Job {
       backup,
       client: this.tx,
     })
+
+    const surveyUpdated = Survey.assocNodeDefs({ nodeDefs: Survey.getNodeDefs(arenaSurvey) })(survey)
+    this.setContext({ survey: surveyUpdated })
   }
 }
 
