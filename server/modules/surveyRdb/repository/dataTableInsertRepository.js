@@ -10,7 +10,13 @@ import * as SurveySchemaRepository from '../../survey/repository/surveySchemaRep
 
 import * as DataTable from '../schemaRdb/dataTable'
 
-const getSelectQuery = ({ surveySchema, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity }) => {
+const getSelectQuery = ({
+  surveySchema,
+  nodeDef,
+  nodeDefContext,
+  nodeDefAncestorMultipleEntity,
+  nodeDefColumnsUuids,
+}) => {
   const nodeAncestorEntityHierarchyIndex = nodeDefAncestorMultipleEntity
     ? NodeDef.getMetaHierarchy(nodeDefAncestorMultipleEntity).length
     : null
@@ -62,8 +68,8 @@ const getSelectQuery = ({ surveySchema, nodeDef, nodeDefContext, nodeDefAncestor
           FROM
             ${surveySchema}.node c
           WHERE
-            ${childrenAncestorUuidColumn} IN (select uuid from n)
-            AND c.node_def_uuid IN ($2:csv)
+            ${childrenAncestorUuidColumn} IN (SELECT uuid FROM n)
+            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''}
             AND c.value IS NOT NULL
           GROUP BY
             ancestor_uuid
@@ -80,15 +86,19 @@ export const populateTable = async (survey, nodeDef, client) => {
   const nodeDefContext = NodeDef.isEntity(nodeDef) ? nodeDef : nodeDefAncestorMultipleEntity
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
+  const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
   const viewName = `${surveySchema}.m_view_data`
-  const selectQuery = getSelectQuery({ surveySchema, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity })
+  const selectQuery = getSelectQuery({
+    surveySchema,
+    nodeDef,
+    nodeDefContext,
+    nodeDefAncestorMultipleEntity,
+    nodeDefColumnsUuids,
+  })
 
-  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [
-    nodeDefUuid,
-    nodeDefColumns.map(NodeDef.getUuid),
-  ])
+  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [nodeDefUuid, nodeDefColumnsUuids])
 
   const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 
