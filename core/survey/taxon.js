@@ -111,6 +111,7 @@ export const mergeProps = (taxonNew) => (taxon) => {
       [propKeys.family]: getFamily(taxonNew),
       [propKeys.genus]: getGenus(taxonNew),
       [propKeys.scientificName]: getScientificName(taxonNew),
+      [propKeys.extra]: getExtra(taxonNew),
     },
     [keys.vernacularNames]: vernacularNamesUpdated,
   }
