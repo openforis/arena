@@ -18,8 +18,8 @@ export const getItemsDialog = async ({ state, value }) => {
   return Array.isArray(items)
     ? items.filter(
         (item) =>
-          StringUtils.contains(searchValue, State.getItemKey(state)(item)) ||
-          StringUtils.contains(searchValue, State.getItemLabel(state)(item))
+          StringUtils.contains(searchValue, String(State.getItemKey(state)(item))) ||
+          StringUtils.contains(searchValue, String(State.getItemLabel(state)(item)))
       )
     : items(value)
 }
