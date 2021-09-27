@@ -1,10 +1,11 @@
 import './TaxonomyDetails.scss'
 
-import * as A from '@core/arena'
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
+import classNames from 'classnames'
+
+import * as A from '@core/arena'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -35,14 +36,19 @@ const TaxonomyDetails = (props) => {
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
   const extraPropsDefs = Taxonomy.getExtraPropsDefs(taxonomy)
+  const extraPropKeys = Object.keys(extraPropsDefs)
 
-  const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${
-    R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 15rem)`
-  }
-  ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 10rem)`}`
+  const onlyRequiredColumns = R.isEmpty(vernacularLanguageCodes) && R.isEmpty(extraPropKeys)
+
+  const gridTemplateColumns = onlyRequiredColumns
+    ? `.1fr .1fr .2fr .2fr .4fr`
+    : `4rem 15rem 15rem 20rem 30rem ${
+        R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 20rem)`
+      }
+        ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 15rem)`}`
 
   return (
-    <div className="taxonomy">
+    <div className={classNames('taxonomy', { onlyRequiredColumns })}>
       <Header state={state} Actions={Actions} />
 
       <div className="taxonomy__table-container">
