@@ -121,11 +121,20 @@ describe('RecordExpressionParser Test', () => {
       r: null,
     },
     // distance
+    // distance between 2 points as text
+    {
+      q: `distance('SRID=EPSG:4326;POINT(50.84809 5.69769)', 'SRID=EPSG:4326;POINT(50.84805423 5.697799)').toFixed(2)`,
+      r: '12.75', // real distance should be around 8.57m
+    },
+    // distance between 2 points as coordinate attributes
     { q: 'distance(plot[0].plot_location, plot[1].plot_location).toFixed(2)', r: '2171.94' },
+    // distance: commutative property
     {
       q: 'distance(plot[0].plot_location, plot[1].plot_location) == distance(plot[1].plot_location, plot[0].plot_location)',
       r: true,
     },
+    // distance between points in the same location should be 0
+    { q: `distance('SRID=EPSG:4326;POINT(12.89463 42.00048)', 'SRID=EPSG:4326;POINT(12.89463 42.00048)')`, r: 0 },
     // distance (invalid node type)
     { q: 'distance(plot[0].plot_location, remarks)', r: null },
     // distance (using categoryItemProp)
