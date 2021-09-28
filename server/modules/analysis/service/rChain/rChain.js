@@ -1,4 +1,3 @@
-import Counter from '@core/counter'
 import * as ProcessUtils from '@core/processUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as Survey from '@core/survey/survey'
@@ -13,7 +12,15 @@ import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyServi
 import * as AnalysisManager from '../../manager'
 import * as StringUtils from '../../../../../core/stringUtils'
 
-import { ListCategories, ListTaxonomies, RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
+import {
+  ListCategories,
+  ListTaxonomies,
+  RFileClose,
+  RFileInit,
+  RFileLogin,
+  RFilePersistResults,
+  RFileReadData,
+} from './rFile/system'
 import { RFileCommon } from './rFile/user'
 import RFile, { padStart } from './rFile'
 
@@ -53,8 +60,6 @@ class RChain {
 
     // Taxonomies
     this._listTaxonomies = null
-
-    this._counter = new Counter()
 
     this._entities = []
   }
@@ -107,10 +112,6 @@ class RChain {
     return this._fileArena
   }
 
-  get scriptIndexNext() {
-    return this._counter.increment()
-  }
-
   get listCategories() {
     return this._listCategories
   }
@@ -123,24 +124,8 @@ class RChain {
     return this._entities
   }
 
-  get entitiesWithAnalysisNodeDefs() {
-    return this._entities.filter(
-      (entity) => Survey.getAnalysisNodeDefs({ entity, chain: this.chain })(this.survey).length > 0
-    )
-  }
-
   async _initEntities() {
-    // GET entities in survey in order
-    const { root } = Survey.getHierarchy()(this._survey)
-
-    // get survey entities in order
-    const entities = []
-    Survey.traverseHierarchyItemSync(root, (nodeDef) => {
-      if (NodeDef.isEntity(nodeDef)) {
-        entities.push(nodeDef)
-      }
-    })
-    this._entities = entities
+    this._entities = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
   }
 
   async _initSurveyAndChain() {
@@ -201,36 +186,35 @@ class RChain {
   }
 
   async _initAnalysisNodeDefsFiles() {
-    await PromiseUtils.each(this.entities, async (entity, entityIndex) => {
-      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain: this.chain })(this.survey)
+    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain: this.chain })(this.survey)
 
-      if (analysisNodeDefsInEntity.length > 0) {
-        const entityPath = FileUtils.join(this.dirUser, `${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`)
-        await FileUtils.mkdir(entityPath)
+    if (analysisNodeDefs.length > 0) {
+      const _entityPath = FileUtils.join(this.dirUser)
+      await FileUtils.mkdir(_entityPath)
 
-        // create analysisNodeDefs files
-        await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef, nodeDefIndex) => {
-          this._scriptIndexNext = nodeDefIndex + 1
+      await PromiseUtils.each(analysisNodeDefs, async (nodeDef) => {
+        const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
+        const entityName = NodeDef.getName(parentEntity)
+        let attributeName = NodeDef.getName(nodeDef)
+        const fileIndex = padStart(Number(NodeDef.getChainIndex(nodeDef)) + 1)
 
-          let attributeName = NodeDef.getName(nodeDef)
+        const fileName = `${fileIndex}-${entityName}-${attributeName}`
 
-          const rFile = new RFile(this, entityPath, attributeName)
+        const rFile = new RFile(this, _entityPath, fileName)
 
-          await rFile.init()
+        await rFile.init()
 
-          const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
-          const entityName = NodeDef.getName(entity)
+        const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
 
-          if (NodeDef.isCode(nodeDef)) {
-            attributeName = `${attributeName}_code`
-          }
+        if (NodeDef.isCode(nodeDef)) {
+          attributeName = `${attributeName}_code`
+        }
 
-          const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
+        const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
 
-          await rFile.appendContent(content)
-        })
-      }
-    })
+        await rFile.appendContent(content)
+      })
+    }
   }
 
   async _initFilesClosing() {

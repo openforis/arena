@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
+
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -226,4 +227,4 @@ export const {
 } = SurveyRefDataIndex
 
 // Analysis
-export const { getAnalysisNodeDefs } = SurveyAnalysis
+export const { getAnalysisNodeDefs, getAnalysisEntities } = SurveyAnalysis
