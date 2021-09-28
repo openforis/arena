@@ -125,22 +125,7 @@ class RChain {
   }
 
   async _initEntities() {
-    // GET entities in survey in order
-    const { root } = Survey.getHierarchy()(this._survey)
-
-    // get survey entities in order
-    const entities = []
-    entities.push(root)
-    Survey.traverseHierarchyItemSync(root, (nodeDef) => {
-      if (
-        NodeDef.isEntity(nodeDef) &&
-        !NodeDef.isSingleEntity(nodeDef) &&
-        Survey.getAnalysisNodeDefs({ entity: nodeDef, chain: this.chain })(this.survey).length > 0
-      ) {
-        entities.push(nodeDef)
-      }
-    })
-    this._entities = entities
+    this._entities = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
   }
 
   async _initSurveyAndChain() {

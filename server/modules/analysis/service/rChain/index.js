@@ -66,7 +66,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     }).start()
     await massiveUpdateData.flush()
     await massiveUpdateNodes.flush()
-
   })
 
   fileZip.close()
@@ -94,19 +93,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true, draft: true }),
     ])
 
-    const { root } = Survey.getHierarchy()(survey)
-
-    const entities = []
-    entities.push(root)
-    Survey.traverseHierarchyItemSync(root, (nodeDef) => {
-      if (
-        NodeDef.isEntity(nodeDef) &&
-        !NodeDef.isSingleEntity(nodeDef) &&
-        Survey.getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
-      ) {
-        entities.push(nodeDef)
-      }
-    })
+    const entities = Survey.getAnalysisEntities({ chain })(survey)
 
     await PromiseUtils.each(entities, async (entity) => {
       const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
@@ -120,7 +107,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const entityFolder = `${RChain.dirNames.user}`
           const name = `${NodeDef.getName(entity)}-${nodeDefName}`
           const script = (await fileZip.getEntryAsText(findEntry(entityFolder, name)))?.trim()
-          
+
           await NodeDefManager.updateNodeDefProps(
             { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
             tx
