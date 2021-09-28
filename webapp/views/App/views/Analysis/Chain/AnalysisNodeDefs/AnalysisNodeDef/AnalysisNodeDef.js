@@ -49,7 +49,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
           <span className="icon icon-14px icon-menu" />
         </button>
       </div>
-      <div>{NodeDef.getName(Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey))}</div>
+      <div>{Survey.getNodeDefParent(nodeDef)(survey)}</div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div className="analysis-node-def__type">

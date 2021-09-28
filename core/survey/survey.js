@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
-import * as NodeDef from './nodeDef'
 
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
@@ -228,24 +227,4 @@ export const {
 } = SurveyRefDataIndex
 
 // Analysis
-export const { getAnalysisNodeDefs } = SurveyAnalysis
-
-export const getAnalysisEntities =
-  ({ chain }) =>
-  (survey) => {
-    const { root } = getHierarchy()(survey)
-
-    const entities = []
-    entities.push(root)
-    traverseHierarchyItemSync(root, (nodeDef) => {
-      if (
-        NodeDef.isEntity(nodeDef) &&
-        !NodeDef.isSingleEntity(nodeDef) &&
-        getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
-      ) {
-        entities.push(nodeDef)
-      }
-    })
-
-    return entities
-  }
+export const { getAnalysisNodeDefs, getAnalysisEntities } = SurveyAnalysis

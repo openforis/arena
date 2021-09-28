@@ -3,6 +3,8 @@ import * as Chain from '@common/analysis/chain'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
+import { getHierarchy, traverseHierarchyItemSync } from './surveyNodeDefs'
+
 // ====== READ
 export const getAnalysisNodeDefs =
   ({ chain, entity, entityDefUuid }) =>
@@ -23,4 +25,24 @@ export const getAnalysisNodeDefs =
     }
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
+  }
+
+export const getAnalysisEntities =
+  ({ chain }) =>
+  (survey) => {
+    const { root } = getHierarchy()(survey)
+
+    const entities = []
+    entities.push(root)
+    traverseHierarchyItemSync(root, (nodeDef) => {
+      if (
+        NodeDef.isEntity(nodeDef) &&
+        NodeDef.isMultipleEntity(nodeDef) &&
+        getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
+      ) {
+        entities.push(nodeDef)
+      }
+    })
+
+    return entities
   }
