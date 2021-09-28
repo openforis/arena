@@ -111,7 +111,10 @@ export const getNodeDefKeys = (nodeDef) =>
     R.filter((n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n))
   )
 
-export const getNodeDefRootKeys = (survey) => getNodeDefKeys(getNodeDefRoot(survey))(survey)
+export const getNodeDefRootKeys = (survey) => {
+  const root = getNodeDefRoot(survey)
+  return root ? getNodeDefKeys(root)(survey) : []
+}
 
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
