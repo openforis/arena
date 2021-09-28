@@ -145,25 +145,27 @@ const DateInput = React.forwardRef(
 
     const handleShouldFocusCalendar = (e) => {
       if (!withCalendar) return
-      if (e.target === elRefs[2].current && e.key === KeyboardKeys.Tab) {
-        e.stopPropagation()
-        e.preventDefault()
-        calendarContainer.current.getElementsByTagName('button')[0].focus()
-      }
-
-      if (isCalendarOpen && e.key === KeyboardKeys.Enter) {
-        e.stopPropagation()
-        e.preventDefault()
-        const calendarButtons = calendarContainer.current.getElementsByTagName('button')
-        if ([...calendarButtons].includes(document.activeElement)) {
-          document.activeElement.click()
+      if (isCalendarOpen) {
+        if (e.target === elRefs[2].current && e.key === KeyboardKeys.Tab) {
+          e.stopPropagation()
+          e.preventDefault()
+          calendarContainer.current.getElementsByTagName('button')[0].focus()
         }
-      }
 
-      if (isCalendarOpen && e.key === KeyboardKeys.Escape) {
-        e.stopPropagation()
-        e.preventDefault()
-        setIsCalendarOpen(false)
+        if (e.key === KeyboardKeys.Enter) {
+          e.stopPropagation()
+          e.preventDefault()
+          const calendarButtons = calendarContainer.current.getElementsByTagName('button')
+          if ([...calendarButtons].includes(document.activeElement)) {
+            document.activeElement.click()
+          }
+        }
+
+        if (e.key === KeyboardKeys.Escape) {
+          e.stopPropagation()
+          e.preventDefault()
+          setIsCalendarOpen(false)
+        }
       }
     }
 
