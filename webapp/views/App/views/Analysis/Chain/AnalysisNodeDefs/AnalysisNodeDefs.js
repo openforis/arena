@@ -1,6 +1,5 @@
 import './AnalysisNodeDefs.scss'
 import React, { useRef, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
