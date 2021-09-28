@@ -11,8 +11,7 @@ export default class RFile {
   constructor(rChain, dir, fileName) {
     this._rChain = rChain
     this._dir = dir
-    const fileIndex = padStart(this._rChain.scriptIndexNext)
-    this._fileName = `${fileIndex}-${fileName}.R`
+    this._fileName = `${fileName}.R`
     this._path = FileUtils.join(this._dir, this._fileName)
     this._pathRelative = this._path.slice(this._rChain.dir.length + 1)
   }

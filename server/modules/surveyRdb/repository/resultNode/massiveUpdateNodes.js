@@ -13,7 +13,9 @@ const { Column } = pgp.helpers
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+    const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
+      NodeDef.isAnalysis
+    )
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
@@ -24,12 +26,12 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
-    const tabletNode = new TableNode(surveyId)
+    const tableNode = new TableNode(surveyId)
 
     super(
       {
-        schema: tabletNode.schema,
-        table: tabletNode.name,
+        schema: tableNode.schema,
+        table: tableNode.name,
         cols,
         where: ` WHERE t.${TableNode.columnSet.recordUuid}::uuid = v.${TableNode.columnSet.recordUuid}::uuid AND t.${TableNode.columnSet.nodeDefUuid}::uuid = v.${TableNode.columnSet.nodeDefUuid}::uuid `,
       },
@@ -45,20 +47,25 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
 
   async push(rowResult) {
     const insertValues = Object.keys(this.nodeDefsByColumnName).reduce(
-      (values, cloumnName) => {
+      (values, columnName) => {
         let value = 'DEFAULT'
-        const nodeDef = this.nodeDefsByColumnName[cloumnName]
-        if (rowResult[cloumnName] && rowResult[cloumnName] !== NA) {
-          value = rowResult[cloumnName]
+
+        const nodeDef = this.nodeDefsByColumnName[columnName]
+        if (rowResult[columnName] && rowResult[columnName] !== NA) {
+          value = rowResult[columnName]
           if (NodeDef.isCode(nodeDef)) {
-            value = { itemUuid: rowResult[cloumnName.replace('_code', '_uuid').replace('_label', '_uuid')] }
+            value = { itemUuid: rowResult[columnName.replace('_code', '_uuid').replace('_label', '_uuid')] }
           }
+        }
+
+        if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
+          value = isNaN(Number(rowResult[columnName])) ? null : Number(rowResult[columnName])
         }
 
         return {
           ...values,
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-          [TableNode.columnSet.value]: JSON.stringify(value),
+          [TableNode.columnSet.value]: value,
         }
       },
       {

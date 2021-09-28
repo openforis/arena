@@ -4,7 +4,7 @@ import RFileUser from './rFileUser'
 
 export default class RFileCommon extends RFileUser {
   constructor(rChain) {
-    super(rChain, 'common')
+    super(rChain, '000-common')
   }
 
   async init() {

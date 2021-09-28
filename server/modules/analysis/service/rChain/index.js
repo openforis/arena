@@ -16,8 +16,6 @@ import * as NodeDefManager from '../../../nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
-import { padStart } from './rFile'
-
 import RChain from './rChain'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
@@ -69,10 +67,6 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     await massiveUpdateData.flush()
     await massiveUpdateNodes.flush()
 
-    // Insert node results
-
-    // refresh result step materialized view
-    // await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()
@@ -103,13 +97,18 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
     const { root } = Survey.getHierarchy()(survey)
 
     const entities = []
+    entities.push(root)
     Survey.traverseHierarchyItemSync(root, (nodeDef) => {
-      if (NodeDef.isEntity(nodeDef)) {
+      if (
+        NodeDef.isEntity(nodeDef) &&
+        !NodeDef.isSingleEntity(nodeDef) &&
+        Survey.getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
+      ) {
         entities.push(nodeDef)
       }
     })
 
-    await PromiseUtils.each(entities, async (entity, entityIndex) => {
+    await PromiseUtils.each(entities, async (entity) => {
       const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
 
       if (analysisNodeDefsInEntity.length > 0) {
@@ -118,10 +117,10 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const nodeDefName = NodeDef.getName(nodeDef)
           const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-          const entityFolder = `${RChain.dirNames.user}/${padStart(entityIndex + 1)}-${NodeDef.getName(entity)}`
-
-          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, nodeDefName)))?.trim()
-
+          const entityFolder = `${RChain.dirNames.user}`
+          const name = `${NodeDef.getName(entity)}-${nodeDefName}`
+          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, name)))?.trim()
+          
           await NodeDefManager.updateNodeDefProps(
             { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
             tx

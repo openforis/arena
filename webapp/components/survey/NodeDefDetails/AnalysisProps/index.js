@@ -53,7 +53,7 @@ const AnalysisProps = (props) => {
       NodeDef.getName(nodeDef) || 'NAME'
     } <- NA`
 
-    const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
+  const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
 
   const generatePreScriptWithCategories = async () => {
     const { request } = API.fetchCategoryItems({
@@ -86,7 +86,7 @@ const AnalysisProps = (props) => {
     if (NodeDef.getCategoryUuid(nodeDef)) {
       generatePreScriptWithCategories()
     }
-  }, [NodeDef.getCategoryUuid(nodeDef)])
+  }, [NodeDef.getCategoryUuid(nodeDef), NodeDef.getParentUuid(nodeDef)])
 
   useEffect(() =>{
     setDefaultLocalScript(getScriptOrDefault())

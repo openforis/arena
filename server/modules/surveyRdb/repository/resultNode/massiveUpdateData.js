@@ -1,3 +1,5 @@
+import * as pgPromise from 'pg-promise'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { TableDataNodeDef } from '@common/model/db'
@@ -6,20 +8,34 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 
+const pgp = pgPromise()
+const { Column } = pgp.helpers
+
 export default class MassiveUpdateData extends MassiveUpdate {
   constructor({ survey, entity, chain, cycle }, tx) {
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
-    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
+    const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
+      NodeDef.isAnalysis
+    )
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefs)
     const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
-    const cols = [`?${TableDataNodeDef.columnSet.recordUuid}`, ...columnNames]
-    const tabletNode = new TableDataNodeDef(survey, entity)
+    const cols = [
+      `?${TableDataNodeDef.columnSet.recordUuid}`,
+      ...columnNames.map((columnName) => {
+        const nodeDef = nodeDefsByColumnName[columnName]
+        return new Column({ name: columnName, 
+          ...(NodeDef.isInteger(nodeDef) ? { cast: 'integer' } : {}),
+          ...(NodeDef.isDecimal(nodeDef) ? { cast: 'decimal' } : {})
+         })
+      }),
+    ]
+    const tableNode = new TableDataNodeDef(survey, entity)
 
     super(
       {
-        schema: tabletNode.schema,
-        table: tabletNode.name,
+        schema: tableNode.schema,
+        table: tableNode.name,
         cols,
         where: ` WHERE t.record_uuid::uuid = v.record_uuid::uuid AND t.record_cycle = '${cycle}' `,
       },
@@ -35,20 +51,21 @@ export default class MassiveUpdateData extends MassiveUpdate {
 
   async push(rowResult) {
     const insertValues = (this.columnNames || []).reduce(
-      (values, cloumnName) => {
-        let value = 'DEFAULT'
-        if (rowResult[cloumnName] && rowResult[cloumnName] !== NA) {
-          const nodeDef = this.nodeDefsByColumnName[cloumnName]
+      (values, columnName) => {
+        const nodeDef = this.nodeDefsByColumnName[columnName]
+
+        let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) ? null : 'DEFAULT'
+        if (rowResult[columnName] && rowResult[columnName] !== NA) {
           if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
-            value = Number(rowResult[cloumnName])
+            value = Number(rowResult[columnName])
           } else {
-            value = rowResult[cloumnName]
+            value = rowResult[columnName]
           }
         }
 
         return {
           ...values,
-          [cloumnName]: value,
+          [columnName]: value,
         }
       },
       {
