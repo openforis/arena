@@ -127,6 +127,7 @@ const SurveyCreate = (props) => {
               inputFieldId={DataTestId.surveyCreate.importFromArena}
               label={i18n.t('homeView.surveyCreate.importFromArena')}
               accept=".zip"
+              maxSize={1000}
               onChange={(files) => onImport.Arena({ file: files[0] })}
             />
           </div>
