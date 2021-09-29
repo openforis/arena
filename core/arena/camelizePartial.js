@@ -5,7 +5,7 @@ import { _camelizePartial } from './internal/_camelizePartial'
  *
  * @param {!object} [params={}] - The camelize parameters.
  * @param {Array} [params.skip=[]] - An optional list of keys to skip.
- *
+ * @param {number} [params.limitToLevel=null] - If specified, camelizes the object prop names only down to the specified level.
  * @returns {any} - The object with keys in camel case or the value in camel case.
  */
 export const camelizePartial = _camelizePartial
