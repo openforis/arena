@@ -1,7 +1,6 @@
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
