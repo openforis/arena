@@ -28,6 +28,7 @@ export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid, draft = 
     cycle,
     advanced: true,
     draft,
+    includeAnalysis: false
   })
 
   const query = Query.create({ entityDefUuid })
