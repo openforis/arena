@@ -36,7 +36,7 @@ const query = ({ surveyId, recordUuid }) => {
       -- node validation object
       nv.value::jsonb AS validation
     FROM
-      survey_1893.record r,
+      ${surveySchema}.record r,
       jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) nv    
   )
     
