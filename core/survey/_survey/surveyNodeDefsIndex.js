@@ -88,7 +88,7 @@ export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDef }) => {
   // remove node def deleted uuid from parent children references
   const { parentUuid } = nodeDef
 
-  const deleteItem = ({ array, uuid }) => array.filter((itemId) => itemId !== uuid)
+  const deleteItem = ({ array = [], uuid }) => array.filter((itemId) => itemId !== uuid)
 
   nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid] = deleteItem({
     array: nodeDefsIndexUpdated.childDefUuidsByParentUuid[parentUuid],
