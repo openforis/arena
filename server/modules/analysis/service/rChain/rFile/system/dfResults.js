@@ -51,7 +51,7 @@ export default class DfResults {
     const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
     const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
 
-    this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
+    this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.filter(columnName => !(new RegExp('label').test(columnName))).join(', ')} FROM ${this.dfSourceName}`)))
   }
 
   initUuids() {

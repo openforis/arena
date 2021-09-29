@@ -100,7 +100,7 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false, 
 // ============== READ
 
 export const fetchNodeDefsBySurveyId = async (
-  { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false },
+  { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true },
   client = DB
 ) =>
   client.map(
@@ -116,6 +116,7 @@ export const fetchNodeDefsBySurveyId = async (
       } 
       ${!backup && !draft ? " AND props <> '{}'::jsonb" : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
+      ${!includeAnalysis ? ' AND analysis IS NOT TRUE' : ''}
     ORDER BY id`,
     [JSON.stringify(cycle || null)],
     (row) => dbTransformCallback({ row, draft, advanced, backup })
