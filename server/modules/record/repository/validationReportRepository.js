@@ -78,6 +78,9 @@ export const fetchValidationReport = async (
     { cycle, limit, offset, recordUuid },
     A.camelizePartial({ limitToLevel: 1 })
   )
+  if (A.isEmpty(validationReportItems)) {
+    return []
+  }
   // fetch node keys and associate them to the validation report items
   const nodeUuids = validationReportItems.map((item) => item.nodeUuid)
   const nodesKeys = await NodeKeysRepository.fetchNodesHierarchyKeys({ surveyId, nodeUuids }, client)
