@@ -17,7 +17,11 @@ export const getKeysHierarchyPath = (survey, lang, includeRootKeys = false) =>
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const label = NodeDef.getLabel(nodeDef, lang)
       // Do not show keys for root entity when includeRootKeys is false
-      return R.isEmpty(_keys) || (!includeRootKeys && NodeDef.isRoot(nodeDef)) ? label : `${label}[${R.values(_keys)}]`
+      return R.isEmpty(_keys) ||
+        (!includeRootKeys && NodeDef.isRoot(nodeDef)) ||
+        (NodeDef.isSingleEntity(nodeDef) && !NodeDef.isRoot(nodeDef))
+        ? label
+        : `${label}[${R.values(_keys)}]`
     }),
     R.join(' / ')
   )
