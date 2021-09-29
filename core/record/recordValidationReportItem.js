@@ -49,8 +49,10 @@ const getKeysHierarchy = (survey) => (item) =>
     )
   )(item)
 
-export const getPath = (survey, lang) =>
-  R.pipe(getKeysHierarchy(survey), NodeKeys.getKeysHierarchyPath(survey, lang, true))
+export const getPath = (survey, lang) => (item) => {
+  const keys = getKeysHierarchy(survey)(item)
+  return NodeKeys.getKeysHierarchyPath(survey, lang, true)(keys)
+}
 
 export const getNodeContextUuid = R.ifElse(
   isValidationCount,
