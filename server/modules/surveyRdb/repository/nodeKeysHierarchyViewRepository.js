@@ -22,7 +22,7 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
         k_s.${NodeKeysView.columns.keys} AS ${NodeKeysHierarchyView.columns.keysSelf},
         jsonb_agg(
           jsonb_build_object(
-            '${NodeKeys.keys.nodeDefUuid}', k_h.${NodeKeysView.columns.nodeDefUuid}, 
+            '${NodeKeys.keys.nodeDefUuid}', h.${NodeHierarchyDisaggregatedView.columns.nodeDefAncestorUuid}, 
             '${NodeKeys.keys.nodeUuid}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}, 
             '${NodeKeys.keys.nodeId}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorId}, 
             '${NodeKeys.keys.recordUuid}', h.${NodeHierarchyDisaggregatedView.columns.recordUuid}, 
