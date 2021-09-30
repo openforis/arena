@@ -6,6 +6,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
@@ -39,13 +40,14 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 // ==== DML
 
-const _getExportFields = ({ survey, query }) => {
+const _getExportFields = ({ survey, query, addCycle = false}) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  return nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
+  const fileds = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
+  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fileds]
 }
 
 /**
@@ -63,7 +65,7 @@ const _getExportFields = ({ survey, query }) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
-  const { survey, cycle, query, columnNodeDefs = false, offset = 0, limit = null, streamOutput = null } = params
+  const { survey, cycle, query, columnNodeDefs = false, offset = 0, limit = null, streamOutput = null, addCycle = false } = params
 
   // Fetch data
   const result = await DataViewRepository.fetchViewData({
@@ -78,7 +80,7 @@ export const fetchViewData = async (params) => {
 
   if (streamOutput) {
     await db.stream(result, (stream) => {
-      const fields = _getExportFields({ survey, query })
+      const fields = _getExportFields({ survey, query, addCycle })
       stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
     return null
@@ -182,7 +184,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query })
+    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query, addCycle: true})
   })
 
   return { exportDataFolderName, dir }
