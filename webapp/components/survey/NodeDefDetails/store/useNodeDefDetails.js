@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
 
@@ -6,7 +8,7 @@ import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnlo
 import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useActions } from './actions'
 import { State } from './state'
@@ -17,6 +19,7 @@ export const useNodeDefDetails = () => {
   const history = useHistory()
 
   const survey = useSurvey()
+  const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
   const [state, setState] = useState({})
@@ -40,6 +43,17 @@ export const useNodeDefDetails = () => {
       setState(State.create({ nodeDef: nodeDefSurvey, validation }))
     }
   }, [])
+
+  useEffect(() => {
+    const refreshNodeDef = async () => {
+    const {
+      data: { nodeDef },
+      } = await axios.get(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {})
+      console.log("nodeDef", nodeDef)
+    }
+    refreshNodeDef()
+
+  },[])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
