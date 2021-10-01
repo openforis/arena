@@ -1,6 +1,4 @@
-import * as R from 'ramda'
 import * as A from '@core/arena'
-import * as camelize from 'camelize'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -24,8 +22,8 @@ export const tableColumns = [
 // camelize all but "meta"
 const dbTransformCallback = (node) =>
   A.pipe(
-    // do not camelize nested properties (e.g. meta properties)
-    A.camelizePartial({ limitToLevel: 1 }),
+    // do not camelize meta properties
+    A.camelizePartial({ skip: [Node.keys.meta] }),
     // cast id to Number
     A.assoc('id', Number(node.id))
   )(node)
