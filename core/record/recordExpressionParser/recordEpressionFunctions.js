@@ -19,7 +19,7 @@ export const recordExpressionFunctions = ({ survey, record }) => ({
       categoryUuid: Category.getUuid(category),
       codePaths,
     })(survey)
-
+    
     if (!categoryItem) return null
 
     const extraProp = CategoryItem.getExtraProp(itemPropName)(categoryItem)
