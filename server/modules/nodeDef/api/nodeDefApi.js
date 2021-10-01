@@ -69,19 +69,8 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, cycle, draft = true, advanced = true, validate = true, nodeDefUuid } = Request.getParams(req)
-
-        const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
-          surveyId,
-          cycle,
-          draft,
-          advanced,
-          validate,
-        })
-
-        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        res.json({
-          nodeDef,
-        })
+        const nodeDef = await NodeDefService.getNodeDef({ surveyId, cycle, draft, advanced, validate, nodeDefUuid })
+        res.json({ nodeDef })
       } catch (error) {
         next(error)
       }

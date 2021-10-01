@@ -4,6 +4,7 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
@@ -61,10 +62,17 @@ const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nod
   }
 }
 
-export const getNodeDef = async ({ surveyId, cycle = Survey.cycleOneKey, nodeDefUuid }, client = db) => {
-  const survey = await fetchSurvey({ surveyId, cycle }, db)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  return {nodeDef}
+export const getNodeDef = async ({ surveyId, cycle, draft, advanced, validate, nodeDefUuid }, client = db) => {
+  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced,
+    validate,
+    nodeDefUuid,
+  })
+
+  return Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 }
 
 export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey, nodeDef }, client = db) =>

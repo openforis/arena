@@ -3,9 +3,11 @@ import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
 
+import * as API from '@webapp/service/api'
 import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnload } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useSurvey, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
@@ -36,24 +38,24 @@ export const useNodeDefDetails = () => {
   useOnPageUnload({ active: State.isDirty(state) })
 
   useEffect(() => {
-    // Editing a nodeDef
-    if (nodeDefUuid) {
-      const nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
-      setState(State.create({ nodeDef: nodeDefSurvey, validation }))
+    const loadNodeDef = async () => {
+      // Editing a nodeDef
+      if (nodeDefUuid) {
+        let nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+        if (NodeDef.isAnalysis(nodeDefSurvey)) {
+          try {
+            nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
+          } catch (err) {
+            console.log('Error fetching nodeDef')
+          }
+        }
+        const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
+        setState(State.create({ nodeDef: nodeDefSurvey, validation }))
+      }
     }
+    loadNodeDef()
   }, [])
-
-  useEffect(() => {
-    const refreshNodeDef = async () => {
-    const {
-      data: { nodeDef },
-      } = await axios.get(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {})
-      console.log("nodeDef", nodeDef)
-    }
-    refreshNodeDef()
-
-  },[])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {

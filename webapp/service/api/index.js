@@ -19,6 +19,7 @@ export {
 export { fetchActivityLogs } from './activityLog'
 export { importRecordsFromCollect, updateRecordsStep } from './data'
 export { fetchSurveys, insertSurvey } from './survey'
+export { fetchNodeDef, fetchNodeDefs, putNodeDefProps, postNodeDef, deleteNodeDef } from './nodeDef'
 
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
