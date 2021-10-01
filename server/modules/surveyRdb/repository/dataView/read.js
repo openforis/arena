@@ -58,7 +58,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
         _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
       ),
-      DataTable.columnNameRecordCycle
+      `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
     )
     // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {
@@ -207,6 +207,8 @@ export const fetchViewData = async (params, client = db) => {
   const select = queryBuilder.build()
   const queryParams = queryBuilder.params
 
+  console.log("select", select)
+  console.log("select", dbUtils.formatQuery(select, queryParams))
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
