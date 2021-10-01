@@ -48,7 +48,7 @@ const _getExportFields = ({ survey, query, addCycle = false}) => {
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
   // Cycle is 0-based
-  return [...(addCycle ? [`${DataTable.columnNameRecordCycle} + 1 AS ${DataTable.columnNameRecordCycle}`] : []), ...fields]
+  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
 }
 
 /**
