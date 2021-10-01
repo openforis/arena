@@ -46,8 +46,9 @@ const _getExportFields = ({ survey, query, addCycle = false}) => {
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fileds = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
-  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fileds]
+  const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
+  // Cycle is 0-based
+  return [...(addCycle ? [`${DataTable.columnNameRecordCycle} + 1 AS ${DataTable.columnNameRecordCycle}`] : []), ...fields]
 }
 
 /**
