@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import * as API from '@webapp/service/api'
 import { LoaderActions } from '@webapp/store/ui/loader'
 

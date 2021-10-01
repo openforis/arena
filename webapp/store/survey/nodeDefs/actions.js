@@ -1,4 +1,3 @@
-import axios from 'axios'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
