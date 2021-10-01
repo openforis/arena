@@ -57,7 +57,8 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       viewDataNodeDef.columnRecordUuid,
       ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
         _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
-      )
+      ),
+      DataTable.columnNameRecordCycle
     )
     // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {

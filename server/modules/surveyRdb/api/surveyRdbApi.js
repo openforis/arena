@@ -60,7 +60,7 @@ export const init = (app) => {
       const outputFileName = `data-export-${DateUtils.nowFormatDefault()}.csv`
       Response.setContentTypeFile(res, outputFileName, null, Response.contentTypes.csv)
 
-      await SurveyRdbService.fetchViewData({ surveyId, cycle, query, streamOutput: res })
+      await SurveyRdbService.fetchViewData({ surveyId, cycle, query, streamOutput: res, addCycle: true })
     } catch (error) {
       next(error)
     }

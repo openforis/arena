@@ -27,13 +27,13 @@ const _fetchSurvey = async (surveyId, cycle) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
-  const { surveyId, cycle, query, offset = 0, limit = null, columnNodeDefs = false, streamOutput = null } = params
+  const { surveyId, cycle, query, offset = 0, limit = null, columnNodeDefs = false, streamOutput = null, addCycle = false } = params
 
   const survey = await _fetchSurvey(surveyId, cycle)
 
   return Query.isModeAggregate(query)
     ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, streamOutput })
-    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput })
+    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput, addCycle})
 }
 
 /**
