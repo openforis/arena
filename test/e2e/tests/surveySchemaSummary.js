@@ -47,7 +47,6 @@ export default () =>
     test('export schema summary', async () => {
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.waitForResponse(/.+\/schema-summary\//),
         page.click(getSelector(DataTestId.surveyForm.schemaSummary, 'button')),
       ])
 

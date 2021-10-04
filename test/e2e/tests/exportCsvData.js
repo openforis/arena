@@ -62,7 +62,6 @@ export default () =>
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.waitForResponse('**/export-csv-data/**'),
         page.click(getSelector(DataTestId.dataExport.exportCSV, 'button')),
       ])
 
