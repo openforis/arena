@@ -65,7 +65,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         return {
           ...values,
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-          [TableNode.columnSet.value]: value,
+          [TableNode.columnSet.value]: String(value),
         }
       },
       {
