@@ -2,8 +2,8 @@ import fs, { promises } from 'fs'
 import { ncp } from 'ncp'
 import { join, sep } from 'path'
 
-import * as ProcessUtils from '@core/processUtils'
-import { uuidv4 } from '@core/uuid'
+import * as ProcessUtils from '../../../core/processUtils'
+import { uuidv4 } from '../../../core/uuid'
 
 // ====== DIR
 
