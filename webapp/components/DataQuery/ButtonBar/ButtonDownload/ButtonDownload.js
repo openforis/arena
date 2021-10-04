@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Query } from '@common/model/query'
 
 import * as API from '@webapp/service/api'
-import { Button } from '@webapp/components'
+import DownloadButton from '@webapp/components/form/downloadButton'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
@@ -23,14 +23,7 @@ const ButtonDownload = (props) => {
     API.downloadDataQueryExport({ surveyId, entityDefUuid, tempFileName })
   }
 
-  return (
-    <Button
-      disabled={disabled}
-      title={i18n.t('common.csvExport')}
-      onClick={onClick}
-      iconClassName="icon-download2 icon-14px"
-    />
-  )
+  return <DownloadButton disabled={disabled} title={i18n.t('common.csvExport')} showLabel={false} onClick={onClick} />
 }
 
 ButtonDownload.propTypes = {

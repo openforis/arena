@@ -21,7 +21,7 @@ export const Button = (props) => {
       title={title ? i18n.t(title) : null}
       {...otherProps}
     >
-      {iconClassName && <span className={`icon ${iconClassName}`} />}
+      {iconClassName && <span className={`icon ${iconClassName}${label ? ' icon-left' : ''}`} />}
       {label ? i18n.t(label) : null}
     </button>
   )

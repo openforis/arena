@@ -23,7 +23,7 @@ const DownloadButton = (props) => {
     <Button
       className={`btn-s ${className}`}
       disabled={disabled}
-      label={label}
+      label={showLabel && label}
       iconClassName="icon-download2 icon-14px"
       testId={id}
       title={title}
@@ -36,10 +36,7 @@ const DownloadButton = (props) => {
           await onClick()
         }
       }}
-    >
-      <span className={`icon icon-download2 icon-14px${showLabel && label ? ' icon-left' : ''}`} />
-      {showLabel && i18n.t(label)}
-    </Button>
+    />
   )
 }
 
