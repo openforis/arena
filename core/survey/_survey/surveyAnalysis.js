@@ -33,7 +33,9 @@ export const getAnalysisEntities =
     const { root } = getHierarchy()(survey)
 
     const entities = []
-    entities.push(root)
+    if (getAnalysisNodeDefs({ entity: root, chain })(survey).length > 0) {
+      entities.push(root)
+    }
     traverseHierarchyItemSync(root, (nodeDef) => {
       if (
         NodeDef.isEntity(nodeDef) &&
