@@ -34,8 +34,6 @@ const Row = (props) => {
       <div>{DateUtils.getRelativeDate(i18n, Chain.getDateCreated(row))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Chain.getDateModified(row))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Chain.getDateExecuted(row))}</div>
-      { false && <div className="column-draft">{Chain.isDraft(row) && <span className="icon icon-wrench icon-14px" />}</div> }
-      { false && <div className={`column-status ${statusExec}`}>{statusComponent[statusExec]}</div> }
       <div>
         <span className="icon icon-12px icon-action icon-pencil2" />
       </div>

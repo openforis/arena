@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router'
+import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
 import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnload } from '@webapp/components/hooks'
@@ -8,7 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId, useSurveyCycleKey, NodeDefsActions } from '@webapp/store/survey'
 
 import { useActions } from './actions'
 import { State } from './state'
@@ -17,6 +18,7 @@ export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
   const history = useHistory()
+  const dispatch = useDispatch()
 
   const survey = useSurvey()
   const surveyId = useSurveyId()
@@ -44,6 +46,7 @@ export const useNodeDefDetails = () => {
         if (NodeDef.isAnalysis(nodeDefSurvey)) {
           try {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
+            dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
           } catch (err) {
             console.log('Error fetching nodeDef')
           }
