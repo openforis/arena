@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
-
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-
-import DownloadButton from '@webapp/components/form/downloadButton'
 import { Query } from '@common/model/query'
+
+import * as API from '@webapp/service/api'
+import { Button } from '@webapp/components'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 const ButtonDownload = (props) => {
@@ -17,23 +16,19 @@ const ButtonDownload = (props) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
 
   const surveyId = useSurveyId()
-  const surveyCycleKey = useSurveyCycleKey()
+  const cycle = useSurveyCycleKey()
 
-  const requestParams = {
-    cycle: surveyCycleKey,
-    query: A.stringify(query),
+  const onClick = async () => {
+    const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query })
+    API.downloadDataQueryExport({ surveyId, entityDefUuid, tempFileName })
   }
 
-  const href = `/api/surveyRdb/${surveyId}/${entityDefUuid}/export`
-
   return (
-    <DownloadButton
-      href={href}
-      requestMethod="POST"
-      requestParams={requestParams}
-      showLabel={false}
+    <Button
       disabled={disabled}
       title={i18n.t('common.csvExport')}
+      onClick={onClick}
+      iconClassName="icon-download2 icon-14px"
     />
   )
 }

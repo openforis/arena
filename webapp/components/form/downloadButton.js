@@ -15,7 +15,7 @@ const DownloadButton = (props) => {
     id,
     label = i18n.t('common.download'),
     onClick,
-    requestMethod,
+  requestMethod,
     requestParams,
     showLabel,
     title,

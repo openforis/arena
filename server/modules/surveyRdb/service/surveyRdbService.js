@@ -3,6 +3,7 @@ import { Query } from '../../../../common/model/query'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
+import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 
@@ -27,13 +28,22 @@ const _fetchSurvey = async (surveyId, cycle) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
-  const { surveyId, cycle, query, offset = 0, limit = null, columnNodeDefs = false, streamOutput = null, addCycle = false } = params
+  const {
+    surveyId,
+    cycle,
+    query,
+    offset = 0,
+    limit = null,
+    columnNodeDefs = false,
+    streamOutput = null,
+    addCycle = false,
+  } = params
 
   const survey = await _fetchSurvey(surveyId, cycle)
 
   return Query.isModeAggregate(query)
     ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, streamOutput })
-    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput, addCycle})
+    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput, addCycle })
 }
 
 /**
@@ -66,4 +76,16 @@ export const refreshAllRdbs = async () => {
   JobManager.executeJobThread(job)
 
   return { job: JobUtils.jobToJSON(job) }
+}
+
+export const exportViewDataToTempFile = async (params) => {
+  const { surveyId, cycle, query, columnNodeDefs = false, addCycle = false } = params
+
+  const tempFileName = FileUtils.newTempFileName()
+  const tempFilePath = FileUtils.tempFilePath(tempFileName)
+  const streamOutput = FileUtils.createWriteSteam(tempFilePath)
+
+  await fetchViewData({ surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
+
+  return tempFileName
 }
