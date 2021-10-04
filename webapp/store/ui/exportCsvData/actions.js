@@ -26,7 +26,6 @@ export const startCSVExport = () => async (dispatch, getState) => {
           <DownloadButton
             id={DataTestId.dataExport.exportCSV}
             href={`/api/survey/${surveyId}/export-csv-data/${exportDataFolderName}`}
-            label="common.export"
             onClick={() => dispatch(JobActions.hideJobMonitor())}
           />
         )
