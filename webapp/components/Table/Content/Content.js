@@ -7,8 +7,9 @@ import LoadingBar from '@webapp/components/LoadingBar'
 
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
-import { ContentRow } from './ContentRow'
+import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
+import { ContentRow } from './ContentRow'
 
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
@@ -26,8 +27,9 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
+    columns,
+    expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
-    isRowActive,
     list,
     loading,
     maxRows,
@@ -36,12 +38,10 @@ const Content = (props) => {
     noItemsLabelForSearchKey,
     offset,
     totalCount,
-    onRowClick,
     rowHeaderComponent: rowHeaderComponentParam,
     rowComponent: rowComponentParam,
+    rowExpandedComponent,
     rowProps,
-    initData,
-    columns,
   } = props
 
   const i18n = useI18n()
@@ -63,14 +63,14 @@ const Content = (props) => {
   }
 
   const hasColumns = columns?.length > 0
-  const rowComponent = hasColumns ? (_props) => <ContentRow {..._props} columns={columns} /> : rowComponentParam
+  const rowComponent = hasColumns ? (_props) => <ContentRowCells {..._props} columns={columns} /> : rowComponentParam
 
   const rowHeaderComponent = hasColumns
     ? (_props) => <ContentHeaders {..._props} columns={columns} />
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
-    ? columns.map((column) => column.width || '1fr').join(' ')
+    ? [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
     : gridTemplateColumnsParam
 
   return (
@@ -83,34 +83,18 @@ const Content = (props) => {
         <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
-          {list.map((row, i) => {
-            const active = isRowActive && isRowActive(row)
-            let className = 'table__row'
-            className += onRowClick ? ' hoverable' : ''
-            className += active ? ' active' : ''
-
-            return (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
-              <div
-                role="button"
-                data-testid={`${module}_${i}`}
-                key={String(i)}
-                onClick={() => onRowClick && onRowClick(row)}
-                className={className}
-                style={{ gridTemplateColumns }}
-              >
-                {React.createElement(rowComponent, {
-                  idx: i,
-                  offset,
-                  row,
-                  rowNo: i + offset + 1,
-                  active,
-                  initData,
-                  ...rowProps,
-                })}
-              </div>
-            )
-          })}
+          {list.map((row, index) =>
+            React.createElement(ContentRow, {
+              key: String(index),
+              ...props,
+              ...rowProps,
+              row,
+              index,
+              rowComponent,
+              rowExpandedComponent,
+              gridTemplateColumns,
+            })
+          )}
         </div>
       )}
     </div>
@@ -118,6 +102,8 @@ const Content = (props) => {
 }
 
 Content.propTypes = {
+  columns: PropTypes.array,
+  expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
   list: PropTypes.array.isRequired,
@@ -131,17 +117,19 @@ Content.propTypes = {
   initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
+  rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
-  columns: PropTypes.array,
 }
 
 Content.defaultProps = {
+  columns: null,
+  expandableRows: false,
   isRowActive: null,
   onRowClick: null,
   initData: null,
   loading: false,
+  rowExpandedComponent: null,
   rowProps: {},
-  columns: null,
 }
 
 export default Content

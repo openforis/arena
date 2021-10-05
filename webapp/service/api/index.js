@@ -23,4 +23,4 @@ export { fetchSurveys, insertSurvey } from './survey'
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
 
-export { createAccessRequest, acceptAccessRequest } from './user'
+export { createAccessRequest, acceptAccessRequest, fetchUserSurveys } from './user'

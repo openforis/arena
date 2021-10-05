@@ -8,7 +8,7 @@ export const ContentHeaders = (props) => {
   return (
     <>
       {columns.map((column) => (
-        <ContentHeader column={column} />
+        <ContentHeader key={column.key} column={column} />
       ))}
     </>
   )

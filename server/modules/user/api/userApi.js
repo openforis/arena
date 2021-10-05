@@ -122,10 +122,19 @@ export const init = (app) => {
     }
   })
 
+  app.get('/user/:userUuid/surveys', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+      const userSearch = await UserService.fetchUserByUuid(userUuid)
+      const surveys = await SurveyManager.fetchUserSurveysInfo({ user: userSearch })
+      res.json({ surveys })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
-
       const count = await UserService.countUsers()
       res.json(count)
     } catch (error) {

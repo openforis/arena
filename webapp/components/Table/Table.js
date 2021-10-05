@@ -19,10 +19,12 @@ const Table = (props) => {
     onRowClick,
     restParams,
     rowComponent,
+    rowExpandedComponent,
     rowHeaderComponent,
     headerProps,
     rowProps,
     columns,
+    expandableRows,
   } = props
 
   const {
@@ -76,9 +78,11 @@ const Table = (props) => {
         offset={offset}
         onRowClick={onRowClick}
         rowComponent={rowComponent}
+        rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
         columns={columns}
         rowProps={rowProps}
+        expandableRows={expandableRows}
         initData={initData}
         sort={sort}
         handleSortBy={handleSortBy}
@@ -101,10 +105,12 @@ Table.propTypes = {
   onRowClick: PropTypes.func, // Row click handler
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
+  rowExpandedComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   headerProps: PropTypes.object,
   columns: PropTypes.array,
+  expandableRows: PropTypes.bool,
 }
 
 Table.defaultProps = {
@@ -119,9 +125,11 @@ Table.defaultProps = {
   restParams: {},
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
+  rowExpandedComponent: DummyComponent,
   rowProps: {},
   headerProps: {},
   columns: null,
+  expandableRows: false,
 }
 
 export default Table

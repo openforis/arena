@@ -479,6 +479,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     notAcceptedYet: 'Invitation not accepted yet',
     invitedBy: 'Invited by',
     invitedDate: 'Invited date',
+    userSurveys: 'User Surveys',
+    surveyName: 'Survey name',
+    roleInSurvey: 'Role in survey',
   },
 
   usersAccessRequestView: {

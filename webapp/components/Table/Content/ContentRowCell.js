@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const ContentCell = (props) => {
+export const ContentRowCell = (props) => {
   const { column, row } = props
 
   const { key, cellRenderer } = column

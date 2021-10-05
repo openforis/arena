@@ -1,3 +1,5 @@
+import './UsersList.scss'
+
 import React from 'react'
 import { useHistory } from 'react-router'
 
@@ -6,11 +8,14 @@ import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 import ProfilePicture from '@webapp/components/profilePicture'
+import { ButtonIconEdit } from '@webapp/components'
+
+import { UserSurveysTable } from './UserSurveysTable'
 
 export const UsersList = () => {
   const history = useHistory()
 
-  const onRowClick = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+  const goToUserDetails = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
 
   return (
     <Table
@@ -37,8 +42,14 @@ export const UsersList = () => {
           width: '15rem',
           cellRenderer: ({ row }) => User.isSurveyManager(row) && <span className="icon icon-checkmark" />,
         },
+        {
+          key: 'user-edit',
+          width: '40px',
+          cellRenderer: ({ row }) => <ButtonIconEdit onClick={() => goToUserDetails(row)} />,
+        },
       ]}
-      onRowClick={onRowClick}
+      expandableRows
+      rowExpandedComponent={({ row }) => <UserSurveysTable user={row} />}
     />
   )
 }
