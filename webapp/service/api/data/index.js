@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+import * as A from '@core/arena'
+import { Query } from '@common/model/query'
+
 // ==== READ
 export const importRecordsFromCollect = async ({
   surveyId,
@@ -24,4 +27,22 @@ export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) =
     data: { count },
   } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
   return { count }
+}
+
+export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const {
+    data: { tempFileName },
+  } = await axios.post(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/start`, {
+    cycle,
+    query: A.stringify(query),
+  })
+  return tempFileName
+}
+
+export const downloadDataQueryExport = ({ surveyId, entityDefUuid, tempFileName }) => {
+  window.open(
+    `/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?tempFileName=${tempFileName}`,
+    'data-query-export'
+  )
 }

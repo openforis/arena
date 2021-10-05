@@ -86,7 +86,6 @@ export const exportCategory = (category) => {
   test(`Export category ${category.name}`, async () => {
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.waitForResponse('**/export/**'),
       page.click(getSelector(DataTestId.categoryDetails.exportBtn, 'button')),
     ])
     const exportFilePath = path.resolve(downloadsPath, `category-${category.name}-export.zip`)

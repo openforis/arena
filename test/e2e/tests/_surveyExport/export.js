@@ -20,7 +20,6 @@ export const exportSurvey = (survey) =>
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.waitForResponse(/.+\/download\?.*/),
       page.click(DataTestId.surveyExport.downloadBtn),
     ])
 

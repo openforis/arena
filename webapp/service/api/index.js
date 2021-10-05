@@ -17,7 +17,7 @@ export {
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
-export { importRecordsFromCollect, updateRecordsStep } from './data'
+export { importRecordsFromCollect, updateRecordsStep, exportDataQueryToTempFile, downloadDataQueryExport } from './data'
 export { fetchSurveys, insertSurvey } from './survey'
 export { fetchNodeDef, fetchNodeDefs, putNodeDefProps, postNodeDef, deleteNodeDef } from './nodeDef'
 

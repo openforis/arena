@@ -25,7 +25,6 @@ export default () =>
       })
 
       test(`Verify record ${idx} deleted`, async () => {
-        // await page.waitForResponse('**/records**')
         if (idx === records.length - 1) {
           // last record deleted: no items in table
           await expectNoItems()
