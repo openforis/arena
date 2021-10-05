@@ -158,7 +158,7 @@ export const fetchViewData = async (params, client = db) => {
 
   const editMode = Query.isModeRawEdit(query)
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const nodeDefCols = Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey) 
+  const nodeDefCols = Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey)
 
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
@@ -207,8 +207,6 @@ export const fetchViewData = async (params, client = db) => {
   const select = queryBuilder.build()
   const queryParams = queryBuilder.params
 
-  console.log("select", select)
-  console.log("select", dbUtils.formatQuery(select, queryParams))
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))

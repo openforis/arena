@@ -26,7 +26,6 @@ const JobMonitor = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const { job, closeButton } = useJob()
-  const customCloseButtonComponent = getCustomCloseButtonComponent({ closeButton, job })
 
   if (!job || JobSerialized.isCanceled(job)) return null
 
@@ -50,7 +49,7 @@ const JobMonitor = () => {
           />
         )}
         {JobSerialized.isEnded(job) &&
-          (customCloseButtonComponent || (
+          (getCustomCloseButtonComponent({ closeButton, job }) || (
             <Button
               className="modal-footer__item"
               onClick={() => dispatch(JobActions.hideJobMonitor())}

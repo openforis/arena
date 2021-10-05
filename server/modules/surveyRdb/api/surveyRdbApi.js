@@ -3,6 +3,7 @@ import * as DateUtils from '../../../../core/dateUtils'
 
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
+import * as FileUtils from '../../../utils/file/fileUtils'
 
 import * as SurveyRdbService from '../service/surveyRdbService'
 
@@ -51,18 +52,40 @@ export const init = (app) => {
     }
   )
 
-  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+  app.post(
+    '/surveyRdb/:surveyId/:nodeDefUuidTable/export/start',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, query: queryParam } = Request.getParams(req)
 
-      const query = A.parse(queryParam)
+        const query = A.parse(queryParam)
 
-      const outputFileName = `data-export-${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile(res, outputFileName, null, Response.contentTypes.csv)
+        const tempFileName = await SurveyRdbService.exportViewDataToTempFile({ surveyId, cycle, query, addCycle: true })
 
-      await SurveyRdbService.fetchViewData({ surveyId, cycle, query, streamOutput: res, addCycle: true })
-    } catch (error) {
-      next(error)
+        res.json({ tempFileName })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
+
+  app.get(
+    '/surveyRdb/:surveyId/:nodeDefUuidTable/export/download',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { tempFileName } = Request.getParams(req)
+
+        Response.sendFile({
+          res,
+          path: FileUtils.tempFilePath(tempFileName),
+          name: `data-export-${DateUtils.nowFormatDefault()}.csv`,
+          contentType: Response.contentTypes.csv,
+        })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 }
