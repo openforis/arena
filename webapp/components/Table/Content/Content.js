@@ -7,8 +7,8 @@ import LoadingBar from '@webapp/components/LoadingBar'
 
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
-import { ContentCell } from './ContentCell'
-import { ContentHeader } from './ContentHeader'
+import { ContentRow } from './ContentRow'
+import { ContentHeaders } from './ContentHeaders'
 
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
@@ -63,24 +63,10 @@ const Content = (props) => {
   }
 
   const hasColumns = columns?.length > 0
-  const rowComponent = hasColumns
-    ? ({ row }) => (
-        <>
-          {columns.map((column) => (
-            <ContentCell column={column} row={row} />
-          ))}
-        </>
-      )
-    : rowComponentParam
+  const rowComponent = hasColumns ? (_props) => <ContentRow {..._props} columns={columns} /> : rowComponentParam
 
   const rowHeaderComponent = hasColumns
-    ? () => (
-        <>
-          {columns.map((column) => (
-            <ContentHeader column={column} />
-          ))}
-        </>
-      )
+    ? (_props) => <ContentHeaders {..._props} columns={columns} />
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
