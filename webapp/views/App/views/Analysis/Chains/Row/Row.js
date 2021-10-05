@@ -7,21 +7,12 @@ import * as DateUtils from '@core/dateUtils'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
-import ProgressBar from '@webapp/components/progressBar'
 import ErrorBadge from '@webapp/components/errorBadge'
-
-const statusComponent = {
-  [Chain.statusExec.success]: <span className="icon icon-checkmark icon-10px" />,
-  [Chain.statusExec.error]: <span className="icon icon-cross icon-10px" />,
-  [Chain.statusExec.running]: <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />,
-}
 
 const Row = (props) => {
   const { row } = props
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-
-  const statusExec = Chain.getStatusExec(row)
 
   return (
     <>
