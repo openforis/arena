@@ -4,7 +4,6 @@ import React from 'react'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
@@ -19,9 +18,9 @@ import ButtonBar from './ButtonBar'
 import ValidationsProps from './ValidationsProps'
 import AdvancedProps from './AdvancedProps'
 import BasicProps from './BasicProps'
+import AnalysisEntitySelector from './AnalysisEntitySelector'
 
 import { State, useNodeDefDetails } from './store'
-import { EntitySelector } from '../NodeDefsSelector'
 
 const NodeDefDetails = () => {
   const i18n = useI18n()
@@ -40,15 +39,10 @@ const NodeDefDetails = () => {
       <div className="node-def-edit">
         <div className="node-def-edit__container">
           {NodeDef.isAnalysis(nodeDef) && (
-            <FormItem label={i18n.t('common.entity')} className="node-def-edit__title">
-              <EntitySelector
-                hierarchy={Survey.getHierarchy()(survey)}
-                lang={lang}
-                nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
-                onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
-                showSingleEntities={false}
-              />
-            </FormItem>
+            <AnalysisEntitySelector
+              onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
+              nodeDef={nodeDef}
+            />
           )}
 
           <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
