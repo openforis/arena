@@ -4,7 +4,6 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
