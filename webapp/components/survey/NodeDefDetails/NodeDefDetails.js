@@ -7,7 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
 import TabBar from '@webapp/components/tabBar'
@@ -24,13 +23,11 @@ import { State, useNodeDefDetails } from './store'
 
 const NodeDefDetails = () => {
   const i18n = useI18n()
-  const survey = useSurvey()
 
   const { state, Actions, editingFromDesigner } = useNodeDefDetails()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
-  const lang = useSurveyPreferredLang()
 
   const nodeDefType = NodeDef.getType(nodeDef)
 
