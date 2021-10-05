@@ -20,6 +20,7 @@ import {
   useAuthCanCreateSurvey,
   useAuthCanCreateTemplate,
   useAuthCanEditTemplates,
+  useAuthCanViewAllUsers,
   useAuthCanViewUsersAccessRequests,
 } from '@webapp/store/user/hooks'
 import { DataTestId } from '@webapp/utils/dataTestId'
@@ -38,6 +39,7 @@ const UserPopupMenu = (props) => {
   const canCreateTemplate = useAuthCanCreateTemplate()
   const canEditTemplates = useAuthCanEditTemplates()
   const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests()
+  const canViewAllUsers = useAuthCanViewAllUsers()
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -137,6 +139,21 @@ const UserPopupMenu = (props) => {
           >
             <span className="icon icon-paragraph-justify icon-12px icon-left" />
             {i18n.t('appModules.usersAccessRequests')}
+          </Link>
+        </>
+      )}
+
+      {canViewAllUsers && (
+        <>
+          <Separator />
+          <Link
+            data-testid={DataTestId.header.usersListBtn}
+            to={appModuleUri(userModules.users)}
+            onClick={onClose}
+            className="btn-s btn-transparent"
+          >
+            <span className="icon icon-paragraph-justify icon-12px icon-left" />
+            {i18n.t('appModules.usersList')}
           </Link>
         </>
       )}

@@ -22,9 +22,23 @@ const Table = (props) => {
     rowHeaderComponent,
     headerProps,
     rowProps,
+    columns,
   } = props
 
-  const { loadingData, loadingCount, list, offset, limit, sort, search, handleSortBy, handleSearch, count, totalCount, initData } = useTable({
+  const {
+    loadingData,
+    loadingCount,
+    list,
+    offset,
+    limit,
+    sort,
+    search,
+    handleSortBy,
+    handleSearch,
+    count,
+    totalCount,
+    initData,
+  } = useTable({
     moduleApiUri,
     module,
     restParams,
@@ -63,6 +77,7 @@ const Table = (props) => {
         onRowClick={onRowClick}
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
+        columns={columns}
         rowProps={rowProps}
         initData={initData}
         sort={sort}
@@ -89,6 +104,7 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   headerProps: PropTypes.object,
+  columns: PropTypes.array,
 }
 
 Table.defaultProps = {
@@ -105,6 +121,7 @@ Table.defaultProps = {
   rowComponent: DummyComponent,
   rowProps: {},
   headerProps: {},
+  columns: null,
 }
 
 export default Table

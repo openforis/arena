@@ -7,6 +7,8 @@ import LoadingBar from '@webapp/components/LoadingBar'
 
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
+import { ContentCell } from './ContentCell'
+import { ContentHeader } from './ContentHeader'
 
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
@@ -24,7 +26,7 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
-    gridTemplateColumns,
+    gridTemplateColumns: gridTemplateColumnsParam,
     isRowActive,
     list,
     loading,
@@ -35,10 +37,11 @@ const Content = (props) => {
     offset,
     totalCount,
     onRowClick,
-    rowHeaderComponent,
-    rowComponent,
+    rowHeaderComponent: rowHeaderComponentParam,
+    rowComponent: rowComponentParam,
     rowProps,
     initData,
+    columns,
   } = props
 
   const i18n = useI18n()
@@ -58,6 +61,31 @@ const Content = (props) => {
       </div>
     )
   }
+
+  const hasColumns = columns?.length > 0
+  const rowComponent = hasColumns
+    ? ({ row }) => (
+        <>
+          {columns.map((column) => (
+            <ContentCell column={column} row={row} />
+          ))}
+        </>
+      )
+    : rowComponentParam
+
+  const rowHeaderComponent = hasColumns
+    ? () => (
+        <>
+          {columns.map((column) => (
+            <ContentHeader column={column} />
+          ))}
+        </>
+      )
+    : rowHeaderComponentParam
+
+  const gridTemplateColumns = hasColumns
+    ? columns.map((column) => column.width || '1fr').join(' ')
+    : gridTemplateColumnsParam
 
   return (
     <div className="table__content">
@@ -118,6 +146,7 @@ Content.propTypes = {
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
   rowProps: PropTypes.object,
+  columns: PropTypes.array,
 }
 
 Content.defaultProps = {
@@ -126,6 +155,7 @@ Content.defaultProps = {
   initData: null,
   loading: false,
   rowProps: {},
+  columns: null,
 }
 
 export default Content

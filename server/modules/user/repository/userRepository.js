@@ -38,6 +38,14 @@ export const insertUser = async ({ surveyId, surveyCycleKey, email, password, st
 
 // READ
 
+export const countUsers = async (client = db) =>
+  client.one(
+    `
+    SELECT count(*)
+    FROM "user" u
+    `
+  )
+
 export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
   client.one(
     `
@@ -51,6 +59,19 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     ON g.uuid = gu.group_uuid
     AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))`,
     [surveyId, countSystemAdmins]
+  )
+
+export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
+  client.map(
+    `
+  SELECT 
+      ${selectFieldsCommaSep}
+  FROM "user" u
+  ORDER BY u.name, u.email
+  LIMIT ${limit || 'ALL'}
+  OFFSET ${offset}`,
+    [],
+    camelize
   )
 
 export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>

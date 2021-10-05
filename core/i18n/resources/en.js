@@ -198,7 +198,8 @@ Do you want to proceed?`,
     validationReport: 'Validation report',
 
     users: 'Users',
-    userList: 'User list',
+    usersSurvey: 'Users list',
+    usersList: 'Users list (all)',
 
     analysis: 'Analysis',
     chain: 'Chain',

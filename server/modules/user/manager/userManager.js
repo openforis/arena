@@ -19,6 +19,7 @@ import * as UserAccessRequestRepository from '@server/modules/user/repository/us
 import * as UserInvitationManager from './userInvitationManager'
 
 export const {
+  countUsers,
   countUsersBySurveyId,
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
@@ -127,6 +128,22 @@ const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = 
   return userUpdated
 }
 
+const _initializeUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+  const usersUuids = users.map(User.getUuid)
+
+  const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
+
+  return Promise.all(
+    users.map((user) =>
+      _initializeUser({
+        user,
+        invitationsByUserUuid,
+        userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+      })
+    )
+  )
+}
+
 const _userFetcher =
   (fetchFn) =>
   async (...args) => {
@@ -138,6 +155,12 @@ export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
+
+export const fetchUsers = async ({ offset, limit }, client = db) =>
+  client.tx(async (t) => {
+    const users = await UserRepository.fetchUsers({ offset, limit }, t)
+    return _initializeUsers({ users, t })
+  })
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
   client.tx(async (t) => {
@@ -152,17 +175,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmi
       {}
     )
 
-    const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
-
-    return Promise.all(
-      users.map((user) =>
-        _initializeUser({
-          user,
-          invitationsByUserUuid,
-          userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
-        })
-      )
-    )
+    return _initializeUsers({ users, invitationsByUserUuid, t })
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {

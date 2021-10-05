@@ -1,34 +1,44 @@
-import './UsersList.scss'
-
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router'
 
 import * as User from '@core/user/user'
+
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
-import Table from '@webapp/components/Table/Table'
+import Table from '@webapp/components/Table'
+import ProfilePicture from '@webapp/components/profilePicture'
 
-import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
-import Row from './Row'
-
-const UsersList = () => {
+export const UsersList = () => {
   const history = useHistory()
-  const emailVisible = useAuthCanViewOtherUsersEmail()
 
   const onRowClick = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
 
   return (
     <Table
       module="users"
+      moduleApiUri="/api/users"
       className="users-list"
-      gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 50px`}
-      headerLeftComponent={HeaderLeft}
-      rowHeaderComponent={(headerProps) => RowHeader({ ...headerProps, emailVisible })}
-      rowComponent={(rowProps) => Row({ ...rowProps, emailVisible })}
+      columns={[
+        {
+          key: 'profile-picture',
+          width: '40px',
+          cellRenderer: ({ row }) => <ProfilePicture userUuid={User.getUuid(row)} thumbnail />,
+        },
+        { key: 'email', header: 'common.email', cellRenderer: ({ row }) => User.getEmail(row) },
+        { key: 'name', header: 'common.name', cellRenderer: ({ row }) => User.getName(row) },
+        {
+          key: 'is-system-admin',
+          header: 'authGroups.systemAdmin.label',
+          width: '15rem',
+          cellRenderer: ({ row }) => User.isSystemAdmin(row) && <span className="icon icon-checkmark" />,
+        },
+        {
+          key: 'is-survey-manager',
+          header: 'authGroups.surveyManager.label',
+          width: '15rem',
+          cellRenderer: ({ row }) => User.isSurveyManager(row) && <span className="icon icon-checkmark" />,
+        },
+      ]}
       onRowClick={onRowClick}
     />
   )
 }
-
-export default UsersList
