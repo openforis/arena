@@ -48,7 +48,7 @@ export const useNodeDefDetails = () => {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
             dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
           } catch (err) {
-            console.log('Error fetching nodeDef')
+            history.goBack()
           }
         }
         const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
