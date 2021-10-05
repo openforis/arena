@@ -46,7 +46,7 @@ export const useNodeDefDetails = () => {
         if (NodeDef.isAnalysis(nodeDefSurvey)) {
           try {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
-            dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
+            dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefSurvey }))
           } catch (err) {
             history.goBack()
           }

@@ -62,18 +62,8 @@ const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nod
   }
 }
 
-export const getNodeDef = async ({ surveyId, cycle, draft, advanced, validate, nodeDefUuid }, client = db) => {
-  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
-    surveyId,
-    cycle,
-    draft,
-    advanced,
-    validate,
-    nodeDefUuid,
-  })
-
-  return Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-}
+export const getNodeDef = async ({ surveyId, draft, advanced, nodeDefUuid }, client = db) =>
+  NodeDefManager.fetchNodeDefByUuid(surveyId, nodeDefUuid, draft, advanced, client)
 
 export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey, nodeDef }, client = db) =>
   client.tx(async (t) => {
