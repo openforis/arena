@@ -10,12 +10,14 @@ import * as StringUtils from '@core/stringUtils'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { DataTestId } from '@webapp/utils/dataTestId'
 
-const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntities }) => {
+const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel }) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
     if (NodeDef.isRoot(nodeDef) || showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) {
-      const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
+      const label = useNameAsLabel
+        ? NodeDef.getName(nodeDef)
+        : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
       entities.push({
         key: NodeDef.getUuid(nodeDef),
         value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
@@ -29,9 +31,19 @@ const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntitie
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuidEntity, lang, validation, onChange, nodeDefLabelType, showSingleEntities } = props
+  const {
+    hierarchy,
+    nodeDefUuidEntity,
+    lang,
+    validation,
+    onChange,
+    nodeDefLabelType,
+    showSingleEntities,
+    disabled,
+    useNameAsLabel,
+  } = props
 
-  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, showSingleEntities })
+  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel })
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
@@ -43,6 +55,7 @@ const EntitySelector = (props) => {
       selection={selection}
       validation={validation}
       onChange={(item) => onChange(R.prop('key', item))}
+      disabled={disabled}
     />
   )
 }
@@ -52,6 +65,8 @@ EntitySelector.propTypes = {
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
   showSingleEntities: PropTypes.bool,
+  disabled: PropTypes.bool,
+  useNameAsLabel: PropTypes.bool,
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string,
@@ -60,6 +75,8 @@ EntitySelector.propTypes = {
 EntitySelector.defaultProps = {
   nodeDefUuidEntity: null,
   showSingleEntities: true,
+  disabled: false,
+  useNameAsLabel: false,
   validation: null,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
