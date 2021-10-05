@@ -144,7 +144,6 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
       const { offset, limit } = Request.getParams(req)
 
       const list = await UserService.fetchUsers({ offset, limit })
