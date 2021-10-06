@@ -8,6 +8,7 @@ export const ContentRow = (props) => {
     index,
     initData,
     isRowActive,
+    isRowExpandable,
     module,
     offset,
     onRowClick,
@@ -34,13 +35,14 @@ export const ContentRow = (props) => {
         key={String(index)}
         data-testid={`${module}_${index}`}
         role="button"
-        onClick={() => onRowClick && onRowClick(row)}
+        onClick={() => onRowClick && onRowClick(item)}
         className={className}
         style={{ gridTemplateColumns, height }}
       >
         {React.createElement(rowComponent, {
           idx: index,
           offset,
+          isRowExpandable,
           item,
           itemPosition,
           row: item, // TODO pass only item

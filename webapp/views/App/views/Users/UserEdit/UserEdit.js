@@ -32,14 +32,15 @@ const UserEdit = () => {
     canRemove,
     canSave,
     canViewEmail,
+    hideSurveyGroup,
 
     onUpdate,
     onUpdateProfilePicture,
     onSave,
     onRemove,
     onInviteRepeat,
-  } = useEditUser({userUuid})
-  
+  } = useEditUser({ userUuid })
+
   const i18n = useI18n()
   const validation = User.getValidation(userToUpdate)
 
@@ -88,16 +89,17 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      <FormItem label={i18n.t('common.group')}>
-        <DropdownUserGroup
-          editingLoggedUser={User.isEqual(user)(userToUpdate)}
-          disabled={!canEditGroup}
-          validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
-          groupUuid={User.getGroupUuid(userToUpdate)}
-          onChange={(value) => onUpdate(User.assocGroupUuid(value)(userToUpdate))}
-        />
-      </FormItem>
-
+      {!hideSurveyGroup && (
+        <FormItem label={i18n.t('usersView.roleInSurvey')}>
+          <DropdownUserGroup
+            editingLoggedUser={User.isEqual(user)(userToUpdate)}
+            disabled={!canEditGroup}
+            validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
+            groupUuid={User.getGroupUuid(userToUpdate)}
+            onChange={(value) => onUpdate(User.assocGroupUuid(value)(userToUpdate))}
+          />
+        </FormItem>
+      )}
       {(canEdit || User.isInvitationExpired(userToUpdate)) && (
         <div className="user-edit__buttons">
           {canRemove && (

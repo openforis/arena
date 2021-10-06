@@ -5,7 +5,7 @@ import { Button } from '@webapp/components/buttons'
 import { ContentRowCell } from './ContentRowCell'
 
 export const ContentRowCells = (props) => {
-  const { columns, expandableRows, item, onRowExpandToggle, rowExpanded } = props
+  const { columns, expandableRows, isRowExpandable, item, onRowExpandToggle, rowExpanded } = props
 
   return (
     <>
@@ -16,6 +16,7 @@ export const ContentRowCells = (props) => {
         <div>
           <Button
             iconClassName={rowExpanded ? 'icon-circle-up' : 'icon-circle-down'}
+            disabled={!isRowExpandable({ item })}
             title="common.expandCollapse"
             onClick={onRowExpandToggle}
           />

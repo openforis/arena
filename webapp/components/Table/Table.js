@@ -13,6 +13,7 @@ const Table = (props) => {
     className,
     gridTemplateColumns,
     headerLeftComponent,
+    isRowExpandable,
     isRowActive,
     keyExtractor,
     module,
@@ -71,6 +72,7 @@ const Table = (props) => {
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
         keyExtractor={keyExtractor}
+        isRowExpandable={isRowExpandable}
         list={list}
         loading={loadingData}
         maxRows={limit}
@@ -102,6 +104,7 @@ Table.propTypes = {
   gridTemplateColumns: PropTypes.string,
   headerLeftComponent: PropTypes.elementType,
   isRowActive: PropTypes.func, // Checks whether a row must be highlighted
+  isRowExpandable: PropTypes.func, // Checks if a row rendering an item can be expanded
   keyExtractor: PropTypes.func,
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,
@@ -120,9 +123,13 @@ Table.propTypes = {
 
 Table.defaultProps = {
   className: '',
+  columns: null,
+  expandableRows: false,
   gridTemplateColumns: '1fr',
   headerLeftComponent: DummyComponent,
+  headerProps: {},
   isRowActive: null,
+  isRowExpandable: () => true,
   keyExtractor: ({ item }) => ObjectUtils.getUuid(item),
   moduleApiUri: null,
   noItemsLabelKey: 'common.noItems',
@@ -133,9 +140,6 @@ Table.defaultProps = {
   rowComponent: DummyComponent,
   rowExpandedComponent: DummyComponent,
   rowProps: {},
-  headerProps: {},
-  columns: null,
-  expandableRows: false,
 }
 
 export default Table

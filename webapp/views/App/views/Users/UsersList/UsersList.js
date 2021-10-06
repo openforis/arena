@@ -15,7 +15,8 @@ import { UserSurveysTable } from './UserSurveysTable'
 export const UsersList = () => {
   const history = useHistory()
 
-  const goToUserDetails = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+  const goToUserDetails = (user) =>
+    history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
 
   return (
     <Table
@@ -49,6 +50,7 @@ export const UsersList = () => {
         },
       ]}
       expandableRows
+      isRowExpandable={({ item }) => !User.isSystemAdmin(item)}
       rowExpandedComponent={({ item }) => <UserSurveysTable user={item} />}
     />
   )
