@@ -67,8 +67,8 @@ const AnalysisProps = (props) => {
     const currentScript = NodeDef.getScript(nodeDef)
     let newScript = ''
     const generateCodesText = (_items) =>
-      Object.values(items)
-        .map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)} `)
+      Object.values(_items)
+        .map((_item) => `'${CategoryItem.getCode(_item)}', ${CategoryItem.getLabel(lang)(_item)} `)
         .join('; ')
 
     if (NodeDef.getParentUuid(nodeDef) && NodeDef.getCategoryUuid(nodeDef)) {
