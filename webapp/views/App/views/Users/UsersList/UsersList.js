@@ -26,30 +26,30 @@ export const UsersList = () => {
         {
           key: 'profile-picture',
           width: '40px',
-          cellRenderer: ({ row }) => <ProfilePicture userUuid={User.getUuid(row)} thumbnail />,
+          renderItem: ({ item }) => <ProfilePicture userUuid={User.getUuid(item)} thumbnail />,
         },
-        { key: 'email', header: 'common.email', cellRenderer: ({ row }) => User.getEmail(row) },
-        { key: 'name', header: 'common.name', cellRenderer: ({ row }) => User.getName(row) },
+        { key: 'email', header: 'common.email', renderItem: ({ item }) => User.getEmail(item) },
+        { key: 'name', header: 'common.name', renderItem: ({ item }) => User.getName(item) },
         {
           key: 'is-system-admin',
           header: 'authGroups.systemAdmin.label',
           width: '15rem',
-          cellRenderer: ({ row }) => User.isSystemAdmin(row) && <span className="icon icon-checkmark" />,
+          renderItem: ({ item }) => User.isSystemAdmin(item) && <span className="icon icon-checkmark" />,
         },
         {
           key: 'is-survey-manager',
           header: 'authGroups.surveyManager.label',
           width: '15rem',
-          cellRenderer: ({ row }) => User.isSurveyManager(row) && <span className="icon icon-checkmark" />,
+          renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
         },
         {
           key: 'user-edit',
           width: '40px',
-          cellRenderer: ({ row }) => <ButtonIconEdit onClick={() => goToUserDetails(row)} />,
+          renderItem: ({ item }) => <ButtonIconEdit onClick={() => goToUserDetails(item)} />,
         },
       ]}
       expandableRows
-      rowExpandedComponent={({ row }) => <UserSurveysTable user={row} />}
+      rowExpandedComponent={({ item }) => <UserSurveysTable user={item} />}
     />
   )
 }

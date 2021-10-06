@@ -136,7 +136,7 @@ export const init = (app) => {
   app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
       const count = await UserService.countUsers()
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
@@ -160,7 +160,7 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
 
       const count = await UserService.countUsersBySurveyId(user, surveyId)
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }

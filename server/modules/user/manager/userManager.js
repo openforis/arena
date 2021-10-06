@@ -111,7 +111,7 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 
 // ==== READ
 
-const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
+const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
   // Assoc auth groups
 
   const _userGroups = R.isEmpty(userGroups) ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user)) : userGroups
@@ -128,14 +128,14 @@ const _initializeUser = async ({ user, invitationsByUserUuid = {}, userGroups = 
   return userUpdated
 }
 
-const _initializeUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
   const usersUuids = users.map(User.getUuid)
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
 
   return Promise.all(
     users.map((user) =>
-      _initializeUser({
+      _attachAuthGroupsAndInvitationToUser({
         user,
         invitationsByUserUuid,
         userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
@@ -148,7 +148,7 @@ const _userFetcher =
   (fetchFn) =>
   async (...args) => {
     const user = await fetchFn(...args)
-    return user ? _initializeUser({ user }) : null
+    return user ? _attachAuthGroupsAndInvitationToUser({ user }) : null
   }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
@@ -159,7 +159,7 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
 export const fetchUsers = async ({ offset, limit }, client = db) =>
   client.tx(async (t) => {
     const users = await UserRepository.fetchUsers({ offset, limit }, t)
-    return _initializeUsers({ users, t })
+    return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
@@ -175,14 +175,14 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmi
       {}
     )
 
-    return _initializeUsers({ users, invitationsByUserUuid, t })
+    return _attachAuthGroupsAndInvitationToUsers({ users, invitationsByUserUuid, t })
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
-    return _initializeUser({ user: R.dissoc('password', user) })
+    return _attachAuthGroupsAndInvitationToUser({ user: R.dissoc('password', user) })
 
   return null
 }

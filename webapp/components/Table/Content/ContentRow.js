@@ -11,7 +11,7 @@ export const ContentRow = (props) => {
     module,
     offset,
     onRowClick,
-    row,
+    item,
     rowComponent,
     rowExpandedComponent,
     rowProps,
@@ -19,11 +19,13 @@ export const ContentRow = (props) => {
 
   const [rowExpanded, setRowExpanded] = useState(false)
 
-  const active = isRowActive && isRowActive(row)
+  const active = isRowActive && isRowActive(item)
   const className = classNames('table__row', { hoverable: Boolean(onRowClick), active, expanded: rowExpanded })
 
   const onRowExpandToggle = () => setRowExpanded((oldExpanded) => !oldExpanded)
   const height = rowExpanded ? '300px' : '35px'
+
+  const itemPosition = index + offset + 1
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
@@ -39,8 +41,10 @@ export const ContentRow = (props) => {
         {React.createElement(rowComponent, {
           idx: index,
           offset,
-          row,
-          rowNo: index + offset + 1,
+          item,
+          itemPosition,
+          row: item, // TODO pass only item
+          rowNo: itemPosition,
           active,
           initData,
           ...rowProps,
@@ -50,7 +54,7 @@ export const ContentRow = (props) => {
         })}
         {rowExpanded && (
           <div className="table__row-expanded-panel-wrapper">
-            {React.createElement(rowExpandedComponent, { row, ...rowProps })}
+            {React.createElement(rowExpandedComponent, { item, ...rowProps })}
           </div>
         )}
       </div>

@@ -30,6 +30,7 @@ const Content = (props) => {
     columns,
     expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
+    keyExtractor,
     list,
     loading,
     maxRows,
@@ -83,13 +84,14 @@ const Content = (props) => {
         <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
-          {list.map((row, index) =>
+          {list.map((item, index) =>
             React.createElement(ContentRow, {
-              key: String(index),
+              key: keyExtractor(item),
               ...props,
               ...rowProps,
-              row,
+              row: item, // TODO do not pass "row" but "item" instead
               index,
+              item,
               rowComponent,
               rowExpandedComponent,
               gridTemplateColumns,
@@ -106,6 +108,7 @@ Content.propTypes = {
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
+  keyExtractor: PropTypes.func.isRequired,
   list: PropTypes.array.isRequired,
   loading: PropTypes.bool,
   maxRows: PropTypes.number.isRequired,

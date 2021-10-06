@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as ObjectUtils from '@core/objectUtils'
+
 import Header from './Header'
 import Content from './Content'
 import { useTable } from './useTable'
@@ -12,6 +14,7 @@ const Table = (props) => {
     gridTemplateColumns,
     headerLeftComponent,
     isRowActive,
+    keyExtractor,
     module,
     moduleApiUri,
     noItemsLabelKey,
@@ -67,6 +70,7 @@ const Table = (props) => {
       <Content
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
+        keyExtractor={keyExtractor}
         list={list}
         loading={loadingData}
         maxRows={limit}
@@ -98,6 +102,7 @@ Table.propTypes = {
   gridTemplateColumns: PropTypes.string,
   headerLeftComponent: PropTypes.elementType,
   isRowActive: PropTypes.func, // Checks whether a row must be highlighted
+  keyExtractor: PropTypes.func,
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,
   noItemsLabelKey: PropTypes.string,
@@ -118,6 +123,7 @@ Table.defaultProps = {
   gridTemplateColumns: '1fr',
   headerLeftComponent: DummyComponent,
   isRowActive: null,
+  keyExtractor: ({ item }) => ObjectUtils.getUuid(item),
   moduleApiUri: null,
   noItemsLabelKey: 'common.noItems',
   noItemsLabelForSearchKey: 'common.noItems',
