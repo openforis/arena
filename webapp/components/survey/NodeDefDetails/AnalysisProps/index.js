@@ -16,7 +16,7 @@ import * as API from '@webapp/service/api'
 
 const AnalysisProps = (props) => {
   const [defaultLocalScript, setDefaultLocalScript] = useState('')
-  
+
   const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
@@ -49,8 +49,8 @@ const AnalysisProps = (props) => {
   }
 
   const getDefaultScript = () =>
-    `${Survey.getNodeDefParent(nodeDef)(survey) || 'PARENT'}$${
-      NodeDef.getName(nodeDef) || 'NAME'
+    `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${NodeDef.getName(nodeDef) || 'NAME'}${
+      NodeDef.isCode(nodeDef) ? '_code' : ''
     } <- NA`
 
   const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
@@ -66,16 +66,19 @@ const AnalysisProps = (props) => {
 
     const currentScript = NodeDef.getScript(nodeDef)
     let newScript = ''
-    if (/^# __CODES__/.test(currentScript)) {
-      const scriptSplitted = currentScript.split('\n')
-      scriptSplitted[0] = `# __CODES__ ${Object.values(items)
-        .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
-        .join('; ')}`
-      newScript = scriptSplitted.join('\n')
-    } else {
-      newScript = `# __CODES__ ${Object.values(items)
-        .map((item) => `${CategoryItem.getCode(item)}, ${CategoryItem.getLabel(lang)(item)} `)
-        .join('; ')}\n${getScriptOrDefault()}`
+    const generateCodesText = (_items) =>
+      Object.values(items)
+        .map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)} `)
+        .join('; ')
+
+    if (NodeDef.getParentUuid(nodeDef) && NodeDef.getCategoryUuid(nodeDef)) {
+      if (/^# __CODES__/.test(currentScript)) {
+        const scriptSplitted = currentScript.split('\n')
+        scriptSplitted[0] = `# __CODES__ ${generateCodesText(items)}`
+        newScript = scriptSplitted.join('\n')
+      } else {
+        newScript = `# __CODES__ ${generateCodesText(items)}\n${getScriptOrDefault()}`
+      }
     }
 
     onChange(newScript)
@@ -88,15 +91,14 @@ const AnalysisProps = (props) => {
     }
   }, [NodeDef.getCategoryUuid(nodeDef), NodeDef.getParentUuid(nodeDef)])
 
-  useEffect(() =>{
+  useEffect(() => {
     setDefaultLocalScript(getScriptOrDefault())
-  },[])
-
+  }, [])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form"> 
+    <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form">
       <ScriptEditor
-      key={defaultLocalScript}
+        key={defaultLocalScript}
         name="node_def_analysis_script"
         mode="r"
         script={defaultLocalScript}
