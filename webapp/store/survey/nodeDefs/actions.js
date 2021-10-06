@@ -1,9 +1,9 @@
-import axios from 'axios'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as API from '@webapp/service/api'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -72,14 +72,7 @@ export const putNodeDefProps =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const {
-      data: { nodeDefsValidation, nodeDefsUpdated },
-    } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
-      parentUuid,
-      cycle,
-      props,
-      propsAdvanced,
-    })
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({ surveyId, nodeDefUuid, parentUuid, cycle, props, propsAdvanced })
 
     dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
   }
@@ -91,9 +84,9 @@ export const postNodeDef =
     const surveyId = SurveyState.getSurveyId(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-    const {
-      data: { nodeDefsValidation, nodeDefsUpdated },
-    } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef })
+    
+
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDef({ surveyId, surveyCycleKey, nodeDef })
 
     dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
   }
@@ -193,7 +186,7 @@ export const removeNodeDef =
                 data: { nodeDefsUpdated, nodeDefsValidation },
               },
             ] = await Promise.all([
-              axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
+              API.deleteNodeDef({surveyId, nodeDefUuid, surveyCycleKey}),
               dispatch({ type: nodeDefDelete, nodeDef }),
             ])
 

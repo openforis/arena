@@ -23,7 +23,7 @@ const ChainsView = () => {
   return (
     <Table
       className="chains"
-      gridTemplateColumns="30px repeat(4, 1fr) repeat(2, 80px) 50px"
+      gridTemplateColumns="30px repeat(4, 1fr) 50px"
       headerLeftComponent={HeaderLeft}
       module="processing-chains"
       onRowClick={onRowClick}

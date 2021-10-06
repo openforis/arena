@@ -63,6 +63,20 @@ export const init = (app) => {
     }
   })
 
+  app.get(
+    '/survey/:surveyId/nodeDef/:nodeDefUuid',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, draft = true, advanced = true, validate = true, nodeDefUuid } = Request.getParams(req)
+        const nodeDef = await NodeDefService.fetchNodeDef({ surveyId, cycle, draft, advanced, validate, nodeDefUuid })
+        res.json({ nodeDef })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== UPDATE
 
   app.put(
