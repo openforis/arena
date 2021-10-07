@@ -1,7 +1,6 @@
 import './UsersList.scss'
 
 import React from 'react'
-import { useHistory } from 'react-router'
 
 import * as User from '@core/user/user'
 
@@ -13,8 +12,6 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { UserSurveysTable } from './UserSurveysTable'
 
 export const UsersList = () => {
-  const history = useHistory()
-
   // const goToUserDetails = (user) =>
   //   history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
 
