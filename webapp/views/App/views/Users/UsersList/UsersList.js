@@ -8,7 +8,7 @@ import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 import ProfilePicture from '@webapp/components/profilePicture'
-import { ButtonIconEdit } from '@webapp/components'
+// import { ButtonIconEdit } from '@webapp/components'
 
 import { UserSurveysTable } from './UserSurveysTable'
 
@@ -43,11 +43,11 @@ export const UsersList = () => {
           width: '15rem',
           renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
         },
-        {
-          key: 'user-edit',
-          width: '40px',
-          renderItem: ({ item }) => <ButtonIconEdit onClick={() => goToUserDetails(item)} />,
-        },
+        // {
+        //   key: 'user-edit',
+        //   width: '40px',
+        //   renderItem: ({ item }) => <ButtonIconEdit onClick={() => goToUserDetails(item)} />,
+        // },
       ]}
       expandableRows
       isRowExpandable={({ item }) => !User.isSystemAdmin(item)}

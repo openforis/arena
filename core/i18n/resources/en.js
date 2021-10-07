@@ -482,6 +482,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     userSurveys: 'User Surveys',
     surveyName: 'Survey name',
     roleInSurvey: 'Role in survey',
+    userNotInvitedToAnySurvey: `User not invited to any survey`,
   },
 
   usersAccessRequestView: {

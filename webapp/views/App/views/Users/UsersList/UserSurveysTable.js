@@ -27,6 +27,10 @@ export const UserSurveysTable = (props) => {
     return <LoadingBar />
   }
 
+  if (surveys.length === 0) {
+    return <div>{i18n.t('usersView.userNotInvitedToAnySurvey')}</div>
+  }
+
   const gridTemplateColumns = '45rem 15rem'
 
   return (
