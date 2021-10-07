@@ -5,7 +5,7 @@ import { useHistory } from 'react-router'
 
 import * as User from '@core/user/user'
 
-import { appModuleUri, userModules } from '@webapp/app/appModules'
+// import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 import ProfilePicture from '@webapp/components/profilePicture'
 // import { ButtonIconEdit } from '@webapp/components'
@@ -15,8 +15,8 @@ import { UserSurveysTable } from './UserSurveysTable'
 export const UsersList = () => {
   const history = useHistory()
 
-  const goToUserDetails = (user) =>
-    history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
+  // const goToUserDetails = (user) =>
+  //   history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
 
   return (
     <Table
