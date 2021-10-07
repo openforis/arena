@@ -483,6 +483,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     surveyName: 'Survey name',
     roleInCurrentSurvey: 'Role in current survey',
     userNotInvitedToAnySurvey: `User not invited to any survey`,
+    confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
   },
 
   usersAccessRequestView: {
