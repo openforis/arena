@@ -59,13 +59,13 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         }
 
         if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
-          value = isNaN(Number(rowResult[columnName])) ? null : Number(rowResult[columnName])
+          value = String(isNaN(Number(rowResult[columnName])) ? null : Number(rowResult[columnName]))
         }
 
         return {
           ...values,
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-          [TableNode.columnSet.value]: String(value),
+          [TableNode.columnSet.value]: value,
         }
       },
       {
