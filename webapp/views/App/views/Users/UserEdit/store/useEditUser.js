@@ -74,10 +74,8 @@ export const useEditUser = ({ userUuid }) => {
 
   const onSurveyManagerChange = (checked) => {
     const surveyManagerGroup = User.getAuthGroupByName(AuthGroup.groupNames.surveyManager)(user)
-    const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdate)
-
     const userUpdated = checked
-      ? A.pipe(User.dissocAuthGroup(groupInCurrentSurvey), User.assocAuthGroup(surveyManagerGroup))(userToUpdate)
+      ? User.assocAuthGroup(surveyManagerGroup)(userToUpdate)
       : User.dissocAuthGroup(surveyManagerGroup)(userToUpdate)
     onUpdate(userUpdated)
   }

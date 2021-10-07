@@ -61,9 +61,6 @@ export const getAuthGroupBySurveyUuid =
     return authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
   }
 
-export const hasAuthGroupForSurvey = (surveyUuid) => (user) =>
-  Boolean(getAuthGroupBySurveyUuid(surveyUuid, false)(user))
-
 export const getAuthGroupByName = (groupName) => (user) => {
   const authGroups = getAuthGroups(user)
   return authGroups.find((group) => AuthGroup.getName(group) === groupName)

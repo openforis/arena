@@ -9,19 +9,10 @@ import * as Validation from '@core/validation/validation'
 import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
-import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-
-const _checkSelf = (req) => {
-  const { userUuid } = Request.getParams(req)
-  const user = Request.getUser(req)
-  if (userUuid !== User.getUuid(user)) {
-    throw new UnauthorizedError(user && User.getName(user))
-  }
-}
 
 export const init = (app) => {
   // ==== CREATE
