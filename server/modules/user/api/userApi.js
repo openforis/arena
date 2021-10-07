@@ -113,9 +113,8 @@ export const init = (app) => {
     }
   })
 
-  app.get('/user/:userUuid', async (req, res, next) => {
+  app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
-      _checkSelf(req)
       await _getUser(req, res)
     } catch (error) {
       next(error)
@@ -263,9 +262,8 @@ export const init = (app) => {
     }
   })
 
-  app.put('/user/:userUuid', async (req, res, next) => {
+  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      _checkSelf(req)
       await _updateUser(req, res)
     } catch (error) {
       next(error)

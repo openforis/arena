@@ -13,7 +13,7 @@ import { UsersAccessRequest } from './UsersAccessRequest'
 const Users = () => (
   <ModuleSwitch
     moduleRoot={appModules.users}
-    moduleDefault={userModules.users}
+    moduleDefault={userModules.usersSurvey}
     modules={[
       {
         component: UsersList,

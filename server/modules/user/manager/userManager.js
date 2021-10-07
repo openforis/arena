@@ -28,11 +28,8 @@ export const {
   importNewUser,
 } = UserRepository
 
-export const {
-  findUserUuidByUuid: findResetPasswordUserUuidByUuid,
-  deleteUserResetPasswordByUuid,
-  deleteUserResetPasswordExpired,
-} = UserResetPasswordRepository
+export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
+  UserResetPasswordRepository
 
 // ==== CREATE
 
@@ -151,10 +148,12 @@ const _userFetcher =
     return user ? _attachAuthGroupsAndInvitationToUser({ user }) : null
   }
 
-export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
+export const fetchUserByEmail = (email, client = db) => _userFetcher(UserRepository.fetchUserByEmail)(email, client)
 
-export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
-export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
+export const fetchUserByUuid = (uuid, client = db) => _userFetcher(UserRepository.fetchUserByUuid)(uuid, client)
+
+export const fetchUserByUuidWithPassword = (uuid, client = db) =>
+  _userFetcher(UserRepository.fetchUserByUuidWithPassword)(uuid, client)
 
 export const fetchUsers = async ({ offset, limit }, client = db) =>
   client.tx(async (t) => {
@@ -199,15 +198,49 @@ export {
 const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
   client.tx(async (t) => {
     const userUuid = User.getUuid(userToUpdate)
-    const groupUuid = User.getGroupUuid(userToUpdate)
-    const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
+    const userToUpdateOld = await fetchUserByUuid(userUuid, t)
+    const authGroupsUuidsNew = User.getAuthGroupsUuids(userToUpdate)
 
-    if (AuthGroup.isSystemAdminGroup(newGroup)) {
+    const authGroupsNew = await AuthGroupRepository.fetchGroupsByUuids(authGroupsUuidsNew, t)
+
+    const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
+    if (userToUpdateWillBeSystemAdmin) {
       // If new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
       await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
-      await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
-    } else if (surveyId) {
-      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
+      const systemAdminGroup = authGroupsNew.find(AuthGroup.isSystemAdminGroup)
+      await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(systemAdminGroup), userUuid, t)
+    } else if (!userToUpdateWillBeSystemAdmin && User.isSystemAdmin(userToUpdateOld)) {
+      // remove user from system admin group
+      const surveyManagerGroup = User.getSystemAdminGroup(userToUpdateOld)
+      await AuthGroupRepository.deleteUserGroupByUserAndGroupUuid(
+        { userUuid, groupUuid: AuthGroup.getUuid(surveyManagerGroup) },
+        t
+      )
+    }
+    const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
+    if (userToUpdateWillBeSurveyManager && !User.isSurveyManager(userToUpdateOld)) {
+      // add user to survey manager group
+      const surveyManagerGroup = authGroupsNew.find(AuthGroup.isSurveyManagerGroup)
+      await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(surveyManagerGroup), userUuid, t)
+    } else if (!userToUpdateWillBeSurveyManager && User.isSurveyManager(userToUpdateOld)) {
+      // remove user from survey manager group
+      const surveyManagerGroup = User.getSurveyManagerGroup(userToUpdateOld)
+      await AuthGroupRepository.deleteUserGroupByUserAndGroupUuid(
+        { userUuid, groupUuid: AuthGroup.getUuid(surveyManagerGroup) },
+        t
+      )
+    }
+
+    if (surveyId && !userToUpdateWillBeSystemAdmin) {
+      // insert or update user survey auth group relation
+      const surveyAuthGroupNew = authGroupsNew.find((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
+      const surveyUuid = AuthGroup.getSurveyUuid(surveyAuthGroupNew)
+      const groupUuid = AuthGroup.getUuid(surveyAuthGroupNew)
+      if (User.hasAuthGroupForSurvey(surveyUuid)(userToUpdateOld)) {
+        await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
+      } else {
+        await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
+      }
       // Log user update activity only for non system admin users
       await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userUpdate, userToUpdate, false, t)
     }
@@ -215,6 +248,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     const name = User.getName(userToUpdate)
     const email = User.getEmail(userToUpdate)
     const props = User.getProps(userToUpdate)
+
     return UserRepository.updateUser(
       {
         userUuid,
@@ -240,7 +274,7 @@ export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     return Promise.all([
-      AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
+      AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
       ActivityLogRepository.insert(
         user,
         surveyId,

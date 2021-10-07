@@ -41,7 +41,7 @@ const _performInvite =
             params: { email: UserInvite.getEmail(userInvite) },
           })
         )
-        history.push(appModuleUri(userModules.users))
+        history.push(appModuleUri(userModules.usersSurvey))
       }
     } finally {
       dispatch(LoaderActions.hideLoader())

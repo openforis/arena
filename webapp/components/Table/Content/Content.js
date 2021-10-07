@@ -86,7 +86,7 @@ const Content = (props) => {
         <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
           {list.map((item, index) =>
             React.createElement(ContentRow, {
-              key: keyExtractor(item),
+              key: keyExtractor({ item }),
               ...props,
               ...rowProps,
               row: item, // TODO do not pass "row" but "item" instead

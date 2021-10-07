@@ -12,13 +12,13 @@ import { useUser } from '@webapp/store/user'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const DropdownUserGroup = (props) => {
-  const { editingLoggedUser, groupUuid, disabled, validation, onChange } = props
+  const { editingLoggedUser, groupUuid, disabled, validation, onChange, showOnlySurveyGroups } = props
 
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
 
-  const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo, editingLoggedUser })
+  const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo, editingLoggedUser, showOnlySurveyGroups })
 
   return (
     <Dropdown
@@ -30,18 +30,10 @@ const DropdownUserGroup = (props) => {
       itemKey={AuthGroup.keys.uuid}
       itemLabel={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
       selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
-      onChange={(group) => onChange(AuthGroup.getUuid(group))}
+      onChange={(group) => onChange(group)}
       readOnlyInput
     />
   )
-}
-
-DropdownUserGroup.defaultProps = {
-  editingLoggedUser: false, // True if user being edited is the logged one
-  groupUuid: null,
-  disabled: false,
-  validation: null,
-  onChange: null,
 }
 
 DropdownUserGroup.propTypes = {
@@ -50,6 +42,16 @@ DropdownUserGroup.propTypes = {
   disabled: PropTypes.bool,
   validation: PropTypes.any,
   onChange: PropTypes.func,
+  showOnlySurveyGroups: PropTypes.bool,
+}
+
+DropdownUserGroup.defaultProps = {
+  editingLoggedUser: false, // True if user being edited is the logged one
+  groupUuid: null,
+  disabled: false,
+  validation: null,
+  onChange: null,
+  showOnlySurveyGroups: false,
 }
 
 export default DropdownUserGroup

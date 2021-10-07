@@ -70,7 +70,7 @@ export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
     SELECT 
         ${selectFieldsCommaSep}
     FROM "user" u
-    ORDER BY u.name, u.email
+    ORDER BY u.email
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],

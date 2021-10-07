@@ -22,7 +22,10 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
       try {
         dispatch(LoaderActions.showLoader())
 
-        const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
+        const authGroups = User.getAuthGroups(userToInvite)
+        const authGroup = authGroups[0]
+
+        const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), authGroup.uuid)
         const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
 
         const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
@@ -38,7 +41,7 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
             })
           )
 
-          history.push(appModuleUri(userModules.users))
+          history.push(appModuleUri(userModules.usersSurvey))
         }
       } finally {
         dispatch(LoaderActions.hideLoader())

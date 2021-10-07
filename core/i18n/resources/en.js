@@ -481,7 +481,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     invitedDate: 'Invited date',
     userSurveys: 'User Surveys',
     surveyName: 'Survey name',
-    roleInSurvey: 'Role in survey',
+    roleInCurrentSurvey: 'Role in current survey',
     userNotInvitedToAnySurvey: `User not invited to any survey`,
   },
 

@@ -33,7 +33,7 @@ export const useOnRemove = ({ userToUpdate }) => {
           },
         })
       )
-      history.push(appModuleUri(userModules.users))
+      history.push(appModuleUri(userModules.usersSurvey))
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
