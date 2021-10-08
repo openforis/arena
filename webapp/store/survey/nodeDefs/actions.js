@@ -72,9 +72,33 @@ export const putNodeDefProps =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({ surveyId, nodeDefUuid, parentUuid, cycle, props, propsAdvanced })
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({
+      surveyId,
+      nodeDefUuid,
+      parentUuid,
+      cycle,
+      props,
+      propsAdvanced,
+    })
 
     dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+  }
+
+export const putNodeDefsProps =
+  ({ nodeDefs }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
+
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefsProps({ surveyId, nodeDefs, cycle })
+
+    dispatch(
+      _onNodeDefsUpdate(
+        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
+        nodeDefsValidation
+      )
+    )
   }
 
 export const postNodeDef =
@@ -83,8 +107,6 @@ export const postNodeDef =
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-
-    
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDef({ surveyId, surveyCycleKey, nodeDef })
 
@@ -186,7 +208,7 @@ export const removeNodeDef =
                 data: { nodeDefsUpdated, nodeDefsValidation },
               },
             ] = await Promise.all([
-              API.deleteNodeDef({surveyId, nodeDefUuid, surveyCycleKey}),
+              API.deleteNodeDef({ surveyId, nodeDefUuid, surveyCycleKey }),
               dispatch({ type: nodeDefDelete, nodeDef }),
             ])
 

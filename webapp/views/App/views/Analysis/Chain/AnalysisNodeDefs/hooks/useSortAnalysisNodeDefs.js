@@ -9,20 +9,6 @@ export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs 
 
   const sortableRef = useRef(null)
 
-  const updateAnalysisNodeDef = ({ nodeDef, newIndex }) => {
-    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.index, value: newIndex })(nodeDef)
-
-    dispatch(
-      NodeDefsActions.putNodeDefProps({
-        nodeDefUuid: NodeDef.getUuid(nodeDef),
-        parentUuid: NodeDef.getParentUuid(nodeDef),
-        propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: newIndex },
-      })
-    )
-
-    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
-  }
-
   const initSortable = useCallback(() => {
     if (analysisNodeDefs.length > 0 && analysisNodeDefsRef.current !== null) {
       sortableRef.current = new Sortable(analysisNodeDefsRef.current, {
@@ -41,9 +27,16 @@ export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs 
         newAnalysisNodeDefs.splice(oldIndex, 1)
         newAnalysisNodeDefs.splice(newIndex, 0, analysisNodeDef)
 
-        newAnalysisNodeDefs.forEach((nodeDef, i) => {
-          updateAnalysisNodeDef({ nodeDef, newIndex: i })
+        const newAnalysisNodeDefsSorted = newAnalysisNodeDefs.map((nodeDef, i) => {
+          const nodeDefUpdated = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.index, value: i })(nodeDef)
+          dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
+          return {
+            nodeDefUuid: NodeDef.getUuid(nodeDef),
+            propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: i },
+          }
         })
+
+        dispatch(NodeDefsActions.putNodeDefsProps({ nodeDefs: newAnalysisNodeDefsSorted }))
       })
     }
   }, [analysisNodeDefs, analysisNodeDefsRef])
