@@ -40,19 +40,19 @@ export const ContentRow = (props) => {
         style={{ gridTemplateColumns, height }}
       >
         {React.createElement(rowComponent, {
+          ...rowProps,
           idx: index,
           offset,
           isRowExpandable,
           item,
           itemPosition,
-          row: item, // TODO pass only item
-          rowNo: itemPosition,
           active,
           initData,
-          ...rowProps,
           expandableRows,
           onRowExpandToggle,
           rowExpanded,
+          row: item, // TODO remove it and pass only item
+          rowNo: itemPosition, // TODO remove it and pass only itemPosition
         })}
         {rowExpanded && (
           <div className="table__row-expanded-panel-wrapper">
