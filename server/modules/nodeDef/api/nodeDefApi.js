@@ -107,6 +107,22 @@ export const init = (app) => {
     }
   )
 
+  app.put('/survey/:surveyId/nodeDefs/props', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId,  } = Request.getParams(req)
+      const { nodeDefs, cycle } = Request.getBody(req)
+
+      const _nodedefsUpdated = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
+
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({ cycle, surveyId, user, nodeDefsUpdated: _nodedefsUpdated })
+      
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
 
   app.delete(
