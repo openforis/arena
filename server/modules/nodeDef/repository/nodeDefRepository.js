@@ -182,6 +182,30 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, prop
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
 
+export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
+  client.tx(async (tx) => {
+    const schema = getSurveyDBSchema(surveyId)
+    const nodedefsUpdated = await tx.batch(
+      nodeDefs.map(async (nodeDef) => {
+        const { nodeDefUuid, parentUuid, props = {}, propsAdvanced = {} } = nodeDef
+        return tx.one(
+          `
+        UPDATE ${schema}.node_def 
+        SET 
+        props_draft = props_draft || $3::jsonb,
+        props_advanced_draft = props_advanced_draft || $4::jsonb,
+        parent_uuid = $2,
+        date_modified = ${DbUtils.now}
+    WHERE uuid = $1
+    RETURNING *`,
+          [nodeDefUuid, parentUuid, props, propsAdvanced],
+          (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
+        )
+      }),
+    )
+    return nodedefsUpdated
+  })
+
 // CYCLES
 
 const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {

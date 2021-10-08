@@ -61,6 +61,32 @@ const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nod
   }
 }
 
+const afterNodeDefsUpdate = async ({ survey, nodeDefsUpdated }, client = db) => {
+  let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+  const nodeDefsToValidate = Survey.getNodeDefsArray(surveyUpdated).filter(Boolean)
+ 
+
+  const nodeDefsValidationArray = await Promise.all(
+    nodeDefsToValidate.map((nodeDefToValidate) => SurveyValidator.validateNodeDef(surveyUpdated, nodeDefToValidate))
+  )
+  const valid = nodeDefsValidationArray.every(Validation.isValid)
+  const nodeDefsValidation = Validation.newInstance(
+    valid,
+    nodeDefsToValidate.reduce(
+      (nodeDefsValidationsAcc, nodeDefToValidate, index) => ({
+        ...nodeDefsValidationsAcc,
+        [nodeDefToValidate.uuid]: nodeDefsValidationArray[index],
+      }),
+      {}
+    )
+  )
+
+  return {
+    nodeDefsUpdated,
+    nodeDefsValidation,
+  }
+}
+
 export const fetchNodeDef = async ({ surveyId, draft, advanced, nodeDefUuid }, client = db) =>
   NodeDefManager.fetchNodeDefByUuid(surveyId, nodeDefUuid, draft, advanced, client)
 
@@ -83,7 +109,7 @@ export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey
   })
 
 export const updateNodeDefProps = async (
-  { user, surveyId, cycle, nodeDefUuid, parentUuid, props, propsAdvanced = {}, system = false },
+  { user, surveyId, cycle, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -109,6 +135,15 @@ export const updateNodeDefProps = async (
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependent, nodeDefsUpdated }, t)
   })
+
+export const updateNodeDefsProps = async ({ user, surveyId, cycle, nodeDefs }, client = db) =>
+  NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
+
+export const getNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
+  const survey = await fetchSurvey({ surveyId, cycle }, client )
+
+  return afterNodeDefUpdate({ survey, nodeDefsUpdated }, client)
+}
 
 export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid }, client = db) =>
   client.tx(async (t) => {
