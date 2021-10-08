@@ -187,18 +187,18 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
     const schema = getSurveyDBSchema(surveyId)
     const nodedefsUpdated = await tx.batch(
       nodeDefs.map(async (nodeDef) => {
-        const { nodeDefUuid, parentUuid, props = {}, propsAdvanced = {} } = nodeDef
+        const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
         return tx.one(
           `
         UPDATE ${schema}.node_def 
         SET 
-        props_draft = props_draft || $3::jsonb,
-        props_advanced_draft = props_advanced_draft || $4::jsonb,
-        parent_uuid = $2,
+        props_draft = props_draft || $2::jsonb,
+        props_advanced_draft = props_advanced_draft || $3::jsonb,
+        
         date_modified = ${DbUtils.now}
     WHERE uuid = $1
     RETURNING *`,
-          [nodeDefUuid, parentUuid, props, propsAdvanced],
+          [nodeDefUuid, props, propsAdvanced],
           (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
         )
       }),

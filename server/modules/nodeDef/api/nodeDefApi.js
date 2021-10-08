@@ -115,7 +115,7 @@ export const init = (app) => {
 
       const _nodedefsUpdated = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.getNodeDefsUpdatedAndValidated({ cycle, surveyId, user, nodeDefsUpdated: _nodedefsUpdated })
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({ cycle, surveyId, user, nodeDefsUpdated: _nodedefsUpdated })
       
       res.json({ nodeDefsUpdated, nodeDefsValidation })
     } catch (error) {

@@ -110,10 +110,10 @@ export const updateNodeDefProps = async (
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependent, nodeDefsUpdated }, t)
   })
 
-export const updateNodeDefsProps = async ({ user, surveyId, cycle, nodeDefs }, client = db) =>
+export const updateNodeDefsProps = async ({ surveyId, nodeDefs }, client = db) =>
   NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
 
-export const getNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
+export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
   const survey = await fetchSurvey({ surveyId, cycle }, client )
 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated }, client)

@@ -32,7 +32,6 @@ export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs 
           dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
           return {
             nodeDefUuid: NodeDef.getUuid(nodeDef),
-            parentUuid: NodeDef.getParentUuid(nodeDef),
             propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: i },
           }
         })
