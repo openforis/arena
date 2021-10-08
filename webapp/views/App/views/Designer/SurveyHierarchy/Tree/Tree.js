@@ -182,13 +182,19 @@ export default class Tree {
       .attr('width', nodeWidth)
       .attr('height', nodeHeight)
 
-    const grid = fo
+    const nodeGrid = fo
       .append('xhtml:div')
       .attr('class', (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`)
-      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
       .on('click', (_, d) => this.onEntityClick(d.data.uuid))
 
-    grid
+    // node label element
+    nodeGrid
+      .append('xhtml:span')
+      .attr('class', 'node-label')
+      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+
+    // node expand/collapse button
+    nodeGrid
       .append('xhtml:button')
       .attr('class', 'btn')
       .attr('title', () => this.i18n.t('common.expandCollapse'))
@@ -296,7 +302,7 @@ export default class Tree {
 
   _updateLabels() {
     this.svg
-      .selectAll('.node-grid')
+      .selectAll('.node-label')
       .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
   }
 
