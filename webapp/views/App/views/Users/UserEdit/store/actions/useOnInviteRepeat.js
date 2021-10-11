@@ -23,6 +23,7 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
       dispatch(LoaderActions.showLoader())
 
       const authGroups = User.getAuthGroups(userToInvite)
+      // authGroups is never empty when repeating an invitation
       const authGroup = authGroups[0]
 
       const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), authGroup.uuid)

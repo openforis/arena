@@ -194,15 +194,18 @@ export {
 
 // ==== UPDATE
 
-const _insertOrDeleteUserGroup = async ({ userUuid, authGroupsNew, userToUpdateOld, groupName, t }) => {
+const _insertOrDeleteUserGroup = async ({ userUuid, authGroupsNew, userToUpdateOld, groupName }, client = db) => {
   const group = User.getAuthGroupByName(groupName)(userToUpdateOld)
   if (group) {
     // user previously associated to the group: remove user from group
-    await AuthGroupRepository.deleteUserGroupByUserAndGroupUuid({ userUuid, groupUuid: AuthGroup.getUuid(group) }, t)
+    await AuthGroupRepository.deleteUserGroupByUserAndGroupUuid(
+      { userUuid, groupUuid: AuthGroup.getUuid(group) },
+      client
+    )
   } else {
     // add user to the new group
     const groupNew = authGroupsNew.find((authGroup) => AuthGroup.getName(authGroup) === groupName)
-    await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(groupNew), userUuid, t)
+    await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(groupNew), userUuid, client)
   }
 }
 
@@ -222,13 +225,13 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
         await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
       }
       const groupName = AuthGroup.groupNames.systemAdmin
-      await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName, t })
+      await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName }, t)
     }
     // if user survey manager role changed, insert or delete the user auth group
     const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
     if (userToUpdateWillBeSurveyManager !== User.isSurveyManager(userToUpdateOld)) {
       const groupName = AuthGroup.groupNames.surveyManager
-      await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName, t })
+      await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName }, t)
     }
 
     // insert or update user survey auth group relation
