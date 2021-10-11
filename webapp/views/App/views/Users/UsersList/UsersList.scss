@@ -1,13 +1,3 @@
-@import 'webapp/style/vars';
-
-.users-list__cell-profile-picture {
-  height: $tableRowHeight;
-  display: flex;
-  align-items: center;
-}
-
-.users-list {
-  .icon-invitation-expired {
-    color: $red;
-  }
+.users-surveys-fieldset {
+  height: 100%;
 }

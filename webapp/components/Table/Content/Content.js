@@ -7,6 +7,9 @@ import LoadingBar from '@webapp/components/LoadingBar'
 
 import { useI18n } from '@webapp/store/system'
 import { DataTestId } from '@webapp/utils/dataTestId'
+import { ContentRowCells } from './ContentRowCells'
+import { ContentHeaders } from './ContentHeaders'
+import { ContentRow } from './ContentRow'
 
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
@@ -24,8 +27,10 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
-    gridTemplateColumns,
-    isRowActive,
+    columns,
+    expandableRows,
+    gridTemplateColumns: gridTemplateColumnsParam,
+    keyExtractor,
     list,
     loading,
     maxRows,
@@ -34,11 +39,10 @@ const Content = (props) => {
     noItemsLabelForSearchKey,
     offset,
     totalCount,
-    onRowClick,
-    rowHeaderComponent,
-    rowComponent,
+    rowHeaderComponent: rowHeaderComponentParam,
+    rowComponent: rowComponentParam,
+    rowExpandedComponent,
     rowProps,
-    initData,
   } = props
 
   const i18n = useI18n()
@@ -59,6 +63,17 @@ const Content = (props) => {
     )
   }
 
+  const hasColumns = columns?.length > 0
+  const rowComponent = hasColumns ? (_props) => <ContentRowCells {..._props} columns={columns} /> : rowComponentParam
+
+  const rowHeaderComponent = hasColumns
+    ? (_props) => <ContentHeaders {..._props} columns={columns} />
+    : rowHeaderComponentParam
+
+  const gridTemplateColumns = hasColumns
+    ? [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+    : gridTemplateColumnsParam
+
   return (
     <div className="table__content">
       <div className="table__row-header" style={{ gridTemplateColumns }}>
@@ -69,34 +84,19 @@ const Content = (props) => {
         <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
-          {list.map((row, i) => {
-            const active = isRowActive && isRowActive(row)
-            let className = 'table__row'
-            className += onRowClick ? ' hoverable' : ''
-            className += active ? ' active' : ''
-
-            return (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
-              <div
-                role="button"
-                data-testid={`${module}_${i}`}
-                key={String(i)}
-                onClick={() => onRowClick && onRowClick(row)}
-                className={className}
-                style={{ gridTemplateColumns }}
-              >
-                {React.createElement(rowComponent, {
-                  idx: i,
-                  offset,
-                  row,
-                  rowNo: i + offset + 1,
-                  active,
-                  initData,
-                  ...rowProps,
-                })}
-              </div>
-            )
-          })}
+          {list.map((item, index) =>
+            React.createElement(ContentRow, {
+              key: keyExtractor(item),
+              ...props,
+              ...rowProps,
+              row: item, // TODO do not pass "row" but "item" instead
+              index,
+              item,
+              rowComponent,
+              rowExpandedComponent,
+              gridTemplateColumns,
+            })
+          )}
         </div>
       )}
     </div>
@@ -104,8 +104,11 @@ const Content = (props) => {
 }
 
 Content.propTypes = {
+  columns: PropTypes.array,
+  expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
+  keyExtractor: PropTypes.func.isRequired,
   list: PropTypes.array.isRequired,
   loading: PropTypes.bool,
   maxRows: PropTypes.number.isRequired,
@@ -117,14 +120,18 @@ Content.propTypes = {
   initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
+  rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
 }
 
 Content.defaultProps = {
+  columns: null,
+  expandableRows: false,
   isRowActive: null,
   onRowClick: null,
   initData: null,
   loading: false,
+  rowExpandedComponent: null,
   rowProps: {},
 }
 
