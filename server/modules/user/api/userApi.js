@@ -9,19 +9,10 @@ import * as Validation from '@core/validation/validation'
 import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
-import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-
-const _checkSelf = (req) => {
-  const { userUuid } = Request.getParams(req)
-  const user = Request.getUser(req)
-  if (userUuid !== User.getUuid(user)) {
-    throw new UnauthorizedError(user && User.getName(user))
-  }
-}
 
 export const init = (app) => {
   // ==== CREATE
@@ -113,9 +104,8 @@ export const init = (app) => {
     }
   })
 
-  app.get('/user/:userUuid', async (req, res, next) => {
+  app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
-      _checkSelf(req)
       await _getUser(req, res)
     } catch (error) {
       next(error)
@@ -263,9 +253,8 @@ export const init = (app) => {
     }
   })
 
-  app.put('/user/:userUuid', async (req, res, next) => {
+  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      _checkSelf(req)
       await _updateUser(req, res)
     } catch (error) {
       next(error)

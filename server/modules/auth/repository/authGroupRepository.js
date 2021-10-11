@@ -60,6 +60,18 @@ export const fetchGroupByUuid = async (groupUuid, client = db) =>
     dbTransformCallback
   )
 
+export const fetchGroupsByUuids = async (groupUuids, client = db) =>
+  client.map(
+    `
+    SELECT g.*, s.id as survey_id
+    FROM auth_group g
+    LEFT OUTER JOIN survey s 
+      ON g.survey_uuid = s.uuid
+    WHERE g.uuid IN ($1:csv)`,
+    [groupUuids],
+    dbTransformCallback
+  )
+
 export const fetchSurveyGroups = async (surveyId, client = db) =>
   client.map(
     `
@@ -134,7 +146,7 @@ export const deleteAllUserGroups = async (userUuid, client = db) =>
 
 // ==== DELETE
 
-export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
+export const deleteUserGroupBySurveyAndUser = async (surveyId, userUuid, client = db) =>
   client.query(
     `
     DELETE
@@ -160,4 +172,17 @@ export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
     )               
   `,
     [userUuid, surveyId]
+  )
+
+export const deleteUserGroupByUserAndGroupUuid = async ({ userUuid, groupUuid }, client = db) =>
+  client.query(
+    `
+      DELETE
+      FROM
+        auth_group_user
+      WHERE
+        user_uuid = $1
+      AND group_uuid = $2
+    `,
+    [userUuid, groupUuid]
   )

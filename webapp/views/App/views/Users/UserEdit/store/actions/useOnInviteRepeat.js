@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import axios from 'axios'
 
 import { useDispatch } from 'react-redux'
@@ -17,32 +18,34 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
-  return () => {
-    ;(async () => {
-      try {
-        dispatch(LoaderActions.showLoader())
+  return useCallback(async () => {
+    try {
+      dispatch(LoaderActions.showLoader())
 
-        const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
-        const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
+      const authGroups = User.getAuthGroups(userToInvite)
+      // authGroups is never empty when repeating an invitation
+      const authGroup = authGroups[0]
 
-        const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-        const { errorKey, errorParams } = data
+      const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), authGroup.uuid)
+      const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
 
-        if (errorKey) {
-          dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
-        } else {
-          dispatch(
-            NotificationActions.notifyInfo({
-              key: 'emails.userInviteRepeatConfirmation',
-              params: { email: UserInvite.getEmail(userInvite) },
-            })
-          )
+      const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
+      const { errorKey, errorParams } = data
 
-          history.push(appModuleUri(userModules.users))
-        }
-      } finally {
-        dispatch(LoaderActions.hideLoader())
+      if (errorKey) {
+        dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
+      } else {
+        dispatch(
+          NotificationActions.notifyInfo({
+            key: 'emails.userInviteRepeatConfirmation',
+            params: { email: UserInvite.getEmail(userInvite) },
+          })
+        )
+
+        history.push(appModuleUri(userModules.usersSurvey))
       }
-    })()
-  }
+    } finally {
+      dispatch(LoaderActions.hideLoader())
+    }
+  }, [dispatch, history, surveyCycleKey, userToInvite])
 }

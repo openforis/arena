@@ -15,7 +15,7 @@ export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
     R.prop('uuid')
   )
 
-export const findUserUuidByUuid = async (uuid, client = db) =>
+export const findResetPasswordUserUuidByUuid = async (uuid, client = db) =>
   await client.oneOrNone(
     `SELECT user_uuid
      FROM user_reset_password

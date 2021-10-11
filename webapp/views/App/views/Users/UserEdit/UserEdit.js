@@ -3,14 +3,19 @@ import './UserEdit.scss'
 import React from 'react'
 import { useParams } from 'react-router'
 
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
+import * as AuthGroup from '@core/auth/authGroup'
 
 import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
@@ -32,19 +37,33 @@ const UserEdit = () => {
     canRemove,
     canSave,
     canViewEmail,
+    canEditSystemAdmin,
+    canEditSurveyManager,
     hideSurveyGroup,
 
     onUpdate,
     onUpdateProfilePicture,
+    onSurveyAuthGroupChange,
+    onSurveyManagerChange,
     onSave,
     onRemove,
     onInviteRepeat,
   } = useEditUser({ userUuid })
 
   const i18n = useI18n()
-  const validation = User.getValidation(userToUpdate)
+  const surveyInfo = useSurveyInfo()
+  const surveyUuid = Survey.getUuid(surveyInfo)
 
   if (!ready) return null
+
+  const validation = canEdit ? User.getValidation(userToUpdate) : null
+
+  const systemAdminGroup = User.getAuthGroupByName(AuthGroup.groupNames.systemAdmin)(user)
+  const systemAdmin = User.isSystemAdmin(userToUpdate)
+  const surveyManager = User.isSurveyManager(userToUpdate)
+
+  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdate)
+  const invitationExpired = User.isInvitationExpired(userToUpdate)
 
   return (
     <div className="user-edit form" key={userUuid}>
@@ -89,20 +108,40 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {!hideSurveyGroup && (
-        <FormItem label={i18n.t('usersView.roleInSurvey')}>
-          <DropdownUserGroup
-            editingLoggedUser={User.isEqual(user)(userToUpdate)}
-            disabled={!canEditGroup}
-            validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
-            groupUuid={User.getGroupUuid(userToUpdate)}
-            onChange={(value) => onUpdate(User.assocGroupUuid(value)(userToUpdate))}
+      {canEditSystemAdmin && (
+        <FormItem label={i18n.t('authGroups.systemAdmin.label')}>
+          <Checkbox
+            checked={systemAdmin}
+            onChange={(value) => {
+              const userUpdated = value
+                ? User.assocAuthGroup(systemAdminGroup)(userToUpdate)
+                : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
+              onUpdate(userUpdated)
+            }}
+            disabled={!canEdit}
           />
         </FormItem>
       )}
-      {(canEdit || User.isInvitationExpired(userToUpdate)) && (
+      {canEditSurveyManager && !systemAdmin && (
+        <FormItem label={i18n.t('authGroups.surveyManager.label')}>
+          <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
+        </FormItem>
+      )}
+      {!hideSurveyGroup && !systemAdmin && (
+        <FormItem label={i18n.t('usersView.roleInCurrentSurvey')}>
+          <DropdownUserGroup
+            editingLoggedUser={User.isEqual(user)(userToUpdate)}
+            disabled={!canEditGroup}
+            validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}
+            groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
+            onChange={onSurveyAuthGroupChange}
+            showOnlySurveyGroups
+          />
+        </FormItem>
+      )}
+      {(canEdit || invitationExpired) && (
         <div className="user-edit__buttons">
-          {canRemove && (
+          {!hideSurveyGroup && canRemove && (
             <button type="button" className="btn-s btn-danger btn-remove-user" onClick={onRemove}>
               <span className="icon icon-bin icon-left icon-10px" />
               {i18n.t('userView.removeFromSurvey')}
@@ -116,7 +155,7 @@ const UserEdit = () => {
             </button>
           )}
 
-          {User.isInvitationExpired(userToUpdate) && (
+          {!hideSurveyGroup && invitationExpired && (
             <button type="button" className="btn btn-invite" onClick={onInviteRepeat}>
               <span className="icon icon-envelop icon-left icon-12px" />
               {i18n.t('userView.sendNewInvitation')}

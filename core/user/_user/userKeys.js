@@ -1,4 +1,5 @@
 import * as ObjectUtils from '@core/objectUtils'
+import * as Validation from '@core/validation/validation'
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -12,9 +13,11 @@ export const keys = {
   profilePicture: 'profilePicture',
   props: ObjectUtils.keys.props,
   status: 'status',
-  validation: ObjectUtils.keys.validation,
-  groupUuid: 'groupUuid', // Used only when editing user survey group
+  validation: Validation.keys.validation,
   invitationExpired: 'invitationExpired',
   invitedBy: 'invitedBy',
   invitedDate: 'invitedDate',
+
+  // Used only when editing user auth groups
+  authGroupsUuids: 'authGroupsUuids'
 }
