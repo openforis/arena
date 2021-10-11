@@ -148,12 +148,11 @@ const _userFetcher =
     return user ? _attachAuthGroupsAndInvitationToUser({ user }) : null
   }
 
-export const fetchUserByEmail = (email, client = db) => _userFetcher(UserRepository.fetchUserByEmail)(email, client)
+export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
-export const fetchUserByUuid = (uuid, client = db) => _userFetcher(UserRepository.fetchUserByUuid)(uuid, client)
+export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
-export const fetchUserByUuidWithPassword = (uuid, client = db) =>
-  _userFetcher(UserRepository.fetchUserByUuidWithPassword)(uuid, client)
+export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
 export const fetchUsers = async ({ offset, limit }, client = db) =>
   client.tx(async (t) => {
