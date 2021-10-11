@@ -22,8 +22,13 @@ const getLink = ({ limit, offset, sort, search }) => {
   if (limit > 0) url.searchParams.set('limit', String(limit))
   if (offset >= 0) url.searchParams.set('offset', String(offset))
   if (sort) {
-    url.searchParams.set('sortBy', String(sort.by))
-    url.searchParams.set('sortOrder', String(sort.order))
+    if (A.isEmpty(sort.order)) {
+      url.searchParams.delete('sortBy')
+      url.searchParams.delete('sortOrder')
+    } else {
+      url.searchParams.set('sortBy', String(sort.by))
+      url.searchParams.set('sortOrder', String(sort.order))
+    }
     url.searchParams.set('offset', String(0))
   }
   if (!A.isNull(search)) {
