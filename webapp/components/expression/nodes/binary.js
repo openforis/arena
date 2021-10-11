@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import Dropdown from '../../form/Dropdown'
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
