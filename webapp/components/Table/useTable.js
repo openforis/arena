@@ -64,8 +64,11 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   const handleSortBy = useCallback(
     (orderByField) => {
+      let order = sort.by !== orderByField && sort.order !== 'asc'? 'desc' : 'asc'
+      order = sort.by === orderByField && sort.order === 'asc' ? null : order
+
       updateQuery(history)({
-        value: { by: orderByField, order: sort.by !== orderByField || sort.order === 'asc' ? 'desc' : 'asc' },
+        value: { by: orderByField, order },
         key: 'sort',
       })
     },
