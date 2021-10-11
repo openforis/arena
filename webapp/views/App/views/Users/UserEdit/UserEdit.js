@@ -63,6 +63,7 @@ const UserEdit = () => {
   const surveyManager = User.isSurveyManager(userToUpdate)
 
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdate)
+  const invitationExpired = User.isInvitationExpired(userToUpdate)
 
   return (
     <div className="user-edit form" key={userUuid}>
@@ -138,7 +139,7 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {(canEdit || User.isInvitationExpired(userToUpdate)) && (
+      {(canEdit || invitationExpired) && (
         <div className="user-edit__buttons">
           {!hideSurveyGroup && canRemove && (
             <button type="button" className="btn-s btn-danger btn-remove-user" onClick={onRemove}>
@@ -154,7 +155,7 @@ const UserEdit = () => {
             </button>
           )}
 
-          {!hideSurveyGroup && User.isInvitationExpired(userToUpdate) && (
+          {!hideSurveyGroup && invitationExpired && (
             <button type="button" className="btn btn-invite" onClick={onInviteRepeat}>
               <span className="icon icon-envelop icon-left icon-12px" />
               {i18n.t('userView.sendNewInvitation')}
