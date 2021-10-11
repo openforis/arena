@@ -32,7 +32,7 @@ const NodeDefTableCellBody = (props) => {
         nodes={nodes}
         edit={edit}
         insideTable={true}
-      ></NodeDefErrorBadge>
+      />
       {(NodeDef.isMultiple(nodeDef) ||
         (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) &&
       !entryDataQuery ? (

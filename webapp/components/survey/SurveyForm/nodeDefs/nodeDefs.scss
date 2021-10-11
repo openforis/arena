@@ -49,6 +49,18 @@
   }
 }
 
+// === page / page item - read-only
+.survey-form__node-def-page,
+.survey-form__node-def-page-item {
+  &.read-only {
+    input,
+    .survey-form__node-def-code,
+    .survey-form__node-def-date {
+      background-color: rgba($greyBorder, 0.3);
+    }
+  }
+}
+
 // === form item
 .survey-form__node-def-form-item {
   grid-template-columns: 1fr !important;
@@ -141,12 +153,12 @@
     height: 100%;
     width: 100%;
 
-    &.inside-table{
+    &.inside-table {
       position: absolute;
       left: 12px;
       top: 12px;
       width: 36px;
-      }
+    }
 
     .badge__content {
       height: 100%;
@@ -164,5 +176,4 @@
       }
     }
   }
- 
 }
