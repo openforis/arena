@@ -16,3 +16,11 @@ export const acceptAccessRequest = async ({ accessRequestAccept }) => {
 
   return { errorKey, errorParams, validation, userInvited, survey }
 }
+
+export const fetchUserSurveys = async ({ userUuid }) => {
+  const {
+    data: { surveys },
+  } = await axios.get(`/api/user/${userUuid}/surveys`)
+
+  return { surveys }
+}

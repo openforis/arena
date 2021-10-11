@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as Authorizer from '@core/auth/authorizer'
 
+import { useQuery } from '@webapp/components/hooks'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
@@ -40,6 +41,7 @@ export const useEditUser = ({ userUuid }) => {
 
   const [userToUpdate, setUserToUpdate] = useState({})
 
+  const { hideSurveyGroup } = useQuery()
   const surveyInfo = useSurveyInfo()
   const ready = !R.isEmpty(userToUpdate)
   const editCapabilities = getEditCapabilities({ user, userToUpdate, surveyInfo, ready })
@@ -54,6 +56,7 @@ export const useEditUser = ({ userUuid }) => {
   }, [userUuid])
 
   return {
+    hideSurveyGroup,
     ready,
     user,
     userToUpdate,

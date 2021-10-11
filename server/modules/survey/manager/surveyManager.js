@@ -174,12 +174,24 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false, includeAnalysis = true },
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    backup = false,
+    includeAnalysis = true,
+  },
   client = db
 ) => {
   const [surveyDb, nodeDefs, dependencies] = await Promise.all([
     fetchSurveyById({ surveyId, draft, validate, backup }, client),
-    NodeDefManager.fetchNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis }, client),
+    NodeDefManager.fetchNodeDefsBySurveyId(
+      { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
+      client
+    ),
     fetchDependencies(surveyId),
   ])
   let survey = Survey.assocNodeDefs({ nodeDefs })(surveyDb)

@@ -152,8 +152,12 @@ export const dataModules = {
 
 export const userModules = {
   users: {
-    key: 'userList',
-    path: `${appModules.users.path}/userList`,
+    key: 'users',
+    path: `${appModules.users.path}/users`,
+  },
+  usersSurvey: {
+    key: 'usersSurvey',
+    path: `${appModules.users.path}/usersSurvey`,
   },
   user: {
     key: 'user',

@@ -92,6 +92,7 @@ export const requireRecordAnalysisPermission = requireSurveyPermission(Authorize
 // User
 export const requireUserInvitePermission = requireSurveyPermission(Authorizer.canInviteUsers)
 export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)
+export const requireUsersAllViewPermission = requirePermission(Authorizer.canViewAllUsers)
 export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
 export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
 // User access requests

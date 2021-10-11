@@ -4,7 +4,8 @@ import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-import UsersList from './UsersList'
+import { UsersList } from './UsersList'
+import UsersListSurvey from './UsersListSurvey'
 import UserInvite from './UserInvite'
 import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
@@ -17,6 +18,10 @@ const Users = () => (
       {
         component: UsersList,
         path: appModuleUri(userModules.users),
+      },
+      {
+        component: UsersListSurvey,
+        path: appModuleUri(userModules.usersSurvey),
       },
       {
         component: UserEdit,
