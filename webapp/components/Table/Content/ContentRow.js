@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import classNames from 'classnames'
 
 export const ContentRow = (props) => {
@@ -28,6 +28,12 @@ export const ContentRow = (props) => {
 
   const itemPosition = index + offset + 1
 
+  const onClick = useCallback(async () => {
+    if (onRowClick) {
+      await onRowClick(item)
+    }
+  }, [item, onRowClick])
+
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
     <>
@@ -35,7 +41,7 @@ export const ContentRow = (props) => {
         key={String(index)}
         data-testid={`${module}_${index}`}
         role="button"
-        onClick={() => onRowClick && onRowClick(item)}
+        onClick={onClick}
         className={className}
         style={{ gridTemplateColumns, height }}
       >

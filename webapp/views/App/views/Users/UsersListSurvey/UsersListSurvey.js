@@ -1,6 +1,6 @@
 import './UsersList.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import * as User from '@core/user/user'
@@ -18,7 +18,10 @@ const UsersListSurvey = () => {
   const surveyId = useSurveyId()
   const emailVisible = useAuthCanViewOtherUsersEmail()
 
-  const onRowClick = (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+  const onRowClick = useCallback(
+    (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
+    [history]
+  )
 
   return (
     <Table
