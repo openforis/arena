@@ -25,7 +25,6 @@ export const getEmail = R.prop(keys.email)
 export const getInvitedBy = R.prop(keys.invitedBy)
 export const getInvitedDate = R.prop(keys.invitedDate)
 export const getPassword = R.prop(keys.password)
-export const getGroupUuid = R.prop(keys.groupUuid)
 export const getLang = R.propOr('en', keys.lang)
 export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
@@ -34,12 +33,12 @@ export const getProfilePicture = R.prop(keys.profilePicture)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
+export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
 
 // ====== UPDATE
 export const assocProp = R.assoc
 export const assocEmail = R.assoc(keys.email)
 export const { assocValidation } = Validation
-export const assocGroupUuid = R.assoc(keys.groupUuid)
 export const assocName = R.assoc(keys.name)
 export const assocInvitationExpired = R.assoc(keys.invitationExpired)
 export const assocProfilePicture = R.assoc(keys.profilePicture)
@@ -67,7 +66,16 @@ export const getAuthGroupByName = (groupName) => (user) => {
   return authGroups.find((group) => AuthGroup.getName(group) === groupName)
 }
 
-export const assocAuthGroups = R.assoc(keys.authGroups)
+export const getAuthGroupsNonSurvey = () => (user) => {
+  const authGroups = getAuthGroups(user)
+  return authGroups.filter((group) => !AuthGroup.getSurveyId(group))
+}
+
+export const getSystemAdminGroup = (user) => user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
+export const getSurveyManagerGroup = (user) => user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
+
+export const assocAuthGroups = (authGroups) =>
+  R.pipe(R.assoc(keys.authGroups, authGroups), R.assoc(keys.authGroupsUuids, authGroups.map(ObjectUtils.getUuid)))
 
 const _updateAuthGroups = (updateFn) => (user) =>
   R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups)(user))(user)

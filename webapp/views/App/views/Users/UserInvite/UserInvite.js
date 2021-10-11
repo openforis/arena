@@ -50,7 +50,7 @@ const UserInviteComponent = () => {
         <DropdownUserGroup
           validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
           groupUuid={selectedGroupUuid}
-          onChange={(value) => onUpdate({ name: UserInvite.keys.groupUuid, value })}
+          onChange={(group) => onUpdate({ name: UserInvite.keys.groupUuid, value: AuthGroup.getUuid(group) })}
         />
       </FormItem>
 

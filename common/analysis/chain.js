@@ -12,7 +12,7 @@ export const keys = {
   statusExec: 'status_exec',
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
-  validation: ObjectUtils.keys.validation,
+  validation: Validation.keys.validation,
   scriptCommon: 'script_common',
 }
 
@@ -20,7 +20,7 @@ export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
   cycles: ObjectUtils.keysProps.cycles,
-  analysisNodeDefs: 'analysisNodeDefs'
+  analysisNodeDefs: 'analysisNodeDefs',
 }
 
 export const statusExec = {

@@ -47,18 +47,18 @@ export const ContentRow = (props) => {
       >
         {React.createElement(rowComponent, {
           ...rowProps,
+          initData,
+          active,
           idx: index,
           offset,
-          isRowExpandable,
           item,
           itemPosition,
-          active,
-          initData,
-          expandableRows,
-          onRowExpandToggle,
-          rowExpanded,
           row: item, // TODO remove it and pass only item
           rowNo: itemPosition, // TODO remove it and pass only itemPosition
+          onRowExpandToggle,
+          expandableRows,
+          isRowExpandable,
+          rowExpanded,
         })}
         {rowExpanded && (
           <div className="table__row-expanded-panel-wrapper">

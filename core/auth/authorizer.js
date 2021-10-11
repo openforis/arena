@@ -132,7 +132,12 @@ export const canViewUsersAccessRequests = (user) => User.isSystemAdmin(user)
 export const canEditUsersAccessRequests = (user) => User.isSystemAdmin(user)
 
 // INVITE
-export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedUser = false }) => {
+export const getUserGroupsCanAssign = ({
+  user,
+  surveyInfo = null,
+  editingLoggedUser = false,
+  showOnlySurveyGroups = false,
+}) => {
   let surveyGroups
   if (editingLoggedUser && !surveyInfo) {
     // This can happen for system administrators when they don't have an active survey
@@ -144,7 +149,7 @@ export const getUserGroupsCanAssign = ({ user, surveyInfo = null, editingLoggedU
   }
 
   const groups = []
-  if (User.isSystemAdmin(user) || User.isSurveyManager(user)) {
+  if (!showOnlySurveyGroups && (User.isSystemAdmin(user) || User.isSurveyManager(user))) {
     // Add SystemAdmin or SurveyManager group if current user is a SystemAdmin or SurveyManager himself
     groups.push(...User.getAuthGroups(user))
   }
