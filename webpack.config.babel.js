@@ -98,7 +98,9 @@ const webPackConfig = {
   },
   devServer: {
     hot: true,
-    index: '',
+    devMiddleware: {
+      index: false, // specify to enable root proxying
+    },
     proxy: [
       {
         // Proxy all server-served routes:
@@ -147,16 +149,16 @@ const webPackConfig = {
           {
             loader: 'css-loader',
             options: {
-              url: (url) => {
-                // Don't handle /img/ urls
-                if (url.includes('/img/')) {
-                  return false
-                }
-
-                return true
+              url: {
+                filter: (url) => {
+                  // Don't handle /img/ urls
+                  return !url.includes('/img/')
+                },
               },
-              import: (url) => {
-                return true
+              import: {
+                filter: (url) => {
+                  return true
+                },
               },
             },
           },
