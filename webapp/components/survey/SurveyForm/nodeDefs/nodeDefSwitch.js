@@ -88,7 +88,8 @@ class NodeDefSwitch extends React.Component {
     const className =
       'survey-form__node-def-page' +
       (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item') +
-      (applicable ? '' : ' not-applicable')
+      (applicable ? '' : ' not-applicable') +
+      (NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader ? ' read-only' : '')
 
     return (
       <div
@@ -105,7 +106,7 @@ class NodeDefSwitch extends React.Component {
         {renderType === NodeDefLayout.renderType.tableHeader ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
         ) : renderType === NodeDefLayout.renderType.tableBody ? (
-          <NodeDefTableCellBody {...this.props} label={label}/>
+          <NodeDefTableCellBody {...this.props} label={label} />
         ) : (
           <NodeDefFormItem {...this.props} label={label} />
         )}
