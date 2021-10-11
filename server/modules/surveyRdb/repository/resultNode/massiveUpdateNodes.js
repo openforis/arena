@@ -62,6 +62,10 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
           value = String(isNaN(Number(rowResult[columnName])) ? null : Number(rowResult[columnName]))
         }
 
+        if (NodeDef.isCode(nodeDef)) {
+          value = String(rowResult[columnName]) ? null : String(rowResult[columnName])
+        }
+
         return {
           ...values,
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),

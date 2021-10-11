@@ -55,7 +55,7 @@ export default class DfResults {
       setVar(
         this.name,
         sqldf(
-          `SELECT ${columnNames.filter((columnName) => !columnName.includes('label')).join(', ')} FROM ${
+          `SELECT ${columnNames.filter((columnName) => !columnName.includes('label')).join(', ').replace('_code', '')} FROM ${
             this.dfSourceName
           }`
         )
@@ -106,10 +106,11 @@ export default class DfResults {
                 c.uuid as computed_category_uuid
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
-            ON r.${nodeVarName}_code = c.code  
+            ON r.${nodeVarName} = c.code  
         `
         this.scripts.push(setVar('category_values', sqldf(query)))
 
+        this.scripts.push(setVar(`${this.name}$${nodeVarName}_code`, `category_values$${nodeVarName}`))
         this.scripts.push(setVar(`${this.name}$${nodeVarName}_label`, `category_values$computed_category_label`))
         this.scripts.push(setVar(`${this.name}$${nodeVarName}_uuid`, `category_values$computed_category_uuid`))
 

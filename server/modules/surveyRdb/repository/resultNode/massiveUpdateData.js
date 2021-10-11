@@ -54,7 +54,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
       (values, columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
 
-        let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) ? null : 'DEFAULT'
+        let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
         if (rowResult[columnName] && rowResult[columnName] !== NA) {
           if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
             value = Number(rowResult[columnName])
