@@ -94,12 +94,24 @@ $tableHeaderHeight: 30px;
   }
 }
 
+.table__row.expanded {
+  align-items: baseline;
+}
+
 .table__row-header {
   @extend .table__row;
   border-bottom: none;
   background-color: $black;
   color: white;
   font-weight: 600;
+}
+
+.table__row-expanded-panel-wrapper {
+  position: absolute;
+  top: 35px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
 }
 
 .table__paginator {

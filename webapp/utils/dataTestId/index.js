@@ -75,6 +75,7 @@ export const DataTestId = {
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',
     usersAccessRequstsBtn: 'users-access-requests-btn',
+    usersListBtn: 'users-list-btn',
   },
   modal: {
     close: 'text="Close"',

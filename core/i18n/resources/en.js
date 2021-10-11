@@ -198,7 +198,8 @@ Do you want to proceed?`,
     validationReport: 'Validation report',
 
     users: 'Users',
-    userList: 'User list',
+    usersSurvey: 'Users list',
+    usersList: 'Users list (all)',
 
     analysis: 'Analysis',
     chain: 'Chain',
@@ -478,6 +479,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     notAcceptedYet: 'Invitation not accepted yet',
     invitedBy: 'Invited by',
     invitedDate: 'Invited date',
+    userSurveys: 'User Surveys',
+    surveyName: 'Survey name',
+    roleInSurvey: 'Role in survey',
+    userNotInvitedToAnySurvey: `User not invited to any survey`,
   },
 
   usersAccessRequestView: {
