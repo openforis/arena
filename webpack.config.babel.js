@@ -97,6 +97,10 @@ const webPackConfig = {
     publicPath: '/',
   },
   devServer: {
+    hot: true,
+    devMiddleware: {
+      index: false, // specify to enable root proxying
+    },
     proxy: [
       {
         // Proxy all server-served routes:
