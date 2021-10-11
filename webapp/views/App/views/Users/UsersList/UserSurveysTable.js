@@ -46,7 +46,7 @@ export const UserSurveysTable = (props) => {
             {surveys.map((survey) => {
               const surveyInfo = Survey.getSurveyInfo(survey)
               const surveyUuid = Survey.getUuid(surveyInfo)
-              const authGroup = User.getAuthGroupBySurveyUuid(surveyUuid, false)(user)
+              const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
               const authGroupName = AuthGroup.getName(authGroup)
               const authGroupLabel = authGroupName ? i18n.t(`authGroups.${authGroupName}.label`) : ''
 

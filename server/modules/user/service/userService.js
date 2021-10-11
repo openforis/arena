@@ -356,7 +356,7 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
     const authGroupNew = surveyAuthGroupsNew.length > 0 ? surveyAuthGroupsNew[0] : null
     const survey = await SurveyManager.fetchSurveyById({ surveyId })
     const surveyInfo = Survey.getSurveyInfo(survey)
-    const authGroupOld = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), false)(userToUpdateOld)
+    const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userToUpdateOld)
     // Check if group has changed and user can edit group
     if (
       AuthGroup.getUuid(authGroupOld) !== AuthGroup.getUuid(authGroupNew) &&

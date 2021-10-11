@@ -20,7 +20,7 @@ const Row = (props) => {
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
 
-  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
+  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userListItem)
   const authGroupName = AuthGroup.getName(authGroup)
   const email = User.getEmail(userListItem)
   const invitedBy = User.getInvitedBy(userListItem)

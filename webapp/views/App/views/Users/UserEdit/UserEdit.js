@@ -62,7 +62,7 @@ const UserEdit = () => {
   const systemAdmin = User.isSystemAdmin(userToUpdate)
   const surveyManager = User.isSurveyManager(userToUpdate)
 
-  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdate)
+  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
 
   return (

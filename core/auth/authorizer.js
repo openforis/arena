@@ -13,8 +13,10 @@ const MAX_SURVEYS_CREATED_BY_USER = 5
 // ====== Survey
 // ======
 
-const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
-  User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), includeSystemAdmin)(user)
+const _getSurveyUserGroup = (user, surveyInfo, defaultToMainGroup = true) => {
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  return User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup })(user)
+}
 
 const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user &&
@@ -67,7 +69,8 @@ export const canEditRecord = (user, record) => {
 
   const recordDataStep = Record.getStep(record)
 
-  const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
+  const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
+  if (!userAuthGroup) return false
 
   // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records

@@ -67,7 +67,7 @@ export const useEditUser = ({ userUuid }) => {
   }, [userUuid])
 
   const onSurveyAuthGroupChange = (surveyGroupNew) => {
-    const surveyGroupOld = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdate)
+    const surveyGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
     const userUpdated = A.pipe(User.dissocAuthGroup(surveyGroupOld), User.assocAuthGroup(surveyGroupNew))(userToUpdate)
     onUpdate(userUpdated)
   }
