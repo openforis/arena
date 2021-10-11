@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import Dropdown from '../../form/Dropdown'
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
@@ -14,7 +13,7 @@ const Binary = (props) => {
 
   const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
 
-  const showOperator = isBoolean && (!NodeDef.isBoolean(nodeDefCurrent) || !isLeftLiteral)
+  const showOperator = !isLeftLiteral
 
   const createOperand = (type) => (
     <BinaryOperand
