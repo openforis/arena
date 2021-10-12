@@ -49,18 +49,12 @@ export default class DfResults {
 
   initDf() {
     const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
-    const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
+    const columnNames = NodeDefTable.getNodeDefsColumnNames({
+      nodeDefs: analysisNodeDefsInEntity,
+      includeExtendedCols: false,
+    })
 
-    this.scripts.push(
-      setVar(
-        this.name,
-        sqldf(
-          `SELECT ${columnNames.filter((columnName) => !columnName.includes('label')).join(', ').replace('_code', '')} FROM ${
-            this.dfSourceName
-          }`
-        )
-      )
-    )
+    this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
   initUuids() {

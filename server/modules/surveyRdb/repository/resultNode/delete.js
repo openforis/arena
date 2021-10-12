@@ -19,7 +19,7 @@ export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycl
   const tableData = new TableDataNodeDef(survey, entity)
 
   const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
-  const columnNames = NodeDefTable.getNodeDefsColumnNames(analysisNodeDefsInEntity)
+  const columnNames = NodeDefTable.getNodeDefsColumnNames({nodeDefs: analysisNodeDefsInEntity, includeExtendedCols: true})
 
   return client.query(
     `UPDATE ${tableData.nameQualified}

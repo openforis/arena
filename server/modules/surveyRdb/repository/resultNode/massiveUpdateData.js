@@ -16,7 +16,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
     const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
       NodeDef.isAnalysis
     )
-    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefs)
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({nodeDefs: analysisNodeDefs, includeExtendedCols: true })
     const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
@@ -55,6 +55,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
         const nodeDef = this.nodeDefsByColumnName[columnName]
 
         let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
+        
         if (rowResult[columnName] && rowResult[columnName] !== NA) {
           if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
             value = Number(rowResult[columnName])
