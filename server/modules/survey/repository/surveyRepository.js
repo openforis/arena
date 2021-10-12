@@ -11,6 +11,15 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { getSurveyDBSchema } from './surveySchemaRepositoryUtils'
 
+export const sortByFields = {
+  dateCreated: 'date_created',
+  dateModified: 'date_modified',
+  name: 'name',
+  ownerName: 'owner_name',
+  label: 'label',
+  status: 'status',
+}
+
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
   const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template']
@@ -26,7 +35,7 @@ const surveySelectFields = (alias = '') => {
 export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template )
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING ${surveySelectFields()}
     `,
@@ -47,15 +56,39 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
 export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
 export const fetchUserSurveys = async (
-  { user, draft = false, template = false, offset = 0, limit = null },
+  { user, draft = false, template = false, offset = 0, limit = null, sortBy = 'date_modified', sortOrder = 'DESC' },
   client = db
 ) => {
   const checkAccess = !User.isSystemAdmin(user)
+  const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
+
+  const sortFieldBySortBy = {
+    [sortByFields.dateCreated]: 's.date_created',
+    [sortByFields.dateModified]: 's.date_modified',
+    [sortByFields.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
+    [sortByFields.ownerName]: 'owner_name',
+    [sortByFields.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
+    [sortByFields.status]: 'status',
+  }
+  const sortByField = sortFieldBySortBy[sortBy] || 'date_modified'
 
   return client.map(
     `
     SELECT ${surveySelectFields('s')},
-    u.name as owner_name
+      -- STATUS
+      CASE
+        WHEN s.published AND s.draft 
+          THEN 'PUBLISHED-DRAFT'
+        WHEN s.published 
+          THEN 'PUBLISHED'
+        WHEN s.draft 
+          THEN 'DRAFT'
+        ELSE 
+          NULL
+      END AS status,
+      -- DEFAULT LANGUAGE
+      ${propsCol} #>> '{${Survey.infoKeys.languages},0}' as lang_default,
+      u.name as owner_name
       ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
     FROM survey s
     JOIN "user" u 
@@ -74,7 +107,7 @@ export const fetchUserSurveys = async (
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       (s.props || s.props_draft) ->> 'temporary' IS NULL 
       AND s.template = $2
-    ORDER BY s.date_modified DESC
+    ORDER BY ${sortByField} ${sortOrder}
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
   `,

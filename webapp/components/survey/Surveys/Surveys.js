@@ -9,7 +9,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useOnUpdate } from '@webapp/components/hooks'
-import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -24,6 +24,7 @@ const Surveys = (props) => {
   const history = useHistory()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
+  const lang = useSurveyPreferredLang()
   const i18n = useI18n()
 
   /**
@@ -65,37 +66,47 @@ const Surveys = (props) => {
           ),
           width: '50px',
         },
-        { key: 'name', header: 'common.name', renderItem: ({ item }) => Survey.getName(Survey.getSurveyInfo(item)) },
         {
-          key: 'owner',
-          header: 'common.owner',
-          renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
-          width: '1.5fr',
+          key: 'name',
+          header: 'common.name',
+          renderItem: ({ item }) => Survey.getName(Survey.getSurveyInfo(item)),
+          width: '1fr',
           sortable: true,
         },
         {
           key: 'label',
           header: 'common.label',
-          renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
-          width: '1.5fr',
+          renderItem: ({ item }) => Survey.getLabel(Survey.getSurveyInfo(item), lang),
+          width: '1fr',
+          sortable: true,
         },
         {
-          key: 'dateCreated',
+          key: 'owner_name',
+          header: 'common.owner',
+          renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
+          width: '15rem',
+          sortable: true,
+        },
+        {
+          key: 'date_created',
           header: 'common.dateCreated',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateCreated(Survey.getSurveyInfo(item))),
-          width: '1.5fr',
+          width: '15rem',
+          sortable: true,
         },
         {
-          key: 'dateLastModified',
+          key: 'date_modified',
           header: 'common.dateLastModified',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateModified(Survey.getSurveyInfo(item))),
-          width: '1.5fr',
+          width: '15rem',
+          sortable: true,
         },
         {
           key: 'status',
           header: 'common.status',
           renderItem: ({ item }) => Survey.getStatus(Survey.getSurveyInfo(item)),
-          width: '1.5fr',
+          width: '15rem',
+          sortable: true,
         },
       ]}
     />

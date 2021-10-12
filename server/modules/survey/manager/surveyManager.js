@@ -27,6 +27,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
+import SystemError from '@core/systemError'
 
 const assocSurveyInfo = (info) => ({ info })
 
@@ -224,8 +225,26 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   )(survey)
 }
 
-export const fetchUserSurveysInfo = async ({ user, draft = true, template = false, offset, limit }) =>
-  (await SurveyRepository.fetchUserSurveys({ user, draft, template, offset, limit })).map(assocSurveyInfo)
+export const fetchUserSurveysInfo = async ({
+  user,
+  draft = true,
+  template = false,
+  offset,
+  limit,
+  sortBy,
+  sortOrder,
+}) => {
+  // check sortBy is valid
+  if (sortBy && !Object.values(SurveyRepository.sortByFields).includes(sortBy)) {
+    throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
+  }
+  // check sortOrder is valid
+  if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
+    throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
+  }
+  const surveys = await SurveyRepository.fetchUserSurveys({ user, draft, template, offset, limit, sortBy, sortOrder })
+  return surveys.map(assocSurveyInfo)
+}
 
 // ====== UPDATE
 export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
