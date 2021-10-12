@@ -58,6 +58,9 @@ const Surveys = (props) => {
       headerLeftComponent={() => HeaderLeft({ title })}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
+      cellTestIdExtractor={({ column, item }) =>
+        column.key === 'name' ? Survey.getName(Survey.getSurveyInfo(item)) : null
+      }
       columns={[
         {
           key: 'active',

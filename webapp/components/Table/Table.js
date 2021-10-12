@@ -10,6 +10,7 @@ import LoadingBar from '../LoadingBar'
 
 const Table = (props) => {
   const {
+    cellTestIdExtractor,
     className,
     gridTemplateColumns,
     headerLeftComponent,
@@ -69,6 +70,7 @@ const Table = (props) => {
       />
 
       <Content
+        cellTestIdExtractor={cellTestIdExtractor}
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
         keyExtractor={keyExtractor}
@@ -100,6 +102,7 @@ const Table = (props) => {
 const DummyComponent = () => <div />
 
 Table.propTypes = {
+  cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
   gridTemplateColumns: PropTypes.string,
   headerLeftComponent: PropTypes.elementType,
@@ -122,6 +125,7 @@ Table.propTypes = {
 }
 
 Table.defaultProps = {
+  cellTestIdExtractor: null,
   className: '',
   columns: null,
   expandableRows: false,

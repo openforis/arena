@@ -27,6 +27,7 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
+    cellTestIdExtractor,
     columns,
     expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
