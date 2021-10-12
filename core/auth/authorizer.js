@@ -11,10 +11,12 @@ const MAX_SURVEYS_CREATED_BY_USER = 5
 // ====== Survey
 // ======
 
-const _getSurveyUserGroup = (user, surveyInfo, defaultToMainGroup = true) => {
+const _getSurveyUserGroup = (user, surveyInfo) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
-  return User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup })(user)
+  return User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
 }
+
+const _hasAuthGroupForSurvey = ({ user, surveyInfo }) => Boolean(_getSurveyUserGroup(user, surveyInfo))
 
 const _hasSurveyPermission = (permission) => (user, surveyInfo) => {
   if (!user) return false
@@ -45,7 +47,7 @@ export const getMaxSurveysUserCanCreate = (user) => {
 }
 
 // READ
-export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))
+export const canViewSurvey = (user, surveyInfo) => _hasAuthGroupForSurvey({ user, surveyInfo })
 export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
@@ -124,7 +126,8 @@ export const canViewAllUsers = (user) => User.isSystemAdmin(user)
 const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
   User.isSystemAdmin(user) ||
   (_hasSurveyPermission(permissions.userEdit)(user, surveyInfo) &&
-    Boolean(_getSurveyUserGroup(userToUpdate, surveyInfo, false)))
+    // user to update has an auth group in the same survey
+    _hasAuthGroupForSurvey({ user: userToUpdate, surveyInfo }))
 
 export const canEditUser = (user, surveyInfo, userToUpdate) =>
   User.hasAccepted(userToUpdate) &&
