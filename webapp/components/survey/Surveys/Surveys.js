@@ -71,6 +71,7 @@ const Surveys = (props) => {
           header: 'common.owner',
           renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
           width: '1.5fr',
+          sortable: true,
         },
         {
           key: 'label',

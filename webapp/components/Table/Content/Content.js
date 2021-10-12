@@ -31,6 +31,7 @@ const Content = (props) => {
     expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
     keyExtractor,
+    handleSortBy,
     list,
     loading,
     maxRows,
@@ -43,6 +44,7 @@ const Content = (props) => {
     rowComponent: rowComponentParam,
     rowExpandedComponent,
     rowProps,
+    sort,
   } = props
 
   const i18n = useI18n()
@@ -77,7 +79,8 @@ const Content = (props) => {
   return (
     <div className="table__content">
       <div className="table__row-header" style={{ gridTemplateColumns }}>
-        {React.createElement(rowHeaderComponent, { props, ...rowProps })}
+        {/* TODO check why props is passed in this way*/}
+        {React.createElement(rowHeaderComponent, { props, sort, handleSortBy, ...rowProps })}
       </div>
 
       {loading ? (
@@ -107,6 +110,7 @@ Content.propTypes = {
   columns: PropTypes.array,
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
+  handleSortBy: PropTypes.func.isRequired,
   isRowActive: PropTypes.func,
   keyExtractor: PropTypes.func.isRequired,
   list: PropTypes.array.isRequired,
@@ -122,6 +126,7 @@ Content.propTypes = {
   rowComponent: PropTypes.elementType.isRequired,
   rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
+  sort: PropTypes.object.isRequired,
 }
 
 Content.defaultProps = {
