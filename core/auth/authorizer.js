@@ -26,9 +26,8 @@ const _hasSurveyPermission = (permission) => (user, surveyInfo) => {
   if (!surveyInfo) return false
 
   const authGroup = _getSurveyUserGroup(user, surveyInfo)
-  if (!authGroup) {
-    return false
-  }
+  if (!authGroup) return false
+
   return AuthGroup.getPermissions(authGroup).includes(permission)
 }
 
