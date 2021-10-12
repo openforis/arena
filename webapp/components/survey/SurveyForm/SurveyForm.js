@@ -11,6 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
+import { useI18n } from '@webapp/store/system'
 
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
@@ -49,6 +50,7 @@ const SurveyForm = (props) => {
     parentNode,
   } = props
 
+  const i18n = useI18n()
   const dispatch = useDispatch()
   const state = useSelector((rootState) => rootState)
   const isSideBarOpened = useIsSidebarOpened()
@@ -59,6 +61,7 @@ const SurveyForm = (props) => {
   let className = editAllowed ? ' edit' : ''
   className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
+  className += preview ? ' form-preview' : ''
 
   // If showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
   useOnUpdate(() => {
@@ -133,6 +136,7 @@ const SurveyForm = (props) => {
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
       <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
+        {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
           <div className="survey-form__sidebar">
             <EntitySelectorTree
