@@ -16,7 +16,10 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
       NodeDef.isAnalysis
     )
-    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames(analysisNodeDefsInEntity)
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
+      nodeDefs: analysisNodeDefsInEntity,
+      includeExtendedCols: true,
+    })
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
@@ -48,18 +51,17 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   async push(rowResult) {
     const insertValues = Object.keys(this.nodeDefsByColumnName).reduce(
       (values, columnName) => {
-        let value = 'DEFAULT'
-
         const nodeDef = this.nodeDefsByColumnName[columnName]
+        let value =
+          NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
         if (rowResult[columnName] && rowResult[columnName] !== NA) {
           value = rowResult[columnName]
           if (NodeDef.isCode(nodeDef)) {
             value = { itemUuid: rowResult[columnName.replace('_code', '_uuid').replace('_label', '_uuid')] }
           }
-        }
-
-        if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
-          value = String(isNaN(Number(rowResult[columnName])) ? null : Number(rowResult[columnName]))
+          if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
+            value = String(Number(rowResult[columnName]))
+          }
         }
 
         return {
