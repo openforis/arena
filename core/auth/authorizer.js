@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
@@ -18,10 +16,18 @@ const _getSurveyUserGroup = (user, surveyInfo, defaultToMainGroup = true) => {
   return User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup })(user)
 }
 
-const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
-  user &&
-  (User.isSystemAdmin(user) ||
-    (surveyInfo && R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))))
+const _hasSurveyPermission = (permission) => (user, surveyInfo) => {
+  if (!user) return false
+
+  if (User.isSystemAdmin(user)) return true
+
+  if (!surveyInfo) return false
+
+  const authGroup = _getSurveyUserGroup(user, surveyInfo)
+  if (!authGroup) return false
+
+  return AuthGroup.getPermissions(authGroup).includes(permission)
+}
 
 const _hasPermissionInSomeGroup = (permission) => (user) => {
   if (User.isSystemAdmin(user)) return true
