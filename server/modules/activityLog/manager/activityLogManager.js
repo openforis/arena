@@ -56,7 +56,7 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   }
 
   return R.pipe(
-    User.getAuthGroupBySurveyUuid(surveyUuid),
+    User.getAuthGroupBySurveyUuid({ surveyUuid }),
     AuthGroups.getPermissions,
     // For each permission in group, get available activity types
     R.reduce(

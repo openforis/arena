@@ -30,7 +30,10 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser, ar
 
   const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
 
-  const userGroupImportedSurvey = User.getAuthGroupBySurveyUuid(arenaSurveyUuid, true)(user)
+  const userGroupImportedSurvey = User.getAuthGroupBySurveyUuid({
+    surveyUuid: arenaSurveyUuid,
+    defaultToMainGroup: true,
+  })(user)
 
   const newGroup = authGroups.find((group) => AuthGroup.getName(group) === AuthGroup.getName(userGroupImportedSurvey))
 

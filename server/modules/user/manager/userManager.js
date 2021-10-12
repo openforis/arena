@@ -239,7 +239,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
       const surveyAuthGroupNew = authGroupsNew.find((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
       const surveyUuid = AuthGroup.getSurveyUuid(surveyAuthGroupNew)
       const groupUuid = AuthGroup.getUuid(surveyAuthGroupNew)
-      const surveyAuthGroupOld = User.getAuthGroupBySurveyUuid(surveyUuid, false)(userToUpdateOld)
+      const surveyAuthGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdateOld)
       if (!AuthGroup.isEqual(surveyAuthGroupNew)(surveyAuthGroupOld)) {
         if (surveyAuthGroupOld) {
           await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
