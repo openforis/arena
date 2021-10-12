@@ -56,11 +56,13 @@ export const getAuthGroupBySurveyUuid =
   (user) => {
     const authGroups = getAuthGroups(user)
     const authGroup = authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
-    if (!authGroup && !defaultToMainGroup) {
-      return null
-    } else {
+    if (authGroup) {
+      return authGroup
+    }
+    if (defaultToMainGroup) {
       return getSystemAdminGroup(user) || getSurveyManagerGroup(user)
     }
+    return null
   }
 
 export const getAuthGroupByName = (groupName) => (user) => {

@@ -16,11 +16,12 @@ import * as DateUtils from '@core/dateUtils'
 const Row = (props) => {
   const { row: userListItem, emailVisible } = props
   const surveyInfo = useSurveyInfo()
+  const surveyUuid = Survey.getUuid(surveyInfo)
 
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
 
-  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userListItem)
+  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(userListItem)
   const authGroupName = AuthGroup.getName(authGroup)
   const email = User.getEmail(userListItem)
   const invitedBy = User.getInvitedBy(userListItem)
