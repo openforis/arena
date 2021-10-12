@@ -1,9 +1,9 @@
 import React from 'react'
 
 export const ContentRowCell = (props) => {
-  const { column, item } = props
+  const { active, column, item } = props
 
   const { key, renderItem } = column
 
-  return <div key={key}>{renderItem({ item })}</div>
+  return <div key={key}>{renderItem({ item, active })}</div>
 }
