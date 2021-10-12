@@ -92,6 +92,7 @@ Do you want to proceed?`,
     openForisShort: 'OF',
     owner: 'Owner',
     path: 'Path',
+    preview: 'Preview Mode',
     publish: 'Publish',
     publishConfirm: `#### You are about to publish the survey {{survey}} ####
 
