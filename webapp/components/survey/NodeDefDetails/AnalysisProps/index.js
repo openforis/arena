@@ -49,9 +49,7 @@ const AnalysisProps = (props) => {
   }
 
   const getDefaultScript = () =>
-    `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${NodeDef.getName(nodeDef) || 'NAME'}${
-      NodeDef.isCode(nodeDef) ? '_code' : ''
-    } <- NA`
+    `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${NodeDef.getName(nodeDef) || 'NAME'} <- NA`
 
   const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
 
