@@ -13,8 +13,10 @@ const MAX_SURVEYS_CREATED_BY_USER = 5
 // ====== Survey
 // ======
 
-const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
-  User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), includeSystemAdmin)(user)
+const _getSurveyUserGroup = (user, surveyInfo, defaultToMainGroup = true) => {
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  return User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup })(user)
+}
 
 const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user &&
@@ -67,7 +69,8 @@ export const canEditRecord = (user, record) => {
 
   const recordDataStep = Record.getStep(record)
 
-  const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
+  const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
+  if (!userAuthGroup) return false
 
   // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
@@ -90,17 +93,21 @@ export const canUpdateRecordsStep = canAnalyzeRecords
 export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 
 // READ
-export const canViewUser = (user, surveyInfo, userToView) => {
-  return (
-    // system admin
-    User.isSystemAdmin(user) ||
-    // same user
-    User.isEqual(userToView)(user) ||
-    //
-    (Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
-      Boolean(_getSurveyUserGroup(userToView, surveyInfo, false)))
+export const canViewUser = (user, _surveyInfo, userToView) =>
+  // system admin
+  User.isSystemAdmin(user) ||
+  // same user
+  User.isEqual(userToView)(user) ||
+  // both users have an auth group in the same survey
+  User.getAuthGroups(user).some(
+    (authGroupUser) =>
+      AuthGroup.isSurveyGroup(authGroupUser) &&
+      User.getAuthGroups(userToView).some(
+        (authGroupUserToView) =>
+          AuthGroup.isSurveyGroup(authGroupUserToView) &&
+          AuthGroup.getSurveyUuid(authGroupUserToView) === AuthGroup.getSurveyUuid(authGroupUser)
+      )
   )
-}
 
 export const canViewOtherUsersEmail = ({ user, surveyInfo }) =>
   User.isSystemAdmin(user) || canInviteUsers(user, surveyInfo)
