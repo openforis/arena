@@ -19,7 +19,7 @@ export default class CategoriesImportJob extends Job {
   async execute() {
     const { arenaSurveyFileZip, surveyId } = this.context
 
-    const categories = (await ArenaSurveyFileZip.getCategories(arenaSurveyFileZip)) || {}
+    const categories = await ArenaSurveyFileZip.getCategories(arenaSurveyFileZip)
 
     const categoriesArray = Object.values(categories)
     if (categoriesArray.length > 0) {
