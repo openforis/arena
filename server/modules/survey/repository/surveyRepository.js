@@ -47,7 +47,15 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
 export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
 export const fetchUserSurveys = async (
-  { user, draft = false, template = false, offset = 0, limit = null, sortBy = 'date_modified', sortOrder = 'DESC' },
+  {
+    user,
+    draft = false,
+    template = false,
+    offset = 0,
+    limit = null,
+    sortBy = Survey.sortKeys.dateModified,
+    sortOrder = 'DESC',
+  },
   client = db
 ) => {
   const checkAccess = !User.isSystemAdmin(user)
@@ -61,7 +69,7 @@ export const fetchUserSurveys = async (
     [Survey.sortKeys.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
     [Survey.sortKeys.status]: 'status',
   }
-  const sortByField = sortFieldBySortBy[sortBy] || 'date_modified'
+  const sortByField = sortFieldBySortBy[sortBy] || Survey.sortKeys.dateModified
 
   return client.map(
     `
