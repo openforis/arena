@@ -13,7 +13,7 @@ export const getTaxonomies = async (zipFile) => _getJson(zipFile, ExportFile.tax
 export const getTaxa = async (zipFile, taxonomyUuid) => _getJson(zipFile, ExportFile.taxa({ taxonomyUuid }), [])
 
 // Categories
-export const getCategories = async (zipFile) => _getJson(zipFile, ExportFile.categories, [])
+export const getCategories = async (zipFile) => _getJson(zipFile, ExportFile.categories, {})
 export const getCategoryItems = async (zipFile, categoryUuid) =>
   _getJson(zipFile, ExportFile.categoryItems({ categoryUuid }), [])
 
