@@ -11,15 +11,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { getSurveyDBSchema } from './surveySchemaRepositoryUtils'
 
-export const sortByFields = {
-  dateCreated: 'date_created',
-  dateModified: 'date_modified',
-  name: 'name',
-  ownerName: 'owner_name',
-  label: 'label',
-  status: 'status',
-}
-
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
   const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template']
@@ -63,12 +54,12 @@ export const fetchUserSurveys = async (
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
 
   const sortFieldBySortBy = {
-    [sortByFields.dateCreated]: 's.date_created',
-    [sortByFields.dateModified]: 's.date_modified',
-    [sortByFields.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
-    [sortByFields.ownerName]: 'owner_name',
-    [sortByFields.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
-    [sortByFields.status]: 'status',
+    [Survey.sortKeys.dateCreated]: 's.date_created',
+    [Survey.sortKeys.dateModified]: 's.date_modified',
+    [Survey.sortKeys.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
+    [Survey.sortKeys.ownerName]: 'owner_name',
+    [Survey.sortKeys.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
+    [Survey.sortKeys.status]: 'status',
   }
   const sortByField = sortFieldBySortBy[sortBy] || 'date_modified'
 

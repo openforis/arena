@@ -4,6 +4,8 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
 
+import * as SurveySortKeys from './_survey/surveySortKeys'
+
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -59,6 +61,7 @@ export const newSurvey = ({
 export const infoKeys = SurveyInfo.keys
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey } = SurveyInfo
+export const { sortKeys } = SurveySortKeys
 
 // ====== DEFAULTS
 export const { getDefaultAuthGroups } = SurveyDefaults

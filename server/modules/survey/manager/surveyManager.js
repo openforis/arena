@@ -235,7 +235,7 @@ export const fetchUserSurveysInfo = async ({
   sortOrder,
 }) => {
   // check sortBy is valid
-  if (sortBy && !Object.values(SurveyRepository.sortByFields).includes(sortBy)) {
+  if (sortBy && !Object.values(Survey.sortKeys).includes(sortBy)) {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
   }
   // check sortOrder is valid
