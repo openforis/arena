@@ -22,12 +22,14 @@ export default class RecordsImportJob extends Job {
     const { surveyId, survey, arenaSurveyFileZip } = this.context
 
     const records = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
+    if (records.length == 0) return
+
+    this.total = records.length
 
     const recordsToInsert = await Promise.all(
       records.map(async (record) => ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(record)))
     )
 
-    if (recordsToInsert.length <= 0) return
     await RecordManager.insertRecordsInBatch(
       {
         user: this.user,
@@ -51,6 +53,7 @@ export default class RecordsImportJob extends Job {
           await batchPersister.addItem(node)
         }
       })
+      this.incrementProcessedItems()
     })
 
     await batchPersister.flush()
