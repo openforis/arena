@@ -84,7 +84,7 @@ Do you want to proceed?`,
     name: 'Name',
     new: 'New',
     no: 'No',
-    noItems: `$t(common.no) $t(common.item,{'count':2})`,
+    noItems: `$t(common.no) $t(common.item_plural)`,
     orderBy: 'Order by',
     of: 'of',
     ok: 'Ok',
@@ -471,6 +471,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     dataVis: {
       noData: 'This query returned no data',
     },
+  },
+
+  surveysView: {
+    filter: 'Filter',
+    filterPlaceholder: 'Name, label or owner',
+    noSurveysMatchingFilter: 'No surveys matching the specified filter',
   },
 
   usersView: {
