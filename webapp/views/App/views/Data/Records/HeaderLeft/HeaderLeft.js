@@ -9,7 +9,7 @@ import * as StringUtils from '@core/stringUtils'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { Button } from '@webapp/components'
 import { useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
@@ -27,7 +27,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   return (
     <div className="records__header-left">
       <Button
-        testId={DataTestId.records.addBtn}
+        testId={TestId.records.addBtn}
         onClick={() => dispatch(RecordActions.createRecord(history))}
         className="btn-s"
         iconClassName="icon-plus icon-12px icon-left"

@@ -13,7 +13,7 @@ import ErrorBadge from '@webapp/components/errorBadge'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import ItemDetails from './ItemDetails'
 
@@ -39,10 +39,10 @@ const LevelDetails = (props) => {
     <div
       id={`category-level-${levelIndex}`}
       className={classNames('category__level', { single })}
-      data-testid={DataTestId.categoryDetails.level(levelIndex)}
+      data-testid={TestId.categoryDetails.level(levelIndex)}
     >
       <ErrorBadge
-        id={DataTestId.categoryDetails.levelErrorBadge(levelIndex)}
+        id={TestId.categoryDetails.levelErrorBadge(levelIndex)}
         validation={validation}
         showLabel={false}
         showIcon
@@ -57,7 +57,7 @@ const LevelDetails = (props) => {
               <button
                 type="button"
                 className="btn btn-s"
-                data-testid={DataTestId.categoryDetails.levelDeleteBtn(levelIndex)}
+                data-testid={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
                 onClick={() => Actions.deleteLevel({ category, level })}
                 aria-disabled={!canBeDeleted}
               >
@@ -68,7 +68,7 @@ const LevelDetails = (props) => {
 
           <FormItem label={i18n.t('common.name')}>
             <Input
-              id={DataTestId.categoryDetails.levelName(levelIndex)}
+              id={TestId.categoryDetails.levelName(levelIndex)}
               value={CategoryLevel.getName(level)}
               validation={Validation.getFieldValidation('name')(validation)}
               onChange={(value) =>
@@ -85,7 +85,7 @@ const LevelDetails = (props) => {
         {!readOnly && (
           <button
             id={`category-level-${levelIndex}-btn-item-add`}
-            data-testid={DataTestId.categoryDetails.levelAddItemBtn(levelIndex)}
+            data-testid={TestId.categoryDetails.levelAddItemBtn(levelIndex)}
             type="button"
             className="btn btn-s btn-add-item"
             aria-disabled={!canAddItem}

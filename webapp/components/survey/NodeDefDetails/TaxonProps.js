@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
@@ -80,14 +80,14 @@ const TaxonProps = (props) => {
             items={itemsLookupFunction}
             itemKey="uuid"
             itemLabel={Taxonomy.getName}
-            idInput={DataTestId.nodeDefDetails.taxonomySelector}
+            idInput={TestId.nodeDefDetails.taxonomySelector}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
           <ButtonMetaItemAdd
-            id={DataTestId.nodeDefDetails.taxonomySelectorAddBtn}
+            id={TestId.nodeDefDetails.taxonomySelectorAddBtn}
             onAdd={setTaxonomyToEdit}
             metaItemType={metaItemTypes.taxonomy}
           />

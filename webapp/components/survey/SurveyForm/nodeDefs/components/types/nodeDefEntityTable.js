@@ -4,7 +4,7 @@ import React from 'react'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
@@ -26,7 +26,7 @@ const NodeDefEntityTable = (props) => {
             <button
               aria-disabled={!canAddNode}
               className="btn btn-xs btn-add"
-              data-testid={DataTestId.surveyForm.entityAddBtn(NodeDef.getName(nodeDef))}
+              data-testid={TestId.surveyForm.entityAddBtn(NodeDef.getName(nodeDef))}
               onClick={() => {
                 const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                 updateNode(nodeDef, entity)

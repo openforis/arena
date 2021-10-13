@@ -4,7 +4,7 @@ import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import * as NodeDef from '@core/survey/nodeDef'
 
 const HeaderLeft = () => {
@@ -17,7 +17,7 @@ const HeaderLeft = () => {
   }
 
   return (
-    <button data-testid={DataTestId.entities.addBtn} className="btn btn-s" onClick={createVirtualEntity} type="button">
+    <button data-testid={TestId.entities.addBtn} className="btn btn-s" onClick={createVirtualEntity} type="button">
       <span className="icon icon-plus icon-12px icon-left" />
       {i18n.t('chainView.entities.new')}
     </button>

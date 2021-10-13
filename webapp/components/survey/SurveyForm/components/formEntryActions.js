@@ -13,7 +13,7 @@ import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
@@ -39,7 +39,7 @@ const RecordEntryButtons = () => {
     <>
       {!valid && (
         <Link
-          data-testid={DataTestId.record.invalidBtn}
+          data-testid={TestId.record.invalidBtn}
           className="btn btn-transparent error"
           to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
           title={i18n.t('dataView.showValidationReport')}
@@ -94,7 +94,7 @@ const RecordEntryButtons = () => {
       {canDelete && (
         <Button
           className="btn-s btn-danger"
-          testId={DataTestId.record.deleteBtn}
+          testId={TestId.record.deleteBtn}
           onClick={() =>
             dispatch(
               DialogConfirmActions.showDialogConfirm({
@@ -122,7 +122,7 @@ const FormEntryActions = (props) => {
       {preview ? (
         <button
           className="btn-s btn-transparent"
-          data-testid={DataTestId.surveyForm.previewCloseBtn}
+          data-testid={TestId.surveyForm.previewCloseBtn}
           onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
           type="button"
         >

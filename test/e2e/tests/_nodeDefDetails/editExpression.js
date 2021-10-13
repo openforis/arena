@@ -1,9 +1,9 @@
 import { each } from '../../../../core/promiseUtils'
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { persistNodeDefChanges } from './editDetails'
 
 const editAdvanced = async (expressionStr) => {
-  await page.click(getSelector(DataTestId.expressionEditor.toggleModeBtn, 'button'))
+  await page.click(getSelector(TestId.expressionEditor.toggleModeBtn, 'button'))
   // wait for codemirror to initialize
   await page.waitForTimeout(500)
 
@@ -18,7 +18,7 @@ const editBoolean = async (expressionStr) => page.click(`text="${expressionStr}"
 const editDropdown = async (expressionStr) => {
   // TODO make a better selector
   await page.focus("//div[normalize-space(.)='VarConst']/div/div/div/input[normalize-space(@type)='text']")
-  await page.click(getSelector(DataTestId.dropdown.dropDownItem(expressionStr)))
+  await page.click(getSelector(TestId.dropdown.dropDownItem(expressionStr)))
   await expect(page).toHaveText(expressionStr)
 }
 
@@ -34,31 +34,31 @@ export const editNodeDefExpression = (nodeDef, expressions) => {
       if (idx === 0) {
         // goto tab
         const tab =
-          DataTestId.nodeDefDetails.validations === expression.type
-            ? DataTestId.nodeDefDetails.validations
-            : DataTestId.nodeDefDetails.advanced
-        await page.click(getSelector(DataTestId.tabBar.tabBarBtn(tab), 'button'))
+          TestId.nodeDefDetails.validations === expression.type
+            ? TestId.nodeDefDetails.validations
+            : TestId.nodeDefDetails.advanced
+        await page.click(getSelector(TestId.tabBar.tabBarBtn(tab), 'button'))
       }
 
       // goto expression editor
-      const button = (await page.$$(getSelector(DataTestId.expressionEditor.editBtn(expression.type), 'button')))[idx]
+      const button = (await page.$$(getSelector(TestId.expressionEditor.editBtn(expression.type), 'button')))[idx]
       await button.click()
 
       const editFn = editFns[nodeDef.type] || editAdvanced
       await editFn(expression.expression)
 
-      await page.click(getSelector(DataTestId.expressionEditor.applyBtn, 'button'))
+      await page.click(getSelector(TestId.expressionEditor.applyBtn, 'button'))
     })
 
     if (expression.applyIf) {
       test(`${nodeDef.label} edit expression ${expression.expression} applyIf ${expression.applyIf}`, async () => {
-        const btnId = DataTestId.expressionEditor.editBtn(DataTestId.nodeDefDetails.applyIf(expression.type))
+        const btnId = TestId.expressionEditor.editBtn(TestId.nodeDefDetails.applyIf(expression.type))
         const button = (await page.$$(getSelector(btnId, 'button')))[idx]
         await button.click()
 
         await editAdvanced(expression.applyIf)
 
-        await page.click(getSelector(DataTestId.expressionEditor.applyBtn, 'button'))
+        await page.click(getSelector(TestId.expressionEditor.applyBtn, 'button'))
       })
     }
   })

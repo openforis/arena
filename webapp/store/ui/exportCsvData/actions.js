@@ -7,7 +7,7 @@ import DownloadButton from '@webapp/components/form/downloadButton'
 
 import { SurveyState } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 export const startCSVExport = () => async (dispatch, getState) => {
   const state = getState()
@@ -24,7 +24,7 @@ export const startCSVExport = () => async (dispatch, getState) => {
         const { exportDataFolderName } = JobSerialized.getResult(jobComplete)
         return (
           <DownloadButton
-            id={DataTestId.dataExport.exportCSV}
+            id={TestId.dataExport.exportCSV}
             href={`/api/survey/${surveyId}/export-csv-data/${exportDataFolderName}`}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
           />

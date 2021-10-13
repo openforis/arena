@@ -1,5 +1,5 @@
 import { gotoEntities, gotoHome } from './_navigation'
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { virtualEntities } from '../mock/nodeDefs'
 
@@ -10,8 +10,8 @@ export default () =>
     test(`Delete entity`, async () => {
       await Promise.all([page.waitForNavigation(), page.click(`text="${virtualEntities[0].name}"`)])
 
-      await page.click(getSelector(DataTestId.nodeDefDetails.deleteBtn, 'button'))
-      await Promise.all([page.waitForNavigation(), page.click(DataTestId.modal.ok)])
+      await page.click(getSelector(TestId.nodeDefDetails.deleteBtn, 'button'))
+      await Promise.all([page.waitForNavigation(), page.click(TestId.modal.ok)])
     })
     gotoHome()
   })

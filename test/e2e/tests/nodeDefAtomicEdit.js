@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { editNodeDef, addNodeDef, addNodeDefAtomicChildren, addNodeDefSubPage } from './_formDesigner'
 import { gotoFormDesigner } from './_navigation'
@@ -9,7 +9,7 @@ export default () =>
     gotoFormDesigner()
 
     test('Verify root entity error', async () => {
-      await page.hover(getSelector(DataTestId.surveyForm.nodeDefErrorBadge('root_entity')))
+      await page.hover(getSelector(TestId.surveyForm.nodeDefErrorBadge('root_entity')))
 
       await expect(page).toHaveText('Define at least one key attribute')
       await expect(page).toHaveText('Define at least one child item')

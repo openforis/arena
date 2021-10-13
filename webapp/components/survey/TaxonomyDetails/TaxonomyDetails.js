@@ -11,7 +11,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { ButtonBack } from '@webapp/components/buttons'
 import Table from '@webapp/components/Table/Table'
@@ -68,7 +68,7 @@ const TaxonomyDetails = (props) => {
 
       {showClose && (
         <div className="button-bar">
-          <ButtonBack testId={DataTestId.taxonomyDetails.doneEditBtn} />
+          <ButtonBack testId={TestId.taxonomyDetails.doneEditBtn} />
         </div>
       )}
     </div>

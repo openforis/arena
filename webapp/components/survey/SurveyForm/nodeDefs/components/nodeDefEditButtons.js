@@ -13,7 +13,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
@@ -63,7 +63,7 @@ const NodeDefEditButtons = (props) => {
       )}
 
       <Link
-        data-testid={DataTestId.surveyForm.nodeDefEditBtn(NodeDef.getName(nodeDef))}
+        data-testid={TestId.surveyForm.nodeDefEditBtn(NodeDef.getName(nodeDef))}
         className="btn btn-s btn-transparent survey-form__node-def-edit-button"
         to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
       >
@@ -73,7 +73,7 @@ const NodeDefEditButtons = (props) => {
       {NodeDef.isEntity(nodeDef) && (
         <button
           type="button"
-          data-testid={DataTestId.surveyForm.nodeDefAddChildBtn(NodeDef.getName(nodeDef))}
+          data-testid={TestId.surveyForm.nodeDefAddChildBtn(NodeDef.getName(nodeDef))}
           className="btn btn-s btn-transparent"
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
           onMouseDown={(e) => {

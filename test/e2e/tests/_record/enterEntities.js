@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 import { cluster, plot, tree } from '../../mock/nodeDefs'
 import { enterAttribute } from './enterAttributes'
@@ -32,11 +32,11 @@ export const enterCluster = (record) =>
 export const enterPlot = (record) =>
   describe(`Enter ${plot.name} values`, () => {
     test('Add new plot', async () => {
-      await page.click(getSelector(DataTestId.entities.form.addNewNode, 'button'))
-      await expect(page).toHaveSelector(getSelector(DataTestId.entities.form.nodeSelect), 'select')
+      await page.click(getSelector(TestId.entities.form.addNewNode, 'button'))
+      await expect(page).toHaveSelector(getSelector(TestId.entities.form.nodeSelect), 'select')
     })
     test(`Test ${plot_id.name} is required`, async () => {
-      await page.hover(getSelector(DataTestId.surveyForm.nodeDefErrorBadge(plot_id.name)))
+      await page.hover(getSelector(TestId.surveyForm.nodeDefErrorBadge(plot_id.name)))
       const tooltipEl = await page.waitForSelector('.tooltip__message-error')
       await expect(tooltipEl).toHaveText('Required value')
     })
@@ -52,13 +52,13 @@ export const enterTrees = (record) => {
     const treeSelector = getTreeSelector(treeIdx)
 
     test('Add tree', async () => {
-      await page.click(getSelector(DataTestId.surveyForm.entityAddBtn(tree.name), 'button'))
+      await page.click(getSelector(TestId.surveyForm.entityAddBtn(tree.name), 'button'))
       await expect(page).toHaveSelector(treeSelector)
     })
 
     // verify default values before entering
     test(`Verify ${tree_id.name} required`, async () => {
-      await page.hover(`${treeSelector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`)
+      await page.hover(`${treeSelector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`)
       const tooltipEl = await page.waitForSelector('.tooltip__message-error')
       await expect(tooltipEl).toHaveText('Required value')
       await page.mouse.move(0, 0, { steps: 1 })

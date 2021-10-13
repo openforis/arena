@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/markdown'
 import { Modal, ModalBody, ModalHeader, ModalFooter } from '@webapp/components/modal'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()
@@ -35,7 +35,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
             type="text"
             className="confirm-name"
             value={confirmName}
-            data-testid={DataTestId.surveyDelete.confirmNameInput}
+            data-testid={TestId.surveyDelete.confirmNameInput}
             onChange={(event) => setConfirmName(event.target.value)}
           />
         </div>

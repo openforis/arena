@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { plot, tree } from '../mock/nodeDefs'
 import { taxonomies } from '../mock/taxonomies'
 import { addNodeDef, gotoFormPage } from './_formDesigner'
@@ -24,14 +24,14 @@ export default () =>
         page.waitForResponse('**/taxonomies/**'),
         page.waitForResponse('**/taxonomies/**/taxa**'),
         page.waitForResponse('**/taxonomies/**/taxa/count**'),
-        page.click(getSelector(DataTestId.nodeDefDetails.taxonomySelectorAddBtn, 'button')),
+        page.click(getSelector(TestId.nodeDefDetails.taxonomySelectorAddBtn, 'button')),
       ])
     })
 
     editTaxonomyDetails(taxonomy)
 
     test('Close taxonomy editor', async () => {
-      await page.click(getSelector(DataTestId.panelRight.closeBtn, 'button'))
+      await page.click(getSelector(TestId.panelRight.closeBtn, 'button'))
       await expect(page).toHaveText('Taxonomy')
     })
 

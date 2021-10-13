@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 export const clickSurvey = async (survey) => {
   await Promise.all([
@@ -6,7 +6,7 @@ export const clickSurvey = async (survey) => {
     page.click(getSelector(survey.name)),
   ])
 
-  const labelSelector = getSelector(DataTestId.dashboard.surveyName, 'h3')
+  const labelSelector = getSelector(TestId.dashboard.surveyName, 'h3')
   expect(await page.innerText(labelSelector)).toBe(survey.name.toUpperCase())
 }
 
