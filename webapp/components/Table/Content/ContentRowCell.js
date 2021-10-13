@@ -1,9 +1,15 @@
 import React from 'react'
 
 export const ContentRowCell = (props) => {
-  const { column, item } = props
+  const { active, cellTestIdExtractor, column, item } = props
 
   const { key, renderItem } = column
 
-  return <div key={key}>{renderItem({ item })}</div>
+  const testId = cellTestIdExtractor ? cellTestIdExtractor({ column, item }) : null
+
+  return (
+    <div key={key} data-testid={testId}>
+      {renderItem({ item, active })}
+    </div>
+  )
 }
