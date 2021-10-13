@@ -53,7 +53,7 @@ export const fetchUserSurveys = async (
     template = false,
     offset = 0,
     limit = null,
-    sortBy = Survey.sortKeys.dateModified,
+    sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
   },
   client = db
@@ -62,14 +62,14 @@ export const fetchUserSurveys = async (
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
 
   const sortFieldBySortBy = {
-    [Survey.sortKeys.dateCreated]: 's.date_created',
-    [Survey.sortKeys.dateModified]: 's.date_modified',
-    [Survey.sortKeys.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
-    [Survey.sortKeys.ownerName]: 'owner_name',
-    [Survey.sortKeys.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
-    [Survey.sortKeys.status]: 'status',
+    [Survey.sortableKeys.dateCreated]: 's.date_created',
+    [Survey.sortableKeys.dateModified]: 's.date_modified',
+    [Survey.sortableKeys.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
+    [Survey.sortableKeys.ownerName]: 'owner_name',
+    [Survey.sortableKeys.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
+    [Survey.sortableKeys.status]: 'status',
   }
-  const sortByField = sortFieldBySortBy[sortBy] || Survey.sortKeys.dateModified
+  const sortByField = sortFieldBySortBy[sortBy] || Survey.sortableKeys.dateModified
 
   return client.map(
     `

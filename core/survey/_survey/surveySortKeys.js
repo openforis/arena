@@ -1,6 +1,6 @@
 import * as ObjectUtils from '@core/objectUtils'
 
-export const sortKeys = {
+export const sortableKeys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   name: ObjectUtils.keys.name,

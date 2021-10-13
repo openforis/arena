@@ -61,7 +61,7 @@ export const newSurvey = ({
 export const infoKeys = SurveyInfo.keys
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey } = SurveyInfo
-export const { sortKeys } = SurveySortKeys
+export const { sortableKeys } = SurveySortKeys
 
 // ====== DEFAULTS
 export const { getDefaultAuthGroups } = SurveyDefaults
