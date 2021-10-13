@@ -3,6 +3,7 @@ import classNames from 'classnames'
 
 export const ContentRow = (props) => {
   const {
+    cellTestIdExtractor,
     expandableRows,
     gridTemplateColumns,
     index,
@@ -47,6 +48,7 @@ export const ContentRow = (props) => {
       >
         {React.createElement(rowComponent, {
           ...rowProps,
+          cellTestIdExtractor,
           initData,
           active,
           idx: index,
