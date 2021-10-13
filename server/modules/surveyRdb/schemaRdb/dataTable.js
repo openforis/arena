@@ -55,7 +55,7 @@ export const getColumnNames = (survey, nodeDef) => [
   columnNameRecordUuuid,
   columnNameRecordCycle,
   columnNameParentUuuid,
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames)),
+  ...R.flatten(getNodeDefColumns(survey, nodeDef).map((nodeDefCol) => DataCol.getNames(nodeDefCol))),
 ]
 
 // eslint-disable-next-line

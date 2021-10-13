@@ -30,24 +30,24 @@ const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), colsByType)
 const getDefaultColumnName = (nodeDef) =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
-export const getColumnNames = (nodeDef, includeExtendedCols = true ) => {
+export const getColumnNames = (nodeDef, includeExtendedCols = true) => {
   const cols = includeExtendedCols ? getCols(nodeDef) : []
   return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map((col) => `${NodeDef.getName(nodeDef)}_${col}`)
 }
 
 export const getColumnName = R.pipe(getColumnNames, R.head)
 
-export const getNodeDefsWithColumnNames = ({nodeDefs, includeExtendedCols}) =>
+export const getNodeDefsWithColumnNames = ({ nodeDefs, includeExtendedCols }) =>
   nodeDefs.flatMap((nodeDef) => {
     const columnNames = getColumnNames(nodeDef, includeExtendedCols)
     return columnNames.map((colName) => ({ columnName: colName, nodeDef }))
   })
 
-export const getNodeDefsColumnNames = ({nodeDefs, includeExtendedCols}) =>
-  getNodeDefsWithColumnNames({nodeDefs, includeExtendedCols}).flatMap(({ columnName }) => columnName)
+export const getNodeDefsColumnNames = ({ nodeDefs, includeExtendedCols }) =>
+  getNodeDefsWithColumnNames({ nodeDefs, includeExtendedCols }).flatMap(({ columnName }) => columnName)
 
-export const getNodeDefsByColumnNames = ({nodeDefs, includeExtendedCols}) =>
-  getNodeDefsWithColumnNames({nodeDefs, includeExtendedCols}).reduce(
+export const getNodeDefsByColumnNames = ({ nodeDefs, includeExtendedCols }) =>
+  getNodeDefsWithColumnNames({ nodeDefs, includeExtendedCols }).reduce(
     (_nodeDefs, { columnName, nodeDef }) => ({ ..._nodeDefs, [columnName]: nodeDef }),
     {}
   )
