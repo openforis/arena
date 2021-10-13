@@ -53,6 +53,8 @@ export const fetchUserSurveys = async (
     template = false,
     offset = 0,
     limit = null,
+    lang, // survey label preferred language
+    search: searchParam = null,
     sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
   },
@@ -60,13 +62,17 @@ export const fetchUserSurveys = async (
 ) => {
   const checkAccess = !User.isSystemAdmin(user)
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
+  const search = searchParam ? `%${searchParam.toLowerCase()}%` : null
+
+  const nameCol = `${propsCol} ->> '${Survey.infoKeys.name}'`
+  const labelCol = `${propsCol} #>> '{${Survey.infoKeys.labels},${lang}}'`
 
   const sortFieldBySortBy = {
     [Survey.sortableKeys.dateCreated]: 's.date_created',
     [Survey.sortableKeys.dateModified]: 's.date_modified',
-    [Survey.sortableKeys.name]: `${propsCol} -> '${Survey.infoKeys.name}'`,
+    [Survey.sortableKeys.name]: nameCol,
     [Survey.sortableKeys.ownerName]: 'owner_name',
-    [Survey.sortableKeys.label]: `${propsCol} #>> '{${Survey.infoKeys.labels},lang_default}'`,
+    [Survey.sortableKeys.label]: labelCol,
     [Survey.sortableKeys.status]: 'status',
   }
   const sortByField = sortFieldBySortBy[sortBy] || Survey.sortableKeys.dateModified
@@ -85,8 +91,6 @@ export const fetchUserSurveys = async (
         ELSE 
           NULL
       END AS status,
-      -- DEFAULT LANGUAGE
-      ${propsCol} #>> '{${Survey.infoKeys.languages},0}' as lang_default,
       u.name as owner_name
       ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
     FROM survey s
@@ -98,19 +102,29 @@ export const fetchUserSurveys = async (
     JOIN auth_group g
       ON s.uuid = g.survey_uuid
     JOIN auth_group_user gu
-      ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
+      ON gu.group_uuid = g.uuid AND gu.user_uuid = $/userUuid/`
         : ''
     }
     WHERE 
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       (s.props || s.props_draft) ->> 'temporary' IS NULL 
-      AND s.template = $2
+      AND s.template = $/template/
+      ${
+        search
+          ? `
+          AND (
+          ${nameCol} LIKE $/search/
+          OR lower(${labelCol}) LIKE $/search/
+          OR lower(u.name) LIKE $/search/
+      )`
+          : ''
+      }
     ORDER BY ${sortByField} ${sortOrder}
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
   `,
-    [User.getUuid(user), template],
+    { userUuid: User.getUuid(user), template, search },
     (def) => DB.transformCallback(def, true)
   )
 }

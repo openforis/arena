@@ -231,6 +231,8 @@ export const fetchUserSurveysInfo = async ({
   template = false,
   offset,
   limit,
+  lang,
+  search,
   sortBy,
   sortOrder,
 }) => {
@@ -242,7 +244,17 @@ export const fetchUserSurveysInfo = async ({
   if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
     throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
-  const surveys = await SurveyRepository.fetchUserSurveys({ user, draft, template, offset, limit, sortBy, sortOrder })
+  const surveys = await SurveyRepository.fetchUserSurveys({
+    user,
+    draft,
+    template,
+    offset,
+    limit,
+    lang,
+    search,
+    sortBy,
+    sortOrder,
+  })
   return surveys.map(assocSurveyInfo)
 }
 

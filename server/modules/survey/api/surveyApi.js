@@ -55,9 +55,19 @@ export const init = (app) => {
   app.get('/surveys', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { draft = true, template = false, offset, limit, sortBy, sortOrder } = Request.getParams(req)
+      const { draft = true, template = false, offset, limit, lang, search, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await SurveyService.fetchUserSurveysInfo({ user, draft, template, offset, limit, sortBy, sortOrder })
+      const list = await SurveyService.fetchUserSurveysInfo({
+        user,
+        draft,
+        template,
+        offset,
+        limit,
+        lang,
+        search,
+        sortBy,
+        sortOrder,
+      })
 
       res.json({ list })
     } catch (error) {

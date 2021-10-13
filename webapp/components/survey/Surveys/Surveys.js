@@ -1,3 +1,5 @@
+import './Surveys.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
@@ -52,10 +54,12 @@ const Surveys = (props) => {
 
   return (
     <Table
+      className="surveys"
       module={module}
       moduleApiUri={moduleApiUri}
-      restParams={{ template, requestedAt }}
-      headerLeftComponent={() => HeaderLeft({ title })}
+      restParams={{ lang, template, requestedAt }}
+      headerLeftComponent={HeaderLeft}
+      headerProps={{ title }}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
       cellTestIdExtractor={({ column, item }) =>
@@ -112,6 +116,7 @@ const Surveys = (props) => {
           sortable: true,
         },
       ]}
+      noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
     />
   )
 }
