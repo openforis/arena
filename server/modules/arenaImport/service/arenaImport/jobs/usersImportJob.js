@@ -109,7 +109,9 @@ export default class UsersImportJob extends Job {
     )
 
     const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
-    await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
+    if (userInvitations.length > 0) {
+      await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
+    }
 
     this.setContext({ users })
   }
