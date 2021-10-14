@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { dragAndDrop, dragAndDropOver } from './utils/dragDrop'
 import { gotoFormDesigner } from './_navigation'
@@ -6,8 +6,8 @@ import { gotoFormPage } from './_formDesigner'
 import { publishWithoutErrors } from './_publish'
 
 const getBBoxes = async (nodeDefTarget, nodeDefSource) => {
-  const targetEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(nodeDefTarget.name)))
-  const sourceEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(nodeDefSource.name)))
+  const targetEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(nodeDefTarget.name)))
+  const sourceEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(nodeDefSource.name)))
   await targetEl.scrollIntoViewIfNeeded()
   const targetBBox = await targetEl.boundingBox()
   const sourceBBox = await sourceEl.boundingBox()
@@ -74,7 +74,7 @@ export default () =>
 
     test('Page reload', async () => {
       await page.reload()
-      await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
+      await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
     })
 
     verityEntityOrder(

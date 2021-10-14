@@ -12,7 +12,7 @@ import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -52,7 +52,7 @@ const CategoryDetails = (props) => {
         <div className="category__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
-              id={DataTestId.categoryDetails.categoryName}
+              id={TestId.categoryDetails.categoryName}
               value={Category.getName(category)}
               validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
               onChange={(value) =>
@@ -71,7 +71,7 @@ const CategoryDetails = (props) => {
             />
           )}
           <DownloadButton
-            id={DataTestId.categoryDetails.exportBtn}
+            id={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/export/`}
             label={i18n.t('common.csvExport')}
           />
@@ -91,7 +91,7 @@ const CategoryDetails = (props) => {
           {!readOnly && (
             <Button
               className="btn-s btn-add-level"
-              testId={DataTestId.categoryDetails.addLevelBtn}
+              testId={TestId.categoryDetails.addLevelBtn}
               onClick={() => Actions.createLevel({ category })}
               disabled={levels.length === MAX_LEVELS}
               iconClassName="icon icon-plus icon-16px icon-left"

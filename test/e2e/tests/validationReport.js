@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { records } from '../mock/records'
@@ -19,10 +19,10 @@ const record1 = records[0]
 const record2 = records[1]
 const record3 = records[2]
 
-const { validationReport } = DataTestId.validationReport
+const { validationReport } = TestId.validationReport
 const getMessagesEl = async (path) => {
-  await page.waitForSelector(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
-  return page.$(`[data-value="${path}"] + ${getSelector(DataTestId.validationReport.cellMessages)}`)
+  await page.waitForSelector(`[data-value="${path}"] + ${getSelector(TestId.validationReport.cellMessages)}`)
+  return page.$(`[data-value="${path}"] + ${getSelector(TestId.validationReport.cellMessages)}`)
 }
 
 const waitThread = (timeout = 1500) =>
@@ -35,7 +35,7 @@ const gotoNode = (path) =>
   test(`Goto ${path}`, async () => {
     const messagesEl = await getMessagesEl(path)
     await Promise.all([
-      page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)),
+      page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
       page.waitForNavigation(),
       messagesEl.click(),
     ])
@@ -45,7 +45,7 @@ const expectMessages = (messages) => {
   if (messages.length > 0) {
     messages.forEach(([path, message], idx) =>
       test(`Verify messages ${path}`, async () => {
-        await page.waitForSelector(getSelector(DataTestId.table.row(DataTestId.validationReport.validationReport, idx)))
+        await page.waitForSelector(getSelector(TestId.table.row(TestId.validationReport.validationReport, idx)))
         const messagesEl = await getMessagesEl(path)
         await expect(messagesEl).not.toBeNull()
         await expect(await messagesEl.getAttribute('data-value')).toBe(message)
@@ -58,7 +58,7 @@ const expectMessages = (messages) => {
   }
 
   test(`Verify messages to be ${messages.length}`, async () => {
-    const rowsSelector = getSelector(DataTestId.table.rows(validationReport))
+    const rowsSelector = getSelector(TestId.table.rows(validationReport))
 
     const rowsEl = await page.$$(`${rowsSelector} div.table__row`)
     await expect(rowsEl.length).toBe(messages.length)

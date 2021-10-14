@@ -12,7 +12,7 @@ import * as DateUtils from '@core/dateUtils'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo, useNodeDefRootKeys } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 
@@ -47,7 +47,7 @@ const Row = (props) => {
         const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
         const valueFormatted = value && formatter ? formatter({ value }) : value
         return (
-          <div key={uuid} data-testid={DataTestId.records.cellNodeDef(name)} data-value={value}>
+          <div key={uuid} data-testid={TestId.records.cellNodeDef(name)} data-value={value}>
             {valueFormatted}
           </div>
         )

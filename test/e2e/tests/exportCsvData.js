@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import csv from 'csv/lib/sync'
 
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { survey } from '../mock/survey'
 
@@ -40,17 +40,17 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      const prepareExportBtnSelector = getSelector(DataTestId.dataExport.prepareExport, 'button')
+      const prepareExportBtnSelector = getSelector(TestId.dataExport.prepareExport, 'button')
       await page.waitForSelector(prepareExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open
       await Promise.all([
-        page.waitForSelector(getSelector(DataTestId.modal.modal)),
+        page.waitForSelector(getSelector(TestId.modal.modal)),
         page.click(prepareExportBtnSelector),
       ])
 
       // wait for the job to complete: export button will appear
-      const downloadBtnSelector = getSelector(DataTestId.dataExport.exportCSV, 'button')
+      const downloadBtnSelector = getSelector(TestId.dataExport.exportCSV, 'button')
       await page.waitForSelector(downloadBtnSelector)
 
       await expect(downloadBtnSelector).toBeTruthy()
@@ -62,7 +62,7 @@ export default () =>
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click(getSelector(DataTestId.dataExport.exportCSV, 'button')),
+        page.click(getSelector(TestId.dataExport.exportCSV, 'button')),
       ])
 
       const surveyZipPath = path.resolve(downloadsPath, zipFileName)

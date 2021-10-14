@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { plot } from '../mock/nodeDefs'
 import { records } from '../mock/records'
@@ -19,7 +19,7 @@ export default () =>
       gotoRecord(record)
 
       test(`Verify record valid`, async () => {
-        const invalidRecordBtn = await page.$(getSelector(DataTestId.record.invalidBtn))
+        const invalidRecordBtn = await page.$(getSelector(TestId.record.invalidBtn))
         await expect(invalidRecordBtn).toBeNull()
       })
 

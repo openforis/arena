@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
 import { gotoHome, gotoSurveyCreate, gotoSurveyList } from './_navigation'
@@ -22,9 +22,9 @@ export default () =>
 
     test(`Import survey `, async () => {
       await page.click(
-        getSelector(DataTestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' }))
+        getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' }))
       )
-      const input = await page.$(getSelector(DataTestId.surveyCreate.importFromArena), 'input')
+      const input = await page.$(getSelector(TestId.surveyCreate.importFromArena), 'input')
       await Promise.all([
         page.waitForResponse('**/survey/**'), // job status response
         input.setInputFiles(getSurveyZipPath(survey)),
@@ -32,7 +32,7 @@ export default () =>
       const [response] = await Promise.all([
         page.waitForResponse('**/survey/**'), // created survey
         page.waitForNavigation(),
-        page.click(DataTestId.modal.close),
+        page.click(TestId.modal.close),
       ])
 
       const json = await response.json()

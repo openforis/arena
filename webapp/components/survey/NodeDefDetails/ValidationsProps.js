@@ -10,7 +10,7 @@ import * as Validation from '@core/validation/validation'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
@@ -78,7 +78,7 @@ const ValidationsProps = (props) => {
         (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
           <FormItem label={i18n.t('common.unique')}>
             <Checkbox
-              id={DataTestId.nodeDefDetails.nodeDefUnique}
+              id={TestId.nodeDefDetails.nodeDefUnique}
               checked={NodeDefValidations.isUnique(nodeDefValidations)}
               disabled={readOnly}
               onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocUnique(checked)(nodeDefValidations))}
@@ -87,7 +87,7 @@ const ValidationsProps = (props) => {
         )}
       {NodeDef.isAttribute(nodeDef) && (
         <ExpressionsProp
-          qualifier={DataTestId.nodeDefDetails.validations}
+          qualifier={TestId.nodeDefDetails.validations}
           label={i18n.t('nodeDefEdit.validationsProps.expressions')}
           readOnly={readOnly}
           applyIf

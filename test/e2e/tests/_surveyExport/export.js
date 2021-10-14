@@ -1,7 +1,7 @@
 import AdmZip from 'adm-zip'
 import fs from 'fs'
 
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
@@ -9,18 +9,18 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    await page.waitForSelector(getSelector(DataTestId.dashboard.surveyExportWithDataBtn))
+    await page.waitForSelector(getSelector(TestId.dashboard.surveyExportWithDataBtn))
 
     await Promise.all([
-      page.waitForSelector(getSelector(DataTestId.modal.modal)),
-      page.click(getSelector(DataTestId.dashboard.surveyExportWithDataBtn, 'button')),
+      page.waitForSelector(getSelector(TestId.modal.modal)),
+      page.click(getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')),
     ])
 
-    await page.waitForSelector(DataTestId.surveyExport.downloadBtn)
+    await page.waitForSelector(TestId.surveyExport.downloadBtn)
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.click(DataTestId.surveyExport.downloadBtn),
+      page.click(TestId.surveyExport.downloadBtn),
     ])
 
     await download.saveAs(surveyZipPath)

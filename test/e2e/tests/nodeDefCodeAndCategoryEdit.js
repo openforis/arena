@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { categories } from '../mock/categories'
 import { cluster } from '../mock/nodeDefs'
@@ -23,7 +23,7 @@ export default () =>
         page.waitForResponse('**/categories'),
         page.waitForResponse('**/categories/**'),
         page.waitForResponse('**/categories/**/items**'),
-        page.click(getSelector(DataTestId.categorySelector.addCategoryBtn, 'button')),
+        page.click(getSelector(TestId.categorySelector.addCategoryBtn, 'button')),
       ])
       const json = await response.json()
       const categoryUuid = json.category.uuid
@@ -40,7 +40,7 @@ export default () =>
     exportCategory(category)
 
     test('Close category editor', async () => {
-      await page.click(getSelector(DataTestId.panelRight.closeBtn, 'button'))
+      await page.click(getSelector(TestId.panelRight.closeBtn, 'button'))
       await expect(page).toHaveText('Parent Code')
     })
 

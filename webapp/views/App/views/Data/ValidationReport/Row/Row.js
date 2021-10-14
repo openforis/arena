@@ -9,7 +9,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { useI18n, useLang } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import ValidationFieldMessages, { getValidationFieldMessages } from '@webapp/components/validationFieldMessages'
 
@@ -47,7 +47,7 @@ const Row = (props) => {
       <div data-value={path}>{path}</div>
       <div
         className="validation-report__message"
-        data-testid={DataTestId.validationReport.cellMessages}
+        data-testid={TestId.validationReport.cellMessages}
         data-value={messages}
       >
         <ValidationFieldMessages validation={validation} showKeys={false} showIcons />

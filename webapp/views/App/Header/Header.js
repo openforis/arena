@@ -11,7 +11,7 @@ import { useIsAppSaving } from '@webapp/store/app'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useLang } from '@webapp/store/system'
 import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
@@ -56,7 +56,7 @@ const Header = () => {
           ) : (
             <>
               <Link
-                data-testid={DataTestId.header.surveyTitle}
+                data-testid={TestId.header.surveyTitle}
                 to={appModuleUri(homeModules.surveyInfo)}
                 className="btn-s btn-transparent"
               >
@@ -78,7 +78,7 @@ const Header = () => {
 
       <button
         className="header__btn-user"
-        data-testid={DataTestId.header.userBtn}
+        data-testid={TestId.header.userBtn}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()

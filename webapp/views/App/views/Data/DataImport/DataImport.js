@@ -14,7 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
@@ -94,7 +94,7 @@ const DataImport = () => {
         </FormItem>
 
         <UploadButton
-          inputFieldId={DataTestId.recordsImport.importDataBtn}
+          inputFieldId={TestId.recordsImport.importDataBtn}
           label={i18n.t('homeView.recordsImport.importFromCollect')}
           accept=".collect-backup,.collect-data"
           onChange={(files) => onFileChange(files[0])}

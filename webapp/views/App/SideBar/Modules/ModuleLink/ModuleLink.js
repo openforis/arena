@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import * as SideBarModule from '../utils'
 
@@ -34,7 +34,7 @@ const ModuleLink = (props) => {
       target={target}
       className={className}
       aria-disabled={disabled || active}
-      data-testid={DataTestId.sidebar.moduleBtn(key)}
+      data-testid={TestId.sidebar.moduleBtn(key)}
       id={`sidebar_btn_${key}`}
     >
       {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}

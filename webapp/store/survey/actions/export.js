@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import DownloadButton from '@webapp/components/form/downloadButton'
 import { JobActions } from '@webapp/store/app'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import * as SurveyState from '../state'
 
@@ -27,7 +27,7 @@ export const exportSurvey =
         job,
         closeButton: (
           <DownloadButton
-            id={DataTestId.surveyExport.downloadBtn}
+            id={TestId.surveyExport.downloadBtn}
             href={`/api/survey/${surveyId}/export/download`}
             requestParams={{ fileName, surveyName, includeData }}
             onClick={() => dispatch(JobActions.hideJobMonitor())}

@@ -1,7 +1,7 @@
 import './tabBar.scss'
 import React, { useState } from 'react'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
@@ -10,7 +10,7 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
         key={String(i)}
         aria-disabled={Boolean(tab.disabled)}
         className={`btn${i === selection ? ' active' : ''}`}
-        data-testid={tab.id ? DataTestId.tabBar.tabBarBtn(tab.id) : null}
+        data-testid={tab.id ? TestId.tabBar.tabBarBtn(tab.id) : null}
         onClick={() => onClick(i)}
         type="button"
       >

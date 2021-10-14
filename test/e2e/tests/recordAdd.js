@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { plot } from '../mock/nodeDefs'
 import { records } from '../mock/records'
@@ -15,11 +15,11 @@ export default () =>
 
       test(`Create record`, async () => {
         await Promise.all([
-          page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)),
+          page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
           page.waitForNavigation(),
-          page.click(getSelector(DataTestId.records.addBtn, 'button')),
+          page.click(getSelector(TestId.records.addBtn, 'button')),
         ])
-        const invalidRecordBtn = await page.waitForSelector(getSelector(DataTestId.record.invalidBtn))
+        const invalidRecordBtn = await page.waitForSelector(getSelector(TestId.record.invalidBtn))
         await expect(invalidRecordBtn).not.toBeNull()
       })
 

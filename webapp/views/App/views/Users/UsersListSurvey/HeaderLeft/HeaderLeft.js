@@ -5,7 +5,7 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanInviteUser } from '@webapp/store/user'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const HeaderLeft = () => {
   const i18n = useI18n()
@@ -15,7 +15,7 @@ const HeaderLeft = () => {
     <div>
       {canInvite && (
         <Link
-          data-testid={DataTestId.userList.inviteBtn}
+          data-testid={TestId.userList.inviteBtn}
           to={appModuleUri(userModules.userInvite)}
           className="btn btn-s"
         >

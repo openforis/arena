@@ -3,7 +3,7 @@ import './ExportData.scss'
 import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
 import { useDispatch } from 'react-redux'
@@ -16,7 +16,7 @@ const ExportData = () => {
   return (
     <div className="export">
       <Button
-        testId={DataTestId.dataExport.prepareExport}
+        testId={TestId.dataExport.prepareExport}
         onClick={() => dispatch(ExportCsvDataActions.startCSVExport())}
         label={i18n.t('dataExportView.startCsvExport')}
       />

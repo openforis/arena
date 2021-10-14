@@ -17,7 +17,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
 
@@ -60,7 +60,7 @@ const ItemDetails = (props) => {
   return (
     <div
       id={prefixId}
-      data-testid={DataTestId.categoryDetails.item(levelIndex, index)}
+      data-testid={TestId.categoryDetails.item(levelIndex, index)}
       className={`category__item ${active ? 'active' : ''}`}
       onKeyDown={setActive}
       onClick={setActive}
@@ -69,7 +69,7 @@ const ItemDetails = (props) => {
       tabIndex={0}
     >
       <ErrorBadge
-        id={DataTestId.categoryDetails.itemErrorBadge(levelIndex, index)}
+        id={TestId.categoryDetails.itemErrorBadge(levelIndex, index)}
         validation={validation}
         showLabel={false}
         showIcon
@@ -78,7 +78,7 @@ const ItemDetails = (props) => {
         <>
           <button
             id={`${prefixId}-btn-close`}
-            data-testid={DataTestId.categoryDetails.itemCloseBtn(levelIndex, index)}
+            data-testid={TestId.categoryDetails.itemCloseBtn(levelIndex, index)}
             type="button"
             className="btn btn-s btn-close"
             onClick={() => Actions.resetItemActive({ levelIndex })}
@@ -88,7 +88,7 @@ const ItemDetails = (props) => {
 
           <FormItem label={i18n.t('common.code')}>
             <Input
-              id={DataTestId.categoryDetails.itemCode(levelIndex, index)}
+              id={TestId.categoryDetails.itemCode(levelIndex, index)}
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
@@ -98,7 +98,7 @@ const ItemDetails = (props) => {
           </FormItem>
 
           <LabelsEditor
-            inputFieldIdPrefix={DataTestId.categoryDetails.itemLabel(levelIndex, index)('')}
+            inputFieldIdPrefix={TestId.categoryDetails.itemLabel(levelIndex, index)('')}
             labels={CategoryItem.getLabels(item)}
             onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
             readOnly={readOnly}
@@ -128,7 +128,7 @@ const ItemDetails = (props) => {
             <button
               type="button"
               className="btn btn-delete"
-              data-testid={DataTestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
+              data-testid={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
               aria-disabled={disabled}
               onClick={() => Actions.deleteItem({ category, level, item, leaf })}
             >

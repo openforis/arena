@@ -1,5 +1,5 @@
 import { gotoHome, gotoEntities } from './_navigation'
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { virtualEntities } from '../mock/nodeDefs'
 
 export default () =>
@@ -10,23 +10,23 @@ export default () =>
       const entity = virtualEntities[idx]
 
       test(`Create entity`, async () => {
-        await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.entities.addBtn, 'button'))])
+        await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.entities.addBtn, 'button'))])
 
-        await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefName, 'input'), entity.name)
-        await page.fill(getSelector(DataTestId.nodeDefDetails.nodeDefLabels(), 'input'), entity.label)
+        await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), entity.name)
+        await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), entity.label)
 
-        await page.click(getSelector(DataTestId.dropdown.toggleBtn(DataTestId.entities.entitySelector), 'button'))
+        await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.entities.entitySelector), 'button'))
         await page.click(`text="Tree"`)
 
         // Save
         await Promise.all([
           page.waitForResponse('**/api/survey/**'),
-          page.click(getSelector(DataTestId.nodeDefDetails.saveBtn, 'button')),
+          page.click(getSelector(TestId.nodeDefDetails.saveBtn, 'button')),
         ])
         // Back
         await Promise.all([
           page.waitForNavigation(),
-          page.click(getSelector(DataTestId.nodeDefDetails.backBtn, 'button')),
+          page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button')),
         ])
       })
     })

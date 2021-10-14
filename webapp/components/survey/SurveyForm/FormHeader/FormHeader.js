@@ -16,7 +16,7 @@ import {
   useNodeDefPage,
   useShowPageNavigation,
 } from '@webapp/store/ui/surveyForm'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import DownloadButton from '@webapp/components/form/downloadButton'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
@@ -57,7 +57,7 @@ const FormHeader = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            data-testid={DataTestId.surveyForm.addSubPageBtn}
+            data-testid={TestId.surveyForm.addSubPageBtn}
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
@@ -85,7 +85,7 @@ const FormHeader = (props) => {
       <div className="survey-form-header__options">
         {edit && canEditSurvey && (
           <DownloadButton
-            id={DataTestId.surveyForm.schemaSummary}
+            id={TestId.surveyForm.schemaSummary}
             href={`/api/survey/${surveyId}/schema-summary/`}
             label={'surveyForm.schemaSummary'}
           />

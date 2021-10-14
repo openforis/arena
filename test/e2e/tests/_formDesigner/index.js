@@ -1,10 +1,10 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { editNodeDefDetails } from '../_nodeDefDetails'
 import { getAtomicAttributeKeys, tree } from '../../mock/nodeDefs'
 import { dragAndDrop } from '../utils/dragDrop'
 
 const makeEditButtonsVisible = async ({ nodeDefName }) => {
-  const wrapperSelector = getSelector(DataTestId.surveyForm.nodeDefWrapper(nodeDefName))
+  const wrapperSelector = getSelector(TestId.surveyForm.nodeDefWrapper(nodeDefName))
   await page.waitForSelector(wrapperSelector)
   const wrapperEl = await page.$(wrapperSelector)
   await expect(wrapperEl).not.toBeNull()
@@ -19,7 +19,7 @@ const makeEditButtonsVisible = async ({ nodeDefName }) => {
 export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
     await makeEditButtonsVisible({ nodeDefName: nodeDefParent.name })
-    await page.click(getSelector(DataTestId.surveyForm.nodeDefAddChildBtn(nodeDefParent.name), 'button'))
+    await page.click(getSelector(TestId.surveyForm.nodeDefAddChildBtn(nodeDefParent.name), 'button'))
     await Promise.all([page.waitForNavigation(), page.click(`text="${nodeDefChild.type}"`)])
   })
 
@@ -28,7 +28,7 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   if (nodeDefChild.type === 'entity') {
     test(`Expand ${nodeDefChild.name} table`, async () => {
       // expand table by 3 columns and 4 rows
-      const entityEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(tree.name)))
+      const entityEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(tree.name)))
       const entityBBox = await entityEl.boundingBox()
       await dragAndDrop(
         entityBBox.x + entityBBox.width - 5,
@@ -51,7 +51,7 @@ export const addNodeDefSubPage = (nodeDefParent, nodeDefChild) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
     await Promise.all([
       page.waitForNavigation(),
-      page.click(getSelector(DataTestId.surveyForm.addSubPageBtn, 'button')),
+      page.click(getSelector(TestId.surveyForm.addSubPageBtn, 'button')),
     ])
   })
 
@@ -63,7 +63,7 @@ export const editNodeDef = (formName, nodeDef, editDetails = true) => {
   test(`${nodeDef.label} edit`, async () => {
     await makeEditButtonsVisible({ nodeDefName: formName })
 
-    const editBtnSelector = getSelector(DataTestId.surveyForm.nodeDefEditBtn(formName), 'a')
+    const editBtnSelector = getSelector(TestId.surveyForm.nodeDefEditBtn(formName), 'a')
     await page.waitForSelector(editBtnSelector)
 
     await Promise.all([page.waitForNavigation(), page.click(editBtnSelector)])
@@ -75,14 +75,14 @@ export const editNodeDef = (formName, nodeDef, editDetails = true) => {
 // ==== form navigation
 export const gotoFormPage = (nodeDef) => {
   test(`Goto form page ${nodeDef.name}`, async () => {
-    await page.click(getSelector(DataTestId.surveyForm.pageLinkBtn(nodeDef.name), 'button'))
+    await page.click(getSelector(TestId.surveyForm.pageLinkBtn(nodeDef.name), 'button'))
   })
 }
 
 export const selectForm = (nodeDef, keyValue) => {
   const optionLabel = `${nodeDef.label} - ${keyValue}`
   test(`Select form ${optionLabel}`, async () => {
-    const nodeSelectSelector = getSelector(DataTestId.entities.form.nodeSelect, 'select')
+    const nodeSelectSelector = getSelector(TestId.entities.form.nodeSelect, 'select')
     await page.selectOption(nodeSelectSelector, { label: optionLabel })
   })
 }

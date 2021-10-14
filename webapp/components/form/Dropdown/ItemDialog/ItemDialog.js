@@ -1,14 +1,14 @@
 import './itemDialog.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const ItemDialog = (props) => {
   const { item, itemKey, itemLabel, onKeyDown, onMouseDown } = props
 
   return (
     <div
-      data-testid={DataTestId.dropdown.dropDownItem(itemKey(item))}
+      data-testid={TestId.dropdown.dropDownItem(itemKey(item))}
       role="button"
       className={ItemDialog.className}
       onMouseDown={onMouseDown}

@@ -17,7 +17,7 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
@@ -135,7 +135,7 @@ const SurveyForm = (props) => {
     <div>
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
-      <div className={`survey-form${className}`} data-testid={DataTestId.surveyForm.surveyForm}>
+      <div className={`survey-form${className}`} data-testid={TestId.surveyForm.surveyForm}>
         {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
           <div className="survey-form__sidebar">

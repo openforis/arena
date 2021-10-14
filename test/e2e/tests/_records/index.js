@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { cluster } from '../../mock/nodeDefs'
 
 /*
@@ -11,9 +11,9 @@ export const gotoRecord = (record) => {
   const clusterId = record[clusterIdName]
 
   test(`Goto record ${clusterIdName} ${clusterId}`, async () => {
-    const cellSelector = `${getSelector(DataTestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
+    const cellSelector = `${getSelector(TestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
     await Promise.all([
-      page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm)),
+      page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
       page.waitForNavigation(),
       page.click(cellSelector),
     ])
