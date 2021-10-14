@@ -3,7 +3,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { KeyboardMap } from '@webapp/utils/keyboardMap'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 export const ModalClose = ({ _children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>
@@ -47,7 +47,7 @@ export class Modal extends React.Component {
     return R.propEq('closed', true)(this.state) ? null : (
       <div
         className={`modal ${className}`}
-        data-testid={DataTestId.modal.modal}
+        data-testid={TestId.modal.modal}
         tabIndex="-1"
         role="dialog"
         style={{ display: isOpen ? 'block' : 'none' }}

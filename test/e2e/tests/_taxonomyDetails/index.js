@@ -1,17 +1,17 @@
 import path from 'path'
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 const waitForApi = async (action) => Promise.all([page.waitForResponse('**/taxonomies/**'), action])
 
-const getFileInput = async () => page.$(getSelector(DataTestId.taxonomyDetails.uploadInput), 'input')
+const getFileInput = async () => page.$(getSelector(TestId.taxonomyDetails.uploadInput), 'input')
 
 const getFileName = (fileName) => path.resolve(__dirname, '..', '..', 'resources', fileName)
 
 export const editTaxonomyDetails = (taxonomy) => {
   test(`Edit taxonomy ${taxonomy.name} details`, async () => {
-    await waitForApi(page.fill(getSelector(DataTestId.taxonomyDetails.taxonomyName, 'input'), taxonomy.name))
+    await waitForApi(page.fill(getSelector(TestId.taxonomyDetails.taxonomyName, 'input'), taxonomy.name))
     await waitForApi(
-      page.fill(getSelector(DataTestId.taxonomyDetails.taxonomyDescription(), 'input'), taxonomy.description)
+      page.fill(getSelector(TestId.taxonomyDetails.taxonomyDescription(), 'input'), taxonomy.description)
     )
   })
 
@@ -21,7 +21,7 @@ export const editTaxonomyDetails = (taxonomy) => {
     await fileInput.setInputFiles(fileName)
     await page.waitForTimeout(2000)
     await expect(page).toHaveText('Duplicate code')
-    await page.click(DataTestId.modal.close)
+    await page.click(TestId.modal.close)
   })
 
   test(`Upload taxonomy ${taxonomy.name} valid CSV`, async () => {
@@ -29,6 +29,6 @@ export const editTaxonomyDetails = (taxonomy) => {
     const fileName = getFileName(`${taxonomy.name}.csv`)
     await fileInput.setInputFiles(fileName)
     await page.waitForTimeout(2000)
-    await page.click(DataTestId.modal.close)
+    await page.click(TestId.modal.close)
   })
 }

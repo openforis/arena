@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -22,7 +22,7 @@ const DropdownUserGroup = (props) => {
 
   return (
     <Dropdown
-      idInput={DataTestId.userInvite.group}
+      idInput={TestId.userInvite.group}
       disabled={disabled}
       validation={validation}
       placeholder={i18n.t('common.group')}

@@ -10,7 +10,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
@@ -37,21 +37,21 @@ const SurveyInfo = () => {
       <div className="home-dashboard__survey-info">
         <Header>
           <Link
-            data-testid={DataTestId.dashboard.surveyInfoBtnHeader}
+            data-testid={TestId.dashboard.surveyInfoBtnHeader}
             to={appModuleUri(homeModules.surveyInfo)}
             className="btn-s btn-transparent"
           >
-            <h3 data-testid={DataTestId.dashboard.surveyName}>{surveyName}</h3>
+            <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
           </Link>
 
-          <div className="survey-status" data-testid={DataTestId.dashboard.surveyStatus}>
+          <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
             ({Survey.getStatus(surveyInfo)})
           </div>
         </Header>
 
         <div>
           <Link
-            data-testid={DataTestId.dashboard.surveyInfoBtn}
+            data-testid={TestId.dashboard.surveyInfoBtn}
             to={appModuleUri(homeModules.surveyInfo)}
             className="btn-s btn-transparent"
           >
@@ -62,14 +62,14 @@ const SurveyInfo = () => {
           {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           <DownloadButton
-            id={DataTestId.dashboard.surveyExportBtn}
+            id={TestId.dashboard.surveyExportBtn}
             className="btn-transparent"
             onClick={() => dispatch(SurveyActions.exportSurvey())}
             label={i18n.t('common.export')}
           />
 
           <DownloadButton
-            id={DataTestId.dashboard.surveyExportWithDataBtn}
+            id={TestId.dashboard.surveyExportWithDataBtn}
             className="btn-transparent"
             onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
             label={i18n.t('homeView.dashboard.exportWithData')}
@@ -78,7 +78,7 @@ const SurveyInfo = () => {
           {canEditSurvey && (
             <Button
               className="btn-s btn-transparent"
-              testId={DataTestId.dashboard.surveyDeleteBtn}
+              testId={TestId.dashboard.surveyDeleteBtn}
               onClick={() => setShowDeleteDialog(true)}
               iconClassName="icon-bin icon-12px icon-left"
               label="common.delete"
@@ -87,7 +87,7 @@ const SurveyInfo = () => {
 
           {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
             <Link
-              data-testid={DataTestId.dashboard.collectReportBtn}
+              data-testid={TestId.dashboard.collectReportBtn}
               to={appModuleUri(homeModules.collectImportReport)}
               className="btn-s btn-transparent"
             >

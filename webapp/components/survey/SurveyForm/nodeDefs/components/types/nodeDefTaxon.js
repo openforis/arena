@@ -16,7 +16,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { SurveyState } from '@webapp/store/survey'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
 
@@ -112,7 +112,7 @@ const NodeDefTaxon = (props) => {
       {R.keys(selectionDefault).map((field) => {
         const inputField = (
           <NodeDefTaxonInputField
-            id={DataTestId.surveyForm.taxonField(NodeDef.getName(nodeDef), field)}
+            id={TestId.surveyForm.taxonField(NodeDef.getName(nodeDef), field)}
             key={field}
             surveyId={surveyId}
             taxonomyUuid={taxonomyUuid}

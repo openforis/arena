@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { BASE_URL } from '../config'
 import { templates } from '../mock/survey'
 import { gotoHome, gotoTemplateList } from './_navigation'
@@ -19,8 +19,8 @@ export default () =>
       test(`Delete template ${template.name}`, async () => {
         const { name } = template
 
-        await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
-        await page.fill(getSelector(DataTestId.surveyDelete.confirmNameInput), name)
+        await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
+        await page.fill(getSelector(TestId.surveyDelete.confirmNameInput), name)
 
         // Click div[role="dialog"] >> text="Delete"
         await Promise.all([
@@ -40,7 +40,7 @@ export default () =>
         } else {
           const expectedTemplatesCount = templates.length - (idx + 1)
 
-          const rowsSelector = getSelector(DataTestId.table.rows(DataTestId.templateList.module))
+          const rowsSelector = getSelector(TestId.table.rows(TestId.templateList.module))
           await page.waitForSelector(rowsSelector)
           const templatesEl = await page.$$(`${rowsSelector} > div`)
           await expect(templatesEl.length).toBe(expectedTemplatesCount)

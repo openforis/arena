@@ -7,7 +7,7 @@ const _withLang =
   (lang = defaults.lang) =>
     `${key}${lang && lang.length > 0 ? `-${lang}` : ''}`
 
-export const DataTestId = {
+export const TestId = {
   categoryDetails: {
     addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',

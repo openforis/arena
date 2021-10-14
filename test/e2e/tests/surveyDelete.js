@@ -1,5 +1,5 @@
 import * as PromiseUtils from '../../../core/promiseUtils'
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { survey, survey2, surveyFromTemplate, surveyImport } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import { clickSurvey } from './_surveyList'
@@ -10,8 +10,8 @@ const deleteSurvey = async (surveyToDelete) => {
 
   await clickSurvey(surveyToDelete)
 
-  await page.click(getSelector(DataTestId.dashboard.surveyDeleteBtn, 'button'))
-  await page.fill(getSelector(DataTestId.surveyDelete.confirmNameInput), name)
+  await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
+  await page.fill(getSelector(TestId.surveyDelete.confirmNameInput), name)
 
   // Click div[role="dialog"] >> text="Delete"
   await Promise.all([

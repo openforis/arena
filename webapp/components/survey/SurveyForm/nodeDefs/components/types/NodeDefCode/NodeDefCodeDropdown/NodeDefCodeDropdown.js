@@ -4,7 +4,7 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
@@ -37,7 +37,7 @@ const NodeDefCodeDropdown = (props) => {
         />
       ) : (
         <Dropdown
-          idInput={DataTestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
+          idInput={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}

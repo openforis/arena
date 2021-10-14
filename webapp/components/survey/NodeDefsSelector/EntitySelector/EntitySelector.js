@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
 import Dropdown from '@webapp/components/form/Dropdown'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel }) => {
   const entities = []
@@ -48,7 +48,7 @@ const EntitySelector = (props) => {
 
   return (
     <Dropdown
-      idInput={DataTestId.entities.entitySelector}
+      idInput={TestId.entities.entitySelector}
       className="entity-selector"
       autocompleteDialogClassName="entity-selector__dialog"
       items={dropdownItems}

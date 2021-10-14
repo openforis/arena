@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
@@ -26,7 +26,7 @@ const Module = (props) => {
   return (
     <div
       className={`sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
-      data-testid={DataTestId.sidebar.module(SideBarModule.getKey(module))}
+      data-testid={TestId.sidebar.module(SideBarModule.getKey(module))}
       ref={elementRef}
       onMouseEnter={
         isModuleHome || sideBarOpened

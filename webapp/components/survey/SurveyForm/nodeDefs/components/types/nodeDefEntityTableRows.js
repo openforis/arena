@@ -12,7 +12,7 @@ import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { SurveyState } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
@@ -127,8 +127,8 @@ const NodeDefEntityTableRows = (props) => {
       <NodeDefEntityTableRow
         id={
           renderType === NodeDefLayout.renderType.tableHeader
-            ? DataTestId.surveyForm.entityRowHeader(nodeDefName)
-            : DataTestId.surveyForm.entityRowData(nodeDefName, index)
+            ? TestId.surveyForm.entityRowHeader(nodeDefName)
+            : TestId.surveyForm.entityRowData(nodeDefName, index)
         }
         key={key}
         canEditDef={canEditDef}

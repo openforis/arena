@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { tree } from '../../mock/nodeDefs'
 
 // ==== value parser
@@ -6,7 +6,7 @@ export const parseValue = (value) => (typeof value === 'function' ? value() : va
 
 // ==== selector utils
 export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
-  `${parentSelector} ${getSelector(DataTestId.surveyForm.nodeDefWrapper(nodeDef.name))}`.trim()
+  `${parentSelector} ${getSelector(TestId.surveyForm.nodeDefWrapper(nodeDef.name))}`.trim()
 
 export const getBooleanSelector = (nodeDef, parentSelector, value) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
@@ -14,16 +14,16 @@ export const getBooleanSelector = (nodeDef, parentSelector, value) =>
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
 
-  const xSelector = `${nodeDefSelector} ${getSelector(DataTestId.surveyForm.coordinateX(nodeDef.name), 'input')}`
-  const ySelector = `${nodeDefSelector} ${getSelector(DataTestId.surveyForm.coordinateY(nodeDef.name), 'input')}`
-  const srsSelector = `${nodeDefSelector} ${getSelector(DataTestId.surveyForm.coordinateSRS(nodeDef.name), 'input')}`
+  const xSelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateX(nodeDef.name), 'input')}`
+  const ySelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateY(nodeDef.name), 'input')}`
+  const srsSelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateSRS(nodeDef.name), 'input')}`
   return { xSelector, ySelector, srsSelector }
 }
 
 export const getTaxonSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const _selector = (field) =>
-    `${nodeDefSelector} ${getSelector(DataTestId.surveyForm.taxonField(nodeDef.name, field), 'input')}`
+    `${nodeDefSelector} ${getSelector(TestId.surveyForm.taxonField(nodeDef.name, field), 'input')}`
   const codeSelector = _selector('code')
   const scientificNameSelector = _selector('scientificName')
   const vernacularNameSelector = _selector('vernacularName')
@@ -33,7 +33,7 @@ export const getTaxonSelector = (nodeDef, parentSelector) => {
 export const getTextSelector = (nodeDef, parentSelector) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} input[type="text"]`
 
-export const getTreeSelector = (treeIdx) => getSelector(DataTestId.surveyForm.entityRowData(tree.name, treeIdx))
+export const getTreeSelector = (treeIdx) => getSelector(TestId.surveyForm.entityRowData(tree.name, treeIdx))
 
 // ==== format utils
 export const formatTime = (date) => {

@@ -7,7 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -44,7 +44,7 @@ const NodeDefDetails = () => {
 
           <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
             <Input
-              id={DataTestId.nodeDefDetails.nodeDefName}
+              id={TestId.nodeDefDetails.nodeDefName}
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>
@@ -62,7 +62,7 @@ const NodeDefDetails = () => {
               {
                 label: i18n.t('nodeDefEdit.basic'),
                 component: BasicProps,
-                id: DataTestId.nodeDefDetails.basic,
+                id: TestId.nodeDefDetails.basic,
                 props: {
                   state,
                   Actions,
@@ -75,7 +75,7 @@ const NodeDefDetails = () => {
                     {
                       label: i18n.t('nodeDefEdit.advanced'),
                       component: AdvancedProps,
-                      id: DataTestId.nodeDefDetails.advanced,
+                      id: TestId.nodeDefDetails.advanced,
                       props: {
                         state,
                         Actions,
@@ -87,7 +87,7 @@ const NodeDefDetails = () => {
                           {
                             label: i18n.t('nodeDefEdit.validations'),
                             component: ValidationsProps,
-                            id: DataTestId.nodeDefDetails.validations,
+                            id: TestId.nodeDefDetails.validations,
                             props: {
                               state,
                               Actions,
