@@ -7,7 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { FormItem } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
@@ -60,14 +60,14 @@ const BasicProps = (props) => {
       )}
 
       <LabelsEditor
-        inputFieldIdPrefix={DataTestId.nodeDefDetails.nodeDefLabels('')}
+        inputFieldIdPrefix={TestId.nodeDefDetails.nodeDefLabels('')}
         labels={NodeDef.getLabels(nodeDef)}
         onChange={(labels) => Actions.setProp({ state, key: NodeDef.propKeys.labels, value: labels })}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
-        inputFieldIdPrefix={DataTestId.nodeDefDetails.nodeDefDescriptions('')}
+        inputFieldIdPrefix={TestId.nodeDefDetails.nodeDefDescriptions('')}
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
@@ -85,7 +85,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
-            id={DataTestId.nodeDefDetails.nodeDefKey}
+            id={TestId.nodeDefDetails.nodeDefKey}
             checked={NodeDef.isKey(nodeDef)}
             disabled={keyEditDisabled}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
@@ -96,7 +96,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
-            id={DataTestId.nodeDefDetails.nodeDefMultiple}
+            id={TestId.nodeDefDetails.nodeDefMultiple}
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={multipleEditDisabled}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
@@ -171,7 +171,7 @@ const BasicProps = (props) => {
             />
           </FormItem>
           <NodeDefExpressionsProp
-            qualifier={DataTestId.nodeDefDetails.formula}
+            qualifier={TestId.nodeDefDetails.formula}
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.basicProps.formula')}

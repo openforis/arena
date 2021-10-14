@@ -1,4 +1,4 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormPage } from './_formDesigner'
 import { gotoFormDesigner, gotoHome } from './_navigation'
@@ -35,8 +35,8 @@ export default () =>
     gotoFormDesigner()
 
     test('Open preview', async () => {
-      await page.click(getSelector(DataTestId.surveyForm.previewOpenBtn, 'button'))
-      await page.waitForSelector(getSelector(DataTestId.surveyForm.surveyForm))
+      await page.click(getSelector(TestId.surveyForm.previewOpenBtn, 'button'))
+      await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
       startTime = new Date()
     })
 
@@ -64,7 +64,7 @@ export default () =>
       gotoFormPage(plot)
 
       test(`Verify ${plot.name} not applicable`, async () => {
-        const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
+        const plotEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(plot.name)))
         await expect(await plotEl.getAttribute('class')).toContain('not-applicable')
       })
     })
@@ -75,7 +75,7 @@ export default () =>
     verifyCluster(recordPreview)
 
     test(`Verify ${cluster_coordinate.name} invalid coordinate`, async () => {
-      await page.waitForSelector(getSelector(DataTestId.surveyForm.nodeDefErrorBadge(cluster_coordinate.name)))
+      await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefErrorBadge(cluster_coordinate.name)))
       await page.hover(`text="${cluster_coordinate.label}"`)
       await expect(page).toHaveText('Invalid value')
     })
@@ -83,7 +83,7 @@ export default () =>
     gotoFormPage(plot)
 
     test(`Verify ${plot.name} applicable`, async () => {
-      const plotEl = await page.$(getSelector(DataTestId.surveyForm.nodeDefWrapper(plot.name)))
+      const plotEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(plot.name)))
       await expect(await plotEl.getAttribute('class')).not.toContain('not-applicable')
     })
     enterPlot(recordPreview)
@@ -93,22 +93,22 @@ export default () =>
     verifyTrees(recordPreview)
 
     describe(`Verify ${tree.name} validations`, () => {
-      const tree1Selector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, 0))
-      const tree2Selector = getSelector(DataTestId.surveyForm.entityRowData(tree.name, 1))
+      const tree1Selector = getSelector(TestId.surveyForm.entityRowData(tree.name, 0))
+      const tree2Selector = getSelector(TestId.surveyForm.entityRowData(tree.name, 1))
 
       test(`Verify ${tree_id.name} duplicate`, async () => {
         // TODO thread issue: https://github.com/openforis/arena/issues/1412
         await page.waitForTimeout(1000)
 
         const treeIdTree1El = await page.waitForSelector(
-          `${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
+          `${tree1Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
         )
         await treeIdTree1El.hover()
         await expect(page).toHaveText('Duplicate entity key')
         await page.mouse.move(0, 0, { steps: 1 })
 
         const treeIdTree2El = await page.waitForSelector(
-          `${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
+          `${tree2Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_id.name))}`
         )
         await treeIdTree2El.hover()
         await expect(page).toHaveText('Duplicate entity key')
@@ -116,21 +116,21 @@ export default () =>
       })
 
       test(`Verify ${tree_dec_1.name} validation`, async () => {
-        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_1.name))}`)
+        await page.hover(`${tree1Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_dec_1.name))}`)
         await expect(page).toHaveText('tree_dec_1 > 0')
 
         const treeDec1Tree2BadgeEl = await page.$(
-          `${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_1.name))}`
+          `${tree2Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_dec_1.name))}`
         )
         await expect(treeDec1Tree2BadgeEl).toBeNull()
       })
 
       test(`Verify ${tree_dec_2.name} validation`, async () => {
         // We check in reverse order because the tooltip hide the badge below
-        await page.hover(`${tree2Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
+        await page.hover(`${tree2Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
         await expect(page).toHaveText('tree_dec_2 > 0')
 
-        await page.hover(`${tree1Selector} ${getSelector(DataTestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
+        await page.hover(`${tree1Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_dec_2.name))}`)
         await expect(page).toHaveText('tree_dec_2 > 10')
       })
 

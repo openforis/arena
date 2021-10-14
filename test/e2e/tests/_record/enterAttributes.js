@@ -1,6 +1,6 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
 
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import {
   formatTime,
   getBooleanSelector,
@@ -24,7 +24,7 @@ const enterCode = async (nodeDef, value, parentSelector) => {
   // only dropdown for now
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const toggleBtnSelector = `${nodeDefSelector} ${getSelector(
-    DataTestId.dropdown.toggleBtn(DataTestId.surveyForm.codeInputDropdown(nodeDef.name)),
+    TestId.dropdown.toggleBtn(TestId.surveyForm.codeInputDropdown(nodeDef.name)),
     'button'
   )}`
   await page.click(toggleBtnSelector)
@@ -39,7 +39,7 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
   await page.fill(ySelector, value.y)
   if (await page.isEditable(srsSelector)) {
     await page.focus(srsSelector)
-    await page.click(getSelector(DataTestId.dropdown.dropDownItem(value.srs)))
+    await page.click(getSelector(TestId.dropdown.dropDownItem(value.srs)))
   }
 }
 

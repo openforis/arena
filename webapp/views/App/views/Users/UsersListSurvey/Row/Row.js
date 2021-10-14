@@ -5,7 +5,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
@@ -32,23 +32,23 @@ const Row = (props) => {
 
   return (
     <>
-      <div data-testid={DataTestId.userList.profilePicture} className="users-list__cell-profile-picture">
+      <div data-testid={TestId.userList.profilePicture} className="users-list__cell-profile-picture">
         <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail />
       </div>
-      <div data-testid={DataTestId.userList.name}>{User.getName(userListItem)}</div>
+      <div data-testid={TestId.userList.name}>{User.getName(userListItem)}</div>
       {emailVisible && (
-        <div data-testid={DataTestId.userList.email} data-value={email}>
+        <div data-testid={TestId.userList.email} data-value={email}>
           {email}
         </div>
       )}
-      <div data-testid={DataTestId.userList.authGroup} data-value={authGroupName}>
+      <div data-testid={TestId.userList.authGroup} data-value={authGroupName}>
         {i18n.t(`authGroups.${authGroupName}.label_plural`)}
       </div>
-      <div data-testid={DataTestId.userList.invitedBy} data-value={invitedBy}>
+      <div data-testid={TestId.userList.invitedBy} data-value={invitedBy}>
         {invitedBy}
       </div>
       <div
-        data-testid={DataTestId.userList.invitedDate}
+        data-testid={TestId.userList.invitedDate}
         data-value={invitedDate}
         title={invitedDate ? DateUtils.format(DateUtils.parseISO(invitedDate), DateUtils.formats.datetimeDefault) : ''}
       >
@@ -63,7 +63,7 @@ const Row = (props) => {
           <span onClick={handleResendInvitation} className="icon icon-reply icon-16px icon-invitation-retry" />
         )}
       </div>
-      <div data-testid={DataTestId.userList.edit}>
+      <div data-testid={TestId.userList.edit}>
         <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
     </>

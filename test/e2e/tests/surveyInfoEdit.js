@@ -1,11 +1,11 @@
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { gotoHome, gotoSurveyInfo } from './_navigation'
 
-const surveyName = getSelector(DataTestId.surveyInfo.surveyName, 'input')
-const surveyLabel = getSelector(DataTestId.surveyInfo.surveyLabel(), 'input')
-const surveyDescription = getSelector(DataTestId.surveyInfo.surveyDescription(), 'input')
-const surveyLanguage = getSelector(DataTestId.surveyInfo.surveyLanguage, 'input')
-const saveBtn = getSelector(DataTestId.surveyInfo.saveBtn, 'button')
+const surveyName = getSelector(TestId.surveyInfo.surveyName, 'input')
+const surveyLabel = getSelector(TestId.surveyInfo.surveyLabel(), 'input')
+const surveyDescription = getSelector(TestId.surveyInfo.surveyDescription(), 'input')
+const surveyLanguage = getSelector(TestId.surveyInfo.surveyLanguage, 'input')
+const saveBtn = getSelector(TestId.surveyInfo.saveBtn, 'button')
 
 export default () =>
   describe('Survey info edit', () => {
@@ -24,7 +24,7 @@ export default () =>
       await page.fill(surveyLabel, 'My Survey')
       await page.fill(surveyDescription, 'This is a survey description')
       await page.fill(surveyLanguage, 'fr')
-      await page.click(getSelector(DataTestId.dropdown.dropDownItem('fr')))
+      await page.click(getSelector(TestId.dropdown.dropDownItem('fr')))
 
       await page.click(saveBtn)
     })

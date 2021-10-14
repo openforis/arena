@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import csv from 'csv/lib/sync'
 
-import { DataTestId, getSelector } from '../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { downloadsPath } from '../paths'
 import { gotoFormDesigner } from './_navigation'
 import { cluster } from '../mock/nodeDefs'
@@ -47,7 +47,7 @@ export default () =>
     test('export schema summary', async () => {
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click(getSelector(DataTestId.surveyForm.schemaSummary, 'button')),
+        page.click(getSelector(TestId.surveyForm.schemaSummary, 'button')),
       ])
 
       await download.saveAs(filePath)

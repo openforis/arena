@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
@@ -44,7 +44,7 @@ const EntitySelectorTreeNode = (props) => {
           className={classNames('btn', 'btn-s', 'btn-node-def', {
             active: NodeDef.getUuid(nodeDef) === nodeDefUuidActive,
           })}
-          data-testid={DataTestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef))}
+          data-testid={TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef))}
           onClick={() => onSelect(nodeDef)}
           aria-disabled={isDisabled(nodeDef)}
         >

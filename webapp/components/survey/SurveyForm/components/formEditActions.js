@@ -4,7 +4,7 @@ import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { RecordActions } from '@webapp/store/ui/record'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const FormEditActions = () => {
   const i18n = useI18n()
@@ -17,7 +17,7 @@ const FormEditActions = () => {
         type="button"
         className="btn-s btn-transparent"
         onClick={() => dispatch(RecordActions.createRecord(history, true))}
-        data-testid={DataTestId.surveyForm.previewOpenBtn}
+        data-testid={TestId.surveyForm.previewOpenBtn}
       >
         <span className="icon icon-eye icon-12px icon-left" />
         {i18n.t('surveyForm.formEditActions.preview')}

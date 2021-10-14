@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import LoadingBar from '@webapp/components/LoadingBar'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
@@ -59,7 +59,7 @@ const Content = (props) => {
 
   if (!loading && R.isEmpty(list)) {
     return (
-      <div className="table__empty-rows" data-testid={DataTestId.table.noItems}>
+      <div className="table__empty-rows" data-testid={TestId.table.noItems}>
         {Number(totalCount) <= 0 ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}
       </div>
     )
@@ -86,7 +86,7 @@ const Content = (props) => {
       {loading ? (
         <LoadingRows rows={maxRows} />
       ) : (
-        <div className="table__rows" data-testid={DataTestId.table.rows(module)} ref={tableRef}>
+        <div className="table__rows" data-testid={TestId.table.rows(module)} ref={tableRef}>
           {list.map((item, index) =>
             React.createElement(ContentRow, {
               ...props,

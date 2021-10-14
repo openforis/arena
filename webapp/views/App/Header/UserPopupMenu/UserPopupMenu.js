@@ -23,7 +23,7 @@ import {
   useAuthCanViewAllUsers,
   useAuthCanViewUsersAccessRequests,
 } from '@webapp/store/user/hooks'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 
@@ -65,7 +65,7 @@ const UserPopupMenu = (props) => {
           <div>
             <Link
               className="btn-s btn-transparent"
-              data-testid={DataTestId.header.userProfileBtn}
+              data-testid={TestId.header.userProfileBtn}
               to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
               onClick={onClose}
             >
@@ -79,7 +79,7 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <Link
-        data-testid={DataTestId.header.surveyListBtn}
+        data-testid={TestId.header.surveyListBtn}
         to={appModuleUri(homeModules.surveyList)}
         onClick={onClose}
         className="btn-s btn-transparent"
@@ -90,7 +90,7 @@ const UserPopupMenu = (props) => {
 
       {canCreateSurvey && (
         <Link
-          data-testid={DataTestId.header.surveyCreateBtn}
+          data-testid={TestId.header.surveyCreateBtn}
           to={appModuleUri(homeModules.surveyNew)}
           onClick={onClose}
           className="btn-s btn-transparent"
@@ -105,7 +105,7 @@ const UserPopupMenu = (props) => {
           <Separator />
           {canEditTemplates && (
             <Link
-              data-testid={DataTestId.header.templateListBtn}
+              data-testid={TestId.header.templateListBtn}
               to={appModuleUri(homeModules.templateList)}
               onClick={onClose}
               className="btn-s btn-transparent"
@@ -116,7 +116,7 @@ const UserPopupMenu = (props) => {
           )}
           {canCreateTemplate && (
             <Link
-              data-testid={DataTestId.header.templateCreateBtn}
+              data-testid={TestId.header.templateCreateBtn}
               to={appModuleUri(homeModules.templateNew)}
               onClick={onClose}
               className="btn-s btn-transparent"
@@ -132,7 +132,7 @@ const UserPopupMenu = (props) => {
         <>
           <Separator />
           <Link
-            data-testid={DataTestId.header.usersAccessRequstsBtn}
+            data-testid={TestId.header.usersAccessRequstsBtn}
             to={appModuleUri(userModules.usersAccessRequest)}
             onClick={onClose}
             className="btn-s btn-transparent"
@@ -147,7 +147,7 @@ const UserPopupMenu = (props) => {
         <>
           <Separator />
           <Link
-            data-testid={DataTestId.header.usersListBtn}
+            data-testid={TestId.header.usersListBtn}
             to={appModuleUri(userModules.users)}
             onClick={onClose}
             className="btn-s btn-transparent"
@@ -161,7 +161,7 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <button
-        data-testid={DataTestId.header.userLogoutBtn}
+        data-testid={TestId.header.userLogoutBtn}
         type="button"
         className="btn-s btn-transparent"
         onClick={() => {

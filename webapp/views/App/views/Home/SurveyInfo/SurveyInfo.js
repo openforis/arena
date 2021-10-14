@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
@@ -49,7 +49,7 @@ const SurveyInfo = () => {
             {i18n.t('common.name')}
           </label>
           <Input
-            id={DataTestId.surveyInfo.surveyName}
+            id={TestId.surveyInfo.surveyName}
             value={name}
             validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
@@ -58,7 +58,7 @@ const SurveyInfo = () => {
         </div>
 
         <LabelsEditor
-          inputFieldIdPrefix={DataTestId.surveyInfo.surveyLabel('')}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel('')}
           readOnly={readOnly}
           languages={languages}
           labels={labels}
@@ -66,7 +66,7 @@ const SurveyInfo = () => {
         />
 
         <LabelsEditor
-          inputFieldIdPrefix={DataTestId.surveyInfo.surveyDescription('')}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription('')}
           readOnly={readOnly}
           formLabelKey="common.description"
           languages={languages}
@@ -75,7 +75,7 @@ const SurveyInfo = () => {
         />
 
         <LanguagesEditor
-          idInput={DataTestId.surveyInfo.surveyLanguage}
+          idInput={TestId.surveyInfo.surveyLanguage}
           readOnly={readOnly}
           languages={languages}
           setLanguages={setLanguages}
@@ -104,7 +104,7 @@ const SurveyInfo = () => {
         {!readOnly && (
           <button
             className="btn btn-save"
-            data-testid={DataTestId.surveyInfo.saveBtn}
+            data-testid={TestId.surveyInfo.saveBtn}
             type="button"
             onClick={saveProps}
           >

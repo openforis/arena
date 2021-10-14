@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
 
@@ -27,7 +27,7 @@ const ButtonBar = (props) => {
       <button
         type="button"
         className="btn btn-cancel"
-        data-testid={DataTestId.nodeDefDetails.backBtn}
+        data-testid={TestId.nodeDefDetails.backBtn}
         onClick={() => Actions.cancelEdits({ state })}
       >
         {i18n.t(dirty ? 'common.cancel' : 'common.back')}
@@ -35,7 +35,7 @@ const ButtonBar = (props) => {
       <button
         type="button"
         className="btn btn-primary"
-        data-testid={DataTestId.nodeDefDetails.saveBtn}
+        data-testid={TestId.nodeDefDetails.saveBtn}
         onClick={() => Actions.saveEdits({ state })}
         aria-disabled={!dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
       >
@@ -44,7 +44,7 @@ const ButtonBar = (props) => {
       </button>
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
         <button
-          data-testid={DataTestId.nodeDefDetails.deleteBtn}
+          data-testid={TestId.nodeDefDetails.deleteBtn}
           type="button"
           className="btn btn-danger btn-delete"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}

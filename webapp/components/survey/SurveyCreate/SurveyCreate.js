@@ -13,7 +13,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { Input } from '@webapp/components/form/Input'
@@ -70,7 +70,7 @@ const SurveyCreate = (props) => {
       </div>
       <div className="row">
         <Input
-          id={DataTestId.surveyCreate.surveyName}
+          id={TestId.surveyCreate.surveyName}
           placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
@@ -81,7 +81,7 @@ const SurveyCreate = (props) => {
         <>
           <div className="row">
             <Input
-              id={DataTestId.surveyCreate.surveyLabel}
+              id={TestId.surveyCreate.surveyLabel}
               placeholder={i18n.t('common.label')}
               value={label}
               validation={Validation.getFieldValidation('label')(validation)}
@@ -108,7 +108,7 @@ const SurveyCreate = (props) => {
       {createType !== createTypes.import && (
         <div className="row">
           <button
-            data-testid={DataTestId.surveyCreate.submitBtn}
+            data-testid={TestId.surveyCreate.submitBtn}
             type="button"
             className="btn"
             onClick={onCreate}
@@ -124,7 +124,7 @@ const SurveyCreate = (props) => {
         <>
           <div className="row">
             <UploadButton
-              inputFieldId={DataTestId.surveyCreate.importFromArena}
+              inputFieldId={TestId.surveyCreate.importFromArena}
               label={i18n.t('homeView.surveyCreate.importFromArena')}
               accept=".zip"
               maxSize={1000}
@@ -133,7 +133,7 @@ const SurveyCreate = (props) => {
           </div>
           <div className="row">
             <UploadButton
-              inputFieldId={DataTestId.surveyCreate.importFromCollect}
+              inputFieldId={TestId.surveyCreate.importFromCollect}
               label={i18n.t('homeView.surveyCreate.importFromCollect')}
               accept=".collect,.collect-backup"
               maxSize={1000}

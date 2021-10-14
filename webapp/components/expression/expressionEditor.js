@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
@@ -56,7 +56,7 @@ const ExpressionEditor = (props) => {
       ) : (
         <div className="expression-editor__query-container">
           {!R.isEmpty(query) && (
-            <div className="query" id={`${idPrefix}-query`} data-testid={DataTestId.expressionEditor.query(qualifier)}>
+            <div className="query" id={`${idPrefix}-query`} data-testid={TestId.expressionEditor.query(qualifier)}>
               {query}
             </div>
           )}
@@ -64,7 +64,7 @@ const ExpressionEditor = (props) => {
             type="button"
             className="btn btn-s btn-edit"
             id={`${idPrefix}-edit-btn`}
-            data-testid={DataTestId.expressionEditor.editBtn(qualifier)}
+            data-testid={TestId.expressionEditor.editBtn(qualifier)}
             onClick={() => setEdit(true)}
           >
             <span className="icon icon-pencil2 icon-14px" />

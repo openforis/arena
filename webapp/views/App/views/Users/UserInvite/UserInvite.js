@@ -15,7 +15,7 @@ import { useUser } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Markdown from '@webapp/components/markdown'
 
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
@@ -39,7 +39,7 @@ const UserInviteComponent = () => {
     <div className="user-invite form">
       <FormItem label={i18n.t('common.email')}>
         <Input
-          id={DataTestId.userInvite.email}
+          id={TestId.userInvite.email}
           placeholder={i18n.t('common.email')}
           value={UserInvite.getEmail(userInvite)}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
@@ -69,7 +69,7 @@ const UserInviteComponent = () => {
 
       <div className="user-invite__buttons">
         <Button
-          testId={DataTestId.userInvite.submitBtn}
+          testId={TestId.userInvite.submitBtn}
           className="btn-invite"
           onClick={onInvite}
           iconClassName="icon-envelop icon-left icon-12px"

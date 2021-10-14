@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
-import { DataTestId } from '@webapp/utils/dataTestId'
+import { TestId } from '@webapp/utils/testId'
 
 import Select from '@webapp/components/form/Select'
 import { useOptions } from './useOptions'
@@ -18,7 +18,7 @@ const SurveyDropdown = (props) => {
 
   return (
     <Select
-      id={DataTestId.surveyCreate.surveyCloneFrom}
+      id={TestId.surveyCreate.surveyCloneFrom}
       options={options}
       value={selectedOption}
       onChange={(item) => onChange(item.value)}

@@ -1,32 +1,32 @@
-import { DataTestId, getSelector } from '../../../../webapp/utils/dataTestId'
+import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { BASE_URL } from '../../config'
 
 // ===== Header
 export const gotoSurveyCreate = () =>
   test('Goto survey create', async () => {
-    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
-    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.header.surveyCreateBtn, 'a'))])
+    await page.click(getSelector(TestId.header.userBtn, 'button'))
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.header.surveyCreateBtn, 'a'))])
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyNew/`)
   })
 
 export const gotoSurveyList = () =>
   test('Goto survey list', async () => {
-    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
-    await page.click(getSelector(DataTestId.header.surveyListBtn, 'a'))
+    await page.click(getSelector(TestId.header.userBtn, 'button'))
+    await page.click(getSelector(TestId.header.surveyListBtn, 'a'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveys/`)
   })
 
 export const gotoTemplateCreate = () =>
   test('Goto template create', async () => {
-    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
-    await Promise.all([page.waitForNavigation(), page.click(getSelector(DataTestId.header.templateCreateBtn, 'a'))])
+    await page.click(getSelector(TestId.header.userBtn, 'button'))
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.header.templateCreateBtn, 'a'))])
     expect(page.url()).toBe(`${BASE_URL}/app/home/templateNew/`)
   })
 
 export const gotoTemplateList = () =>
   test('Goto template list', async () => {
-    await page.click(getSelector(DataTestId.header.userBtn, 'button'))
-    await page.click(getSelector(DataTestId.header.templateListBtn, 'a'))
+    await page.click(getSelector(TestId.header.userBtn, 'button'))
+    await page.click(getSelector(TestId.header.templateListBtn, 'a'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/templates/`)
   })
 
@@ -34,7 +34,7 @@ export const gotoTemplateList = () =>
 export const gotoSurveyInfo = () =>
   test('Goto survey create', async () => {
     await page.goto(`${BASE_URL}/app/home/dashboard/`)
-    await page.click(getSelector(DataTestId.dashboard.surveyInfoBtn, 'a'))
+    await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'a'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)
   })
 
@@ -43,19 +43,19 @@ export const gotoHome = () =>
   test('Goto home', async () => {
     const currentUrl = await page.url()
     if (currentUrl !== `${BASE_URL}/app/home/dashboard/`) {
-      await page.click(getSelector(DataTestId.sidebar.moduleBtn('home'), 'a'))
+      await page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a'))
     }
     expect(page.url()).toBe(`${BASE_URL}/app/home/dashboard/`)
   })
 
 const _gotoSubModule = (module, subModule, waitForApiPaths = null) => () =>
   test(`Goto ${module}->${subModule}`, async () => {
-    await page.hover(getSelector(DataTestId.sidebar.module(module)))
+    await page.hover(getSelector(TestId.sidebar.module(module)))
 
     await Promise.all([
       ...(waitForApiPaths ? waitForApiPaths.map((path) => page.waitForResponse(path)) : []),
       page.waitForNavigation(),
-      page.click(getSelector(DataTestId.sidebar.moduleBtn(subModule), 'a')),
+      page.click(getSelector(TestId.sidebar.moduleBtn(subModule), 'a')),
     ])
 
     expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
