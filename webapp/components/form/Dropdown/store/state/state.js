@@ -8,7 +8,7 @@ const keys = {
   autocompleteMinChars: 'autocompleteMinChars',
   disabled: 'disabled',
   itemKey: 'itemKey',
-  itemLabel: 'itemLabel',
+  itemLabelFunction: 'itemLabelFunction',
   items: 'items',
   readOnly: 'readOnly',
 }
@@ -21,12 +21,13 @@ export const getAutocompleteMinChars = A.prop(keys.autocompleteMinChars)
 export const getDisabled = A.prop(keys.disabled)
 export const getItems = A.prop(keys.items)
 export const getItemKey = A.prop(keys.itemKey)
-export const getItemLabel = A.prop(keys.itemLabel)
+export const getItemLabelFunction = A.prop(keys.itemLabelFunction)
 export const getReadOnly = A.prop(keys.readOnly)
 
 // ====== UPDATE
 export const assocDisabled = A.assoc(keys.disabled)
 export const assocInputValue = A.assoc(keys.inputValue)
+export const assocItemLabelFunction = A.assoc(keys.itemLabelFunction)
 export const assocItems = A.assoc(keys.items)
 export const assocItemsDialog = A.assoc(keys.itemsDialog)
 export const assocShowDialog = A.assoc(keys.showDialog)
@@ -34,17 +35,14 @@ export const assocShowDialog = A.assoc(keys.showDialog)
 // ====== CREATE
 const _createGetItemProp = (prop) => (prop.constructor === String ? A.prop(prop) : (item) => prop(item))
 
-export const create = ({ autocompleteMinChars, disabled, items, itemKey, itemLabel, readOnly, selection }) => {
-  const state = {
-    [keys.autocompleteMinChars]: autocompleteMinChars,
-    [keys.disabled]: disabled,
-    [keys.items]: items,
-    [keys.itemsDialog]: items,
-    [keys.itemKey]: _createGetItemProp(itemKey),
-    [keys.itemLabel]: _createGetItemProp(itemLabel),
-    [keys.readOnly]: readOnly,
-    [keys.showDialog]: false,
-  }
-  const inputValue = A.isEmpty(selection) ? '' : getItemLabel(state)(selection)
-  return assocInputValue(inputValue, state)
-}
+export const create = ({ autocompleteMinChars, disabled, items, itemKey, itemLabelFunction, readOnly, selection }) => ({
+  [keys.autocompleteMinChars]: autocompleteMinChars,
+  [keys.disabled]: disabled,
+  [keys.inputValue]: A.isEmpty(selection) ? '' : itemLabelFunction(selection),
+  [keys.items]: items,
+  [keys.itemsDialog]: items,
+  [keys.itemKey]: _createGetItemProp(itemKey),
+  [keys.itemLabelFunction]: itemLabelFunction,
+  [keys.readOnly]: readOnly,
+  [keys.showDialog]: false,
+})

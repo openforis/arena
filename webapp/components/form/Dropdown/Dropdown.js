@@ -1,8 +1,10 @@
 import './dropdown.scss'
-import React, { useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
+
+import * as A from '@core/arena'
 
 import { DataTestId } from '@webapp/utils/dataTestId'
 
@@ -36,11 +38,16 @@ const Dropdown = (props) => {
   const dropdownRef = useRef(null)
   const inputRef = useRef(null)
 
+  const itemLabelFunction = useCallback(
+    (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
+    [itemLabel]
+  )
+
   const { state, Actions } = useLocalState({
     autocompleteMinChars,
     disabled,
     itemKey,
-    itemLabel,
+    itemLabelFunction,
     items,
     onBeforeChange,
     onChange,
@@ -48,6 +55,12 @@ const Dropdown = (props) => {
     selection,
     title,
   })
+
+  // update itemLabelFunction and input value on itemLabelFunction change
+  useEffect(() => {
+    Actions.updateItemLabelFunction({ itemLabelFunction, selection })
+  }, [itemLabelFunction])
+
   const showDialog = State.getShowDialog(state)
   const itemsDialog = State.getItemsDialog(state)
   const inputValue = State.getInputValue(state) || ''
@@ -103,7 +116,7 @@ const Dropdown = (props) => {
           <AutocompleteDialog
             className={autocompleteDialogClassName}
             inputField={inputRef.current}
-            itemLabel={State.getItemLabel(state)}
+            itemLabel={itemLabelFunction}
             itemKey={State.getItemKey(state)}
             itemRenderer={ItemDialog}
             items={itemsDialog}
@@ -127,7 +140,7 @@ Dropdown.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   idInput: PropTypes.string,
-  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)

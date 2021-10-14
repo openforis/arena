@@ -9,7 +9,7 @@ export const useLocalState = ({
   autocompleteMinChars,
   disabled,
   itemKey,
-  itemLabel,
+  itemLabelFunction,
   items,
   onBeforeChange,
   onChange,
@@ -22,7 +22,7 @@ export const useLocalState = ({
       disabled,
       items,
       itemKey,
-      itemLabel,
+      itemLabelFunction,
       readOnly,
       selection,
     })
