@@ -18,10 +18,11 @@ export const insertUserInvitation = async ({ user, survey, userToInvite }, clien
   )
 
 export const updateRemovedDate = async ({ survey, userUuidToRemove }, client = db) =>
-  client.one(
+  client.many(
     `UPDATE ${tableName}
     SET removed_date = (now() AT TIME ZONE 'UTC')
     WHERE user_uuid = $1 AND survey_uuid = $2
+    AND removed_date is null
     RETURNING id`,
     [userUuidToRemove, Survey.getUuid(Survey.getSurveyInfo(survey))]
   )
