@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
-import { ButtonIconRetry } from '@webapp/components'
+import { ButtonInvite } from '@webapp/components'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import * as DateUtils from '@core/dateUtils'
@@ -61,11 +61,7 @@ const Row = (props) => {
           <span className="icon icon-crying icon-16px icon-invitation-expired" />
         )}
         {User.isInvited(userListItem) && (
-           <ButtonIconRetry
-           className="icon-invitation-retry"
-           onClick={handleResendInvitation}
-           title="common.retry"
-         />
+          <ButtonInvite containerClassName="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
         )}
       </div>
       <div data-testid={TestId.userList.edit}>
