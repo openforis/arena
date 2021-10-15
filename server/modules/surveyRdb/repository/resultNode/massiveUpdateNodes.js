@@ -25,7 +25,8 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     const cols = [
       `?${TableNode.columnSet.recordUuid}`,
       `?${TableNode.columnSet.nodeDefUuid}`,
-
+      `?${TableNode.columnSet.parentUuid}`,
+      
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
@@ -36,7 +37,10 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE t.${TableNode.columnSet.recordUuid}::uuid = v.${TableNode.columnSet.recordUuid}::uuid AND t.${TableNode.columnSet.nodeDefUuid}::uuid = v.${TableNode.columnSet.nodeDefUuid}::uuid `,
+        where: ` WHERE 
+        t.${TableNode.columnSet.recordUuid}::uuid = v.${TableNode.columnSet.recordUuid}::uuid 
+        AND t.${TableNode.columnSet.nodeDefUuid}::uuid = v.${TableNode.columnSet.nodeDefUuid}::uuid
+        AND t.${TableNode.columnSet.parentUuid}::uuid = v.${TableNode.columnSet.parentUuid}::uuid `,
       },
       tx
     )
@@ -49,8 +53,8 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    const insertValues = Object.keys(this.nodeDefsByColumnName).reduce(
-      (values, columnName) => {
+    Object.keys(this.nodeDefsByColumnName).forEach(
+      (columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
         let value =
           NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
@@ -64,17 +68,17 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
           }
         }
 
-        return {
-          ...values,
+        const values = {
+          [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
+          [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
           [TableNode.columnSet.value]: value,
         }
-      },
-      {
-        [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
+
+        super.push(values)
       }
     )
 
-    return super.push(insertValues)
+    return true
   }
 }
