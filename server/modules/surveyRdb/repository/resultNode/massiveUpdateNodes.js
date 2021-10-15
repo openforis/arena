@@ -25,6 +25,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     const cols = [
       `?${TableNode.columnSet.recordUuid}`,
       `?${TableNode.columnSet.nodeDefUuid}`,
+      `?${TableNode.columnSet.parentUuid}`,
       
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
@@ -49,7 +50,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    Object.keys(this.nodeDefsByColumnName).map(
+    Object.keys(this.nodeDefsByColumnName).forEach(
       (columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
         let value =
@@ -65,6 +66,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         }
 
         const values = {
+          [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
           [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
           [TableNode.columnSet.value]: value,
