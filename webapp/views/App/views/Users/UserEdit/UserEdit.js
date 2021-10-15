@@ -145,15 +145,15 @@ const UserEdit = () => {
           {!hideSurveyGroup && canRemove && (
             <ButtonDelete
               onClick={onRemove}
-              containerClassName="btn-s btn-danger btn-remove-user"
+              className="btn-s btn-danger btn-remove-user"
               label={i18n.t('userView.removeFromSurvey')}
             />
           )}
 
-          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave} containerClassName="btn btn-save" />}
+          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave} className="btn btn-save" />}
 
           {!hideSurveyGroup && invitationExpired && (
-            <ButtonInvite onClick={onInviteRepeat} containerClassName="btn btn-invite" />
+            <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
           )}
         </div>
       )}

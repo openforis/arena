@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import { useI18n } from '@webapp/store/system'
 
 export const Button = (props) => {
-  const { className, containerClassName, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } = props
+  const { className, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } = props
 
   const i18n = useI18n()
 
@@ -16,7 +16,7 @@ export const Button = (props) => {
       disabled={disabled}
       aria-disabled={disabled}
       type="button"
-      className={classNames('btn', className, { 'btn-s': size === 'small' }, containerClassName)}
+      className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
       title={title ? i18n.t(title) : (showLabel && label ? i18n.t(label) : null)}
       {...otherProps}
@@ -29,7 +29,6 @@ export const Button = (props) => {
 
 Button.propTypes = {
   className: PropTypes.string,
-  containerClassName: PropTypes.string,
   disabled: PropTypes.bool,
   showLabel: PropTypes.bool,
   id: PropTypes.string,
@@ -43,7 +42,6 @@ Button.propTypes = {
 
 Button.defaultProps = {
   className: null,
-  containerClassName: null,
   disabled: false,
   showLabel: true,
   iconClassName: null,

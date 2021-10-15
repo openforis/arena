@@ -61,7 +61,7 @@ const Row = (props) => {
           <span className="icon icon-crying icon-16px icon-invitation-expired" />
         )}
         {User.isInvited(userListItem) && (
-          <ButtonInvite containerClassName="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
+          <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
         )}
       </div>
       <div data-testid={TestId.userList.edit}>
