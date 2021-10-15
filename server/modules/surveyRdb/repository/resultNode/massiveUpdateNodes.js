@@ -25,7 +25,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     const cols = [
       `?${TableNode.columnSet.recordUuid}`,
       `?${TableNode.columnSet.nodeDefUuid}`,
-
+      
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
@@ -49,8 +49,8 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    const insertValues = Object.keys(this.nodeDefsByColumnName).reduce(
-      (values, columnName) => {
+    Object.keys(this.nodeDefsByColumnName).map(
+      (columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
         let value =
           NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
@@ -64,17 +64,16 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
           }
         }
 
-        return {
-          ...values,
+        const values = {
+          [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
           [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
           [TableNode.columnSet.value]: value,
         }
-      },
-      {
-        [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
+
+        super.push(values)
       }
     )
 
-    return super.push(insertValues)
+    return true
   }
 }
