@@ -63,7 +63,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
             value = rowResult[columnName]
           }
         }
-
+ 
         return {
           ...values,
           [columnName]: value,
