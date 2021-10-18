@@ -3,8 +3,8 @@ export const integer = () => ({
   maxLength: 16,
 })
 
-export const decimal = ({ decimalScale = 6 } = {}) => ({
-  decimalScale,
+export const decimal = ({ decimalScale = 2 } = {}) => ({
+  ...(Number.isNaN(decimalScale) ? {} : { decimalScale }),
   decimalSeparator: '.',
   maxLength: 16,
 })

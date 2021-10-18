@@ -172,7 +172,7 @@ export const getTextTransform = getProp(propKeys.textTransform, textTransformVal
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
-export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, 6)(nodeDef))
+export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef))
 
 // File
 export const isNumberOfFilesEnabled = isMultiple

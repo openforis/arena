@@ -19,7 +19,6 @@ const DecimalProps = (props) => {
     <FormItem label={i18n.t('nodeDefEdit.decimalProps.maxNumberDecimalDigits')}>
       <Input
         disabled={false}
-        placeholder={i18n.t('nodeDefEdit.decimalProps.maxNumberDecimalDigits')}
         value={NodeDef.getMaxNumberDecimalDigits(nodeDef)}
         type="number"
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxNumberDecimalDigits, value })}
