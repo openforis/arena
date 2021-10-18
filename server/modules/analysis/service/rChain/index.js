@@ -62,8 +62,8 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     )
 
     await CSVReader.createReaderFromStream(stream, null, (row) => {
-      massiveUpdateData.push.bind(massiveUpdateData)(row)
-      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+        massiveUpdateData.push.bind(massiveUpdateData)(row)
+        massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
     }).start()
     await massiveUpdateData.flush()
     await massiveUpdateNodes.flush()
