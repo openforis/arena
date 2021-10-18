@@ -16,18 +16,23 @@ export default class MassiveUpdateData extends MassiveUpdate {
     const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
       NodeDef.isAnalysis
     )
-    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({nodeDefs: analysisNodeDefs, includeExtendedCols: true })
+    const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
+      nodeDefs: analysisNodeDefs,
+      includeExtendedCols: true,
+    })
     const columnNames = Object.keys(nodeDefsByColumnName)
 
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
       `?${TableDataNodeDef.columnSet.recordUuid}`,
+      `?${TableDataNodeDef.columnSet.uuid}`,
       ...columnNames.map((columnName) => {
         const nodeDef = nodeDefsByColumnName[columnName]
-        return new Column({ name: columnName, 
+        return new Column({
+          name: columnName,
           ...(NodeDef.isInteger(nodeDef) ? { cast: 'integer' } : {}),
-          ...(NodeDef.isDecimal(nodeDef) ? { cast: 'decimal' } : {})
-         })
+          ...(NodeDef.isDecimal(nodeDef) ? { cast: 'decimal' } : {}),
+        })
       }),
     ]
     const tableNode = new TableDataNodeDef(survey, entity)
@@ -37,7 +42,9 @@ export default class MassiveUpdateData extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE t.record_uuid::uuid = v.record_uuid::uuid AND t.record_cycle = '${cycle}' `,
+        where: ` WHERE t.record_uuid::uuid = v.record_uuid::uuid
+        AND t.uuid::uuid = v.uuid::uuid
+        AND t.record_cycle = '${cycle}' `,
       },
       tx
     )
@@ -54,8 +61,9 @@ export default class MassiveUpdateData extends MassiveUpdate {
       (values, columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
 
-        let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
-        
+        let value =
+          NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
+
         if (rowResult[columnName] && rowResult[columnName] !== NA) {
           if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
             value = Number(rowResult[columnName])
@@ -71,6 +79,8 @@ export default class MassiveUpdateData extends MassiveUpdate {
       },
       {
         [TableDataNodeDef.columnSet.recordUuid]: rowResult[TableDataNodeDef.columnSet.recordUuid],
+        // in this table the coloumn uuid is the parent_uuid of the result
+        [TableDataNodeDef.columnSet.uuid]: rowResult[TableDataNodeDef.columnSet.parentUuid], 
       }
     )
 

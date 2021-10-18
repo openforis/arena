@@ -43,7 +43,7 @@ export const useNodeDefDetails = () => {
       if (nodeDefUuid) {
         let nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-        if (NodeDef.isAnalysis(nodeDefSurvey)) {
+        if (NodeDef.isAnalysis(nodeDefSurvey) && !NodeDef.isTemporary(nodeDefSurvey)) {
           try {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
             dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefSurvey }))
