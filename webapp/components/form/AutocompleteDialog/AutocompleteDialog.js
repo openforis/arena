@@ -1,7 +1,9 @@
 import './AutocompleteDialog.scss'
 
-import React, { useRef, useMemo } from 'react'
+import React, { useCallback, useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
+
+import * as A from '@core/arena'
 
 import { useLocalState, State } from './store'
 
@@ -18,21 +20,27 @@ const AutocompleteDialog = (props) => {
     onClose,
   } = props
   const list = useRef(null)
+
+  const itemLabelFunction = useCallback(
+    (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
+    [itemLabel]
+  )
+
   const { state, Actions } = useLocalState({
     inputField,
     sourceElement,
     items,
-    itemLabel,
+    itemLabelFunction,
     itemKey,
     onItemSelect,
     onClose,
     list,
   })
 
-  const calculatedPosition = useMemo(() => State.calculatePosition(state), [
-    State.getSourceElement(state),
-    State.getInputField(state),
-  ])
+  const calculatedPosition = useMemo(
+    () => State.calculatePosition(state),
+    [State.getSourceElement(state), State.getInputField(state)]
+  )
 
   return (
     <div ref={list} className={`autocomplete-list ${className}`} style={{ ...calculatedPosition }}>
@@ -42,7 +50,7 @@ const AutocompleteDialog = (props) => {
           tabIndex="0"
           item={item}
           itemKey={State.getItemKey(state)}
-          itemLabel={State.getItemLabel(state)}
+          itemLabel={itemLabelFunction}
           onKeyDown={Actions.onListItemKeyDown({
             state,
           })}
@@ -58,7 +66,7 @@ AutocompleteDialog.propTypes = {
   sourceElement: PropTypes.any,
   items: PropTypes.array,
   itemRenderer: PropTypes.any,
-  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or label property name
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   className: PropTypes.string,
   onItemSelect: PropTypes.func,
