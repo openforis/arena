@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -20,6 +20,8 @@ const NodeDefCodeDropdown = (props) => {
 
   const disabled = R.isEmpty(items)
 
+  const itemLabelFunction = useCallback((item) => CategoryItem.getLabelWithCode(lang)(item), [lang])
+
   return (
     <div className="survey-form__node-def-code">
       {NodeDef.isMultiple(nodeDef) && !entryDataQuery ? (
@@ -28,7 +30,7 @@ const NodeDefCodeDropdown = (props) => {
           items={items}
           disabled={disabled}
           itemKey="uuid"
-          itemLabel={CategoryItem.getLabelWithCode(lang)}
+          itemLabel={itemLabelFunction}
           selection={selectedItems}
           onItemAdd={onItemAdd}
           onItemRemove={onItemRemove}
@@ -40,7 +42,7 @@ const NodeDefCodeDropdown = (props) => {
           items={items}
           disabled={disabled}
           itemKey="uuid"
-          itemLabel={CategoryItem.getLabelWithCode(lang)}
+          itemLabel={itemLabelFunction}
           selection={R.head(selectedItems)}
           onChange={(item) => {
             // NB: onItemRemove is not possible?

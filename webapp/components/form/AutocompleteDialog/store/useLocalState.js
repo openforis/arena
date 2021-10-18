@@ -9,7 +9,7 @@ export const useLocalState = ({
   inputField,
   sourceElement,
   items,
-  itemLabel,
+  itemLabelFunction,
   itemKey,
   onItemSelect,
   onClose,
@@ -20,7 +20,7 @@ export const useLocalState = ({
       inputField,
       sourceElement,
       items,
-      itemLabel,
+      itemLabelFunction,
       itemKey,
       list,
     })

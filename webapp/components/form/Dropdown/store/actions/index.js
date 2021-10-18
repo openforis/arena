@@ -2,6 +2,7 @@ import { useCloseDialog } from './useCloseDialog'
 import { useOpenDialog } from './useOpenDialog'
 import { useUpdateSelection } from './useUpdateSelection'
 import { useUpdateInputValue } from './useUpdateInputValue'
+import { useUpdateItemLabelFunction } from './useUpdateItemLabelFunction'
 import { useOnBlurInputValue } from './useOnBlurInputValue'
 
 export const useActions = ({ setState, onBeforeChange, onChange }) => ({
@@ -9,5 +10,6 @@ export const useActions = ({ setState, onBeforeChange, onChange }) => ({
   openDialog: useOpenDialog({ setState }),
   updateSelection: useUpdateSelection({ onBeforeChange, onChange }),
   updateInputValue: useUpdateInputValue({ setState }),
+  updateItemLabelFunction: useUpdateItemLabelFunction({ setState }),
   onBlurInput: useOnBlurInputValue({ onChange }),
 })

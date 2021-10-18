@@ -13,7 +13,7 @@ export const useOnBlurInputValue = ({ onChange }) =>
       !A.isEmpty(selection) &&
       (A.isEmpty(value) ||
         A.isEmpty(itemsDialog) ||
-        !itemsDialog.some((item) => String(State.getItemLabel(state)(item)) === String(value)))
+        !itemsDialog.some((item) => String(State.getItemLabelFunction(state)(item)) === String(value)))
     ) {
       await onChange(null)
     }
