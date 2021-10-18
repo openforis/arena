@@ -9,7 +9,7 @@ export const useCloseDialog = ({ setState }) =>
     setState((state) => {
       let stateUpdated = State.assocShowDialog(false)(state)
       stateUpdated = State.assocInputValue(
-        A.isEmpty(selection) ? '' : State.getItemLabel(state)(selection),
+        A.isEmpty(selection) ? '' : State.getItemLabelFunction(state)(selection),
         stateUpdated
       )
       return stateUpdated

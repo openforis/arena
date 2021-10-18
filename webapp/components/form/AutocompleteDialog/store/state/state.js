@@ -45,11 +45,11 @@ export const calculatePosition = (state) => {
 // ====== CREATE
 const _createGetItemProp = (prop) => (prop.constructor === String ? A.prop(prop) : (item) => prop(item))
 
-export const create = ({ inputField, sourceElement, items, itemLabel, itemKey, list }) => ({
+export const create = ({ inputField, sourceElement, items, itemLabelFunction, itemKey, list }) => ({
   [keys.inputField]: inputField,
   [keys.sourceElement]: sourceElement,
   [keys.items]: items,
-  [keys.itemLabel]: _createGetItemProp(itemLabel),
+  [keys.itemLabel]: itemLabelFunction,
   [keys.itemKey]: _createGetItemProp(itemKey),
   [keys.focusedItemIndex]: null,
   [keys.list]: list,
