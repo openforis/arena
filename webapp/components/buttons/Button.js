@@ -5,7 +5,8 @@ import classNames from 'classnames'
 import { useI18n } from '@webapp/store/system'
 
 export const Button = (props) => {
-  const { className, disabled, iconClassName, id, label, onClick, size, testId, title, ...otherProps } = props
+  const { className, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } =
+    props
 
   const i18n = useI18n()
 
@@ -22,7 +23,7 @@ export const Button = (props) => {
       {...otherProps}
     >
       {iconClassName && <span className={`icon ${iconClassName}${label ? ' icon-left' : ''}`} />}
-      {label ? i18n.t(label) : null}
+      {showLabel && label ? i18n.t(label) : null}
     </button>
   )
 }
@@ -30,6 +31,7 @@ export const Button = (props) => {
 Button.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  showLabel: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
   label: PropTypes.string,
@@ -42,6 +44,7 @@ Button.propTypes = {
 Button.defaultProps = {
   className: null,
   disabled: false,
+  showLabel: true,
   iconClassName: null,
   id: null,
   label: null,

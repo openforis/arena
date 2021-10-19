@@ -1,35 +1,20 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import { Button } from './Button'
 
-export const ButtonSave = (props) => {
-  const { disabled, id, onClick, testId } = props
-
-  return (
-    <Button
-      {...props}
-      id={id}
-      data-testid={testId}
-      disabled={disabled}
-      aria-disabled={disabled}
-      className="btn-primary"
-      iconClassName="icon-floppy-disk icon-left icon-12px"
-      label="common.save"
-      onClick={onClick}
-    />
-  )
-}
+export const ButtonSave = (props) => (
+  <Button
+    {...props}
+    className={`btn-primary ${props.className}`}
+    iconClassName="icon-floppy-disk icon-left icon-12px"
+  />
+)
 
 ButtonSave.propTypes = {
-  disabled: PropTypes.bool,
-  id: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-  testId: PropTypes.string,
+  ...Button.propTypes,
 }
 
 ButtonSave.defaultProps = {
-  disabled: false,
-  id: null,
-  testId: null,
+  ...Button.defaultProps,
+  label: 'common.save',
 }
