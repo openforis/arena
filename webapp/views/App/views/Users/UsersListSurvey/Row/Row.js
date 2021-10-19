@@ -9,6 +9,8 @@ import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
+import { ButtonInvite } from '@webapp/components'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import * as DateUtils from '@core/dateUtils'
@@ -27,6 +29,8 @@ const Row = (props) => {
   const invitedBy = User.getInvitedBy(userListItem)
   const invitedDate = User.getInvitedDate(userListItem)
 
+  const handleResendInvitation = useOnInviteRepeat({ userToInvite: userListItem, hasToNavigate: false })
+
   return (
     <>
       <div data-testid={TestId.userList.profilePicture} className="users-list__cell-profile-picture">
@@ -44,13 +48,20 @@ const Row = (props) => {
       <div data-testid={TestId.userList.invitedBy} data-value={invitedBy}>
         {invitedBy}
       </div>
-      <div data-testid={TestId.userList.invitedDate} data-value={invitedDate}>
+      <div
+        data-testid={TestId.userList.invitedDate}
+        data-value={invitedDate}
+        title={invitedDate ? DateUtils.format(DateUtils.parseISO(invitedDate), DateUtils.formats.datetimeDefault) : ''}
+      >
         {invitedDate ? DateUtils.format(DateUtils.parseISO(invitedDate), DateUtils.formats.dateDefault) : ''}
       </div>
       <div>
         {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}
         {User.isInvited(userListItem) && User.isInvitationExpired(userListItem) && (
           <span className="icon icon-crying icon-16px icon-invitation-expired" />
+        )}
+        {User.isInvited(userListItem) && (
+          <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
         )}
       </div>
       <div data-testid={TestId.userList.edit}>

@@ -140,7 +140,8 @@ export const inviteUser = async (
       } else if (repeatInvitation) {
         // User has a pending invitation still
         // Generate reset password and send email again
-        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)        
+        await UserInvitationManager.cleanOldInvitations({ survey, userUuidToRemove: User.getUuid(userToInvite) }, t)
         await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
       } else {
         throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)

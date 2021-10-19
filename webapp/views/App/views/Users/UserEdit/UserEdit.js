@@ -14,6 +14,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
+import { ButtonSave, ButtonDelete, ButtonInvite } from '@webapp/components'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -142,24 +143,17 @@ const UserEdit = () => {
       {(canEdit || invitationExpired) && (
         <div className="user-edit__buttons">
           {!hideSurveyGroup && canRemove && (
-            <button type="button" className="btn-s btn-danger btn-remove-user" onClick={onRemove}>
-              <span className="icon icon-bin icon-left icon-10px" />
-              {i18n.t('userView.removeFromSurvey')}
-            </button>
+            <ButtonDelete
+              onClick={onRemove}
+              className="btn-s btn-danger btn-remove-user"
+              label={i18n.t('userView.removeFromSurvey')}
+            />
           )}
 
-          {canEdit && (
-            <button type="button" className="btn btn-save" aria-disabled={!canSave} onClick={onSave}>
-              <span className="icon icon-floppy-disk icon-left icon-12px" />
-              {i18n.t('common.save')}
-            </button>
-          )}
+          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave} className="btn btn-save" />}
 
           {!hideSurveyGroup && invitationExpired && (
-            <button type="button" className="btn btn-invite" onClick={onInviteRepeat}>
-              <span className="icon icon-envelop icon-left icon-12px" />
-              {i18n.t('userView.sendNewInvitation')}
-            </button>
+            <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
           )}
         </div>
       )}

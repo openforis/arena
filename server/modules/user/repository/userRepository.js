@@ -96,6 +96,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
     LEFT OUTER JOIN user_invitation ui
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid
+      AND ui.removed_date is null
     GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
