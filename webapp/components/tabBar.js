@@ -1,5 +1,6 @@
 import './tabBar.scss'
 import React, { useState } from 'react'
+import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -28,8 +29,8 @@ const TabBar = (props) => {
   const tab = tabs[selectionState]
 
   return (
-    <div className={`tab-bar ${className}`}>
-      {showTabs ? (
+    <div className={classNames('tab-bar', className, { 'no-tabs': !showTabs })}>
+      {showTabs && (
         <TabBarButtons
           tabs={tabs}
           selection={selectionState}
@@ -40,8 +41,6 @@ const TabBar = (props) => {
             }
           }}
         />
-      ) : (
-        <div />
       )}
 
       {renderer
