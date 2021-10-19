@@ -67,7 +67,7 @@ const Header = (props) => {
         <DownloadButton
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
-          label={i18n.t('common.csvExport')}
+          label="common.csvExport"
         />
       </div>
     </div>

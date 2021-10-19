@@ -2,29 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
-import { useI18n } from '@webapp/store/system'
 
 const DownloadButton = (props) => {
-  const i18n = useI18n()
-
-  const {
-    disabled,
-    href,
-    id,
-    label = i18n.t('common.download'),
-    onClick,
-    requestParams,
-    showLabel,
-    title,
-    className,
-  } = props
+  const { disabled, href, id, label, onClick, requestParams, showLabel, title, className } = props
 
   return (
     <Button
       className={`btn-s ${className}`}
       disabled={disabled}
-      label={showLabel && label}
+      label={label}
       iconClassName="icon-download2 icon-14px"
+      showLabel={showLabel}
       testId={id}
       title={title}
       onClick={async () => {
@@ -57,7 +45,7 @@ DownloadButton.defaultProps = {
   disabled: false,
   href: null,
   id: null,
-  label: undefined, // default to i18n.t('common.download')
+  label: 'common.download',
   onClick: null,
   requestParams: null,
   showLabel: true,
