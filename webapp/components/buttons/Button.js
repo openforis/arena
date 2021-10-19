@@ -5,7 +5,8 @@ import classNames from 'classnames'
 import { useI18n } from '@webapp/store/system'
 
 export const Button = (props) => {
-  const { className, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } = props
+  const { className, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } =
+    props
 
   const i18n = useI18n()
 
@@ -18,7 +19,7 @@ export const Button = (props) => {
       type="button"
       className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
-      title={title ? i18n.t(title) : (showLabel && label ? i18n.t(label) : null)}
+      title={title ? i18n.t(title) : null}
       {...otherProps}
     >
       {iconClassName && <span className={`icon ${iconClassName}${label ? ' icon-left' : ''}`} />}
