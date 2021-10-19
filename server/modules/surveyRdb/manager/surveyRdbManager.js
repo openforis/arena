@@ -40,7 +40,7 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 // ==== DML
 
-const _getExportFields = ({ survey, query, addCycle = false}) => {
+const _getExportFields = ({ survey, query, addCycle = false }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
   // Consider only user selected fields (from column node defs)
@@ -66,8 +66,8 @@ const _getExportFields = ({ survey, query, addCycle = false}) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
-  const { survey, cycle, query, columnNodeDefs = false, offset = 0, limit = null, streamOutput = null, addCycle = false } = params
-
+  const { survey, cycle, query, columnNodeDefs = false, offset = 0, limit = null, streamOutput = null, addCycle = false, joinCodes = false } = params
+  
   // Fetch data
   const result = await DataViewRepository.fetchViewData({
     survey,
@@ -77,6 +77,7 @@ export const fetchViewData = async (params) => {
     offset,
     limit,
     stream: Boolean(streamOutput),
+    joinCodes
   })
 
   if (streamOutput) {

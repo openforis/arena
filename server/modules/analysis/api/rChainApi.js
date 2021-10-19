@@ -13,14 +13,18 @@ import * as AnalysisService from '../service'
 export const init = (app) => {
   // ====== READ - Chain entity data
   app.get(
-    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
+    ApiRoutes.rChain.entityData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+      entityUuid: ':entityDefUuid',
+    }),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
-
-        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false })
-
+        const { surveyId, cycle, entityDefUuid, joinCodes = false } = Request.getParams(req)
+        
+        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false, joinCodes })
         res.json(data)
       } catch (error) {
         next(error)
@@ -85,12 +89,17 @@ export const init = (app) => {
 
   // ====== UPDATE - calculated entity data
   app.put(
-    ApiRoutes.rChain.entityData(':surveyId', ':cycle', ':chainUuid', ':entityDefUuid'),
+    ApiRoutes.rChain.entityData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+      entityUuid: ':entityDefUuid',
+    }),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
         const filePath = Request.getFilePath(req)
-        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
+        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)      
         await AnalysisService.persistResults({ surveyId, cycle, entityDefUuid, chainUuid, filePath })
 
         Response.sendOk(res)

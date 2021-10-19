@@ -27,7 +27,7 @@ const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
 }
 
 const _selectsByNodeDefType =
-  ({ viewDataNodeDef, streamMode }) =>
+  ({ viewDataNodeDef, streamMode, joinCodes = false }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
     const { name: alias, nameFull, namesFull } = columnNodeDef
@@ -48,15 +48,24 @@ const _selectsByNodeDefType =
         `'EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
       ]
     }
+
+    if (NodeDef.isCode(nodeDefCol) && joinCodes) {
+      console.log("asadsa")
+      // this is to return the code as the name of the varibale
+      return [
+        `${alias} AS ${alias.replace(/_code$/, '')}`
+      ]
+    }
+
     return namesFull
   }
 
-const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
+const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode, joinCodes}) => {
   if (columnNodeDefs) {
     queryBuilder.select(
       viewDataNodeDef.columnRecordUuid,
       ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
-        _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
+        _selectsByNodeDefType({ viewDataNodeDef, streamMode, joinCodes })(columnNodeDef.nodeDef)
       ),
       `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
     )
@@ -68,7 +77,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
+      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode, joinCodes })),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
@@ -154,7 +163,7 @@ const _dbTransformCallbackSelect =
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {
-  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false } = params
+  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false, joinCodes = false } = params
 
   const editMode = Query.isModeRawEdit(query)
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -171,6 +180,7 @@ export const fetchViewData = async (params, client = db) => {
     nodeDefCols,
     editMode,
     streamMode: stream,
+    joinCodes
   })
 
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
