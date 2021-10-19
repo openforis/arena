@@ -11,5 +11,5 @@ export const useActions = ({ userToUpdate, setUserToUpdate, userToUpdateOriginal
   onUpdateProfilePicture: useOnUpdateProfilePicture({ userToUpdate, setUserToUpdate }),
   onSave: useOnSave({ userToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }),
   onRemove: useOnRemove({ userToUpdate, setUserToUpdate }),
-  onInviteRepeat: useOnInviteRepeat({ userToUpdate, setUserToUpdate }),
+  onInviteRepeat: useOnInviteRepeat({ userToInvite: userToUpdate, setUserToUpdate }),
 })

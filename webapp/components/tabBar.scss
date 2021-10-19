@@ -2,6 +2,10 @@
   display: grid;
   grid-template-rows: 60px 1fr;
 
+  &.no-tabs {
+    grid-template-rows: 1fr;
+  }
+
   .form {
     height: calc(100% - 60px);
   }
