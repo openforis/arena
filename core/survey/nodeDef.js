@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -172,7 +173,10 @@ export const getTextTransform = getProp(propKeys.textTransform, textTransformVal
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
-export const getMaxNumberDecimalDigits = (nodeDef) => Number(getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef))
+export const getMaxNumberDecimalDigits = (nodeDef) => {
+  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
+  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
+}
 
 // File
 export const isNumberOfFilesEnabled = isMultiple
