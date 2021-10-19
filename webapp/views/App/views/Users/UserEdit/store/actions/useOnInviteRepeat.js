@@ -12,14 +12,15 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
-export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
+export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true}) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
-  return useCallback(async () => {
+  return useCallback(async (e) => {
     try {
+      e.stopPropagation()
       dispatch(LoaderActions.showLoader())
 
       const authGroups = User.getAuthGroups(userToInvite)
@@ -42,7 +43,9 @@ export const useOnInviteRepeat = ({ userToUpdate: userToInvite }) => {
           })
         )
 
-        history.push(appModuleUri(userModules.usersSurvey))
+        if(hasToNavigate){
+          history.push(appModuleUri(userModules.usersSurvey))
+        }
       }
     } finally {
       dispatch(LoaderActions.hideLoader())
