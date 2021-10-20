@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 import { NodeDefsActions } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -20,38 +20,41 @@ const ButtonBar = (props) => {
 
   const dispatch = useDispatch()
   const history = useHistory()
-  const i18n = useI18n()
+
+  const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
   return (
     <div className="button-bar">
-      <button
-        type="button"
-        className="btn btn-cancel"
-        data-testid={TestId.nodeDefDetails.backBtn}
+      <Button
+        className="btn-cancel"
+        testId={TestId.nodeDefDetails.backBtn}
         onClick={() => Actions.cancelEdits({ state })}
-      >
-        {i18n.t(dirty ? 'common.cancel' : 'common.back')}
-      </button>
-      <button
-        type="button"
-        className="btn btn-primary"
-        data-testid={TestId.nodeDefDetails.saveBtn}
+        label={dirty ? 'common.cancel' : 'common.back'}
+      />
+      <Button
+        className="btn-primary"
+        testId={TestId.nodeDefDetails.saveAndBackBtn}
+        onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
+        disabled={saveDisabled}
+        iconClassName="icon-floppy-disk icon-12px"
+        label="common.saveAndBack"
+      />
+      <Button
+        className="btn-primary"
+        testId={TestId.nodeDefDetails.saveBtn}
         onClick={() => Actions.saveEdits({ state })}
-        aria-disabled={!dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
-      >
-        <span className="icon icon-floppy-disk icon-left icon-12px" />
-        {i18n.t('common.save')}
-      </button>
+        disabled={saveDisabled}
+        iconClassName="icon-floppy-disk icon-12px"
+        label="common.save"
+      />
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
-        <button
-          data-testid={TestId.nodeDefDetails.deleteBtn}
-          type="button"
-          className="btn btn-danger btn-delete"
+        <Button
+          testId={TestId.nodeDefDetails.deleteBtn}
+          className="btn-danger btn-delete"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}
-        >
-          <span className="icon icon-bin2 icon-left icon-12px" />
-          {i18n.t('common.delete')}
-        </button>
+          iconClassName="icon-bin2 icon-12px"
+          label="common.delete"
+        />
       )}
     </div>
   )

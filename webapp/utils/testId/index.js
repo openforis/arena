@@ -101,6 +101,7 @@ export const TestId = {
     nodeDefUnique: 'node-def-unique',
     relevantIf: 'relevant-if',
     saveBtn: 'node-def-save-btn',
+    saveAndBackBtn: 'node-def-save-and-back-btn',
     taxonomySelector: 'taxonomy-selector',
     taxonomySelectorAddBtn: 'taxonomy-selector-add-btn',
     validations: 'validations',
