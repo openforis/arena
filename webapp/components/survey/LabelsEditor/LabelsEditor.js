@@ -15,6 +15,14 @@ import ButtonToggle from './ButtonToggle'
 
 const MAX_PREVIEW_LANGUAGES = 1
 
+// puts the preferred language on top
+const sortLanguages = ({ languages, preferredLanguage }) =>
+  [...languages].sort((langA, langB) => {
+    if (langA === preferredLanguage) return -1
+    if (langB === preferredLanguage) return 1
+    return 0
+  })
+
 const LabelsEditor = (props) => {
   const {
     labels,
@@ -32,13 +40,8 @@ const LabelsEditor = (props) => {
   const [editingLabels, setEditingLabels] = useState(false)
   const surveyLanguages = useSurveyLangs()
   const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages
-  const language = useSurveyPreferredLang()
-  // show preferred language first
-  const languagesSorted = [...languages].sort((langA, langB) => {
-    if (langA === language) return -1
-    if (langB === language) return 1
-    return 0
-  })
+  const preferredLanguage = useSurveyPreferredLang()
+  const languagesSorted = sortLanguages({ languages, preferredLanguage })
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
   const showLanguageBadge = languages.length > 1
@@ -51,31 +54,18 @@ const LabelsEditor = (props) => {
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
-          {!editingLabels && (
+          {(editingLabels ? languagesSorted : [preferredLanguage]).map((lang) => (
             <Label
-              key={language}
+              key={lang}
               inputFieldIdPrefix={inputFieldIdPrefix}
-              lang={language}
+              lang={lang}
               labels={labels}
               onChange={onChange}
               readOnly={readOnly}
               showLanguageBadge={showLanguageBadge}
               compactLanguage={compactLanguage}
             />
-          )}
-          {editingLabels &&
-            languagesSorted.map((lang) => (
-              <Label
-                key={lang}
-                inputFieldIdPrefix={inputFieldIdPrefix}
-                lang={lang}
-                labels={labels}
-                onChange={onChange}
-                readOnly={readOnly}
-                showLanguageBadge={showLanguageBadge}
-                compactLanguage={compactLanguage}
-              />
-            ))}
+          ))}
         </ValidationTooltip>
       </div>
     </div>
