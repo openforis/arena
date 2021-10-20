@@ -22,7 +22,7 @@ export const Button = (props) => {
       title={title ? i18n.t(title) : null}
       {...otherProps}
     >
-      {iconClassName && <span className={`icon ${iconClassName}${label ? ' icon-left' : ''}`} />}
+      {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {showLabel && label ? i18n.t(label) : null}
     </button>
   )
