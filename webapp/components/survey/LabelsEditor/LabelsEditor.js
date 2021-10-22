@@ -6,15 +6,22 @@ import * as A from '@core/arena'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyLangs } from '@webapp/store/survey'
+import { useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import PanelRight from '@webapp/components/PanelRight'
 
 import Label from './Label'
 import ButtonToggle from './ButtonToggle'
 
 const MAX_PREVIEW_LANGUAGES = 1
+
+// puts the preferred language on top
+const sortLanguages = ({ languages, preferredLanguage }) =>
+  [...languages].sort((langA, langB) => {
+    if (langA === preferredLanguage) return -1
+    if (langB === preferredLanguage) return 1
+    return 0
+  })
 
 const LabelsEditor = (props) => {
   const {
@@ -33,54 +40,34 @@ const LabelsEditor = (props) => {
   const [editingLabels, setEditingLabels] = useState(false)
   const surveyLanguages = useSurveyLangs()
   const languages = !A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages
-  const language = languages[0]
+  const preferredLanguage = useSurveyPreferredLang()
+  const languagesSorted = sortLanguages({ languages, preferredLanguage })
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
+  const showLanguageBadge = languages.length > 1
 
   return (
     <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
       <div className="labels-editor-label">
         {showFormLabel && <span className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</span>}
-        {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(true)} open={editingLabels} />}
+        {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(!editingLabels)} open={editingLabels} />}
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
-          <Label
-            key={language}
-            inputFieldIdPrefix={inputFieldIdPrefix}
-            lang={language}
-            labels={labels}
-            onChange={onChange}
-            readOnly={readOnly}
-            showLanguageBadge={languages.length > 1}
-            compactLanguage={compactLanguage}
-          />
+          {(editingLabels ? languagesSorted : [preferredLanguage]).map((lang) => (
+            <Label
+              key={lang}
+              inputFieldIdPrefix={inputFieldIdPrefix}
+              lang={lang}
+              labels={labels}
+              onChange={onChange}
+              readOnly={readOnly}
+              showLanguageBadge={showLanguageBadge}
+              compactLanguage={compactLanguage}
+            />
+          ))}
         </ValidationTooltip>
       </div>
-      {editingLabels && (
-        <PanelRight
-          width="100vw"
-          onClose={() => setEditingLabels(false)}
-          header={i18n.t(formLabelKey, { count: languages.length })}
-        >
-          <div className="labels-editor__labels">
-            <ValidationTooltip validation={validation}>
-              {languages.map((lang) => (
-                <Label
-                  key={lang}
-                  inputFieldIdPrefix={inputFieldIdPrefix}
-                  lang={lang}
-                  labels={labels}
-                  onChange={onChange}
-                  readOnly={readOnly}
-                  showLanguageBadge={languages.length > 1}
-                  compactLanguage={compactLanguage}
-                />
-              ))}
-            </ValidationTooltip>
-          </div>
-        </PanelRight>
-      )}
     </div>
   )
 }
