@@ -43,7 +43,6 @@ export const Button = (props) => {
 Button.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
-  showLabel: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
   label: PropTypes.string,
@@ -57,7 +56,6 @@ Button.propTypes = {
 Button.defaultProps = {
   className: null,
   disabled: false,
-  showLabel: true,
   iconClassName: null,
   id: null,
   label: null,
