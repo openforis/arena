@@ -2,7 +2,7 @@ export const types = {
   uuid: 'UUID',
   varchar: 'VARCHAR',
   bigint: 'BIGINT',
-  decimal: `DECIMAL(${16 + 6}, 6)`,
+  decimal: `DECIMAL`,
   date: 'DATE',
   time: 'TIME WITHOUT TIME ZONE',
   timeStamp: 'TIMESTAMP',
