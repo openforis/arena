@@ -49,23 +49,15 @@ const _selectsByNodeDefType =
       ]
     }
 
-    if (NodeDef.isCode(nodeDefCol) && joinCodes) {
-      console.log("asadsa")
-      // this is to return the code as the name of the varibale
-      return [
-        `${alias} AS ${alias.replace(/_code$/, '')}`
-      ]
-    }
-
     return namesFull
   }
 
-const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode, joinCodes}) => {
+const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
   if (columnNodeDefs) {
     queryBuilder.select(
       viewDataNodeDef.columnRecordUuid,
       ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
-        _selectsByNodeDefType({ viewDataNodeDef, streamMode, joinCodes })(columnNodeDef.nodeDef)
+        _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
       ),
       `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
     )
@@ -77,7 +69,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode, joinCodes })),
+      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
@@ -163,7 +155,7 @@ const _dbTransformCallbackSelect =
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {
-  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false, joinCodes = false } = params
+  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false } = params
 
   const editMode = Query.isModeRawEdit(query)
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -180,7 +172,6 @@ export const fetchViewData = async (params, client = db) => {
     nodeDefCols,
     editMode,
     streamMode: stream,
-    joinCodes
   })
 
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
@@ -254,11 +245,11 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
-  const recordNotEqualCondition = Expression.newBinary(
-    Expression.newIdentifier(DataTable.columnNameRecordUuuid),
-    Expression.newLiteral(Record.getUuid(record)),
-    Expression.operators.comparison.notEq.key
-  )
+  const recordNotEqualCondition = Expression.newBinary({
+    left: Expression.newIdentifier(DataTable.columnNameRecordUuuid),
+    right: Expression.newLiteral(Record.getUuid(record)),
+    operator: Expression.operators.comparison.notEq.key,
+  })
 
   const filter = R.reduce(
     (whereExprAcc, nodeDefUnique) => {
@@ -267,9 +258,17 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
 
-      const condition = Expression.newBinary(identifier, value, Expression.operators.comparison.eq.key)
+      const condition = Expression.newBinary({
+        left: identifier,
+        right: value,
+        operator: Expression.operators.comparison.eq.key,
+      })
 
-      return Expression.newBinary(whereExprAcc, condition, Expression.operators.logical.and.key)
+      return Expression.newBinary({
+        left: whereExprAcc,
+        right: condition,
+        operator: Expression.operators.logical.and.key,
+      })
     },
     recordNotEqualCondition,
     nodeDefsUnique

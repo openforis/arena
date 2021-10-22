@@ -22,9 +22,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, entityDefUuid, joinCodes = false } = Request.getParams(req)
+        const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
         
-        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false, joinCodes })
+        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false })
         res.json(data)
       } catch (error) {
         next(error)

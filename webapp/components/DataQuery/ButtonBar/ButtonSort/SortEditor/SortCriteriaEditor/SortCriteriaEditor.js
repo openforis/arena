@@ -15,7 +15,7 @@ const SortCriteriaEditor = (props) => {
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
 
   const i18n = useI18n()
-
+ 
   return (
     <div className="sort-criteria-editor">
       <Dropdown

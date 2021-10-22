@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+// MOVE import from table
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ColProps from './dataColProps'
 

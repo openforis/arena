@@ -22,7 +22,7 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) 
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 
 // ==== READ
-export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid, draft = true, joinCodes = false }) => {
+export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid, draft = true }) => {
   const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
     cycle,
@@ -33,7 +33,7 @@ export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid, draft = 
 
   const query = Query.create({ entityDefUuid })
 
-  return SurveyRdbManager.fetchViewData({ survey: surveyAndNodeDefs, cycle, query, columnNodeDefs: true, joinCodes })
+  return SurveyRdbManager.fetchViewData({ survey: surveyAndNodeDefs, cycle, query, columnNodeDefs: true })
 }
 
 // ==== UPDATE

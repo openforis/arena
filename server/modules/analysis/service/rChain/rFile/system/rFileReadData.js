@@ -22,8 +22,7 @@ export default class RFileReadData extends RFileSystem {
           surveyId: Survey.getId(survey),
           cycle,
           chainUuid,
-          entityUuid: NodeDef.getUuid(entityDef),
-          params: 'joinCodes=true'
+          entityUuid: NodeDef.getUuid(entityDef)
         })
       )
       const dfEntity = NodeDef.getName(entityDef)
