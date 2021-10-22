@@ -1,30 +1,76 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { ResizableBox } from 'react-resizable'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import ProgressBar from '@webapp/components/progressBar'
-import { useSurveyCycleKey } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 
 import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
+const NodeDefEntityTableCellContent = (props) => {
+  const { children, fieldsLength, onResizeStart, onResizeStop, resizable, width } = props
+
+  const className = 'survey-form__node-def-entity-table-cell-content'
+
+  if (!resizable)
+    return (
+      <div className={className} style={{ width: `${width}px` }}>
+        {children}
+      </div>
+    )
+
+  return (
+    <ResizableBox
+      className={className}
+      width={width}
+      height={40}
+      axis={resizable ? 'x' : 'none'}
+      handleSize={[25, 25]}
+      resizeHandles={resizable ? ['se'] : []}
+      onResizeStart={onResizeStart}
+      onResizeStop={onResizeStop}
+      minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, 40]}
+      maxConstraints={[NodeDefLayout.columnWidthMaxPx * fieldsLength, 40]}
+    >
+      {children}
+    </ResizableBox>
+  )
+}
+
 const NodeDefEntityTableCell = (props) => {
-  const { nodeDef, parentNode, draggable, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
+  const {
+    nodeDef,
+    parentNode,
+    draggable,
+    renderType,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+    onResizeStart,
+    onResizeStop: onResizeStopProp,
+    gridSize,
+    resizable,
+    windowed,
+  } = props
 
   const cycle = useSurveyCycleKey()
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const elementRef = useRef(null)
+  const dispatch = useDispatch()
 
   // Table cell header is always visible
   const isHeader = renderType === NodeDefLayout.renderType.tableHeader
   const [visible, setVisible] = useState(isHeader || !windowed)
 
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const fields = NodeDefUiProps.getFormFields(nodeDef)
+  const fieldsLength = fields.length
   const widthValue = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
-  const widthUnit = NodeDefLayout.getColumnWidthUnit(cycle)(nodeDef)
-  const width = `${fields.length * widthValue}${widthUnit}`
+  const totalWidthValue = fieldsLength * widthValue
 
   useEffect(() => {
     if (isHeader || !windowed || !gridSize) {
@@ -49,25 +95,49 @@ const NodeDefEntityTableCell = (props) => {
     setVisible(elemVisible)
   }, [gridSize])
 
+  const onResizeStop = (_e, { size }) => {
+    const { width } = size
+
+    const fieldWidth = Math.ceil(width / NodeDefUiProps.getFormFields(nodeDef).length)
+    if (!fieldWidth || fieldWidth < NodeDefLayout.columnWidthMinPx) return
+
+    dispatch(
+      NodeDefsActions.putNodeDefLayoutProp({
+        nodeDef,
+        key: NodeDefLayout.keys.columnWidth,
+        value: `${fieldWidth}px`,
+      })
+    )
+
+    onResizeStopProp()
+  }
+
   return (
     <div
       ref={elementRef}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
-      style={{ width }}
       onMouseDown={(e) => e.stopPropagation()}
       draggable={draggable}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
     >
-      {visible ? (
-        <NodeDefSwitch {...props} node={null} nodeDef={nodeDef} parentNode={parentNode} renderType={renderType} />
-      ) : (
-        <div className="survey-form__node-def-entity-table-cell-placeholder">
-          <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
-        </div>
-      )}
+      <NodeDefEntityTableCellContent
+        fieldsLength={fieldsLength}
+        onResizeStart={onResizeStart}
+        onResizeStop={onResizeStop}
+        resizable={resizable}
+        width={totalWidthValue}
+      >
+        {visible ? (
+          <NodeDefSwitch {...props} node={null} nodeDef={nodeDef} parentNode={parentNode} renderType={renderType} />
+        ) : (
+          <div className="survey-form__node-def-entity-table-cell-placeholder">
+            <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
+          </div>
+        )}
+      </NodeDefEntityTableCellContent>
     </div>
   )
 }
@@ -87,6 +157,9 @@ NodeDefEntityTableCell.propTypes = {
   onDragStart: PropTypes.func.isRequired,
   onDragOver: PropTypes.func.isRequired,
   onDragEnd: PropTypes.func.isRequired,
+  onResizeStart: PropTypes.func.isRequired,
+  onResizeStop: PropTypes.func.isRequired,
+  resizable: PropTypes.bool.isRequired,
 }
 
 NodeDefEntityTableCell.defaultProps = {

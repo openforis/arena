@@ -25,16 +25,18 @@ const NodeDefEntityTableRow = (props) => {
     i = 'header',
   } = props
 
-  const draggable = edit && canEditDef
-
   const placeholderRef = useRef()
   const rowRef = useRef()
   const [dragged, setDragged] = useState(null)
+  const [resizing, setResizing] = useState(false)
 
   const dispatch = useDispatch()
 
+  const draggable = edit && canEditDef && !resizing
+  const resizable = edit && renderType === NodeDefLayout.renderType.tableHeader
+
   const dragStart = (evt) => {
-    if (!draggable) {
+    if (!draggable || resizing) {
       return
     }
     const { currentTarget, dataTransfer } = evt
@@ -90,6 +92,14 @@ const NodeDefEntityTableRow = (props) => {
     dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
   }
 
+  const onChildResizeStart = () => {
+    setResizing(true)
+  }
+
+  const onChildResizeStop = () => {
+    setResizing(false)
+  }
+
   const className =
     'survey-form__node-def-entity-table-row' +
     (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
@@ -105,9 +115,12 @@ const NodeDefEntityTableRow = (props) => {
           parentNode={node}
           draggable={draggable}
           renderType={renderType}
+          resizable={resizable}
           onDragStart={dragStart}
           onDragOver={dragOver}
           onDragEnd={dragEnd}
+          onResizeStart={onChildResizeStart}
+          onResizeStop={onChildResizeStop}
         />
       ))}
 
