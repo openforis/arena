@@ -1,23 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import ProgressBar from '@webapp/components/progressBar'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import ProgressBar from '@webapp/components/progressBar'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+
 import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCell = (props) => {
   const { nodeDef, parentNode, draggable, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
 
+  const cycle = useSurveyCycleKey()
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const { length } = NodeDefUiProps.getFormFields(nodeDef)
   const elementRef = useRef(null)
 
   // Table cell header is always visible
   const isHeader = renderType === NodeDefLayout.renderType.tableHeader
   const [visible, setVisible] = useState(isHeader || !windowed)
+
+  const fields = NodeDefUiProps.getFormFields(nodeDef)
+  const widthValue = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
+  const widthUnit = NodeDefLayout.getColumnWidthUnit(cycle)(nodeDef)
+  const width = `${fields.length * widthValue}${widthUnit}`
 
   useEffect(() => {
     if (isHeader || !windowed || !gridSize) {
@@ -47,7 +54,7 @@ const NodeDefEntityTableCell = (props) => {
       ref={elementRef}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
-      style={{ width: 160 * length + 'px' }}
+      style={{ width }}
       onMouseDown={(e) => e.stopPropagation()}
       draggable={draggable}
       onDragStart={onDragStart}

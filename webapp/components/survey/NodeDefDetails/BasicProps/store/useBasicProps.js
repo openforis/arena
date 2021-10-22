@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as StringUtils from '@core/stringUtils'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
@@ -41,6 +42,10 @@ export const useBasicProps = (props) => {
   const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
+  const insideTable = NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)
+  const columnWidth = NodeDefLayout.getColumnWidthValue(surveyCycleKey)(nodeDef)
+  const columnWidthText = StringUtils.trim(columnWidth)
+
   return {
     nodeDef,
     validation,
@@ -55,5 +60,7 @@ export const useBasicProps = (props) => {
     renderType,
     displayIn,
     cyclesNodeDef,
+    insideTable,
+    columnWidthText,
   }
 }

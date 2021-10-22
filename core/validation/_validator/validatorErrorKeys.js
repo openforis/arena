@@ -52,6 +52,8 @@ export const ValidatorErrorKeys = {
   nodeDefEdit: {
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
+    columnWidthCannotBeGreaterThan: 'validationErrors.nodeDefEdit.columnWidthCannotBeGreaterThan',
+    columnWidthCannotBeLessThan: 'validationErrors.nodeDefEdit.columnWidthCannotBeLessThan',
     countMaxMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMaxMustBePositiveNumber',
     countMinMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMinMustBePositiveNumber',
     defaultValuesInvalid: 'validationErrors.nodeDefEdit.defaultValuesInvalid',

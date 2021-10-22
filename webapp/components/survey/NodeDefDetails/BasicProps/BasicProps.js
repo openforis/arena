@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
@@ -49,6 +49,8 @@ const BasicProps = (props) => {
     renderType,
     displayIn,
     cyclesNodeDef,
+    insideTable,
+    columnWidthText,
   } = useBasicProps(props)
 
   return (
@@ -81,6 +83,19 @@ const BasicProps = (props) => {
       {NodeDef.isDecimal(nodeDef) && <DecimalProps state={state} Actions={Actions} />}
 
       {NodeDef.isBoolean(nodeDef) && <BooleanProps state={state} Actions={Actions} />}
+
+      {insideTable && (
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.columnWidth')}>
+          <Input
+            value={columnWidthText}
+            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.columnWidth)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.columnWidth, value: `${value}px` })
+            }
+          />
+        </FormItem>
+      )}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
