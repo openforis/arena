@@ -29,9 +29,8 @@ const NodeDefEntityTableCellContent = (props) => {
       className={className}
       width={width}
       height={40}
-      axis={resizable ? 'x' : 'none'}
+      axis="x"
       handleSize={[25, 25]}
-      resizeHandles={resizable ? ['se'] : []}
       onResizeStart={onResizeStart}
       onResizeStop={onResizeStop}
       minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, 40]}
