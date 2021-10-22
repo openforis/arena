@@ -23,7 +23,15 @@ export const isFloat = R.pipe(toNumber, Number.isFinite)
  * @param {number} [decimalDigits=2] - Number of fixed decimal digits.
  * @returns {string} - The formatted value or null if the value was null.
  */
-export const formatDecimal = (value, decimalDigits = 2) => (value ? new BigNumber(value).toFormat(decimalDigits) : null)
+export const formatDecimal = (value, decimalDigits = NaN) => {
+  if (Number.isNaN(value) || value === null) return null
+  const num = new BigNumber(value)
+
+  if (decimalDigits >= 0) {
+    return num.toFormat(decimalDigits)
+  }
+  return num.toString()
+}
 
 /**
  * Formats the given value to a rounded integer.

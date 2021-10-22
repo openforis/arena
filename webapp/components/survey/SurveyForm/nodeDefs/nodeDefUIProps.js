@@ -115,8 +115,10 @@ const propsUI = {
   },
 }
 
-const getPropByType = (prop, defaultValue = null) => (nodeDefType) =>
-  R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+const getPropByType =
+  (prop, defaultValue = null) =>
+  (nodeDefType) =>
+    R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
 const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 

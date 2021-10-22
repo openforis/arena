@@ -1,1 +1,9 @@
-export { Button, ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonNew, ButtonSave } from './buttons'
+export {
+  Button,
+  ButtonCancel,
+  ButtonDelete,
+  ButtonIconEdit,
+  ButtonNew,
+  ButtonSave,
+  ButtonInvite,
+} from './buttons'

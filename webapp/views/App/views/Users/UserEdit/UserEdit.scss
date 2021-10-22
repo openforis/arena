@@ -1,3 +1,5 @@
+@import 'webapp/style/vars';
+
 .user-edit {
   margin: auto;
   padding: 1rem;
@@ -30,6 +32,7 @@
   .btn-save {
     padding-left: 3rem;
     padding-right: 3rem;
+    background-color: $white;
   }
 
   .btn-remove-user {

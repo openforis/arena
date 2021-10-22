@@ -34,7 +34,7 @@ export const Button = (props) => {
       title={title ? i18n.t(title) : null}
       {...otherProps}
     >
-      {iconClassName && <span className={`icon ${iconClassName}${label ? ' icon-left' : ''}`} />}
+      {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
     </button>
   )
@@ -43,6 +43,7 @@ export const Button = (props) => {
 Button.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  showLabel: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
   label: PropTypes.string,
@@ -56,6 +57,7 @@ Button.propTypes = {
 Button.defaultProps = {
   className: null,
   disabled: false,
+  showLabel: true,
   iconClassName: null,
   id: null,
   label: null,
