@@ -62,8 +62,8 @@ export const getColumnNames = (survey, nodeDef) => [
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns, idx ) => {
-  const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns, idx )
+export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns ) => {
+  const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns )
 
   return [
     Node.getUuid(nodeRow),
