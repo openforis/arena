@@ -5,10 +5,22 @@ import classNames from 'classnames'
 import { useI18n } from '@webapp/store/system'
 
 export const Button = (props) => {
-  const { className, disabled, iconClassName, id, label, showLabel, onClick, size, testId, title, ...otherProps } =
-    props
+  const {
+    className,
+    disabled,
+    iconClassName,
+    id,
+    label: labelProp,
+    onClick,
+    showLabel,
+    size,
+    testId,
+    title,
+    ...otherProps
+  } = props
 
   const i18n = useI18n()
+  const label = showLabel && labelProp ? i18n.t(labelProp) : null
 
   return (
     <button
@@ -23,7 +35,7 @@ export const Button = (props) => {
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
-      {showLabel && label ? i18n.t(label) : null}
+      {label}
     </button>
   )
 }
@@ -31,11 +43,11 @@ export const Button = (props) => {
 Button.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
-  showLabel: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func.isRequired,
+  showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
   title: PropTypes.string,
@@ -44,10 +56,10 @@ Button.propTypes = {
 Button.defaultProps = {
   className: null,
   disabled: false,
-  showLabel: true,
   iconClassName: null,
   id: null,
   label: null,
+  showLabel: true,
   size: 'medium',
   testId: null,
   title: null,
