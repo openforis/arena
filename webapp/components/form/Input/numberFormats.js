@@ -1,10 +1,12 @@
-export const integer = () => ({
+export const integer = ({ allowNegative = true, allowZero = true } = {}) => ({
+  allowNegative,
   decimalScale: 0,
+  isAllowed: (valueObj) => allowZero || valueObj.value !== '0',
   maxLength: 16,
 })
 
 export const decimal = ({ decimalScale = 6 } = {}) => ({
-  decimalScale,
+  ...(Number.isNaN(decimalScale) ? {} : { decimalScale }),
   decimalSeparator: '.',
   maxLength: 16,
 })
