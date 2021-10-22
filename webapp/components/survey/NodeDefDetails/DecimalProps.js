@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -15,13 +15,15 @@ const DecimalProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
 
+  const decimalDigits = NodeDef.getMaxNumberDecimalDigits(nodeDef)
+  const decimalDigitsString = Number.isNaN(decimalDigits) ? '' : String(decimalDigits)
+
   return (
     <FormItem label={i18n.t('nodeDefEdit.decimalProps.maxNumberDecimalDigits')}>
       <Input
         disabled={false}
-        placeholder={i18n.t('nodeDefEdit.decimalProps.maxNumberDecimalDigits')}
-        value={NodeDef.getMaxNumberDecimalDigits(nodeDef)}
-        type="number"
+        value={decimalDigitsString}
+        numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxNumberDecimalDigits, value })}
       />
     </FormItem>
