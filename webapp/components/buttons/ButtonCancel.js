@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Button } from './Button'
 
-export const ButtonCancel = (props) => <Button {...props} className="btn-secondary" label="common.cancel" />
+export const ButtonCancel = (props) => <Button {...props} className={`btn-secondary ${props.className || ''}`} />
 
 ButtonCancel.propTypes = {
   ...Button.propTypes,
@@ -10,4 +10,5 @@ ButtonCancel.propTypes = {
 
 ButtonCancel.defaultProps = {
   ...Button.defaultProps,
+  label: 'common.cancel',
 }

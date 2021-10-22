@@ -27,83 +27,82 @@ const NodeDefDetails = () => {
   const { state, Actions, editingFromDesigner } = useNodeDefDetails()
 
   const nodeDef = State.getNodeDef(state)
-  const validation = State.getValidation(state)
+  if (!nodeDef) return null
 
+  const validation = State.getValidation(state)
   const nodeDefType = NodeDef.getType(nodeDef)
 
-  return nodeDef ? (
-    <>
-      <div className="node-def-edit">
-        <div className="node-def-edit__container">
-          {NodeDef.isAnalysis(nodeDef) && (
-            <AnalysisEntitySelector
-              onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
-              nodeDef={nodeDef}
-            />
-          )}
-
-          <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
-            <Input
-              id={TestId.nodeDefDetails.nodeDefName}
-              value={NodeDef.getName(nodeDef)}
-              validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-              onChange={(value) =>
-                Actions.setProp({ state, key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
-              }
-            />
-            <div className="attribute-selector">
-              {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
-            </div>
-          </FormItem>
-
-          <TabBar
-            showTabs={!NodeDef.isAnalysis(nodeDef)}
-            tabs={[
-              {
-                label: i18n.t('nodeDefEdit.basic'),
-                component: BasicProps,
-                id: TestId.nodeDefDetails.basic,
-                props: {
-                  state,
-                  Actions,
-                  editingFromDesigner,
-                },
-              },
-              ...(NodeDef.isRoot(nodeDef)
-                ? []
-                : [
-                    {
-                      label: i18n.t('nodeDefEdit.advanced'),
-                      component: AdvancedProps,
-                      id: TestId.nodeDefDetails.advanced,
-                      props: {
-                        state,
-                        Actions,
-                      },
-                    },
-
-                    ...(NodeDefUIProps.getValidationsEnabledByType(nodeDefType)
-                      ? [
-                          {
-                            label: i18n.t('nodeDefEdit.validations'),
-                            component: ValidationsProps,
-                            id: TestId.nodeDefDetails.validations,
-                            props: {
-                              state,
-                              Actions,
-                            },
-                          },
-                        ]
-                      : []),
-                  ]),
-            ]}
+  return (
+    <div className="node-def-edit">
+      <div className="node-def-edit__container">
+        {NodeDef.isAnalysis(nodeDef) && (
+          <AnalysisEntitySelector
+            onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
+            nodeDef={nodeDef}
           />
+        )}
 
-          <ButtonBar state={state} Actions={Actions} />
-        </div>
+        <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
+          <Input
+            id={TestId.nodeDefDetails.nodeDefName}
+            value={NodeDef.getName(nodeDef)}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+            onChange={(value) =>
+              Actions.setProp({ state, key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
+            }
+          />
+          <div className="attribute-selector">
+            {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
+          </div>
+        </FormItem>
+
+        <TabBar
+          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef)}
+          tabs={[
+            {
+              label: i18n.t('nodeDefEdit.basic'),
+              component: BasicProps,
+              id: TestId.nodeDefDetails.basic,
+              props: {
+                state,
+                Actions,
+                editingFromDesigner,
+              },
+            },
+            ...(NodeDef.isRoot(nodeDef)
+              ? []
+              : [
+                  {
+                    label: i18n.t('nodeDefEdit.advanced'),
+                    component: AdvancedProps,
+                    id: TestId.nodeDefDetails.advanced,
+                    props: {
+                      state,
+                      Actions,
+                    },
+                  },
+
+                  ...(NodeDefUIProps.getValidationsEnabledByType(nodeDefType)
+                    ? [
+                        {
+                          label: i18n.t('nodeDefEdit.validations'),
+                          component: ValidationsProps,
+                          id: TestId.nodeDefDetails.validations,
+                          props: {
+                            state,
+                            Actions,
+                          },
+                        },
+                      ]
+                    : []),
+                ]),
+          ]}
+        />
+
+        <ButtonBar state={state} Actions={Actions} />
       </div>
-    </>
-  ) : null
+    </div>
+  )
 }
 
 export default NodeDefDetails

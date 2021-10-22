@@ -8,14 +8,7 @@ export const ButtonBack = (props) => {
 
   const history = useHistory()
 
-  return (
-    <Button
-      {...props}
-      className={`btn-secondary btn-back ${className}`}
-      label="common.back"
-      onClick={() => history.goBack()}
-    />
-  )
+  return <Button onClick={history.goBack} {...props} className={`btn-secondary btn-back ${className}`} />
 }
 
 // onClick prop is not required in ButtonBack
@@ -27,4 +20,5 @@ ButtonBack.propTypes = {
 
 ButtonBack.defaultProps = {
   ...Button.defaultProps,
+  label: 'common.back',
 }

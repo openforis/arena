@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,10 +14,12 @@ import { State } from '../state'
 // Persists the temporary changes applied to the node def in the state
 export const useSaveEdits = ({ setState }) => {
   const dispatch = useDispatch()
+  const history = useHistory()
+
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
 
-  return useCallback(async ({ state }) => {
+  return useCallback(async ({ state, goBackOnEnd = false }) => {
     const nodeDef = State.getNodeDef(state)
     const validation = State.getValidation(state)
 
@@ -70,5 +73,9 @@ export const useSaveEdits = ({ setState }) => {
     dispatch(LoaderActions.hideLoader())
 
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
+
+    if (goBackOnEnd) {
+      history.goBack()
+    }
   }, [])
 }
