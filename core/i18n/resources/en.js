@@ -715,7 +715,6 @@ $t(common.cantUndoWarning)`,
       analysis: 'Analysis',
       entitySource: 'Entity Source',
       formula: 'Formula',
-      columnWidth: 'Column width (in pixels)',
     },
     advancedProps: {
       readOnly: 'Read only',
