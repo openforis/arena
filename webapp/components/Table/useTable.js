@@ -22,7 +22,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     loading: loadingData,
   } = useAsyncGetRequest(apiUri, {
     params: {
-      offset,
+      ...(offset ? { offset } : {}),
       limit,
       sortBy: sort.by,
       sortOrder: sort.order,
@@ -40,6 +40,8 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
       ...restParams,
     },
   })
+
+  const resetOffset = () => updateQuery(history)({ offset: null })
 
   const initData = useCallback(() => {
     fetchData()
@@ -67,27 +69,18 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
       let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
       order = sort.by === orderByField && sort.order === 'asc' ? null : order
 
-      updateQuery(history)({
-        value: { by: orderByField, order },
-        key: 'sort',
-      })
+      updateQuery(history)({ sort: { by: orderByField, order }, offset: null })
     },
     [sort]
   )
 
   const handleSearch = useCallback((searchText) => {
-    updateQuery(history)({
-      value: searchText,
-      key: 'search',
-    })
+    updateQuery(history)({ search: searchText, offset: null })
   }, [])
 
   // on rest params update, go to first page (reset offset)
   useEffect(() => {
-    updateQuery(history)({
-      key: 'offset',
-      value: 0,
-    })
+    resetOffset()
   }, [JSON.stringify(restParams)])
 
   return {
