@@ -23,12 +23,13 @@ export default class SurveyCreatorJob extends Job {
 
     // merge survey info props with draft props (Arena survey backup file could have only draft props)
     surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
-    // skipt collect report
-    const { collectReport, ...propsToClone } = surveyInfoArenaSurvey.props
 
-    const surveyToCloneName = Survey.getName(surveyInfoArenaSurvey)
+    // skip collect report
+    const { collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
 
-    const startingName = backup ? surveyToCloneName : Survey.getName(surveyInfoTarget) || `clone_${surveyToCloneName}`
+    const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
+
+    const startingName = backup ? surveySourceName : Survey.getName(surveyInfoTarget) || `clone_${surveySourceName}`
 
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
@@ -40,7 +41,7 @@ export default class SurveyCreatorJob extends Job {
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
     const newSurveyInfo = Survey.newSurvey({
-      ...propsToClone,
+      ...propsToImport,
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.published]: published,
