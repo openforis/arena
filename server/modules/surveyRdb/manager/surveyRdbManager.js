@@ -40,7 +40,7 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 // ==== DML
 
-const _getExportFields = ({ survey, query, addCycle = false}) => {
+const _getExportFields = ({ survey, query, addCycle = false }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
   // Consider only user selected fields (from column node defs)

@@ -10,9 +10,9 @@ import * as SQL from '../../sql'
 const { nodeDefType } = NodeDef
 
 const columnNamesSuffixByType = {
-  [nodeDefType.code]: ['code', 'label'],
-  [nodeDefType.taxon]: ['code', 'scientific_name'],
-  [nodeDefType.file]: ['file_uuid', 'file_name'],
+  [nodeDefType.code]: ['', '_label'],
+  [nodeDefType.taxon]: ['', '_scientific_name'],
+  [nodeDefType.file]: ['_file_uuid', '_file_name'],
 }
 
 const colTypesByType = {
@@ -33,7 +33,7 @@ const getColumnNames = (nodeDef) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const colsSuffix = columnNamesSuffixByType[NodeDef.getType(nodeDef)]
   if (colsSuffix) {
-    return colsSuffix.map((col) => `${nodeDefName}_${col}`)
+    return colsSuffix.map((col) => `${nodeDefName}${col}`)
   }
   if (NodeDef.isEntity(nodeDef)) {
     return [`${nodeDefName}_uuid`]
@@ -41,8 +41,13 @@ const getColumnNames = (nodeDef) => {
   return [nodeDefName]
 }
 
-const extractColumnName = ({ nodeDef, columnName }) =>
-  camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
+const extractColumnName = ({ nodeDef, columnName }) => {
+  // this is because when there is not subfix whe should return
+  if(NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)){
+    return 'code'
+  }
+  return camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
+}
 
 /**
  * A nodeDef data table column.

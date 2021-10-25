@@ -24,11 +24,18 @@ import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
-  nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false
+  nodeDef
+    ? !(
+        NodeDef.isInteger(nodeDef) ||
+        NodeDef.isCode(nodeDef) ||
+        NodeDef.isDecimal(nodeDef) ||
+        StringUtils.isBlank(value)
+      )
+    : false
 
-const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.parse(value) : value)
+const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? A.parse(value) : value)
 
-const getValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.stringify(value) : value)
+const getValue = (nodeDef, value) => (isValueText(nodeDef, value) ? A.stringify(value) : value)
 
 const loadItems = async (params) => {
   const {
@@ -45,7 +52,12 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => 
     const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
     if (Expression.isIdentifier(nodeLeftOperand)) {
       const identifierName = A.prop('name', nodeLeftOperand)
-      return Survey.getNodeDefByName(identifierName)(survey)
+      const nodeDef = Survey.getNodeDefByName(identifierName)(survey)
+      if (!nodeDef) {
+        const nameWithOutSubfix = identifierName.replace('_label', '')
+        return Survey.getNodeDefByName(nameWithOutSubfix)(survey)
+      }
+      return nodeDef
     }
   }
   return null
@@ -87,7 +99,7 @@ const Literal = (props) => {
         <Dropdown
           items={(value) => loadItems({ ...literalSearchParams, value })}
           itemLabel="label"
-          onChange={(itm) => onChangeValue(itm ? itm.key : null)}
+          onChange={(_item) => onChangeValue(_item ? _item.key : null)}
           selection={item}
         />
       )

@@ -13,10 +13,11 @@ export const parseQuery = (query, mode, canBeConstant) => {
   const expr =
     isBinary || isLogical
       ? exprQuery
-      : Expression.newBinary(
-          isCompound && canBeConstant ? Expression.newLiteral() : isCompound ? Expression.newIdentifier() : exprQuery,
-          Expression.newLiteral(),
-        )
+      : Expression.newBinary({
+          left:
+            isCompound && canBeConstant ? Expression.newLiteral() : isCompound ? Expression.newIdentifier() : exprQuery,
+          right: Expression.newLiteral(),
+        })
   return expr
 }
 

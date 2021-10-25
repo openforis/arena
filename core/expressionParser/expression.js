@@ -76,7 +76,7 @@ export const newIdentifier = (value = '') => ({
   name: value,
 })
 
-export const newBinary = (left, right, operator = '') => ({
+export const newBinary = ({ left, right, operator = '' }) => ({
   type: types.BinaryExpression,
   operator,
   left,

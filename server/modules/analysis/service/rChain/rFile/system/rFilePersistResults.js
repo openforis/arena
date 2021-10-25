@@ -20,7 +20,7 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
   const fileZip = `${dirResults}/${dfSourceName}.zip`
   scripts.push(zipr(fileZip, fileResults))
   // put request
-  scripts.push(arenaPutFile(ApiRoutes.rChain.entityData(surveyId, cycle, chainUuid, NodeDef.getUuid(entity)), fileZip))
+  scripts.push(arenaPutFile(ApiRoutes.rChain.entityData({surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }), fileZip))
 
   return scripts
 }
