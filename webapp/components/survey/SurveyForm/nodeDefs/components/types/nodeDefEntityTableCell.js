@@ -8,6 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import ProgressBar from '@webapp/components/progressBar'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { TestId } from '@webapp/utils/testId'
 
 import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
@@ -66,6 +67,7 @@ const NodeDefEntityTableCell = (props) => {
   const [visible, setVisible] = useState(isHeader || !windowed)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefName = NodeDef.getName(nodeDef)
   const fields = NodeDefUiProps.getFormFields(nodeDef)
   const fieldsLength = fields.length
   const widthValue = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
@@ -114,6 +116,7 @@ const NodeDefEntityTableCell = (props) => {
   return (
     <div
       ref={elementRef}
+      data-testid={TestId.surveyForm.nodeDefEntityTableCellWrapper(nodeDefName)}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
       onMouseDown={(e) => e.stopPropagation()}
