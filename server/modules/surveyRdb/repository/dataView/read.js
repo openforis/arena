@@ -27,7 +27,7 @@ const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
 }
 
 const _selectsByNodeDefType =
-  ({ viewDataNodeDef, streamMode }) =>
+  ({ viewDataNodeDef, streamMode, joinCodes = false }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
     const { name: alias, nameFull, namesFull } = columnNodeDef
@@ -48,6 +48,7 @@ const _selectsByNodeDefType =
         `'EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
       ]
     }
+
     return namesFull
   }
 
@@ -244,11 +245,11 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
-  const recordNotEqualCondition = Expression.newBinary(
-    Expression.newIdentifier(DataTable.columnNameRecordUuuid),
-    Expression.newLiteral(Record.getUuid(record)),
-    Expression.operators.comparison.notEq.key
-  )
+  const recordNotEqualCondition = Expression.newBinary({
+    left: Expression.newIdentifier(DataTable.columnNameRecordUuuid),
+    right: Expression.newLiteral(Record.getUuid(record)),
+    operator: Expression.operators.comparison.notEq.key,
+  })
 
   const filter = R.reduce(
     (whereExprAcc, nodeDefUnique) => {
@@ -257,9 +258,17 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
 
-      const condition = Expression.newBinary(identifier, value, Expression.operators.comparison.eq.key)
+      const condition = Expression.newBinary({
+        left: identifier,
+        right: value,
+        operator: Expression.operators.comparison.eq.key,
+      })
 
-      return Expression.newBinary(whereExprAcc, condition, Expression.operators.logical.and.key)
+      return Expression.newBinary({
+        left: whereExprAcc,
+        right: condition,
+        operator: Expression.operators.logical.and.key,
+      })
     },
     recordNotEqualCondition,
     nodeDefsUnique

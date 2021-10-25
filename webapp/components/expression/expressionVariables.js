@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { types as sqlTypes } from '@common/model/db/sql'
+import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -28,12 +28,12 @@ const getJsVariables = (nodeDef) => [
 ]
 
 const getSqlVariables = (nodeDef, lang) => {
-  const columnNames = NodeDefTable.getColumnNames(nodeDef)
+  const columnNames = ColumnNodeDef.getColumnNames(nodeDef)
 
   // Returns the label of the nodeDef with the col name as suffix (when there are multiple columns)
   const getLabel = (col) =>
     NodeDef.getLabel(nodeDef, lang) +
-    (columnNames.length === 1 ? '' : ` - ${NodeDefTable.extractColumnName(nodeDef, col)}`)
+    (columnNames.length === 1 ? '' : ` - ${ColumnNodeDef.extractColumnName({ nodeDef, columnName: col })}`)
 
   return columnNames.map((col) => ({
     value: col,

@@ -110,15 +110,15 @@ export default () =>
           await expect(String(_cluster.cluster_boolean)).toBe(String(mockRecord[cluster_boolean.name]))
 
           const { code: countryCode, label: countryLabel } = getCodeAndLabel(mockRecord[cluster_country.name])
-          await expect(_cluster.cluster_country_code).toBe(countryCode)
+          await expect(_cluster.cluster_country).toBe(countryCode)
           await expect(_cluster.cluster_country_label).toBe(countryLabel)
 
           const { code: regionCode, label: regionLabel } = getCodeAndLabel(mockRecord[cluster_region.name])
-          await expect(_cluster.cluster_region_code).toBe(regionCode)
+          await expect(_cluster.cluster_region).toBe(regionCode)
           await expect(_cluster.cluster_region_label).toBe(regionLabel)
 
           const { code: provinceCode, label: provinceLabel } = getCodeAndLabel(mockRecord[cluster_province.name])
-          await expect(_cluster.cluster_province_code).toBe(provinceCode)
+          await expect(_cluster.cluster_province).toBe(provinceCode)
           await expect(_cluster.cluster_province_label).toBe(provinceLabel)
         })
       )
@@ -172,7 +172,7 @@ export default () =>
           await expect(Number(mockTree[tree_dec_1.name]).toFixed(2)).toBe(Number(_tree[tree_dec_1.name]).toFixed(2))
           await expect(Number(mockTree[tree_dec_2.name]).toFixed(2)).toBe(Number(_tree[tree_dec_2.name]).toFixed(2))
 
-          await expect(mockTree[tree_species.name].code).toBe(_tree.tree_species_code)
+          await expect(mockTree[tree_species.name].code).toBe(_tree.tree_species)
           await expect(mockTree[tree_species.name].scientificName).toBe(_tree.tree_species_scientific_name)
         })
       )

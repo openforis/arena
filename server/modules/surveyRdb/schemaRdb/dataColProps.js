@@ -6,6 +6,7 @@ import { PointFactory, Points } from '@openforis/arena-core'
 import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
@@ -74,11 +75,14 @@ const props = {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
-
-      return (_node, columnName) =>
-        R.endsWith('code', columnName)
-          ? getValueFromItem(nodeDefCol, columnName, item, true)
-          : ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
+      
+      
+      return (_node, columnName) => {
+        return  R.endsWith('label', columnName)
+          ? ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
+          : CategoryItem.getCode(item)
+      }
+          
     },
   },
 
@@ -90,7 +94,7 @@ const props = {
 
       return (node, columnName) =>
         // eslint-disable-next-line no-nested-ternary
-        R.endsWith('code', columnName)
+        R.equals(NodeDef.getName(_nodeDefCol), columnName)
           ? Taxon.getCode(taxon)
           : Taxon.isUnlistedTaxon(taxon) // Scientific_name
           ? Node.getScientificName(node) // From node value

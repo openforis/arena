@@ -15,6 +15,8 @@ const columnProps = {
   [CategoryImportSummary.columnTypes.description]: { preffix: 'description', lang: true },
 }
 
+// TODO remove code from here if needed // categories export
+
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
   // the language suffix is optional
