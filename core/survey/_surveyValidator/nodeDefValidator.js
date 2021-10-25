@@ -91,6 +91,31 @@ const validateVirtualEntityFormula = (survey, nodeDef) =>
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
+const validateColumnWidth =
+  ({ survey }) =>
+  (_propName, nodeDef) => {
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const cycles = Survey.getCycleKeys(surveyInfo)
+    let error = null
+    cycles.some((cycle) => {
+      const width = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
+      const min = NodeDefLayout.columnWidthMinPx
+      if (width < min) {
+        error = { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeLessThan, params: { min } }
+        // break the loop
+        return true
+      }
+      const max= NodeDefLayout.columnWidthMaxPx
+      if (width > max) {
+        error = { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeGreaterThan, params: { max } }
+        // break the loop
+        return true
+      }
+      return false
+    })
+    return error
+  }
+
 const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
@@ -109,20 +134,18 @@ const propsValidations = (survey) => ({
   [keysValidationFields.children]: [validateChildren(survey)],
   // Virtual Entity
   [`${keys.parentUuid}`]: [validateVirtualEntitySoruceUuid],
+  // Layout
+  [`${keys.props}.${propKeys.layout}.${NodeDefLayout.keys.columnWidth}`]: [validateColumnWidth({ survey })],
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {
-  const [
-    validationDefaultValues,
-    validationApplicable,
-    validationValidations,
-    validationVirtualEntityFormula,
-  ] = await Promise.all([
-    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
-    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
-    NodeDefValidationsValidator.validate(survey, nodeDef),
-    validateVirtualEntityFormula(survey, nodeDef),
-  ])
+  const [validationDefaultValues, validationApplicable, validationValidations, validationVirtualEntityFormula] =
+    await Promise.all([
+      NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
+      NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
+      NodeDefValidationsValidator.validate(survey, nodeDef),
+      validateVirtualEntityFormula(survey, nodeDef),
+    ])
 
   return Validation.newInstance(
     R.all(Validation.isValid, [

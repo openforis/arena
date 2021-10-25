@@ -37,7 +37,13 @@ const NodeDefEditButtons = (props) => {
   }, [hasNodeDefAddChildTo])
 
   return (
-    <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
+    <div
+      className="survey-form__node-def-edit-buttons"
+      ref={elementRef}
+      style={style}
+      draggable={false}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
         <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}

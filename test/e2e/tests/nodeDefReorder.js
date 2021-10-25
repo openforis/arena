@@ -5,42 +5,50 @@ import { gotoFormDesigner } from './_navigation'
 import { gotoFormPage } from './_formDesigner'
 import { publishWithoutErrors } from './_publish'
 
-const getBBoxes = async (nodeDefTarget, nodeDefSource) => {
-  const targetEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(nodeDefTarget.name)))
-  const sourceEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(nodeDefSource.name)))
+const getBBoxes = async ({ nodeDefTarget, nodeDefSource, insideTable = false }) => {
+  const targetTestId = insideTable
+    ? TestId.surveyForm.nodeDefEntityTableCellWrapper(nodeDefTarget.name)
+    : TestId.surveyForm.nodeDefWrapper(nodeDefTarget.name)
+  const targetEl = await page.$(getSelector(targetTestId))
+
+  const sourceTestId = insideTable
+    ? TestId.surveyForm.nodeDefEntityTableCellWrapper(nodeDefSource.name)
+    : TestId.surveyForm.nodeDefWrapper(nodeDefSource.name)
+  const sourceEl = await page.$(getSelector(sourceTestId))
+
   await targetEl.scrollIntoViewIfNeeded()
+
   const targetBBox = await targetEl.boundingBox()
   const sourceBBox = await sourceEl.boundingBox()
   return { targetEl, sourceEl, targetBBox, sourceBBox }
 }
 
-const getBoxCenter = (bBox) => {
-  return {
-    x: bBox.x + bBox.width / 2,
-    y: bBox.y + bBox.height / 2,
-  }
-}
+const getBoxCenter = (bBox) => ({
+  x: bBox.x + bBox.width / 2,
+  y: bBox.y + bBox.height / 2,
+})
 
 const moveRight = async (nodeDefTarget, nodeDefSource) => {
-  const { targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
+  const { targetBBox, sourceBBox } = await getBBoxes({ nodeDefTarget, nodeDefSource })
   await dragAndDrop(targetBBox.x + 2, targetBBox.y + 2, sourceBBox.x + sourceBBox.width + 5, sourceBBox.y)
 }
 
 const moveBelow = async (nodeDefTarget, nodeDefSource) => {
-  const { targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
+  const { targetBBox, sourceBBox } = await getBBoxes({ nodeDefTarget, nodeDefSource })
   await dragAndDrop(targetBBox.x + 2, targetBBox.y + 2, sourceBBox.x, sourceBBox.y + sourceBBox.height + 5)
 }
 
 const moveEntityTableCell =
   (offset = { x: 2, y: 2 }) =>
   async (nodeDefTarget, nodeDefSource) => {
-    const { targetEl, sourceEl, targetBBox, sourceBBox } = await getBBoxes(nodeDefTarget, nodeDefSource)
-    await dragAndDropOver({
-      targetEl,
-      sourceEl,
-      from: { x: targetBBox.x + 2, y: targetBBox.y + 2 },
-      to: { x: getBoxCenter(sourceBBox).x + offset.x, y: sourceBBox.y + offset.y },
+    const { targetEl, sourceEl, targetBBox, sourceBBox } = await getBBoxes({
+      nodeDefTarget,
+      nodeDefSource,
+      insideTable: true,
     })
+    const from = { x: targetBBox.x + 5, y: targetBBox.y + 5 }
+    const to = { x: getBoxCenter(sourceBBox).x + offset.x, y: sourceBBox.y + offset.y }
+    await dragAndDropOver({ targetEl, sourceEl, from, to })
   }
 const moveEntityTableCellRight = moveEntityTableCell({ x: 5, y: 2 })
 const moveEntityTableCellLeft = moveEntityTableCell({ x: -5, y: 2 })
