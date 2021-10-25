@@ -94,7 +94,7 @@ const props = {
 
       return (node, columnName) =>
         // eslint-disable-next-line no-nested-ternary
-        R.endsWith('code', columnName)
+        R.equals(NodeDef.getName(_nodeDefCol), columnName)
           ? Taxon.getCode(taxon)
           : Taxon.isUnlistedTaxon(taxon) // Scientific_name
           ? Node.getScientificName(node) // From node value
