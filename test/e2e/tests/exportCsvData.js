@@ -172,7 +172,7 @@ export default () =>
           await expect(Number(mockTree[tree_dec_1.name]).toFixed(2)).toBe(Number(_tree[tree_dec_1.name]).toFixed(2))
           await expect(Number(mockTree[tree_dec_2.name]).toFixed(2)).toBe(Number(_tree[tree_dec_2.name]).toFixed(2))
 
-          await expect(mockTree[tree_species.name].code).toBe(_tree.tree_species_code)
+          await expect(mockTree[tree_species.name].code).toBe(_tree.tree_species)
           await expect(mockTree[tree_species.name].scientificName).toBe(_tree.tree_species_scientific_name)
         })
       )
