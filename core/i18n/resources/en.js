@@ -971,6 +971,8 @@ $t(common.cantUndoWarning)`,
     nodeDefEdit: {
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+      columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
+      columnWidthCannotBeLessThan: 'Column width cannot be less than {{min}}',
       countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
       countMinMustBePositiveNumber: 'Min Count must be a positive integer',
       categoryRequired: 'Category is required',

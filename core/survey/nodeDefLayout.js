@@ -9,6 +9,7 @@ export const keys = {
   pageUuid: 'pageUuid', // Page uuid
   renderType: 'renderType', // RenderType
   columnsNo: 'columnsNo', // Number of columns
+  columnWidth: 'columnWidth', // Width of the column when rendering inside a table (defaults to '160px')
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
 }
 
@@ -29,6 +30,10 @@ export const displayIn = {
   parentPage: 'parentPage',
   ownPage: 'ownPage',
 }
+
+const widthRegEx = /(\d+)([a-z]+)/
+export const columnWidthMinPx = 160
+export const columnWidthMaxPx = 500
 
 // ====== CREATE
 
@@ -91,6 +96,16 @@ export const isDisplayInOwnPage = (cycle) => isDisplayIn(cycle, displayIn.ownPag
 export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
   isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
+export const getColumnWidth = (cycle) => _getPropLayout(cycle, keys.columnWidth, `${columnWidthMinPx}px`)
+
+const _getColumnWidthPart = ({ cycle, nodeDef, partIndex }) => {
+  const width = getColumnWidth(cycle)(nodeDef)
+  const match = width.match(widthRegEx)
+  return match ? match[partIndex] : null
+}
+export const getColumnWidthValue = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 1 })
+export const getColumnWidthUnit = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 2 })
+
 // ====== UPDATE
 
 // invoked on "layout"
@@ -111,6 +126,8 @@ export const assocLayoutChildren = (cycle, layoutChildren) =>
 export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutChildren])
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
+
+export const assocColumnWidth = (cycle, columnWidth) => assocLayoutProp(cycle, keys.columnWidth, columnWidth)
 
 // ====== UTILS
 

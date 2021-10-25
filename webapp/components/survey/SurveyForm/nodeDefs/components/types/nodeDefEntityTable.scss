@@ -69,6 +69,12 @@
       display: none;
     }
   }
+
+  .draggable-item {
+    .react-resizable {
+      position: relative;
+    }
+  }
 }
 
 .survey-form:not(.edit) {
@@ -132,4 +138,8 @@
   .progress-bar {
     height: 0.5rem;
   }
+}
+
+.survey-form__node-def-entity-table-cell-content {
+  height: 100%;
 }
