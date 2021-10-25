@@ -110,15 +110,15 @@ export default () =>
           await expect(String(_cluster.cluster_boolean)).toBe(String(mockRecord[cluster_boolean.name]))
 
           const { code: countryCode, label: countryLabel } = getCodeAndLabel(mockRecord[cluster_country.name])
-          await expect(_cluster.cluster_country_code).toBe(countryCode)
+          await expect(_cluster.cluster_country).toBe(countryCode)
           await expect(_cluster.cluster_country_label).toBe(countryLabel)
 
           const { code: regionCode, label: regionLabel } = getCodeAndLabel(mockRecord[cluster_region.name])
-          await expect(_cluster.cluster_region_code).toBe(regionCode)
+          await expect(_cluster.cluster_region).toBe(regionCode)
           await expect(_cluster.cluster_region_label).toBe(regionLabel)
 
           const { code: provinceCode, label: provinceLabel } = getCodeAndLabel(mockRecord[cluster_province.name])
-          await expect(_cluster.cluster_province_code).toBe(provinceCode)
+          await expect(_cluster.cluster_province).toBe(provinceCode)
           await expect(_cluster.cluster_province_label).toBe(provinceLabel)
         })
       )
