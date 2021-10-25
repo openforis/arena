@@ -8,11 +8,14 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-export const fetchItems = async (surveyId, offset = 0, limit = null, client = db) =>
+const _getSelectWhereCondition = ({ excludeResolved }) => `${excludeResolved ? 'WHERE resolved = FALSE' : ''}`
+
+export const fetchItems = async ({ surveyId, excludeResolved = false, offset = 0, limit = null }, client = db) =>
   client.map(
     `
       SELECT * 
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
+      ${_getSelectWhereCondition({ excludeResolved })}
       ORDER BY id
       LIMIT ${limit ? '$/limit/' : 'ALL'}
       OFFSET $/offset/
@@ -41,11 +44,12 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
 }
 
-export const countItems = async (surveyId, client = db) =>
+export const countItems = async ({ surveyId, excludeResolved }, client = db) =>
   client.one(
     `
       SELECT COUNT(*) as tot
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
+      ${_getSelectWhereCondition({ excludeResolved })}
     `,
     [],
     R.prop('tot')

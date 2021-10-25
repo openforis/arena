@@ -64,7 +64,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   const handleSortBy = useCallback(
     (orderByField) => {
-      let order = sort.by !== orderByField && sort.order !== 'asc'? 'desc' : 'asc'
+      let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
       order = sort.by === orderByField && sort.order === 'asc' ? null : order
 
       updateQuery(history)({
@@ -81,6 +81,14 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
       key: 'search',
     })
   }, [])
+
+  // on rest params update, go to first page (reset offset)
+  useEffect(() => {
+    updateQuery(history)({
+      key: 'offset',
+      value: 0,
+    })
+  }, [JSON.stringify(restParams)])
 
   return {
     loadingData,

@@ -41,9 +41,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, offset, limit } = Request.getParams(req)
+        const { surveyId, excludeResolved = false, offset, limit } = Request.getParams(req)
 
-        const list = await CollectImportService.fetchReportItems(surveyId, offset, limit)
+        const list = await CollectImportService.fetchReportItems({ surveyId, excludeResolved, offset, limit })
 
         res.json({ list })
       } catch (error) {
@@ -92,9 +92,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId } = Request.getParams(req)
+        const { surveyId, excludeResolved } = Request.getParams(req)
 
-        const count = await CollectImportService.countReportItems(surveyId)
+        const count = await CollectImportService.countReportItems({ surveyId, excludeResolved })
 
         res.json({ count })
       } catch (error) {

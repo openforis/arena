@@ -333,6 +333,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
     },
     collectImportReport: {
+      excludeResolvedItems: 'Exclude resolved items',
       expression: 'Expression',
       resolved: 'Resolved',
       exprType: {
@@ -341,6 +342,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         defaultValue: 'Default value',
         validationRule: 'Validation rule',
       },
+      title: 'Collect Import Report',
     },
     recordsSummary: {
       recordsAdded: 'Records added from {{from}} to {{to}}',
