@@ -25,50 +25,60 @@ const NodeDefEntityTableRow = (props) => {
     i = 'header',
   } = props
 
-  const draggable = edit && canEditDef
-
   const placeholderRef = useRef()
   const rowRef = useRef()
   const [dragged, setDragged] = useState(null)
+  const [resizing, setResizing] = useState(false)
 
   const dispatch = useDispatch()
 
+  const draggable = edit && canEditDef && !resizing
+  const resizable = edit && renderType === NodeDefLayout.renderType.tableHeader
+
   const dragStart = (evt) => {
-    if (!draggable) {
+    if (!draggable || resizing) {
       return
     }
-    const { currentTarget, dataTransfer } = evt
-    const placeholder = placeholderRef.current
+    try {
+      const { currentTarget, dataTransfer } = evt
+      const placeholder = placeholderRef.current
 
-    placeholder.style.width = `${currentTarget.clientWidth}px`
-    placeholder.style.height = `${currentTarget.clientHeight}px`
+      placeholder.style.width = `${currentTarget.clientWidth}px`
+      placeholder.style.height = `${currentTarget.clientHeight}px`
 
-    dataTransfer.effectAllowed = 'move'
-    // Firefox requires dataTransfer data to be set
-    dataTransfer.setData('text/html', currentTarget)
+      dataTransfer.effectAllowed = 'move'
+      // Firefox requires dataTransfer data to be set
+      dataTransfer.setData('text/html', currentTarget)
 
-    setDragged(currentTarget)
+      setDragged(currentTarget)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const dragOver = (evt) => {
     if (!draggable) {
       return
     }
-    evt.preventDefault()
-    const placeholder = placeholderRef.current
+    try {
+      evt.preventDefault()
+      const placeholder = placeholderRef.current
 
-    dragged.style.display = 'none'
-    placeholder.style.display = 'block'
+      dragged.style.display = 'none'
+      placeholder.style.display = 'block'
 
-    if (evt.target !== placeholder) {
-      const overElement = evt.target
+      if (evt.target !== placeholder) {
+        const overElement = evt.target
 
-      const { left } = elementOffset(overElement)
-      const relX = evt.clientX - left
-      const width = overElement.offsetWidth / 2
-      const parent = evt.target.parentNode
+        const { left } = elementOffset(overElement)
+        const relX = evt.clientX - left
+        const width = overElement.offsetWidth / 2
+        const parent = evt.target.parentNode
 
-      parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
+        parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -76,18 +86,30 @@ const NodeDefEntityTableRow = (props) => {
     if (!draggable) {
       return
     }
-    const placeholder = placeholderRef.current
+    try {
+      const placeholder = placeholderRef.current
 
-    dragged.style.display = 'block'
-    placeholder.style.display = 'none'
+      dragged.style.display = 'block'
+      placeholder.style.display = 'none'
 
-    placeholder.parentNode.insertBefore(dragged, placeholder)
-    setDragged(null)
+      placeholder.parentNode.insertBefore(dragged, placeholder)
+      setDragged(null)
 
-    const childNodes = rowRef.current.childNodes
-    const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
+      const childNodes = rowRef.current.childNodes
+      const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
 
-    dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
+      dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const onChildResizeStart = () => {
+    setResizing(true)
+  }
+
+  const onChildResizeStop = () => {
+    setResizing(false)
   }
 
   const className =
@@ -105,9 +127,12 @@ const NodeDefEntityTableRow = (props) => {
           parentNode={node}
           draggable={draggable}
           renderType={renderType}
+          resizable={resizable}
           onDragStart={dragStart}
           onDragOver={dragOver}
           onDragEnd={dragEnd}
+          onResizeStart={onChildResizeStart}
+          onResizeStop={onChildResizeStop}
         />
       ))}
 

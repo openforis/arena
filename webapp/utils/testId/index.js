@@ -151,6 +151,7 @@ export const TestId = {
     entityRowData: (name, idx) => `${name}-row-${idx}`,
     nodeDefAddChildBtn: (name) => `${name}-add-child-btn`,
     nodeDefEditBtn: (name) => `${name}-edit-btn`,
+    nodeDefEntityTableCellWrapper: (name) => `node-def-entity-table-cell-wrapper-${name}`,
     nodeDefErrorBadge: (name) => `${name}-error-badge`,
     nodeDefWrapper: (name) => `node-def-wrapper-${name}`,
     pageLinkBtn: (name) => `${name}-page-link-btn`,
