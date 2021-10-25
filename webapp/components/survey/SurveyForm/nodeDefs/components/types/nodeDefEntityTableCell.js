@@ -14,19 +14,21 @@ import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCellContent = (props) => {
-  const { children, fieldsLength, onResizeStart, onResizeStop, resizable, width } = props
+  const { children, fieldsLength, nodeDef, onResizeStart, onResizeStop, resizable, width } = props
 
   const className = 'survey-form__node-def-entity-table-cell-content'
+  const testId = TestId.surveyForm.nodeDefEntityTableCellWrapper(NodeDef.getName(nodeDef))
 
   if (!resizable)
     return (
-      <div className={className} style={{ width: `${width}px` }}>
+      <div data-testid={testId} className={className} style={{ width: `${width}px` }}>
         {children}
       </div>
     )
 
   return (
     <ResizableBox
+      data-testid={testId}
       className={className}
       width={width}
       height={40}
@@ -67,7 +69,6 @@ const NodeDefEntityTableCell = (props) => {
   const [visible, setVisible] = useState(isHeader || !windowed)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefName = NodeDef.getName(nodeDef)
   const fields = NodeDefUiProps.getFormFields(nodeDef)
   const fieldsLength = fields.length
   const widthValue = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
@@ -116,7 +117,6 @@ const NodeDefEntityTableCell = (props) => {
   return (
     <div
       ref={elementRef}
-      data-testid={TestId.surveyForm.nodeDefEntityTableCellWrapper(nodeDefName)}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
       onMouseDown={(e) => e.stopPropagation()}
@@ -127,6 +127,7 @@ const NodeDefEntityTableCell = (props) => {
     >
       <NodeDefEntityTableCellContent
         fieldsLength={fieldsLength}
+        nodeDef={nodeDef}
         onResizeStart={onResizeStart}
         onResizeStop={onResizeStop}
         resizable={resizable}
