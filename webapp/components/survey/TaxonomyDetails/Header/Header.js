@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
@@ -64,7 +64,7 @@ const Header = (props) => {
             onChange={([file]) => Actions.upload({ state, file })}
           />
         )}
-        <DownloadButton
+        <ButtonDownload
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
           label="common.csvExport"

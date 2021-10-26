@@ -4,17 +4,20 @@ import { useHistory } from 'react-router'
 
 import * as Category from '@core/survey/category'
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
+import { ButtonDownload } from '@webapp/components/buttons'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { State } from '../store'
+import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
   const { headerProps } = props
   const { state } = headerProps
   const history = useHistory()
+
+  const Actions = useActions({})
 
   const inCategoriesPath = useIsCategoriesRoute()
   const canEditSurvey = useAuthCanEditSurvey()
@@ -35,7 +38,13 @@ const TableHeaderLeft = (props) => {
     return <div></div>
   }
 
-  return <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
+  return (
+    <>
+      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
+
+      <ButtonDownload label="common.export" onClick={Actions.exportAll} />
+    </>
+  )
 }
 
 TableHeaderLeft.propTypes = {

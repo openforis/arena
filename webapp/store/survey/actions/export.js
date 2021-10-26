@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { JobActions } from '@webapp/store/app'
 import { TestId } from '@webapp/utils/testId'
 
@@ -26,7 +26,7 @@ export const exportSurvey =
       JobActions.showJobMonitor({
         job,
         closeButton: (
-          <DownloadButton
+          <ButtonDownload
             id={TestId.surveyExport.downloadBtn}
             href={`/api/survey/${surveyId}/export/download`}
             requestParams={{ fileName, surveyName, includeData }}

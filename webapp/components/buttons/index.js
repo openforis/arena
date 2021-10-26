@@ -1,5 +1,6 @@
 export { Button } from './Button'
 export { ButtonBack } from './ButtonBack'
+export { ButtonDownload } from './ButtonDownload'
 export { ButtonCancel } from './ButtonCancel'
 export { ButtonDelete } from './ButtonDelete'
 export { ButtonIconEdit } from './ButtonIconEdit'
