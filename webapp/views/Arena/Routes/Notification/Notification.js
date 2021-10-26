@@ -22,7 +22,7 @@ const Notification = () => {
           <span className="icon icon-cross icon-8px" />
         </button>
 
-        <div>{i18n.t(messageKey, messageParams)}</div>
+        <div className="notification-content">{i18n.t(messageKey, messageParams)}</div>
       </div>
     </CSSTransition>
   )

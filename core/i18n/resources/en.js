@@ -44,7 +44,12 @@ Do you want to ignore them?`,
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
-    emailSentConfirmation: 'An email to {{email}} has been sent',
+    emailSentConfirmation: `An email to {{email}} has been sent.
+
+Please inform the person to check also the Spam/Junk mail folder.`,
+    emailSentToSelfConfirmation: `You should have received an email to {{email}}.
+
+Please check also the Spam/Junk mail folder.`,
     empty: 'Empty',
     entity: 'Entity',
     error: 'Error',
