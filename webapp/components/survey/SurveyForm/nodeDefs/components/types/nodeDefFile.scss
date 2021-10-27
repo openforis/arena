@@ -1,13 +1,17 @@
 .survey-form__node-def-file {
   display: grid;
   grid-template-columns: 30px 1fr 30px;
-  grid-column-gap: .5rem;
+  grid-column-gap: 0.5rem;
+
+  .survey-form__node-def-file__tooltip-preview {
+    display: inherit;
+  }
 }
 
-.survey-form__node-def-file__preview-image{
+.survey-form__node-def-file__preview-image {
   min-height: 10px;
   min-width: 10px;
-  img{
+  img {
     height: 30vmin;
     width: auto;
   }
