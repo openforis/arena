@@ -117,6 +117,7 @@ const Surveys = (props) => {
         },
       ]}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
+      keyExtractor={({ item }) => Survey.getId(item)}
     />
   )
 }

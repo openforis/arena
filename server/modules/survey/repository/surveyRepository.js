@@ -6,6 +6,7 @@ import * as DB from '@server/db'
 
 import { selectDate } from '@server/db/dbUtils'
 
+import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -46,6 +47,25 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
 
 export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
 
+const _getSelectWhereCondition = ({ search, lang = null }) => {
+  const propsCol = '(s.props || s.props_draft)'
+  const nameCol = `${propsCol} ->> '${Survey.infoKeys.name}'`
+  const labelCol = `${propsCol} #>> '{${Survey.infoKeys.labels},${lang}}'`
+
+  return `${propsCol} ->> 'temporary' IS NULL 
+      AND s.template = $/template/
+      ${
+        StringUtils.isNotBlank(search)
+          ? `
+          AND (
+          ${nameCol} LIKE $/search/
+          OR lower(${labelCol}) LIKE $/search/
+          OR lower(u.name) LIKE $/search/
+      )`
+          : ''
+      }`
+}
+
 export const fetchUserSurveys = async (
   {
     user,
@@ -61,9 +81,9 @@ export const fetchUserSurveys = async (
   client = db
 ) => {
   const checkAccess = !User.isSystemAdmin(user)
-  const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
-  const search = searchParam ? `%${searchParam.toLowerCase()}%` : null
+  const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
+  const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
   const nameCol = `${propsCol} ->> '${Survey.infoKeys.name}'`
   const labelCol = `${propsCol} #>> '{${Survey.infoKeys.labels},${lang}}'`
 
@@ -94,32 +114,21 @@ export const fetchUserSurveys = async (
       u.name as owner_name
       ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
     FROM survey s
-    JOIN "user" u 
-    ON u.uuid = s.owner_uuid
+      JOIN "user" u 
+        ON u.uuid = s.owner_uuid
     ${
       checkAccess
         ? `
-    JOIN auth_group g
-      ON s.uuid = g.survey_uuid
-    JOIN auth_group_user gu
-      ON gu.group_uuid = g.uuid AND gu.user_uuid = $/userUuid/`
+      JOIN auth_group g
+        ON s.uuid = g.survey_uuid
+      JOIN auth_group_user gu
+        ON gu.group_uuid = g.uuid AND gu.user_uuid = $/userUuid/`
         : ''
     }
     WHERE 
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
-      (s.props || s.props_draft) ->> 'temporary' IS NULL 
-      AND s.template = $/template/
-      ${
-        search
-          ? `
-          AND (
-          ${nameCol} LIKE $/search/
-          OR lower(${labelCol}) LIKE $/search/
-          OR lower(u.name) LIKE $/search/
-      )`
-          : ''
-      }
+      ${_getSelectWhereCondition({ search, lang })}
     ORDER BY ${sortByField} ${sortOrder}
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
@@ -129,27 +138,32 @@ export const fetchUserSurveys = async (
   )
 }
 
-export const countUserSurveys = async ({ user, template = false }, client = db) => {
+export const countUserSurveys = async (
+  { user, template = false, search: searchParam = null, lang = null },
+  client = db
+) => {
   const checkAccess = !User.isSystemAdmin(user)
+
+  const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
   return client.one(
     `
     SELECT count(s.id)
     FROM survey s
+      JOIN "user" u 
+        ON u.uuid = s.owner_uuid
     ${
       checkAccess
         ? `
     JOIN auth_group g
       ON s.uuid = g.survey_uuid
     JOIN auth_group_user gu
-      ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
+      ON gu.group_uuid = g.uuid 
+         AND gu.user_uuid = $/userUuid/`
         : ''
     }
-    WHERE 
-    (s.props || s.props_draft) ->> 'temporary' IS NULL 
-    AND s.template = $2
-    `,
-    [User.getUuid(user), template]
+    WHERE ${_getSelectWhereCondition({ search, lang })}`,
+    { search, template, userUuid: User.getUuid(user) }
   )
 }
 
