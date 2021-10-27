@@ -41,4 +41,4 @@ export const getUserProfilePicture = async (zipFile, userUuid) =>
 export const getUserInvitations = async (zipFile) => _getJson(zipFile, ExportFile.userInvitations, [])
 
 // Chains
-export const getChains = async (zipFile) => _getJson(zipFile, ExportFile.chains)
+export const getChains = async (zipFile) => _getJson(zipFile, ExportFile.chains, [])

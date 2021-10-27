@@ -1,6 +1,17 @@
 @import 'webapp/style/vars';
 
 .collect-import-report {
+  .table__header {
+    header {
+      column-gap: 2rem;
+
+      .form-item.exclude-resolved {
+        text-transform: none;
+        width: 20rem;
+        grid-template-columns: 0.8fr 0.2fr;
+      }
+    }
+  }
   .table__row-header,
   .table__row {
     grid-template-columns: 60px repeat(5, 0.2fr) 0.1fr 30px;

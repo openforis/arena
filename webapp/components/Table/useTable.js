@@ -22,7 +22,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     loading: loadingData,
   } = useAsyncGetRequest(apiUri, {
     params: {
-      offset,
+      ...(offset ? { offset } : {}),
       limit,
       sortBy: sort.by,
       sortOrder: sort.order,
@@ -46,7 +46,8 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     fetchCount()
   }, [fetchData, fetchCount])
 
-  useEffect(initData, [JSON.stringify(restParams)])
+  // init data on mount and on restParams and search update
+  useEffect(initData, [JSON.stringify(restParams), search])
 
   useEffect(() => {
     if (totalCount < count) {
@@ -56,31 +57,26 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
 
   useOnUpdate(() => {
     fetchData()
-  }, [limit, offset, sort.by, sort.order, search])
-
-  useEffect(() => {
-    fetchCount()
-  }, [search])
+  }, [limit, offset, sort.by, sort.order])
 
   const handleSortBy = useCallback(
     (orderByField) => {
-      let order = sort.by !== orderByField && sort.order !== 'asc'? 'desc' : 'asc'
+      let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
       order = sort.by === orderByField && sort.order === 'asc' ? null : order
 
-      updateQuery(history)({
-        value: { by: orderByField, order },
-        key: 'sort',
-      })
+      updateQuery(history)({ sort: { by: orderByField, order }, offset: null })
     },
     [sort]
   )
 
   const handleSearch = useCallback((searchText) => {
-    updateQuery(history)({
-      value: searchText,
-      key: 'search',
-    })
+    updateQuery(history)({ search: searchText, offset: null })
   }, [])
+
+  // on rest params and limit update, go to first page (reset offset)
+  useOnUpdate(() => {
+    updateQuery(history)({ offset: null })
+  }, [JSON.stringify(restParams), limit])
 
   return {
     loadingData,
