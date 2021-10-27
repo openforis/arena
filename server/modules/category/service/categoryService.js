@@ -10,6 +10,7 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 import { db } from '@server/db/db'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
+import CategoriesExportJob from './CategoriesExportJob'
 import * as CategoryManager from '../manager/categoryManager'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
@@ -58,6 +59,18 @@ export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
   return db.stream(categoryStream, (stream) => {
     stream.pipe(CSVWriter.transformToStream(res, [...headers, ...extraPropsHeaders]))
   })
+}
+
+export const exportAllCategories = async ({ surveyId, draft }) => {
+  const job = new CategoriesExportJob({
+    user,
+    surveyId,
+    draft,
+  })
+
+  JobManager.executeJobThread(job)
+
+  return job
 }
 
 export const {

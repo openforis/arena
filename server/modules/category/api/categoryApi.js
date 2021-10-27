@@ -55,7 +55,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
-        const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
+        const job = CategoryService.importCategory(user, surveyId, categoryUuid, summary)
         res.json({ job })
       } catch (error) {
         next(error)
@@ -93,6 +93,23 @@ export const init = (app) => {
         const { category, item } = await CategoryService.insertItem(user, surveyId, categoryUuid, itemReq)
 
         res.json({ category, item })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/export',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft = false } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const summary = Request.getBody(req)
+
+        const job = CategoryService.exportAllCategories({ user, surveyId })
+        res.json({ job })
       } catch (error) {
         next(error)
       }
