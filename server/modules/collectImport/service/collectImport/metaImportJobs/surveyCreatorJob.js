@@ -15,7 +15,7 @@ import * as ActivityLogManager from '../../../../activityLog/manager/activityLog
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 
 import * as CollectSurvey from '../model/collectSurvey'
-import { findUniqueSurveyName } from './surveyUniqueNameGenerator'
+import * as SurveyUniqueNameGenerator from '../../../../survey/service/surveyUniqueNameGenerator'
 
 const SRS_ID_PREFIX = 'EPSG:'
 
@@ -30,7 +30,7 @@ export default class SurveyCreatorJob extends Job {
     const collectUri = CollectSurvey.getUri(collectSurvey)
 
     const startingName = newSurveyParam.name || R.pipe(R.split('/'), R.last)(collectUri)
-    const name = await findUniqueSurveyName({ startingName })
+    const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
     const languages = R.pipe(CollectSurvey.getElementsByName('language'), R.map(CollectSurvey.getText))(collectSurvey)
 

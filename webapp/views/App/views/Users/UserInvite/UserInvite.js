@@ -43,7 +43,8 @@ const UserInviteComponent = () => {
           placeholder={i18n.t('common.email')}
           value={UserInvite.getEmail(userInvite)}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
-          onChange={(value) => onUpdate({ name: UserInvite.keys.email, value: value.trim() })}
+          textTransformFunction={(value) => value.trim().toLowerCase()}
+          onChange={(value) => onUpdate({ name: UserInvite.keys.email, value })}
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>

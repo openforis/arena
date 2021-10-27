@@ -19,20 +19,21 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
-
-  if (!Survey.isPublished(surveyInfo)) return <div />
+  const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
 
   return (
     <div className="records__header-left">
-      <Button
-        testId={TestId.records.addBtn}
-        onClick={() => dispatch(RecordActions.createRecord(history))}
-        className="btn-s"
-        iconClassName="icon-plus icon-12px icon-left"
-        label="common.new"
-      />
+      {published && (
+        <Button
+          testId={TestId.records.addBtn}
+          onClick={() => dispatch(RecordActions.createRecord(history))}
+          className="btn-s"
+          iconClassName="icon-plus icon-12px icon-left"
+          label="common.new"
+        />
+      )}
 
       {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
@@ -43,7 +44,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
         />
       )}
 
-      {canUpdateRecordsStep && (
+      {published && canUpdateRecordsStep && (
         <>
           <UpdateRecordsStepDropdown
             keys={[updateTypes.promoteAllRecordsToCleansing, updateTypes.promoteAllRecordsToAnalysis]}
