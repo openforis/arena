@@ -1,16 +1,15 @@
 import './nodeDefFile.scss'
 
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React from 'react'
 
 import { uuidv4 } from '@core/uuid'
-
-import UploadButton from '@webapp/components/form/uploadButton'
-import DownloadButton from '@webapp/components/form/downloadButton'
-import Tooltip from '@webapp/components/tooltip'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+
+import UploadButton from '@webapp/components/form/uploadButton'
+import Tooltip from '@webapp/components/tooltip'
+import ButtonDownload from '@webapp/components/DataQuery/ButtonBar/ButtonDownload'
+
 import NodeDeleteButton from '../nodeDeleteButton'
 
 const TooltipPreviewImage = ({ nodeDef, path }) => {
@@ -53,20 +52,9 @@ const FileInput = (props) => {
       />
 
       {fileUploaded && (
-<<<<<<< Updated upstream
-        <React.Fragment>
-          <Tooltip tooltipComponent={renderPreviewComponent} type="info">
-            <DownloadButton
-              href={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
-              label={fileName}
-              title={fileName}
-              className="ellipsis"
-            />
-=======
         <>
           <Tooltip messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />} type="info">
             <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
->>>>>>> Stashed changes
           </Tooltip>
 
           <NodeDeleteButton
@@ -74,7 +62,7 @@ const FileInput = (props) => {
             node={node}
             removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}
           />
-        </React.Fragment>
+        </>
       )}
     </div>
   )
