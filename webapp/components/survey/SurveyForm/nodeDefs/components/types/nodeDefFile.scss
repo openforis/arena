@@ -3,3 +3,12 @@
   grid-template-columns: 30px 1fr 30px;
   grid-column-gap: .5rem;
 }
+
+.survey-form__node-def-file__preview-image{
+  min-height: 10px;
+  min-width: 10px;
+  img{
+    height: 30vmin;
+    width: auto;
+  }
+}
