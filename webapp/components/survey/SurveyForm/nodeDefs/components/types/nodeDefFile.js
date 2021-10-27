@@ -6,9 +6,9 @@ import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
+import DownloadButton from '@webapp/components/form/downloadButton'
 import UploadButton from '@webapp/components/form/uploadButton'
 import Tooltip from '@webapp/components/tooltip'
-import ButtonDownload from '@webapp/components/DataQuery/ButtonBar/ButtonDownload'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 
@@ -54,7 +54,7 @@ const FileInput = (props) => {
       {fileUploaded && (
         <>
           <Tooltip messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />} type="info">
-            <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
+            <DownloadButton href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
           </Tooltip>
 
           <NodeDeleteButton
