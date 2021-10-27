@@ -48,7 +48,8 @@
 }
 
 .tooltip__message-error,
-.tooltip__message-warning {
+.tooltip__message-warning,
+.tooltip__message-info {
   @extend .tooltip__message;
 
   color: white;
@@ -75,5 +76,14 @@
 
   &:after {
     border-bottom-color: $orange;
+  }
+}
+
+.tooltip__message-info {
+  background-color: $greyAppBg;
+  border-color: $greyAppBg;
+
+  &:after {
+    border-bottom-color: $greyAppBg;
   }
 }

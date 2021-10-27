@@ -21,8 +21,8 @@ const Header = (props) => {
           offset={offset}
           limit={limit}
           count={count}
-          setLimit={(limitUpdated) => updateQuery(history)({ value: limitUpdated, key: 'limit' })}
-          setOffset={(offsetUpdated) => updateQuery(history)({ value: offsetUpdated, key: 'offset' })}
+          setLimit={(limitUpdated) => updateQuery(history)({ limit: limitUpdated })}
+          setOffset={(offsetUpdated) => updateQuery(history)({ offset: offsetUpdated })}
         />
       )}
     </div>

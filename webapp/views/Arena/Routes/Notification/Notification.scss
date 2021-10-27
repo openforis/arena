@@ -17,6 +17,10 @@ $appNotificationWidth: 500px;
   text-align: center;
 
   transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+
+  .notification-content {
+    white-space: pre-wrap;
+  }
 }
 
 .notification.info {
