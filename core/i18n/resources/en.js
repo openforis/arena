@@ -1085,7 +1085,6 @@ $t(common.cantUndoWarning)`,
   // ====== Jobs
   jobs: {
     ActivityLogImportJob: 'Activity Log Import',
-    CategoriesExportJob: 'Categories Export',
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
