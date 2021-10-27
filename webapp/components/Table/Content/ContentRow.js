@@ -37,37 +37,34 @@ export const ContentRow = (props) => {
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
-    <>
-      <div
-        key={String(index)}
-        data-testid={`${module}_${index}`}
-        role="button"
-        onClick={onClick}
-        className={className}
-        style={{ gridTemplateColumns, height }}
-      >
-        {React.createElement(rowComponent, {
-          ...rowProps,
-          cellTestIdExtractor,
-          initData,
-          active,
-          idx: index,
-          offset,
-          item,
-          itemPosition,
-          row: item, // TODO remove it and pass only item
-          rowNo: itemPosition, // TODO remove it and pass only itemPosition
-          onRowExpandToggle,
-          expandableRows,
-          isRowExpandable,
-          rowExpanded,
-        })}
-        {rowExpanded && (
-          <div className="table__row-expanded-panel-wrapper">
-            {React.createElement(rowExpandedComponent, { item, ...rowProps })}
-          </div>
-        )}
-      </div>
-    </>
+    <div
+      data-testid={`${module}_${index}`}
+      role="button"
+      onClick={onClick}
+      className={className}
+      style={{ gridTemplateColumns, height }}
+    >
+      {React.createElement(rowComponent, {
+        ...rowProps,
+        cellTestIdExtractor,
+        initData,
+        active,
+        idx: index,
+        offset,
+        item,
+        itemPosition,
+        row: item, // TODO remove it and pass only item
+        rowNo: itemPosition, // TODO remove it and pass only itemPosition
+        onRowExpandToggle,
+        expandableRows,
+        isRowExpandable,
+        rowExpanded,
+      })}
+      {rowExpanded && (
+        <div className="table__row-expanded-panel-wrapper">
+          {React.createElement(rowExpandedComponent, { item, ...rowProps })}
+        </div>
+      )}
+    </div>
   )
 }
