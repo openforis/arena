@@ -21,7 +21,7 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
   return job
 }
 
-export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
+export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
   const numberOfItemsInCategory = await CategoryManager.countItemsByCategoryUuid(surveyId, categoryUuid)
   const categoryIsEmpty = numberOfItemsInCategory <= 0
 
@@ -42,7 +42,7 @@ export const exportCategory = async (surveyId, categoryUuid, draft, res) => {
   }
 }
 
-export const exportAllCategories = async ({ surveyId, draft }) => {
+export const exportAllCategories = async ({ user, surveyId, draft }) => {
   const job = new CategoriesExportJob({
     user,
     surveyId,

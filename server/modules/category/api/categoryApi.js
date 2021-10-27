@@ -1,8 +1,13 @@
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import SystemError from '@core/systemError'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -99,6 +104,7 @@ export const init = (app) => {
     }
   )
 
+  // categories export (start job)
   app.post(
     '/survey/:surveyId/categories/export',
     AuthMiddleware.requireSurveyEditPermission,
@@ -106,10 +112,33 @@ export const init = (app) => {
       try {
         const { surveyId, draft = false } = Request.getParams(req)
         const user = Request.getUser(req)
-        const summary = Request.getBody(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId })
+        const job = CategoryService.exportAllCategories({ user, surveyId, draft })
         res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // categories export (download generated zip file)
+  app.get(
+    '/survey/:surveyId/categories/export/download',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft = false, tempFileName } = Request.getParams(req)
+        const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const name = `${Survey.getName(surveyInfo)}_categories.zip`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.zip,
+        })
       } catch (error) {
         next(error)
       }
@@ -178,7 +207,7 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
 
-        await CategoryService.exportCategory(surveyId, categoryUuid, draft, res)
+        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res })
       } catch (error) {
         next(error)
       }

@@ -27,8 +27,20 @@ export const appendFile = async (path, data = '') => promises.appendFile(path, d
 
 export const copyFile = async (src, dest) => promises.copyFile(src, dest)
 
-export const createWriteSteam = fs.createWriteStream
+export const { createWriteStream, createReadStream } = fs
+
+export const getFileSize = (path) => {
+  const stats = fs.statSync(path)
+  const { size } = stats
+  return size
+}
+
+export const deleteFile = (path) => fs.unlinkSync(path)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`
-export const tempFilePath = (fileName) => join(ProcessUtils.ENV.tempFolder, fileName)
+export const newTempFolderName = () => uuidv4()
+export const tempFilePath = (fileName, subfolderName = null) =>
+  subfolderName
+    ? join(ProcessUtils.ENV.tempFolder, subfolderName, fileName)
+    : join(ProcessUtils.ENV.tempFolder, fileName)
