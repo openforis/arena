@@ -17,7 +17,9 @@ export default class ChainsImportJob extends Job {
 
     const chains = await ArenaSurveyFileZip.getChains(arenaSurveyFileZip)
 
-    await ChainRepository.insertMany({ surveyId, chains }, this.tx)
+    if (chains.length > 0) {
+      await ChainRepository.insertMany({ surveyId, chains }, this.tx)
+    }
 
     this.setContext({ chains })
   }
