@@ -14,10 +14,9 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
-import { ButtonDownload } from '@webapp/components/buttons'
 
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'

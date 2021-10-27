@@ -44,7 +44,12 @@ Do you want to ignore them?`,
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
-    emailSentConfirmation: 'An email to {{email}} has been sent',
+    emailSentConfirmation: `An email to {{email}} has been sent.
+
+Please inform the person to check also the Spam/Junk mail folder.`,
+    emailSentToSelfConfirmation: `You should have received an email to {{email}}.
+
+Please check also the Spam/Junk mail folder.`,
     empty: 'Empty',
     entity: 'Entity',
     error: 'Error',
@@ -333,6 +338,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
     },
     collectImportReport: {
+      excludeResolvedItems: 'Exclude resolved items',
       expression: 'Expression',
       resolved: 'Resolved',
       exprType: {
@@ -341,6 +347,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         defaultValue: 'Default value',
         validationRule: 'Validation rule',
       },
+      title: 'Collect Import Report',
     },
     recordsSummary: {
       recordsAdded: 'Records added from {{from}} to {{to}}',

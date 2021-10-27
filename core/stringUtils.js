@@ -14,13 +14,13 @@ export const padStart = (length, padString) => R.pipe(String, (s) => s.padStart(
 
 const toLower = R.pipe(trim, R.toLower)
 
-export const truncate = (maxLength) => (text) => (text.length > maxLength ? text.slice(0, maxLength) + '...' : text)
+export const truncate = (maxLength) => (text) => text.length > maxLength ? text.slice(0, maxLength) + '...' : text
 
 export const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
 export const isBlank = R.ifElse(isString, R.pipe(trim, R.isEmpty), R.isNil)
 
-export const isNotBlank = R.pipe(isBlank, R.not)
+export const isNotBlank = (value) => isString(value) && !isBlank(value)
 
 /**
  * NormalizeName: Make an identifier suitable for use in various contexts.
