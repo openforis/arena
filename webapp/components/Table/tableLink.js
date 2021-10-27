@@ -16,34 +16,43 @@ export const getSort = () => ({
 
 export const getSearch = () => String(_getUrlSearchParam({ param: 'search', defaultValue: '' }))
 
+const _setOrDeleteParams = ({ searchParams, params }) => {
+  Object.entries(params).forEach(([key, value]) => {
+    if (A.isEmpty(value)) {
+      searchParams.delete(key)
+    } else {
+      searchParams.set(key, String(value))
+    }
+  })
+}
+
 const getLink = ({ limit, offset, sort, search }) => {
   const url = new URL(window.location.href)
+  const { searchParams } = url
 
-  if (limit > 0) url.searchParams.set('limit', String(limit))
-  if (offset >= 0) url.searchParams.set('offset', String(offset))
+  // limit
+  if (limit > 0) _setOrDeleteParams({ searchParams, params: { limit } })
+
+  // offset
+  if (offset !== undefined) {
+    const offsetNew = offset > 0 ? offset : null
+    _setOrDeleteParams({ searchParams, params: { offset: offsetNew } })
+  }
+
+  // sort
   if (sort) {
-    if (A.isEmpty(sort.order)) {
-      url.searchParams.delete('sortBy')
-      url.searchParams.delete('sortOrder')
-    } else {
-      url.searchParams.set('sortBy', String(sort.by))
-      url.searchParams.set('sortOrder', String(sort.order))
-    }
-    url.searchParams.set('offset', String(0))
+    const { by: sortBy, order: sortOrder } = sort
+    _setOrDeleteParams({ searchParams, params: { sortBy: sortOrder ? sortBy : null, sortOrder } })
   }
-  if (!A.isNull(search)) {
-    if (A.isEmpty(search)) {
-      url.searchParams.delete('search')
-    } else {
-      url.searchParams.set('search', String(search))
-      url.searchParams.set('offset', String(0))
-    }
+
+  // search
+  if (search !== undefined) {
+    _setOrDeleteParams({ searchParams, params: { search } })
   }
+
   return `${url.pathname}${url.search}`
 }
 
-export const updateQuery =
-  (history) =>
-  ({ key, value }) => {
-    history.replace(getLink({ [key]: value }))
-  }
+export const updateQuery = (history) => (params) => {
+  history.replace(getLink(params))
+}

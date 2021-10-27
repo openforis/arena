@@ -1,9 +1,9 @@
 import * as Survey from '@core/survey/survey'
-import * as DateUtils from '@core/dateUtils'
 import * as User from '@core/user/user'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
 
 const isTemplate = ({ backup = true, surveyInfoArenaSurvey, surveyInfoTarget = null }) => {
   if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
@@ -20,12 +20,18 @@ export default class SurveyCreatorJob extends Job {
     const { arenaSurvey, backup, surveyInfoTarget } = this.context
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
+
     // merge survey info props with draft props (Arena survey backup file could have only draft props)
     surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
 
-    const name = backup
-      ? `${Survey.getName(surveyInfoArenaSurvey)}-import-${DateUtils.nowFormatDefault()}`
-      : Survey.getName(surveyInfoTarget) || `clone_${Survey.getName(surveyInfoArenaSurvey)}`
+    // skip collect report
+    const { collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
+
+    const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
+
+    const startingName = backup ? surveySourceName : Survey.getName(surveyInfoTarget) || `clone_${surveySourceName}`
+
+    const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
 
@@ -35,7 +41,7 @@ export default class SurveyCreatorJob extends Job {
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
     const newSurveyInfo = Survey.newSurvey({
-      ...surveyInfoArenaSurvey.props,
+      ...propsToImport,
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.published]: published,

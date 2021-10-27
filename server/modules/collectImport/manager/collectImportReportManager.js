@@ -1,11 +1,10 @@
 import * as CollectImportReportRepository from '../repository/collectImportReportRepository'
 
-export const insertItem = CollectImportReportRepository.insertItem
+// CREATE
+export const { insertItem } = CollectImportReportRepository
 
 // READ
-export const fetchItems = CollectImportReportRepository.fetchItems
-export const fetchItemsStream = CollectImportReportRepository.fetchItemsStream
-export const countItems = CollectImportReportRepository.countItems
+export const { fetchItems, fetchItemsStream, countItems } = CollectImportReportRepository
 
 // UPDATE
-export const updateItem = CollectImportReportRepository.updateItem
+export const { updateItem } = CollectImportReportRepository
