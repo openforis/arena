@@ -14,10 +14,9 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/uploadButton'
-import DownloadButton from '@webapp/components/form/downloadButton'
 
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
@@ -70,7 +69,7 @@ const CategoryDetails = (props) => {
               disabled={Category.isPublished(category)}
             />
           )}
-          <DownloadButton
+          <ButtonDownload
             id={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/export/`}
             label={i18n.t('common.csvExport')}

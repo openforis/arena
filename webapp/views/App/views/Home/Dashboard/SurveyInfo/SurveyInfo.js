@@ -14,8 +14,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import DownloadButton from '@webapp/components/form/downloadButton'
-import { Button } from '@webapp/components'
+import { ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
 
@@ -61,14 +61,14 @@ const SurveyInfo = () => {
 
           {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
-          <DownloadButton
+          <ButtonDownload
             id={TestId.dashboard.surveyExportBtn}
             className="btn-transparent"
             onClick={() => dispatch(SurveyActions.exportSurvey())}
             label={i18n.t('common.export')}
           />
 
-          <DownloadButton
+          <ButtonDownload
             id={TestId.dashboard.surveyExportWithDataBtn}
             className="btn-transparent"
             onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}

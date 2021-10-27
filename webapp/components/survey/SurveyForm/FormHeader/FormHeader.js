@@ -18,7 +18,7 @@ import {
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import FormEntryActions from '../components/formEntryActions'
@@ -84,7 +84,7 @@ const FormHeader = (props) => {
 
       <div className="survey-form-header__options">
         {edit && canEditSurvey && (
-          <DownloadButton
+          <ButtonDownload
             id={TestId.surveyForm.schemaSummary}
             href={`/api/survey/${surveyId}/schema-summary/`}
             label={'surveyForm.schemaSummary'}

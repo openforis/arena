@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Header from '@webapp/components/header'
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
@@ -11,7 +11,7 @@ const HeaderLeft = () => {
 
   return (
     <Header>
-      <DownloadButton
+      <ButtonDownload
         href={`/api/survey/${surveyId}/collect-import/report/export/`}
         label={i18n.t('common.csvExport')}
       />

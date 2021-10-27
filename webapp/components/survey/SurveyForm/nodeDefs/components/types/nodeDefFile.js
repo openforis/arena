@@ -4,7 +4,7 @@ import React from 'react'
 import { uuidv4 } from '@core/uuid'
 
 import UploadButton from '@webapp/components/form/uploadButton'
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -43,8 +43,8 @@ const FileInput = (props) => {
       />
 
       {fileUploaded && (
-        <React.Fragment>
-          <DownloadButton
+        <>
+          <ButtonDownload
             href={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
             label={fileName}
             title={fileName}
@@ -56,7 +56,7 @@ const FileInput = (props) => {
             node={node}
             removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}
           />
-        </React.Fragment>
+        </>
       )}
     </div>
   )

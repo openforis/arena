@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import DownloadButton from '@webapp/components/form/downloadButton'
+import { ButtonDownload } from '@webapp/components/buttons'
 
 import { SurveyState } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
@@ -23,7 +23,7 @@ export const startCSVExport = () => async (dispatch, getState) => {
         const { job: jobComplete } = closeButtonProps
         const { exportDataFolderName } = JobSerialized.getResult(jobComplete)
         return (
-          <DownloadButton
+          <ButtonDownload
             id={TestId.dataExport.exportCSV}
             href={`/api/survey/${surveyId}/export-csv-data/${exportDataFolderName}`}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
