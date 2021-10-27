@@ -42,7 +42,7 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   }
 }
 
-export const exportAllCategories = async ({ user, surveyId, draft }) => {
+export const exportAllCategories = ({ user, surveyId, draft }) => {
   const job = new CategoriesExportJob({
     user,
     surveyId,

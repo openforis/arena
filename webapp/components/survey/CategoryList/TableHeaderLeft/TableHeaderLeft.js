@@ -42,7 +42,7 @@ const TableHeaderLeft = (props) => {
     <>
       <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
 
-      <ButtonDownload label="common.export" onClick={Actions.exportAll} />
+      <ButtonDownload label="common.exportAll" onClick={Actions.exportAll} />
     </>
   )
 }
