@@ -14,7 +14,6 @@ import { TestId } from '@webapp/utils/testId'
 
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import { ButtonDownload } from '@webapp/components/buttons'
 import { Button, ButtonDownload } from '@webapp/components'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
