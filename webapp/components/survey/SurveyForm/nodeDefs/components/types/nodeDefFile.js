@@ -62,6 +62,7 @@ const FileInput = (props) => {
   const fileUploaded = !edit && fileName
 
   const renderPreviewComponent = () => {
+    if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
     return (
       <TooltipPreviewImage
         path={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
