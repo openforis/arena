@@ -27,7 +27,9 @@ const NodeDefEntitySwitch = (props) => {
   }
 
   const survey = useSurvey()
-  const childDefs = Survey.getNodeDefChildren(props.nodeDef)(survey)
+
+  const includeAnalysis = false
+  const childDefs = Survey.getNodeDefChildren(props.nodeDef, includeAnalysis)(survey)
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
