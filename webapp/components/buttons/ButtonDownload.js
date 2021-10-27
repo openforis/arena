@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
 
-const DownloadButton = (props) => {
+export const ButtonDownload = (props) => {
   const { disabled, href, id, label, onClick, requestParams, showLabel, title, className } = props
 
   return (
@@ -28,7 +28,7 @@ const DownloadButton = (props) => {
   )
 }
 
-DownloadButton.propTypes = {
+ButtonDownload.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
@@ -40,7 +40,7 @@ DownloadButton.propTypes = {
   title: PropTypes.string,
 }
 
-DownloadButton.defaultProps = {
+ButtonDownload.defaultProps = {
   className: '',
   disabled: false,
   href: null,
@@ -51,5 +51,3 @@ DownloadButton.defaultProps = {
   showLabel: true,
   title: null,
 }
-
-export default DownloadButton

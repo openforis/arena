@@ -1,7 +1,8 @@
 import React from 'react'
 
 import Header from '@webapp/components/header'
-import { Checkbox, DownloadButton } from '@webapp/components/form'
+import { ButtonDownload } from '@webapp/components/buttons'
+import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useSurveyId } from '@webapp/store/survey'
@@ -16,11 +17,10 @@ const HeaderLeft = (props) => {
   return (
     <Header>
       <h6>{i18n.t('homeView.collectImportReport.title')}</h6>
-
       <FormItem className="exclude-resolved" label={i18n.t('homeView.collectImportReport.excludeResolvedItems')}>
         <Checkbox checked={excludeResolved} onChange={(value) => setExcludeResolved(value)} />
       </FormItem>
-      <DownloadButton href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.csvExport" />
+      <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.csvExport" />
     </Header>
   )
 }
