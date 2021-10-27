@@ -10,7 +10,7 @@ class Tooltip extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { messageElement: null }
+    this.state = { messageElement: null, componentElement: null }
     this.tooltipRef = React.createRef()
 
     this.mouseEnter = this.mouseEnter.bind(this)
@@ -24,29 +24,43 @@ class Tooltip extends React.Component {
   }
 
   mouseEnter() {
-    const { messages, messageComponent, showContent, type } = this.props
+    const { messages, messageComponent, showContent, type, tooltipComponent } = this.props
 
-    if (showContent && (messageComponent || !(R.isEmpty(messages) || R.isNil(messages)))) {
+    if (showContent) {
       const style = this.getStyle()
       const className = `tooltip__message${type ? `-${type}` : ''}`
 
-      this.setState({
-        messageElement: (
-          <div className={className} style={style}>
-            {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
-          </div>
-        ),
-      })
+      if (messageComponent || !(R.isEmpty(messages) || R.isNil(messages))) {
+        this.setState({
+          messageElement: (
+            <div className={className} style={style}>
+              {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
+            </div>
+          ),
+          componentElement: null,
+        })
+      }
+
+      if (tooltipComponent || !(R.isEmpty(tooltipComponent) || R.isNil(tooltipComponent))) {
+        this.setState({
+          componentElement: (
+            <div className={className} style={style}>
+              {tooltipComponent?.()}
+            </div>
+          ),
+          messageElement: null,
+        })
+      }
     }
   }
 
   mouseLeave() {
-    this.setState({ messageElement: null })
+    this.setState({ messageElement: null, componentElement: null })
   }
 
   render() {
-    const { children, className, id, type, showContent, insideTable} = this.props
-    const { messageElement } = this.state
+    const { children, className, id, type, showContent, insideTable } = this.props
+    const { messageElement, componentElement } = this.state
 
     const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
       showContent ? ' hoverable' : ''
@@ -64,6 +78,7 @@ class Tooltip extends React.Component {
         {children}
 
         {messageElement && ReactDom.createPortal(messageElement, document.body)}
+        {componentElement && ReactDom.createPortal(componentElement, document.body)}
       </div>
     )
   }
@@ -76,6 +91,7 @@ Tooltip.defaultProps = {
   messageComponent: null, // React message component
   type: null, // Tooltip type (error or warning)
   showContent: true, // Set to false not to show the tooltip on mouse over
+  tooltipComponent: null,
 }
 
 export default Tooltip
