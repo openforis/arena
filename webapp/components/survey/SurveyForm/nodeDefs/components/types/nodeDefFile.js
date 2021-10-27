@@ -13,28 +13,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-const TooltipPreviewImage = ({ path }) => {
-  const [imageUrl, setImageUrl] = useState(false)
-  const [data, setData] = useState(false)
-  const getImage = async () => {
-    const { data } = await axios.get(path, {
-      responseType: 'blob',
-    })
-    setData(data)
-  }
+const TooltipPreviewImage = ({ nodeDef, path }) => {
+  if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
 
-  useEffect(() => {
-    getImage()
-    return () => {}
-  }, [])
-
-  useEffect(() => {
-    if (data) {
-      setImageUrl(URL.createObjectURL(data))
-    }
-  }, [data])
-
-  return <div className="survey-form__node-def-file__preview-image">{imageUrl && <img src={imageUrl} />}</div>
+  return <div className="survey-form__node-def-file__preview-image">{path && <img src={path} />}</div>
 }
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
@@ -60,15 +42,7 @@ const FileInput = (props) => {
 
   const fileName = Node.getFileName(node)
   const fileUploaded = !edit && fileName
-
-  const renderPreviewComponent = () => {
-    if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
-    return (
-      <TooltipPreviewImage
-        path={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
-      />
-    )
-  }
+  const fileUrl = `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
 
   return (
     <div className="survey-form__node-def-file">
@@ -79,6 +53,7 @@ const FileInput = (props) => {
       />
 
       {fileUploaded && (
+<<<<<<< Updated upstream
         <React.Fragment>
           <Tooltip tooltipComponent={renderPreviewComponent} type="info">
             <DownloadButton
@@ -87,6 +62,11 @@ const FileInput = (props) => {
               title={fileName}
               className="ellipsis"
             />
+=======
+        <>
+          <Tooltip messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />} type="info">
+            <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
+>>>>>>> Stashed changes
           </Tooltip>
 
           <NodeDeleteButton
