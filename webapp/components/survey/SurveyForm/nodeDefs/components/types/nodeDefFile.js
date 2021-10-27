@@ -15,7 +15,11 @@ import NodeDeleteButton from '../nodeDeleteButton'
 const TooltipPreviewImage = ({ nodeDef, path }) => {
   if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
 
-  return <div className="survey-form__node-def-file__preview-image">{path && <img src={path} />}</div>
+  return (
+    <div className="survey-form__node-def-file__preview-image">
+      <img src={path} />
+    </div>
+  )
 }
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
@@ -53,7 +57,11 @@ const FileInput = (props) => {
 
       {fileUploaded && (
         <>
-          <Tooltip messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />} type="info">
+          <Tooltip
+            className="survey-form__node-def-file__tooltip-preview"
+            messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />}
+            type="info"
+          >
             <DownloadButton href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
           </Tooltip>
 
