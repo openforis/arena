@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
 
-export const { DownloadButton: ButtonDownload } = (props) => {
+export const ButtonDownload = (props) => {
   const { disabled, href, id, label, onClick, requestParams, showLabel, title, className } = props
 
   return (
