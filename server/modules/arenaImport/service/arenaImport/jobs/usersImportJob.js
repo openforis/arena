@@ -5,73 +5,78 @@ import * as Survey from '@core/survey/survey'
 
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
-import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
-const insertUser = async ({ user, surveyId, survey, arenaSurvey, currentUser, arenaSurveyFileZip }, client) => {
-  let _user = false
+const _associateToGroup = async ({ userUuid, groupName }, client) => {
+  const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
+  await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(group), userUuid, client)
+}
+
+const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFileZip }, client) => {
+  let userAlreadyExisting = false
   try {
-    _user = await UserManager.fetchUserByUuid(User.getUuid(user), client)
+    userAlreadyExisting = await UserManager.fetchUserByUuid(User.getUuid(user), client)
   } catch (e) {
-    _user = false
+    userAlreadyExisting = false
   }
 
-  if (!_user) {
-    _user = await UserManager.fetchUserByEmail(User.getEmail(user), client)
+  if (!userAlreadyExisting) {
+    userAlreadyExisting = await UserManager.fetchUserByEmail(User.getEmail(user), client)
   }
 
-  const arenaSurveyUuid = Survey.getUuid(Survey.getSurveyInfo(arenaSurvey))
-
-  if (User.isSystemAdmin(_user)) {
+  if (User.isSystemAdmin(userAlreadyExisting)) {
+    // user already existing and he's a system admin, don't do anything else
     return
   }
 
-  const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+  const userUuid = userAlreadyExisting ? User.getUuid(userAlreadyExisting) : User.getUuid(user)
 
-  const userGroupImportedSurvey = User.getAuthGroupBySurveyUuid({
-    surveyUuid: arenaSurveyUuid,
-    defaultToMainGroup: true,
-  })(user)
+  if (!userAlreadyExisting) {
+    // insert user
+    const profilePicture = await ArenaSurveyFileZip.getUserProfilePicture(arenaSurveyFileZip, userUuid)
 
-  const newGroup = authGroups.find((group) => AuthGroup.getName(group) === AuthGroup.getName(userGroupImportedSurvey))
-
-  if (!newGroup) return
-  const newGroupUuid = AuthGroup.getUuid(newGroup)
-
-  if (_user) {
-    await AuthGroupRepository.insertUserGroup(newGroupUuid, User.getUuid(_user), client)
-  } else {
-    const userCreated = await UserManager.importNewUser(
+    await UserManager.importNewUser(
       {
         surveyId,
-        uuid: User.getUuid(user),
+        uuid: userUuid,
         email: User.getEmail(user),
         password: User.getPassword(user),
         status: User.getStatus(user),
-        groupUuid: newGroupUuid,
         title: User.getTitle(user),
-        user: currentUser,
         name: User.getName(user),
+        profilePicture,
       },
       client
     )
+  }
 
-    const profilePicture = await ArenaSurveyFileZip.getUserProfilePicture(arenaSurveyFileZip, User.getUuid(user))
+  // associate user to auth group(s)
 
-    if (profilePicture) {
-      await UserRepository.updateUser(
-        {
-          userUuid: User.getUuid(user),
-          profilePicture,
-          name: User.getName(user),
-          email: User.getEmail(user),
-        },
-        client
-      )
+  if (User.isSystemAdmin(user)) {
+    // user to insert is system admin but not yet inserted
+    await _associateToGroup({ userUuid, groupName: AuthGroup.groupNames.systemAdmin }, client)
+  } else {
+    if (User.isSurveyManager(user) && !(userAlreadyExisting && User.isSurveyManager(userAlreadyExisting))) {
+      // user to insert is survey manager (but relation with group not existing yet)
+      await _associateToGroup({ userUuid, groupName: AuthGroup.groupNames.surveyManager }, client)
     }
-    await AuthGroupRepository.insertUserGroup(newGroupUuid, User.getUuid(userCreated), client)
+    // associate to survey auth group
+    const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+
+    const arenaSurveyUuid = Survey.getUuid(Survey.getSurveyInfo(arenaSurvey))
+
+    const userGroupImportedSurvey = User.getAuthGroupBySurveyUuid({
+      surveyUuid: arenaSurveyUuid,
+      defaultToMainGroup: true,
+    })(user)
+
+    const newGroup = authGroups.find((group) => AuthGroup.getName(group) === AuthGroup.getName(userGroupImportedSurvey))
+    if (newGroup) {
+      const surveyGroupUuid = AuthGroup.getUuid(newGroup)
+      await AuthGroupRepository.insertUserGroup(surveyGroupUuid, userUuid, client)
+    }
   }
 }
 
@@ -94,18 +99,7 @@ export default class UsersImportJob extends Job {
     }
 
     await Promise.all(
-      users.map(async (user) =>
-        insertUser(
-          {
-            user,
-            surveyId,
-            survey,
-            arenaSurveyFileZip,
-            arenaSurvey,
-          },
-          this.tx
-        )
-      )
+      users.map(async (user) => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
     )
 
     const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
