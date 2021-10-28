@@ -31,10 +31,13 @@ export const getNodeDefsByUuids =
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
-export const getNodeDefChildren = (nodeDef) => (survey) => {
-  const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
-  return SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
-}
+export const getNodeDefChildren =
+  (nodeDef, includeAnalysis = true) =>
+  (survey) => {
+    const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
+    const childDefs = SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
+    return includeAnalysis ? childDefs : childDefs.filter((childDef) => !NodeDef.isAnalysis(childDef))
+  }
 
 export const getNodeDefChildrenInOwnPage =
   ({ nodeDef, cycle }) =>
