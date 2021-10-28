@@ -27,7 +27,6 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
   }
 
   if (User.isSystemAdmin(userAlreadyExisting)) {
-    console.log(`user already existing and he is a system admin: ${userAlreadyExisting.uuid}`)
     // user already existing and he's a system admin, don't do anything else
     return
   }
@@ -35,7 +34,6 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
   const userUuid = userAlreadyExisting ? User.getUuid(userAlreadyExisting) : User.getUuid(user)
 
   if (!userAlreadyExisting) {
-    console.log(`inserting user: ${userUuid}`)
     // insert user
     const profilePicture = await ArenaSurveyFileZip.getUserProfilePicture(arenaSurveyFileZip, userUuid)
 
