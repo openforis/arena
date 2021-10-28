@@ -1,5 +1,4 @@
 import Job from '@server/job/job'
-import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -32,6 +31,7 @@ export default class RecordsImportJob extends Job {
       NODES_INSERT_BATCH_SIZE
     )
 
+    // import records sequentially
     await PromiseUtils.each(recordSummaries, async (recordSummary) => {
       // insert record
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(recordSummary))
