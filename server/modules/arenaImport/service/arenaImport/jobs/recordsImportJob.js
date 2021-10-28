@@ -21,42 +21,34 @@ export default class RecordsImportJob extends Job {
   async execute() {
     const { surveyId, survey, arenaSurveyFileZip } = this.context
 
-    const records = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
-    if (records.length == 0) return
+    const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
+    if (recordSummaries.length == 0) return
 
-    this.total = records.length
+    this.total = recordSummaries.length
 
-    const recordsToInsert = await Promise.all(
-      records.map(async (record) => ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(record)))
-    )
-
-    await RecordManager.insertRecordsInBatch(
-      {
-        user: this.user,
-        surveyId,
-        records: recordsToInsert,
-        userUuid: User.getUuid(this.user),
-      },
-      this.tx
-    )
-
-    const batchPersister = new BatchPersister(
+    // use a batch persister to persist nodes in batch
+    const nodesBatchPersister = new BatchPersister(
       async (nodes) => RecordManager.insertNodesInBatch({ surveyId, nodeValues: nodes }, this.tx),
       NODES_INSERT_BATCH_SIZE
     )
 
-    await PromiseUtils.each(recordsToInsert, async (record) => {
+    await PromiseUtils.each(recordSummaries, async (recordSummary) => {
+      // insert record
+      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(recordSummary))
+      await RecordManager.insertRecord(this.user, surveyId, record, false, this.tx)
+
+      // insert nodes (add them to batch persister)
       const nodes = Record.getNodes(record)
       await PromiseUtils.each(Object.values(nodes), async (node) => {
         // check that the node definition associated to the node has not been deleted from the survey
         if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
-          await batchPersister.addItem(node)
+          await nodesBatchPersister.addItem(node)
         }
       })
       this.incrementProcessedItems()
     })
 
-    await batchPersister.flush()
+    await nodesBatchPersister.flush()
   }
 }
 
