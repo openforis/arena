@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 import * as JobSerialized from '@common/job/jobSerialized'
+import { useCallback } from 'react'
 
 export const importSources = {
   collect: 'collect',
@@ -18,8 +19,8 @@ const urlBasedOnSource = {
 export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.collect }) => {
   const dispatch = useDispatch()
 
-  return ({ file }) => {
-    ;(async () => {
+  return useCallback(
+    async ({ file }) => {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('survey', JSON.stringify(newSurvey))
@@ -43,6 +44,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.co
           validation,
         })
       }
-    })()
-  }
+    },
+    [dispatch, newSurvey, setNewSurvey]
+  )
 }
