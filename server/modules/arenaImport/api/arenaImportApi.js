@@ -1,3 +1,5 @@
+import * as Survey from '@core/survey/survey'
+
 import * as Request from '@server/utils/request'
 
 import * as JobUtils from '@server/job/jobUtils'
@@ -10,13 +12,14 @@ export const init = (app) => {
   app.post('/survey/arena-import', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const file = Request.getFile(req)
+      const filePath = Request.getFilePath(req)
+      const newSurveyParams = Request.getJsonParam(req, 'survey')
 
-      const job = ArenaImportService.startArenaImportJob(user, file.tempFilePath)
+      const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name: newSurveyParams.name })
 
-      res.json({
-        job: JobUtils.jobToJSON(job),
-      })
+      const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget })
+
+      res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
       next(error)
     }

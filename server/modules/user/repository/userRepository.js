@@ -14,15 +14,24 @@ const selectFieldsCommaSep = selectFields.map((f) => `u.${f}`).join(',')
 // CREATE
 
 export const importNewUser = async (
-  { surveyId, surveyCycleKey, name, uuid, email, password, status, title },
+  { surveyId, surveyCycleKey, name, uuid, email, password, status, title, profilePicture },
   client = db
 ) =>
   client.one(
     `
-    INSERT INTO "user" AS u (uuid, email, name, password, status, prefs, props)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb)
+    INSERT INTO "user" AS u (uuid, email, name, password, status, prefs, props, profile_picture)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8)
     RETURNING ${selectFieldsCommaSep}`,
-    [uuid, email, name, password, status, User.newPrefs(surveyId, surveyCycleKey), User.newProps({ title })],
+    [
+      uuid,
+      email,
+      name,
+      password,
+      status,
+      User.newPrefs(surveyId, surveyCycleKey),
+      User.newProps({ title }),
+      profilePicture,
+    ],
     camelize
   )
 
