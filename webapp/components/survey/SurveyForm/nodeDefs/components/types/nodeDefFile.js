@@ -113,6 +113,7 @@ const FileInput = (props) => {
         disabled={edit || !canEditRecord || readOnly}
         showLabel={false}
         onChange={(files) => handleFileChange(files[0])}
+        maxSize={NodeDef.getMaxFileSize(nodeDef)}
       />
 
       {fileReady && (
