@@ -10,7 +10,7 @@ class Tooltip extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { messageElement: null, componentElement: null }
+    this.state = { messageElement: null }
     this.tooltipRef = React.createRef()
 
     this.mouseEnter = this.mouseEnter.bind(this)
@@ -37,19 +37,18 @@ class Tooltip extends React.Component {
               {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
             </div>
           ),
-          componentElement: null,
         })
       }
     }
   }
 
   mouseLeave() {
-    this.setState({ messageElement: null, componentElement: null })
+    this.setState({ messageElement: null })
   }
 
   render() {
     const { children, className, id, type, showContent, insideTable } = this.props
-    const { messageElement, componentElement } = this.state
+    const { messageElement } = this.state
 
     const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
       showContent ? ' hoverable' : ''
@@ -67,7 +66,6 @@ class Tooltip extends React.Component {
         {children}
 
         {messageElement && ReactDom.createPortal(messageElement, document.body)}
-        {componentElement && ReactDom.createPortal(componentElement, document.body)}
       </div>
     )
   }

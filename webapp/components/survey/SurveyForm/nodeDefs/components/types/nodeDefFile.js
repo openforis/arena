@@ -1,6 +1,6 @@
 import './nodeDefFile.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,15 +9,19 @@ import * as Node from '@core/record/node'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
 import Tooltip from '@webapp/components/tooltip'
+import { LoadingBar } from '@webapp/components'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 
-const TooltipPreviewImage = ({ nodeDef, path }) => {
+const FilePreview = ({ nodeDef, path }) => {
   if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
+
+  const [loading, setLoading] = useState(true)
 
   return (
     <div className="survey-form__node-def-file__preview-image">
-      <img src={path} />
+      <img onLoad={() => setLoading(false)} src={path} style={{ display: loading ? 'none' : 'block' }} />
+      {loading && <LoadingBar />}
     </div>
   )
 }
@@ -59,7 +63,7 @@ const FileInput = (props) => {
         <>
           <Tooltip
             className="survey-form__node-def-file__tooltip-preview"
-            messageComponent={<TooltipPreviewImage nodeDef={nodeDef} path={fileUrl} />}
+            messageComponent={<FilePreview nodeDef={nodeDef} path={fileUrl} />}
             type="info"
           >
             <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />

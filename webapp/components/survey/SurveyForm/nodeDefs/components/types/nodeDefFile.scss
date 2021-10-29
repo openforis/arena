@@ -11,6 +11,17 @@
 .survey-form__node-def-file__preview-image {
   min-height: 10px;
   min-width: 10px;
+
+  .loading-bar {
+    position: relative;
+    width: 200px;
+
+    .progress-bar {
+      top: inherit;
+      width: inherit;
+    }
+  }
+
   img {
     height: 30vmin;
     width: auto;
