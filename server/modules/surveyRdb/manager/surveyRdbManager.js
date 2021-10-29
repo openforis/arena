@@ -167,7 +167,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const stream = FileUtils.createWriteSteam(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
+    const stream = FileUtils.createWriteStream(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)

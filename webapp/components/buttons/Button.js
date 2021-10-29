@@ -15,12 +15,14 @@ export const Button = (props) => {
     showLabel,
     size,
     testId,
-    title,
+    title: titleProp,
     ...otherProps
   } = props
 
   const i18n = useI18n()
   const label = showLabel && labelProp ? i18n.t(labelProp) : null
+  // use label as title when not showing label
+  const title = titleProp ? i18n.t(titleProp) : !showLabel && labelProp ? i18n.t(labelProp) : null
 
   return (
     <button
@@ -31,7 +33,7 @@ export const Button = (props) => {
       type="button"
       className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
-      title={title ? i18n.t(title) : null}
+      title={title}
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
