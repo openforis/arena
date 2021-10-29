@@ -1,6 +1,6 @@
 import './nodeDefFile.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,18 +10,49 @@ import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
 import Tooltip from '@webapp/components/tooltip'
 import { LoadingBar } from '@webapp/components'
+import { useI18n } from '@webapp/store/system'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 
 const FilePreview = ({ nodeDef, path }) => {
+  const i18n = useI18n()
+
   if (NodeDef.getFileType(nodeDef) !== NodeDef.fileTypeValues.image) return null
 
+  const imgRef = useRef(null)
+  const retriesRef = useRef(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  const onError = useCallback(() => {
+    // try to load again the image after 1 sec, then after 2 seconds, otherwise show a warning icon
+    const retries = retriesRef.current
+    if (retries <= 2) {
+      setTimeout(() => {
+        retriesRef.current = retries + 1
+        imgRef.current.src = path
+      }, 1000 * (retries + 1))
+    } else {
+      setLoading(false)
+      setError(true)
+    }
+  }, [])
 
   return (
     <div className="survey-form__node-def-file__preview-image">
-      <img onLoad={() => setLoading(false)} src={path} style={{ display: loading ? 'none' : 'block' }} />
       {loading && <LoadingBar />}
+      {!error && (
+        <img
+          ref={imgRef}
+          onLoad={() => setLoading(false)}
+          src={path}
+          style={{ display: loading ? 'none' : 'block' }}
+          onError={onError}
+        />
+      )}
+      {error && (
+        <span className="icon error icon-warning" title={i18n.t('surveyForm.nodeDefFile.errorLoadingPreview')} />
+      )}
     </div>
   )
 }
@@ -45,11 +76,14 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
 }
 
 const FileInput = (props) => {
-  const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
+  const { surveyInfo, nodeDef, node, readOnly, edit, insideTable, canEditRecord, updateNode, removeNode } = props
 
   const fileName = Node.getFileName(node)
   const fileUploaded = !edit && fileName
   const fileUrl = `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
+
+  const filePreviewComponent = <FilePreview nodeDef={nodeDef} path={fileUrl} />
+  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
 
   return (
     <div className="survey-form__node-def-file">
@@ -61,13 +95,27 @@ const FileInput = (props) => {
 
       {fileUploaded && (
         <>
-          <Tooltip
-            className="survey-form__node-def-file__tooltip-preview"
-            messageComponent={<FilePreview nodeDef={nodeDef} path={fileUrl} />}
-            type="info"
-          >
-            <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
-          </Tooltip>
+          {
+            // when displayed inside table, show the image preview in a tooltip
+            insideTable && (
+              <Tooltip
+                className="survey-form__node-def-file__tooltip-preview"
+                messageComponent={filePreviewComponent}
+                type="info"
+              >
+                {downloadButton}
+              </Tooltip>
+            )
+          }
+          {
+            // when displayed in a form, show the image preview in a container
+            !insideTable && (
+              <>
+                {downloadButton}
+                {filePreviewComponent}
+              </>
+            )
+          }
 
           <NodeDeleteButton
             nodeDef={nodeDef}

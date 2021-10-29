@@ -849,6 +849,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       vernacularName: 'Vernacular name',
     },
     nodeDefFile: {
+      errorLoadingPreview: 'Error loading preview',
       fileUuid: 'File uuid',
       fileName: 'File name',
     },

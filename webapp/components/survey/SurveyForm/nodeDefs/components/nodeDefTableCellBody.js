@@ -22,6 +22,7 @@ const NodeDefTableCellBody = (props) => {
   const propsNodeDefComponent = {
     ...props,
     readOnly,
+    insideTable: true,
   }
   return (
     <>
