@@ -30,6 +30,7 @@ const LabelsEditor = (props) => {
     formLabelKey,
     languages: languagesFromProps,
     onChange,
+    placeholder,
     readOnly,
     compactLanguage,
     validation,
@@ -61,6 +62,7 @@ const LabelsEditor = (props) => {
               lang={lang}
               labels={labels}
               onChange={onChange}
+              placeholder={i18n.t(placeholder)}
               readOnly={readOnly}
               showLanguageBadge={showLanguageBadge}
               compactLanguage={compactLanguage}
@@ -73,27 +75,29 @@ const LabelsEditor = (props) => {
 }
 
 LabelsEditor.propTypes = {
+  compactLanguage: PropTypes.bool,
+  formLabelKey: PropTypes.string,
   inputFieldIdPrefix: PropTypes.string,
   languages: PropTypes.array,
   labels: PropTypes.object,
-  showFormLabel: PropTypes.bool,
-  formLabelKey: PropTypes.string,
-  readOnly: PropTypes.bool,
-  compactLanguage: PropTypes.bool,
-  validation: PropTypes.object,
   onChange: PropTypes.func,
+  placeholder: PropTypes.string,
+  readOnly: PropTypes.bool,
+  showFormLabel: PropTypes.bool,
+  validation: PropTypes.object,
 }
 
 LabelsEditor.defaultProps = {
+  compactLanguage: false,
+  formLabelKey: 'common.label',
   inputFieldIdPrefix: null,
   languages: [],
   labels: {},
-  showFormLabel: true,
-  formLabelKey: 'common.label',
-  readOnly: false,
-  compactLanguage: false,
-  validation: null,
   onChange: null,
+  placeholder: null,
+  readOnly: false,
+  showFormLabel: true,
+  validation: null,
 }
 
 export default LabelsEditor

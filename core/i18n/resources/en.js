@@ -872,6 +872,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       genus: 'Genus',
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
+    vernacularNameLabel: 'Vernacular name label',
   },
 
   categoryList: {
