@@ -20,7 +20,7 @@ export const useTable = ({ data, query, nodeDefsSelectorVisible, setData }) => {
   const nodeDefCols = useNodeDefsByUuids(nodeDefColUuids)
   const columnNames = nodeDefCols.flatMap(ColumnNodeDef.getColumnNames)
   const colsNumber = Query.isModeRawEdit(query)
-    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
+    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFieldsLength(nodeDefCol), 0)
     : columnNames.length
 
   const colIndexWidth = 70

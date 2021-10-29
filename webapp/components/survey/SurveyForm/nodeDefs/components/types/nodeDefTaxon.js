@@ -14,7 +14,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
 
-import { SurveyState } from '@webapp/store/survey'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 import { TestId } from '@webapp/utils/testId'
 
@@ -33,6 +33,7 @@ const NodeDefTaxon = (props) => {
   const elementRef = useRef(null)
 
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
   const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
 
   const updateSelectionFromNode = () => {
@@ -128,10 +129,14 @@ const NodeDefTaxon = (props) => {
           />
         )
 
-        return isTableBody ? (
-          inputField
-        ) : (
-          <FormItem key={field} label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}>
+        if (isTableBody) {
+          return inputField
+        }
+        const fieldLabelKey =
+          (field === vernacularName ? NodeDef.getVernacularNameLabel(lang)(nodeDef) : null) ||
+          `surveyForm.nodeDefTaxon.${field}`
+        return (
+          <FormItem key={field} label={i18n.t(fieldLabelKey)}>
             {inputField}
           </FormItem>
         )

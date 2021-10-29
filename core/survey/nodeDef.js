@@ -172,10 +172,7 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
-export const getVernacularNameLabel = (lang) => (nodeDef) => {
-  const labels = getVernacularNameLabels(nodeDef)
-  return labels[lang] || 'surveyForm.nodeDefTaxon.vernacularName'
-}
+export const getVernacularNameLabel = (lang) => (nodeDef) => getVernacularNameLabels(nodeDef)[lang]
 // text
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
