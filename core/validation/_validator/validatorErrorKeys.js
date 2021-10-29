@@ -67,6 +67,7 @@ export const ValidatorErrorKeys = {
     formulaInvalid: 'validationErrors.nodeDefEdit.formulaInvalid',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
+    maxFileSizeInvalid: 'validationErrors.nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',

@@ -17,6 +17,8 @@ const keysValidationFields = {
   keyAttributes: 'keyAttributes',
 }
 
+const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using file attribute
+
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.categoryRequired)(propName, nodeDef)
@@ -105,7 +107,7 @@ const validateColumnWidth =
         // break the loop
         return true
       }
-      const max= NodeDefLayout.columnWidthMaxPx
+      const max = NodeDefLayout.columnWidthMaxPx
       if (width > max) {
         error = { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeGreaterThan, params: { max } }
         // break the loop
@@ -116,6 +118,20 @@ const validateColumnWidth =
     return error
   }
 
+const validateMaxFileSize = (_propName, nodeDef) => {
+  if (!NodeDef.isFile(nodeDef)) return null
+
+  const maxSize = NodeDef.getMaxFileSize(nodeDef)
+
+  if (maxSize <= 0 || maxSize > MAX_FILE_SIZE_MAX) {
+    return {
+      key: Validation.messageKeys.nodeDefEdit.maxFileSizeInvalid,
+      params: { max: MAX_FILE_SIZE_MAX },
+    }
+  }
+  return null
+}
+
 const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
@@ -123,11 +139,6 @@ const propsValidations = (survey) => ({
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
   ],
-  [`${keys.props}.${propKeys.maxNumberDecimalDigits}`]: [
-    Validator.validatePositiveNumber(Validation.messageKeys.invalidNumber),
-  ],
-  [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
-  [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
   [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
   [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
@@ -136,6 +147,16 @@ const propsValidations = (survey) => ({
   [`${keys.parentUuid}`]: [validateVirtualEntitySoruceUuid],
   // Layout
   [`${keys.props}.${propKeys.layout}.${NodeDefLayout.keys.columnWidth}`]: [validateColumnWidth({ survey })],
+  // Decimal
+  [`${keys.props}.${propKeys.maxNumberDecimalDigits}`]: [
+    Validator.validatePositiveNumber(Validation.messageKeys.invalidNumber),
+  ],
+  // Code
+  [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
+  // File
+  [`${keys.props}.${propKeys.maxFileSize}`]: [validateMaxFileSize],
+  // Taxonomy
+  [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {

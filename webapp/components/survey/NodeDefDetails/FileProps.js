@@ -8,6 +8,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Validation from '@core/validation/validation'
 
 import { State } from './store'
 
@@ -36,6 +37,7 @@ const FileProps = (props) => {
   const i18n = useI18n()
 
   const nodeDef = State.getNodeDef(state)
+  const validation = State.getValidation(state)
 
   const selectFileType = useCallback(
     (value) => {
@@ -65,6 +67,7 @@ const FileProps = (props) => {
           value={NodeDef.getMaxFileSize(nodeDef)}
           type="number"
           onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxFileSize, value })}
+          validation={Validation.getFieldValidation(NodeDef.propKeys.maxFileSize)(validation)}
         />
       </FormItem>
       <FormItem label={i18n.t('nodeDefEdit.fileProps.fileType')}>
