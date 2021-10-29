@@ -28,8 +28,9 @@ export default class SurveyCreatorJob extends Job {
     const { collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
 
     const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
+    const surveyTargetName = Survey.getName(surveyInfoTarget)
 
-    const startingName = backup ? surveySourceName : Survey.getName(surveyInfoTarget) || `clone_${surveySourceName}`
+    const startingName = surveyTargetName || (backup ? surveySourceName : `clone_${surveySourceName}`)
 
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
