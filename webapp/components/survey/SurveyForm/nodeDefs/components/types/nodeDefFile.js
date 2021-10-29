@@ -25,6 +25,7 @@ const ImagePreview = ({ path, file = null }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  // reset retry timeout on unmount
   useEffect(() => {
     return () => {
       clearTimeout(retryTimeoutRef.current)
@@ -38,13 +39,13 @@ const ImagePreview = ({ path, file = null }) => {
     clearTimeout(retryTimeoutRef.current)
   }, [path, file])
 
+  // used the file blob if specified, to avoid downloading the file from the path
   const imgSrc = file ? URL.createObjectURL(file) : path
 
   const onError = useCallback(() => {
     // try to load again the image after 1 sec, then after 2 seconds, otherwise show a warning icon
     const retries = retriesRef.current
     if (retries <= 2) {
-      clearTimeout(retryTimeoutRef.current)
       retryTimeoutRef.current = setTimeout(() => {
         retriesRef.current = retries + 1
         imgRef.current.src = path
