@@ -11,3 +11,7 @@ export {
   ButtonSave,
   ButtonInvite,
 } from './buttons'
+
+import LoadingBar from './LoadingBar'
+
+export { LoadingBar }

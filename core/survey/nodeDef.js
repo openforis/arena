@@ -76,7 +76,7 @@ export const propKeys = {
   vernacularNameLabels: 'vernacularNameLabels',
 
   // File
-  maxFileSize: 'maxFileSize',
+  maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
 }
 
@@ -118,6 +118,7 @@ const metaKeys = {
 }
 
 export const maxKeyAttributes = 3
+const MAX_FILE_SIZE_DEFAULT = 10
 
 // ==== READ
 
@@ -184,7 +185,7 @@ export const getMaxNumberDecimalDigits = (nodeDef) => {
 }
 // File
 export const isNumberOfFilesEnabled = isMultiple
-export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize)(nodeDef))
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
