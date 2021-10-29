@@ -5,12 +5,31 @@ import { Button } from '@webapp/components/buttons'
 import { ContentRowCell } from './ContentRowCell'
 
 export const ContentRowCells = (props) => {
-  const { active, cellTestIdExtractor, columns, expandableRows, isRowExpandable, item, onRowExpandToggle, rowExpanded } = props
+  const {
+    active,
+    cellTestIdExtractor,
+    columns,
+    expandableRows,
+    initData,
+    isRowExpandable,
+    item,
+    itemPosition,
+    onRowExpandToggle,
+    rowExpanded,
+  } = props
 
   return (
     <>
       {columns.map((column) => (
-        <ContentRowCell key={column.key} active={active} cellTestIdExtractor={cellTestIdExtractor} column={column} item={item} />
+        <ContentRowCell
+          key={column.key}
+          active={active}
+          cellTestIdExtractor={cellTestIdExtractor}
+          column={column}
+          initData={initData}
+          item={item}
+          itemPosition={itemPosition}
+        />
       ))}
       {expandableRows && (
         <div>

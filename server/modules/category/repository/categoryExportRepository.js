@@ -1,7 +1,6 @@
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Category from '@core/survey/category'
-import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 const getEmpty = ({ header }) => `'' AS ${header}`
@@ -150,9 +149,8 @@ export const getCategoryExportHeaders = ({ levels, languages }) =>
 
 export const getCategoryExportHeadersExtraProps = ({ category }) => Category.getItemExtraDefKeys(category)
 
-export const getCategoryExportTemplate = async ({ res }) => {
-  Response.setContentTypeFile(res, 'template_code_list_hierarchical.csv', null, Response.contentTypes.csv)
-  await CSVWriter.writeToStream(res, [
+export const writeCategoryExportTemplateToStream = async ({ outputStream }) => {
+  await CSVWriter.writeToStream(outputStream, [
     { level_1_code: 1, level_2_code: '', label_en: 'label_1' },
     { level_1_code: 1, level_2_code: 1, label_en: 'label_1_1' },
     { level_1_code: 1, level_2_code: 2, label_en: 'label_1_2' },

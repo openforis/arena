@@ -30,6 +30,14 @@ export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, paren
     data: { draft, parentUuid },
   })
 
+export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft })
+
+  return { job }
+}
+
 // CREATE
 export const createCategory = async ({ surveyId }) => {
   const {

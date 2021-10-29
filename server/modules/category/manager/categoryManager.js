@@ -7,17 +7,20 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import {
   publishSurveySchemaTableProps,
   markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryValidator from '../categoryValidator'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 import * as CategoryRepository from '../repository/categoryRepository'
@@ -153,9 +156,35 @@ export const {
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
-  getCategoryExportTemplate,
+  writeCategoryExportTemplateToStream,
   insertItems: insertItemsInBatch,
 } = CategoryRepository
+
+export const exportCategoryToStream = async ({ surveyId, categoryUuid, draft, outputStream }, client = db) => {
+  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+
+  const levels = Category.getLevelsArray(category)
+
+  // get survey languages
+  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft })
+  const languages = Survey.getLanguages(surveyInfo)
+
+  const {
+    stream: categoryStream,
+    headers = [],
+    extraPropsHeaders = [],
+  } = getCategoryStreamAndHeaders({
+    surveyId,
+    categoryUuid,
+    levels,
+    languages,
+    category,
+  })
+
+  return client.stream(categoryStream, (dbStream) => {
+    dbStream.pipe(CSVWriter.transformToStream(outputStream, [...headers, ...extraPropsHeaders]))
+  })
+}
 
 // ====== UPDATE
 
