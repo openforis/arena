@@ -17,8 +17,8 @@ export const ButtonDownload = (props) => {
       title={title}
       onClick={async () => {
         if (href) {
-          const queryParams = new URLSearchParams(requestParams)
-          window.open(`${href}?${queryParams}`, '_blank')
+          const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
+          window.open(url, '_blank')
         }
         if (onClick) {
           await onClick()

@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import path from 'path'
 import Archiver from 'archiver'
 
@@ -58,11 +57,10 @@ export const sendFileContent = (res, name, content, size) => {
 }
 
 export const sendFile = ({ res, path: filePath, name = null, contentType = null }) => {
-  const stats = fs.statSync(filePath)
-  const { size } = stats
+  const size = FileUtils.getFileSize(filePath)
   const fileName = name || path.basename(filePath)
   setContentTypeFile(res, fileName, size, contentType)
-  fs.createReadStream(filePath).pipe(res)
+  FileUtils.createReadStream(filePath).pipe(res)
 }
 
 export const sendZipFile = (res, dir, name) => {
@@ -83,7 +81,7 @@ export const sendZipFile = (res, dir, name) => {
 
 export const sendFilesAsZipWithSize = ({ res, dir, name }) => {
   const filePath = FileUtils.join(dir, name)
-  const output = fs.createWriteStream(filePath)
+  const output = FileUtils.createWriteStream(filePath)
   const zip = Archiver('zip')
   zip.pipe(output)
   zip.directory(dir, false)

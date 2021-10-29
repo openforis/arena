@@ -7,6 +7,7 @@ export {
   fetchCategoryItems,
   deleteCategory,
   cleanupCategory,
+  startExportAllCategoriesJob,
 } from './categories'
 export {
   fetchTaxonomies,

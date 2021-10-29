@@ -54,7 +54,7 @@ export default class SurveyExportJob extends Job {
 
     this.logDebug(`using output file: ${outputFilePath}`)
 
-    const outputFileStream = FileUtils.createWriteSteam(outputFilePath)
+    const outputFileStream = FileUtils.createWriteStream(outputFilePath)
 
     const archive = Archiver('zip')
     archive.pipe(outputFileStream)
