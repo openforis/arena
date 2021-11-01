@@ -26,6 +26,8 @@ const actionHandlers = {
 
   [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
   [NodeDefsActions.nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
   [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
