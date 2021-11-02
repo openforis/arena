@@ -1,6 +1,7 @@
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import { normalizeName } from '@core/stringUtils'
+import { Countries } from '../Countries'
 
 export const keys = {
   email: 'email',
@@ -28,16 +29,31 @@ export const editableFields = [
   { name: `props.${keysProps.firstName}`, required: true },
   { name: `props.${keysProps.lastName}`, required: true },
   { name: `props.${keysProps.institution}` },
-  { name: `props.${keysProps.country}` },
+  {
+    name: `props.${keysProps.country}`,
+    itemsFetchFunction: () => Countries.list(),
+    // user country name as both key and label
+    itemKeyExtractor: ({ item }) => item.name,
+    itemLabelFunction: ({ item }) => item.name,
+  },
   { name: `props.${keysProps.purpose}`, required: true },
   { name: `props.${keysProps.surveyName}`, required: true, normalizeFn: normalizeName },
-  // {
-  //   name: `props.${keysProps.template}`,
-  //   required: true,
-  //   items: ['none', 'templateA', 'templateB'],
-  //   defaultValue: 'none',
-  // },
 ]
+
+export const getFieldItems = ({ field }) => {
+  const { itemsFetchFunction } = field
+  return itemsFetchFunction ? itemsFetchFunction() : null
+}
+
+export const getFieldItemKey = ({ field, item }) => {
+  const { itemKeyExtractor } = field
+  return itemKeyExtractor ? itemKeyExtractor({ item }) : item
+}
+
+export const getFieldItemLabel = ({ field, item }) => {
+  const { itemLabelFunction } = field
+  return itemLabelFunction ? itemLabelFunction({ item }) : null
+}
 
 export const getEmail = A.prop(keys.email)
 
