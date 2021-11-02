@@ -18,6 +18,7 @@ import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { State } from './store'
 
 const TaxonProps = (props) => {
@@ -102,6 +103,13 @@ const TaxonProps = (props) => {
           </button>
         </div>
       </FormItem>
+
+      <LabelsEditor
+        formLabelKey="taxonomy.vernacularNameLabel"
+        placeholder="surveyForm.nodeDefTaxon.vernacularName"
+        labels={NodeDef.getVernacularNameLabels(nodeDef)}
+        onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
+      />
 
       <div className="taxon-props__panel-right">
         {showTaxonomiesPanel && !taxonomyToEdit && (

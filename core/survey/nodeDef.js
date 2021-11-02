@@ -73,6 +73,7 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+  vernacularNameLabels: 'vernacularNameLabels',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
@@ -167,18 +168,21 @@ export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 
 export const getDescriptions = getProp(propKeys.descriptions, {})
+// code
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
+// taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
-
+export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
+export const getVernacularNameLabel = (lang) => (nodeDef) => getVernacularNameLabels(nodeDef)[lang]
+// text
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
-
+// decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {
   const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
   return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
 }
-
 // File
 export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))

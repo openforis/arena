@@ -16,7 +16,7 @@ export const useColumn = ({ colWidth, query, nodeDef }) => {
       aggregateFunctions.map((aggregateFn) => ColumnNodeDef.getColumnNameAggregateFunction({ nodeDef, aggregateFn }))
     : ColumnNodeDef.getColumnNames(nodeDef)
 
-  const noCols = modeEdit ? NodeDefUIProps.getFormFields(nodeDef).length : columnNames.length
+  const noCols = modeEdit ? NodeDefUIProps.getFormFieldsLength(nodeDef) : columnNames.length
 
   const widthOuter = colWidth * noCols
   const widthInner = `${(1 / noCols) * 100}%`
