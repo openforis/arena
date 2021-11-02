@@ -89,7 +89,7 @@ export default class RecordCheckJob extends Job {
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
 
     // 1. fetch record and nodes
-    let record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, true, this.tx)
+    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId: this.surveyId, recordUuid }, this.tx)
 
     // 2. remove deleted nodes
     if (!R.isEmpty(nodeDefDeletedUuids)) {
