@@ -133,6 +133,8 @@ export const getComponent = getProp('component', NodeDefText)
 
 export const getFormFields = getProp('formFields', ['field'])
 
+export const getFormFieldsLength = (nodeDef) => getFormFields(nodeDef).length
+
 export const getDefaultValue = getProp('defaultValue')
 
 export const getValidationsEnabledByType = getPropByType('validations', true)

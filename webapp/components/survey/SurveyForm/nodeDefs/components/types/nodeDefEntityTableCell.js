@@ -69,8 +69,7 @@ const NodeDefEntityTableCell = (props) => {
   const [visible, setVisible] = useState(isHeader || !windowed)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const fields = NodeDefUiProps.getFormFields(nodeDef)
-  const fieldsLength = fields.length
+  const fieldsLength = NodeDefUiProps.getFormFieldsLength(nodeDef)
   const widthValue = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
   const totalWidthValue = fieldsLength * widthValue
 
@@ -100,7 +99,7 @@ const NodeDefEntityTableCell = (props) => {
   const onResizeStop = (_e, { size }) => {
     const { width } = size
 
-    const fieldWidth = Math.ceil(width / NodeDefUiProps.getFormFields(nodeDef).length)
+    const fieldWidth = Math.ceil(width / NodeDefUiProps.getFormFieldsLength(nodeDef))
     if (!fieldWidth || fieldWidth < NodeDefLayout.columnWidthMinPx) return
 
     dispatch(

@@ -19,6 +19,15 @@ const NodeDefTableCellHeader = (props) => {
 
   const fields = NodeDefUiProps.getFormFields(nodeDef)
 
+  const getFieldLabelKey = ({ field }) => {
+    let labelKey = null
+    // use custom field label
+    if (NodeDef.isTaxon(nodeDef) && field.field === 'vernacular_name') {
+      labelKey = NodeDef.getVernacularNameLabel(lang)(nodeDef)
+    }
+    return labelKey || field.labelKey
+  }
+
   return (
     <div
       className={`survey-form__node-def-table-cell-header survey-form__node-def-table-cell-${NodeDef.getType(nodeDef)}`}
@@ -34,7 +43,7 @@ const NodeDefTableCellHeader = (props) => {
         <div className="subfields-labels-wrapper">
           {fields.map((field) => (
             <div key={field.field} className="label">
-              {i18n.t(field.labelKey)}
+              {i18n.t(getFieldLabelKey({ field }))}
             </div>
           ))}
         </div>
