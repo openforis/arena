@@ -6,6 +6,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Node from '@core/record/node'
 
 import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 
@@ -42,13 +43,15 @@ const NodeDefEntityFormGrid = (props) => {
   }
 
   const columns = NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)
-  const rdgLayout = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+  const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
+
+  const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle: surveyCycleKey, nodeDef })(node) : rdgLayoutOriginal
 
   return nodeDefsInnerPage.length > 0 ? (
     <ResponsiveGridLayout
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      autoSize={false}
+      autoSize={entry}
       rowHeight={70}
       cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
       layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
@@ -63,23 +66,33 @@ const NodeDefEntityFormGrid = (props) => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >
-      {nodeDefsInnerPage.map((childDef) => (
-        <div key={NodeDef.getUuid(childDef)}>
-          <NodeDefSwitch
-            edit={edit}
-            entry={entry}
-            preview={preview}
-            recordUuid={recordUuid}
-            surveyInfo={surveyInfo}
-            surveyCycleKey={surveyCycleKey}
-            nodeDef={childDef}
-            parentNode={node}
-            canEditDef={canEditDef}
-            canEditRecord={canEditRecord}
-            canAddNode={canAddNode}
-          />
-        </div>
-      ))}
+      {nodeDefsInnerPage.map((childDef) => {
+        const childDefUuid = NodeDef.getUuid(childDef)
+        const applicable = Node.isChildApplicable(childDefUuid)(node)
+        const style = !applicable
+          ? {
+              width: '0px',
+              height: '0px',
+            }
+          : null
+        return (
+          <div key={childDefUuid}>
+            <NodeDefSwitch
+              edit={edit}
+              entry={entry}
+              preview={preview}
+              recordUuid={recordUuid}
+              surveyInfo={surveyInfo}
+              surveyCycleKey={surveyCycleKey}
+              nodeDef={childDef}
+              parentNode={node}
+              canEditDef={canEditDef}
+              canEditRecord={canEditRecord}
+              canAddNode={canAddNode}
+            />
+          </div>
+        )
+      })}
     </ResponsiveGridLayout>
   ) : null
 }

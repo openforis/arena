@@ -6,6 +6,7 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -108,6 +109,37 @@ export const getNodeDefUuids = (nodes) =>
     R.map((key) => getNodeDefUuid(nodes[key])),
     R.uniq
   )(nodes)
+
+export const getNodeLayoutChildren =
+  ({ cycle, nodeDef }) =>
+  (node) => {
+    const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
+
+    let minY = 0
+    let minX = 0
+    return (
+      [...layoutChildren]
+        // sort layout items from top to bottom
+        .sort((item1, item2) => {
+          if (item1.y - item2.y === 0) {
+            return item1.x - item2.x
+          }
+          return item1.y - item2.y
+        })
+        // compact layout items vertically
+        .reduce((rdgLayoutAcc, item) => {
+          const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
+          const visible = isChildApplicable(childDefUuid)(node)
+          const h = visible ? hOriginal : 0
+          const w = visible ? wOriginal : 0
+          const x = Math.min(minX, xOriginal)
+          const y = Math.min(minY, yOriginal)
+          minY = yOriginal + h
+          minX = xOriginal + w
+          return [...rdgLayoutAcc, { ...item, h, x, y }]
+        }, [])
+    )
+  }
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isCreated = R.propEq(keys.created, true)
