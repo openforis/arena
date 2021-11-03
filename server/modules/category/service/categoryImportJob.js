@@ -87,7 +87,9 @@ export default class CategoryImportJob extends Job {
     await super.beforeSuccess()
 
     // Validate category
+    this.logDebug('category validation start')
     this.category = await CategoryManager.validateCategory(this.surveyId, Category.getUuid(this.category), this.tx)
+    this.logDebug('category validation end')
 
     this.setResult({
       category: this.category,
@@ -321,8 +323,15 @@ export default class CategoryImportJob extends Job {
 
   _getParentItemUuid(itemCodes) {
     if (itemCodes.length > 1) {
-      const itemParent = this._getItemCachedByCodes(itemCodes.slice(0, itemCodes.length - 1))
-      return CategoryItem.getUuid(itemParent)
+      const parentItemCodes = itemCodes.slice(0, itemCodes.length - 1)
+      const itemParent = this._getItemCachedByCodes(parentItemCodes)
+      if (itemParent) {
+        return CategoryItem.getUuid(itemParent)
+      } else {
+        this._addError(Validation.messageKeys.categoryImport.invalidParentItemOrder, {
+          parentItemCodes: String(parentItemCodes),
+        })
+      }
     }
 
     return null
