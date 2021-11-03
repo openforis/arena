@@ -11,6 +11,7 @@ export const keys = {
   columnsNo: 'columnsNo', // Number of columns
   columnWidth: 'columnWidth', // Width of the column when rendering inside a table (defaults to '160px')
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
+  hiddenWhenNotRelevant: 'hiddenWhenNotRelevant', // Boolean: true if the node must be hidden when is not relevant
 }
 
 export const renderType = {
@@ -58,6 +59,8 @@ export const getIndexChildren = (cycle) => _getPropLayout(cycle, keys.indexChild
 export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
+
+export const isHiddenWhenNotRelevant = (cycle) => _getPropLayout(cycle, keys.hiddenWhenNotRelevant, false)
 
 /**
  * Returns the uuids of the layout children items.

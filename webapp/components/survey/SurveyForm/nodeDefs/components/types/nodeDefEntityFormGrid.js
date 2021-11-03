@@ -22,7 +22,7 @@ const NodeDefEntityFormGrid = (props) => {
   const dispatch = useDispatch()
 
   const survey = useSelector(SurveyState.getSurvey)
-  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
+  const cycle = useSelector(SurveyState.getSurveyCycleKey)
 
   const canEditDef = useAuthCanEditSurvey()
 
@@ -42,11 +42,11 @@ const NodeDefEntityFormGrid = (props) => {
     }
   }
 
-  const columns = NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)
-  const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
-  const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
+  const columns = NodeDefLayout.getColumnsNo(cycle)(nodeDef)
+  const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
+  const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(cycle)(childDefs)
 
-  const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle: surveyCycleKey, nodeDef })(node) : rdgLayoutOriginal
+  const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal
 
   return nodeDefsInnerPage.length > 0 ? (
     <ResponsiveGridLayout
@@ -66,33 +66,23 @@ const NodeDefEntityFormGrid = (props) => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >
-      {nodeDefsInnerPage.map((childDef) => {
-        const childDefUuid = NodeDef.getUuid(childDef)
-        const applicable = Node.isChildApplicable(childDefUuid)(node)
-        const style = !applicable
-          ? {
-              width: '0px',
-              height: '0px',
-            }
-          : null
-        return (
-          <div key={childDefUuid}>
-            <NodeDefSwitch
-              edit={edit}
-              entry={entry}
-              preview={preview}
-              recordUuid={recordUuid}
-              surveyInfo={surveyInfo}
-              surveyCycleKey={surveyCycleKey}
-              nodeDef={childDef}
-              parentNode={node}
-              canEditDef={canEditDef}
-              canEditRecord={canEditRecord}
-              canAddNode={canAddNode}
-            />
-          </div>
-        )
-      })}
+      {nodeDefsInnerPage.map((childDef) => (
+        <div key={NodeDef.getUuid(childDef)}>
+          <NodeDefSwitch
+            edit={edit}
+            entry={entry}
+            preview={preview}
+            recordUuid={recordUuid}
+            surveyInfo={surveyInfo}
+            surveyCycleKey={cycle}
+            nodeDef={childDef}
+            parentNode={node}
+            canEditDef={canEditDef}
+            canEditRecord={canEditRecord}
+            canAddNode={canAddNode}
+          />
+        </div>
+      ))}
     </ResponsiveGridLayout>
   ) : null
 }

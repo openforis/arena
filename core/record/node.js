@@ -111,7 +111,7 @@ export const getNodeDefUuids = (nodes) =>
   )(nodes)
 
 export const getNodeLayoutChildren =
-  ({ cycle, nodeDef }) =>
+  ({ cycle, nodeDef, childDefs }) =>
   (node) => {
     const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
 
@@ -129,14 +129,16 @@ export const getNodeLayoutChildren =
         // compact layout items vertically
         .reduce((rdgLayoutAcc, item) => {
           const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
-          const visible = isChildApplicable(childDefUuid)(node)
-          const h = visible ? hOriginal : 0
-          const w = visible ? wOriginal : 0
+          const childDef = childDefs.find((childDef) => childDef.uuid === childDefUuid)
+          const hidden =
+            NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDefUuid)(node)
+          const h = hidden ? 0 : hOriginal
+          const w = hidden ? 0 : wOriginal
           const x = Math.min(minX, xOriginal)
           const y = Math.min(minY, yOriginal)
           minY = yOriginal + h
           minX = xOriginal + w
-          return [...rdgLayoutAcc, { ...item, h, x, y }]
+          return [...rdgLayoutAcc, { ...item, h, w, x, y }]
         }, [])
     )
   }
