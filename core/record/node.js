@@ -113,34 +113,14 @@ export const getNodeDefUuids = (nodes) =>
 export const getNodeLayoutChildren =
   ({ cycle, nodeDef, childDefs }) =>
   (node) => {
-    const hiddenChildDefsByUuid = childDefs.reduce(
+    const hiddenDefsByUuid = childDefs.reduce(
       (uuidsMap, childDef) =>
         NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
           ? { ...uuidsMap, [childDef.uuid]: true }
           : uuidsMap,
       {}
     )
-    const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
-
-    let nextY = 0
-    let nextX = 0
-    return (
-      [...layoutChildren]
-        // sort layout items from top to bottom
-        .sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
-        // compact layout items
-        .reduce((rdgLayoutAcc, item) => {
-          const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
-          const hidden = Boolean(hiddenChildDefsByUuid[childDefUuid])
-          const h = hidden ? 0 : hOriginal
-          const w = hidden ? 0 : wOriginal
-          const x = Math.min(nextX, xOriginal)
-          const y = Math.min(nextY, yOriginal)
-          nextY = y + h
-          nextX = x + w
-          return hidden ? rdgLayoutAcc : [...rdgLayoutAcc, { ...item, h, w, x, y }]
-        }, [])
-    )
+    return NodeDefLayout.getLayoutChildrenCompact({ cycle, hiddenDefsByUuid })(nodeDef)
   }
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)

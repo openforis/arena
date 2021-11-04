@@ -60,6 +60,31 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
+export const getLayoutChildrenCompact =
+  ({ cycle, hiddenDefsByUuid = {} }) =>
+  (nodeDef) => {
+    const layoutChildren = getLayoutChildren(cycle)(nodeDef)
+    let nextY = 0
+    let nextX = 0
+    return (
+      [...layoutChildren]
+        // sort layout items from top to bottom
+        .sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
+        // compact layout items
+        .reduce((layoutChildrenAcc, item) => {
+          const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
+          const hidden = Boolean(hiddenDefsByUuid[childDefUuid])
+          const h = hidden ? 0 : hOriginal
+          const w = hidden ? 0 : wOriginal
+          const x = Math.min(nextX, xOriginal)
+          const y = Math.min(nextY, yOriginal)
+          nextY = y + h
+          nextX = x + w
+          return hidden ? layoutChildrenAcc : [...layoutChildrenAcc, { ...item, h, w, x, y }]
+        }, [])
+    )
+  }
+
 export const isHiddenWhenNotRelevant = (cycle) => _getPropLayout(cycle, keys.hiddenWhenNotRelevant, false)
 
 /**
