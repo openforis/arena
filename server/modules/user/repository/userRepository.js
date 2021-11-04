@@ -87,12 +87,13 @@ export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
     camelize
   )
 
-export const fetchUsersStream = () => {
+export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   const select = `
     SELECT u.email, u.name, u.status
     FROM "user" u
     ORDER BY u.email`
-  return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
+  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
+  await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
 export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>

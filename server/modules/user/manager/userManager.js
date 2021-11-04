@@ -164,12 +164,10 @@ export const fetchUsers = async ({ offset, limit }, client = db) =>
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
-export const exportUsersIntoStream = async ({ outputStream }, client = db) => {
-  const usersStream = UserRepository.fetchUsersStream()
-
+export const exportUsersIntoStream = async ({ outputStream }) => {
   const headers = ['email', 'name', 'status']
-
-  await client.stream(usersStream, (dbStream) => dbStream.pipe(CSVWriter.transformToStream(outputStream, headers)))
+  const transformer = CSVWriter.transformToStream(outputStream, headers)
+  await UserRepository.fetchUsersIntoStream({ transformer })
 }
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
