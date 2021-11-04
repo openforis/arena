@@ -792,7 +792,11 @@ $t(common.cantUndoWarning)`,
 
   surveyForm: {
     subPage: 'Sub page',
-    addChildTo: 'Add to {{nodeDef}}',
+    addChildTo: 'Add to {{nodeDefLabel}}',
+    addChildToTitle: 'Add new node to {{nodeDefLabel}}',
+    compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    delete: `Delete '{{nodeDefLabel}}'`,
+    edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema Summary',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
