@@ -4,9 +4,10 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Node from '@core/record/node'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { NodeDefsActions } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
@@ -14,6 +15,7 @@ import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 const NodeDefEntityTableRow = (props) => {
   const {
     edit,
+    entry,
     id,
     nodeDef,
     nodeDefColumns,
@@ -23,6 +25,7 @@ const NodeDefEntityTableRow = (props) => {
     canEditDef,
     renderType,
     i = 'header',
+    siblingEntities,
   } = props
 
   const placeholderRef = useRef()
@@ -32,6 +35,8 @@ const NodeDefEntityTableRow = (props) => {
 
   const dispatch = useDispatch()
 
+  const cycle = useSurveyCycleKey()
+
   const draggable = edit && canEditDef && !resizing
   const resizable = edit && renderType === NodeDefLayout.renderType.tableHeader
 
@@ -39,46 +44,38 @@ const NodeDefEntityTableRow = (props) => {
     if (!draggable || resizing) {
       return
     }
-    try {
-      const { currentTarget, dataTransfer } = evt
-      const placeholder = placeholderRef.current
+    const { currentTarget, dataTransfer } = evt
+    const placeholder = placeholderRef.current
 
-      placeholder.style.width = `${currentTarget.clientWidth}px`
-      placeholder.style.height = `${currentTarget.clientHeight}px`
+    placeholder.style.width = `${currentTarget.clientWidth}px`
+    placeholder.style.height = `${currentTarget.clientHeight}px`
 
-      dataTransfer.effectAllowed = 'move'
-      // Firefox requires dataTransfer data to be set
-      dataTransfer.setData('text/html', currentTarget)
+    dataTransfer.effectAllowed = 'move'
+    // Firefox requires dataTransfer data to be set
+    dataTransfer.setData('text/html', currentTarget)
 
-      setDragged(currentTarget)
-    } catch (e) {
-      console.log(e)
-    }
+    setDragged(currentTarget)
   }
 
   const dragOver = (evt) => {
     if (!draggable) {
       return
     }
-    try {
-      evt.preventDefault()
-      const placeholder = placeholderRef.current
+    evt.preventDefault()
+    const placeholder = placeholderRef.current
 
-      dragged.style.display = 'none'
-      placeholder.style.display = 'block'
+    dragged.style.display = 'none'
+    placeholder.style.display = 'block'
 
-      if (evt.target !== placeholder) {
-        const overElement = evt.target
+    if (evt.target !== placeholder) {
+      const overElement = evt.target
 
-        const { left } = elementOffset(overElement)
-        const relX = evt.clientX - left
-        const width = overElement.offsetWidth / 2
-        const parent = evt.target.parentNode
+      const { left } = elementOffset(overElement)
+      const relX = evt.clientX - left
+      const width = overElement.offsetWidth / 2
+      const parent = evt.target.parentNode
 
-        parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
-      }
-    } catch (e) {
-      console.log(e)
+      parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
     }
   }
 
@@ -86,22 +83,18 @@ const NodeDefEntityTableRow = (props) => {
     if (!draggable) {
       return
     }
-    try {
-      const placeholder = placeholderRef.current
+    const placeholder = placeholderRef.current
 
-      dragged.style.display = 'block'
-      placeholder.style.display = 'none'
+    dragged.style.display = 'block'
+    placeholder.style.display = 'none'
 
-      placeholder.parentNode.insertBefore(dragged, placeholder)
-      setDragged(null)
+    placeholder.parentNode.insertBefore(dragged, placeholder)
+    setDragged(null)
 
-      const childNodes = rowRef.current.childNodes
-      const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
+    const childNodes = rowRef.current.childNodes
+    const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
 
-      dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
-    } catch (e) {
-      console.log(e)
-    }
+    dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
   }
 
   const onChildResizeStart = () => {
@@ -119,22 +112,37 @@ const NodeDefEntityTableRow = (props) => {
 
   return (
     <div ref={rowRef} className={className} data-testid={id} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
-      {nodeDefColumns.map((nodeDefChild) => (
-        <NodeDefEntityTableCell
-          key={NodeDef.getUuid(nodeDefChild)}
-          {...props}
-          nodeDef={nodeDefChild}
-          parentNode={node}
-          draggable={draggable}
-          renderType={renderType}
-          resizable={resizable}
-          onDragStart={dragStart}
-          onDragOver={dragOver}
-          onDragEnd={dragEnd}
-          onResizeStart={onChildResizeStart}
-          onResizeStop={onChildResizeStop}
-        />
-      ))}
+      {nodeDefColumns.map((nodeDefChild) => {
+        const nodeDefChildUuid = nodeDefChild.uuid
+        let hidden = false
+        if (entry && NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefChild)) {
+          const allSiblinNodesNotRelevant = siblingEntities.every(
+            (siblingEntity) => !Node.isChildApplicable(nodeDefChildUuid)(siblingEntity)
+          )
+          if (allSiblinNodesNotRelevant) {
+            hidden = true
+          }
+        }
+        if (hidden) {
+          return null
+        }
+        return (
+          <NodeDefEntityTableCell
+            key={nodeDefChildUuid}
+            {...props}
+            nodeDef={nodeDefChild}
+            parentNode={node}
+            draggable={draggable}
+            renderType={renderType}
+            resizable={resizable}
+            onDragStart={dragStart}
+            onDragOver={dragOver}
+            onDragEnd={dragEnd}
+            onResizeStart={onChildResizeStart}
+            onResizeStop={onChildResizeStop}
+          />
+        )
+      })}
 
       {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
 
