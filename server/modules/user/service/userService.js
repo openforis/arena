@@ -12,6 +12,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
+import { Countries } from '@core/Countries'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -140,7 +141,7 @@ export const inviteUser = async (
       } else if (repeatInvitation) {
         // User has a pending invitation still
         // Generate reset password and send email again
-        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)        
+        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
         await UserInvitationManager.cleanOldInvitations({ survey, userUuidToRemove: User.getUuid(userToInvite) }, t)
         await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
       } else {
@@ -211,18 +212,21 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     return requestCheck
   }
   try {
-    return await db.tx(async (t) => {
-      const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail(t)
-      const { email, props } = userAccessRequest
-      await Mailer.sendEmail({
-        to: systemAdminEmails,
-        msgKey: 'emails.userAccessRequest',
-        msgParams: { ...props, email, serverUrl },
-      })
+    const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
 
-      const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest }, t)
-      return { requestInserted }
+    const { email, props } = userAccessRequest
+    const { country: countryCode } = props
+    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : null
+
+    // send the emails only after use access request has been inserted into the db
+    const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
+
+    await Mailer.sendEmail({
+      to: systemAdminEmails,
+      msgKey: 'emails.userAccessRequest',
+      msgParams: { ...props, country, email, serverUrl },
     })
+    return { requestInserted }
   } catch (error) {
     return { error: error.message }
   }
