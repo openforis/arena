@@ -36,6 +36,7 @@ export const ValidatorErrorKeys = {
     columnMissing: 'validationErrors.categoryImport.columnMissing',
     emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
     emptyFile: 'validationErrors.categoryImport.emptyFile',
+    invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
   },
 
   expressions: {

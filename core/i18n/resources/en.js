@@ -964,6 +964,7 @@ $t(common.cantUndoWarning)`,
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: 'The file you are trying to import is empty',
+      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children'
     },
 
     expressions: {
