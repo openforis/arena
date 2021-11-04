@@ -45,6 +45,13 @@ const NodeDefEntityFormGrid = (props) => {
   const columns = NodeDefLayout.getColumnsNo(cycle)(nodeDef)
   const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
   const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(cycle)(childDefs)
+  const visibleNodeDefsInnerPage = entry
+    ? nodeDefsInnerPage.filter(
+        (nodeDefInnerPage) =>
+          !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
+          Node.isChildApplicable(nodeDefInnerPage.uuid)(node)
+      )
+    : nodeDefsInnerPage
 
   const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal
 
@@ -66,7 +73,7 @@ const NodeDefEntityFormGrid = (props) => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >
-      {nodeDefsInnerPage.map((childDef) => (
+      {visibleNodeDefsInnerPage.map((childDef) => (
         <div key={NodeDef.getUuid(childDef)}>
           <NodeDefSwitch
             edit={edit}

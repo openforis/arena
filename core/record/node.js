@@ -113,6 +113,13 @@ export const getNodeDefUuids = (nodes) =>
 export const getNodeLayoutChildren =
   ({ cycle, nodeDef, childDefs }) =>
   (node) => {
+    const hiddenChildDefsByUuid = childDefs.reduce(
+      (uuidsMap, childDef) =>
+        NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
+          ? { ...uuidsMap, [childDef.uuid]: true }
+          : uuidsMap,
+      {}
+    )
     const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
 
     let nextY = 0
@@ -120,25 +127,18 @@ export const getNodeLayoutChildren =
     return (
       [...layoutChildren]
         // sort layout items from top to bottom
-        .sort((item1, item2) => {
-          if (item1.y - item2.y === 0) {
-            return item1.x - item2.x
-          }
-          return item1.y - item2.y
-        })
+        .sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
         // compact layout items
         .reduce((rdgLayoutAcc, item) => {
           const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
-          const childDef = childDefs.find((childDef) => childDef.uuid === childDefUuid)
-          const hidden =
-            NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDefUuid)(node)
+          const hidden = Boolean(hiddenChildDefsByUuid[childDefUuid])
           const h = hidden ? 0 : hOriginal
           const w = hidden ? 0 : wOriginal
           const x = Math.min(nextX, xOriginal)
           const y = Math.min(nextY, yOriginal)
           nextY = y + h
           nextX = x + w
-          return [...rdgLayoutAcc, { ...item, h, w, x, y }]
+          return hidden ? rdgLayoutAcc : [...rdgLayoutAcc, { ...item, h, w, x, y }]
         }, [])
     )
   }
