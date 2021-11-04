@@ -6,6 +6,7 @@ import * as Response from '@server/utils/response'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
+import * as DateUtils from '@core/dateUtils'
 import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
@@ -139,6 +140,17 @@ export const init = (app) => {
       const list = await UserService.fetchUsers({ offset, limit })
 
       res.json({ list })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+    try {
+      const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
+      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+      await UserService.exportUsersIntoStream({ outputStream: res })
     } catch (error) {
       next(error)
     }

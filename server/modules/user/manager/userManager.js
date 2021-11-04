@@ -16,6 +16,7 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as UserInvitationManager from './userInvitationManager'
 
 export const {
@@ -159,6 +160,14 @@ export const fetchUsers = async ({ offset, limit }, client = db) =>
     const users = await UserRepository.fetchUsers({ offset, limit }, t)
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
+
+export const exportUsersIntoStream = async ({ outputStream }, client = db) => {
+  const usersStream = UserRepository.fetchUsersStream()
+
+  const headers = ['email', 'name', 'status']
+
+  await client.stream(usersStream, (dbStream) => dbStream.pipe(CSVWriter.transformToStream(outputStream, headers)))
+}
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
   client.tx(async (t) => {
