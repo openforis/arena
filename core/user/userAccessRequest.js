@@ -32,8 +32,7 @@ export const editableFields = [
   {
     name: `props.${keysProps.country}`,
     itemsFetchFunction: () => Countries.list(),
-    // user country name as both key and label
-    itemKeyExtractor: ({ item }) => item.name,
+    itemKeyExtractor: ({ item }) => item.code,
     itemLabelFunction: ({ item }) => item.name,
   },
   { name: `props.${keysProps.purpose}`, required: true },
