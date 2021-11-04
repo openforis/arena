@@ -115,8 +115,8 @@ export const getNodeLayoutChildren =
   (node) => {
     const layoutChildren = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
 
-    let minY = 0
-    let minX = 0
+    let nextY = 0
+    let nextX = 0
     return (
       [...layoutChildren]
         // sort layout items from top to bottom
@@ -134,10 +134,10 @@ export const getNodeLayoutChildren =
             NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDefUuid)(node)
           const h = hidden ? 0 : hOriginal
           const w = hidden ? 0 : wOriginal
-          const x = Math.min(minX, xOriginal)
-          const y = Math.min(minY, yOriginal)
-          minY = yOriginal + h
-          minX = xOriginal + w
+          const x = Math.min(nextX, xOriginal)
+          const y = Math.min(nextY, yOriginal)
+          nextY = y + h
+          nextX = x + w
           return [...rdgLayoutAcc, { ...item, h, w, x, y }]
         }, [])
     )

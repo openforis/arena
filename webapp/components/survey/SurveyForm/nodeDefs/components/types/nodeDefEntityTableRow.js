@@ -4,12 +4,10 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
-import { useRecord } from '@webapp/store/ui/record'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
@@ -38,7 +36,6 @@ const NodeDefEntityTableRow = (props) => {
   const dispatch = useDispatch()
 
   const cycle = useSurveyCycleKey()
-  const record = useRecord()
 
   const draggable = edit && canEditDef && !resizing
   const resizable = edit && renderType === NodeDefLayout.renderType.tableHeader
