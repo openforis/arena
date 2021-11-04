@@ -1,6 +1,7 @@
 import * as camelize from 'camelize'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 
@@ -13,27 +14,37 @@ export const countUserAccessRequests = (client = db) =>
     (row) => Number(row.count)
   )
 
-export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, client = db) =>
-  client.map(
-    `
+const userAccessRequestsSelect = `
     SELECT 
       ar.*,
       CASE 
         WHEN u.uuid IS NULL THEN '${UserAccessRequest.status.CREATED}' 
         ELSE '${UserAccessRequest.status.ACCEPTED}' 
         END 
-        AS status 
+        AS status
     FROM user_access_request ar
     LEFT OUTER JOIN "user" u
       ON u.email = ar.email
     ORDER BY 
-      ar.date_created DESC
+      ar.date_created DESC`
+
+export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, client = db) =>
+  client.map(
+    `${userAccessRequestsSelect}
     OFFSET $/offset/
     ${limit ? `LIMIT $/limit/` : ''}
   `,
     { offset, limit },
     camelize
   )
+
+export const fetchUserAccessRequestsAsStream = async ({ transformer }, client = db) => {
+  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(userAccessRequestsSelect, []))
+  await client.stream(
+    stream,
+    (dbStream) => console.log('===dbStream', dbStream, transformer) || dbStream.pipe(transformer)
+  )
+}
 
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
   client.oneOrNone(

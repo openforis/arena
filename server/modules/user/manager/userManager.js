@@ -4,12 +4,15 @@ import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import { Countries } from '@core/Countries'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
+import * as DateUtils from '@core/dateUtils'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
@@ -200,6 +203,37 @@ export {
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
 } from '../repository/userAccessRequestRepository'
+
+export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
+  const headers = [
+    'email',
+    ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
+    'status',
+    'date_created',
+  ]
+
+  const objectTransformer = (obj) => ({
+    ...obj,
+    // expand props into separate columns
+    ...Object.values(UserAccessRequest.keysProps).reduce((acc, prop) => {
+      const header = StringUtils.toSnakeCase(prop)
+      const value = obj.props[prop]
+      // export country name instead of code
+      const valueTransformed =
+        prop === UserAccessRequest.keysProps.country ? Countries.getCountryName({ code: value }) : value
+      return {
+        ...acc,
+        [header]: valueTransformed,
+      }
+    }, {}),
+    // format date_created
+    date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+  })
+
+  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
+    transformer: CSVWriter.transformToStream(outputStream, headers, { objectTransformer }),
+  })
+}
 
 // ==== UPDATE
 

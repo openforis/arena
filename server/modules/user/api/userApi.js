@@ -222,6 +222,17 @@ export const init = (app) => {
     }
   )
 
+  app.get('/users/users-access-request/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+    try {
+      const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
+      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+      await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get(
     '/users/users-access-request/count',
     AuthMiddleware.requireCanViewAccessRequestsPermission,

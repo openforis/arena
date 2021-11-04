@@ -4,7 +4,12 @@ const list = () => Object.entries(countriesData).reduce((acc, [code, item]) => [
 
 const _getCountry = ({ code }) => countriesData[code]
 
-const getCountryName = ({ code, defaultToCode = true }) => _getCountry({ code })?.name || code
+const getCountryName = ({ code, defaultToCode = true }) => {
+  const country = _getCountry({ code })
+  if (country) return country.name
+  if (defaultToCode) return code
+  return null
+}
 
 export const Countries = {
   list,
