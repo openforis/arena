@@ -89,7 +89,11 @@ class NodeDefSwitch extends React.Component {
       'survey-form__node-def-page' +
       (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item') +
       (applicable ? '' : ' not-applicable') +
-      (!applicable && NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) ? ' hidden' : '') +
+      (!applicable &&
+      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+      renderType !== NodeDefLayout.renderType.tableBody
+        ? ' hidden'
+        : '') +
       (NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader ? ' read-only' : '')
 
     return (

@@ -126,7 +126,7 @@ export const getNodeLayoutChildren =
           }
           return item1.y - item2.y
         })
-        // compact layout items vertically
+        // compact layout items
         .reduce((rdgLayoutAcc, item) => {
           const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
           const childDef = childDefs.find((childDef) => childDef.uuid === childDefUuid)

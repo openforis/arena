@@ -146,6 +146,7 @@ const NodeDefEntityTableRows = (props) => {
         preview={preview}
         recordUuid={recordUuid}
         renderType={renderType}
+        siblingEntities={nodes}
         surveyCycleKey={surveyCycleKey}
         surveyInfo={surveyInfo}
       />
