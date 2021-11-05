@@ -1,5 +1,7 @@
 import camelize from 'camelize'
 
+import * as A from '@core/arena'
+
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
@@ -71,7 +73,7 @@ export const fetchSimple = async ({ surveyId, limit = 30, offset = 0 }, client =
     LIMIT $/limit/
   `,
     { offset, limit },
-    camelize
+    A.camelizePartial({ limitToLevel: 1 })
   )
 
 export const count = async ({ surveyId }, client = db) =>
