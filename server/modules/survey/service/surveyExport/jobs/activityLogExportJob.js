@@ -1,8 +1,8 @@
+import * as PromiseUtils from '@core/promiseUtils'
+
 import Job from '@server/job/job'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import { ExportFile } from '../exportFile'
-
-import * as PromiseUtils from '@core/promiseUtils'
 
 const BATCH_SIZE = 50
 
@@ -19,7 +19,7 @@ export default class ActivityLogExportJob extends Job {
 
     await PromiseUtils.each([...Array(this.total).keys()], async (index) => {
       const offset = index * BATCH_SIZE
-      const activityLog = await ActivityLogService.fetchSimple({ surveyId, limit: BATCH_SIZE, offset })
+      const activityLog = await ActivityLogService.fetchSimple({ surveyId, limit: BATCH_SIZE, offset }, this.tx)
       archive.append(JSON.stringify(activityLog, null, 2), { name: ExportFile.activityLog({ index }) })
       this.incrementProcessedItems()
     })
