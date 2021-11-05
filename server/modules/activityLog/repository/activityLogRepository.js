@@ -62,6 +62,21 @@ export const insertManyBatch = async (user, surveyId, activities, client = db) =
   )
 
 // ===== READ
+export const fetchSimple = async ({ surveyId, limit = 30, offset = 0 }, client = db) =>
+  client.map(
+    `SELECT l.* 
+    FROM ${getSurveyDBSchema(surveyId)}.activity_log l
+    ORDER BY l.id
+    OFFSET $/offset/
+    LIMIT $/limit/
+  `,
+    { offset, limit },
+    camelize
+  )
+
+export const count = async ({ surveyId }, client = db) =>
+  client.one(`SELECT COUNT(*) FROM ${getSurveyDBSchema(surveyId)}.activity_log`, [], (row) => Number(row.count))
+
 export const fetch = async ({
   surveyInfo,
   activityTypes = null,

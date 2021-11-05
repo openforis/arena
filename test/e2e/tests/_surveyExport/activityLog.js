@@ -3,7 +3,7 @@ import { ExportFile } from '../../../../server/modules/survey/service/surveyExpo
 
 export const verifyActivityLog = (survey) =>
   test('Verify activity log', async () => {
-    const activityLog = getSurveyEntry(survey, ExportFile.activityLog)
+    const activityLog = getSurveyEntry(survey, ExportFile.activityLog({ index: 0 }))
 
     const activities = Object.values(activityLog)
 

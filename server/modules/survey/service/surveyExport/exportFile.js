@@ -12,7 +12,7 @@ const dir = {
 }
 
 export const ExportFile = {
-  activityLog: FileUtils.join(dir.activityLog, 'activityLog.json'),
+  activityLog: ({index}) => FileUtils.join(dir.activityLog, `activityLog_${index}.json`),
   categories: FileUtils.join(dir.categories, 'categories.json'),
   categoryItems: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
   chains: FileUtils.join(dir.chains, 'chains.json'),
