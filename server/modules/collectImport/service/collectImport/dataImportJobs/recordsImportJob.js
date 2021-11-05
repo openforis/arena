@@ -349,7 +349,10 @@ export default class RecordsImportJob extends Job {
           }
         })
         const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
-        await RecordManager.updateNode(this.user, survey, record, nodeUpdated, true, this.tx)
+        await RecordManager.updateNode(
+          { user: this.user, survey, record, node: nodeUpdated, system: true, updateDependents: false },
+          this.tx
+        )
       }
     }
   }

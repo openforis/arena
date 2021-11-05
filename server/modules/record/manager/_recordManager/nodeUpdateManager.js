@@ -22,7 +22,7 @@ const _getNodesToInsert = (nodeDef) => {
   return Number(NodeDefValidations.getMinCount(validations)) || 0
 }
 
-const _createUpdateResult = (record, node, nodes) => {
+const _createUpdateResult = (record, node, nodes = {}) => {
   const recordUpdated = Record.assocNodes(nodes)(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
@@ -57,11 +57,12 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
           return NodeDef.isMultiple(nodeDefDependent)
             ? NodeRepository.deleteNode(surveyId, Node.getUuid(nodeDependent), t)
             : NodeRepository.updateNode(
-                surveyId,
-                Node.getUuid(nodeDependent),
-                null,
-                Node.getMeta(nodeDependent),
-                Record.isPreview(record),
+                {
+                  surveyId,
+                  nodeUuid: Node.getUuid(nodeDependent),
+                  meta: Node.getMeta(nodeDependent),
+                  draft: Record.isPreview(record),
+                },
                 t
               )
         })
@@ -135,7 +136,7 @@ export const insertNode = async (user, survey, record, node, system, t) => {
 
 // ==== UPDATE
 
-export const updateNode = async (user, survey, record, node, system, t) => {
+export const updateNode = async ({ user, survey, record, node, system = false, updateDependents = true }, t) => {
   const surveyId = Survey.getId(survey)
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   const meta = { ...Node.getMeta(node) }
@@ -154,17 +155,23 @@ export const updateNode = async (user, survey, record, node, system, t) => {
   }
 
   const nodeUpdated = await NodeRepository.updateNode(
-    surveyId,
-    Node.getUuid(node),
-    Node.getValue(node),
-    meta,
-    Record.isPreview(record),
+    {
+      surveyId,
+      nodeUuid: Node.getUuid(node),
+      value: Node.getValue(node),
+      meta,
+      draft: Record.isPreview(record),
+      reloadNode: updateDependents,
+    },
     t
   )
 
-  const recordUpdated = Record.assocNode(nodeUpdated)(record)
-
-  return _onNodeUpdate(survey, recordUpdated, nodeUpdated, {}, t)
+  if (updateDependents && nodeUpdated) {
+    const recordUpdated = Record.assocNode(nodeUpdated)(record)
+    return _onNodeUpdate(survey, recordUpdated, nodeUpdated, {}, t)
+  } else {
+    return _createUpdateResult(record, node)
+  }
 }
 
 export const persistNode = async (user, survey, record, node, system, t) => {
@@ -174,7 +181,7 @@ export const persistNode = async (user, survey, record, node, system, t) => {
 
   if (existingNode) {
     // Updating existing node
-    return updateNode(user, survey, record, node, system, t)
+    return updateNode({ user, survey, record, node, system }, t)
   }
   // Inserting new node
   return insertNode(user, survey, record, node, system, t)

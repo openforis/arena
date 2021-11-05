@@ -133,11 +133,13 @@ export const updateSelfAndDependentsDefaultValues = async (survey, record, node,
 
         return {
           [nodeCtxUuid]: await NodeRepository.updateNode(
-            Survey.getId(survey),
-            nodeCtxUuid,
-            exprValue,
-            { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
-            Record.isPreview(record),
+            {
+              surveyId: Survey.getId(survey),
+              nodeUuid: nodeCtxUuid,
+              value: exprValue,
+              meta: { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
+              draft: Record.isPreview(record),
+            },
             tx
           ),
         }

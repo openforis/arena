@@ -154,7 +154,10 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
   )
 
 // ============== UPDATE
-export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client = db) => {
+export const updateNode = async (
+  { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
+  client = db
+) => {
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
@@ -165,6 +168,9 @@ export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client 
     `,
     [JSON.stringify(value), meta || {}, nodeUuid]
   )
+  if (!reloadNode) return null
+
+  // fetch node with ref data
   const node = await client.one(
     `
     ${_getNodeSelectQuery(surveyId, draft)}

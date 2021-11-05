@@ -32,20 +32,6 @@ export const insert = async (user, surveyId, type, content, system, client = db)
   )
 
 export const insertMany = async (user, surveyId, activities, client = db) =>
-  client.batch(
-    activities.map((activity) =>
-      insert(
-        user,
-        surveyId,
-        ActivityLog.getType(activity),
-        ActivityLog.getContent(activity),
-        ActivityLog.isSystem(activity),
-        client
-      )
-    )
-  )
-
-export const insertManyBatch = async (user, surveyId, activities, client = db) =>
   activities.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
@@ -55,7 +41,7 @@ export const insertManyBatch = async (user, surveyId, activities, client = db) =
       activities.map((activity) => ({
         ...activity,
         user_uuid: User.getUuid(user),
-        date_created: ActivityLog.getDateCreated(activity),
+        date_created: ActivityLog.getDateCreated(activity) || new Date(),
         [ActivityLog.keys.system]: ActivityLog.isSystem(activity),
       }))
     )

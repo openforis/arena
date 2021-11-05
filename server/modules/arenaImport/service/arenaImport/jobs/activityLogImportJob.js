@@ -13,7 +13,7 @@ export default class ActivityLogImportJob extends Job {
     // TODO process activities with a stream
     const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip)
     if (activities.length > 0) {
-      await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
+      await ActivityLogManager.insertMany(this.user, surveyId, activities, this.tx)
     }
   }
 }
