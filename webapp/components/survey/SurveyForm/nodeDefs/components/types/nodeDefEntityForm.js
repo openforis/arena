@@ -40,9 +40,7 @@ const NodeDefEntityForm = (props) => {
         />
       )}
 
-      {entry && selectedNode && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
-
-      {edit && <NodeDefEntityFormGrid {...props} node={null} />}
+      {(entry || edit) && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
     </div>
   )
 }

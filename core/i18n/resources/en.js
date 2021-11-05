@@ -725,8 +725,9 @@ $t(common.cantUndoWarning)`,
       formula: 'Formula',
     },
     advancedProps: {
-      readOnly: 'Read only',
       defaultValues: 'Default values',
+      hiddenIfNotRelevant: 'Hidden when not relevant',
+      readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
     },
@@ -963,6 +964,7 @@ $t(common.cantUndoWarning)`,
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: 'The file you are trying to import is empty',
+      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children'
     },
 
     expressions: {

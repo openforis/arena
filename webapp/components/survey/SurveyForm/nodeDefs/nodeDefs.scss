@@ -46,6 +46,10 @@
   &.not-applicable {
     background-color: rgba($greyBorder, 0.7);
     opacity: 0.6;
+
+    &.hidden {
+      display: none;
+    }
   }
 }
 

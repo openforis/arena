@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -23,6 +25,7 @@ const AdvancedProps = (props) => {
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const i18n = useI18n()
+  const cycle = useSurveyCycleKey()
 
   return (
     <div className="form">
@@ -63,6 +66,15 @@ const AdvancedProps = (props) => {
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent
       />
+
+      <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenIfNotRelevant')}>
+        <Checkbox
+          checked={NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)}
+          disabled={readOnly}
+          validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
+          onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
+        />
+      </FormItem>
     </div>
   )
 }
