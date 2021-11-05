@@ -22,7 +22,7 @@ const NodeDefEntityForm = (props) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (entry && NodeDef.isSingle(nodeDef)) {
+    if (entry) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
       dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
     }
