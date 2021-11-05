@@ -30,11 +30,11 @@ const verifyCoordinate = async (nodeExport, value) => {
   await expect(y).toBe(value.y)
   await expect(srs).toBe(value.srs)
 }
-const verifyTaxon = async (nodeExport, value) => {
+const verifyTaxon = async (nodeExport, _value) => {
   const { value } = nodeExport
   await expect(value).not.toBeNull()
   const { taxonUuid } = value
-  await expect(taxonUuid  ).not.toBeNull()
+  await expect(taxonUuid).not.toBeNull()
   // TODO check that taxon code and scientific name are equal to the ones in the specified value
   // await expect(refData.taxon.props.code).toBe(value.code)
   // await expect(refData.taxon.props.scientificName).toBe(value.scientificName)
