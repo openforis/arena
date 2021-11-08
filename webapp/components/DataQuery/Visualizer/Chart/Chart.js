@@ -102,17 +102,16 @@ const updateCategoyOnDonnutChart =
   }
 
 const Chart = (props) => {
-  const i18n = useI18n()
+  const { query } = props
 
   const [chart, setChart] = useState(defaultSpec)
   const [chartImage, setChartImage] = useState(null)
-
   const [showChartEditor, setShowChartEditor] = useState(true)
 
+  const i18n = useI18n()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-
-  const { query } = props
+  
   useEffect(() => {
     const getChart = async () => {
       try {
@@ -178,12 +177,6 @@ const Chart = (props) => {
 
 Chart.propTypes = {
   query: PropTypes.object.isRequired,
-  data: PropTypes.array.isRequired,
-  dataEmpty: PropTypes.bool.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
-  offset: PropTypes.number.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
-  setData: PropTypes.func.isRequired,
 }
 
 export default Chart
