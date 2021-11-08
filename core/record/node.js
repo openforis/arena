@@ -163,6 +163,8 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
   [keys.meta]: {
     [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
   },
+  [keys.created]: true,
+  [keys.dateCreated]: new Date(),
 })
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({

@@ -11,6 +11,7 @@ import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
+import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
@@ -20,6 +21,7 @@ export default class RecordCheckJob extends Job {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
+    this.nodesBatchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
   }
 
   async onStart() {
@@ -104,13 +106,11 @@ export default class RecordCheckJob extends Job {
     }
 
     // 3. insert missing nodes
-    const { record: recordUpdateInsert, nodes: missingNodes = {} } = await _insertMissingSingleNodes(
+    const { record: recordUpdateInsert, nodes: missingNodes = {} } = await this._insertMissingSingleNodes({
       survey,
       nodeDefAddedUuids,
       record,
-      this.user,
-      this.tx
-    )
+    })
     record = recordUpdateInsert || record
 
     // 4. apply default values and recalculate applicability
@@ -141,6 +141,46 @@ export default class RecordCheckJob extends Job {
 
     await _validateNodes(survey, R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids), record, nodesToValidate, this.tx)
   }
+
+  /**
+   * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+   *
+   * Returns an indexed object with all the inserted nodes.
+   */
+  async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
+    const nodesAdded = {}
+    let recordUpdated = record
+    await PromiseUtils.each(nodeDefAddedUuids, async (nodeDefUuid) => {
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
+      await PromiseUtils.each(parentNodes, async (parentNode) => {
+        const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode(
+          survey,
+          nodeDef,
+          recordUpdated,
+          parentNode,
+          this.user,
+          this.tx
+        )
+        Object.assign(nodesAdded, nodes)
+        recordUpdated = recordUpdatedNodeInsert || recordUpdated
+      })
+    })
+    await PromiseUtils.each(Object.values(nodesAdded).filter(Node.isCreated), async (node) => {
+      this.nodesBatchPersister.addItem(node, this.tx)
+    })
+
+    return { record: recordUpdated, nodes: nodesAdded }
+  }
+
+  async nodesBatchInsertHandler(nodes, tx) {
+    await RecordManager.insertNodesInBulk(this.user, this.surveyId, nodes, tx)
+  }
+
+  async beforeSuccess() {
+    super.beforeSuccess()
+    await this.nodesBatchPersister.flush(this.tx)
+  }
 }
 
 /**
@@ -160,24 +200,7 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
   }
   // insert missing single node
   const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
-  return RecordManager.insertNode(user, survey, record, childNode, true, tx)
-}
-
-/**
- * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
- *
- * Returns an indexed object with all the inserted nodes.
- */
-const _insertMissingSingleNodes = async (survey, nodeDefAddedUuids, record, user, tx) => {
-  const nodesAdded = {}
-  await PromiseUtils.each(nodeDefAddedUuids, async (nodeDefUuid) => {
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
-    await PromiseUtils.each(parentNodes, async (parentNode) => {
-      Object.assign(nodesAdded, await _insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx))
-    })
-  })
-  return nodesAdded
+  return RecordManager.insertNode({ user, survey, record, node: childNode, system: true, persistNodes: false }, tx)
 }
 
 const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {

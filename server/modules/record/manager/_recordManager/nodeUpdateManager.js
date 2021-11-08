@@ -79,7 +79,10 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
 
 // ==== CREATE
 
-const _insertNodeRecursively = async ({ user, survey, nodeDef, record, nodeToInsert, system }, t) => {
+const _insertNodeRecursively = async (
+  { user, survey, nodeDef, record, nodeToInsert, system, persistNodes = true },
+  t
+) => {
   const surveyId = Survey.getId(survey)
 
   if (!Record.isPreview(record)) {
@@ -87,7 +90,9 @@ const _insertNodeRecursively = async ({ user, survey, nodeDef, record, nodeToIns
   }
 
   // Insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
+  const node = persistNodes
+    ? await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
+    : nodeToInsert
 
   const recordUpdated = Record.assocNode(node)(record)
 
@@ -102,7 +107,15 @@ const _insertNodeRecursively = async ({ user, survey, nodeDef, record, nodeToIns
       await PromiseUtils.each([...Array(Number(nodesToInsert)).keys()], async () => {
         const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
         const childNodesInserted = await _insertNodeRecursively(
-          { user, survey, nodeDef: childDef, record: recordUpdated, nodeToInsert: childNode, system: true },
+          {
+            user,
+            survey,
+            nodeDef: childDef,
+            record: recordUpdated,
+            nodeToInsert: childNode,
+            system: true,
+            persistNodes,
+          },
           t
         )
         Object.assign(childNodes, childNodesInserted)
@@ -116,7 +129,7 @@ const _insertNodeRecursively = async ({ user, survey, nodeDef, record, nodeToIns
   }
 }
 
-export const insertNode = async (user, survey, record, node, system, t) => {
+export const insertNode = async ({ user, survey, record, node, system, persistNodes = true }, t) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -129,7 +142,10 @@ export const insertNode = async (user, survey, record, node, system, t) => {
     }
   }
 
-  const nodesToReturn = await _insertNodeRecursively({ user, survey, nodeDef, record, nodeToInsert: node, system }, t)
+  const nodesToReturn = await _insertNodeRecursively(
+    { user, survey, nodeDef, record, nodeToInsert: node, system, persistNodes },
+    t
+  )
 
   return _createUpdateResult(record, node, nodesToReturn)
 }
@@ -184,7 +200,7 @@ export const persistNode = async (user, survey, record, node, system, t) => {
     return updateNode({ user, survey, record, node, system }, t)
   }
   // Inserting new node
-  return insertNode(user, survey, record, node, system, t)
+  return insertNode({ user, survey, record, node, system }, t)
 }
 
 /**

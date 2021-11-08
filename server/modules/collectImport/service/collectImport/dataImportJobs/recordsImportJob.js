@@ -290,26 +290,9 @@ export default class RecordsImportJob extends Job {
   }
 
   async _insertRecordNodes(record) {
-    await PromiseUtils.each(Object.values(Record.getNodes(record)), async (node) => {
-      const value = Node.getValue(node, null)
-
-      const nodeValueInsert = [
-        Node.getUuid(node),
-        node.dateCreated,
-        node.dateCreated,
-        Node.getRecordUuid(node),
-        Node.getParentUuid(node),
-        Node.getNodeDefUuid(node),
-        JSON.stringify(value),
-        {
-          ...Node.getMeta(node),
-          [Node.metaKeys.childApplicability]: {},
-        },
-      ]
-
-      await this.batchPersister.addItem(nodeValueInsert, this.tx)
-    })
-    await this.batchPersister.flush(this.tx)
+    await PromiseUtils.each(Object.values(Record.getNodes(record)), async (node) =>
+      this.batchPersister.addItem(node, this.tx)
+    )
   }
 
   /**
@@ -358,8 +341,8 @@ export default class RecordsImportJob extends Job {
     return recordUpdated
   }
 
-  async nodesBatchInsertHandler(nodeValues, tx) {
-    await RecordManager.insertNodesFromValues(this.user, this.surveyId, nodeValues, tx)
+  async nodesBatchInsertHandler(nodes, tx) {
+    await RecordManager.insertNodesInBulk(this.user, this.surveyId, nodes, tx)
   }
 }
 

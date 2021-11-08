@@ -5,6 +5,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
@@ -28,14 +29,18 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
     return recordDb
   })
 
-export const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) => {
-  const activities = nodeValues.map((nodeValuesRow) => {
-    const node = NodeRepository.tableColumns.reduce(
-      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValuesRow[index] }),
-      {}
-    )
-    return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)
-  })
+export const insertNodesInBulk = async (user, surveyId, nodes, client = db) => {
+  const nodeValues = nodes.map((node) => [
+    Node.getUuid(node),
+    Node.getDateCreated(node),
+    Node.getDateCreated(node),
+    Node.getRecordUuid(node),
+    Node.getParentUuid(node),
+    Node.getNodeDefUuid(node),
+    JSON.stringify(Node.getValue(node, null)),
+    Node.getMeta(node),
+  ])
+  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true))
 
   await client.tx(async (t) =>
     Promise.all([
