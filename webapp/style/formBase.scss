@@ -28,6 +28,11 @@ button,
   //transition: all .1s ease;
 }
 
+select {
+  border: 1px solid $greyBorder;
+  padding: 0.5rem;
+}
+
 textarea {
   border: 1px solid #d1d1dd;
 }
