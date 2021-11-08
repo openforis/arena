@@ -11,6 +11,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { ButtonIconEdit } from '@webapp/components'
 
 import { UserSurveysTable } from './UserSurveysTable'
+import { TableHeaderLeft } from './TableHeaderLeft'
 
 export const UsersList = () => {
   const history = useHistory()
@@ -60,6 +61,7 @@ export const UsersList = () => {
       expandableRows
       isRowExpandable={({ item }) => !User.isSystemAdmin(item)}
       rowExpandedComponent={({ item }) => <UserSurveysTable user={item} />}
+      headerLeftComponent={TableHeaderLeft}
     />
   )
 }

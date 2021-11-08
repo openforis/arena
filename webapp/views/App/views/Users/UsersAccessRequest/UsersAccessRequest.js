@@ -8,6 +8,7 @@ import Table from '@webapp/components/Table/Table'
 
 import ColumnHeaders from './ColumnHeaders'
 import Row from './Row'
+import {TableHeaderLeft} from './TableHeaderLeft'
 
 export const UsersAccessRequest = () => {
   const [requestedAt, setRequestedAt] = useState(Date.now())
@@ -24,6 +25,7 @@ export const UsersAccessRequest = () => {
       restParams={{ requestedAt }}
       className="users-access-request-list"
       gridTemplateColumns={`20rem repeat(${UserAccessRequest.editableFields.length}, 1fr) 5rem 5rem`}
+      headerLeftComponent={TableHeaderLeft}
       rowHeaderComponent={ColumnHeaders}
       rowComponent={Row}
       rowProps={{ onRowChange }}

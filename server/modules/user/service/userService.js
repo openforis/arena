@@ -315,8 +315,10 @@ export const countUsersBySurveyId = async (user, surveyId) => {
 }
 
 export const {
-  fetchUsers,
   countUsers,
+  exportUsersIntoStream,
+  exportUserAccessRequestsIntoStream,
+  fetchUsers,
   fetchUserByUuid,
   fetchUserByUuidWithPassword,
   fetchUserProfilePicture,
