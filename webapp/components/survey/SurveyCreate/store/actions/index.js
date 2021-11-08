@@ -7,6 +7,6 @@ export const useActions = ({ newSurvey, setNewSurvey }) => ({
   onCreate: useOnCreate({ newSurvey, setNewSurvey }),
   onImport: {
     Collect: useOnImport({ newSurvey, setNewSurvey, source: importSources.collect }),
-    Arena: useOnImport({ source: importSources.arena }),
+    Arena: useOnImport({ newSurvey, source: importSources.arena }),
   },
 })

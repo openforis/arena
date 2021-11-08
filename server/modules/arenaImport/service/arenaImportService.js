@@ -2,9 +2,9 @@ import * as JobManager from '@server/job/jobManager'
 
 import ArenaImportJob from './arenaImport/arenaImportJob'
 
-// COLLECT SURVEY IMPORT
-export const startArenaImportJob = (user, filePath) => {
-  const job = new ArenaImportJob({ user, filePath })
+// ARENA SURVEY IMPORT
+export const startArenaImportJob = ({ user, filePath, surveyInfoTarget }) => {
+  const job = new ArenaImportJob({ user, filePath, surveyInfoTarget })
 
   JobManager.executeJobThread(job)
 

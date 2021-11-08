@@ -120,7 +120,7 @@ const validateItems = async (category, itemsByParentUuid) => {
   const stack = []
 
   // Keep track of already visited items: if not leaf, they will be validated only when already visited
-  const visitedUuids = new Set()
+  const visitedIds = {}
 
   const addItemsToStack = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
@@ -146,7 +146,7 @@ const validateItems = async (category, itemsByParentUuid) => {
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
-    const visited = visitedUuids.has(itemUuid)
+    const visited = Boolean(visitedIds[item.id])
 
     let validation = null
 
@@ -183,7 +183,7 @@ const validateItems = async (category, itemsByParentUuid) => {
     // Keep only invalid validations
     if (!Validation.isValid(validation)) itemsValidationsByUuid[itemUuid] = validation
 
-    visitedUuids.add(itemUuid)
+    visitedIds[item.id] = true
   }
 
   const valid = R.isEmpty(itemsValidationsByUuid)

@@ -6,6 +6,8 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
+import * as DbUtils from '@server/db/dbUtils'
+
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const selectFieldsCommaSep = selectFields.map((f) => `u.${f}`).join(',')
 
@@ -76,8 +78,7 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
 export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
   client.map(
     `
-    SELECT 
-        ${selectFieldsCommaSep}
+    SELECT ${selectFieldsCommaSep}
     FROM "user" u
     ORDER BY u.email
     LIMIT ${limit || 'ALL'}
@@ -85,6 +86,15 @@ export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
     [],
     camelize
   )
+
+export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
+  const select = `
+    SELECT u.email, u.name, u.status
+    FROM "user" u
+    ORDER BY u.email`
+  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
+  await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
+}
 
 export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>
   client.map(

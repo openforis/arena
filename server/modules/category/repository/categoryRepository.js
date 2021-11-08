@@ -309,7 +309,8 @@ export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, la
   return { stream, headers, extraPropsHeaders }
 }
 
-export const { getCategoryExportTemplate } = CategoryExportRepository
+export const { writeCategoryExportTemplateToStream } = CategoryExportRepository
+
 // ============== UPDATE
 
 export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>

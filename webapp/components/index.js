@@ -1,8 +1,8 @@
 export {
   Button,
   ButtonBack,
-  ButtonDownload,
   ButtonCancel,
+  ButtonDownload,
   ButtonDelete,
   ButtonIconEdit,
   ButtonIconFilter,
@@ -11,3 +11,7 @@ export {
   ButtonSave,
   ButtonInvite,
 } from './buttons'
+
+import LoadingBar from './LoadingBar'
+
+export { LoadingBar }

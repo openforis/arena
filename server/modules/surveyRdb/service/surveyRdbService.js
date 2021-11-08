@@ -83,7 +83,7 @@ export const exportViewDataToTempFile = async (params) => {
 
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
-  const streamOutput = FileUtils.createWriteSteam(tempFilePath)
+  const streamOutput = FileUtils.createWriteStream(tempFilePath)
 
   await fetchViewData({ surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
 

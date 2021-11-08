@@ -40,12 +40,16 @@ const AccessRequest = () => {
           <Markdown source={i18n.t('accessRequestView.introduction')} />
         </div>
         <form onSubmit={(event) => event.preventDefault()}>
-          {UserAccessRequest.editableFields.map(({ items, name, normalizeFn, required, defaultValue }) => {
+          {UserAccessRequest.editableFields.map((field) => {
+            const { name, normalizeFn, required, defaultValue } = field
             const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
             const value = R.path(name.split('.'))(request)
+            const items = UserAccessRequest.getFieldItems({ field })
             const dropdownItems = items?.map((item) => ({
-              key: item,
-              value: i18n.t(`accessRequestView.fields.${name}_value.${item}`),
+              key: UserAccessRequest.getFieldItemKey({ field, item }),
+              value:
+                UserAccessRequest.getFieldItemLabel({ field, item }) ||
+                i18n.t(`accessRequestView.fields.${name}_value.${item}`),
             }))
             const dropdownSelection = dropdownItems?.find((item) => item.key === (value || defaultValue))
 

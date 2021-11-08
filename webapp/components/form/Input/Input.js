@@ -55,6 +55,7 @@ export const Input = React.forwardRef((props, ref) => {
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
         <NumberFormat
+          autoComplete="off"
           disabled={disabled}
           className="form-input"
           getInputRef={(el) => {

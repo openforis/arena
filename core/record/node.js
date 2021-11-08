@@ -6,6 +6,7 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -108,6 +109,19 @@ export const getNodeDefUuids = (nodes) =>
     R.map((key) => getNodeDefUuid(nodes[key])),
     R.uniq
   )(nodes)
+
+export const getNodeLayoutChildren =
+  ({ cycle, nodeDef, childDefs }) =>
+  (node) => {
+    const hiddenDefsByUuid = childDefs.reduce(
+      (uuidsMap, childDef) =>
+        NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
+          ? { ...uuidsMap, [childDef.uuid]: true }
+          : uuidsMap,
+      {}
+    )
+    return NodeDefLayout.getLayoutChildrenCompressed({ cycle, hiddenDefsByUuid })(nodeDef)
+  }
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isCreated = R.propEq(keys.created, true)

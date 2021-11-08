@@ -36,6 +36,7 @@ export const ValidatorErrorKeys = {
     columnMissing: 'validationErrors.categoryImport.columnMissing',
     emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
     emptyFile: 'validationErrors.categoryImport.emptyFile',
+    invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
   },
 
   expressions: {
@@ -67,6 +68,7 @@ export const ValidatorErrorKeys = {
     formulaInvalid: 'validationErrors.nodeDefEdit.formulaInvalid',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
+    maxFileSizeInvalid: 'validationErrors.nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',

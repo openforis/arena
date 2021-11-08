@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as DateUtils from '@core/dateUtils'
+import { Countries } from '@core/Countries'
 
 import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
@@ -33,9 +34,11 @@ const Row = (props) => {
 
   return (
     <>
-      {UserAccessRequest.editableFields.map(({ name }) => (
-        <LabelWithTooltip key={name} label={R.pathOr('', name.split('.'), userAccessRequest)} />
-      ))}
+      {UserAccessRequest.editableFields.map(({ name }) => {
+        const fieldValue = R.pathOr('', name.split('.'), userAccessRequest)
+        const label = name === 'props.country' ? Countries.getCountryName({ code: fieldValue }) : fieldValue
+        return <LabelWithTooltip key={name} label={label} />
+      })}
       <div>{DateUtils.formatDateTimeDefault(UserAccessRequest.getDateCreated(userAccessRequest))}</div>
       <div>{iconByStatus({ i18n })[status]}</div>
       <div>

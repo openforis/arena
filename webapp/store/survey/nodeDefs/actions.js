@@ -143,6 +143,15 @@ export const putNodeDefLayoutProp =
     dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, propsToPersist))
   }
 
+export const compressFormItems = (nodeDef) => async (dispatch, getState) => {
+  const state = getState()
+  const cycle = SurveyState.getSurveyCycleKey(state)
+  const layoutChildrenCompact = NodeDefLayout.getLayoutChildrenCompressed({ cycle, compressHorizontally: false })(
+    nodeDef
+  )
+  dispatch(putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: layoutChildrenCompact }))
+}
+
 // ==== DELETE
 
 const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {

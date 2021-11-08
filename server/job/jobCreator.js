@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import CategoriesExportJob from '@server/modules/category/service/CategoriesExportJob'
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -12,6 +13,7 @@ import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyE
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 
 const jobClasses = [
+  CategoriesExportJob,
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,
