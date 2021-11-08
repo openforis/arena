@@ -40,10 +40,7 @@ export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, clien
 
 export const fetchUserAccessRequestsAsStream = async ({ transformer }, client = db) => {
   const stream = new DbUtils.QueryStream(DbUtils.formatQuery(userAccessRequestsSelect, []))
-  await client.stream(
-    stream,
-    (dbStream) => console.log('===dbStream', dbStream, transformer) || dbStream.pipe(transformer)
-  )
+  await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
