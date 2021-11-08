@@ -4,9 +4,11 @@ import PropTypes from 'prop-types'
 import { Query } from '@common/model/query'
 
 import Table from './Table'
+import Chart from './Chart'
 
 const components = {
   [Query.displayTypes.table]: Table,
+  [Query.displayTypes.chart]: Chart,
 }
 
 const Visualizer = (props) => {

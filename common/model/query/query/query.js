@@ -13,8 +13,9 @@ export const DEFAULT_AGGREGATE_FUNCTIONS = {
 }
 
 // ====== CREATE
-export const create = ({ entityDefUuid = null } = {}) => ({
+export const create = ({ entityDefUuid = null, displayType = defaults[keys.displayType] } = {}) => ({
   ...defaults,
+  [keys.displayType]: displayType,
   [keys.entityDefUuid]: entityDefUuid,
 })
 
@@ -56,6 +57,11 @@ export const toggleModeAggregate = (query) => ({
 export const toggleModeEdit = (query) => ({
   ...query,
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
+})
+
+export const toggleDisplayType = (query) => ({
+  ...query,
+  [keys.displayType]: query.displayType === displayTypes.chart ? displayTypes.table : displayTypes.chart
 })
 
 export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFn }) => (query) => {

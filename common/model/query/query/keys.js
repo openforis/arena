@@ -17,4 +17,5 @@ export const modes = {
 
 export const displayTypes = {
   table: 'table',
+  chart: 'chart',
 }
