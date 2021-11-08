@@ -58,7 +58,7 @@ export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
 export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
-  const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   await RecordManager.deleteRecord(user, survey, record)
 
@@ -83,7 +83,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
 export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, draft)
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
   const preview = Record.isPreview(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
