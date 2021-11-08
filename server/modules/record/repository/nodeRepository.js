@@ -28,8 +28,14 @@ const dbTransformCallback = (node) =>
     A.assoc('id', Number(node.id))
   )(node)
 
-const _getNodeSelectQuery = (surveyId, draft) => {
+const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) => {
   const schema = getSurveyDBSchema(surveyId)
+
+  if (!includeRefData) {
+    return `SELECT n.* FROM ${schema}.node n`
+  }
+
+  // include ref data (category items, taxa, etc.)
 
   const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
   const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
@@ -88,7 +94,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 
   const nodeAdded = await client.one(
     `
-    ${_getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery({ surveyId, draft })}
     WHERE n.uuid = $1
   `,
     Node.getUuid(node),
@@ -122,10 +128,13 @@ export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client =
 
 // ============== READ
 
-export const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
+export const fetchNodesByRecordUuid = async (
+  { surveyId, recordUuid, includeRefData = true, draft = true },
+  client = db
+) =>
   client.map(
     `
-    ${_getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery({ surveyId, includeRefData, draft })}
     WHERE n.record_uuid = $1
     order by n.date_created
     `,
@@ -145,7 +154,7 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
 export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   client.map(
     `
-    ${_getNodeSelectQuery(surveyId, false)}
+    ${_getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $1
       AND n.parent_uuid ${nodeUuid ? '= $2' : 'is null'}
       AND n.node_def_uuid IN ($3:csv)`,
@@ -167,7 +176,7 @@ export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client 
   )
   const node = await client.one(
     `
-    ${_getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery({ surveyId, draft })}
     WHERE n.uuid = $1
   `,
     nodeUuid,
