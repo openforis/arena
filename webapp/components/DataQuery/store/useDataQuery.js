@@ -9,6 +9,7 @@ import { useActions } from './actions'
 
 const defaults = {
   [Query.displayTypes.table]: { limit: 15, offset: 0 },
+  [Query.displayTypes.chart]: { offset: 0 },
 }
 
 export const useDataQuery = ({ query }) => {
@@ -46,6 +47,13 @@ export const useDataQuery = ({ query }) => {
   useOnUpdate(() => {
     Actions.fetch({ offset, limit, query, includesCount: true })
   }, [filter])
+
+  useOnUpdate(() => {
+    const defaultValues = defaults[Query.getDisplayType(query)]
+    setOffset(defaultValues.offset)
+    setLimit(defaultValues.limit)
+    Actions.fetch({ offset, limit, query, includesCount: true })
+  }, [mode])
 
   return {
     count: count && count.data,
