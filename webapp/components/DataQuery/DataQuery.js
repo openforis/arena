@@ -49,7 +49,7 @@ const DataQuery = (props) => {
           )}
         </div>
 
-        {dataLoaded && (
+        {dataLoaded || Query.getDisplayType(query) === Query.displayTypes.chart &&  (
           <Visualizer
             query={query}
             data={data}
