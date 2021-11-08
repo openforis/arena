@@ -16,13 +16,14 @@ export const Button = (props) => {
     size,
     testId,
     title: titleProp,
+    titleParams,
     ...otherProps
   } = props
 
   const i18n = useI18n()
   const label = showLabel && labelProp ? i18n.t(labelProp) : null
   // use label as title when not showing label
-  const title = titleProp ? i18n.t(titleProp) : !showLabel && labelProp ? i18n.t(labelProp) : null
+  const title = titleProp ? i18n.t(titleProp, titleParams) : !showLabel && labelProp ? i18n.t(labelProp) : null
 
   return (
     <button
@@ -53,6 +54,7 @@ Button.propTypes = {
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
   title: PropTypes.string,
+  titleParams: PropTypes.object,
 }
 
 Button.defaultProps = {
@@ -65,4 +67,5 @@ Button.defaultProps = {
   size: 'medium',
   testId: null,
   title: null,
+  titleParams: null,
 }
