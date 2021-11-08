@@ -58,7 +58,7 @@ const AddNodeDefPanel = (props) => {
 
         <div className="flex-center add-to-label">
           <span className="icon icon-plus icon-10px icon-left" />
-          {i18n.t('surveyForm.addChildTo', { nodeDef: nodeDefLabel })}
+          {i18n.t('surveyForm.addChildTo', { nodeDefLabel })}
         </div>
 
         <AddNodeDefButtons

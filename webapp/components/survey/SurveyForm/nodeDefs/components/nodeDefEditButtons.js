@@ -9,11 +9,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import { TestId } from '@webapp/utils/testId'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
-import { TestId } from '@webapp/utils/testId'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { Button } from '@webapp/components'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
@@ -24,8 +26,11 @@ const NodeDefEditButtons = (props) => {
   const [style, setStyle] = useState({})
 
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
 
   const hasNodeDefAddChildTo = Boolean(useSelector(SurveyFormState.getNodeDefAddChildTo))
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   useEffect(() => {
     const { parentNode } = elementRef.current
@@ -69,38 +74,52 @@ const NodeDefEditButtons = (props) => {
       )}
 
       <Link
-        data-testid={TestId.surveyForm.nodeDefEditBtn(NodeDef.getName(nodeDef))}
+        data-testid={TestId.surveyForm.nodeDefEditBtn(nodeDefName)}
         className="btn btn-s btn-transparent survey-form__node-def-edit-button"
         to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
+        title={i18n.t('surveyForm.edit', { nodeDefLabel })}
       >
         <span className="icon icon-pencil2 icon-12px" />
       </Link>
 
+      {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
+        <Button
+          className="btn-s btn-transparent"
+          onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
+          onMouseDown={(e) => {
+            e.stopPropagation()
+          }}
+          iconClassName="icon-paragraph-justify"
+          title="surveyForm.compressFormItems"
+          titleParams={{ nodeDefLabel }}
+        />
+      )}
+
       {NodeDef.isEntity(nodeDef) && (
-        <button
-          type="button"
-          data-testid={TestId.surveyForm.nodeDefAddChildBtn(NodeDef.getName(nodeDef))}
-          className="btn btn-s btn-transparent"
+        <Button
+          testId={TestId.surveyForm.nodeDefAddChildBtn(nodeDefName)}
+          className="btn-s btn-transparent"
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
           onMouseDown={(e) => {
             e.stopPropagation()
           }}
-        >
-          <span className="icon icon-plus icon-12px" />
-        </button>
+          iconClassName="icon-plus icon-12px"
+          title="surveyForm.addChildToTitle"
+          titleParams={{ nodeDefLabel }}
+        />
       )}
 
       {!NodeDef.isRoot(nodeDef) && (
-        <button
-          type="button"
-          className="btn btn-s btn-transparent"
+        <Button
+          className="btn-s btn-transparent"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
           onMouseDown={(e) => {
             e.stopPropagation()
           }}
-        >
-          <span className="icon icon-bin2 icon-12px" />
-        </button>
+          iconClassName="icon-bin2 icon-12px"
+          title="surveyForm.delete"
+          titleParams={{ nodeDefLabel }}
+        />
       )}
     </div>
   )
