@@ -19,7 +19,7 @@ export default class RecordsExportJob extends Job {
 
     await PromiseUtils.each(records, async (record) => {
       const recordUuid = record.uuid
-      const recordData = await RecordService.fetchRecordAndNodesByUuid(surveyId, recordUuid, true)
+      const recordData = await RecordService.fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: false })
 
       archive.append(JSON.stringify(recordData, null, 2), {
         name: ExportFile.record({ recordUuid }),

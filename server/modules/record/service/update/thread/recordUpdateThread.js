@@ -97,10 +97,10 @@ class RecordUpdateThread extends Thread {
     await SRSs.init()
 
     // Init record
-    this.record = await RecordManager.fetchRecordAndNodesByUuid(
-      this.surveyId,
-      RecordUpdateThreadParams.getRecordUuid(this.params)
-    )
+    this.record = await RecordManager.fetchRecordAndNodesByUuid({
+      surveyId: this.surveyId,
+      recordUuid: RecordUpdateThreadParams.getRecordUuid(this.params),
+    })
 
     // Init survey
     const preview = Record.isPreview(this.record)

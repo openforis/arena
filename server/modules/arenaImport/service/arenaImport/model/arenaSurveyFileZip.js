@@ -30,7 +30,14 @@ export const getFileUuids = async (zipFile) => {
 export const getFile = async (zipFile, fileUuid) => _getJson(zipFile, ExportFile.file({ fileUuid }))
 
 // Activities
-export const getActivities = async (zipFile) => _getJson(zipFile, ExportFile.activityLog, [])
+export const getActivitiesFilesCount = (zipFile) => {
+  let count = 0
+  while (zipFile.hasEntry(ExportFile.activityLog({ index: count }))) {
+    count = count + 1
+  }
+  return count
+}
+export const getActivities = async (zipFile, index = 0) => _getJson(zipFile, ExportFile.activityLog({ index }), [])
 
 // Users
 export const getUsers = async (zipFile) => _getJson(zipFile, ExportFile.users, [])
