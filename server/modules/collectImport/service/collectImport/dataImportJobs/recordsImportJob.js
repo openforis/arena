@@ -10,6 +10,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import SystemError from '@core/systemError'
 
@@ -193,8 +194,8 @@ export default class RecordsImportJob extends Job {
           const { value = null, meta = {} } = valueAndMeta || {}
 
           nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+          nodeToInsert.dateCreated = new Date()
 
-          await this._insertNode(nodeDef, nodeToInsert)
           recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
 
           if (NodeDef.isEntity(nodeDef)) {
@@ -212,8 +213,9 @@ export default class RecordsImportJob extends Job {
         }
       }
     }
+    recordUpdated = this._updateRelevance(survey, recordUpdated)
 
-    await this._updateRelevance(survey, recordUpdated)
+    await this._insertRecordNodes(recordUpdated)
   }
 
   _extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath }) {
@@ -287,25 +289,27 @@ export default class RecordsImportJob extends Job {
     }
   }
 
-  async _insertNode(nodeDef, node) {
-    node.dateCreated = new Date()
-    const value = Node.getValue(node, null)
+  async _insertRecordNodes(record) {
+    await PromiseUtils.each(Object.values(Record.getNodes(record)), async (node) => {
+      const value = Node.getValue(node, null)
 
-    const nodeValueInsert = [
-      Node.getUuid(node),
-      node.dateCreated,
-      node.dateCreated,
-      Node.getRecordUuid(node),
-      Node.getParentUuid(node),
-      NodeDef.getUuid(nodeDef),
-      JSON.stringify(value),
-      {
-        ...Node.getMeta(node),
-        [Node.metaKeys.childApplicability]: {},
-      },
-    ]
+      const nodeValueInsert = [
+        Node.getUuid(node),
+        node.dateCreated,
+        node.dateCreated,
+        Node.getRecordUuid(node),
+        Node.getParentUuid(node),
+        Node.getNodeDefUuid(node),
+        JSON.stringify(value),
+        {
+          ...Node.getMeta(node),
+          [Node.metaKeys.childApplicability]: {},
+        },
+      ]
 
-    await this.batchPersister.addItem(nodeValueInsert, this.tx)
+      await this.batchPersister.addItem(nodeValueInsert, this.tx)
+    })
+    await this.batchPersister.flush(this.tx)
   }
 
   /**
@@ -315,11 +319,10 @@ export default class RecordsImportJob extends Job {
    * @param {!Record} record
    * @returns {Promise<null>} - The result promise.
    */
-  async _updateRelevance(survey, record) {
-    await this.batchPersister.flush(this.tx)
-
+  _updateRelevance(survey, record) {
     const stack = []
     stack.push(Record.getRootNode(record))
+    let recordUpdated = record
 
     while (stack.length > 0) {
       const node = stack.pop()
@@ -334,7 +337,7 @@ export default class RecordsImportJob extends Job {
           if (!R.isEmpty(expressionsApplicable)) {
             const exprEval = RecordExpressionParser.evalApplicableExpression(
               survey,
-              record,
+              recordUpdated,
               node,
               expressionsApplicable
             )
@@ -349,12 +352,10 @@ export default class RecordsImportJob extends Job {
           }
         })
         const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
-        await RecordManager.updateNode(
-          { user: this.user, survey, record, node: nodeUpdated, system: true, updateDependents: false },
-          this.tx
-        )
+        recordUpdated = Record.assocNode(nodeUpdated)(recordUpdated)
       }
     }
+    return recordUpdated
   }
 
   async nodesBatchInsertHandler(nodeValues, tx) {
