@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import * as PromiseUtils from '@core/promiseUtils'
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -9,8 +9,6 @@ import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as RecordExpressionValueConverter from '@core/record/recordExpressionValueConverter'
 
 import * as Log from '@server/log/log'
-
-import * as NodeRepository from '../../repository/nodeRepository'
 
 const logger = Log.getLogger('NodeUpdateDependentManager')
 
@@ -27,16 +25,17 @@ const logExpressionError = ({ error, expressionType, survey, nodeDef, expression
  * Module responsible for updating applicable and default values.
  */
 
-export const updateSelfAndDependentsApplicable = async (survey, record, node, tx) => {
+export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
   // Output
-  const nodesUpdated = {} // Updated nodes indexed by uuid
+  const nodesUpdatedToPersist = {}
+  const nodesWithApplicabilityUpdated = {}
 
   // 1. fetch dependent nodes
   const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-  if (Node.isCreated(node) && !R.isEmpty(NodeDef.getApplicable(nodeDef))) {
+  if (Node.isCreated(node) && !A.isEmpty(NodeDef.getApplicable(nodeDef))) {
     // Include a pointer to node itself if it has just been created and it has an "applicable if" expression
     nodePointersToUpdate.push({
       nodeDef,
@@ -44,15 +43,22 @@ export const updateSelfAndDependentsApplicable = async (survey, record, node, tx
     })
   }
 
+  let recordUpdated = { ...record }
+
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
-  await PromiseUtils.each(nodePointersToUpdate, async (nodePointer) => {
+  nodePointersToUpdate.forEach((nodePointer) => {
     const { nodeCtx, nodeDef: nodeDefNodePointer } = nodePointer
     const expressionsToEvaluate = NodeDef.getApplicable(nodeDefNodePointer)
     try {
       // 3. evaluate applicable expression
-      const exprEval = RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, expressionsToEvaluate)
-      const applicable = R.propOr(false, 'value', exprEval)
+      const exprEval = RecordExpressionParser.evalApplicableExpression(
+        survey,
+        recordUpdated,
+        nodeCtx,
+        expressionsToEvaluate
+      )
+      const applicable = A.propOr(false, 'value', exprEval)
 
       // 4. persist updated node value if changed, and return updated node
       const nodeDefUuid = NodeDef.getUuid(nodeDefNodePointer)
@@ -61,36 +67,37 @@ export const updateSelfAndDependentsApplicable = async (survey, record, node, tx
         // Applicability changed
 
         // update node and add it to nodesUpdated
-        const nodeCtxUuid = Node.getUuid(nodeCtx)
-        nodesUpdated[nodeCtxUuid] = {
-          ...(await NodeRepository.updateChildrenApplicability(
-            Survey.getId(survey),
-            nodeCtxUuid,
-            nodeDefUuid,
-            applicable,
-            tx
-          )),
-          // Preserve 'created' flag (used by rdb generator)
-          ...(Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}),
-        }
+        const nodeCtxUpdated = Node.assocChildApplicability({ nodeDefUuid, applicable })(nodeCtx)
+        nodesUpdatedToPersist[Node.getUuid(nodeCtx)] = nodeCtxUpdated
 
-        const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
+        const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(recordUpdated)
         nodeCtxChildren.forEach((nodeCtxChild) => {
           // 5. add nodeCtxChild and its descendants to nodesUpdated
           Record.visitDescendantsAndSelf(nodeCtxChild, (nodeDescendant) => {
-            nodesUpdated[Node.getUuid(nodeDescendant)] = nodeDescendant
-          })(record)
+            nodesWithApplicabilityUpdated[Node.getUuid(nodeDescendant)] = nodeDescendant
+          })(recordUpdated)
         })
+        recordUpdated = Record.assocNode(nodeCtxUpdated)(recordUpdated)
       }
     } catch (error) {
-      logExpressionError({ error, type: 'applicable', survey, nodeDef: nodeDefNodePointer, expressionsToEvaluate })
+      logExpressionError({
+        error,
+        type: 'applicable',
+        survey,
+        nodeDef: nodeDefNodePointer,
+        expressionsToEvaluate,
+      })
     }
   })
 
-  return nodesUpdated
+  return {
+    nodesUpdatedToPersist,
+    nodesWithApplicabilityUpdated,
+    record: recordUpdated,
+  }
 }
 
-export const updateSelfAndDependentsDefaultValues = async (survey, record, node, tx) => {
+export const updateSelfAndDependentsDefaultValues = ({ survey, record, node }) => {
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
@@ -109,46 +116,50 @@ export const updateSelfAndDependentsDefaultValues = async (survey, record, node,
     nodeDependentPointersFilterFn
   )(record)
 
+  let recordUpdated = { ...record }
+
   // 2. update expr to node and dependent nodes
-  const nodesUpdated = await Promise.all(
-    nodePointersToUpdate.map(async ({ nodeCtx, nodeDef }) => {
-      const expressionsToEvaluate = NodeDef.getDefaultValues(nodeDef)
-      try {
-        // 3. evaluate applicable default value expression
-        const exprEval = RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, expressionsToEvaluate)
+  const nodesUpdated = nodePointersToUpdate.reduce((nodesUpdatedAcc, { nodeCtx, nodeDef }) => {
+    const expressionsToEvaluate = NodeDef.getDefaultValues(nodeDef)
+    try {
+      // 3. evaluate applicable default value expression
+      const exprEval = RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, expressionsToEvaluate)
 
-        const oldValue = Node.getValue(nodeCtx, null)
+      const oldValue = Node.getValue(nodeCtx, null)
 
-        const exprValue = R.pipe(
-          R.propOr(null, 'value'),
-          R.unless(R.isNil, (value) => RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, value))
-        )(exprEval)
+      const exprEvalValue = A.propOr(null, 'value')(exprEval)
+      const exprValue = A.isNull(exprEvalValue)
+        ? null
+        : RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, exprEvalValue)
 
-        // 4. persist updated node value if changed and new value is not empty, and return updated node
-        if (R.equals(oldValue, exprValue) || R.isEmpty(oldValue)) {
-          return {}
-        }
-
-        const nodeCtxUuid = Node.getUuid(nodeCtx)
-
-        return {
-          [nodeCtxUuid]: await NodeRepository.updateNode(
-            {
-              surveyId: Survey.getId(survey),
-              nodeUuid: nodeCtxUuid,
-              value: exprValue,
-              meta: { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
-              draft: Record.isPreview(record),
-            },
-            tx
-          ),
-        }
-      } catch (error) {
-        logExpressionError({ error, type: 'default value', survey, nodeDef, expressionsToEvaluate })
-        return {}
+      // 4
+      // 4a. if node value is not changed, do nothing
+      if (R.equals(oldValue, exprValue)) {
+        return nodesUpdatedAcc
       }
-    })
-  )
 
-  return R.mergeAll(nodesUpdated)
+      // 4b. update node value and meta and return updated node
+      const nodeCtxUuid = Node.getUuid(nodeCtx)
+      // 4c. update meta
+      const defaultValueApplied = !A.isNull(exprEval)
+      const nodeCtxUpdated = A.pipe(
+        Node.assocIsDefaultValueApplied(defaultValueApplied),
+        Node.assocValue(exprValue)
+      )(nodeCtx)
+      recordUpdated = Record.assocNode(nodeCtxUpdated)(recordUpdated)
+
+      return {
+        ...nodesUpdatedAcc,
+        [nodeCtxUuid]: nodeCtxUpdated,
+      }
+    } catch (error) {
+      logExpressionError({ error, type: 'default value', survey, nodeDef, expressionsToEvaluate })
+      return nodesUpdatedAcc
+    }
+  }, {})
+
+  return {
+    record: recordUpdated,
+    nodesUpdated,
+  }
 }

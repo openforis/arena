@@ -12,6 +12,6 @@ import { prop } from './prop'
  * @returns {*} - The value at `object.property` or the default value.
  */
 export const propOr = _curry3((defaultValue, property, object) => {
-  const value = prop(property, object)
+  const value = object ? prop(property, object) : null
   return value || defaultValue
 })

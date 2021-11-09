@@ -178,11 +178,50 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // ======
 //
 export const assocValue = R.assoc(keys.value)
-export const assocMeta = R.assoc(keys.meta)
 export const { assocValidation } = Validation
 
-export const mergeMeta = (meta) => (node) =>
-  R.pipe(getMeta, R.mergeLeft(meta), (metaUpdated) => R.assoc(keys.meta, metaUpdated)(node))(node)
+export const assocMeta = R.assoc(keys.meta)
+
+export const mergeMeta = (meta) => (node) => {
+  const metaOld = getMeta(node)
+  const metaUpdated = R.mergeLeft(meta)(metaOld)
+  return assocMeta(metaUpdated)(node)
+}
+
+export const assocIsDefaultValueApplied = (value) => (node) => {
+  const metaKey = metaKeys.defaultValue
+  const metaOld = getMeta(node)
+  const metaUpdated = { ...metaOld }
+  if (value) {
+    metaUpdated[metaKey] = true
+  } else {
+    // default value is false by default
+    delete metaUpdated[metaKey]
+  }
+  return assocMeta(metaUpdated)(node)
+}
+
+export const assocChildApplicability =
+  ({ nodeDefUuid, applicable }) =>
+  (node) => {
+    const metaKey = metaKeys.childApplicability
+    const metaOld = getMeta(node)
+    const childApplicabilityOld = metaOld[metaKey]
+    const childApplicabilityUpdated = { ...childApplicabilityOld }
+    if (applicable) {
+      // applicable is true by default, remove it from meta object
+      delete childApplicabilityUpdated[nodeDefUuid]
+    } else {
+      childApplicabilityUpdated[nodeDefUuid] = false
+    }
+    const metaUpdated = { ...metaOld }
+    if (R.isEmpty(childApplicabilityUpdated)) {
+      delete metaUpdated[metaKey]
+    } else {
+      metaUpdated[metaKey] = childApplicabilityUpdated
+    }
+    return assocMeta(metaUpdated)(node)
+  }
 
 //
 // ======

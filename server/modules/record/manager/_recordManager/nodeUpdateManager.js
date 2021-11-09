@@ -214,6 +214,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
   const nodesUpdated = { ...nodes }
 
+  const nodesUpdatedToPersist = {}
   const nodesToVisit = new Queue(R.values(nodes))
 
   const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
@@ -228,27 +229,31 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
 
     if (visitedCount < MAX_VISITING_TIMES) {
       // Update node dependents (applicability)
-      const nodesApplicability = await NodeUpdateDependentManager.updateSelfAndDependentsApplicable(
-        survey,
-        recordUpdated,
-        node,
-        tx
-      )
-      recordUpdated = Record.assocNodes(nodesApplicability)(recordUpdated)
+      const {
+        nodesUpdatedToPersist: nodesToPersistApplicability,
+        nodesWithApplicabilityUpdated,
+        record: recordUpdatedAvailability,
+      } = NodeUpdateDependentManager.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node })
+
+      recordUpdated = recordUpdatedAvailability
+      Object.assign(nodesUpdatedToPersist, nodesToPersistApplicability)
 
       // Update node dependents (default values)
-      const nodesDefaultValues = await NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(
-        survey,
-        recordUpdated,
-        node,
-        tx
-      )
-      recordUpdated = Record.assocNodes(nodesDefaultValues)(recordUpdated)
+      const {
+        nodesUpdatedToPersist: nodesToPersistDefaultValues,
+        nodesUpdated: nodesWithDefaultValueUpdated,
+        record: recordUpdatedDefaultValues,
+      } = NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node })
+
+      recordUpdated = recordUpdatedDefaultValues
+      Object.assign(nodesUpdatedToPersist, nodesToPersistDefaultValues)
 
       // Update record nodes
       const nodesUpdatedCurrent = {
-        ...nodesApplicability,
-        ...nodesDefaultValues,
+        ...nodesToPersistApplicability,
+        ...nodesWithApplicabilityUpdated,
+        ...nodesToPersistDefaultValues,
+        ...nodesWithDefaultValueUpdated,
       }
 
       // Mark updated nodes to visit
@@ -261,6 +266,19 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
       visitedCountByUuid[nodeUuid] = visitedCount + 1
     }
   }
+
+  // persist updates in batch
+  await tx.batch(
+    Object.values(nodesUpdatedToPersist).map((nodeUpdatedToPersist) =>
+      NodeRepository.updateNode({
+        surveyId: Survey.getId(survey),
+        nodeUuid: nodeUpdatedToPersist.uuid,
+        value: Node.getValue(nodeUpdatedToPersist),
+        meta: Node.getMeta(nodeUpdatedToPersist),
+        reloadNode: false,
+      })
+    )
+  )
 
   return {
     record: recordUpdated,
