@@ -148,11 +148,11 @@ export default class RecordCheckJob extends Job {
    * Returns an indexed object with all the inserted nodes.
    */
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
-    const nodesAdded = {}
-    let recordUpdated = record
+    const nodesUpdated = {}
+    let recordUpdated = { ...record }
     await PromiseUtils.each(nodeDefAddedUuids, async (nodeDefUuid) => {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
+      const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(recordUpdated)
       await PromiseUtils.each(parentNodes, async (parentNode) => {
         const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode(
           survey,
@@ -162,19 +162,20 @@ export default class RecordCheckJob extends Job {
           this.user,
           this.tx
         )
-        Object.assign(nodesAdded, nodes)
+        Object.assign(nodesUpdated, nodes)
         recordUpdated = recordUpdatedNodeInsert || recordUpdated
       })
     })
-    await PromiseUtils.each(Object.values(nodesAdded).filter(Node.isCreated), async (node) => {
+    const nodesAddedArray = Object.values(nodesUpdated).filter(Node.isCreated)
+    await PromiseUtils.each(nodesAddedArray, async (node) => {
       this.nodesBatchPersister.addItem(node, this.tx)
     })
 
-    return { record: recordUpdated, nodes: nodesAdded }
+    return { record: recordUpdated, nodes: nodesUpdated }
   }
 
   async nodesBatchInsertHandler(nodes, tx) {
-    await RecordManager.insertNodesInBulk(this.user, this.surveyId, nodes, tx)
+    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodes }, tx)
   }
 
   async beforeSuccess() {

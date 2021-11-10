@@ -29,7 +29,7 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
     return recordDb
   })
 
-export const insertNodesInBulk = async (user, surveyId, nodes, client = db) => {
+export const insertNodesInBulk = async ({ user, surveyId, nodes }, tx) => {
   const nodeValues = nodes.map((node) => [
     Node.getUuid(node),
     Node.getDateCreated(node),
@@ -42,12 +42,8 @@ export const insertNodesInBulk = async (user, surveyId, nodes, client = db) => {
   ])
   const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true))
 
-  await client.tx(async (t) =>
-    Promise.all([
-      NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-      ActivityLogRepository.insertMany(user, surveyId, activities, t),
-    ])
-  )
+  await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
 }
 
 export const { insertNode } = RecordUpdateManager

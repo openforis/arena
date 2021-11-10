@@ -182,16 +182,30 @@ export const updateNode = async (
   return { ...node, [Node.keys.updated]: true }
 }
 
-export const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
-  client.one(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET meta = jsonb_set(meta, '{"${Node.metaKeys.childApplicability}", "${childDefUuid}"}', '${applicable}')
-    WHERE uuid = $1
-    RETURNING *`,
-    [parentNodeUuid],
-    dbTransformCallback
+export const updateNodes = async ({ surveyId, nodes }, client = db) => {
+  const values = nodes.map((node) => {
+    const value = Node.getValue(node)
+    return [
+      Node.getId(node),
+      value === null ? null : JSON.stringify(value),
+      Node.getMeta(node),
+      Node.getDateModified(node),
+    ]
+  })
+  await client.none(
+    DbUtils.updateAllQuery(
+      getSurveyDBSchema(surveyId),
+      'node',
+      { name: 'id', cast: 'int' },
+      [
+        { name: 'value', cast: 'jsonb' },
+        { name: 'meta', cast: 'jsonb' },
+        { name: 'date_modified', cast: 'timestamp' },
+      ],
+      values
+    )
   )
+}
 
 // ============== DELETE
 export const deleteNode = async (surveyId, nodeUuid, client = db) =>

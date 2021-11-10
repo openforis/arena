@@ -91,7 +91,7 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getTyp
 // ======
 //
 
-export const { getUuid } = ObjectUtils
+export const { getId, getUuid } = ObjectUtils
 
 export const { getParentUuid } = ObjectUtils
 
