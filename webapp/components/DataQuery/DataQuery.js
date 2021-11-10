@@ -23,7 +23,9 @@ const DataQuery = (props) => {
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector query={query} onChangeQuery={onChangeQuery} />
+      {Query.getDisplayType(query) !== Query.displayTypes.chart && (
+        <QueryNodeDefsSelector query={query} onChangeQuery={onChangeQuery} />
+      )}
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -49,17 +51,18 @@ const DataQuery = (props) => {
           )}
         </div>
 
-        {dataLoaded || Query.getDisplayType(query) === Query.displayTypes.chart &&  (
-          <Visualizer
-            query={query}
-            data={data}
-            dataEmpty={dataEmpty}
-            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
-            offset={offset}
-            onChangeQuery={onChangeQuery}
-            setData={setData}
-          />
-        )}
+        {dataLoaded ||
+          (Query.getDisplayType(query) === Query.displayTypes.chart && (
+            <Visualizer
+              query={query}
+              data={data}
+              dataEmpty={dataEmpty}
+              nodeDefsSelectorVisible={nodeDefsSelectorVisible}
+              offset={offset}
+              onChangeQuery={onChangeQuery}
+              setData={setData}
+            />
+          ))}
       </div>
     </div>
   )

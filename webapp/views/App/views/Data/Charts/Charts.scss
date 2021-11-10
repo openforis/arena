@@ -1,0 +1,13 @@
+
+.charts{
+display: flex;
+flex-direction: row;
+}
+
+.charts_panel__container {
+  width: 300px;
+}
+
+.charts_visualizer__container {
+  flex: 1;
+}
