@@ -3,10 +3,14 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import * as A from '@core/arena'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { useI18n } from '@webapp/store/system'
 import { Query } from '@common/model/query'
-import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId,useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
 import PanelRight from '@webapp/components/PanelRight'
+import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/chart`
 
@@ -101,23 +105,25 @@ const updateCategoyOnDonnutChart =
     }
   }
 
-const Chart = (props) => {
-  const { query } = props
+const Chart = () => {
 
   const [chart, setChart] = useState(defaultSpec)
+  const [entityDefUuid, setEntityDefUuid] = useState(null)
   const [chartImage, setChartImage] = useState(null)
   const [showChartEditor, setShowChartEditor] = useState(true)
 
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  
+
   useEffect(() => {
     const getChart = async () => {
       try {
-        const { data } = await axios.post(getUrl({ surveyId, query }), {
+        const { data } = await axios.post(getUrl({ surveyId, query: Query.create({ entityDefUuid }) }), {
           cycle,
-          query: A.stringify(query),
+          query: A.stringify(Query.create({ entityDefUuid })),
           chart: A.stringify(chart),
         })
         setChartImage(data.svg)
@@ -127,7 +133,7 @@ const Chart = (props) => {
     }
     getChart()
     return () => {}
-  }, [surveyId, cycle, query, chart])
+  }, [surveyId, cycle, chart, entityDefUuid])
 
   return (
     <div className="chart_container">
@@ -142,6 +148,16 @@ const Chart = (props) => {
       )}
       {showChartEditor && (
         <PanelRight width="30vw" onClose={() => setShowChartEditor(false)} header={i18n.t('appModules.categories')}>
+          <EntitySelector
+        hierarchy={Survey.getHierarchy()(survey)}
+        lang={lang}
+        nodeDefUuidEntity={entityDefUuid}
+        onChange={setEntityDefUuid}
+        showSingleEntities={false}
+        disabled={false}
+        useNameAsLabel={true}
+      />
+
           <button
             onClick={() => setChart(updateCategoyOnDonnutChart({ chart })({ nodeDef: { name: 'tree_health_label' } }))}
           >
@@ -173,10 +189,6 @@ const Chart = (props) => {
       )}
     </div>
   )
-}
-
-Chart.propTypes = {
-  query: PropTypes.object.isRequired,
 }
 
 export default Chart
