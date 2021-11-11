@@ -271,6 +271,13 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const nodesArray = Object.values(nodesUpdatedToPersist)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
+    const nodesReloadedArray = await NodeRepository.fetchNodesWithRefDataByUuids(
+      { surveyId, nodeUuids: Object.keys(nodesUpdatedToPersist), draft: Record.isPreview(record) },
+      tx
+    )
+    const nodesReloaded = ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
+    Object.assign(nodesUpdated, nodesReloaded)
+    recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
   }
 
   return {
