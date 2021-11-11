@@ -1,5 +1,3 @@
-import * as camelize from 'camelize'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
