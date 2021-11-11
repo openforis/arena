@@ -15,8 +15,9 @@ export const keysProps = {
   institution: 'institution',
   purpose: 'purpose',
   surveyName: 'surveyName',
-  template: 'template',
 }
+
+export const keysPropsNamesLowercase = Object.values(keysProps).map((prop) => prop.toLowerCase())
 
 export const status = {
   ACCEPTED: 'ACCEPTED',

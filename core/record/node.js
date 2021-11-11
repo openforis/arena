@@ -120,7 +120,7 @@ export const getNodeLayoutChildren =
           : uuidsMap,
       {}
     )
-    return NodeDefLayout.getLayoutChildrenCompact({ cycle, hiddenDefsByUuid })(nodeDef)
+    return NodeDefLayout.getLayoutChildrenCompressed({ cycle, hiddenDefsByUuid })(nodeDef)
   }
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)

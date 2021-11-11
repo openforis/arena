@@ -4,18 +4,22 @@ import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import { Countries } from '@core/Countries'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
+import * as DateUtils from '@core/dateUtils'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as UserInvitationManager from './userInvitationManager'
 
 export const {
@@ -160,6 +164,12 @@ export const fetchUsers = async ({ offset, limit }, client = db) =>
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
+export const exportUsersIntoStream = async ({ outputStream }) => {
+  const headers = ['email', 'name', 'status']
+  const transformer = CSVWriter.transformToStream(outputStream, headers)
+  await UserRepository.fetchUsersIntoStream({ transformer })
+}
+
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
   client.tx(async (t) => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)
@@ -191,6 +201,37 @@ export {
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
 } from '../repository/userAccessRequestRepository'
+
+export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
+  const headers = [
+    'email',
+    ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
+    'status',
+    'date_created',
+  ]
+
+  const objectTransformer = (obj) => ({
+    ...obj,
+    // expand props into separate columns
+    ...Object.values(UserAccessRequest.keysProps).reduce((acc, prop) => {
+      const header = StringUtils.toSnakeCase(prop)
+      const value = obj.props[prop]
+      // export country name instead of code
+      const valueTransformed =
+        prop === UserAccessRequest.keysProps.country ? Countries.getCountryName({ code: value }) : value
+      return {
+        ...acc,
+        [header]: valueTransformed,
+      }
+    }, {}),
+    // format date_created
+    date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+  })
+
+  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
+    transformer: CSVWriter.transformToStream(outputStream, headers, { objectTransformer }),
+  })
+}
 
 // ==== UPDATE
 

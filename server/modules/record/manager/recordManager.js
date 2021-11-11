@@ -98,9 +98,12 @@ export {
   insertRecordsInBatch,
 } from '../repository/recordRepository'
 
-export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
+export const fetchRecordAndNodesByUuid = async (
+  { surveyId, recordUuid, draft = true, includeRefData = true },
+  client = db
+) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid({ surveyId, recordUuid, includeRefData, draft }, client)
 
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }

@@ -1,5 +1,9 @@
 import * as R from 'ramda'
 
+import * as toSnakeCase from 'to-snake-case'
+
+export { toSnakeCase }
+
 export const NEW_LINE = '\r\n'
 
 export const nbsp = '\u00A0'

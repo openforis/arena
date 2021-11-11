@@ -60,8 +60,8 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
-export const getLayoutChildrenCompact =
-  ({ cycle, hiddenDefsByUuid = {} }) =>
+export const getLayoutChildrenCompressed =
+  ({ cycle, hiddenDefsByUuid = {}, compressHorizontally = true }) =>
   (nodeDef) => {
     const layoutChildren = getLayoutChildren(cycle)(nodeDef)
     let nextY = 0
@@ -76,7 +76,7 @@ export const getLayoutChildrenCompact =
           const hidden = Boolean(hiddenDefsByUuid[childDefUuid])
           const h = hidden ? 0 : hOriginal
           const w = hidden ? 0 : wOriginal
-          const x = Math.min(nextX, xOriginal)
+          const x = compressHorizontally ? Math.min(nextX, xOriginal) : xOriginal
           const y = Math.min(nextY, yOriginal)
           nextY = y + h
           nextX = x + w
