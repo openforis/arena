@@ -223,8 +223,10 @@ export const assocChildApplicability =
     return assocMeta(metaUpdated)(node)
   }
 
-export const assocDeleted = R.assoc(keys.deleted, true)
-
+export const assocCreated = R.assoc(keys.created)
+export const assocDeleted = R.assoc(keys.deleted)
+export const assocUpdated = R.assoc(keys.updated)
+ 
 //
 // ======
 // UTILS

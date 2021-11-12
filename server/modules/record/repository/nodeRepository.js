@@ -183,7 +183,7 @@ export const updateNode = async (
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [JSON.stringify(value), meta || {}, nodeUuid]
+    [A.isEmpty(value) ? null : JSON.stringify(value), meta || {}, nodeUuid]
   )
   if (!reloadNode) return null
 

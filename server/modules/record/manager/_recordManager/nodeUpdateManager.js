@@ -213,6 +213,24 @@ export const persistNode = async (user, survey, record, node, system, t) => {
  */
 const MAX_VISITING_TIMES = 2
 
+const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
+  const nodesReloadedArray = (
+    await NodeRepository.fetchNodesWithRefDataByUuids(
+      { surveyId, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
+      tx
+    )
+  ).map((nodeReloaded) => {
+    // preserve status flags (used in rdb updates)
+    const oldNode = nodes[Node.getUuid(nodeReloaded)]
+    return R.pipe(
+      Node.assocCreated(Node.isCreated(oldNode)),
+      Node.assocDeleted(Node.isDeleted(oldNode)),
+      Node.assocUpdated(Node.isUpdated(oldNode))
+    )(nodeReloaded)
+  })
+  return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
+}
+
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
   const nodesUpdated = { ...nodes }
@@ -271,23 +289,9 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const nodesArray = Object.values(nodesUpdatedToPersist)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
+
     // reload nodes to get nodes ref data
-    const nodesReloadedArray = (
-      await NodeRepository.fetchNodesWithRefDataByUuids(
-        { surveyId, nodeUuids: Object.keys(nodesUpdatedToPersist), draft: Record.isPreview(record) },
-        tx
-      )
-    ).map((nodeReloaded) => {
-      // preserve status flags (used in rdb updates)
-      const oldNode = nodesUpdatedToPersist[Node.getUuid(nodeReloaded)]
-      return {
-        ...nodeReloaded,
-        ...(Node.isCreated(oldNode) ? { [Node.keys.created]: true } : {}),
-        ...(Node.isDeleted(oldNode) ? { [Node.keys.deleted]: true } : {}),
-        ...(Node.isUpdated(oldNode) ? { [Node.keys.updated]: true } : {}),
-      }
-    })
-    const nodesReloaded = ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
+    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
     recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
   }
@@ -360,7 +364,7 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
     const nodeDependentUuid = Node.getUuid(nodeDependent)
     const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
-    const nodeDependentUpdated = deleted ? Node.assocDeleted(nodeDependent) : nodeDependent
+    const nodeDependentUpdated = Node.assocDeleted(deleted)(nodeDependent)
     return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
   }, {})
 
