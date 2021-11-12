@@ -33,24 +33,28 @@ const mergeMeta = (meta) => (node) => {
   return assocMeta(metaUpdated)(node)
 }
 
-const assocIsDefaultValueApplied = (value) => (node) => {
-  const metaKey = metaKeys.defaultValue
+const _updateMeta = (updateFn) => (node) => {
   const metaOld = getMeta(node)
-  const metaUpdated = { ...metaOld }
-  if (value) {
-    metaUpdated[metaKey] = true
-  } else {
-    // default value is false by default
-    delete metaUpdated[metaKey]
-  }
+  const metaUpdated = updateFn(metaOld)
   return assocMeta(metaUpdated)(node)
 }
 
-const assocChildApplicability =
-  ({ nodeDefUuid, applicable }) =>
-  (node) => {
+const assocIsDefaultValueApplied = (value) =>
+  _updateMeta((metaOld) => {
+    const metaKey = metaKeys.defaultValue
+    const metaUpdated = { ...metaOld }
+    if (value) {
+      metaUpdated[metaKey] = true
+    } else {
+      // default value is false by default
+      delete metaUpdated[metaKey]
+    }
+    return metaUpdated
+  })
+
+const assocChildApplicability = ({ nodeDefUuid, applicable }) =>
+  _updateMeta((metaOld) => {
     const metaKey = metaKeys.childApplicability
-    const metaOld = getMeta(node)
     const childApplicabilityOld = metaOld[metaKey]
     const childApplicabilityUpdated = { ...childApplicabilityOld }
     if (applicable) {
@@ -65,8 +69,8 @@ const assocChildApplicability =
     } else {
       metaUpdated[metaKey] = childApplicabilityUpdated
     }
-    return assocMeta(metaUpdated)(node)
-  }
+    return metaUpdated
+  })
 
 export const NodeMeta = {
   keys,
