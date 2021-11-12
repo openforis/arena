@@ -27,17 +27,13 @@ const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
 
 const assocMeta = R.assoc(keys.meta)
 
-const mergeMeta = (meta) => (node) => {
-  const metaOld = getMeta(node)
-  const metaUpdated = R.mergeLeft(meta)(metaOld)
-  return assocMeta(metaUpdated)(node)
-}
-
 const _updateMeta = (updateFn) => (node) => {
   const metaOld = getMeta(node)
   const metaUpdated = updateFn(metaOld)
   return assocMeta(metaUpdated)(node)
 }
+
+const mergeMeta = (meta) => _updateMeta((metaOld) => R.mergeLeft(meta)(metaOld))
 
 const assocIsDefaultValueApplied = (value) =>
   _updateMeta((metaOld) => {
