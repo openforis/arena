@@ -264,10 +264,15 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
   }
 
   // 3. update node validations
+  // exclude deleted nodes
+  const nodesToValidate = Object.values(updatedNodesAndDependents).reduce(
+    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
+    {}
+  )
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(
     survey,
     record,
-    updatedNodesAndDependents,
+    nodesToValidate,
     true,
     t
   )
