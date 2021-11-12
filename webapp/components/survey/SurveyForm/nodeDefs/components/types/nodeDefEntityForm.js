@@ -22,7 +22,7 @@ const NodeDefEntityForm = (props) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (entry) {
+    if (entry && !R.isEmpty(nodes)) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
       dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
     }
@@ -40,7 +40,7 @@ const NodeDefEntityForm = (props) => {
         />
       )}
 
-      {(entry || edit) && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
+      {(edit || (entry && selectedNode)) && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
     </div>
   )
 }
