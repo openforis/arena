@@ -92,14 +92,9 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
     ]
   )
 
-  const nodeAdded = await client.one(
-    `
-    ${_getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid = $1
-  `,
-    Node.getUuid(node),
-    dbTransformCallback
-  )
+  // reload node to get node ref data
+  const nodeAdded = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid: Node.getUuid(node), draft }, client)
+
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
@@ -151,25 +146,18 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
-export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
-  client.one(
-    `
-    ${_getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid = $1
-  `,
-    nodeUuid,
-    dbTransformCallback
-  )
-
 export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
   client.map(
     `
     ${_getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid IN ($1:csv)
+    WHERE n.uuid IN ($1:list)
   `,
-    nodeUuids,
+    [nodeUuids],
     dbTransformCallback
   )
+
+export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
+  (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
 
 export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   client.map(

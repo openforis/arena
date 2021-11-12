@@ -271,10 +271,22 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     const nodesArray = Object.values(nodesUpdatedToPersist)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
-    const nodesReloadedArray = await NodeRepository.fetchNodesWithRefDataByUuids(
-      { surveyId, nodeUuids: Object.keys(nodesUpdatedToPersist), draft: Record.isPreview(record) },
-      tx
-    )
+    // reload nodes to get nodes ref data
+    const nodesReloadedArray = (
+      await NodeRepository.fetchNodesWithRefDataByUuids(
+        { surveyId, nodeUuids: Object.keys(nodesUpdatedToPersist), draft: Record.isPreview(record) },
+        tx
+      )
+    ).map((nodeReloaded) => {
+      // preserve status flags (used in rdb updates)
+      const oldNode = nodesUpdatedToPersist[Node.getUuid(nodeReloaded)]
+      return {
+        ...nodeReloaded,
+        ...(Node.isCreated(oldNode) ? { [Node.keys.created]: true } : {}),
+        ...(Node.isDeleted(oldNode) ? { [Node.keys.deleted]: true } : {}),
+        ...(Node.isUpdated(oldNode) ? { [Node.keys.updated]: true } : {}),
+      }
+    })
     const nodesReloaded = ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
     Object.assign(nodesUpdated, nodesReloaded)
     recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
