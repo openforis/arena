@@ -194,7 +194,6 @@ export default class RecordsImportJob extends Job {
           const { value = null, meta = {} } = valueAndMeta || {}
 
           nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
-          nodeToInsert.dateCreated = new Date()
 
           recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
 
