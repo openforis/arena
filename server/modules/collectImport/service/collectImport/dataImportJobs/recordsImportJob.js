@@ -93,7 +93,9 @@ export default class RecordsImportJob extends Job {
 
       // this.logDebug(`-- end import record ${entryName}`)
 
-      this.incrementProcessedItems()
+      if (!this.isCanceled()) {
+        this.incrementProcessedItems()
+      }
     }
 
     this.setContext({ insertedRecords: this.processed })
@@ -198,8 +200,8 @@ export default class RecordsImportJob extends Job {
           recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
 
           if (NodeDef.isEntity(nodeDef)) {
-            // Create child nodes to insert
-            const { nodesToInsert } = this._createNodeChildrenToInsert({
+            // Create child items to insert
+            const { itemsToInsert } = this._extractChildrenItemsToInsert({
               survey,
               nodeDefNamesByPath,
               collectNodeDef,
@@ -207,7 +209,7 @@ export default class RecordsImportJob extends Job {
               collectNode,
               node: nodeToInsert,
             })
-            queue.enqueueItems(nodesToInsert)
+            queue.enqueueItems(itemsToInsert)
           }
         }
       }
@@ -229,14 +231,14 @@ export default class RecordsImportJob extends Job {
     return nodeDef ? [{ uuid: nodeDef.uuid }] : null
   }
 
-  _createNodeChildrenToInsert({ survey, nodeDefNamesByPath, collectNodeDef, collectNodeDefPath, collectNode, node }) {
+  _extractChildrenItemsToInsert({ survey, nodeDefNamesByPath, collectNodeDef, collectNodeDefPath, collectNode, node }) {
     // Output
-    const nodesToInsert = []
+    const itemsToInsert = []
 
     const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
-    for (const collectNodeDefChild of collectNodeDefChildren) {
+    collectNodeDefChildren.some((collectNodeDefChild) => {
       if (this.isCanceled()) {
-        break
+        return true //breaks the loop
       }
 
       const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
@@ -253,25 +255,25 @@ export default class RecordsImportJob extends Job {
         const childrenCount = collectChildNodes.length
 
         // If children count > 0
-        for (const collectChildNode of collectChildNodes) {
+        collectChildNodes.some((collectChildNode) => {
           if (this.isCanceled()) {
-            break
+            return true //breaks the loop
           }
 
-          nodesToInsert.push({
+          itemsToInsert.push({
             nodeParent: node,
             collectNodeDef: collectNodeDefChild,
             collectNodeDefPath: collectNodeDefChildPath,
             collectNode: collectChildNode,
           })
-        }
+        })
 
         // Get nodeDefUuid from first nodeDef field
         const { uuid: nodeDefChildUuid } = nodeDefsInfo[0]
         const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
 
         if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
-          nodesToInsert.push({
+          itemsToInsert.push({
             nodeParent: node,
             collectNodeDef: collectNodeDefChild,
             collectNodeDefPath: collectNodeDefChildPath,
@@ -281,10 +283,10 @@ export default class RecordsImportJob extends Job {
       } else {
         this.logError(`==== NodeDef not found for ${collectNodeDefChildPath}`)
       }
-    }
+    })
 
     return {
-      nodesToInsert,
+      itemsToInsert,
     }
   }
 
@@ -326,15 +328,19 @@ export default class RecordsImportJob extends Job {
             applicable = R.propOr(false, 'value', exprEval)
           }
           const childDefUuid = NodeDef.getUuid(childDef)
-          childrenApplicability[childDefUuid] = applicable
 
           if (applicable) {
             const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)
             stack.push(...nodeChildren)
+          } else {
+            // store children applicability only if not applicable (applicable by default)
+            childrenApplicability[childDefUuid] = applicable
           }
         })
-        const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
-        recordUpdated = Record.assocNode(nodeUpdated)(recordUpdated)
+        if (!R.isEmpty(childrenApplicability)) {
+          const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
+          recordUpdated = Record.assocNode(nodeUpdated)(recordUpdated)
+        }
       }
     }
     return recordUpdated

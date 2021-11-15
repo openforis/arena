@@ -41,23 +41,24 @@ export const mergeNodes = (nodes) => (record) => {
   return recordUpdated
 }
 
-export const assocNodes = (nodes) => (record) => {
-  let recordUpdated = { ...record }
-  recordUpdated[keys.nodes] = { ...RecordReader.getNodes(record) }
-
-  Object.entries(nodes).forEach(([nodeUuid, node]) => {
-    if (Node.isDeleted(node)) {
-      recordUpdated = deleteNode(node)(recordUpdated)
-    } else {
-      recordUpdated[keys.nodes][nodeUuid] = node
-      recordUpdated = NodesIndex.addNode(node)(recordUpdated)
+export const assocNode = (node) => (record) => {
+  if (Node.isDeleted(node)) {
+    return deleteNode(node)(record)
+  } else {
+    let recordUpdated = {
+      ...record,
+      [keys.nodes]: {
+        ...RecordReader.getNodes(record),
+        [Node.getUuid(node)]: node,
+      },
     }
-  })
-
-  return recordUpdated
+    recordUpdated = NodesIndex.addNode(node)(recordUpdated)
+    return recordUpdated
+  }
 }
 
-export const assocNode = (node) => assocNodes({ [Node.getUuid(node)]: node })
+export const assocNodes = (nodes) => (record) =>
+  Object.values(nodes).reduce((recordAcc, node) => assocNode(node)(recordAcc), record)
 
 export const mergeNodeValidations = (nodeValidations) => (record) =>
   R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
