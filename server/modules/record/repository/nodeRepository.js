@@ -28,6 +28,9 @@ const dbTransformCallback = (node) =>
     A.assoc('id', Number(node.id))
   )(node)
 
+const valueDefault = {}
+const _toValueQueryParam = (value) => _JSON.stringify(value === null ? valueDefault : value)
+
 const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) => {
   const schema = getSurveyDBSchema(surveyId)
 
@@ -87,7 +90,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
       Node.getRecordUuid(node),
       Node.getParentUuid(node),
       Node.getNodeDefUuid(node),
-      JSON.stringify(Node.getValue(node, null)),
+      _toValueQueryParam(Node.getValue(node, null)),
       meta,
     ]
   )
@@ -115,8 +118,8 @@ export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client =
         record_uuid: Node.getRecordUuid(node),
         parent_uuid: Node.getParentUuid(node),
         node_def_uuid: Node.getNodeDefUuid(node),
-        value: !A.isEmpty(Node.getValue(node)) ? JSON.stringify(Node.getValue(node)) : null,
-        meta: Node.getMeta(node) ? JSON.stringify(Node.getMeta(node)) : null,
+        value: _toValueQueryParam(Node.getValue(node)),
+        meta: Node.getMeta(node),
       }))
     )
   )
@@ -183,7 +186,7 @@ export const updateNode = async (
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [A.isEmpty(value) ? null : JSON.stringify(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), meta || {}, nodeUuid]
   )
   if (!reloadNode) return null
 
@@ -193,15 +196,12 @@ export const updateNode = async (
 }
 
 export const updateNodes = async ({ surveyId, nodes }, client = db) => {
-  const values = nodes.map((node) => {
-    const value = Node.getValue(node)
-    return [
-      Node.getId(node),
-      value === null ? null : JSON.stringify(value),
-      Node.getMeta(node),
-      Node.getDateModified(node),
-    ]
-  })
+  const values = nodes.map((node) => [
+    Node.getId(node),
+    _toValueQueryParam(Node.getValue(node)),
+    Node.getMeta(node),
+    Node.getDateModified(node),
+  ])
   await client.none(
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
