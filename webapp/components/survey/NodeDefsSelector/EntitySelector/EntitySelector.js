@@ -41,17 +41,18 @@ const EntitySelector = (props) => {
     showSingleEntities,
     disabled,
     useNameAsLabel,
+    hasNull
   } = props
 
   const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel })
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
-
+   
   return (
     <Dropdown
       idInput={TestId.entities.entitySelector}
       className="entity-selector"
       autocompleteDialogClassName="entity-selector__dialog"
-      items={dropdownItems}
+      items={[...(hasNull ? [{key: 'null', value: 'NULL'}]:[]),...dropdownItems]}
       selection={selection}
       validation={validation}
       onChange={(item) => onChange(R.prop('key', item))}
@@ -70,6 +71,7 @@ EntitySelector.propTypes = {
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string,
+  hasNull: PropTypes.bool,
 }
 
 EntitySelector.defaultProps = {
@@ -79,6 +81,7 @@ EntitySelector.defaultProps = {
   useNameAsLabel: false,
   validation: null,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+  hasNull: false
 }
 
 export default EntitySelector

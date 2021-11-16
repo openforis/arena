@@ -111,6 +111,8 @@ export const keysPropsAdvanced = {
   index: 'index',
   active: 'active',
   aggregateFunctions: 'aggregateFunctions',
+
+  isBaseUnit: 'isBaseUnit'
 }
 
 const metaKeys = {
@@ -197,6 +199,8 @@ export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
 export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
+export const isBaseUnit = nodeDef => Boolean(getIsBaseUnit(nodeDef))
+
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
@@ -266,6 +270,7 @@ export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 
 export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
+export const getIsBaseUnit = getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)
 
 export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, [])
 
