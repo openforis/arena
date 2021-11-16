@@ -52,8 +52,7 @@ export const assocNode = (node) => (record) => {
         [Node.getUuid(node)]: node,
       },
     }
-    recordUpdated = NodesIndex.addNode(node)(recordUpdated)
-    return recordUpdated
+    return NodesIndex.addNode(node)(recordUpdated)
   }
 }
 
