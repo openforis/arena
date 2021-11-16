@@ -59,10 +59,10 @@ export const assocNode = (node) => (record) => {
 export const assocNodes = (nodes) => (record) =>
   Object.values(nodes).reduce((recordAcc, node) => assocNode(node)(recordAcc), record)
 
-export const mergeNodeValidations = (nodeValidations) =>
+export const mergeNodeValidations = (nodeValidations) => (record) =>
   R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
     Validation.assocValidation(validationMerged)(record)
-  )
+  )(record)
 
 // ====== DELETE
 

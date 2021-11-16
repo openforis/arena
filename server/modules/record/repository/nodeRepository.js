@@ -29,7 +29,7 @@ const dbTransformCallback = (node) =>
   )(node)
 
 const valueDefault = {}
-const _toValueQueryParam = (value) => _JSON.stringify(value === null ? valueDefault : value)
+const _toValueQueryParam = (value) => JSON.stringify(value === null ? valueDefault : value)
 
 const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) => {
   const schema = getSurveyDBSchema(surveyId)
