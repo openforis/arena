@@ -39,14 +39,13 @@ export const initNewRecord = async (
   nodesUpdateListener = null,
   nodesValidationListener = null,
   client = db
-) =>
-  await client.tx(async (t) => {
-    const rootNodeDef = Survey.getNodeDefRoot(survey)
+) => {
+  const rootNodeDef = Survey.getNodeDefRoot(survey)
 
-    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
+  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
-  })
+  return persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, client)
+}
 
 // ==== UPDATE
 
@@ -157,7 +156,7 @@ export const persistNode = async (
   system = false,
   t = db
 ) =>
-  await _updateNodeAndValidateRecordUniqueness(
+  _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -179,7 +178,7 @@ export const deleteNode = async (
   nodesValidationListener = null,
   t = db
 ) =>
-  await _updateNodeAndValidateRecordUniqueness(
+  _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -200,9 +199,9 @@ const _updateNodeAndValidateRecordUniqueness = async (
   nodesUpdateFn,
   nodesUpdateListener = null,
   nodesValidationListener = null,
-  t = db
+  client = db
 ) =>
-  await t.tx(async (t) => {
+  client.tx(async (t) => {
     await _beforeNodeUpdate({ survey, record, node }, t)
 
     const { record: recordUpdated1, nodes: nodesUpdated } = await nodesUpdateFn(user, survey, record, node, t)
