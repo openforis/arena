@@ -135,9 +135,9 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const { offset, limit } = Request.getParams(req)
+      const { offset, limit, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await UserService.fetchUsers({ offset, limit })
+      const list = await UserService.fetchUsers({ offset, limit, sortBy, sortOrder })
 
       res.json({ list })
     } catch (error) {
@@ -222,16 +222,20 @@ export const init = (app) => {
     }
   )
 
-  app.get('/users/users-access-request/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
-    try {
-      const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+  app.get(
+    '/users/users-access-request/export',
+    AuthMiddleware.requireUsersAllViewPermission,
+    async (_req, res, next) => {
+      try {
+        const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
+        Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-      await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
-    } catch (error) {
-      next(error)
+        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   app.get(
     '/users/users-access-request/count',

@@ -75,28 +75,40 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     (row) => Number(row.count)
   )
 
-const _usersSelectQuery = ({ selectFields }) => `
-  WITH us AS (
-    SELECT DISTINCT ON (us.sess #>> '{passport,user}')
-      (us.sess #>> '{passport,user}')::uuid AS user_uuid,
-      (us.expire - interval '30 days') AS last_login_time
-    FROM user_sessions us
-    WHERE us.sess #>> '{passport,user}' IS NOT NULL
-    ORDER BY us.sess #>> '{passport,user}', expire DESC
-  )
-  SELECT ${selectFields.join(', ')},
-    ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
-  FROM "user" u
-  LEFT OUTER JOIN us
-    ON us.user_uuid = u.uuid
-  ORDER BY u.email`
+const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC' }) => {
+  // check sort by parameters
+  const orderByFieldBySortBy = {
+    email: 'email',
+    name: 'name',
+    last_login_time: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
+    status: 'status',
+  }
+  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
+  const orderByDirection = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
 
-export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
+  return `
+    WITH us AS (
+      SELECT DISTINCT ON (us.sess #>> '{passport,user}')
+        (us.sess #>> '{passport,user}')::uuid AS user_uuid,
+        (us.expire - interval '30 days') AS last_login_time
+      FROM user_sessions us
+      WHERE us.sess #>> '{passport,user}' IS NOT NULL
+      ORDER BY us.sess #>> '{passport,user}', expire DESC
+    )
+    SELECT ${selectFields.join(', ')},
+      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
+    FROM "user" u
+    LEFT OUTER JOIN us
+      ON us.user_uuid = u.uuid
+    ORDER BY ${orderBy} ${orderByDirection}`
+}
+
+export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
   client.map(
-    `${_usersSelectQuery({ selectFields })}
+    `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [],
+    { sortBy, sortOrder },
     camelize
   )
 

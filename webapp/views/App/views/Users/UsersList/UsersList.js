@@ -34,13 +34,14 @@ export const UsersList = () => {
           width: '40px',
           renderItem: ({ item }) => <ProfilePicture userUuid={User.getUuid(item)} thumbnail />,
         },
-        { key: 'email', header: 'common.email', renderItem: ({ item }) => User.getEmail(item) },
-        { key: 'name', header: 'common.name', renderItem: ({ item }) => User.getName(item) },
+        { key: 'email', header: 'common.email', renderItem: ({ item }) => User.getEmail(item), sortable: true },
+        { key: 'name', header: 'common.name', renderItem: ({ item }) => User.getName(item), sortable: true },
         {
-          key: 'accepted',
+          key: 'status',
           header: 'usersView.accepted',
           width: '10rem',
           renderItem: ({ item }) => User.hasAccepted(item) && <span className="icon icon-checkmark" />,
+          sortable: true,
         },
         {
           key: 'is-system-admin',
@@ -55,7 +56,7 @@ export const UsersList = () => {
           renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
         },
         {
-          key: 'lastLogin',
+          key: 'last_login_time',
           header: 'usersView.lastLogin',
           width: '14rem',
           renderItem: ({ item }) => {
@@ -66,6 +67,7 @@ export const UsersList = () => {
               return i18n.t('usersView.moreThan30DaysAgo')
             }
           },
+          sortable: true,
         },
         {
           key: 'user-edit',

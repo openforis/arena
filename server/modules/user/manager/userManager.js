@@ -158,9 +158,9 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
-export const fetchUsers = async ({ offset, limit }, client = db) =>
+export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = db) =>
   client.tx(async (t) => {
-    const users = await UserRepository.fetchUsers({ offset, limit }, t)
+    const users = await UserRepository.fetchUsers({ offset, limit, sortBy, sortOrder }, t)
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
