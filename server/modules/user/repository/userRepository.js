@@ -78,8 +78,19 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
 export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
   client.map(
     `
-    SELECT ${selectFieldsCommaSep}
+    WITH us AS (
+      SELECT DISTINCT ON (us.sess #>> '{passport,user}')
+        (us.sess #>> '{passport,user}')::uuid AS user_uuid,
+        (us.expire - interval '30 days') AS last_login_time
+      FROM user_sessions us
+      WHERE us.sess #>> '{passport,user}' IS NOT NULL
+      ORDER BY us.sess #>> '{passport,user}', expire DESC
+    )
+    SELECT ${selectFieldsCommaSep},
+      us.last_login_time
     FROM "user" u
+    LEFT OUTER JOIN us
+      ON us.user_uuid = u.uuid
     ORDER BY u.email
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
@@ -101,10 +112,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
     `
     SELECT 
         ${selectFieldsCommaSep},
-        
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
-        
-        
         ui.invited_date
     FROM "user" u
     JOIN survey s ON s.id = $1

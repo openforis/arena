@@ -34,6 +34,7 @@ export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
+export const getLastLoginTime = R.prop(keys.lastLoginTime)
 
 // ====== UPDATE
 export const assocProp = R.assoc
