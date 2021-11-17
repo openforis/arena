@@ -28,6 +28,8 @@ const dbTransformCallback = (node) =>
     A.assoc('id', Number(node.id))
   )(node)
 
+const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
+
 const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) => {
   const schema = getSurveyDBSchema(surveyId)
 
@@ -87,19 +89,14 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
       Node.getRecordUuid(node),
       Node.getParentUuid(node),
       Node.getNodeDefUuid(node),
-      JSON.stringify(Node.getValue(node, null)),
+      _toValueQueryParam(Node.getValue(node, null)),
       meta,
     ]
   )
 
-  const nodeAdded = await client.one(
-    `
-    ${_getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid = $1
-  `,
-    Node.getUuid(node),
-    dbTransformCallback
-  )
+  // reload node to get node ref data
+  const nodeAdded = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid: Node.getUuid(node), draft }, client)
+
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
@@ -120,8 +117,8 @@ export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client =
         record_uuid: Node.getRecordUuid(node),
         parent_uuid: Node.getParentUuid(node),
         node_def_uuid: Node.getNodeDefUuid(node),
-        value: !A.isEmpty(Node.getValue(node)) ? JSON.stringify(Node.getValue(node)) : null,
-        meta: Node.getMeta(node) ? JSON.stringify(Node.getMeta(node)) : null,
+        value: _toValueQueryParam(Node.getValue(node)),
+        meta: Node.getMeta(node),
       }))
     )
   )
@@ -151,6 +148,19 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
+export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
+  client.map(
+    `
+    ${_getNodeSelectQuery({ surveyId, draft })}
+    WHERE n.uuid IN ($1:list)
+  `,
+    [nodeUuids],
+    dbTransformCallback
+  )
+
+export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
+  (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
+
 export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   client.map(
     `
@@ -163,7 +173,10 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
   )
 
 // ============== UPDATE
-export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client = db) => {
+export const updateNode = async (
+  { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
+  client = db
+) => {
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
@@ -172,29 +185,36 @@ export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [JSON.stringify(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), meta || {}, nodeUuid]
   )
-  const node = await client.one(
-    `
-    ${_getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid = $1
-  `,
-    nodeUuid,
-    dbTransformCallback
-  )
+  if (!reloadNode) return null
+
+  // fetch node with ref data
+  const node = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid, draft }, client)
   return { ...node, [Node.keys.updated]: true }
 }
 
-export const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
-  client.one(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET meta = jsonb_set(meta, '{"${Node.metaKeys.childApplicability}", "${childDefUuid}"}', '${applicable}')
-    WHERE uuid = $1
-    RETURNING *`,
-    [parentNodeUuid],
-    dbTransformCallback
+export const updateNodes = async ({ surveyId, nodes }, client = db) => {
+  const values = nodes.map((node) => [
+    Node.getId(node),
+    _toValueQueryParam(Node.getValue(node)),
+    Node.getMeta(node),
+    Node.getDateModified(node),
+  ])
+  await client.none(
+    DbUtils.updateAllQuery(
+      getSurveyDBSchema(surveyId),
+      'node',
+      { name: 'id', cast: 'int' },
+      [
+        { name: 'value', cast: 'jsonb' },
+        { name: 'meta', cast: 'jsonb' },
+        { name: 'date_modified', cast: 'timestamp' },
+      ],
+      values
+    )
   )
+}
 
 // ============== DELETE
 export const deleteNode = async (surveyId, nodeUuid, client = db) =>
