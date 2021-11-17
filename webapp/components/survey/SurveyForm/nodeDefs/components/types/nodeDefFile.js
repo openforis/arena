@@ -102,9 +102,8 @@ const FileInput = (props) => {
     }
   }
 
-  const imagePreviewComponent = NodeDef.isFile(nodeDef) ? (
-    <ImagePreview nodeDef={nodeDef} path={fileUrl} file={fileUploaded} />
-  ) : null
+  const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
+
   const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
 
   return (
@@ -119,26 +118,18 @@ const FileInput = (props) => {
       {fileReady && (
         <>
           {
-            // when displayed inside table and file is an image, show the image preview in a tooltip
-            insideTable && NodeDef.isFile(nodeDef) && (
+            // when file is an image, show the image preview in a tooltip
+            isImage && (
               <Tooltip
                 className="survey-form__node-def-file__tooltip-preview"
-                messageComponent={imagePreviewComponent}
+                messageComponent={<ImagePreview nodeDef={nodeDef} path={fileUrl} file={fileUploaded} />}
                 type="info"
               >
                 {downloadButton}
               </Tooltip>
             )
           }
-          {
-            // when displayed in a form, show the image preview in a container
-            !insideTable && (
-              <>
-                {downloadButton}
-                {imagePreviewComponent}
-              </>
-            )
-          }
+          {!isImage && downloadButton}
 
           <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={handleNodeDelete} />
         </>
