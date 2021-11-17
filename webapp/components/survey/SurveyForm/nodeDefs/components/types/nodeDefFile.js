@@ -76,7 +76,7 @@ const ImagePreview = ({ path, file = null }) => {
 }
 
 const FileInput = (props) => {
-  const { surveyInfo, nodeDef, node, readOnly, edit, insideTable, canEditRecord, updateNode, removeNode } = props
+  const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
 
   const [fileUploaded, setFileUploaded] = useState(null)
   const fileName = Node.getFileName(node)
