@@ -61,12 +61,7 @@ export const UsersList = () => {
           renderItem: ({ item }) => {
             const lastLoginTime = User.getLastLoginTime(item)
             if (lastLoginTime) {
-              return DateUtils.convertDate({
-                dateStr: lastLoginTime,
-                formatFrom: DateUtils.formats.datetimeISO,
-                formatTo: DateUtils.formats.datetimeDisplay,
-                adjustTimezoneDifference: true,
-              })
+              return DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime)
             } else if (User.hasAccepted(item)) {
               return i18n.t('usersView.moreThan30DaysAgo')
             }

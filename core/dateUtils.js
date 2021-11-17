@@ -134,4 +134,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
   return format(dateAdjusted, formatTo)
 }
 
+export const convertDateTimeFromISOToDisplay = (dateStr) =>
+  convertDate({ dateStr, formatFrom: formats.datetimeISO, formatTo: formats.datetimeDisplay, adjustTimezoneDifference: true })
+
 export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)
