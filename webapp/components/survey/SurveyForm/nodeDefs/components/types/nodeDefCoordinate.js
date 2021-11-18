@@ -1,6 +1,6 @@
 import './nodeDefCoordinate.scss'
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
@@ -13,6 +13,7 @@ import * as Srs from '@core/geo/srs'
 
 import { useI18n } from '@webapp/store/system'
 
+import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import { TestId } from '@webapp/utils/testId'
@@ -23,6 +24,8 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = (props) => {
   const i18n = useI18n()
+
+  const [showMap, setShowMap] = useState(false)
 
   const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
@@ -50,6 +53,9 @@ const NodeDefCoordinate = (props) => {
 
     updateNode(nodeDef, node, newValue)
   }
+
+  const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
+
   const xInput = (
     <Input
       id={TestId.surveyForm.coordinateX(NodeDef.getName(nodeDef))}
@@ -83,12 +89,22 @@ const NodeDefCoordinate = (props) => {
     />
   )
 
+  const mapPanelRight = showMap ? (
+    <PanelRight width="40vw" onClose={toggleShowMap}>
+      <Map markerPosition={value} />{' '}
+    </PanelRight>
+  ) : null
+
+  const mapTriggerButton = <Button label="Map" onClick={toggleShowMap} />
+
   if (renderType === NodeDefLayout.renderType.tableBody) {
     return (
       <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
         {xInput}
         {yInput}
         {srsDropdown}
+        {mapTriggerButton}
+        {mapPanelRight}
       </div>
     )
   }
@@ -98,6 +114,8 @@ const NodeDefCoordinate = (props) => {
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
       <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+      {mapTriggerButton}
+      {mapPanelRight}
     </div>
   )
 }
