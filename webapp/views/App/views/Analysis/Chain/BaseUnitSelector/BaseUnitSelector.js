@@ -1,29 +1,30 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { matchPath, useParams, Prompt } from 'react-router'
 import { useDispatch } from 'react-redux'
-import classNames from 'classnames'
 
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurvey, useSurveyCycleKeys, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
+import {
+  useSurvey,
+  useSurveyCycleKeys,
+  useSurveyPreferredLang,
+  useSurveyInfo,
+  NodeDefsActions,
+  useSurveyCycleKey,
+} from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-import { useHistoryListen } from '@webapp/components/hooks'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import ButtonRStudio from '@webapp/components/ButtonRStudio'
+
+import { ButtonSave } from '@webapp/components'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 /*
-    BAS_EUNIT annotations
+    BASE_UNIT annotations
     The concept of BaseUnit is quite complex so this is the reason behind of this comments. 
 
     A base unit is a value contained into a Chain, 
@@ -50,18 +51,23 @@ const BaseUnitSelector = () => {
 
   const dispatch = useDispatch()
   const cycleKeys = useSurveyCycleKeys()
+  const surveyInfo = useSurveyInfo()
+  const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
 
   const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
+  const handleSaveNodeDefs = useCallback(async () => {
+    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+    dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: baseUnitNodeDefsToCreate }))
+    setBaseUnitNodeDefsToCreate([])
+  }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, baseUnitNodeDefsToCreate, setBaseUnitNodeDefsToCreate])
+
   const handleUpdateBaseUnit = useCallback(
     (entityReferenceUuid) => {
-      // TODO -> deleteAllBaseUnitNodeDefs in chain to restart this base unit items
-      // TODO -> If entityReferenceUuid is null delete base unit node_defs -> this is solved with the previus line
-
-      // getNodeDefs
-      // filter by isBaseUnit
-      // send request to backend to delete this nodes and update State
+      // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
+      // -> deleteAllBaseUnitNodeDefs in chain to restart this base unit items ( add a new state with nodeDefsToDelete )
+      // -> If entityReferenceUuid is null delete base unit node_defs -> this is solved with the previus line
 
       const referenceNodeDef = Survey.getNodeDefByUuid(entityReferenceUuid)(survey)
       if (A.isEmpty(referenceNodeDef)) return
@@ -81,15 +87,15 @@ const BaseUnitSelector = () => {
         const defaultValue = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? `1` : `NA`
 
         const advancedProps = {
-          chainUuid,
-          active: true,
-          index: -1,
+          [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
+          [NodeDef.keysPropsAdvanced.active]: true,
+          [NodeDef.keysPropsAdvanced.index]: -1,
           [NodeDef.keysPropsAdvanced.isBaseUnit]: true,
           [NodeDef.keysPropsAdvanced.script]: `${NodeDef.getName(nodeDef)}$${name} <- ${defaultValue}`,
         }
-        const parentNodeDef = nodeDef
+        const parentNodeDef = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? referenceNodeDef : nodeDef
         const temporary = true
-        const virtual = true
+        const virtual = false
         const _nodeDef = NodeDef.newNodeDef(
           parentNodeDef,
           NodeDef.nodeDefType.decimal,
@@ -116,6 +122,7 @@ const BaseUnitSelector = () => {
   )
 
   useEffect(() => {
+    // TODO if survey has other base unit nodedef into other chain, the user is not able to create "base unit/weight" nodedef
     const hierarchy = Survey.getHierarchy()(survey)
     let _baseUnitNodeDef = null
 
@@ -147,17 +154,23 @@ const BaseUnitSelector = () => {
   return (
     <FormItem label={i18n.t('common.baseUnit')} className="node-def-edit__base-unit">
       <div>
-      <EntitySelector
-        hierarchy={Survey.getHierarchy()(survey)}
-        lang={lang}
-        nodeDefUuidEntity={NodeDef.getParentUuid(baseUnitNodeDef)}
-        onChange={handleUpdateBaseUnit}
-        showSingleEntities={false}
-        disabled={hadBaseUnitNodeDef}
-        useNameAsLabel={true}
-        hasNull={true}
-      />
-      { baseUnitNodeDefsToCreate.length > 0 ? <p>as</p> : <></>}
+        <EntitySelector
+          hierarchy={Survey.getHierarchy()(survey)}
+          lang={lang}
+          nodeDefUuidEntity={NodeDef.getParentUuid(baseUnitNodeDef)}
+          onChange={handleUpdateBaseUnit}
+          showSingleEntities={false}
+          disabled={hadBaseUnitNodeDef}
+          useNameAsLabel={true}
+          allowEmptySelection={true}
+        />
+        {baseUnitNodeDefsToCreate.length > 0 ? (
+          <div>
+            <ButtonSave onClick={handleSaveNodeDefs} />
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </FormItem>
   )
