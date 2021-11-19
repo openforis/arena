@@ -2,6 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -149,6 +150,16 @@ export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid },
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependent, nodeDefsUpdated }, t)
   })
+
+export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids }, client = db) => {
+  let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
+
+  await PromiseUtils.each(nodeDefUuids, async (nodeDefUuid) => {
+    response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
+  })
+
+  return response
+}
 
 export {
   // ======  READ - entities

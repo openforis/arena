@@ -28,6 +28,7 @@ export {
   postNodeDef,
   postNodeDefs,
   deleteNodeDef,
+  deleteNodeDefs
 } from './nodeDef'
 
 export { cancelableGetRequest } from './cancelableRequest'

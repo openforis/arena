@@ -312,9 +312,9 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   )
 }
 
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
+export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, record, client = db) =>
   client.tx(async (t) => {
-    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
+    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
     const activities = nodesDeleted.map((node) =>
       ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
     )
