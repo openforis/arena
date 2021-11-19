@@ -23,13 +23,14 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = (props) => {
+  const { insideTable, surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } =
+    props
+
   const i18n = useI18n()
 
   const [showMap, setShowMap] = useState(false)
 
   const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
-
-  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -41,8 +42,6 @@ const NodeDefCoordinate = (props) => {
   const selectedSrs = singleSrs ? surveySrs[0] : surveySrs.find((srs) => srs.code === value.srs)
 
   const handleInputChange = (field, value) => {
-    const { nodeDef, updateNode } = props
-
     let newValue = A.assoc(field, value)(node.value)
 
     if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
@@ -99,7 +98,7 @@ const NodeDefCoordinate = (props) => {
     <Button
       className="map-trigger-btn btn-transparent"
       title="surveyForm.nodeDefCoordinate.showOnMap"
-      iconClassName="icon-map icon-24px"
+      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
       disabled={edit || Node.isValueBlank(node)}
     />
