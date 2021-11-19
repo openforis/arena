@@ -4,3 +4,16 @@
   width: 100%;
   height: 100%;
 }
+
+.leaflet-control-layers-toggle {
+  background-image: url('/img/map-layers-toggle.png');
+}
+
+.leaflet-popup-content {
+  width: 120px;
+
+  ul {
+    margin-block-start: 0;
+    padding-inline-start: 20px;
+  }
+}

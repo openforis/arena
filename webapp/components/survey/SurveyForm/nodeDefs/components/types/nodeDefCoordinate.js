@@ -90,8 +90,8 @@ const NodeDefCoordinate = (props) => {
   )
 
   const mapPanelRight = showMap ? (
-    <PanelRight width="40vw" onClose={toggleShowMap}>
-      <Map markerPosition={value} />{' '}
+    <PanelRight width="40vw" onClose={toggleShowMap} header={NodeDef.getLabel(nodeDef)}>
+      <Map markerPoint={value} markerTitle={NodeDef.getLabel(nodeDef)} />
     </PanelRight>
   ) : null
 

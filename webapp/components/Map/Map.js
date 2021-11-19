@@ -1,43 +1,49 @@
 import './Map.scss'
 
 import React from 'react'
-import { LayersControl, MapContainer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, Marker, Popup } from 'react-leaflet'
+import PropTypes from 'prop-types'
+import Markdown from '@webapp/components/markdown'
+
+// start of workaround to show leaflet marker icon
 import leaflet from 'leaflet'
-
-import icon from 'leaflet/dist/images/marker-icon.png'
-import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-
-let DefaultIcon = leaflet.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+leaflet.Marker.prototype.options.icon = leaflet.icon({
+  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 })
+// end of workaround
 
-leaflet.Marker.prototype.options.icon = DefaultIcon
-
-import { OpenStreetMapLayer, ESRILayer } from './TileLayers'
+import { MapLayersControl } from './MapLayersControl'
 
 const fromPointToLatLon = (point) => [point.y, point.x]
 
 export const Map = (props) => {
-  const { markerPosition, markerDescription } = props
+  const { markerPoint, markerTitle } = props
 
-  const markerPositionLatLon = markerPosition ? fromPointToLatLon(markerPosition) : null
+  const markerPositionLatLon = markerPoint ? fromPointToLatLon(markerPoint) : null
+  const markerDescription = `**${markerTitle}**
+* x: ${markerPoint.x}
+* y: ${markerPoint.y}
+* SRS: ${markerPoint.srs}`
 
   return (
     <MapContainer center={markerPositionLatLon} zoom={4}>
-      <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="ESRI">
-          <ESRILayer />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="OpenStreetMap">
-          <OpenStreetMapLayer />
-        </LayersControl.BaseLayer>
-        <LayersControl.Overlay checked name="Location">
-          <Marker position={markerPositionLatLon}>
-            <Popup>{markerDescription}</Popup>
-          </Marker>
-        </LayersControl.Overlay>
-      </LayersControl>
+      <MapLayersControl />
+      <Marker position={markerPositionLatLon}>
+        <Popup>
+          <Markdown source={markerDescription} />
+        </Popup>
+      </Marker>
     </MapContainer>
   )
+}
+
+Map.propTypes = {
+  markerPoint: PropTypes.object,
+  markerTitle: PropTypes.string,
+}
+
+Map.defaultProps = {
+  markerPoint: null,
+  markerTitle: null,
 }
