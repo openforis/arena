@@ -193,7 +193,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
       { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
       client
     ),
-    fetchDependencies(surveyId),
+    fetchDependencies(surveyId, client),
   ])
   let survey = Survey.assocNodeDefs({ nodeDefs })(surveyDb)
   if (dependencies) {

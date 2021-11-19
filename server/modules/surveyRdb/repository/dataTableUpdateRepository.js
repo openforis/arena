@@ -20,13 +20,10 @@ const _getType = (nodeDef, node) => {
   if (created && _hasTable(nodeDef)) {
     return types.insert
   }
-  if (updated || created) {
-    return types.update
-  }
   if (deleted && _hasTable(nodeDef)) {
     return types.delete
   }
-  if (deleted) {
+  if (updated || created) {
     return types.update
   }
   return null

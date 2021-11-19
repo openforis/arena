@@ -10,7 +10,7 @@ import * as RecordReader from './recordReader'
 
 // ====== UPDATE
 
-export const mergeNodes = nodes => record => {
+export const mergeNodes = (nodes) => (record) => {
   let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated)) {
     recordUpdated[keys.nodes] = {}
@@ -41,34 +41,32 @@ export const mergeNodes = nodes => record => {
   return recordUpdated
 }
 
-export const assocNodes = nodes => record => {
-  let recordUpdated = { ...record }
-  if (!(keys.nodes in recordUpdated)) {
-    recordUpdated[keys.nodes] = {}
-  }
-
-  R.forEachObjIndexed((node, nodeUuid) => {
-    if (Node.isDeleted(node)) {
-      recordUpdated = deleteNode(node)(recordUpdated)
-    } else {
-      recordUpdated[keys.nodes][nodeUuid] = node
-      recordUpdated = NodesIndex.addNode(node)(recordUpdated)
+export const assocNode = (node) => (record) => {
+  if (Node.isDeleted(node)) {
+    return deleteNode(node)(record)
+  } else {
+    let recordUpdated = {
+      ...record,
+      [keys.nodes]: {
+        ...RecordReader.getNodes(record),
+        [Node.getUuid(node)]: node,
+      },
     }
-  }, nodes)
-
-  return recordUpdated
+    return NodesIndex.addNode(node)(recordUpdated)
+  }
 }
 
-export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
+export const assocNodes = (nodes) => (record) =>
+  Object.values(nodes).reduce((recordAcc, node) => assocNode(node)(recordAcc), record)
 
-export const mergeNodeValidations = nodeValidations => record =>
-  R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), validationMerged =>
-    Validation.assocValidation(validationMerged)(record),
+export const mergeNodeValidations = (nodeValidations) => (record) =>
+  R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
+    Validation.assocValidation(validationMerged)(record)
   )(record)
 
 // ====== DELETE
 
-export const deleteNode = node => record => {
+export const deleteNode = (node) => (record) => {
   const nodeUuid = Node.getUuid(node)
 
   // 1. remove entity children recursively
@@ -86,7 +84,7 @@ export const deleteNode = node => record => {
     Validation.dissocFieldValidation(nodeUuid),
     // Dissoc childrenCount validation
     Validation.dissocFieldValidationsStartingWith(`${RecordValidation.prefixValidationFieldChildrenCount}${nodeUuid}`),
-    newValidation => Validation.assocValidation(newValidation)(recordUpdated),
+    (newValidation) => Validation.assocValidation(newValidation)(recordUpdated)
   )(recordUpdated)
 
   // 5. remove node from record

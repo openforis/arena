@@ -497,6 +497,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     notAcceptedYet: 'Invitation not accepted yet',
     invitedBy: 'Invited by',
     invitedDate: 'Invited date',
+    lastLogin: 'Last login',
+    moreThan30DaysAgo: 'More than 30 days ago',
     userSurveys: 'User Surveys',
     surveyName: 'Survey name',
     roleInSurvey: 'Role in survey',
@@ -969,7 +971,7 @@ $t(common.cantUndoWarning)`,
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: 'The file you are trying to import is empty',
-      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children'
+      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
     },
 
     expressions: {
