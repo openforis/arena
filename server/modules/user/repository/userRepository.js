@@ -9,7 +9,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as DbUtils from '@server/db/dbUtils'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
-const selectFieldsCommaSep = selectFields.map((f) => `u.${f}`).join(',')
+const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
 
 // In sql queries, user table must be surrounded by "" e.g. "user"
 
@@ -23,7 +23,7 @@ export const importNewUser = async (
     `
     INSERT INTO "user" AS u (uuid, email, name, password, status, prefs, props, profile_picture)
     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8)
-    RETURNING ${selectFieldsCommaSep}`,
+    RETURNING ${columnsCommaSeparated}`,
     [
       uuid,
       email,
@@ -42,7 +42,7 @@ export const insertUser = async ({ surveyId, surveyCycleKey, email, password, st
     `
     INSERT INTO "user" AS u (email, password, status, prefs, props)
     VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
-    RETURNING ${selectFieldsCommaSep}`,
+    RETURNING ${columnsCommaSeparated}`,
     [email, password, status, User.newPrefs(surveyId, surveyCycleKey), User.newProps({ title })],
     camelize
   )
@@ -75,23 +75,45 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     (row) => Number(row.count)
   )
 
-export const fetchUsers = async ({ offset = 0, limit = null }, client = db) =>
-  client.map(
-    `
-    SELECT ${selectFieldsCommaSep}
+const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC' }) => {
+  // check sort by parameters
+  const orderByFieldBySortBy = {
+    email: 'email',
+    name: 'name',
+    last_login_time: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
+    status: 'status',
+  }
+  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
+  const orderByDirection = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+
+  return `
+    WITH us AS (
+      SELECT DISTINCT ON (us.sess #>> '{passport,user}')
+        (us.sess #>> '{passport,user}')::uuid AS user_uuid,
+        (us.expire - interval '30 days') AS last_login_time
+      FROM user_sessions us
+      WHERE us.sess #>> '{passport,user}' IS NOT NULL
+      ORDER BY us.sess #>> '{passport,user}', expire DESC
+    )
+    SELECT ${selectFields.join(', ')},
+      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
     FROM "user" u
-    ORDER BY u.email
+    LEFT OUTER JOIN us
+      ON us.user_uuid = u.uuid
+    ORDER BY ${orderBy} ${orderByDirection}`
+}
+
+export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
+  client.map(
+    `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [],
+    { sortBy, sortOrder },
     camelize
   )
 
 export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
-  const select = `
-    SELECT u.email, u.name, u.status
-    FROM "user" u
-    ORDER BY u.email`
+  const select = _usersSelectQuery({ selectFields: ['u.email', 'u.name', 'u.status'] })
   const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
@@ -100,11 +122,8 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
   client.map(
     `
     SELECT 
-        ${selectFieldsCommaSep},
-        
+        ${columnsCommaSeparated},
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
-        
-        
         ui.invited_date
     FROM "user" u
     JOIN survey s ON s.id = $1
@@ -127,7 +146,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(
     `
-    SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture, u.password
+    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture, u.password
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -137,7 +156,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
 export const fetchUserByUuid = async (uuid, client = db) =>
   client.one(
     `
-    SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture
+    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -147,7 +166,7 @@ export const fetchUserByUuid = async (uuid, client = db) =>
 export const fetchUserByEmail = async (email, client = db) =>
   client.oneOrNone(
     `
-    SELECT ${selectFieldsCommaSep}
+    SELECT ${columnsCommaSeparated}
     FROM "user" u
     WHERE u.email = $1`,
     [email],
@@ -157,7 +176,7 @@ export const fetchUserByEmail = async (email, client = db) =>
 export const fetchUserAndPasswordByEmail = async (email, client = db) =>
   client.oneOrNone(
     `
-    SELECT ${selectFieldsCommaSep}, password
+    SELECT ${columnsCommaSeparated}, password
     FROM "user" u
     WHERE u.email = $1`,
     [email],
@@ -200,7 +219,7 @@ export const updateUser = async ({ userUuid, name, email, profilePicture, props 
     profile_picture = COALESCE($3, profile_picture),
     props = $5::jsonb
     WHERE u.uuid = $4
-    RETURNING ${selectFieldsCommaSep}`,
+    RETURNING ${columnsCommaSeparated}`,
     [name, email, profilePicture, userUuid, User.newProps({ ...props })],
     camelize
   )
@@ -211,7 +230,7 @@ export const updateNamePasswordAndStatus = async ({ userUuid, name, password, st
     UPDATE "user" u
     SET name = $1, password = $2, status = $3, props = $5::jsonb
     WHERE u.uuid = $4
-    RETURNING ${selectFieldsCommaSep}`,
+    RETURNING ${columnsCommaSeparated}`,
     [name, password, status, userUuid, User.newProps({ title })],
     camelize
   )
@@ -224,7 +243,7 @@ export const updateUserPrefs = async (user, client = db) =>
     UPDATE "user" u
     SET prefs = prefs || $1::jsonb
     WHERE u.uuid = $2
-    RETURNING ${selectFieldsCommaSep}`,
+    RETURNING ${columnsCommaSeparated}`,
     [User.getPrefs(user), User.getUuid(user)],
     camelize
   )

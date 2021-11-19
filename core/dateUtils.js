@@ -30,6 +30,7 @@ export const formats = {
   dateDefault: 'dd/MM/yyyy',
   dateISO: 'yyyy-MM-dd',
   datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
+  datetimeDisplay: 'dd/MM/yyyy HH:mm:ss',
   datetimeISO: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`,
   timeStorage: 'HH:mm',
 }
@@ -115,7 +116,7 @@ export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
 export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
-export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo }) => {
+export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, adjustTimezoneDifference = false }) => {
   if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
     return null
   }
@@ -123,7 +124,17 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
   if (!fnsIsValid(dateParsed)) {
     return null
   }
-  return format(dateParsed, formatTo)
+  let dateAdjusted
+  if (adjustTimezoneDifference) {
+    const timezoneOffset = dateParsed.getTimezoneOffset() * 60000
+    dateAdjusted = new Date(dateParsed.getTime() - timezoneOffset)
+  } else {
+    dateAdjusted = dateParsed
+  }
+  return format(dateAdjusted, formatTo)
 }
+
+export const convertDateTimeFromISOToDisplay = (dateStr) =>
+  convertDate({ dateStr, formatFrom: formats.datetimeISO, formatTo: formats.datetimeDisplay, adjustTimezoneDifference: true })
 
 export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)

@@ -372,7 +372,7 @@ export default class Job {
     if (this.isEnded()) {
       this.logDebug('onEnd...')
       await this.onEnd()
-      this.logDebug('onEnd run')
+      this.logDebug(`onEnd run. Job completed in ${this.elapsedTimePrettyFormat}`)
     }
 
     await this._notifyEvent(event)
@@ -386,6 +386,14 @@ export default class Job {
     if (this.eventListener) {
       this.eventListener(event)
     }
+  }
+
+  get elapsedTimePrettyFormat() {
+    const elapsedTime = this.endTime.getTime() - this.startTime.getTime()
+    const elapsedMins = Math.floor(elapsedTime / 1000 / 60)
+    const elapsedSeconds = String(Math.floor(elapsedTime / 1000) % 60).padStart(2, '0')
+    const elapsedMillis = String(elapsedTime % 1000).padStart(3, '0')
+    return `${elapsedMins}:${elapsedSeconds}.${elapsedMillis}`
   }
 
   _createJobEvent(type) {

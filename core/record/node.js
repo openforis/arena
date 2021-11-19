@@ -8,6 +8,8 @@ import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { NodeMeta } from './_node/nodeMeta'
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -17,20 +19,13 @@ export const keys = {
   recordUuid: 'recordUuid',
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   value: 'value',
-  meta: 'meta',
+  meta: NodeMeta.keys.meta,
   placeholder: 'placeholder',
 
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',
   dirty: 'dirty', // Modified by the user but not persisted yet
-}
-
-export const metaKeys = {
-  hierarchy: 'h', // Ancestor nodes uuids hierarchy
-  childApplicability: 'childApplicability', // Applicability by child def uuid
-  defaultValue: 'defaultValue', // True if default value has been applied, false if the value is user defined
-  hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
 export const valuePropsCode = {
@@ -91,7 +86,7 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getTyp
 // ======
 //
 
-export const { getUuid } = ObjectUtils
+export const { getId, getUuid } = ObjectUtils
 
 export const { getParentUuid } = ObjectUtils
 
@@ -135,18 +130,10 @@ export const { getValidation } = Validation
 
 // ===== READ metadata
 
-export const getMeta = R.propOr({}, keys.meta)
+export const { metaKeys, getMeta, isChildApplicable, isDefaultValueApplied, getHierarchy, getHierarchyCode } = NodeMeta
 
-export const isChildApplicable = (childDefUuid) =>
-  R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
-export const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
-
-export const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
-
+// Hierarchy
 export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancestor), getHierarchy(node))
-
-// Code metadata
-export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
 
 //
 // ======
@@ -163,6 +150,8 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
   [keys.meta]: {
     [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
   },
+  [keys.created]: true,
+  [keys.dateCreated]: new Date(),
 })
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
@@ -176,11 +165,13 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // ======
 //
 export const assocValue = R.assoc(keys.value)
-export const assocMeta = R.assoc(keys.meta)
 export const { assocValidation } = Validation
 
-export const mergeMeta = (meta) => (node) =>
-  R.pipe(getMeta, R.mergeLeft(meta), (metaUpdated) => R.assoc(keys.meta, metaUpdated)(node))(node)
+export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValueApplied } = NodeMeta
+
+export const assocCreated = R.assoc(keys.created)
+export const assocDeleted = R.assoc(keys.deleted)
+export const assocUpdated = R.assoc(keys.updated)
 
 //
 // ======
