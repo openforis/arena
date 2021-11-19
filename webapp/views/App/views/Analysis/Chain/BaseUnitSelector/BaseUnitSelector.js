@@ -56,8 +56,6 @@ const BaseUnitSelector = () => {
   const chain = useChain()
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-  const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
-
   const handleSaveBaseUnitNodeDefs = useCallback(() => {
     
     dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: baseUnitNodeDefsToCreate }))
@@ -73,7 +71,8 @@ const BaseUnitSelector = () => {
     setBaseUnitNodeDefsToCreate([])
     setHadBaseUnitNodeDef(false)
     setBaseUnitNodeDef(null)
-  })
+  }, [surveyId, surveyCycleKey, chain] )
+  
   const handleUpdateBaseUnit = useCallback(
     (entityReferenceUuid) => {
       // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
