@@ -20,7 +20,15 @@ export {
 export { fetchActivityLogs } from './activityLog'
 export { importRecordsFromCollect, updateRecordsStep, exportDataQueryToTempFile, downloadDataQueryExport } from './data'
 export { fetchSurveys, insertSurvey } from './survey'
-export { fetchNodeDef, fetchNodeDefs, putNodeDefProps, putNodeDefsProps, postNodeDef, deleteNodeDef } from './nodeDef'
+export {
+  fetchNodeDef,
+  fetchNodeDefs,
+  putNodeDefProps,
+  putNodeDefsProps,
+  postNodeDef,
+  postNodeDefs,
+  deleteNodeDef,
+} from './nodeDef'
 
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'

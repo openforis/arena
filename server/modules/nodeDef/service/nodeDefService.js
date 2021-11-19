@@ -82,6 +82,21 @@ export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsUpdated }, t)
   })
 
+export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKey, nodeDefs }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId, cycle }, t)
+
+    await NodeDefManager.insertNodeDefsBatch({
+      surveyId,
+      nodeDefs,
+      client: t,
+    })
+
+    const surveyUpdated = Survey.assocNodeDefs({ nodeDefs })(survey)
+
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs }, t)
+  })
+
 export const updateNodeDefProps = async (
   { user, surveyId, cycle, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
@@ -114,7 +129,7 @@ export const updateNodeDefsProps = async ({ surveyId, nodeDefs }, client = db) =
   NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
-  const survey = await fetchSurvey({ surveyId, cycle }, client )
+  const survey = await fetchSurvey({ surveyId, cycle }, client)
 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated }, client)
 }
