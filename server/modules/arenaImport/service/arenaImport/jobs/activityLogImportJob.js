@@ -17,7 +17,7 @@ export default class ActivityLogImportJob extends Job {
     if (this.total > 0) {
       await PromiseUtils.each([...Array(this.total).keys()], async (index) => {
         const activities = await ArenaSurveyFileZip.getActivities(arenaSurveyFileZip, index)
-        await ActivityLogManager.insertManyBatch(this.user, surveyId, activities, this.tx)
+        await ActivityLogManager.insertMany(this.user, surveyId, activities, this.tx)
         this.incrementProcessedItems()
       })
     }
