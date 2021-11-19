@@ -842,6 +842,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
+      showOnMap: 'Show on map',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
@@ -968,7 +969,7 @@ $t(common.cantUndoWarning)`,
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: 'The file you are trying to import is empty',
-      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children'
+      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
     },
 
     expressions: {

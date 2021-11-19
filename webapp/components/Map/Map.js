@@ -3,7 +3,11 @@ import './Map.scss'
 import React from 'react'
 import { MapContainer, Marker, Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
+
 import Markdown from '@webapp/components/markdown'
+
+import { MapLayersControl } from './MapLayersControl'
+import { useMap } from './useMap'
 
 // start of workaround to show leaflet marker icon
 import leaflet from 'leaflet'
@@ -13,18 +17,12 @@ leaflet.Marker.prototype.options.icon = leaflet.icon({
 })
 // end of workaround
 
-import { MapLayersControl } from './MapLayersControl'
-
-const fromPointToLatLon = (point) => [point.y, point.x]
-
 export const Map = (props) => {
-  const { markerPoint, markerTitle } = props
+  const { markerPositionLatLon, markerDescription } = useMap(props)
 
-  const markerPositionLatLon = markerPoint ? fromPointToLatLon(markerPoint) : null
-  const markerDescription = `**${markerTitle}**
-* x: ${markerPoint.x}
-* y: ${markerPoint.y}
-* SRS: ${markerPoint.srs}`
+  if (!markerPositionLatLon) {
+    return null
+  }
 
   return (
     <MapContainer center={markerPositionLatLon} zoom={4}>

@@ -95,7 +95,15 @@ const NodeDefCoordinate = (props) => {
     </PanelRight>
   ) : null
 
-  const mapTriggerButton = <Button label="Map" onClick={toggleShowMap} />
+  const mapTriggerButton = (
+    <Button
+      className="map-trigger-btn btn-transparent"
+      title="surveyForm.nodeDefCoordinate.showOnMap"
+      iconClassName="icon-map icon-24px"
+      onClick={toggleShowMap}
+      disabled={edit || Node.isValueBlank(node)}
+    />
+  )
 
   if (renderType === NodeDefLayout.renderType.tableBody) {
     return (
