@@ -39,14 +39,13 @@ export const initNewRecord = async (
   nodesUpdateListener = null,
   nodesValidationListener = null,
   client = db
-) =>
-  await client.tx(async (t) => {
-    const rootNodeDef = Survey.getNodeDefRoot(survey)
+) => {
+  const rootNodeDef = Survey.getNodeDefRoot(survey)
 
-    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
+  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
-  })
+  return persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, client)
+}
 
 // ==== UPDATE
 
@@ -157,7 +156,7 @@ export const persistNode = async (
   system = false,
   t = db
 ) =>
-  await _updateNodeAndValidateRecordUniqueness(
+  _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -179,7 +178,7 @@ export const deleteNode = async (
   nodesValidationListener = null,
   t = db
 ) =>
-  await _updateNodeAndValidateRecordUniqueness(
+  _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -200,23 +199,22 @@ const _updateNodeAndValidateRecordUniqueness = async (
   nodesUpdateFn,
   nodesUpdateListener = null,
   nodesValidationListener = null,
-  t = db
+  client = db
 ) =>
-  await t.tx(async (t) => {
+  client.tx(async (t) => {
     await _beforeNodeUpdate({ survey, record, node }, t)
 
-    const nodesUpdated = await nodesUpdateFn(user, survey, record, node, t)
+    const { record: recordUpdated1, nodes: nodesUpdated } = await nodesUpdateFn(user, survey, record, node, t)
+    let recordUpdated = recordUpdated1
 
-    const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
-      survey,
-      nodesUpdated,
-      nodesUpdateListener,
-      nodesValidationListener,
+    const { record: recordUpdated2, updatedNodesAndDependents } = await _onNodesUpdate(
+      { survey, record: recordUpdated, nodesUpdated, nodesUpdateListener, nodesValidationListener },
       t
     )
-    await _afterNodesUpdate({ survey, record: updatedRecord, nodes: updatedNodesAndDependents }, t)
+    recordUpdated = recordUpdated2
+    await _afterNodesUpdate({ survey, record: recordUpdated, nodes: updatedNodesAndDependents }, t)
 
-    return updatedRecord
+    return recordUpdated
   })
 
 const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
@@ -244,21 +242,15 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   }
 }
 
-const _onNodesUpdate = async (
-  survey,
-  { record, nodes: updatedNodes },
-  nodesUpdateListener,
-  nodesValidationListener,
-  t
-) => {
+const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListener, nodesValidationListener }, t) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
-    nodesUpdateListener(updatedNodes)
+    nodesUpdateListener(nodesUpdated)
   }
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
+    await NodeUpdateManager.updateNodesDependents(survey, record, nodesUpdated, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }
@@ -266,15 +258,20 @@ const _onNodesUpdate = async (
   record = recordUpdatedDependentNodes
 
   const updatedNodesAndDependents = {
-    ...updatedNodes,
+    ...nodesUpdated,
     ...updatedDependentNodes,
   }
 
   // 3. update node validations
+  // exclude deleted nodes
+  const nodesToValidate = Object.values(updatedNodesAndDependents).reduce(
+    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
+    {}
+  )
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(
     survey,
     record,
-    updatedNodesAndDependents,
+    nodesToValidate,
     true,
     t
   )

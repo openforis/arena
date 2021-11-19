@@ -17,7 +17,8 @@ export const keys = {
   invitationExpired: 'invitationExpired',
   invitedBy: 'invitedBy',
   invitedDate: 'invitedDate',
+  lastLoginTime: 'lastLoginTime',
 
   // Used only when editing user auth groups
-  authGroupsUuids: 'authGroupsUuids'
+  authGroupsUuids: 'authGroupsUuids',
 }

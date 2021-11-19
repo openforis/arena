@@ -26,7 +26,7 @@ const NodeDefCoordinate = (props) => {
 
   const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
-  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
+  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -38,8 +38,9 @@ const NodeDefCoordinate = (props) => {
   const selectedSrs = singleSrs ? surveySrs[0] : surveySrs.find((srs) => srs.code === value.srs)
 
   const handleInputChange = (field, value) => {
-    const { nodeDef, updateNode } = props
-
+    if (entryDisabled) {
+      return // input change could be triggered by numeric input field formatting
+    }
     let newValue = A.assoc(field, value)(node.value)
 
     if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
