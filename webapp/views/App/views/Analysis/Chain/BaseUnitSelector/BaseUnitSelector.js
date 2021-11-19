@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { useChain } from '@webapp/store/ui/chain'
 import {
   useSurvey,
   useSurveyCycleKeys,
@@ -54,8 +54,6 @@ const BaseUnitSelector = () => {
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
-
-  const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
 
   const handleSaveNodeDefs = useCallback(async () => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
