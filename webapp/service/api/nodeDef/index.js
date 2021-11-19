@@ -42,7 +42,6 @@ export const postNodeDefs = async ({ surveyId, surveyCycleKey, nodeDefs } = {}) 
   return { nodeDefsValidation, nodeDefsUpdated }
 }
 
-// ==== DELETE
 export const deleteNodeDef = async ({ surveyId, nodeDefUuid, surveyCycleKey }) =>
   axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } })
 
