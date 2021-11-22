@@ -136,6 +136,10 @@ export const dataModules = {
     key: 'explorer',
     path: `${appModules.data.path}/explorer`,
   },
+  map: {
+    key: 'map',
+    path: `${appModules.data.path}/map`,
+  },
   export: {
     key: 'export',
     path: `${appModules.data.path}/export`,
