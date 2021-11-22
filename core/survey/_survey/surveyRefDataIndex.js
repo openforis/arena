@@ -46,8 +46,8 @@ const keys = {
   // Root path key
   indexRefData: '_indexRefData',
   // Ref data indexes
-  categoryItemUuidIndex: 'categoryItemUuidIndex',
-  categoryItemIndex: 'categoryItemIndex',
+  categoryItemUuidIndex: 'categoryItemUuidIndex', // items by category uuid, parent item uuid and item code
+  categoryItemIndex: 'categoryItemIndex', // items by item uuid
   taxonUuidIndex: 'taxonUuidIndex',
   taxonIndex: 'taxonIndex',
 }
@@ -57,6 +57,17 @@ const categoryItemNullParentUuid = 'null'
 // ====== READ
 
 // ==== category index
+
+export const getCategoryItemByUuid = (categoryItemUuid) =>
+  R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+
+const getCategoryItemChildren =
+  ({ categoryUuid, parentItemUuid }) =>
+  (survey) => {
+    const itemUuidByCode = R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid])(survey)
+    return Object.values(itemUuidByCode).map((uuid) => getCategoryItemByUuid(uuid)(survey))
+  }
+
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
   R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
 
@@ -80,8 +91,22 @@ export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode,
   }
 }
 
-export const getCategoryItemByUuid = (categoryItemUuid) =>
-  R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+export const getCategoryItemsInLevel =
+  ({ categoryUuid, levelIndex }) =>
+  (survey) => {
+    if (levelIndex === 0) {
+      return getCategoryItemChildren({ categoryUuid, parentItemUuid: categoryItemNullParentUuid })(survey)
+    } else {
+      const itemsPreviousLevel = getCategoryItemsInLevel({ categoryUuid, levelIndex: levelIndex - 1 })(survey)
+      return itemsPreviousLevel.reduce(
+        (itemsAcc, itemPreviousLevel) => [
+          ...itemsAcc,
+          ...getCategoryItemChildren({ categoryUuid, parentItemUuid: CategoryItem.getUuid(itemPreviousLevel) })(survey),
+        ],
+        []
+      )
+    }
+  }
 
 export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codePaths }) =>

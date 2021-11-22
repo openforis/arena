@@ -339,7 +339,7 @@ export default class NodeDefsImportJob extends Job {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
-          ? SamplingPointDataImportJob.categoryName
+          ? Survey.samplingPointDataCategoryName
           : listName
         const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
 

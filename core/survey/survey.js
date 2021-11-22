@@ -63,6 +63,8 @@ export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey } = SurveyInfo
 export const { sortableKeys } = SurveySortKeys
 
+export const samplingPointDataCategoryName = 'sampling_point_data'
+
 // ====== DEFAULTS
 export const { getDefaultAuthGroups } = SurveyDefaults
 
@@ -217,8 +219,12 @@ export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTa
 
 // ====== Survey Reference data index
 // Category index
-export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
-  SurveyRefDataIndex
+export const {
+  getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid,
+  getCategoryItemByHierarchicalCodes,
+  getCategoryItemsInLevel,
+} = SurveyRefDataIndex
 // Taxon index
 export const {
   getTaxonByCode,

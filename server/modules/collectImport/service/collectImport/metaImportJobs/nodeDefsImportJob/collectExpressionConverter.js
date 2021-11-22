@@ -89,13 +89,13 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
       pattern: /idm:samplingPointCoordinate\(([^)]+)\)/,
       // change the function name but keep the same arguments.
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)
-      replace: (_, fnArs) => `categoryItemProp('${SamplingPointDataImportJob.categoryName}', 'location', ${fnArs})`,
+      replace: (_, fnArs) => `categoryItemProp('${Survey.samplingPointDataCategoryName}', 'location', ${fnArs})`,
     },
     {
       pattern: /idm:samplingPointData\(([^)]+)\)/,
       // change the function name but keep the same arguments.
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'propertyName', cluster_id, plot_id)
-      replace: (_, fnArs) => `categoryItemProp('${SamplingPointDataImportJob.categoryName}', ${fnArs})`,
+      replace: (_, fnArs) => `categoryItemProp('${Survey.samplingPointDataCategoryName}', ${fnArs})`,
     },
     {
       pattern: /idm:speciesListData\(([^)]+)\)/,

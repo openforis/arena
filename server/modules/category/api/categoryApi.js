@@ -7,7 +7,7 @@ import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -128,7 +128,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, draft = false, tempFileName } = Request.getParams(req)
-        const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const name = `${Survey.getName(surveyInfo)}_categories.zip`
         const exportedFilePath = FileUtils.tempFilePath(tempFileName)
@@ -226,6 +226,24 @@ export const init = (app) => {
           await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
         )
 
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/sampling-point-data',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0 } = Request.getParams(req)
+
+        const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, draft: true })
+        const samplingPointDataCategory = Survey.getCategoryByName(Survey.samplingPointDataCategoryName)(survey)
+        const categoryUuid = Category.getUuid(samplingPointDataCategory)
+        const items = Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
         res.json({ items })
       } catch (error) {
         next(error)

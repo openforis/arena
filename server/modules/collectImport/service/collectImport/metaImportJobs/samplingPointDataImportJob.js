@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CollectImportJobContext from '../collectImportJobContext'
@@ -28,7 +29,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     super(
       {
         ...params,
-        [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName,
+        [CategoryImportJobParams.keys.categoryName]: Survey.samplingPointDataCategoryName,
       },
       'SamplingPointDataImportJob'
     )
@@ -108,5 +109,3 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
   }
 }
-
-SamplingPointDataImportJob.categoryName = 'sampling_point_data'
