@@ -9,7 +9,7 @@ const pgp = pgPromise()
 export const QueryStream = _QueryStream
 
 export const selectDate = (field, fieldAlias = null) =>
-  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias || field}`
+  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS ${fieldAlias || field}`
 
 export const now = "timezone('UTC', now())"
 

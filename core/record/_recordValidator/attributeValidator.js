@@ -18,10 +18,13 @@ import * as AttributeTypeValidator from './attributeTypeValidator'
 import * as AttributeKeyValidator from './attributeKeyValidator'
 import * as AttributeUniqueValidator from './attributeUniqueValidator'
 
-const _validateRequired = ({ nodeDef }) => (_propName, node) =>
-  (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))) && Node.isValueBlank(node)
-    ? { key: Validation.messageKeys.record.valueRequired }
-    : null
+const _validateRequired =
+  ({ nodeDef }) =>
+  (_propName, node) =>
+    (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))) &&
+    Node.isValueBlank(node)
+      ? { key: Validation.messageKeys.record.valueRequired }
+      : null
 
 /**
  * Evaluates the validation expressions.
