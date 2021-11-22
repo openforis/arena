@@ -100,7 +100,7 @@ const NodeDefCoordinate = (props) => {
       title="surveyForm.nodeDefCoordinate.showOnMap"
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      disabled={edit || Node.isValueBlank(node)}
+      disabled={edit || Node.isValueBlank(node) || !Node.isValid(node)}
     />
   )
 

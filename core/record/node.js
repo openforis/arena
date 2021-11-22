@@ -127,6 +127,7 @@ export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation
+export const isValid = R.pipe(getValidation, Validation.isValid)
 
 // ===== READ metadata
 

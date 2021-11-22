@@ -12,6 +12,9 @@ import { useMap } from './useMap'
 // start of workaround to show leaflet marker icon
 import leaflet from 'leaflet'
 leaflet.Marker.prototype.options.icon = leaflet.icon({
+  iconSize: [25, 41],
+  iconAnchor: [10, 41],
+  popupAnchor: [2, -40],
   iconUrl: require('leaflet/dist/images/marker-icon.png').default,
   shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 })

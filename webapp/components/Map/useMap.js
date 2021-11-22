@@ -10,7 +10,9 @@ export const useMap = (props) => {
 
   const fromPointToLatLon = (point) => {
     if (srsInitialized && Points.isValid(point)) {
-      return [point.y, point.x]
+      const pointLatLong = Points.toLatLong(point)
+      const { x, y } = pointLatLong
+      return [y, x]
     }
     return null
   }
