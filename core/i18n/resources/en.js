@@ -13,6 +13,7 @@ export const enTranslation = {
     avg: 'Average',
     ascending: 'Ascending',
     back: 'Back',
+    baseUnit: 'Base unit',
     cancel: 'Cancel',
     cancelConfirm: `**There are unsaved changes**.
 
@@ -496,6 +497,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     notAcceptedYet: 'Invitation not accepted yet',
     invitedBy: 'Invited by',
     invitedDate: 'Invited date',
+    lastLogin: 'Last login',
+    moreThan30DaysAgo: 'More than 30 days ago',
     userSurveys: 'User Surveys',
     surveyName: 'Survey name',
     roleInSurvey: 'Role in survey',
