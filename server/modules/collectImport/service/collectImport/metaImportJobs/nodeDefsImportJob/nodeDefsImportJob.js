@@ -297,8 +297,11 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      const validationRules = await this.parseValidationRules({ nodeDef, collectNodeDef })
+      const { validationRules, unique } = this.parseValidationRules({ nodeDef, collectNodeDef })
       validations[NodeDefValidations.keys.expressions] = validationRules
+      if (unique) {
+        validations[NodeDefValidations.keys.unique] = true
+      }
     }
     propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
 
@@ -391,12 +394,12 @@ export default class NodeDefsImportJob extends Job {
     return defaultValues
   }
 
-  async parseValidationRules({ nodeDef, collectNodeDef }) {
+  parseValidationRules({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
-    const { validationRules, importIssues } = parseValidationRules({
+    const { validationRules, importIssues, unique } = parseValidationRules({
       survey: this.survey,
       nodeDef,
       collectValidationRules,
@@ -405,7 +408,7 @@ export default class NodeDefsImportJob extends Job {
 
     this.importIssues.push(...importIssues)
 
-    return validationRules
+    return { validationRules, unique }
   }
 
   /**
