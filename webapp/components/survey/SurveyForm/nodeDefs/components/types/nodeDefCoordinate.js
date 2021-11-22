@@ -2,7 +2,6 @@ import './nodeDefCoordinate.scss'
 
 import React, { useCallback, useState } from 'react'
 
-import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -45,7 +44,16 @@ const NodeDefCoordinate = (props) => {
     if (entryDisabled) {
       return // input change could be triggered by numeric input field formatting
     }
-    let newValue = A.assoc(field, value)(node.value)
+    let fieldValue
+    if (StringUtils.isBlank(value)) {
+      fieldValue = null
+    } else if ([Node.valuePropsCoordinate.x, Node.valuePropsCoordinate.y].includes(field)) {
+      fieldValue = Number(value)
+    } else {
+      fieldValue = value
+    }
+
+    let newValue = { ...Node.getValue(node), [field]: fieldValue }
 
     if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
       newValue = null
@@ -63,7 +71,7 @@ const NodeDefCoordinate = (props) => {
       id={TestId.surveyForm.coordinateX(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
-      value={value.x}
+      value={StringUtils.nullToEmpty(value.x)}
       onChange={(value) => handleInputChange(Node.valuePropsCoordinate.x, value)}
     />
   )
@@ -73,7 +81,7 @@ const NodeDefCoordinate = (props) => {
       id={TestId.surveyForm.coordinateY(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
-      value={value.y}
+      value={StringUtils.nullToEmpty(value.y)}
       onChange={(value) => handleInputChange(Node.valuePropsCoordinate.y, value)}
     />
   )

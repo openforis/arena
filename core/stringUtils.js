@@ -36,3 +36,5 @@ export const normalizeName = R.pipe(leftTrim, R.toLower, R.replace(/[^a-z0-9]/g,
 export const capitalizeFirstLetter = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 
 export const removeNewLines = R.when(isString, R.pipe(R.split(/\r\n|\r|\n/g), R.join(' ')))
+
+export const nullToEmpty = (value) => (value === null ? '' : value)
