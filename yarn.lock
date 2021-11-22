@@ -1841,10 +1841,10 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-core@^0.0.72":
-  version "0.0.72"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.72/9a10b3e6727d5eeadad11da28f2a3de67ada8cfe97f1c90601b5cdb1b78f0f92#263725d9eb233f42ca8fbcd7c3d918c9d5b711f2"
-  integrity sha512-p3zsfW4Kr6D1PPGuBx8a7gtTio9RVIYiBQ7m+i5HUdFLTbDZm/OlgvQMTD6fDdJ9h2RrpWW0m90QXzpjoxgLjg==
+"@openforis/arena-core@^0.0.74":
+  version "0.0.74"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.74/016fcce837ab3576391f58359412ee848d55cfc78a090c2efd747547999ccf29#66c29f34ba8e5f9d343725dfbc30fb7e16e0f5cd"
+  integrity sha512-ffOmiip3GY+zlZinOGd4kfHmiUyy38U0UIsGs/BQlPMzn7cVah7tyOHEl5Zo0ZtvQzGRBQ3O1gMswlZSEvcV5w==
   dependencies:
     "@esri/proj-codes" "^2.7.0"
     lodash.differencewith "^4.5.0"
