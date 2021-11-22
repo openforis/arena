@@ -1,7 +1,7 @@
 import * as CollectImportReportRepository from '../repository/collectImportReportRepository'
 
 // CREATE
-export const { insertItem } = CollectImportReportRepository
+export const { insertItem, insertItems } = CollectImportReportRepository
 
 // READ
 export const { fetchItems, fetchItemsStream, countItems } = CollectImportReportRepository
