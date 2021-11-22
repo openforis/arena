@@ -70,6 +70,21 @@ export const insertItem = async (surveyId, item, client = db) =>
     dbTransformCallback
   )
 
+export const insertItems = async ({ surveyId, items = [] }, client = db) =>
+  items.length > 0 &&
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      getSurveyDBSchema(surveyId),
+      'collect_import_report',
+      ['node_def_uuid', 'props', 'resolved'],
+      items.map((item) => ({
+        node_def_uuid: CollectImportReportItem.getNodeDefUuid(item),
+        props: CollectImportReportItem.getProps(item),
+        resolved: CollectImportReportItem.isResolved(item),
+      }))
+    )
+  )
+
 export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
   client.one(
     `
