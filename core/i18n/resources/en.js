@@ -13,6 +13,7 @@ export const enTranslation = {
     avg: 'Average',
     ascending: 'Ascending',
     back: 'Back',
+    baseUnit: 'Base unit',
     cancel: 'Cancel',
     cancelConfirm: `**There are unsaved changes**.
 

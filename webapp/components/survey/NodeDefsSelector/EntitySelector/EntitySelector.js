@@ -10,7 +10,14 @@ import * as StringUtils from '@core/stringUtils'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { TestId } from '@webapp/utils/testId'
 
-const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel }) => {
+const getDropdownItems = ({
+  hierarchy,
+  lang,
+  nodeDefLabelType,
+  showSingleEntities,
+  useNameAsLabel,
+  allowEmptySelection,
+}) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
@@ -27,7 +34,7 @@ const getDropdownItems = ({ hierarchy, lang, nodeDefLabelType, showSingleEntitie
 
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
-  return entities
+  return [...(allowEmptySelection ? [{ key: 'null', value: 'NULL' }] : []), ...entities]
 }
 
 const EntitySelector = (props) => {
@@ -41,9 +48,17 @@ const EntitySelector = (props) => {
     showSingleEntities,
     disabled,
     useNameAsLabel,
+    allowEmptySelection,
   } = props
 
-  const dropdownItems = getDropdownItems({ hierarchy, lang, nodeDefLabelType, showSingleEntities, useNameAsLabel })
+  const dropdownItems = getDropdownItems({
+    hierarchy,
+    lang,
+    nodeDefLabelType,
+    showSingleEntities,
+    useNameAsLabel,
+    allowEmptySelection,
+  })
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
@@ -70,6 +85,7 @@ EntitySelector.propTypes = {
   validation: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string,
+  allowEmptySelection: PropTypes.bool,
 }
 
 EntitySelector.defaultProps = {
@@ -79,6 +95,7 @@ EntitySelector.defaultProps = {
   useNameAsLabel: false,
   validation: null,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+  allowEmptySelection: false,
 }
 
 export default EntitySelector

@@ -111,6 +111,8 @@ export const keysPropsAdvanced = {
   index: 'index',
   active: 'active',
   aggregateFunctions: 'aggregateFunctions',
+
+  isBaseUnit: 'isBaseUnit',
 }
 
 const metaKeys = {
@@ -196,6 +198,8 @@ export const isBooleanLabelYesNo = (nodeDef) =>
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
 export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
+
+export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

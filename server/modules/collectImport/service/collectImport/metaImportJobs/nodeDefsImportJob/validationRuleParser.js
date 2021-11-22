@@ -1,5 +1,6 @@
 import * as StringUtils from '@core/stringUtils'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
@@ -71,6 +72,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
 
   let exprConverted = null
   let applyIfConverted = null
+  let unique = false
 
   if (checkType === collectCheckType.distance) {
     const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
@@ -81,6 +83,18 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
     })
     if (toExprConverted) {
       exprConverted = `distance(${NodeDef.getName(nodeDefCurrent)}, ${toExprConverted}) <= ${max}`
+    }
+  } else if (checkType === collectCheckType.unique) {
+    const { expr } = CollectSurvey.getAttributes(collectValidationRule)
+    const nodeDefName = NodeDef.getName(nodeDefCurrent)
+    const nodeDefParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+    if (
+      (NodeDef.isMultipleAttribute(nodeDefCurrent) && expr === nodeDefName) ||
+      expr === `parent()/${NodeDef.getName(nodeDefParent)}/${nodeDefName}`
+    ) {
+      unique = true
+    } else {
+      // do not try to convert uniqueness expression in other cases, it should be converted "manually" into a more complex expression
     }
   } else {
     exprConverted = CollectExpressionConverter.convert({
@@ -98,7 +112,8 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
     })
   }
 
-  const success = exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null)
+  const success =
+    unique || (exprConverted !== null && (StringUtils.isBlank(collectApplyIf) || applyIfConverted !== null))
 
   const messages = CollectSurvey.toLabels('message', defaultLanguage)(collectValidationRule)
 
@@ -116,31 +131,39 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
   })
 
   return {
-    validationRule: success
-      ? NodeDefExpression.createExpression({
-          expression: exprConverted,
-          applyIf: applyIfConverted === null ? '' : applyIfConverted,
-          severity: flag === 'error' ? ValidationResult.severity.error : ValidationResult.severity.warning,
-          messages,
-        })
-      : null,
+    validationRule:
+      success && exprConverted !== null
+        ? NodeDefExpression.createExpression({
+            expression: exprConverted,
+            applyIf: applyIfConverted === null ? '' : applyIfConverted,
+            severity: flag === 'error' ? ValidationResult.severity.error : ValidationResult.severity.warning,
+            messages,
+          })
+        : null,
     importIssue,
+    unique,
   }
 }
 
 export const parseValidationRules = ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
   const validationRules = []
   const importIssues = []
+  let unique = false
 
   collectValidationRules.forEach((collectValidationRule) => {
     const parseResult = parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
     if (parseResult) {
-      const { validationRule, importIssue } = parseResult
+      const { validationRule, importIssue, unique: _unique } = parseResult
       if (validationRule) {
         validationRules.push(validationRule)
       }
-      importIssues.push(importIssue)
+      if (importIssue) {
+        importIssues.push(importIssue)
+      }
+      if (_unique) {
+        unique = true
+      }
     }
   })
-  return { validationRules, importIssues }
+  return { validationRules, importIssues, unique }
 }

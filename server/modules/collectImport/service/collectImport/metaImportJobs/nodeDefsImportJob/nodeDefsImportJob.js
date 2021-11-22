@@ -41,7 +41,7 @@ export default class NodeDefsImportJob extends Job {
     this.nodeDefs = {} // Node definitions by uuid
     this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator() // to avoid naming collision
     this.nodeDefsInfoByCollectPath = {} // Used by following jobs
-    this.issuesCount = 0
+    this.importIssues = []
   }
 
   async execute() {
@@ -54,8 +54,11 @@ export default class NodeDefsImportJob extends Job {
 
     await this.insertNodeDef(null, '', collectRootDef, NodeDef.nodeDefType.entity)
 
+    // insert import issues and write report into survey props
+    await CollectImportReportManager.insertItems({ surveyId: this.surveyId, items: this.importIssues }, this.tx)
+
     const collectReport = {
-      [Survey.collectReportKeys.issuesTotal]: this.issuesCount,
+      [Survey.collectReportKeys.issuesTotal]: this.importIssues.length,
       [Survey.collectReportKeys.issuesResolved]: 0,
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, true, this.tx)
@@ -294,8 +297,11 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      const validationRules = await this.parseValidationRules({ nodeDef, collectNodeDef })
+      const { validationRules, unique } = this.parseValidationRules({ nodeDef, collectNodeDef })
       validations[NodeDefValidations.keys.expressions] = validationRules
+      if (unique) {
+        validations[NodeDefValidations.keys.unique] = true
+      }
     }
     propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
 
@@ -309,7 +315,7 @@ export default class NodeDefsImportJob extends Job {
       })
       const success = relevantExprConverted !== null
 
-      await this.addImportIssue(
+      this.importIssues.push(
         CollectImportReportItem.newReportItem({
           nodeDefUuid,
           expressionType: CollectImportReportItem.exprTypes.applicable,
@@ -383,35 +389,26 @@ export default class NodeDefsImportJob extends Job {
       defaultLanguage,
     })
 
-    await this.addImportIssues(importIssues)
+    this.importIssues.push(...importIssues)
 
     return defaultValues
   }
 
-  async parseValidationRules({ nodeDef, collectNodeDef }) {
+  parseValidationRules({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
-    const { validationRules, importIssues } = parseValidationRules({
+    const { validationRules, importIssues, unique } = parseValidationRules({
       survey: this.survey,
       nodeDef,
       collectValidationRules,
       defaultLanguage,
     })
 
-    await this.addImportIssues(importIssues)
+    this.importIssues.push(...importIssues)
 
-    return validationRules
-  }
-
-  async addImportIssue(reportItem) {
-    await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
-    this.issuesCount += 1
-  }
-
-  async addImportIssues(importIssues) {
-    await Promise.all(importIssues.map((importIssue) => this.addImportIssue(importIssue)))
+    return { validationRules, unique }
   }
 
   /**
@@ -527,7 +524,7 @@ export default class NodeDefsImportJob extends Job {
 
       const success = Boolean(nodeDefsInfo)
 
-      await this.addImportIssue(
+      this.importIssues.push(
         CollectImportReportItem.newReportItem({
           nodeDefUuid: NodeDef.getUuid(nodeDef),
           expressionType: CollectImportReportItem.exprTypes.codeParent,

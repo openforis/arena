@@ -23,6 +23,7 @@ import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
+import BaseUnitSelector from './BaseUnitSelector'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -90,6 +91,9 @@ const ChainComponent = () => {
           cyclesKeysSelected={chain.props.cycles}
           onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
         />
+
+
+        <BaseUnitSelector />
 
         <AnalysisNodeDefs />
       </div>

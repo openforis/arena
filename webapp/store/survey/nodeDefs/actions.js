@@ -56,6 +56,19 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
   return nodeDef
 }
 
+export const createNodeDefs =
+  ({ surveyId, surveyCycleKey, nodeDefs }) =>
+  async (dispatch, getState) => {
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDefs({ surveyId, surveyCycleKey, nodeDefs })
+
+    dispatch(
+      _onNodeDefsUpdate(
+        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
+        nodeDefsValidation
+      )
+    )
+  }
+
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
