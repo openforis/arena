@@ -160,11 +160,11 @@ export const init = (app) => {
         nodeDefUuids,
       })
 
+      // do not send updated node def back to client (node def already updated client side)
       nodeDefUuids.forEach((nodeDefUuid) => {
         delete nodeDefsUpdated[nodeDefUuid]
       })
-
-      // do not send updated node def back to client (node def already updated client side)
+      
       res.json({ nodeDefsUpdated, nodeDefsValidation })
     } catch (error) {
       next(error)

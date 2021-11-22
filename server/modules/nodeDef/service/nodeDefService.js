@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
@@ -155,7 +157,8 @@ export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids 
   let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
 
   await PromiseUtils.each(nodeDefUuids, async (nodeDefUuid) => {
-    response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
+    const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
+    response = R.mergeDeepLeft(response, _response)
   })
 
   return response
