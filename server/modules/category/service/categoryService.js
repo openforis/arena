@@ -58,27 +58,25 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   return job
 }
 
-const _getSamplingPointDataCategoryUuid = async ({ surveyId }) => {
+const _getSamplingPointDataCategory = async ({ surveyId }) => {
   const draft = true
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
-  const samplingPointDataCategory = categories.find(
-    (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
-  )
-  return Category.getUuid(samplingPointDataCategory)
+  return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
 }
 
 export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
-  const categoryUuid = await _getSamplingPointDataCategoryUuid({ surveyId })
+  const category = await _getSamplingPointDataCategory({ surveyId })
+  const categoryUuid = Category.getUuid(category)
   const count = await CategoryManager.countItemsByLevelIndex({ surveyId, categoryUuid, levelIndex })
   return count
 }
 
 export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
   const draft = true
-  const categoryUuid = await _getSamplingPointDataCategoryUuid({ surveyId })
+  const category = await _getSamplingPointDataCategory({ surveyId })
   const items = await CategoryManager.fetchItemsByLevelIndex({
     surveyId,
-    categoryUuid,
+    categoryUuid: Category.getUuid(category),
     levelIndex,
     limit,
     offset,
@@ -86,10 +84,11 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   })
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
+    const ancestorCodes = CategoryItem.getAncestorCodes(item)
     const point = Points.parse(location)
     // TODO convert it to lat long
-    const pointLatLong = [point.y, point.x]
-    return pointLatLong
+    const pointLatLong = point
+    return { codes: [...ancestorCodes, CategoryItem.getCode(item)], location: [pointLatLong.y, pointLatLong.x] }
   })
   return samplingPointData
 }

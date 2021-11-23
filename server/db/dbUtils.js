@@ -84,8 +84,8 @@ export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
 /**
  * Combines a draft and a published column prop, if needed
  */
-export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true) =>
-  `(${columnPrefix}props${draft ? ` || ${columnPrefix}props_draft` : ''})${asText ? '->>' : '->'}'${propName}'`
+export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) =>
+  `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${alias ? ` AS ${alias}` : ''}`
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.

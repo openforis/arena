@@ -276,32 +276,32 @@ export const fetchItemsByLevelIndex = async (
   client = db
 ) => {
   const schema = getSurveyDBSchema(surveyId)
+
+  // join category_item table to get ancestors codes
   const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
+  const ancestorCodesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
+    DbUtils.getPropColCombined(
+      CategoryItem.keysProps.code,
+      draft,
+      `i${ancstorLevelIdx}.`,
+      true,
+      `ancestor_${ancstorLevelIdx}_code`
+    )
+  )
+  const ancestorItemsJoins = ancestorLevelIndexes.reduce(
+    (joinConditionsAcc, ancstorLevelIdx) => [
+      ...joinConditionsAcc,
+      `JOIN ${schema}.category_item i${ancstorLevelIdx} 
+        ON i${ancstorLevelIdx}.uuid = i${ancstorLevelIdx + 1}.parent_uuid`,
+    ],
+    []
+  )
   return client.map(
-    `SELECT i${levelIndex}.* ${
-      ancestorLevelIndexes.length > 0
-        ? `, ${ancestorLevelIndexes
-            .map((ancstorLevelIdx) => `i${ancstorLevelIdx}.props AS ancestor_${ancstorLevelIdx}_props`)
-            .join(', ')}`
-        : ''
-    }
+    `SELECT i${levelIndex}.* ${ancestorCodesSelectFields.length > 0 ? `, ${ancestorCodesSelectFields.join(', ')}` : ''}
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid
-      ${
-        ancestorLevelIndexes.length > 0
-          ? ancestorLevelIndexes
-              .reduce(
-                (joinConditionsAcc, ancstorLevelIdx) => [
-                  ...joinConditionsAcc,
-                  `JOIN ${schema}.category_item i${ancstorLevelIdx} 
-                    ON i${ancstorLevelIdx}.uuid = i${ancstorLevelIdx + 1}.parent_uuid`,
-                ],
-                []
-              )
-              .join(' ')
-          : ''
-      }
+      ${ancestorItemsJoins.join(' ')}
      WHERE l.category_uuid = $/categoryUuid/
        AND l.index = $/levelIndex/
     ${limit ? `LIMIT $/limit/` : ''}
