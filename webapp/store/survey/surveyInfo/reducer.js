@@ -33,6 +33,7 @@ const actionHandlers = {
   // NodeDef
   [NodeDefsActions.nodeDefCreate]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefDelete]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefsDelete]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefSave]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefUpdate]: SurveyInfoState.markDraft,
 
