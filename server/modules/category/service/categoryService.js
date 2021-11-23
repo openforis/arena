@@ -58,19 +58,37 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   return job
 }
 
-export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
+const _getSamplingPointDataCategoryUuid = async ({ surveyId }) => {
   const draft = true
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
   const samplingPointDataCategory = categories.find(
     (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
   )
-  const categoryUuid = Category.getUuid(samplingPointDataCategory)
-  const items = await CategoryManager.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, limit, offset })
+  return Category.getUuid(samplingPointDataCategory)
+}
+
+export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
+  const categoryUuid = await _getSamplingPointDataCategoryUuid({ surveyId })
+  const count = await CategoryManager.countItemsByLevelIndex({ surveyId, categoryUuid, levelIndex })
+  return count
+}
+
+export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
+  const draft = true
+  const categoryUuid = await _getSamplingPointDataCategoryUuid({ surveyId })
+  const items = await CategoryManager.fetchItemsByLevelIndex({
+    surveyId,
+    categoryUuid,
+    levelIndex,
+    limit,
+    offset,
+    draft,
+  })
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
     const point = Points.parse(location)
     // TODO convert it to lat long
-    const pointLatLong = point
+    const pointLatLong = [point.y, point.x]
     return pointLatLong
   })
   return samplingPointData
@@ -92,6 +110,7 @@ export const {
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,
   fetchItemsByCategoryUuid,
+  countItemsByLevelIndex,
   fetchItemsByLevelIndex,
 
   updateCategoryProp,

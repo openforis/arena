@@ -31,7 +31,13 @@ export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, paren
     data: { draft, parentUuid },
   })
 
-export const fetchSamplingPointItems = ({ surveyId, levelIndex = 0, limit = 500, offset = 0 }) =>
+export const countSamplingPointData = ({ surveyId, levelIndex = 0 }) =>
+  cancelableGetRequest({
+    url: `/api/survey/${surveyId}/sampling-point-data/count`,
+    data: { levelIndex },
+  })
+
+export const fetchSamplingPointData = ({ surveyId, levelIndex = 0, limit = 500, offset = 0 }) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/sampling-point-data`,
     data: { levelIndex, limit, offset },

@@ -259,6 +259,18 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
+export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex, draft = false }, client = db) =>
+  client.one(
+    `SELECT COUNT(i.*) 
+     FROM ${getSurveyDBSchema(surveyId)}.category_item i
+       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+         ON l.uuid = i.level_uuid
+     WHERE l.category_uuid = $/categoryUuid/
+       AND l.index = $/levelIndex/`,
+    { categoryUuid, levelIndex },
+    (row) => Number(row.count)
+  )
+
 export const fetchItemsByLevelIndex = async (
   { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
   client = db

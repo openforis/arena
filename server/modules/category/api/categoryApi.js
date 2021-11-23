@@ -234,6 +234,21 @@ export const init = (app) => {
   )
 
   app.get(
+    '/survey/:surveyId/sampling-point-data/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0 } = Request.getParams(req)
+
+        const count = await CategoryService.countSamplingPointData({ surveyId, levelIndex })
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
     '/survey/:surveyId/sampling-point-data',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
