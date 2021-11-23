@@ -148,6 +148,29 @@ export const init = (app) => {
 
   // ==== DELETE
 
+  app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, surveyCycleKey: cycle, nodeDefUuids } = Request.getParams(req)
+
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefsDeleted({
+        user,
+        surveyId,
+        cycle,
+        nodeDefUuids,
+      })
+
+      // do not send updated node def back to client (node def already updated client side)
+      nodeDefUuids.forEach((nodeDefUuid) => {
+        delete nodeDefsUpdated[nodeDefUuid]
+      })
+      
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.delete(
     '/survey/:surveyId/nodeDef/:nodeDefUuid',
     AuthMiddleware.requireSurveyEditPermission,
