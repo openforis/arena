@@ -274,12 +274,34 @@ export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelInde
 export const fetchItemsByLevelIndex = async (
   { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
   client = db
-) =>
-  client.map(
-    `SELECT i.* 
-     FROM ${getSurveyDBSchema(surveyId)}.category_item i
-       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
-         ON l.uuid = i.level_uuid
+) => {
+  const schema = getSurveyDBSchema(surveyId)
+  const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
+  return client.map(
+    `SELECT i${levelIndex}.* ${
+      ancestorLevelIndexes.length > 0
+        ? `, ${ancestorLevelIndexes
+            .map((ancstorLevelIdx) => `i${ancstorLevelIdx}.props AS ancestor_${ancstorLevelIdx}_props`)
+            .join(', ')}`
+        : ''
+    }
+     FROM ${schema}.category_item i${levelIndex}
+       JOIN ${schema}.category_level l 
+         ON l.uuid = i${levelIndex}.level_uuid
+      ${
+        ancestorLevelIndexes.length > 0
+          ? ancestorLevelIndexes
+              .reduce(
+                (joinConditionsAcc, ancstorLevelIdx) => [
+                  ...joinConditionsAcc,
+                  `JOIN ${schema}.category_item i${ancstorLevelIdx} 
+                    ON i${ancstorLevelIdx}.uuid = i${ancstorLevelIdx + 1}.parent_uuid`,
+                ],
+                []
+              )
+              .join(' ')
+          : ''
+      }
      WHERE l.category_uuid = $/categoryUuid/
        AND l.index = $/levelIndex/
     ${limit ? `LIMIT $/limit/` : ''}
@@ -287,6 +309,7 @@ export const fetchItemsByLevelIndex = async (
     { categoryUuid, levelIndex, limit, offset },
     (item) => dbTransformCallback(item, draft, true)
   )
+}
 
 export const fetchIndex = async (surveyId, draft = false, client = db) =>
   client.map(
