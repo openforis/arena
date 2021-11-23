@@ -31,7 +31,7 @@ const AnalysisNodeDefsHeader = ({toggleShowBaseUnit, showBaseUnit}) => {
       <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">
       <div>
         <button className="btn btn-s" onClick={toggleShowBaseUnit} type="button">
-        {showBaseUnit ? i18n.t('common.hide') : i18n.t('common.see')} {i18n.t('chainView.baseUnitNodeDefs')} 
+        {showBaseUnit ? i18n.t('common.hide') : i18n.t('common.show')} {i18n.t('chainView.baseUnitNodeDefs')} 
         </button>
         </div>
       </div>
