@@ -17,6 +17,7 @@ import * as SurveyState from '../state'
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
+export const nodeDefsDelete = 'survey/nodeDefs/delete'
 export const nodeDefSave = 'survey/nodeDef/save'
 export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
@@ -242,4 +243,18 @@ export const removeNodeDef =
         })
       )
     }
+  }
+
+export const resetBaseUnitNodeDefs =
+  ({ surveyId, surveyCycleKey, chain }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const nodeDefs = Survey.getAnalysisNodeDefs({ chain })(survey).filter(NodeDef.isBaseUnit)
+
+    const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
+
+    await API.deleteNodeDefs({ surveyId, nodeDefUuids, surveyCycleKey })
+
+    dispatch({ type: nodeDefsDelete, nodeDefs, nodeDefUuids })
   }

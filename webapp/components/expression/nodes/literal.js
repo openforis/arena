@@ -24,7 +24,14 @@ import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
-  nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false
+  nodeDef
+    ? !(
+        NodeDef.isBoolean(nodeDef) ||
+        NodeDef.isInteger(nodeDef) ||
+        NodeDef.isDecimal(nodeDef) ||
+        StringUtils.isBlank(value)
+      )
+    : false
 
 const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? A.parse(value) : value)
 
