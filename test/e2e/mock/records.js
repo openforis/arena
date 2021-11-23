@@ -53,8 +53,8 @@ export const createRecord = (idx) => {
     [cluster_time.name]: clusterTime,
     [cluster_boolean.name]: Boolean(Number(getRandomInRange(0, 1))),
     [cluster_coordinate.name]: {
-      x: getRandomInRange(-90, 90, 4),
-      y: getRandomInRange(-90, 90, 4),
+      x: Number(getRandomInRange(-90, 90, 4)),
+      y: Number(getRandomInRange(-90, 90, 4)),
       srs: '4326',
       srsLabel: 'GCS WGS 1984 (EPSG:4326)',
     },
