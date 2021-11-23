@@ -200,14 +200,13 @@ export const isValueBlank = (node) => {
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
 // Coordinate
-export const getCoordinateX = (node) => {
-  const x = _getValuePropRaw(valuePropsCoordinate.x)(node)
-  return R.isNil(x) ? null : Number(x)
+const _getValuePropNumber = ({ node, prop }) => {
+  const value = _getValuePropRaw(prop)(node)
+  return R.isNil(value) || R.isEmpty(value) ? null : Number(value)
 }
-export const getCoordinateY = (node) => {
-  const y = _getValuePropRaw(valuePropsCoordinate.y)(node)
-  return R.isNil(y) || R.isEmpty(y) ? null : Number(y)
-}
+export const getCoordinateX = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.x })
+export const getCoordinateY = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.y })
+
 export const getCoordinateSrs = (node, defaultValue = null) =>
   _getValuePropRaw(valuePropsCoordinate.srs, defaultValue)(node)
 
