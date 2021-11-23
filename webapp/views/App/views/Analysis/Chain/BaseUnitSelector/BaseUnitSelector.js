@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 
 import { useChain } from '@webapp/store/ui/chain'
+
 import {
   useSurvey,
   useSurveyCycleKeys,
@@ -20,7 +21,8 @@ import {
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
 
-import { ButtonSave } from '@webapp/components'
+import { ButtonSave, ButtonDelete } from '@webapp/components'
+
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 /*
@@ -54,13 +56,25 @@ const BaseUnitSelector = () => {
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-  const handleSaveNodeDefs = useCallback(async () => {
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  const handleSaveBaseUnitNodeDefs = useCallback(() => {
+    
     dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: baseUnitNodeDefsToCreate }))
+    
+    setBaseUnitNodeDef(baseUnitNodeDefsToCreate[0])
+    setHadBaseUnitNodeDef(true)
     setBaseUnitNodeDefsToCreate([])
+
   }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, baseUnitNodeDefsToCreate, setBaseUnitNodeDefsToCreate])
 
+  const handleDeleteBaseUnit = useCallback(() => {
+    dispatch(NodeDefsActions.resetBaseUnitNodeDefs({ surveyId, surveyCycleKey, chain }))
+    setBaseUnitNodeDefsToCreate([])
+    setHadBaseUnitNodeDef(false)
+    setBaseUnitNodeDef(null)
+  }, [surveyId, surveyCycleKey, chain] )
+  
   const handleUpdateBaseUnit = useCallback(
     (entityReferenceUuid) => {
       // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
@@ -109,12 +123,6 @@ const BaseUnitSelector = () => {
       setBaseUnitNodeDefsToCreate(_baseUnitNodeDefsToCreate)
       setBaseUnitNodeDef(_baseUnitNodeDefsToCreate[0])
 
-      //
-      /*
-      [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
-      [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
-      */
-      // the selector should be available only if the current initial value is null?
     },
     [setBaseUnitNodeDef, baseUnitNodeDef, survey]
   )
@@ -162,13 +170,18 @@ const BaseUnitSelector = () => {
           useNameAsLabel={true}
           allowEmptySelection={true}
         />
-        {baseUnitNodeDefsToCreate.length > 0 ? (
+        {baseUnitNodeDefsToCreate.length > 0 && (
           <div>
-            <ButtonSave onClick={handleSaveNodeDefs} />
+            <ButtonSave onClick={handleSaveBaseUnitNodeDefs} />
           </div>
-        ) : (
-          <></>
         )}
+
+        {hadBaseUnitNodeDef && (
+          <div>
+            <ButtonDelete onClick={handleDeleteBaseUnit} />
+          </div>
+        )}
+
       </div>
     </FormItem>
   )
