@@ -70,6 +70,7 @@ export const {
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,
   fetchItemsByCategoryUuid,
+  fetchItemsByLevelIndex,
 
   updateCategoryProp,
   cleanupCategory,

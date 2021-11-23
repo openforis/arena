@@ -219,12 +219,8 @@ export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTa
 
 // ====== Survey Reference data index
 // Category index
-export const {
-  getCategoryItemUuidAndCodeHierarchy,
-  getCategoryItemByUuid,
-  getCategoryItemByHierarchicalCodes,
-  getCategoryItemsInLevel,
-} = SurveyRefDataIndex
+export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
+  SurveyRefDataIndex
 // Taxon index
 export const {
   getTaxonByCode,

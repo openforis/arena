@@ -3,6 +3,7 @@ import axios from 'axios'
 import * as Category from '@core/survey/category'
 import { cancelableGetRequest } from '../cancelableRequest'
 
+// READ
 export const fetchCategories = async ({ surveyId, draft = true, validate = false, search = '' }) => {
   const {
     data: { list: categories },
@@ -28,6 +29,12 @@ export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, paren
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
     data: { draft, parentUuid },
+  })
+
+export const fetchSamplingPointItems = ({ surveyId, levelIndex = 0, limit = 500, offset = 0 }) =>
+  cancelableGetRequest({
+    url: `/api/survey/${surveyId}/sampling-point-data`,
+    data: { levelIndex, limit, offset },
   })
 
 export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) => {

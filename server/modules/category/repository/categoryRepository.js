@@ -259,15 +259,20 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
-export const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
+export const fetchItemsByLevelIndex = async (
+  { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
+  client = db
+) =>
   client.map(
     `SELECT i.* 
      FROM ${getSurveyDBSchema(surveyId)}.category_item i
        JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
          ON l.uuid = i.level_uuid
-     WHERE l.category_uuid = $1
-       AND l.index = $2`,
-    [categoryUuid, levelIndex],
+     WHERE l.category_uuid = $/categoryUuid/
+       AND l.index = $/levelIndex/
+    ${limit ? `LIMIT $/limit/` : ''}
+    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
+    { categoryUuid, levelIndex, limit, offset },
     (item) => dbTransformCallback(item, draft, true)
   )
 

@@ -61,13 +61,6 @@ const categoryItemNullParentUuid = 'null'
 export const getCategoryItemByUuid = (categoryItemUuid) =>
   R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
 
-const getCategoryItemChildren =
-  ({ categoryUuid, parentItemUuid }) =>
-  (survey) => {
-    const itemUuidByCode = R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid])(survey)
-    return Object.values(itemUuidByCode).map((uuid) => getCategoryItemByUuid(uuid)(survey))
-  }
-
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
   R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
 
@@ -90,23 +83,6 @@ export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode,
     hierarchyCode,
   }
 }
-
-export const getCategoryItemsInLevel =
-  ({ categoryUuid, levelIndex }) =>
-  (survey) => {
-    if (levelIndex === 0) {
-      return getCategoryItemChildren({ categoryUuid, parentItemUuid: categoryItemNullParentUuid })(survey)
-    } else {
-      const itemsPreviousLevel = getCategoryItemsInLevel({ categoryUuid, levelIndex: levelIndex - 1 })(survey)
-      return itemsPreviousLevel.reduce(
-        (itemsAcc, itemPreviousLevel) => [
-          ...itemsAcc,
-          ...getCategoryItemChildren({ categoryUuid, parentItemUuid: CategoryItem.getUuid(itemPreviousLevel) })(survey),
-        ],
-        []
-      )
-    }
-  }
 
 export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codePaths }) =>
