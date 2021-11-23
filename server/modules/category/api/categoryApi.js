@@ -240,10 +240,7 @@ export const init = (app) => {
       try {
         const { surveyId, levelIndex = 0, limit = null, offset = null } = Request.getParams(req)
 
-        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-        const samplingPointDataCategory = Survey.getCategoryByName(Survey.samplingPointDataCategoryName)(survey)
-        const categoryUuid = Category.getUuid(samplingPointDataCategory)
-        const items = await CategoryService.fetchItemsByLevelIndex({surveyId, categoryUuid, levelIndex, limit, offset})
+        const items = await CategoryService.fetchSamplingPointData({ surveyId, levelIndex, limit, offset })
         res.json({ items })
       } catch (error) {
         next(error)

@@ -1,8 +1,12 @@
-import * as JobManager from '@server/job/jobManager'
+import { Point, Points, SRSs } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 
+import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
+
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
@@ -52,6 +56,24 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   JobManager.executeJobThread(job)
 
   return job
+}
+
+export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
+  const draft = true
+  const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
+  const samplingPointDataCategory = categories.find(
+    (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
+  )
+  const categoryUuid = Category.getUuid(samplingPointDataCategory)
+  const items = await CategoryManager.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, limit, offset })
+  const samplingPointData = items.map((item) => {
+    const location = CategoryItem.getExtraProp('location')(item)
+    const point = Points.parse(location)
+    // TODO convert it to lat long
+    const pointLatLong = point
+    return pointLatLong
+  })
+  return samplingPointData
 }
 
 export const {
