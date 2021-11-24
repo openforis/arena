@@ -72,7 +72,7 @@ export const SamplingPointDataLayer = (props) => {
     <LayersControl.Overlay checked name="Sampling point data">
       <LayerGroup>
         {items.map((item) => (
-          <Circle center={item.location} pathOptions={{ fillColor: 'blue' }} radius={200} />
+          <Circle key={item.uuid} center={item.location} pathOptions={{ fillColor: 'blue' }} radius={200} />
         ))}
       </LayerGroup>
     </LayersControl.Overlay>

@@ -1,4 +1,4 @@
-import { Point, Points, SRSs } from '@openforis/arena-core'
+import { Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -87,7 +87,11 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     const ancestorCodes = CategoryItem.getAncestorCodes(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point)
-    return { codes: [...ancestorCodes, CategoryItem.getCode(item)], location: [pointLatLong.y, pointLatLong.x] }
+    return {
+      uuid: CategoryItem.getUuid(item),
+      codes: [...ancestorCodes, CategoryItem.getCode(item)],
+      location: [pointLatLong.y, pointLatLong.x],
+    }
   })
   return samplingPointData
 }

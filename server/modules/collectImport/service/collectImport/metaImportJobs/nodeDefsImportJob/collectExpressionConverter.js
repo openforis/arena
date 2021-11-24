@@ -1,7 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 
 /**
  * Converts a Collect XPath expression into a valid JS expression.
