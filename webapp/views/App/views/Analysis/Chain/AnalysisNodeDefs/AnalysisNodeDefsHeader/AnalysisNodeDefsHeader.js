@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-const AnalysisNodeDefsHeader = () => {
+const AnalysisNodeDefsHeader = ({toggleShowBaseUnit, showBaseUnit}) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const i18n = useI18n()
@@ -27,6 +27,14 @@ const AnalysisNodeDefsHeader = () => {
     <div className="analysis-node-defs-header">
       <div className="analysis-node-defs__header-label">{nodeDefLabel}</div>
 
+<div className="analysis-node-defs-header__buttons_container">
+      <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">
+      <div>
+        <button className="btn btn-s" onClick={toggleShowBaseUnit} type="button">
+        {showBaseUnit ? i18n.t('common.hide') : i18n.t('common.show')} {i18n.t('chainView.baseUnitNodeDefs')} 
+        </button>
+        </div>
+      </div>
       <div className="analysis-node-defs-header__buttons">
         <div>
           {i18n.t('common.add')} <span className="icon icon-plus icon-12px" />
@@ -37,6 +45,7 @@ const AnalysisNodeDefsHeader = () => {
         <button className="btn btn-s" onClick={() => createNodeDef(NodeDef.nodeDefType.code)} type="button">
           {i18n.t('chain.categorical')} {NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
         </button>
+      </div>
       </div>
     </div>
   )
