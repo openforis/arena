@@ -845,6 +845,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
+      showOnMap: 'Show on map',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
