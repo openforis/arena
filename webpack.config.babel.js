@@ -165,6 +165,10 @@ const webPackConfig = {
           'sass-loader',
         ],
       },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: 'file-loader',
+      },
     ],
   },
   plugins,

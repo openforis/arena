@@ -26,8 +26,8 @@ const verifyCode = async (nodeExport, _value) => {
 }
 const verifyCoordinate = async (nodeExport, value) => {
   const { x, y, srs } = nodeExport.value
-  await expect(x).toBe(value.x)
-  await expect(y).toBe(value.y)
+  await expect(Number(x)).toBe(Number(value.x))
+  await expect(Number(y)).toBe(Number(value.y))
   await expect(srs).toBe(value.srs)
 }
 const verifyTaxon = async (nodeExport, _value) => {
