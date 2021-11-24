@@ -59,13 +59,11 @@ const BaseUnitSelector = () => {
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
   const handleSaveBaseUnitNodeDefs = useCallback(() => {
-    
     dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: baseUnitNodeDefsToCreate }))
-    
+
     setBaseUnitNodeDef(baseUnitNodeDefsToCreate[0])
     setHadBaseUnitNodeDef(true)
     setBaseUnitNodeDefsToCreate([])
-
   }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, baseUnitNodeDefsToCreate, setBaseUnitNodeDefsToCreate])
 
   const handleDeleteBaseUnit = useCallback(() => {
@@ -73,8 +71,8 @@ const BaseUnitSelector = () => {
     setBaseUnitNodeDefsToCreate([])
     setHadBaseUnitNodeDef(false)
     setBaseUnitNodeDef(null)
-  }, [surveyId, surveyCycleKey, chain] )
-  
+  }, [surveyId, surveyCycleKey, chain])
+
   const handleUpdateBaseUnit = useCallback(
     (entityReferenceUuid) => {
       // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
@@ -84,7 +82,9 @@ const BaseUnitSelector = () => {
       const referenceNodeDef = Survey.getNodeDefByUuid(entityReferenceUuid)(survey)
       if (A.isEmpty(referenceNodeDef)) return
       const descentants = Survey.getDescendants({ nodeDef: referenceNodeDef })(survey)
-      const descendantEntities = descentants.filter(NodeDef.isEntity)
+      const descendantEntities = descentants
+        .filter(NodeDef.isEntity)
+        .filter((_nodeDef) => NodeDef.isMultiple(_nodeDef) || NodeDef.isRoot(_nodeDef))
 
       let _baseUnitNodeDefsToCreate = [] // store nodeDefs to trigger to the backend
       const chainUuid = Chain.getUuid(chain)
@@ -92,7 +92,7 @@ const BaseUnitSelector = () => {
       descendantEntities.forEach((nodeDef) => {
         const name = NodeDef.isEqual(nodeDef)(referenceNodeDef)
           ? `weight`
-          : `${NodeDef.getName(nodeDef)}-${NodeDef.getName(referenceNodeDef)}_area`
+          : `${NodeDef.getName(nodeDef)}__${NodeDef.getName(referenceNodeDef)}_area`
         const props = {
           [NodeDef.propKeys.name]: name,
         }
@@ -122,7 +122,6 @@ const BaseUnitSelector = () => {
 
       setBaseUnitNodeDefsToCreate(_baseUnitNodeDefsToCreate)
       setBaseUnitNodeDef(_baseUnitNodeDefsToCreate[0])
-
     },
     [setBaseUnitNodeDef, baseUnitNodeDef, survey]
   )
@@ -181,7 +180,6 @@ const BaseUnitSelector = () => {
             <ButtonDelete onClick={handleDeleteBaseUnit} />
           </div>
         )}
-
       </div>
     </FormItem>
   )
