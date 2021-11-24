@@ -1841,10 +1841,10 @@
     proj4 "^2.7.2"
     uuid "^8.3.2"
 
-"@openforis/arena-core@^0.0.72":
-  version "0.0.72"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.72/9a10b3e6727d5eeadad11da28f2a3de67ada8cfe97f1c90601b5cdb1b78f0f92#263725d9eb233f42ca8fbcd7c3d918c9d5b711f2"
-  integrity sha512-p3zsfW4Kr6D1PPGuBx8a7gtTio9RVIYiBQ7m+i5HUdFLTbDZm/OlgvQMTD6fDdJ9h2RrpWW0m90QXzpjoxgLjg==
+"@openforis/arena-core@^0.0.74":
+  version "0.0.74"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.74/016fcce837ab3576391f58359412ee848d55cfc78a090c2efd747547999ccf29#66c29f34ba8e5f9d343725dfbc30fb7e16e0f5cd"
+  integrity sha512-ffOmiip3GY+zlZinOGd4kfHmiUyy38U0UIsGs/BQlPMzn7cVah7tyOHEl5Zo0ZtvQzGRBQ3O1gMswlZSEvcV5w==
   dependencies:
     "@esri/proj-codes" "^2.7.0"
     lodash.differencewith "^4.5.0"
@@ -1897,6 +1897,11 @@
   version "1.0.0-next.15"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.15.tgz#6a9d143f7f4f49db2d782f9e1c8839a29b43ae23"
   integrity sha512-15spi3V28QdevleWBNXE4pIls3nFZmBbUGrW9IVPwiQczuSb9n76TCB4bsk8TSel+I1OkHEdPhu5QKMfY6rQHA==
+
+"@react-leaflet/core@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-1.1.1.tgz#827fd05bb542cf874116176d8ef48d5b12163f81"
+  integrity sha512-7PGLWa9MZ5x/cWy8EH2VzI4T8q5WpuHbixzCDXqixP/WyqwIrg5NDUPgYuFnB4IEIZF+6nA265mYzswFo/h1Pw==
 
 "@sendgrid/client@^7.4.7":
   version "7.4.7"
@@ -7804,6 +7809,11 @@ lazystream@^1.0.0:
   dependencies:
     readable-stream "^2.0.5"
 
+leaflet@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.7.1.tgz#10d684916edfe1bf41d688a3b97127c0322a2a19"
+  integrity sha512-/xwPEBidtg69Q3HlqPdU3DnrXQOvQU/CCHA1tcDQVzOwm91YMYaILjNp7L4Eaw5Z4sOYdbBz6koWyibppd8Zqw==
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/leven/-/leven-3.1.0.tgz#77891de834064cccba82ae7842bb6b14a13ed7f2"
@@ -10124,6 +10134,13 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
+
+react-leaflet@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-3.2.2.tgz#3d779662c32a1d8729e73d24e8ad96ee5b38beef"
+  integrity sha512-5W7iWjI9+CdTGVAICe8RUyK0n+uLshr+eLQa8eBCbmstPNpCHZJTUSbju4Ws5dkS/PUCr9t5VmoIE9CXuSBEhw==
+  dependencies:
+    "@react-leaflet/core" "^1.1.1"
 
 react-number-format@^4.7.3:
   version "4.7.3"

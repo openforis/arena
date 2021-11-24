@@ -11,6 +11,8 @@
   font-weight: 600;
 }
 
+
+
 .analysis-node-defs-header__buttons {
   background-color: rgba($greyBorder, 0.6);
   display: flex;
@@ -36,4 +38,12 @@
       margin-right: unset;
     }
   }
+}
+
+.analysis-node-defs-header__buttons_container{
+  display: flex;
+}
+
+.analysis-node-defs-header__filter{
+  margin-right: 8px;
 }

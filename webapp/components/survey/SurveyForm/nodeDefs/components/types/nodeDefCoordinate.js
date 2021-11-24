@@ -1,8 +1,7 @@
 import './nodeDefCoordinate.scss'
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 
-import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -13,6 +12,7 @@ import * as Srs from '@core/geo/srs'
 
 import { useI18n } from '@webapp/store/system'
 
+import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import { TestId } from '@webapp/utils/testId'
@@ -21,12 +21,15 @@ import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
+const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
+
 const NodeDefCoordinate = (props) => {
+  const { insideTable, surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } =
+    props
+
   const i18n = useI18n()
 
-  const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
-
-  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } = props
+  const [showMap, setShowMap] = useState(false)
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -41,7 +44,16 @@ const NodeDefCoordinate = (props) => {
     if (entryDisabled) {
       return // input change could be triggered by numeric input field formatting
     }
-    let newValue = A.assoc(field, value)(node.value)
+    let fieldValue
+    if (StringUtils.isBlank(value)) {
+      fieldValue = null
+    } else if ([Node.valuePropsCoordinate.x, Node.valuePropsCoordinate.y].includes(field)) {
+      fieldValue = Number(value)
+    } else {
+      fieldValue = value
+    }
+
+    let newValue = { ...Node.getValue(node), [field]: fieldValue }
 
     if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
       newValue = null
@@ -51,12 +63,15 @@ const NodeDefCoordinate = (props) => {
 
     updateNode(nodeDef, node, newValue)
   }
+
+  const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
+
   const xInput = (
     <Input
       id={TestId.surveyForm.coordinateX(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
-      value={value.x}
+      value={StringUtils.nullToEmpty(value.x)}
       onChange={(value) => handleInputChange(Node.valuePropsCoordinate.x, value)}
     />
   )
@@ -66,7 +81,7 @@ const NodeDefCoordinate = (props) => {
       id={TestId.surveyForm.coordinateY(NodeDef.getName(nodeDef))}
       numberFormat={numberFormat}
       readOnly={entryDisabled}
-      value={value.y}
+      value={StringUtils.nullToEmpty(value.y)}
       onChange={(value) => handleInputChange(Node.valuePropsCoordinate.y, value)}
     />
   )
@@ -84,12 +99,30 @@ const NodeDefCoordinate = (props) => {
     />
   )
 
+  const mapPanelRight = showMap ? (
+    <PanelRight width="40vw" onClose={toggleShowMap} header={NodeDef.getLabel(nodeDef)}>
+      <Map markerPoint={value} markerTitle={NodeDef.getLabel(nodeDef)} />
+    </PanelRight>
+  ) : null
+
+  const mapTriggerButton = (
+    <Button
+      className="map-trigger-btn btn-transparent"
+      title="surveyForm.nodeDefCoordinate.showOnMap"
+      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
+      onClick={toggleShowMap}
+      disabled={edit || Node.isValueBlank(node) || !Node.isValid(node)}
+    />
+  )
+
   if (renderType === NodeDefLayout.renderType.tableBody) {
     return (
       <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
         {xInput}
         {yInput}
         {srsDropdown}
+        {mapTriggerButton}
+        {mapPanelRight}
       </div>
     )
   }
@@ -99,6 +132,8 @@ const NodeDefCoordinate = (props) => {
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
       <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+      {mapTriggerButton}
+      {mapPanelRight}
     </div>
   )
 }
