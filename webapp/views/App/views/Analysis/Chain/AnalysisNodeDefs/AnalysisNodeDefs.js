@@ -1,5 +1,5 @@
 import './AnalysisNodeDefs.scss'
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -14,6 +14,7 @@ import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
 
 const AnalysisNodeDefs = () => {
+  const [showBaseUnit, setShowBaseUnit ] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -24,8 +25,8 @@ const AnalysisNodeDefs = () => {
   const analysisNodeDefsRef = useRef(null) 
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain })(survey),
-    [chain, survey, entityDefUuid]
+    () => Survey.getAnalysisNodeDefs({ chain })(survey).filter(_nodeDef => showBaseUnit || !NodeDef.isBaseUnit(_nodeDef)),
+    [chain, survey, entityDefUuid, showBaseUnit]
   )
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
@@ -41,7 +42,7 @@ const AnalysisNodeDefs = () => {
         )}
 
         <>
-          <AnalysisNodeDefsHeader />
+          <AnalysisNodeDefsHeader toggleShowBaseUnit={() => setShowBaseUnit(!showBaseUnit)} showBaseUnit={showBaseUnit}/>
 
           {_analysisNodeDefsToShow.length > 0 && (
             <div className="analysis-node-def__list-header">
