@@ -5,6 +5,11 @@
   height: 100%;
 }
 
+.leaflet-top.leaflet-right,
+.leaflet-control-layers.leaflet-control {
+  z-index: 450;
+}
+
 .leaflet-control-layers-toggle {
   background-image: url('/img/map-layers-toggle.png');
 }

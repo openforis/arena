@@ -279,13 +279,13 @@ export const fetchItemsByLevelIndex = async (
 
   // join category_item table to get ancestors codes
   const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
-  const ancestorCodesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
+  const codesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
     DbUtils.getPropColCombined(
       CategoryItem.keysProps.code,
       draft,
       `i${ancstorLevelIdx}.`,
       true,
-      `ancestor_${ancstorLevelIdx}_code`
+      `level_${ancstorLevelIdx}_code`
     )
   )
   const ancestorItemsJoins = ancestorLevelIndexes.reduce(
@@ -297,7 +297,7 @@ export const fetchItemsByLevelIndex = async (
     []
   )
   return client.map(
-    `SELECT i${levelIndex}.* ${ancestorCodesSelectFields.length > 0 ? `, ${ancestorCodesSelectFields.join(', ')}` : ''}
+    `SELECT i${levelIndex}.* ${codesSelectFields.length > 0 ? `, ${codesSelectFields.join(', ')}` : ''}
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid

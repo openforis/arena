@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Circle, LayerGroup, LayersControl } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import { useIsMounted } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
@@ -14,47 +16,47 @@ export const SamplingPointDataLayer = (props) => {
 
   const isMountedRef = useIsMounted()
   const fetchCancel = useRef(null)
+  const [items, setItems] = useState([])
   const survey = useSurvey()
 
   const surveyId = Survey.getId(survey)
 
   useEffect(() => {
     ;(async () => {
-      const samplingPointCategory = Survey.getCategoryByName(Survey.samplingPointDataCategoryName)(survey)
-      if (samplingPointCategory) {
-        const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })
+      const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })
 
-        fetchCancel.current = countCancel
+      fetchCancel.current = countCancel
 
-        const {
-          data: { count },
-        } = await countRequest
+      const {
+        data: { count },
+      } = await countRequest
 
-        fetchCancel.current = null
+      fetchCancel.current = null
 
-        // load items in pages
-        const pagesCount = Math.ceil(count / itemsPageSize)
-        await PromiseUtils.each([...Array(pagesCount).keys()], async (currentPage) => {
-          if (isMountedRef.current) {
-            const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
-              surveyId,
-              levelIndex,
-              limit: itemsPageSize,
-              offset: currentPage * itemsPageSize,
-            })
+      // load items in pages
+      const itemsFetched = []
+      const pagesCount = Math.ceil(count / itemsPageSize)
+      await PromiseUtils.each([...Array(pagesCount).keys()], async (currentPage) => {
+        if (isMountedRef.current) {
+          const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
+            surveyId,
+            levelIndex,
+            limit: itemsPageSize,
+            offset: currentPage * itemsPageSize,
+          })
 
-            fetchCancel.current = itemsFetchCancel
+          fetchCancel.current = itemsFetchCancel
 
-            const {
-              data: { items },
-            } = await itemsRequest
+          const {
+            data: { items: itemsFetchedCurrent },
+          } = await itemsRequest
 
-            fetchCancel.current = null
+          itemsFetched.push(...itemsFetchedCurrent)
 
-            // TODO do something with items
-          }
-        })
-      }
+          fetchCancel.current = null
+        }
+      })
+      setItems(itemsFetched)
     })()
 
     return () => {
@@ -64,5 +66,15 @@ export const SamplingPointDataLayer = (props) => {
     }
   }, [])
 
-  return null
+  if (items.length === 0) return null
+
+  return (
+    <LayersControl.Overlay checked name="Sampling point data">
+      <LayerGroup>
+        {items.map((item) => (
+          <Circle center={item.location} pathOptions={{ fillColor: 'blue' }} radius={200} />
+        ))}
+      </LayerGroup>
+    </LayersControl.Overlay>
+  )
 }

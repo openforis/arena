@@ -86,8 +86,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     const location = CategoryItem.getExtraProp('location')(item)
     const ancestorCodes = CategoryItem.getAncestorCodes(item)
     const point = Points.parse(location)
-    // TODO convert it to lat long
-    const pointLatLong = point
+    const pointLatLong = Points.toLatLong(point)
     return { codes: [...ancestorCodes, CategoryItem.getCode(item)], location: [pointLatLong.y, pointLatLong.x] }
   })
   return samplingPointData

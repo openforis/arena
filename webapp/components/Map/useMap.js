@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 
-import { Points, SRSs } from '@openforis/arena-core'
+import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
 export const useMap = (props) => {
-  const { markerPoint, markerTitle } = props
+  const { centerPoint, markerPoint, markerTitle } = props
 
   const [srsInitialized, setSrsInitialized] = useState(false)
+  const [centerPositionLatLon, setCenterPositionLatLon] = useState(null)
   const [markerPositionLatLon, setMarkerPositionLatLon] = useState(null)
 
   const fromPointToLatLon = (point) => {
@@ -28,9 +29,11 @@ export const useMap = (props) => {
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
     if (srsInitialized) {
+      const actualCenterPoint = markerPoint || centerPoint || PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
+      setCenterPositionLatLon(actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null)
       setMarkerPositionLatLon(markerPoint ? fromPointToLatLon(markerPoint) : null)
     }
-  }, [srsInitialized, markerPoint])
+  }, [srsInitialized, centerPoint, markerPoint])
 
   const markerDescription = markerPoint
     ? `**${markerTitle}**
@@ -40,6 +43,7 @@ export const useMap = (props) => {
     : null
 
   return {
+    centerPositionLatLon,
     markerPositionLatLon,
     markerDescription,
   }

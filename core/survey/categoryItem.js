@@ -52,7 +52,7 @@ export const getAncestorCodes = (item) => {
   const codes = []
   let levelIndex = 0
   while (true) {
-    const levelCode = R.propOr(null, `ancestor${levelIndex}Code`)(item)
+    const levelCode = R.propOr(null, `level${levelIndex}Code`)(item)
     if (levelCode === null) {
       break
     }
