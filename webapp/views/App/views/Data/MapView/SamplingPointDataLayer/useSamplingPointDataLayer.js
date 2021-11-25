@@ -65,7 +65,7 @@ export const useSamplingPointDataLayer = (props) => {
     setState((statePrev) => ({ ...statePrev, loading: false, items: itemsFetched }))
   }
 
-  const map = useMapEvents({
+  useMapEvents({
     overlayadd(event) {
       const { name } = event
       if (name === overlayName) {

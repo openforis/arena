@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircleMarker, LayersControl, Popup, useMapEvents } from 'react-leaflet'
+import { CircleMarker, LayersControl, Popup } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 import PropTypes from 'prop-types'
 
