@@ -1,20 +1,23 @@
 import * as R from 'ramda'
 
+import * as ActivityLog from '@common/activityLog/activityLog'
+
 import Queue from '@core/queue'
 
-import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import * as ActivityLog from '@common/activityLog/activityLog'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
-import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
+
+const logger = Log.getLogger('NodeUpdateManager')
 
 const _getNodesToInsert = (nodeDef) => {
   if (NodeDef.isSingle(nodeDef)) return 1
@@ -254,14 +257,14 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
         nodesUpdatedToPersist: nodesToPersistApplicability,
         nodesWithApplicabilityUpdated,
         record: recordUpdatedAvailability,
-      } = NodeUpdateDependentManager.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node })
+      } = Record.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node, logger })
 
       recordUpdated = recordUpdatedAvailability
       Object.assign(nodesUpdatedToPersist, nodesToPersistApplicability)
 
       // Update node dependents (default values)
       const { nodesUpdated: nodesWithDefaultValueUpdated, record: recordUpdatedDefaultValues } =
-        NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node })
+        Record.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node, logger })
 
       recordUpdated = recordUpdatedDefaultValues
       Object.assign(nodesUpdatedToPersist, nodesWithDefaultValueUpdated)

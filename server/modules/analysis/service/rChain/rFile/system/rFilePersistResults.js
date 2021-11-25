@@ -20,7 +20,12 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
   const fileZip = `${dirResults}/${dfSourceName}.zip`
   scripts.push(zipr(fileZip, fileResults))
   // put request
-  scripts.push(arenaPutFile(ApiRoutes.rChain.entityData({surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }), fileZip))
+  scripts.push(
+    arenaPutFile(
+      ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
+      fileZip
+    )
+  )
 
   return scripts
 }
@@ -44,16 +49,26 @@ export default class RFilePersistResults extends RFileSystem {
     super(rChain, 'persist-results')
   }
 
-  async initPersistUserScripts() {
-    const { surveyId, chainUuid, dirResults, dirNames } = this.rChain
-    const zipFile = FileUtils.join(dirResults, 'userScripts.zip')
+  async initPersistScripts({ dirName, zipName }) {
+    const { surveyId, chainUuid, dirResults } = this.rChain
+    const zipFile = FileUtils.join(dirResults, zipName)
 
-    await this.logInfo(`'Persisting user scripts started'`)
+    await this.logInfo(`'Persisting ${zipName} started'`)
     await this.appendContent(
-      zipr(zipFile, dirNames.user),
+      zipr(zipFile, dirName),
       arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
     )
-    await this.logInfo(`'Persisting user scripts completed'`)
+    await this.logInfo(`'Persisting ${zipName} completed'`)
+  }
+
+  async initPersistUserScripts() {
+    const { dirNames } = this.rChain
+    await this.initPersistScripts({ dirName: dirNames.user, zipName: 'userScripts.zip' })
+  }
+
+  async initPersistBaseUnitScripts() {
+    const { dirNames } = this.rChain
+    await this.initPersistScripts({ dirName: dirNames.baseUnit, zipName: 'baseUnitScripts.zip' })
   }
 
   async init() {
@@ -65,6 +80,8 @@ export default class RFilePersistResults extends RFileSystem {
     await this.appendContent(dirCreate(dirResults))
     // persist chainEntitiesResults
     await PromiseUtils.resolveGenerator(this.initPersistChainEntitiesResults())
+    // persist base unit scripts
+    await this.initPersistBaseUnitScripts()
     // persist user scripts
     await this.initPersistUserScripts()
     // remove results dir

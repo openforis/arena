@@ -62,8 +62,8 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     )
 
     await CSVReader.createReaderFromStream(stream, null, (row) => {
-        massiveUpdateData.push.bind(massiveUpdateData)(row)
-        massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+      massiveUpdateData.push.bind(massiveUpdateData)(row)
+      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
     }).start()
     await massiveUpdateData.flush()
     await massiveUpdateNodes.flush()
@@ -78,16 +78,21 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
   const entryNames = fileZip.getEntryNames()
 
-  const findEntry = (folder, name) =>
-    entryNames.find((entryName) => new RegExp(`^${folder}\\/\\d{3}-${name}\\.R$`).test(entryName))
+  const findEntry = ({ folderNames = [RChain.dirNames.user, RChain.dirNames.baseUnit], name }) =>
+    entryNames.find((entryName) =>
+      folderNames.some((folder) => new RegExp(`^${folder}\\/\\d{3}-${name}\\.R$`).test(entryName))
+    )
 
   await db.tx(async (tx) => {
     // Persist common script
-    const scriptCommon = (await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))).trim()
-    await AnalysisManager.updateChain(
-      { surveyId, chainUuid, fields: { [TableChain.columnSet.scriptCommon]: scriptCommon } },
-      tx
-    )
+    let scriptCommon = (await fileZip.getEntryAsText(findEntry({ name: 'common' })))?.trim()
+
+    if (scriptCommon) {
+      await AnalysisManager.updateChain(
+        { surveyId, chainUuid, fields: { [TableChain.columnSet.scriptCommon]: scriptCommon } },
+        tx
+      )
+    }
 
     const [chain, survey] = await Promise.all([
       AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true }, tx),
@@ -105,14 +110,15 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const nodeDefName = NodeDef.getName(nodeDef)
           const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-          const entityFolder = `${RChain.dirNames.user}`
           const name = `${NodeDef.getName(entity)}-${nodeDefName}`
-          const script = (await fileZip.getEntryAsText(findEntry(entityFolder, name)))?.trim()
+          const script = (await fileZip.getEntryAsText(findEntry({ name })))?.trim()
 
-          await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
-            tx
-          )
+          if (script) {
+            await NodeDefManager.updateNodeDefProps(
+              { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
+              tx
+            )
+          }
         })
       }
     })

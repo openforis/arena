@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { CircleMarker, LayersControl, LayerGroup, Popup } from 'react-leaflet'
+import { CircleMarker, LayersControl, Popup } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
 
 import * as Survey from '@core/survey/survey'
