@@ -487,6 +487,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
   },
 
+  mapView: {
+    samplingPointDataLayerName: 'Sampling point data - level {{levelIndex}}',
+    samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
+  },
+
   surveysView: {
     filter: 'Filter',
     filterPlaceholder: 'Name, label or owner',

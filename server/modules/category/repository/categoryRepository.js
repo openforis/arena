@@ -83,6 +83,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
   backup = false,
   offset = null,
   limit = null,
+  search = null,
 }) => {
   const propsFields = (tableAlias) => {
     if (backup) {
@@ -93,6 +94,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
     // combine props and props_draft column into one
     return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
   }
+
+  const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
 
   return `
     WITH
@@ -115,6 +118,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
       (
         SELECT * 
         FROM ${getSurveyDBSchema(surveyId)}.category
+        ${search ? `WHERE ${nameColumn} ILIKE $/search/` : ''} 
         ORDER BY (props || props_draft) -> '${Category.keysProps.name}'
         ${offset ? 'OFFSET $/offset/' : ''}
         ${limit ? 'LIMIT $/limit/' : ''}
@@ -176,14 +180,15 @@ export const fetchCategoriesBySurveyId = async (
 }
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, backup = false, offset = 0, limit = null },
+  { surveyId, draft = false, includeValidation = false, backup = false, offset = 0, limit = null, search = null },
   client = db
 ) => {
   const { categories } = await client.one(
-    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup, offset, limit }),
+    _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup, offset, limit, search }),
     {
       offset,
       limit,
+      search: `%${search}%`,
     }
   )
   return categories || {}
