@@ -14,15 +14,15 @@ export const MapLayersControl = (props) => {
       <LayersControl.BaseLayer name="OpenStreetMap">
         <OpenStreetMapLayer />
       </LayersControl.BaseLayer>
-      {layers && layers}
+      {layers}
     </LayersControl>
   )
 }
 
 MapLayersControl.propTypes = {
-  layers: PropTypes.element,
+  layers: PropTypes.array,
 }
 
 MapLayersControl.defaultProps = {
-  layers: null,
+  layers: [],
 }

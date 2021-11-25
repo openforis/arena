@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { CircleMarker, LayersControl, Popup } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-markercluster'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -70,7 +71,7 @@ export const SamplingPointDataLayer = (props) => {
   if (items.length === 0) return null
 
   return (
-    <LayersControl.Overlay checked name="Sampling point data">
+    <LayersControl.Overlay checked name={`Sampling point data - level ${levelIndex + 1}`}>
       <MarkerClusterGroup>
         {items.map((item) => (
           <CircleMarker key={item.uuid} center={item.location} pathOptions={{ fillColor: 'blue' }} radius={20}>
@@ -80,4 +81,12 @@ export const SamplingPointDataLayer = (props) => {
       </MarkerClusterGroup>
     </LayersControl.Overlay>
   )
+}
+
+SamplingPointDataLayer.propTypes = {
+  levelIndex: PropTypes.number,
+}
+
+SamplingPointDataLayer.defaultProps = {
+  levelIndex: 0,
 }

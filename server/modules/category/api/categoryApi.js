@@ -151,7 +151,7 @@ export const init = (app) => {
     try {
       const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)
 
-      const list = await CategoryService.fetchCategoriesBySurveyId({
+      const categoriesByUuid = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
         surveyId,
         draft,
         includeValidation: validate,
@@ -160,7 +160,7 @@ export const init = (app) => {
         search,
       })
 
-      res.json({ list })
+      res.json({ list: Object.values(categoriesByUuid) })
     } catch (error) {
       next(error)
     }

@@ -44,14 +44,14 @@ export const Map = (props) => {
 
 Map.propTypes = {
   centerPoint: PropTypes.object,
-  layers: PropTypes.element,
+  layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
 }
 
 Map.defaultProps = {
   centerPoint: null,
-  layers: null,
+  layers: [],
   markerPoint: null,
   markerTitle: null,
 }
