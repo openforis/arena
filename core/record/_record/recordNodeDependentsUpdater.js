@@ -49,7 +49,10 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   nodePointersToUpdate.forEach((nodePointer) => {
-    const { nodeCtx, nodeDef: nodeDefNodePointer } = nodePointer
+    const { nodeCtx: nodeCtxNodePointer, nodeDef: nodeDefNodePointer } = nodePointer
+    const nodeCtxUuid = Node.getUuid(nodeCtxNodePointer)
+    // nodeCtx could have been updated in a previous iteration
+    const nodeCtx = nodesUpdatedToPersist[nodeCtxUuid] || nodeCtxNodePointer
     const expressionsToEvaluate = NodeDef.getApplicable(nodeDefNodePointer)
     try {
       // 3. evaluate applicable expression
@@ -59,6 +62,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
         nodeCtx,
         expressionsToEvaluate
       )
+
       const applicable = A.propOr(false, 'value', exprEval)
 
       // 4. persist updated node value if changed, and return updated node
@@ -69,7 +73,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
 
         // update node and add it to nodesUpdated
         const nodeCtxUpdated = Node.assocChildApplicability({ nodeDefUuid, applicable })(nodeCtx)
-        nodesUpdatedToPersist[Node.getUuid(nodeCtx)] = nodeCtxUpdated
+        nodesUpdatedToPersist[nodeCtxUuid] = nodeCtxUpdated
 
         const nodeCtxChildren = RecordReader.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(recordUpdated)
         nodeCtxChildren.forEach((nodeCtxChild) => {
