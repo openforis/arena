@@ -49,13 +49,13 @@ export default class RFilePersistResults extends RFileSystem {
     super(rChain, 'persist-results')
   }
 
-  async initPersistScripts({ dirNane, zipName }) {
+  async initPersistScripts({ dirName, zipName }) {
     const { surveyId, chainUuid, dirResults } = this.rChain
     const zipFile = FileUtils.join(dirResults, zipName)
 
     await this.logInfo(`'Persisting ${zipName} started'`)
     await this.appendContent(
-      zipr(zipFile, dirNane),
+      zipr(zipFile, dirName),
       arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
     )
     await this.logInfo(`'Persisting ${zipName} completed'`)
@@ -63,12 +63,12 @@ export default class RFilePersistResults extends RFileSystem {
 
   async initPersistUserScripts() {
     const { dirNames } = this.rChain
-    await this.initPersistScripts({ dirNane: dirNames.user, zipName: 'userScripts.zip' })
+    await this.initPersistScripts({ dirName: dirNames.user, zipName: 'userScripts.zip' })
   }
 
   async initPersistBaseUnitScripts() {
     const { dirNames } = this.rChain
-    await this.initPersistScripts({ dirNane: dirNames.baseUnit, zipName: 'baseUnitScripts.zip' })
+    await this.initPersistScripts({ dirName: dirNames.baseUnit, zipName: 'baseUnitScripts.zip' })
   }
 
   async init() {
