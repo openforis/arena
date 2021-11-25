@@ -5,6 +5,8 @@ export {
   fetchCategory,
   createCategory,
   fetchCategoryItems,
+  countSamplingPointData,
+  fetchSamplingPointData,
   deleteCategory,
   cleanupCategory,
   startExportAllCategoriesJob,

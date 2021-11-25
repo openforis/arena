@@ -21,30 +21,37 @@ leaflet.Marker.prototype.options.icon = leaflet.icon({
 // end of workaround
 
 export const Map = (props) => {
-  const { markerPositionLatLon, markerDescription } = useMap(props)
+  const { layers } = props
+  const { centerPositionLatLon, markerPositionLatLon, markerDescription } = useMap(props)
 
-  if (!markerPositionLatLon) {
+  if (!centerPositionLatLon) {
     return null
   }
 
   return (
-    <MapContainer center={markerPositionLatLon} zoom={4}>
-      <MapLayersControl />
-      <Marker position={markerPositionLatLon}>
-        <Popup>
-          <Markdown source={markerDescription} />
-        </Popup>
-      </Marker>
+    <MapContainer center={centerPositionLatLon} zoom={4}>
+      <MapLayersControl layers={layers} />
+      {markerPositionLatLon && (
+        <Marker position={markerPositionLatLon}>
+          <Popup>
+            <Markdown source={markerDescription} />
+          </Popup>
+        </Marker>
+      )}m
     </MapContainer>
   )
 }
 
 Map.propTypes = {
+  centerPoint: PropTypes.object,
+  layers: PropTypes.element,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
 }
 
 Map.defaultProps = {
+  centerPoint: null,
+  layers: null,
   markerPoint: null,
   markerTitle: null,
 }
