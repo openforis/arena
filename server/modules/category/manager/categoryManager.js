@@ -154,6 +154,7 @@ export const {
   fetchCategoryAndLevelsByUuid,
   getCategoryStreamAndHeaders,
   fetchItemsByParentUuid,
+  countItemsByLevelIndex,
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
   writeCategoryExportTemplateToStream,

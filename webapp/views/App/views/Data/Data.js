@@ -17,6 +17,7 @@ import Records from './Records'
 import Explorer from './Explorer'
 import ExportData from './ExportData'
 import DataImport from './DataImport'
+import { MapView } from './MapView'
 
 const Data = () => {
   const dispatch = useDispatch()
@@ -54,6 +55,11 @@ const Data = () => {
           {
             component: Explorer,
             path: appModuleUri(dataModules.explorer),
+          },
+          // Map
+          {
+            component: MapView,
+            path: appModuleUri(dataModules.map),
           },
           // Data export
           {

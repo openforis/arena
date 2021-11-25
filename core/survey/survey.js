@@ -63,6 +63,8 @@ export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey } = SurveyInfo
 export const { sortableKeys } = SurveySortKeys
 
+export const samplingPointDataCategoryName = 'sampling_point_data'
+
 // ====== DEFAULTS
 export const { getDefaultAuthGroups } = SurveyDefaults
 

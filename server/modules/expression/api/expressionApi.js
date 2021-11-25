@@ -10,20 +10,22 @@ import * as Request from '@server/utils/request'
 import * as CategoryManager from '../../category/manager/categoryManager'
 import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
-const toItem = (type, lang = null) => item =>
-  item
-    ? type === NodeDef.nodeDefType.code
-      ? {
-          key: CategoryItem.getCode(item),
-          label: CategoryItem.getLabel(lang)(item),
-        }
-      : {
-          key: Taxon.getCode(item),
-          label: Taxon.getScientificName(item),
-        }
-    : null
+const toItem =
+  (type, lang = null) =>
+  (item) =>
+    item
+      ? type === NodeDef.nodeDefType.code
+        ? {
+            key: CategoryItem.getCode(item),
+            label: CategoryItem.getLabel(lang)(item),
+          }
+        : {
+            key: Taxon.getCode(item),
+            label: Taxon.getScientificName(item),
+          }
+      : null
 
-export const init = app => {
+export const init = (app) => {
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {
@@ -32,11 +34,16 @@ export const init = app => {
       if (NodeDef.nodeDefType.code === type) {
         const { categoryUuid, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
+          surveyId,
+          categoryUuid,
+          levelIndex: 0,
+          draft: true,
+        })
 
         const item = R.pipe(
           R.find((_item) => CategoryItem.getCode(_item) === value),
-          toItem(type, lang),
+          toItem(type, lang)
         )(itemsDb)
 
         res.json({ item })
@@ -61,7 +68,12 @@ export const init = app => {
       if (NodeDef.nodeDefType.code === type) {
         const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
+          surveyId,
+          categoryUuid,
+          levelIndex: categoryLevelIndex,
+          draft: true,
+        })
 
         const items = R.pipe(
           R.ifElse(
@@ -71,11 +83,11 @@ export const init = app => {
               const code = CategoryItem.getCode(item)
               const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
-            }),
+            })
           ),
           R.sort((a, b) => Number(a.id) - Number(b.id)),
           R.take(25),
-          R.map(toItem(type, lang)),
+          R.map(toItem(type, lang))
         )(itemsDb)
 
         res.json({ items })

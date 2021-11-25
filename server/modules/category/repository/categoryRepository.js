@@ -259,17 +259,57 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
-export const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
-  client.map(
-    `SELECT i.* 
+export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex, draft = false }, client = db) =>
+  client.one(
+    `SELECT COUNT(i.*) 
      FROM ${getSurveyDBSchema(surveyId)}.category_item i
        JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
          ON l.uuid = i.level_uuid
-     WHERE l.category_uuid = $1
-       AND l.index = $2`,
-    [categoryUuid, levelIndex],
+     WHERE l.category_uuid = $/categoryUuid/
+       AND l.index = $/levelIndex/`,
+    { categoryUuid, levelIndex },
+    (row) => Number(row.count)
+  )
+
+export const fetchItemsByLevelIndex = async (
+  { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
+  client = db
+) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  // join category_item table to get ancestors codes
+  const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
+  const codesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
+    DbUtils.getPropColCombined(
+      CategoryItem.keysProps.code,
+      draft,
+      `i${ancstorLevelIdx}.`,
+      true,
+      `level_${ancstorLevelIdx}_code`
+    )
+  )
+  const ancestorItemsJoins = ancestorLevelIndexes.reduce(
+    (joinConditionsAcc, ancstorLevelIdx) => [
+      ...joinConditionsAcc,
+      `JOIN ${schema}.category_item i${ancstorLevelIdx} 
+        ON i${ancstorLevelIdx}.uuid = i${ancstorLevelIdx + 1}.parent_uuid`,
+    ],
+    []
+  )
+  return client.map(
+    `SELECT i${levelIndex}.* ${codesSelectFields.length > 0 ? `, ${codesSelectFields.join(', ')}` : ''}
+     FROM ${schema}.category_item i${levelIndex}
+       JOIN ${schema}.category_level l 
+         ON l.uuid = i${levelIndex}.level_uuid
+      ${ancestorItemsJoins.join(' ')}
+     WHERE l.category_uuid = $/categoryUuid/
+       AND l.index = $/levelIndex/
+    ${limit ? `LIMIT $/limit/` : ''}
+    ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
+    { categoryUuid, levelIndex, limit, offset },
     (item) => dbTransformCallback(item, draft, true)
   )
+}
 
 export const fetchIndex = async (surveyId, draft = false, client = db) =>
   client.map(

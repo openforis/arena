@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@import '~@webapp/style/vars';
 
 .user-popup-menu {
   position: fixed;
@@ -6,7 +6,7 @@
   top: $headerHeight - 1px;
   border-bottom: 1px solid $greyBorder;
   border-left: 1px solid $greyBorder;
-  z-index: $zIndex15UserMenu;
+  z-index: $zIndex500UserMenu;
   background-color: white;
   display: grid;
   padding: 20px 10px 10px;

@@ -15,9 +15,9 @@ import { useI18n } from '@webapp/store/system'
 import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
-import { TestId } from '@webapp/utils/testId'
-
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
@@ -28,6 +28,7 @@ const NodeDefCoordinate = (props) => {
     props
 
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
 
   const [showMap, setShowMap] = useState(false)
 
@@ -39,6 +40,8 @@ const NodeDefCoordinate = (props) => {
   const surveySrs = Survey.getSRS(surveyInfo)
   const singleSrs = surveySrs.length === 1
   const selectedSrs = singleSrs ? surveySrs[0] : surveySrs.find((srs) => srs.code === value.srs)
+
+  const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const handleInputChange = (field, value) => {
     if (entryDisabled) {
@@ -100,8 +103,8 @@ const NodeDefCoordinate = (props) => {
   )
 
   const mapPanelRight = showMap ? (
-    <PanelRight width="40vw" onClose={toggleShowMap} header={NodeDef.getLabel(nodeDef)}>
-      <Map markerPoint={value} markerTitle={NodeDef.getLabel(nodeDef)} />
+    <PanelRight width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
+      <Map markerPoint={value} markerTitle={nodeDefLabel} />
     </PanelRight>
   ) : null
 
