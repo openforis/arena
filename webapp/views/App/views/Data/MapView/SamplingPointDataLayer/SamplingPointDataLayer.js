@@ -1,5 +1,5 @@
 import React from 'react'
-import { LayersControl, LayerGroup } from 'react-leaflet'
+import { LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
