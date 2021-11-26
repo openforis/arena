@@ -21,7 +21,7 @@ leaflet.Marker.prototype.options.icon = leaflet.icon({
 // end of workaround
 
 export const Map = (props) => {
-  const { layers, editable } = props
+  const { layers } = props
   const { centerPositionLatLon, markerPositionLatLon, markerDescription } = useMap(props)
 
   if (!centerPositionLatLon) {
@@ -32,7 +32,7 @@ export const Map = (props) => {
     <MapContainer center={centerPositionLatLon} zoom={4}>
       <MapLayersControl layers={layers} />
       {markerPositionLatLon && (
-        <Marker draggable={editable} position={markerPositionLatLon}>
+        <Marker position={markerPositionLatLon}>
           <Popup>
             <Markdown source={markerDescription} />
           </Popup>
@@ -45,7 +45,6 @@ export const Map = (props) => {
 
 Map.propTypes = {
   centerPoint: PropTypes.object,
-  editable: PropTypes.bool,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
@@ -53,7 +52,6 @@ Map.propTypes = {
 
 Map.defaultProps = {
   centerPoint: null,
-  editable: false,
   layers: [],
   markerPoint: null,
   markerTitle: null,

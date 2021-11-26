@@ -2,33 +2,41 @@ import React, { useCallback, useEffect, useState } from 'react'
 import L from 'leaflet'
 // import './ShowCrimes.css'
 import useSupercluster from 'use-supercluster'
-import { Marker, useMap } from 'react-leaflet'
+import { CircleMarker, LayerGroup, Marker, Popup, useMap } from 'react-leaflet'
 
-const icons = {}
-const fetchIcon = (count, size) => {
-  if (!icons[count]) {
-    icons[count] = L.divIcon({
+const clusterRadius = 150
+const clusterMaxZoom = 17
+const maxZoom = 22
+const initialZoom = 12
+const markerRadius = 10
+
+const _clusterIconsCache = {}
+const getOrCreateClusterIcon = (count, size) => {
+  if (!_clusterIconsCache[count]) {
+    _clusterIconsCache[count] = L.divIcon({
       html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px;">
         ${count}
       </div>`,
     })
   }
-  return icons[count]
+  return _clusterIconsCache[count]
 }
 
 export const SamplingPointDataClusters = (props) => {
   const { items } = props
 
-  const maxZoom = 22
-  const [bounds, setBounds] = useState(null)
-  const [zoom, setZoom] = useState(12)
+  const [state, setState] = useState({ bounds: null, zoom: initialZoom })
   const map = useMap()
 
+  const { bounds, zoom } = state
+
   // get map bounds
-  function updateMap() {
+  const updateMap = () => {
     const b = map.getBounds()
-    setBounds([b.getSouthWest().lng, b.getSouthWest().lat, b.getNorthEast().lng, b.getNorthEast().lat])
-    setZoom(map.getZoom())
+    setState({
+      bounds: [b.getSouthWest().lng, b.getSouthWest().lat, b.getNorthEast().lng, b.getNorthEast().lat],
+      zoom: map.getZoom(),
+    })
   }
 
   const onMove = useCallback(() => {
@@ -46,15 +54,16 @@ export const SamplingPointDataClusters = (props) => {
     }
   }, [map, onMove])
 
+  // convert items to GEOJson points
   const points = items.map((item) => {
-    const { location, codes, id: itemId } = item
-    const [longitude, latitude] = location
+    const { location, codes: itemCodes, uuid: itemUuid } = item
+    const [lat, long] = location
     return {
       type: 'Feature',
-      properties: { cluster: false, itemId, codes },
+      properties: { cluster: false, itemUuid, itemCodes },
       geometry: {
         type: 'Point',
-        coordinates: [latitude, longitude],
+        coordinates: [long, lat],
       },
     }
   })
@@ -63,16 +72,16 @@ export const SamplingPointDataClusters = (props) => {
     points,
     bounds,
     zoom,
-    options: { radius: 100, maxZoom: 17 },
+    options: { radius: clusterRadius, maxZoom: clusterMaxZoom },
   })
 
   return (
-    <>
+    <LayerGroup>
       {clusters.map((cluster) => {
         // every cluster point has coordinates
         const [longitude, latitude] = cluster.geometry.coordinates
-        // the point may be either a cluster or a crime point
-        const { cluster: isCluster, point_count: pointCount } = cluster.properties
+        // the point may be either a cluster or a sampling point item
+        const { cluster: isCluster, point_count: pointCount, itemUuid, itemCodes } = cluster.properties
 
         // we have a cluster to render
         if (isCluster) {
@@ -80,7 +89,7 @@ export const SamplingPointDataClusters = (props) => {
             <Marker
               key={`cluster-${cluster.id}`}
               position={[latitude, longitude]}
-              icon={fetchIcon(pointCount, 10 + (pointCount / points.length) * 40)}
+              icon={getOrCreateClusterIcon(pointCount, 10 + (pointCount / points.length) * 40)}
               eventHandlers={{
                 click: () => {
                   const expansionZoom = Math.min(supercluster.getClusterExpansionZoom(cluster.id), maxZoom)
@@ -94,8 +103,12 @@ export const SamplingPointDataClusters = (props) => {
         }
 
         // we have a single point (sampling point item) to render
-        return <Marker key={`crime-${cluster.properties.itemId}`} position={[latitude, longitude]} />
+        return (
+          <CircleMarker key={itemUuid} center={[latitude, longitude]} radius={markerRadius}>
+            <Popup>{itemCodes}</Popup>
+          </CircleMarker>
+        )
       })}
-    </>
+    </LayerGroup>
   )
 }
