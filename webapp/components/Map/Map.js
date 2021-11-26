@@ -38,7 +38,6 @@ export const Map = (props) => {
           </Popup>
         </Marker>
       )}
-      m
     </MapContainer>
   )
 }
