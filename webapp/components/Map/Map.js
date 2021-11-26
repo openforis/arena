@@ -37,7 +37,7 @@ export const Map = (props) => {
             <Markdown source={markerDescription} />
           </Popup>
         </Marker>
-      )}m
+      )}
     </MapContainer>
   )
 }
