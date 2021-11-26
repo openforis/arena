@@ -1,25 +1,48 @@
 @import 'leaflet/dist/leaflet.css';
 @import 'react-leaflet-markercluster/dist/styles.min.css';
 
-.leaflet-container {
-  width: 100%;
+.panel-right {
+  &.map-panel > * {
+    padding-top: 0;
+    padding-bottom: 10px;
+  }
+}
+
+.map-wrapper {
   height: 100%;
-}
 
-.leaflet-top.leaflet-right,
-.leaflet-control-layers.leaflet-control {
-  z-index: 450;
-}
+  .location-edit-info,
+  .button-bar {
+    height: 2rem;
+    text-align: center;
+  }
 
-.leaflet-control-layers-toggle {
-  background-image: url('/img/map-layers-toggle.png');
-}
+  .leaflet-container {
+    width: 100%;
+    height: 100%;
 
-.leaflet-popup-content {
-  width: 120px;
+    .leaflet-top.leaflet-right,
+    .leaflet-control-layers.leaflet-control {
+      z-index: 450;
+    }
 
-  ul {
-    margin-block-start: 0;
-    padding-inline-start: 20px;
+    .leaflet-control-layers-toggle {
+      background-image: url('/img/map-layers-toggle.png');
+    }
+
+    .leaflet-popup-content {
+      width: 120px;
+
+      ul {
+        margin-block-start: 0;
+        padding-inline-start: 20px;
+      }
+    }
+  }
+
+  &.editable {
+    .leaflet-container {
+      height: calc(100% - 4rem);
+    }
   }
 }

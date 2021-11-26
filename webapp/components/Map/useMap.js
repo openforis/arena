@@ -1,13 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
 export const useMap = (props) => {
-  const { centerPoint, markerPoint, markerTitle } = props
+  const { centerPoint, markerPoint, markerTitle, onMarkerPositionChange } = props
 
-  const [srsInitialized, setSrsInitialized] = useState(false)
-  const [centerPositionLatLon, setCenterPositionLatLon] = useState(null)
-  const [markerPositionLatLon, setMarkerPositionLatLon] = useState(null)
+  const [state, setState] = useState({
+    srsInitialized: false,
+    centerPositionLatLon: null,
+    markerPositionLatLon: null,
+    markerPositionUpdated: null,
+  })
+  const markerRef = useRef(null)
+
+  const { srsInitialized, centerPositionLatLon, markerPositionLatLon, markerPositionUpdated } = state
 
   const fromPointToLatLon = (point) => {
     if (srsInitialized && Points.isValid(point)) {
@@ -22,7 +28,7 @@ export const useMap = (props) => {
   useEffect(() => {
     ;(async () => {
       await SRSs.init()
-      setSrsInitialized(true)
+      setState((statePrev) => ({ ...statePrev, srsInitialized: true }))
     })()
   }, [])
 
@@ -30,8 +36,11 @@ export const useMap = (props) => {
   useEffect(() => {
     if (srsInitialized) {
       const actualCenterPoint = markerPoint || centerPoint || PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
-      setCenterPositionLatLon(actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null)
-      setMarkerPositionLatLon(markerPoint ? fromPointToLatLon(markerPoint) : null)
+      setState((statePrev) => ({
+        ...statePrev,
+        centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
+        markerPositionLatLon: markerPoint ? fromPointToLatLon(markerPoint) : null,
+      }))
     }
   }, [srsInitialized, centerPoint, markerPoint])
 
@@ -42,9 +51,31 @@ export const useMap = (props) => {
 * SRS: ${markerPoint.srs}`
     : null
 
+  const markerEventHandlers = useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current
+        if (marker != null) {
+          const { lat, lng } = marker.getLatLng()
+          const markerPositionUpdated = PointFactory.createInstance({ x: lng, y: lat, srs: '4326' })
+          setState((statePrev) => ({ ...statePrev, markerPositionUpdated }))
+        }
+      },
+    }),
+    []
+  )
+
+  const onSaveClick = useCallback(() => {
+    onMarkerPositionChange(markerPositionUpdated)
+  }, [markerPositionUpdated])
+
   return {
     centerPositionLatLon,
-    markerPositionLatLon,
+    markerEventHandlers,
     markerDescription,
+    markerPositionLatLon,
+    markerRef,
+    markerPositionUpdated,
+    onSaveClick,
   }
 }
