@@ -4,6 +4,8 @@ import React from 'react'
 import { MapContainer, Marker, Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import { Points } from '@openforis/arena-core'
+
 import { ButtonSave } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 
@@ -30,7 +32,7 @@ export const Map = (props) => {
     markerDescription,
     markerEventHandlers,
     markerPositionLatLon,
-    markerPositionUpdated,
+    markerPointUpdated,
     markerRef,
     onSaveClick,
   } = useMap(props)
@@ -61,17 +63,14 @@ export const Map = (props) => {
 
       {editable && (
         <div className="button-bar">
-          {markerPositionUpdated && (
+          {markerPointUpdated && (
             <div className="location-updated-label">
               <label>
-                {i18n.t('mapView.locationUpdated')}:
-                <span>
-                  [{markerPositionUpdated.x}, {markerPositionUpdated.y}]
-                </span>
+                {i18n.t('mapView.locationUpdated')}:<span>{Points.toString(markerPointUpdated)}</span>
               </label>
             </div>
           )}
-          <ButtonSave disabled={!markerPositionUpdated} onClick={onSaveClick} />
+          <ButtonSave disabled={!markerPointUpdated} onClick={onSaveClick} />
         </div>
       )}
     </div>
@@ -84,7 +83,7 @@ Map.propTypes = {
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
-  onMarkerPositionChange: PropTypes.func,
+  onMarkerPointChange: PropTypes.func,
 }
 
 Map.defaultProps = {
@@ -93,5 +92,5 @@ Map.defaultProps = {
   layers: [],
   markerPoint: null,
   markerTitle: null,
-  onMarkerPositionChange: null,
+  onMarkerPointChange: null,
 }
