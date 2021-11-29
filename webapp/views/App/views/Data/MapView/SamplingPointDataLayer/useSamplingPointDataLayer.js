@@ -13,7 +13,7 @@ import { useI18n } from '@webapp/store/system'
 const itemsPageSize = 1000
 
 export const useSamplingPointDataLayer = (props) => {
-  const { levelIndex } = props
+  const { levelIndex, markersColor } = props
 
   const i18n = useI18n()
   const isMountedRef = useIsMounted()
@@ -23,10 +23,13 @@ export const useSamplingPointDataLayer = (props) => {
   const { checked, loading, items } = state
   const survey = useSurvey()
 
-  const overlayName = i18n.t(
+  const overlayInnerName = i18n.t(
     loading ? 'mapView.samplingPointDataLayerNameLoading' : 'mapView.samplingPointDataLayerName',
     { levelIndex }
   )
+
+  // add icon close to name
+  const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
 
   const loadItems = async () => {
     const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })

@@ -28,7 +28,11 @@ export const MapView = () => {
   return (
     <Map
       layers={samplingPointDataLevels.map((level) => (
-        <SamplingPointDataLayer key={CategoryLevel.getUuid(level)} levelIndex={CategoryLevel.getIndex(level)} />
+        <SamplingPointDataLayer
+          key={CategoryLevel.getUuid(level)}
+          levelIndex={CategoryLevel.getIndex(level)}
+          markersColor="#ed5b46"
+        />
       ))}
     />
   )

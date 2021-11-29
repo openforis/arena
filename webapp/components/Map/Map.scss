@@ -39,12 +39,25 @@
       }
     }
 
-    .layer-item {
+    .leaflet-control-layers-overlays {
+      label div,
+      label div span {
+        display: flex;
+        column-gap: 5px;
+        vertical-align: middle;
+      }
+
+      .leaflet-control-layers-selector {
+        margin-top: 0;
+        top: 0;
+      }
+
       .layer-icon {
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        border: 2px solid blue;
+        border-style: solid;
+        border-width: 2px;
       }
     }
   }
@@ -62,7 +75,6 @@
 
   .cluster-marker {
     color: #fff;
-    background: #1978c8;
     border-radius: 50%;
     padding: 10px;
     width: 10px;
