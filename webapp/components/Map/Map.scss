@@ -38,7 +38,12 @@
         padding-inline-start: 20px;
       }
     }
-
+    .leaflet-control-layers-base,
+    .leaflet-control-layers-overlays {
+      label {
+        padding: 0.3rem;
+      }
+    }
     .leaflet-control-layers-overlays {
       label div,
       label div span {
@@ -53,8 +58,8 @@
       }
 
       .layer-icon {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
         border-style: solid;
         border-width: 2px;
