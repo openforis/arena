@@ -163,7 +163,9 @@
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.3.0",
     "socket.io-client": "^4.2.0",
+    "supercluster": "^7.1.4",
     "to-snake-case": "^1.0.0",
+    "use-supercluster": "^0.3.0",
     "uuid": "^8.3.2",
     "xml-js": "^1.6.11"
   },
