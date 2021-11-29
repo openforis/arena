@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useRef } from 'react'
 
 const colors = {
   aqua: '#00ffff',
