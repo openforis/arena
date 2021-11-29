@@ -43,6 +43,19 @@ const NodeDefCoordinate = (props) => {
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
+  const handleValueChange = (newValue) => {
+    // adjust value:
+    // - if x and y are blank, consider store value as null
+    // - if single srs, set it into value
+    let valueAdjusted = { ...newValue }
+    if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
+      valueAdjusted = null
+    } else if (singleSrs) {
+      valueAdjusted[Node.valuePropsCoordinate.srs] = selectedSrs.code
+    }
+    updateNode(nodeDef, node, valueAdjusted)
+  }
+
   const handleInputChange = (field, value) => {
     if (entryDisabled) {
       return // input change could be triggered by numeric input field formatting
@@ -55,17 +68,13 @@ const NodeDefCoordinate = (props) => {
     } else {
       fieldValue = value
     }
-
-    let newValue = { ...Node.getValue(node), [field]: fieldValue }
-
-    if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
-      newValue = null
-    } else if (singleSrs) {
-      newValue[Node.valuePropsCoordinate.srs] = selectedSrs.code
-    }
-
-    updateNode(nodeDef, node, newValue)
+    handleValueChange({ ...Node.getValue(node), [field]: fieldValue })
   }
+
+  const handleLocationOnMapChanged = useCallback((markerPointUpdated) => {
+    handleValueChange(markerPointUpdated)
+    setShowMap(false)
+  }, [])
 
   const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
 
@@ -103,8 +112,8 @@ const NodeDefCoordinate = (props) => {
   )
 
   const mapPanelRight = showMap ? (
-    <PanelRight width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <Map markerPoint={value} markerTitle={nodeDefLabel} />
+    <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
+      <Map editable markerPoint={value} markerTitle={nodeDefLabel} onMarkerPointChange={handleLocationOnMapChanged} />
     </PanelRight>
   ) : null
 
@@ -114,7 +123,7 @@ const NodeDefCoordinate = (props) => {
       title="surveyForm.nodeDefCoordinate.showOnMap"
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      disabled={edit || Node.isValueBlank(node) || !Node.isValid(node)}
+      disabled={edit}
     />
   )
 

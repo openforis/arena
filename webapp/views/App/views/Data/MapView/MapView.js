@@ -8,13 +8,14 @@ import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { Map } from '@webapp/components/Map'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
+import { useRandomColor } from './useRandomColor'
 
 export const MapView = () => {
   const surveyId = useSurveyId()
   const [samplingPointDataLevels, setSamplingPointDataLevels] = useState([])
+  const { nextColor } = useRandomColor()
 
   useEffect(() => {
     ;(async () => {
@@ -27,12 +28,14 @@ export const MapView = () => {
   }, [])
 
   return (
-    <SurveyDefsLoader draft validate={false}>
-      <Map
-        layers={samplingPointDataLevels.map((level) => (
-          <SamplingPointDataLayer key={CategoryLevel.getUuid(level)} levelIndex={CategoryLevel.getIndex(level)} />
-        ))}
-      />
-    </SurveyDefsLoader>
+    <Map
+      layers={samplingPointDataLevels.map((level) => (
+        <SamplingPointDataLayer
+          key={CategoryLevel.getUuid(level)}
+          levelIndex={CategoryLevel.getIndex(level)}
+          markersColor={nextColor()}
+        />
+      ))}
+    />
   )
 }

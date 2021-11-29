@@ -95,7 +95,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.74",
+    "@openforis/arena-core": "^0.0.75",
     "@openforis/arena-server": "^0.1.17",
     "@sendgrid/mail": "^7.4.7",
     "@shopify/draggable": "^1.0.0-beta.8",
@@ -163,7 +163,9 @@
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.3.0",
     "socket.io-client": "^4.2.0",
+    "supercluster": "^7.1.4",
     "to-snake-case": "^1.0.0",
+    "use-supercluster": "^0.3.0",
     "uuid": "^8.3.2",
     "xml-js": "^1.6.11"
   },

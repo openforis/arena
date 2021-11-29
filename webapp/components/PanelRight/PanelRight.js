@@ -5,10 +5,10 @@ import PropTypes from 'prop-types'
 import { TestId } from '@webapp/utils/testId'
 
 const PanelRight = (props) => {
-  const { children, header, onClose, width } = props
+  const { children, className, header, onClose, width } = props
 
   return ReactDOM.createPortal(
-    <div className="panel-right" style={{ width: `min(${width}, 100vw)` }}>
+    <div className={`panel-right ${className ? className : ''}`} style={{ width: `min(${width}, 100vw)` }}>
       <div className="panel-right__header">
         <button
           data-testid={TestId.panelRight.closeBtn}
@@ -27,6 +27,7 @@ const PanelRight = (props) => {
 }
 
 PanelRight.propTypes = {
+  className: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]).isRequired,
   header: PropTypes.node,
   onClose: PropTypes.func.isRequired,
@@ -34,6 +35,7 @@ PanelRight.propTypes = {
 }
 
 PanelRight.defaultProps = {
+  className: null,
   header: '',
   width: '500px',
 }
