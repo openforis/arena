@@ -31,11 +31,20 @@
     }
 
     .leaflet-popup-content {
-      width: 120px;
+      width: 190px;
 
       ul {
         margin-block-start: 0;
         padding-inline-start: 20px;
+      }
+    }
+
+    .layer-item {
+      .layer-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid blue;
       }
     }
   }

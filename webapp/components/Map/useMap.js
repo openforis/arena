@@ -1,22 +1,23 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { PointFactory, Points, SRSs } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
+
+import { useSRSs } from '@webapp/components/hooks'
 
 export const useMap = (props) => {
-  const { centerPoint, markerPoint, markerTitle, onMarkerPointChange } = props
+  const { centerPoint, markerPoint, onMarkerPointChange } = props
+
+  const { srssInitialized } = useSRSs()
 
   const [state, setState] = useState({
-    srsInitialized: false,
     centerPositionLatLon: null,
-    markerPositionLatLon: null,
     markerPointUpdated: null,
   })
-  const markerRef = useRef(null)
 
-  const { srsInitialized, centerPositionLatLon, markerPositionLatLon, markerPointUpdated } = state
+  const { centerPositionLatLon, markerPointUpdated } = state
 
   const fromPointToLatLon = (point) => {
-    if (srsInitialized && Points.isValid(point)) {
+    if (srssInitialized && Points.isValid(point)) {
       const pointLatLong = Points.toLatLong(point)
       const { x, y } = pointLatLong
       return [y, x]
@@ -24,51 +25,39 @@ export const useMap = (props) => {
     return null
   }
 
-  // initialize SRSs at component mount, before using Points functions
-  useEffect(() => {
-    ;(async () => {
-      await SRSs.init()
-      setState((statePrev) => ({ ...statePrev, srsInitialized: true }))
-    })()
-  }, [])
-
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
-    if (srsInitialized) {
-      const actualCenterPoint = markerPoint || centerPoint || PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
+    if (srssInitialized) {
+      const actualCenterPoint =
+        markerPoint && Points.isValid(markerPoint)
+          ? markerPoint
+          : centerPoint && Points.isValid(centerPoint)
+          ? centerPoint
+          : PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
+
       setState((statePrev) => ({
         ...statePrev,
         centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
-        markerPositionLatLon: markerPoint ? fromPointToLatLon(markerPoint) : null,
       }))
     }
-  }, [srsInitialized, centerPoint, markerPoint])
+  }, [srssInitialized, centerPoint, markerPoint])
 
-  const markerDescription = markerPoint
-    ? `**${markerTitle}**
-* x: ${markerPoint.x}
-* y: ${markerPoint.y}
-* SRS: ${markerPoint.srs}`
-    : null
-
-  const markerEventHandlers = useMemo(
+  const mapEventHandlers = useMemo(
     () => ({
-      dragend() {
-        const marker = markerRef.current
-        if (marker != null) {
-          const { lat, lng } = marker.getLatLng()
-          let markerPointUpdated = PointFactory.createInstance({ x: lng, y: lat, srs: '4326' })
-
-          // transform updated location into a location with the same SRS as the marker position parameter
-          if (markerPoint && markerPoint.srs !== markerPointUpdated.srs) {
-            markerPointUpdated = Points.transform(markerPointUpdated, markerPoint.srs)
-          }
-          setState((statePrev) => ({ ...statePrev, markerPointUpdated }))
-        }
+      dblclick(event) {
+        const [latitude, longitute] = event.latlng
+        setState((statePrev) => ({
+          ...statePrev,
+          markerPositionLatLon: PointFactory.createInstance({ x: longitute, y: latitude, srs: '4326' }),
+        }))
       },
     }),
     []
   )
+
+  const onMarkerPointUpdated = useCallback((markerPointUpdated) => {
+    setState((statePrev) => ({ ...statePrev, markerPointUpdated }))
+  }, [])
 
   const onSaveClick = useCallback(() => {
     onMarkerPointChange(markerPointUpdated)
@@ -76,11 +65,9 @@ export const useMap = (props) => {
 
   return {
     centerPositionLatLon,
-    markerEventHandlers,
-    markerDescription,
-    markerPositionLatLon,
-    markerRef,
+    mapEventHandlers,
     markerPointUpdated,
+    onMarkerPointUpdated,
     onSaveClick,
   }
 }
