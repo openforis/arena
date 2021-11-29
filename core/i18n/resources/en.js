@@ -492,6 +492,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     locationUpdated: 'Location updated',
     samplingPointDataLayerName: 'Sampling point data - level {{levelIndex}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
+    samplingPointItemPopup: {
+      title: 'Sampling Point Item',
+      location: 'Location',
+      levelCode: 'Level {{level}} code',
+    },
   },
 
   surveysView: {
