@@ -1,3 +1,5 @@
+import './BaseUnitSelector.scss'
+
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -39,7 +41,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
     So everytime that this selector changes e should delete all of the baseUnit nodeDefs and recreate all of this tree, 
     
     // TO DEFINE ->  I am not sure about the naming at this moment
-    In addition of this into the quantitative nodes there are going to be "Area-based estimate nodedefs" with the following scripts -> entity_name$node_def_name <- entity_name$[tree_volume] / tree$plot_area
+    In addition of this, Into the quantitative nodes the user has the possibility to create "Area-based estimate nodedefs" with the following scripts -> entity_name$node_def_name <- entity_name$[tree_volume] / tree$plot_area
 */
 
 const BaseUnitSelector = () => {
@@ -158,7 +160,7 @@ const BaseUnitSelector = () => {
 
   return (
     <FormItem label={i18n.t('common.baseUnit')} className="node-def-edit__base-unit">
-      <div>
+      <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
           lang={lang}
