@@ -10,18 +10,6 @@ const maxZoom = 22
 const initialZoom = 12
 const markerRadius = 10
 
-const _clusterIconsCache = {}
-const _getOrCreateClusterIcon = ({ count, size, color }) => {
-  if (!_clusterIconsCache[count]) {
-    _clusterIconsCache[count] = L.divIcon({
-      html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px; background: ${color};">
-        ${count}
-      </div>`,
-    })
-  }
-  return _clusterIconsCache[count]
-}
-
 export const SamplingPointDataClusters = (props) => {
   const { items, color } = props
 
@@ -29,6 +17,18 @@ export const SamplingPointDataClusters = (props) => {
   const map = useMap()
 
   const { bounds, zoom } = state
+
+  const _clusterIconsCache = {}
+  const _getOrCreateClusterIcon = ({ count, size, color }) => {
+    if (!_clusterIconsCache[count]) {
+      _clusterIconsCache[count] = L.divIcon({
+        html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px; background: ${color};">
+        ${count}
+      </div>`,
+      })
+    }
+    return _clusterIconsCache[count]
+  }
 
   // get map bounds
   const updateMap = () => {
