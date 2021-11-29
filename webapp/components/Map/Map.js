@@ -4,7 +4,12 @@ import React from 'react'
 import { MapContainer, Marker, Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import { Points } from '@openforis/arena-core'
+
+import { ButtonSave } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
+
+import i18n from '@core/i18n/i18nFactory'
 
 import { MapLayersControl } from './MapLayersControl'
 import { useMap } from './useMap'
@@ -21,37 +26,71 @@ leaflet.Marker.prototype.options.icon = leaflet.icon({
 // end of workaround
 
 export const Map = (props) => {
-  const { layers } = props
-  const { centerPositionLatLon, markerPositionLatLon, markerDescription } = useMap(props)
+  const { editable, layers } = props
+  const {
+    centerPositionLatLon,
+    markerDescription,
+    markerEventHandlers,
+    markerPositionLatLon,
+    markerPointUpdated,
+    markerRef,
+    onSaveClick,
+  } = useMap(props)
 
   if (!centerPositionLatLon) {
     return null
   }
 
   return (
-    <MapContainer center={centerPositionLatLon} zoom={4}>
-      <MapLayersControl layers={layers} />
-      {markerPositionLatLon && (
-        <Marker position={markerPositionLatLon}>
-          <Popup>
-            <Markdown source={markerDescription} />
-          </Popup>
-        </Marker>
+    <div className={`map-wrapper${editable ? ' editable' : ''}`}>
+      {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
+
+      <MapContainer center={centerPositionLatLon} zoom={4}>
+        <MapLayersControl layers={layers} />
+        {markerPositionLatLon && (
+          <Marker
+            draggable={editable}
+            eventHandlers={markerEventHandlers}
+            position={markerPositionLatLon}
+            ref={markerRef}
+          >
+            <Popup>
+              <Markdown source={markerDescription} />
+            </Popup>
+          </Marker>
+        )}
+      </MapContainer>
+
+      {editable && (
+        <div className="button-bar">
+          {markerPointUpdated && (
+            <div className="location-updated-label">
+              <label>
+                {i18n.t('mapView.locationUpdated')}:<span>{Points.toString(markerPointUpdated)}</span>
+              </label>
+            </div>
+          )}
+          <ButtonSave disabled={!markerPointUpdated} onClick={onSaveClick} />
+        </div>
       )}
-    </MapContainer>
+    </div>
   )
 }
 
 Map.propTypes = {
   centerPoint: PropTypes.object,
+  editable: PropTypes.bool,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
+  onMarkerPointChange: PropTypes.func,
 }
 
 Map.defaultProps = {
   centerPoint: null,
+  editable: false,
   layers: [],
   markerPoint: null,
   markerTitle: null,
+  onMarkerPointChange: null,
 }

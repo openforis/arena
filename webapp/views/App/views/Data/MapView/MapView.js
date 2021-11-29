@@ -8,7 +8,6 @@ import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { Map } from '@webapp/components/Map'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 
@@ -27,12 +26,10 @@ export const MapView = () => {
   }, [])
 
   return (
-    <SurveyDefsLoader draft validate={false}>
-      <Map
-        layers={samplingPointDataLevels.map((level) => (
-          <SamplingPointDataLayer key={CategoryLevel.getUuid(level)} levelIndex={CategoryLevel.getIndex(level)} />
-        ))}
-      />
-    </SurveyDefsLoader>
+    <Map
+      layers={samplingPointDataLevels.map((level) => (
+        <SamplingPointDataLayer key={CategoryLevel.getUuid(level)} levelIndex={CategoryLevel.getIndex(level)} />
+      ))}
+    />
   )
 }
