@@ -10,10 +10,12 @@ import { useSurveyId } from '@webapp/store/survey'
 import { Map } from '@webapp/components/Map'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
+import { useRandomColor } from './useRandomColor'
 
 export const MapView = () => {
   const surveyId = useSurveyId()
   const [samplingPointDataLevels, setSamplingPointDataLevels] = useState([])
+  const { nextColor } = useRandomColor()
 
   useEffect(() => {
     ;(async () => {
@@ -28,7 +30,11 @@ export const MapView = () => {
   return (
     <Map
       layers={samplingPointDataLevels.map((level) => (
-        <SamplingPointDataLayer key={CategoryLevel.getUuid(level)} levelIndex={CategoryLevel.getIndex(level)} />
+        <SamplingPointDataLayer
+          key={CategoryLevel.getUuid(level)}
+          levelIndex={CategoryLevel.getIndex(level)}
+          markersColor={nextColor()}
+        />
       ))}
     />
   )

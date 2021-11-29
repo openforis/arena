@@ -488,7 +488,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   mapView: {
-    locationEditInfo: 'Drag the marker to update the location, then press Save',
+    locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     samplingPointDataLayerName: 'Sampling point data - level {{levelIndex}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',

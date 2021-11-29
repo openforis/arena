@@ -6,11 +6,12 @@ import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataClusters } from './SamplingPointDataClusters'
 
 export const SamplingPointDataLayer = (props) => {
+  const { markersColor } = props
   const { items, checked, overlayName } = useSamplingPointDataLayer(props)
 
   return (
     <LayersControl.Overlay checked={checked} name={overlayName}>
-      <SamplingPointDataClusters items={items} />
+      <SamplingPointDataClusters items={items} color={markersColor} />
     </LayersControl.Overlay>
   )
 }
