@@ -12,19 +12,19 @@ import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
-import {CoordinateAttributeDataLayer} from './CoordinateAttributeDataLayer'
+import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
 import { useRandomColor } from './useRandomColor'
 
 const MapWrapper = () => {
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
   const [state, setState] = useState({
-    samplingPointDataLevels:[], 
+    samplingPointDataLevels: [],
     coordinateAttributeDefs: [],
   })
   const { nextColor } = useRandomColor()
 
-  const { samplingPointDataLevels, coordinateAttributeDefs} = state
+  const { samplingPointDataLevels, coordinateAttributeDefs } = state
 
   useEffect(() => {
     ;(async () => {
@@ -46,15 +46,16 @@ const MapWrapper = () => {
 
   return (
     <Map
-      layers={[...samplingPointDataLevels.map((level) => (
-        <SamplingPointDataLayer
-          key={CategoryLevel.getUuid(level)}
-          levelIndex={CategoryLevel.getIndex(level)}
-          markersColor={nextColor()}
-        />
-      )), ...coordinateAttributeDefs.map(attributeDef=> (
-        <CoordinateAttributeDataLayer attributeDef={attributeDef} />
-      )]}
+      layers={[
+        ...samplingPointDataLevels.map((level) => (
+          <SamplingPointDataLayer
+            key={CategoryLevel.getUuid(level)}
+            levelIndex={CategoryLevel.getIndex(level)}
+            markersColor={nextColor()}
+          />
+        )),
+        ...coordinateAttributeDefs.map((attributeDef) => <CoordinateAttributeDataLayer attributeDef={attributeDef} />),
+      ]}
     />
   )
 }

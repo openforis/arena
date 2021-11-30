@@ -3,6 +3,7 @@ import { CircleMarker, LayerGroup } from 'react-leaflet'
 
 import { PointFactory } from '@openforis/arena-core'
 
+import { useMapClusters, ClusterMarker } from '../common'
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
 const markerRadius = 10
@@ -44,6 +45,7 @@ export const SamplingPointDataClusters = (props) => {
               clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
               clusterIconCreator={clusterIconCreator}
               color={color}
+              totalPoints={points.length}
             />
           )
         }

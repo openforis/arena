@@ -1,27 +1,35 @@
 import React from 'react'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { Query } from '@common/model/query'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useDataQuery } from '@webapp/components/DataQuery/store'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+
 import { useMapClusters, ClusterMarker } from '../common'
 import { CircleMarker } from 'react-leaflet'
 
+const markerRadius = 10
+
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef } = props
+
+  const lang = useSurveyPreferredLang()
 
   const query = Query.create({ entityDefUuid: NodeDef.getParentUuid(attributeDef) })
 
   const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData } = useDataQuery(
     { query }
   )
-  useEffect(() => {}, [])
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters()
+  const points = []
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
   return (
-    <LayersControl.Overlay name={overlayName}>
+    <LayersControl.Overlay name={NodeDef.getLabel(attributeDef, lang)}>
+      <LayerGroup>
       {clusters.map((cluster) => {
         // every cluster point has coordinates
         const [longitude, latitude] = cluster.geometry.coordinates
@@ -36,6 +44,7 @@ export const CoordinateAttributeDataLayer = (props) => {
               color={color}
               clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
               clusterIconCreator={clusterIconCreator}
+              totalPoints={points.length}
             />
           )
         }
@@ -46,6 +55,7 @@ export const CoordinateAttributeDataLayer = (props) => {
           </CircleMarker>
         )
       })}
+      </LayerGroup>
     </LayersControl.Overlay>
   )
 }

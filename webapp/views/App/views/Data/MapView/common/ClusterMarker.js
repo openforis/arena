@@ -1,8 +1,12 @@
 import React from 'react'
-import { Marker } from 'react-leaflet'
+import { Marker, useMap } from 'react-leaflet'
+
+const maxZoom = 17
 
 export const ClusterMarker = (props) => {
-  const { cluster, clusterExpansionZoomExtractor, clusterIconCreator, color } = props
+  const { cluster, clusterExpansionZoomExtractor, clusterIconCreator, color, totalPoints } = props
+
+  const map = useMap()
 
   const [longitude, latitude] = cluster.geometry.coordinates
   const { point_count: pointCount } = cluster.properties
@@ -11,7 +15,7 @@ export const ClusterMarker = (props) => {
     <Marker
       key={`cluster-${cluster.id}`}
       position={[latitude, longitude]}
-      icon={clusterIconCreator({ count: pointCount, size: 10 + (pointCount / points.length) * 40, color })}
+      icon={clusterIconCreator({ count: pointCount, size: 10 + (pointCount / totalPoints) * 40, color })}
       eventHandlers={{
         click: () => {
           const expansionZoom = Math.min(clusterExpansionZoomExtractor(cluster), maxZoom)
