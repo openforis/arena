@@ -66,9 +66,9 @@ export default class RFilePersistResults extends RFileSystem {
     await this.initPersistScripts({ dirName: dirNames.user, zipName: 'userScripts.zip' })
   }
 
-  async initPersistBaseUnitScripts() {
+  async initPersistSamplingScripts() {
     const { dirNames } = this.rChain
-    await this.initPersistScripts({ dirName: dirNames.baseUnit, zipName: 'baseUnitScripts.zip' })
+    await this.initPersistScripts({ dirName: dirNames.sampling, zipName: 'samplingScripts.zip' })
   }
 
   async init() {
@@ -81,7 +81,7 @@ export default class RFilePersistResults extends RFileSystem {
     // persist chainEntitiesResults
     await PromiseUtils.resolveGenerator(this.initPersistChainEntitiesResults())
     // persist base unit scripts
-    await this.initPersistBaseUnitScripts()
+    await this.initPersistSamplingScripts()
     // persist user scripts
     await this.initPersistUserScripts()
     // remove results dir
