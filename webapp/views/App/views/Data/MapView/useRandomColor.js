@@ -58,7 +58,7 @@ export const useRandomColor = () => {
 
     // update state
     const availableColorsUpdated = [...availableColors]
-    delete availableColorsUpdated[colorIndex]
+    availableColorsUpdated.splice(colorIndex, 1)
     availableColorsRef.current = availableColorsUpdated.length > 0 ? availableColorsUpdated : [...Object.values(colors)]
 
     return color
