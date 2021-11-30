@@ -13,6 +13,7 @@ const AttributeSelector = (props) => {
   const {
     canSelectAttributes,
     filterTypes,
+    filterChains,
     lang,
     nodeDef,
     nodeDefUuidsAttributes,
@@ -28,7 +29,10 @@ const AttributeSelector = (props) => {
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
-    (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
+    (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes)) &&
+    (R.isEmpty(filterChains) ||
+      R.isEmpty(NodeDef.getChainUuid(nodeDef)) ||
+      R.includes(NodeDef.getChainUuid(nodeDef), filterChains))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
@@ -53,6 +57,7 @@ const AttributeSelector = (props) => {
 AttributeSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
   filterTypes: PropTypes.array,
+  filterChains: PropTypes.array,
   lang: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefContext: PropTypes.object.isRequired,
@@ -66,6 +71,7 @@ AttributeSelector.propTypes = {
 AttributeSelector.defaultProps = {
   canSelectAttributes: true,
   filterTypes: [],
+  filterChains: [],
   showMultipleAttributes: true,
   showNodeDefPath: false,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,

@@ -16,6 +16,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
+import ChainsFilter from './ChainsFilter'
 
 const NodeDefsSelector = (props) => {
   const {
@@ -35,6 +36,8 @@ const NodeDefsSelector = (props) => {
   const lang = useSurveyPreferredLang()
 
   const [filterTypes, setFilterTypes] = useState([])
+  const [filterChains, setFilterChains] = useState([])
+
   const [showFilter, setShowFilter] = useState(false)
 
   const onToggleAttribute = (nodeDefUuid) => {
@@ -63,28 +66,31 @@ const NodeDefsSelector = (props) => {
       />
 
       {showFilter && (
-        <div className="node-defs-selector__settings">
-          {Object.keys(NodeDef.nodeDefType).map((type) =>
-            NodeDef.nodeDefType.entity !== type ? (
-              <button
-                type="button"
-                key={type}
-                className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
-                  active: filterTypes.includes(type),
-                })}
-                onClick={() => {
-                  const filterTypesUpdated = filterTypes.includes(type)
-                    ? filterTypes.filter((_type) => _type !== type)
-                    : [...filterTypes, type]
-                  setFilterTypes(filterTypesUpdated)
-                }}
-              >
-                <span>{i18n.t(type)}</span>
-                {NodeDefUIProps.getIconByType(type)}
-              </button>
-            ) : null
-          )}
-        </div>
+        <>
+          <div className="node-defs-selector__settings">
+            {Object.keys(NodeDef.nodeDefType).map((type) =>
+              NodeDef.nodeDefType.entity !== type ? (
+                <button
+                  type="button"
+                  key={type}
+                  className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
+                    active: filterTypes.includes(type),
+                  })}
+                  onClick={() => {
+                    const filterTypesUpdated = filterTypes.includes(type)
+                      ? filterTypes.filter((_type) => _type !== type)
+                      : [...filterTypes, type]
+                    setFilterTypes(filterTypesUpdated)
+                  }}
+                >
+                  <span>{i18n.t(type)}</span>
+                  {NodeDefUIProps.getIconByType(type)}
+                </button>
+              ) : null
+            )}
+          </div>
+          <ChainsFilter filterChains={filterChains} setFilterChains={setFilterChains} />
+        </>
       )}
 
       {nodeDefUuidEntity && (
@@ -94,6 +100,7 @@ const NodeDefsSelector = (props) => {
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
+          filterChains={filterChains}
           canSelectAttributes={canSelectAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
