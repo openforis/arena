@@ -20,6 +20,8 @@ export const enTranslation = {
 Do you want to ignore them?`,
     cantUndoWarning: 'This operation cannot be undone',
     cantBeDeletedUsedItem: 'This {{item}} is used by some node definitions and cannot be deleted',
+    chain: 'Chain',
+    chain_plural: 'Chains',
     childrenEmpty: 'Define at least one child item',
     clone: 'Clone',
     close: 'Close',
