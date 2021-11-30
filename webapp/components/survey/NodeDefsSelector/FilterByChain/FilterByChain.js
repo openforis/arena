@@ -31,7 +31,7 @@ const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
     <div className="node-defs-selector__chains">
       <p>{i18n.t('common.chain')}</p>
       <div className="node-defs-selector__chains_filter">
-        {(chains || []).map((chain) => (
+        {chains.map((chain) => (
           <button
             type="button"
             key={Chain.getUuid(chain)}
