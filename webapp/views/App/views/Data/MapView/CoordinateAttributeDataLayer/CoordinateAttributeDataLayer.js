@@ -80,7 +80,7 @@ export const CoordinateAttributeDataLayer = (props) => {
     <LayersControl.Overlay name={layerName}>
       <LayerGroup>
         {clusters.map((cluster) => {
-          // the point may be either a cluster or a sampling point item
+          // the point may be either a cluster or a node value point
           const { cluster: isCluster, nodeUuid } = cluster.properties
 
           // we have a cluster to render
@@ -98,7 +98,7 @@ export const CoordinateAttributeDataLayer = (props) => {
           }
           const [longitude, latitude] = cluster.geometry.coordinates
 
-          // we have a single point to render
+          // we have a single point (node value) to render
           return (
             <CircleMarker
               key={nodeUuid}

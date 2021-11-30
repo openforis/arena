@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { PointFactory } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
 
@@ -9,7 +11,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { useMapLayerAdd } from '../common'
+import { useMapClusters, useMapLayerAdd } from '../common'
 
 const itemsPageSize = 2000
 
@@ -90,5 +92,31 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [])
 
-  return { checked, items, overlayName }
+  // convert items to GEOJson points
+  const points = items.map((item) => {
+    const { codes: itemCodes, latLng, location, uuid: itemUuid } = item
+    const [lat, long] = latLng
+    const itemPoint = PointFactory.createInstance({ x: long, y: lat, srs: '4326' })
+
+    return {
+      type: 'Feature',
+      properties: { cluster: false, itemUuid, itemCodes, itemPoint, location },
+      geometry: {
+        type: 'Point',
+        coordinates: [long, lat],
+      },
+    }
+  })
+
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+
+  return {
+    checked,
+    clusters,
+    clusterExpansionZoomExtractor,
+    clusterIconCreator,
+    items,
+    overlayName,
+    totalPoints: points.length,
+  }
 }
