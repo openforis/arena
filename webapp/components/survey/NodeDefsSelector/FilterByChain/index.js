@@ -1,1 +1,1 @@
-export { default } from './ChainFilter'
+export { default } from './FilterByChain'
