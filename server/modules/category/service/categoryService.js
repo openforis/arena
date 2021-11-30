@@ -90,7 +90,8 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     return {
       uuid: CategoryItem.getUuid(item),
       codes: [...ancestorCodes, CategoryItem.getCode(item)],
-      location: [pointLatLong.y, pointLatLong.x],
+      latLng: [pointLatLong.y, pointLatLong.x],
+      location,
     }
   })
   return samplingPointData

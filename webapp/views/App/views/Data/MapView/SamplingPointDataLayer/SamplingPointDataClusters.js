@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import L from 'leaflet'
-// import './ShowCrimes.css'
+import { CircleMarker, LayerGroup, Marker, useMap } from 'react-leaflet'
 import useSupercluster from 'use-supercluster'
-import { CircleMarker, LayerGroup, Marker, Popup, useMap } from 'react-leaflet'
+
+import { PointFactory } from '@openforis/arena-core'
+
+import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
 const clusterRadius = 150
 const clusterMaxZoom = 17
@@ -56,11 +59,13 @@ export const SamplingPointDataClusters = (props) => {
 
   // convert items to GEOJson points
   const points = items.map((item) => {
-    const { location, codes: itemCodes, uuid: itemUuid } = item
-    const [lat, long] = location
+    const { codes: itemCodes, latLng, location, uuid: itemUuid } = item
+    const [lat, long] = latLng
+    const itemPoint = PointFactory.createInstance({ x: long, y: lat, srs: '4326' })
+
     return {
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes },
+      properties: { cluster: false, itemUuid, itemCodes, itemPoint, location },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
@@ -81,7 +86,7 @@ export const SamplingPointDataClusters = (props) => {
         // every cluster point has coordinates
         const [longitude, latitude] = cluster.geometry.coordinates
         // the point may be either a cluster or a sampling point item
-        const { cluster: isCluster, point_count: pointCount, itemUuid, itemCodes } = cluster.properties
+        const { cluster: isCluster, point_count: pointCount, itemUuid, itemCodes, location } = cluster.properties
 
         // we have a cluster to render
         if (isCluster) {
@@ -105,7 +110,7 @@ export const SamplingPointDataClusters = (props) => {
         // we have a single point (sampling point item) to render
         return (
           <CircleMarker key={itemUuid} center={[latitude, longitude]} radius={markerRadius} color={color}>
-            <Popup>{itemCodes}</Popup>
+            <SamplingPointDataItemPopup location={location} codes={itemCodes} />
           </CircleMarker>
         )
       })}

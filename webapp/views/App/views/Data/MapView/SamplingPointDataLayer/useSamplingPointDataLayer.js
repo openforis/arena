@@ -10,7 +10,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-const itemsPageSize = 1000
+const itemsPageSize = 2000
 
 export const useSamplingPointDataLayer = (props) => {
   const { levelIndex, markersColor } = props
