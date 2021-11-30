@@ -1,14 +1,18 @@
 import React from 'react'
 import { Popup } from 'react-leaflet'
 
+import { Points } from '@openforis/arena-core'
+
 import Markdown from '@webapp/components/markdown'
 
 import { useI18n } from '@webapp/store/system'
 
 export const SamplingPointDataItemPopup = (props) => {
-  const { point, codes } = props
+  const { location, codes } = props
 
   const i18n = useI18n()
+
+  const point = Points.parse(location)
 
   const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
 ${codes
