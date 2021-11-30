@@ -54,7 +54,13 @@ const MapWrapper = () => {
             markersColor={nextColor()}
           />
         )),
-        ...coordinateAttributeDefs.map((attributeDef) => <CoordinateAttributeDataLayer attributeDef={attributeDef} />),
+        ...coordinateAttributeDefs.map((attributeDef) => (
+          <CoordinateAttributeDataLayer
+            key={NodeDef.getUuid(attributeDef)}
+            attributeDef={attributeDef}
+            markersColor={nextColor()}
+          />
+        )),
       ]}
     />
   )
@@ -62,7 +68,7 @@ const MapWrapper = () => {
 
 export const MapView = () => {
   return (
-    <SurveyDefsLoader>
+    <SurveyDefsLoader draft={false} requirePublish>
       <MapWrapper />
     </SurveyDefsLoader>
   )

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useMapEvents } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -9,6 +8,8 @@ import * as API from '@webapp/service/api'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+
+import { useMapLayerAdd } from '../common'
 
 const itemsPageSize = 2000
 
@@ -68,16 +69,14 @@ export const useSamplingPointDataLayer = (props) => {
     setState((statePrev) => ({ ...statePrev, loading: false, items: itemsFetched }))
   }
 
-  useMapEvents({
-    overlayadd(event) {
-      const { name } = event
-      if (name === overlayName) {
-        const shouldLoadItems = items.length === 0 && !loading
-        if (shouldLoadItems) {
-          ;(async () => loadItems())()
-        }
-        setState((statePrev) => ({ ...statePrev, checked: true, loading: shouldLoadItems }))
+  useMapLayerAdd({
+    layerName: overlayName,
+    callback: () => {
+      const shouldLoadItems = items.length === 0 && !loading
+      if (shouldLoadItems) {
+        ;(async () => loadItems())()
       }
+      setState((statePrev) => ({ ...statePrev, checked: true, loading: shouldLoadItems }))
     },
   })
 
