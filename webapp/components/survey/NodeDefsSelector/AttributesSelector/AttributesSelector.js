@@ -14,7 +14,7 @@ const AttributesSelector = (props) => {
   const {
     canSelectAttributes,
     filterTypes,
-    filterChains,
+    filterChainUuids,
     lang,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
@@ -55,7 +55,7 @@ const AttributesSelector = (props) => {
             key={NodeDef.getUuid(childDef)}
             canSelectAttributes={canSelectAttributes}
             filterTypes={filterTypes}
-            filterChains={filterChains}
+            filterChainUuids={filterChainUuids}
             lang={lang}
             nodeDef={childDef}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
@@ -75,7 +75,7 @@ const AttributesSelector = (props) => {
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
-          filterChains={filterChains}
+          filterChainUuids={filterChainUuids}
           canSelectAttributes={canSelectAttributes}
           showLabel={showAncestorsLabel}
           showAncestorsLabel={showAncestorsLabel}
@@ -91,7 +91,7 @@ const AttributesSelector = (props) => {
 AttributesSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
   filterTypes: PropTypes.array,
-  filterChains: PropTypes.array,
+  filterChainUuids: PropTypes.array,
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
@@ -107,7 +107,7 @@ AttributesSelector.propTypes = {
 AttributesSelector.defaultProps = {
   canSelectAttributes: true,
   filterTypes: [],
-  filterChains: [],
+  filterChainUuids: [],
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   showAncestors: true,

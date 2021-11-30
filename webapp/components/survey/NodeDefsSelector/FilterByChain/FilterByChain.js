@@ -1,4 +1,4 @@
-import './ChainFilter.scss'
+import './FilterByChain.scss'
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -10,7 +10,7 @@ import { useSurveyPreferredLang, useSurveyId, useSurveyCycleKey } from '@webapp/
 
 import * as API from '@webapp/service/api'
 
-const ChainsFilter = ({ filterChains, setFilterChains }) => {
+const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
   const surveyId = useSurveyId()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -36,13 +36,13 @@ const ChainsFilter = ({ filterChains, setFilterChains }) => {
             type="button"
             key={Chain.getUuid(chain)}
             className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
-              active: filterChains.includes(Chain.getUuid(chain)),
+              active: filterChainUuids.includes(Chain.getUuid(chain)),
             })}
             onClick={() => {
-              const filterChainsUpdated = filterChains.includes(Chain.getUuid(chain))
-                ? filterChains.filter((_uuid) => _uuid !== Chain.getUuid(chain))
-                : [...filterChains, Chain.getUuid(chain)]
-              setFilterChains(filterChainsUpdated)
+              const filterChainUuidsUpdated = filterChainUuids.includes(Chain.getUuid(chain))
+                ? filterChainUuids.filter((_uuid) => _uuid !== Chain.getUuid(chain))
+                : [...filterChainUuids, Chain.getUuid(chain)]
+              setFilterChainUuids(filterChainUuidsUpdated)
             }}
           >
             <span>{Chain.getLabel(lang)(chain)}</span>
@@ -53,14 +53,14 @@ const ChainsFilter = ({ filterChains, setFilterChains }) => {
   )
 }
 
-ChainsFilter.propTypes = {
-  filterChains: PropTypes.array,
-  setFilterChains: PropTypes.func,
+FilterByChain.propTypes = {
+  filterChainUuids: PropTypes.array,
+  setFilterChainUuids: PropTypes.func,
 }
 
-ChainsFilter.defaultProps = {
-  filterChains: [],
-  setFilterChains: () => {},
+FilterByChain.defaultProps = {
+  filterChainUuids: [],
+  setFilterChainUuids: () => {},
 }
 
-export default ChainsFilter
+export default FilterByChain

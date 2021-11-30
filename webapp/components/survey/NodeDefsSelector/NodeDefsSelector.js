@@ -16,7 +16,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
-import ChainsFilter from './ChainsFilter'
+import FilterByChain from './FilterByChain'
 
 const NodeDefsSelector = (props) => {
   const {
@@ -36,7 +36,7 @@ const NodeDefsSelector = (props) => {
   const lang = useSurveyPreferredLang()
 
   const [filterTypes, setFilterTypes] = useState([])
-  const [filterChains, setFilterChains] = useState([])
+  const [filterChainUuids, setFilterChainUuids] = useState([])
 
   const [showFilter, setShowFilter] = useState(false)
 
@@ -89,7 +89,7 @@ const NodeDefsSelector = (props) => {
               ) : null
             )}
           </div>
-          <ChainsFilter filterChains={filterChains} setFilterChains={setFilterChains} />
+          <FilterByChain filterChainUuids={filterChainUuids} setFilterChainUuids={setFilterChainUuids} />
         </>
       )}
 
@@ -100,7 +100,7 @@ const NodeDefsSelector = (props) => {
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
-          filterChains={filterChains}
+          filterChainUuids={filterChainUuids}
           canSelectAttributes={canSelectAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
