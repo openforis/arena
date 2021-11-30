@@ -14,7 +14,7 @@ import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
 
 const AnalysisNodeDefs = () => {
-  const [showBaseUnit, setShowBaseUnit ] = useState(false)
+  const [showBaseUnit, setShowBaseUnit] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -22,10 +22,10 @@ const AnalysisNodeDefs = () => {
   const validation = Chain.getValidation(chain)
   const survey = useSurvey()
 
-  const analysisNodeDefsRef = useRef(null) 
+  const analysisNodeDefsRef = useRef(null)
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain })(survey).filter(_nodeDef => showBaseUnit || !NodeDef.isBaseUnit(_nodeDef)),
+    () => Survey.getAnalysisNodeDefs({ chain, showBaseUnit })(survey),
     [chain, survey, entityDefUuid, showBaseUnit]
   )
 
@@ -42,7 +42,10 @@ const AnalysisNodeDefs = () => {
         )}
 
         <>
-          <AnalysisNodeDefsHeader toggleShowBaseUnit={() => setShowBaseUnit(!showBaseUnit)} showBaseUnit={showBaseUnit}/>
+          <AnalysisNodeDefsHeader
+            toggleShowBaseUnit={() => setShowBaseUnit(!showBaseUnit)}
+            showBaseUnit={showBaseUnit}
+          />
 
           {_analysisNodeDefsToShow.length > 0 && (
             <div className="analysis-node-def__list-header">
