@@ -12,6 +12,10 @@ export {
   startExportAllCategoriesJob,
 } from './categories'
 export {
+  fetchChains
+} from './analysis'
+
+export {
   fetchTaxonomies,
   fetchTaxonomy,
   createTaxonomy,
