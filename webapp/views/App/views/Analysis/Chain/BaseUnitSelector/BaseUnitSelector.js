@@ -47,7 +47,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 const BaseUnitSelector = () => {
   const [baseUnitNodeDef, setBaseUnitNodeDef] = useState(null)
   const [hadBaseUnitNodeDef, setHadBaseUnitNodeDef] = useState(false)
-  const [baseUnitNodeDefsToCreate, setBaseUnitNodeDefsToCreate] = useState([])
+  const [samplingNodeDefsToCreate, setSamplingNodeDefsToCreate] = useState([])
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -60,17 +60,17 @@ const BaseUnitSelector = () => {
   const chain = useChain()
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-  const handleSaveBaseUnitNodeDefs = useCallback(() => {
-    dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: baseUnitNodeDefsToCreate }))
+  const handleSaveSamplingNodeDefs = useCallback(() => {
+    dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: samplingNodeDefsToCreate }))
 
-    setBaseUnitNodeDef(baseUnitNodeDefsToCreate[0])
+    setBaseUnitNodeDef(samplingNodeDefsToCreate[0])
     setHadBaseUnitNodeDef(true)
-    setBaseUnitNodeDefsToCreate([])
-  }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, baseUnitNodeDefsToCreate, setBaseUnitNodeDefsToCreate])
+    setSamplingNodeDefsToCreate([])
+  }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, samplingNodeDefsToCreate, setSamplingNodeDefsToCreate])
 
-  const handleDeleteBaseUnit = useCallback(() => {
-    dispatch(NodeDefsActions.resetBaseUnitNodeDefs({ surveyId, surveyCycleKey, chain }))
-    setBaseUnitNodeDefsToCreate([])
+  const handleDeleteBaseUnitAndSamplingNodeDefs = useCallback(() => {
+    dispatch(NodeDefsActions.resetSamplingNodeDefs({ surveyId, surveyCycleKey, chain }))
+    setSamplingNodeDefsToCreate([])
     setHadBaseUnitNodeDef(false)
     setBaseUnitNodeDef(null)
   }, [surveyId, surveyCycleKey, chain])
@@ -78,7 +78,7 @@ const BaseUnitSelector = () => {
   const handleUpdateBaseUnit = useCallback(
     (entityReferenceUuid) => {
       // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
-      // -> deleteAllBaseUnitNodeDefs in chain to restart this base unit items ( add a new state with nodeDefsToDelete )
+      // -> deleteAllSamplingNodeDefs in chain to restart this base unit items ( add a new state with nodeDefsToDelete )
       // -> If entityReferenceUuid is null delete base unit node_defs -> this is solved with the previus line
 
       const referenceNodeDef = Survey.getNodeDefByUuid(entityReferenceUuid)(survey)
@@ -88,11 +88,12 @@ const BaseUnitSelector = () => {
         .filter(NodeDef.isEntity)
         .filter((_nodeDef) => NodeDef.isMultiple(_nodeDef) || NodeDef.isRoot(_nodeDef))
 
-      let _baseUnitNodeDefsToCreate = [] // store nodeDefs to trigger to the backend
+      let _samplingNodeDefsToCreate = [] // store nodeDefs to trigger to the backend
       const chainUuid = Chain.getUuid(chain)
 
       descendantEntities.forEach((nodeDef) => {
-        const name = NodeDef.isEqual(nodeDef)(referenceNodeDef)
+        const isBaseUnit = NodeDef.isEqual(nodeDef)(referenceNodeDef)
+        const name = isBaseUnit
           ? `weight`
           : `${NodeDef.getName(nodeDef)}__${NodeDef.getName(referenceNodeDef)}_area`
         const props = {
@@ -104,7 +105,8 @@ const BaseUnitSelector = () => {
           [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
           [NodeDef.keysPropsAdvanced.active]: true,
           [NodeDef.keysPropsAdvanced.index]: -1,
-          [NodeDef.keysPropsAdvanced.isBaseUnit]: true,
+          [NodeDef.keysPropsAdvanced.isBaseUnit]: isBaseUnit,
+          [NodeDef.keysPropsAdvanced.isSampling]: true,
           [NodeDef.keysPropsAdvanced.script]: `${NodeDef.getName(nodeDef)}$${name} <- ${defaultValue}`,
         }
         const parentNodeDef = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? referenceNodeDef : nodeDef
@@ -119,11 +121,11 @@ const BaseUnitSelector = () => {
           temporary,
           virtual
         )
-        _baseUnitNodeDefsToCreate.push(_nodeDef)
+        _samplingNodeDefsToCreate.push(_nodeDef)
       })
 
-      setBaseUnitNodeDefsToCreate(_baseUnitNodeDefsToCreate)
-      setBaseUnitNodeDef(_baseUnitNodeDefsToCreate[0])
+      setSamplingNodeDefsToCreate(_samplingNodeDefsToCreate)
+      setBaseUnitNodeDef(_samplingNodeDefsToCreate[0])
     },
     [setBaseUnitNodeDef, baseUnitNodeDef, survey]
   )
@@ -171,15 +173,15 @@ const BaseUnitSelector = () => {
           useNameAsLabel={true}
           allowEmptySelection={true}
         />
-        {baseUnitNodeDefsToCreate.length > 0 && (
+        {samplingNodeDefsToCreate.length > 0 && (
           <div>
-            <ButtonSave onClick={handleSaveBaseUnitNodeDefs} />
+            <ButtonSave onClick={handleSaveSamplingNodeDefs} />
           </div>
         )}
 
         {hadBaseUnitNodeDef && (
           <div>
-            <ButtonDelete onClick={handleDeleteBaseUnit} />
+            <ButtonDelete onClick={handleDeleteBaseUnitAndSamplingNodeDefs} />
           </div>
         )}
       </div>

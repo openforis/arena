@@ -14,7 +14,7 @@ import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
 
 const AnalysisNodeDefs = () => {
-  const [showBaseUnit, setShowBaseUnit] = useState(false)
+  const [showSamplingNodeDefs, setshowSamplingNodeDefs] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -25,8 +25,8 @@ const AnalysisNodeDefs = () => {
   const analysisNodeDefsRef = useRef(null)
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain, showBaseUnit })(survey),
-    [chain, survey, entityDefUuid, showBaseUnit]
+    () => Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs })(survey),
+    [chain, survey, entityDefUuid, showSamplingNodeDefs]
   )
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
@@ -43,8 +43,8 @@ const AnalysisNodeDefs = () => {
 
         <>
           <AnalysisNodeDefsHeader
-            toggleShowBaseUnit={() => setShowBaseUnit(!showBaseUnit)}
-            showBaseUnit={showBaseUnit}
+            toggleshowSamplingNodeDefs={() => setshowSamplingNodeDefs(!showSamplingNodeDefs)}
+            showSamplingNodeDefs={showSamplingNodeDefs}
           />
 
           {_analysisNodeDefsToShow.length > 0 && (

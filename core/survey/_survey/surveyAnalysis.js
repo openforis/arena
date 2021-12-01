@@ -7,7 +7,7 @@ import { getHierarchy, traverseHierarchyItemSync } from './surveyNodeDefs'
 
 // ====== READ
 export const getAnalysisNodeDefs =
-  ({ chain, entity, entityDefUuid, showBaseUnit = true }) =>
+  ({ chain, entity, entityDefUuid, showSamplingNodeDefs = true, hideSamplingNodeDefsWithoutSibilings = true }) =>
   (survey) => {
     let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter(NodeDef.isAnalysis)
 
@@ -29,12 +29,12 @@ export const getAnalysisNodeDefs =
       nodeDefs = nodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === entityDefUuid)
     }
 
-    nodeDefs = nodeDefs.filter((_nodeDef) => showBaseUnit || !NodeDef.isBaseUnit(_nodeDef))
+    nodeDefs = nodeDefs.filter((_nodeDef) => showSamplingNodeDefs || !NodeDef.isSampling(_nodeDef))
 
     // show base unit nodeDefs with nodeDef analysis sibilings
-    if (showBaseUnit) {
+    if (showSamplingNodeDefs && hideSamplingNodeDefsWithoutSibilings) {
       nodeDefs = nodeDefs.filter((nodeDef) => {
-        if (NodeDef.isBaseUnit(nodeDef)) {
+        if (NodeDef.isSampling(nodeDef) && !NodeDef.isBaseUnit(nodeDef)) {
           const hasAnalysisSibilings = nodeDefs.some(
             (_nodeDef) =>
               NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
