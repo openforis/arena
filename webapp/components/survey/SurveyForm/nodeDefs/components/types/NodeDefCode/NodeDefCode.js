@@ -2,8 +2,6 @@ import './NodeDefCode.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
-
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
