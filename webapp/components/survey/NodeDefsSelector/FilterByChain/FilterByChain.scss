@@ -1,0 +1,30 @@
+@import 'webapp/style/vars';
+
+.node-defs-selector__chains {
+  background-color: rgba($greyBorder, 0.8);
+  padding: 1rem;
+  margin-top: -0.3rem;
+  .node-defs-selector__chains_filter {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    .btn-node-def-type {
+      font-size: 0.75rem;
+      font-weight: 400;
+      padding: 0.3rem 0.5rem;
+      height: 30px;
+      text-transform: capitalize;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .icon-left {
+        margin-left: 0 !important;
+      }
+
+      .icon {
+        font-size: 14px !important;
+      }
+    }
+  }
+}
