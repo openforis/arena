@@ -201,7 +201,12 @@ class RChain {
     let attributeName = NodeDef.getName(nodeDef)
     const fileIndex = padStart(Number(index || NodeDef.getChainIndex(nodeDef)) + 1)
 
-    const fileName = `${fileIndex}-${entityName}-${attributeName}`
+    let prefix = entityName
+    if (NodeDef.isBaseUnit(nodeDef)) {
+      prefix = 'base-unit'
+    }
+
+    const fileName = `${fileIndex}-${prefix}-${attributeName}`
 
     const rFile = new RFile(this, path, fileName)
 
@@ -226,7 +231,7 @@ class RChain {
       await FileUtils.mkdir(_samplingPath)
 
       await PromiseUtils.each(
-        analysisNodeDefs.filter((_nodeDef) => NodeDef.isBaseUnit(_nodeDef)),
+        analysisNodeDefs.filter((_nodeDef) => NodeDef.isSampling(_nodeDef)),
         async (nodeDef, index) => {
           await this._initNodeDefFile({ nodeDef, index: index - 1, path: _samplingPath })
         }
@@ -236,7 +241,7 @@ class RChain {
       await FileUtils.mkdir(_entityPath)
 
       await PromiseUtils.each(
-        analysisNodeDefs.filter((_nodeDef) => !NodeDef.isBaseUnit(_nodeDef)),
+        analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
         async (nodeDef, index) => {
           await this._initNodeDefFile({ nodeDef, path: _entityPath })
         }

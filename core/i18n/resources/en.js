@@ -682,7 +682,7 @@ $t(common.cantUndoWarning)`,
     entities: {
       new: 'Virtual entity',
     },
-    baseUnitNodeDefs: 'Base unit NodeDefs',
+    samplingNodeDefs: 'Sampling NodeDefs',
   },
 
   instancesView: {
