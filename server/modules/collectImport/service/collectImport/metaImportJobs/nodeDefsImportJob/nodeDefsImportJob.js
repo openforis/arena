@@ -11,7 +11,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-import * as ObjectUtils from '@core/objectUtils'
 
 import Job from '@server/job/job'
 
