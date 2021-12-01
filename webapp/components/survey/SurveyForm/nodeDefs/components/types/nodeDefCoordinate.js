@@ -1,6 +1,7 @@
 import './nodeDefCoordinate.scss'
 
 import React, { useCallback, useState } from 'react'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 
@@ -17,6 +18,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useAuthCanSeeMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
@@ -29,6 +31,7 @@ const NodeDefCoordinate = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
+  const canSeeMap = useAuthCanSeeMap()
 
   const [showMap, setShowMap] = useState(false)
 
@@ -122,7 +125,7 @@ const NodeDefCoordinate = (props) => {
     </PanelRight>
   ) : null
 
-  const mapTriggerButton = (
+  const mapTriggerButton = canSeeMap ? (
     <Button
       className="map-trigger-btn btn-transparent"
       title="surveyForm.nodeDefCoordinate.showOnMap"
@@ -130,11 +133,17 @@ const NodeDefCoordinate = (props) => {
       onClick={toggleShowMap}
       disabled={edit}
     />
-  )
+  ) : null
 
   if (renderType === NodeDefLayout.renderType.tableBody) {
     return (
-      <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
+      <div
+        className={classNames(
+          'survey-form__node-def-table-cell-composite',
+          'survey-form__node-def-table-cell-coordinate',
+          { 'with-map': canSeeMap }
+        )}
+      >
         {xInput}
         {yInput}
         {srsDropdown}
@@ -145,7 +154,7 @@ const NodeDefCoordinate = (props) => {
   }
 
   return (
-    <div className="survey-form__node-def-coordinate">
+    <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canSeeMap })}>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
       <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
