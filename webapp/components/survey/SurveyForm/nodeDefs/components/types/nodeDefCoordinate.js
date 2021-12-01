@@ -113,7 +113,12 @@ const NodeDefCoordinate = (props) => {
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <Map editable markerPoint={value} markerTitle={nodeDefLabel} onMarkerPointChange={handleLocationOnMapChanged} />
+      <Map
+        editable={!entryDisabled}
+        markerPoint={value}
+        markerTitle={nodeDefLabel}
+        onMarkerPointChange={handleLocationOnMapChanged}
+      />
     </PanelRight>
   ) : null
 
