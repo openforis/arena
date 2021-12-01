@@ -747,7 +747,7 @@ $t(common.cantUndoWarning)`,
     },
     advancedProps: {
       defaultValues: 'Default values',
-      hiddenIfNotRelevant: 'Hidden when not relevant',
+      hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',

@@ -67,7 +67,7 @@ const AdvancedProps = (props) => {
         isContextParent
       />
 
-      <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenIfNotRelevant')}>
+      <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenWhenNotRelevant')}>
         <Checkbox
           checked={NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)}
           disabled={readOnly}
