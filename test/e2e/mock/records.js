@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import csv from 'csv/lib/sync'
+import csv from 'csv/sync'
 
 /* eslint-disable camelcase */
 import { cluster, plot, tree } from './nodeDefs'

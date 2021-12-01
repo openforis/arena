@@ -1,7 +1,7 @@
 import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
-import csv from 'csv/lib/sync'
+import csv from 'csv/sync'
 
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 

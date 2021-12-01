@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import csv from 'csv/lib/sync'
+import csv from 'csv/sync'
 
 import * as PromiseUtils from '../../../../core/promiseUtils'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
