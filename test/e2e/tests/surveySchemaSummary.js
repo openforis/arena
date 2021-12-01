@@ -1,11 +1,11 @@
 import fs from 'fs'
 import path from 'path'
-import csv from 'csv/sync'
 
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { downloadsPath } from '../paths'
 import { gotoFormDesigner } from './_navigation'
 import { cluster } from '../mock/nodeDefs'
+import { parseCsv } from '../../utils/csvUtils'
 
 const getTestNodeDefsOrderedByPath = () => {
   const items = []
@@ -60,10 +60,7 @@ export default () =>
     test(`Check generated schema summary`, async () => {
       await expect(fs.existsSync(filePath)).toBeTruthy()
 
-      data = csv.parse(fs.readFileSync(filePath), {
-        columns: true,
-        skip_empty_lines: true,
-      })
+      data = parseCsv(filePath)
 
       await expect(data.length).toBe(nodeDefsOrderedByPath.length)
     })

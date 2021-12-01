@@ -1,10 +1,9 @@
 import path from 'path'
-import fs from 'fs'
-import csv from 'csv/sync'
 
 /* eslint-disable camelcase */
 import { cluster, plot, tree } from './nodeDefs'
 import { taxonomies } from './taxonomies'
+import { parseCsv } from '../../utils/csvUtils'
 
 const {
   cluster_id,
@@ -21,7 +20,7 @@ const { tree_id, tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 const taxonomy = taxonomies[tree_species.taxonomy]
 const taxonomyPath = path.resolve(__dirname, '..', 'resources', `${taxonomy.name}_predefined.csv`)
-const taxa = csv.parse(fs.readFileSync(taxonomyPath), { columns: true, skip_empty_lines: true })
+const taxa = parseCsv(taxonomyPath)
 
 const getRandomInRange = (from, to, fixed = 0) => (Math.random() * (to - from) + from).toFixed(fixed)
 
