@@ -245,12 +245,14 @@ export const removeNodeDef =
     }
   }
 
-export const resetBaseUnitNodeDefs =
+export const resetSamplingNodeDefs =
   ({ surveyId, surveyCycleKey, chain }) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
-    const nodeDefs = Survey.getAnalysisNodeDefs({ chain })(survey).filter(NodeDef.isBaseUnit)
+    const nodeDefs = Survey.getAnalysisNodeDefs({ chain, hideSamplingNodeDefsWithoutSibilings: false })(survey).filter(
+      (_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef)
+    )
 
     const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
 

@@ -113,6 +113,7 @@ export const keysPropsAdvanced = {
   aggregateFunctions: 'aggregateFunctions',
 
   isBaseUnit: 'isBaseUnit',
+  isSampling: 'isSampling',
 }
 
 const metaKeys = {
@@ -200,6 +201,7 @@ export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
 export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
 export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
+export const isSampling = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isSampling, false)(nodeDef))
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
