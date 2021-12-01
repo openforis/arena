@@ -18,7 +18,6 @@ const Analysis = () => {
   return (
     <SurveyDefsLoader
       draft
-      validate={false}
       requirePublish
       onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.chains))}
     >
