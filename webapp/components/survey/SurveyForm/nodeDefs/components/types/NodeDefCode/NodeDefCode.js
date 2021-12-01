@@ -1,21 +1,21 @@
 import './NodeDefCode.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 
 import * as R from 'ramda'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { RecordState } from '@webapp/store/ui/record'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useRecord } from '@webapp/store/ui/record'
 
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
@@ -26,7 +26,8 @@ const NodeDefCode = (props) => {
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
-  const record = useSelector(RecordState.getRecord)
+  const lang = useSurveyPreferredLang()
+  const record = useRecord()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyId = Survey.getId(survey)
@@ -74,11 +75,20 @@ const NodeDefCode = (props) => {
     }
   }
 
+  const itemLabelFunction = useCallback(
+    (item) =>
+      NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)
+        ? CategoryItem.getLabelWithCode(lang)(item)
+        : CategoryItem.getLabel(lang)(item),
+    [lang]
+  )
+
   return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
     <NodeDefCodeDropdown
       canEditRecord={canEditRecord}
       edit={edit}
       entryDataQuery={entryDataQuery}
+      itemLabelFunction={itemLabelFunction}
       items={itemsArray}
       nodeDef={nodeDef}
       onItemAdd={onItemAdd}
@@ -90,6 +100,7 @@ const NodeDefCode = (props) => {
     <NodeDefCodeCheckbox
       canEditRecord={canEditRecord}
       edit={edit}
+      itemLabelFunction={itemLabelFunction}
       items={itemsArray}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}

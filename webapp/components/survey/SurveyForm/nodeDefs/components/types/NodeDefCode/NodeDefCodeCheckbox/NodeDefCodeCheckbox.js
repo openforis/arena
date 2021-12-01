@@ -4,13 +4,11 @@ import PropTypes from 'prop-types'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefCodeCheckbox = (props) => {
-  const { canEditRecord, edit, items, onItemAdd, onItemRemove, readOnly, selectedItems } = props
+  const { canEditRecord, edit, itemLabelFunction, items, onItemAdd, onItemRemove, readOnly, selectedItems } = props
 
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
 
   const disabled = edit || !canEditRecord || readOnly
 
@@ -35,7 +33,7 @@ const NodeDefCodeCheckbox = (props) => {
                 else onItemAdd(item)
               }}
             >
-              {CategoryItem.getLabel(lang)(item)}
+              {itemLabelFunction(item)}
             </button>
           )
         })
@@ -47,6 +45,7 @@ const NodeDefCodeCheckbox = (props) => {
 NodeDefCodeCheckbox.propTypes = {
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
+  itemLabelFunction: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.object),
   onItemAdd: PropTypes.func.isRequired,
   onItemRemove: PropTypes.func.isRequired,
