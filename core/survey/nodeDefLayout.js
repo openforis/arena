@@ -12,6 +12,8 @@ export const keys = {
   columnWidth: 'columnWidth', // Width of the column when rendering inside a table (defaults to '160px')
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
   hiddenWhenNotRelevant: 'hiddenWhenNotRelevant', // Boolean: true if the node must be hidden when is not relevant
+  // Node Def Code
+  codeShown: 'codeShown', // Boolean: true if the code of the category item should be shown, false otherwise
 }
 
 export const renderType = {
@@ -134,6 +136,8 @@ const _getColumnWidthPart = ({ cycle, nodeDef, partIndex }) => {
 export const getColumnWidthValue = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 1 })
 export const getColumnWidthUnit = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 2 })
 
+export const isCodeShown = (cycle) => _getPropLayout(cycle, keys.codeShown, true)
+
 // ====== UPDATE
 
 // invoked on "layout"
@@ -156,6 +160,8 @@ export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutC
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
 export const assocColumnWidth = (cycle, columnWidth) => assocLayoutProp(cycle, keys.columnWidth, columnWidth)
+
+export const assocCodeShown = (cycle, codeShown) => assocLayoutProp(cycle, keys.codeShown, codeShown)
 
 // ====== UTILS
 

@@ -128,8 +128,15 @@ export const getAttributeBoolean = (name) => R.pipe(getAttribute(name), R.equals
 
 export const getUiAttribute =
   (name, defaultValue = null) =>
-  (collectXmlElement) =>
-    getAttribute(`n1:${name}`)(collectXmlElement) || getAttribute(`ui:${name}`, defaultValue)(collectXmlElement)
+  (collectXmlElement) => {
+    const value =
+      getAttribute(`n1:${name}`)(collectXmlElement) || getAttribute(`ui:${name}`, defaultValue)(collectXmlElement)
+    if (value === 'true' || value === 'false') {
+      // cast the value into Boolean
+      return value === 'true'
+    }
+    return value
+  }
 
 export const getNodeDefRoot = R.pipe(getElementsByPath(['schema', 'entity']), R.head)
 

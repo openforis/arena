@@ -168,6 +168,7 @@ export default class NodeDefsImportJob extends Job {
       propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
     }
 
+    // 3 update node type specific props
     if (type === NodeDef.nodeDefType.entity) {
       // 3a. insert child definitions
       const childrenUuids = await this.insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout)
@@ -176,20 +177,27 @@ export default class NodeDefsImportJob extends Job {
         _updateLayoutProp({ propName: NodeDefLayout.keys.layoutChildren, value: childrenUuids })
       }
     } else if (type === NodeDef.nodeDefType.code) {
-      // Add parent code def uuid
+      // 3b. Add parent code def uuid
       const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
       if (parentCodeDefUuid) {
         propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
       }
 
-      // 3b. add specify text attribute def
+      // 3c. show code prop
+      const codeShown = CollectSurvey.getUiAttribute('showCode', true)(collectNodeDef)
+      if (!codeShown) {
+        // code shown is true by default
+        _updateLayoutProp({ propName: NodeDefLayout.keys.codeShown, value: codeShown })
+      }
+
+      // 3d. add specify text attribute def
       const { nodeDefsUpdated: qualifierNodeDefsUpdated, nodeDefsInserted: qualifierNodeDefsInserted } =
         await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
-    // 3c. update hidden when not relevant layout prop
+    // 4. update hidden when not relevant layout prop
     const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
     if (hiddenWhenNotRelevant) {
       _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
@@ -197,7 +205,7 @@ export default class NodeDefsImportJob extends Job {
 
     Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
 
-    // 4. update node def with other props
+    // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
 
     Object.assign(
