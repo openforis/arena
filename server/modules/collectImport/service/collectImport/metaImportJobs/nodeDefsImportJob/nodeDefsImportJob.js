@@ -11,6 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as ObjectUtils from '@core/objectUtils'
 
 import Job from '@server/job/job'
 
@@ -162,16 +163,18 @@ export default class NodeDefsImportJob extends Job {
     // 3. insert children and updated layout props
     const propsUpdated = {}
 
+    const _updateLayoutProp = ({ propName, value }) => {
+      const layout = propsUpdated[NodeDefLayout.keys.layout] || NodeDef.getLayout(nodeDef)
+      const layoutUpdated = R.assocPath([Survey.cycleOneKey, propName], value)(layout)
+      propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
+    }
+
     if (type === NodeDef.nodeDefType.entity) {
       // 3a. insert child definitions
       const childrenUuids = await this.insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout)
 
       if (tableLayout) {
-        // Update layout prop
-        propsUpdated[NodeDefLayout.keys.layout] = R.pipe(
-          NodeDefLayout.getLayout,
-          R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids)
-        )(nodeDef)
+        _updateLayoutProp({ propName: NodeDefLayout.keys.layoutChildren, value: childrenUuids })
       }
     } else if (type === NodeDef.nodeDefType.code) {
       // Add parent code def uuid
@@ -186,6 +189,11 @@ export default class NodeDefsImportJob extends Job {
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
+    }
+    // 3c. update hidden when not relevant layout prop
+    const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+    if (hiddenWhenNotRelevant) {
+      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
     }
 
     Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
