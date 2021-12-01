@@ -10,11 +10,11 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
+import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
@@ -36,6 +36,7 @@ const CodeProps = (props) => {
   const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
+  const readOnly = !useAuthCanEditSurvey()
 
   const [category, setCategory] = useState(null)
 
@@ -45,8 +46,6 @@ const CodeProps = (props) => {
   const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
 
-  const disabled = !canUpdateCategory
-
   const setCategoryProp = (categorySelected) =>
     Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(categorySelected) })
 
@@ -54,7 +53,7 @@ const CodeProps = (props) => {
     <>
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
         <CategorySelector
-          disabled={disabled}
+          disabled={!canUpdateCategory}
           categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           editingNodeDef
@@ -74,7 +73,7 @@ const CodeProps = (props) => {
               }}
             >
               <Dropdown
-                disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
+                disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
                 idInput={TestId.nodeDefDetails.nodeDefCodeParent}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
@@ -92,6 +91,15 @@ const CodeProps = (props) => {
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
               onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
               items={displayAsItems({ i18n })}
+            />
+          </FormItem>
+
+          <FormItem label={i18n.t('nodeDefEdit.codeProps.codeShown')}>
+            <Checkbox
+              checked={NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)}
+              disabled={readOnly}
+              validation={Validation.getFieldValidation(NodeDefLayout.keys.codeShown)(validation)}
+              onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.codeShown, value })}
             />
           </FormItem>
         </>

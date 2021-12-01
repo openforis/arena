@@ -1,8 +1,12 @@
 .survey-form__node-def-coordinate {
   display: grid;
-  grid-template-columns: 1fr 40px;
+  grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto);
   row-gap: 0.3rem;
+
+  &.with-map {
+    grid-template-columns: 1fr 40px;
+  }
 
   .form-item {
     grid-template-columns: 40px 1fr;
@@ -21,6 +25,10 @@
   .subfields-labels-wrapper,
   &.survey-form__node-def-table-cell-composite {
     display: grid;
-    grid-template-columns: repeat(3, auto) 30px;
+    grid-template-columns: repeat(3, auto);
+
+    &.with-map {
+      grid-template-columns: repeat(3, auto) 30px;
+    }
   }
 }

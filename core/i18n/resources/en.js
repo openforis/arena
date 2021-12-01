@@ -784,6 +784,7 @@ $t(common.cantUndoWarning)`,
     },
     codeProps: {
       category: 'Category',
+      codeShown: 'Show code',
       displayAs: 'Display As',
       displayAsTypes: {
         checkbox: 'Checkbox',
