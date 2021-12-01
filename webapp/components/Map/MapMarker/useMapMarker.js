@@ -46,7 +46,7 @@ export const useMapMarker = (props) => {
       let pointUpdated = PointFactory.createInstance({ x: lng, y: lat, srs: '4326' })
 
       // transform updated location into a location with the same SRS as the marker position parameter
-      if (point && point.srs !== pointUpdated.srs) {
+      if (point?.srs && point.srs !== pointUpdated.srs) {
         pointUpdated = Points.transform(pointUpdated, point.srs)
       }
       onPointUpdatedProp(pointUpdated)
