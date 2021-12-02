@@ -61,7 +61,7 @@ const Login = () => {
         placeholder={i18n.t('loginView.yourPassword')}
       />
 
-      <Link className="btn btn-s btn-transparent guest-login__btn-forgot-pwd" to={guestModules.forgotPassword.path}>
+      <Link className="btn btn-s btn-transparent guest-login__btn-forgot-pwd" to={guestModules.forgotPassword.pathFull}>
         <span className="icon icon-question icon-left icon-12px" />
         {i18n.t('loginView.forgotPassword')}
       </Link>
@@ -72,7 +72,7 @@ const Login = () => {
         </button>
       </div>
 
-      <Link className="btn btn-s btn-transparent guest-login__btn-request-access" to={guestModules.accessRequest.path}>
+      <Link className="btn btn-s btn-transparent guest-login__btn-request-access" to={guestModules.accessRequest.pathFull}>
         <span className="icon icon-question icon-left icon-12px" />
         {i18n.t('loginView.requestAccess')}
       </Link>

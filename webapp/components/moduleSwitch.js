@@ -17,15 +17,11 @@ const ModuleSwitch = (props) => {
   }
 
   return (
-    <Routes location={location}>
-      {modules.map((module, i) => (
-        <Route
-          key={i}
-          exact
-          path={module.path}
-          render={(props) => React.createElement(module.component, { ...module.props, ...props })}
-        />
-      ))}
+    <Routes>
+      {modules.map((module, i) => {
+        const component = React.createElement(module.component, module.props)
+        return <Route key={i} path={module.path} element={component} />
+      })}
     </Routes>
   )
 }

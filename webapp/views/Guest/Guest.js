@@ -26,12 +26,10 @@ const Guest = () => (
     </div>
 
     <Routes>
-      <Route path={guestModules.resetPassword.path} exact component={ResetPassword} />
-      <Route path={guestModules.forgotPassword.path} exact component={ForgotPassword} />
-      <Route path={guestModules.accessRequest.path} exact component={AccessRequest} />
-      <Route>
-        <Login />
-      </Route>
+      <Route path={guestModules.resetPassword.path} element={<ResetPassword />} />
+      <Route path={guestModules.forgotPassword.path} element={<ForgotPassword />} />
+      <Route path={guestModules.accessRequest.path} element={<AccessRequest />} />
+      <Route element={<Login />} />
     </Routes>
   </>
 )

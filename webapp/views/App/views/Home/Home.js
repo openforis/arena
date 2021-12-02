@@ -24,11 +24,11 @@ const Home = () => {
       modules={[
         {
           component: Dashboard,
-          path: appModuleUri(homeModules.dashboard),
+          path: homeModules.dashboard.path,
         },
         {
           component: SurveyList,
-          path: appModuleUri(homeModules.surveyList),
+          path: homeModules.surveyList.path,
         },
         {
           component: TemplateList,

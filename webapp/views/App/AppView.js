@@ -1,9 +1,10 @@
-import './App.scss'
+import './AppView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useLocation, Route, Routes } from 'react-router'
 
 import { appModuleUri, appModules } from '@webapp/app/appModules'
+import { AppReducer, AppState } from '@webapp/store/app'
 
 import Header from './Header'
 import JobMonitor from './JobMonitor'
@@ -14,9 +15,14 @@ import Data from './views/Data'
 import Designer from './views/Designer'
 import Home from './views/Home'
 import Users from './views/Users'
+import { injectReducers } from '@webapp/store'
 
 const AppView = () => {
   const location = useLocation()
+
+  useEffect(() => {
+    injectReducers(AppState.stateKey, AppReducer)
+  }, [])
 
   return (
     <>
@@ -25,12 +31,12 @@ const AppView = () => {
       <div className="app__container">
         <SideBar />
         <div className="app-module">
-          <Routes location={location}>
-            <Route path={appModuleUri(appModules.home)} component={Home} />
-            <Route path={appModuleUri(appModules.designer)} component={Designer} />
-            <Route path={appModuleUri(appModules.data)} component={Data} />
-            <Route path={appModuleUri(appModules.users)} component={Users} />
-            <Route path={appModuleUri(appModules.analysis)} component={Analysis} />
+          <Routes>
+            <Route path={`${appModules.home.path}/*`} element={<Home />} />
+            <Route path={`${appModules.designer.path}/*`} element={<Designer />} />
+            <Route path={`${appModules.data.path}/*`} element={<Data />} />
+            <Route path={`${appModules.users.path}/*`} element={<Users />} />
+            <Route path={`${appModules.analysis.path}/*`} element={<Analysis />} />
           </Routes>
         </div>
       </div>

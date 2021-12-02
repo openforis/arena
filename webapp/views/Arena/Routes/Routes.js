@@ -6,8 +6,8 @@ import { app, guest } from '@webapp/app/appModules'
 
 import { useUser } from '@webapp/store/user'
 
-import DynamicImport from '@webapp/components/dynamicImport'
 import Guest from '@webapp/views/Guest'
+const AppView = React.lazy(() => import('../../App'))
 
 import { useWebSocket } from './useWebSocket'
 import Loader from './Loader'
@@ -21,14 +21,18 @@ const Routes = () => {
   return (
     <>
       <RouterRoutes>
-        <Route path={`/${guest}`} component={Guest} />
-
+        <Route path={`/${guest}/*`} element={<Guest />} />
         {user && User.hasAccepted(user) ? (
-          <Route path={`/${app}`}>
-            <DynamicImport load={() => import('@webapp/views/App/appExport')} />
-          </Route>
+          <Route
+            path={`/${app}/*`}
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <AppView />
+              </React.Suspense>
+            }
+          />
         ) : (
-          <Route component={Guest} />
+          <></>
         )}
       </RouterRoutes>
 
