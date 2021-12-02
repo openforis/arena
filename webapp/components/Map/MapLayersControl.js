@@ -2,7 +2,7 @@ import React from 'react'
 import { LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { OpenStreetMapLayer, ESRILayer } from './BaseLayers'
+import { ESRILayer } from './BaseLayers'
 
 export const MapLayersControl = (props) => {
   const { layers } = props
@@ -11,9 +11,9 @@ export const MapLayersControl = (props) => {
       <LayersControl.BaseLayer checked name="ESRI">
         <ESRILayer />
       </LayersControl.BaseLayer>
-      <LayersControl.BaseLayer name="OpenStreetMap">
+      {/* <LayersControl.BaseLayer name="OpenStreetMap">
         <OpenStreetMapLayer />
-      </LayersControl.BaseLayer>
+      </LayersControl.BaseLayer> */}
       {layers}
     </LayersControl>
   )

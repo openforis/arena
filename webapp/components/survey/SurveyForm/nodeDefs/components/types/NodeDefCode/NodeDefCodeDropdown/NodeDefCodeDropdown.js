@@ -1,26 +1,30 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
 import { TestId } from '@webapp/utils/testId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const NodeDefCodeDropdown = (props) => {
-  const { canEditRecord, edit, entryDataQuery, items, nodeDef, onItemAdd, onItemRemove, readOnly, selectedItems } =
-    props
-
-  const lang = useSurveyPreferredLang()
+  const {
+    canEditRecord,
+    edit,
+    entryDataQuery,
+    itemLabelFunction,
+    items,
+    nodeDef,
+    onItemAdd,
+    onItemRemove,
+    readOnly,
+    selectedItems,
+  } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
   const disabled = R.isEmpty(items)
-
-  const itemLabelFunction = useCallback((item) => CategoryItem.getLabelWithCode(lang)(item), [lang])
 
   return (
     <div className="survey-form__node-def-code">
@@ -59,6 +63,7 @@ NodeDefCodeDropdown.propTypes = {
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
   entryDataQuery: PropTypes.bool,
+  itemLabelFunction: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.object),
   nodeDef: PropTypes.object.isRequired,
   onItemAdd: PropTypes.func.isRequired,

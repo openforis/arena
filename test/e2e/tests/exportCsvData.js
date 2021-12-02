@@ -1,7 +1,6 @@
 import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
-import csv from 'csv/lib/sync'
 
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
@@ -13,6 +12,7 @@ import { gotoHome, gotoDataExport } from './_navigation'
 import { downloadsPath } from '../paths'
 import { cluster, tree, plot } from '../mock/nodeDefs'
 import * as DateUtils from '../../../core/dateUtils'
+import { parseCsvAsync } from '../../utils/csvUtils'
 
 let extractedFolderName = ''
 
@@ -44,10 +44,7 @@ export default () =>
       await page.waitForSelector(prepareExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open
-      await Promise.all([
-        page.waitForSelector(getSelector(TestId.modal.modal)),
-        page.click(prepareExportBtnSelector),
-      ])
+      await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(prepareExportBtnSelector)])
 
       // wait for the job to complete: export button will appear
       const downloadBtnSelector = getSelector(TestId.dataExport.exportCSV, 'button')
@@ -84,12 +81,10 @@ export default () =>
     })
 
     test(`Check cluster data`, async () => {
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'cluster.csv'))).toBeTruthy()
+      const clusterFilePath = path.resolve(extractedFolderName, 'cluster.csv')
+      await expect(fs.existsSync(clusterFilePath)).toBeTruthy()
 
-      const clusterData = csv.parse(fs.readFileSync(path.resolve(extractedFolderName, 'cluster.csv')), {
-        columns: true,
-        skip_empty_lines: true,
-      })
+      const clusterData = await parseCsvAsync(clusterFilePath)
 
       await expect(clusterData.length).toBe(records.length)
 
@@ -125,12 +120,10 @@ export default () =>
     })
 
     test(`Check plot data`, async () => {
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'plot.csv'))).toBeTruthy()
+      const plotFilePath = path.resolve(extractedFolderName, 'plot.csv')
+      await expect(fs.existsSync(plotFilePath)).toBeTruthy()
 
-      const plotData = csv.parse(fs.readFileSync(path.resolve(extractedFolderName, 'plot.csv')), {
-        columns: true,
-        skip_empty_lines: true,
-      })
+      const plotData = await parseCsvAsync(plotFilePath)
 
       const mockPlots = records.flatMap((record) => ({
         plot_id: record.plot_id,
@@ -151,12 +144,10 @@ export default () =>
     })
 
     test(`Check tree data`, async () => {
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'tree.csv'))).toBeTruthy()
+      const treeFilePath = path.resolve(extractedFolderName, 'tree.csv')
+      await expect(fs.existsSync(treeFilePath)).toBeTruthy()
 
-      const treeData = csv.parse(fs.readFileSync(path.resolve(extractedFolderName, 'tree.csv')), {
-        columns: true,
-        skip_empty_lines: true,
-      })
+      const treeData = await parseCsvAsync(treeFilePath)
 
       const mockTrees = records.flatMap((record) => record.trees)
 
