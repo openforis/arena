@@ -38,7 +38,7 @@ const _createTree = (idx) => {
   }
 }
 
-export const createRecord = (idx) => {
+const _createRecord = (idx) => {
   const clusterRegion = `0${getRandomInRange(0, 1)}`
   const clusterProvince = `${clusterRegion}${getRandomInRange(0, 2)}`
   const clusterTime = new Date()
@@ -70,7 +70,7 @@ export const createRecord = (idx) => {
 let _records = null
 const _getRecords = () => {
   if (_records) return _records
-  _records = Array.from(Array(3).keys()).map((idx) => createRecord(idx))
+  _records = Array.from(Array(3).keys()).map((idx) => _createRecord(idx))
   return _records
 }
 

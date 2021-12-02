@@ -5,7 +5,7 @@ import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { downloadsPath } from '../paths'
 import { gotoFormDesigner } from './_navigation'
 import { cluster } from '../mock/nodeDefs'
-import { parseCsv } from '../../utils/csvUtils'
+import { parseCsvAsync } from '../../utils/csvUtils'
 
 const getTestNodeDefsOrderedByPath = () => {
   const items = []
@@ -60,7 +60,7 @@ export default () =>
     test(`Check generated schema summary`, async () => {
       await expect(fs.existsSync(filePath)).toBeTruthy()
 
-      data = parseCsv(filePath)
+      data = await parseCsvAsync(filePath)
 
       await expect(data.length).toBe(nodeDefsOrderedByPath.length)
     })

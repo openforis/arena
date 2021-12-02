@@ -12,7 +12,7 @@ import { gotoHome, gotoDataExport } from './_navigation'
 import { downloadsPath } from '../paths'
 import { cluster, tree, plot } from '../mock/nodeDefs'
 import * as DateUtils from '../../../core/dateUtils'
-import { parseCsv } from '../../utils/csvUtils'
+import { parseCsvAsync } from '../../utils/csvUtils'
 
 let extractedFolderName = ''
 
@@ -84,7 +84,7 @@ export default () =>
       const clusterFilePath = path.resolve(extractedFolderName, 'cluster.csv')
       await expect(fs.existsSync(clusterFilePath)).toBeTruthy()
 
-      const clusterData = parseCsv(clusterFilePath)
+      const clusterData = await parseCsvAsync(clusterFilePath)
 
       await expect(clusterData.length).toBe(records.length)
 
@@ -123,7 +123,7 @@ export default () =>
       const plotFilePath = path.resolve(extractedFolderName, 'plot.csv')
       await expect(fs.existsSync(plotFilePath)).toBeTruthy()
 
-      const plotData = parseCsv(plotFilePath)
+      const plotData = await parseCsvAsync(plotFilePath)
 
       const mockPlots = records.flatMap((record) => ({
         plot_id: record.plot_id,
@@ -147,7 +147,7 @@ export default () =>
       const treeFilePath = path.resolve(extractedFolderName, 'tree.csv')
       await expect(fs.existsSync(treeFilePath)).toBeTruthy()
 
-      const treeData = parseCsv(treeFilePath)
+      const treeData = await parseCsvAsync(treeFilePath)
 
       const mockTrees = records.flatMap((record) => record.trees)
 

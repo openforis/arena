@@ -3447,6 +3447,11 @@ char-regex@^1.0.2:
   resolved "https://registry.yarnpkg.com/char-regex/-/char-regex-1.0.2.tgz#d744358226217f981ed58f479b1d6bcc29545dcf"
   integrity sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==
 
+check-more-types@^2.10.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/check-more-types/-/check-more-types-2.24.0.tgz#1420ffb10fd444dcfc79b43891bbfffd32a84600"
+  integrity sha1-FCD/sQ/URNz8ebQ4kbv//TKoRgA=
+
 chokidar@^3.4.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.1.tgz#ee9ce7bbebd2b79f49f304799d5468e31e14e68a"
@@ -4134,6 +4139,13 @@ csv-generate@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.0.3.tgz#bb95133c918dfcd4a104ce98326c0e4bea4d5aff"
   integrity sha512-BLkPf0MkFfPGNNkqjnT16aNMMHUrbbguDE0pMPDcqrBeMoPOKw04dPl1VNQd6+j/JjmrXjQfFKgz6p3FT+bJFA==
+
+csv-load-sync@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/csv-load-sync/-/csv-load-sync-2.3.1.tgz#847439a206154131bfc0a2905edb853d2c74870f"
+  integrity sha512-oe8Ex/lwUwPY+7FGrGkfIHzihTNHJ9L3rLSZPLVoprT35Mk8DZ1MkLGsJWZjmMlseVyldLqFSWqFHtYsxr2jXQ==
+  dependencies:
+    check-more-types "^2.10.0"
 
 csv-parse@^5.0.3:
   version "5.0.3"

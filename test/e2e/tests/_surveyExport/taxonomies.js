@@ -5,7 +5,7 @@ import { ExportFile } from '../../../../server/modules/survey/service/surveyExpo
 import { getSurveyEntry } from '../../paths'
 import { taxonomies } from '../../mock/taxonomies'
 import { getProps } from './_surveyUtils'
-import { parseCsv } from '../../../utils/csvUtils'
+import { parseCsvAsync } from '../../../utils/csvUtils'
 
 export const verifyTaxonomies = (survey) =>
   test('Verify taxonomies', async () => {
@@ -18,7 +18,7 @@ export const verifyTaxonomies = (survey) =>
 
       // verify taxa
       const taxaFilePath = path.resolve(__dirname, '..', '..', 'resources', `${taxonomy.name}_predefined.csv`)
-      const taxa = parseCsv(taxaFilePath)
+      const taxa = await parseCsvAsync(taxaFilePath)
 
       const taxaExport = getSurveyEntry(survey, ExportFile.taxa({ taxonomyUuid: taxonomyExport.uuid }))
       await expect(taxaExport.length).toBe(taxa.length)
