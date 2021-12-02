@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -13,7 +13,7 @@ const HeaderLeft = (props) => {
   const { headerProps } = props
   const { onTaxonomyCreated } = headerProps
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const inTaxonomiesPath = useIsTaxonomiesRoute()
 
@@ -21,7 +21,7 @@ const HeaderLeft = (props) => {
 
   const onAdd = (taxonomyCreated) => {
     if (inTaxonomiesPath) {
-      history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomyCreated)}`)
+      navigate(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomyCreated)}`)
     } else {
       onTaxonomyCreated(taxonomyCreated)
     }

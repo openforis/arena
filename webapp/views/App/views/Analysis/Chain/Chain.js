@@ -1,6 +1,6 @@
 import './Chain.scss'
 import React, { useEffect } from 'react'
-import { matchPath, useParams, Prompt } from 'react-router'
+import { matchPath, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -16,7 +16,7 @@ import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
-import { useHistoryListen } from '@webapp/components/hooks'
+import { useOnLocationUpdate } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -46,7 +46,7 @@ const ChainComponent = () => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [chainUuid])
 
-  useHistoryListen((location) => {
+  useOnLocationUpdate((location) => {
     const path = appModuleUri(analysisModules.nodeDef)
     if (!matchPath(location.pathname, { path })) {
       dispatch(ChainActions.resetChainStore())
@@ -57,12 +57,12 @@ const ChainComponent = () => {
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
-      <Prompt
+      {/* <Prompt
         when={
           !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
         }
         message={i18n.t('chainView.errorNoLabel')}
-      />
+      /> */}
 
       <div className="btn-rstudio-container">
         {Survey.isDraft(surveyInfo) && (
@@ -91,7 +91,6 @@ const ChainComponent = () => {
           cyclesKeysSelected={chain.props.cycles}
           onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
         />
-
 
         <BaseUnitSelector />
 

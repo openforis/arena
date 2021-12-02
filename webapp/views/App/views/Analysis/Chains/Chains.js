@@ -1,6 +1,6 @@
 import './Chains.scss'
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
 
@@ -15,10 +15,10 @@ import RowHeader from './RowHeader'
 import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyCycleKey = useSurveyCycleKey()
 
-  const onRowClick = (chain) => history.push(`${appModuleUri(analysisModules.chain)}${Chain.getUuid(chain)}`)
+  const onRowClick = (chain) => navigate(`${appModuleUri(analysisModules.chain)}${Chain.getUuid(chain)}`)
 
   return (
     <Table

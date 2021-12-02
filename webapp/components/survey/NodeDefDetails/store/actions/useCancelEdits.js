@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { NodeDefsActions } from '@webapp/store/survey'
@@ -8,19 +8,21 @@ import { NodeDefsActions } from '@webapp/store/survey'
 import { State } from '../state'
 
 export const useCancelEdits = ({ setState }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const cancelEdits = ({ state }) => async () => {
-    const nodeDef = State.getNodeDef(state)
-    const nodeDefOriginal = State.getNodeDefOriginal(state)
+  const cancelEdits =
+    ({ state }) =>
+    async () => {
+      const nodeDef = State.getNodeDef(state)
+      const nodeDefOriginal = State.getNodeDefOriginal(state)
 
-    await setState(State.reset)
+      await setState(State.reset)
 
-    await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
+      await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
-    history.goBack()
-  }
+      navigate.go(-1)
+    }
 
   return useCallback(
     async ({ state }) =>

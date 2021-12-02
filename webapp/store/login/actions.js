@@ -49,7 +49,7 @@ export const logout = () => async (dispatch) => {
   dispatch(LoaderActions.hideLoader())
 }
 
-export const sendPasswordResetEmail = (email, history) =>
+export const sendPasswordResetEmail = (email, navigate) =>
   _createAction(async (dispatch) => {
     const {
       data: { error },
@@ -59,6 +59,6 @@ export const sendPasswordResetEmail = (email, history) =>
       dispatch(setLoginError(error))
     } else {
       dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentToSelfConfirmation', params: { email } }))
-      history.goBack()
+      navigate.go(-1)
     }
   })

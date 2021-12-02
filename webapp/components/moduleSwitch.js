@@ -1,17 +1,21 @@
 import React from 'react'
-import { Route, Routes, withRouter } from 'react-router'
-import { Redirect } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router'
 
 import { appModuleUri } from '@webapp/app/appModules'
 
 const ModuleSwitch = (props) => {
-  const { modules, moduleRoot, moduleDefault, location } = props
+  const { modules, moduleRoot, moduleDefault } = props
+
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const isRootUri = location.pathname === appModuleUri(moduleRoot)
 
-  return isRootUri ? (
-    <Redirect to={appModuleUri(moduleDefault)} />
-  ) : (
+  if (isRootUri) {
+    navigate(appModuleUri(moduleDefault), { replace: true })
+  }
+
+  return (
     <Routes location={location}>
       {modules.map((module, i) => (
         <Route
@@ -31,4 +35,4 @@ ModuleSwitch.defaultProps = {
   moduleDefault: '',
 }
 
-export default withRouter(ModuleSwitch)
+export default ModuleSwitch

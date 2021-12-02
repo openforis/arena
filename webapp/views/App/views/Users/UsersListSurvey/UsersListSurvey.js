@@ -1,7 +1,7 @@
 import './UsersList.scss'
 
 import React, { useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
@@ -14,13 +14,13 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const UsersListSurvey = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyId = useSurveyId()
   const emailVisible = useAuthCanViewOtherUsersEmail()
 
   const onRowClick = useCallback(
-    (user) => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
-    [history]
+    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
+    [navigate]
   )
 
   return (

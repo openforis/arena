@@ -2,7 +2,7 @@ import './formHeader.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
@@ -29,7 +29,7 @@ const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
 
   const surveyId = useSurveyId()
@@ -66,7 +66,7 @@ const FormHeader = (props) => {
                   uuidv4()
                 ),
               }
-              dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, history))
+              dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, navigate))
             }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
