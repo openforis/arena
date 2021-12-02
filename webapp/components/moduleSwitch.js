@@ -12,6 +12,7 @@ const ModuleSwitch = (props) => {
   const isRootUri = location.pathname === appModuleUri(moduleRoot)
 
   if (isRootUri) {
+    // redirect to default url
     navigate(appModuleUri(moduleDefault), { replace: true })
   }
 
