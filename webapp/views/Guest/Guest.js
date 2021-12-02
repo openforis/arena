@@ -1,6 +1,6 @@
 import './Guest.scss'
 import React from 'react'
-import { Route, Switch } from 'react-router'
+import { Route, Routes } from 'react-router'
 
 import { guestModules } from '@webapp/app/appModules'
 import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
@@ -25,14 +25,14 @@ const Guest = () => (
       </div>
     </div>
 
-    <Switch>
+    <Routes>
       <Route path={guestModules.resetPassword.path} exact component={ResetPassword} />
       <Route path={guestModules.forgotPassword.path} exact component={ForgotPassword} />
       <Route path={guestModules.accessRequest.path} exact component={AccessRequest} />
       <Route>
         <Login />
       </Route>
-    </Switch>
+    </Routes>
   </>
 )
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Switch, withRouter } from 'react-router'
+import { Route, Routes, withRouter } from 'react-router'
 import { Redirect } from 'react-router-dom'
 
 import { appModuleUri } from '@webapp/app/appModules'
@@ -12,7 +12,7 @@ const ModuleSwitch = (props) => {
   return isRootUri ? (
     <Redirect to={appModuleUri(moduleDefault)} />
   ) : (
-    <Switch location={location}>
+    <Routes location={location}>
       {modules.map((module, i) => (
         <Route
           key={i}
@@ -21,7 +21,7 @@ const ModuleSwitch = (props) => {
           render={(props) => React.createElement(module.component, { ...module.props, ...props })}
         />
       ))}
-    </Switch>
+    </Routes>
   )
 }
 

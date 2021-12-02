@@ -1,7 +1,7 @@
 import './App.scss'
 
 import React from 'react'
-import { useLocation, Route, Switch } from 'react-router'
+import { useLocation, Route, Routes } from 'react-router'
 
 import { appModuleUri, appModules } from '@webapp/app/appModules'
 
@@ -25,13 +25,13 @@ const AppView = () => {
       <div className="app__container">
         <SideBar />
         <div className="app-module">
-          <Switch location={location}>
+          <Routes location={location}>
             <Route path={appModuleUri(appModules.home)} component={Home} />
             <Route path={appModuleUri(appModules.designer)} component={Designer} />
             <Route path={appModuleUri(appModules.data)} component={Data} />
             <Route path={appModuleUri(appModules.users)} component={Users} />
             <Route path={appModuleUri(appModules.analysis)} component={Analysis} />
-          </Switch>
+          </Routes>
         </div>
       </div>
 
