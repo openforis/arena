@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import marked from 'marked'
+import { marked } from 'marked'
 
 const Markdown = (props) => {
   const { container: Container, className, source } = props
   const [output, setOutput] = useState('')
 
   useEffect(() => {
-    setOutput(marked(source))
+    setOutput(marked.parse(source))
   }, [source])
 
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />

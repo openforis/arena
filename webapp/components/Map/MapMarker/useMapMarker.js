@@ -6,7 +6,7 @@ import { useSRSs } from '@webapp/components/hooks'
 import { useMapEvents } from 'react-leaflet'
 
 export const useMapMarker = (props) => {
-  const { onPointUpdated: onPointUpdatedProp, point } = props
+  const { editable, onPointUpdated: onPointUpdatedProp, point } = props
 
   const { srssInitialized } = useSRSs()
 
@@ -46,7 +46,7 @@ export const useMapMarker = (props) => {
       let pointUpdated = PointFactory.createInstance({ x: lng, y: lat, srs: '4326' })
 
       // transform updated location into a location with the same SRS as the marker position parameter
-      if (point && point.srs !== pointUpdated.srs) {
+      if (point?.srs && point.srs !== pointUpdated.srs) {
         pointUpdated = Points.transform(pointUpdated, point.srs)
       }
       onPointUpdatedProp(pointUpdated)
@@ -67,12 +67,14 @@ export const useMapMarker = (props) => {
     []
   )
 
-  useMapEvents({
-    dblclick(event) {
-      const { lat, lng } = event.latlng
-      onPointUpdated({ lat, lng })
-    },
-  })
+  if (editable) {
+    useMapEvents({
+      dblclick(event) {
+        const { lat, lng } = event.latlng
+        onPointUpdated({ lat, lng })
+      },
+    })
+  }
 
   return { markerEventHandlers, markerRef, pointLatLon }
 }

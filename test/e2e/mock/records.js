@@ -1,10 +1,9 @@
 import path from 'path'
-import fs from 'fs'
-import csv from 'csv/lib/sync'
 
 /* eslint-disable camelcase */
 import { cluster, plot, tree } from './nodeDefs'
 import { taxonomies } from './taxonomies'
+import { parseCsv } from '../../utils/csvUtils'
 
 const {
   cluster_id,
@@ -21,7 +20,7 @@ const { tree_id, tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 const taxonomy = taxonomies[tree_species.taxonomy]
 const taxonomyPath = path.resolve(__dirname, '..', 'resources', `${taxonomy.name}_predefined.csv`)
-const taxa = csv.parse(fs.readFileSync(taxonomyPath), { columns: true, skip_empty_lines: true })
+const taxa = parseCsv(taxonomyPath)
 
 const getRandomInRange = (from, to, fixed = 0) => (Math.random() * (to - from) + from).toFixed(fixed)
 
@@ -39,7 +38,7 @@ const _createTree = (idx) => {
   }
 }
 
-export const createRecord = (idx) => {
+const _createRecord = (idx) => {
   const clusterRegion = `0${getRandomInRange(0, 1)}`
   const clusterProvince = `${clusterRegion}${getRandomInRange(0, 2)}`
   const clusterTime = new Date()
@@ -71,7 +70,7 @@ export const createRecord = (idx) => {
 let _records = null
 const _getRecords = () => {
   if (_records) return _records
-  _records = Array.from(Array(3).keys()).map((idx) => createRecord(idx))
+  _records = Array.from(Array(3).keys()).map((idx) => _createRecord(idx))
   return _records
 }
 
