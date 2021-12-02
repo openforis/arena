@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
@@ -9,7 +9,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { State } from '../state'
 
 export const useEdit = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const inTaxonomiesPath = useIsTaxonomiesRoute()
 
   return useCallback(({ state }) => {
@@ -21,7 +21,7 @@ export const useEdit = () => {
         onTaxonomyOpen(taxonomy)
       }
     } else {
-      history.push(`${appModuleUri(designerModules.taxonomy)}${taxonomyUuid}/`)
+      navigate(`${appModuleUri(designerModules.taxonomy)}${taxonomyUuid}/`)
     }
   }, [])
 }

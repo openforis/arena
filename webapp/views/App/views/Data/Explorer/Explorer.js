@@ -6,14 +6,14 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { ExplorerStorage } from '@webapp/service/storage/explorer'
 
-import { useHistoryListen } from '@webapp/components/hooks'
+import { useOnLocationUpdate } from '@webapp/components/hooks'
 import DataQuery from '@webapp/components/DataQuery'
 
 const Explorer = () => {
   const queryStorage = ExplorerStorage.getQuery()
   const [query, setQuery] = useState(queryStorage || Query.create())
 
-  useHistoryListen(
+  useOnLocationUpdate(
     (location) => {
       // user clicks record link in table edit mode: query gets persisted in storage
       if (matchPath(location.pathname, { path: appModuleUri(dataModules.record) })) {

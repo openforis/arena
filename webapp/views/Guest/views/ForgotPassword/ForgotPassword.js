@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { useFormObject } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
@@ -12,7 +12,7 @@ const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
   const error = useSelector(LoginState.getError)
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
 
   const onSubmit = () => {
     if (objectValid) {
-      dispatch(LoginActions.sendPasswordResetEmail(formObject.email, history))
+      dispatch(LoginActions.sendPasswordResetEmail(formObject.email, navigate))
     } else {
       dispatch(LoginActions.setLoginError(LoginValidator.getFirstError(validation, ['email'])))
     }

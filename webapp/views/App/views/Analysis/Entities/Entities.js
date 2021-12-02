@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import Table from '@webapp/components/Table'
 
@@ -10,9 +10,9 @@ import RowHeader from './RowHeader'
 import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
-  const onRowClick = (nodeDef) => history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDef.uuid}`)
+  const onRowClick = (nodeDef) => navigate(`${appModuleUri(analysisModules.nodeDef)}${nodeDef.uuid}`)
 
   return (
     <Table

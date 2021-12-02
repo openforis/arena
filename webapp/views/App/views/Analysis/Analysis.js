@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
@@ -14,13 +14,9 @@ import Instances from './Instances'
 // import Entities from './Entities'
 
 const Analysis = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
-    <SurveyDefsLoader
-      draft
-      requirePublish
-      onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.chains))}
-    >
+    <SurveyDefsLoader draft requirePublish onSurveyCycleUpdate={() => navigate(appModuleUri(analysisModules.chains))}>
       <ModuleSwitch
         moduleRoot={appModules.analysis}
         moduleDefault={analysisModules.chains}

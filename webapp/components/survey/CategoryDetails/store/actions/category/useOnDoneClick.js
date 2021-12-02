@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
@@ -7,11 +7,11 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { State } from '../../state'
 
 export const useOnDoneClick = ({ setState }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const performDone = () => {
-    history.goBack()
+    navigate.go(-1)
   }
 
   return useCallback(() => {

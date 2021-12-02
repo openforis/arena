@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes as RouterRoutes } from 'react-router-dom'
 
 import * as User from '@core/user/user'
 import { app, guest } from '@webapp/app/appModules'
@@ -20,7 +20,7 @@ const Routes = () => {
 
   return (
     <>
-      <Routes>
+      <RouterRoutes>
         <Route path={`/${guest}`} component={Guest} />
 
         {user && User.hasAccepted(user) ? (
@@ -30,7 +30,7 @@ const Routes = () => {
         ) : (
           <Route component={Guest} />
         )}
-      </Routes>
+      </RouterRoutes>
 
       <Loader />
       <DialogConfirm />

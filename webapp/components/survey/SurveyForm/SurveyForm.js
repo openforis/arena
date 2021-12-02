@@ -2,9 +2,7 @@ import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
-import { compose } from 'redux'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
@@ -19,7 +17,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
+import { useOnLocationUpdate, useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
@@ -116,7 +114,7 @@ const SurveyForm = (props) => {
     }
   }, [])
 
-  useHistoryListen(() => {
+  useOnLocationUpdate(() => {
     // the entity navigation state should be reset if we change from designer to records
     if (
       matchPath(window.location.pathname, {
@@ -223,5 +221,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const enhance = compose(withRouter, connect(mapStateToProps))
-export default enhance(SurveyForm)
+export default connect(mapStateToProps)(SurveyForm)
