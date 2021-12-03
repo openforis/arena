@@ -7,16 +7,16 @@ export const guestModules = {
     path: 'login/',
   },
   resetPassword: {
+    key: 'resetPassword',
     path: `resetPassword/:uuid/`,
-    pathFull: `/${guest}/resetPassword/:uuid/`,
   },
   forgotPassword: {
-    path: `forgotPassword/`,
-    pathFull: `/${guest}/forgotPassword/`,
+    key: 'forgotPassword',
+    path: `forgotPassword`,
   },
   accessRequest: {
-    path: `accessRequest/`,
-    pathFull: `/${guest}/accessRequest/`,
+    key: 'accessRequest',
+    path: `accessRequest`,
   },
 }
 
@@ -222,6 +222,8 @@ export const app = 'app'
 
 const _getModuleParentPathParts = (module) => {
   if (Object.values(appModules).includes(module)) return [app]
+  if (Object.values(guestModules).includes(module)) return [guest]
+
   if (Object.values(homeModules).includes(module)) return _getModulePathParts(appModules.home)
   if (Object.values(designerModules).includes(module)) return _getModulePathParts(appModules.designer)
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)

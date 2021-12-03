@@ -3,7 +3,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { guestModules } from '@webapp/app/appModules'
+import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
@@ -61,7 +61,10 @@ const Login = () => {
         placeholder={i18n.t('loginView.yourPassword')}
       />
 
-      <Link className="btn btn-s btn-transparent guest-login__btn-forgot-pwd" to={guestModules.forgotPassword.pathFull}>
+      <Link
+        className="btn btn-s btn-transparent guest-login__btn-forgot-pwd"
+        to={appModuleUri(guestModules.forgotPassword)}
+      >
         <span className="icon icon-question icon-left icon-12px" />
         {i18n.t('loginView.forgotPassword')}
       </Link>
@@ -72,7 +75,10 @@ const Login = () => {
         </button>
       </div>
 
-      <Link className="btn btn-s btn-transparent guest-login__btn-request-access" to={guestModules.accessRequest.pathFull}>
+      <Link
+        className="btn btn-s btn-transparent guest-login__btn-request-access"
+        to={appModuleUri(guestModules.accessRequest)}
+      >
         <span className="icon icon-question icon-left icon-12px" />
         {i18n.t('loginView.requestAccess')}
       </Link>

@@ -100,7 +100,7 @@ const SurveyForm = (props) => {
   }, [])
 
   const isInFormDesignerRoute = useIsInRoute(appModuleUri(designerModules.formDesigner))
-  const isInNodeDefRoute = useIsInRoute(appModuleUri(designerModules.formDesigner))
+  const isInNodeDefRoute = useIsInRoute(appModuleUri(designerModules.nodeDef))
   const isInRecordsRoute = useIsInRoute(appModuleUri(dataModules.records))
 
   useEffect(() => {
@@ -111,15 +111,15 @@ const SurveyForm = (props) => {
         dispatch(SurveyFormActions.resetForm())
       }
     }
-  }, [])
+  }, [isInFormDesignerRoute, isInNodeDefRoute])
 
   const onLocationUpdate = useCallback(() => {
+    // TODO restore it
     // the entity navigation state should be reset if we change from designer to records
-    if ((canEditDef && isInRecordsRoute) || isInFormDesignerRoute) {
-      dispatch(SurveyFormActions.resetForm())
-    }
+    // if ((canEditDef && isInRecordsRoute) || isInFormDesignerRoute) {
+    //   dispatch(SurveyFormActions.resetForm())
+    // }
   }, [canEditDef, isInRecordsRoute, isInFormDesignerRoute])
-
   useOnLocationUpdate(onLocationUpdate, [])
 
   if (!nodeDef) {
