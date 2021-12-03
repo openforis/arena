@@ -36,7 +36,7 @@ export const useOnBrowserBack = (params) => {
 
   const addTempLocationToHistory = () => {
     if (!tempLocationSetRef.current) {
-      navigate(location.pathname, null)
+      navigate(location.pathname, { state: null })
       //history.push(history.location.pathname, null)
       tempLocationSetRef.current = true
     }
