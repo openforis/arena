@@ -1,12 +1,10 @@
 import './AppView.scss'
 
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router'
 
-import { app, appModules } from '@webapp/app/appModules'
+import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
-import { useIsInRoute } from '@webapp/components/hooks'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import Header from './Header'
@@ -20,9 +18,6 @@ import Home from './views/Home'
 import Users from './views/Users'
 
 const AppView = () => {
-  const navigate = useNavigate()
-  const isInRootPath = useIsInRoute(`/${app}/`)
-
   useEffect(() => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])
