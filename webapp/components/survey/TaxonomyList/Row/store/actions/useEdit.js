@@ -12,16 +12,19 @@ export const useEdit = () => {
   const navigate = useNavigate()
   const inTaxonomiesPath = useIsTaxonomiesRoute()
 
-  return useCallback(({ state }) => {
-    const taxonomy = State.getTaxonomy(state)
-    const taxonomyUuid = Taxonomy.getUuid(taxonomy)
-    if (!inTaxonomiesPath) {
-      const onTaxonomyOpen = State.getOnTaxonomyOpen(state)
-      if (onTaxonomyOpen) {
-        onTaxonomyOpen(taxonomy)
+  return useCallback(
+    ({ state }) => {
+      const taxonomy = State.getTaxonomy(state)
+      const taxonomyUuid = Taxonomy.getUuid(taxonomy)
+      if (!inTaxonomiesPath) {
+        const onTaxonomyOpen = State.getOnTaxonomyOpen(state)
+        if (onTaxonomyOpen) {
+          onTaxonomyOpen(taxonomy)
+        }
+      } else {
+        navigate(`${appModuleUri(designerModules.taxonomy)}${taxonomyUuid}/`)
       }
-    } else {
-      navigate(`${appModuleUri(designerModules.taxonomy)}${taxonomyUuid}/`)
-    }
-  }, [])
+    },
+    [inTaxonomiesPath]
+  )
 }

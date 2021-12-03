@@ -1,10 +1,12 @@
 import './AppView.scss'
 
 import React, { useEffect } from 'react'
-import { Route, Routes } from 'react-router'
+import { Route, Routes, useNavigate } from 'react-router'
 
-import { appModules } from '@webapp/app/appModules'
+import { app, appModules, appModuleUri } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
+import { injectReducers } from '@webapp/store'
+import { useIsInRoute } from '@webapp/components/hooks'
 
 import Header from './Header'
 import JobMonitor from './JobMonitor'
@@ -15,12 +17,22 @@ import Data from './views/Data'
 import Designer from './views/Designer'
 import Home from './views/Home'
 import Users from './views/Users'
-import { injectReducers } from '@webapp/store'
 
 const AppView = () => {
+  const navigate = useNavigate()
+  const isInRootPath = useIsInRoute(`/${app}/`)
+
   useEffect(() => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])
+
+  // if is in root path (/app) redirect to /app/home
+  useEffect(() => {
+    if (isInRootPath) {
+      // redirect to default url
+      navigate(appModuleUri(appModules.home), { replace: true })
+    }
+  }, [isInRootPath])
 
   return (
     <>

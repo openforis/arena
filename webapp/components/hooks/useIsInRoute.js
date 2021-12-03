@@ -4,11 +4,8 @@ import { designerModules, appModuleUri } from '@webapp/app/appModules'
 export const useIsInRoute = (path) => {
   const { pathname: currentPathName } = useLocation()
   // path can be a string or an array
-  if (typeof path === 'string') {
-    return Boolean(matchPath(currentPathName, path))
-  } else {
-    path.every((_path) => Boolean(matchPath(currentPathName, _path)))
-  }
+  const paths = Array.isArray(path) ? path : [path]
+  return paths.some((_path) => Boolean(matchPath(currentPathName, _path)))
 }
 
 export const useIsCategoriesRoute = () =>

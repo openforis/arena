@@ -67,7 +67,7 @@ const Designer = () => {
 
           {
             component: TaxonomyDetails,
-            path: `${designerModules.taxonomy}/:taxonomyUuid`,
+            path: `${designerModules.taxonomy.path}/:taxonomyUuid`,
           },
         ]}
       />
