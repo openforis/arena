@@ -1,21 +1,27 @@
 import React, { useEffect } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
+import PropTypes from 'prop-types'
 
-import { appModuleUri } from '@webapp/app/appModules'
+import { app, appModuleUri } from '@webapp/app/appModules'
 import { useIsInRoute } from '@webapp/components/hooks'
 
 const ModuleSwitch = (props) => {
   const { modules, moduleRoot, moduleDefault } = props
 
   const navigate = useNavigate()
-  const isInRootModule = useIsInRoute(appModuleUri(moduleRoot))
 
-  useEffect(() => {
-    if (isInRootModule) {
-      // redirect to default url
-      navigate(appModuleUri(moduleDefault), { replace: true })
-    }
-  }, [isInRootModule])
+  if (moduleDefault) {
+    // redirect to default module/url
+    const rootPath = moduleRoot ? appModuleUri(moduleRoot) : `/${app}`
+
+    const isInRootModule = useIsInRoute(rootPath)
+
+    useEffect(() => {
+      if (isInRootModule) {
+        navigate(appModuleUri(moduleDefault), { replace: true })
+      }
+    }, [isInRootModule])
+  }
 
   return (
     <Routes>
@@ -26,10 +32,16 @@ const ModuleSwitch = (props) => {
   )
 }
 
+ModuleSwitch.propTypes = {
+  modules: PropTypes.array.isRequired,
+  moduleRoot: PropTypes.object,
+  moduleDefault: PropTypes.object,
+}
+
 ModuleSwitch.defaultProps = {
   modules: [],
-  moduleRoot: '',
-  moduleDefault: '',
+  moduleRoot: null,
+  moduleDefault: null,
 }
 
 export default ModuleSwitch

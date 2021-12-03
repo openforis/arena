@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
+import { appModules, userModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 

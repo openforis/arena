@@ -10,7 +10,7 @@ import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
-import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
+import { appModules, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import FormDesigner from './FormDesigner'

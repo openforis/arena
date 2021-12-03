@@ -3,6 +3,9 @@
 export const guest = 'guest'
 
 export const guestModules = {
+  login: {
+    path: 'login/',
+  },
   resetPassword: {
     path: `resetPassword/:uuid/`,
     pathFull: `/${guest}/resetPassword/:uuid/`,
