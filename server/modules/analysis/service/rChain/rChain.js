@@ -199,14 +199,21 @@ class RChain {
     const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
     const entityName = NodeDef.getName(parentEntity)
     let attributeName = NodeDef.getName(nodeDef)
-    const fileIndex = padStart(Number(index || NodeDef.getChainIndex(nodeDef)) + 1)
+    const fileIndex = padStart(Number((index || index === 0 ) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1)
 
-    let prefix = entityName
+    let prefix = `-${entityName}`
+    let attributeNameInFile = attributeName
     if (NodeDef.isBaseUnit(nodeDef)) {
-      prefix = 'base-unit'
+      prefix = '-base-unit'
     }
 
-    const fileName = `${fileIndex}-${prefix}-${attributeName}`
+    if (NodeDef.isSampling(nodeDef)) {
+      prefix = ''
+      attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
+      console.log("attributeNameInFile", attributeNameInFile)
+    }
+
+    const fileName = `${fileIndex}${prefix}-${attributeNameInFile}`
 
     const rFile = new RFile(this, path, fileName)
 

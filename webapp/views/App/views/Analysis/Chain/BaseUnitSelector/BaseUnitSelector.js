@@ -95,7 +95,8 @@ const BaseUnitSelector = () => {
         const isBaseUnit = NodeDef.isEqual(nodeDef)(referenceNodeDef)
         const name = isBaseUnit
           ? `weight`
-          : `${NodeDef.getName(nodeDef)}__${NodeDef.getName(referenceNodeDef)}_area`
+          : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
+
         const props = {
           [NodeDef.propKeys.name]: name,
         }

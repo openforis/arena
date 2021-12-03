@@ -110,7 +110,14 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const nodeDefName = NodeDef.getName(nodeDef)
           const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-          const name = `${NodeDef.getName(entity)}-${nodeDefName}`
+          let name = `${NodeDef.getName(entity)}-${nodeDefName}`
+          if(NodeDef.isBaseUnit(nodeDef)){
+            name = `base-unit`
+          }
+          if(NodeDef.isSampling(nodeDef)){
+            name = nodeDefName.replace(`${NodeDef.getName(entity)}_`,`${NodeDef.getName(entity)}-`)
+          }
+           
           const script = (await fileZip.getEntryAsText(findEntry({ name })))?.trim()
 
           if (script) {
