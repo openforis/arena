@@ -75,7 +75,7 @@ export const useSaveEdits = ({ setState }) => {
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
 
     if (goBackOnEnd) {
-      navigate.go(-1)
+      navigate(-1)
     }
   }, [])
 }

@@ -59,6 +59,6 @@ export const sendPasswordResetEmail = (email, navigate) =>
       dispatch(setLoginError(error))
     } else {
       dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentToSelfConfirmation', params: { email } }))
-      navigate.go(-1)
+      navigate(-1)
     }
   })

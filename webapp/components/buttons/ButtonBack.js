@@ -8,7 +8,7 @@ export const ButtonBack = (props) => {
 
   const navigate = useNavigate()
 
-  return <Button onClick={() => navigate.go(-1)} {...props} className={`btn-secondary btn-back ${className}`} />
+  return <Button onClick={() => navigate(-1)} {...props} className={`btn-secondary btn-back ${className}`} />
 }
 
 // onClick prop is not required in ButtonBack

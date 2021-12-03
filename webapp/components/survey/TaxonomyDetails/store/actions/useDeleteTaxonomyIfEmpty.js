@@ -12,7 +12,7 @@ export const useDeleteTaxonomyIfEmpty = ({ setState }) => {
   return useCallback(async ({ taxonomyUuid }) => {
     await API.deleteTaxonomyIfEmpty({ surveyId, taxonomyUuid })
     setState(State.assocDeleted)
-    navigate.go(-1)
+    navigate(-1)
     return true // returns true to notify the navigation to the previous page
   }, [])
 }

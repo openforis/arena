@@ -20,7 +20,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
 export const recordDeleted = (navigate) => (dispatch) => {
   dispatch({ type: ActionTypes.recordDelete })
   dispatch(NotificationActions.notifyInfo({ key: 'recordView.justDeleted' }))
-  navigate.go(-1)
+  navigate(-1)
 }
 
 export const deleteRecord = (navigate) => async (dispatch, getState) => {

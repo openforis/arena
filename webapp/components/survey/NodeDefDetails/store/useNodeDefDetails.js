@@ -48,7 +48,7 @@ export const useNodeDefDetails = () => {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
             dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefSurvey }))
           } catch (err) {
-            navigate.go(-1)
+            navigate(-1)
           }
         }
         const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
@@ -60,7 +60,7 @@ export const useNodeDefDetails = () => {
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
-      navigate.go(-1)
+      navigate(-1)
     } else {
       navigate(appModuleUri(analysisModules.chains))
     }

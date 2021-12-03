@@ -21,7 +21,7 @@ export const useCancelEdits = ({ setState }) => {
 
       await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
-      navigate.go(-1)
+      navigate(-1)
     }
 
   return useCallback(

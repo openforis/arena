@@ -11,7 +11,7 @@ export const useOnDoneClick = ({ setState }) => {
   const dispatch = useDispatch()
 
   const performDone = () => {
-    navigate.go(-1)
+    navigate(-1)
   }
 
   return useCallback(() => {

@@ -237,7 +237,7 @@ export const removeNodeDef =
 
             dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
             if (navigate) {
-              navigate.go(-1)
+              navigate(-1)
             }
           },
         })

@@ -13,7 +13,7 @@ export const useCleanupCategory = ({ setState }) => {
   return useCallback(async ({ categoryUuid }) => {
     await API.cleanupCategory({ surveyId, categoryUuid })
     setState(State.assocCleaned)
-    navigate.go(-1)
+    navigate(-1)
     return true // returns true to notify the navigation to the previous page
   }, [])
 }
