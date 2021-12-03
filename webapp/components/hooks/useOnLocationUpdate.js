@@ -7,5 +7,5 @@ export const useOnLocationUpdate = (listener, inputs = []) => {
   useEffect(() => {
     // invoke listener on location change
     listener(location)
-  }, [...inputs, location, listener])
+  }, [...inputs, location.pathname])
 }

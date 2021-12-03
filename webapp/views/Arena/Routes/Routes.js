@@ -32,7 +32,7 @@ const Routes = () => {
             }
           />
         ) : (
-          <></>
+          <Route path="*" element={<Guest />} />
         )}
       </RouterRoutes>
 

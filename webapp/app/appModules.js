@@ -216,4 +216,17 @@ export const helpModules = {
 }
 
 export const app = 'app'
-export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
+
+const _getModuleParentPathParts = (module) => {
+  if (Object.values(appModules).includes(module)) return [app]
+  if (Object.values(homeModules).includes(module)) return _getModulePathParts(appModules.home)
+  if (Object.values(designerModules).includes(module)) return _getModulePathParts(appModules.designer)
+  if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
+  if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
+  if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
+  throw new Error(`Parent path not found for module ${module?.path}`)
+}
+
+const _getModulePathParts = (module) => [..._getModuleParentPathParts(module), module.path]
+
+export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`

@@ -27,47 +27,47 @@ const Designer = () => {
         modules={[
           {
             component: FormDesigner,
-            path: appModuleUri(designerModules.formDesigner),
+            path: designerModules.formDesigner.path,
           },
 
           {
             component: NodeDefDetails,
-            path: appModuleUri(designerModules.nodeDef),
+            path: designerModules.nodeDef.path,
           },
 
           {
             component: NodeDefDetails,
-            path: `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid/`,
+            path: `${designerModules.nodeDef.path}/:nodeDefUuid/`,
           },
 
           {
             component: SurveyHierarchy,
-            path: appModuleUri(designerModules.surveyHierarchy),
+            path: designerModules.surveyHierarchy.path,
           },
 
           {
             component: CategoryList,
-            path: appModuleUri(designerModules.categories),
+            path: designerModules.categories.path,
           },
 
           {
             component: CategoryDetails,
-            path: `${appModuleUri(designerModules.category)}`,
+            path: designerModules.category.path,
           },
 
           {
             component: CategoryDetails,
-            path: `${appModuleUri(designerModules.category)}:categoryUuid`,
+            path: `${designerModules.category.path}/:categoryUuid`,
           },
 
           {
             component: TaxonomyList,
-            path: appModuleUri(designerModules.taxonomies),
+            path: designerModules.taxonomies.path,
           },
 
           {
             component: TaxonomyDetails,
-            path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
+            path: `${designerModules.taxonomy}/:taxonomyUuid`,
           },
         ]}
       />

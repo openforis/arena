@@ -1,9 +1,8 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,7 +16,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useOnLocationUpdate, useOnUpdate } from '@webapp/components/hooks'
+import { useIsInRoute, useOnLocationUpdate, useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
@@ -100,30 +99,28 @@ const SurveyForm = (props) => {
     }
   }, [])
 
+  const isInFormDesignerRoute = useIsInRoute(appModuleUri(designerModules.formDesigner))
+  const isInNodeDefRoute = useIsInRoute(appModuleUri(designerModules.formDesigner))
+  const isInRecordsRoute = useIsInRoute(appModuleUri(dataModules.records))
+
   useEffect(() => {
     // reset form between records
     return () => {
       // the entity navigation state should remain if we open a nodeDef
-      if (
-        !matchPath(window.location.pathname, {
-          path: [appModuleUri(designerModules.formDesigner), appModuleUri(designerModules.nodeDef)],
-        })
-      ) {
+      if (!isInFormDesignerRoute && !isInNodeDefRoute) {
         dispatch(SurveyFormActions.resetForm())
       }
     }
   }, [])
 
-  useOnLocationUpdate(() => {
+  const onLocationUpdate = useCallback(() => {
     // the entity navigation state should be reset if we change from designer to records
-    if (
-      matchPath(window.location.pathname, {
-        path: appModuleUri(canEditDef ? dataModules.records : designerModules.formDesigner),
-      })
-    ) {
+    if ((canEditDef && isInRecordsRoute) || isInFormDesignerRoute) {
       dispatch(SurveyFormActions.resetForm())
     }
-  }, [])
+  }, [canEditDef, isInRecordsRoute, isInFormDesignerRoute])
+
+  useOnLocationUpdate(onLocationUpdate, [])
 
   if (!nodeDef) {
     return null

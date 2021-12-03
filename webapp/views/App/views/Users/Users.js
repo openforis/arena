@@ -17,23 +17,23 @@ const Users = () => (
     modules={[
       {
         component: UsersList,
-        path: appModuleUri(userModules.users),
+        path: userModules.users.path,
       },
       {
         component: UsersListSurvey,
-        path: appModuleUri(userModules.usersSurvey),
+        path: userModules.usersSurvey.path,
       },
       {
         component: UserEdit,
-        path: `${appModuleUri(userModules.user)}:userUuid`,
+        path: `${userModules.user.path}/:userUuid`,
       },
       {
         component: UserInvite,
-        path: `${appModuleUri(userModules.userInvite)}`,
+        path: userModules.userInvite.path,
       },
       {
         component: UsersAccessRequest,
-        path: appModuleUri(userModules.usersAccessRequest),
+        path: userModules.usersAccessRequest.path,
       },
     ]}
   />

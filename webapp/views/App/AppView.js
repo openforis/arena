@@ -1,9 +1,9 @@
 import './AppView.scss'
 
 import React, { useEffect } from 'react'
-import { useLocation, Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router'
 
-import { appModuleUri, appModules } from '@webapp/app/appModules'
+import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 
 import Header from './Header'
@@ -18,8 +18,6 @@ import Users from './views/Users'
 import { injectReducers } from '@webapp/store'
 
 const AppView = () => {
-  const location = useLocation()
-
   useEffect(() => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])

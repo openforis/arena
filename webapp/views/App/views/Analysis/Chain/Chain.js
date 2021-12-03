@@ -1,6 +1,6 @@
 import './Chain.scss'
-import React, { useEffect } from 'react'
-import { matchPath, useParams } from 'react-router'
+import React, { useCallback, useEffect } from 'react'
+import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -16,7 +16,7 @@ import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
-import { useOnLocationUpdate } from '@webapp/components/hooks'
+import { useIsInRoute, useOnLocationUpdate } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -46,12 +46,15 @@ const ChainComponent = () => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [chainUuid])
 
-  useOnLocationUpdate((location) => {
-    const path = appModuleUri(analysisModules.nodeDef)
-    if (!matchPath(location.pathname, { path })) {
+  const isInNodeDefRoute = useIsInRoute(appModuleUri(analysisModules.nodeDef))
+
+  const onLocationUpdate = useCallback(() => {
+    // if changing location into node def edit, keep chain store, otherwise reset it
+    if (!isInNodeDefRoute) {
       dispatch(ChainActions.resetChainStore())
     }
-  }, [])
+  }, [isInNodeDefRoute])
+  useOnLocationUpdate(onLocationUpdate, [])
 
   if (!chain || A.isEmpty(chain)) return null
 

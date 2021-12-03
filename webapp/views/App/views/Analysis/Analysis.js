@@ -23,15 +23,15 @@ const Analysis = () => {
         modules={[
           {
             component: Chains,
-            path: appModuleUri(analysisModules.chains),
+            path: analysisModules.chains.path,
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.chain)}`,
+            path: analysisModules.chain.path,
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.chain)}:chainUuid/`,
+            path: `${analysisModules.chain.path}/:chainUuid/`,
           },
           // {
           //   component: Entities,
@@ -39,16 +39,16 @@ const Analysis = () => {
           // },
           {
             component: NodeDefDetails,
-            path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
+            path: `${analysisModules.nodeDef.path}/:nodeDefUuid/`,
           },
           {
             component: CategoryDetails,
-            path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
+            path: `${analysisModules.category.path}/:categoryUuid`,
             props: { analysis: true },
           },
           {
             component: Instances,
-            path: `${appModuleUri(analysisModules.instances)}`,
+            path: analysisModules.instances.path,
           },
         ]}
       />

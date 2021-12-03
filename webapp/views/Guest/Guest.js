@@ -29,7 +29,7 @@ const Guest = () => (
       <Route path={guestModules.resetPassword.path} element={<ResetPassword />} />
       <Route path={guestModules.forgotPassword.path} element={<ForgotPassword />} />
       <Route path={guestModules.accessRequest.path} element={<AccessRequest />} />
-      <Route element={<Login />} />
+      <Route path="*" element={<Login />} />
     </Routes>
   </>
 )
