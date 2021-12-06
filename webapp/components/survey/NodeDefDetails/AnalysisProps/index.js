@@ -32,9 +32,7 @@ const AreaBasedEstimated = (props) => {
   const lang = useLang()
 
   useEffect(() => {
-    const _areaBasedEstimatedNodeDef = Survey.getNodeDefsArray(survey).find(
-      (_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef)
-    )
+    const _areaBasedEstimatedNodeDef = Survey.getNodeDefAreaBasedStimate(nodeDef)(survey)
     if (_areaBasedEstimatedNodeDef) {
       setAreaBasedEstimatedNodeDef(_areaBasedEstimatedNodeDef)
     }
