@@ -16,7 +16,8 @@ import { useOnUpdate, useQuery } from '@webapp/components/hooks'
 
 import { State } from './state'
 
-export const useLocalState = () => {
+export const useLocalState = (props) => {
+  const { recordUuid: recordUuidProp, pageNodeUuid: pageNodeUuidProp, pageNodeDefUuid: pageNodeDefUuidProp } = props
   const history = useHistory()
   const dispatch = useDispatch()
 
@@ -27,7 +28,9 @@ export const useLocalState = () => {
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
   const preview = Boolean(recordUuidPreview)
 
-  const recordUuid = recordUuidUrlParam || recordUuidPreview
+  const recordUuid = recordUuidProp || recordUuidUrlParam || recordUuidPreview
+  const pageNodeUuid = pageNodeUuidProp || pageNodeUuidUrlParam
+  const pageNodeDefUuid = pageNodeDefUuidProp || pageNodeDefUuidUrlParam
 
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
@@ -65,7 +68,7 @@ export const useLocalState = () => {
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
     const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuidUrlParam, pageNodeDefUuidUrlParam))
+    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuid, pageNodeDefUuid))
 
     // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, (content) => dispatch(RecordActions.recordNodesUpdate(content)))
