@@ -34,7 +34,7 @@ export const getAnalysisNodeDefs =
 
       if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
 
-      if (hideAreaBasedStimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+      if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
 
       // show base unit nodeDefs with nodeDef analysis sibilings
       if (
@@ -54,7 +54,7 @@ export const getAnalysisNodeDefs =
       return true
     })
 
-    nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedStimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
+    nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedEstimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
   }
