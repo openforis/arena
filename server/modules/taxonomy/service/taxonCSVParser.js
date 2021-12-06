@@ -76,7 +76,11 @@ export default class TaxonCSVParser {
           Validation.newInstance(false, {}, [
             {
               key: errorKeyDuplicate,
-              params: { row: this.processedRow + 1, duplicateRow },
+              params: {
+                value,
+                row: this.processedRow + 1,
+                duplicateRow,
+              },
             },
           ])
         )
