@@ -198,7 +198,7 @@ export default class TaxonomiesImportJob extends Job {
               {
                 key: Validation.messageKeys.taxonomyEdit.codeDuplicate,
                 params: {
-                  code,
+                  value: code,
                   row: this.currentRow,
                   duplicateRow: rowDuplicateCode,
                 },
@@ -223,7 +223,7 @@ export default class TaxonomiesImportJob extends Job {
               {
                 key: Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
                 params: {
-                  scientificName,
+                  value: scientificName,
                   row: this.currentRow,
                   duplicateRow: rowDuplicateScientificName,
                 },
