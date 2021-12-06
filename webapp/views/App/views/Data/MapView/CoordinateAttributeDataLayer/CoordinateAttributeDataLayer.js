@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { CircleMarker, LayerGroup, LayersControl } from 'react-leaflet'
 
 import { Points } from '@openforis/arena-core'
@@ -14,13 +14,11 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { useMapClusters, useMapLayerAdd, ClusterMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
-import { PanelRight } from '@webapp/components'
-import Record from '@webapp/components/survey/Record'
 
 const markerRadius = 10
 
 export const CoordinateAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor } = props
+  const { attributeDef, markersColor, onRecordEditClick } = props
 
   const [state, setState] = useState({ query: Query.create(), showRecordPanel: false })
   const lang = useSurveyPreferredLang()
@@ -31,7 +29,7 @@ export const CoordinateAttributeDataLayer = (props) => {
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
 
-  const { query, editingRecordUuid, editingParentUuid } = state
+  const { query } = state
 
   const {
     data,
@@ -51,14 +49,6 @@ export const CoordinateAttributeDataLayer = (props) => {
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
-
-  const setEditingRecord = useCallback(
-    (params) => {
-      const { recordUuid, parentUuid } = params || {}
-      setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentUuid: parentUuid }))
-    },
-    [setState]
-  )
 
   // convert data items to GEOJson points
   const points =
@@ -98,53 +88,48 @@ export const CoordinateAttributeDataLayer = (props) => {
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
   return (
-    <>
-      <LayersControl.Overlay name={layerName}>
-        <LayerGroup>
-          {clusters.map((cluster) => {
-            // the point may be either a cluster or a node value point
-            const { cluster: isCluster, key, recordUuid, parentUuid } = cluster.properties
+    <LayersControl.Overlay name={layerName}>
+      <LayerGroup>
+        {clusters.map((cluster) => {
+          // the point may be either a cluster or a node value point
+          const { cluster: isCluster, key, recordUuid, parentUuid, point } = cluster.properties
 
-            // we have a cluster to render
-            if (isCluster) {
-              return (
-                <ClusterMarker
-                  key={cluster.id}
-                  cluster={cluster}
-                  color={markersColor}
-                  clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
-                  clusterIconCreator={clusterIconCreator}
-                  totalPoints={points.length}
-                />
-              )
-            }
-            const [longitude, latitude] = cluster.geometry.coordinates
-
-            // we have a single point (node value) to render
+          // we have a cluster to render
+          if (isCluster) {
             return (
-              <CircleMarker
-                key={key}
-                center={[latitude, longitude]}
-                radius={markerRadius}
+              <ClusterMarker
+                key={cluster.id}
+                cluster={cluster}
                 color={markersColor}
-                fillColor={markersColor}
-                fillOpacity={0.5}
-              >
-                <CoordinateAttributePopUp
-                  recordUuid={recordUuid}
-                  parentUuid={parentUuid}
-                  onEditClick={() => setEditingRecord({ recordUuid, parentUuid })}
-                />
-              </CircleMarker>
+                clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
+                clusterIconCreator={clusterIconCreator}
+                totalPoints={points.length}
+              />
             )
-          })}
-        </LayerGroup>
-      </LayersControl.Overlay>
-      {editingRecordUuid && (
-        <PanelRight className="record-panel" width="70vw" onClose={() => setEditingRecord(null)}>
-          <Record recordUuid={editingRecordUuid} pageNodeUuid={editingParentUuid} />
-        </PanelRight>
-      )}
-    </>
+          }
+          const [longitude, latitude] = cluster.geometry.coordinates
+
+          // we have a single point (node value) to render
+          return (
+            <CircleMarker
+              key={key}
+              center={[latitude, longitude]}
+              radius={markerRadius}
+              color={markersColor}
+              fillColor={markersColor}
+              fillOpacity={0.5}
+            >
+              <CoordinateAttributePopUp
+                attributeDef={attributeDef}
+                point={point}
+                recordUuid={recordUuid}
+                parentUuid={parentUuid}
+                onRecordEditClick={onRecordEditClick}
+              />
+            </CircleMarker>
+          )
+        })}
+      </LayerGroup>
+    </LayersControl.Overlay>
   )
 }

@@ -11,9 +11,7 @@ export {
   cleanupCategory,
   startExportAllCategoriesJob,
 } from './categories'
-export {
-  fetchChains
-} from './analysis'
+export { fetchChains } from './analysis'
 
 export {
   fetchTaxonomies,
@@ -24,7 +22,13 @@ export {
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
-export { importRecordsFromCollect, updateRecordsStep, exportDataQueryToTempFile, downloadDataQueryExport } from './data'
+export {
+  importRecordsFromCollect,
+  updateRecordsStep,
+  exportDataQueryToTempFile,
+  downloadDataQueryExport,
+  fetchRecordSummary,
+} from './data'
 export { fetchSurveys, insertSurvey } from './survey'
 export {
   fetchNodeDef,
@@ -34,7 +38,7 @@ export {
   postNodeDef,
   postNodeDefs,
   deleteNodeDef,
-  deleteNodeDefs
+  deleteNodeDefs,
 } from './nodeDef'
 
 export { cancelableGetRequest } from './cancelableRequest'
