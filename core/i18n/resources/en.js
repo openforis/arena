@@ -1059,11 +1059,11 @@ $t(common.cantUndoWarning)`,
     },
 
     taxonomyEdit: {
-      codeDuplicate: 'Duplicate code {{code}}; $t(validationErrors.rowsDuplicate)',
+      codeDuplicate: 'Duplicate code {{value}}; $t(validationErrors.rowsDuplicate)',
       codeRequired: 'Code is required',
       familyRequired: 'Family is required',
       genusRequired: 'Genus is required',
-      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
+      scientificNameDuplicate: 'Duplicate scientific name {{value}}; $t(validationErrors.rowsDuplicate)',
       scientificNameRequired: 'Scientific name is required',
       taxaEmpty: 'Empty taxa',
       vernacularNamesDuplicate: `Duplicate vernacular name '{{name}}' for language '{{lang}}'`,
