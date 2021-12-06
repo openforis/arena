@@ -451,6 +451,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDelete: 'Delete this custom aggregate function?',
       sqlExpression: 'SQL Expression',
     },
+    editRecord: 'Edit record',
   },
 
   dataExportView: {

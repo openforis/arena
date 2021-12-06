@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as A from '@core/arena'
@@ -18,7 +18,7 @@ import { State } from './state'
 
 export const useLocalState = (props) => {
   const { recordUuid: recordUuidProp, pageNodeUuid: pageNodeUuidProp, pageNodeDefUuid: pageNodeDefUuidProp } = props
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const { recordUuid: recordUuidUrlParam } = useParams()
@@ -78,10 +78,10 @@ export const useLocalState = (props) => {
     AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, (content) =>
       dispatch(RecordActions.nodesUpdateCompleted(content))
     )
-    AppWebSocket.on(WebSocketEvents.recordDelete, () => dispatch(RecordActions.recordDeleted(history)))
-    AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => dispatch(RecordActions.sessionExpired(history)))
+    AppWebSocket.on(WebSocketEvents.recordDelete, () => dispatch(RecordActions.recordDeleted(navigate)))
+    AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => dispatch(RecordActions.sessionExpired(navigate)))
     AppWebSocket.on(WebSocketEvents.applicationError, ({ key, params }) =>
-      dispatch(RecordActions.applicationError(history, key, params))
+      dispatch(RecordActions.applicationError(navigate, key, params))
     )
 
     // Add beforeunload event listener
@@ -94,7 +94,7 @@ export const useLocalState = (props) => {
   }, [])
 
   useOnUpdate(() => {
-    dispatch(RecordActions.cycleChanged(history))
+    dispatch(RecordActions.cycleChanged(navigate))
   }, [surveyCycleKey])
 
   return { state }

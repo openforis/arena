@@ -17,13 +17,13 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
-export const recordDeleted = (history) => (dispatch) => {
+export const recordDeleted = (navigate) => (dispatch) => {
   dispatch({ type: ActionTypes.recordDelete })
   dispatch(NotificationActions.notifyInfo({ key: 'recordView.justDeleted' }))
-  history.goBack()
+  navigate(-1)
 }
 
-export const deleteRecord = (history) => async (dispatch, getState) => {
+export const deleteRecord = (navigate) => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -31,7 +31,7 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
 
-  dispatch(recordDeleted(history))
+  dispatch(recordDeleted(navigate))
 }
 
 export const deleteRecordUuidPreview = () => (dispatch) =>

@@ -9,7 +9,7 @@ import { NotificationActions } from '@webapp/store/ui/notification'
 import * as SurveyState from '../state'
 import { surveyDelete } from './actionTypes'
 
-export const deleteSurvey = (history) => async (dispatch, getState) => {
+export const deleteSurvey = (navigate) => async (dispatch, getState) => {
   dispatch(LoaderActions.showLoader())
 
   const state = getState()
@@ -22,7 +22,7 @@ export const deleteSurvey = (history) => async (dispatch, getState) => {
 
   // Navigate to survey/template list
   const moduleDestination = Survey.isTemplate(surveyInfo) ? homeModules.templateList : homeModules.surveyList
-  history.push(appModuleUri(moduleDestination))
+  navigate(appModuleUri(moduleDestination))
 
   await dispatch(LoaderActions.hideLoader())
 

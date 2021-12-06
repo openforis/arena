@@ -1,6 +1,6 @@
 import './Chain.scss'
-import React, { useEffect } from 'react'
-import { matchPath, useParams, Prompt } from 'react-router'
+import React, { useCallback, useEffect } from 'react'
+import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -16,7 +16,7 @@ import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
-import { useHistoryListen } from '@webapp/components/hooks'
+import { useIsInRoute, useOnLocationUpdate } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -46,23 +46,26 @@ const ChainComponent = () => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [chainUuid])
 
-  useHistoryListen((location) => {
-    const path = appModuleUri(analysisModules.nodeDef)
-    if (!matchPath(location.pathname, { path })) {
+  const isInNodeDefRoute = useIsInRoute(appModuleUri(analysisModules.nodeDef))
+
+  const onLocationUpdate = useCallback(() => {
+    // if changing location into node def edit, keep chain store, otherwise reset it
+    if (!isInNodeDefRoute) {
       dispatch(ChainActions.resetChainStore())
     }
-  }, [])
+  }, [isInNodeDefRoute])
+  useOnLocationUpdate(onLocationUpdate, [])
 
   if (!chain || A.isEmpty(chain)) return null
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
-      <Prompt
+      {/* <Prompt
         when={
           !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
         }
         message={i18n.t('chainView.errorNoLabel')}
-      />
+      /> */}
 
       <div className="btn-rstudio-container">
         {Survey.isDraft(surveyInfo) && (
@@ -91,7 +94,6 @@ const ChainComponent = () => {
           cyclesKeysSelected={chain.props.cycles}
           onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
         />
-
 
         <BaseUnitSelector />
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { updateQuery } from '@webapp/components/Table/tableLink'
 
@@ -10,7 +10,7 @@ import Paginator from './Paginator'
 const Header = (props) => {
   const { headerLeftComponent, headerProps, list, offset, limit, count } = props
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <div className="table__header">
@@ -21,8 +21,8 @@ const Header = (props) => {
           offset={offset}
           limit={limit}
           count={count}
-          setLimit={(limitUpdated) => updateQuery(history)({ limit: limitUpdated })}
-          setOffset={(offsetUpdated) => updateQuery(history)({ offset: offsetUpdated })}
+          setLimit={(limitUpdated) => updateQuery(navigate)({ limit: limitUpdated })}
+          setOffset={(offsetUpdated) => updateQuery(navigate)({ offset: offsetUpdated })}
         />
       )}
     </div>

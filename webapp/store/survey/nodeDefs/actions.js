@@ -44,7 +44,7 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
 
@@ -52,7 +52,7 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 
   return nodeDef
 }
@@ -210,7 +210,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 }
 
 export const removeNodeDef =
-  (nodeDef, history = null) =>
+  (nodeDef, navigate = null) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -236,8 +236,8 @@ export const removeNodeDef =
             ])
 
             dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-            if (history) {
-              history.goBack()
+            if (navigate) {
+              navigate(-1)
             }
           },
         })

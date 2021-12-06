@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import './CoordinateAttributePopUp.scss'
+
+import React, {  useEffect, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
@@ -10,21 +12,26 @@ import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/st
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 
-export const CoordinateAttributePopUp = (props) => {
+const PopupContent = (props) => {
   const { attributeDef, recordUuid, parentUuid, point, onRecordEditClick } = props
+
   const survey = useSurvey()
-  const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
+
   const [record, setRecord] = useState(null)
 
-  const keyDefs = Survey.getNodeDefRootKeys(survey)
-
   useEffect(() => {
-    const loadRecordSummary = async () => {
-      setRecord(await API.fetchRecordSummary({ surveyId: Survey.getId(survey), cycle, recordUuid }))
+    if (!record) {
+      const loadRecord = async () => {
+        const recordLoaded = await API.fetchRecordSummary({ surveyId: Survey.getId(survey), cycle, recordUuid })
+        setRecord(recordLoaded)
+      }
+      loadRecord()
     }
-    loadRecordSummary()
-  }, [])
+  }, [record, setRecord])
+
+  const keyDefs = Survey.getNodeDefRootKeys(survey)
 
   const pathParts = []
   Survey.visitAncestorsAndSelf(attributeDef, (nodeDef) => {
@@ -37,16 +44,31 @@ export const CoordinateAttributePopUp = (props) => {
   }
 
   const path = pathParts.join(' -> ')
-
   const content = `**${path}**
 * **x**: ${point.x}
 * **y**: ${point.y}
 * **SRS**: ${point.srs}`
 
   return (
-    <Popup>
+    <div className="coordinate-attribute-popup-content">
       <Markdown source={content} />
       <ButtonIconEdit label="Edit Record" onClick={() => onRecordEditClick({ recordUuid, parentUuid })} />
+    </div>
+  )
+}
+
+export const CoordinateAttributePopUp = (props) => {
+  const { attributeDef, recordUuid, parentUuid, point, onRecordEditClick } = props
+
+  return (
+    <Popup>
+      <PopupContent
+        attributeDef={attributeDef}
+        recordUuid={recordUuid}
+        parentUuid={parentUuid}
+        point={point}
+        onRecordEditClick={onRecordEditClick}
+      />
     </Popup>
   )
 }

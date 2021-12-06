@@ -2,7 +2,7 @@ import './SurveyCreate.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
 
@@ -29,14 +29,14 @@ const SurveyCreate = (props) => {
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
   const { createType, name, label, lang, validation, cloneFrom } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
-    history.push(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
   return (
