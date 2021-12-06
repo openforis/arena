@@ -2,7 +2,7 @@ import './SurveyInfo.scss'
 
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 
@@ -23,7 +23,7 @@ const SurveyInfo = () => {
 
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const surveyInfo = useSurveyInfo()
 
@@ -100,7 +100,7 @@ const SurveyInfo = () => {
       {showDeleteDialog && (
         <DeleteSurveyDialog
           onCancel={() => setShowDeleteDialog(false)}
-          onDelete={() => dispatch(SurveyActions.deleteSurvey(history))}
+          onDelete={() => dispatch(SurveyActions.deleteSurvey(navigate))}
           surveyName={Survey.getName(surveyInfo)}
         />
       )}

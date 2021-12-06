@@ -3,7 +3,7 @@ import './Surveys.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
@@ -23,7 +23,7 @@ const Surveys = (props) => {
   const { module, moduleApiUri, template, title } = props
 
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const lang = useSurveyPreferredLang()
@@ -37,7 +37,7 @@ const Surveys = (props) => {
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
-    history.push(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
   // reload table data on survey publish

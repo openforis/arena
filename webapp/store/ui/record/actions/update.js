@@ -46,7 +46,7 @@ export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData
   dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
-export const updateRecordStep = (step, history) => async (dispatch, getState) => {
+export const updateRecordStep = (step, navigate) => async (_dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -56,7 +56,7 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
     step,
   })
 
-  history.push(appModuleUri(appModules.data))
+  navigate(appModuleUri(appModules.data))
 }
 
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => (dispatch) =>

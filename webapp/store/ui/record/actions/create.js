@@ -12,7 +12,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import * as ActionTypes from './actionTypes'
 import { recordNodesUpdate } from './common'
 
-export const createRecord = (history, preview = false) => async (dispatch, getState) => {
+export const createRecord = (navigate, preview = false) => async (dispatch, getState) => {
   dispatch(LoaderActions.showLoader())
 
   const state = getState()
@@ -28,7 +28,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   if (preview) {
     dispatch({ type: ActionTypes.recordUuidPreviewUpdate, recordUuid })
   } else {
-    history.push(`${appModuleUri(dataModules.record)}${recordUuid}`)
+    navigate(`${appModuleUri(dataModules.record)}${recordUuid}`)
   }
 }
 

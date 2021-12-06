@@ -1,17 +1,17 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 const ButtonBar = () => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
   const chain = useChain()
 
-  const deleteChain = () => dispatch(ChainActions.deleteChain({ chain, history }))
+  const deleteChain = () => dispatch(ChainActions.deleteChain({ chain, navigate }))
 
   return (
     <div className="button-bar">

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useHistory, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
@@ -17,7 +17,7 @@ import { State } from './state'
 export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const survey = useSurvey()
@@ -48,7 +48,7 @@ export const useNodeDefDetails = () => {
             nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
             dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefSurvey }))
           } catch (err) {
-            history.goBack()
+            navigate(-1)
           }
         }
         const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
@@ -60,9 +60,9 @@ export const useNodeDefDetails = () => {
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
-      history.goBack()
+      navigate(-1)
     } else {
-      history.push(appModuleUri(analysisModules.chains))
+      navigate(appModuleUri(analysisModules.chains))
     }
   }, [surveyCycleKey])
 

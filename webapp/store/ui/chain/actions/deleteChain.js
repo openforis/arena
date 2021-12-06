@@ -8,7 +8,7 @@ import { SurveyActions, SurveyState } from '@webapp/store/survey'
 import { ChainActions } from '@webapp/store/ui/chain'
 
 export const deleteChain =
-  ({ chain, history }) =>
+  ({ chain, navigate }) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
@@ -23,7 +23,7 @@ export const deleteChain =
       dispatch(ChainActions.updateChain({ chain: { ...chain, isDeleted: true } }))
       dispatch(LoaderActions.hideLoader())
 
-      history.push(appModuleUri(analysisModules.chains))
+      navigate(appModuleUri(analysisModules.chains))
     }
 
     dispatch(

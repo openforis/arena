@@ -1,6 +1,6 @@
 import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/components/hooks'
 import { useEffect, useReducer } from 'react'
-import { useHistory, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import { LoginValidator } from '@webapp/store/login'
@@ -15,17 +15,17 @@ import initialState from './initialState'
 export const useResetPassword = () => {
   const dispatchRedux = useDispatch()
   const { uuid } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { name, password, passwordConfirm, props = {} } = state.user
   const { title } = props
 
   const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
-  const {
-    data: { result: resetComplete = false } = {},
-    dispatch: dispatchPostResetPassword,
-  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, title, password })
+  const { data: { result: resetComplete = false } = {}, dispatch: dispatchPostResetPassword } = useAsyncPutRequest(
+    `/auth/reset-password/${uuid}`,
+    { name, title, password }
+  )
 
   const onChangeUser = (event) => actions.updateUser(event)(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)
@@ -51,7 +51,7 @@ export const useResetPassword = () => {
   }, [user])
 
   useOnUpdate(() => {
-    history.push(appModuleUri())
+    navigate(appModuleUri())
     dispatchRedux(NotificationActions.notifyInfo({ key: 'resetPasswordView.passwordSuccessfullyReset' }))
   }, [resetComplete])
 

@@ -18,8 +18,6 @@ const ModuleLink = (props) => {
 
   const icon = SideBarModule.getIcon(module)
   const uri = SideBarModule.getUri(module)
-  const to = external ? { pathname: uri } : uri
-  const target = external ? `openforis_arena_${key}` : null
 
   const className = classNames('sidebar__module-btn', 'text-uppercase', {
     'sidebar__module-child-btn': !root,
@@ -28,17 +26,37 @@ const ModuleLink = (props) => {
 
   const i18n = useI18n()
 
-  return (
-    <Link
-      to={to}
-      target={target}
-      className={className}
-      aria-disabled={disabled || active}
-      data-testid={TestId.sidebar.moduleBtn(key)}
-      id={`sidebar_btn_${key}`}
-    >
+  const testId = TestId.sidebar.moduleBtn(key)
+
+  const linkContent = (
+    <>
       {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}
       {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
+    </>
+  )
+
+  if (external) {
+    return (
+      <a
+        className={className}
+        aria-disabled={disabled}
+        data-testid={testId}
+        href={uri}
+        target={`openforis_arena_${key}`}
+      >
+        {linkContent}
+      </a>
+    )
+  }
+  return (
+    <Link
+      to={{ pathname: uri }}
+      className={className}
+      aria-disabled={disabled || active}
+      data-testid={testId}
+      id={`sidebar_btn_${key}`}
+    >
+      {linkContent}
     </Link>
   )
 }

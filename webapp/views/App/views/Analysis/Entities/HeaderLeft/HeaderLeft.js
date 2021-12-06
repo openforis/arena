@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
@@ -9,11 +9,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 const HeaderLeft = () => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
 
   const createVirtualEntity = () => {
-    dispatch(ChainActions.createNodeDef({ history, type: NodeDef.nodeDefType.entity, virtual: true }))
+    dispatch(ChainActions.createNodeDef({ navigate, type: NodeDef.nodeDefType.entity, virtual: true }))
   }
 
   return (
