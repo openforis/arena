@@ -210,7 +210,6 @@ class RChain {
     if (NodeDef.isSampling(nodeDef)) {
       prefix = ''
       attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
-      console.log("attributeNameInFile", attributeNameInFile)
     }
 
     const fileName = `${fileIndex}${prefix}-${attributeNameInFile}`

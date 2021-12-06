@@ -751,6 +751,7 @@ $t(common.cantUndoWarning)`,
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
+      areaBasedEstimate: 'Area-based estimate'
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
