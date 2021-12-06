@@ -2,16 +2,16 @@ import { NotificationActions } from '@webapp/store/ui'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 
-const _navigateToModuleDataHome = (history) => history.push(appModuleUri(appModules.data))
+const _navigateToModuleDataHome = (navigate) => navigate(appModuleUri(appModules.data))
 
-export const sessionExpired = (history) => (dispatch) => {
+export const sessionExpired = (navigate) => (dispatch) => {
   dispatch(NotificationActions.notifyInfo({ key: 'recordView.sessionExpired' }))
-  _navigateToModuleDataHome(history)
+  _navigateToModuleDataHome(navigate)
 }
 
-export const applicationError = (history, key, params) => (dispatch) => {
+export const applicationError = (navigate, key, params) => (dispatch) => {
   dispatch(NotificationActions.notifyError({ key, params }))
-  history.push(appModuleUri(appModules.designer))
+  navigate(appModuleUri(appModules.designer))
 }
 
-export const cycleChanged = (history) => () => _navigateToModuleDataHome(history)
+export const cycleChanged = (navigate) => () => _navigateToModuleDataHome(navigate)

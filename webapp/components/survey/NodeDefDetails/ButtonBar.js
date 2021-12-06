@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -19,7 +19,7 @@ const ButtonBar = (props) => {
   const dirty = State.isDirty(state)
 
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
@@ -51,7 +51,7 @@ const ButtonBar = (props) => {
         <Button
           testId={TestId.nodeDefDetails.deleteBtn}
           className="btn-danger btn-delete"
-          onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}
+          onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, navigate))}
           iconClassName="icon-bin2 icon-12px"
           label="common.delete"
         />

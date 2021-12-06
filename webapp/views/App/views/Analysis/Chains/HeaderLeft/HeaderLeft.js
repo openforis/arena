@@ -1,17 +1,17 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
 
 const HeaderLeft = () => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
 
   const createChain = () => {
-    dispatch(ChainActions.createChain({ history }))
+    dispatch(ChainActions.createChain({ navigate }))
   }
 
   return (

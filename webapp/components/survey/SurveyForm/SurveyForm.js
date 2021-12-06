@@ -2,27 +2,26 @@ import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
-import { compose } from 'redux'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { matchPath } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
-import { useI18n } from '@webapp/store/system'
 
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { SurveyState, useSurvey } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
-import { SurveyState, useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useHistoryListen, useOnUpdate } from '@webapp/components/hooks'
-import { appModuleUri, dataModules, designerModules } from '@webapp/app/appModules'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
+
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import FormHeader from './FormHeader'
 import AddNodeDefPanel from './components/addNodeDefPanel'
@@ -102,28 +101,18 @@ const SurveyForm = (props) => {
     }
   }, [])
 
+  const pathMatcher = useLocationPathMatcher()
+
   useEffect(() => {
-    // reset form between records
+    // reset form on unmount and not editing survey form or node def
     return () => {
       // the entity navigation state should remain if we open a nodeDef
       if (
-        !matchPath(window.location.pathname, {
-          path: [appModuleUri(designerModules.formDesigner), appModuleUri(designerModules.nodeDef)],
-        })
+        !pathMatcher(appModuleUri(designerModules.formDesigner)) &&
+        !pathMatcher(`${appModuleUri(designerModules.nodeDef)}:uuid`)
       ) {
         dispatch(SurveyFormActions.resetForm())
       }
-    }
-  }, [])
-
-  useHistoryListen(() => {
-    // the entity navigation state should be reset if we change from designer to records
-    if (
-      matchPath(window.location.pathname, {
-        path: appModuleUri(canEditDef ? dataModules.records : designerModules.formDesigner),
-      })
-    ) {
-      dispatch(SurveyFormActions.resetForm())
     }
   }, [])
 
@@ -223,5 +212,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const enhance = compose(withRouter, connect(mapStateToProps))
-export default enhance(SurveyForm)
+export default connect(mapStateToProps)(SurveyForm)

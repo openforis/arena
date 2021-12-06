@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
 
@@ -8,7 +8,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { State } from '../state'
 
 export const useEdit = ({ setState }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return useCallback(({ category }) => {
     setState((statePrev) => {
@@ -18,7 +18,7 @@ export const useEdit = ({ setState }) => {
         onEdit(category)
       } else {
         const categoryUuid = Category.getUuid(category)
-        history.push(`${appModuleUri(designerModules.category)}${categoryUuid}`)
+        navigate(`${appModuleUri(designerModules.category)}${categoryUuid}`)
       }
       return statePrev
     })

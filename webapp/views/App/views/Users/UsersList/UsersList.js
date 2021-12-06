@@ -1,7 +1,7 @@
 import './UsersList.scss'
 
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
@@ -17,11 +17,11 @@ import { UserSurveysTable } from './UserSurveysTable'
 import { TableHeaderLeft } from './TableHeaderLeft'
 
 export const UsersList = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18n = useI18n()
 
   const goToUserDetails = (user) =>
-    history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
+    navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`)
 
   return (
     <Table
