@@ -18,18 +18,16 @@ import { useDispatch } from 'react-redux'
 import Checkbox from '@webapp/components/form/checkbox'
 
 const AreaBasedEstimated = (props) => {
-  const { state, Actions, nodeDef } = props
+  const { nodeDef } = props
   const [areaBasedEstimatedNodeDef, setAreaBasedEstimatedNodeDef] = useState(false)
 
   const dispatch = useDispatch()
 
   const survey = useSurvey()
   const cycleKeys = useSurveyCycleKeys()
-  const surveyInfo = useSurveyInfo()
   const chain = useChain()
 
   const i18n = useI18n()
-  const lang = useLang()
 
   useEffect(() => {
     const _areaBasedEstimatedNodeDef = Survey.getNodeDefsArray(survey).find(
