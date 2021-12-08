@@ -1,5 +1,7 @@
 import * as PromiseUtils from '@core/promiseUtils'
 
+import * as RecordFile from '@core/record/recordFile'
+
 import Job from '@server/job/job'
 import * as FileService from '@server/modules/record/service/fileService'
 import { ExportFile } from '../exportFile'
@@ -12,14 +14,22 @@ export default class FilesExportJob extends Job {
   async execute() {
     const { archive, surveyId } = this.context
 
-    const fileUuids = await FileService.fetchFileUuidsBySurveyId(surveyId, this.tx)
-    this.total = fileUuids.length
-    this.logDebug(`file(s) to export: ${this.total}`)
+    const filesSummaries = await FileService.fetchFileSummariesBySurveyId(surveyId, this.tx)
+    const filesCount = filesSummaries.length
+    this.total = filesCount
 
-    await PromiseUtils.each(fileUuids, async (fileUuid) => {
-      const fileData = await FileService.fetchFileByUuid(surveyId, fileUuid, this.tx)
-      archive.append(JSON.stringify(fileData, null, 2), { name: ExportFile.file({ fileUuid }) })
-      this.incrementProcessedItems()
-    })
+    this.logDebug(`file(s) to export: ${filesCount}`)
+
+    if (filesCount > 0) {
+      archive.append(JSON.stringify(filesSummaries, null, 2), { name: ExportFile.files })
+
+      // write each file content into a separate binary file
+      await PromiseUtils.each(filesSummaries, async (fileSummary) => {
+        const fileUuid = RecordFile.getUuid(fileSummary)
+        const fileData = await FileService.fetchFileByUuid(surveyId, fileUuid, this.tx)
+        archive.append(RecordFile.getContent(fileData), { name: ExportFile.file({ fileUuid }) })
+        this.incrementProcessedItems()
+      })
+    }
   }
 }

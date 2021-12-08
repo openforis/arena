@@ -34,6 +34,14 @@ export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
     (row) => row.uuid
   )
 
+export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
+  client.many(
+    `
+    SELECT ${SIMPLE_SELECT_FIELDS_COMMA_SEPARATED}
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE ${NOT_DELETED_CONDITION}`
+  )
+
 export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
   client.one(
     `
