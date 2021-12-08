@@ -83,15 +83,14 @@ const AreaBasedEstimated = (props) => {
     }
   }
 
-  return (
-    <>
-      {NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.advancedProps.areaBasedEstimate')} className="">
-          <Checkbox checked={!!areaBasedEstimatedNodeDef} onChange={handleSwitchAreaBasedEstimated} />
-        </FormItem>
-      )}
-    </>
-  )
+  if (NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef)) {
+    return (
+      <FormItem label={i18n.t('nodeDefEdit.advancedProps.areaBasedEstimate')} className="">
+        <Checkbox checked={!!areaBasedEstimatedNodeDef} onChange={handleSwitchAreaBasedEstimated} />
+      </FormItem>
+    )
+  }
+  return null
 }
 
 AreaBasedEstimated.propTypes = {
