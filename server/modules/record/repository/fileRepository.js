@@ -35,8 +35,6 @@ export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const fetchFilesB
-
 export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
   client.one(
     `
