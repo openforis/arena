@@ -2,7 +2,7 @@ import React from 'react'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
+import { appModules, homeModules } from '@webapp/app/appModules'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
 import Dashboard from './Dashboard'
@@ -24,21 +24,21 @@ const Home = () => {
       modules={[
         {
           component: Dashboard,
-          path: appModuleUri(homeModules.dashboard),
+          path: homeModules.dashboard.path,
         },
         {
           component: SurveyList,
-          path: appModuleUri(homeModules.surveyList),
+          path: homeModules.surveyList.path,
         },
         {
           component: TemplateList,
-          path: appModuleUri(homeModules.templateList),
+          path: homeModules.templateList.path,
         },
         ...(canCreateSurvey
           ? [
               {
                 component: SurveyCreate,
-                path: appModuleUri(homeModules.surveyNew),
+                path: homeModules.surveyNew.path,
               },
             ]
           : []),
@@ -46,17 +46,17 @@ const Home = () => {
           ? [
               {
                 component: TemplateCreate,
-                path: appModuleUri(homeModules.templateNew),
+                path: homeModules.templateNew.path,
               },
             ]
           : []),
         {
           component: SurveyInfo,
-          path: appModuleUri(homeModules.surveyInfo),
+          path: homeModules.surveyInfo.path,
         },
         {
           component: CollectImportReport,
-          path: appModuleUri(homeModules.collectImportReport),
+          path: homeModules.collectImportReport.path,
         },
       ]}
     />

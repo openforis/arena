@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
+import { appModules, dataModules } from '@webapp/app/appModules'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -38,43 +38,43 @@ const Data = () => {
           // Records list
           {
             component: Records,
-            path: appModuleUri(dataModules.records),
+            path: dataModules.records.path,
           },
           // Edit record
           {
             component: Record,
-            path: `${appModuleUri(dataModules.record)}:recordUuid/`,
+            path: `${dataModules.record.path}/:recordUuid/`,
             props: { draftDefs },
           },
           // Record validation report
           {
             component: ValidationReport,
-            path: `${appModuleUri(dataModules.recordValidationReport)}:recordUuid`,
+            path: `${dataModules.recordValidationReport.path}/:recordUuid`,
           },
           // Data visualization
           {
             component: Explorer,
-            path: appModuleUri(dataModules.explorer),
+            path: dataModules.explorer.path,
           },
           // Map
           {
             component: MapView,
-            path: appModuleUri(dataModules.map),
+            path: dataModules.map.path,
           },
           // Data export
           {
             component: ExportData,
-            path: appModuleUri(dataModules.export),
+            path: dataModules.export.path,
           },
           // Data import
           {
             component: DataImport,
-            path: appModuleUri(dataModules.import),
+            path: dataModules.import.path,
           },
           // Validation report
           {
             component: ValidationReport,
-            path: appModuleUri(dataModules.validationReport),
+            path: dataModules.validationReport.path,
           },
         ]}
       />

@@ -1,7 +1,7 @@
 import './HeaderLeft.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as StringUtils from '@core/stringUtils'
@@ -17,7 +17,7 @@ import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropd
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()
   const published = Survey.isPublished(surveyInfo)
 
@@ -28,7 +28,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
       {published && (
         <Button
           testId={TestId.records.addBtn}
-          onClick={() => dispatch(RecordActions.createRecord(history))}
+          onClick={() => dispatch(RecordActions.createRecord(navigate))}
           className="btn-s"
           iconClassName="icon-plus icon-12px icon-left"
           label="common.new"

@@ -1,7 +1,7 @@
 import './Records.scss'
 
 import React, { useCallback, useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
 
@@ -16,7 +16,7 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const Records = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
 
@@ -25,7 +25,7 @@ const Records = () => {
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 50px`
 
-  const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
+  const onRowClick = (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())

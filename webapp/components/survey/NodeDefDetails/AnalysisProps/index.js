@@ -12,24 +12,23 @@ import { useI18n, useLang } from '@webapp/store/system'
 import { useChain } from '@webapp/store/ui/chain'
 import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
-import { useSurvey, useSurveyCycleKeys, useSurveyInfo, NodeDefsActions } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKeys, NodeDefsActions } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 import { useDispatch } from 'react-redux'
 import Checkbox from '@webapp/components/form/checkbox'
 
 const AreaBasedEstimated = (props) => {
-  const { state, Actions, nodeDef } = props
+  const { nodeDef } = props
+
   const [areaBasedEstimatedNodeDef, setAreaBasedEstimatedNodeDef] = useState(false)
 
   const dispatch = useDispatch()
 
   const survey = useSurvey()
   const cycleKeys = useSurveyCycleKeys()
-  const surveyInfo = useSurveyInfo()
   const chain = useChain()
 
   const i18n = useI18n()
-  const lang = useLang()
 
   useEffect(() => {
     const _areaBasedEstimatedNodeDef = Survey.getNodeDefAreaBasedStimate(nodeDef)(survey)

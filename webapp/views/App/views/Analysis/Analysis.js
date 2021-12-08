@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
@@ -14,28 +14,24 @@ import Instances from './Instances'
 // import Entities from './Entities'
 
 const Analysis = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
-    <SurveyDefsLoader
-      draft
-      requirePublish
-      onSurveyCycleUpdate={() => history.push(appModuleUri(analysisModules.chains))}
-    >
+    <SurveyDefsLoader draft requirePublish onSurveyCycleUpdate={() => navigate(appModuleUri(analysisModules.chains))}>
       <ModuleSwitch
         moduleRoot={appModules.analysis}
         moduleDefault={analysisModules.chains}
         modules={[
           {
             component: Chains,
-            path: appModuleUri(analysisModules.chains),
+            path: analysisModules.chains.path,
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.chain)}`,
+            path: analysisModules.chain.path,
           },
           {
             component: Chain,
-            path: `${appModuleUri(analysisModules.chain)}:chainUuid/`,
+            path: `${analysisModules.chain.path}/:chainUuid/`,
           },
           // {
           //   component: Entities,
@@ -43,16 +39,16 @@ const Analysis = () => {
           // },
           {
             component: NodeDefDetails,
-            path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
+            path: `${analysisModules.nodeDef.path}/:nodeDefUuid/`,
           },
           {
             component: CategoryDetails,
-            path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
+            path: `${analysisModules.category.path}/:categoryUuid`,
             props: { analysis: true },
           },
           {
             component: Instances,
-            path: `${appModuleUri(analysisModules.instances)}`,
+            path: analysisModules.instances.path,
           },
         ]}
       />

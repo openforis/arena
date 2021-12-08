@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
@@ -15,7 +15,7 @@ import { useActions, State } from '../store'
 const TableHeaderLeft = (props) => {
   const { headerProps } = props
   const { state } = headerProps
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const Actions = useActions({})
 
@@ -24,7 +24,7 @@ const TableHeaderLeft = (props) => {
 
   const onAdd = (categoryCreated) => {
     if (inCategoriesPath) {
-      history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(categoryCreated)}`)
+      navigate(`${appModuleUri(designerModules.category)}${Category.getUuid(categoryCreated)}`)
     } else {
       const onCreate = State.getOnCategoryCreated(state)
       if (onCreate) {

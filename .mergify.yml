@@ -1,11 +1,17 @@
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=build
+      - check-success=DeepScan
+      
 pull_request_rules:
   - name: Automatic merge on approval
     conditions:
       - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart+fasttrack
+        name: default
   - name: automatic branch update
     conditions:
       - -conflict # skip PRs with conflicts
