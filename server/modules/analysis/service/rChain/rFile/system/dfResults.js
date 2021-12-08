@@ -48,7 +48,7 @@ export default class DfResults {
   }
 
   initDf() {
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain, hideAreaBasedEstimate: false })(this.survey)
     const columnNames = NodeDefTable.getNodeDefsColumnNames({
       nodeDefs: analysisNodeDefsInEntity,
       includeExtendedCols: false,

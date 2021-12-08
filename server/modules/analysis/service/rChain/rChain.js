@@ -207,7 +207,7 @@ class RChain {
       prefix = '-base-unit'
     }
 
-    if (NodeDef.isSampling(nodeDef)) {
+    if (NodeDef.isSampling(nodeDef) && !Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))) {
       prefix = ''
       attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
     }
@@ -250,6 +250,10 @@ class RChain {
         analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
         async (nodeDef, index) => {
           await this._initNodeDefFile({ nodeDef, path: _entityPath })
+          const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
+          if(areaBasedEstimated){
+            await this._initNodeDefFile({ nodeDef: areaBasedEstimated, path: _entityPath, index: NodeDef.getChainIndex(nodeDef) })
+          }
         }
       )
     }

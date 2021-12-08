@@ -102,7 +102,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
     const entities = Survey.getAnalysisEntities({ chain })(survey)
 
     await PromiseUtils.each(entities, async (entity) => {
-      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, hideAreaBasedEstimate: false  })(survey)
 
       if (analysisNodeDefsInEntity.length > 0) {
         await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
@@ -114,7 +114,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           if(NodeDef.isBaseUnit(nodeDef)){
             name = `base-unit`
           }
-          if(NodeDef.isSampling(nodeDef)){
+          if(NodeDef.isSampling(nodeDef) && !Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))){
             name = nodeDefName.replace(`${NodeDef.getName(entity)}_`,`${NodeDef.getName(entity)}-`)
           }
            

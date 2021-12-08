@@ -54,7 +54,14 @@ export const getAnalysisNodeDefs =
       return true
     })
 
-    nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedEstimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
+    nodeDefs = nodeDefs.filter((nodeDef) => {
+      if (Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))) {
+        if (hideAreaBasedEstimate) {
+          return false
+        }
+      }
+      return true
+    })
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
   }
