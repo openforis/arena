@@ -7,44 +7,52 @@ import { getHierarchy, traverseHierarchyItemSync } from './surveyNodeDefs'
 
 // ====== READ
 export const getAnalysisNodeDefs =
-  ({ chain, entity, entityDefUuid, showSamplingNodeDefs = true, hideSamplingNodeDefsWithoutSibilings = true, hideAreaBasedStimate = true }) =>
+  ({
+    chain,
+    entity,
+    entityDefUuid,
+    showSamplingNodeDefs = true,
+    hideSamplingNodeDefsWithoutSibilings = true,
+    hideAreaBasedEstimate = true,
+  }) =>
   (survey) => {
-    let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter(NodeDef.isAnalysis)
+    let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter((nodeDef) => {
+      if (!NodeDef.isAnalysis(nodeDef)) return false
 
-    // nedeDefs in this entity by chain
-    if (chain) {
-      nodeDefs = nodeDefs.filter(
-        (nodeDef) =>
-          NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) === Chain.getUuid(chain)
+      // remove nodeDefs not in this chain
+      if (
+        chain &&
+        NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) !== Chain.getUuid(chain)
       )
-    }
+        return false
 
-    // nedeDefs in this entity
-    if (entity) {
-      nodeDefs = nodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity))
-    }
+      // remove nodeDefs not in this entity
+      if (entity && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(entity)) return false
 
-    // nedeDefs in this entity by entityUuid
-    if (entityDefUuid) {
-      nodeDefs = nodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === entityDefUuid)
-    }
+      // remove nodeDefs not in this entity bu entityUuid
+      if (enentityDefUuidtity && NodeDef.getParentUuid(nodeDef) !== entityDefUuid) return false
 
-    nodeDefs = nodeDefs.filter((_nodeDef) => showSamplingNodeDefs || !NodeDef.isSampling(_nodeDef))
+      if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
 
-    // show base unit nodeDefs with nodeDef analysis sibilings
-    if (showSamplingNodeDefs && hideSamplingNodeDefsWithoutSibilings) {
-      nodeDefs = nodeDefs.filter((nodeDef) => {
-        if (NodeDef.isSampling(nodeDef) && !NodeDef.isBaseUnit(nodeDef)) {
-          const hasAnalysisSibilings = nodeDefs.some(
-            (_nodeDef) =>
-              NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
-              NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
-          )
-          return hasAnalysisSibilings
-        }
-        return true
-      })
-    }
+      if (hideAreaBasedStimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+
+      // show base unit nodeDefs with nodeDef analysis sibilings
+      if (
+        showSamplingNodeDefs &&
+        hideSamplingNodeDefsWithoutSibilings &&
+        NodeDef.isSampling(nodeDef) &&
+        !NodeDef.isBaseUnit(nodeDef)
+      ) {
+        const hasAnalysisSibilings = nodeDefs.some(
+          (_nodeDef) =>
+            NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
+            NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
+        )
+        if (!hasAnalysisSibilings) return false
+      }
+
+      return true
+    })
 
     nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedStimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
 

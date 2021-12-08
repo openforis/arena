@@ -53,6 +53,6 @@ const getLink = ({ limit, offset, sort, search }) => {
   return `${url.pathname}${url.search}`
 }
 
-export const updateQuery = (history) => (params) => {
-  history.replace(getLink(params))
+export const updateQuery = (navigate) => (params) => {
+  navigate(getLink(params), { replace: true })
 }

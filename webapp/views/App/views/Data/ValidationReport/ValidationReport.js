@@ -1,7 +1,7 @@
 import './ValidationReport.scss'
 
 import React from 'react'
-import { useHistory, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
@@ -15,7 +15,7 @@ import Row from './Row'
 import { ButtonBack } from '@webapp/components/buttons'
 
 const ValidationReport = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyCycleKey = useSurveyCycleKey()
   const { recordUuid } = useParams()
 
@@ -27,7 +27,7 @@ const ValidationReport = () => {
       dataModules.record
     )}${recordUuid}?pageNodeUuid=${pageNodeUuid}&pageNodeDefUuid=${pageNodeDefUuid}`
 
-    history.push(recordEditUrl)
+    navigate(recordEditUrl)
   }
 
   const restParams = { cycle: surveyCycleKey, recordUuid }

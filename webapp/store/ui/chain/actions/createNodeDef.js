@@ -5,7 +5,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
 export const createNodeDef =
-  ({ history, type, virtual = false }) =>
+  ({ navigate, type, virtual = false }) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -22,5 +22,5 @@ export const createNodeDef =
     const nodeDef = NodeDef.newNodeDef(nodeDefParent, type, cycleKeys, {}, defaultAdvancedProps, true, virtual)
 
     await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-    history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+    navigate(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
   }

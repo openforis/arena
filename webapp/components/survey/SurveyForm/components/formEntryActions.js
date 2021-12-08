@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import * as Record from '@core/record/record'
@@ -20,7 +20,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 const RecordEntryButtons = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const record = useRecord()
 
   const stepId = Record.getStep(record)
@@ -57,7 +57,7 @@ const RecordEntryButtons = () => {
                 DialogConfirmActions.showDialogConfirm({
                   key: 'surveyForm.formEntryActions.confirmDemote',
                   params: { name: getStepLabel(stepPrev) },
-                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepPrev), history)),
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepPrev), navigate)),
                 })
               )
             }
@@ -81,7 +81,7 @@ const RecordEntryButtons = () => {
                 DialogConfirmActions.showDialogConfirm({
                   key: `surveyForm.formEntryActions.confirmPromote${valid ? '' : 'WithErrors'}`,
                   params: { name: getStepLabel(stepNext) },
-                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), history)),
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), navigate)),
                 })
               )
             }
@@ -99,7 +99,7 @@ const RecordEntryButtons = () => {
             dispatch(
               DialogConfirmActions.showDialogConfirm({
                 key: 'surveyForm.formEntryActions.confirmDelete',
-                onOk: () => dispatch(RecordActions.deleteRecord(history)),
+                onOk: () => dispatch(RecordActions.deleteRecord(navigate)),
               })
             )
           }

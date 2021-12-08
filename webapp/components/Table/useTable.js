@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
@@ -7,7 +7,7 @@ import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/co
 
 export const useTable = ({ moduleApiUri, module, restParams }) => {
   const [totalCount, setTotalCount] = useState(0)
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
@@ -64,18 +64,18 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
       let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
       order = sort.by === orderByField && sort.order === 'asc' ? null : order
 
-      updateQuery(history)({ sort: { by: orderByField, order }, offset: null })
+      updateQuery(navigate)({ sort: { by: orderByField, order }, offset: null })
     },
     [sort]
   )
 
   const handleSearch = useCallback((searchText) => {
-    updateQuery(history)({ search: searchText, offset: null })
+    updateQuery(navigate)({ search: searchText, offset: null })
   }, [])
 
   // on rest params and limit update, go to first page (reset offset)
   useOnUpdate(() => {
-    updateQuery(history)({ offset: null })
+    updateQuery(navigate)({ offset: null })
   }, [JSON.stringify(restParams), limit])
 
   return {
