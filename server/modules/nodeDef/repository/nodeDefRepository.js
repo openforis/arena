@@ -152,6 +152,18 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = D
     (row) => dbTransformCallback({ row, draft })
   )
 
+const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, client = DB) =>
+  client.map(
+    `
+    SELECT ${nodeDefSelectFields}
+    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    WHERE 
+    (props_advanced || props_advanced_draft) ->> '${NodeDef.keysPropsAdvanced.areaBasedEstimatedOf}' = $1
+    AND deleted IS NOT TRUE`,
+    [nodeDefUuid],
+    (row) => dbTransformCallback({ row, draft })
+  )
+
 export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = DB) =>
   client.map(
     `
@@ -301,6 +313,14 @@ export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => 
   const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)
   await Promise.all(
     childNodeDefs.map(async (childNodeDef) => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client))
+  )
+
+  const relatedNodeDefsToDelete = await fetchAreaBasedEstimateNodeDefsOf(surveyId, nodeDefUuid, true, client)
+
+  await Promise.all(
+    relatedNodeDefsToDelete.map(async (childNodeDef) =>
+      markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
+    )
   )
 
   return nodeDef
