@@ -94,8 +94,6 @@ const AreaBasedEstimated = (props) => {
 }
 
 AreaBasedEstimated.propTypes = {
-  state: PropTypes.object.isRequired,
-  Actions: PropTypes.object.isRequired,
   nodeDef: PropTypes.object.isRequired,
 }
 
