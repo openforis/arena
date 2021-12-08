@@ -16,6 +16,7 @@ import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
+import * as FileRepository from '../../repository/fileRepository'
 
 const logger = Log.getLogger('NodeUpdateManager')
 
@@ -174,6 +175,15 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
       R.assoc(Node.keys.meta, meta)
     )(node)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
+  }
+
+  if (NodeDef.isFile(nodeDef)) {
+    // mark old file as deleted if changed
+    const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
+    const fileUuidPrev = Node.getFileUuid(nodePrev)
+    if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
+      await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+    }
   }
 
   const nodeUpdated = await NodeRepository.updateNode(
