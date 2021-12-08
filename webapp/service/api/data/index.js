@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 
-// ==== READ
+// ==== DATA IMPORT
 export const importRecordsFromCollect = async ({
   surveyId,
   file,
@@ -22,13 +22,7 @@ export const importRecordsFromCollect = async ({
   return job
 }
 
-export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) => {
-  const {
-    data: { count },
-  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
-  return { count }
-}
-
+// ==== DATA EXPORT
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
@@ -45,4 +39,18 @@ export const downloadDataQueryExport = ({ surveyId, entityDefUuid, tempFileName 
     `/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?tempFileName=${tempFileName}`,
     'data-query-export'
   )
+}
+
+// ==== READ
+export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { cycle, recordUuid } })
+  return record
+}
+
+// ==== UPDATE
+export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) => {
+  const {
+    data: { count },
+  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
+  return { count }
 }
