@@ -12,6 +12,7 @@ export const enTranslation = {
     aggregateFunction_plural: 'Aggregate functions',
     avg: 'Average',
     ascending: 'Ascending',
+    areaBased: 'area-based',
     back: 'Back',
     baseUnit: 'Base unit',
     cancel: 'Cancel',

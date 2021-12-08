@@ -19,6 +19,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 
 const AreaBasedEstimated = (props) => {
   const { nodeDef } = props
+
   const [areaBasedEstimatedNodeDef, setAreaBasedEstimatedNodeDef] = useState(false)
 
   const dispatch = useDispatch()
@@ -30,9 +31,7 @@ const AreaBasedEstimated = (props) => {
   const i18n = useI18n()
 
   useEffect(() => {
-    const _areaBasedEstimatedNodeDef = Survey.getNodeDefsArray(survey).find(
-      (_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef)
-    )
+    const _areaBasedEstimatedNodeDef = Survey.getNodeDefAreaBasedStimate(nodeDef)(survey)
     if (_areaBasedEstimatedNodeDef) {
       setAreaBasedEstimatedNodeDef(_areaBasedEstimatedNodeDef)
     }
