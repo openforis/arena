@@ -26,7 +26,13 @@ const ModuleSwitch = (props) => {
   return (
     <Routes>
       {modules.map((module, i) => (
-        <Route key={i} path={module.path} element={React.createElement(module.component, module.props)} />
+        <Route
+          key={i}
+          path={module.path}
+          element={
+            <React.Suspense fallback={<>...</>}>{React.createElement(module.component, module.props)}</React.Suspense>
+          }
+        />
       ))}
     </Routes>
   )
