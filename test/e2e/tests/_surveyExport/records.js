@@ -10,7 +10,7 @@ import { getNodeDefByName } from './_surveyUtils'
 const { tree_id } = tree.children
 
 const getNodesByDefUuid = (nodeDefUuid) => (record) =>
-  Object.values(record.nodes).filter((node) => Node.getNodeByDefUuid(node) === nodeDefUuid)
+  Object.values(record.nodes).filter((node) => node.nodeDefUuid === nodeDefUuid)
 
 const getNodeByDefUuid = (nodeDefUuid) => (record) => getNodesByDefUuid(nodeDefUuid)(record)[0]
 
