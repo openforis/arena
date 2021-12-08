@@ -4,8 +4,9 @@ import SurveyForm from '@webapp/components/survey/SurveyForm'
 
 import { State, useLocalState } from './store'
 
-const Record = () => {
-  const { state } = useLocalState()
+const Record = (props) => {
+  const { recordUuid, pageNodeUuid } = props
+  const { state } = useLocalState({ recordUuid, pageNodeUuid })
 
   if (!State.isLoaded(state)) {
     return null

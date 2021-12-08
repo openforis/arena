@@ -4,21 +4,30 @@ import { CircleMarker, LayerGroup, LayersControl } from 'react-leaflet'
 import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
+import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useDataQuery } from '@webapp/components/DataQuery/store'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { useMapClusters, useMapLayerAdd, ClusterMarker } from '../common'
+import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 
 const markerRadius = 10
 
 export const CoordinateAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor } = props
+  const { attributeDef, markersColor, onRecordEditClick } = props
 
-  const [state, setState] = useState({ query: Query.create() })
+  const [state, setState] = useState({ query: Query.create(), showRecordPanel: false })
   const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
+
+  const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
+  const dataTable = new TableDataNodeDef(survey, nodeDefParent)
+  const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
+  const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
 
   const { query } = state
 
@@ -47,8 +56,7 @@ export const CoordinateAttributeDataLayer = (props) => {
       ? []
       : data
           .map((item) => {
-            // TODO get value using data column name
-            const location = item[NodeDef.getName(attributeDef)]
+            const location = item[attributeColumn.name]
             if (!location) return null
 
             // workaraound: prepend SRID= to location if not specified
@@ -61,11 +69,14 @@ export const CoordinateAttributeDataLayer = (props) => {
             }
 
             const { x: long, y: lat } = pointLatLong
-            const nodeUuid = null // TODO get it from the query
+
+            const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
+            const parentUuid = item[parentEntityColumn.name]
+            const key = `${recordUuid}-${parentUuid}`
 
             return {
               type: 'Feature',
-              properties: { cluster: false, point, location, nodeUuid },
+              properties: { key, cluster: false, point, recordUuid, parentUuid, location },
               geometry: {
                 type: 'Point',
                 coordinates: [long, lat],
@@ -81,7 +92,7 @@ export const CoordinateAttributeDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a node value point
-          const { cluster: isCluster, nodeUuid } = cluster.properties
+          const { cluster: isCluster, key, recordUuid, parentUuid, point } = cluster.properties
 
           // we have a cluster to render
           if (isCluster) {
@@ -101,13 +112,21 @@ export const CoordinateAttributeDataLayer = (props) => {
           // we have a single point (node value) to render
           return (
             <CircleMarker
-              key={nodeUuid}
+              key={key}
               center={[latitude, longitude]}
               radius={markerRadius}
               color={markersColor}
               fillColor={markersColor}
               fillOpacity={0.5}
-            ></CircleMarker>
+            >
+              <CoordinateAttributePopUp
+                attributeDef={attributeDef}
+                point={point}
+                recordUuid={recordUuid}
+                parentUuid={parentUuid}
+                onRecordEditClick={onRecordEditClick}
+              />
+            </CircleMarker>
           )
         })}
       </LayerGroup>
