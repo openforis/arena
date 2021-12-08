@@ -133,6 +133,7 @@ export const {
   getNodeDefKeys,
   isNodeDefRootKey,
   findNodeDef,
+  getNodeDefAreaBasedStimate,
 } = SurveyNodeDefs
 
 // Hierarchy

@@ -53,6 +53,7 @@ const AnalysisNodeDefs = () => {
               <div>{i18n.t('common.entity')}</div>
               <div>{i18n.t('common.name')}</div>
               <div>{i18n.t('common.label')}</div>
+              <div>{i18n.t('common.areaBased')}</div>
               <div>{i18n.t('common.type')}</div>
               <div>{i18n.t('common.active')}</div>
               <div />
