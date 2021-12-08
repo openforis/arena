@@ -12,13 +12,13 @@ const dir = {
 }
 
 export const ExportFile = {
-  activityLog: ({index}) => FileUtils.join(dir.activityLog, `activityLog_${index}.json`),
+  activityLog: ({ index }) => FileUtils.join(dir.activityLog, `activityLog_${index}.json`),
   categories: FileUtils.join(dir.categories, 'categories.json'),
   categoryItems: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
   chains: FileUtils.join(dir.chains, 'chains.json'),
   chain: ({ chainUuid }) => FileUtils.join(dir.chains, `${chainUuid}.json`),
   filesDir: dir.files,
-  files: FileUtils.join(dir.files, 'files.json'),
+  filesSummaries: FileUtils.join(dir.files, 'files.json'),
   file: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.bin`),
   records: FileUtils.join(dir.records, 'records.json'),
   record: ({ recordUuid }) => FileUtils.join(dir.records, `${recordUuid}.json`),
@@ -28,4 +28,7 @@ export const ExportFile = {
   users: FileUtils.join(dir.users, 'users.json'),
   userInvitations: FileUtils.join(dir.users, 'userInvitations.json'),
   userProfilePicture: ({ userUuid }) => FileUtils.join(dir.userProfilePictures, userUuid),
+
+  // Deprecated (old export format)
+  fileOld: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.json`),
 }

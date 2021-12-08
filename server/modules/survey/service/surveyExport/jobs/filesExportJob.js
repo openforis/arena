@@ -21,7 +21,7 @@ export default class FilesExportJob extends Job {
     this.logDebug(`file(s) to export: ${filesCount}`)
 
     if (filesCount > 0) {
-      archive.append(JSON.stringify(filesSummaries, null, 2), { name: ExportFile.files })
+      archive.append(JSON.stringify(filesSummaries, null, 2), { name: ExportFile.filesSummaries })
 
       // write each file content into a separate binary file
       await PromiseUtils.each(filesSummaries, async (fileSummary) => {

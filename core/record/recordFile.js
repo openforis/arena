@@ -46,3 +46,6 @@ export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted,
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getContent = R.prop(keys.content)
+
+// UPDATE
+export const assocContent = R.assoc(keys.content)
