@@ -9,10 +9,8 @@ import { getNodeDefByName } from './_surveyUtils'
 // eslint-disable-next-line camelcase
 const { tree_id } = tree.children
 
-const getNodesByDefUuid = (nodeDefUuid) => (record) => {
-  const nodeUuids = record._nodesByDef[nodeDefUuid]
-  return nodeUuids.map((nodeUuid) => record.nodes[nodeUuid])
-}
+const getNodesByDefUuid = (nodeDefUuid) => (record) =>
+  Object.values(record.nodes).filter((node) => Node.getNodeByDefUuid(node) === nodeDefUuid)
 
 const getNodeByDefUuid = (nodeDefUuid) => (record) => getNodesByDefUuid(nodeDefUuid)(record)[0]
 
