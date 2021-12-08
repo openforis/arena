@@ -207,7 +207,7 @@ class RChain {
       prefix = '-base-unit'
     }
 
-    if (NodeDef.isSampling(nodeDef) && !Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))) {
+    if (NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
       prefix = ''
       attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
     }

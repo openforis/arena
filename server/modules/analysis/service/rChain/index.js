@@ -114,7 +114,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           if(NodeDef.isBaseUnit(nodeDef)){
             name = `base-unit`
           }
-          if(NodeDef.isSampling(nodeDef) && !Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))){
+          if(NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef)){
             name = nodeDefName.replace(`${NodeDef.getName(entity)}_`,`${NodeDef.getName(entity)}-`)
           }
            

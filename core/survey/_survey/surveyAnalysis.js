@@ -54,7 +54,7 @@ export const getAnalysisNodeDefs =
         if (!hasAnalysisSibilings) return false
       }
 
-      if(hideAreaBasedEstimate && Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef))){
+      if(hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)){
         return false
       }
 
