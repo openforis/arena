@@ -42,24 +42,29 @@ export const gotoSurveyInfo = () =>
 export const gotoHome = () =>
   test('Goto home', async () => {
     const currentUrl = await page.url()
-    if (currentUrl !== `${BASE_URL}/app/home/dashboard/`) {
+    const homeUrl = `${BASE_URL}/app/home/`
+    const dashboardUrl = `${homeUrl}dashboard/`
+    if (currentUrl !== dashboardUrl) {
       await page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a'))
     }
-    expect(page.url()).toBe(`${BASE_URL}/app/home/dashboard/`)
+    // page url could be /home/dashboard or /home (redirection to dashboard not performed yet)
+    expect([homeUrl, dashboardUrl]).toContain(page.url())
   })
 
-const _gotoSubModule = (module, subModule, waitForApiPaths = null) => () =>
-  test(`Goto ${module}->${subModule}`, async () => {
-    await page.hover(getSelector(TestId.sidebar.module(module)))
+const _gotoSubModule =
+  (module, subModule, waitForApiPaths = null) =>
+  () =>
+    test(`Goto ${module}->${subModule}`, async () => {
+      await page.hover(getSelector(TestId.sidebar.module(module)))
 
-    await Promise.all([
-      ...(waitForApiPaths ? waitForApiPaths.map((path) => page.waitForResponse(path)) : []),
-      page.waitForNavigation(),
-      page.click(getSelector(TestId.sidebar.moduleBtn(subModule), 'a')),
-    ])
+      await Promise.all([
+        ...(waitForApiPaths ? waitForApiPaths.map((path) => page.waitForResponse(path)) : []),
+        page.waitForNavigation(),
+        page.click(getSelector(TestId.sidebar.moduleBtn(subModule), 'a')),
+      ])
 
-    expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
-  })
+      expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
+    })
 
 export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
 
