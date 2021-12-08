@@ -89,6 +89,17 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/record', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, recordUuid } = Request.getParams(req)
+
+      const record = await RecordService.fetchRecordSummaryByRecordUuid({ surveyId, cycle, recordUuid })
+      res.json(record)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)

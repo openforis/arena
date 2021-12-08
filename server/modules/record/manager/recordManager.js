@@ -49,7 +49,7 @@ export const { insertNode } = RecordUpdateManager
 // ==== READ
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null },
+  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null, recordUuid = null },
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
@@ -64,7 +64,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
-    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step },
+    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step, recordUuid },
     client
   )
 
@@ -72,6 +72,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     nodeDefKeys,
     list,
   }
+}
+
+export const fetchRecordSummaryByRecordUuid = async ({ surveyId, cycle, recordUuid }, client = db) => {
+  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, recordUuid }, client)
+  return list.length === 1 ? list[0] : null
 }
 
 export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
