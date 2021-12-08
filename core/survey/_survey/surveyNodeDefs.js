@@ -115,7 +115,7 @@ export const getNodeDefParent = (nodeDef) => (survey) => {
   return NodeDef.isVirtual(nodeDef) ? getNodeDefParent(nodeDefParent)(survey) : nodeDefParent
 }
 
-export const getNodeDefAreaBasedStimate = (nodeDef) => (survey) =>
+export const getNodeDefAreaBasedEstimate = (nodeDef) => (survey) =>
   getNodeDefsArray(survey).find((_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef))
 
 export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
