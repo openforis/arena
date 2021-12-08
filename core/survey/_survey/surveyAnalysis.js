@@ -13,7 +13,7 @@ export const getAnalysisNodeDefs =
     entityDefUuid,
     showSamplingNodeDefs = true,
     hideSamplingNodeDefsWithoutSibilings = true,
-    hideAreaBasedStimate = true,
+    hideAreaBasedEstimate = true,
   }) =>
   (survey) => {
     let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter((nodeDef) => {
@@ -53,6 +53,8 @@ export const getAnalysisNodeDefs =
 
       return true
     })
+
+    nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedStimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
   }
