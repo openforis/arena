@@ -7,6 +7,7 @@ export const {
   fetchFileUuidsBySurveyId,
   fetchFileByUuid,
   fetchFileByNodeUuid,
+  fetchFileSummariesBySurveyId,
   // DELETE
   deleteFileByUuid,
   deleteFilesByRecordUuids,
