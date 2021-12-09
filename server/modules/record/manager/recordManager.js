@@ -102,13 +102,16 @@ export {
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = true, includeRefData = true },
+  { surveyId, recordUuid, draft = true, fetchForUpdate = true },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid({ surveyId, recordUuid, includeRefData, draft }, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(
+    { surveyId, recordUuid, includeRefData: fetchForUpdate, draft },
+    client
+  )
 
-  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
+  return Record.assocNodes({ nodes: ObjectUtils.toUuidIndexedObj(nodes), updateNodesIndex: fetchForUpdate })(record)
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } from '../repository/nodeRepository'

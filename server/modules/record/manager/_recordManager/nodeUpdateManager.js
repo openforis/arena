@@ -30,7 +30,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  const recordUpdated = R.isEmpty(nodes) ? record : Record.assocNodes(nodes)(record)
+  const recordUpdated = R.isEmpty(nodes) ? record : Record.assocNodes({ nodes })(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
@@ -306,7 +306,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
-    recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
+    recordUpdated = Record.assocNodes({ nodes: nodesReloaded })(recordUpdated)
   }
 
   return {
@@ -397,5 +397,5 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
       ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
+    return Record.assocNodes({ nodes: ObjectUtils.toUuidIndexedObj(nodesDeleted) })(record)
   })
