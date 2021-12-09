@@ -16,7 +16,8 @@ export const getAnalysisNodeDefs =
     hideAreaBasedEstimate = true,
   }) =>
   (survey) => {
-    let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter((nodeDef) => {
+    const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
+    let nodeDefs = _nodeDefs.filter((nodeDef) => {
       if (!NodeDef.isAnalysis(nodeDef)) return false
 
       // remove nodeDefs not in this chain
@@ -30,11 +31,11 @@ export const getAnalysisNodeDefs =
       if (entity && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(entity)) return false
 
       // remove nodeDefs not in this entity bu entityUuid
-      if (enentityDefUuidtity && NodeDef.getParentUuid(nodeDef) !== entityDefUuid) return false
+      if (entityDefUuid && NodeDef.getParentUuid(nodeDef) !== entityDefUuid) return false
 
       if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
 
-      if (hideAreaBasedStimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+      if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
 
       // show base unit nodeDefs with nodeDef analysis sibilings
       if (
@@ -43,18 +44,22 @@ export const getAnalysisNodeDefs =
         NodeDef.isSampling(nodeDef) &&
         !NodeDef.isBaseUnit(nodeDef)
       ) {
-        const hasAnalysisSibilings = nodeDefs.some(
+        const hasAnalysisSibilings = _nodeDefs.some(
           (_nodeDef) =>
+            NodeDef.isSampling(_nodeDef) &&
             NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
             NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
         )
+
         if (!hasAnalysisSibilings) return false
+      }
+
+      if(hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)){
+        return false
       }
 
       return true
     })
-
-    nodeDefs = nodeDefs.filter(nodeDef => !hideAreaBasedStimate || !NodeDef.getAreaBasedEstimatedOf(nodeDef))
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
   }
