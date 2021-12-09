@@ -56,8 +56,12 @@ export const assocNode = (node) => (record) => {
   }
 }
 
-export const assocNodes = (nodes) => (record) =>
-  Object.values(nodes).reduce((recordAcc, node) => assocNode(node)(recordAcc), record)
+export const assocNodes =
+  ({ nodes, updateNodesIndex = true }) =>
+  (record) =>
+    updateNodesIndex
+      ? Object.values(nodes).reduce((recordAcc, node) => assocNode(node)(recordAcc), record)
+      : { ...record, [keys.nodes]: { ...RecordReader.getNodes(record), ...nodes } }
 
 export const mergeNodeValidations = (nodeValidations) => (record) =>
   R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>

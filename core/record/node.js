@@ -127,6 +127,7 @@ export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation
+export const isValid = R.pipe(getValidation, Validation.isValid)
 
 // ===== READ metadata
 
@@ -199,8 +200,13 @@ export const isValueBlank = (node) => {
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
 // Coordinate
-export const getCoordinateX = _getValuePropRaw(valuePropsCoordinate.x)
-export const getCoordinateY = _getValuePropRaw(valuePropsCoordinate.y)
+const _getValuePropNumber = ({ node, prop }) => {
+  const value = _getValuePropRaw(prop)(node)
+  return R.isNil(value) || R.isEmpty(value) ? null : Number(value)
+}
+export const getCoordinateX = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.x })
+export const getCoordinateY = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.y })
+
 export const getCoordinateSrs = (node, defaultValue = null) =>
   _getValuePropRaw(valuePropsCoordinate.srs, defaultValue)(node)
 
@@ -216,7 +222,7 @@ export const getDateModified = R.prop(keys.dateModified)
 
 // File
 export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')
-export const getFileUuid = _getValuePropRaw(valuePropsFile.fileUuid, '')
+export const getFileUuid = _getValuePropRaw(valuePropsFile.fileUuid)
 
 // Taxon
 export const getTaxonUuid = _getValuePropRaw(valuePropsTaxon.taxonUuid)

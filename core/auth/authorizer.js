@@ -95,6 +95,12 @@ export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 export const canUpdateRecordsStep = canAnalyzeRecords
 
 // ======
+// ====== Map
+// ======
+
+export const canSeeMap = _hasSurveyPermission(permissions.recordAnalyse)
+
+// ======
 // ====== Users
 // ======
 

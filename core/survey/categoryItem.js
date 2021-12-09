@@ -44,3 +44,20 @@ export const getExtraProp = (prop) => R.pipe(getExtra, R.propOr('', prop))
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
+
+// ====== UTILS
+
+// gets the ancestor codes as an array (only if ancestor codes have been populated during fetch)
+export const getAncestorCodes = (item) => {
+  const codes = []
+  let levelIndex = 0
+  while (true) {
+    const levelCode = R.propOr(null, `level${levelIndex}Code`)(item)
+    if (levelCode === null) {
+      break
+    }
+    codes.push(levelCode)
+    levelIndex += 1
+  }
+  return codes
+}

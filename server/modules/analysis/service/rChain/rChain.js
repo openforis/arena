@@ -40,6 +40,7 @@ class RChain {
     this._dirNames = RChain.dirNames
     this._dir = null
     this._dirUser = null
+    this._dirSampling = null
     this._dirSystem = null
     this._dirResults = null
 
@@ -104,6 +105,10 @@ class RChain {
     return this._dirUser
   }
 
+  get dirSampling() {
+    return this._dirSampling
+  }
+
   get dirResults() {
     return this._dirResults
   }
@@ -162,8 +167,13 @@ class RChain {
 
     this._dirSystem = FileUtils.join(this._dir, this.dirNames.system)
     this._dirUser = FileUtils.join(this._dir, this.dirNames.user)
+    this._dirSampling = FileUtils.join(this._dir, this.dirNames.sampling)
     this._dirResults = FileUtils.join(this.dirNames.system, 'results')
-    await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
+    await Promise.all([
+      FileUtils.mkdir(this._dirSystem),
+      FileUtils.mkdir(this._dirUser),
+      FileUtils.mkdir(this._dirSampling),
+    ])
   }
 
   async _initFiles() {
@@ -185,35 +195,67 @@ class RChain {
     this._fileCommon = await new RFileCommon(this).init()
   }
 
+  async _initNodeDefFile({ nodeDef, index, path }) {
+    const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
+    const entityName = NodeDef.getName(parentEntity)
+    let attributeName = NodeDef.getName(nodeDef)
+    const fileIndex = padStart(Number((index || index === 0 ) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1)
+
+    let prefix = `-${entityName}`
+    let attributeNameInFile = attributeName
+    if (NodeDef.isBaseUnit(nodeDef)) {
+      prefix = '-base-unit'
+    }
+
+    if (NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
+      prefix = ''
+      attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
+    }
+
+    const fileName = `${fileIndex}${prefix}-${attributeNameInFile}`
+
+    const rFile = new RFile(this, path, fileName)
+
+    await rFile.init()
+
+    const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
+
+    if (NodeDef.isCode(nodeDef)) {
+      attributeName = `${attributeName}_code`
+    }
+
+    const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
+
+    await rFile.appendContent(content)
+  }
+
   async _initAnalysisNodeDefsFiles() {
     const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain: this.chain })(this.survey)
 
     if (analysisNodeDefs.length > 0) {
+      const _samplingPath = FileUtils.join(this.dirSampling)
+      await FileUtils.mkdir(_samplingPath)
+
+      await PromiseUtils.each(
+        analysisNodeDefs.filter((_nodeDef) => NodeDef.isSampling(_nodeDef)),
+        async (nodeDef, index) => {
+          await this._initNodeDefFile({ nodeDef, index: index - 1, path: _samplingPath })
+        }
+      )
+
       const _entityPath = FileUtils.join(this.dirUser)
       await FileUtils.mkdir(_entityPath)
 
-      await PromiseUtils.each(analysisNodeDefs, async (nodeDef) => {
-        const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
-        const entityName = NodeDef.getName(parentEntity)
-        let attributeName = NodeDef.getName(nodeDef)
-        const fileIndex = padStart(Number(NodeDef.getChainIndex(nodeDef)) + 1)
-
-        const fileName = `${fileIndex}-${entityName}-${attributeName}`
-
-        const rFile = new RFile(this, _entityPath, fileName)
-
-        await rFile.init()
-
-        const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
-
-        if (NodeDef.isCode(nodeDef)) {
-          attributeName = `${attributeName}_code`
+      await PromiseUtils.each(
+        analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
+        async (nodeDef, index) => {
+          await this._initNodeDefFile({ nodeDef, path: _entityPath })
+          const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
+          if(areaBasedEstimated){
+            await this._initNodeDefFile({ nodeDef: areaBasedEstimated, path: _entityPath, index: NodeDef.getChainIndex(nodeDef) })
+          }
         }
-
-        const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
-
-        await rFile.appendContent(content)
-      })
+      )
     }
   }
 
@@ -233,6 +275,6 @@ class RChain {
   }
 }
 
-RChain.dirNames = { user: 'user', system: 'system' }
+RChain.dirNames = { user: 'user', system: 'system', sampling: 'sampling' }
 
 export default RChain

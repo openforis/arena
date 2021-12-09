@@ -44,7 +44,7 @@ export const getNodeDefChildren = (nodeDef) => (survey) => {
 
   const childrenUuidsIndex = nodeDefsIndex.childDefUuidsByParentUuid
 
-  let actualEntityUuid = nodeDef.uuid
+  let actualEntityUuid = nodeDef?.uuid
   if (NodeDef.isVirtual(nodeDef)) {
     const entitySource = getNodeDefSource(nodeDef)(survey)
     actualEntityUuid = entitySource?.uuid

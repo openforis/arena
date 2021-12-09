@@ -52,6 +52,13 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
       <div>{NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey))}</div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
+      <div>
+        {NodeDef.isDecimal(nodeDef)
+          ? Boolean(Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey))
+            ? i18n.t('common.true')
+            : i18n.t('common.false')
+          : '-'}
+      </div>
       <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
       </div>

@@ -49,6 +49,24 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId } = Request.getParams(req)
+      const { surveyCycleKey, nodeDefs } = Request.getBody(req)
+
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDefs({
+        user,
+        surveyId,
+        cycle: surveyCycleKey,
+        nodeDefs,
+      })
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== READ
 
   app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
@@ -110,13 +128,18 @@ export const init = (app) => {
   app.put('/survey/:surveyId/nodeDefs/props', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId,  } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
       const { nodeDefs, cycle } = Request.getBody(req)
 
       const _nodedefsUpdated = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({ cycle, surveyId, user, nodeDefsUpdated: _nodedefsUpdated })
-      
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({
+        cycle,
+        surveyId,
+        user,
+        nodeDefsUpdated: _nodedefsUpdated,
+      })
+
       res.json({ nodeDefsUpdated, nodeDefsValidation })
     } catch (error) {
       next(error)
@@ -124,6 +147,29 @@ export const init = (app) => {
   })
 
   // ==== DELETE
+
+  app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, surveyCycleKey: cycle, nodeDefUuids } = Request.getParams(req)
+
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefsDeleted({
+        user,
+        surveyId,
+        cycle,
+        nodeDefUuids,
+      })
+
+      // do not send updated node def back to client (node def already updated client side)
+      nodeDefUuids.forEach((nodeDefUuid) => {
+        delete nodeDefsUpdated[nodeDefUuid]
+      })
+      
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
+    } catch (error) {
+      next(error)
+    }
+  })
 
   app.delete(
     '/survey/:surveyId/nodeDef/:nodeDefUuid',

@@ -1,20 +1,24 @@
 import * as R from 'ramda'
 
+import * as ActivityLog from '@common/activityLog/activityLog'
+
 import Queue from '@core/queue'
 
-import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import * as ActivityLog from '@common/activityLog/activityLog'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
-import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
+import * as FileRepository from '../../repository/fileRepository'
+
+const logger = Log.getLogger('NodeUpdateManager')
 
 const _getNodesToInsert = (nodeDef) => {
   if (NodeDef.isSingle(nodeDef)) return 1
@@ -26,7 +30,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  const recordUpdated = R.isEmpty(nodes) ? record : Record.assocNodes(nodes)(record)
+  const recordUpdated = R.isEmpty(nodes) ? record : Record.assocNodes({ nodes })(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
@@ -173,6 +177,15 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
   }
 
+  if (NodeDef.isFile(nodeDef)) {
+    // mark old file as deleted if changed
+    const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
+    const fileUuidPrev = Node.getFileUuid(nodePrev)
+    if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
+      await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+    }
+  }
+
   const nodeUpdated = await NodeRepository.updateNode(
     {
       surveyId,
@@ -254,14 +267,14 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
         nodesUpdatedToPersist: nodesToPersistApplicability,
         nodesWithApplicabilityUpdated,
         record: recordUpdatedAvailability,
-      } = NodeUpdateDependentManager.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node })
+      } = Record.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node, logger })
 
       recordUpdated = recordUpdatedAvailability
       Object.assign(nodesUpdatedToPersist, nodesToPersistApplicability)
 
       // Update node dependents (default values)
       const { nodesUpdated: nodesWithDefaultValueUpdated, record: recordUpdatedDefaultValues } =
-        NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node })
+        Record.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node, logger })
 
       recordUpdated = recordUpdatedDefaultValues
       Object.assign(nodesUpdatedToPersist, nodesWithDefaultValueUpdated)
@@ -293,7 +306,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
-    recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
+    recordUpdated = Record.assocNodes({ nodes: nodesReloaded })(recordUpdated)
   }
 
   return {
@@ -377,12 +390,12 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   )
 }
 
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
+export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, record, client = db) =>
   client.tx(async (t) => {
-    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
+    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
     const activities = nodesDeleted.map((node) =>
       ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
+    return Record.assocNodes({ nodes: ObjectUtils.toUuidIndexedObj(nodesDeleted) })(record)
   })

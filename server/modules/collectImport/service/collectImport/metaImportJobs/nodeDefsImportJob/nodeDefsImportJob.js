@@ -20,7 +20,6 @@ import * as CollectImportJobContext from '../../collectImportJobContext'
 import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../../model/collectSurvey'
 import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
-import SamplingPointDataImportJob from '../samplingPointDataImportJob'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 import { parseValidationRules } from './validationRuleParser'
 import { parseDefaultValues } from './defaultValueParser'
@@ -41,7 +40,7 @@ export default class NodeDefsImportJob extends Job {
     this.nodeDefs = {} // Node definitions by uuid
     this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator() // to avoid naming collision
     this.nodeDefsInfoByCollectPath = {} // Used by following jobs
-    this.issuesCount = 0
+    this.importIssues = []
   }
 
   async execute() {
@@ -54,8 +53,11 @@ export default class NodeDefsImportJob extends Job {
 
     await this.insertNodeDef(null, '', collectRootDef, NodeDef.nodeDefType.entity)
 
+    // insert import issues and write report into survey props
+    await CollectImportReportManager.insertItems({ surveyId: this.surveyId, items: this.importIssues }, this.tx)
+
     const collectReport = {
-      [Survey.collectReportKeys.issuesTotal]: this.issuesCount,
+      [Survey.collectReportKeys.issuesTotal]: this.importIssues.length,
       [Survey.collectReportKeys.issuesResolved]: 0,
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, true, this.tx)
@@ -160,35 +162,50 @@ export default class NodeDefsImportJob extends Job {
     // 3. insert children and updated layout props
     const propsUpdated = {}
 
+    const _updateLayoutProp = ({ propName, value }) => {
+      const layout = propsUpdated[NodeDefLayout.keys.layout] || NodeDef.getLayout(nodeDef)
+      const layoutUpdated = R.assocPath([Survey.cycleOneKey, propName], value)(layout)
+      propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
+    }
+
+    // 3 update node type specific props
     if (type === NodeDef.nodeDefType.entity) {
       // 3a. insert child definitions
       const childrenUuids = await this.insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout)
 
       if (tableLayout) {
-        // Update layout prop
-        propsUpdated[NodeDefLayout.keys.layout] = R.pipe(
-          NodeDefLayout.getLayout,
-          R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids)
-        )(nodeDef)
+        _updateLayoutProp({ propName: NodeDefLayout.keys.layoutChildren, value: childrenUuids })
       }
     } else if (type === NodeDef.nodeDefType.code) {
-      // Add parent code def uuid
+      // 3b. Add parent code def uuid
       const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
       if (parentCodeDefUuid) {
         propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
       }
 
-      // 3b. add specify text attribute def
+      // 3c. show code prop
+      const codeShown = CollectSurvey.getUiAttribute('showCode', true)(collectNodeDef)
+      if (!codeShown) {
+        // code shown is true by default
+        _updateLayoutProp({ propName: NodeDefLayout.keys.codeShown, value: codeShown })
+      }
+
+      // 3d. add specify text attribute def
       const { nodeDefsUpdated: qualifierNodeDefsUpdated, nodeDefsInserted: qualifierNodeDefsInserted } =
         await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     }
+    // 4. update hidden when not relevant layout prop
+    const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+    if (hiddenWhenNotRelevant) {
+      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+    }
 
     Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
 
-    // 4. update node def with other props
+    // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
 
     Object.assign(
@@ -294,8 +311,11 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      const validationRules = await this.parseValidationRules({ nodeDef, collectNodeDef })
+      const { validationRules, unique } = this.parseValidationRules({ nodeDef, collectNodeDef })
       validations[NodeDefValidations.keys.expressions] = validationRules
+      if (unique) {
+        validations[NodeDefValidations.keys.unique] = true
+      }
     }
     propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
 
@@ -309,7 +329,7 @@ export default class NodeDefsImportJob extends Job {
       })
       const success = relevantExprConverted !== null
 
-      await this.addImportIssue(
+      this.importIssues.push(
         CollectImportReportItem.newReportItem({
           nodeDefUuid,
           expressionType: CollectImportReportItem.exprTypes.applicable,
@@ -333,7 +353,7 @@ export default class NodeDefsImportJob extends Job {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
-          ? SamplingPointDataImportJob.categoryName
+          ? Survey.samplingPointDataCategoryName
           : listName
         const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
 
@@ -383,35 +403,26 @@ export default class NodeDefsImportJob extends Job {
       defaultLanguage,
     })
 
-    await this.addImportIssues(importIssues)
+    this.importIssues.push(...importIssues)
 
     return defaultValues
   }
 
-  async parseValidationRules({ nodeDef, collectNodeDef }) {
+  parseValidationRules({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
-    const { validationRules, importIssues } = parseValidationRules({
+    const { validationRules, importIssues, unique } = parseValidationRules({
       survey: this.survey,
       nodeDef,
       collectValidationRules,
       defaultLanguage,
     })
 
-    await this.addImportIssues(importIssues)
+    this.importIssues.push(...importIssues)
 
-    return validationRules
-  }
-
-  async addImportIssue(reportItem) {
-    await CollectImportReportManager.insertItem(this.surveyId, reportItem, this.tx)
-    this.issuesCount += 1
-  }
-
-  async addImportIssues(importIssues) {
-    await Promise.all(importIssues.map((importIssue) => this.addImportIssue(importIssue)))
+    return { validationRules, unique }
   }
 
   /**
@@ -527,7 +538,7 @@ export default class NodeDefsImportJob extends Job {
 
       const success = Boolean(nodeDefsInfo)
 
-      await this.addImportIssue(
+      this.importIssues.push(
         CollectImportReportItem.newReportItem({
           nodeDefUuid: NodeDef.getUuid(nodeDef),
           expressionType: CollectImportReportItem.exprTypes.codeParent,

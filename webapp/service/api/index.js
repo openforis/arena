@@ -5,10 +5,14 @@ export {
   fetchCategory,
   createCategory,
   fetchCategoryItems,
+  countSamplingPointData,
+  fetchSamplingPointData,
   deleteCategory,
   cleanupCategory,
   startExportAllCategoriesJob,
 } from './categories'
+export { fetchChains } from './analysis'
+
 export {
   fetchTaxonomies,
   fetchTaxonomy,
@@ -18,9 +22,24 @@ export {
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
-export { importRecordsFromCollect, updateRecordsStep, exportDataQueryToTempFile, downloadDataQueryExport } from './data'
+export {
+  importRecordsFromCollect,
+  updateRecordsStep,
+  exportDataQueryToTempFile,
+  downloadDataQueryExport,
+  fetchRecordSummary,
+} from './data'
 export { fetchSurveys, insertSurvey } from './survey'
-export { fetchNodeDef, fetchNodeDefs, putNodeDefProps, putNodeDefsProps, postNodeDef, deleteNodeDef } from './nodeDef'
+export {
+  fetchNodeDef,
+  fetchNodeDefs,
+  putNodeDefProps,
+  putNodeDefsProps,
+  postNodeDef,
+  postNodeDefs,
+  deleteNodeDef,
+  deleteNodeDefs,
+} from './nodeDef'
 
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'

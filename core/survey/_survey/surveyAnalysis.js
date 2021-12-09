@@ -7,22 +7,59 @@ import { getHierarchy, traverseHierarchyItemSync } from './surveyNodeDefs'
 
 // ====== READ
 export const getAnalysisNodeDefs =
-  ({ chain, entity, entityDefUuid }) =>
+  ({
+    chain,
+    entity,
+    entityDefUuid,
+    showSamplingNodeDefs = true,
+    hideSamplingNodeDefsWithoutSibilings = true,
+    hideAreaBasedEstimate = true,
+  }) =>
   (survey) => {
-    let nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey).filter(NodeDef.isAnalysis)
+    const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
+    let nodeDefs = _nodeDefs.filter((nodeDef) => {
+      if (!NodeDef.isAnalysis(nodeDef)) return false
 
-    if (chain) {
-      nodeDefs = nodeDefs.filter((nodeDef) => {
-        return NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) === Chain.getUuid(chain)
-      })
-    }
+      // remove nodeDefs not in this chain
+      if (
+        chain &&
+        NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) !== Chain.getUuid(chain)
+      )
+        return false
 
-    if (entity) {
-      nodeDefs = nodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entity))
-    }
-    if (entityDefUuid) {
-      nodeDefs = nodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === entityDefUuid)
-    }
+      // remove nodeDefs not in this entity
+      if (entity && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(entity)) return false
+
+      // remove nodeDefs not in this entity bu entityUuid
+      if (entityDefUuid && NodeDef.getParentUuid(nodeDef) !== entityDefUuid) return false
+
+      if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
+
+      if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+
+      // show base unit nodeDefs with nodeDef analysis sibilings
+      if (
+        showSamplingNodeDefs &&
+        hideSamplingNodeDefsWithoutSibilings &&
+        NodeDef.isSampling(nodeDef) &&
+        !NodeDef.isBaseUnit(nodeDef)
+      ) {
+        const hasAnalysisSibilings = _nodeDefs.some(
+          (_nodeDef) =>
+            NodeDef.isSampling(_nodeDef) &&
+            NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
+            NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
+        )
+
+        if (!hasAnalysisSibilings) return false
+      }
+
+      if(hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)){
+        return false
+      }
+
+      return true
+    })
 
     return nodeDefs.sort((nodeDefA, nodeDefB) => NodeDef.getChainIndex(nodeDefA) - NodeDef.getChainIndex(nodeDefB))
   }

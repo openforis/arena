@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -13,7 +13,7 @@ import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 
 export const useOnRemove = ({ userToUpdate }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const lang = useLang()
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
@@ -33,7 +33,7 @@ export const useOnRemove = ({ userToUpdate }) => {
           },
         })
       )
-      history.push(appModuleUri(userModules.usersSurvey))
+      navigate(appModuleUri(userModules.usersSurvey))
     } finally {
       dispatch(LoaderActions.hideLoader())
     }

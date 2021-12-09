@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import axios from 'axios'
 import * as R from 'ramda'
 
@@ -18,7 +18,7 @@ import { useUser } from '@webapp/store/user'
 import { validateUserInvite } from './validate'
 
 const _performInvite =
-  ({ dispatch, history, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
+  ({ dispatch, navigate, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
   async () => {
     try {
       dispatch(LoaderActions.showLoader())
@@ -41,7 +41,7 @@ const _performInvite =
             params: { email: UserInvite.getEmail(userInvite) },
           })
         )
-        history.push(appModuleUri(userModules.usersSurvey))
+        navigate(appModuleUri(userModules.usersSurvey))
       }
     } finally {
       dispatch(LoaderActions.hideLoader())
@@ -50,7 +50,7 @@ const _performInvite =
 
 export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = false }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const user = useUser()
@@ -65,7 +65,7 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
       const groupUuid = UserInvite.getGroupUuid(userInvite)
       const group = groups.find((group) => group.uuid === groupUuid)
 
-      const invite = _performInvite({ dispatch, history, surveyId, surveyCycleKey, userInvite, repeatInvitation })
+      const invite = _performInvite({ dispatch, navigate, surveyId, surveyCycleKey, userInvite, repeatInvitation })
 
       if (AuthGroup.isSystemAdminGroup(group)) {
         // ask for a confirmation when user is inviting someone else as system administrator

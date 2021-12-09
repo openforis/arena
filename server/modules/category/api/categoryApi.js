@@ -7,7 +7,7 @@ import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -128,7 +128,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, draft = false, tempFileName } = Request.getParams(req)
-        const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const name = `${Survey.getName(surveyInfo)}_categories.zip`
         const exportedFilePath = FileUtils.tempFilePath(tempFileName)
@@ -151,7 +151,7 @@ export const init = (app) => {
     try {
       const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)
 
-      const list = await CategoryService.fetchCategoriesBySurveyId({
+      const categoriesByUuid = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
         surveyId,
         draft,
         includeValidation: validate,
@@ -160,7 +160,7 @@ export const init = (app) => {
         search,
       })
 
-      res.json({ list })
+      res.json({ list: Object.values(categoriesByUuid) })
     } catch (error) {
       next(error)
     }
@@ -226,6 +226,36 @@ export const init = (app) => {
           await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
         )
 
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/sampling-point-data/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0 } = Request.getParams(req)
+
+        const count = await CategoryService.countSamplingPointData({ surveyId, levelIndex })
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/sampling-point-data',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0, limit = null, offset = null } = Request.getParams(req)
+
+        const items = await CategoryService.fetchSamplingPointData({ surveyId, levelIndex, limit, offset })
         res.json({ items })
       } catch (error) {
         next(error)

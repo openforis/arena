@@ -20,8 +20,8 @@ const verifyCoordinate = async (nodeDef, value, parentSelector) => {
   const x = await page.$(xSelector)
   const y = await page.$(ySelector)
   const srs = await page.$(srsSelector)
-  await expect(await x.getAttribute('value')).toBe(value.x)
-  await expect(await y.getAttribute('value')).toBe(value.y)
+  await expect(Number(await x.getAttribute('value'))).toBe(Number(value.x))
+  await expect(Number(await y.getAttribute('value'))).toBe(Number(value.y))
   await expect(await srs.getAttribute('value')).toBe(value.srsLabel)
 }
 

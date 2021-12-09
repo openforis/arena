@@ -111,6 +111,10 @@ export const keysPropsAdvanced = {
   index: 'index',
   active: 'active',
   aggregateFunctions: 'aggregateFunctions',
+
+  isBaseUnit: 'isBaseUnit',
+  isSampling: 'isSampling',
+  areaBasedEstimatedOf: 'areaBasedEstimatedOf',
 }
 
 const metaKeys = {
@@ -192,11 +196,6 @@ export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.tru
 export const isBooleanLabelYesNo = (nodeDef) =>
   isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
 
-// READ Analysis
-export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
-export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
-export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
-
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
@@ -276,6 +275,16 @@ export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
 export const getAggregateFunctionByUuid = (uuid) => R.pipe(getAggregateFunctions, R.propOr(null, uuid))
+
+// READ Analysis
+export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
+export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
+export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalysis(nodeDef)
+
+export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
+export const isSampling = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isSampling, false)(nodeDef))
+export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)
+export const isAreaBasedEstimatedOf = nodeDef => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)(nodeDef))
 
 // ==== CREATE
 

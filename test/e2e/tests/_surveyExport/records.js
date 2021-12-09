@@ -9,10 +9,8 @@ import { getNodeDefByName } from './_surveyUtils'
 // eslint-disable-next-line camelcase
 const { tree_id } = tree.children
 
-const getNodesByDefUuid = (nodeDefUuid) => (record) => {
-  const nodeUuids = record._nodesByDef[nodeDefUuid]
-  return nodeUuids.map((nodeUuid) => record.nodes[nodeUuid])
-}
+const getNodesByDefUuid = (nodeDefUuid) => (record) =>
+  Object.values(record.nodes).filter((node) => node.nodeDefUuid === nodeDefUuid)
 
 const getNodeByDefUuid = (nodeDefUuid) => (record) => getNodesByDefUuid(nodeDefUuid)(record)[0]
 
@@ -26,8 +24,8 @@ const verifyCode = async (nodeExport, _value) => {
 }
 const verifyCoordinate = async (nodeExport, value) => {
   const { x, y, srs } = nodeExport.value
-  await expect(x).toBe(value.x)
-  await expect(y).toBe(value.y)
+  await expect(Number(x)).toBe(Number(value.x))
+  await expect(Number(y)).toBe(Number(value.y))
   await expect(srs).toBe(value.srs)
 }
 const verifyTaxon = async (nodeExport, _value) => {

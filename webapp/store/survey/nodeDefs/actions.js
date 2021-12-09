@@ -17,6 +17,7 @@ import * as SurveyState from '../state'
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
+export const nodeDefsDelete = 'survey/nodeDefs/delete'
 export const nodeDefSave = 'survey/nodeDef/save'
 export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
@@ -43,7 +44,7 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
 
@@ -51,10 +52,23 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 
   return nodeDef
 }
+
+export const createNodeDefs =
+  ({ surveyId, surveyCycleKey, nodeDefs }) =>
+  async (dispatch, getState) => {
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDefs({ surveyId, surveyCycleKey, nodeDefs })
+
+    dispatch(
+      _onNodeDefsUpdate(
+        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
+        nodeDefsValidation
+      )
+    )
+  }
 
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
@@ -196,7 +210,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 }
 
 export const removeNodeDef =
-  (nodeDef, history = null) =>
+  (nodeDef, navigate = null) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -222,11 +236,27 @@ export const removeNodeDef =
             ])
 
             dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-            if (history) {
-              history.goBack()
+            if (navigate) {
+              navigate(-1)
             }
           },
         })
       )
     }
+  }
+
+export const resetSamplingNodeDefs =
+  ({ surveyId, surveyCycleKey, chain }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const nodeDefs = Survey.getAnalysisNodeDefs({ chain, hideSamplingNodeDefsWithoutSibilings: false, hideAreaBasedEstimate: false  })(survey).filter(
+      (_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef)
+    )
+
+    const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
+
+    await API.deleteNodeDefs({ surveyId, nodeDefUuids, surveyCycleKey })
+
+    dispatch({ type: nodeDefsDelete, nodeDefs, nodeDefUuids })
   }

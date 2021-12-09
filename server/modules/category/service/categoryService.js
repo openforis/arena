@@ -1,8 +1,12 @@
-import * as JobManager from '@server/job/jobManager'
+import { Points } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 
+import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
+
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
@@ -54,6 +58,45 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   return job
 }
 
+const _getSamplingPointDataCategory = async ({ surveyId }) => {
+  const draft = true
+  const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
+  return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
+}
+
+export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
+  const category = await _getSamplingPointDataCategory({ surveyId })
+  const categoryUuid = Category.getUuid(category)
+  const count = await CategoryManager.countItemsByLevelIndex({ surveyId, categoryUuid, levelIndex })
+  return count
+}
+
+export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
+  const draft = true
+  const category = await _getSamplingPointDataCategory({ surveyId })
+  const items = await CategoryManager.fetchItemsByLevelIndex({
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+    levelIndex,
+    limit,
+    offset,
+    draft,
+  })
+  const samplingPointData = items.map((item) => {
+    const location = CategoryItem.getExtraProp('location')(item)
+    const ancestorCodes = CategoryItem.getAncestorCodes(item)
+    const point = Points.parse(location)
+    const pointLatLong = Points.toLatLong(point)
+    return {
+      uuid: CategoryItem.getUuid(item),
+      codes: [...ancestorCodes, CategoryItem.getCode(item)],
+      latLng: [pointLatLong.y, pointLatLong.x],
+      location,
+    }
+  })
+  return samplingPointData
+}
+
 export const {
   insertCategory,
   createImportSummary,
@@ -70,6 +113,8 @@ export const {
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,
   fetchItemsByCategoryUuid,
+  countItemsByLevelIndex,
+  fetchItemsByLevelIndex,
 
   updateCategoryProp,
   cleanupCategory,

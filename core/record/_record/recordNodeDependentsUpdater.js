@@ -3,16 +3,13 @@ import * as R from 'ramda'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as RecordExpressionValueConverter from '@core/record/recordExpressionValueConverter'
+import * as RecordReader from './recordReader'
+import * as RecordUpdater from './recordUpdater'
 
-import * as Log from '@server/log/log'
-
-const logger = Log.getLogger('NodeUpdateDependentManager')
-
-const logExpressionError = ({ error, expressionType, survey, nodeDef, expressionsToEvaluate }) => {
+const _logExpressionError = ({ error, expressionType, survey, nodeDef, expressionsToEvaluate, logger }) => {
   const surveyId = Survey.getId(survey)
   const nodeDefName = NodeDef.getName(nodeDef)
   const expressionsString = JSON.stringify(expressionsToEvaluate)
@@ -25,13 +22,17 @@ const logExpressionError = ({ error, expressionType, survey, nodeDef, expression
  * Module responsible for updating applicable and default values.
  */
 
-export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
+export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger }) => {
   // Output
   const nodesUpdatedToPersist = {}
   const nodesWithApplicabilityUpdated = {}
 
   // 1. fetch dependent nodes
-  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
+  const nodePointersToUpdate = RecordReader.getDependentNodePointers(
+    survey,
+    node,
+    Survey.dependencyTypes.applicable
+  )(record)
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
@@ -39,7 +40,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
     // Include a pointer to node itself if it has just been created and it has an "applicable if" expression
     nodePointersToUpdate.push({
       nodeDef,
-      nodeCtx: Record.getParentNode(node)(record),
+      nodeCtx: RecordReader.getParentNode(node)(record),
     })
   }
 
@@ -48,7 +49,10 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   nodePointersToUpdate.forEach((nodePointer) => {
-    const { nodeCtx, nodeDef: nodeDefNodePointer } = nodePointer
+    const { nodeCtx: nodeCtxNodePointer, nodeDef: nodeDefNodePointer } = nodePointer
+    const nodeCtxUuid = Node.getUuid(nodeCtxNodePointer)
+    // nodeCtx could have been updated in a previous iteration
+    const nodeCtx = nodesUpdatedToPersist[nodeCtxUuid] || nodeCtxNodePointer
     const expressionsToEvaluate = NodeDef.getApplicable(nodeDefNodePointer)
     try {
       // 3. evaluate applicable expression
@@ -58,6 +62,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
         nodeCtx,
         expressionsToEvaluate
       )
+
       const applicable = A.propOr(false, 'value', exprEval)
 
       // 4. persist updated node value if changed, and return updated node
@@ -68,24 +73,25 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
 
         // update node and add it to nodesUpdated
         const nodeCtxUpdated = Node.assocChildApplicability({ nodeDefUuid, applicable })(nodeCtx)
-        nodesUpdatedToPersist[Node.getUuid(nodeCtx)] = nodeCtxUpdated
+        nodesUpdatedToPersist[nodeCtxUuid] = nodeCtxUpdated
 
-        const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(recordUpdated)
+        const nodeCtxChildren = RecordReader.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(recordUpdated)
         nodeCtxChildren.forEach((nodeCtxChild) => {
           // 5. add nodeCtxChild and its descendants to nodesUpdated
-          Record.visitDescendantsAndSelf(nodeCtxChild, (nodeDescendant) => {
+          RecordReader.visitDescendantsAndSelf(nodeCtxChild, (nodeDescendant) => {
             nodesWithApplicabilityUpdated[Node.getUuid(nodeDescendant)] = nodeDescendant
           })(recordUpdated)
         })
-        recordUpdated = Record.assocNode(nodeCtxUpdated)(recordUpdated)
+        recordUpdated = RecordUpdater.assocNode(nodeCtxUpdated)(recordUpdated)
       }
     } catch (error) {
-      logExpressionError({
+      _logExpressionError({
         error,
         type: 'applicable',
         survey,
         nodeDef: nodeDefNodePointer,
         expressionsToEvaluate,
+        logger,
       })
     }
   })
@@ -97,7 +103,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node }) => {
   }
 }
 
-export const updateSelfAndDependentsDefaultValues = ({ survey, record, node }) => {
+export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, logger }) => {
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
@@ -108,7 +114,7 @@ export const updateSelfAndDependentsDefaultValues = ({ survey, record, node }) =
     return NodeDef.isAttribute(nodeDef) && (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx))
   }
 
-  const nodePointersToUpdate = Record.getDependentNodePointers(
+  const nodePointersToUpdate = RecordReader.getDependentNodePointers(
     survey,
     node,
     Survey.dependencyTypes.defaultValues,
@@ -146,14 +152,14 @@ export const updateSelfAndDependentsDefaultValues = ({ survey, record, node }) =
         Node.assocIsDefaultValueApplied(defaultValueApplied),
         Node.assocValue(exprValue)
       )(nodeCtx)
-      recordUpdated = Record.assocNode(nodeCtxUpdated)(recordUpdated)
+      recordUpdated = RecordUpdater.assocNode(nodeCtxUpdated)(recordUpdated)
 
       return {
         ...nodesUpdatedAcc,
         [nodeCtxUuid]: nodeCtxUpdated,
       }
     } catch (error) {
-      logExpressionError({ error, type: 'default value', survey, nodeDef, expressionsToEvaluate })
+      _logExpressionError({ error, type: 'default value', survey, nodeDef, expressionsToEvaluate, logger })
       return nodesUpdatedAcc
     }
   }, {})

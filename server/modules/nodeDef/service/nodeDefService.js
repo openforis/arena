@@ -1,7 +1,10 @@
+import * as R from 'ramda'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -82,6 +85,21 @@ export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsUpdated }, t)
   })
 
+export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKey, nodeDefs }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId, cycle }, t)
+
+    await NodeDefManager.insertNodeDefsBatch({
+      surveyId,
+      nodeDefs,
+      client: t,
+    })
+
+    const surveyUpdated = Survey.assocNodeDefs({ nodeDefs })(survey)
+
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs }, t)
+  })
+
 export const updateNodeDefProps = async (
   { user, surveyId, cycle, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
@@ -114,7 +132,7 @@ export const updateNodeDefsProps = async ({ surveyId, nodeDefs }, client = db) =
   NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
-  const survey = await fetchSurvey({ surveyId, cycle }, client )
+  const survey = await fetchSurvey({ surveyId, cycle }, client)
 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated }, client)
 }
@@ -134,6 +152,17 @@ export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid },
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependent, nodeDefsUpdated }, t)
   })
+
+export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids }, client = db) => {
+  let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
+
+  await PromiseUtils.each(nodeDefUuids, async (nodeDefUuid) => {
+    const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
+    response = R.mergeDeepLeft(response, _response)
+  })
+
+  return response
+}
 
 export {
   // ======  READ - entities

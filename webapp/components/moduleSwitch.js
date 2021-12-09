@@ -1,34 +1,53 @@
-import React from 'react'
-import { Route, Switch, withRouter } from 'react-router'
-import { Redirect } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Routes, useNavigate } from 'react-router'
+import PropTypes from 'prop-types'
 
-import { appModuleUri } from '@webapp/app/appModules'
+import { app, appModuleUri } from '@webapp/app/appModules'
+import { useIsInRoute } from '@webapp/components/hooks'
 
 const ModuleSwitch = (props) => {
-  const { modules, moduleRoot, moduleDefault, location } = props
+  const { modules, moduleRoot, moduleDefault } = props
 
-  const isRootUri = location.pathname === appModuleUri(moduleRoot)
+  const navigate = useNavigate()
 
-  return isRootUri ? (
-    <Redirect to={appModuleUri(moduleDefault)} />
-  ) : (
-    <Switch location={location}>
+  if (moduleDefault) {
+    // redirect to default module/url
+    const rootPath = moduleRoot ? appModuleUri(moduleRoot) : `/${app}`
+
+    const isInRootModule = useIsInRoute(rootPath)
+
+    useEffect(() => {
+      if (isInRootModule) {
+        navigate(appModuleUri(moduleDefault), { replace: true })
+      }
+    }, [isInRootModule])
+  }
+
+  return (
+    <Routes>
       {modules.map((module, i) => (
         <Route
           key={i}
-          exact
           path={module.path}
-          render={(props) => React.createElement(module.component, { ...module.props, ...props })}
+          element={
+            <React.Suspense fallback={<>...</>}>{React.createElement(module.component, module.props)}</React.Suspense>
+          }
         />
       ))}
-    </Switch>
+    </Routes>
   )
+}
+
+ModuleSwitch.propTypes = {
+  modules: PropTypes.array.isRequired,
+  moduleRoot: PropTypes.object,
+  moduleDefault: PropTypes.object,
 }
 
 ModuleSwitch.defaultProps = {
   modules: [],
-  moduleRoot: '',
-  moduleDefault: '',
+  moduleRoot: null,
+  moduleDefault: null,
 }
 
-export default withRouter(ModuleSwitch)
+export default ModuleSwitch

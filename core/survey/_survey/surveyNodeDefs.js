@@ -35,8 +35,18 @@ export const getNodeDefChildren =
   (nodeDef, includeAnalysis = true) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
-    const childDefs = SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
-    return includeAnalysis ? childDefs : childDefs.filter((childDef) => !NodeDef.isAnalysis(childDef))
+    let childDefs = SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
+    childDefs = includeAnalysis ? childDefs : childDefs.filter((childDef) => !NodeDef.isAnalysis(childDef))
+    // the next line filters the sampling analysis nodeDefs without sibilinings
+    childDefs = childDefs.filter(
+      (childDef) =>
+        !NodeDef.isSampling(childDef) ||
+        childDefs.filter(
+          (_childDef) =>
+            NodeDef.isAnalysis(_childDef) && NodeDef.getChainUuid(_childDef) === NodeDef.getChainUuid(childDef)
+        ).length > 1
+    )
+    return childDefs
   }
 
 export const getNodeDefChildrenInOwnPage =
@@ -102,6 +112,9 @@ export const getNodeDefParent = (nodeDef) => (survey) => {
   const nodeDefParent = getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   return NodeDef.isVirtual(nodeDef) ? getNodeDefParent(nodeDefParent)(survey) : nodeDefParent
 }
+
+export const getNodeDefAreaBasedEstimate = (nodeDef) => (survey) =>
+  getNodeDefsArray(survey).find((_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef))
 
 export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
   const parentDef = getNodeDefParent(nodeDef)(survey)

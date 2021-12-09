@@ -35,9 +35,19 @@ export const postNodeDef = async ({ surveyId, surveyCycleKey, nodeDef } = {}) =>
   return { nodeDefsValidation, nodeDefsUpdated }
 }
 
+export const postNodeDefs = async ({ surveyId, surveyCycleKey, nodeDefs } = {}) => {
+  const {
+    data: { nodeDefsValidation, nodeDefsUpdated },
+  } = await axios.post(`/api/survey/${surveyId}/nodeDefs`, { surveyCycleKey, nodeDefs })
+  return { nodeDefsValidation, nodeDefsUpdated }
+}
+
 export const deleteNodeDef = async ({ surveyId, nodeDefUuid, surveyCycleKey }) =>
   axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } })
 
+ 
+export const deleteNodeDefs = async ({ surveyId, nodeDefUuids, surveyCycleKey }) =>
+  axios.delete(`/api/survey/${surveyId}/nodeDefs`, { params: { surveyCycleKey, nodeDefUuids } })
 
 // ==== UPDATE
 export const putNodeDefsProps = async ({ surveyId, nodeDefs, cycle }) => {
@@ -45,8 +55,7 @@ export const putNodeDefsProps = async ({ surveyId, nodeDefs, cycle }) => {
     data: { nodeDefsValidation, nodeDefsUpdated },
   } = await axios.put(`/api/survey/${surveyId}/nodeDefs/props`, {
     nodeDefs,
-    cycle
+    cycle,
   })
   return { nodeDefsValidation, nodeDefsUpdated }
 }
-  

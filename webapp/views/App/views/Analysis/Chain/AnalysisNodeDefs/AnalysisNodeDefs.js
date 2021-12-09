@@ -1,5 +1,5 @@
 import './AnalysisNodeDefs.scss'
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -14,6 +14,7 @@ import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
 
 const AnalysisNodeDefs = () => {
+  const [showSamplingNodeDefs, setshowSamplingNodeDefs] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -21,11 +22,11 @@ const AnalysisNodeDefs = () => {
   const validation = Chain.getValidation(chain)
   const survey = useSurvey()
 
-  const analysisNodeDefsRef = useRef(null) 
+  const analysisNodeDefsRef = useRef(null)
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain })(survey),
-    [chain, survey, entityDefUuid]
+    () => Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs })(survey),
+    [chain, survey, entityDefUuid, showSamplingNodeDefs]
   )
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
@@ -41,7 +42,10 @@ const AnalysisNodeDefs = () => {
         )}
 
         <>
-          <AnalysisNodeDefsHeader />
+          <AnalysisNodeDefsHeader
+            toggleshowSamplingNodeDefs={() => setshowSamplingNodeDefs(!showSamplingNodeDefs)}
+            showSamplingNodeDefs={showSamplingNodeDefs}
+          />
 
           {_analysisNodeDefsToShow.length > 0 && (
             <div className="analysis-node-def__list-header">
@@ -49,6 +53,7 @@ const AnalysisNodeDefs = () => {
               <div>{i18n.t('common.entity')}</div>
               <div>{i18n.t('common.name')}</div>
               <div>{i18n.t('common.label')}</div>
+              <div>{i18n.t('common.areaBased')}</div>
               <div>{i18n.t('common.type')}</div>
               <div>{i18n.t('common.active')}</div>
               <div />

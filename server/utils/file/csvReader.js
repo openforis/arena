@@ -1,10 +1,6 @@
 import * as fs from 'fs'
 import { parse as csvParser } from 'csv'
 
-// the next library is imported from 'csv' https://www.npmjs.com/package/csv
-/* eslint-disable-next-line import/no-extraneous-dependencies */
-import csvParseSync from 'csv-parse/lib/sync'
-
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 
@@ -99,5 +95,3 @@ export const readHeadersFromStream = async (stream) => {
 
   return result
 }
-
-export const CSVReaderSync = csvParseSync

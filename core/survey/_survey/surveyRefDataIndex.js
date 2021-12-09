@@ -46,8 +46,8 @@ const keys = {
   // Root path key
   indexRefData: '_indexRefData',
   // Ref data indexes
-  categoryItemUuidIndex: 'categoryItemUuidIndex',
-  categoryItemIndex: 'categoryItemIndex',
+  categoryItemUuidIndex: 'categoryItemUuidIndex', // items by category uuid, parent item uuid and item code
+  categoryItemIndex: 'categoryItemIndex', // items by item uuid
   taxonUuidIndex: 'taxonUuidIndex',
   taxonIndex: 'taxonIndex',
 }
@@ -57,6 +57,10 @@ const categoryItemNullParentUuid = 'null'
 // ====== READ
 
 // ==== category index
+
+export const getCategoryItemByUuid = (categoryItemUuid) =>
+  R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
   R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
 
@@ -79,9 +83,6 @@ export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode,
     hierarchyCode,
   }
 }
-
-export const getCategoryItemByUuid = (categoryItemUuid) =>
-  R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
 
 export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codePaths }) =>
