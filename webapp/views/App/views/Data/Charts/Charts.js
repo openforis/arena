@@ -14,7 +14,7 @@ import PanelRight from '@webapp/components/PanelRight'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 
-import Visualizer from './Visualizer'
+import Chart from './Chart'
 import Panel from './Panel'
 
 export const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Query.getEntityDefUuid(query)}/chart`

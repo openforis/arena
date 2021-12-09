@@ -1,5 +1,3 @@
-import { Query } from '@common/model/query'
-
 import { useFetchData } from './useFetchData'
 import { useFetchCount } from './useFetchCount'
 
@@ -8,7 +6,6 @@ export const useActions = ({ setData, setCount }) => {
   const { fetchCount, resetCount } = useFetchCount({ setCount })
 
   const fetch = ({ offset, limit, query, includesCount = true }) => {
-    if (Query.getDisplayType(query) === Query.displayTypes.chart) return
     fetchData({ offset, limit, query })
     if (includesCount) fetchCount({ query })
   }
