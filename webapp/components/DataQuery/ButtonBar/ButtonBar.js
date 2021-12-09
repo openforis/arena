@@ -32,7 +32,6 @@ const ButtonBar = (props) => {
   const modeEdit = Query.isModeRawEdit(query)
   const modeAggregate = Query.isModeAggregate(query)
   const hasSelection = Query.hasSelection(query)
-  const displayType = Query.getDisplayType(query)
   const { Actions, state } = useButtonBar()
 
   /*
@@ -43,27 +42,7 @@ const ButtonBar = (props) => {
 
   return (
     <div className="data-query-button-bar">
-      { isSystemAdmin && <div>
-        <button
-          type="button"
-          title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
-          className={classNames('btn', 'btn-s', { highlight: displayType === Query.displayTypes.table })}
-          onClick={() => onChangeQuery(Query.toggleDisplayType(query))}
-        >
-          <span className="icon icon-table icon-14px" />
-        </button>
-
-        <button
-          type="button"
-          title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
-          className={classNames('btn', 'btn-s', { highlight: displayType === Query.displayTypes.chart })}
-          onClick={() => onChangeQuery(Query.toggleDisplayType(query))}
-        >
-          <span className="icon icon-stats-bars icon-14px" />
-        </button>
-      </div> }
-
-      {displayType !== Query.displayTypes.chart && (
+      {isSystemAdmin && (
         <div>
           <button
             type="button"
@@ -73,33 +52,44 @@ const ButtonBar = (props) => {
             className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
             onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
           >
-            <span className="icon icon-tab icon-14px" />
+            <span className="icon icon-table icon-14px" />
           </button>
-
-          <button
-            type="button"
-            title={i18n.t('dataView.aggregateMode')}
-            className={classNames('btn', 'btn-s', 'btn-edit', { highlight: Query.isModeAggregate(query) })}
-            onClick={() => onChangeQuery(Query.toggleModeAggregate(query))}
-            aria-disabled={appSaving || modeEdit || !nodeDefsSelectorVisible}
-          >
-            <span className="icon icon-sigma icon-14px" />
-          </button>
-          {canEdit && hasSelection && (
-            <button
-              type="button"
-              title={i18n.t('dataView.editMode')}
-              className={classNames('btn', 'btn-s', 'btn-edit', { highlight: modeEdit })}
-              onClick={() => onChangeQuery(Query.toggleModeEdit(query))}
-              aria-disabled={appSaving || modeAggregate || dataEmpty || !dataLoaded}
-            >
-              <span className="icon icon-pencil2 icon-14px" />
-            </button>
-          )}
         </div>
       )}
 
-      {hasSelection && displayType !== Query.displayTypes.chart && (
+      <div>
+        <button
+          type="button"
+          title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
+          className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+          onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
+        >
+          <span className="icon icon-tab icon-14px" />
+        </button>
+
+        <button
+          type="button"
+          title={i18n.t('dataView.aggregateMode')}
+          className={classNames('btn', 'btn-s', 'btn-edit', { highlight: Query.isModeAggregate(query) })}
+          onClick={() => onChangeQuery(Query.toggleModeAggregate(query))}
+          aria-disabled={appSaving || modeEdit || !nodeDefsSelectorVisible}
+        >
+          <span className="icon icon-sigma icon-14px" />
+        </button>
+        {canEdit && hasSelection && (
+          <button
+            type="button"
+            title={i18n.t('dataView.editMode')}
+            className={classNames('btn', 'btn-s', 'btn-edit', { highlight: modeEdit })}
+            onClick={() => onChangeQuery(Query.toggleModeEdit(query))}
+            aria-disabled={appSaving || modeAggregate || dataEmpty || !dataLoaded}
+          >
+            <span className="icon icon-pencil2 icon-14px" />
+          </button>
+        )}
+      </div>
+
+      {hasSelection && (
         <div>
           <ButtonFilter
             query={query}
