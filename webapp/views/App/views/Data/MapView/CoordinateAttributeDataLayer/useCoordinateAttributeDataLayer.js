@@ -15,18 +15,62 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
+const _convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey }) => {
+  const dataTable = new TableDataNodeDef(survey, nodeDefParent)
+  const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
+  const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
+
+  const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
+
+  const points = data
+    .map((item) => {
+      const location = item[attributeColumn.name]
+      if (!location) return null
+
+      // workaraound: prepend SRID= to location if not specified
+      const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
+      const point = Points.parse(locationStr)
+      const pointLatLong = point ? Points.toLatLong(point) : null
+      if (!pointLatLong) {
+        // location is not valid, cannot convert it to lat-lon
+        return null
+      }
+
+      const { x: long, y: lat } = pointLatLong
+
+      bounds.extend([lat, long])
+
+      const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
+      const parentUuid = item[parentEntityColumn.name]
+      const key = `${recordUuid}-${parentUuid}`
+
+      return {
+        type: 'Feature',
+        properties: { key, cluster: false, point, recordUuid, parentUuid, location },
+        geometry: {
+          type: 'Point',
+          coordinates: [long, lat],
+        },
+      }
+    })
+    .filter(Boolean)
+
+  return { points, bounds }
+}
+
 export const useCoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor } = props
 
-  const [state, setState] = useState({ query: Query.create(), showRecordPanel: false, points: [] })
+  const [state, setState] = useState({
+    query: Query.create(),
+    showRecordPanel: false,
+    points: [],
+  })
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
   const map = useMap()
 
   const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
-  const dataTable = new TableDataNodeDef(survey, nodeDefParent)
-  const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
-  const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
 
   const { query, points } = state
 
@@ -49,46 +93,18 @@ export const useCoordinateAttributeDataLayer = (props) => {
     },
   })
 
-  // when data has been loaded, convert fetched items to GEOJson points after
+  // when data has been loaded, convert fetched items to GEOJson points
   useEffect(() => {
     if (data === null) return
 
-    const layerBounds = latLngBounds()
-    const _points = data
-      .map((item) => {
-        const location = item[attributeColumn.name]
-        if (!location) return null
-
-        // workaraound: prepend SRID= to location if not specified
-        const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
-        const point = Points.parse(locationStr)
-        const pointLatLong = point ? Points.toLatLong(point) : null
-        if (!pointLatLong) {
-          // location is not valid, cannot convert it to lat-lon
-          return null
-        }
-
-        const { x: long, y: lat } = pointLatLong
-
-        layerBounds.extend([lat, long])
-
-        const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
-        const parentUuid = item[parentEntityColumn.name]
-        const key = `${recordUuid}-${parentUuid}`
-
-        return {
-          type: 'Feature',
-          properties: { key, cluster: false, point, recordUuid, parentUuid, location },
-          geometry: {
-            type: 'Point',
-            coordinates: [long, lat],
-          },
-        }
-      })
-      .filter(Boolean)
+    const { points: _points, bounds } = _convertDataToPoints({ data, attributeDef, nodeDefParent, survey })
 
     setState((statePrev) => ({ ...statePrev, points: _points }))
-    map.panTo(layerBounds.getCenter())
+
+    if (_points.length > 0) {
+      // pan map into layer bounds center
+      map.panTo(bounds.getCenter())
+    }
   }, [data])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
