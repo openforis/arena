@@ -9,9 +9,6 @@ import * as SurveyRdbService from '../service/surveyRdbService'
 
 import { requireRecordListViewPermission, requireSurveyRdbRefreshPermission } from '../../auth/authApiMiddleware'
 
-const vega = require('vega')
-const lite = require('vega-lite')
-
 export const init = (app) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {
     try {
@@ -32,32 +29,6 @@ export const init = (app) => {
       const rows = await SurveyRdbService.fetchViewData({ surveyId, cycle, query, offset, limit })
 
       res.json(rows)
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/chart', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, query: queryParam, chart: chartSpec } = Request.getParams(req)
-
-      const query = A.parse(queryParam)
-      const chart = A.parse(chartSpec)
-
-      const rows = await SurveyRdbService.fetchViewData({ surveyId, cycle, query })  
-
-      const spec = {...chart, data: {
-        name: 'table',
-        values: rows
-      }}
-
-
-      // TODO extract to Chart Service to encapsulate Vega inside
-      let vegaspec = lite.compile(spec).spec
-      const view = new vega.View(vega.parse(vegaspec), { renderer: 'none' })
-      const svg = await view.toSVG()
-
-      res.json({ svg })
     } catch (error) {
       next(error)
     }

@@ -62,9 +62,10 @@ const Data = () => {
             component: MapView,
             path: dataModules.map.path,
           },
+          // Chart
           {
             component: Charts,
-            path: appModuleUri(dataModules.charts),
+            path: dataModules.charts.path,
           },
           // Data export
           {

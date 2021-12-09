@@ -148,7 +148,7 @@ export const dataModules = {
   },
   charts: {
     key: 'charts',
-    path: `${appModules.data.path}/charts`,
+    path: `charts`,
   },
   export: {
     key: 'export',
