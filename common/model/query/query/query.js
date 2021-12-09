@@ -59,11 +59,6 @@ export const toggleModeEdit = (query) => ({
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
 })
 
-export const toggleDisplayType = (query) => ({
-  ...query,
-  [keys.displayType]: query.displayType === displayTypes.chart ? displayTypes.table : displayTypes.chart
-})
-
 export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFn }) => (query) => {
   const measures = getMeasures(query)
   const aggregateFns = measures.get(nodeDefUuid)
