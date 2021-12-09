@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { CircleMarker, LayerGroup, LayersControl } from 'react-leaflet'
+import React, { useEffect, useState } from 'react'
+import { CircleMarker, LayerGroup, LayersControl, useMap } from 'react-leaflet'
+import { latLngBounds } from 'leaflet'
 
 import { Points } from '@openforis/arena-core'
 
@@ -20,16 +21,17 @@ const markerRadius = 10
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
 
-  const [state, setState] = useState({ query: Query.create(), showRecordPanel: false })
+  const [state, setState] = useState({ query: Query.create(), showRecordPanel: false, points: [] })
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
+  const map = useMap()
 
-  const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
+  const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
 
-  const { query } = state
+  const { query, points } = state
 
   const {
     data,
@@ -44,46 +46,53 @@ export const CoordinateAttributeDataLayer = (props) => {
   useMapLayerAdd({
     layerName,
     callback: () => {
-      let query = Query.create({ entityDefUuid: NodeDef.getParentUuid(attributeDef) })
+      let query = Query.create({ entityDefUuid: NodeDef.getUuid(nodeDefParent) })
       query = Query.assocAttributeDefUuids([NodeDef.getUuid(attributeDef)])(query)
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
 
-  // convert data items to GEOJson points
-  const points =
-    data === null
-      ? []
-      : data
-          .map((item) => {
-            const location = item[attributeColumn.name]
-            if (!location) return null
+  // when data has been loaded, convert fetched items to GEOJson points after
+  useEffect(() => {
+    if (data === null) return
 
-            // workaraound: prepend SRID= to location if not specified
-            const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
-            const point = Points.parse(locationStr)
-            const pointLatLong = point ? Points.toLatLong(point) : null
-            if (!pointLatLong) {
-              // location is not valid, cannot convert it to lat-lon
-              return null
-            }
+    const layerBounds = latLngBounds()
+    const _points = data
+      .map((item) => {
+        const location = item[attributeColumn.name]
+        if (!location) return null
 
-            const { x: long, y: lat } = pointLatLong
+        // workaraound: prepend SRID= to location if not specified
+        const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
+        const point = Points.parse(locationStr)
+        const pointLatLong = point ? Points.toLatLong(point) : null
+        if (!pointLatLong) {
+          // location is not valid, cannot convert it to lat-lon
+          return null
+        }
 
-            const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
-            const parentUuid = item[parentEntityColumn.name]
-            const key = `${recordUuid}-${parentUuid}`
+        const { x: long, y: lat } = pointLatLong
 
-            return {
-              type: 'Feature',
-              properties: { key, cluster: false, point, recordUuid, parentUuid, location },
-              geometry: {
-                type: 'Point',
-                coordinates: [long, lat],
-              },
-            }
-          })
-          .filter(Boolean)
+        layerBounds.extend([lat, long])
+
+        const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
+        const parentUuid = item[parentEntityColumn.name]
+        const key = `${recordUuid}-${parentUuid}`
+
+        return {
+          type: 'Feature',
+          properties: { key, cluster: false, point, recordUuid, parentUuid, location },
+          geometry: {
+            type: 'Point',
+            coordinates: [long, lat],
+          },
+        }
+      })
+      .filter(Boolean)
+
+    setState((statePrev) => ({ ...statePrev, points: _points }))
+    map.panTo(layerBounds.getCenter())
+  }, [data])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
