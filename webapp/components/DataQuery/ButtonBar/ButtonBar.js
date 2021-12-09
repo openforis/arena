@@ -4,10 +4,9 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
-import * as User from '@core/user/user'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import { useUser, useAuthCanCleanseRecords } from '@webapp/store/user'
+import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import { useButtonBar } from './store'
@@ -34,29 +33,8 @@ const ButtonBar = (props) => {
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
 
-  /*
-  check if user is systen admin to allow charts
-  */
-  const user = useUser()
-  const isSystemAdmin = User.isSystemAdmin(user)
-
   return (
     <div className="data-query-button-bar">
-      {isSystemAdmin && (
-        <div>
-          <button
-            type="button"
-            title={i18n.t(
-              nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'
-            )}
-            className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-            onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
-          >
-            <span className="icon icon-table icon-14px" />
-          </button>
-        </div>
-      )}
-
       <div>
         <button
           type="button"
