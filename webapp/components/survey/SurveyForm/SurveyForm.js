@@ -17,10 +17,9 @@ import { useI18n } from '@webapp/store/system'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useOnUpdate } from '@webapp/components/hooks'
+import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
 
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
 
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import FormHeader from './FormHeader'
