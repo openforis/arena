@@ -1,32 +1,44 @@
-import React, { useCallback, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Query } from '@common/model/query'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { ExplorerStorage } from '@webapp/service/storage/explorer'
 
-import { useIsInRoute, useOnLocationUpdate } from '@webapp/components/hooks'
 import DataQuery from '@webapp/components/DataQuery'
+import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
 
 const Explorer = () => {
   const queryStorage = ExplorerStorage.getQuery()
   const [query, setQuery] = useState(queryStorage || Query.create())
 
-  const isInRecordRoute = useIsInRoute(appModuleUri(dataModules.record))
-  const isInExplorerRoute = useIsInRoute(appModuleUri(dataModules.explorer))
+  const getQueryFromState = () => {
+    let result = null
+    setQuery((queryPrev) => {
+      result = queryPrev
+      return queryPrev
+    })
+    return result
+  }
 
-  const onLocationUpdated = useCallback(() => {
-    if (!isInExplorerRoute) {
-      // user clicks record link in table edit mode: query gets persisted in storage
-      if (isInRecordRoute) {
-        ExplorerStorage.persistQuery(query)
+  const pathMatcher = useLocationPathMatcher()
+
+  // on unmount, store query into local storage if location is record edit module
+  const onUnmount = () => {
+    if (!pathMatcher(appModuleUri(dataModules.explorer))) {
+      if (pathMatcher(`${appModuleUri(dataModules.record)}:uuid`)) {
+        // do not use "query": in this callback it's value is not up to date
+        const queryCurrent = getQueryFromState()
+        ExplorerStorage.persistQuery(queryCurrent)
       } else {
         ExplorerStorage.removeQuery()
       }
     }
-  }, [query])
+  }
 
-  useOnLocationUpdate(onLocationUpdated, [])
+  useEffect(() => {
+    return onUnmount
+  }, [])
 
   return <DataQuery query={query} onChangeQuery={setQuery} />
 }
