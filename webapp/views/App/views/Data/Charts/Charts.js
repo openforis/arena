@@ -110,7 +110,7 @@ const updateCategoyOnDonnutChart =
     }
   }
   
-const Chart = () => {
+const Charts = () => {
 
   const [chart, setChart] = useState(defaultSpec)
   const [entityDefUuid, setEntityDefUuid] = useState(null)
@@ -142,10 +142,10 @@ const Chart = () => {
 
   return (
     <div className="charts">
-      <Visualizer src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}`} />
+      <Chart src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}`} />
       <Panel  setEntityDefUuid={setEntityDefUuid} entityDefUuid={entityDefUuid}/>
     </div>
   )
 }
 
-export default Chart
+export default Charts
