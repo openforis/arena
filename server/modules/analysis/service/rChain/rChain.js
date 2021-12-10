@@ -251,7 +251,10 @@ class RChain {
         async (nodeDef, index) => {
           await this._initNodeDefFile({ nodeDef, path: _entityPath })
           const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
-          if(areaBasedEstimated){
+          
+          // at this moment we dont like to have the areaBasedEstimated files
+          const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
+          if(areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES){
             await this._initNodeDefFile({ nodeDef: areaBasedEstimated, path: _entityPath, index: NodeDef.getChainIndex(nodeDef) })
           }
         }
