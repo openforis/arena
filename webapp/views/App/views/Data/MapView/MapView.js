@@ -74,6 +74,7 @@ const MapWrapper = () => {
               attributeDef={attributeDef}
               markersColor={nextColor()}
               onRecordEditClick={onRecordEditClick}
+              editingRecordUuid={editingRecordUuid}
             />
           )),
         ]}

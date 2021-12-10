@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
@@ -6,10 +6,13 @@ import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -59,12 +62,13 @@ const _convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey }) => 
 }
 
 export const useCoordinateAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor } = props
+  const { attributeDef, markersColor, editingRecordUuid } = props
 
   const [state, setState] = useState({
     query: Query.create(),
     showRecordPanel: false,
     points: [],
+    editedRecordQuery: Query.create(),
   })
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
@@ -72,12 +76,17 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
 
-  const { query, points } = state
+  const { query, points, editedRecordQuery } = state
 
   const {
     data,
     //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
   } = useDataQuery({ query })
+
+  const {
+    data: dataEditedRecord,
+    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
+  } = useDataQuery({ query: editedRecordQuery })
 
   const layerInnerName = NodeDef.getLabel(attributeDef, lang)
 
@@ -108,6 +117,39 @@ export const useCoordinateAttributeDataLayer = (props) => {
   }, [data])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+
+  const onNodesUpdate = useCallback(
+    (nodesUpdated) => {
+      if (editingRecordUuid) {
+        const attributesChanged = Object.values(nodesUpdated).some(
+          (nodeUpdated) =>
+            Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
+            Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef)
+        )
+        if (attributesChanged) {
+          setState((statePrev) => ({
+            ...statePrev,
+            editedRecordQuery: Query.assocFilterRecordUuid(editingRecordUuid)(query),
+          }))
+        }
+      }
+    },
+    [editingRecordUuid]
+  )
+
+  useEffect(() => {
+    AppWebSocket.on(WebSocketEvents.nodesUpdate, onNodesUpdate)
+
+    return () => {
+      AppWebSocket.off(WebSocketEvents.nodesUpdate, onNodesUpdate)
+    }
+  }, [onNodesUpdate])
+
+  useEffect(() => {
+    if (dataEditedRecord?.length > 0) {
+      // replace data with updated data and recreate points and clusters
+    }
+  }, [dataEditedRecord])
 
   return {
     layerName,
