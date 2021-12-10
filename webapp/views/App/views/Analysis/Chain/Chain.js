@@ -15,7 +15,7 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { useLocationPathMatcher } from '@webapp/components/hooks'
+import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -55,17 +55,16 @@ const ChainComponent = () => {
     }
   }, [])
 
+  // prevent page unload if label is not specified and chain is not deleted
+  useOnPageUnload({
+    active: !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted,
+    confirmMessageKey: 'chainView.errorNoLabel',
+  })
+
   if (!chain || A.isEmpty(chain)) return null
 
   return (
     <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
-      {/* <Prompt
-        when={
-          !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
-        }
-        message={i18n.t('chainView.errorNoLabel')}
-      /> */}
-
       <div className="btn-rstudio-container">
         {Survey.isDraft(surveyInfo) && (
           <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
