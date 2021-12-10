@@ -301,7 +301,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
     )
 
     // Merge updated nodes with existing ones (remove created/updated flags nodes)
-    record = Record.mergeNodes(updatedNodesAndDependents)(record)
+    record = Record.mergeNodes(updatedNodesAndDependents, true)(record)
   }
 
   return {
