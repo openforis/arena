@@ -11,11 +11,11 @@ const markerRadius = 10
 export const SamplingPointDataLayer = (props) => {
   const { markersColor } = props
 
-  const { checked, clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints } =
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints } =
     useSamplingPointDataLayer(props)
 
   return (
-    <LayersControl.Overlay checked={checked} name={overlayName}>
+    <LayersControl.Overlay name={overlayName}>
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item

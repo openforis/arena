@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { useMap } from 'react-leaflet'
+import { latLngBounds } from 'leaflet'
 
 import { PointFactory } from '@openforis/arena-core'
 
@@ -15,88 +17,15 @@ import { useMapClusters, useMapLayerAdd } from '../common'
 
 const itemsPageSize = 2000
 
-export const useSamplingPointDataLayer = (props) => {
-  const { levelIndex, markersColor } = props
+const _convertItemsToPoints = (items) => {
+  const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
 
-  const i18n = useI18n()
-  const isMountedRef = useIsMounted()
-
-  const fetchCancelRef = useRef(null)
-  const [state, setState] = useState({ checked: false, loading: false, items: [] })
-  const { checked, loading, items } = state
-  const survey = useSurvey()
-
-  const overlayInnerName = i18n.t(
-    loading ? 'mapView.samplingPointDataLayerNameLoading' : 'mapView.samplingPointDataLayerName',
-    { levelIndex }
-  )
-
-  // add icon close to name
-  const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
-
-  const loadItems = async () => {
-    const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })
-
-    fetchCancelRef.current = countCancel
-
-    const {
-      data: { count },
-    } = await countRequest
-
-    fetchCancelRef.current = null
-
-    // load items in pages
-    const itemsFetched = []
-    const pagesCount = Math.ceil(count / itemsPageSize)
-    await PromiseUtils.each([...Array(pagesCount).keys()], async (currentPage) => {
-      if (isMountedRef.current) {
-        const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
-          surveyId,
-          levelIndex,
-          limit: itemsPageSize,
-          offset: currentPage * itemsPageSize,
-        })
-
-        fetchCancelRef.current = itemsFetchCancel
-
-        const {
-          data: { items: itemsFetchedCurrent },
-        } = await itemsRequest
-
-        itemsFetched.push(...itemsFetchedCurrent)
-
-        fetchCancelRef.current = null
-      }
-    })
-    setState((statePrev) => ({ ...statePrev, loading: false, items: itemsFetched }))
-  }
-
-  useMapLayerAdd({
-    layerName: overlayName,
-    callback: () => {
-      const shouldLoadItems = items.length === 0 && !loading
-      if (shouldLoadItems) {
-        ;(async () => loadItems())()
-      }
-      setState((statePrev) => ({ ...statePrev, checked: true, loading: shouldLoadItems }))
-    },
-  })
-
-  const surveyId = Survey.getId(survey)
-
-  useEffect(() => {
-    return () => {
-      if (fetchCancelRef.current) {
-        fetchCancelRef.current()
-      }
-    }
-  }, [])
-
-  // convert items to GEOJson points
   const points = items.map((item) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid } = item
     const [lat, long] = latLng
     const itemPoint = PointFactory.createInstance({ x: long, y: lat, srs: '4326' })
+
+    bounds.extend([lat, long])
 
     return {
       type: 'Feature',
@@ -108,14 +37,107 @@ export const useSamplingPointDataLayer = (props) => {
     }
   })
 
+  return { points, bounds }
+}
+
+const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef }) => {
+  const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })
+
+  fetchCancelRef.current = countCancel
+
+  const {
+    data: { count },
+  } = await countRequest
+
+  fetchCancelRef.current = null
+
+  // load items in pages
+  const items = []
+  const pagesCount = Math.ceil(count / itemsPageSize)
+  await PromiseUtils.each([...Array(pagesCount).keys()], async (currentPage) => {
+    if (isMountedRef.current) {
+      const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
+        surveyId,
+        levelIndex,
+        limit: itemsPageSize,
+        offset: currentPage * itemsPageSize,
+      })
+
+      fetchCancelRef.current = itemsFetchCancel
+
+      const {
+        data: { items: itemsFetchedCurrent },
+      } = await itemsRequest
+
+      items.push(...itemsFetchedCurrent)
+
+      fetchCancelRef.current = null
+    }
+  })
+
+  return items
+}
+
+export const useSamplingPointDataLayer = (props) => {
+  const { levelIndex, markersColor } = props
+
+  const i18n = useI18n()
+  const isMountedRef = useIsMounted()
+  const map = useMap()
+
+  const fetchCancelRef = useRef(null)
+  const [state, setState] = useState({
+    loaded: false,
+    loading: false,
+    points: [],
+  })
+  const { loaded, loading, points } = state
+
+  const survey = useSurvey()
+  const surveyId = Survey.getId(survey)
+
+  const overlayInnerName = i18n.t(
+    loading ? 'mapView.samplingPointDataLayerNameLoading' : 'mapView.samplingPointDataLayerName',
+    { levelIndex }
+  )
+
+  // add icon close to name
+  const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+
+  useMapLayerAdd({
+    layerName: overlayName,
+    callback: () => {
+      const shouldLoadItems = !loaded && !loading
+      if (shouldLoadItems) {
+        ;(async () => {
+          const items = await _fetchItems({ surveyId, levelIndex, fetchCancelRef, isMountedRef })
+          const { points, bounds } = _convertItemsToPoints(items)
+
+          // pan map into layer bounds center
+          map.panTo(bounds.getCenter())
+
+          setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points }))
+        })()
+      }
+      setState((statePrev) => ({ ...statePrev, loading: shouldLoadItems }))
+    },
+  })
+
+  // cancel items fetch (if any) on unmount
+  useEffect(() => {
+    return () => {
+      if (fetchCancelRef.current) {
+        fetchCancelRef.current()
+      }
+    }
+  }, [])
+
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
   return {
-    checked,
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
-    items,
     overlayName,
     totalPoints: points.length,
   }
