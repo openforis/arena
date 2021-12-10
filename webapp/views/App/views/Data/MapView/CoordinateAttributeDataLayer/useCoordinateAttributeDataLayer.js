@@ -66,6 +66,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const [state, setState] = useState({
     query: Query.create(),
+    data: null,
     showRecordPanel: false,
     points: [],
     editedRecordQuery: Query.create(),
@@ -79,7 +80,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
   const { query, points, editedRecordQuery } = state
 
   const {
-    data,
+    data: dataFetched,
     //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
   } = useDataQuery({ query })
 
@@ -104,17 +105,17 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   // when data has been loaded, convert fetched items to GEOJson points
   useEffect(() => {
-    if (data === null) return
+    if (dataFetched === null) return
 
     const { points: _points, bounds } = _convertDataToPoints({ data, attributeDef, nodeDefParent, survey })
 
-    setState((statePrev) => ({ ...statePrev, points: _points }))
+    setState((statePrev) => ({ ...statePrev, data: dataFetched, points: _points }))
 
     if (_points.length > 0) {
       // pan map into layer bounds center
       map.panTo(bounds.getCenter())
     }
-  }, [data])
+  }, [dataFetched])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
@@ -148,6 +149,22 @@ export const useCoordinateAttributeDataLayer = (props) => {
   useEffect(() => {
     if (dataEditedRecord?.length > 0) {
       // replace data with updated data and recreate points and clusters
+      const dataUpdated = data.reduce((dataAcc, item) => {
+        const itemRecordUuid = item[TableDataNodeDef.columnSet.recordUuid]
+        let itemUpdated = item
+        if (itemRecordUuid === editingRecordUuid) {
+          const itemParentUuid = item[parentEntityColumn.name]
+          const editedRecordItem = dataEditedRecord.find(
+            (_editedRecordItem) => _editedRecordItem[parentEntityColumn.name] === itemParentUuid
+          )
+          if (editedRecordItem) {
+            itemUpdated = editedRecordItem
+          }
+        }
+        dataAcc.push(itemUpdated)
+        return dataAcc
+      }, [])
+      setState((statePrev) => ({ ...statePrev, data: dataUpdated }))
     }
   }, [dataEditedRecord])
 
