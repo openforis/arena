@@ -1,100 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { CircleMarker, LayerGroup, LayersControl, useMap } from 'react-leaflet'
-import { latLngBounds } from 'leaflet'
+import React from 'react'
+import { CircleMarker, LayerGroup, LayersControl } from 'react-leaflet'
 
-import { Points } from '@openforis/arena-core'
-
-import { Query } from '@common/model/query'
-import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
-import { useDataQuery } from '@webapp/components/DataQuery/store'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-
-import { useMapClusters, useMapLayerAdd, ClusterMarker } from '../common'
+import { ClusterMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
+import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
 
 const markerRadius = 10
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
 
-  const [state, setState] = useState({ query: Query.create(), showRecordPanel: false, points: [] })
-  const lang = useSurveyPreferredLang()
-  const survey = useSurvey()
-  const map = useMap()
-
-  const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
-  const dataTable = new TableDataNodeDef(survey, nodeDefParent)
-  const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
-  const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
-
-  const { query, points } = state
-
-  const {
-    data,
-    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
-  } = useDataQuery({ query })
-
-  const layerInnerName = NodeDef.getLabel(attributeDef, lang)
-
-  // add icon close to layer name
-  const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
-
-  useMapLayerAdd({
-    layerName,
-    callback: () => {
-      let query = Query.create({ entityDefUuid: NodeDef.getUuid(nodeDefParent) })
-      query = Query.assocAttributeDefUuids([NodeDef.getUuid(attributeDef)])(query)
-      setState((statePrev) => ({ ...statePrev, query }))
-    },
-  })
-
-  // when data has been loaded, convert fetched items to GEOJson points after
-  useEffect(() => {
-    if (data === null) return
-
-    const layerBounds = latLngBounds()
-    const _points = data
-      .map((item) => {
-        const location = item[attributeColumn.name]
-        if (!location) return null
-
-        // workaraound: prepend SRID= to location if not specified
-        const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
-        const point = Points.parse(locationStr)
-        const pointLatLong = point ? Points.toLatLong(point) : null
-        if (!pointLatLong) {
-          // location is not valid, cannot convert it to lat-lon
-          return null
-        }
-
-        const { x: long, y: lat } = pointLatLong
-
-        layerBounds.extend([lat, long])
-
-        const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
-        const parentUuid = item[parentEntityColumn.name]
-        const key = `${recordUuid}-${parentUuid}`
-
-        return {
-          type: 'Feature',
-          properties: { key, cluster: false, point, recordUuid, parentUuid, location },
-          geometry: {
-            type: 'Point',
-            coordinates: [long, lat],
-          },
-        }
-      })
-      .filter(Boolean)
-
-    setState((statePrev) => ({ ...statePrev, points: _points }))
-    map.panTo(layerBounds.getCenter())
-  }, [data])
-
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+  const { layerName, clusters, clusterExpansionZoomExtractor, clusterIconCreator, totalPoints } =
+    useCoordinateAttributeDataLayer(props)
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -112,7 +29,7 @@ export const CoordinateAttributeDataLayer = (props) => {
                 color={markersColor}
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
-                totalPoints={points.length}
+                totalPoints={totalPoints}
               />
             )
           }
