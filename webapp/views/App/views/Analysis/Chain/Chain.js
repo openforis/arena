@@ -1,5 +1,5 @@
 import './Chain.scss'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
@@ -13,10 +13,9 @@ import * as Chain from '@common/analysis/chain'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
-
 import { useI18n } from '@webapp/store/system'
 
-import { useIsInRoute, useOnLocationUpdate } from '@webapp/components/hooks'
+import { useLocationPathMatcher } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
@@ -46,15 +45,15 @@ const ChainComponent = () => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
   }, [chainUuid])
 
-  const isInNodeDefRoute = useIsInRoute(appModuleUri(analysisModules.nodeDef))
-
-  const onLocationUpdate = useCallback(() => {
-    // if changing location into node def edit, keep chain store, otherwise reset it
-    if (!isInNodeDefRoute) {
-      dispatch(ChainActions.resetChainStore())
+  const locationPathMatcher = useLocationPathMatcher()
+  // un unmount, if changing location into node def edit, keep chain store, otherwise reset it
+  useEffect(() => {
+    return () => {
+      if (!locationPathMatcher(`${appModuleUri(analysisModules.nodeDef)}:uuid`)) {
+        dispatch(ChainActions.resetChainStore())
+      }
     }
-  }, [isInNodeDefRoute])
-  useOnLocationUpdate(onLocationUpdate, [])
+  }, [])
 
   if (!chain || A.isEmpty(chain)) return null
 
