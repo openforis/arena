@@ -12,9 +12,9 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
-import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useWebSocket } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
@@ -67,7 +67,6 @@ export const useCoordinateAttributeDataLayer = (props) => {
   const [state, setState] = useState({
     query: Query.create(),
     data: null,
-    showRecordPanel: false,
     points: [],
     editedRecordQuery: Query.create(),
   })
@@ -77,7 +76,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
 
-  const { query, points, editedRecordQuery } = state
+  const { query, data, points, editedRecordQuery } = state
 
   const {
     data: dataFetched,
@@ -94,11 +93,14 @@ export const useCoordinateAttributeDataLayer = (props) => {
   // add icon close to layer name
   const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
 
+  // on layer add, create query and fetch data
   useMapLayerAdd({
     layerName,
     callback: () => {
-      let query = Query.create({ entityDefUuid: NodeDef.getUuid(nodeDefParent) })
-      query = Query.assocAttributeDefUuids([NodeDef.getUuid(attributeDef)])(query)
+      const query = Query.create({
+        entityDefUuid: NodeDef.getUuid(nodeDefParent),
+        attributeDefUuids: [NodeDef.getUuid(attributeDef)],
+      })
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
@@ -107,7 +109,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
   useEffect(() => {
     if (dataFetched === null) return
 
-    const { points: _points, bounds } = _convertDataToPoints({ data, attributeDef, nodeDefParent, survey })
+    const { points: _points, bounds } = _convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey })
 
     setState((statePrev) => ({ ...statePrev, data: dataFetched, points: _points }))
 
@@ -119,37 +121,38 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
-  const onNodesUpdate = useCallback(
-    (nodesUpdated) => {
-      if (editingRecordUuid) {
-        const attributesChanged = Object.values(nodesUpdated).some(
-          (nodeUpdated) =>
-            Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
-            Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef)
-        )
-        if (attributesChanged) {
-          setState((statePrev) => ({
-            ...statePrev,
-            editedRecordQuery: Query.assocFilterRecordUuid(editingRecordUuid)(query),
-          }))
+  // listen to websocket nodesUpdate events to detect edited record updates
+  useWebSocket({
+    eventName: WebSocketEvents.nodesUpdate,
+    eventHandler: useCallback(
+      (nodesUpdated) => {
+        if (editingRecordUuid) {
+          const attributesChanged = Object.values(nodesUpdated).some(
+            (nodeUpdated) =>
+              Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
+              Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef)
+          )
+          if (attributesChanged) {
+            setState((statePrev) => ({
+              ...statePrev,
+              editedRecordQuery: Query.assocFilterRecordUuid(editingRecordUuid)(statePrev.query),
+            }))
+          }
         }
-      }
-    },
-    [editingRecordUuid]
-  )
+      },
+      [setState, editingRecordUuid, query]
+    ),
+  })
 
-  useEffect(() => {
-    AppWebSocket.on(WebSocketEvents.nodesUpdate, onNodesUpdate)
-
-    return () => {
-      AppWebSocket.off(WebSocketEvents.nodesUpdate, onNodesUpdate)
-    }
-  }, [onNodesUpdate])
-
+  // when edited record data has been fetched, update points
   useEffect(() => {
     if (dataEditedRecord?.length > 0) {
+      const dataTable = new TableDataNodeDef(survey, nodeDefParent)
+      const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
+
       // replace data with updated data and recreate points and clusters
-      const dataUpdated = data.reduce((dataAcc, item) => {
+      const dataUpdated = []
+      data.forEach((item) => {
         const itemRecordUuid = item[TableDataNodeDef.columnSet.recordUuid]
         let itemUpdated = item
         if (itemRecordUuid === editingRecordUuid) {
@@ -161,10 +164,24 @@ export const useCoordinateAttributeDataLayer = (props) => {
             itemUpdated = editedRecordItem
           }
         }
-        dataAcc.push(itemUpdated)
-        return dataAcc
+        dataUpdated.push(itemUpdated)
       }, [])
-      setState((statePrev) => ({ ...statePrev, data: dataUpdated }))
+
+      // convert data to points
+      const { points: pointsUpdated } = _convertDataToPoints({
+        data: dataUpdated,
+        attributeDef,
+        nodeDefParent,
+        survey,
+      })
+
+      setState((statePrev) => ({
+        ...statePrev,
+        data: dataUpdated,
+        points: pointsUpdated,
+        // clear edited record data fetch query to allow fetching data again on record updates
+        editedRecordQuery: Query.create(),
+      }))
     }
   }, [dataEditedRecord])
 

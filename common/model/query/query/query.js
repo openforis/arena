@@ -13,9 +13,10 @@ export const DEFAULT_AGGREGATE_FUNCTIONS = {
 }
 
 // ====== CREATE
-export const create = ({ entityDefUuid = null } = {}) => ({
+export const create = ({ entityDefUuid = null, attributeDefUuids = [] } = {}) => ({
   ...defaults,
   [keys.entityDefUuid]: entityDefUuid,
+  [keys.attributeDefUuids]: attributeDefUuids,
 })
 
 // ====== READ
