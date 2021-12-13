@@ -1,6 +1,5 @@
 import './Charts.scss'
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import axios from 'axios'
 import * as A from '@core/arena'
 
