@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
-import { latLngBounds } from 'leaflet'
-
-import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
-import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Survey from '@core/survey/survey'
@@ -17,49 +13,8 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useWebSocket } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
-
-const _convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey }) => {
-  const dataTable = new TableDataNodeDef(survey, nodeDefParent)
-  const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
-  const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
-
-  const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
-
-  const points = data
-    .map((item) => {
-      const location = item[attributeColumn.name]
-      if (!location) return null
-
-      // workaraound: prepend SRID= to location if not specified
-      const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
-      const point = Points.parse(locationStr)
-      const pointLatLong = point ? Points.toLatLong(point) : null
-      if (!pointLatLong) {
-        // location is not valid, cannot convert it to lat-lon
-        return null
-      }
-
-      const { x: long, y: lat } = pointLatLong
-
-      bounds.extend([lat, long])
-
-      const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
-      const parentUuid = item[parentEntityColumn.name]
-      const key = `${recordUuid}-${parentUuid}`
-
-      return {
-        type: 'Feature',
-        properties: { key, cluster: false, point, recordUuid, parentUuid, location },
-        geometry: {
-          type: 'Point',
-          coordinates: [long, lat],
-        },
-      }
-    })
-    .filter(Boolean)
-
-  return { points, bounds }
-}
+import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
+import { convertDataToPoints } from './convertDataToPoints'
 
 export const useCoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
@@ -68,6 +23,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
     query: Query.create(),
     data: null,
     points: [],
+    pointIndexByDataIndex: [],
     editedRecordQuery: Query.create(),
   })
   const lang = useSurveyPreferredLang()
@@ -76,17 +32,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
 
-  const { query, data, points, editedRecordQuery } = state
-
-  const {
-    data: dataFetched,
-    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
-  } = useDataQuery({ query })
-
-  const {
-    data: dataEditedRecord,
-    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
-  } = useDataQuery({ query: editedRecordQuery })
+  const { query, points, editedRecordQuery } = state
 
   const layerInnerName = NodeDef.getLabel(attributeDef, lang)
 
@@ -105,19 +51,38 @@ export const useCoordinateAttributeDataLayer = (props) => {
     },
   })
 
+  const {
+    data: dataFetched,
+    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
+  } = useDataQuery({ query })
+
   // when data has been loaded, convert fetched items to GEOJson points
   useEffect(() => {
     if (dataFetched === null) return
 
-    const { points: _points, bounds } = _convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey })
+    const {
+      points: _points,
+      pointIndexByDataIndex: _pointIndexByDataIndex,
+      bounds,
+    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey })
 
-    setState((statePrev) => ({ ...statePrev, data: dataFetched, points: _points }))
+    setState((statePrev) => ({
+      ...statePrev,
+      data: dataFetched,
+      points: _points,
+      pointIndexByDataIndex: _pointIndexByDataIndex,
+    }))
 
     if (_points.length > 0) {
       // pan map into layer bounds center
       map.panTo(bounds.getCenter())
     }
   }, [dataFetched])
+
+  const {
+    data: dataEditedRecord,
+    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
+  } = useDataQuery({ query: editedRecordQuery })
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
@@ -144,46 +109,15 @@ export const useCoordinateAttributeDataLayer = (props) => {
     ),
   })
 
-  // when edited record data has been fetched, update points
-  useEffect(() => {
-    if (dataEditedRecord?.length > 0) {
-      const dataTable = new TableDataNodeDef(survey, nodeDefParent)
-      const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
-
-      // replace data with updated data and recreate points and clusters
-      const dataUpdated = []
-      data.forEach((item) => {
-        const itemRecordUuid = item[TableDataNodeDef.columnSet.recordUuid]
-        let itemUpdated = item
-        if (itemRecordUuid === editingRecordUuid) {
-          const itemParentUuid = item[parentEntityColumn.name]
-          const editedRecordItem = dataEditedRecord.find(
-            (_editedRecordItem) => _editedRecordItem[parentEntityColumn.name] === itemParentUuid
-          )
-          if (editedRecordItem) {
-            itemUpdated = editedRecordItem
-          }
-        }
-        dataUpdated.push(itemUpdated)
-      }, [])
-
-      // convert data to points
-      const { points: pointsUpdated } = _convertDataToPoints({
-        data: dataUpdated,
-        attributeDef,
-        nodeDefParent,
-        survey,
-      })
-
-      setState((statePrev) => ({
-        ...statePrev,
-        data: dataUpdated,
-        points: pointsUpdated,
-        // clear edited record data fetch query to allow fetching data again on record updates
-        editedRecordQuery: Query.create(),
-      }))
-    }
-  }, [dataEditedRecord])
+  useOnEditedRecordDataFetched({
+    survey,
+    attributeDef,
+    nodeDefParent,
+    editingRecordUuid,
+    dataEditedRecord,
+    state,
+    setState,
+  })
 
   return {
     layerName,
