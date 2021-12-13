@@ -65,7 +65,7 @@ const Panel = ({ setEntityDefUuid, entityDefUuid, setDimensionDefUuids, dimensio
 }
 
 Panel.propTypes = {
-  setEntityDefUuid: PropTypes.arrayOf(String).isRequired,
+  setEntityDefUuid: PropTypes.func.isRequired,
   entityDefUuid: PropTypes.string.isRequired,
   setDimensionDefUuids: PropTypes.func.isRequired,
   dimensionDefUuids: PropTypes.arrayOf(String).isRequired,
