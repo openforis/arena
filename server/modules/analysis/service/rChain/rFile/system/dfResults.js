@@ -54,6 +54,8 @@ export default class DfResults {
       includeExtendedCols: false,
     })
 
+    const areaBasedNodeDefs = analysisNodeDefsInEntity.filter(NodeDef.isAreaBasedEstimatedOf)
+    areaBasedNodeDefs.forEach(areaBasedNodeDef => this.scripts.push(NodeDef.getScript(areaBasedNodeDef)) )
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
