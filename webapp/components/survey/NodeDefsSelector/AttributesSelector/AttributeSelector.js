@@ -12,6 +12,7 @@ import { useSurvey } from '@webapp/store/survey'
 const AttributeSelector = (props) => {
   const {
     canSelectAttributes,
+    filterFunction,
     filterTypes,
     filterChainUuids,
     lang,
@@ -29,6 +30,7 @@ const AttributeSelector = (props) => {
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+    (filterFunction === null || filterFunction(nodeDef)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes)) &&
     (R.isEmpty(filterChainUuids) ||
       R.isEmpty(NodeDef.getChainUuid(nodeDef)) ||
@@ -56,6 +58,7 @@ const AttributeSelector = (props) => {
 
 AttributeSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
+  filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
   lang: PropTypes.string.isRequired,
@@ -70,6 +73,7 @@ AttributeSelector.propTypes = {
 
 AttributeSelector.defaultProps = {
   canSelectAttributes: true,
+  filterFunction: null,
   filterTypes: [],
   filterChainUuids: [],
   showMultipleAttributes: true,

@@ -13,6 +13,7 @@ import AttributeSelector from './AttributeSelector'
 const AttributesSelector = (props) => {
   const {
     canSelectAttributes,
+    filterFunction,
     filterTypes,
     filterChainUuids,
     lang,
@@ -54,6 +55,7 @@ const AttributesSelector = (props) => {
           <AttributeSelector
             key={NodeDef.getUuid(childDef)}
             canSelectAttributes={canSelectAttributes}
+            filterFunction={filterFunction}
             filterTypes={filterTypes}
             filterChainUuids={filterChainUuids}
             lang={lang}
@@ -74,6 +76,7 @@ const AttributesSelector = (props) => {
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
+          filterFunction={filterFunction}
           filterTypes={filterTypes}
           filterChainUuids={filterChainUuids}
           canSelectAttributes={canSelectAttributes}
@@ -90,6 +93,7 @@ const AttributesSelector = (props) => {
 
 AttributesSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
+  filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
   lang: PropTypes.string.isRequired,
@@ -106,6 +110,7 @@ AttributesSelector.propTypes = {
 
 AttributesSelector.defaultProps = {
   canSelectAttributes: true,
+  filterFunction: null,
   filterTypes: [],
   filterChainUuids: [],
   nodeDefUuidEntity: null,
