@@ -33,7 +33,7 @@ export const init = (app) => {
       const data = await SurveyRdbService.fetchViewData({ surveyId, cycle, query })
 
       const chartSpec = A.parse(chart)
-      const svg = generateSvgChart({ chartSpec, data })
+      const svg = await generateSvgChart({ chartSpec, data })
 
       res.json({ svg })
     } catch (error) {

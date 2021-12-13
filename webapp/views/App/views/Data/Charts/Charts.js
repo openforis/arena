@@ -7,12 +7,8 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
 import { Query } from '@common/model/query'
-import { useSurvey, useSurveyId, useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
-import PanelRight from '@webapp/components/PanelRight'
-import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-
+import { useSurvey, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
 import Chart from './Chart'
 import Panel from './Panel'
@@ -29,96 +25,96 @@ export const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Que
  Maybe the only thing that the user needs to chose on the left pannel is the last entity
 */
 
-const defaultSpec = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  /*name: 'tree_health_label',
-  description: 'tree_health_label',
-  title: {
-    text: 'tree_health_label',
-  },*/
-  /*width: 500,
-  height: 500,
-  autosize: {
-    type: 'fit',
-    contatins: 'padding',
-    resize: true,
-  },*/
-  /*data: {
-    name: 'table',
-    values: [],
-  },*/
+const buildSpec = ({ dimensions = [], survey, showStackedLegent = false } = {}) => {
+  const [dimension] = dimensions
 
-  layer: [
-    {
-      mark: { type: 'arc', innerRadius: 60, outerRadius: 80 },
-    },
-    /*{
-    mark: {type: "text", radius: 120},
-    encoding: {
-      text: {field: "tree_health_label", type: "nominal"}
-    }
-  }*/
-  ],
-  encoding: {
-    theta: {
-      field: 'tree_health_label',
-      type: 'nominal',
-      aggregate: 'count',
-      impute: {
-        value: 'NULL',
-      },
-      //stack: true
-    },
-    color: {
-      field: 'tree_health_label',
-      type: 'nominal',
-      /*legend: {
-        title: 'Tree health',
-      },*/
-
-      impute: {
-        value: 'NULL',
-      },
-    },
-    /*column: {
-      field: 'tree_origin_label',
-      type: 'nominal',
-      impute: {
-        value: 'NULL',
-      },
-    },
-    row: {
-      field: 'cluster_accessibility_label',
-      type: 'nominal',
-      impute: {
-        value: 'NULL',
-      },
+  const spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    /*name: 'tree_health_label',
+    description: 'tree_health_label',
+    title: {
+      text: 'tree_health_label',
     },*/
-  },
+    /*width: 500,
+    height: 500,
+    autosize: {
+      type: 'fit',
+      contatins: 'padding',
+      resize: true,
+    },*/
+    /*data: {
+      name: 'table',
+      values: [],
+    },*/
+
+    layer: [
+      {
+        mark: { type: 'arc', innerRadius: 40, outerRadius: 60 },
+      },
+      ...(showStackedLegent
+        ? [
+            {
+              mark: { type: 'text', radius: 75 },
+              encoding: {
+                text: {
+                  field: `${NodeDef.getName(Survey.getNodeDefByUuid(dimension)(survey))}_label`,
+                  type: 'nominal',
+                },
+              },
+            },
+          ]
+        : []),
+    ],
+    encoding: {
+      theta: {
+        field: `${NodeDef.getName(Survey.getNodeDefByUuid(dimension)(survey))}_label`,
+        type: 'nominal',
+        aggregate: 'count',
+        impute: {
+          value: 'NULL',
+        },
+        stack: showStackedLegent ? true : false,
+      },
+      color: {
+        field: `${NodeDef.getName(Survey.getNodeDefByUuid(dimension)(survey))}_label`,
+        type: 'nominal',
+        /*legend: {
+          title: 'Tree health',
+        },*/
+        legend: {
+          titleFontSize: 8,
+          labelFontSize: 5,
+        },
+
+        impute: {
+          value: 'NULL',
+        },
+      },
+      /*column: {
+        field: 'tree_origin_label',
+        type: 'nominal',
+        impute: {
+          value: 'NULL',
+        },
+      },
+      row: {
+        field: 'cluster_accessibility_label',
+        type: 'nominal',
+        impute: {
+          value: 'NULL',
+        },
+      },*/
+    },
+  }
+  return spec
 }
 
-const updateCategoyOnDonnutChart =
-  ({ chart: _chart }) =>
-  ({ nodeDef }) => {
-    return {
-      ..._chart,
-      encoding: {
-        ..._chart.encoding,
-        theta: { ..._chart.encoding.theta, field: nodeDef.name },
-        color: { ..._chart.encoding.color, field: nodeDef.name },
-      },
-    }
-  }
-  
-const Charts = () => {
-
-  const [chart, setChart] = useState(defaultSpec)
+const Charts = () => { 
   const [entityDefUuid, setEntityDefUuid] = useState(null)
+  const [dimensionDefUuids, setDimensionDefUuids] = useState([])
   const [chartImage, setChartImage] = useState(null)
-  const [showChartEditor, setShowChartEditor] = useState(true)
+  // const [showStackedLegent, setShowStackedLegend] = useState(false)
 
-  const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
   const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
@@ -126,10 +122,11 @@ const Charts = () => {
   useEffect(() => {
     const getChart = async () => {
       try {
+        if (dimensionDefUuids.length <= 0) return
         const { data } = await axios.post(getUrl({ surveyId, query: Query.create({ entityDefUuid }) }), {
           cycle,
           query: A.stringify(Query.create({ entityDefUuid })),
-          chart: A.stringify(chart),
+          chart: A.stringify(buildSpec({ dimensions: dimensionDefUuids, survey })),
         })
         setChartImage(data.svg)
       } catch (err) {
@@ -138,12 +135,17 @@ const Charts = () => {
     }
     getChart()
     return () => {}
-  }, [surveyId, cycle, chart, entityDefUuid])
+  }, [surveyId, cycle, entityDefUuid, dimensionDefUuids])
 
   return (
     <div className="charts">
-      <Chart src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}`} />
-      <Panel  setEntityDefUuid={setEntityDefUuid} entityDefUuid={entityDefUuid}/>
+      <Chart src={chartImage ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}` : false} />
+      <Panel
+        setEntityDefUuid={setEntityDefUuid}
+        entityDefUuid={entityDefUuid}
+        setDimensionDefUuids={setDimensionDefUuids}
+        dimensionDefUuids={dimensionDefUuids}
+      />
     </div>
   )
 }

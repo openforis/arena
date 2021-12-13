@@ -5,7 +5,9 @@ flex-direction: row;
 }
 
 .charts_panel__container {
+  padding: 18px;
   width: 300px;
+  overflow-y: scroll;
 }
 
 .charts_chart__container {
