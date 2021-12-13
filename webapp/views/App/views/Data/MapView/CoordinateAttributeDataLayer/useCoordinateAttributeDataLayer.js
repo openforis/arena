@@ -79,13 +79,6 @@ export const useCoordinateAttributeDataLayer = (props) => {
     }
   }, [dataFetched])
 
-  const {
-    data: dataEditedRecord,
-    //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
-  } = useDataQuery({ query: editedRecordQuery })
-
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
-
   // listen to websocket nodesUpdate events to detect edited record updates
   useWebSocket({
     eventName: WebSocketEvents.nodesUpdate,
@@ -109,6 +102,9 @@ export const useCoordinateAttributeDataLayer = (props) => {
     ),
   })
 
+  // fetch record data on edited record query updates
+  const { data: dataEditedRecord } = useDataQuery({ query: editedRecordQuery })
+
   useOnEditedRecordDataFetched({
     survey,
     attributeDef,
@@ -118,6 +114,8 @@ export const useCoordinateAttributeDataLayer = (props) => {
     state,
     setState,
   })
+
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
 
   return {
     layerName,
