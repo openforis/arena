@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, {  useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
@@ -52,7 +52,7 @@ const PopupContent = (props) => {
   return (
     <div className="coordinate-attribute-popup-content">
       <Markdown source={content} />
-      <ButtonIconEdit label="Edit Record" onClick={() => onRecordEditClick({ recordUuid, parentUuid })} />
+      <ButtonIconEdit label="mapView.editRecord" onClick={() => onRecordEditClick({ recordUuid, parentUuid })} />
     </div>
   )
 }
