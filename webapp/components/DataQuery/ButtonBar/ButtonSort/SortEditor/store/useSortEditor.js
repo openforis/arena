@@ -18,7 +18,9 @@ const getVariables = ({ survey, entityDef, attributeDefUuids, lang }) =>
 export const useSortEditor = ({ query }) => {
   const sort = Query.getSort(query)
   const entityDefUuid = Query.getEntityDefUuid(query)
-  const attributeDefUuids = Query.getAttributeDefUuids(query)
+  const attributeDefUuids = Query.isModeAggregate(query)
+    ? Query.getDimensions(query)
+    : Query.getAttributeDefUuids(query)
 
   const lang = useLang()
   const survey = useSurvey()
