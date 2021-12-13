@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
 import { useSurvey } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
@@ -49,7 +50,10 @@ const AttributeSelector = (props) => {
         disabled={!canSelectAttributes}
         title={showNodeDefPath ? Survey.getNodeDefPath({ nodeDef, showLabels: true, labelLang: lang })(survey) : null}
       >
-        {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
+        <span>
+          <NodeDefIconKey nodeDef={nodeDef} />
+          {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
+        </span>
         {NodeDefUIProps.getIconByType(nodeDefType)}
       </button>
     )
