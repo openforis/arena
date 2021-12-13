@@ -83,7 +83,7 @@ const NodeDefsSelectorAggregate = (props) => {
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
               lang={lang}
-              filterTypes={[NodeDef.nodeDefType.code]}
+              filterFunction={(nodeDef) => NodeDef.isCode(nodeDef) || NodeDef.isKey(nodeDef)}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
               showAncestorsLabel={false}
