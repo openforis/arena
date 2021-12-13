@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import * as R from 'ramda'
 
 import * as Authorizer from '@core/auth/authorizer'
+import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 
 import {
@@ -58,6 +59,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
       dataModules.records,
       dataModules.explorer,
       ...(Authorizer.canSeeMap(user, surveyInfo) ? [dataModules.map] : []),
+      ...(User.isSystemAdmin(user) ? [dataModules.charts] : []),
       ...(Authorizer.canEditSurvey(user, surveyInfo) ? [dataModules.export] : []),
       ...(Authorizer.canEditSurvey(user, surveyInfo) ? [dataModules.import] : []),
       ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),

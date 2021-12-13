@@ -13,8 +13,9 @@ export const DEFAULT_AGGREGATE_FUNCTIONS = {
 }
 
 // ====== CREATE
-export const create = ({ entityDefUuid = null, attributeDefUuids = [] } = {}) => ({
+export const create = ({ entityDefUuid = null, displayType = defaults[keys.displayType], attributeDefUuids = [] } = {}) => ({
   ...defaults,
+  [keys.displayType]: displayType,
   [keys.entityDefUuid]: entityDefUuid,
   [keys.attributeDefUuids]: attributeDefUuids,
 })
