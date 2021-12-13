@@ -72,7 +72,7 @@ const buildSpec = ({ dimensions = [], survey, showStackedLegent = false } = {}) 
         impute: {
           value: 'NULL',
         },
-        stack: showStackedLegent ? true : false,
+        stack: true,
       },
       color: {
         field: `${NodeDef.getName(Survey.getNodeDefByUuid(dimension)(survey))}_label`,
