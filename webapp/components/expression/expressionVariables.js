@@ -4,6 +4,7 @@ import { types as sqlTypes } from '@common/model/db/sql'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
 import * as Expression from '@core/expressionParser/expression'
+import { ExpressionEditorType } from './expressionEditorType'
 
 // TODO: match all nodeDefTypes and throw an error if unknown:
 const toSqlType = (nodeDef) => {
@@ -16,10 +17,10 @@ const toSqlType = (nodeDef) => {
   return sqlTypes.varchar
 }
 
-const getJsVariables = (nodeDef) => [
+const getJsVariables = (nodeDef, lang) => [
   {
     value: NodeDef.getName(nodeDef),
-    label: NodeDef.getName(nodeDef),
+    label: NodeDef.getLabel(nodeDef, lang),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
@@ -45,7 +46,7 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) => {
+const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang, editorType }) => {
   if (Expression.isValidExpressionType(childDef)) {
     // exclude nodes that reference the current one
     const referenceCurrentNode =
@@ -53,19 +54,18 @@ const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang }) 
       Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
 
     if (!referenceCurrentNode) {
+      if (editorType === ExpressionEditorType.basic || mode === Expression.modes.json) {
+        return getJsVariables(childDef, lang)
+      }
       if (mode === Expression.modes.sql) {
         return getSqlVariables(childDef, lang)
-      }
-
-      if (mode === Expression.modes.json) {
-        return getJsVariables(childDef)
       }
     }
   }
   return []
 }
 
-const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang }) => {
+const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, editorType }) => {
   const variables = []
   const stack = []
   const entitiesVisitedByUuid = {}
@@ -93,7 +93,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
       // get variables from every child def
       const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
       nodeDefChildren.forEach((childDef) => {
-        variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
+        variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang, editorType }))
 
         // if the child def is a single entity, include variables from the descendants of that entity
         if (NodeDef.isSingleEntity(childDef)) {
@@ -150,11 +150,12 @@ export const getVariables = ({
   mode,
   lang: langPreferred,
   groupByParent,
+  editorType,
 }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang })
+  const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang, editorType })
 
   _sortVariables({ nodeDefCurrent, variables })
 
