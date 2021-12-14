@@ -94,7 +94,7 @@ export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (_dispatch, getSta
     const label = NodeDef.getLabel(nodeDefKey, lang)
     const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
     const value = _getNodeValueString({ nodeDef: nodeDefKey, node: nodeKey, lang })
-    return `${label} - ${value}`
+    return `${label}: ${value}`
   }
 
   return nodeDefKeys.map(getNodeDefKeyLabelValue).join(', ')
