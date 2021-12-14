@@ -31,7 +31,6 @@ const ButtonBar = (props) => {
   const modeEdit = Query.isModeRawEdit(query)
   const modeAggregate = Query.isModeAggregate(query)
   const hasSelection = Query.hasSelection(query)
-
   const { Actions, state } = useButtonBar()
 
   return (
@@ -45,6 +44,7 @@ const ButtonBar = (props) => {
         >
           <span className="icon icon-tab icon-14px" />
         </button>
+
         <button
           type="button"
           title={i18n.t('dataView.aggregateMode')}

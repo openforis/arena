@@ -15,6 +15,7 @@ import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 import ValidationReport from './ValidationReport'
 import Records from './Records'
 import Explorer from './Explorer'
+import Charts from './Charts'
 import ExportData from './ExportData'
 import DataImport from './DataImport'
 import { MapView } from './MapView'
@@ -60,6 +61,11 @@ const Data = () => {
           {
             component: MapView,
             path: dataModules.map.path,
+          },
+          // Chart
+          {
+            component: Charts,
+            path: dataModules.charts.path,
           },
           // Data export
           {
