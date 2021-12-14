@@ -21,6 +21,7 @@ const NodeDefEntityForm = (props) => {
 
   const dispatch = useDispatch()
 
+  // when there is no entity selected, select the first one
   useEffect(() => {
     if (entry && !selectedNode && !R.isEmpty(nodes)) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
