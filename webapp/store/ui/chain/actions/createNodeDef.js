@@ -16,7 +16,7 @@ export const createNodeDef =
     const cycleKeys = Survey.getCycleKeys(surveyInfo)
     const nodeDefParent = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ chain, entityDefUuid })(survey)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ chain, entityDefUuid, showInactiveResultVariables: true })(survey)
 
     const defaultAdvancedProps = { chainUuid, active: true, index: analysisNodeDefsInEntity.length }
     const nodeDef = NodeDef.newNodeDef(nodeDefParent, type, cycleKeys, {}, defaultAdvancedProps, true, virtual)

@@ -14,6 +14,7 @@ export const getAnalysisNodeDefs =
     showSamplingNodeDefs = true,
     hideSamplingNodeDefsWithoutSibilings = true,
     hideAreaBasedEstimate = true,
+    showInactiveResultVariables = false
   }) =>
   (survey) => {
     const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
@@ -56,6 +57,10 @@ export const getAnalysisNodeDefs =
 
       if(hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)){
         return false
+      }
+
+      if(!showInactiveResultVariables && !NodeDef.getActive(nodeDef)){
+          return false 
       }
 
       return true
