@@ -65,6 +65,8 @@ export const unary = (node, params) => {
 
 const _getLiteralParamValue = (value) => {
   // expression node value could have been "stringified" (e.g. code/taxon/text attributes)
+  // it needs to be parsed
+  // when the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
   if (typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"') {
     try {
       return JSON.parse(value)
