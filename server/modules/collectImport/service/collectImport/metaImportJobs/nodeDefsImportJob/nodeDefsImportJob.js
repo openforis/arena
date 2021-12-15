@@ -455,6 +455,12 @@ export default class NodeDefsImportJob extends Job {
           NodeDef.getLabels,
           R.mapObjIndexed((label) => `${label} ${specifyAttributeSuffix}`)
         )(nodeDef),
+        // hidden when not relevant
+        [NodeDef.propKeys.layout]: {
+          [Survey.cycleOneKey]: {
+            [NodeDefLayout.keys.hiddenWhenNotRelevant]: true,
+          },
+        },
       }
 
       const applicableIfExpr = NodeDef.isSingle(nodeDef)
@@ -475,6 +481,7 @@ export default class NodeDefsImportJob extends Job {
         },
         this.tx
       )
+
       const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
       nodeDefsInserted[qualifierNodeDefUuid] = qualifierNodeDefAndOthersUpdated[qualifierNodeDefUuid]
       Object.assign(nodeDefsUpdated, R.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
