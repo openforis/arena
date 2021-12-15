@@ -63,6 +63,15 @@ export const unary = (node, params) => {
   }
 }
 
+const _getLiteralParamValue = (value) => {
+  if (typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"') {
+    try {
+      return JSON.parse(value)
+    } catch (e) {}
+  }
+  return value
+}
+
 export const literal = (node, params) => {
   if (R.isNil(node.value)) {
     return {
@@ -72,9 +81,11 @@ export const literal = (node, params) => {
   }
 
   const param = getParamNameNext(params)
+  const paramValue = _getLiteralParamValue(node.raw)
+
   return {
     clause: `$/${param}/`,
-    params: { ...params, [param]: node.raw },
+    params: { ...params, [param]: paramValue },
   }
 }
 
