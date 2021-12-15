@@ -123,7 +123,7 @@ export default () =>
       gotoRecord(record1)
       enterAttribute(cluster_id, '')
       gotoFormPage(plot)
-      selectForm(plot, record1[plot_id.name])
+      selectForm({ nodeDef: plot, keyNodeDef: plot_id, keyValue: record1[plot_id.name] })
       enterAttribute(plot_id, '')
       enterAttribute(tree_id, '', getTreeSelector(0))
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
