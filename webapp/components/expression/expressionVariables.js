@@ -17,10 +17,10 @@ const toSqlType = (nodeDef) => {
   return sqlTypes.varchar
 }
 
-const getJsVariables = (nodeDef, lang) => [
+const getJsVariables = (nodeDef) => [
   {
     value: NodeDef.getName(nodeDef),
-    label: NodeDef.getLabel(nodeDef, lang),
+    label: NodeDef.getName(nodeDef),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
@@ -55,7 +55,7 @@ const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang, ed
 
     if (!referenceCurrentNode) {
       if (editorType === ExpressionEditorType.basic || mode === Expression.modes.json) {
-        return getJsVariables(childDef, lang)
+        return getJsVariables(childDef)
       }
       if (mode === Expression.modes.sql) {
         return getSqlVariables(childDef, lang)
