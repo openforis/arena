@@ -49,10 +49,7 @@ export const addNodeDefAtomicChildren = (nodeDefParent) => {
 
 export const addNodeDefSubPage = (nodeDefParent, nodeDefChild) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click(getSelector(TestId.surveyForm.addSubPageBtn, 'button')),
-    ])
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.surveyForm.addSubPageBtn, 'button'))])
   })
 
   editNodeDefDetails(nodeDefChild)
@@ -79,8 +76,8 @@ export const gotoFormPage = (nodeDef) => {
   })
 }
 
-export const selectForm = (nodeDef, keyValue) => {
-  const optionLabel = `${nodeDef.label} - ${keyValue}`
+export const selectForm = ({ nodeDef, keyNodeDef, keyValue }) => {
+  const optionLabel = `${keyNodeDef.label}: ${keyValue}`
   test(`Select form ${optionLabel}`, async () => {
     const nodeSelectSelector = getSelector(TestId.entities.form.nodeSelect, 'select')
     await page.selectOption(nodeSelectSelector, { label: optionLabel })

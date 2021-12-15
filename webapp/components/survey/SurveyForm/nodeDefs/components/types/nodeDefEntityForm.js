@@ -21,8 +21,9 @@ const NodeDefEntityForm = (props) => {
 
   const dispatch = useDispatch()
 
+  // when there is no entity selected, select the first one
   useEffect(() => {
-    if (entry && !R.isEmpty(nodes)) {
+    if (entry && !selectedNode && !R.isEmpty(nodes)) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
       dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
     }
