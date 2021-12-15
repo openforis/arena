@@ -17,9 +17,12 @@ import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
-  const col = ColumnNodeDef.extractColumnName({ nodeDef, columnName })
+  const field =
+    NodeDef.isTaxon(nodeDef) && columnName === NodeDef.getName(nodeDef)
+      ? 'code'
+      : ColumnNodeDef.extractColumnName({ nodeDef, columnName })
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
-  return `surveyForm.${nodeDefTypePrefix}.${col}`
+  return `surveyForm.${nodeDefTypePrefix}.${field}`
 }
 
 const ColumnHeader = (props) => {
