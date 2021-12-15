@@ -43,10 +43,6 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
     queryBuilder.addParams(filterParams)
   }
 
-  // GROUP clause
-  // always group by data_modified (used in sort)
-  queryBuilder.groupBy(ViewDataNodeDef.columnSet.dateModified)
-
   // ORDER BY clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
