@@ -7,7 +7,6 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
