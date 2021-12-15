@@ -27,7 +27,7 @@ export default () =>
 
       gotoFormPage(plot)
 
-      selectForm(plot, record[plot_id.name])
+      selectForm({ nodeDef: plot, keyNodeDef: plot_id, keyValue: record[plot_id.name] })
 
       verifyPlot(record)
 
