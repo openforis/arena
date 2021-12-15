@@ -3,6 +3,7 @@ import './CoordinateAttributePopUp.scss'
 import React, { useEffect, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -40,7 +41,12 @@ const PopupContent = (props) => {
 
   // add record keys to first part of the path
   if (record) {
-    pathParts[0] = `${pathParts[0]} [${keyDefs.map((keyDef) => record[NodeDef.getName(keyDef)]).join(',')}]`
+    pathParts[0] = `${pathParts[0]} [${keyDefs
+      .map((keyDef) => {
+        const recordKeyProp = A.camelize(NodeDef.getName(keyDef))
+        return record[recordKeyProp]
+      })
+      .join(',')}]`
   }
 
   const path = pathParts.join(' -> ')
