@@ -41,7 +41,7 @@ export const useDataQuery = ({ query }) => {
   useEffect(() => {
     if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
     else Actions.reset()
-  }, [offset, attributeDefUuids, dimensions, measures, measuresAggregateFnsSize, mode, sort])
+  }, [limit, offset, attributeDefUuids, dimensions, measures, measuresAggregateFnsSize, mode, sort])
 
   // on filter update: fetch data and count
   useOnUpdate(() => {
