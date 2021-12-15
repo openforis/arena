@@ -30,7 +30,7 @@ const _walk = ({ object, skip = [], limitToLevel = null }) => {
  * @returns {any} - The object with keys in camel case or the value in camel case.
  */
 export const _camelizePartial = _curry2(({ skip = [], limitToLevel = null } = {}, object) => {
-  if (object instanceof String) {
+  if (typeof object === 'string' || object instanceof String) {
     return _camelCase(object)
   }
   return _walk({ object, skip, limitToLevel })
