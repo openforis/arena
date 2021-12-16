@@ -49,6 +49,7 @@ export const getMaxSurveysUserCanCreate = (user) => {
 // READ
 export const canViewSurvey = (user, surveyInfo) =>
   User.isSystemAdmin(user) || _hasAuthGroupForSurvey({ user, surveyInfo })
+export const canExportSurvey = _hasSurveyPermission(permissions.surveyEdit)
 export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
