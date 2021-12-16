@@ -56,7 +56,7 @@ NodeDefEntityForm.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDef, nodes, entry } = props
+  const { nodeDef, entry } = props
 
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
