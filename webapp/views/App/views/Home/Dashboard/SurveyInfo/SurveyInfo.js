@@ -17,6 +17,7 @@ import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDownload } from '@webapp/components'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
+import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 
 const SurveyInfo = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -28,6 +29,7 @@ const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
 
   const canEditSurvey = useAuthCanEditSurvey()
+  const canExportSurvey = useAuthCanExportSurvey()
 
   const surveyName = Survey.getName(surveyInfo)
 
@@ -60,19 +62,23 @@ const SurveyInfo = () => {
 
           {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
-          <ButtonDownload
-            id={TestId.dashboard.surveyExportBtn}
-            className="btn-transparent"
-            onClick={() => dispatch(SurveyActions.exportSurvey())}
-            label={i18n.t('common.export')}
-          />
+          {canExportSurvey && (
+            <>
+              <ButtonDownload
+                id={TestId.dashboard.surveyExportBtn}
+                className="btn-transparent"
+                onClick={() => dispatch(SurveyActions.exportSurvey())}
+                label={i18n.t('common.export')}
+              />
 
-          <ButtonDownload
-            id={TestId.dashboard.surveyExportWithDataBtn}
-            className="btn-transparent"
-            onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
-            label={i18n.t('homeView.dashboard.exportWithData')}
-          />
+              <ButtonDownload
+                id={TestId.dashboard.surveyExportWithDataBtn}
+                className="btn-transparent"
+                onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
+                label={i18n.t('homeView.dashboard.exportWithData')}
+              />
+            </>
+          )}
 
           {canEditSurvey && (
             <Button
