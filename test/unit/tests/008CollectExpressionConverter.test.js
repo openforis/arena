@@ -52,6 +52,7 @@ describe('CollectExpressionConverter Test', () => {
     { q: 'cluster_accessible and true()', r: 'cluster_accessible && true' },
     { q: 'false() or TRUE', r: 'false || true' },
     { q: 'cluster_accessible=true()', r: 'cluster_accessible==true' },
+    { q: 'cluster_accessible\nand true()', r: 'cluster_accessible && true' },
     // object conversion
     { q: 'boolean(remarks)', r: 'Boolean(remarks)' },
     { q: 'number(gps_model)', r: 'Number(gps_model)' },
