@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as User from '@core/user/user'
@@ -14,16 +14,18 @@ export const useWebSocket = () => {
   const dispatch = useDispatch()
   const user = useUser()
 
+  const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [])
+
   const openSocket = () => {
     ;(async () => {
       await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
-      AppWebSocket.on(WebSocketEvents.jobUpdate, (job) => dispatch(JobActions.updateJob({ job })))
+      AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
     })()
   }
 
   const closeSocket = () => {
     AppWebSocket.closeSocket()
-    AppWebSocket.off(WebSocketEvents.jobUpdate)
+    AppWebSocket.off(WebSocketEvents.jobUpdate, onJobUpdate)
   }
 
   useEffect(() => {
