@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Record from '@core/record/record'
@@ -49,30 +49,44 @@ export const useListenOnNodeUpdates = ({ data, query, setData }) => {
   const dataClone = useRef([])
   const modeEdit = Query.isModeRawEdit(query)
 
+  // listening to websocket events when data is loaded in edit mode and rows have record property
+  const listeningToWebSocket = modeEdit && data?.length > 0 && Object.prototype.hasOwnProperty.call(data[0], 'record')
+
+  const onNodesUpdate = useCallback(
+    (nodes) => {
+      dataClone.current = updateValues({ data: dataClone.current, nodes })
+    },
+    [updateValues]
+  )
+
+  const onNodeValidationsUpdate = useCallback(
+    ({ recordUuid, validations }) => {
+      dataClone.current = updateValidations({ data, recordUuid, validations })
+    },
+    [updateValidations]
+  )
+
+  const onNodesUpdateCompleted = useCallback(() => {
+    setData(dataClone.current)
+    dispatch(AppSavingActions.hideAppSaving())
+  }, [])
+
   // eslint-disable-next-line consistent-return
   useEffect(() => {
-    // listening to websocket node update events when data is loaded in edit mode (rows have record property)
-    if (modeEdit && Object.prototype.hasOwnProperty.call(data[0], 'record')) {
+    if (listeningToWebSocket) {
       // when start editing, create a clone of the data
       dataClone.current = [...data]
 
-      AppWebSocket.on(WebSocketEvents.nodesUpdate, (nodes) => {
-        dataClone.current = updateValues({ data: dataClone.current, nodes })
-      })
-      AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, ({ recordUuid, validations }) => {
-        dataClone.current = updateValidations({ data, recordUuid, validations })
-      })
-      AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, () => {
-        setData(dataClone.current)
-        dispatch(AppSavingActions.hideAppSaving())
-      })
+      AppWebSocket.on(WebSocketEvents.nodesUpdate, onNodesUpdate)
+      AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, onNodeValidationsUpdate)
+      AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, onNodesUpdateCompleted)
 
       return () => {
         dataClone.current = []
-        AppWebSocket.off(WebSocketEvents.nodesUpdate)
-        AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
-        AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
+        AppWebSocket.off(WebSocketEvents.nodesUpdate, onNodesUpdate)
+        AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate, onNodeValidationsUpdate)
+        AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted, onNodesUpdateCompleted)
       }
     }
-  }, [modeEdit, data])
+  }, [listeningToWebSocket, onNodesUpdate, onNodeValidationsUpdate, onNodesUpdateCompleted])
 }
