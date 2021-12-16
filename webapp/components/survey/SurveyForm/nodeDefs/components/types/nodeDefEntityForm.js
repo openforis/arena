@@ -27,7 +27,7 @@ const NodeDefEntityForm = (props) => {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
       dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
     }
-  }, [NodeDef.getUuid(nodeDef)])
+  }, [entry, selectedNode, nodes, NodeDef.getUuid(nodeDef)])
 
   return (
     <div>
@@ -62,9 +62,7 @@ const mapStateToProps = (state, props) => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
     const record = RecordState.getRecord(state)
 
-    const selectedNodeUuid = entryMultiple
-      ? SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
-      : Node.getUuid(nodes[0])
+    const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
 
     const selectedNode = selectedNodeUuid ? Record.getNodeByUuid(selectedNodeUuid)(record) : null
 
