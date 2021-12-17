@@ -8,7 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as Node from '@core/record/node'
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-export const tableColumns = [
+export const tableColumnsInsert = [
   'uuid',
   'date_created',
   'date_modified',
@@ -18,6 +18,8 @@ export const tableColumns = [
   'value',
   'meta',
 ] // Used for node values batch insert
+
+const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
@@ -54,7 +56,7 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
   const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
   const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
 
-  const selectFields = (excludeRecordUuid ? R.without('record_uuid', tableColumns) : tableColumns)
+  const selectFields = (excludeRecordUuid ? R.without('record_uuid', tableColumnsSelect) : tableColumnsSelect)
     .map((field) => `n.${field}`)
     .join(', ')
 
@@ -112,11 +114,12 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   // reload node to get node ref data
   const nodeAdded = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid: Node.getUuid(node), draft }, client)
 
+  console.log('---nodeAdded', nodeAdded)
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
 export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumns, nodeValues))
+  client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumnsInsert, nodeValues))
 
 export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client = db) =>
   nodeValues.length > 0 &&
@@ -124,7 +127,7 @@ export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client =
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
       'node',
-      tableColumns,
+      tableColumnsInsert,
       nodeValues.map((node) => ({
         ...node,
         date_created: Node.getDateCreated(node),
