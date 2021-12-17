@@ -25,7 +25,7 @@ const AnalysisNodeDefs = () => {
   const analysisNodeDefsRef = useRef(null)
 
   const _analysisNodeDefsToShow = useMemo(
-    () => Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs })(survey),
+    () => Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs, showInactiveResultVariables: true })(survey),
     [chain, survey, entityDefUuid, showSamplingNodeDefs]
   )
 
@@ -34,7 +34,7 @@ const AnalysisNodeDefs = () => {
   return (
     <div className="analysis-node-defs-wrapper">
       <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
-        {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain })(survey).length <= 0 && (
+        {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey).length === 0 && (
           <div className="analysis-node-defs-error">
             <ErrorBadge validation={validation} showLabel={false} showIcon />
             <p>{i18n.t('chain.emptyNodeDefs')}</p>
