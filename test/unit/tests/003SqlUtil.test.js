@@ -31,7 +31,7 @@ const goodExpressions = [
     q: 'a != "a"',
     r: {
       clause: '$/_0:name/ IS DISTINCT FROM $/_1/',
-      params: { _0: 'a', _1: '"a"' },
+      params: { _0: 'a', _1: 'a' }, // the second parameter will be quoted by pg-promise because it's a string
     },
   },
   {

@@ -63,6 +63,33 @@ export const unary = (node, params) => {
   }
 }
 
+/**
+ * Returns true if the specified value is a string that starts and ends with a double quote (") char.
+ *
+ * @param {!string} value - The value to test.
+ * @returns {boolean} - True if the value is quoted, false otherwise.
+ */
+const _isQuotedString = (value) =>
+  typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"'
+
+/**
+ * Expression node value could have been "stringified" (e.g. code/taxon/text attributes)
+ * so it needs to be parsed.
+ * When the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
+ * and if it's already quoted, remove the double quotes.
+ *
+ * @param {!string} value - The value to parse.
+ * @returns {object} - The result of the parsing.
+ */
+const _getLiteralParamValue = (value) => {
+  if (_isQuotedString(value)) {
+    try {
+      return JSON.parse(value)
+    } catch (e) {}
+  }
+  return value
+}
+
 export const literal = (node, params) => {
   if (R.isNil(node.value)) {
     return {
@@ -72,9 +99,11 @@ export const literal = (node, params) => {
   }
 
   const param = getParamNameNext(params)
+  const paramValue = _getLiteralParamValue(node.raw)
+
   return {
     clause: `$/${param}/`,
-    params: { ...params, [param]: node.raw },
+    params: { ...params, [param]: paramValue },
   }
 }
 
