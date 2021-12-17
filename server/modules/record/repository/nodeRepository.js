@@ -46,8 +46,12 @@ const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null
 const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, excludeRecordUuid = false }) => {
   const schema = getSurveyDBSchema(surveyId)
 
+  const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect)
+    .map((field) => `n.${field}`)
+    .join(', ')
+
   if (!includeRefData) {
-    return `SELECT n.* FROM ${schema}.node n`
+    return `SELECT ${selectFields} FROM ${schema}.node n`
   }
 
   // include ref data (category items, taxa, etc.)
@@ -55,10 +59,6 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
   const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
   const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
   const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
-
-  const selectFields = (excludeRecordUuid ? R.without('record_uuid', tableColumnsSelect) : tableColumnsSelect)
-    .map((field) => `n.${field}`)
-    .join(', ')
 
   return `
     SELECT
