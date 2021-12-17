@@ -114,7 +114,6 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   // reload node to get node ref data
   const nodeAdded = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid: Node.getUuid(node), draft }, client)
 
-  console.log('---nodeAdded', nodeAdded)
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
