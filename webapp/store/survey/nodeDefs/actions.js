@@ -255,6 +255,7 @@ export const resetSamplingNodeDefs =
       chain,
       hideSamplingNodeDefsWithoutSibilings: false,
       hideAreaBasedEstimate: false,
+      showInactiveResultVariables: true
     })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
 
     const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
