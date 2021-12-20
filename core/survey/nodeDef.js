@@ -270,7 +270,7 @@ export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, 
 
 export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 
-export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
+export const getActive = getPropAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
@@ -284,7 +284,8 @@ export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalys
 export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
 export const isSampling = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isSampling, false)(nodeDef))
 export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)
-export const isAreaBasedEstimatedOf = nodeDef => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)(nodeDef))
+export const isAreaBasedEstimatedOf = (nodeDef) =>
+  Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)(nodeDef))
 
 // ==== CREATE
 
