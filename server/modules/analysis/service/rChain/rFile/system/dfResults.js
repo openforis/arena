@@ -48,12 +48,14 @@ export default class DfResults {
   }
 
   initDf() {
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain })(this.survey)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain, hideAreaBasedEstimate: false })(this.survey)
     const columnNames = NodeDefTable.getNodeDefsColumnNames({
       nodeDefs: analysisNodeDefsInEntity,
       includeExtendedCols: false,
     })
 
+    const areaBasedNodeDefs = analysisNodeDefsInEntity.filter(NodeDef.isAreaBasedEstimatedOf)
+    areaBasedNodeDefs.forEach(areaBasedNodeDef => this.scripts.push(NodeDef.getScript(areaBasedNodeDef)) )
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
 

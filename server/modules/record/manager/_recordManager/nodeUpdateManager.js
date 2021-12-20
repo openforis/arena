@@ -16,6 +16,7 @@ import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
+import * as FileRepository from '../../repository/fileRepository'
 
 const logger = Log.getLogger('NodeUpdateManager')
 
@@ -29,7 +30,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  const recordUpdated = R.isEmpty(nodes) ? record : Record.assocNodes(nodes)(record)
+  const recordUpdated = R.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
@@ -176,6 +177,15 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
   }
 
+  if (NodeDef.isFile(nodeDef)) {
+    // mark old file as deleted if changed
+    const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
+    const fileUuidPrev = Node.getFileUuid(nodePrev)
+    if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
+      await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+    }
+  }
+
   const nodeUpdated = await NodeRepository.updateNode(
     {
       surveyId,
@@ -296,7 +306,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
-    recordUpdated = Record.assocNodes(nodesReloaded)(recordUpdated)
+    recordUpdated = Record.mergeNodes(nodesReloaded)(recordUpdated)
   }
 
   return {
@@ -387,5 +397,5 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
       ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
+    return Record.mergeNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })

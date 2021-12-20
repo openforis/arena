@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-const colors = {
+const possibleColors = {
   aqua: '#00ffff',
   azure: '#f0ffff',
   beige: '#f5f5dc',
@@ -46,10 +46,10 @@ const colors = {
   yellow: '#ffff00',
 }
 
-export const useRandomColor = () => {
-  const availableColorsRef = useRef([...Object.values(colors)])
+export const useRandomColor = (dependencies = []) => {
+  const availableColorsRef = useRef([...Object.values(possibleColors)])
 
-  const nextColor = () => {
+  const nextColor = useCallback(() => {
     const availableColors = availableColorsRef.current
 
     // pick a color randomly among the available (not used) ones
@@ -62,9 +62,33 @@ export const useRandomColor = () => {
     availableColorsRef.current = availableColorsUpdated.length > 0 ? availableColorsUpdated : [...Object.values(colors)]
 
     return color
-  }
+  }, dependencies)
 
   return {
     nextColor,
   }
+}
+
+export const useRandomColors = (size) => {
+  const [colors, setColors] = useState([])
+
+  useEffect(() => {
+    const availableColors = [...Object.values(possibleColors)]
+
+    const colorsUpdated = []
+
+    for (let count = 0; count < size; count++) {
+      // pick a color randomly among the available (not used) ones
+      const colorIndex = Math.floor(Math.random() * availableColors.length)
+      const color = availableColors[colorIndex]
+
+      colorsUpdated.push(color)
+
+      availableColors.splice(colorIndex, 1)
+    }
+
+    setColors(colorsUpdated)
+  }, [size])
+
+  return colors
 }

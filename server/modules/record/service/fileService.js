@@ -7,4 +7,5 @@ export const {
   fetchFileUuidsBySurveyId,
   fetchFileByUuid,
   fetchFileByNodeUuid,
+  fetchFileSummariesBySurveyId,
 } = FileManager

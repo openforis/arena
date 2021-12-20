@@ -116,6 +116,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     sortBy = 'date_created',
     sortOrder = 'DESC',
     search = false,
+    recordUuid = null,
   },
   client = db
 ) => {
@@ -152,6 +153,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       r.preview = FALSE 
       ${A.isNull(cycle) ? '' : 'AND r.cycle = $/cycle/'}
       ${A.isNull(step) ? '' : 'AND r.step = $/step/'}
+      ${A.isNull(recordUuid) ? '' : 'AND r.uuid = $/recordUuid/'}
     ORDER BY r.date_created DESC
   `
 
@@ -197,7 +199,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
     OFFSET $/offset:value/
   `,
-    { surveyId, cycle, step, search, limit, offset },
+    { surveyId, cycle, step, search, limit, offset, recordUuid },
     dbTransformCallback(surveyId, false)
   )
 }

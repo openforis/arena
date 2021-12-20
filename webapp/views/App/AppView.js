@@ -11,11 +11,12 @@ import Header from './Header'
 import JobMonitor from './JobMonitor'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
-import Analysis from './views/Analysis'
-import Data from './views/Data'
-import Designer from './views/Designer'
-import Home from './views/Home'
-import Users from './views/Users'
+
+import Analysis from './views/Analysis' // TODO load Analysis module lazily
+const Data = React.lazy(() => import('./views/Data'))
+const Designer = React.lazy(() => import('./views/Designer'))
+const Home = React.lazy(() => import('./views/Home'))
+const Users = React.lazy(() => import('./views/Users'))
 
 const AppView = () => {
   useEffect(() => {

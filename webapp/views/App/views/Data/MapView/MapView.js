@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -7,24 +7,30 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import { PanelRight } from '@webapp/components'
+import Record from '@webapp/components/survey/Record'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
-import { useRandomColor } from './useRandomColor'
+import { useRandomColors } from './useRandomColor'
 
 const MapWrapper = () => {
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
+
+  const i18n = useI18n()
+
   const [state, setState] = useState({
     samplingPointDataLevels: [],
     coordinateAttributeDefs: [],
   })
-  const { nextColor } = useRandomColor()
+  const { samplingPointDataLevels, coordinateAttributeDefs, editingRecordUuid, editingParentNodeUuid } = state
 
-  const { samplingPointDataLevels, coordinateAttributeDefs } = state
+  const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
 
   useEffect(() => {
     ;(async () => {
@@ -44,25 +50,52 @@ const MapWrapper = () => {
     })()
   }, [])
 
+  const onRecordEditClick = useCallback(
+    (params) => {
+      const { recordUuid, parentUuid } = params || {}
+      setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeUuid: parentUuid }))
+    },
+    [setState]
+  )
+
+  if (samplingPointDataLevels.length + coordinateAttributeDefs.length > 0 && layerColors.length === 0) {
+    // layer colors not generated yet
+    return null
+  }
+
   return (
-    <Map
-      layers={[
-        ...samplingPointDataLevels.map((level) => (
-          <SamplingPointDataLayer
-            key={CategoryLevel.getUuid(level)}
-            levelIndex={CategoryLevel.getIndex(level)}
-            markersColor={nextColor()}
-          />
-        )),
-        ...coordinateAttributeDefs.map((attributeDef) => (
-          <CoordinateAttributeDataLayer
-            key={NodeDef.getUuid(attributeDef)}
-            attributeDef={attributeDef}
-            markersColor={nextColor()}
-          />
-        )),
-      ]}
-    />
+    <>
+      <Map
+        layers={[
+          ...samplingPointDataLevels.map((level, index) => (
+            <SamplingPointDataLayer
+              key={CategoryLevel.getUuid(level)}
+              levelIndex={CategoryLevel.getIndex(level)}
+              markersColor={layerColors[index]}
+            />
+          )),
+          ...coordinateAttributeDefs.map((attributeDef, index) => (
+            <CoordinateAttributeDataLayer
+              key={NodeDef.getUuid(attributeDef)}
+              attributeDef={attributeDef}
+              markersColor={layerColors[samplingPointDataLevels.length + index]}
+              onRecordEditClick={onRecordEditClick}
+              editingRecordUuid={editingRecordUuid}
+            />
+          )),
+        ]}
+      />
+      {editingRecordUuid && (
+        <PanelRight
+          className="record-panel"
+          header={i18n.t('mapView.editRecord')}
+          width="70vw"
+          onClose={() => onRecordEditClick(null)}
+        >
+          <Record recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} />
+        </PanelRight>
+      )}
+    </>
   )
 }
 

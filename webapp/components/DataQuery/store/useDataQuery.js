@@ -30,6 +30,7 @@ export const useDataQuery = ({ query }) => {
   const measures = Query.getMeasures(query)
   const measuresAggregateFnsSize = Array.from(measures.values()).flat().length
   const filter = Query.getFilter(query)
+  const filterRecordUuid = Query.getFilterRecordUuid(query)
   const sort = Query.getSort(query)
   const Actions = useActions({ setData, setCount })
 
@@ -40,12 +41,12 @@ export const useDataQuery = ({ query }) => {
   useEffect(() => {
     if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
     else Actions.reset()
-  }, [offset, attributeDefUuids, dimensions, measures, measuresAggregateFnsSize, mode, sort])
+  }, [limit, offset, attributeDefUuids, dimensions, measures, measuresAggregateFnsSize, mode, sort])
 
   // on filter update: fetch data and count
   useOnUpdate(() => {
-    Actions.fetch({ offset, limit, query, includesCount: true })
-  }, [filter])
+    if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: true })
+  }, [filter, filterRecordUuid])
 
   return {
     count: count && count.data,

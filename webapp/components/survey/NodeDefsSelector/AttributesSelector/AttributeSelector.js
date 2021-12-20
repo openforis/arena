@@ -7,11 +7,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
 import { useSurvey } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
   const {
     canSelectAttributes,
+    filterFunction,
     filterTypes,
     filterChainUuids,
     lang,
@@ -29,6 +31,7 @@ const AttributeSelector = (props) => {
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+    (filterFunction === null || filterFunction(nodeDef)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes)) &&
     (R.isEmpty(filterChainUuids) ||
       R.isEmpty(NodeDef.getChainUuid(nodeDef)) ||
@@ -47,7 +50,10 @@ const AttributeSelector = (props) => {
         disabled={!canSelectAttributes}
         title={showNodeDefPath ? Survey.getNodeDefPath({ nodeDef, showLabels: true, labelLang: lang })(survey) : null}
       >
-        {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
+        <span>
+          <NodeDefIconKey nodeDef={nodeDef} />
+          {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
+        </span>
         {NodeDefUIProps.getIconByType(nodeDefType)}
       </button>
     )
@@ -56,6 +62,7 @@ const AttributeSelector = (props) => {
 
 AttributeSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
+  filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
   lang: PropTypes.string.isRequired,
@@ -70,6 +77,7 @@ AttributeSelector.propTypes = {
 
 AttributeSelector.defaultProps = {
   canSelectAttributes: true,
+  filterFunction: null,
   filterTypes: [],
   filterChainUuids: [],
   showMultipleAttributes: true,

@@ -16,6 +16,18 @@ const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =
     if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
       // there are draft advanced props to merge with "published" advanced props
       rowUpdated.draft_advanced = true
+
+      // set updated props flags
+      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.validations]) {
+        rowUpdated.draft_advanced_validations = true
+      }
+      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.applicable]) {
+        rowUpdated.draft_advanced_applicable = true
+      }
+      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.defaultValues]) {
+        rowUpdated.draft_advanced_default_values = true
+      }
+
       if (draft && !backup) {
         // merge props_advanced and props_advanced_draft into props_advanced
         rowUpdated.props_advanced = R.mergeDeepLeft(row.props_advanced_draft, row.props_advanced)
@@ -213,7 +225,7 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
           [nodeDefUuid, props, propsAdvanced],
           (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
         )
-      }),
+      })
     )
     return nodedefsUpdated
   })

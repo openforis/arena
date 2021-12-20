@@ -13,9 +13,11 @@ export const DEFAULT_AGGREGATE_FUNCTIONS = {
 }
 
 // ====== CREATE
-export const create = ({ entityDefUuid = null } = {}) => ({
+export const create = ({ entityDefUuid = null, displayType = defaults[keys.displayType], attributeDefUuids = [] } = {}) => ({
   ...defaults,
+  [keys.displayType]: displayType,
   [keys.entityDefUuid]: entityDefUuid,
+  [keys.attributeDefUuids]: attributeDefUuids,
 })
 
 // ====== READ
@@ -23,6 +25,7 @@ export { displayTypes }
 export const getMode = A.prop(keys.mode)
 export const getDisplayType = A.prop(keys.displayType)
 export const getFilter = A.prop(keys.filter)
+export const getFilterRecordUuid = A.prop(keys.filterRecordUuid)
 export const getSort = A.prop(keys.sort)
 export const getEntityDefUuid = A.prop(keys.entityDefUuid)
 export const getAttributeDefUuids = A.prop(keys.attributeDefUuids)
@@ -46,6 +49,7 @@ export const assocAttributeDefUuids = A.assoc(keys.attributeDefUuids)
 export const assocDimensions = A.assoc(keys.dimensions)
 export const assocMeasures = A.assoc(keys.measures)
 export const assocFilter = A.assoc(keys.filter)
+export const assocFilterRecordUuid = A.assoc(keys.filterRecordUuid)
 export const assocSort = A.assoc(keys.sort)
 
 // mode
@@ -58,15 +62,17 @@ export const toggleModeEdit = (query) => ({
   [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
 })
 
-export const toggleMeasureAggregateFunction = ({ nodeDefUuid, aggregateFn }) => (query) => {
-  const measures = getMeasures(query)
-  const aggregateFns = measures.get(nodeDefUuid)
-  const aggregateFnIndex = aggregateFns.indexOf(aggregateFn)
-  const aggregateFnsUpdated = [...aggregateFns]
-  if (aggregateFnIndex >= 0) {
-    aggregateFnsUpdated.splice(aggregateFnIndex, 1)
-  } else {
-    aggregateFnsUpdated.push(aggregateFn)
+export const toggleMeasureAggregateFunction =
+  ({ nodeDefUuid, aggregateFn }) =>
+  (query) => {
+    const measures = getMeasures(query)
+    const aggregateFns = measures.get(nodeDefUuid)
+    const aggregateFnIndex = aggregateFns.indexOf(aggregateFn)
+    const aggregateFnsUpdated = [...aggregateFns]
+    if (aggregateFnIndex >= 0) {
+      aggregateFnsUpdated.splice(aggregateFnIndex, 1)
+    } else {
+      aggregateFnsUpdated.push(aggregateFn)
+    }
+    return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
   }
-  return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
-}

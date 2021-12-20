@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router'
@@ -7,16 +7,16 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
-import { useOnUpdate, useQuery } from '@webapp/components/hooks'
+import { useOnUpdate, useQuery, useWebSocket } from '@webapp/components/hooks'
 
 import { State } from './state'
 
-export const useLocalState = () => {
+export const useLocalState = (props) => {
+  const { recordUuid: recordUuidProp, pageNodeUuid: pageNodeUuidProp, pageNodeDefUuid: pageNodeDefUuidProp } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -27,7 +27,9 @@ export const useLocalState = () => {
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
   const preview = Boolean(recordUuidPreview)
 
-  const recordUuid = recordUuidUrlParam || recordUuidPreview
+  const recordUuid = recordUuidProp || recordUuidUrlParam || recordUuidPreview
+  const pageNodeUuid = pageNodeUuidProp || pageNodeUuidUrlParam
+  const pageNodeDefUuid = pageNodeDefUuidProp || pageNodeDefUuidUrlParam
 
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
@@ -44,14 +46,6 @@ export const useLocalState = () => {
   }
 
   const componentUnload = () => {
-    // Remove web socket listeners
-    AppWebSocket.off(WebSocketEvents.nodesUpdate)
-    AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
-    AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
-    AppWebSocket.off(WebSocketEvents.recordDelete)
-    AppWebSocket.off(WebSocketEvents.recordSessionExpired)
-    AppWebSocket.off(WebSocketEvents.applicationError)
-
     if (loadedRef.current) {
       dispatch(RecordActions.checkOutRecord(recordUuid))
     }
@@ -60,26 +54,39 @@ export const useLocalState = () => {
     window.removeEventListener('beforeunload', componentUnload)
   }
 
+  // Add websocket event listeners
+  useWebSocket({
+    eventName: WebSocketEvents.nodesUpdate,
+    eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content)), []),
+  })
+  useWebSocket({
+    eventName: WebSocketEvents.nodeValidationsUpdate,
+    eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
+  })
+
+  useWebSocket({
+    eventName: WebSocketEvents.nodesUpdateCompleted,
+    eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), []),
+  })
+  useWebSocket({
+    eventName: WebSocketEvents.recordDelete,
+    eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), []),
+  })
+  useWebSocket({
+    eventName: WebSocketEvents.recordSessionExpired,
+    eventHandler: useCallback(() => dispatch(RecordActions.sessionExpired(navigate)), []),
+  })
+  useWebSocket({
+    eventName: WebSocketEvents.applicationError,
+    eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
+  })
+
   const componentLoad = () => {
     // Check in record
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
     const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuidUrlParam, pageNodeDefUuidUrlParam))
-
-    // Add websocket event listeners
-    AppWebSocket.on(WebSocketEvents.nodesUpdate, (content) => dispatch(RecordActions.recordNodesUpdate(content)))
-    AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, (content) =>
-      dispatch(RecordActions.nodeValidationsUpdate(content))
-    )
-    AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, (content) =>
-      dispatch(RecordActions.nodesUpdateCompleted(content))
-    )
-    AppWebSocket.on(WebSocketEvents.recordDelete, () => dispatch(RecordActions.recordDeleted(navigate)))
-    AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => dispatch(RecordActions.sessionExpired(navigate)))
-    AppWebSocket.on(WebSocketEvents.applicationError, ({ key, params }) =>
-      dispatch(RecordActions.applicationError(navigate, key, params))
-    )
+    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuid, pageNodeDefUuid))
 
     // Add beforeunload event listener
     window.addEventListener('beforeunload', componentUnload)

@@ -46,6 +46,7 @@ export const {
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
+  fetchRecordSummaryByRecordUuid,
   fetchRecordCreatedCountsByDates,
   updateRecordsStep,
 } = RecordManager

@@ -210,7 +210,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 }
 
 export const removeNodeDef =
-  (nodeDef, navigate = null) =>
+  (nodeDef, navigate = null, callBack = null) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -236,6 +236,7 @@ export const removeNodeDef =
             ])
 
             dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+            callBack?.()
             if (navigate) {
               navigate(-1)
             }
@@ -250,9 +251,12 @@ export const resetSamplingNodeDefs =
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
-    const nodeDefs = Survey.getAnalysisNodeDefs({ chain, hideSamplingNodeDefsWithoutSibilings: false, hideAreaBasedStimate: false  })(survey).filter(
-      (_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef)
-    )
+    const nodeDefs = Survey.getAnalysisNodeDefs({
+      chain,
+      hideSamplingNodeDefsWithoutSibilings: false,
+      hideAreaBasedEstimate: false,
+      showInactiveResultVariables: true
+    })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
 
     const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
 

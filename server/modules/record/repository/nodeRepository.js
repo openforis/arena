@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
@@ -6,7 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as Node from '@core/record/node'
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-export const tableColumns = [
+export const tableColumnsInsert = [
   'uuid',
   'date_created',
   'date_modified',
@@ -16,6 +18,8 @@ export const tableColumns = [
   'value',
   'meta',
 ] // Used for node values batch insert
+
+const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
@@ -29,12 +33,25 @@ const dbTransformCallback = (node) =>
   )(node)
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
-
-const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) => {
+/**
+ * It builds the node select query.
+ *
+ * @param {!object} params - The parameters.
+ * @param {!number} [params.surveyId] - The survey ID.
+ * @param {boolean} [params.includeRefData = true] - If true, category item and taxon item associated to the node value will be fetched.
+ * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
+ * @param {boolean} [params.excludeRecordUuid = false] - If true, the record uuid won't be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @returns {Array} - List of fetched nodes.
+ */
+const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, excludeRecordUuid = false }) => {
   const schema = getSurveyDBSchema(surveyId)
 
+  const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect)
+    .map((field) => `n.${field}`)
+    .join(', ')
+
   if (!includeRefData) {
-    return `SELECT n.* FROM ${schema}.node n`
+    return `SELECT ${selectFields} FROM ${schema}.node n`
   }
 
   // include ref data (category items, taxa, etc.)
@@ -45,7 +62,7 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true }) 
 
   return `
     SELECT
-        n.*,
+        ${selectFields},
         CASE
             WHEN n.value->>'taxonUuid' IS NOT NULL
             THEN json_build_object( 'taxon',json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') )
@@ -101,7 +118,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 }
 
 export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumns, nodeValues))
+  client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumnsInsert, nodeValues))
 
 export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client = db) =>
   nodeValues.length > 0 &&
@@ -109,7 +126,7 @@ export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client =
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
       'node',
-      tableColumns,
+      tableColumnsInsert,
       nodeValues.map((node) => ({
         ...node,
         date_created: Node.getDateCreated(node),
@@ -131,12 +148,12 @@ export const fetchNodesByRecordUuid = async (
 ) =>
   client.map(
     `
-    ${_getNodeSelectQuery({ surveyId, includeRefData, draft })}
+    ${_getNodeSelectQuery({ surveyId, includeRefData, draft, excludeRecordUuid: true })}
     WHERE n.record_uuid = $1
     order by n.date_created
     `,
     [recordUuid],
-    dbTransformCallback
+    (row) => ({ ...dbTransformCallback(row), recordUuid })
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>

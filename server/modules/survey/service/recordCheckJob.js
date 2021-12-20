@@ -68,8 +68,13 @@ export default class RecordCheckJob extends Job {
         } else if (!NodeDef.isPublished(def)) {
           // New node def
           nodeDefAddedUuids.push(nodeDefUuid)
-        } else if (NodeDef.hasAdvancedPropsDraft(def)) {
-          // Already existing node def but validations have been updated
+        } else if (
+          NodeDef.hasAdvancedPropsDraft(def) &&
+          (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
+            NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
+            NodeDef.hasAdvancedPropsValidationsDraft(def))
+        ) {
+          // Already existing node def but applicable or default values or validations have been updated
           nodeDefUpdatedUuids.push(nodeDefUuid)
         }
       })
@@ -105,41 +110,49 @@ export default class RecordCheckJob extends Job {
       record = recordDeletedNodes || record
     }
 
+    const nodesToValidate = {}
+    let missingNodes = {}
+
     // 3. insert missing nodes
-    const { record: recordUpdateInsert, nodes: missingNodes = {} } = await this._insertMissingSingleNodes({
-      survey,
-      nodeDefAddedUuids,
-      record,
-    })
-    record = recordUpdateInsert || record
+    if (!R.isEmpty(nodeDefAddedUuids)) {
+      const { record: recordUpdateInsert, nodes: missingNodesInserted = {} } = await this._insertMissingSingleNodes({
+        survey,
+        nodeDefAddedUuids,
+        record,
+      })
+      record = recordUpdateInsert || record
+      missingNodes = missingNodesInserted
+      Object.assign(nodesToValidate, missingNodesInserted)
+    }
 
     // 4. apply default values and recalculate applicability
-    const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
-      survey,
-      nodeDefUpdatedUuids,
-      record,
-      missingNodes,
-      this.tx
-    )
-    record = recordUpdate || record
+    if (!R.isEmpty(nodeDefUpdatedUuids) || !R.isEmpty(missingNodes)) {
+      const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
+        survey,
+        nodeDefUpdatedUuids,
+        record,
+        missingNodes,
+        this.tx
+      )
+      record = recordUpdate || record
+      Object.assign(nodesToValidate, nodesUpdatedDefaultValues)
+    }
 
     // 5. clear record keys validation (record keys validation performed after RDB generation)
     record = _clearRecordKeysValidation(record)
 
     // 6. validate nodes
-
     const newNodes = nodeDefAddedUuids.reduce((nodesByUuid, nodeDefUuid) => {
       const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
       return { ...nodesByUuid, ...ObjectUtils.toUuidIndexedObj(nodes) }
     }, {})
 
-    const nodesToValidate = {
-      ...newNodes,
-      ...missingNodes,
-      ...nodesUpdatedDefaultValues,
-    }
+    Object.assign(nodesToValidate, newNodes)
 
-    await _validateNodes(survey, R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids), record, nodesToValidate, this.tx)
+    const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
+    if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(nodesToValidate)) {
+      await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, nodesToValidate, this.tx)
+    }
   }
 
   /**

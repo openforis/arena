@@ -31,9 +31,9 @@ class EntityBuilder extends NodeBuilder {
     const entity = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode)
 
     return R.pipe(
-      R.map(childBuilder => childBuilder.build(survey, nodeDef, recordUuid, entity)),
+      R.map((childBuilder) => childBuilder.build(survey, nodeDef, recordUuid, entity)),
       R.mergeAll,
-      R.assoc(Node.getUuid(entity), entity),
+      R.assoc(Node.getUuid(entity), entity)
     )(this.childBuilders)
   }
 
@@ -102,11 +102,11 @@ class RecordBuilder {
   build() {
     const record = RecordUtils.newRecord(this.user)
     const nodes = this.rootEntityBuilder.build(this.survey, null, Record.getUuid(record), null)
-    return Record.assocNodes(nodes)(record)
+    return Record.assocNodes({ nodes })(record)
   }
 
   async buildAndStore(client = db) {
-    return await client.tx(async t => {
+    return await client.tx(async (t) => {
       const record = await RecordUtils.insertAndInitRecord(this.user, this.survey, false, t)
 
       return await this.rootEntityBuilder.buildAndStore(this.user, this.survey, record, null, t)

@@ -14,7 +14,8 @@ import { useSurvey, useSurveyCycleKeys, NodeDefsActions } from '@webapp/store/su
 import Checkbox from '@webapp/components/form/checkbox'
 
 const AreaBasedEstimated = (props) => {
-  const { nodeDef } = props
+  const { nodeDef, state, Actions } = props
+
   const [areaBasedEstimatedNodeDef, setAreaBasedEstimatedNodeDef] = useState(false)
 
   const dispatch = useDispatch()
@@ -32,7 +33,7 @@ const AreaBasedEstimated = (props) => {
     }
   }, [nodeDef])
 
-  const handleSwitchAreaBasedEstimated = async (value) => {
+  const handleSwitchAreaBasedEstimated = async (value = false) => {
     if (value) {
       const chainUuid = Chain.getUuid(chain)
       const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
@@ -41,7 +42,11 @@ const AreaBasedEstimated = (props) => {
       const name = `${NodeDef.getName(nodeDef)}_ha`
 
       const samplingNodeDefInParent = Survey.getNodeDefsArray(survey).find(
-        (_nodeDef) => NodeDef.isSampling(_nodeDef) && NodeDef.getParentUuid(_nodeDef) === NodeDef.getUuid(parentNodeDef)
+        (_nodeDef) =>
+          NodeDef.isSampling(_nodeDef) &&
+          NodeDef.getParentUuid(_nodeDef) === NodeDef.getUuid(parentNodeDef) &&
+          NodeDef.getChainUuid(_nodeDef) === chainUuid &&
+          !NodeDef.isDeleted(_nodeDef)
       )
 
       const props = {
@@ -75,27 +80,32 @@ const AreaBasedEstimated = (props) => {
 
       dispatch(NodeDefsActions.postNodeDef({ nodeDef: _nodeDef }))
       dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef: _nodeDef })
-
+      Actions.setProp({ state, key: 'hasAreaBasedEstimated', value: true })
       setAreaBasedEstimatedNodeDef(_nodeDef)
     } else {
-      dispatch(NodeDefsActions.removeNodeDef(areaBasedEstimatedNodeDef))
-      setAreaBasedEstimatedNodeDef(false)
+      dispatch(
+        NodeDefsActions.removeNodeDef(areaBasedEstimatedNodeDef, null, () => {
+          setAreaBasedEstimatedNodeDef(false)
+          Actions.setProp({ state, key: 'hasAreaBasedEstimated', value: false })
+        })
+      )
     }
   }
 
-  return (
-    <>
-      {NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.advancedProps.areaBasedEstimate')} className="">
-          <Checkbox checked={!!areaBasedEstimatedNodeDef} onChange={handleSwitchAreaBasedEstimated} />
-        </FormItem>
-      )}
-    </>
-  )
+  if (NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef)) {
+    return (
+      <FormItem label={i18n.t('nodeDefEdit.advancedProps.areaBasedEstimate')} className="">
+        <Checkbox checked={!!areaBasedEstimatedNodeDef} onChange={handleSwitchAreaBasedEstimated} />
+      </FormItem>
+    )
+  }
+  return null
 }
 
 AreaBasedEstimated.propTypes = {
   nodeDef: PropTypes.object.isRequired,
+  Actions: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
 }
 
 export default AreaBasedEstimated

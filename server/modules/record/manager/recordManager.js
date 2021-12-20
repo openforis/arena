@@ -49,7 +49,7 @@ export const { insertNode } = RecordUpdateManager
 // ==== READ
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null },
+  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null, recordUuid = null },
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
@@ -64,7 +64,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
-    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step },
+    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step, recordUuid },
     client
   )
 
@@ -72,6 +72,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     nodeDefKeys,
     list,
   }
+}
+
+export const fetchRecordSummaryByRecordUuid = async ({ surveyId, cycle, recordUuid }, client = db) => {
+  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, recordUuid }, client)
+  return list.length === 1 ? list[0] : null
 }
 
 export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
@@ -97,13 +102,17 @@ export {
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = true, includeRefData = true },
+  { surveyId, recordUuid, draft = true, fetchForUpdate = true },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid({ surveyId, recordUuid, includeRefData, draft }, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(
+    { surveyId, recordUuid, includeRefData: fetchForUpdate, draft },
+    client
+  )
 
-  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
+  const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
+  return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate })(record)
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } from '../repository/nodeRepository'

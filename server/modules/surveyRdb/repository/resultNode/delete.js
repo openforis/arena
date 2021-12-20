@@ -18,7 +18,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycle }, client = db) => {
   const tableData = new TableDataNodeDef(survey, entity)
 
-  const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain })(survey)
+  const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, showInactiveResultVariables: true, showSamplingNodeDefs: true })(survey)
   const columnNames = NodeDefTable.getNodeDefsColumnNames({nodeDefs: analysisNodeDefsInEntity, includeExtendedCols: true})
 
   return client.query(
