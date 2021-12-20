@@ -276,7 +276,7 @@ export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, 
 
 export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 
-export const getActive = getPropOrDraftAdvanced(keysPropsAdvanced.active, false)
+export const getActive = getPropAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
