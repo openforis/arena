@@ -68,8 +68,13 @@ export default class RecordCheckJob extends Job {
         } else if (!NodeDef.isPublished(def)) {
           // New node def
           nodeDefAddedUuids.push(nodeDefUuid)
-        } else if (NodeDef.hasAdvancedPropsDraft(def)) {
-          // Already existing node def but validations have been updated
+        } else if (
+          NodeDef.hasAdvancedPropsDraft(def) &&
+          (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
+            NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
+            NodeDef.hasAdvancedPropsValidationsDraft(def))
+        ) {
+          // Already existing node def but applicable or default values or validations have been updated
           nodeDefUpdatedUuids.push(nodeDefUuid)
         }
       })

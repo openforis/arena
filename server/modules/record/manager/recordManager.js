@@ -111,7 +111,8 @@ export const fetchRecordAndNodesByUuid = async (
     client
   )
 
-  return Record.assocNodes({ nodes: ObjectUtils.toUuidIndexedObj(nodes), updateNodesIndex: fetchForUpdate })(record)
+  const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
+  return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate })(record)
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } from '../repository/nodeRepository'

@@ -116,10 +116,8 @@ const _addNode =
 export const addNewNodes = (nodes) => (record) => {
   let recordUpdated = { ...record }
   Object.values(nodes).forEach((node) => {
-    if (!Node.isDeleted(node)) {
-      // nodes should not be already in the cache, do not check for duplicates.
-      recordUpdated = _addNode({ node, avoidDuplicates: false })(recordUpdated)
-    }
+    // nodes should not be already in the cache, do not check for duplicates.
+    recordUpdated = _addNode({ node, avoidDuplicates: false })(recordUpdated)
   })
   return recordUpdated
 }
@@ -129,15 +127,14 @@ export const addOrUpdateNode = (node) => _addNode({ node, avoidDuplicates: true 
 const _addNodeToCodeDependentsIndex =
   ({ node, avoidDuplicates = true }) =>
   (record) =>
-    R.reduce(
+    Node.getHierarchyCode(node).reduce(
       (recordAcc, ancestorCodeAttributeUuid) =>
         _assocToIndexPath({
           path: [keys.nodeCodeDependents, ancestorCodeAttributeUuid],
           value: Node.getUuid(node),
           avoidDuplicates,
         })(recordAcc),
-      record,
-      Node.getHierarchyCode(node)
+      record
     )
 
 // ===== DELETE
