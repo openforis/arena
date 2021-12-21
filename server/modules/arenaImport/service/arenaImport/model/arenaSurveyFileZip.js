@@ -19,6 +19,7 @@ export const getCategoryItems = async (zipFile, categoryUuid) =>
 
 // Records
 export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records, [])
+export const hasRecords = async (zipFile) => (await getRecords(zipFile)).length > 0
 export const getRecord = async (zipFile, recordUuid) => _getJson(zipFile, ExportFile.record({ recordUuid }))
 
 // Files

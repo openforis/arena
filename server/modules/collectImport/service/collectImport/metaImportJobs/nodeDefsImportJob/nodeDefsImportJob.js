@@ -24,7 +24,8 @@ import { CollectExpressionConverter } from './collectExpressionConverter'
 import { parseValidationRules } from './validationRuleParser'
 import { parseDefaultValues } from './defaultValueParser'
 
-const specifyAttributeSuffix = 'specify'
+const specifyAttributeNameSuffix = '_specify'
+const specifyAttributeLabelSuffix = ' (Specify)'
 
 const arenaFileTypeByCollectFileType = {
   AUDIO: NodeDef.fileTypeValues.audio,
@@ -449,11 +450,11 @@ export default class NodeDefsImportJob extends Job {
       const props = {
         [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
           parentNodeDefName: NodeDef.getName(parentNodeDef),
-          nodeDefName: `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`,
+          nodeDefName: `${nodeDefName}${specifyAttributeNameSuffix}`,
         }),
         [NodeDef.propKeys.labels]: R.pipe(
           NodeDef.getLabels,
-          R.mapObjIndexed((label) => `${label} ${specifyAttributeSuffix}`)
+          R.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
         )(nodeDef),
         // hidden when not relevant
         [NodeDef.propKeys.layout]: {
