@@ -14,7 +14,7 @@ export const getAnalysisNodeDefs =
     showSamplingNodeDefs = true,
     hideSamplingNodeDefsWithoutSibilings = true,
     hideAreaBasedEstimate = true,
-    showInactiveResultVariables = false
+    showInactiveResultVariables = false,
   }) =>
   (survey) => {
     const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
@@ -55,12 +55,22 @@ export const getAnalysisNodeDefs =
         if (!hasAnalysisSibilings) return false
       }
 
-      if(hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)){
+      if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
         return false
       }
 
-      if(!showInactiveResultVariables && !NodeDef.getActive(nodeDef)){
-          return false 
+      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+        return false
+      }
+
+      if (
+        Boolean(NodeDef.getAreaBasedEstimatedOf(nodeDef)) &&
+        !showInactiveResultVariables &&
+        !NodeDef.getActive(
+          _nodeDefs.find((_nodeDef) => NodeDef.getUuid(_nodeDef) === NodeDef.getAreaBasedEstimatedOf(nodeDef))
+        )
+      ) {
+        return false
       }
 
       return true
