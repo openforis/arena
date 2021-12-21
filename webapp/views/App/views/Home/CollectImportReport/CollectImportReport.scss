@@ -23,8 +23,8 @@
   }
 
   .table__row {
-    padding: 0.5rem 0;
-    min-height: 40px;
+    padding: 0.2rem 0;
+    min-height: 50px;
     height: auto;
     font-size: 0.8rem;
 
@@ -34,6 +34,9 @@
 
     div {
       white-space: pre-line;
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 100%;
     }
 
     .icon-warning.warning {
