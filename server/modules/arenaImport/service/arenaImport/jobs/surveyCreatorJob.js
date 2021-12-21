@@ -4,6 +4,7 @@ import * as User from '@core/user/user'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 const isTemplate = ({ backup = true, surveyInfoArenaSurvey, surveyInfoTarget = null }) => {
   if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
@@ -17,7 +18,7 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, backup, surveyInfoTarget } = this.context
+    const { arenaSurvey, backup, surveyInfoTarget, arenaSurveyFileZip } = this.context
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
 
@@ -36,8 +37,9 @@ export default class SurveyCreatorJob extends Job {
 
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
 
-    // always import as draft when not backup
-    const published = backup ? Survey.isPublished(surveyInfoArenaSurvey) : false
+    // import survey as published only if it has records
+    const published =
+      (await ArenaSurveyFileZip.hasRecords(arenaSurveyFileZip)) && Survey.isPublished(surveyInfoArenaSurvey)
     const draft = !published
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
 
