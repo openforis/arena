@@ -1,5 +1,5 @@
 import './AnalysisNodeDef.scss'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -24,8 +24,9 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
 
-  const updateAnalysisNodeDef = () => {
-    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !NodeDef.getActive(nodeDef) })(
+  const handleSetActive = useCallback(() => {
+    const active = NodeDef.getActive(nodeDef)
+    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !active })(
       nodeDef
     )
 
@@ -34,13 +35,13 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
         nodeDefUuid: NodeDef.getUuid(nodeDef),
         parentUuid: NodeDef.getParentUuid(nodeDef),
         propsAdvanced: {
-          [NodeDef.keysPropsAdvanced.active]: !NodeDef.getActive(nodeDef),
+          [NodeDef.keysPropsAdvanced.active]: !active,
         },
       })
     )
 
     dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
-  }
+  }, [NodeDef.getActive(nodeDef)])
 
   return (
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
@@ -66,7 +67,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
         <InputSwitch
           checked={!nodeDefDeleted && NodeDef.getActive(nodeDef)}
           disabled={nodeDefDeleted}
-          onChange={updateAnalysisNodeDef}
+          onChange={handleSetActive}
         />
       </div>
       <div>
