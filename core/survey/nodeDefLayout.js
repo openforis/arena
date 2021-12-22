@@ -62,6 +62,12 @@ export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
 export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
 
+export const getLayoutChildrenSorted = (cycle) => (nodeDef) => {
+  const layoutChildren = getLayoutChildren(cycle)(nodeDef)
+  // sort layout items from top to bottom
+  return [...layoutChildren].sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
+}
+
 export const getLayoutChildrenCompressed =
   ({ cycle, hiddenDefsByUuid = {}, compressHorizontally = true }) =>
   (nodeDef) => {

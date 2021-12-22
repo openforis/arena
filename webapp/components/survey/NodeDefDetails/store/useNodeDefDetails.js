@@ -56,7 +56,7 @@ export const useNodeDefDetails = () => {
       }
     }
     loadNodeDef()
-  }, [])
+  }, [nodeDefUuid])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
