@@ -19,7 +19,10 @@ export const useGoToNodeDef = ({ setState }) => {
       offset,
       onCancel: ({ state }) => {
         const nodeDefUuidSibling = getSiblingNodeDefUuid({ state, offset })
-        navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuidSibling}/`)
+        // wait for local state to reset and navigate to the next node def
+        setTimeout(() => {
+          navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuidSibling}/`)
+        }, 100)
       },
     })
   }, [])
