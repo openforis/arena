@@ -69,11 +69,10 @@ export const getLayoutChildrenSorted = (cycle) => (nodeDef) => {
 }
 
 export const getLayoutChildrenCompressed =
-  ({ cycle, hiddenDefsByUuid = {}, compressHorizontally = true }) =>
+  ({ cycle, hiddenDefsByUuid = {} }) =>
   (nodeDef) => {
     const layoutChildren = getLayoutChildren(cycle)(nodeDef)
-    let nextY = 0
-    let nextX = 0
+    let itemPrev = { x: 0, y: 0, w: 0, h: 0, xOriginal: 0, yOriginal: 0 }
     return (
       [...layoutChildren]
         // sort layout items from top to bottom
@@ -84,10 +83,23 @@ export const getLayoutChildrenCompressed =
           const hidden = Boolean(hiddenDefsByUuid[childDefUuid])
           const h = hidden ? 0 : hOriginal
           const w = hidden ? 0 : wOriginal
-          const x = compressHorizontally ? Math.min(nextX, xOriginal) : xOriginal
-          const y = Math.min(nextY, yOriginal)
-          nextY = y + h
-          nextX = x + w
+
+          const sameRowOfPreviousItem = xOriginal > itemPrev.xOriginal
+
+          const x = sameRowOfPreviousItem
+            ? // move it to xPrev + wPrev
+              Math.min(itemPrev.x + itemPrev.w, xOriginal)
+            : // item in another row, can have the same x of the previous one
+              Math.min(itemPrev.x, xOriginal)
+
+          const y = sameRowOfPreviousItem
+            ? // item can have the same y of the previous one
+              Math.min(itemPrev.y, yOriginal)
+            : // item in another row, move it yPrev + hPrev
+              Math.min(itemPrev.y + itemPrev.h, yOriginal)
+
+          itemPrev = { x, y, h, w, xOriginal, yOriginal, hOriginal, wOriginal }
+
           return hidden ? layoutChildrenAcc : [...layoutChildrenAcc, { ...item, h, w, x, y }]
         }, [])
     )
