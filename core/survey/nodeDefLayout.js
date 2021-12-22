@@ -71,12 +71,10 @@ export const getLayoutChildrenSorted = (cycle) => (nodeDef) => {
 export const getLayoutChildrenCompressed =
   ({ cycle, hiddenDefsByUuid = {} }) =>
   (nodeDef) => {
-    const layoutChildren = getLayoutChildren(cycle)(nodeDef)
+    const layoutChildren = getLayoutChildrenSorted(cycle)(nodeDef)
     let itemPrev = { x: 0, y: 0, w: 0, h: 0, xOriginal: 0, yOriginal: 0 }
     return (
-      [...layoutChildren]
-        // sort layout items from top to bottom
-        .sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
+      layoutChildren
         // compact layout items
         .reduce((layoutChildrenAcc, item) => {
           const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item

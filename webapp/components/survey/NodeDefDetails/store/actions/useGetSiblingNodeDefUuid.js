@@ -24,5 +24,5 @@ export const useGetSiblingNodeDefUuid = () => {
     }
     const nodeDefIndex = siblingUuids.indexOf(NodeDef.getUuid(nodeDef))
     return siblingUuids[nodeDefIndex + offset]
-  })
+  }, [])
 }

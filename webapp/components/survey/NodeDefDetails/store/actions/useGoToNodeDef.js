@@ -22,5 +22,5 @@ export const useGoToNodeDef = ({ setState }) => {
         navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuidSibling}/`)
       },
     })
-  })
+  }, [])
 }
