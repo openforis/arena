@@ -64,7 +64,7 @@ export const getAnalysisNodeDefs =
       }
 
       if (
-       NodeDef. isAreaBasedEstimatedOf(nodeDef) &&
+       NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
         !showInactiveResultVariables &&
         !NodeDef.getActive(
           _nodeDefs.find((_nodeDef) => NodeDef.getUuid(_nodeDef) === NodeDef.getAreaBasedEstimatedOf(nodeDef))
