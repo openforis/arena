@@ -1,11 +1,12 @@
 import { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
+import * as R from 'ramda'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 
-export const useTable = ({ moduleApiUri, module, restParams }) => {
+export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRowClick: onRowClickProp }) => {
   const [totalCount, setTotalCount] = useState(0)
   const navigate = useNavigate()
   const surveyId = useSurveyId()
@@ -78,6 +79,23 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     updateQuery(navigate)({ offset: null })
   }, [JSON.stringify(restParams), limit])
 
+  // selected items
+  const [selectedItemKeys, setSelectedItemKeys] = useState([])
+
+  const onRowClick = useCallback(
+    async (item) => {
+      if (onRowClickProp) {
+        await onRowClickProp(item)
+      }
+      const key = keyExtractor({ item })
+      const selectedItemKeysUpdated = selectedItemKeys.includes(key)
+        ? R.without(key, selectedItemKeys)
+        : R.append(key, selectedItemKeys)
+      setSelectedItemKeys(selectedItemKeysUpdated)
+    },
+    [onRowClickProp, selectedItemKeys]
+  )
+
   return {
     loadingData,
     loadingCount,
@@ -91,5 +109,7 @@ export const useTable = ({ moduleApiUri, module, restParams }) => {
     count: Number(count),
     totalCount: Number(totalCount),
     initData,
+    onRowClick,
+    selectedItemKeys,
   }
 }

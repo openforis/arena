@@ -21,7 +21,7 @@ const Table = (props) => {
     moduleApiUri,
     noItemsLabelKey,
     noItemsLabelForSearchKey,
-    onRowClick,
+    onRowClick: onRowClickProp,
     restParams,
     rowComponent,
     rowExpandedComponent,
@@ -45,10 +45,14 @@ const Table = (props) => {
     count,
     totalCount,
     initData,
+    onRowClick,
+    selectedItemKeys,
   } = useTable({
+    keyExtractor,
     moduleApiUri,
     module,
     restParams,
+    onRowClick: onRowClickProp,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -67,6 +71,7 @@ const Table = (props) => {
         headerLeftComponent={headerLeftComponent}
         headerProps={headerProps}
         handleSearch={handleSearch}
+        selectedItemKeys={selectedItemKeys}
       />
 
       <Content
@@ -94,6 +99,7 @@ const Table = (props) => {
         initData={initData}
         sort={sort}
         handleSortBy={handleSortBy}
+        selectedItemKeys={selectedItemKeys}
       />
     </div>
   )

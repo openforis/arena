@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
@@ -39,11 +39,14 @@ const Content = (props) => {
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
+    onRowClick,
+    onRowDoubleClick,
     totalCount,
     rowHeaderComponent: rowHeaderComponentParam,
     rowComponent: rowComponentParam,
     rowExpandedComponent,
     rowProps,
+    selectedItemKeys,
     sort,
   } = props
 
@@ -87,19 +90,23 @@ const Content = (props) => {
         <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={TestId.table.rows(module)} ref={tableRef}>
-          {list.map((item, index) =>
-            React.createElement(ContentRow, {
+          {list.map((item, index) => {
+            const key = keyExtractor({ item })
+            return React.createElement(ContentRow, {
               ...props,
               ...rowProps,
-              key: keyExtractor({ item }),
+              key,
               row: item, // TODO do not pass "row" but "item" instead
               index,
               item,
               rowComponent,
               rowExpandedComponent,
               gridTemplateColumns,
+              onRowClick,
+              onRowDoubleClick,
+              selected: selectedItemKeys.includes(key),
             })
-          )}
+          })}
         </div>
       )}
     </div>
