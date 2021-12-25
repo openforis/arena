@@ -34,5 +34,13 @@ export const deleteRecord = (navigate) => async (dispatch, getState) => {
   dispatch(recordDeleted(navigate))
 }
 
+export const deleteRecords = () => async (dispatch, getState) => {
+  // const state = getState()
+  // const surveyId = SurveyState.getSurveyId(state)
+  // const recordUuid = RecordState.getRecordUuid(state)
+  // await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
+  // dispatch(recordDeleted(navigate))
+}
+
 export const deleteRecordUuidPreview = () => (dispatch) =>
   dispatch({ type: ActionTypes.recordUuidPreviewUpdate, recordUuid: null })

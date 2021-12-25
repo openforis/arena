@@ -11,8 +11,8 @@ import { RecordActions } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { Button } from '@webapp/components'
-import { useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
+import { Button, ButtonDelete } from '@webapp/components'
+import { useAuthCanDeleteRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems }) => {
@@ -22,6 +22,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
+  const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
 
   return (
     <div className="records__header-left">
@@ -59,6 +60,21 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
           />
         </>
       )}
+
+      {canDeleteSelectedRecords && (
+        <ButtonDelete
+          onClick={() =>
+            dispatch(
+              DialogConfirmActions.showDialogConfirm({
+                key: 'surveyForm.formEntryActions.confirmDelete',
+                onOk: () => dispatch(RecordActions.deleteRecord(navigate)),
+              })
+            )
+          }
+        />
+      )}
+
+      {}
     </div>
   )
 }
