@@ -46,7 +46,7 @@ const Content = (props) => {
     rowComponent: rowComponentParam,
     rowExpandedComponent,
     rowProps,
-    selectedItemKeys,
+    selectedItems,
     sort,
   } = props
 
@@ -104,7 +104,7 @@ const Content = (props) => {
               gridTemplateColumns,
               onRowClick,
               onRowDoubleClick,
-              selected: selectedItemKeys.includes(key),
+              selected: Boolean(selectedItems.find((_item) => keyExtractor({ item: _item }) === key)),
             })
           })}
         </div>

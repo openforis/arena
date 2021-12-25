@@ -15,7 +15,7 @@ import { Button } from '@webapp/components'
 import { useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
-const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate }) => {
+const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()

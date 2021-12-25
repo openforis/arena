@@ -1,5 +1,7 @@
 import * as A from '@core/arena'
 
+import { ArrayUtils } from '@core/arrayUtils'
+
 import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
 
@@ -13,7 +15,11 @@ export const DEFAULT_AGGREGATE_FUNCTIONS = {
 }
 
 // ====== CREATE
-export const create = ({ entityDefUuid = null, displayType = defaults[keys.displayType], attributeDefUuids = [] } = {}) => ({
+export const create = ({
+  entityDefUuid = null,
+  displayType = defaults[keys.displayType],
+  attributeDefUuids = [],
+} = {}) => ({
   ...defaults,
   [keys.displayType]: displayType,
   [keys.entityDefUuid]: entityDefUuid,
@@ -67,12 +73,6 @@ export const toggleMeasureAggregateFunction =
   (query) => {
     const measures = getMeasures(query)
     const aggregateFns = measures.get(nodeDefUuid)
-    const aggregateFnIndex = aggregateFns.indexOf(aggregateFn)
-    const aggregateFnsUpdated = [...aggregateFns]
-    if (aggregateFnIndex >= 0) {
-      aggregateFnsUpdated.splice(aggregateFnIndex, 1)
-    } else {
-      aggregateFnsUpdated.push(aggregateFn)
-    }
+    const aggregateFnsUpdated = ArrayUtils.addOrRemoveItem({ item: aggregateFn })(aggregateFns)
     return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
   }

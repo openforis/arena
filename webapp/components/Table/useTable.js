@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
+import { ArrayUtils } from '@core/arrayUtils'
 
 export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRowClick: onRowClickProp }) => {
   const [totalCount, setTotalCount] = useState(0)
@@ -80,7 +81,7 @@ export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRow
   }, [JSON.stringify(restParams), limit])
 
   // selected items
-  const [selectedItemKeys, setSelectedItemKeys] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
 
   const onRowClick = useCallback(
     async (item) => {
@@ -88,12 +89,13 @@ export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRow
         await onRowClickProp(item)
       }
       const key = keyExtractor({ item })
-      const selectedItemKeysUpdated = selectedItemKeys.includes(key)
-        ? R.without(key, selectedItemKeys)
-        : R.append(key, selectedItemKeys)
-      setSelectedItemKeys(selectedItemKeysUpdated)
+      const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
+        item,
+        compareFn: (_item) => keyExtractor({ item: _item }) === key,
+      })
+      setSelectedItems(selectedItemsUpdated)
     },
-    [onRowClickProp, selectedItemKeys]
+    [onRowClickProp, selectedItems]
   )
 
   return {
@@ -110,6 +112,6 @@ export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRow
     totalCount: Number(totalCount),
     initData,
     onRowClick,
-    selectedItemKeys,
+    selectedItems,
   }
 }
