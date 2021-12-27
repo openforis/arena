@@ -12,7 +12,7 @@ import { RecordActions } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonDelete, ButtonIconEdit } from '@webapp/components'
-import { useAuthCanDeleteRecords, useAuthCanEditRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
+import { useAuthCanDeleteRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'

@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
-import * as R from 'ramda'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
