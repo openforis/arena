@@ -13,6 +13,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonDelete } from '@webapp/components'
 import { useAuthCanDeleteRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems }) => {
@@ -63,11 +65,13 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
 
       {canDeleteSelectedRecords && (
         <ButtonDelete
+          showLabel={false}
           onClick={() =>
             dispatch(
               DialogConfirmActions.showDialogConfirm({
-                key: 'surveyForm.formEntryActions.confirmDelete',
-                onOk: () => dispatch(RecordActions.deleteRecord(navigate)),
+                key: 'dataView.confirmDeleteSelectedRecords',
+                params: { count: selectedItems.length },
+                onOk: () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
               })
             )
           }

@@ -51,15 +51,15 @@ export const validateRecordUniqueNodes = async ({ survey, record }, tx) => {
 
 // Returns an indexed object with recordUuid as key and validation as value
 export const validateRecordsUniqueness = async (
-  { survey, cycle, nodesUnique, recordUuidExcluded, excludeRecordFromCount, errorKey },
+  { survey, cycle, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
   tx
 ) => {
   const recordsCountRows = await DataViewRepository.fetchRecordsCountByRootNodesValue(
     survey,
     cycle,
     nodesUnique,
-    recordUuidExcluded,
-    excludeRecordFromCount,
+    recordUuidsExcluded,
+    excludeRecordsFromCount,
     tx
   )
 

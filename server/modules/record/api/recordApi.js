@@ -246,6 +246,19 @@ export const init = (app) => {
     }
   })
 
+  app.delete('/survey/:surveyId/records', requireRecordEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId, recordUuids } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await RecordService.deleteRecords({ user, surveyId, recordUuids })
+
+      sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
     const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
     const user = Request.getUser(req)

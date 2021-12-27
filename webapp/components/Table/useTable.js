@@ -83,6 +83,13 @@ export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRow
   // selected items
   const [selectedItems, setSelectedItems] = useState([])
 
+  // reset selected items on data (list) update
+  useOnUpdate(() => {
+    if (selectedItems.length > 0) {
+      setSelectedItems([])
+    }
+  }, [list])
+
   const onRowClick = useCallback(
     async (item) => {
       if (onRowClickProp) {

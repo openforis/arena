@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import { AppSavingActions } from '@webapp/store/app'
@@ -34,13 +35,18 @@ export const deleteRecord = (navigate) => async (dispatch, getState) => {
   dispatch(recordDeleted(navigate))
 }
 
-export const deleteRecords = () => async (dispatch, getState) => {
-  // const state = getState()
-  // const surveyId = SurveyState.getSurveyId(state)
-  // const recordUuid = RecordState.getRecordUuid(state)
-  // await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-  // dispatch(recordDeleted(navigate))
-}
+export const deleteRecords =
+  ({ records, onRecordsUpdate }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    await axios.delete(`/api/survey/${surveyId}/records`, {
+      params: { recordUuids: records.map((record) => Record.getUuid(record)) },
+    })
+    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsDeleted', params: { count: records.length } }))
+
+    onRecordsUpdate()
+  }
 
 export const deleteRecordUuidPreview = () => (dispatch) =>
   dispatch({ type: ActionTypes.recordUuidPreviewUpdate, recordUuid: null })
