@@ -25,8 +25,10 @@ const Records = () => {
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `30px 70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 50px`
 
-  const onRowDoubleClick = (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
-
+  const editRecord = useCallback(
+    (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`),
+    [navigate]
+  )
   const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())
   }, [setRecordsRequestedAt])
@@ -38,12 +40,12 @@ const Records = () => {
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
-      headerProps={{ onRecordsUpdate }}
+      headerProps={{ onRecordsUpdate, editRecord }}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
-      onRowDoubleClick={onRowDoubleClick}
+      onRowDoubleClick={editRecord}
     />
   )
 }
