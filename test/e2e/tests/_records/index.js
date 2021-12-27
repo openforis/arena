@@ -15,7 +15,7 @@ export const gotoRecord = (record) => {
     await Promise.all([
       page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
       page.waitForNavigation(),
-      page.click(cellSelector),
+      page.dblclick(cellSelector),
     ])
   })
 }
