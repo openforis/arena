@@ -17,7 +17,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
-const HeaderLeft = ({ editRecord, handleSearch, search, totalCount, onRecordsUpdate, selectedItems }) => {
+const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems, navigateToRecord }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()
@@ -26,7 +26,18 @@ const HeaderLeft = ({ editRecord, handleSearch, search, totalCount, onRecordsUpd
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
 
-  const onSelectedRecordClick = useCallback(() => editRecord(selectedItems[0]), [editRecord, selectedItems])
+  const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
+  const onDeleteButtonClick = useCallback(
+    () =>
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataView.records.confirmDeleteSelectedRecords',
+          params: { count: selectedItems.length },
+          onOk: () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
+        })
+      ),
+    [dispatch, selectedItems, onRecordsUpdate]
+  )
 
   return (
     <div className="records__header-left">
@@ -72,20 +83,7 @@ const HeaderLeft = ({ editRecord, handleSearch, search, totalCount, onRecordsUpd
       }
       {
         // Delete selected records
-        canDeleteSelectedRecords && (
-          <ButtonDelete
-            showLabel={false}
-            onClick={() =>
-              dispatch(
-                DialogConfirmActions.showDialogConfirm({
-                  key: 'dataView.confirmDeleteSelectedRecords',
-                  params: { count: selectedItems.length },
-                  onOk: () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
-                })
-              )
-            }
-          />
-        )
+        canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
       }
     </div>
   )
