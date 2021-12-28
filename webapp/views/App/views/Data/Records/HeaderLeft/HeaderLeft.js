@@ -61,19 +61,16 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
       )}
 
       {published && canUpdateRecordsStep && (
-        <>
-          <UpdateRecordsStepDropdown
-            keys={[updateTypes.promoteAllRecordsToCleansing, updateTypes.promoteAllRecordsToAnalysis]}
-            placeholder="dataView.promoteAllRecords"
-            onRecordsUpdate={onRecordsUpdate}
-          />
-
-          <UpdateRecordsStepDropdown
-            keys={[updateTypes.demoteAllRecordsFromAnalysis, updateTypes.demoteAllRecordsFromCleansing]}
-            placeholder="dataView.demoteAllRecords"
-            onRecordsUpdate={onRecordsUpdate}
-          />
-        </>
+        <UpdateRecordsStepDropdown
+          keys={[
+            updateTypes.promoteAllRecordsToCleansing,
+            updateTypes.promoteAllRecordsToAnalysis,
+            updateTypes.demoteAllRecordsFromAnalysis,
+            updateTypes.demoteAllRecordsFromCleansing,
+          ]}
+          placeholder="dataView.records.updateRecordsStep"
+          onRecordsUpdate={onRecordsUpdate}
+        />
       )}
       {
         // Edit selected record
