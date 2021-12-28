@@ -14,7 +14,7 @@ export default () =>
         await Promise.all([
           page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
           page.waitForNavigation(),
-          page.click(getSelector(TestId.table.row(TestId.records.records, 0))),
+          page.dblclick(getSelector(TestId.table.row(TestId.records.records, 0))),
         ])
       })
 

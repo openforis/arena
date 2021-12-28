@@ -13,10 +13,12 @@ export const ContentRow = (props) => {
     module,
     offset,
     onRowClick,
+    onRowDoubleClick,
     item,
     rowComponent,
     rowExpandedComponent,
     rowProps,
+    selected,
   } = props
 
   const [rowExpanded, setRowExpanded] = useState(false)
@@ -35,12 +37,19 @@ export const ContentRow = (props) => {
     }
   }, [item, onRowClick])
 
+  const onDoubleClick = useCallback(async () => {
+    if (onRowDoubleClick) {
+      await onRowDoubleClick(item)
+    }
+  }, [item, onRowDoubleClick])
+
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
     <div
       data-testid={`${module}_${index}`}
       role="button"
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       className={className}
       style={{ gridTemplateColumns, height }}
     >
@@ -59,6 +68,7 @@ export const ContentRow = (props) => {
         expandableRows,
         isRowExpandable,
         rowExpanded,
+        selected,
       })}
       {rowExpanded && (
         <div className="table__row-expanded-panel-wrapper">

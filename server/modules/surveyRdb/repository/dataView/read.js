@@ -297,8 +297,8 @@ export const fetchRecordsCountByRootNodesValue = async (
   survey,
   cycle,
   nodes,
-  recordUuidExcluded,
-  excludeRecordFromCount,
+  recordUuidsExcluded = [],
+  excludeRecordsFromCount = false,
   client = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -328,7 +328,7 @@ export const fetchRecordsCountByRootNodesValue = async (
         ${rootTable}
       WHERE 
         ${DataTable.columnNameRecordCycle} = $2
-        ${excludeRecordFromCount ? ` AND ${DataTable.columnNameRecordUuuid} != $1` : ''} 
+        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)` : ''} 
       GROUP BY 
         ${filterColumnsString}
     )
@@ -344,10 +344,10 @@ export const fetchRecordsCountByRootNodesValue = async (
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $2
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.columnNameRecordUuuid} != $1
+      AND ${rootTableAlias}.${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)
     GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, cr.count
   `,
-    [recordUuidExcluded, cycle],
+    [recordUuidsExcluded, cycle],
     camelize
   )
 }

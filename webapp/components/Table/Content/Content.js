@@ -39,11 +39,14 @@ const Content = (props) => {
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
+    onRowClick,
+    onRowDoubleClick,
     totalCount,
     rowHeaderComponent: rowHeaderComponentParam,
     rowComponent: rowComponentParam,
     rowExpandedComponent,
     rowProps,
+    selectedItems,
     sort,
   } = props
 
@@ -87,19 +90,23 @@ const Content = (props) => {
         <LoadingRows rows={maxRows} />
       ) : (
         <div className="table__rows" data-testid={TestId.table.rows(module)} ref={tableRef}>
-          {list.map((item, index) =>
-            React.createElement(ContentRow, {
+          {list.map((item, index) => {
+            const key = keyExtractor({ item })
+            return React.createElement(ContentRow, {
               ...props,
               ...rowProps,
-              key: keyExtractor({ item }),
+              key,
               row: item, // TODO do not pass "row" but "item" instead
               index,
               item,
               rowComponent,
               rowExpandedComponent,
               gridTemplateColumns,
+              onRowClick,
+              onRowDoubleClick,
+              selected: Boolean(selectedItems.find((_item) => keyExtractor({ item: _item }) === key)),
             })
-          )}
+          })}
         </div>
       )}
     </div>

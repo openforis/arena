@@ -5,8 +5,8 @@ import { Button } from './Button'
 export const ButtonDelete = (props) => (
   <Button
     {...props}
-    className={`btn-danger btn-delete ${props.className}`}
-    iconClassName="icon-bin icon-left icon-12px"
+    className={`btn-danger btn-delete ${props.className ? props.className : ''}`}
+    iconClassName="icon-bin icon-12px"
   />
 )
 
@@ -16,5 +16,5 @@ ButtonDelete.propTypes = {
 
 ButtonDelete.defaultProps = {
   ...Button.defaultProps,
-  label: "common.delete"
+  label: 'common.delete',
 }
