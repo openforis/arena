@@ -10,6 +10,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -71,6 +72,16 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
     }
   })
   RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
+}
+
+export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
+  Logger.debug('delete records. surveyId:', surveyId, 'recordUuids:', recordUuids)
+
+  await PromiseUtils.each(recordUuids, async (recordUuid) => {
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
+    await RecordManager.deleteRecord(user, survey, record)
+  })
 }
 
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {

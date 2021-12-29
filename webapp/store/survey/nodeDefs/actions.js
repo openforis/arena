@@ -160,9 +160,7 @@ export const putNodeDefLayoutProp =
 export const compressFormItems = (nodeDef) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
-  const layoutChildrenCompact = NodeDefLayout.getLayoutChildrenCompressed({ cycle, compressHorizontally: false })(
-    nodeDef
-  )
+  const layoutChildrenCompact = NodeDefLayout.getLayoutChildrenCompressed({ cycle })(nodeDef)
   dispatch(putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: layoutChildrenCompact }))
 }
 
@@ -255,7 +253,7 @@ export const resetSamplingNodeDefs =
       chain,
       hideSamplingNodeDefsWithoutSibilings: false,
       hideAreaBasedEstimate: false,
-      showInactiveResultVariables: true
+      showInactiveResultVariables: true,
     })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
 
     const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
