@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { Button } from '@webapp/components/buttons'
-import { NodeDefsActions } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
@@ -20,11 +21,30 @@ const ButtonBar = (props) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const cycle = useSurveyCycleKey()
+
+  const previousDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: -1 })
+  const nextDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: 1 })
 
   const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
+  const canNavigateNodeDefs =
+    !NodeDef.isRoot(nodeDef) &&
+    !NodeDef.isAnalysis(nodeDef) &&
+    !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
+
   return (
     <div className="button-bar">
+      {canNavigateNodeDefs && (
+        <Button
+          className="btn-previous"
+          testId={TestId.nodeDefDetails.previousBtn}
+          onClick={() => Actions.goToNodeDef({ state, offset: -1 })}
+          iconClassName="icon-arrow-left2"
+          title="common.previous"
+          disabled={!previousDefUuid}
+        />
+      )}
       <Button
         className="btn-cancel"
         testId={TestId.nodeDefDetails.backBtn}
@@ -47,6 +67,16 @@ const ButtonBar = (props) => {
         iconClassName="icon-floppy-disk icon-12px"
         label="common.save"
       />
+      {canNavigateNodeDefs && (
+        <Button
+          className="btn-next"
+          testId={TestId.nodeDefDetails.nextBtn}
+          onClick={() => Actions.goToNodeDef({ state, offset: 1 })}
+          iconClassName="icon-arrow-right2"
+          title="common.next"
+          disabled={!nextDefUuid}
+        />
+      )}
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
         <Button
           testId={TestId.nodeDefDetails.deleteBtn}

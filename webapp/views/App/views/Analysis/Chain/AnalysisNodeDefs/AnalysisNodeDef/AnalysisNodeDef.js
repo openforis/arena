@@ -66,7 +66,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
       <div>
         <InputSwitch
           checked={!nodeDefDeleted && NodeDef.getActive(nodeDef)}
-          disabled={nodeDefDeleted}
+          disabled={nodeDefDeleted || NodeDef.isSampling(nodeDef)}
           onChange={handleSetActive}
         />
       </div>

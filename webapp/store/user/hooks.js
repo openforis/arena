@@ -26,12 +26,18 @@ export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUs
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
 
 // ====== Auth / Records
-export const useAuthCanEditRecord = (record) => {
-  const canEdit = Authorizer.canEditRecord(useUser(), record)
-  const surveyInfo = useSurveyInfo()
+const _canEditRecord = ({ user, surveyInfo, record }) => {
+  const canEdit = Authorizer.canEditRecord(user, record)
   return canEdit && !Record.isInAnalysisStep(record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 }
-export const useAuthCanDeleteRecord = (record) => useAuthCanEditRecord(record) && !Record.isInAnalysisStep(record)
+export const useAuthCanEditRecords = (records) => {
+  const surveyInfo = useSurveyInfo()
+  const user = useUser()
+  return records.length > 0 && records.every((record) => _canEditRecord({ user, surveyInfo, record }))
+}
+export const useAuthCanEditRecord = (record) => useAuthCanEditRecords([record])
+export const useAuthCanDeleteRecords = (records) => useAuthCanEditRecords(records)
+export const useAuthCanDeleteRecord = (record) => useAuthCanDeleteRecords([record])
 export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUser(), useSurveyInfo())
 export const useAuthCanPromoteRecord = (record) =>
   useAuthCanEditRecord(record) && RecordStep.getNextStep(Record.getStep(record))
