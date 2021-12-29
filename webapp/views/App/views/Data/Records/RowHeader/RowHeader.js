@@ -17,6 +17,7 @@ const RowHeader = (props) => {
 
   return (
     <>
+      <div></div>
       <div>#</div>
       {nodeDefKeys.map((nodeDef) => (
         <div key={NodeDef.getUuid(nodeDef)}>

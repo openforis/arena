@@ -26,7 +26,7 @@ const valueFormattersByType = {
 }
 
 const Row = (props) => {
-  const { row: record, rowNo } = props
+  const { row: record, rowNo, selected } = props
   const nodeDefKeys = useNodeDefRootKeys()
 
   const i18n = useI18n()
@@ -36,6 +36,9 @@ const Row = (props) => {
 
   return (
     <>
+      <div>
+        <span className={`icon icon-12px icon-action icon-checkbox-${selected ? 'checked' : 'unchecked'}`} />
+      </div>
       <div>
         <ErrorBadge validation={Validation.getValidation(record)} showLabel={false} className="error-badge-inverse" />
         {rowNo}
