@@ -20,16 +20,22 @@ export const useCancelEdits = ({ setState }) => {
       await setState(State.reset)
 
       await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
-
-      navigate(-1)
     }
 
   return useCallback(
-    async ({ state }) =>
+    async ({ state, onCancel = null }) =>
       new Promise((resolve, reject) => {
         const _cancel = () =>
           cancelEdits({ state })()
-            .then(() => resolve(true))
+            .then(() => {
+              if (onCancel) {
+                onCancel({ state })
+              } else {
+                // go back by default
+                navigate(-1)
+              }
+              resolve(true)
+            })
             .catch(reject)
 
         if (State.isDirty(state)) {

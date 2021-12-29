@@ -58,17 +58,17 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   return validation
 }
 
-const _validateRecordUniquenessAndPersistValidation = async (
-  { survey, record, nodesUnique, excludeRecordFromCount, errorKey },
+export const validateRecordsUniquenessAndPersistValidation = async (
+  { survey, cycle, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
   t
 ) => {
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
     {
       survey,
-      cycle: Record.getCycle(record),
+      cycle,
       nodesUnique,
-      recordUuidExcluded: Record.getUuid(record),
-      excludeRecordFromCount,
+      recordUuidsExcluded,
+      excludeRecordsFromCount,
       errorKey,
     },
     t
@@ -83,12 +83,19 @@ const _validateRecordUniquenessAndPersistValidation = async (
 }
 
 export const validateRecordKeysUniquenessAndPersistValidation = async (
-  { survey, record, excludeRecordFromCount },
+  { survey, record, excludeRecordsFromCount },
   t
 ) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
-  return _validateRecordUniquenessAndPersistValidation(
-    { survey, record, nodesUnique, excludeRecordFromCount, errorKey: Validation.messageKeys.record.keyDuplicate },
+  return validateRecordsUniquenessAndPersistValidation(
+    {
+      survey,
+      cycle: Record.getCycle(record),
+      nodesUnique,
+      recordUuidsExcluded: [Record.getUuid(record)],
+      excludeRecordsFromCount,
+      errorKey: Validation.messageKeys.record.keyDuplicate,
+    },
     t
   )
 }
@@ -99,12 +106,13 @@ export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
 ) => {
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
-  return _validateRecordUniquenessAndPersistValidation(
+  return validateRecordsUniquenessAndPersistValidation(
     {
       survey,
-      record,
+      cycle: Record.getCycle(record),
       nodesUnique,
-      excludeRecordFromCount,
+      recordUuidsExcluded: [Record.getUuid(record)],
+      excludeRecordsFromCount: excludeRecordFromCount,
       errorKey: Validation.messageKeys.record.uniqueAttributeDuplicate,
     },
     t
