@@ -34,6 +34,15 @@
       }
     }
   }
+
+  .button-bar {
+    .btn-next {
+      margin-left: 5rem;
+    }
+    .btn-previous {
+      margin-right: 5rem;
+    }
+  }
 }
 
 .form-item.node-def-edit__title {
