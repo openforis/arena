@@ -99,7 +99,7 @@ const RecordEntryButtons = () => {
             dispatch(
               DialogConfirmActions.showDialogConfirm({
                 key: 'surveyForm.formEntryActions.confirmDelete',
-                onOk: () => dispatch(RecordActions.deleteRecord(navigate)),
+                onOk: () => dispatch(RecordActions.deleteRecord({ navigate })),
               })
             )
           }
