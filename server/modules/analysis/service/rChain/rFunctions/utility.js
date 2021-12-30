@@ -2,7 +2,10 @@ export const NA = 'NA'
 
 export const comment = (text) => `# ${text}`
 
+export const tryCatch = ({ code, errorFnName = 'saveError' }) => `tryCatch(${code},error=${errorFnName})`
+
 export const source = (path) => `source("${path}")`
+export const sourceWithTryCatch = (path) => tryCatch({ code: source(path) })
 
 export const setVar = (name, value) => `${name} <- ${value}`
 
