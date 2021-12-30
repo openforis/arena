@@ -112,9 +112,9 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
           let name = `${NodeDef.getName(entity)}-${nodeDefName}`
           if(NodeDef.isBaseUnit(nodeDef)){
-            name = `base-unit`
+            name = `base-unit-${nodeDefName}`
           }
-          if(NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef)){
+          if(NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef) && !NodeDef.isBaseUnit(nodeDef)){
             name = nodeDefName.replace(`${NodeDef.getName(entity)}_`,`${NodeDef.getName(entity)}-`)
           }
            
