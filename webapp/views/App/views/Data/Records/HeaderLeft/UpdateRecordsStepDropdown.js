@@ -44,7 +44,7 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
 
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.confirmUpdateRecordsStep',
+        key: 'dataView.records.confirmUpdateRecordsStep',
         params: { stepFrom: i18n.t(`surveyForm.step.${stepFrom}`), stepTo: i18n.t(`surveyForm.step.${stepTo}`) },
         onOk: async () => {
           dispatch(LoaderActions.showLoader())
@@ -69,7 +69,7 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
     <Dropdown
       items={keys.map((key) => ({
         key,
-        value: i18n.t(`dataView.${key}`),
+        value: i18n.t(`dataView.records.${key}`),
       }))}
       placeholder={i18n.t(placeholder)}
       onChange={(item) => onMoveAllRecords(item.key)}
