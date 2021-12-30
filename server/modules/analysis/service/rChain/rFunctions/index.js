@@ -6,6 +6,8 @@ export {
   setVar,
   sysTime,
   source,
+  sourceWithTryCatch,
+  tryCatch,
   ifElse,
   isNa,
   withDF,
