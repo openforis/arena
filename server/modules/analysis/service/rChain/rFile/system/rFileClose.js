@@ -1,9 +1,18 @@
 import * as Chain from '@common/analysis/chain'
-import * as ApiRoutes from '../../../../../../../common/apiRoutes'
 
+import * as ApiRoutes from '../../../../../../../common/apiRoutes'
 import RFileSystem from './rFileSystem'
 
-import { arenaEndTime, arenaStartTime, arenaPut, asNumeric, paste, setVar, sysTime, unlinkWd } from '../../rFunctions'
+import {
+  arenaEndTime,
+  arenaStartTime,
+  arenaPut,
+  asNumeric,
+  paste,
+  setVar,
+  sysTime,
+  unlinkWd
+} from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -23,7 +32,13 @@ export default class RFileClose extends RFileSystem {
 
     const execTime = asNumeric(`(${arenaEndTime} - ${arenaStartTime})`, 'secs')
     const logEnd = paste([`'Processing chain successfully executed in'`, execTime, `'seconds'`])
+    const logEndError = paste([`'Processing chain executed with errors in'`, execTime, `'seconds'`])
+
+    await this.appendContent(`if(global_arena_error == TRUE){`)
+    await this.logInfo(logEndError)
+    await this.appendContent(`}else{`)
     await this.logInfo(logEnd)
+    await this.appendContent(`}`)
 
     return this.appendContent(unlinkWd)
   }
