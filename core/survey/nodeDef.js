@@ -272,7 +272,7 @@ export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 
 export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
 
-export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, [])
+export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, null)
 
 export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 
