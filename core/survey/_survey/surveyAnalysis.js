@@ -1,4 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/chain'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
@@ -66,9 +67,7 @@ export const getAnalysisNodeDefs =
       if (
        NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
         !showInactiveResultVariables &&
-        !NodeDef.getActive(
-          _nodeDefs.find((_nodeDef) => NodeDef.getUuid(_nodeDef) === NodeDef.getAreaBasedEstimatedOf(nodeDef))
-        )
+        !NodeDef.getActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
       ) {
         return false
       }

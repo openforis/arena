@@ -116,6 +116,9 @@ export const getNodeDefParent = (nodeDef) => (survey) => {
 export const getNodeDefAreaBasedEstimate = (nodeDef) => (survey) =>
   getNodeDefsArray(survey).find((_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef))
 
+export const getAreaBasedEstimatedOfNodeDef = (nodeDef) => (survey) =>
+  getNodeDefsArray(survey).find((_nodeDef) => NodeDef.getAreaBasedEstimatedOf(nodeDef) === NodeDef.getUuid(_nodeDef))
+
 export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
   const parentDef = getNodeDefParent(nodeDef)(survey)
   return getNodeDefChildByName(parentDef, name)(survey)
