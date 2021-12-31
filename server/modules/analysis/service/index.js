@@ -10,6 +10,7 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
+  cleanChainsOrphans
 } from '../manager'
 
 export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'

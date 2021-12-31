@@ -115,6 +115,23 @@ export const init = (app) => {
 
   // ====== DELETE - Chain
 
+  app.get(
+    '/survey/:surveyId/chains-clean',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        await AnalysisService.cleanChainsOrphans({ user, surveyId })
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   app.delete(
     '/survey/:surveyId/chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
