@@ -8,4 +8,5 @@ export {
   removeChainCycles,
   deleteChain,
   deleteChainWithoutCycle,
+  cleanChainsOrphans
 } from './chain'
