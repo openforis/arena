@@ -27,14 +27,14 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   const aliasA = 'e1'
   const aliasB = 'e2'
 
-  const getColEqualCondition = columnName => `${aliasA}.${columnName} = ${aliasB}.${columnName}`
+  const getColEqualCondition = (columnName) => `${aliasA}.${columnName} = ${aliasB}.${columnName}`
 
-  const getNullableColEqualCondition = columnName =>
+  const getNullableColEqualCondition = (columnName) =>
     `(${aliasA}.${columnName} IS NULL AND ${aliasB}.${columnName} IS NULL OR ${getColEqualCondition(columnName)})`
 
   const equalKeysCondition = R.pipe(
-    R.map(nodeDefKey => getNullableColEqualCondition(NodeDefTable.getColumnName(nodeDefKey))),
-    R.join(' AND '),
+    R.map((nodeDefKey) => getNullableColEqualCondition(NodeDefTable.getColumnName(nodeDefKey))),
+    R.join(' AND ')
   )(nodeDefKeys)
 
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
@@ -65,7 +65,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       )
     GROUP BY r.uuid, r.validation
     `,
-    [cycle],
+    [cycle]
   )
 }
 
@@ -74,7 +74,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
   entityDefUuid,
   recordUuid,
   nodeUuid = null,
-  client = db,
+  client = db
 ) => {
   const surveyId = Survey.getId(survey)
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
@@ -92,6 +92,6 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
       ${DataTable.columnNameRecordUuuid} = $1
       ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.columnNameUuuid} = $2`}`,
     [recordUuid, nodeUuid],
-    row => Object.values(row),
+    (row) => (row ? Object.values(row) : [])
   )
 }
