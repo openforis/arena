@@ -87,6 +87,9 @@ export const validateRecordKeysUniquenessAndPersistValidation = async (
   t
 ) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
+  if (nodesUnique.length === 0) {
+    return null // empty record, consider its uniqueness as valid
+  }
   return validateRecordsUniquenessAndPersistValidation(
     {
       survey,
@@ -106,6 +109,9 @@ export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
 ) => {
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
+  if (nodesUnique.length === 0) {
+    return null // empty record, consider its uniqueness as valid
+  }
   return validateRecordsUniquenessAndPersistValidation(
     {
       survey,
