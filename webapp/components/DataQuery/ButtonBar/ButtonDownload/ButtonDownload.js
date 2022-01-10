@@ -6,12 +6,9 @@ import { Query } from '@common/model/query'
 import * as API from '@webapp/service/api'
 import { ButtonDownload as ButtonDownloadSimple } from '@webapp/components/buttons'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 const ButtonDownload = (props) => {
   const { disabled, query } = props
-
-  const i18n = useI18n()
 
   const entityDefUuid = Query.getEntityDefUuid(query)
 
@@ -23,9 +20,7 @@ const ButtonDownload = (props) => {
     API.downloadDataQueryExport({ surveyId, entityDefUuid, tempFileName })
   }
 
-  return (
-    <ButtonDownloadSimple disabled={disabled} title={i18n.t('common.csvExport')} showLabel={false} onClick={onClick} />
-  )
+  return <ButtonDownloadSimple disabled={disabled} title="common.csvExport" showLabel={false} onClick={onClick} />
 }
 
 ButtonDownload.propTypes = {
