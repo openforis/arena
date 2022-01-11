@@ -1,7 +1,7 @@
 import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import { arenaInfo } from '../rFunctions'
+import { arenaInfo, sourceWithTryCatch, source } from '../rFunctions'
 
 const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 
@@ -44,7 +44,13 @@ export default class RFile {
 
   async init() {
     await FileUtils.appendFile(this.path)
-    await FileUtils.appendFile(this._rChain.fileArena, `source('${this.pathRelative}')${_contentSeparator}`)
+    if (this.path.includes('system/init') || this.path.includes('system/close')) {
+      await FileUtils.appendFile(this._rChain.fileArena, source(this.pathRelative))
+    } else {
+      await FileUtils.appendFile(this._rChain.fileArena, sourceWithTryCatch(this.pathRelative))
+    }
+
+    await FileUtils.appendFile(this._rChain.fileArena, _contentSeparator)
     return this
   }
 }

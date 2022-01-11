@@ -2,6 +2,7 @@ import './AttributeSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 import * as R from 'ramda'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -39,16 +40,22 @@ const AttributeSelector = (props) => {
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
-  const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
+  const active = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
   return (
     isVisible && (
       <button
         type="button"
-        className={`btn btn-s deselectable attribute-selector${isActive ? ' active' : ''}`}
-        onClick={() => onToggleAttribute(nodeDefUuid)}
-        disabled={!canSelectAttributes}
-        title={showNodeDefPath ? Survey.getNodeDefPath({ nodeDef, showLabels: true, labelLang: lang })(survey) : null}
+        className={classNames('btn btn-s deselectable attribute-selector', {
+          active,
+          'not-selectable': !canSelectAttributes,
+        })}
+        onClick={canSelectAttributes ? () => onToggleAttribute(nodeDefUuid) : null}
+        title={
+          showNodeDefPath
+            ? Survey.getNodeDefPath({ nodeDef, showLabels: true, labelLang: lang })(survey)
+            : NodeDef.getDescription(lang)(nodeDef)
+        }
       >
         <span>
           <NodeDefIconKey nodeDef={nodeDef} />
