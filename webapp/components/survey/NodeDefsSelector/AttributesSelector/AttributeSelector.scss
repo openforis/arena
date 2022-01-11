@@ -10,10 +10,8 @@
   border-bottom: 1px dotted $greyBorder;
   text-align: left;
 
-  &[disabled] {
-    opacity: 1;
-    pointer-events: none;
-    display: flex;
+  &.not-selectable {
+    cursor: default !important;
   }
 
   .icon {
