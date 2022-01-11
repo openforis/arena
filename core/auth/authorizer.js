@@ -109,6 +109,8 @@ export const canSeeMap = _hasSurveyPermission(permissions.recordAnalyse)
 export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 
 // READ
+export const canViewSurveyUsers = _hasSurveyPermission(permissions.userInvite)
+
 export const canViewUser = (user, _surveyInfo, userToView) =>
   // system admin
   User.isSystemAdmin(user) ||
