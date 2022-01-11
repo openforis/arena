@@ -191,7 +191,10 @@ export default class Tree {
     nodeGrid
       .append('xhtml:span')
       .attr('class', 'node-label')
+      // label
       .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+      // tooltip
+      .attr('title', (d) => NodeDef.getDescription(this.lang)(d.data))
 
     // node expand/collapse button
     nodeGrid
@@ -303,7 +306,10 @@ export default class Tree {
   _updateLabels() {
     this.svg
       .selectAll('.node-label')
+      // label
       .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+      // tooltip
+      .attr('title', (d) => NodeDef.getDescription(this.lang)(d.data))
   }
 
   get nodeDefLabelType() {

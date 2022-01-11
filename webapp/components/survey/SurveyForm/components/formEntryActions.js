@@ -61,7 +61,8 @@ const RecordEntryButtons = () => {
                 })
               )
             }
-            title={i18n.t('surveyForm.formEntryActions.demoteTo', { stepPrev: getStepLabel(stepPrev) })}
+            title="surveyForm.formEntryActions.demoteTo"
+            titleParams={{ stepPrev: getStepLabel(stepPrev) }}
             iconClassName="icon-reply icon-12px"
           />
         )}
@@ -85,7 +86,8 @@ const RecordEntryButtons = () => {
                 })
               )
             }
-            title={i18n.t('surveyForm.formEntryActions.promoteTo', { stepNext: getStepLabel(stepNext) })}
+            title="surveyForm.formEntryActions.promoteTo"
+            titleParams={{ stepNext: getStepLabel(stepNext) }}
             iconClassName="icon-redo2 icon-12px"
           />
         )}
