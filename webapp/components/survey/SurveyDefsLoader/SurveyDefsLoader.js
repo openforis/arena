@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
+import { useAuthcanUseAnalysis } from '@webapp/store/user'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
@@ -16,10 +17,11 @@ const SurveyDefsLoader = (props) => {
   const surveyInfo = useSurveyInfo()
   const ready = useSurveyDefsFetched(draft)
   const surveyUuid = Survey.getUuid(surveyInfo)
+  const includeAnalysis = useAuthcanUseAnalysis()
 
   useEffect(() => {
     if (surveyUuid && !ready) {
-      dispatch(SurveyActions.initSurveyDefs({ draft, validate }))
+      dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis }))
     }
   }, [surveyUuid, ready])
 
