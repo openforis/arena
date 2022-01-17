@@ -39,47 +39,56 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.external]: module.external,
 })
 
-export const getModulesHierarchy = (user, surveyInfo) => [
-  // home
-  getModule({ module: appModules.home }),
-  // designer
-  getModule({
-    module: appModules.designer,
-    children: [
-      designerModules.formDesigner,
-      designerModules.surveyHierarchy,
-      designerModules.categories,
-      designerModules.taxonomies,
-    ],
-  }),
-  // data
-  getModule({
-    module: appModules.data,
-    children: [
-      dataModules.records,
-      dataModules.explorer,
-      ...(Authorizer.canSeeMap(user, surveyInfo) ? [dataModules.map] : []),
-      ...(User.isSystemAdmin(user) ? [dataModules.charts] : []),
-      ...(Authorizer.canEditSurvey(user, surveyInfo) ? [dataModules.export] : []),
-      ...(Authorizer.canEditSurvey(user, surveyInfo) ? [dataModules.import] : []),
-      ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
-    ],
-    hidden: Survey.isTemplate(surveyInfo),
-  }),
-  // analysis
-  getModule({
-    module: appModules.analysis,
-    children: [
-      analysisModules.chains,
-      analysisModules.instances,
-      // , analysisModules.entities
-    ],
-    hidden: !Authorizer.canAnalyzeRecords(user, surveyInfo),
-  }),
-  // users
-  getModule({ module: appModules.users, children: [userModules.usersSurvey], hidden: Survey.isTemplate(surveyInfo) }),
-  getModule({ module: appModules.help, children: [helpModules.userManual] }),
-]
+export const getModulesHierarchy = (user, surveyInfo) => {
+  const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
+  const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
+
+  return [
+    // home
+    getModule({ module: appModules.home }),
+    // designer
+    getModule({
+      module: appModules.designer,
+      children: [
+        ...(canEditSurvey ? [designerModules.formDesigner] : []),
+        designerModules.surveyHierarchy,
+        ...(canAnalyzeRecords ? [designerModules.categories] : []),
+        ...(canAnalyzeRecords ? [designerModules.taxonomies] : []),
+      ],
+    }),
+    // data
+    getModule({
+      module: appModules.data,
+      children: [
+        dataModules.records,
+        dataModules.explorer,
+        ...(Authorizer.canSeeMap(user, surveyInfo) ? [dataModules.map] : []),
+        ...(User.isSystemAdmin(user) ? [dataModules.charts] : []),
+        ...(canEditSurvey ? [dataModules.export] : []),
+        ...(canEditSurvey ? [dataModules.import] : []),
+        ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
+      ],
+      hidden: Survey.isTemplate(surveyInfo),
+    }),
+    // analysis
+    getModule({
+      module: appModules.analysis,
+      children: [
+        analysisModules.chains,
+        analysisModules.instances,
+        // , analysisModules.entities
+      ],
+      hidden: !canAnalyzeRecords,
+    }),
+    // users
+    getModule({
+      module: appModules.users,
+      children: [userModules.usersSurvey],
+      hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
+    }),
+    getModule({ module: appModules.help, children: [helpModules.userManual] }),
+  ]
+}
 
 export const getKey = R.prop(keys.key)
 export const getUri = R.prop(keys.uri)
