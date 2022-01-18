@@ -26,7 +26,7 @@ export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUs
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
 
 // ====== Auth / Analysis
-export const useAuthcanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(), useSurveyInfo())
+export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(), useSurveyInfo())
 
 // ====== Auth / Records
 const _canEditRecord = ({ user, surveyInfo, record }) => {
