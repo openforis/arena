@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
-import { useAuthcanUseAnalysis } from '@webapp/store/user'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
