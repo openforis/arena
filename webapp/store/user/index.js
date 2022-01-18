@@ -10,7 +10,7 @@ import {
   useAuthCanEditUser,
   useAuthCanInviteUser,
   useAuthCanViewOtherUsersEmail,
-  useAuthcanUseAnalysis,
+  useAuthCanUseAnalysis,
   useUserIsSystemAdmin,
   useProfilePicture,
 } from './hooks'
