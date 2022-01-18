@@ -17,7 +17,7 @@ const SurveyDefsLoader = (props) => {
   const surveyInfo = useSurveyInfo()
   const ready = useSurveyDefsFetched(draft)
   const surveyUuid = Survey.getUuid(surveyInfo)
-  const includeAnalysis = useAuthcanUseAnalysis()
+  const includeAnalysis = useAuthCanUseAnalysis()
 
   useEffect(() => {
     if (surveyUuid && !ready) {
