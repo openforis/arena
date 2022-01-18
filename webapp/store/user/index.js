@@ -27,7 +27,7 @@ export {
   useAuthCanEditUser,
   useAuthCanInviteUser,
   useAuthCanViewOtherUsersEmail,
-  useAuthcanUseAnalysis,
+  useAuthCanUseAnalysis,
   useUserIsSystemAdmin,
   useProfilePicture,
 }
