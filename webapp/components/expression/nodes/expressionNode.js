@@ -10,27 +10,16 @@ import Literal from './literal'
 import Logical from './logical'
 import Member from './member'
 
-const getComponent = (expressionNode) => {
-  const { type } = expressionNode
-  switch (type) {
-    case Expression.types.Identifier:
-      return Identifier
-    case Expression.types.MemberExpression:
-      return Member
-    case Expression.types.Literal:
-      return Literal
-    case Expression.types.CallExpression:
-      return Call
-    case Expression.types.BinaryExpression:
-      const { logical: logicalOperators } = Expression.operators
-      return [logicalOperators.or.value, logicalOperators.and.value].includes(expressionNode.operator)
-        ? Logical
-        : Binary
-    case Expression.types.SequenceExpression:
-      return Sequence
-    default:
-      throw new Error(`Expression type not supported: ${type}`)
-  }
+const componentFns = {
+  [Expression.types.Identifier]: () => Identifier,
+  [Expression.types.MemberExpression]: () => Member,
+  [Expression.types.Literal]: () => Literal,
+  [Expression.types.CallExpression]: () => Call,
+  [Expression.types.BinaryExpression]: (expressionNode) => {
+    const { logical: logicalOperators } = Expression.operators
+    return [logicalOperators.or.value, logicalOperators.and.value].includes(expressionNode.operator) ? Logical : Binary
+  },
+  [Expression.types.SequenceExpression]: () => Sequence,
 }
 
 const ExpressionNode = (props) => {
@@ -47,7 +36,8 @@ const ExpressionNode = (props) => {
     variables,
   } = props
 
-  const component = getComponent(node)
+  const componentFn = componentFns[node.type]
+  const component = componentFn(node)
 
   return React.createElement(component, {
     canDelete,
