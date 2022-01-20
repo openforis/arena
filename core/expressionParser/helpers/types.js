@@ -8,6 +8,4 @@ export const types = {
   UnaryExpression: 'UnaryExpression',
   BinaryExpression: 'BinaryExpression',
   SequenceExpression: 'SequenceExpression',
-  // 'ConditionalExpression'
-  // 'ArrayExpression'
 }
