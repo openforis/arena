@@ -61,7 +61,7 @@ export const isLiteral = isType(types.Literal)
 export const isCompound = isType(types.Compound)
 export const isBinary = isType(types.BinaryExpression)
 export const isIdentifier = isType(types.Identifier)
-export const isLogical = isType(types.LogicalExpression)
+export const isSequence = isType(types.SequenceExpression)
 
 // ====== Instance creators
 
@@ -76,7 +76,7 @@ export const newIdentifier = (value = '') => ({
   name: value,
 })
 
-export const newBinary = ({ left, right, operator = '' }) => ({
+export const newBinary = ({ left, right, operator = '' }) => ({
   type: types.BinaryExpression,
   operator,
   left,

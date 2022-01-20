@@ -7,9 +7,7 @@ export const types = {
   CallExpression: 'CallExpression',
   UnaryExpression: 'UnaryExpression',
   BinaryExpression: 'BinaryExpression',
-  LogicalExpression: 'LogicalExpression',
+  SequenceExpression: 'SequenceExpression',
   // 'ConditionalExpression'
   // 'ArrayExpression'
-  // custom - not managed by jsep
-  GroupExpression: 'GroupExpression',
 }

@@ -8,10 +8,10 @@ export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)
   const isCompound = Expression.isCompound(exprQuery)
   const isBinary = Expression.isBinary(exprQuery)
-  const isLogical = Expression.isLogical(exprQuery)
+  const isSequence = Expression.isSequence(exprQuery)
 
   const expr =
-    isBinary || isLogical
+    isBinary || isSequence
       ? exprQuery
       : Expression.newBinary({
           left:

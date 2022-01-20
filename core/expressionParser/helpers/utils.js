@@ -39,13 +39,9 @@ const typeProps = {
     toString: binaryToString,
     isValid: binaryValid,
   },
-  [types.LogicalExpression]: {
-    toString: binaryToString,
-    isValid: binaryValid,
-  },
-  [types.GroupExpression]: {
-    toString: (node) => `(${toString(node.argument)})`,
-    isValid: (node) => isValid(node.argument),
+  [types.SequenceExpression]: {
+    toString: (node) => `(${toString(node.expression)})`,
+    isValid: (node) => isValid(node.expression),
   },
 }
 

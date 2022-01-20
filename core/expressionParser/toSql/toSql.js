@@ -47,8 +47,9 @@ export const binary = (node, params) => {
   }
 }
 
-export const group = (node, params) => {
-  const { clause, params: paramsGroup } = _toSql(node.argument, params)
+export const sequence = (node, params) => {
+  const { expression } = node
+  const { clause, params: paramsGroup } = _toSql(expression, params)
   return {
     clause: `(${clause})`,
     params: paramsGroup,
@@ -145,8 +146,7 @@ const functionsByType = {
   [types.Literal]: literal,
   [types.UnaryExpression]: unary,
   [types.BinaryExpression]: binary,
-  [types.LogicalExpression]: binary,
-  [types.GroupExpression]: group,
+  [types.SequenceExpression]: sequence,
   [types.CallExpression]: call,
 }
 
