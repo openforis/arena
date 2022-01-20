@@ -9,7 +9,7 @@ import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as NodeDefService from '../service/nodeDefService'
 
-const sendRespNodeDefsAndValidation = async (
+const sendRespNodeDefsAndValidation = async ({
   res,
   surveyId,
   cycle,
@@ -17,9 +17,17 @@ const sendRespNodeDefsAndValidation = async (
   draft = true,
   advanced = true,
   validate = true,
-  nodeDefsUpdated = null
-) => {
-  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate })
+  nodeDefsUpdated = null,
+  includeAnalysis = true,
+}) => {
+  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced,
+    validate,
+    includeAnalysis,
+  })
 
   res.json({
     nodeDefs: sendNodeDefs ? Survey.getNodeDefs(survey) : null,
@@ -71,11 +79,20 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, draft, validate } = Request.getParams(req)
+      const { surveyId, cycle, draft, validate, includeAnalysis } = Request.getParams(req)
       const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
       const sendNodeDefs = true
 
-      await sendRespNodeDefsAndValidation(res, surveyId, cycle, sendNodeDefs, draft, advanced, validate)
+      await sendRespNodeDefsAndValidation({
+        res,
+        surveyId,
+        cycle,
+        sendNodeDefs,
+        draft,
+        advanced,
+        validate,
+        includeAnalysis,
+      })
     } catch (error) {
       next(error)
     }
@@ -164,7 +181,6 @@ export const init = (app) => {
       nodeDefUuids.forEach((nodeDefUuid) => {
         delete nodeDefsUpdated[nodeDefUuid]
       })
-      
       res.json({ nodeDefsUpdated, nodeDefsValidation })
     } catch (error) {
       next(error)

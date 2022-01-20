@@ -6,7 +6,7 @@ import * as SurveyStatusState from '../status/state'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
 
 export const initSurveyDefs =
-  ({ draft = false, validate = false }) =>
+  ({ draft = false, validate = false, includeAnalysis = true }) =>
   async (dispatch, getState) => {
     const state = getState()
 
@@ -14,7 +14,7 @@ export const initSurveyDefs =
       dispatch(LoaderActions.showLoader())
 
       const surveyId = SurveyState.getSurveyId(state)
-      const params = { draft, validate, cycle: SurveyState.getSurveyCycleKey(state) }
+      const params = { draft, validate, cycle: SurveyState.getSurveyCycleKey(state), includeAnalysis }
 
       const { nodeDefs, nodeDefsValidation } = await API.fetchNodeDefs({ surveyId, params })
 
