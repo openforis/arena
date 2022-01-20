@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import Binary from './binary'
