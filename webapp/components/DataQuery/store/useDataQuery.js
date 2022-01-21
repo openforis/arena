@@ -11,11 +11,12 @@ const defaults = {
   [Query.displayTypes.table]: { limit: 15, offset: 0 },
 }
 
-export const useDataQuery = ({ query }) => {
+export const useDataQuery = ({ query, limitData = true }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
+  const initialLimit = limitData ? defaultValues.limit : null
   const [data, setData] = useState(null)
   const [count, setCount] = useState(null)
-  const [limit, setLimit] = useState(defaultValues.limit)
+  const [limit, setLimit] = useState(initialLimit)
   const [offset, setOffset] = useState(defaultValues.offset)
 
   const hasSelection = Query.hasSelection(query)
