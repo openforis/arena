@@ -168,8 +168,6 @@ Do you want to proceed?`,
   },
 
   sidebar: {
-    openForisShort: 'OF',
-    openForis: 'Open Foris',
     logout: 'Logout',
   },
 
@@ -229,6 +227,8 @@ Do you want to proceed?`,
     instances: 'Instances',
 
     help: 'help',
+    about: 'About',
+    disclaimer: 'Disclaimer',
     userManual: 'User Manual',
   },
 
@@ -272,7 +272,7 @@ Do you want to proceed?`,
 We are also interested in what you want to do with it so please let us know!
 **A new blank survey** will be created, so please provide a name for it.
 You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it. You can also create new surveys (up to 5) if needed.
-For more information please visit our website: *http://www.openforis.org/tools/arena/*
+For more information please visit our website: *https://www.openforis.org/tools/arena/*
 **Once you send the request, please wait for an invitation email to access Arena.**
 \\* = required field`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
@@ -711,6 +711,22 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
+  },
+
+  // ====== Help views
+  helpView: {
+    about: {
+      text: `
+About
+========
+
+$t(common.appNameFull)
+--------
+ 
+ * Developed by: [Open Foris](https://www.openforis.org/)
+ * Version: {{version}}
+`,
+    },
   },
 
   // ====== Survey views

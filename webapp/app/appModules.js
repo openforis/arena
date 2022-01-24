@@ -8,15 +8,15 @@ export const guestModules = {
   },
   resetPassword: {
     key: 'resetPassword',
-    path: `resetPassword/:uuid/`,
+    path: 'resetPassword/:uuid/',
   },
   forgotPassword: {
     key: 'forgotPassword',
-    path: `forgotPassword`,
+    path: 'forgotPassword',
   },
   accessRequest: {
     key: 'accessRequest',
-    path: `accessRequest`,
+    path: 'accessRequest',
   },
 }
 
@@ -61,160 +61,169 @@ export const appModules = {
 export const homeModules = {
   dashboard: {
     key: 'dashboard',
-    path: `dashboard`,
+    path: 'dashboard',
   },
   surveyInfo: {
     key: 'surveyInfo',
-    path: `surveyInfo`,
+    path: 'surveyInfo',
   },
   surveyList: {
     key: 'surveys',
-    path: `surveys`,
+    path: 'surveys',
   },
   surveyTemplateList: {
     key: 'surveyTemplateList',
-    path: `surveyTemplates`,
+    path: 'surveyTemplates',
   },
   surveyNew: {
     key: 'surveyNew',
-    path: `surveyNew`,
+    path: 'surveyNew',
   },
   templateList: {
     key: 'templates',
-    path: `templates`,
+    path: 'templates',
   },
   templateNew: {
     key: 'templateNew',
-    path: `templateNew`,
+    path: 'templateNew',
   },
   collectImportReport: {
     key: 'collectImportReport',
-    path: `collectImportReport`,
+    path: 'collectImportReport',
   },
 }
 
 export const designerModules = {
   formDesigner: {
     key: 'formDesigner',
-    path: `formDesigner`,
+    path: 'formDesigner',
   },
   nodeDef: {
     key: 'nodeDef',
-    path: `nodeDef`,
+    path: 'nodeDef',
   },
 
   surveyHierarchy: {
     key: 'surveyHierarchy',
-    path: `surveyHierarchy`,
+    path: 'surveyHierarchy',
   },
   categories: {
     key: 'categories',
-    path: `categories`,
+    path: 'categories',
   },
   category: {
     key: 'category',
-    path: `category`,
+    path: 'category',
   },
   taxonomies: {
     key: 'taxonomies',
-    path: `taxonomies`,
+    path: 'taxonomies',
   },
   taxonomy: {
     key: 'taxonomy',
-    path: `taxonomy`,
+    path: 'taxonomy',
   },
 }
 
 export const dataModules = {
   record: {
     key: 'record',
-    path: `record`,
+    path: 'record',
   },
   recordValidationReport: {
     key: 'recordValidationReport',
-    path: `recordValidationReport`,
+    path: 'recordValidationReport',
   },
   records: {
     key: 'records',
-    path: `records`,
+    path: 'records',
   },
   explorer: {
     key: 'explorer',
-    path: `explorer`,
+    path: 'explorer',
   },
   map: {
     key: 'map',
-    path: `map`,
+    path: 'map',
   },
   charts: {
     key: 'charts',
-    path: `charts`,
+    path: 'charts',
   },
   export: {
     key: 'export',
-    path: `export`,
+    path: 'export',
   },
   import: {
     key: 'import',
-    path: `import`,
+    path: 'import',
   },
   validationReport: {
     key: 'validationReport',
-    path: `validationReport`,
+    path: 'validationReport',
   },
 }
 
 export const userModules = {
   users: {
     key: 'users',
-    path: `users`,
+    path: 'users',
   },
   usersSurvey: {
     key: 'usersSurvey',
-    path: `usersSurvey`,
+    path: 'usersSurvey',
   },
   user: {
     key: 'user',
-    path: `user`,
+    path: 'user',
   },
   userInvite: {
     key: 'userInvite',
-    path: `userInvite`,
+    path: 'userInvite',
   },
   usersAccessRequest: {
     key: 'usersAccessRequest',
-    path: `usersAccessRequest`,
+    path: 'usersAccessRequest',
   },
 }
 
 export const analysisModules = {
   chains: {
     key: 'chain_plural',
-    path: `chains`,
+    path: 'chains',
   },
   chain: {
     key: 'chain',
-    path: `chain`,
+    path: 'chain',
   },
   entities: {
     key: 'entities',
-    path: `entities`,
+    path: 'entities',
   },
   nodeDef: {
     key: 'nodeDef',
-    path: `nodeDef`,
+    path: 'nodeDef',
   },
   category: {
     key: 'category',
-    path: `category`,
+    path: 'category',
   },
   instances: {
     key: 'instances',
-    path: `instances`,
+    path: 'instances',
   },
 }
 
 export const helpModules = {
+  about: {
+    key: 'about',
+    path: 'about',
+  },
+  disclaimer: {
+    key: 'disclaimer',
+    uri: 'https://openforis.org/legal-disclaimer/',
+    external: true,
+  },
   userManual: {
     key: 'userManual',
     uri: 'https://docs.google.com/document/d/1GWerrExvbdT5oOOlwdkE9pptK4pVbQxwtgaSNPasmKA/view',
@@ -233,6 +242,8 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
+  if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
+
   throw new Error(`Parent path not found for module ${module?.path}`)
 }
 
