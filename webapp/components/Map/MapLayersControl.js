@@ -1,19 +1,18 @@
 import React from 'react'
-import { LayersControl } from 'react-leaflet'
+import { LayersControl, TileLayer } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { ESRILayer } from './BaseLayers'
+import { baseLayers } from './baseLayers'
 
 export const MapLayersControl = (props) => {
   const { layers } = props
   return (
     <LayersControl position="topright">
-      <LayersControl.BaseLayer checked name="ESRI">
-        <ESRILayer />
-      </LayersControl.BaseLayer>
-      {/* <LayersControl.BaseLayer name="OpenStreetMap">
-        <OpenStreetMapLayer />
-      </LayersControl.BaseLayer> */}
+      {baseLayers.map(({ key, name, attribution, url }, index) => (
+        <LayersControl.BaseLayer key={key} name={name} checked={index === 0}>
+          <TileLayer attribution={attribution} url={url} />
+        </LayersControl.BaseLayer>
+      ))}
       {layers}
     </LayersControl>
   )
