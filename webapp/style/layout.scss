@@ -1,4 +1,4 @@
-@import "./layoutMixins";
+@import './layoutMixins';
 
 // layout
 .full-screen-fixed {
@@ -35,17 +35,22 @@
   justify-content: center;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: 600;
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 h2 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
 }
 
 h3 {
@@ -77,21 +82,21 @@ p {
 }
 
 .p-05 {
-  padding: .5rem;
+  padding: 0.5rem;
 }
 
 .p-t-05 {
-  padding-top: .5rem;
+  padding-top: 0.5rem;
 }
 
 .p-r-05 {
-  padding-right: .5rem;
+  padding-right: 0.5rem;
 }
 
 .p-b-05 {
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
 }
 
 .p-l-05 {
-  padding-left: .5rem;
+  padding-left: 0.5rem;
 }

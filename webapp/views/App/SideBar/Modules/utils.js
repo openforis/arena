@@ -86,7 +86,10 @@ export const getModulesHierarchy = (user, surveyInfo) => {
       children: [userModules.usersSurvey],
       hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
     }),
-    getModule({ module: appModules.help, children: [helpModules.userManual] }),
+    getModule({
+      module: appModules.help,
+      children: [helpModules.about, helpModules.disclaimer, helpModules.userManual],
+    }),
   ]
 }
 
