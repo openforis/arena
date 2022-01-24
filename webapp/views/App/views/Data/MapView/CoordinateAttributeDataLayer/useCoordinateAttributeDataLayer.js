@@ -54,7 +54,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
   const {
     data: dataFetched,
     //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
-  } = useDataQuery({ query })
+  } = useDataQuery({ query, limitData: false })
 
   // when data has been loaded, convert fetched items to GEOJson points
   useEffect(() => {
