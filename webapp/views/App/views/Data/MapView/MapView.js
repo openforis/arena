@@ -81,6 +81,7 @@ const MapWrapper = () => {
               markersColor={layerColors[samplingPointDataLevels.length + index]}
               onRecordEditClick={onRecordEditClick}
               editingRecordUuid={editingRecordUuid}
+              showMarkerKeys
             />
           )),
         ]}

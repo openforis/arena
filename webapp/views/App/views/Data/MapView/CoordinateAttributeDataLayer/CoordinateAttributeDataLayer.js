@@ -1,11 +1,9 @@
 import React from 'react'
-import { CircleMarker, LayerGroup, LayersControl, Tooltip } from 'react-leaflet'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { ClusterMarker } from '../common'
-import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
+import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
-
-const markerRadius = 10
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, showMarkerKeys, onRecordEditClick } = props
@@ -37,28 +35,19 @@ export const CoordinateAttributeDataLayer = (props) => {
 
           // we have a single point (node value) to render
           return (
-            <CircleMarker
+            <CoordinateAttributeMarker
               key={key}
-              center={[latitude, longitude]}
-              radius={markerRadius}
-              color={markersColor}
-              fillColor={markersColor}
-              fillOpacity={0.5}
-            >
-              {showMarkerKeys && (
-                <Tooltip direction="top" offset={[0, -10]} opacity={0.7} permanent>
-                  {ancestorsKeys.join(' - ')}
-                </Tooltip>
-              )}
-              <CoordinateAttributePopUp
-                attributeDef={attributeDef}
-                point={point}
-                recordUuid={recordUuid}
-                parentUuid={parentUuid}
-                ancestorsKeys={ancestorsKeys}
-                onRecordEditClick={onRecordEditClick}
-              />
-            </CircleMarker>
+              ancestorsKeys={ancestorsKeys}
+              attributeDef={attributeDef}
+              latitude={latitude}
+              longitude={longitude}
+              markersColor={markersColor}
+              parentUuid={parentUuid}
+              point={point}
+              onRecordEditClick={onRecordEditClick}
+              recordUuid={recordUuid}
+              showMarkerKeys={showMarkerKeys}
+            />
           )
         })}
       </LayerGroup>
