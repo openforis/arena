@@ -134,13 +134,14 @@ export const {
   isNodeDefRootKey,
   findNodeDef,
   getNodeDefAreaBasedEstimate,
-  getAreaBasedEstimatedOfNodeDef
+  getAreaBasedEstimatedOfNodeDef,
 } = SurveyNodeDefs
 
 // Hierarchy
 export const {
   isNodeDefAncestor,
   visitAncestorsAndSelf,
+  visitAncestors,
   getNodeDefPath,
   getHierarchy,
   traverseHierarchyItem,
@@ -151,6 +152,7 @@ export const {
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,
+  getNodeDefAncestorsKeyAttributes,
 } = SurveyNodeDefs
 
 // ====== READ dependencies

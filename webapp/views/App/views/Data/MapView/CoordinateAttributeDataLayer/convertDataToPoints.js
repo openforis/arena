@@ -4,10 +4,13 @@ import { Points } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 
-export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey }) => {
+export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey }) => {
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
+  const ancestorsKeysColumns = ancestorsKeyAttributes.map(
+    (ancestorKeyAttribute) => new ColumnNodeDef(dataTable, ancestorKeyAttribute)
+  )
 
   return data.reduce(
     (acc, item, index) => {
@@ -34,10 +37,11 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey 
       const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
       const parentUuid = item[parentEntityColumn.name]
       const key = `${recordUuid}-${parentUuid}`
+      const ancestorsKeys = ancestorsKeysColumns.map((column) => item[column.name])
 
       acc.points.push({
         type: 'Feature',
-        properties: { key, cluster: false, point, recordUuid, parentUuid, location },
+        properties: { key, cluster: false, point, recordUuid, parentUuid, location, ancestorsKeys },
         geometry: {
           type: 'Point',
           coordinates: [long, lat],

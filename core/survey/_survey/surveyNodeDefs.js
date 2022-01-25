@@ -190,6 +190,12 @@ export const visitAncestorsAndSelf = (nodeDef, visitorFn) => (survey) => {
   } while (nodeDefCurrent)
 }
 
+export const visitAncestors = (nodeDef, visitorFn) => (survey) =>
+  visitAncestorsAndSelf(nodeDef, (currentDef) => {
+    if (NodeDef.getUuid(currentDef) === NodeDef.getUuid(nodeDef)) return
+    visitorFn(currentDef)
+  })(survey)
+
 export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => (survey) => {
   if (NodeDef.isRoot(nodeDefDescendant)) {
     return false
@@ -207,6 +213,15 @@ export const getNodeDefAncestorMultipleEntity = (nodeDef) => (survey) => {
     nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
   } while (nodeDefCurrent && !NodeDef.isRoot(nodeDefCurrent) && !NodeDef.isMultipleEntity(nodeDefCurrent))
   return nodeDefCurrent
+}
+
+export const getNodeDefAncestorsKeyAttributes = (nodeDef) => (survey) => {
+  let ancestorsKeyAttributes = []
+  visitAncestors(nodeDef, (ancestorDef) => {
+    const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
+    ancestorsKeyAttributes = [...ancestorKeyAttributes, ...ancestorsKeyAttributes]
+  })(survey)
+  return ancestorsKeyAttributes
 }
 
 export const getNodeDefPath =
