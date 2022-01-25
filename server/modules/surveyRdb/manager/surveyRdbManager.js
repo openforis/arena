@@ -66,7 +66,16 @@ const _getExportFields = ({ survey, query, addCycle = false }) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
-  const { survey, cycle, query, columnNodeDefs = false, offset = 0, limit = null, streamOutput = null, addCycle = false } = params
+  const {
+    survey,
+    cycle,
+    query,
+    columnNodeDefs = false,
+    offset = 0,
+    limit = null,
+    streamOutput = null,
+    addCycle = false,
+  } = params
 
   // Fetch data
   const result = await DataViewRepository.fetchViewData({
@@ -151,7 +160,7 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, client)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, client)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)
@@ -185,7 +194,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query, addCycle: true})
+    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query, addCycle: true })
   })
 
   return { exportDataFolderName, dir }
