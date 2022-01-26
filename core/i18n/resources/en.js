@@ -940,6 +940,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
+      reportingData: 'Reporting Data',
     },
   },
 
