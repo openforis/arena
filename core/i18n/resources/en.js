@@ -504,6 +504,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     editRecord: 'Edit record',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
+    options: {
+      showMarkersLabels: `Show markers' labels`,
+    },
     samplingPointDataLayerName: 'Sampling point data - level {{levelIndex}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {

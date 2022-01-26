@@ -31,10 +31,16 @@ export const useCoordinateAttributeDataLayer = (props) => {
   const map = useMap()
 
   const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
+  const ancestorsKeyAttributes = Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey)
 
   const { query, points, editedRecordQuery } = state
 
-  const layerInnerName = NodeDef.getLabel(attributeDef, lang)
+  const layerInnerName = Survey.getNodeDefPath({
+    nodeDef: attributeDef,
+    showLabels: true,
+    labelLang: lang,
+    includeRootEntity: false,
+  })(survey)
 
   // add icon close to layer name
   const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
@@ -45,7 +51,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
     callback: () => {
       const query = Query.create({
         entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [NodeDef.getUuid(attributeDef)],
+        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), NodeDef.getUuid(attributeDef)],
       })
       setState((statePrev) => ({ ...statePrev, query }))
     },
@@ -64,7 +70,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
       points: _points,
       pointIndexByDataIndex: _pointIndexByDataIndex,
       bounds,
-    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey })
+    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey })
 
     setState((statePrev) => ({
       ...statePrev,

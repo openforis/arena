@@ -23,14 +23,17 @@
 
     .leaflet-pane {
       z-index: unset;
-    }
 
-    .leaflet-marker-pane {
-      z-index: 400;
-    }
+      &.leaflet-tooltip-pane {
+        z-index: 1;
+      }
+      &.leaflet-marker-pane {
+        z-index: 400;
+      }
 
-    .leaflet-popup-pane {
-      z-index: 600;
+      &.leaflet-popup-pane {
+        z-index: 600;
+      }
     }
 
     .leaflet-top.leaflet-right,
