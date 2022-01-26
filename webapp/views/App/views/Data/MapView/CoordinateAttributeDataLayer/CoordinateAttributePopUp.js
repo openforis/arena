@@ -1,55 +1,51 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Popup } from 'react-leaflet'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as API from '@webapp/service/api'
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 
+/**
+ * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
+ * e.g. Cluster [123] -> Plot [4]
+ */
+const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
+  const pathParts = []
+
+  const keyDefs = Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey)
+
+  Survey.visitAncestorsAndSelf(attributeDef, (nodeDef) => {
+    const label = NodeDef.getLabel(nodeDef, lang)
+    let pathPart = `${label}`
+    if (!NodeDef.isEqual(attributeDef)(nodeDef)) {
+      const ancestorKeys = ancestorsKeys.filter((_ancestorKey, index) => {
+        const ancestorKeyDef = keyDefs[index]
+        return NodeDef.getParentUuid(ancestorKeyDef) === NodeDef.getUuid(nodeDef)
+      })
+      if (ancestorKeys.length > 0) {
+        pathPart += `[${ancestorKeys.join(',')}]`
+      }
+    }
+    pathParts.unshift(pathPart)
+  })(survey)
+
+  return pathParts.join(' -> ')
+}
+
 const PopupContent = (props) => {
-  const { attributeDef, recordUuid, parentUuid, point, onRecordEditClick } = props
+  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const cycle = useSurveyCycleKey()
 
-  const [record, setRecord] = useState(null)
+  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
 
-  useEffect(() => {
-    if (!record) {
-      const loadRecord = async () => {
-        const recordLoaded = await API.fetchRecordSummary({ surveyId: Survey.getId(survey), cycle, recordUuid })
-        setRecord(recordLoaded)
-      }
-      loadRecord()
-    }
-  }, [record, setRecord])
-
-  const keyDefs = Survey.getNodeDefRootKeys(survey)
-
-  const pathParts = []
-  Survey.visitAncestorsAndSelf(attributeDef, (nodeDef) => {
-    pathParts.unshift(NodeDef.getLabel(nodeDef, lang))
-  })(survey)
-
-  // add record keys to first part of the path
-  if (record) {
-    pathParts[0] = `${pathParts[0]} [${keyDefs
-      .map((keyDef) => {
-        const recordKeyProp = A.camelize(NodeDef.getName(keyDef))
-        return record[recordKeyProp]
-      })
-      .join(',')}]`
-  }
-
-  const path = pathParts.join(' -> ')
   const content = `**${path}**
 * **x**: ${point.x}
 * **y**: ${point.y}
@@ -64,7 +60,7 @@ const PopupContent = (props) => {
 }
 
 export const CoordinateAttributePopUp = (props) => {
-  const { attributeDef, recordUuid, parentUuid, point, onRecordEditClick } = props
+  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
 
   return (
     <Popup>
@@ -72,6 +68,7 @@ export const CoordinateAttributePopUp = (props) => {
         attributeDef={attributeDef}
         recordUuid={recordUuid}
         parentUuid={parentUuid}
+        ancestorsKeys={ancestorsKeys}
         point={point}
         onRecordEditClick={onRecordEditClick}
       />

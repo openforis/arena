@@ -1,11 +1,9 @@
 import React from 'react'
-import { CircleMarker, LayerGroup, LayersControl } from 'react-leaflet'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { ClusterMarker } from '../common'
-import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
+import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
-
-const markerRadius = 10
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
@@ -18,7 +16,7 @@ export const CoordinateAttributeDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a node value point
-          const { cluster: isCluster, key, recordUuid, parentUuid, point } = cluster.properties
+          const { cluster: isCluster, key, recordUuid, parentUuid, point, ancestorsKeys } = cluster.properties
 
           // we have a cluster to render
           if (isCluster) {
@@ -37,22 +35,18 @@ export const CoordinateAttributeDataLayer = (props) => {
 
           // we have a single point (node value) to render
           return (
-            <CircleMarker
+            <CoordinateAttributeMarker
               key={key}
-              center={[latitude, longitude]}
-              radius={markerRadius}
-              color={markersColor}
-              fillColor={markersColor}
-              fillOpacity={0.5}
-            >
-              <CoordinateAttributePopUp
-                attributeDef={attributeDef}
-                point={point}
-                recordUuid={recordUuid}
-                parentUuid={parentUuid}
-                onRecordEditClick={onRecordEditClick}
-              />
-            </CircleMarker>
+              ancestorsKeys={ancestorsKeys}
+              attributeDef={attributeDef}
+              latitude={latitude}
+              longitude={longitude}
+              markersColor={markersColor}
+              parentUuid={parentUuid}
+              point={point}
+              onRecordEditClick={onRecordEditClick}
+              recordUuid={recordUuid}
+            />
           )
         })}
       </LayerGroup>
