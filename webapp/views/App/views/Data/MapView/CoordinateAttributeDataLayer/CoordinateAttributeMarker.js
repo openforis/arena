@@ -13,7 +13,6 @@ export const CoordinateAttributeMarker = (props) => {
   const {
     ancestorsKeys,
     attributeDef,
-    key,
     latitude,
     longitude,
     markersColor,
@@ -39,7 +38,6 @@ export const CoordinateAttributeMarker = (props) => {
 
   return (
     <CircleMarker
-      key={key}
       center={[latitude, longitude]}
       radius={markerRadius}
       color={markersColor}

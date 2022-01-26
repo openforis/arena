@@ -225,11 +225,12 @@ export const getNodeDefAncestorsKeyAttributes = (nodeDef) => (survey) => {
 }
 
 export const getNodeDefPath =
-  ({ nodeDef, showLabels = false, labelLang = null }) =>
+  ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true }) =>
   (survey) => {
     const pathParts = []
 
     visitAncestorsAndSelf(nodeDef, (currentNodeDef) => {
+      if (!includeRootEntity && NodeDef.isRoot(currentNodeDef)) return
       const pathPart = showLabels ? NodeDef.getLabel(currentNodeDef, labelLang) : NodeDef.getName(currentNodeDef)
       pathParts.unshift(pathPart)
     })(survey)

@@ -3,6 +3,8 @@ import L from 'leaflet'
 import { useMap } from 'react-leaflet'
 import useSupercluster from 'use-supercluster'
 
+import { Colors } from '@webapp/utils/colors'
+
 const clusterRadius = 150
 const clusterMaxZoom = 17
 const initialZoom = 12
@@ -19,8 +21,10 @@ export const useMapClusters = (props) => {
   const _clusterIconsCache = {}
   const clusterIconCreator = ({ count, size, color }) => {
     if (!_clusterIconsCache[count]) {
+      const textColor = Colors.getHighContrastTextColor(color)
+
       _clusterIconsCache[count] = L.divIcon({
-        html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px; background: ${color};">
+        html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px; background-color: ${color}; color: ${textColor}">
         ${count}
       </div>`,
       })

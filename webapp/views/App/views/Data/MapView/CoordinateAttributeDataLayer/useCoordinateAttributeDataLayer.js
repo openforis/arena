@@ -35,7 +35,12 @@ export const useCoordinateAttributeDataLayer = (props) => {
 
   const { query, points, editedRecordQuery } = state
 
-  const layerInnerName = NodeDef.getLabel(attributeDef, lang)
+  const layerInnerName = Survey.getNodeDefPath({
+    nodeDef: attributeDef,
+    showLabels: true,
+    labelLang: lang,
+    includeRootEntity: false,
+  })(survey)
 
   // add icon close to layer name
   const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`

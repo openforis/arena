@@ -1,10 +1,13 @@
 .map-options {
+  bottom: 10px;
+
   .popup {
     width: 15rem;
+    padding: 1rem;
     background-color: white;
 
     .form-item {
-        display: flex;
+      display: flex;
     }
   }
 }
