@@ -27,6 +27,7 @@ export const type = {
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',
   categoryImport: 'categoryImport',
+  categoryConvertToReportingData: 'categoryConvertToReportingData',
 
   // Taxonomy
   taxonomyCreate: 'taxonomyCreate',

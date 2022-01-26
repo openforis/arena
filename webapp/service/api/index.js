@@ -9,6 +9,7 @@ export {
   fetchSamplingPointData,
   deleteCategory,
   cleanupCategory,
+  convertToReportingDataCategory,
   startExportAllCategoriesJob,
 } from './categories'
 export { fetchChains } from './analysis'

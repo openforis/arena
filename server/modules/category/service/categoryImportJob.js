@@ -110,9 +110,9 @@ export default class CategoryImportJob extends Job {
 
     return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
       if (CategoryImportSummary.isColumnExtra(column)) {
-        accExtraDef[columnName] = {
-          [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.getColumnDataType(column),
-        }
+        accExtraDef[columnName] = Category.newItemExtraDefItem({
+          dataType: CategoryImportSummary.getColumnDataType(column),
+        })
       }
 
       return accExtraDef

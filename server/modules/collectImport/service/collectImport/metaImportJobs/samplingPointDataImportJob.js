@@ -81,9 +81,10 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   extractItemExtraDef() {
     return R.pipe(
       R.omit(R.keys(keysExtra)),
-      R.assoc(keysItem.location, {
-        [CategoryItem.keysExtraDef.dataType]: Category.itemExtraDefDataTypes.geometryPoint,
-      })
+      R.assoc(
+        keysItem.location,
+        Category.newItemExtraDefItem({ dataType: Category.itemExtraDefDataTypes.geometryPoint })
+      )
     )(super.extractItemExtraDef())
   }
 
