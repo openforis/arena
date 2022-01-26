@@ -6,6 +6,7 @@ import { baseLayers } from './baseLayers'
 
 export const MapLayersControl = (props) => {
   const { layers } = props
+
   return (
     <LayersControl position="topright">
       {baseLayers.map(({ key, name, attribution, url }, index) => (

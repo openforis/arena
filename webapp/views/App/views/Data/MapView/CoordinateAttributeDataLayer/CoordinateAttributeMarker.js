@@ -3,6 +3,7 @@ import { CircleMarker, Tooltip } from 'react-leaflet'
 
 import { Colors } from '@webapp/utils/colors'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
+import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -20,7 +21,6 @@ export const CoordinateAttributeMarker = (props) => {
     parentUuid,
     point,
     recordUuid,
-    showMarkerKeys,
   } = props
 
   const tooltipRef = useRef()
@@ -34,6 +34,9 @@ export const CoordinateAttributeMarker = (props) => {
     Object.assign(tooltipRef.current._container.style, customStyle)
   }, [tooltipRef])
 
+  const options = useMapContextOptions()
+  const { showMarkersLabels } = options
+
   return (
     <CircleMarker
       key={key}
@@ -43,7 +46,7 @@ export const CoordinateAttributeMarker = (props) => {
       fillColor={markersColor}
       fillOpacity={fillOpacity}
     >
-      {showMarkerKeys && (
+      {showMarkersLabels && (
         <Tooltip
           ref={tooltipRef}
           direction="top"

@@ -12,10 +12,13 @@ import i18n from '@core/i18n/i18nFactory'
 
 import { MapLayersControl } from './MapLayersControl'
 import { MapMarker } from './MapMarker'
+import { MapOptions } from './MapOptions'
+import { MapContextProvider } from './MapContext'
 import { useMap } from './useMap'
 
 // start of workaround to show leaflet marker icon
 import leaflet from 'leaflet'
+
 leaflet.Marker.prototype.options.icon = leaflet.icon({
   iconSize: [25, 41],
   iconAnchor: [10, 41],
@@ -38,10 +41,18 @@ export const Map = (props) => {
     <div className={`map-wrapper${editable ? ' editable' : ''}`}>
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
 
-      <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={4} eventHandlers={mapEventHandlers}>
-        <MapLayersControl layers={layers} />
-        <MapMarker editable={editable} point={markerPoint} onPointUpdated={onMarkerPointUpdated} title={markerTitle} />
-      </MapContainer>
+      <MapContextProvider>
+        <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={4} eventHandlers={mapEventHandlers}>
+          <MapLayersControl layers={layers} />
+          <MapMarker
+            editable={editable}
+            point={markerPoint}
+            onPointUpdated={onMarkerPointUpdated}
+            title={markerTitle}
+          />
+          <MapOptions />
+        </MapContainer>
+      </MapContextProvider>
 
       {editable && (
         <div className="button-bar">

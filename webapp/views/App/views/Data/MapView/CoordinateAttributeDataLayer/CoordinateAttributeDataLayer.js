@@ -6,7 +6,7 @@ import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
 
 export const CoordinateAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor, showMarkerKeys, onRecordEditClick } = props
+  const { attributeDef, markersColor, onRecordEditClick } = props
 
   const { layerName, clusters, clusterExpansionZoomExtractor, clusterIconCreator, totalPoints } =
     useCoordinateAttributeDataLayer(props)
@@ -46,7 +46,6 @@ export const CoordinateAttributeDataLayer = (props) => {
               point={point}
               onRecordEditClick={onRecordEditClick}
               recordUuid={recordUuid}
-              showMarkerKeys={showMarkerKeys}
             />
           )
         })}
