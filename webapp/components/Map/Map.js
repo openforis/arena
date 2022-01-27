@@ -29,7 +29,7 @@ leaflet.Marker.prototype.options.icon = leaflet.icon({
 // end of workaround
 
 export const Map = (props) => {
-  const { editable, layers, markerPoint, markerTitle } = props
+  const { editable, layers, markerPoint, markerTitle, showOptions } = props
   const { centerPositionLatLon, mapEventHandlers, markerPointUpdated, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
@@ -50,7 +50,7 @@ export const Map = (props) => {
             onPointUpdated={onMarkerPointUpdated}
             title={markerTitle}
           />
-          <MapOptions />
+          {showOptions && <MapOptions />}
         </MapContainer>
       </MapContextProvider>
 
@@ -77,6 +77,7 @@ Map.propTypes = {
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
+  showOptions: PropTypes.bool,
 }
 
 Map.defaultProps = {
@@ -86,4 +87,5 @@ Map.defaultProps = {
   markerPoint: null,
   markerTitle: null,
   onMarkerPointChange: null,
+  showOptions: true,
 }

@@ -4,7 +4,9 @@ import { Points } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 
-export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey }) => {
+import { ValueFormatter } from '@webapp/components/DataQuery'
+
+export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey, i18n }) => {
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
@@ -37,7 +39,11 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancesto
       const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
       const parentUuid = item[parentEntityColumn.name]
       const key = `${recordUuid}-${parentUuid}`
-      const ancestorsKeys = ancestorsKeysColumns.map((column) => item[column.name])
+      const ancestorsKeys = ancestorsKeysColumns.map((column) => {
+        const ancestorDef = column.nodeDef
+        const rawValue = item[column.name]
+        return ValueFormatter.format({ value: rawValue, i18n, nodeDef: ancestorDef })
+      })
 
       acc.points.push({
         type: 'Feature',
