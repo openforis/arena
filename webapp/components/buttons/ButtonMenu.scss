@@ -1,0 +1,11 @@
+.button-menu__popup-wrapper {
+  position: fixed;
+
+  &.align-left {
+    left: 0;
+  }
+
+  &.align-right {
+    right: 0;
+  }
+}

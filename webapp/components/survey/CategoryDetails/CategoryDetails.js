@@ -14,7 +14,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, UploadButton } from '@webapp/components/form'
 
@@ -64,21 +64,6 @@ const CategoryDetails = (props) => {
             />
           </FormItem>
 
-          {Category.isReportingData(category) && (
-            <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
-              <Checkbox
-                checked
-                disabled={readOnly}
-                onChange={(value) => Actions.updateCategoryProp({ key: Category.keysProps.reportingData, value })}
-              />
-            </FormItem>
-          )}
-          {!readOnly && !Category.isReportingData(category) && (
-            <Button
-              label="categoryEdit.convertToReportingDataCategory.buttonLabel"
-              onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
-            />
-          )}
           {!readOnly && (
             <UploadButton
               label={i18n.t('common.csvImport')}
@@ -90,8 +75,30 @@ const CategoryDetails = (props) => {
           <ButtonDownload
             id={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label={i18n.t('common.csvExport')}
+            label={'common.csvExport'}
           />
+          {Category.isReportingData(category) && (
+            <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
+              <Checkbox
+                checked
+                disabled={readOnly}
+                onChange={(value) => Actions.updateCategoryProp({ key: Category.keysProps.reportingData, value })}
+              />
+            </FormItem>
+          )}
+          {!readOnly && !Category.isReportingData(category) && (
+            <ButtonMenu
+              iconClassName="icon-cog icon-14px"
+              popupComponent={
+                <div>
+                  <Button
+                    label="categoryEdit.convertToReportingDataCategory.buttonLabel"
+                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
+                  />
+                </div>
+              }
+            ></ButtonMenu>
+          )}
         </div>
 
         <div className="category__levels">
