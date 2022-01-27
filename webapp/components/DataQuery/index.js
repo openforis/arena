@@ -1,3 +1,3 @@
 export { default } from './DataQuery'
 
-export { valueFormatters } from './valueFormatters'
+export { ValueFormatter } from './valueFormatter'

@@ -1,22 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
-
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { useI18n } from '@webapp/store/system'
-import { valueFormatters } from '../../../../valueFormatters'
+import { ValueFormatter } from '../../../../valueFormatter'
 
 import { useColumn } from './store'
 
 const getColValue = ({ nodeDef, col, row, i18n }) => {
   const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
-  if (A.isNull(value)) {
-    return ''
-  }
-  const formatter = valueFormatters[NodeDef.getType(nodeDef)]
-  return formatter ? formatter({ i18n, nodeDef, value }) : value
+  return ValueFormatter.format({ i18n, nodeDef, value })
 }
 
 const ColumnData = (props) => {
