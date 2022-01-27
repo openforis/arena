@@ -2,19 +2,59 @@ import './ButtonMenu.scss'
 
 import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { Button } from './Button'
 
 export const ButtonMenu = (props) => {
-  const { children, popupComponent, popupAlignment, ...otherProps } = props
+  const { children, className, popupComponent, popupAlignment, ...otherProps } = props
 
   const wrapperRef = useRef(null)
+  const buttonRef = useRef(null)
   const closeTimeoutRef = useRef(null)
-  const [showPopup, setShowPopup] = useState(false)
-  const toggleShowPopup = useCallback(() => setShowPopup((showPopupPrev) => !showPopupPrev), [])
-  const closePopup = useCallback(() => setShowPopup(false), [])
+  const [state, setState] = useState({ showPopup: false, popupTop: 0, popupLeft: 0, popupRight: 0 })
+  const { showPopup, popupTop, popupLeft, popupRight } = state
 
-  const cancelCloseTimeout = () => {
+  const toggleShowPopup = useCallback(() => {
+    setState((statePrev) => {
+      const showPopupNew = !statePrev.showPopup
+      let popupTopNew = undefined
+      let popupLeftNew = undefined
+      let popupRightNew = undefined
+      if (showPopupNew) {
+        // align popup (with fixed position) to the trigger button
+        const btnEl = buttonRef.current
+        const bntElX = btnEl.offsetParent.offsetLeft + btnEl.offsetLeft
+        const bntElY = btnEl.offsetParent.offsetTop + btnEl.offsetTop
+        popupTopNew = bntElY + btnEl.clientHeight
+        if (popupAlignment === 'left') {
+          // align popup to button bottom left corner
+          popupLeftNew = bntElX
+        } else if (popupAlignment === 'right') {
+          // align popup to button bottom right corner
+          popupRightNew = window.innerWidth - (bntElX + btnEl.clientWidth)
+        }
+      }
+      return {
+        ...statePrev,
+        showPopup: showPopupNew,
+        popupTop: popupTopNew,
+        popupLeft: popupLeftNew,
+        popupRight: popupRightNew,
+      }
+    })
+  }, [buttonRef])
+
+  const closePopup = useCallback(
+    () =>
+      setState((statePrev) => ({
+        ...statePrev,
+        showPopup: false,
+      })),
+    []
+  )
+
+  const cancelPopupCloseTimeout = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
       closeTimeoutRef.current = null
@@ -22,16 +62,18 @@ export const ButtonMenu = (props) => {
   }
 
   const startCloseTimeout = () => {
-    cancelCloseTimeout()
+    cancelPopupCloseTimeout()
     closeTimeoutRef.current = setTimeout(closePopup, 500)
   }
 
   const onMouseLeave = useCallback(() => {
-    startCloseTimeout()
-  }, [])
+    if (showPopup) {
+      startCloseTimeout()
+    }
+  }, [showPopup])
 
   const onMouseEnter = useCallback(() => {
-    cancelCloseTimeout()
+    cancelPopupCloseTimeout()
   }, [])
 
   const onBlur = useCallback((event) => {
@@ -51,6 +93,8 @@ export const ButtonMenu = (props) => {
     >
       <Button
         {...otherProps}
+        ref={buttonRef}
+        className={classNames('button-menu__button', className)}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
@@ -59,9 +103,15 @@ export const ButtonMenu = (props) => {
         onKeyDown={toggleShowPopup}
       >
         {children}
+        {/* show small arrow down icon on the right */}
+        <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
 
-      {showPopup && <div className={`button-menu__popup-wrapper align-${popupAlignment}`}>{popupComponent}</div>}
+      {showPopup && (
+        <div className="button-menu__popup-wrapper" style={{ top: popupTop, right: popupRight, left: popupLeft }}>
+          {popupComponent}
+        </div>
+      )}
     </div>
   )
 }
@@ -77,4 +127,5 @@ ButtonMenu.propTypes = {
 
 ButtonMenu.defaultProps = {
   ...Button.defaultProps,
+  popupAlignment: 'left',
 }

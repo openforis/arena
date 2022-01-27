@@ -93,7 +93,7 @@ const CategoryDetails = (props) => {
                   />
                 </div>
               }
-            ></ButtonMenu>
+            />
           )}
         </div>
 

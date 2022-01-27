@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-export const Button = (props) => {
+export const Button = forwardRef((props, ref) => {
   const {
     children,
     className,
@@ -28,6 +28,7 @@ export const Button = (props) => {
 
   return (
     <button
+      ref={ref}
       id={id}
       data-testid={testId}
       disabled={disabled}
@@ -43,7 +44,7 @@ export const Button = (props) => {
       {children}
     </button>
   )
-}
+})
 
 Button.propTypes = {
   children: PropTypes.node,
