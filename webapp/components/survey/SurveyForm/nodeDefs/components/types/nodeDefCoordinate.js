@@ -121,6 +121,7 @@ const NodeDefCoordinate = (props) => {
         markerPoint={value}
         markerTitle={nodeDefLabel}
         onMarkerPointChange={handleLocationOnMapChanged}
+        showOptions={false}
       />
     </PanelRight>
   ) : null

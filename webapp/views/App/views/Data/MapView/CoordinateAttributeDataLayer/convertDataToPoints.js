@@ -3,8 +3,11 @@ import { latLngBounds } from 'leaflet'
 import { Points } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
+import * as NodeDef from '@core/survey/nodeDef'
 
-export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey }) => {
+import { valueFormatters } from '@webapp/components/DataQuery'
+
+export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey, i18n }) => {
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
@@ -37,7 +40,12 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancesto
       const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
       const parentUuid = item[parentEntityColumn.name]
       const key = `${recordUuid}-${parentUuid}`
-      const ancestorsKeys = ancestorsKeysColumns.map((column) => item[column.name])
+      const ancestorsKeys = ancestorsKeysColumns.map((column) => {
+        const ancestorDef = column.nodeDef
+        const rawValue = item[column.name]
+        const valueFormatter = valueFormatters[NodeDef.getType(ancestorDef)]
+        return valueFormatter ? valueFormatter({ value: rawValue, i18n, nodeDef: ancestorDef }) : rawValue
+      })
 
       acc.points.push({
         type: 'Feature',
