@@ -10,6 +10,7 @@ import * as Node from '@core/record/node'
 
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useWebSocket } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
@@ -26,6 +27,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
     pointIndexByDataIndex: [],
     editedRecordQuery: Query.create(),
   })
+  const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
   const map = useMap()
@@ -70,7 +72,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
       points: _points,
       pointIndexByDataIndex: _pointIndexByDataIndex,
       bounds,
-    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey })
+    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey, i18n })
 
     setState((statePrev) => ({
       ...statePrev,
