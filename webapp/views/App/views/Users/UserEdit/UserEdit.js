@@ -17,6 +17,7 @@ import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ButtonSave, ButtonDelete, ButtonInvite } from '@webapp/components'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
@@ -29,6 +30,7 @@ const UserEdit = () => {
 
   const {
     ready,
+    dirty,
     user,
     userToUpdate,
     canEdit,
@@ -54,6 +56,7 @@ const UserEdit = () => {
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
+  const canUseMap = useAuthCanUseMap()
 
   if (!ready) return null
 
@@ -140,6 +143,19 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
+      {hideSurveyGroup && canUseMap && (
+        <fieldset className="map-api-keys">
+          <legend>{i18n.t('user.mapApiKeys.title')}</legend>
+          <FormItem label={i18n.t('user.mapApiKeys.mapProviders.planet')}>
+            <Input
+              disabled={!canEditEmail}
+              value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
+              validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
+              onChange={(value) => onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))}
+            />
+          </FormItem>
+        </fieldset>
+      )}
       {(canEdit || invitationExpired) && (
         <div className="user-edit__buttons">
           {!hideSurveyGroup && canRemove && (
@@ -150,7 +166,7 @@ const UserEdit = () => {
             />
           )}
 
-          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave} className="btn btn-save" />}
+          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
 
           {!hideSurveyGroup && invitationExpired && (
             <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
