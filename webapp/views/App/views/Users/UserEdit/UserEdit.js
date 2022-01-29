@@ -68,6 +68,7 @@ const UserEdit = () => {
 
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
+  const editingSameUser = User.isEqual(user)(userToUpdate)
 
   return (
     <div className="user-edit form" key={userUuid}>
@@ -143,7 +144,8 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {hideSurveyGroup && canUseMap && (
+      {editingSameUser && hideSurveyGroup && canUseMap && (
+        // show map api keys only when editing the current user
         <fieldset className="map-api-keys">
           <legend>{i18n.t('user.mapApiKeys.title')}</legend>
           <FormItem label={i18n.t('user.mapApiKeys.mapProviders.planet')}>

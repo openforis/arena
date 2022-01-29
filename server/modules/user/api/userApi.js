@@ -94,7 +94,9 @@ export const init = (app) => {
   const _getUser = async (req, res) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
-    res.json(user)
+    // show private info only if fetching the same user of the request
+    const userResult = User.isEqual(Request.getUser(req))(user) ? user : User.dissocPrivateProps(user)
+    res.json(userResult)
   }
 
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
@@ -173,7 +175,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, offset, limit } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
+      const list = await UserService.fetchUsersBySurveyId({ user, surveyId, offset, limit })
 
       res.json({ list })
     } catch (error) {

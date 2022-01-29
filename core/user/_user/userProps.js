@@ -41,3 +41,5 @@ export const assocMapApiKey =
     const mapApiKeyByProviderUpdated = { ...mapApiKeyByProvider, [provider]: apiKey }
     return assocProp(keysProps.mapApiKeyByProvider)(mapApiKeyByProviderUpdated)(user)
   }
+
+export const dissocPrivateProps = R.dissocPath([userKeys.props, keysProps.mapApiKeyByProvider])
