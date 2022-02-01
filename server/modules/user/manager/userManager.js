@@ -160,7 +160,9 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
 
 export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = db) =>
   client.tx(async (t) => {
-    const users = await UserRepository.fetchUsers({ offset, limit, sortBy, sortOrder }, t)
+    const users = (await UserRepository.fetchUsers({ offset, limit, sortBy, sortOrder }, t)).map(
+      User.dissocPrivateProps
+    )
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
@@ -170,9 +172,15 @@ export const exportUsersIntoStream = async ({ outputStream }) => {
   await UserRepository.fetchUsersIntoStream({ transformer })
 }
 
-export const fetchUsersBySurveyId = async (surveyId, offset, limit, isSystemAdmin, client = db) =>
+export const fetchUsersBySurveyId = async (
+  { surveyId, offset = 0, limit = null, isSystemAdmin = false },
+  client = db
+) =>
   client.tx(async (t) => {
-    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)
+    console.log('here')
+    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
+      User.dissocPrivateProps
+    )
     const usersUuids = users.map(User.getUuid)
     const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
     const invitationsByUserUuid = invitations.reduce(

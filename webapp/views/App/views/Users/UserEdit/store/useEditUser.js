@@ -48,11 +48,12 @@ export const useEditUser = ({ userUuid }) => {
   const [userToUpdateOriginal, setUserToUpdateOriginal] = useState({})
   const [userToUpdate, setUserToUpdate] = useState({})
 
-  const { hideSurveyGroup } = useQuery()
+  const { hideSurveyGroup = true } = useQuery()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
   const ready = !R.isEmpty(userToUpdate)
+  const dirty = !R.equals(userToUpdate, userToUpdateOriginal)
   const editCapabilities = getEditCapabilities({ user, userToUpdate, surveyInfo, ready })
 
   const { onGetUser, onUpdate, onUpdateProfilePicture, onSave, onRemove, onInviteRepeat } = useActions({
@@ -83,6 +84,7 @@ export const useEditUser = ({ userUuid }) => {
   return {
     hideSurveyGroup,
     ready,
+    dirty,
     user,
     userToUpdate,
     ...editCapabilities,

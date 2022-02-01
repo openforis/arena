@@ -514,6 +514,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       location: 'Location',
       levelCode: 'Level {{level}} code',
     },
+    selectedPeriod: 'Selected period',
   },
 
   surveysView: {
@@ -648,6 +649,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   user: {
+    mapApiKeys: {
+      title: 'Map API Keys',
+      mapProviders: {
+        planet: 'Planet',
+      },
+    },
     title: 'Title',
     titleValues: {
       mr: 'Mr',

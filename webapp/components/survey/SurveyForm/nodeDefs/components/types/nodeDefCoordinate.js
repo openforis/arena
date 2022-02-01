@@ -18,7 +18,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanSeeMap } from '@webapp/store/user/hooks'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
@@ -31,7 +31,7 @@ const NodeDefCoordinate = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-  const canSeeMap = useAuthCanSeeMap()
+  const canUseMap = useAuthCanUseMap()
 
   const [showMap, setShowMap] = useState(false)
 
@@ -126,7 +126,7 @@ const NodeDefCoordinate = (props) => {
     </PanelRight>
   ) : null
 
-  const mapTriggerButton = canSeeMap ? (
+  const mapTriggerButton = canUseMap ? (
     <Button
       className="map-trigger-btn btn-transparent"
       title="surveyForm.nodeDefCoordinate.showOnMap"
@@ -142,7 +142,7 @@ const NodeDefCoordinate = (props) => {
         className={classNames(
           'survey-form__node-def-table-cell-composite',
           'survey-form__node-def-table-cell-coordinate',
-          { 'with-map': canSeeMap }
+          { 'with-map': canUseMap }
         )}
       >
         {xInput}
@@ -155,7 +155,7 @@ const NodeDefCoordinate = (props) => {
   }
 
   return (
-    <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canSeeMap })}>
+    <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canUseMap })}>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
       <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
