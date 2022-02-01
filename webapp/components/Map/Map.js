@@ -1,6 +1,6 @@
 import './Map.scss'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { MapContainer } from 'react-leaflet'
 import PropTypes from 'prop-types'
 

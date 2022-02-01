@@ -9,7 +9,6 @@ import { useUser } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import { fetchAvailableMapPeriods } from '@webapp/service/api/map'
-import Select from '../form/Select'
 
 import { baseLayerUrlByProviderFunction, planetAttribution } from './baseLayers'
 import { useMapContextBaseLayer } from './MapContext'
@@ -68,9 +67,15 @@ export const MapBaseLayerPeriodSelector = () => {
       <div className="period-select-wrapper">
         <label className="selected-period-label">{i18n.t('mapView.selectedPeriod')}:</label>
         <select value={selectedPeriodValue} onChange={(e) => onMapLayerPeriodChange(e.target.value)}>
-          {periods.map((period) => (
-            <option value={getPeriodValue(period)}>{`${period.year} - ${period.month}`}</option>
-          ))}
+          {periods.map((period) => {
+            const value = getPeriodValue(period)
+            const label = `${period.year} - ${period.month}`
+            return (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            )
+          })}
         </select>
       </div>
       <input
