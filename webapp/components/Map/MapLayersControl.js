@@ -1,16 +1,17 @@
 import React from 'react'
-import { LayersControl, TileLayer } from 'react-leaflet'
+import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
-import { apiKeyToken, baseLayers } from './baseLayers'
+import { baseLayers } from './baseLayers'
+import { useMapContext } from './MapContext'
 
 const getTileUrl = ({ url, apiKeyRequired, provider, user }) => {
   if (apiKeyRequired) {
     const apiKey = User.getMapApiKey({ provider })(user)
     if (apiKey) {
-      return url.replace(apiKeyToken, apiKey)
+      return url({ apiKey })
     } else {
       return null
     }
@@ -23,6 +24,15 @@ export const MapLayersControl = (props) => {
   const { layers } = props
 
   const user = useUser()
+  const { onBaseLayerUpdate } = useMapContext()
+
+  // on layer add, set selected layer in map context
+  useMapEvents({
+    baselayerchange(event) {
+      const baseLayerDef = baseLayers.find((baseLayer) => baseLayer.name === event.name)
+      onBaseLayerUpdate(baseLayerDef)
+    },
+  })
 
   return (
     <LayersControl position="topright">

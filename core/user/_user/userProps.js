@@ -22,12 +22,7 @@ export const newProps = ({ title, mapApiKeyByProvider = null }) => ({
 // ====== READ
 export const getProps = R.prop(userKeys.props)
 export const getTitle = R.pipe(getProps, R.propOr('', keysProps.title))
-export const getMapApiKey =
-  ({ provider }) =>
-  (user) => {
-    const value = R.pipe(getProps, R.path([keysProps.mapApiKeyByProvider, provider]))(user)
-    return value
-  }
+export const getMapApiKey = ({ provider }) => R.pipe(getProps, R.path([keysProps.mapApiKeyByProvider, provider]))
 
 // ====== UPDATE
 export const assocProps = R.assoc(userKeys.props)
