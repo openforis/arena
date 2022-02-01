@@ -1,4 +1,4 @@
-import './MapLayerPeriodSelector.scss'
+import './MapBaseLayerPeriodSelector.scss'
 
 import React, { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
@@ -8,7 +8,7 @@ import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
-import { fetchAvailableMapPeriods } from '@webapp/service/api/map'
+import * as API from '@webapp/service/api'
 
 import { baseLayerUrlByProviderFunction, planetAttribution } from './baseLayers'
 import { useMapContextBaseLayer } from './MapContext'
@@ -33,7 +33,7 @@ export const MapBaseLayerPeriodSelector = () => {
   useEffect(() => {
     if (!periodSelectorAvailable || !provider || !apiKey) return
     ;(async () => {
-      const availablePeriods = await fetchAvailableMapPeriods({ provider, apiKey })
+      const availablePeriods = await API.fetchAvailableMapPeriods({ provider, apiKey })
       setState({
         ready: true,
         periods: availablePeriods,
@@ -78,28 +78,30 @@ export const MapBaseLayerPeriodSelector = () => {
           })}
         </select>
       </div>
-      <input
-        id="map-layer-slider"
-        value={selectedPeriodValue}
-        onChange={(e) => onMapLayerPeriodChange(e.target.value)}
-        className="slider"
-        type="range"
-        step="1"
-        min={getPeriodValue(periods[0])}
-        max={getPeriodValue(periods[periods.length - 1])}
-        name="map-layer-period"
-        list={`layers-dl-${provider}`}
-      />
+      <div className="slider-wrapper">
+        <input
+          id="map-layer-slider"
+          value={selectedPeriodValue}
+          onChange={(e) => onMapLayerPeriodChange(e.target.value)}
+          className="slider"
+          type="range"
+          step="1"
+          min={getPeriodValue(periods[0])}
+          max={getPeriodValue(periods[periods.length - 1])}
+          name="map-layer-period"
+          list={`layers-dl-${provider}`}
+        />
 
-      <datalist id="planet-layers-dl">
-        {periods.map((period, index) => {
-          const { year } = period
-          const value = getPeriodValue(period)
-          const showLabel = index === 0 || periods[index - 1].year !== year
-          const label = showLabel ? year : null
-          return <option key={value} value={value} label={label} />
-        })}
-      </datalist>
+        <datalist id="planet-layers-dl">
+          {periods.map((period, index) => {
+            const { year } = period
+            const value = getPeriodValue(period)
+            const showLabel = index === 0 || periods[index - 1].year !== year
+            const label = showLabel ? year : null
+            return <option key={value} value={value} label={label} />
+          })}
+        </datalist>
+      </div>
     </div>
   )
 }
