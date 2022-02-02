@@ -2,7 +2,6 @@ import './MapBaseLayerPeriodSelector.scss'
 
 import React, { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
-import L from 'leaflet'
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
@@ -12,7 +11,7 @@ import * as API from '@webapp/service/api'
 
 import { Slider } from '../Slider'
 
-import { baseLayerAttribution, baseLayerUrlByProviderFunction, planetAttribution } from './baseLayers'
+import { baseLayerAttribution, baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
 const getPeriodValue = (period) => {
@@ -87,7 +86,7 @@ export const MapBaseLayerPeriodSelector = () => {
           value={selectedPeriodValue}
           onChange={onMapLayerPeriodChange}
           className="slider"
-          step="1"
+          step={1}
           min={getPeriodValue(periods[0])}
           max={getPeriodValue(periods[periods.length - 1])}
           name="map-layer-period"
