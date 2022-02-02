@@ -10,8 +10,10 @@ import { useI18n } from '@webapp/store/system'
 
 import * as API from '@webapp/service/api'
 
-import { baseLayerUrlByProviderFunction, planetAttribution } from './baseLayers'
-import { useMapContextBaseLayer } from './MapContext'
+import { Slider } from '../Slider'
+
+import { baseLayerAttribution, baseLayerUrlByProviderFunction, planetAttribution } from './baseLayers'
+import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
 const getPeriodValue = (period) => {
   const { year, month } = period
@@ -20,14 +22,16 @@ const getPeriodValue = (period) => {
 
 export const MapBaseLayerPeriodSelector = () => {
   const map = useMap()
-  const baseLayerDef = useMapContextBaseLayer()
-  const { periodSelectorAvailable, provider } = baseLayerDef
+  const contextBaseLayer = useMapContextBaseLayer()
+  const { onBaseLayerUpdate } = useMapContext()
+  const { periodSelectorAvailable, provider } = contextBaseLayer
 
   const i18n = useI18n()
   const user = useUser()
+  const [state, setState] = useState({ ready: false, periods: [], periodByValue: {}, selectedPeriodValue: null })
+
   const apiKey = User.getMapApiKey({ provider })(user)
 
-  const [state, setState] = useState({ ready: false, periods: [], periodByValue: {}, selectedPeriodValue: null })
   const { ready, periods, periodByValue, selectedPeriodValue } = state
 
   useEffect(() => {
@@ -45,28 +49,27 @@ export const MapBaseLayerPeriodSelector = () => {
 
   if (!periodSelectorAvailable || !provider || !ready) return null
 
-  const onMapLayerPeriodChange = (periodValue) => {
-    // remove previously selected basemap layer from map
-    Object.values(map._layers).forEach((layer) => {
-      if (layer._url) {
-        map.removeLayer(layer)
-      }
-    })
-
-    // add new layer to map
-    const period = periodByValue[periodValue]
-    const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
-    map.addLayer(L.tileLayer(url, { attribution: planetAttribution }))
-
-    // update state
-    setState((statePrev) => ({ ...statePrev, selectedPeriodValue: periodValue }))
+  const onMapLayerPeriodChange = (event) => {
+    const periodValue = event.target.value
+    // replace url in current layer
+    const layer = Object.values(map._layers).find(
+      (layer) => layer._url && layer.options.attribution === baseLayerAttribution[provider]
+    )
+    if (layer) {
+      const period = periodByValue[periodValue]
+      const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
+      layer.setUrl(url)
+      onBaseLayerUpdate({ ...contextBaseLayer, url })
+      // update state
+      setState((statePrev) => ({ ...statePrev, selectedPeriodValue: periodValue }))
+    }
   }
 
   return (
     <div className="leaflet-bottom map-layer-selector-wrapper">
       <div className="period-select-wrapper">
         <label className="selected-period-label">{i18n.t('mapView.selectedPeriod')}:</label>
-        <select value={selectedPeriodValue} onChange={(e) => onMapLayerPeriodChange(e.target.value)}>
+        <select value={selectedPeriodValue} onChange={onMapLayerPeriodChange}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
             const label = `${period.year} - ${period.month}`
@@ -79,28 +82,23 @@ export const MapBaseLayerPeriodSelector = () => {
         </select>
       </div>
       <div className="slider-wrapper">
-        <input
-          id="map-layer-slider"
+        <Slider
+          id="map-layer-period-slider"
           value={selectedPeriodValue}
-          onChange={(e) => onMapLayerPeriodChange(e.target.value)}
+          onChange={onMapLayerPeriodChange}
           className="slider"
-          type="range"
           step="1"
           min={getPeriodValue(periods[0])}
           max={getPeriodValue(periods[periods.length - 1])}
           name="map-layer-period"
-          list={`layers-dl-${provider}`}
-        />
-
-        <datalist id="planet-layers-dl">
-          {periods.map((period, index) => {
+          options={periods.map((period, index) => {
             const { year } = period
             const value = getPeriodValue(period)
             const showLabel = index === 0 || periods[index - 1].year !== year
             const label = showLabel ? year : null
-            return <option key={value} value={value} label={label} />
+            return { value, label }
           })}
-        </datalist>
+        />
       </div>
     </div>
   )

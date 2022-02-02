@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -7,24 +7,12 @@ import { useUser } from '@webapp/store/user'
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'
 
-const getTileUrl = ({ url, apiKeyRequired, provider, user }) => {
-  if (apiKeyRequired) {
-    const apiKey = User.getMapApiKey({ provider })(user)
-    if (apiKey) {
-      return url({ apiKey })
-    } else {
-      return null
-    }
-  } else {
-    return url
-  }
-}
-
 export const MapLayersControl = (props) => {
   const { layers } = props
 
   const user = useUser()
-  const { onBaseLayerUpdate } = useMapContext()
+  const { contextObject, onBaseLayerUpdate } = useMapContext()
+  const { baseLayer: contextBaseLayer } = contextObject
 
   // on layer add, set selected layer in map context
   useMapEvents({
@@ -34,14 +22,30 @@ export const MapLayersControl = (props) => {
     },
   })
 
+  const getTileUrl = useCallback(
+    ({ url, apiKeyRequired, provider, user }) => {
+      if (!apiKeyRequired || typeof url === 'string') {
+        return url
+      }
+      const apiKey = User.getMapApiKey({ provider })(user)
+      return apiKey ? url({ apiKey }) : null
+    },
+    [user]
+  )
+
   return (
     <LayersControl position="topright">
-      {baseLayers.reduce((acc, { key, apiKeyRequired, name, attribution, provider, url }, index) => {
+      {baseLayers.reduce((acc, baseLayer, index) => {
+        const { key, apiKeyRequired, name, attribution, provider, url } = baseLayer
+
         const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
         if (!tileUrl) return acc
+
+        const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
+
         return [
           ...acc,
-          <LayersControl.BaseLayer key={key} name={name} checked={index === 0}>
+          <LayersControl.BaseLayer key={key} name={name} checked={checked}>
             <TileLayer attribution={attribution} url={tileUrl} />
           </LayersControl.BaseLayer>,
         ]
