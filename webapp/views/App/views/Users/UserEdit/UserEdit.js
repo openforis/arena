@@ -14,7 +14,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-import { ButtonSave, ButtonDelete, ButtonInvite } from '@webapp/components'
+import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
@@ -44,6 +44,7 @@ const UserEdit = () => {
     canEditSurveyManager,
     hideSurveyGroup,
 
+    onMapApiKeyTest,
     onUpdate,
     onUpdateProfilePicture,
     onSurveyAuthGroupChange,
@@ -154,6 +155,15 @@ const UserEdit = () => {
               value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
               validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
               onChange={(value) => onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))}
+            />
+            <Button
+              label="common.test"
+              onClick={() =>
+                onMapApiKeyTest({
+                  provider: 'planet',
+                  apiKey: User.getMapApiKey({ provider: 'planet' })(userToUpdate),
+                })
+              }
             />
           </FormItem>
         </fieldset>

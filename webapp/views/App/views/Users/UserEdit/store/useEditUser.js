@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as A from '@core/arena'
@@ -11,6 +12,8 @@ import * as Authorizer from '@core/auth/authorizer'
 import { useQuery } from '@webapp/components/hooks'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
+import { NotificationActions } from '@webapp/store/ui'
+import * as API from '@webapp/service/api'
 
 import { useActions } from './actions'
 
@@ -47,6 +50,7 @@ export const useEditUser = ({ userUuid }) => {
 
   const [userToUpdateOriginal, setUserToUpdateOriginal] = useState({})
   const [userToUpdate, setUserToUpdate] = useState({})
+  const dispatch = useDispatch()
 
   const { hideSurveyGroup = true } = useQuery()
   const surveyInfo = useSurveyInfo()
@@ -81,6 +85,15 @@ export const useEditUser = ({ userUuid }) => {
     onUpdate(userUpdated)
   }
 
+  const onMapApiKeyTest = useCallback(async ({ provider, apiKey }) => {
+    const success = await API.testMapApiKey({ provider, apiKey })
+    if (success) {
+      dispatch(NotificationActions.notifyInfo({ key: 'user.mapApiKeys.keyIsCorrect' }))
+    } else {
+      dispatch(NotificationActions.notifyError({ key: 'user.mapApiKeys.keyIsNotCorrect' }))
+    }
+  }, [])
+
   return {
     hideSurveyGroup,
     ready,
@@ -88,6 +101,7 @@ export const useEditUser = ({ userUuid }) => {
     user,
     userToUpdate,
     ...editCapabilities,
+    onMapApiKeyTest,
     onUpdate,
     onUpdateProfilePicture,
     onSave,
