@@ -12,9 +12,11 @@ export const baseLayerAttribution = {
 
 const planetDefaultPeriod = { year: '2021', month: '12' }
 
+const _getPeriodKey = (period) => `${period.year}_${StringUtils.padStart(2, '0')(period.month)}`
+
 export const baseLayerUrlByProviderFunction = {
   [baseLayerProviders.planet]: ({ period = planetDefaultPeriod, apiKey }) => {
-    const periodKey = `${period.year}_${StringUtils.padStart(2, '0')(period.month)}`
+    const periodKey = _getPeriodKey(period)
     return `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${periodKey}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${apiKey}`
   },
 }
@@ -22,6 +24,13 @@ export const baseLayerUrlByProviderFunction = {
 export const planetAttribution = 'Planet Labs PBC'
 
 export const baseLayers = [
+  {
+    key: 'test',
+    name: 'Test',
+    provider: baseLayerProviders.planet,
+    attribution: 'test',
+    url: `/api/geo/map/planet/tile/{z}/{y}/{x}?period=${_getPeriodKey(planetDefaultPeriod)}`,
+  },
   {
     key: 'ESRI World Imagery',
     name: 'ESRI World Imagery (satellite)',
