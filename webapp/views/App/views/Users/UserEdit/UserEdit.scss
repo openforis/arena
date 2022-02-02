@@ -4,8 +4,7 @@
   margin: auto;
   padding: 1rem;
   grid-row-gap: 1.5rem;
-  min-width: 50%;
-  max-width: 800px;
+  width: 50rem;
 
   .profile-picture {
     margin-bottom: 20px;
@@ -23,8 +22,12 @@
   }
 
   .map-api-keys {
-    width: 50rem;
-    justify-self: end;
+    width: 100%;
+    justify-self: center;
+
+    .form-item {
+      grid-template-columns: 0.3fr 0.7fr 5rem;
+    }
   }
 }
 

@@ -13,7 +13,9 @@ export {
 } from './buttons'
 
 import LoadingBar from './LoadingBar'
-import { Map } from './Map'
 import PanelRight from './PanelRight'
 
-export { LoadingBar, Map, PanelRight }
+export { LoadingBar, PanelRight }
+
+export { Map } from './Map'
+export { Slider } from './Slider'
