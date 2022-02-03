@@ -46,7 +46,7 @@ export const MapLayersControl = (props) => {
         return [
           ...acc,
           <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-            <TileLayer attribution={attribution} url={tileUrl} />
+            <TileLayer id={key} attribution={attribution} url={tileUrl} />
           </LayersControl.BaseLayer>,
         ]
       }, [])}
