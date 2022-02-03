@@ -28,7 +28,7 @@ export const MapBaseLayerPeriodSelector = () => {
   const map = useMap()
   const contextBaseLayer = useMapContextBaseLayer()
   const { onBaseLayerUpdate } = useMapContext()
-  const { periodSelectorAvailable, provider } = contextBaseLayer
+  const { periodSelectorAvailable, provider, periodType } = contextBaseLayer
 
   const i18n = useI18n()
   const user = useUser()
@@ -43,7 +43,7 @@ export const MapBaseLayerPeriodSelector = () => {
     ;(async () => {
       const availablePeriods = await API.fetchAvailableMapPeriods({
         provider,
-        periodType: contextBaseLayer?.periodType,
+        periodType,
         apiKey,
       })
       const lastPeriodValue = getPeriodValue(availablePeriods[availablePeriods.length - 1])
@@ -54,7 +54,7 @@ export const MapBaseLayerPeriodSelector = () => {
         selectedPeriodValue: lastPeriodValue,
       })
     })()
-  }, [periodSelectorAvailable, provider, apiKey, contextBaseLayer?.periodType])
+  }, [periodSelectorAvailable, provider, apiKey, periodType])
 
   if (!periodSelectorAvailable || !provider || !ready) return null
 
