@@ -1,6 +1,6 @@
 import * as StringUtils from '@core/stringUtils'
 
-export const baseLayerProviders = {
+const baseLayerProviders = {
   esri: 'ESRI',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
