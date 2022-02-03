@@ -1,20 +1,16 @@
-import { createProxyMiddleware } from 'http-proxy-middleware'
-
 import { SRSs } from '@openforis/arena-core'
 
-import * as User from '@core/user/user'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import { MapUtils } from '@core/map/mapUtils'
+import { PlanetApi } from './planetApi'
 
-const mapRouter = (req) => {
+const getMapTileForwardUrl = (req) => {
   const { provider, period, x, y, z } = Request.getParams(req)
   const user = Request.getUser(req)
-  const apiKey = User.getMapApiKey({ provider })(user)
+  const apiKey = MapUtils.mapApiKeyByProvider[provider]
 
-  if (provider === 'planet') {
-    return `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${period}_mosaic/gmap/${z}/${x}/${y}.png?api_key=${apiKey}`
-  }
-  return null
+  return MapUtils.getMapTileUrl({ provider, x, y, z, period, apiKey })
 }
 
 export const init = (app) => {
@@ -27,15 +23,44 @@ export const init = (app) => {
     res.json({ srss })
   })
 
-  app.get('/geo/map/:provider/tile/:z/:y/:x', AuthMiddleware.requireMapUsePermission, async (req, res) => {
-    const { provider, period, x, y, z } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const apiKey = User.getMapApiKey({ provider })(user)
+  app.get(
+    '/geo/map/:provider/tile/:z/:y/:x',
+    AuthMiddleware.requireMapUsePermission,
+    // createProxyMiddleware({ router: getForwardUrl, changeOrigin: true, secure: false })
+    async (req, res, _next) => {
+      const url = getMapTileForwardUrl(req)
 
-    if (provider === 'planet') {
-      res.forward(
-        `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${period}_mosaic/gmap/${z}/${x}/${y}.png?api_key=${apiKey}`
-      )
+      res.redirect(url)
+
+      // req.pipe(
+      //   https.get(
+      //     url,
+      //     {
+      //       headers: req.headers,
+      //       //timeout: 2,
+      //       rejectUnauthorized: false,
+      //     },
+      //     (proxyResponse) => {
+      //       proxyResponse.pause()
+      //       res.writeHead(proxyResponse.statusCode, proxyResponse.headers)
+      //       proxyResponse.pipe(res)
+      //       proxyResponse.resume()
+      //     }
+      //   )
+      // )
+    }
+  )
+
+  app.get('/geo/map/:provider/available_montly_periods', AuthMiddleware.requireMapUsePermission, async (req, res) => {
+    const { provider } = Request.getParams(req)
+    try {
+      if (provider === MapUtils.mapProviders.planet) {
+        const periods = await PlanetApi.fetchAvailableMonthlyMosaicsPeriods()
+        res.json(periods)
+      }
+      res.json([])
+    } catch (error) {
+      next(error)
     }
   })
 }

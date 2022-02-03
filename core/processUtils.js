@@ -45,6 +45,8 @@ const ENV = {
   // ReCaptcha
   reCaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
   reCaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
+  // Map
+  mapApiKeyPlanet: process.env.MAP_API_KEY_PLANET,
 }
 
 module.exports = {
