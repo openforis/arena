@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { SRSs } from '@openforis/arena-core'
 
 import * as Request from '@server/utils/request'
@@ -30,24 +32,8 @@ export const init = (app) => {
     async (req, res, _next) => {
       const url = getMapTileForwardUrl(req)
 
-      res.redirect(url)
-
-      // req.pipe(
-      //   https.get(
-      //     url,
-      //     {
-      //       headers: req.headers,
-      //       //timeout: 2,
-      //       rejectUnauthorized: false,
-      //     },
-      //     (proxyResponse) => {
-      //       proxyResponse.pause()
-      //       res.writeHead(proxyResponse.statusCode, proxyResponse.headers)
-      //       proxyResponse.pipe(res)
-      //       proxyResponse.resume()
-      //     }
-      //   )
-      // )
+      const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
+      dataStream.pipe(res
     }
   )
 
