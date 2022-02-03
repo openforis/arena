@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import { MapUtils } from '@core/map/mapUtils'
 
 export const fetchAvailableMapPeriods = async ({ provider }) => {
