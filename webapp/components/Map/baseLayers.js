@@ -12,7 +12,7 @@ export const baseLayerAttribution = {
 
 const planetDefaultPeriod = { year: '2021', month: '12' }
 
-const _getPeriodKey = (period) => `${period.year}_${StringUtils.padStart(2, '0')(period.month)}`
+const _getPeriodKey = (period) => `${period.year}-${StringUtils.padStart(2, '0')(period.month)}`
 
 const getArenaMapUrl = ({ provider, period }) =>
   `/api/geo/map/${provider}/tile/{z}/{y}/{x}?period=${_getPeriodKey(period)}`
@@ -57,7 +57,6 @@ export const baseLayers = [
     key: 'planet_monthly_mosaics',
     name: 'Planet (monthly mosaics)',
     attribution: baseLayerAttribution.planet,
-    apiKeyRequired: true,
     provider: baseLayerProviders.planet,
     periodSelectorAvailable: true,
     url: getArenaMapUrl({ provider: baseLayerProviders.planet, period: planetDefaultPeriod }),

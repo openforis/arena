@@ -9,7 +9,6 @@ import { PlanetApi } from './planetApi'
 
 const getMapTileForwardUrl = (req) => {
   const { provider, period, x, y, z } = Request.getParams(req)
-  const user = Request.getUser(req)
   const apiKey = MapUtils.mapApiKeyByProvider[provider]
 
   return MapUtils.getMapTileUrl({ provider, x, y, z, period, apiKey })
@@ -29,11 +28,14 @@ export const init = (app) => {
     '/geo/map/:provider/tile/:z/:y/:x',
     AuthMiddleware.requireMapUsePermission,
     // createProxyMiddleware({ router: getForwardUrl, changeOrigin: true, secure: false })
-    async (req, res, _next) => {
-      const url = getMapTileForwardUrl(req)
-
-      const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
-      dataStream.pipe(res
+    async (req, res) => {
+      try {
+        const url = getMapTileForwardUrl(req)
+        const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
+        dataStream.pipe(res)
+      } catch (error) {
+        res.json({})
+      }
     }
   )
 
@@ -43,10 +45,11 @@ export const init = (app) => {
       if (provider === MapUtils.mapProviders.planet) {
         const periods = await PlanetApi.fetchAvailableMonthlyMosaicsPeriods()
         res.json(periods)
+        return
       }
-      res.json([])
-    } catch (error) {
-      next(error)
-    }
+    } catch (error) {}
+
+    // error or provider not supported
+    res.json([])
   })
 }

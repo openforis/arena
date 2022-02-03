@@ -10,7 +10,8 @@ const mapApiKeyByProvider = {
 
 const tileUrlTemplateByProvider = {
   [mapProviders.planet]:
-    'https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_{period}_mosaic/gmap/{z}/{x}/{y}.png?api_key={apiKey}',
+    // 'https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_{period}_mosaic/gmap/{z}/{x}/{y}.png?api_key={apiKey}',
+    'https://tiles2.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_{period}_mosaic/gmap/{z}/{x}/{y}?api_key={apiKey}',
 }
 
 const getMapTileUrl = ({ provider, x, y, z, period = null, apiKey = null }) => {

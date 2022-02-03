@@ -14,6 +14,7 @@ const fetchAvailableMonthlyMosaicsPeriods = async () => {
   return mosaics
     .map(({ name }) => {
       const matcher = name.match(planetMosaicNameRegEx)
+
       return matcher ? { year: matcher[1], month: Number(matcher[2]) } : null
     })
     .filter(Boolean) // exclude "mutate" mosaics
