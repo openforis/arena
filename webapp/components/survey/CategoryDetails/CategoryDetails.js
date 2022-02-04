@@ -22,6 +22,7 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
+import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 
 const MAX_LEVELS = 5
 
@@ -96,6 +97,8 @@ const CategoryDetails = (props) => {
             />
           )}
         </div>
+
+        <ItemExtraDefsEditor state={state} setState={setState} />
 
         <div className="category__levels">
           {levels.map((level) => (

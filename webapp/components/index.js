@@ -1,5 +1,6 @@
 export {
   Button,
+  ButtonAdd,
   ButtonBack,
   ButtonCancel,
   ButtonDownload,
