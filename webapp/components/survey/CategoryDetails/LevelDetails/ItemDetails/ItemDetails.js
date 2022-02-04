@@ -37,11 +37,15 @@ const ItemDetails = (props) => {
   const { published: disabled } = item
 
   const levelIndex = CategoryLevel.getIndex(level)
+  const levelIsLast = levelIndex === Category.getLevelsArray(category).length - 1
   const itemActive = State.getItemActive({ levelIndex })(state)
   const itemActiveUuid = itemActive ? CategoryItem.getUuid(itemActive) : null
   const itemUuid = CategoryItem.getUuid(item)
   const active = itemUuid === itemActiveUuid
   const leaf = active && State.isItemActiveLeaf({ levelIndex })(state)
+  const extraPropsEditorVisible =
+    !R.isEmpty(itemExtraDefs) &&
+    (levelIsLast || !Category.isReportingData(category) || Object.entries(itemExtraDefs).length > 1)
 
   const Actions = useActions({ setState })
 
@@ -104,7 +108,7 @@ const ItemDetails = (props) => {
             readOnly={readOnly}
           />
 
-          {!R.isEmpty(itemExtraDefs) && (
+          {extraPropsEditorVisible && (
             <fieldset className="extra-props">
               <legend>{i18n.t('categoryEdit.extraProp', { count: 2 })}</legend>
               {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
