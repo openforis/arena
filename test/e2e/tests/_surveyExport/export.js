@@ -9,19 +9,20 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    await page.waitForSelector(getSelector(TestId.dashboard.surveyExportWithDataBtn))
+    const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
+    await page.waitForSelector(exportButtonMenuSelector)
+    await page.click(exportButtonMenuSelector)
+    const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn)
+    await page.waitForSelector(exportWithDataButtonSelector)
 
     await Promise.all([
       page.waitForSelector(getSelector(TestId.modal.modal)),
-      page.click(getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')),
+      page.click(getSelector(exportWithDataButtonSelector)),
     ])
 
     await page.waitForSelector(TestId.surveyExport.downloadBtn)
 
-    const [download] = await Promise.all([
-      page.waitForEvent('download'),
-      page.click(TestId.surveyExport.downloadBtn),
-    ])
+    const [download] = await Promise.all([page.waitForEvent('download'), page.click(TestId.surveyExport.downloadBtn)])
 
     await download.saveAs(surveyZipPath)
 

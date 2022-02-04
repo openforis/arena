@@ -32,6 +32,7 @@ export const TestId = {
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
     surveyExportBtn: 'survey-export-btn',
+    surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
     surveyExportWithDataNoActivityLogBtn: 'survey-export-with-data-no-activity-log-btn',
     surveyInfoBtnHeader: 'survey-info-btn-header',

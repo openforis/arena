@@ -65,6 +65,7 @@ const SurveyInfo = () => {
 
           {canExportSurvey && (
             <ButtonMenu
+              testId={TestId.dashboard.surveyExportBtn}
               className="btn-menu-export"
               buttonClassName="btn-transparent"
               iconClassName="icon-download2 icon-14px"
@@ -72,7 +73,7 @@ const SurveyInfo = () => {
               popupComponent={
                 <>
                   <ButtonDownload
-                    id={TestId.dashboard.surveyExportBtn}
+                    id={TestId.dashboard.surveyExportOnlySurveyBtn}
                     className="btn-transparent"
                     onClick={() => dispatch(SurveyActions.exportSurvey())}
                     label={i18n.t('common.export')}
