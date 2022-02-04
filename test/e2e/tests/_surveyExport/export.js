@@ -14,8 +14,6 @@ export const exportSurvey = (survey) =>
     await page.click(exportButtonMenuSelector)
 
     const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')
-    await page.waitForSelector(exportButtonMenuSelector)
-
     await page.waitForSelector(exportWithDataButtonSelector)
 
     await Promise.all([
