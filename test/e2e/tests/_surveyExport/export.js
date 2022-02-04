@@ -9,10 +9,11 @@ export const exportSurvey = (survey) =>
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
 
-    const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
+    const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn)
     await page.waitForSelector(exportButtonMenuSelector)
     await page.click(exportButtonMenuSelector)
-    const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn)
+
+    const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')
     await page.waitForSelector(exportWithDataButtonSelector)
 
     await Promise.all([
