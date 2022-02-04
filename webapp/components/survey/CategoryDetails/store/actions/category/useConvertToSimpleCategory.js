@@ -3,14 +3,12 @@ import { useDispatch } from 'react-redux'
 
 import * as Category from '@core/survey/category'
 
-import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useUpdateCategoryProp } from './useUpdateCategoryProp'
 
 export const useConvertToSimpleCategory = ({ setState }) => {
   const dispatch = useDispatch()
-  const surveyId = useSurveyId()
   const updateCategoryProp = useUpdateCategoryProp({ setState })
 
   return useCallback(async () => {

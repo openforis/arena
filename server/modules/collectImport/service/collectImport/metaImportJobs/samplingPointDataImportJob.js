@@ -4,7 +4,6 @@ import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
