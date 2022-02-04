@@ -18,6 +18,7 @@ import { Button, ButtonDownload } from '@webapp/components'
 
 import DeleteSurveyDialog from './DeleteSurveyDialog'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
+import { ButtonMenu } from '@webapp/components/buttons'
 
 const SurveyInfo = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -63,21 +64,36 @@ const SurveyInfo = () => {
           {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           {canExportSurvey && (
-            <>
-              <ButtonDownload
-                id={TestId.dashboard.surveyExportBtn}
-                className="btn-transparent"
-                onClick={() => dispatch(SurveyActions.exportSurvey())}
-                label={i18n.t('common.export')}
-              />
-
-              <ButtonDownload
-                id={TestId.dashboard.surveyExportWithDataBtn}
-                className="btn-transparent"
-                onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
-                label={i18n.t('homeView.dashboard.exportWithData')}
-              />
-            </>
+            <ButtonMenu
+              className="btn-menu-export"
+              buttonClassName="btn-transparent"
+              iconClassName="icon-download2 icon-14px"
+              title="common.export"
+              popupComponent={
+                <>
+                  <ButtonDownload
+                    id={TestId.dashboard.surveyExportBtn}
+                    className="btn-transparent"
+                    onClick={() => dispatch(SurveyActions.exportSurvey())}
+                    label={i18n.t('common.export')}
+                  />
+                  <ButtonDownload
+                    id={TestId.dashboard.surveyExportWithDataBtn}
+                    className="btn-transparent"
+                    onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
+                    label={i18n.t('homeView.dashboard.exportWithData')}
+                  />
+                  <ButtonDownload
+                    id={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
+                    className="btn-transparent"
+                    onClick={() =>
+                      dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
+                    }
+                    label={i18n.t('homeView.dashboard.exportWithDataNoActivityLog')}
+                  />
+                </>
+              }
+            />
           )}
 
           {canEditSurvey && (

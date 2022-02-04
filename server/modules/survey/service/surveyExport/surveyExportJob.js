@@ -14,7 +14,7 @@ import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
 import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
 
-const createInnerJobs = ({ backup }) => {
+const createInnerJobs = ({ backup, includeActivityLog }) => {
   // records, files, activity log are included only if exporting survey as backup (not cloning)
   return [
     new SurveyInfoExportJob(),
@@ -22,7 +22,8 @@ const createInnerJobs = ({ backup }) => {
     new TaxonomiesExportJob(),
     ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
     new ChainExportJob(),
-    ...(backup ? [new UsersExportJob(), new ActivityLogExportJob()] : []),
+    ...(backup ? [new UsersExportJob()] : []),
+    ...(backup && includeActivityLog ? [new ActivityLogExportJob()] : []),
   ]
 }
 
@@ -39,8 +40,12 @@ export default class SurveyExportJob extends Job {
    * @returns {SurveyExportJob} - The export job.
    */
   constructor(params) {
-    const { backup = true } = params
-    super(SurveyExportJob.type, { ...params, backup }, createInnerJobs({ backup }))
+    const { backup = true, includeActivityLog = true } = params
+    super(
+      SurveyExportJob.type,
+      { ...params, backup, includeActivityLog },
+      createInnerJobs({ backup, includeActivityLog })
+    )
   }
 
   async onStart() {
