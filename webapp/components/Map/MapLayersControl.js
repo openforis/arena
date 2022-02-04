@@ -16,6 +16,9 @@ export const MapLayersControl = (props) => {
 
   // on layer add, set selected layer in map context
   useMapEvents({
+    zoomend(event) {
+      console.log(event)
+    },
     baselayerchange(event) {
       const baseLayerDef = baseLayers.find((baseLayer) => baseLayer.name === event.name)
       onBaseLayerUpdate(baseLayerDef)
@@ -36,7 +39,7 @@ export const MapLayersControl = (props) => {
   return (
     <LayersControl position="topright">
       {baseLayers.reduce((acc, baseLayer, index) => {
-        const { key, apiKeyRequired, name, attribution, provider, url } = baseLayer
+        const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
 
         const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
         if (!tileUrl) return acc
@@ -46,7 +49,7 @@ export const MapLayersControl = (props) => {
         return [
           ...acc,
           <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-            <TileLayer id={key} attribution={attribution} url={tileUrl} />
+            <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} />
           </LayersControl.BaseLayer>,
         ]
       }, [])}
