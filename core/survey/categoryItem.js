@@ -16,10 +16,6 @@ export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
 }
 
-export const keysExtraDef = {
-  dataType: 'dataType',
-}
-
 // ====== CREATE
 export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),

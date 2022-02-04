@@ -18,7 +18,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import TableHeaderLeft from './TableHeaderLeft'
 
 import { useActions, useLocalState } from './store'
-import { ButtonDelete, ButtonIconEdit } from '@webapp/components/buttons'
+import { Button, ButtonDelete, ButtonIconEdit } from '@webapp/components/buttons'
 
 const CategoryList = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
@@ -52,9 +52,15 @@ const CategoryList = (props) => {
     {
       key: 'type',
       header: 'common.type',
-      renderItem: ({ item: category }) =>
-        i18n.t(`categoryList.types.${Category.getLevelsCount(category) > 1 ? 'hierarchical' : 'flat'}`),
-      width: '100px',
+      renderItem: ({ item: category }) => {
+        const type = Category.isReportingData(category)
+          ? 'reportingData'
+          : Category.getLevelsCount(category) > 1
+          ? 'hierarchical'
+          : 'flat'
+        return i18n.t(`categoryList.types.${type}`)
+      },
+      width: '10rem',
     },
   ]
 
@@ -83,14 +89,12 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) => {
         const selected = selectedItemUuid && selectedItemUuid === Category.getUuid(category)
         return (
-          <button
-            type="button"
+          <Button
             className={`btn btn-s${selected ? ' active' : ''}`}
             onClick={() => Actions.select({ category })}
-          >
-            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
-            {i18n.t(selected ? 'common.selected' : 'common.select')}
-          </button>
+            iconClassName={`icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}
+            label={selected ? 'common.selected' : 'common.select'}
+          />
         )
       },
       width: '80px',

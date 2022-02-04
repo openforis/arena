@@ -10,7 +10,12 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: grid;
-  grid-template-columns: 0.8fr 0.1fr 0.1fr;
+  grid-template-columns: 0.7fr 0.1fr 0.1fr 0.1fr;
+  column-gap: 2rem;
+
+  .form-item.check {
+    display: flex;
+  }
 }
 
 .category__levels {
