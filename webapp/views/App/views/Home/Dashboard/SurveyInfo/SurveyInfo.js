@@ -73,19 +73,19 @@ const SurveyInfo = () => {
               popupComponent={
                 <>
                   <ButtonDownload
-                    id={TestId.dashboard.surveyExportOnlySurveyBtn}
+                    testId={TestId.dashboard.surveyExportOnlySurveyBtn}
                     className="btn-transparent"
                     onClick={() => dispatch(SurveyActions.exportSurvey())}
                     label={i18n.t('common.export')}
                   />
                   <ButtonDownload
-                    id={TestId.dashboard.surveyExportWithDataBtn}
+                    testId={TestId.dashboard.surveyExportWithDataBtn}
                     className="btn-transparent"
                     onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
                     label={i18n.t('homeView.dashboard.exportWithData')}
                   />
                   <ButtonDownload
-                    id={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
+                    testId={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
                     className="btn-transparent"
                     onClick={() =>
                       dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
