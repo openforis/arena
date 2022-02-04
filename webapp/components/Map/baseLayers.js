@@ -55,6 +55,7 @@ export const baseLayers = [
     name: 'ESRI Terrain',
     provider: baseLayerProviders.esri,
     attribution: 'Esri, NASA, NGA, USGS | VITA, Esri, HERE, Garmin, SafeGraph, METI/NASA, USGS, EPA, NPS, USDA',
+    maxZoom: 9,
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png',
   },
   {
@@ -62,6 +63,7 @@ export const baseLayers = [
     name: 'OpenStreetMap',
     provider: baseLayerProviders.openStreetMap,
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   },
   // Planet Labs maps
