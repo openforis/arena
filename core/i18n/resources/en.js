@@ -950,6 +950,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
+      reportingData: 'Reporting Data',
     },
   },
 
@@ -969,6 +970,15 @@ $t(common.cantUndoWarning)`,
     confirmDeleteItemWithChildren: `Delete the item with all children?
 
 $t(common.cantUndoWarning)`,
+    convertToReportingDataCategory: {
+      buttonLabel: 'Convert to Reporting Data',
+      confirmMessage: `Convert this category to a Reporting Data category?
+
+Levels will be renamed into level_1, level_2... level_N and an extra 'area' property will be added to the items.`,
+    },
+    convertToSimpleCategory: {
+      confirmMessage: `Convert this Reporting Data category to a simple category?`,
+    },
     deleteItem: 'Delete item',
     extraProp: 'Extra property',
     extraProp_plural: 'Extra properties',
@@ -993,6 +1003,8 @@ $t(common.cantUndoWarning)`,
       },
       dataType: 'Data Type',
     },
+
+    reportingData: 'Reporting data',
   },
 
   // ===== All validation errors

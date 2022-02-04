@@ -10,6 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ErrorBadge from '@webapp/components/errorBadge'
+import { Button } from '@webapp/components'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -35,6 +36,8 @@ const LevelDetails = (props) => {
   const items = canAddItem ? State.getItemsArray({ levelIndex })(state) : []
   const validation = Category.getLevelValidation(levelIndex)(category)
 
+  const nameReadOnly = readOnly || Category.isReportingData(category)
+
   return (
     <div
       id={`category-level-${levelIndex}`}
@@ -54,15 +57,13 @@ const LevelDetails = (props) => {
               {i18n.t('categoryEdit.level')} {level.index + 1}
             </h4>
             {!readOnly && (
-              <button
-                type="button"
-                className="btn btn-s"
-                data-testid={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
+              <Button
+                size="small"
+                testId={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
                 onClick={() => Actions.deleteLevel({ category, level })}
-                aria-disabled={!canBeDeleted}
-              >
-                <span className="icon icon-bin2 icon-12px" />
-              </button>
+                disabled={!canBeDeleted}
+                iconClassName="icon-bin2 icon-12px"
+              />
             )}
           </div>
 
@@ -74,7 +75,7 @@ const LevelDetails = (props) => {
               onChange={(value) =>
                 Actions.updateLevelProp({ category, level, key: 'name', value: StringUtils.normalizeName(value) })
               }
-              readOnly={readOnly}
+              readOnly={nameReadOnly}
             />
           </FormItem>
         </>
@@ -83,17 +84,15 @@ const LevelDetails = (props) => {
       <div className="category__level-items-header">
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
         {!readOnly && (
-          <button
+          <Button
             id={`category-level-${levelIndex}-btn-item-add`}
-            data-testid={TestId.categoryDetails.levelAddItemBtn(levelIndex)}
-            type="button"
-            className="btn btn-s btn-add-item"
-            aria-disabled={!canAddItem}
+            testId={TestId.categoryDetails.levelAddItemBtn(levelIndex)}
+            className="btn-s btn-add-item"
+            disabled={!canAddItem}
             onClick={() => Actions.createItem({ category, level, parentItemUuid: CategoryItem.getUuid(parentItem) })}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('common.add')}
-          </button>
+            iconClassName="icon-plus icon-12px"
+            label="common.add"
+          />
         )}
       </div>
 

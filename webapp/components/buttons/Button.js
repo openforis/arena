@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-export const Button = (props) => {
+export const Button = forwardRef((props, ref) => {
   const {
+    children,
     className,
     disabled,
     iconClassName,
@@ -27,6 +28,7 @@ export const Button = (props) => {
 
   return (
     <button
+      ref={ref}
       id={id}
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
@@ -39,11 +41,13 @@ export const Button = (props) => {
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
+      {children}
     </button>
   )
-}
+})
 
 Button.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
@@ -58,6 +62,7 @@ Button.propTypes = {
 }
 
 Button.defaultProps = {
+  children: null,
   className: null,
   disabled: false,
   iconClassName: null,

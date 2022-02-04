@@ -332,6 +332,67 @@ export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client =
     return { updated }
   })
 
+export const convertCategoryToReportingData = async ({ user, surveyId, categoryUuid }, client = db) =>
+  client.tx(async (t) => {
+    const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft: true })
+
+    // mark as reporting data
+    let categoryUpdated = Category.assocProp({ key: Category.keysProps.reportingData, value: true })(category)
+
+    await CategoryRepository.updateCategoryProp(surveyId, categoryUuid, Category.keysProps.reportingData, true, t)
+
+    // add 'area' extra def
+    const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
+    const itemExtraDefUpdated = {
+      ...itemExtraDef,
+      [Category.reportingDataItemExtraDefKeys.area]: Category.newItemExtraDefItem({
+        dataType: Category.itemExtraDefDataTypes.number,
+      }),
+    }
+    categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
+
+    await CategoryRepository.updateCategoryProp(
+      surveyId,
+      categoryUuid,
+      Category.keysProps.itemExtraDef,
+      itemExtraDefUpdated,
+      t
+    )
+
+    // update levels name
+    const levels = Category.getLevelsArray(category)
+
+    const levelsUpdated = await Promise.all(
+      levels.map(async (level, index) => {
+        const levelNameNew = `level_${index + 1}`
+        await CategoryRepository.updateLevelProp(
+          surveyId,
+          CategoryLevel.getUuid(level),
+          CategoryLevel.keysProps.name,
+          levelNameNew,
+          t
+        )
+        return CategoryLevel.assocProp({ key: CategoryLevel.keysProps.name, value: levelNameNew })(level)
+      })
+    )
+    categoryUpdated = Category.assocLevelsArray(levelsUpdated)(categoryUpdated)
+
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.categoryConvertToReportingData,
+        {
+          [ActivityLog.keysContent.uuid]: categoryUuid,
+        },
+        false,
+        t
+      ),
+    ])
+    return categoryUpdated
+  })
+
 // ====== DELETE
 export const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
   client.tx(async (t) => {

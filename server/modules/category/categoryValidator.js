@@ -90,7 +90,7 @@ const _validateItemExtraProps = (extraDefs, validation) => (item) => {
       return null
     }
 
-    const extraDefType = R.path([key, CategoryItem.keysExtraDef.dataType], extraDefs)
+    const extraDefType = R.path([key, Category.keysItemExtraDef.dataType], extraDefs)
     return _extraPropValidators[extraDefType](key, extra)
   }
 

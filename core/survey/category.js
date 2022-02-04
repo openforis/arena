@@ -20,12 +20,21 @@ export const keys = {
 export const keysProps = {
   name: 'name',
   itemExtraDef: 'itemExtraDef',
+  reportingData: 'reportingData',
+}
+
+export const keysItemExtraDef = {
+  dataType: 'dataType',
 }
 
 export const itemExtraDefDataTypes = {
   text: 'text',
   number: 'number',
   geometryPoint: 'geometryPoint',
+}
+
+export const reportingDataItemExtraDefKeys = {
+  area: 'area',
 }
 
 // ========
@@ -35,6 +44,7 @@ export const itemExtraDefDataTypes = {
 // ====== READ
 export const { getProps, getPropsDraft, getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
+export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
 
 const getLevels = R.propOr({}, keys.levels)
@@ -100,6 +110,9 @@ export const getItemValidation = (item) =>
   )
 
 // ====== ITEMS extra def
+export const newItemExtraDefItem = ({ dataType }) => ({
+  [keysItemExtraDef.dataType]: dataType,
+})
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefKeys = (category) => {
   const itemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})(category)

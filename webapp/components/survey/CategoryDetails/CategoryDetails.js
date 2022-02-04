@@ -14,9 +14,9 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import UploadButton from '@webapp/components/form/uploadButton'
+import { Checkbox, UploadButton } from '@webapp/components/form'
 
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
@@ -38,12 +38,15 @@ const CategoryDetails = (props) => {
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
+
+  if (!category) return null
+
+  const categoryUuid = Category.getUuid(category)
+
   const importSummary = State.getImportSummary(state)
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
-
-  if (!category) return null
 
   return (
     <>
@@ -65,15 +68,33 @@ const CategoryDetails = (props) => {
             <UploadButton
               label={i18n.t('common.csvImport')}
               accept=".csv"
-              onChange={(files) => Actions.uploadCategory({ categoryUuid: Category.getUuid(category), file: files[0] })}
+              onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
               disabled={Category.isPublished(category)}
             />
           )}
           <ButtonDownload
             id={TestId.categoryDetails.exportBtn}
-            href={`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/export/`}
-            label={i18n.t('common.csvExport')}
+            href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
+            label={'common.csvExport'}
           />
+          {Category.isReportingData(category) && (
+            <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
+              <Checkbox checked disabled={readOnly} onChange={Actions.convertToSimpleCategory} />
+            </FormItem>
+          )}
+          {!readOnly && !Category.isReportingData(category) && (
+            <ButtonMenu
+              iconClassName="icon-cog icon-14px"
+              popupComponent={
+                <div>
+                  <Button
+                    label="categoryEdit.convertToReportingDataCategory.buttonLabel"
+                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
+                  />
+                </div>
+              }
+            />
+          )}
         </div>
 
         <div className="category__levels">

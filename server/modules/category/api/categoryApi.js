@@ -337,6 +337,27 @@ export const init = (app) => {
     }
   )
 
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToReportingData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToReportingData({
+          user,
+          surveyId,
+          categoryUuid,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== DELETE
 
   app.delete(

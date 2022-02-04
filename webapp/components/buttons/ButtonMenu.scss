@@ -1,0 +1,31 @@
+@import '~@webapp/style/vars';
+
+.button-menu__wrapper {
+  .button-menu__button {
+    display: flex;
+    height: 40px;
+    line-height: 1rem;
+    align-items: center;
+  }
+
+  .button-menu__button-icon {
+    padding: 1.2rem 0 0.7rem 0.2rem;
+    transform: scaleY(-0.7);
+  }
+
+  .button-menu__popup-wrapper {
+    position: fixed;
+    z-index: $zIndex15UserMenu;
+    border-bottom: 1px solid $greyBorder;
+    border-left: 1px solid $greyBorder;
+    border-right: 1px solid $greyBorder;
+
+    &.align-left {
+      left: 0;
+    }
+
+    &.align-right {
+      right: 0;
+    }
+  }
+}

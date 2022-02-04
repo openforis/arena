@@ -69,6 +69,14 @@ export const cleanupCategory = async ({ surveyId, categoryUuid }) => {
   return { deleted, updated }
 }
 
+export const convertToReportingDataCategory = async ({ surveyId, categoryUuid }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToReportingData`)
+
+  return category
+}
+
 // DELETE
 export const deleteCategory = async ({ surveyId, categoryUuid }) =>
   axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
