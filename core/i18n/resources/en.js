@@ -136,6 +136,7 @@ Do you want to proceed?`,
     srs: 'SRS',
     status: 'Status',
     sum: 'Sum',
+    test: 'Test',
     to: 'To',
     true: 'True',
     type: 'Type',
@@ -514,6 +515,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       location: 'Location',
       levelCode: 'Level {{level}} code',
     },
+    selectedPeriod: 'Selected period',
   },
 
   surveysView: {
@@ -648,6 +650,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   user: {
+    mapApiKeys: {
+      title: 'Map API Keys',
+      mapProviders: {
+        planet: 'Planet',
+      },
+      keyIsCorrect: 'This API key is valid',
+      keyIsNotCorrect: 'This API key is NOT valid',
+    },
     title: 'Title',
     titleValues: {
       mr: 'Mr',

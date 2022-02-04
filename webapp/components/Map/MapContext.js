@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react'
+import { defaultBaseLayer } from './baseLayers'
 
 const initialState = {
+  baseLayer: null,
   options: {
     showMarkersLabels: false,
   },
@@ -20,6 +22,7 @@ const MapContextProvider = ({ children }) => {
     contextObject,
     onOptionUpdate: ({ option, value }) =>
       setContextObject((contextPrev) => ({ ...contextPrev, options: { ...contextPrev.options, [option]: value } })),
+    onBaseLayerUpdate: (baseLayer) => setContextObject((contextPrev) => ({ ...contextPrev, baseLayer })),
   }
 
   return <MapContext.Provider value={value}>{children}</MapContext.Provider>
@@ -33,4 +36,17 @@ const useMapContextOptions = () => {
   return options
 }
 
-export { MapContext, MapContextConsumer, MapContextProvider, useMapContext, useMapContextOptions }
+const useMapContextBaseLayer = () => {
+  const { contextObject } = useMapContext()
+  const { baseLayer } = contextObject
+  return baseLayer || defaultBaseLayer
+}
+
+export {
+  MapContext,
+  MapContextConsumer,
+  MapContextProvider,
+  useMapContext,
+  useMapContextBaseLayer,
+  useMapContextOptions,
+}

@@ -302,10 +302,10 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
 
 // ====== READ
 
-export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
+export const fetchUsersBySurveyId = async ({ user, surveyId, offset = 0, limit = null }) => {
   const isSystemAdmin = User.isSystemAdmin(user)
 
-  return UserManager.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin)
+  return UserManager.fetchUsersBySurveyId({ surveyId, offset, limit, isSystemAdmin })
 }
 
 export const countUsersBySurveyId = async (user, surveyId) => {

@@ -89,6 +89,9 @@ export const requireRecordEditPermission = requireRecordPermission(Authorizer.ca
 export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
 export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 
+// Map
+export const requireMapUsePermission = requirePermission(Authorizer.canUseMap)
+
 // User
 export const requireUserInvitePermission = requireSurveyPermission(Authorizer.canInviteUsers)
 export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)

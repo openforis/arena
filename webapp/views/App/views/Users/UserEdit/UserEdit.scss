@@ -4,8 +4,7 @@
   margin: auto;
   padding: 1rem;
   grid-row-gap: 1.5rem;
-  min-width: 50%;
-  max-width: 800px;
+  width: 50rem;
 
   .profile-picture {
     margin-bottom: 20px;
@@ -21,6 +20,15 @@
       }
     }
   }
+
+  .map-api-keys {
+    width: 100%;
+    justify-self: center;
+
+    .form-item {
+      grid-template-columns: 0.3fr 0.7fr 5rem;
+    }
+  }
 }
 
 .user-edit__buttons {
@@ -28,12 +36,6 @@
   justify-content: center;
   align-items: center;
   position: relative;
-
-  .btn-save {
-    padding-left: 3rem;
-    padding-right: 3rem;
-    background-color: $white;
-  }
 
   .btn-remove-user {
     position: absolute;

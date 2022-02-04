@@ -17,9 +17,10 @@ import { MapContextProvider } from './MapContext'
 import { useMap } from './useMap'
 
 // start of workaround to show leaflet marker icon
-import leaflet from 'leaflet'
+import L from 'leaflet'
+import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 
-leaflet.Marker.prototype.options.icon = leaflet.icon({
+L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [10, 41],
   popupAnchor: [2, -40],
@@ -51,6 +52,7 @@ export const Map = (props) => {
             title={markerTitle}
           />
           {showOptions && <MapOptions />}
+          <MapBaseLayerPeriodSelector />
         </MapContainer>
       </MapContextProvider>
 

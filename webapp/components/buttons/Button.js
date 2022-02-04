@@ -31,8 +31,8 @@ export const Button = forwardRef((props, ref) => {
       ref={ref}
       id={id}
       data-testid={testId}
-      disabled={disabled}
-      aria-disabled={disabled}
+      disabled={disabled ? disabled : undefined}
+      aria-disabled={disabled ? disabled : undefined}
       type="button"
       className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
