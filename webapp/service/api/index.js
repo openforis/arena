@@ -30,6 +30,7 @@ export {
   downloadDataQueryExport,
   fetchRecordSummary,
 } from './data'
+export { fetchAvailableMapPeriods, testMapApiKey } from './map'
 export { fetchSurveys, insertSurvey } from './survey'
 export {
   fetchNodeDef,
