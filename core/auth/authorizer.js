@@ -102,6 +102,12 @@ export const canUpdateRecordsStep = canAnalyzeRecords
 export const canUseMap = canAnalyzeRecords
 
 // ======
+// ====== Charts
+// ======
+
+export const canUseCharts = (user, _surveyInfo) => User.isSystemAdmin(user)
+
+// ======
 // ====== Users
 // ======
 

@@ -2,9 +2,12 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import * as Authorizer from '@core/auth/authorizer'
+
 import { appModules, dataModules } from '@webapp/app/appModules'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
@@ -22,6 +25,7 @@ import { MapView } from './MapView'
 
 const Data = () => {
   const dispatch = useDispatch()
+  const user = useUser()
   const surveyInfo = useSurveyInfo()
   const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
@@ -58,30 +62,52 @@ const Data = () => {
             path: dataModules.explorer.path,
           },
           // Map
-          {
-            component: MapView,
-            path: dataModules.map.path,
-          },
+          ...(Authorizer.canUseMap(user, surveyInfo)
+            ? [
+                {
+                  component: MapView,
+                  path: dataModules.map.path,
+                },
+              ]
+            : []),
           // Chart
-          {
-            component: Charts,
-            path: dataModules.charts.path,
-          },
+          ...(Authorizer.canUseCharts(user, surveyInfo)
+            ? [
+                {
+                  component: Charts,
+                  path: dataModules.charts.path,
+                },
+              ]
+            : []),
           // Data export
-          {
-            component: ExportData,
-            path: dataModules.export.path,
-          },
+          ...(Authorizer.canEditSurvey(user, surveyInfo)
+            ? [
+                {
+                  component: ExportData,
+                  path: dataModules.export.path,
+                },
+              ]
+            : []),
           // Data import
-          {
-            component: DataImport,
-            path: dataModules.import.path,
-          },
+          ...(Authorizer.canEditSurvey(user, surveyInfo)
+            ? [
+                {
+                  component: DataImport,
+                  path: dataModules.import.path,
+                },
+              ]
+            : []),
+          ,
           // Validation report
-          {
-            component: ValidationReport,
-            path: dataModules.validationReport.path,
-          },
+          ...(Authorizer.canCleanseRecords(user, surveyInfo)
+            ? [
+                {
+                  component: ValidationReport,
+                  path: dataModules.validationReport.path,
+                },
+              ]
+            : []),
+          ,
         ]}
       />
     </SurveyDefsLoader>
