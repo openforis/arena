@@ -76,13 +76,13 @@ const SurveyInfo = () => {
                     testId={TestId.dashboard.surveyExportOnlySurveyBtn}
                     className="btn-transparent"
                     onClick={() => dispatch(SurveyActions.exportSurvey())}
-                    label={i18n.t('common.export')}
+                    label="common.export"
                   />
                   <ButtonDownload
                     testId={TestId.dashboard.surveyExportWithDataBtn}
                     className="btn-transparent"
                     onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
-                    label={i18n.t('homeView.dashboard.exportWithData')}
+                    label="homeView.dashboard.exportWithData"
                   />
                   <ButtonDownload
                     testId={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
@@ -90,7 +90,7 @@ const SurveyInfo = () => {
                     onClick={() =>
                       dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
                     }
-                    label={i18n.t('homeView.dashboard.exportWithDataNoActivityLog')}
+                    label="homeView.dashboard.exportWithDataNoActivityLog"
                   />
                 </>
               }
