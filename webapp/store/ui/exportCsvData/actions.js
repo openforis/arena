@@ -24,7 +24,7 @@ export const startCSVExport = () => async (dispatch, getState) => {
         const { exportDataFolderName } = JobSerialized.getResult(jobComplete)
         return (
           <ButtonDownload
-            id={TestId.dataExport.exportCSV}
+            testId={TestId.dataExport.exportCSV}
             href={`/api/survey/${surveyId}/export-csv-data/${exportDataFolderName}`}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
           />

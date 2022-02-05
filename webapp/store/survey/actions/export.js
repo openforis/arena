@@ -27,7 +27,7 @@ export const exportSurvey =
         job,
         closeButton: (
           <ButtonDownload
-            id={TestId.surveyExport.downloadBtn}
+            testId={TestId.surveyExport.downloadBtn}
             href={`/api/survey/${surveyId}/export/download`}
             requestParams={{ fileName, surveyName, includeData, includeActivityLog }}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
