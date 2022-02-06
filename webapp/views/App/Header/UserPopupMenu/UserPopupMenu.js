@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 
@@ -31,6 +32,7 @@ const UserPopupMenu = (props) => {
   const { onClose } = props
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const i18n = useI18n()
   const elementRef = useRef(null)
 
@@ -166,7 +168,7 @@ const UserPopupMenu = (props) => {
         className="btn-s btn-transparent"
         onClick={() => {
           onClose()
-          dispatch(LoginActions.logout())
+          dispatch(LoginActions.logout({ navigate }))
         }}
       >
         <span className="icon icon-switch icon-12px icon-left" />
