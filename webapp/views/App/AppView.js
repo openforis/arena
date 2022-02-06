@@ -2,9 +2,15 @@ import './AppView.scss'
 
 import React, { useEffect } from 'react'
 
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+
 import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
+import { useSurveyInfo } from '@webapp/store/survey'
 import { injectReducers } from '@webapp/store'
+
+import { useAuthCanUseAnalysis, useUser } from '@webapp/store/user'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import Header from './Header'
@@ -23,6 +29,11 @@ const AppView = () => {
   useEffect(() => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])
+
+  const user = useUser()
+  const surveyInfo = useSurveyInfo()
+  const canAnalyzeRecords = useAuthCanUseAnalysis()
+  const canViewUsers = Authorizer.canViewSurveyUsers(user, surveyInfo) && !Survey.isTemplate(surveyInfo)
 
   return (
     <>
@@ -46,14 +57,22 @@ const AppView = () => {
                 component: Data,
                 path: `${appModules.data.path}/*`,
               },
-              {
-                component: Analysis,
-                path: `${appModules.analysis.path}/*`,
-              },
-              {
-                component: Users,
-                path: `${appModules.users.path}/*`,
-              },
+              ...(canAnalyzeRecords
+                ? [
+                    {
+                      component: Analysis,
+                      path: `${appModules.analysis.path}/*`,
+                    },
+                  ]
+                : []),
+              ...(canViewUsers
+                ? [
+                    {
+                      component: Users,
+                      path: `${appModules.users.path}/*`,
+                    },
+                  ]
+                : []),
               {
                 component: Help,
                 path: `${appModules.help.path}/*`,
