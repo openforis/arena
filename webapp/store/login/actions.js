@@ -5,6 +5,7 @@ import * as Validation from '@core/validation/validation'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { SystemActions } from '@webapp/store/system'
+import { appModules, appModuleUri } from '@webapp/app/appModules'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
@@ -40,14 +41,19 @@ export const login = (email, password) =>
     }
   })
 
-export const logout = () => async (dispatch) => {
-  dispatch(LoaderActions.showLoader())
+export const logout =
+  ({ navigate }) =>
+  async (dispatch) => {
+    dispatch(LoaderActions.showLoader())
 
-  await axios.post('/auth/logout')
+    await axios.post('/auth/logout')
 
-  dispatch(SystemActions.resetSystem())
-  dispatch(LoaderActions.hideLoader())
-}
+    dispatch(SystemActions.resetSystem())
+    dispatch(LoaderActions.hideLoader())
+
+    // navigate to home page
+    navigate(appModuleUri(appModules.home))
+  }
 
 export const sendPasswordResetEmail = (email, navigate) =>
   _createAction(async (dispatch) => {
