@@ -10,12 +10,9 @@ export const exportSurvey = (survey) =>
     const surveyDirPath = getSurveyDirPath(survey)
 
     const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
-    // await page.waitForSelector(exportButtonMenuSelector)
     await page.click(exportButtonMenuSelector)
 
     const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')
-    // await page.waitForSelector(exportWithDataButtonSelector)
-
     await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(exportWithDataButtonSelector)])
 
     await page.waitForSelector(TestId.surveyExport.downloadBtn)
