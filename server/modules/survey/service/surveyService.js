@@ -17,9 +17,9 @@ export const startPublishJob = (user, surveyId) => {
   return job
 }
 
-export const exportSurvey = ({ surveyId, user, includeData = false }) => {
+export const exportSurvey = ({ surveyId, user, includeData = false, includeActivityLog = true }) => {
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
-  const job = new SurveyExportJob({ surveyId, user, outputFileName, backup: includeData })
+  const job = new SurveyExportJob({ surveyId, user, outputFileName, backup: includeData, includeActivityLog })
 
   JobManager.executeJobThread(job)
 
