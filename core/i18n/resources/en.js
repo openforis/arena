@@ -295,6 +295,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   homeView: {
     dashboard: {
       exportWithData: 'Export with data',
+      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
