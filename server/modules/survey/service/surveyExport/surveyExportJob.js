@@ -22,8 +22,7 @@ const createInnerJobs = ({ backup, includeActivityLog }) => {
     new TaxonomiesExportJob(),
     ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
     new ChainExportJob(),
-    ...(backup ? [new UsersExportJob()] : []),
-    ...(backup && includeActivityLog ? [new ActivityLogExportJob()] : []),
+    ...(backup && includeActivityLog ? [new UsersExportJob(), new ActivityLogExportJob()] : []),
   ]
 }
 
