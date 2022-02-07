@@ -93,6 +93,7 @@ export default class UsersImportJob extends Job {
     const { arenaSurveyFileZip, surveyId, arenaSurvey, survey } = this.context
 
     const users = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
+    const includingUsers = users.length > 0
 
     if (this.user) {
       users.push(this.user)
@@ -107,6 +108,6 @@ export default class UsersImportJob extends Job {
       await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
     }
 
-    this.setContext({ users })
+    this.setContext({ users, includingUsers })
   }
 }
