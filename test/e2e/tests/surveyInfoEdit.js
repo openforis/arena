@@ -2,8 +2,8 @@ import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { gotoHome, gotoSurveyInfo } from './_navigation'
 
 const surveyName = getSelector(TestId.surveyInfo.surveyName, 'input')
-const surveyLabel = getSelector(TestId.surveyInfo.surveyLabel(), 'input')
-const surveyDescription = getSelector(TestId.surveyInfo.surveyDescription(), 'input')
+const surveyLabel = getSelector(TestId.surveyInfo.surveyLabel('en'), 'input')
+const surveyDescription = getSelector(TestId.surveyInfo.surveyDescription('en'), 'textarea')
 const surveyLanguage = getSelector(TestId.surveyInfo.surveyLanguage, 'input')
 const saveBtn = getSelector(TestId.surveyInfo.saveBtn, 'button')
 
