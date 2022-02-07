@@ -5,7 +5,7 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -23,7 +23,6 @@ const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
 
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
 
   const {
     name,
@@ -42,7 +41,6 @@ const SurveyInfo = () => {
     saveProps,
   } = useSurveyInfoForm()
 
-  
   return (
     <div className="home-survey-info">
       <div className="form">
@@ -60,7 +58,7 @@ const SurveyInfo = () => {
         </div>
 
         <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel(lang)}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel()}
           readOnly={readOnly}
           languages={languages}
           labels={labels}
@@ -68,7 +66,7 @@ const SurveyInfo = () => {
         />
 
         <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription(lang)}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription()}
           inputType="textarea"
           readOnly={readOnly}
           formLabelKey="common.description"
