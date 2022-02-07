@@ -43,7 +43,7 @@ const Guest = () => (
         // default to Login form
         {
           component: Login,
-          path: `*`,
+          path: '*',
         },
       ]}
     />
