@@ -168,6 +168,10 @@ Do you want to proceed?`,
     },
   },
 
+  error: {
+    pageNotFound: 'Page not found',
+  },
+
   sidebar: {
     logout: 'Logout',
   },
