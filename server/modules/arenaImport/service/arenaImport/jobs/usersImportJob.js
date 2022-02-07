@@ -14,6 +14,10 @@ const _associateToGroup = async ({ userUuid, groupName }, client) => {
   await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(group), userUuid, client)
 }
 
+/**
+ * Inserts a new user and associate it to the user group of the specified survey.
+ * It returns the newly inserted user or an already existing one, if it has the same uuid or email.
+ */
 const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFileZip }, client) => {
   let userAlreadyExisting = false
   try {
@@ -28,7 +32,7 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
 
   if (User.isSystemAdmin(userAlreadyExisting)) {
     // user already existing and he's a system admin, don't do anything else
-    return
+    return userAlreadyExisting
   }
 
   const userUuid = userAlreadyExisting ? User.getUuid(userAlreadyExisting) : User.getUuid(user)
@@ -78,6 +82,7 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
       await AuthGroupRepository.insertUserGroup(surveyGroupUuid, userUuid, client)
     }
   }
+  return userAlreadyExisting || user
 }
 
 /**
@@ -93,13 +98,19 @@ export default class UsersImportJob extends Job {
     const { arenaSurveyFileZip, surveyId, arenaSurvey, survey } = this.context
 
     const users = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
+    const includingUsers = users.length > 0
 
     if (this.user) {
       users.push(this.user)
     }
 
-    await Promise.all(
+    const insertedUsers = await Promise.all(
       users.map(async (user) => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
+    )
+    // map of user uuids in the db by user uuid in the zip file being imported (users could be already inserted in the db with a different uuid)
+    const userUuidNewByUserUuid = users.reduce(
+      (acc, user, index) => ({ ...acc, [User.getUuid(user)]: User.getUuid(insertedUsers[index]) }),
+      {}
     )
 
     const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
@@ -107,6 +118,6 @@ export default class UsersImportJob extends Job {
       await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
     }
 
-    this.setContext({ users })
+    this.setContext({ users, includingUsers, userUuidNewByUserUuid })
   }
 }
