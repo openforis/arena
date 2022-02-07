@@ -1,9 +1,18 @@
+import './moduleSwitch.scss'
+
 import React, { useEffect } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
 import PropTypes from 'prop-types'
 
 import { app, appModuleUri } from '@webapp/app/appModules'
 import { useIsInRoute } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+
+const NotFoundPage = () => {
+  const i18n = useI18n()
+
+  return <div className="page-not-found-message">{i18n.t('error.pageNotFound')}</div>
+}
 
 const ModuleSwitch = (props) => {
   const { modules, moduleRoot, moduleDefault } = props
@@ -34,6 +43,7 @@ const ModuleSwitch = (props) => {
           }
         />
       ))}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
