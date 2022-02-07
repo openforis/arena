@@ -1,6 +1,6 @@
 import '../form.scss'
 
-import React, { useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
 
@@ -11,6 +11,7 @@ export const Input = React.forwardRef((props, ref) => {
   const {
     disabled,
     id,
+    inputType,
     maxLength,
     onChange,
     onFocus,
@@ -34,15 +35,25 @@ export const Input = React.forwardRef((props, ref) => {
   const valueText = value === null || Number.isNaN(value) ? '' : String(value)
   const title = titleProp || valueText
 
-  const handleValueChange = (newValue) => {
-    const input = inputRef.current
-    if (selectionAllowed) {
-      selectionRef.current = [input.selectionStart, input.selectionEnd]
-    }
-    if (onChange) {
-      onChange(textTransformFunction(newValue))
-    }
-  }
+  const handleValueChange = useCallback(
+    (newValue) => {
+      const input = inputRef.current
+      if (selectionAllowed) {
+        selectionRef.current = [input.selectionStart, input.selectionEnd]
+      }
+      if (onChange) {
+        onChange(textTransformFunction(newValue))
+      }
+    },
+    [onChange]
+  )
+
+  const onChangeEvent = useCallback((event) => handleValueChange(event.target.value), [handleValueChange])
+
+  const onFormattedValueChange = useCallback(
+    ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
+    [valueText, handleValueChange]
+  )
 
   useOnUpdate(() => {
     if (selectionAllowed) {
@@ -63,35 +74,36 @@ export const Input = React.forwardRef((props, ref) => {
           }}
           id={id}
           data-testid={id}
-          onValueChange={({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue)}
+          onValueChange={onFormattedValueChange}
           onFocus={onFocus}
           onBlur={onBlur}
           placeholder={placeholder}
           readOnly={readOnly}
+          title={title}
           type={type}
           value={value}
-          title={title}
           {...numberFormat}
         />
       ) : (
-        <input
-          ref={inputRef}
-          aria-disabled={disabled}
-          className="form-input"
-          disabled={disabled}
-          data-testid={id}
-          id={id}
-          maxLength={maxLength}
-          onChange={(event) => handleValueChange(event.target.value)}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          type={type}
-          value={value}
-          title={title}
-          autoComplete="off"
-        />
+        React.createElement(inputType, {
+          ref: inputRef,
+          'aria-disabled': disabled,
+          autoComplete: 'off',
+          className: 'form-input',
+          'data-testid': id,
+          disabled,
+          id,
+          maxLength,
+          onBlur,
+          onChange: onChangeEvent,
+          onFocus,
+          placeholder,
+          readOnly,
+          rows: inputType === 'textarea' ? 4 : null,
+          title,
+          type,
+          value,
+        })
       )}
     </ValidationTooltip>
   )
@@ -100,6 +112,7 @@ export const Input = React.forwardRef((props, ref) => {
 Input.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
+  inputType: PropTypes.oneOf(['input', 'textarea']),
   maxLength: PropTypes.number,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
@@ -123,6 +136,7 @@ Input.propTypes = {
 Input.defaultProps = {
   disabled: false,
   id: null,
+  inputType: 'input',
   maxLength: null,
   onChange: null,
   onFocus: () => {},
