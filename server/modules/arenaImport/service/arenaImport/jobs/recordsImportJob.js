@@ -18,7 +18,7 @@ export default class RecordsImportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, survey, arenaSurveyFileZip, includingUsers } = this.context
+    const { surveyId, survey, arenaSurveyFileZip, includingUsers, userUuidNewByUserUuid } = this.context
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
@@ -35,10 +35,12 @@ export default class RecordsImportJob extends Job {
     await PromiseUtils.each(recordSummaries, async (recordSummary) => {
       // insert record
       let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, Record.getUuid(recordSummary))
-      if (!includingUsers) {
-        // ignore owner in imported file; consider current user as owner
-        record = Record.assocOwnerUuid(User.getUuid(this.user))(record)
-      }
+      const ownerUuid = includingUsers
+        ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
+          userUuidNewByUserUuid[Record.getOwnerUuid(record)]
+        : // ignore owner in imported file; consider current user as owner
+          User.getUuid(this.user)
+      record = Record.assocOwnerUuid(ownerUuid)(record)
       await RecordManager.insertRecord(this.user, surveyId, record, false, this.tx)
 
       // insert nodes (add them to batch persister)
