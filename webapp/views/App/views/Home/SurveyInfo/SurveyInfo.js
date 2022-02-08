@@ -11,6 +11,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { ButtonSave } from '@webapp/components'
 
 import CyclesEditor from './CyclesEditor'
 import SrsEditor from './SrsEditor'
@@ -102,12 +103,7 @@ const SurveyInfo = () => {
           />
         </div>
 
-        {!readOnly && (
-          <button className="btn btn-save" data-testid={TestId.surveyInfo.saveBtn} type="button" onClick={saveProps}>
-            <span className="icon icon-floppy-disk icon-12px icon-left" />
-            {i18n.t('common.save')}
-          </button>
-        )}
+        {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
     </div>
   )
