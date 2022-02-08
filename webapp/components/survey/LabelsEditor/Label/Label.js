@@ -15,6 +15,7 @@ const Label = ({
   readOnly,
   showLanguageBadge,
   compactLanguage,
+  inputType,
 }) => (
   <div className="labels-editor__label">
     {showLanguageBadge && <Badge lang={lang} compact={compactLanguage} />}
@@ -25,12 +26,14 @@ const Label = ({
       onChange={(value) => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
       placeholder={placeholder}
       readOnly={readOnly}
+      inputType={inputType}
     />
   </div>
 )
 
 Label.propTypes = {
   inputFieldIdPrefix: PropTypes.string,
+  inputType: PropTypes.oneOf(['input', 'textarea']),
   labels: PropTypes.object,
   lang: PropTypes.string,
   onChange: PropTypes.func,
@@ -42,6 +45,7 @@ Label.propTypes = {
 
 Label.defaultProps = {
   inputFieldIdPrefix: null,
+  inputType: 'input',
   labels: {},
   lang: '',
   onChange: null,
