@@ -2,23 +2,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export const Slider = (props) => {
-  const { className, id, max, min, name, onChange, options, step, value } = props
+  const { className, id, max, min, name, onChange, onMouseDown, onMouseUp, options, step, value } = props
 
   const listId = options ? `${id}-dl` : null
 
   return (
     <>
       <input
-        id="map-layer-slider"
-        value={value}
-        onChange={onChange}
         className={className}
-        type="range"
-        step={step}
+        id="map-layer-slider"
+        list={listId}
         min={min}
         max={max}
         name={name}
-        list={listId}
+        onChange={onChange}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        step={step}
+        type="range"
+        value={value}
       />
 
       {options && (
@@ -37,6 +39,9 @@ Slider.propTypes = {
   id: PropTypes.string.isRequired,
   max: PropTypes.number,
   min: PropTypes.number,
+  onChange: PropTypes.func,
+  onMouseDown: PropTypes.func,
+  onMouseUp: PropTypes.func,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -48,5 +53,8 @@ Slider.propTypes = {
 }
 
 Slider.defaultProps = {
+  onChange: null,
+  onMouseDown: null,
+  onMouseUp: null,
   options: null,
 }
