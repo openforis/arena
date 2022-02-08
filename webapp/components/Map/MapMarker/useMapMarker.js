@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMapEvents } from 'react-leaflet'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { useSRSs } from '@webapp/components/hooks'
-import { useMapEvents } from 'react-leaflet'
 
 export const useMapMarker = (props) => {
   const { editable, onPointUpdated: onPointUpdatedProp, point } = props
@@ -28,10 +28,10 @@ export const useMapMarker = (props) => {
   }
   // on point update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
-    if (srssInitialized) {
+    if (srssInitialized && point) {
       setState((statePrev) => ({
         ...statePrev,
-        pointLatLon: point ? fromPointToLatLon(point) : null,
+        pointLatLon: fromPointToLatLon(point),
       }))
     }
   }, [srssInitialized, point])
