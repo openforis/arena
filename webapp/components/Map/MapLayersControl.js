@@ -16,9 +16,6 @@ export const MapLayersControl = (props) => {
 
   // on layer add, set selected layer in map context
   useMapEvents({
-    zoomend(event) {
-      console.log(event)
-    },
     baselayerchange(event) {
       const baseLayerDef = baseLayers.find((baseLayer) => baseLayer.name === event.name)
       onBaseLayerUpdate(baseLayerDef)

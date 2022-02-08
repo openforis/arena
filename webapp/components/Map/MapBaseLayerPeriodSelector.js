@@ -1,7 +1,7 @@
 import './MapBaseLayerPeriodSelector.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { useMap, useMapEvents } from 'react-leaflet'
+import { useMap } from 'react-leaflet'
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
@@ -73,6 +73,7 @@ export const MapBaseLayerPeriodSelector = () => {
     [map, contextBaseLayer, provider, onBaseLayerUpdate, setState]
   )
 
+  // disable map dragging when dragging period slider
   const onSliderMouseDown = useCallback(() => {
     map.dragging.disable()
   }, [map])
