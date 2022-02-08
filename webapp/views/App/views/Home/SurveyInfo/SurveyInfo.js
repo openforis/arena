@@ -58,7 +58,7 @@ const SurveyInfo = () => {
         </div>
 
         <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel()}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel('')}
           readOnly={readOnly}
           languages={languages}
           labels={labels}
@@ -66,7 +66,7 @@ const SurveyInfo = () => {
         />
 
         <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription()}
+          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription('')}
           inputType="textarea"
           readOnly={readOnly}
           formLabelKey="common.description"
