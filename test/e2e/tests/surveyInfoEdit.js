@@ -33,9 +33,9 @@ export default () =>
     gotoSurveyInfo()
 
     test('Verify survey info', async () => {
-      await expect(await page.getAttribute(surveyName, 'value')).toBe('survey')
-      await expect(await page.getAttribute(surveyLabel, 'value')).toBe('My Survey')
-      await expect(await page.getAttribute(surveyDescription, 'value')).toBe('This is a survey description')
+      await expect(await page.inputValue(surveyName)).toBe('survey')
+      await expect(await page.inputValue(surveyLabel)).toBe('My Survey')
+      await expect(await page.inputValue(surveyDescription)).toBe('This is a survey description')
       await expect(page).toHaveText('English')
       await expect(page).toHaveText('French')
     })
