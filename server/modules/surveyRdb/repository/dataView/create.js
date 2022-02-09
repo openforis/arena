@@ -8,20 +8,21 @@ import * as CategoryItem from '../../../../../core/survey/categoryItem'
 
 import * as SQL from '../../../../../common/model/db/sql'
 import * as Schemata from '../../../../../common/model/db/schemata'
-import { ColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
+import { ColumnNodeDef, ViewColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
 
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
-  viewDataNodeDef.columnNodeDefs
-    .map((columnNodeDef) => {
-      if (
-        NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef) &&
-        !NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)
-      ) {
-        return [`${viewDataNodeDef.tableData.columnUuid} AS ${columnNodeDef.name}`]
-      }
-      return columnNodeDef.namesFull
-    })
-    .flat()
+  viewDataNodeDef.columnNodeDefs.flatMap((viewColumnNodeDef) => {
+    const { nodeDef } = viewColumnNodeDef
+
+    if (NodeDef.isEqual(nodeDef)(viewDataNodeDef.nodeDef) && !NodeDef.isMultipleAttribute(nodeDef)) {
+      return [`${viewDataNodeDef.tableData.columnUuid} AS ${viewColumnNodeDef.name}`]
+    }
+    return viewColumnNodeDef instanceof ViewColumnNodeDef
+      ? // column of the view
+        viewColumnNodeDef.namesForCreationFull
+      : // column coming from data table
+        viewColumnNodeDef.namesFull
+  })
 
 const _getSelectFieldKeys = (viewDataNodeDef) => {
   const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
@@ -117,6 +118,8 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
 
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
+
+  console.log('----query', query)
 
   return client.query(query)
 }

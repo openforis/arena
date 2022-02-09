@@ -44,8 +44,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
         // ===== create table and view
         this.logDebug(`create data table ${nodeDefName} - start`)
         await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
-        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
         this.logDebug(`create data table ${nodeDefName} - end`)
+
+        this.logDebug(`create data view ${nodeDefName} - start`)
+        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+        this.logDebug(`create data view ${nodeDefName} - end`)
 
         // ===== insert into table
         this.logDebug(`insert into table ${nodeDefName} - start`)

@@ -7,12 +7,26 @@ import * as SQL from '../../sql'
 export default class ViewColumnNodeDef extends ColumnNodeDef {
   constructor(table, nodeDef) {
     super(table, nodeDef)
+    this._namesForCreation = this.determineColumnNamesForCreation()
+  }
+
+  get namesForCreation() {
+    return this._namesForCreation
+  }
+
+  get namesForCreationFull() {
+    return SQL.addAlias(this.table.alias, this.namesForCreation)
+  }
+
+  determineColumnNamesForCreation() {
+    // do not include columns coming from joins
+    return super.determineColumnNames()
   }
 
   determineColumnNames() {
     const names = super.determineColumnNames()
     if (NodeDef.isCode(this.nodeDef)) {
-      // add label columns
+      // add label columns (they will come joining category_item table)
       const langs = Survey.getLanguages(Survey.getSurveyInfo(this.table.survey))
       return [...names, ...langs.map((lang) => `${NodeDef.getName(this.nodeDef)}_label_${lang}`)]
     }
