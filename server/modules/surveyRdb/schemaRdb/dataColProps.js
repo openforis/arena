@@ -71,18 +71,16 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, _nodeDefCol, nodeCol) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
-      
-      
+
       return (_node, columnName) => {
-        return  R.endsWith('label', columnName)
+        return R.endsWith('label', columnName)
           ? ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
           : CategoryItem.getCode(item)
       }
-          
     },
   },
 
