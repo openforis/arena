@@ -1,5 +1,4 @@
 import * as fs from 'fs'
-import * as R from 'ramda'
 
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
