@@ -39,12 +39,11 @@ export const MapBaseLayerPeriodSelector = () => {
   const { ready, periods, periodByValue, selectedPeriodValue } = state
 
   useEffect(() => {
-    if (!periodSelectorAvailable || !provider || !apiKey) return
+    if (!periodSelectorAvailable || !provider) return
     ;(async () => {
       const availablePeriods = await API.fetchAvailableMapPeriods({
         provider,
         periodType,
-        apiKey,
       })
       const lastPeriodValue = getPeriodValue(availablePeriods[availablePeriods.length - 1])
       setState({
@@ -54,7 +53,7 @@ export const MapBaseLayerPeriodSelector = () => {
         selectedPeriodValue: lastPeriodValue,
       })
     })()
-  }, [periodSelectorAvailable, provider, apiKey, periodType])
+  }, [periodSelectorAvailable, provider, periodType])
 
   const onMapLayerPeriodChange = useCallback(
     (event) => {
