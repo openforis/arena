@@ -4,6 +4,8 @@ import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression
 import * as Expression from '../../../../../core/expressionParser/expression'
 
 import TableDataNodeDef, { ColumnNodeDef } from '../../tables/dataNodeDef'
+import * as SQL from '../../sql'
+import ViewColumnNodeDef from './viewColumnNodeDef'
 
 const columnSet = {
   dateCreated: TableDataNodeDef.columnSetCommon.dateCreated,
@@ -69,7 +71,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     const columns = []
     // table entity uuid column - it doesn't exist for virtual entities
     if (!this.virtual && !NodeDef.isMultipleAttribute(this.nodeDef)) {
-      columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
+      columns.push(new ViewColumnNodeDef(this.tableData, this.nodeDef))
     }
     // attribute columns
     columns.push(...this.tableData.columnNodeDefs)
@@ -77,7 +79,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     if (this.viewDataParent) {
       columns.unshift(
         ...this.viewDataParent.columnNodeDefs.map(
-          (columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef)
+          (columnNodeDef) => new ViewColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef)
         )
       )
     }
@@ -85,11 +87,11 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   }
 
   get columnNodeDefNames() {
-    return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).names)
+    return this.columnNodeDefs.flatMap((columnNodeDef) => columnNodeDef.names)
   }
 
   get columnNodeDefNamesFull() {
-    return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
+    return SQL.addAlias(this.alias, this.columnNodeDefNames)
   }
 
   get tableData() {
