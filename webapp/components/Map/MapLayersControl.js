@@ -46,7 +46,7 @@ export const MapLayersControl = (props) => {
         return [
           ...acc,
           <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-            <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} />
+            <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={3} />
           </LayersControl.BaseLayer>,
         ]
       }, [])}
