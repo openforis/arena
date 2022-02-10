@@ -14,14 +14,7 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { Query, Sort } from '../../../../../common/model/query'
-import {
-  ViewDataNodeDef,
-  ViewColumnNodeDef,
-  TableNode,
-  ColumnNodeDef,
-  TableRecord,
-  Schemata,
-} from '../../../../../common/model/db'
+import { ViewDataNodeDef, TableNode, ColumnNodeDef, TableRecord, Schemata } from '../../../../../common/model/db'
 import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
 
 import * as DataCol from '../../schemaRdb/dataCol'
@@ -34,9 +27,9 @@ const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
 }
 
 const _selectsByNodeDefType =
-  ({ viewDataNodeDef, streamMode }) =>
+  ({ viewDataNodeDef, streamMode, joinCodes = false }) =>
   (nodeDefCol) => {
-    const columnNodeDef = new ViewColumnNodeDef(viewDataNodeDef, nodeDefCol)
+    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
     const { name: alias, nameFull, namesFull } = columnNodeDef
 
     if (streamMode) {
@@ -55,6 +48,7 @@ const _selectsByNodeDefType =
         `'EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
       ]
     }
+
     return namesFull
   }
 
@@ -67,6 +61,7 @@ const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, n
       ),
       `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
     )
+    // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
