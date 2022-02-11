@@ -1036,6 +1036,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeCannotBeKeyword: `Code "{{value}}" cannot be used: it's a reserved word`,
       codeDuplicate: 'Code is duplicate',
       codeRequired: 'Code is required',
+      itemExtraPropDataTypeRequired: 'Data type required for $t(categoryEdit.extraProp) "{{key}}"',
+      itemExtraPropNameInvalid: 'Invalid name for $t(categoryEdit.extraProp) "{{key}}"',
       itemExtraPropInvalidNumber: 'Invalid number for $t(categoryEdit.extraProp) "{{key}}"',
       itemExtraPropInvalidGeometryPoint: 'Invalid geometry point for $t(categoryEdit.extraProp) "{{key}}"',
       itemsInvalid: 'At least one invalid item',

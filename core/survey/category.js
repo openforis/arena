@@ -25,6 +25,7 @@ export const keysProps = {
 
 export const keysItemExtraDef = {
   dataType: 'dataType',
+  name: 'name',
 }
 
 export const itemExtraDefDataTypes = {

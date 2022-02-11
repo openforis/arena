@@ -33,30 +33,32 @@ export const validateNotKeyword = (errorKey) => (propName, item) => {
   return ValidatorNameKeywords.isKeyword(value) ? { key: errorKey, params: { value } } : null
 }
 
-export const validateName = (errorKey) => (propName, item) => {
-  const prop = getProp(propName)(item)
-  return prop && !validNameRegex.test(prop) ? { key: errorKey } : null
-}
+export const validateName =
+  (errorKey, errorParams = {}) =>
+  (propName, item) => {
+    const prop = getProp(propName)(item)
+    return prop && !validNameRegex.test(prop) ? { key: errorKey, params: errorParams } : null
+  }
 
 export const validateNumber =
-  (errorKey = ValidatorErrorKeys.invalidNumber, params = {}) =>
+  (errorKey = ValidatorErrorKeys.invalidNumber, errorParams = {}) =>
   (propName, item) => {
     const value = getProp(propName)(item)
 
-    return value && isNaN(value) ? { key: errorKey, params } : null
+    return value && isNaN(value) ? { key: errorKey, params: errorParams } : null
   }
 
 export const validatePositiveNumber =
-  (errorKey, params = {}) =>
+  (errorKey, errorParams = {}) =>
   (propName, item) => {
-    const validateNumberResult = validateNumber(errorKey, params)(propName, item)
+    const validateNumberResult = validateNumber(errorKey, errorParams)(propName, item)
     if (validateNumberResult) {
       return validateNumberResult
     }
 
     const value = getProp(propName)(item)
 
-    return value && value <= 0 ? { key: errorKey, params } : null
+    return value && value <= 0 ? { key: errorKey, params: errorParams } : null
   }
 
 export const validateEmail =
