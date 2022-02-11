@@ -55,7 +55,7 @@ export const ItemExtraDefsEditor = (props) => {
     [updateItemExtraDefs]
   )
 
-  const onAdd = useCallback(() => {
+  const onAdd = useCallback(async () => {
     const itemExtraDef = {
       ...Category.newItemExtraDefItem({ dataType: Category.itemExtraDefDataTypes.text }),
       name: '', // name property is used only in UI
