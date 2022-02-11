@@ -985,8 +985,14 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
     deleteItem: 'Delete item',
+    editExtraProperties: 'Edit $t(categoryEdit.extraProp_plural)',
     extraProp: 'Extra property',
     extraProp_plural: 'Extra properties',
+    extraPropDataType: {
+      geometryPoint: 'Geometry Point',
+      number: 'Number',
+      text: 'Text',
+    },
     level: 'Level',
 
     importSummary: {
@@ -1000,11 +1006,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         description: 'description',
         label: 'label',
         extra: '$t(categoryEdit.extraProp)',
-      },
-      columnDataType: {
-        geometryPoint: 'Geometry Point',
-        number: 'Number',
-        text: 'Text',
       },
       dataType: 'Data Type',
     },

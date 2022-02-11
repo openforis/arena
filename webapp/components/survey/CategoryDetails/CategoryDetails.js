@@ -45,6 +45,7 @@ const CategoryDetails = (props) => {
   const categoryUuid = Category.getUuid(category)
 
   const importSummary = State.getImportSummary(state)
+  const editingItemExtraDefs = State.isEditingItemExtraDefs(state)
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
@@ -92,13 +93,16 @@ const CategoryDetails = (props) => {
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
                     onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
                   />
+                  <Button label="categoryEdit.editExtraProperties" onClick={Actions.toggleEditExtraPropertiesPanel} />
                 </div>
               }
             />
           )}
         </div>
 
-        <ItemExtraDefsEditor state={state} setState={setState} />
+        {editingItemExtraDefs && (
+          <ItemExtraDefsEditor state={state} setState={setState}/>
+        )}
 
         <div className="category__levels">
           {levels.map((level) => (

@@ -50,7 +50,7 @@ const TableRow = (props) => {
             readOnlyInput
             items={Object.keys(Category.itemExtraDefDataTypes)}
             itemKey={A.identity}
-            itemLabel={(item) => i18n.t(`categoryEdit.importSummary.columnDataType.${item}`)}
+            itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
             selection={dataType}
             onChange={(item) => onDataTypeChange(item)}
           />

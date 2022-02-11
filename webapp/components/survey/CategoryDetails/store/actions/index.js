@@ -5,6 +5,7 @@ import { useCleanupCategory } from './category/useCleanupCategory'
 import { useConvertToReportingDataCategory } from './category/useConvertToReportingDataCategory'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
 import { useOnDoneClick } from './category/useOnDoneClick'
+import { useToggleEditExtraPropertiesPanel } from './category/useToggleEditExtraPropertiesPanel'
 import { useImportCategory } from './importSummary/useImportCategory'
 import { useHideImportSummary } from './importSummary/useHideImportSummary'
 import { useSetImportSummaryColumnDataType } from './importSummary/useSetImportSummaryColumnDataType'
@@ -31,6 +32,7 @@ export const useActions = ({ setState }) => ({
   convertToReportingDataCategory: useConvertToReportingDataCategory({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
   onDoneClick: useOnDoneClick({ setState }),
+  toggleEditExtraPropertiesPanel: useToggleEditExtraPropertiesPanel({ setState }),
 
   // Levels
   fetchLevelItems: useFetchLevelItems({ setState }),

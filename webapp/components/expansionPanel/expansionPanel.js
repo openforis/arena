@@ -1,11 +1,12 @@
 import './expansionPanel.scss'
 import React, { useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
 const ExpansionPanel = (props) => {
-  const { buttonLabel, buttonLabelParams, children, showHeader } = props
+  const { buttonLabel, buttonLabelParams, children, className, showHeader } = props
   const i18n = useI18n()
   const panelRef = useRef(null)
   const contentRef = useRef(null)
@@ -19,7 +20,7 @@ const ExpansionPanel = (props) => {
   useLayoutEffect(setContentHeight, [children])
 
   return (
-    <div className="expansion-panel" ref={panelRef}>
+    <div className={classNames('expansion-panel', className)} ref={panelRef}>
       {showHeader && (
         <div className="expansion-panel__header">
           <button
@@ -47,12 +48,14 @@ ExpansionPanel.propTypes = {
   buttonLabel: PropTypes.string,
   buttonLabelParams: PropTypes.object,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  className: PropTypes.string,
   showHeader: PropTypes.bool,
 }
 
 ExpansionPanel.defaultProps = {
   buttonLabel: '',
   buttonLabelParams: {},
+  className: null,
   showHeader: true,
 }
 
