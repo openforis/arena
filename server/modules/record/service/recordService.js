@@ -1,5 +1,4 @@
 import * as fs from 'fs'
-import * as R from 'ramda'
 
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
@@ -86,10 +85,12 @@ export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
 
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const counts = await Promise.all(
-    surveyIds.map((surveyId) => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours))
-  )
-  return R.sum(counts)
+  let count = 0
+  await PromiseUtils.each(surveyIds, async (surveyId) => {
+    const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
+    count += deletedRecordsCount
+  })
+  return count
 }
 
 export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {

@@ -125,12 +125,11 @@ export const deleteRecordPreview = async (surveyId, recordUuid) =>
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
-  await db.tx(async (t) => {
+  db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
       await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
-
     return recordUuids.length
   })
 

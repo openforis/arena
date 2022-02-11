@@ -1,6 +1,6 @@
 import './MapBaseLayerPeriodSelector.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
 import * as User from '@core/user/user'
@@ -39,12 +39,11 @@ export const MapBaseLayerPeriodSelector = () => {
   const { ready, periods, periodByValue, selectedPeriodValue } = state
 
   useEffect(() => {
-    if (!periodSelectorAvailable || !provider || !apiKey) return
+    if (!periodSelectorAvailable || !provider) return
     ;(async () => {
       const availablePeriods = await API.fetchAvailableMapPeriods({
         provider,
         periodType,
-        apiKey,
       })
       const lastPeriodValue = getPeriodValue(availablePeriods[availablePeriods.length - 1])
       setState({
@@ -54,23 +53,35 @@ export const MapBaseLayerPeriodSelector = () => {
         selectedPeriodValue: lastPeriodValue,
       })
     })()
-  }, [periodSelectorAvailable, provider, apiKey, periodType])
+  }, [periodSelectorAvailable, provider, periodType])
+
+  const onMapLayerPeriodChange = useCallback(
+    (event) => {
+      const periodValue = event.target.value
+      // replace url in current layer
+      const layer = Object.values(map._layers).find((layer) => layer._url && layer.id === contextBaseLayer.id)
+      if (layer) {
+        const period = periodByValue[periodValue]
+        const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
+        layer.setUrl(url)
+        onBaseLayerUpdate({ ...contextBaseLayer, url })
+        // update state
+        setState((statePrev) => ({ ...statePrev, selectedPeriodValue: Number(periodValue) }))
+      }
+    },
+    [map, contextBaseLayer, provider, onBaseLayerUpdate, setState]
+  )
+
+  // disable map dragging when dragging period slider
+  const onSliderMouseDown = useCallback(() => {
+    map.dragging.disable()
+  }, [map])
+
+  const onSliderMouseUp = useCallback(() => {
+    map.dragging.enable()
+  }, [map])
 
   if (!periodSelectorAvailable || !provider || !ready) return null
-
-  const onMapLayerPeriodChange = (event) => {
-    const periodValue = event.target.value
-    // replace url in current layer
-    const layer = Object.values(map._layers).find((layer) => layer._url && layer.id === contextBaseLayer.id)
-    if (layer) {
-      const period = periodByValue[periodValue]
-      const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
-      layer.setUrl(url)
-      onBaseLayerUpdate({ ...contextBaseLayer, url })
-      // update state
-      setState((statePrev) => ({ ...statePrev, selectedPeriodValue: Number(periodValue) }))
-    }
-  }
 
   return (
     <div className="leaflet-bottom map-layer-selector-wrapper">
@@ -94,6 +105,8 @@ export const MapBaseLayerPeriodSelector = () => {
           id="map-layer-period-slider"
           value={selectedPeriodValue}
           onChange={onMapLayerPeriodChange}
+          onMouseDown={onSliderMouseDown}
+          onMouseUp={onSliderMouseUp}
           className="slider"
           step={1}
           min={getPeriodValue(periods[0])}
@@ -101,9 +114,9 @@ export const MapBaseLayerPeriodSelector = () => {
           name="map-layer-period"
           options={periods.map((period, index) => {
             const { year, month, yearTo } = period
-            const value = getPeriodValue(period)
+            const value = String(getPeriodValue(period))
             const yearChanged = index === 0 || periods[index - 1].year !== year
-            const label = yearChanged ? year : yearTo ? '' : month
+            const label = yearChanged ? String(year) : yearTo ? '' : String(month)
             return { value, label }
           })}
         />

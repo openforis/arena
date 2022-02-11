@@ -5,6 +5,8 @@ import React, { useEffect } from 'react'
 import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
+
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import Header from './Header'
@@ -23,6 +25,8 @@ const AppView = () => {
   useEffect(() => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])
+
+  const canAnalyzeRecords = useAuthCanUseAnalysis()
 
   return (
     <>
@@ -46,10 +50,14 @@ const AppView = () => {
                 component: Data,
                 path: `${appModules.data.path}/*`,
               },
-              {
-                component: Analysis,
-                path: `${appModules.analysis.path}/*`,
-              },
+              ...(canAnalyzeRecords
+                ? [
+                    {
+                      component: Analysis,
+                      path: `${appModules.analysis.path}/*`,
+                    },
+                  ]
+                : []),
               {
                 component: Users,
                 path: `${appModules.users.path}/*`,

@@ -7,7 +7,7 @@ import classNames from 'classnames'
 import { Button } from './Button'
 
 export const ButtonMenu = (props) => {
-  const { children, className, popupComponent, popupAlignment, ...otherProps } = props
+  const { buttonClassName, children, className, popupComponent, popupAlignment, ...otherProps } = props
 
   const wrapperRef = useRef(null)
   const buttonRef = useRef(null)
@@ -86,7 +86,7 @@ export const ButtonMenu = (props) => {
   return (
     <div
       ref={wrapperRef}
-      className="button-menu__wrapper"
+      className={classNames('button-menu__wrapper', className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onBlur={onBlur}
@@ -94,7 +94,7 @@ export const ButtonMenu = (props) => {
       <Button
         {...otherProps}
         ref={buttonRef}
-        className={classNames('button-menu__button', className)}
+        className={classNames('button-menu__button', buttonClassName)}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
@@ -121,11 +121,13 @@ const { onClick, ...otherButtonPropTypes } = Button.propTypes
 
 ButtonMenu.propTypes = {
   ...otherButtonPropTypes,
+  buttonClassName: PropTypes.string,
   popupComponent: PropTypes.element.isRequired,
   popupAlignment: PropTypes.oneOf(['left', 'right']),
 }
 
 ButtonMenu.defaultProps = {
   ...Button.defaultProps,
+  buttonClassName: null,
   popupAlignment: 'left',
 }

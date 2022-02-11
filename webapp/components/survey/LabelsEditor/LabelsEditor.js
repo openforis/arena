@@ -35,6 +35,7 @@ const LabelsEditor = (props) => {
     compactLanguage,
     validation,
     inputFieldIdPrefix,
+    inputType,
   } = props
 
   const i18n = useI18n()
@@ -59,6 +60,7 @@ const LabelsEditor = (props) => {
             <Label
               key={lang}
               inputFieldIdPrefix={inputFieldIdPrefix}
+              inputType={inputType}
               lang={lang}
               labels={labels}
               onChange={onChange}
@@ -78,6 +80,7 @@ LabelsEditor.propTypes = {
   compactLanguage: PropTypes.bool,
   formLabelKey: PropTypes.string,
   inputFieldIdPrefix: PropTypes.string,
+  inputType: PropTypes.oneOf(['input', 'textarea']),
   languages: PropTypes.array,
   labels: PropTypes.object,
   onChange: PropTypes.func,
@@ -91,6 +94,7 @@ LabelsEditor.defaultProps = {
   compactLanguage: false,
   formLabelKey: 'common.label',
   inputFieldIdPrefix: null,
+  inputType: 'input',
   languages: [],
   labels: {},
   onChange: null,

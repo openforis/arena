@@ -74,7 +74,7 @@ const CategoryDetails = (props) => {
             />
           )}
           <ButtonDownload
-            id={TestId.categoryDetails.exportBtn}
+            testId={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
             label={'common.csvExport'}
           />
