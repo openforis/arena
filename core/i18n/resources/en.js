@@ -985,7 +985,18 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
     deleteItem: 'Delete item',
-    editExtraProperties: 'Edit $t(categoryEdit.extraProp_plural)',
+    extraPropertiesEditor: {
+      title: 'Edit $t(categoryEdit.extraProp_plural)',
+      confirmSave: `Save the changes to the extra properties definitions?
+
+**Warnings**:
+
+{{warnings}}`,
+      warnings: {
+        nameChanged: 'Name changed from {{nameOld}} to {{nameNew}}',
+        dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
+      },
+    },
     extraProp: 'Extra property',
     extraProp_plural: 'Extra properties',
     extraPropDataType: {

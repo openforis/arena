@@ -93,16 +93,17 @@ const CategoryDetails = (props) => {
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
                     onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
                   />
-                  <Button label="categoryEdit.editExtraProperties" onClick={Actions.toggleEditExtraPropertiesPanel} />
+                  <Button
+                    label="categoryEdit.extraPropertiesEditor.title"
+                    onClick={Actions.toggleEditExtraPropertiesPanel}
+                  />
                 </div>
               }
             />
           )}
         </div>
 
-        {editingItemExtraDefs && (
-          <ItemExtraDefsEditor state={state} setState={setState}/>
-        )}
+        {editingItemExtraDefs && <ItemExtraDefsEditor state={state} setState={setState} />}
 
         <div className="category__levels">
           {levels.map((level) => (

@@ -5,16 +5,15 @@ import React, { useCallback, useState } from 'react'
 import { ArrayUtils } from '@core/arrayUtils'
 import * as Category from '@core/survey/category'
 import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
-import { validateCategoryItemExtraDef } from '@core/survey/categoryItemExtraDefValidator'
-import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import { State, useActions } from '../store'
-import { ButtonAdd, ButtonSave, PanelRight } from '@webapp/components'
+import { ButtonAdd, PanelRight } from '@webapp/components'
 
 import { ItemExtraDefEditor } from './ItemExtraDefEditor'
+import { useConfirm } from '@webapp/components/hooks'
 
 export const ItemExtraDefsEditor = (props) => {
   const { state: categoryState, setState: setCategoryState } = props
@@ -37,11 +36,15 @@ export const ItemExtraDefsEditor = (props) => {
   const { itemExtraDefs } = state
 
   const updateItemExtraDefs = useCallback(
-    (itemExtraDefsUpdated) => {
-      setState((statePrev) => ({
-        ...statePrev,
-        itemExtraDefs: itemExtraDefsUpdated,
-      }))
+    async (itemExtraDefsUpdated) => {
+      const itemExtraDefsIndexed = itemExtraDefsUpdated.reduce(
+        (acc, itemExtraDef) => ({
+          ...acc,
+          [itemExtraDef.name]: CategoryItemExtraDef.newItem({ dataType: itemExtraDef.dataType }),
+        }),
+        {}
+      )
+      Actions.updateCategoryProp({ key: Category.keysProps.itemExtraDef, value: itemExtraDefsIndexed })
     },
     [setState]
   )
@@ -50,47 +53,28 @@ export const ItemExtraDefsEditor = (props) => {
     const itemExtraDef = {
       ...CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
       name: '', // name property is used only in UI
+      newItem: true,
     }
-    const validation = await validateCategoryItemExtraDef({ itemExtraDef: itemExtraDefUpdated })
-    const itemExtraDefValidated = Validation.assocValidation(validation)(itemExtraDef)
-    updateItemExtraDefs([...itemExtraDefs, itemExtraDefValidated])
-  }, [itemExtraDefs, updateItemExtraDefs])
+    setState((statePrev) => ({ ...statePrev, itemExtraDefs: [...itemExtraDefs, itemExtraDef] }))
+  }, [itemExtraDefs])
 
-  const updateItemExtraDef = useCallback(
+  const onItemUpdate = useCallback(
     async ({ index, itemExtraDefUpdated }) => {
       const itemExtraDefsUpdated = [...itemExtraDefs]
-      const validation = await validateCategoryItemExtraDef({ itemExtraDef: itemExtraDefUpdated })
-      itemExtraDefsUpdated[index] = Validation.assocValidation(validation)(itemExtraDefUpdated)
-      updateItemExtraDefs(itemExtraDefsUpdated)
-    },
-    [updateItemExtraDefs]
-  )
-
-  const onItemDelete = useCallback(
-    ({ index }) => {
-      const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(itemExtraDefs)
+      itemExtraDefsUpdated[index] = itemExtraDefUpdated
       updateItemExtraDefs(itemExtraDefsUpdated)
     },
     [itemExtraDefs, updateItemExtraDefs]
   )
 
-  const onSave = useCallback(() => {
-    const itemExtraDefsIndexed = itemExtraDefs.reduce(
-      (acc, itemExtraDef) => ({
-        ...acc,
-        [itemExtraDef.name]: CategoryItemExtraDef.newItem({ dataType: itemExtraDef.dataType }),
-      }),
-      {}
-    )
-    const itemExtraDefsSaved = Category.getItemExtraDef(category)
-    Object.entries(itemExtraDefsSaved).forEach(([name, itemExtraDefSaved], index) => {
-      const itemExtraDef = itemExtraDefs[index]
-      if (name !== itemExtraDef.)
-    })
-
-    Actions.updateCategoryProp({ key: Category.keysProps.itemExtraDef, value: itemExtraDefsIndexed })
-    Actions.toggleEditExtraPropertiesPanel()
-  }, [category, itemExtraDefs, setState, calculateInitialState])
+  const onItemDelete = useCallback(
+    ({ index }) => {
+      // TODO confirm
+      const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(itemExtraDefs)
+      updateItemExtraDefs(itemExtraDefsUpdated)
+    },
+    [itemExtraDefs, updateItemExtraDefs]
+  )
 
   return (
     <PanelRight
@@ -104,15 +88,15 @@ export const ItemExtraDefsEditor = (props) => {
           <ItemExtraDefEditor
             key={String(index)}
             itemExtraDef={itemExtraDef}
+            itemExtraDefs={itemExtraDefs}
             index={index}
             readOnly={readOnly}
             onItemDelete={onItemDelete}
-            updateItemExtraDef={updateItemExtraDef}
+            onItemUpdate={onItemUpdate}
           />
         ))}
       </div>
-      <ButtonAdd className="item-add-btn" onClick={onAdd} />
-      <ButtonSave className="save-btn" onClick={onSave} />
+      <ButtonAdd className="item-add-btn" disabled={readOnly} onClick={onAdd} />
     </PanelRight>
   )
 }

@@ -10,7 +10,13 @@ export const validateCategoryItemExtraDef = async ({ itemExtraDef, itemExtraDefs
     [CategoryItemExtraDef.keys.name]: [
       Validator.validateRequired(Validation.messageKeys.nameRequired, { key: extraDefName }),
       Validator.validateName(Validation.messageKeys.categoryEdit.itemExtraPropNameInvalid, { key: extraDefName }),
-      // Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(itemExtraDefsArray),
+      () => {
+        const hasDuplicates = itemExtraDefsArray.some(
+          (item, index) =>
+            index !== itemExtraDefsArray.indexOf(itemExtraDef) && extraDefName === CategoryItemExtraDef.getName(item)
+        )
+        return hasDuplicates ? { key: Validation.messageKeys.nameDuplicate } : null
+      },
     ],
     [CategoryItemExtraDef.keys.dataType]: [
       Validator.validateRequired(Validation.messageKeys.categoryEdit.itemExtraPropDataTypeRequired),
