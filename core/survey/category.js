@@ -23,11 +23,6 @@ export const keysProps = {
   reportingData: 'reportingData',
 }
 
-export const keysItemExtraDef = {
-  dataType: 'dataType',
-  name: 'name',
-}
-
 export const itemExtraDefDataTypes = {
   text: 'text',
   number: 'number',
@@ -111,9 +106,6 @@ export const getItemValidation = (item) =>
   )
 
 // ====== ITEMS extra def
-export const newItemExtraDefItem = ({ dataType }) => ({
-  [keysItemExtraDef.dataType]: dataType,
-})
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefKeys = (category) => {
   const itemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})(category)

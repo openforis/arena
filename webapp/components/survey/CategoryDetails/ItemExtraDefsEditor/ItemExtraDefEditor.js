@@ -3,6 +3,7 @@ import React from 'react'
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
@@ -20,26 +21,26 @@ export const ItemExtraDefEditor = (props) => {
     <FormItem label={`${i18n.t('categoryEdit.extraProp')} ${index + 1}`} key={String(index)}>
       <Input
         value={name}
-        numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
+        numberFormat={dataType === CategoryItemExtraDef.dataTypes.number ? NumberFormats.decimal() : null}
         readOnly={readOnly}
         onChange={(value) => {
           const valueNormalized = StringUtils.normalizeName(value)
           const itemExtraDefUpdated = { ...itemExtraDef, name: valueNormalized }
           updateItemExtraDef({ index, itemExtraDefUpdated })
         }}
-        validation={Validation.getFieldValidation(Category.keysItemExtraDef.name)(validation)}
+        validation={Validation.getFieldValidation(CategoryItemExtraDef.keys.name)(validation)}
       />
       <Dropdown
         readOnlyInput
         readOnly={readOnly}
-        items={Object.keys(Category.itemExtraDefDataTypes)}
+        items={Object.keys(CategoryItemExtraDef.dataTypes)}
         itemKey={A.identity}
         itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
         selection={dataType}
         onChange={(dataTypeUpdated) =>
           updateItemExtraDef({ index, itemExtraDefUpdated: { ...itemExtraDef, dataType: dataTypeUpdated } })
         }
-        validation={Validation.getFieldValidation(Category.keysItemExtraDef.dataType)(validation)}
+        validation={Validation.getFieldValidation(CategoryItemExtraDef.keys.dataType)(validation)}
       />
       <ButtonDelete showLabel={false} onClick={() => onItemDelete({ index })} />
     </FormItem>

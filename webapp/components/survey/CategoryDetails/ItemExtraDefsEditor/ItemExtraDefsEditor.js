@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as Category from '@core/survey/category'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import { validateCategoryItemExtraDef } from '@core/survey/categoryItemExtraDefValidator'
 import * as Validation from '@core/validation/validation'
 
@@ -45,6 +46,16 @@ export const ItemExtraDefsEditor = (props) => {
     [setState]
   )
 
+  const onAdd = useCallback(async () => {
+    const itemExtraDef = {
+      ...CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
+      name: '', // name property is used only in UI
+    }
+    const validation = await validateCategoryItemExtraDef({ itemExtraDef: itemExtraDefUpdated })
+    const itemExtraDefValidated = Validation.assocValidation(validation)(itemExtraDef)
+    updateItemExtraDefs([...itemExtraDefs, itemExtraDefValidated])
+  }, [itemExtraDefs, updateItemExtraDefs])
+
   const updateItemExtraDef = useCallback(
     async ({ index, itemExtraDefUpdated }) => {
       const itemExtraDefsUpdated = [...itemExtraDefs]
@@ -54,16 +65,6 @@ export const ItemExtraDefsEditor = (props) => {
     },
     [updateItemExtraDefs]
   )
-
-  const onAdd = useCallback(async () => {
-    const itemExtraDef = {
-      ...Category.newItemExtraDefItem({ dataType: Category.itemExtraDefDataTypes.text }),
-      name: '', // name property is used only in UI
-    }
-    const validation = await validateCategoryItemExtraDef({ itemExtraDef: itemExtraDefUpdated })
-    const itemExtraDefValidated = Validation.assocValidation(validation)(itemExtraDef)
-    updateItemExtraDefs([...itemExtraDefs, itemExtraDefValidated])
-  }, [itemExtraDefs, updateItemExtraDefs])
 
   const onItemDelete = useCallback(
     ({ index }) => {
@@ -77,13 +78,19 @@ export const ItemExtraDefsEditor = (props) => {
     const itemExtraDefsIndexed = itemExtraDefs.reduce(
       (acc, itemExtraDef) => ({
         ...acc,
-        [itemExtraDef.name]: Category.newItemExtraDefItem({ dataType: itemExtraDef.dataType }),
+        [itemExtraDef.name]: CategoryItemExtraDef.newItem({ dataType: itemExtraDef.dataType }),
       }),
       {}
     )
+    const itemExtraDefsSaved = Category.getItemExtraDef(category)
+    Object.entries(itemExtraDefsSaved).forEach(([name, itemExtraDefSaved], index) => {
+      const itemExtraDef = itemExtraDefs[index]
+      if (name !== itemExtraDef.)
+    })
+
     Actions.updateCategoryProp({ key: Category.keysProps.itemExtraDef, value: itemExtraDefsIndexed })
     Actions.toggleEditExtraPropertiesPanel()
-  }, [itemExtraDefs, setState, calculateInitialState])
+  }, [category, itemExtraDefs, setState, calculateInitialState])
 
   return (
     <PanelRight

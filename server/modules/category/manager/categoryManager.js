@@ -11,6 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
@@ -345,8 +346,8 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
     const itemExtraDefUpdated = {
       ...itemExtraDef,
-      [Category.reportingDataItemExtraDefKeys.area]: Category.newItemExtraDefItem({
-        dataType: Category.itemExtraDefDataTypes.number,
+      [Category.reportingDataItemExtraDefKeys.area]: CategoryItemExtraDef.newItem({
+        dataType: CategoryItemExtraDef.dataTypes.number,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
