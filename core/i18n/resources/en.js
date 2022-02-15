@@ -467,7 +467,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   dataExportView: {
     options: {
       header: 'Options',
-      includeCategoryItemsLabels: 'Include category items labels',
+      includeCategories: 'Include categories',
     },
     startCsvExport: 'Start CSV export',
   },
@@ -1211,7 +1211,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     TaxonomyImportJob: 'Taxonomy Import',
     // export csv data
     ExportCsvDataJob: 'Export CSV data',
-    CSVDataExtraction: 'Data export',
+    ZipCreationJob: 'ZIP file Creation',
+    CSVDataExtraction: 'Data Export',
     // import arena survey
     ArenaImportJob: 'Arena import',
     ArenaSurveyReaderJob: 'Arena Survey Reader',

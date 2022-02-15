@@ -44,3 +44,5 @@ export const tempFilePath = (fileName, subfolderName = null) =>
   subfolderName
     ? join(ProcessUtils.ENV.tempFolder, subfolderName, fileName)
     : join(ProcessUtils.ENV.tempFolder, fileName)
+export const newTempFilePath = () => tempFilePath(newTempFileName())
+export const newTempFolderPath = () => tempFilePath(newTempFolderName())
