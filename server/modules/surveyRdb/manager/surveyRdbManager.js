@@ -1,7 +1,5 @@
-import * as DateUtils from '@core/dateUtils'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -159,16 +157,8 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
-export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client) => {
+export const fetchEntitiesDataToCsvFiles = async ({ surveyId, outputDir, callback }, client) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, client)
-
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyName = Survey.getName(surveyInfo)
-
-  const exportDataFolderName = `${surveyName}_export_${DateUtils.nowFormatDefault()}`
-  const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
-  await FileUtils.rmdir(dir)
-  await FileUtils.mkdir(dir)
 
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
@@ -176,7 +166,7 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const stream = FileUtils.createWriteStream(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))
+    const stream = FileUtils.createWriteStream(FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
@@ -196,8 +186,6 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
 
     await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query, addCycle: true })
   })
-
-  return { exportDataFolderName, dir }
 }
 /**
  * Counts the number of rows in the data view related to the specified query object.

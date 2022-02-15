@@ -23,6 +23,15 @@ export const importRecordsFromCollect = async ({
 }
 
 // ==== DATA EXPORT
+export const startExportDataToCSVJob = async ({ surveyId, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/export-csv-data`, options)
+  const { job } = data
+  return job
+}
+
+export const downloadExportedDataToCSVUrl = ({ surveyId, exportUuid }) =>
+  `/api/survey/${surveyId}/export-csv-data/${exportUuid}`
+
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
