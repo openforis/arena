@@ -92,17 +92,15 @@ const MapWrapper = () => {
           width="70vw"
           onClose={() => onRecordEditClick(null)}
         >
-          <Record recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} />
+          <Record recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
         </PanelRight>
       )}
     </>
   )
 }
 
-export const MapView = () => {
-  return (
-    <SurveyDefsLoader draft={false} requirePublish>
-      <MapWrapper />
-    </SurveyDefsLoader>
-  )
-}
+export const MapView = () => (
+  <SurveyDefsLoader draft={false} requirePublish>
+    <MapWrapper />
+  </SurveyDefsLoader>
+)
