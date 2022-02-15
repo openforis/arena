@@ -16,7 +16,12 @@ import { useOnUpdate, useQuery, useWebSocket } from '@webapp/components/hooks'
 import { State } from './state'
 
 export const useLocalState = (props) => {
-  const { recordUuid: recordUuidProp, pageNodeUuid: pageNodeUuidProp, pageNodeDefUuid: pageNodeDefUuidProp } = props
+  const {
+    recordUuid: recordUuidProp,
+    pageNodeUuid: pageNodeUuidProp,
+    pageNodeDefUuid: pageNodeDefUuidProp,
+    insideMap = false,
+  } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -86,7 +91,7 @@ export const useLocalState = (props) => {
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
     const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord(recordUuid, draft, pageNodeUuid, pageNodeDefUuid))
+    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }))
 
     // Add beforeunload event listener
     window.addEventListener('beforeunload', componentUnload)

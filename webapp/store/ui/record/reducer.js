@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { SystemActions } from '@webapp/store/system'
@@ -19,7 +21,8 @@ const actionHandlers = {
 
   // Record updates
   [RecordActions.recordCreate]: (state, { record }) => RecordState.assocRecord(record)(state),
-  [RecordActions.recordLoad]: (state, { record }) => RecordState.assocRecord(record)(state),
+  [RecordActions.recordLoad]: (state, { record, insideMap }) =>
+    A.pipe(RecordState.assocRecord(record), RecordState.assocInsideMap(insideMap))(state),
   [RecordActions.recordDelete]: (state) => RecordState.assocRecord(null)(state),
 
   // Node updates
