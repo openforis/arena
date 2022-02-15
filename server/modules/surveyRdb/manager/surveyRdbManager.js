@@ -15,7 +15,6 @@ import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
 import { Query } from '../../../../common/model/query'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-import ViewColumnNodeDef from '../../../../common/model/db/views/dataNodeDef/viewColumnNodeDef'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -47,8 +46,7 @@ const _getExportFields = ({ survey, query, addCycle = false }) => {
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.flatMap((nodeDefCol) => new ViewColumnNodeDef(viewDataNodeDef, nodeDefCol).names)
-
+  const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
   // Cycle is 0-based
   return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
 }
@@ -172,14 +170,10 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, callback }, client
   await FileUtils.rmdir(dir)
   await FileUtils.mkdir(dir)
 
-  // extract multiple node defs (and root) from the survey
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
 
-  // for each multiple node def:
-  // - extract the data
-  // - store the data in a separate csv file
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const stream = FileUtils.createWriteStream(FileUtils.join(dir, `${NodeDef.getName(nodeDefContext)}.csv`))

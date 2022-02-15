@@ -43,7 +43,7 @@ const getColumnNames = (nodeDef) => {
 
 const extractColumnName = ({ nodeDef, columnName }) => {
   // this is because when there is not subfix whe should return
-  if (NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)) {
+  if(NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)){
     return 'code'
   }
   return camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
@@ -58,8 +58,8 @@ export default class ColumnNodeDef {
   constructor(table, nodeDef) {
     this._table = table
     this._nodeDef = nodeDef
-    this._names = this.determineColumnNames()
-    this._types = this.determineColumnTypes()
+    this._names = getColumnNames(nodeDef)
+    this._types = colTypesByType[NodeDef.getType(nodeDef)]
   }
 
   get table() {
@@ -88,14 +88,6 @@ export default class ColumnNodeDef {
 
   get types() {
     return this._types
-  }
-
-  determineColumnNames() {
-    return getColumnNames(this.nodeDef)
-  }
-
-  determineColumnTypes() {
-    return colTypesByType[NodeDef.getType(this.nodeDef)]
   }
 }
 

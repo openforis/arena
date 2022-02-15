@@ -11,4 +11,4 @@ export { default as TableChain } from './tables/chain'
 export { default as TableDataNodeDef, ColumnNodeDef } from './tables/dataNodeDef'
 
 // ====== Views
-export { default as ViewDataNodeDef, ViewColumnNodeDef } from './views/dataNodeDef'
+export { default as ViewDataNodeDef } from './views/dataNodeDef'
