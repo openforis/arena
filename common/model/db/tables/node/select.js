@@ -1,3 +1,4 @@
+import { isUuid } from '../../../../../core/uuid'
 import * as Node from '../../../../../core/record/node'
 
 import TableCategoryItem from '../categoryItem'
@@ -33,9 +34,7 @@ export function getSelect(params) {
   const whereConditions = []
   const _addUuidEqualCondition = (column, value) => {
     if (value) {
-      const isUuid =
-        value.length === 36 && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
-      whereConditions.push(`${column} = ${isUuid ? `'${value}'` : value}`)
+      whereConditions.push(`${column} = ${isUuid(value) ? `'${value}'` : value}`)
     }
   }
 

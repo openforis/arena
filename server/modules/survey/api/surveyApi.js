@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
+import { isUuid } from '@core/uuid'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -159,6 +160,10 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, exportUuid } = Request.getParams(req)
+
+        if (!isUuid(exportUuid)) {
+          throw new Error('Invalid exportUuid specified')
+        }
 
         const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.zip`)
 
