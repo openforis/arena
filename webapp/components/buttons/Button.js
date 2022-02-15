@@ -12,6 +12,7 @@ export const Button = forwardRef((props, ref) => {
     iconClassName,
     id,
     label: labelProp,
+    labelParams,
     onClick,
     showLabel,
     size,
@@ -22,9 +23,13 @@ export const Button = forwardRef((props, ref) => {
   } = props
 
   const i18n = useI18n()
-  const label = showLabel && labelProp ? i18n.t(labelProp) : null
+  const label = showLabel && labelProp ? i18n.t(labelProp, labelParams) : null
   // use label as title when not showing label
-  const title = titleProp ? i18n.t(titleProp, titleParams) : !showLabel && labelProp ? i18n.t(labelProp) : null
+  const title = titleProp
+    ? i18n.t(titleProp, titleParams)
+    : !showLabel && labelProp
+    ? i18n.t(labelProp, labelParams)
+    : null
 
   return (
     <button
@@ -53,6 +58,7 @@ Button.propTypes = {
   id: PropTypes.string,
   iconClassName: PropTypes.string,
   label: PropTypes.string,
+  labelParams: PropTypes.object,
   onClick: PropTypes.func,
   showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
@@ -68,6 +74,7 @@ Button.defaultProps = {
   iconClassName: null,
   id: null,
   label: null,
+  labelParams: null,
   onClick: null,
   showLabel: true,
   size: 'medium',

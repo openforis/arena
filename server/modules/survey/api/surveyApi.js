@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
+import { isUuid } from '@core/uuid'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -15,6 +16,12 @@ import * as User from '../../../../core/user/user'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
 import * as UserService from '../../user/service/userService'
+
+const generateOutputFileName = async ({ surveyId, fileType, extension }) => {
+  const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+  const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+  return `${surveyName}_${fileType}_${DateUtils.nowFormatDefault()}.${extension}`
+}
 
 export const init = (app) => {
   // ==== CREATE
@@ -135,11 +142,11 @@ export const init = (app) => {
   // generate zip with CSV
   app.post('/survey/:surveyId/export-csv-data', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, includeCategories } = Request.getParams(req)
 
       const user = Request.getUser(req)
 
-      const job = SurveyService.startExportCsvDataJob({ surveyId, user })
+      const job = SurveyService.startExportCsvDataJob({ surveyId, user, includeCategories })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
       next(error)
@@ -148,14 +155,27 @@ export const init = (app) => {
 
   // get zip with csv
   app.get(
-    '/survey/:surveyId/export-csv-data/:exportDataFolderName',
+    '/survey/:surveyId/export-csv-data/:exportUuid',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { exportDataFolderName } = Request.getParams(req)
-        const name = `${exportDataFolderName}.zip`
-        const dir = FileUtils.join(ProcessUtils.ENV.tempFolder, exportDataFolderName)
-        Response.sendZipFile(res, dir, name)
+        const { surveyId, exportUuid } = Request.getParams(req)
+
+        if (!isUuid(exportUuid)) {
+          throw new Error('Invalid exportUuid specified')
+        }
+
+        const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.zip`)
+
+        const fileName = await generateOutputFileName({ surveyId, fileType: 'export', extension: 'zip' })
+
+        Response.sendFile({
+          res,
+          path: tempFilePath,
+          name: fileName,
+          contentType: Response.contentTypes.zip,
+          onEnd: async () => FileUtils.deleteFile(tempFilePath),
+        })
       } catch (error) {
         next(error)
       }
@@ -166,9 +186,7 @@ export const init = (app) => {
     try {
       const { surveyId } = Request.getParams(req)
 
-      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
-      const fileName = `${surveyName}_schema_summary_${DateUtils.nowFormatDefault()}.csv`
+      const fileName = await generateOutputFileName({ surveyId, fileType: 'schema_summary', extension: 'csv' })
       Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
       await SurveyService.exportSchemaSummary({ surveyId, outputStream: res })

@@ -29,6 +29,8 @@ export {
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordSummary,
+  startExportDataToCSVJob,
+  downloadExportedDataToCSVUrl,
 } from './data'
 export { fetchAvailableMapPeriods, testMapApiKey } from './map'
 export { fetchSurveys, insertSurvey } from './survey'
