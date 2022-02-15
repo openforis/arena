@@ -465,6 +465,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   dataExportView: {
+    options: {
+      header: 'Options',
+      includeCategoryItemsLabels: 'Include category items labels',
+    },
     startCsvExport: 'Start CSV export',
   },
 

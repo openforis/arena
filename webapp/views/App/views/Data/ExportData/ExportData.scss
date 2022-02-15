@@ -2,6 +2,14 @@
 
 .export {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+
+  .options {
+    width: 25rem;
+
+    .form-item.check {
+      grid-template-columns: 0.7fr 0.3fr;
+    }
+  }
 }
