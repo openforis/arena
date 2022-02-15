@@ -1,6 +1,7 @@
 import './nodeDefCoordinate.scss'
 
 import React, { useCallback, useState } from 'react'
+import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
@@ -12,6 +13,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Srs from '@core/geo/srs'
 
 import { useI18n } from '@webapp/store/system'
+import { RecordState } from '@webapp/store/ui/record'
 
 import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -32,6 +34,8 @@ const NodeDefCoordinate = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const canUseMap = useAuthCanUseMap()
+  const insideMap = useSelector(RecordState.isInsideMap)
+  const canShowMap = canUseMap && !insideMap
 
   const [showMap, setShowMap] = useState(false)
 
@@ -126,7 +130,7 @@ const NodeDefCoordinate = (props) => {
     </PanelRight>
   ) : null
 
-  const mapTriggerButton = canUseMap ? (
+  const mapTriggerButton = canShowMap ? (
     <Button
       className="map-trigger-btn btn-transparent"
       title="surveyForm.nodeDefCoordinate.showOnMap"
@@ -142,7 +146,7 @@ const NodeDefCoordinate = (props) => {
         className={classNames(
           'survey-form__node-def-table-cell-composite',
           'survey-form__node-def-table-cell-coordinate',
-          { 'with-map': canUseMap }
+          { 'with-map': canShowMap }
         )}
       >
         {xInput}
