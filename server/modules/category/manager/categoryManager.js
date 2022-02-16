@@ -233,7 +233,6 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
       ? CategoryItem.dissocExtraProp(name)(item)
       : CategoryItem.renameExtraProp({ nameOld: name, nameNew: CategoryItemExtraDef.getName(itemExtraDef) })(item)
 
-    console.log('===itemUpdated', JSON.stringify(itemUpdated))
     return [...acc, itemUpdated]
   }, [])
 
