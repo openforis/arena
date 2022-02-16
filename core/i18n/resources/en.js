@@ -987,6 +987,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     deleteItem: 'Delete item',
     extraPropertiesEditor: {
       title: 'Edit $t(categoryEdit.extraProp_plural)',
+      confirmDelete: 'Delete the extra properties "{{name}}"?',
       confirmSave: `Save the changes to the extra properties definitions?
 
 **Warnings**:

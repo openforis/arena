@@ -11,6 +11,8 @@ export {
   cleanupCategory,
   convertToReportingDataCategory,
   startExportAllCategoriesJob,
+  updateCategoryProp,
+  updateCategoryItemExtraDefItem,
 } from './categories'
 export { fetchChains } from './analysis'
 

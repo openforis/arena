@@ -273,7 +273,32 @@ export const init = (app) => {
         const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const category = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
+        const category = await CategoryService.updateCategoryProp({ user, surveyId, categoryUuid, key, value })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/extradef',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, name, deleted } = Request.getParams(req)
+        const itemExtraDef = Request.getJsonParam(req, 'itemExtraDef')
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.updateCategoryItemExtraDefItem({
+          user,
+          surveyId,
+          categoryUuid,
+          name,
+          itemExtraDef,
+          deleted,
+        })
 
         res.json({ category })
       } catch (error) {

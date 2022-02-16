@@ -163,12 +163,14 @@ export default class CategoryImportJob extends Job {
 
     if (!R.isEmpty(itemExtraDef)) {
       await CategoryManager.updateCategoryProp(
-        this.user,
-        this.surveyId,
-        Category.getUuid(this.category),
-        Category.keysProps.itemExtraDef,
-        itemExtraDef,
-        true,
+        {
+          user: this.user,
+          surveyId: this.surveyId,
+          categoryUuid: Category.getUuid(this.category),
+          key: Category.keysProps.itemExtraDef,
+          value: itemExtraDef,
+          system: true,
+        },
         this.tx
       )
       this.category = Category.assocItemExtraDef(itemExtraDef)(this.category)

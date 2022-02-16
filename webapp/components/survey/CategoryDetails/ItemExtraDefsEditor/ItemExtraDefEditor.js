@@ -18,7 +18,8 @@ export const ItemExtraDefEditor = (props) => {
   const i18n = useI18n()
   const confirm = useConfirm()
 
-  const [state, setState] = useState({ editing: itemExtraDefProp.newItem, itemExtraDef: itemExtraDefProp })
+  const newItem = itemExtraDefProp.newItem
+  const [state, setState] = useState({ editing: newItem, itemExtraDef: itemExtraDefProp })
 
   const { editing, itemExtraDef } = state
   const { name, dataType, validation } = itemExtraDef
@@ -40,11 +41,11 @@ export const ItemExtraDefEditor = (props) => {
   const onEditClick = () => setState((statePrev) => ({ ...statePrev, editing: true }))
 
   const onSaveClick = useCallback(async () => {
-    const { newItem, ...itemPropsToSave } = itemExtraDef
+    const { newItem, validation, ...itemPropsToSave } = itemExtraDef
 
     const doSave = async () => {
       setState((statePrev) => ({ ...statePrev, editing: false }))
-      onItemUpdate({ index, itemExtraDefUpdated: itemPropsToSave })
+      await onItemUpdate({ index, itemExtraDefUpdated: itemPropsToSave })
     }
 
     if (newItem) {
@@ -78,9 +79,14 @@ export const ItemExtraDefEditor = (props) => {
         await doSave()
       }
     }
-  }, [itemExtraDefProp, confirm, onItemUpdate])
+  }, [itemExtraDef, itemExtraDefProp, confirm, onItemUpdate])
 
-  const onCancelClick = () => setState((statePrev) => ({ ...statePrev, editing: false }))
+  const onCancelClick = () => {
+    setState((statePrev) => ({ ...statePrev, editing: false }))
+    if (newItem) {
+      onItemDelete({ index })
+    }
+  }
 
   return (
     <FormItem label={`${i18n.t('categoryEdit.extraProp')} ${index + 1}`}>

@@ -1,5 +1,6 @@
 import { useInit } from './category/useInit'
 import { useUpdateCategoryProp } from './category/useUpdateCategoryProp'
+import { useUpdateCategoryItemExtraPropItem } from './category/useUpdateCategoryItemExtraPropItem'
 import { useUploadCategory } from './category/useUploadCategory'
 import { useCleanupCategory } from './category/useCleanupCategory'
 import { useConvertToReportingDataCategory } from './category/useConvertToReportingDataCategory'
@@ -24,6 +25,7 @@ export const useActions = ({ setState }) => ({
 
   // Category
   updateCategoryProp: useUpdateCategoryProp({ setState }),
+  updateCategoryItemExtraPropItem: useUpdateCategoryItemExtraPropItem({ setState }),
   uploadCategory: useUploadCategory({ setState }),
   hideImportSummary: useHideImportSummary({ setState }),
   setImportSummaryColumnDataType: useSetImportSummaryColumnDataType({ setState }),
