@@ -23,10 +23,6 @@ export const keysProps = {
   reportingData: 'reportingData',
 }
 
-export const keysItemExtraDef = {
-  dataType: 'dataType',
-}
-
 export const itemExtraDefDataTypes = {
   text: 'text',
   number: 'number',
@@ -110,14 +106,19 @@ export const getItemValidation = (item) =>
   )
 
 // ====== ITEMS extra def
-export const newItemExtraDefItem = ({ dataType }) => ({
-  [keysItemExtraDef.dataType]: dataType,
-})
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefKeys = (category) => {
-  const itemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})(category)
+  const itemExtraDef = getItemExtraDef(category)
   return Object.keys(itemExtraDef)
 }
+export const getItemExtraDefsArray = (category) =>
+  // add uuid and name to each extra def item definition and put them in a array
+  Object.entries(getItemExtraDef(category)).map(([name, item]) => ({
+    ...item,
+    uuid: uuidv4(),
+    name,
+  }))
+
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
 // ========

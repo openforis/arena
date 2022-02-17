@@ -11,6 +11,12 @@ const addOrRemoveItem =
     return result
   }
 
+const removeItemAtIndex =
+  ({ index }) =>
+  (array) =>
+    [...array.slice(0, index), ...array.slice(index + 1)]
+
 export const ArrayUtils = {
   addOrRemoveItem,
+  removeItemAtIndex,
 }

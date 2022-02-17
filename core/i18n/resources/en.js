@@ -989,8 +989,26 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
     deleteItem: 'Delete item',
+    extraPropertiesEditor: {
+      title: 'Edit $t(categoryEdit.extraProp_plural)',
+      confirmDelete: 'Delete the extra properties "{{name}}"?',
+      confirmSave: `Save the changes to the extra properties definitions?
+
+**Warnings**:
+
+{{warnings}}`,
+      warnings: {
+        nameChanged: 'Name changed from {{nameOld}} to {{nameNew}}',
+        dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
+      },
+    },
     extraProp: 'Extra property',
     extraProp_plural: 'Extra properties',
+    extraPropDataType: {
+      geometryPoint: 'Geometry Point',
+      number: 'Number',
+      text: 'Text',
+    },
     level: 'Level',
 
     importSummary: {
@@ -1004,11 +1022,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         description: 'description',
         label: 'label',
         extra: '$t(categoryEdit.extraProp)',
-      },
-      columnDataType: {
-        geometryPoint: 'Geometry Point',
-        number: 'Number',
-        text: 'Text',
       },
       dataType: 'Data Type',
     },
@@ -1039,6 +1052,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeCannotBeKeyword: `Code "{{value}}" cannot be used: it's a reserved word`,
       codeDuplicate: 'Code is duplicate',
       codeRequired: 'Code is required',
+      itemExtraPropDataTypeRequired: 'Data type required for $t(categoryEdit.extraProp) "{{key}}"',
+      itemExtraPropNameInvalid: 'Invalid name for $t(categoryEdit.extraProp) "{{key}}"',
       itemExtraPropInvalidNumber: 'Invalid number for $t(categoryEdit.extraProp) "{{key}}"',
       itemExtraPropInvalidGeometryPoint: 'Invalid geometry point for $t(categoryEdit.extraProp) "{{key}}"',
       itemsInvalid: 'At least one invalid item',

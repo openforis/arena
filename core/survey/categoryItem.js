@@ -36,10 +36,22 @@ export const getLabelWithCode = (language) => (item) =>
 
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
-export const getExtraProp = (prop) => R.pipe(getExtra, R.propOr('', prop))
+export const getExtraProp = (prop) => R.pipe(getExtra, R.prop(prop))
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
+// ====== UPDATE - Extra Props
+export const dissocExtraProp = (key) => R.dissocPath([keys.props, keysProps.extra, key])
+export const renameExtraProp =
+  ({ nameOld, nameNew }) =>
+  (item) => {
+    const extra = getExtra(item)
+    const extraUpdated = { ...extra }
+    const extraProp = extra[nameOld]
+    delete extraUpdated[nameOld]
+    extraUpdated[nameNew] = extraProp
+    return assocProp({ key: keysProps.extra, value: extraUpdated })(item)
+  }
 
 // ====== UTILS
 
