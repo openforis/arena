@@ -119,7 +119,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
         SELECT * 
         FROM ${getSurveyDBSchema(surveyId)}.category
         ${search ? `WHERE ${nameColumn} ILIKE $/search/` : ''} 
-        ORDER BY (props || props_draft) -> '${Category.keysProps.name}'
+        ORDER BY ${nameColumn}
         ${offset ? 'OFFSET $/offset/' : ''}
         ${limit ? 'LIMIT $/limit/' : ''}
       )

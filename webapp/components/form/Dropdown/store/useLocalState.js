@@ -43,5 +43,9 @@ export const useLocalState = ({
     setState(State.assocDisabled(disabled))
   }, [disabled])
 
+  useOnUpdate(() => {
+    setState(State.assocReadOnly(readOnly))
+  }, [readOnly])
+
   return { Actions, state }
 }

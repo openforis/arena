@@ -94,3 +94,5 @@ export const assocImportSummaryColumnDataType =
 export const dissocImportSummary = A.dissoc(keys.importSummary)
 
 export const assocCleaned = A.assoc(keys.cleaned, true)
+
+export const assocEditingItemExtraDefs = A.assoc(keys.editingItemExtraDefs)

@@ -117,6 +117,7 @@ export const {
   fetchItemsByLevelIndex,
 
   updateCategoryProp,
+  updateCategoryItemExtraDefItem,
   cleanupCategory,
   convertCategoryToReportingData,
   updateLevelProp,

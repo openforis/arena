@@ -11,6 +11,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
@@ -110,7 +111,7 @@ export default class CategoryImportJob extends Job {
 
     return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
       if (CategoryImportSummary.isColumnExtra(column)) {
-        accExtraDef[columnName] = Category.newItemExtraDefItem({
+        accExtraDef[columnName] = CategoryItemExtraDef.newItem({
           dataType: CategoryImportSummary.getColumnDataType(column),
         })
       }
@@ -162,12 +163,14 @@ export default class CategoryImportJob extends Job {
 
     if (!R.isEmpty(itemExtraDef)) {
       await CategoryManager.updateCategoryProp(
-        this.user,
-        this.surveyId,
-        Category.getUuid(this.category),
-        Category.keysProps.itemExtraDef,
-        itemExtraDef,
-        true,
+        {
+          user: this.user,
+          surveyId: this.surveyId,
+          categoryUuid: Category.getUuid(this.category),
+          key: Category.keysProps.itemExtraDef,
+          value: itemExtraDef,
+          system: true,
+        },
         this.tx
       )
       this.category = Category.assocItemExtraDef(itemExtraDef)(this.category)

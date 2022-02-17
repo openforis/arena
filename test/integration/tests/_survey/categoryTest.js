@@ -4,13 +4,18 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import { getContextSurveyId, getContextUser } from '../../config/context'
 
 export const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const categoryReq = Category.newCategory({ name: 'category_test' })
+  const extraDef = {
+    extraDefText: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
+    extraDefNumber: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.number }),
+  }
+  const categoryReq = Category.assocItemExtraDef(extraDef)(Category.newCategory({ name: 'category_test' }))
   const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
 
   /* eslint-disable no-unused-expressions */
@@ -66,16 +71,19 @@ export const createCategoryItemTest = async () => {
 
   const itemCode = '1'
   const itemLabel = 'Value 1'
+  const extra = { extraDefText: 'extra 1', extraDefNumber: 3 }
 
   const itemReq = CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
     code: itemCode,
     labels: { en: itemLabel },
+    extra,
   })
 
   const { item } = await CategoryManager.insertItem(user, surveyId, Category.getUuid(category), itemReq)
 
   expect(CategoryItem.getCode(item)).toBe(itemCode)
   expect(CategoryItem.getLabel('en')(item)).toBe(itemLabel)
+  expect(CategoryItem.getExtra(item)).toEqual(extra)
 }
 
 export const updateCategoryTest = async () => {
@@ -85,13 +93,32 @@ export const updateCategoryTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const newName = 'category_modified'
-  const { category: updatedCategory } = await CategoryManager.updateCategoryProp(
+  const { category: updatedCategory } = await CategoryManager.updateCategoryProp({
     user,
     surveyId,
-    Category.getUuid(category),
-    'name',
-    newName
-  )
+    categoryUuid: Category.getUuid(category),
+    key: 'name',
+    value: newName,
+  })
 
   expect(Category.getName(updatedCategory)).toBe(newName)
+}
+
+export const updateCategoryItemExtraDefTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  const category = await _fetchFirstCategory(surveyId)
+
+  const categoryUpdated = await CategoryManager.updateCategoryItemExtraDefItem({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+    name: 'extraDefText',
+    value: { name: 'extraDefText_modified', dataType: CategoryItemExtraDef.dataTypes.text },
+  })
+
+  const itemExtraDefExpected = { extraDefText_modified: { dataType: CategoryItemExtraDef.dataTypes.text } }
+
+  expect(Category.getItemExtraDef(categoryUpdated)).toBe(itemExtraDefExpected)
 }

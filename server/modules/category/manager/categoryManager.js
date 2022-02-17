@@ -11,6 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
@@ -24,6 +25,7 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryValidator from '../categoryValidator'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 import * as CategoryRepository from '../repository/categoryRepository'
+import { validateCategoryItemExtraDef } from '@core/survey/categoryItemExtraDefValidator'
 
 // ====== VALIDATION
 
@@ -200,7 +202,7 @@ export const publishProps = async (surveyId, langsDeleted, client = db) =>
     ])
   )
 
-export const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, system = false, client = db) =>
+export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, value, system = false }, client = db) =>
   client.tx(async (t) => {
     await Promise.all([
       CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
@@ -219,6 +221,80 @@ export const updateCategoryProp = async (user, surveyId, categoryUuid, key, valu
       ),
     ])
     return validateCategory(surveyId, categoryUuid, t)
+  })
+
+const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t) => {
+  const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, t)
+  const itemsUpdated = items.reduce((acc, item) => {
+    if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
+      return acc
+    }
+    const itemUpdated = deleted
+      ? CategoryItem.dissocExtraProp(name)(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: CategoryItemExtraDef.getName(itemExtraDef) })(item)
+
+    return [...acc, itemUpdated]
+  }, [])
+
+  if (itemsUpdated.length > 0) {
+    await CategoryRepository.updateItems(surveyId, itemsUpdated, t)
+  }
+}
+
+export const updateCategoryItemExtraDefItem = async (
+  { user, surveyId, categoryUuid, name, itemExtraDef = null, deleted = false },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft: true }, t)
+
+    // validate new item extra def
+    let itemExtraDefsArrayUpdated = [...Category.getItemExtraDefsArray(category)]
+    // remove old item
+    itemExtraDefsArrayUpdated = itemExtraDefsArrayUpdated.filter((item) => CategoryItemExtraDef.getName(item) !== name)
+
+    if (!deleted) {
+      // add new extra def item
+      itemExtraDefsArrayUpdated.push(itemExtraDef)
+
+      const validation = await validateCategoryItemExtraDef({
+        itemExtraDef,
+        itemExtraDefsArray: itemExtraDefsArrayUpdated,
+      })
+      if (!Validation.isValid(validation)) {
+        throw new Error('Invalid category item extra def')
+      }
+    }
+
+    // update category items
+    if (deleted || name !== CategoryItemExtraDef.getName(itemExtraDef)) {
+      await _updateCategoryItemsExtraDef({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t)
+    }
+
+    // prepare itemExtraDefs for storage
+    // - remove unnecessary information (uuid, name)
+    // - index stored object by extra def name
+    const itemExtraDefsToStore = itemExtraDefsArrayUpdated.reduce(
+      (acc, item) => ({
+        ...acc,
+        [CategoryItemExtraDef.getName(item)]: CategoryItemExtraDef.newItem({
+          dataType: CategoryItemExtraDef.getDataType(item),
+        }),
+      }),
+      {}
+    )
+
+    return updateCategoryProp(
+      {
+        user,
+        surveyId,
+        categoryUuid,
+        key: Category.keysProps.itemExtraDef,
+        value: itemExtraDefsToStore,
+        system: true,
+      },
+      t
+    )
   })
 
 export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
@@ -345,8 +421,8 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
     const itemExtraDefUpdated = {
       ...itemExtraDef,
-      [Category.reportingDataItemExtraDefKeys.area]: Category.newItemExtraDefItem({
-        dataType: Category.itemExtraDefDataTypes.number,
+      [Category.reportingDataItemExtraDefKeys.area]: CategoryItemExtraDef.newItem({
+        dataType: CategoryItemExtraDef.dataTypes.number,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
