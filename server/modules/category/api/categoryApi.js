@@ -160,7 +160,15 @@ export const init = (app) => {
         search,
       })
 
-      res.json({ list: Object.values(categoriesByUuid) })
+      // sort by name
+      const categoriesSorted = Object.values(categoriesByUuid).sort((category1, category2) => {
+        const name1 = Category.getName(category1)
+        const name2 = Category.getName(category2)
+        if (name1 > name2) return 1
+        if (name1 < name2) return -1
+        return 0
+      })
+      res.json({ list: categoriesSorted })
     } catch (error) {
       next(error)
     }
