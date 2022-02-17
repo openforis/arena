@@ -112,9 +112,10 @@ export const getItemExtraDefKeys = (category) => {
   return Object.keys(itemExtraDef)
 }
 export const getItemExtraDefsArray = (category) =>
-  // add name to each extra def item definition and put them in a array
+  // add uuid and name to each extra def item definition and put them in a array
   Object.entries(getItemExtraDef(category)).map(([name, item]) => ({
     ...item,
+    uuid: uuidv4(),
     name,
   }))
 
