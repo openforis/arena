@@ -11,20 +11,23 @@ export const useRefreshCategory = ({ setState }) => {
   const dispatch = useDispatch()
   const fetchLevelItems = useFetchLevelItems({ setState })
 
-  return useCallback(async ({ category }) => {
-    dispatch(SurveyActions.metaUpdated())
+  return useCallback(
+    async ({ category }) => {
+      dispatch(SurveyActions.metaUpdated())
 
-    setState((statePrev) => {
-      const stateUpdated = A.pipe(
-        State.assocCategory({ category }),
-        State.dissocImportSummary,
-        State.dissocItemsActive
-      )(statePrev)
+      setState((statePrev) => {
+        const stateUpdated = A.pipe(
+          State.assocCategory({ category }),
+          State.dissocImportSummary,
+          State.dissocItemsActive
+        )(statePrev)
 
-      // Fetch first level items
-      fetchLevelItems({ state: stateUpdated })
+        // Fetch first level items
+        fetchLevelItems({ state: stateUpdated })
 
-      return stateUpdated
-    })
-  })
+        return stateUpdated
+      })
+    },
+    [dispatch, fetchLevelItems, setState]
+  )
 }
