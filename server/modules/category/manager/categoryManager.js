@@ -271,7 +271,9 @@ export const updateCategoryItemExtraDefItem = async (
       await _updateCategoryItemsExtraDef({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t)
     }
 
-    // remove unnecessary information before storing them
+    // prepare itemExtraDefs for storage
+    // - remove unnecessary information (uuid, name)
+    // - index stored object by extra def name
     const itemExtraDefsToStore = itemExtraDefsArrayUpdated.reduce(
       (acc, item) => ({
         ...acc,

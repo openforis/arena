@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { useConfirm } from '@webapp/components/hooks'
 
 export const useItemExtraDefEditor = (props) => {
-  const { index, itemExtraDef: itemExtraDefProp, itemExtraDefs, readOnly, onItemDelete, onItemUpdate } = props
+  const { index, itemExtraDef: itemExtraDefProp, itemExtraDefs, onItemDelete, onItemUpdate } = props
 
   const i18n = useI18n()
   const confirm = useConfirm()
@@ -77,7 +77,7 @@ export const useItemExtraDefEditor = (props) => {
   }, [itemExtraDef, itemExtraDefProp, confirm, onItemUpdate])
 
   const onCancelClick = () => {
-    setState((statePrev) => ({ ...statePrev, editing: false }))
+    setState((statePrev) => ({ ...statePrev, itemExtraDef: itemExtraDefProp, editing: false }))
     if (newItem) {
       onItemDelete({ index })
     }

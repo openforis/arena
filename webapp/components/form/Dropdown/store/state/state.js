@@ -30,6 +30,7 @@ export const assocInputValue = A.assoc(keys.inputValue)
 export const assocItemLabelFunction = A.assoc(keys.itemLabelFunction)
 export const assocItems = A.assoc(keys.items)
 export const assocItemsDialog = A.assoc(keys.itemsDialog)
+export const assocReadOnly = A.assoc(keys.readOnly)
 export const assocShowDialog = A.assoc(keys.showDialog)
 
 // ====== CREATE

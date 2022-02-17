@@ -1,5 +1,6 @@
 import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -13,7 +14,7 @@ export const validateCategoryItemExtraDef = async ({ itemExtraDef, itemExtraDefs
       () => {
         const hasDuplicates = itemExtraDefsArray.some(
           (item, index) =>
-            index !== itemExtraDefsArray.indexOf(itemExtraDef) && extraDefName === CategoryItemExtraDef.getName(item)
+            !ObjectUtils.isEqual(item)(itemExtraDef) && extraDefName === CategoryItemExtraDef.getName(item)
         )
         return hasDuplicates ? { key: Validation.messageKeys.nameDuplicate } : null
       },
