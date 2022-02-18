@@ -53,9 +53,9 @@ html_css_files = ["css/custom.css"]
 # A complete description of the theme can be found on their documentation: 
 # https://pydata-sphinx-theme.readthedocs.io/en/latest/index.html
 
-html_favicon = "_static/img/icon/favicon.ico"
+html_favicon = "_static/img/favicon.ico"
 
-html_logo = "_static/img/icon/arena-logo.png"
+html_logo = "_static/img/arena-logo.png"
 
 html_theme_options = {
     "show_prev_next": False,
