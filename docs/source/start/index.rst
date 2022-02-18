@@ -13,3 +13,5 @@ This is the entry-point of the Getting started section where you'll learn to use
 
    register
    aknowledgment
+   kitchen-sink
+   custom

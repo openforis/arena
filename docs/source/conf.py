@@ -62,6 +62,7 @@ html_favicon = "_static/img/favicon.ico"
 html_logo = "_static/img/arena-logo.png"
 
 html_theme_options = {
+    "navigation_with_keys": False,
     "show_prev_next": False,
     "icon_links": [
         {
