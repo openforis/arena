@@ -288,3 +288,4 @@ modules.xml
 
 # Sphinx documentation 
 docs/build
+docs/venv/

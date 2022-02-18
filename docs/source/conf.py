@@ -20,7 +20,11 @@ release = "1.0.24"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "notfound.extension"
+    "sphinxcontrib.images",
+    "sphinxcontrib.icon",
+    "sphinxcontrib.btn",
+    "sphinxcontrib.youtube",
+    "notfound.extension",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -87,8 +91,9 @@ html_context = {
     "doc_path": "docs/source"
 }
 
-# -- Options for images -------------------------------------------------------
+# -- Options for images --------------------------------------------------------
 
 images_config = {
-    "download": False
+    "download": False,
+    "override_image_directive": True
 }
