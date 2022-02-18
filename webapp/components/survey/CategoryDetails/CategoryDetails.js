@@ -22,6 +22,7 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
+import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 
 const MAX_LEVELS = 5
 
@@ -44,6 +45,7 @@ const CategoryDetails = (props) => {
   const categoryUuid = Category.getUuid(category)
 
   const importSummary = State.getImportSummary(state)
+  const editingItemExtraDefs = State.isEditingItemExtraDefs(state)
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
@@ -91,11 +93,17 @@ const CategoryDetails = (props) => {
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
                     onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
                   />
+                  <Button
+                    label="categoryEdit.extraPropertiesEditor.title"
+                    onClick={Actions.toggleEditExtraPropertiesPanel}
+                  />
                 </div>
               }
             />
           )}
         </div>
+
+        {editingItemExtraDefs && <ItemExtraDefsEditor state={state} setState={setState} />}
 
         <div className="category__levels">
           {levels.map((level) => (

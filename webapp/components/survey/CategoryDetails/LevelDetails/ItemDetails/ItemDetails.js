@@ -7,6 +7,7 @@ import * as R from 'ramda'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
@@ -115,7 +116,7 @@ const ItemDetails = (props) => {
                 <FormItem label={key} key={key}>
                   <Input
                     value={CategoryItem.getExtraProp(key)(item)}
-                    numberFormat={dataType === Category.itemExtraDefDataTypes.number ? NumberFormats.decimal() : null}
+                    numberFormat={dataType === CategoryItemExtraDef.dataTypes.number ? NumberFormats.decimal() : null}
                     readOnly={readOnly}
                     validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                     onChange={(value) => {

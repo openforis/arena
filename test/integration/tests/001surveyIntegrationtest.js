@@ -17,6 +17,8 @@ describe('Survey Test', () => {
 
   test('Update Category', async () => CategoryTest.updateCategoryTest())
 
+  test('Update Category Item Extra Def', async () => CategoryTest.updateCategoryItemExtraDefTest())
+
   // ==== NODE DEF
 
   test('Create Node Defs', async () => NodeDefTest.createNodeDefsTest())

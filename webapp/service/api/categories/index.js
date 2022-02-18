@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import { cancelableGetRequest } from '../cancelableRequest'
 
@@ -61,6 +62,32 @@ export const createCategory = async ({ surveyId }) => {
 }
 
 // UPDATE
+export const updateCategoryProp = async ({ surveyId, categoryUuid, key, value }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}`, { key, value })
+
+  return category
+}
+
+export const updateCategoryItemExtraDefItem = async ({
+  surveyId,
+  categoryUuid,
+  name,
+  itemExtraDef = null,
+  deleted = false,
+}) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/extradef`, {
+    name,
+    itemExtraDef: A.stringify(itemExtraDef),
+    deleted,
+  })
+
+  return category
+}
+
 export const cleanupCategory = async ({ surveyId, categoryUuid }) => {
   const {
     data: { deleted, updated },

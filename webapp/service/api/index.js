@@ -11,6 +11,8 @@ export {
   cleanupCategory,
   convertToReportingDataCategory,
   startExportAllCategoriesJob,
+  updateCategoryProp,
+  updateCategoryItemExtraDefItem,
 } from './categories'
 export { fetchChains } from './analysis'
 
@@ -29,6 +31,8 @@ export {
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordSummary,
+  startExportDataToCSVJob,
+  downloadExportedDataToCSVUrl,
 } from './data'
 export { fetchAvailableMapPeriods, testMapApiKey } from './map'
 export { fetchSurveys, insertSurvey } from './survey'

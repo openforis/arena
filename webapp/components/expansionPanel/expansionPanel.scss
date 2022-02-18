@@ -18,6 +18,10 @@
   }
 }
 
+.expansion-panel__header {
+  cursor: pointer;
+}
+
 .expansion-panel__content {
   overflow: hidden;
   transition: max-height 0.2s ease-out;

@@ -160,7 +160,15 @@ export const init = (app) => {
         search,
       })
 
-      res.json({ list: Object.values(categoriesByUuid) })
+      // sort by name
+      const categoriesSorted = Object.values(categoriesByUuid).sort((category1, category2) => {
+        const name1 = Category.getName(category1)
+        const name2 = Category.getName(category2)
+        if (name1 > name2) return 1
+        if (name1 < name2) return -1
+        return 0
+      })
+      res.json({ list: categoriesSorted })
     } catch (error) {
       next(error)
     }
@@ -273,7 +281,32 @@ export const init = (app) => {
         const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const category = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
+        const category = await CategoryService.updateCategoryProp({ user, surveyId, categoryUuid, key, value })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/extradef',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, name, deleted } = Request.getParams(req)
+        const itemExtraDef = Request.getJsonParam(req, 'itemExtraDef')
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.updateCategoryItemExtraDefItem({
+          user,
+          surveyId,
+          categoryUuid,
+          name,
+          itemExtraDef,
+          deleted,
+        })
 
         res.json({ category })
       } catch (error) {
