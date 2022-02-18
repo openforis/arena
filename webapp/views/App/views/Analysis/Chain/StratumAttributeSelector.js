@@ -41,7 +41,7 @@ export const StratumAttributeSelector = () => {
 
   const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getLabel(nodeDef, lang) })
 
-  const emptySelectionItem = { key: null, value: '--- Not selected ---' }
+  const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
   const selectableItems = [emptySelectionItem, ...selectableDefs.map(nodeDefToItem)]
 
   const selectedNodeDefUuid = Chain.getStratumNodeDefUuid(chain)
