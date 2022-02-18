@@ -20,10 +20,6 @@ export const StratumAttributeSelector = () => {
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-  if (!baseUnitNodeDef) {
-    return null
-  }
-
   const onChange = (item) => {
     const stratumNodeDefUuid = item.key
     const chainUpdated = Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)

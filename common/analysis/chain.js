@@ -22,6 +22,7 @@ export const keysProps = {
   cycles: ObjectUtils.keysProps.cycles,
   analysisNodeDefs: 'analysisNodeDefs',
   stratumNodeDefUuid: 'stratumNodeDefUuid',
+  areaWeightingMethod: 'areaWeightingMethod',
 }
 
 export const statusExec = {
@@ -49,10 +50,13 @@ export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDefUuid)
+export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
 
 // ====== UPDATE
 export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)
+export const assocAreaWeightingMethod = (areaWeightingMethod) =>
+  ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
 
 // ====== CHECK
 

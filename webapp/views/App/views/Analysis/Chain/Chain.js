@@ -11,13 +11,15 @@ import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import { FormItem } from '@webapp/components/form/Input'
+import { Checkbox } from '@webapp/components/form'
 
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
@@ -30,7 +32,9 @@ const ChainComponent = () => {
   const { chainUuid } = useParams()
   const chain = useChain()
   const validation = Chain.getValidation(chain)
-  const surveyInfo = useSurveyInfo()
+  const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
@@ -94,7 +98,21 @@ const ChainComponent = () => {
 
         <BaseUnitSelector />
 
-        <StratumAttributeSelector />
+        {baseUnitNodeDef && (
+          <>
+            <StratumAttributeSelector />
+
+            <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
+              <Checkbox
+                checked={Chain.isAreaWeightingMethod(chain)}
+                validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
+                onChange={(areaWeightingMethod) =>
+                  updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
+                }
+              />
+            </FormItem>
+          </>
+        )}
       </div>
 
       <AnalysisNodeDefs />
