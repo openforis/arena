@@ -93,9 +93,7 @@ const BaseUnitSelector = () => {
 
       descendantEntities.forEach((nodeDef) => {
         const isBaseUnit = NodeDef.isEqual(nodeDef)(referenceNodeDef)
-        const name = isBaseUnit
-          ? `weight`
-          : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
+        const name = isBaseUnit ? `weight` : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
 
         const props = {
           [NodeDef.propKeys.name]: name,
@@ -133,22 +131,7 @@ const BaseUnitSelector = () => {
 
   useEffect(() => {
     // TODO if survey has other base unit nodedef into other chain, the user is not able to create "base unit/weight" nodedef
-    const hierarchy = Survey.getHierarchy()(survey)
-    let _baseUnitNodeDef = null
-
-    // LOAD _baseUnitNodeDef
-    const traverse = (nodeDef) => {
-      if (NodeDef.isRoot(nodeDef) || !NodeDef.isSingleEntity(nodeDef)) {
-        const nodeDefs = Survey.getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(nodeDef) })(survey)
-        const __baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
-        if (!_baseUnitNodeDef && __baseUnitNodeDef) {
-          _baseUnitNodeDef = __baseUnitNodeDef
-        }
-      }
-    }
-
-    Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
-
+    const _baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
     if (_baseUnitNodeDef) {
       setBaseUnitNodeDef(_baseUnitNodeDef)
       setHadBaseUnitNodeDef(true)

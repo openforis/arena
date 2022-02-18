@@ -21,6 +21,7 @@ export const keysProps = {
   descriptions: ObjectUtils.keysProps.descriptions,
   cycles: ObjectUtils.keysProps.cycles,
   analysisNodeDefs: 'analysisNodeDefs',
+  stratumNodeDefUuid: 'stratumNodeDefUuid',
 }
 
 export const statusExec = {
@@ -47,6 +48,11 @@ export const {
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
+export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDefUuid)
+
+// ====== UPDATE
+export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
+  ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)
 
 // ====== CHECK
 

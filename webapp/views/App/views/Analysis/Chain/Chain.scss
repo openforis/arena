@@ -1,34 +1,37 @@
-.chain {
-  display: grid;
-  grid-template-rows: 1fr 52px;
+.app-module {
+  .chain {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 2rem;
+    padding-bottom: 2rem;
 
-  .form {
-    grid-row-gap: 2rem;
-    grid-template-rows: repeat(2, auto) 1fr;
-  }
+    .chain-form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
 
-  .form-item {
-    grid-template-columns: 0.2fr 0.8fr;
-    grid-column-gap: 1rem;
-  }
+      .form-item {
+        grid-template-columns: 0.2fr 0.8fr;
+        grid-column-gap: 1rem;
+      }
 
-  .button-bar {
-    align-self: center;
-  }
-
-  .btn-rstudio-container {
-    position: absolute;
-    right: 16px;
-    display: flex;
-    flex-direction: column;
-    .btn-rstudio-container-message{
-      max-width: 120px;
+      .stratum-attribute-dropdown {
+        width: 30rem;
+      }
     }
-  }
-}
 
-.chain.with-cycles {
-  .form {
-    grid-template-rows: repeat(4, auto) 1fr;
+    .button-bar {
+      align-self: center;
+    }
+
+    .btn-rstudio-container {
+      position: absolute;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      .btn-rstudio-container-message {
+        max-width: 120px;
+      }
+    }
   }
 }

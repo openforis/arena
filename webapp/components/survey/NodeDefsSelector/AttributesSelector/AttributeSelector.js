@@ -9,7 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
   const {
@@ -17,7 +17,6 @@ const AttributeSelector = (props) => {
     filterFunction,
     filterTypes,
     filterChainUuids,
-    lang,
     nodeDef,
     nodeDefUuidsAttributes,
     nodeDefContext,
@@ -28,6 +27,7 @@ const AttributeSelector = (props) => {
   } = props
 
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
 
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
@@ -72,7 +72,6 @@ AttributeSelector.propTypes = {
   filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
-  lang: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefContext: PropTypes.object.isRequired,
   nodeDefUuidsAttributes: PropTypes.array.isRequired,

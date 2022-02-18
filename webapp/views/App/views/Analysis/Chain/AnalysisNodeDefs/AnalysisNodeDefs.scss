@@ -1,18 +1,22 @@
 @import 'webapp/style/vars';
 
-.analysis-node-defs-wrapper {
+.analysis-node-defs {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-column-gap: 16px;
+  grid-template-rows: auto 1fr;
+  align-content: start;
 
   .entity-selector-tree {
     border-right: 1px solid $greyBorder;
   }
-}
 
-.analysis-node-defs {
-  display: grid;
-  align-content: start;
+  .analysis-node-defs__list {
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    .analysis-node-defs__list-content {
+      overflow-y: auto;
+    }
+  }
 }
 
 .analysis-node-defs-error {
@@ -20,7 +24,7 @@
   display: flex;
   flex-direction: row;
 
-  .tooltip-error{
+  .tooltip-error {
     position: inherit;
     margin-right: 16px;
   }

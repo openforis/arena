@@ -58,7 +58,6 @@ const AttributesSelector = (props) => {
             filterFunction={filterFunction}
             filterTypes={filterTypes}
             filterChainUuids={filterChainUuids}
-            lang={lang}
             nodeDef={childDef}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
             nodeDefContext={nodeDefContext}

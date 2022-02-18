@@ -2,7 +2,6 @@ import './Chain.scss'
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
-import classNames from 'classnames'
 
 import * as A from '@core/arena'
 
@@ -12,7 +11,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
@@ -23,12 +22,12 @@ import ButtonRStudio from '@webapp/components/ButtonRStudio'
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import BaseUnitSelector from './BaseUnitSelector'
+import { StratumAttributeSelector } from './StratumAttributeSelector'
 
 const ChainComponent = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
-  const cycleKeys = useSurveyCycleKeys()
   const chain = useChain()
   const validation = Chain.getValidation(chain)
   const surveyInfo = useSurveyInfo()
@@ -64,7 +63,7 @@ const ChainComponent = () => {
   if (!chain || A.isEmpty(chain)) return null
 
   return (
-    <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
+    <div className="chain">
       <div className="btn-rstudio-container">
         {Survey.isDraft(surveyInfo) && (
           <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
@@ -73,7 +72,7 @@ const ChainComponent = () => {
         <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
       </div>
 
-      <div className="form">
+      <div className="chain-form">
         <LabelsEditor
           labels={chain.props?.labels}
           formLabelKey="chainView.formLabel"
@@ -95,8 +94,10 @@ const ChainComponent = () => {
 
         <BaseUnitSelector />
 
-        <AnalysisNodeDefs />
+        <StratumAttributeSelector />
       </div>
+
+      <AnalysisNodeDefs />
 
       <ButtonBar />
     </div>

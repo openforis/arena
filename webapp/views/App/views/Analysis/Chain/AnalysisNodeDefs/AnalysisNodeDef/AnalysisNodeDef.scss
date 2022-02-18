@@ -1,7 +1,7 @@
 @import 'webapp/style/partials';
 
 .analysis-node-def,
-.analysis-node-def__list-header {
+.analysis-node-defs__list-header {
   position: relative;
   display: grid;
   grid-template-columns: 40px 120px 200px 1fr 120px 120px repeat(2, 80px);
@@ -13,8 +13,7 @@
     @include line-clamp(1);
   }
 }
-
-.analysis-node-def__list-header {
+.analysis-node-defs__list-header {
   margin-top: 16px;
   height: 32px;
   padding: unset;

@@ -65,7 +65,7 @@ export const getAnalysisNodeDefs =
       }
 
       if (
-       NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
+        NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
         !showInactiveResultVariables &&
         !NodeDef.getActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
       ) {
@@ -98,4 +98,23 @@ export const getAnalysisEntities =
     })
 
     return entities
+  }
+
+export const getBaseUnitNodeDef =
+  ({ chain }) =>
+  (survey) => {
+    let baseUnitNodeDef = null
+
+    const hierarchy = SurveyNodeDefs.getHierarchy()(survey)
+    SurveyNodeDefs.traverseHierarchyItemSync(hierarchy.root, (visitedEntityDef) => {
+      if (NodeDef.isRoot(visitedEntityDef) || NodeDef.isMultipleEntity(visitedEntityDef)) {
+        const nodeDefs = getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(visitedEntityDef) })(survey)
+        const _baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
+        if (!baseUnitNodeDef && _baseUnitNodeDef) {
+          baseUnitNodeDef = _baseUnitNodeDef
+        }
+      }
+    })
+
+    return baseUnitNodeDef
   }

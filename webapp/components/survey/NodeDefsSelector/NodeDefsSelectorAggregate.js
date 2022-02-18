@@ -113,7 +113,6 @@ const NodeDefsSelectorAggregate = (props) => {
                 return (
                   <AttributeSelector
                     key={variableNodeDefUuid}
-                    lang={lang}
                     nodeDef={childDef}
                     nodeDefUuidsAttributes={[...measures.keys()]}
                     nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}

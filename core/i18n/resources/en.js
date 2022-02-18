@@ -673,6 +673,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   chainView: {
     formLabel: 'Processing chain label',
+    stratumAttribute: 'Stratum attribute',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     surveyShouldBePublished: 'The survey should be published to run analysis',
