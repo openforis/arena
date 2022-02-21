@@ -115,6 +115,16 @@ const ChainComponent = () => {
             </FormItem>
 
             <ClusteringEntitySelector />
+
+            <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
+              <Checkbox
+                checked={Chain.isClusteringOnlyVariances(chain)}
+                validation={Validation.getFieldValidation(Chain.keysProps.clusteringOnlyVariances)(validation)}
+                onChange={(clusteringOnlyVariances) =>
+                  updateChain(Chain.assocClusteringOnlyVariances(clusteringOnlyVariances)(chain))
+                }
+              />
+            </FormItem>
           </>
         )}
       </div>

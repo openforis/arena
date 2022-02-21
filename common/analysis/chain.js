@@ -24,6 +24,7 @@ export const keysProps = {
   stratumNodeDefUuid: 'stratumNodeDefUuid',
   areaWeightingMethod: 'areaWeightingMethod',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
+  clusteringOnlyVariances: 'clusteringOnlyVariances',
 }
 
 export const statusExec = {
@@ -53,6 +54,7 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDefUuid)
 export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
 export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
+export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
 
 // ====== UPDATE
 export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
@@ -61,6 +63,8 @@ export const assocAreaWeightingMethod = (areaWeightingMethod) =>
   ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
 export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
+export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
+  ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
 
 // ====== CHECK
 
