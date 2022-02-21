@@ -63,7 +63,7 @@ const BaseUnitSelector = () => {
   const handleSaveSamplingNodeDefs = useCallback(() => {
     dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: samplingNodeDefsToCreate }))
 
-    setBaseUnitNodeDef(samplingNodeDefsToCreate[0])
+    setBaseUnitNodeDef(Survey.getNodeDefParent(samplingNodeDefsToCreate[0])(survey))
     setHadBaseUnitNodeDef(true)
     setSamplingNodeDefsToCreate([])
   }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, samplingNodeDefsToCreate, setSamplingNodeDefsToCreate])
@@ -124,7 +124,7 @@ const BaseUnitSelector = () => {
       })
 
       setSamplingNodeDefsToCreate(_samplingNodeDefsToCreate)
-      setBaseUnitNodeDef(_samplingNodeDefsToCreate[0])
+      setBaseUnitNodeDef(Survey.getNodeDefParent(_samplingNodeDefsToCreate[0])(survey))
     },
     [setBaseUnitNodeDef, baseUnitNodeDef, survey]
   )
@@ -150,7 +150,7 @@ const BaseUnitSelector = () => {
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
           lang={lang}
-          nodeDefUuidEntity={NodeDef.getParentUuid(baseUnitNodeDef)}
+          nodeDefUuidEntity={NodeDef.getUuid(baseUnitNodeDef)}
           onChange={handleUpdateBaseUnit}
           showSingleEntities={false}
           disabled={hadBaseUnitNodeDef}

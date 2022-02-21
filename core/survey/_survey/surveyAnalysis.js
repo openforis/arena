@@ -111,7 +111,7 @@ export const getBaseUnitNodeDef =
         const nodeDefs = getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(visitedEntityDef) })(survey)
         const _baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
         if (!baseUnitNodeDef && _baseUnitNodeDef) {
-          baseUnitNodeDef = _baseUnitNodeDef
+          baseUnitNodeDef = SurveyNodeDefs.getNodeDefParent(_baseUnitNodeDef)(survey)
         }
       }
     })

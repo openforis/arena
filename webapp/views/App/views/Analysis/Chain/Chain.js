@@ -1,4 +1,5 @@
 import './Chain.scss'
+
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
@@ -25,6 +26,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
+import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -111,6 +113,8 @@ const ChainComponent = () => {
                 }
               />
             </FormItem>
+
+            <ClusteringEntitySelector />
           </>
         )}
       </div>
