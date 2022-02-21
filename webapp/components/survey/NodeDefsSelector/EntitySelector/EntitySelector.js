@@ -7,11 +7,15 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
-import Dropdown from '@webapp/components/form/Dropdown'
 import { TestId } from '@webapp/utils/testId'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const getDropdownItems = ({
   hierarchy,
+  i18n,
   lang,
   nodeDefLabelType,
   showSingleEntities,
@@ -34,14 +38,13 @@ const getDropdownItems = ({
 
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
-  return [...(allowEmptySelection ? [{ key: 'null', value: 'NULL' }] : []), ...entities]
+  return [...(allowEmptySelection ? [{ key: 'null', value: i18n.t('common.notSpecified') }] : []), ...entities]
 }
 
 const EntitySelector = (props) => {
   const {
     hierarchy,
     nodeDefUuidEntity,
-    lang,
     validation,
     onChange,
     nodeDefLabelType,
@@ -51,8 +54,12 @@ const EntitySelector = (props) => {
     allowEmptySelection,
   } = props
 
+  const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
+
   const dropdownItems = getDropdownItems({
     hierarchy,
+    i18n,
     lang,
     nodeDefLabelType,
     showSingleEntities,
@@ -77,7 +84,6 @@ const EntitySelector = (props) => {
 
 EntitySelector.propTypes = {
   hierarchy: PropTypes.object.isRequired, // Survey hierarchy
-  lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
   showSingleEntities: PropTypes.bool,
   disabled: PropTypes.bool,

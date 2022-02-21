@@ -27,13 +27,11 @@ import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
 import FileProps from '../FileProps'
 import AnalysisProps from '../AnalysisProps'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
 
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
 
   const {
     nodeDef,
@@ -165,7 +163,6 @@ const BasicProps = (props) => {
             <EntitySelector
               hierarchy={entitySourceHierarchy}
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
-              lang={lang}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
               onChange={(uuid) => Actions.setParentUuid({ state, parentUuid: uuid })}
             />

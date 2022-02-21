@@ -71,7 +71,6 @@ const NodeDefsSelectorAggregate = (props) => {
     <div className="node-defs-selector">
       <EntitySelector
         hierarchy={hierarchy}
-        lang={lang}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         showSingleEntities={false}

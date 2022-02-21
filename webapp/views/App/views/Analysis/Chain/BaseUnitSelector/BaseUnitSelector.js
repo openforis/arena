@@ -14,7 +14,6 @@ import { useChain } from '@webapp/store/ui/chain'
 import {
   useSurvey,
   useSurveyCycleKeys,
-  useSurveyPreferredLang,
   useSurveyInfo,
   NodeDefsActions,
   useSurveyCycleKey,
@@ -51,7 +50,6 @@ const BaseUnitSelector = () => {
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const dispatch = useDispatch()
   const cycleKeys = useSurveyCycleKeys()
@@ -149,7 +147,6 @@ const BaseUnitSelector = () => {
       <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
-          lang={lang}
           nodeDefUuidEntity={NodeDef.getUuid(baseUnitNodeDef)}
           onChange={handleUpdateBaseUnit}
           showSingleEntities={false}

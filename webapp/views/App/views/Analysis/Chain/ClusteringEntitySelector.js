@@ -18,7 +18,6 @@ export const ClusteringEntitySelector = () => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hierarchy = Survey.getHierarchy(
@@ -33,10 +32,9 @@ export const ClusteringEntitySelector = () => {
   }
 
   return (
-    <FormItem className='clustering-entity-form-item' label={i18n.t('chainView.clusteringEntity')}>
+    <FormItem className="clustering-entity-form-item" label={i18n.t('chainView.clusteringEntity')}>
       <EntitySelector
         hierarchy={hierarchy}
-        lang={lang}
         nodeDefUuidEntity={selectedEntityUuid}
         onChange={onChange}
         showSingleEntities={false}
