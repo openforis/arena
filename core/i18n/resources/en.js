@@ -678,6 +678,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   chainView: {
     formLabel: 'Processing chain label',
+    samplingDesign: 'Sampling Design',
+    samplingDesignDetails: 'Sampling Design Details',
     stratumAttribute: 'Stratum attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering Entity',

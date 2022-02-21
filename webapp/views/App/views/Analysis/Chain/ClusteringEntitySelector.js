@@ -27,7 +27,7 @@ export const ClusteringEntitySelector = () => {
   const selectedEntityUuid = Chain.getClusteringNodeDefUuid(chain)
 
   const onChange = (entityDefUuid) => {
-    const chainUpdated = Chain.assocClusteringNodeDefUuid(entityDefUuid)(chain)
+    const chainUpdated = Chain.assocClusteringNodeDefUuid(entityDefUuid === 'null' ? null : entityDefUuid)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 

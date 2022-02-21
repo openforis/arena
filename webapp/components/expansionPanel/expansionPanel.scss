@@ -16,6 +16,9 @@
   .btn-toggle {
     transform: unset;
   }
+  .expansion-panel__content {
+    display: none;
+  }
 }
 
 .expansion-panel__header {

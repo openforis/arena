@@ -1,5 +1,5 @@
 import './expansionPanel.scss'
-import React, { useEffect, useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -12,18 +12,9 @@ const ExpansionPanel = (props) => {
   const panelRef = useRef(null)
   const contentRef = useRef(null)
 
-  const updateContentHeight = () => {
-    const closed = panelRef.current.classList.contains('close')
-    const content = contentRef.current
-    content.style.maxHeight = `${closed ? 0 : content.scrollHeight}px`
-  }
-
   const toggleClose = () => {
     panelRef.current.classList.toggle('close')
-    updateContentHeight()
   }
-
-  useLayoutEffect(updateContentHeight, [children])
 
   useEffect(() => {
     if (startClosed) {

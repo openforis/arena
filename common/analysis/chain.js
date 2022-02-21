@@ -20,6 +20,7 @@ export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
   cycles: ObjectUtils.keysProps.cycles,
+  samplingDesign: 'samplingDesign',
   analysisNodeDefs: 'analysisNodeDefs',
   stratumNodeDefUuid: 'stratumNodeDefUuid',
   areaWeightingMethod: 'areaWeightingMethod',
@@ -51,12 +52,14 @@ export const {
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
+export const isSamplingDesign = ObjectUtils.isPropTrue(keysProps.samplingDesign)
 export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDefUuid)
 export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
 export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
 
 // ====== UPDATE
+export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
 export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)
 export const assocAreaWeightingMethod = (areaWeightingMethod) =>

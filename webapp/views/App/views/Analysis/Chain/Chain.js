@@ -27,6 +27,7 @@ import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
+import { ExpansionPanel } from '@webapp/components'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -98,35 +99,52 @@ const ChainComponent = () => {
           onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
         />
 
-        <BaseUnitSelector />
+        <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
+          <div className="form-item-content">
+            <Checkbox
+              checked={Chain.isSamplingDesign(chain)}
+              validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
+              onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
+            />
+            {Chain.isSamplingDesign(chain) && (
+              <ExpansionPanel buttonLabel="chainView.samplingDesignDetails" startClosed={false}>
+                <BaseUnitSelector />
 
-        {baseUnitNodeDef && (
-          <>
-            <StratumAttributeSelector />
+                {baseUnitNodeDef && (
+                  <>
+                    <StratumAttributeSelector />
 
-            <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
-              <Checkbox
-                checked={Chain.isAreaWeightingMethod(chain)}
-                validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
-                onChange={(areaWeightingMethod) =>
-                  updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
-                }
-              />
-            </FormItem>
+                    <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
+                      <Checkbox
+                        checked={Chain.isAreaWeightingMethod(chain)}
+                        validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
+                        onChange={(areaWeightingMethod) =>
+                          updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
+                        }
+                      />
+                    </FormItem>
 
-            <ClusteringEntitySelector />
+                    <ClusteringEntitySelector />
 
-            <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
-              <Checkbox
-                checked={Chain.isClusteringOnlyVariances(chain)}
-                validation={Validation.getFieldValidation(Chain.keysProps.clusteringOnlyVariances)(validation)}
-                onChange={(clusteringOnlyVariances) =>
-                  updateChain(Chain.assocClusteringOnlyVariances(clusteringOnlyVariances)(chain))
-                }
-              />
-            </FormItem>
-          </>
-        )}
+                    {Chain.getClusteringNodeDefUuid(chain) && (
+                      <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
+                        <Checkbox
+                          checked={Chain.isClusteringOnlyVariances(chain)}
+                          validation={Validation.getFieldValidation(Chain.keysProps.clusteringOnlyVariances)(
+                            validation
+                          )}
+                          onChange={(clusteringOnlyVariances) =>
+                            updateChain(Chain.assocClusteringOnlyVariances(clusteringOnlyVariances)(chain))
+                          }
+                        />
+                      </FormItem>
+                    )}
+                  </>
+                )}
+              </ExpansionPanel>
+            )}
+          </div>
+        </FormItem>
       </div>
 
       <AnalysisNodeDefs />

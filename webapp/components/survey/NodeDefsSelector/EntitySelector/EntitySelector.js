@@ -14,8 +14,8 @@ import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const getDropdownItems = ({
+  emptySelection,
   hierarchy,
-  i18n,
   lang,
   nodeDefLabelType,
   showSingleEntities,
@@ -38,7 +38,7 @@ const getDropdownItems = ({
 
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
-  return [...(allowEmptySelection ? [{ key: 'null', value: i18n.t('common.notSpecified') }] : []), ...entities]
+  return [...(allowEmptySelection ? [emptySelection] : []), ...entities]
 }
 
 const EntitySelector = (props) => {
@@ -56,17 +56,18 @@ const EntitySelector = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
+  const emptySelection = { key: 'null', value: i18n.t('common.notSpecified') }
 
   const dropdownItems = getDropdownItems({
+    emptySelection,
     hierarchy,
-    i18n,
     lang,
     nodeDefLabelType,
     showSingleEntities,
     useNameAsLabel,
     allowEmptySelection,
   })
-  const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
+  const selection = nodeDefUuidEntity ? dropdownItems.find(R.propEq('key', nodeDefUuidEntity)) : emptySelection
 
   return (
     <Dropdown

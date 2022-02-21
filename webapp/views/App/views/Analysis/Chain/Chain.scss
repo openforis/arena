@@ -1,3 +1,5 @@
+@import '~@webapp/style/vars';
+
 .app-module {
   .chain {
     display: grid;
@@ -13,6 +15,25 @@
       .form-item {
         grid-template-columns: 0.2fr 0.8fr;
         grid-column-gap: 1rem;
+      }
+
+      .sampling-design-form-item {
+        .form-label {
+          align-self: baseline;
+        }
+
+        .form-item-content {
+          display: flex;
+
+          .expansion-panel {
+            width: 75rem;
+            border: 1px solid $greyBorder;
+
+            .expansion-panel__content {
+              padding: 1rem;
+            }
+          }
+        }
       }
 
       .stratum-attribute-dropdown {
