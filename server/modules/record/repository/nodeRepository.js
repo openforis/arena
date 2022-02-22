@@ -120,14 +120,14 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumnsInsert, nodeValues))
 
-export const insertNodesInBatch = async ({ surveyId, nodeValues = [] }, client = db) =>
-  nodeValues.length > 0 &&
+export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) =>
+  nodes.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
       'node',
       tableColumnsInsert,
-      nodeValues.map((node) => ({
+      nodes.map((node) => ({
         ...node,
         date_created: Node.getDateCreated(node),
         date_modified: Node.getDateModified(node),

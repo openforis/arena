@@ -89,6 +89,8 @@ export const mergeNodeValidations = (nodeValidations) => (record) =>
     Validation.assocValidation(validationMerged)(record)
   )(record)
 
+export const dissocNodes = R.dissoc(keys.nodes)
+
 // ====== DELETE
 
 export const deleteNode = (node) => (record) => {
@@ -101,7 +103,7 @@ export const deleteNode = (node) => (record) => {
   let recordUpdated = NodesIndex.removeNode(node)(record)
 
   // 3. delete children
-  recordUpdated = R.reduce((recordAcc, child) => deleteNode(child)(recordAcc), record, children)
+  recordUpdated = children.reduce((recordAcc, child) => deleteNode(child)(recordAcc), record)
 
   // 4. update validation
   recordUpdated = R.pipe(

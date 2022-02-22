@@ -27,7 +27,7 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
     return recordDb
   })
 
-export const insertNodesInBulk = async ({ user, surveyId, nodes }, tx) => {
+export const insertNodesInBulk = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
   const nodeValues = nodes.map((node) => [
     Node.getUuid(node),
     Node.getDateCreated(node),
@@ -38,9 +38,15 @@ export const insertNodesInBulk = async ({ user, surveyId, nodes }, tx) => {
     JSON.stringify(Node.getValue(node, null)),
     Node.getMeta(node),
   ])
-  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true))
+  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
 
   await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+}
+
+export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
+  await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
+  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
 }
 
@@ -115,7 +121,7 @@ export const fetchRecordAndNodesByUuid = async (
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate })(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids, insertNodesInBatch } from '../repository/nodeRepository'
+export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 // ==== UPDATE
 
