@@ -12,9 +12,10 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 const AnalysisNodeDefs = () => {
-  const [showSamplingNodeDefs, setshowSamplingNodeDefs] = useState(false)
+  const [showSamplingNodeDefs, setShowSamplingNodeDefs] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -31,24 +32,31 @@ const AnalysisNodeDefs = () => {
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
 
+  // hide sampling node defs if chain doen't use sampling design
+  useOnUpdate(() => {
+    if (!Chain.isSamplingDesign(chain)) {
+      setShowSamplingNodeDefs(false)
+    }
+  }, [Chain.isSamplingDesign(chain)])
+
   return (
-    <div className="analysis-node-defs-wrapper">
-      <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
-        {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey).length === 0 && (
-          <div className="analysis-node-defs-error">
-            <ErrorBadge validation={validation} showLabel={false} showIcon />
-            <p>{i18n.t('chain.emptyNodeDefs')}</p>
-          </div>
-        )}
+    <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
+      {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey).length === 0 && (
+        <div className="analysis-node-defs-error">
+          <ErrorBadge validation={validation} showLabel={false} showIcon />
+          <p>{i18n.t('chain.emptyNodeDefs')}</p>
+        </div>
+      )}
 
-        <>
-          <AnalysisNodeDefsHeader
-            toggleshowSamplingNodeDefs={() => setshowSamplingNodeDefs(!showSamplingNodeDefs)}
-            showSamplingNodeDefs={showSamplingNodeDefs}
-          />
+      <>
+        <AnalysisNodeDefsHeader
+          toggleshowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
+          showSamplingNodeDefs={showSamplingNodeDefs}
+        />
 
-          {_analysisNodeDefsToShow.length > 0 && (
-            <div className="analysis-node-def__list-header">
+        {_analysisNodeDefsToShow.length > 0 && (
+          <div className="analysis-node-defs__list">
+            <div className="analysis-node-defs__list-header">
               <div />
               <div>{i18n.t('common.entity')}</div>
               <div>{i18n.t('common.name')}</div>
@@ -58,13 +66,18 @@ const AnalysisNodeDefs = () => {
               <div>{i18n.t('common.active')}</div>
               <div />
             </div>
-          )}
 
-          {_analysisNodeDefsToShow.map((analysisNodeDef) => (
-            <AnalysisNodeDef key={NodeDef.getUuid(analysisNodeDef)} nodeDefUuid={NodeDef.getUuid(analysisNodeDef)} />
-          ))}
-        </>
-      </div>
+            <div className="analysis-node-defs__list-content">
+              {_analysisNodeDefsToShow.map((analysisNodeDef) => (
+                <AnalysisNodeDef
+                  key={NodeDef.getUuid(analysisNodeDef)}
+                  nodeDefUuid={NodeDef.getUuid(analysisNodeDef)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </>
     </div>
   )
 }

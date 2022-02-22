@@ -26,9 +26,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
 
   const handleSetActive = useCallback(() => {
     const active = NodeDef.getActive(nodeDef)
-    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !active })(
-      nodeDef
-    )
+    const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !active })(nodeDef)
 
     dispatch(
       NodeDefsActions.putNodeDefProps({
@@ -47,7 +45,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
       <div>
         <button className="analysis-node-def__btn-move" type="button">
-          <span className="icon icon-14px icon-menu" />
+          <span className="icon icon-menu" />
         </button>
       </div>
       <div>{NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey))}</div>

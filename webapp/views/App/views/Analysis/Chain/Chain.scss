@@ -1,34 +1,33 @@
-.chain {
-  display: grid;
-  grid-template-rows: 1fr 52px;
+@import '~@webapp/style/vars';
 
-  .form {
-    grid-row-gap: 2rem;
-    grid-template-rows: repeat(2, auto) 1fr;
-  }
+.app-module {
+  .chain {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 2rem;
+    padding-bottom: 2rem;
 
-  .form-item {
-    grid-template-columns: 0.2fr 0.8fr;
-    grid-column-gap: 1rem;
-  }
-
-  .button-bar {
-    align-self: center;
-  }
-
-  .btn-rstudio-container {
-    position: absolute;
-    right: 16px;
-    display: flex;
-    flex-direction: column;
-    .btn-rstudio-container-message{
-      max-width: 120px;
+    .stratum-attribute-dropdown {
+      width: 30rem;
     }
-  }
-}
 
-.chain.with-cycles {
-  .form {
-    grid-template-rows: repeat(4, auto) 1fr;
+    .clustering-entity-dropdown,
+    .clustering-entity-form-item > .entity-selector {
+      width: 30rem;
+    }
+
+    .button-bar {
+      align-self: center;
+    }
+
+    .btn-rstudio-container {
+      position: absolute;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      .btn-rstudio-container-message {
+        max-width: 120px;
+      }
+    }
   }
 }

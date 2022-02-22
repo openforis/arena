@@ -71,7 +71,6 @@ const NodeDefsSelectorAggregate = (props) => {
     <div className="node-defs-selector">
       <EntitySelector
         hierarchy={hierarchy}
-        lang={lang}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         showSingleEntities={false}
@@ -113,7 +112,6 @@ const NodeDefsSelectorAggregate = (props) => {
                 return (
                   <AttributeSelector
                     key={variableNodeDefUuid}
-                    lang={lang}
                     nodeDef={childDef}
                     nodeDefUuidsAttributes={[...measures.keys()]}
                     nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}

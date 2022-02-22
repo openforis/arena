@@ -1,8 +1,8 @@
 import './Chain.scss'
-import React, { useEffect } from 'react'
+
+import React, { useCallback, useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
-import classNames from 'classnames'
 
 import * as A from '@core/arena'
 
@@ -12,26 +12,26 @@ import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import TabBar from '@webapp/components/tabBar'
 
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
-import BaseUnitSelector from './BaseUnitSelector'
+import { ChainBasicProps } from './ChainBasicProps'
+import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
-  const cycleKeys = useSurveyCycleKeys()
   const chain = useChain()
   const validation = Chain.getValidation(chain)
-  const surveyInfo = useSurveyInfo()
+  const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
@@ -39,7 +39,10 @@ const ChainComponent = () => {
   const _openRStudioLocal = () => {
     dispatch(ChainActions.openRStudio({ chain, isLocal: true }))
   }
-  const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
+  const updateChain = useCallback(
+    (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
+    [dispatch]
+  )
 
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
@@ -64,7 +67,7 @@ const ChainComponent = () => {
   if (!chain || A.isEmpty(chain)) return null
 
   return (
-    <div className={classNames('chain', { 'with-cycles': cycleKeys.length > 1 })}>
+    <div className="chain">
       <div className="btn-rstudio-container">
         {Survey.isDraft(surveyInfo) && (
           <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
@@ -73,30 +76,26 @@ const ChainComponent = () => {
         <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
       </div>
 
-      <div className="form">
-        <LabelsEditor
-          labels={chain.props?.labels}
-          formLabelKey="chainView.formLabel"
-          readOnly={false}
-          validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}
-        />
+      <TabBar
+        tabs={[
+          {
+            label: i18n.t('chainView.basic'),
+            component: ChainBasicProps,
+            props: {
+              updateChain,
+            },
+          },
+          {
+            label: i18n.t('chainView.samplingDesign'),
+            component: ChainSamplingDesignProps,
+            props: {
+              updateChain,
+            },
+          },
+        ]}
+      />
 
-        <LabelsEditor
-          formLabelKey="common.description"
-          labels={chain.props.descriptions}
-          onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
-        />
-
-        <CyclesSelector
-          cyclesKeysSelected={chain.props.cycles}
-          onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
-        />
-
-        <BaseUnitSelector />
-
-        <AnalysisNodeDefs />
-      </div>
+      <AnalysisNodeDefs />
 
       <ButtonBar />
     </div>

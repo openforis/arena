@@ -40,7 +40,6 @@ const Panel = ({ setEntityDefUuid, entityDefUuid, setDimensionDefUuids, dimensio
       <p>{i18n.t('nodeDefsTypes.entity')}</p>
       <EntitySelector
         hierarchy={Survey.getHierarchy()(survey)}
-        lang={lang}
         nodeDefUuidEntity={entityDefUuid}
         onChange={setEntityDefUuid}
         showSingleEntities={false}

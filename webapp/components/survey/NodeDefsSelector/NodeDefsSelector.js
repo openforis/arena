@@ -51,7 +51,6 @@ const NodeDefsSelector = (props) => {
     <div className="node-defs-selector">
       <EntitySelector
         hierarchy={hierarchy || Survey.getHierarchy()(survey)}
-        lang={lang}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         nodeDefLabelType={nodeDefLabelType}
