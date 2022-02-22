@@ -4,6 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
@@ -76,13 +77,17 @@ export default class RecordsImportJob extends Job {
   }
 
   /**
-   * Removes properties in the record object that don't need to be stored.
+   * Removes properties in the record object that don't need to be stored and logged in the activity log.
    *
    * @param {!object} record - The record to cleanup.
    * @returns {object} - The cleaned up record.
    */
   prepareRecordToStore(record) {
-    return Record.dissocNodes(record)
+    let recordUpdated = Record.dissocNodes(record)
+    if (Validation.isObjValid(recordUpdated)) {
+      recordUpdated = Validation.dissocValidation(recordUpdated)
+    }
+    return recordUpdated
   }
 }
 

@@ -53,9 +53,9 @@ export const insertRecord = async (surveyId, record, client = db) =>
   client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
-    (owner_uuid, uuid, step, cycle, preview, date_created)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $7)
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $8)
     `,
     [
       Record.getOwnerUuid(record),
@@ -63,14 +63,15 @@ export const insertRecord = async (surveyId, record, client = db) =>
       Record.getStep(record),
       Record.getCycle(record),
       Record.isPreview(record),
+      Validation.isObjValid(record) ? {} : Record.getValidation(record),
       Record.getDateCreated(record) || new Date(),
       surveyId,
     ],
     dbTransformCallback(surveyId)
   )
 
-export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) => {
-  await client.none(
+export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) =>
+  client.none(
     DbUtils.insertAllQueryBatch(
       `${getSurveyDBSchema(surveyId)}`,
       tableName,
@@ -79,11 +80,11 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         ...record,
         owner_uuid: userUuid || Record.getOwnerUuid(record),
         date_created: Record.getDateCreated(record),
-        validation: Record.getValidation(record) ? JSON.stringify(Record.getValidation(record)) : null,
+        validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
       }))
     )
   )
-}
+
 // ============== READ
 
 export const countRecordsBySurveyId = async (
