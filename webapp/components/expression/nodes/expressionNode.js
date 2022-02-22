@@ -1,26 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import Binary from './binary'
 import Call from './call'
-import Group from './group'
+import Sequence from './sequence'
 import Identifier from './identifier'
 import Literal from './literal'
 import Logical from './logical'
 import Member from './member'
 
-const components = {
-  [Expression.types.Identifier]: Identifier,
-  [Expression.types.MemberExpression]: Member,
-  [Expression.types.Literal]: Literal,
-  // [Expression.types.ThisExpression]: thisExpression,
-  [Expression.types.CallExpression]: Call,
-  // [Expression.types.UnaryExpression]: unaryExpression,
-  [Expression.types.BinaryExpression]: Binary,
-  [Expression.types.LogicalExpression]: Logical,
-  [Expression.types.GroupExpression]: Group,
+const componentFns = {
+  [Expression.types.Identifier]: () => Identifier,
+  [Expression.types.MemberExpression]: () => Member,
+  [Expression.types.Literal]: () => Literal,
+  [Expression.types.CallExpression]: () => Call,
+  [Expression.types.BinaryExpression]: (expressionNode) => {
+    const { logical: logicalOperators } = Expression.operators
+    return [logicalOperators.or.value, logicalOperators.and.value].includes(expressionNode.operator) ? Logical : Binary
+  },
+  [Expression.types.SequenceExpression]: () => Sequence,
 }
 
 const ExpressionNode = (props) => {
@@ -37,7 +36,8 @@ const ExpressionNode = (props) => {
     variables,
   } = props
 
-  const component = components[R.prop('type', node)]
+  const componentFn = componentFns[node.type]
+  const component = componentFn(node)
 
   return React.createElement(component, {
     canDelete,
@@ -66,7 +66,7 @@ ExpressionNode.propTypes = {
   canDelete: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onDelete: PropTypes.func,
-  // Group
+  // Sequence
   level: PropTypes.number,
   // Literal
   type: PropTypes.string,

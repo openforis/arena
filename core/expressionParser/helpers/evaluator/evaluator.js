@@ -59,59 +59,65 @@ const binaryOperators = {
   ...arithmeticOperators,
 }
 
-const unaryEval = ({ evalExpression }) => (expr, ctx) => {
-  const { argument, operator } = expr
+const unaryEval =
+  ({ evalExpression }) =>
+  (expr, ctx) => {
+    const { argument, operator } = expr
 
-  const fn = unaryOperators[operator]
-  if (!fn) {
-    throw new SystemError('undefinedFunction', { fnName: operator })
+    const fn = unaryOperators[operator]
+    if (!fn) {
+      throw new SystemError('undefinedFunction', { fnName: operator })
+    }
+
+    const res = evalExpression(argument, ctx)
+    return fn(res)
   }
 
-  const res = evalExpression(argument, ctx)
-  return fn(res)
-}
+const binaryEval =
+  ({ evalExpression }) =>
+  (expr, ctx) => {
+    const { left, right, operator } = expr
 
-const binaryEval = ({ evalExpression }) => (expr, ctx) => {
-  const { left, right, operator } = expr
+    const fn = binaryOperators[operator]
+    if (!fn) {
+      throw new SystemError('undefinedFunction', { fnName: operator })
+    }
 
-  const fn = binaryOperators[operator]
-  if (!fn) {
-    throw new SystemError('undefinedFunction', { fnName: operator })
+    const leftResult = evalExpression(left, ctx)
+    const rightResult = evalExpression(right, ctx)
+
+    const nullCount = [leftResult, rightResult].filter(R.isNil).length
+
+    // Arithmetic operators will always return nulls for any non-numeric inputs
+    if (operator in arithmeticOperators) {
+      return R.is(Number, leftResult) && R.is(Number, rightResult) ? fn(leftResult, rightResult) : null
+    }
+
+    // Boolean operators:
+    // Like ternary logic, but logical OR has special handling.
+    // The expression is boolean if either value is not null.
+    // Otherwise the result is null.
+    // All other operators return null if either operand is null
+    const isValid = (operator === '||' && nullCount < 2) || nullCount === 0
+
+    return isValid ? fn(leftResult, rightResult) : null
   }
 
-  const leftResult = evalExpression(left, ctx)
-  const rightResult = evalExpression(right, ctx)
+const memberEval =
+  ({ evalExpression }) =>
+  (expr, ctx) => {
+    const { object, property } = expr
 
-  const nullCount = [leftResult, rightResult].filter(R.isNil).length
-
-  // Arithmetic operators will always return nulls for any non-numeric inputs
-  if (operator in arithmeticOperators) {
-    return R.is(Number, leftResult) && R.is(Number, rightResult) ? fn(leftResult, rightResult) : null
+    const objectEval = evalExpression(object, ctx)
+    if (R.isNil(objectEval)) {
+      return null
+    }
+    const propertyEval = evalExpression(property, { ...ctx, node: objectEval })
+    if (R.is(Array, objectEval) && property.type === types.Literal && objectEval.length > propertyEval) {
+      return objectEval[propertyEval]
+    }
+    return propertyEval
   }
-
-  // Boolean operators:
-  // Like ternary logic, but logical OR has special handling.
-  // The expression is boolean if either value is not null.
-  // Otherwise the result is null.
-  // All other operators return null if either operand is null
-  const isValid = (operator === '||' && nullCount < 2) || nullCount === 0
-
-  return isValid ? fn(leftResult, rightResult) : null
-}
-
-const memberEval = ({ evalExpression }) => (expr, ctx) => {
-  const { object, property } = expr
-
-  const objectEval = evalExpression(object, ctx)
-  if (R.isNil(objectEval)) {
-    return null
-  }
-  const propertyEval = evalExpression(property, { ...ctx, node: objectEval })
-  if (R.is(Array, objectEval) && property.type === types.Literal && objectEval.length > propertyEval) {
-    return objectEval[propertyEval]
-  }
-  return propertyEval
-}
 
 const literalEval = (expr) => R.prop('value')(expr)
 
@@ -125,10 +131,12 @@ const identifierEval = (expr) => {
   throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 
-const groupEval = ({ evalExpression }) => (expr, ctx) => {
-  const { argument } = expr
-  return evalExpression(argument, ctx)
-}
+const sequenceEval =
+  ({ evalExpression }) =>
+  (expr, ctx) => {
+    const { expression } = expr
+    return evalExpression(expression, ctx)
+  }
 
 const evaluatorsDefault = ({ evalExpression }) => ({
   [types.Identifier]: identifierEval,
@@ -138,8 +146,7 @@ const evaluatorsDefault = ({ evalExpression }) => ({
   [types.CallExpression]: callEval({ evalExpression }),
   [types.UnaryExpression]: unaryEval({ evalExpression }),
   [types.BinaryExpression]: binaryEval({ evalExpression }),
-  [types.LogicalExpression]: binaryEval({ evalExpression }),
-  [types.GroupExpression]: groupEval({ evalExpression }),
+  [types.SequenceExpression]: sequenceEval({ evalExpression }),
 })
 
 const _evalExpressionInternal = (expr, ctx) => {

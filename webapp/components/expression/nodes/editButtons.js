@@ -11,7 +11,7 @@ const EditButtons = props => {
 
   const addLogicalExpr = operator =>
     onChange({
-      type: Expression.types.LogicalExpression,
+      type: Expression.types.BinaryExpression,
       operator,
       left: node,
       right: {

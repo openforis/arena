@@ -4,10 +4,10 @@ import * as R from 'ramda'
 
 import EditButtons from './editButtons'
 
-const Group = (props) => {
+const Sequence = (props) => {
   const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, type, variables } = props
 
-  const { argument } = node
+  const { expression } = node
 
   return (
     <div className="group">
@@ -16,22 +16,22 @@ const Group = (props) => {
         canDelete,
         isBoolean,
         level: level + 1,
-        node: argument,
+        node: expression,
         nodeDefCurrent,
-        onChange: (item) => onChange(R.assoc('argument', item, node)),
+        onChange: (item) => onChange(R.assoc('expression', item, node)),
         onDelete,
         type,
         variables,
       })}
       <div className="footer">
         <h3>)</h3>
-        <EditButtons node={node} onChange={onChange} onDelete={() => onChange(argument)} canDelete />
+        <EditButtons node={node} onChange={onChange} onDelete={() => onChange(expression)} canDelete />
       </div>
     </div>
   )
 }
 
-Group.propTypes = {
+Sequence.propTypes = {
   node: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   renderNode: PropTypes.elementType.isRequired,
@@ -45,7 +45,7 @@ Group.propTypes = {
   variables: PropTypes.array,
 }
 
-Group.defaultProps = {
+Sequence.defaultProps = {
   canDelete: false,
   isBoolean: false,
   level: 0,
@@ -55,4 +55,4 @@ Group.defaultProps = {
   variables: null,
 }
 
-export default Group
+export default Sequence

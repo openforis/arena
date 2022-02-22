@@ -52,8 +52,8 @@ const Logical = (props) => {
           className="btn btn-s btns__last"
           onClick={() =>
             onChange({
-              type: Expression.types.GroupExpression,
-              argument: node,
+              type: Expression.types.SequenceExpression,
+              expression: node,
             })
           }
         >
