@@ -11,14 +11,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { useChain } from '@webapp/store/ui/chain'
 
-import {
-  useSurvey,
-  useSurveyCycleKeys,
-  useSurveyPreferredLang,
-  useSurveyInfo,
-  NodeDefsActions,
-  useSurveyCycleKey,
-} from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKeys, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
@@ -51,7 +44,6 @@ const BaseUnitSelector = () => {
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const dispatch = useDispatch()
   const cycleKeys = useSurveyCycleKeys()
@@ -63,7 +55,7 @@ const BaseUnitSelector = () => {
   const handleSaveSamplingNodeDefs = useCallback(() => {
     dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: samplingNodeDefsToCreate }))
 
-    setBaseUnitNodeDef(samplingNodeDefsToCreate[0])
+    setBaseUnitNodeDef(Survey.getNodeDefParent(samplingNodeDefsToCreate[0])(survey))
     setHadBaseUnitNodeDef(true)
     setSamplingNodeDefsToCreate([])
   }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, samplingNodeDefsToCreate, setSamplingNodeDefsToCreate])
@@ -93,14 +85,12 @@ const BaseUnitSelector = () => {
 
       descendantEntities.forEach((nodeDef) => {
         const isBaseUnit = NodeDef.isEqual(nodeDef)(referenceNodeDef)
-        const name = isBaseUnit
-          ? `weight`
-          : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
+        const name = isBaseUnit ? `weight` : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
 
         const props = {
           [NodeDef.propKeys.name]: name,
         }
-        const defaultValue = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? `1` : `NA`
+        const defaultValue = isBaseUnit ? `1` : `NA`
 
         const advancedProps = {
           [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
@@ -110,7 +100,7 @@ const BaseUnitSelector = () => {
           [NodeDef.keysPropsAdvanced.isSampling]: true,
           [NodeDef.keysPropsAdvanced.script]: `${NodeDef.getName(nodeDef)}$${name} <- ${defaultValue}`,
         }
-        const parentNodeDef = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? referenceNodeDef : nodeDef
+        const parentNodeDef = isBaseUnit ? referenceNodeDef : nodeDef
         const temporary = true
         const virtual = false
         const _nodeDef = NodeDef.newNodeDef(
@@ -126,29 +116,14 @@ const BaseUnitSelector = () => {
       })
 
       setSamplingNodeDefsToCreate(_samplingNodeDefsToCreate)
-      setBaseUnitNodeDef(_samplingNodeDefsToCreate[0])
+      setBaseUnitNodeDef(Survey.getNodeDefParent(_samplingNodeDefsToCreate[0])(survey))
     },
     [setBaseUnitNodeDef, baseUnitNodeDef, survey]
   )
 
   useEffect(() => {
     // TODO if survey has other base unit nodedef into other chain, the user is not able to create "base unit/weight" nodedef
-    const hierarchy = Survey.getHierarchy()(survey)
-    let _baseUnitNodeDef = null
-
-    // LOAD _baseUnitNodeDef
-    const traverse = (nodeDef) => {
-      if (NodeDef.isRoot(nodeDef) || !NodeDef.isSingleEntity(nodeDef)) {
-        const nodeDefs = Survey.getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(nodeDef) })(survey)
-        const __baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
-        if (!_baseUnitNodeDef && __baseUnitNodeDef) {
-          _baseUnitNodeDef = __baseUnitNodeDef
-        }
-      }
-    }
-
-    Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
-
+    const _baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
     if (_baseUnitNodeDef) {
       setBaseUnitNodeDef(_baseUnitNodeDef)
       setHadBaseUnitNodeDef(true)
@@ -166,8 +141,7 @@ const BaseUnitSelector = () => {
       <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
-          lang={lang}
-          nodeDefUuidEntity={NodeDef.getParentUuid(baseUnitNodeDef)}
+          nodeDefUuidEntity={NodeDef.getUuid(baseUnitNodeDef)}
           onChange={handleUpdateBaseUnit}
           showSingleEntities={false}
           disabled={hadBaseUnitNodeDef}

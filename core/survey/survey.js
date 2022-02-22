@@ -236,4 +236,4 @@ export const {
 } = SurveyRefDataIndex
 
 // Analysis
-export const { getAnalysisNodeDefs, getAnalysisEntities } = SurveyAnalysis
+export const { getAnalysisNodeDefs, getAnalysisEntities, getBaseUnitNodeDef } = SurveyAnalysis
