@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
