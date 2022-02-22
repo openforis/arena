@@ -12,9 +12,10 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 const AnalysisNodeDefs = () => {
-  const [showSamplingNodeDefs, setshowSamplingNodeDefs] = useState(false)
+  const [showSamplingNodeDefs, setShowSamplingNodeDefs] = useState(false)
   const i18n = useI18n()
   const entityDefUuid = useChainEntityDefUuid()
 
@@ -31,6 +32,13 @@ const AnalysisNodeDefs = () => {
 
   useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
 
+  // hide sampling node defs if chain doen't use sampling design
+  useOnUpdate(() => {
+    if (!Chain.isSamplingDesign(chain)) {
+      setShowSamplingNodeDefs(false)
+    }
+  }, [Chain.isSamplingDesign(chain)])
+
   return (
     <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
       {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey).length === 0 && (
@@ -42,7 +50,7 @@ const AnalysisNodeDefs = () => {
 
       <>
         <AnalysisNodeDefsHeader
-          toggleshowSamplingNodeDefs={() => setshowSamplingNodeDefs(!showSamplingNodeDefs)}
+          toggleshowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
           showSamplingNodeDefs={showSamplingNodeDefs}
         />
 

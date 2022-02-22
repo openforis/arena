@@ -678,6 +678,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   chainView: {
     formLabel: 'Processing chain label',
+    basic: 'Basic',
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
     stratumAttribute: 'Stratum attribute',

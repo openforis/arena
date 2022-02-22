@@ -1,12 +1,12 @@
 @import 'webapp/style/vars';
 
-.node-def-edit__base-unit-selector{
-    display: grid;
-    grid-template-columns: 1fr auto;
-    max-width: 600px;
-    grid-column-gap: 8px;
-    
-    .dropdown{
-        height: auto;
-    }
+.node-def-edit__base-unit-selector {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  max-width: 600px;
+  grid-column-gap: 8px;
+
+  .dropdown {
+    height: auto;
+  }
 }

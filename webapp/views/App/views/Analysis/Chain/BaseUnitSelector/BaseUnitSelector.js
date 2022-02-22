@@ -11,13 +11,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { useChain } from '@webapp/store/ui/chain'
 
-import {
-  useSurvey,
-  useSurveyCycleKeys,
-  useSurveyInfo,
-  NodeDefsActions,
-  useSurveyCycleKey,
-} from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKeys, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
@@ -96,7 +90,7 @@ const BaseUnitSelector = () => {
         const props = {
           [NodeDef.propKeys.name]: name,
         }
-        const defaultValue = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? `1` : `NA`
+        const defaultValue = isBaseUnit ? `1` : `NA`
 
         const advancedProps = {
           [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
@@ -106,7 +100,7 @@ const BaseUnitSelector = () => {
           [NodeDef.keysPropsAdvanced.isSampling]: true,
           [NodeDef.keysPropsAdvanced.script]: `${NodeDef.getName(nodeDef)}$${name} <- ${defaultValue}`,
         }
-        const parentNodeDef = NodeDef.isEqual(nodeDef)(referenceNodeDef) ? referenceNodeDef : nodeDef
+        const parentNodeDef = isBaseUnit ? referenceNodeDef : nodeDef
         const temporary = true
         const virtual = false
         const _nodeDef = NodeDef.newNodeDef(

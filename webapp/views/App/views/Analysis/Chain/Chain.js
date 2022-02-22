@@ -1,6 +1,6 @@
 import './Chain.scss'
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -16,18 +16,13 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
-import { FormItem } from '@webapp/components/form/Input'
-import { Checkbox } from '@webapp/components/form'
+import TabBar from '@webapp/components/tabBar'
 
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
-import BaseUnitSelector from './BaseUnitSelector'
-import { StratumAttributeSelector } from './StratumAttributeSelector'
-import { ClusteringEntitySelector } from './ClusteringEntitySelector'
-import { ExpansionPanel } from '@webapp/components'
+import { ChainBasicProps } from './ChainBasicProps'
+import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -37,7 +32,6 @@ const ChainComponent = () => {
   const validation = Chain.getValidation(chain)
   const survey = useSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
@@ -45,7 +39,10 @@ const ChainComponent = () => {
   const _openRStudioLocal = () => {
     dispatch(ChainActions.openRStudio({ chain, isLocal: true }))
   }
-  const updateChain = (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate }))
+  const updateChain = useCallback(
+    (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
+    [dispatch]
+  )
 
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
@@ -79,73 +76,24 @@ const ChainComponent = () => {
         <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
       </div>
 
-      <div className="chain-form">
-        <LabelsEditor
-          labels={chain.props?.labels}
-          formLabelKey="chainView.formLabel"
-          readOnly={false}
-          validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}
-        />
-
-        <LabelsEditor
-          formLabelKey="common.description"
-          labels={chain.props.descriptions}
-          onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
-        />
-
-        <CyclesSelector
-          cyclesKeysSelected={chain.props.cycles}
-          onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
-        />
-
-        <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
-          <div className="form-item-content">
-            <Checkbox
-              checked={Chain.isSamplingDesign(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
-              onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
-            />
-            {Chain.isSamplingDesign(chain) && (
-              <ExpansionPanel buttonLabel="chainView.samplingDesignDetails" startClosed={false}>
-                <BaseUnitSelector />
-
-                {baseUnitNodeDef && (
-                  <>
-                    <StratumAttributeSelector />
-
-                    <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
-                      <Checkbox
-                        checked={Chain.isAreaWeightingMethod(chain)}
-                        validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
-                        onChange={(areaWeightingMethod) =>
-                          updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
-                        }
-                      />
-                    </FormItem>
-
-                    <ClusteringEntitySelector />
-
-                    {Chain.getClusteringNodeDefUuid(chain) && (
-                      <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
-                        <Checkbox
-                          checked={Chain.isClusteringOnlyVariances(chain)}
-                          validation={Validation.getFieldValidation(Chain.keysProps.clusteringOnlyVariances)(
-                            validation
-                          )}
-                          onChange={(clusteringOnlyVariances) =>
-                            updateChain(Chain.assocClusteringOnlyVariances(clusteringOnlyVariances)(chain))
-                          }
-                        />
-                      </FormItem>
-                    )}
-                  </>
-                )}
-              </ExpansionPanel>
-            )}
-          </div>
-        </FormItem>
-      </div>
+      <TabBar
+        tabs={[
+          {
+            label: i18n.t('chainView.basic'),
+            component: ChainBasicProps,
+            props: {
+              updateChain,
+            },
+          },
+          {
+            label: i18n.t('chainView.samplingDesign'),
+            component: ChainSamplingDesignProps,
+            props: {
+              updateChain,
+            },
+          },
+        ]}
+      />
 
       <AnalysisNodeDefs />
 
