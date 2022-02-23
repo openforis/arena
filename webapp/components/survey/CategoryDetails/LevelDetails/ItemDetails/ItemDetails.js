@@ -23,7 +23,7 @@ import { TestId } from '@webapp/utils/testId'
 import { State, useActions } from '../../store'
 
 const ItemDetails = (props) => {
-  const { level, index, item, state, setState } = props
+  const { level, index, item, state, setState, style } = props
 
   const elemRef = useRef(null)
 
@@ -72,6 +72,7 @@ const ItemDetails = (props) => {
       ref={elemRef}
       role="button"
       tabIndex={0}
+      style={style}
     >
       <ErrorBadge
         id={TestId.categoryDetails.itemErrorBadge(levelIndex, index)}
