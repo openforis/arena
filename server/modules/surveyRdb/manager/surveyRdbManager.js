@@ -38,13 +38,20 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 // ==== DML
 
-const _getExportFields = ({ survey, query, addCycle = false }) => {
+const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItemsLabels = true }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
+  const fields = nodeDefCols.flatMap((nodeDefCol) => {
+    if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
+      // keep only code column
+      return [NodeDef.getName(nodeDefCol)]
+    } else {
+      return new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names
+    }
+  })
   // Cycle is 0-based
   return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
 }
@@ -73,6 +80,7 @@ export const fetchViewData = async (params) => {
     limit = null,
     streamOutput = null,
     addCycle = false,
+    includeCategoryItemsLabels = true,
   } = params
 
   // Fetch data
@@ -88,7 +96,7 @@ export const fetchViewData = async (params) => {
 
   if (streamOutput) {
     await db.stream(result, (stream) => {
-      const fields = _getExportFields({ survey, query, addCycle })
+      const fields = _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
       stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
     return null
@@ -157,12 +165,17 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
-export const fetchEntitiesDataToCsvFiles = async ({ surveyId, outputDir, callback }, client) => {
+export const fetchEntitiesDataToCsvFiles = async (
+  { surveyId, outputDir, includeCategoryItemsLabels, callback },
+  client
+) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, client)
 
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
+
+  callback?.({ total: nodeDefs.length })
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
@@ -180,11 +193,19 @@ export const fetchEntitiesDataToCsvFiles = async ({ surveyId, outputDir, callbac
     })(survey)
 
     let query = Query.create({ entityDefUuid })
-    query = Query.assocAttributeDefUuids(parentKeys.reverse().concat(childDefs).map(NodeDef.getUuid))(query)
+    const queryAttributeDefs = parentKeys.reverse().concat(childDefs)
+    query = Query.assocAttributeDefUuids(queryAttributeDefs.map(NodeDef.getUuid))(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    await fetchViewData({ survey, columnNodeDefs: childDefs, streamOutput: stream, query, addCycle: true })
+    await fetchViewData({
+      survey,
+      columnNodeDefs: childDefs,
+      streamOutput: stream,
+      query,
+      addCycle: true,
+      includeCategoryItemsLabels,
+    })
   })
 }
 /**
