@@ -15,20 +15,26 @@ const ExportData = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  const [state, setState] = useState({ options: { includeCategories: false } })
+  const [state, setState] = useState({ options: { includeCategoryItemsLabels: true, includeCategories: false } })
   const { options } = state
 
-  const onIncludeCategoriesChange = (value) =>
+  const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
-      const optionsUpdated = { ...statePrev.params, includeCategories: value }
+      const optionsUpdated = { ...statePrev.options, [option]: value }
       return { ...statePrev, options: optionsUpdated }
     })
 
   return (
     <div className="export">
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header" startClosed>
+        <FormItem className="check" label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}>
+          <Checkbox
+            checked={options.includeCategoryItemsLabels}
+            onChange={onOptionChange('includeCategoryItemsLabels')}
+          />
+        </FormItem>
         <FormItem className="check" label={i18n.t('dataExportView.options.includeCategories')}>
-          <Checkbox checked={options.includeCategories} onChange={onIncludeCategoriesChange} />
+          <Checkbox checked={options.includeCategories} onChange={onOptionChange('includeCategories')} />
         </FormItem>
       </ExpansionPanel>
 
