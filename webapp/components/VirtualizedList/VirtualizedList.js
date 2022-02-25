@@ -18,6 +18,7 @@ export const VirtualizedList = (props) => {
     rowRenderer,
     showScrollingPlaceholders,
     placeholderRenderer,
+    virtualizationThreshold,
   } = props
 
   const externalContainerRef = useRef(null)
@@ -33,32 +34,45 @@ export const VirtualizedList = (props) => {
 
   const innerHeight = rowCount * rowHeight
 
+  const virtualizationEnabled = rowCount > virtualizationThreshold
+
+  const renderItem = ({ index, forceRendering, scrolling }) => {
+    const oldItemInfo = itemsInfoByIndex[index]
+    let item
+    let placeholder = false
+    if (!forceRendering && oldItemInfo && !oldItemInfo.placeholder) {
+      // use previous rendered item
+      item = items[oldItemInfo.indexInList]
+    } else if (scrolling && showScrollingPlaceholders) {
+      // scrolling and item not rendered yet: render placeholder
+      item = placeholderRenderer({ index })
+      placeholder = true
+    } else {
+      // render new item
+      item = rowRenderer({ index })
+    }
+    return { item, placeholder }
+  }
+
   const renderItems = useCallback(
     ({ scrolling = false, forceRendering = false } = {}) => {
       const scrollTop = scrollTopRef.current
-      const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscanRowCount) // render items before the visible ones
-      const endIndex = Math.min(
-        rowCount - 1, // don't render past the end of the list
-        Math.floor((scrollTop + externalContainerRef.current.offsetHeight) / rowHeight) + overscanRowCount // render 10 items after the visible ones
-      )
+      const startIndex = virtualizationEnabled
+        ? Math.max(0, Math.floor(scrollTop / rowHeight) - overscanRowCount) // render items before the visible ones
+        : 0
+      const endIndex = virtualizationEnabled
+        ? Math.min(
+            rowCount - 1, // don't render past the end of the list
+            Math.floor((scrollTop + externalContainerRef.current.offsetHeight) / rowHeight) + overscanRowCount // render 10 items after the visible ones
+          )
+        : rowCount - 1
+
       const newItems = []
       const newItemsInfoByIndex = []
 
       for (let index = startIndex; index <= endIndex; index++) {
-        const oldItemInfo = itemsInfoByIndex[index]
-        let item
-        let placeholder = false
-        if (!forceRendering && oldItemInfo && !oldItemInfo.placeholder) {
-          // use previous rendered item
-          item = items[oldItemInfo.indexInList]
-        } else if (scrolling && showScrollingPlaceholders) {
-          // scrolling and item not rendered yet: render placeholder
-          item = placeholderRenderer({ index })
-          placeholder = true
-        } else {
-          // render new item
-          item = rowRenderer({ index })
-        }
+        const { placeholder, item } = renderItem({ index, forceRendering, scrolling })
+
         newItemsInfoByIndex[index] = {
           indexInList: newItems.length,
           placeholder,
@@ -81,6 +95,8 @@ export const VirtualizedList = (props) => {
 
   const onScroll = useCallback(
     (e) => {
+      if (!virtualizationEnabled) return // do not render items
+
       scrollTopRef.current = e.currentTarget.scrollTop
       if (showScrollingPlaceholders) {
         // render placeholders
@@ -116,6 +132,7 @@ VirtualizedList.propTypes = {
   rowHeight: PropTypes.number.isRequired,
   rowRenderer: PropTypes.func.isRequired,
   showScrollingPlaceholders: PropTypes.bool,
+  virtualizationThreshold: PropTypes.number, // threshold to consider before virtualizing the rendering
 }
 
 VirtualizedList.defaultProps = {
@@ -123,4 +140,5 @@ VirtualizedList.defaultProps = {
   overscanRowCount: 10,
   placeholderRenderer: () => <div className="item-placeholder">...</div>,
   showScrollingPlaceholders: true,
+  virtualizationThreshold: 300,
 }

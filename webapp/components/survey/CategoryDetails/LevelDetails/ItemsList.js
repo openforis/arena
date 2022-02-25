@@ -31,6 +31,7 @@ export const ItemsList = (props) => {
     <VirtualizedList
       id={`virtualized_list_level_${CategoryLevel.getUuid(level)}`}
       className="category__level-items"
+      overscanRowCount={20}
       rowCount={items.length}
       rowHeight={34}
       rowRenderer={rowRenderer}
