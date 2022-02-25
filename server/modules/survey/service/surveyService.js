@@ -32,8 +32,8 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget }) => {
   return JobUtils.jobToJSON(job)
 }
 
-export const startExportCsvDataJob = ({ surveyId, user, includeCategories }) => {
-  const job = new ExportCsvDataJob({ user, surveyId, includeCategories })
+export const startExportCsvDataJob = ({ surveyId, user, includeCategories, includeCategoryItemsLabels }) => {
+  const job = new ExportCsvDataJob({ user, surveyId, includeCategories, includeCategoryItemsLabels })
 
   JobManager.executeJobThread(job)
 
