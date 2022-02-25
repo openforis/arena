@@ -10,7 +10,7 @@ import ItemDetails from './ItemDetails'
 export const ItemsList = (props) => {
   const { items, level, state, setState } = props
 
-  const renderItem = useCallback(
+  const rowRenderer = useCallback(
     ({ index }) => {
       const item = items[index]
       return (
@@ -24,16 +24,16 @@ export const ItemsList = (props) => {
         />
       )
     },
-    [level, state, setState]
+    [items, level, state, setState]
   )
 
   return (
     <VirtualizedList
       id={`virtualized_list_level_${CategoryLevel.getUuid(level)}`}
       className="category__level-items"
-      numItems={items.length}
-      itemHeight={34}
-      renderItem={renderItem}
+      rowCount={items.length}
+      rowHeight={34}
+      rowRenderer={rowRenderer}
     />
   )
 }
