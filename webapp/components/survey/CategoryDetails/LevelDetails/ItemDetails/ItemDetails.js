@@ -11,6 +11,7 @@ import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
+import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
@@ -81,15 +82,13 @@ const ItemDetails = (props) => {
       />
       {active ? (
         <>
-          <button
+          <Button
             id={`${prefixId}-btn-close`}
-            data-testid={TestId.categoryDetails.itemCloseBtn(levelIndex, index)}
-            type="button"
-            className="btn btn-s btn-close"
+            testId={TestId.categoryDetails.itemCloseBtn(levelIndex, index)}
+            className="btn-s btn-close"
+            iconClassName="icon-arrow-up icon-12px"
             onClick={() => Actions.resetItemActive({ levelIndex })}
-          >
-            <span className="icon icon-arrow-up icon-12px" />
-          </button>
+          />
 
           <FormItem label={i18n.t('common.code')}>
             <Input
@@ -130,16 +129,12 @@ const ItemDetails = (props) => {
           )}
 
           {!readOnly && (
-            <button
-              type="button"
-              className="btn btn-delete"
-              data-testid={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
-              aria-disabled={disabled}
+            <ButtonDelete
+              testId={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
+              disabled={disabled}
               onClick={() => Actions.deleteItem({ category, level, item, leaf })}
-            >
-              <span className="icon icon-bin2 icon-12px icon-left" />
-              {i18n.t('categoryEdit.deleteItem')}
-            </button>
+              label="categoryEdit.deleteItem"
+            />
           )}
         </>
       ) : (
