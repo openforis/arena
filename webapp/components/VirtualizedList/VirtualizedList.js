@@ -38,20 +38,27 @@ export const VirtualizedList = (props) => {
 
   const renderItem = ({ index, forceRendering, scrolling }) => {
     const oldItemInfo = itemsInfoByIndex[index]
-    let item
-    let placeholder = false
+
     if (!forceRendering && oldItemInfo && !oldItemInfo.placeholder) {
       // use previous rendered item
-      item = items[oldItemInfo.indexInList]
-    } else if (scrolling && showScrollingPlaceholders) {
-      // scrolling and item not rendered yet: render placeholder
-      item = placeholderRenderer({ index })
-      placeholder = true
-    } else {
-      // render new item
-      item = rowRenderer({ index })
+      const { indexInList, placeholder } = oldItemInfo
+      return {
+        item: items[indexInList],
+        placeholder,
+      }
     }
-    return { item, placeholder }
+    if (scrolling && showScrollingPlaceholders) {
+      // scrolling and item not rendered yet: render placeholder
+      return {
+        item: placeholderRenderer({ index }),
+        placeholder: true,
+      }
+    }
+    // render new item
+    return {
+      item: rowRenderer({ index }),
+      placeholder: false,
+    }
   }
 
   const renderItems = useCallback(

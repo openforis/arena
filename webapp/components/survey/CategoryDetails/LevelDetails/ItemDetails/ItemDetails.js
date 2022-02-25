@@ -27,6 +27,7 @@ const ItemDetails = (props) => {
   const { level, index, item, state, setState } = props
 
   const elemRef = useRef(null)
+  const isInitialMount = useRef(true)
 
   const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
@@ -56,8 +57,11 @@ const ItemDetails = (props) => {
   const updateProp = ({ key, value }) => Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
 
   useEffect(() => {
-    if (active) {
-      elemRef.current.scrollIntoView(false)
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      if (active) {
+        elemRef.current.scrollIntoView(false)
+      }
     }
   }, [active])
 
