@@ -13,7 +13,7 @@ import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-const AnalysisNodeDefsHeader = ({ toggleshowSamplingNodeDefs, showSamplingNodeDefs }) => {
+const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDefs }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
@@ -33,7 +33,7 @@ const AnalysisNodeDefsHeader = ({ toggleshowSamplingNodeDefs, showSamplingNodeDe
         {Chain.isSamplingDesign(chain) && (
           <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">
             <div>
-              <button className="btn btn-s" onClick={toggleshowSamplingNodeDefs} type="button">
+              <button className="btn btn-s" onClick={toggleShowSamplingNodeDefs} type="button">
                 {showSamplingNodeDefs ? i18n.t('common.hide') : i18n.t('common.show')}{' '}
                 {i18n.t('chainView.samplingNodeDefs')}
               </button>
