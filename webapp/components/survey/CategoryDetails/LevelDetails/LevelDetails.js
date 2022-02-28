@@ -16,9 +16,8 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import ItemDetails from './ItemDetails'
-
 import { State, useActions } from '../store'
+import { ItemsList } from './ItemsList'
 
 const LevelDetails = (props) => {
   const { level, single, state, setState } = props
@@ -96,18 +95,7 @@ const LevelDetails = (props) => {
         )}
       </div>
 
-      <div className="category__level-items">
-        {items.map((item, index) => (
-          <ItemDetails
-            key={CategoryItem.getUuid(item)}
-            level={level}
-            index={index}
-            item={item}
-            state={state}
-            setState={setState}
-          />
-        ))}
-      </div>
+      <ItemsList items={items} level={level} state={state} setState={setState} />
     </div>
   )
 }
