@@ -68,7 +68,7 @@ export const { getEntityKeyNodes, getEntityKeyValues } = RecordReader
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
-export const { assocNodes, assocNode, mergeNodes } = RecordUpdater
+export const { assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
 export const { updateSelfAndDependentsApplicable, updateSelfAndDependentsDefaultValues } = RecordNodeDependentsUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
