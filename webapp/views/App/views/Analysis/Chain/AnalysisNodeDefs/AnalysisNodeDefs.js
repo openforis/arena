@@ -50,7 +50,7 @@ const AnalysisNodeDefs = () => {
 
       <>
         <AnalysisNodeDefsHeader
-          toggleshowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
+          toggleShowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
           showSamplingNodeDefs={showSamplingNodeDefs}
         />
 
