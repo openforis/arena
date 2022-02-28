@@ -1,0 +1,12 @@
+.virtualized-list {
+  overflow-y: auto;
+
+  .loading-bar {
+    position: relative;
+    top: unset;
+
+    .progress-bar {
+      width: 100%;
+    }
+  }
+}
