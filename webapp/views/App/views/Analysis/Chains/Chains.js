@@ -4,19 +4,21 @@ import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
 
+import * as DateUtils from '@core/dateUtils'
+
 import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { useI18n } from '@webapp/store/system'
 
-import Row from './Row'
-import RowHeader from './RowHeader'
 import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
   const navigate = useNavigate()
+  const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
 
@@ -46,25 +48,31 @@ const ChainsView = () => {
           key: 'label',
           header: 'common.label',
           width: '1fr',
-          renderItem: ({ item }) => (
-            <div className="chain-label">
-              <div>{Chain.getLabel(lang)(item)}</div>
-            </div>
-          ),
+          renderItem: ({ item }) => Chain.getLabel(lang)(item),
+        },
+        {
+          key: 'samplingDesign',
+          header: 'chainView.samplingDesign',
+          renderItem: ({ item }) => Chain.isSamplingDesign(item) && <span className="icon icon-checkmark" />,
+          width: '10rem',
         },
         {
           key: Chain.keys.dateCreated,
           header: 'common.dateCreated',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateCreated(item)),
-          width: '15rem',
-          sortable: true,
+          width: '12rem',
         },
         {
           key: Chain.keys.dateModified,
           header: 'common.dateLastModified',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateModified(item)),
-          width: '15rem',
-          sortable: true,
+          width: '12rem',
+        },
+        {
+          key: Chain.keys.dateExecuted,
+          header: 'chainView.dateExecuted',
+          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateExecuted(item)),
+          width: '12rem',
         },
         {
           key: 'edit',
