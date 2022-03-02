@@ -6,7 +6,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as UserValidator from '@core/user/userValidator'
 import * as User from '@core/user/user'
 
-const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
+const validPasswordRe = new RegExp(/^\S+$/)
 const passwordStrengthRe = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d).{8,}$/)
 
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))

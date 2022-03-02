@@ -1170,7 +1170,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       nameRequired: 'Name is required',
       titleRequired: 'Title is required',
       passwordRequired: 'Password is required',
-      passwordInvalid: 'Password should not start nor end with white spaces',
+      passwordInvalid: 'Password should not contain white spaces',
       passwordUnsafe:
         'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
       passwordsDoNotMatch: `Passwords don't match`,
