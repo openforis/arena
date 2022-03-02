@@ -88,7 +88,7 @@ const HelperWithoutAttributes = () => {
 
 export const helperTypes = {
   firstTimeSurvey: 'firstTimeSurvey',
-  surveyWithoutNodeDefs: 'surveyWithoutNodeDefs'
+  surveyWithoutNodeDefs: 'surveyWithoutNodeDefs',
 }
 
 const HelpersByType = {
@@ -96,15 +96,14 @@ const HelpersByType = {
   [helperTypes.surveyWithoutNodeDefs]: HelperWithoutAttributes,
 }
 
-const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => {
-  return (
-    <Link to={to} className="btn-s btn-transparent">
-      {iconLeft && iconLeft}
-      {children}
-      {iconRight && iconRight}
-    </Link>
-  )
-}
+const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => (
+  <Link to={to} className="btn-s btn-transparent">
+    {iconLeft}
+    {children}
+    {iconRight}
+  </Link>
+)
+
 const FirstTimeHelp = ({ firstTimeHelp }) => {
   const HelperComponent = HelpersByType[firstTimeHelp]
   return <HelperComponent />
