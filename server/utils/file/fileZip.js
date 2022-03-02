@@ -82,7 +82,7 @@ export const extractZip = async (src, extractedPath) => {
   }
   await FileUtils.mkdir(extractedPath)
 
-  const fileZip = null
+  let fileZip = null
   try {
     fileZip = new FileZip(src)
     await fileZip.init()
