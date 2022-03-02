@@ -32,6 +32,7 @@ const ChainComponent = () => {
   const validation = Chain.getValidation(chain)
   const survey = useSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))
@@ -93,6 +94,7 @@ const ChainComponent = () => {
             },
           },
         ]}
+        showTabs={Chain.isSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
       />
 
       <AnalysisNodeDefs />

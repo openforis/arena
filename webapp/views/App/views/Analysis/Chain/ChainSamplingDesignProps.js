@@ -28,16 +28,7 @@ export const ChainSamplingDesignProps = (props) => {
 
   return (
     <>
-      <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
-        <Checkbox
-          checked={Chain.isSamplingDesign(chain)}
-          validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
-          onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
-          disabled={Chain.isSamplingDesign(chain) && hasBaseUnit}
-        />
-      </FormItem>
-
-      {Chain.isSamplingDesign(chain) && <BaseUnitSelector />}
+      {(Chain.isSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
       {hasBaseUnit && (
         <>
