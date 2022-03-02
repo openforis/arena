@@ -71,7 +71,7 @@ export default class FileZip {
   }
 
   close() {
-    this.streamZip.close()
+    this.streamZip?.close()
   }
 }
 
@@ -82,8 +82,12 @@ export const extractZip = async (src, extractedPath) => {
   }
   await FileUtils.mkdir(extractedPath)
 
-  const fileZip = new FileZip(src)
-  await fileZip.init()
-  await fileZip.extract(extractedPath)
-  await fileZip.close()
+  const fileZip = null
+  try {
+    fileZip = new FileZip(src)
+    await fileZip.init()
+    await fileZip.extract(extractedPath)
+  } finally {
+    fileZip?.close()
+  }
 }

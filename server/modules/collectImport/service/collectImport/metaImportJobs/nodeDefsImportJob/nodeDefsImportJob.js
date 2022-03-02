@@ -94,7 +94,7 @@ export default class NodeDefsImportJob extends Job {
    * @param {!object} collectNodeDef - Collect node definition.
    * @param {!string} type - Node definition type.
    * @param {string} field - Node sub-field.
-   * @returns {object} - Inserted node definitions.
+   * @returns {Promise<object>} - Inserted node definitions.
    */
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const { defaultLanguage } = this.context

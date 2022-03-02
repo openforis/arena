@@ -156,7 +156,9 @@ export default class Job {
   /**
    * Abstract method to be extended by subclasses
    */
-  async execute() {}
+  async execute() {
+    // to be extended by subclasses
+  }
 
   onEvent(listener) {
     this.eventListener = listener
