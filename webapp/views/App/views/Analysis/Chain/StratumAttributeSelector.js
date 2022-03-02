@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -16,7 +16,6 @@ export const StratumAttributeSelector = () => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
@@ -35,7 +34,7 @@ export const StratumAttributeSelector = () => {
     })(survey)
   }
 
-  const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getLabel(nodeDef, lang) })
+  const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getName(nodeDef) })
 
   const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
   const selectableItems = [emptySelectionItem, ...selectableDefs.map(nodeDefToItem)]
