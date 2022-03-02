@@ -13,7 +13,7 @@ export const isEmpty = _curry1((value) => {
 
   if (value.constructor === Object) return Object.keys(value).length === 0
   if (value.constructor === Array) return value.length === 0
-  if (value.constructor === String) return value === ''
+  if (value.constructor === String) return value.length === 0
   if (value.constructor === Set) return value.size === 0
   if (value.constructor === Map) return value.size === 0
 
