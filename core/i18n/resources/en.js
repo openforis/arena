@@ -474,6 +474,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importComplete: 'Import complete. {{insertedRecords}} records imported',
     importIntoCycle: 'Import into cycle',
+    importIntoEntity: 'Import into entity',
+    selectCSVFileToImport: 'Select CSV file to import',
   },
 
   dataView: {

@@ -73,13 +73,15 @@ export const DataImportCsvView = () => {
       <ButtonDownload
         href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
         label="dataImportView.downloadTemplate"
+        disabled={!selectedEntityDefUuid}
       />
 
       <UploadButton
         inputFieldId={TestId.recordsImport.importDataBtn}
-        label={i18n.t('dataImportView.importFromCsv')}
+        label={i18n.t('dataImportView.selectCSVFileToImport')}
         accept=".csv"
         onChange={(files) => onFileChange(files[0])}
+        disabled={!selectedEntityDefUuid}
       />
     </div>
   )
