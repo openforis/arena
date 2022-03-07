@@ -143,9 +143,13 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
 export const writeDataImportFromCSVTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const exportModel = new CsvExportModel({ survey, nodeDefContext: entityDef })
+  const exportModel = new CsvExportModel({
+    survey,
+    nodeDefContext: entityDef,
+    options: { includeFiles: false, includeCategoryItemsLabels: false, includeTaxonScientificName: false },
+  })
   const dataRow = exportModel.columns.reduce((acc, column) => {
-    const { header, nodeDef, field } = column
+    const { header, nodeDef, valueProp } = column
     let value
     if (nodeDef) {
       const now = new Date()
@@ -156,18 +160,19 @@ export const writeDataImportFromCSVTemplateToStream = async ({ surveyId, cycle, 
           Points.toString(PointFactory.createInstance({ srs: 'EPSG:4326', x: 41.8830209, y: 12.4879562 })),
         [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(now),
         [NodeDef.nodeDefType.decimal]: () => 123.45,
-        [NodeDef.nodeDefType.file]: () => '',
+        [NodeDef.nodeDefType.file]: () => '', // TODO support file attribute import
         [NodeDef.nodeDefType.integer]: () => 123,
         [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
         [NodeDef.nodeDefType.text]: () => 'Text',
         [NodeDef.nodeDefType.time]: () => DateUtils.formatTime(now.getHours(), now.getMinutes()),
       }
-      value = valuesByNodeDefType[NodeDef.getType(nodeDef)]({ field })
+      value = valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp })
     } else {
       value = ''
     }
     return { ...acc, [header]: value }
   }, {})
+
   await CSVWriter.writeToStream(outputStream, [dataRow])
 }
 

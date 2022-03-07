@@ -1,12 +1,47 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+
+const columnsByNodeDefType = {
+  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsCode.code },
+      ...(includeCategoryItemsLabels
+        ? [{ header: `${nodeDefName}_label`, nodeDef, valueProp: Node.valuePropsCode.label }]
+        : []),
+    ]
+  },
+  [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsTaxon.code },
+      ...(includeTaxonScientificName
+        ? [{ header: `${nodeDefName}_scientific_name`, nodeDef, valueProp: Node.valuePropsTaxon }]
+        : []),
+    ]
+  },
+  [NodeDef.nodeDefType.file]: ({ nodeDef }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: `${nodeDefName}_file_uuid`, nodeDef, valueProp: Node.valuePropsFile.fileUuid },
+      { header: `${nodeDefName}_file_name`, nodeDef, valueProp: Node.valuePropsFile.fileName },
+    ]
+  },
+}
+
+const getMainColumn = ({ nodeDef }) => ({ header: NodeDef.getName(nodeDef), nodeDef })
+
+const DEFAULT_OPTIONS = { includeCategoryItemsLabels: true, includeTaxonScientificName: true, includeFiles: true }
+
+const RECORD_CYCLE_HEADER = 'record_cycle'
 
 export class CsvExportModel {
-  constructor({ survey, nodeDefContext, options = {} }) {
+  constructor({ survey, nodeDefContext, options = DEFAULT_OPTIONS }) {
     this.survey = survey
     this.nodeDefContext = nodeDefContext
-    this._options = options
-    this._attributeDefs = [] // to be initialized
+    this.options = options
+    this.attributeDefs = [] // to be initialized
     this.columns = []
 
     this.init()
@@ -18,9 +53,13 @@ export class CsvExportModel {
   }
 
   _initAttributeDefs() {
-    const childDefs = NodeDef.isEntity(this.nodeDefContext)
+    const { includeFiles } = this.options
+    let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
+    if (!includeFiles) {
+      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
+    }
 
     let parentKeys = []
     Survey.visitAncestors(this.nodeDefContext, (n) => {
@@ -28,25 +67,22 @@ export class CsvExportModel {
       parentKeys = parentKeys.concat(keys)
     })(this.survey)
 
-    this._attributeDefs = parentKeys.reverse().concat(childDefs)
+    this.attributeDefs = parentKeys.reverse().concat(descendantDefs)
   }
 
   _initColumns() {
-    const { includeCategoryItemsLabels, addCycle } = this._options
+    const { includeCategoryItemsLabels, includeTaxonScientificName, addCycle } = this.options
 
     const columns = []
-    this._attributeDefs.forEach((nodeDef) => {
-      let columnsPerAttribute
-      if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDef)) {
-        // keep only code column
-        columnsPerAttribute = [{ header: NodeDef.getName(nodeDef), nodeDef }]
-      } else {
-        columnsPerAttribute = [{ header: NodeDef.getName(nodeDef), nodeDef }] // TO DO add columns for sub fields
-      }
+    this.attributeDefs.forEach((nodeDef) => {
+      const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
+      const columnsPerAttribute = columnsGetter
+        ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
+        : [getMainColumn({ nodeDef })]
       columns.push(...columnsPerAttribute)
     })
     // Cycle is 0-based
-    this.columns = [...(addCycle ? [{ header: 'record_cycle' }] : []), ...columns]
+    this.columns = [...(addCycle ? [{ header: RECORD_CYCLE_HEADER }] : []), ...columns]
   }
 
   get headers() {
