@@ -38,7 +38,7 @@ export const sendErr = (res, err) => {
   }
 }
 
-export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
+export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType = null }) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)
@@ -50,16 +50,16 @@ export const setContentTypeFile = (res, fileName, fileSize = null, contentType =
   }
 }
 
-export const sendFileContent = (res, name, content, size) => {
-  setContentTypeFile(res, name, size)
+export const sendFileContent = (res, fileName, content, fileSize) => {
+  setContentTypeFile({ res, fileName, fileSize })
   res.write(content, 'binary')
   res.end(null, 'binary')
 }
 
 export const sendFile = ({ res, path: filePath, name = null, contentType = null, onEnd = null }) => {
-  const size = FileUtils.getFileSize(filePath)
+  const fileSize = FileUtils.getFileSize(filePath)
   const fileName = name || path.basename(filePath)
-  setContentTypeFile(res, fileName, size, contentType)
+  setContentTypeFile({ res, fileName, fileSize, contentType })
   FileUtils.createReadStream(filePath)
     .on('end', async () => {
       if (onEnd) await onEnd()
@@ -96,8 +96,8 @@ export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
   })
 }
 
-export const sendFilesAsZip = (res, name, files) => {
-  setContentTypeFile(res, name, null, contentTypes.zip)
+export const sendFilesAsZip = (res, fileName, files) => {
+  setContentTypeFile({ res, fileName, contentType: contentTypes.zip })
   const zip = Archiver('zip')
   zip.pipe(res)
   files.forEach(({ data, name }) => {

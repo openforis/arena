@@ -187,7 +187,7 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
 
       const fileName = await generateOutputFileName({ surveyId, fileType: 'schema_summary', extension: 'csv' })
-      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
       await SurveyService.exportSchemaSummary({ surveyId, outputStream: res })
     } catch (error) {

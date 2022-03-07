@@ -13,6 +13,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -133,6 +134,10 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
   })
   JobManager.executeJobThread(job)
   return job
+}
+
+export const writeDataImportFromCSVTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
+  await CSVWriter.writeToStream(outputStream, [{ attr1: '', attr2: '' }])
 }
 
 /**
