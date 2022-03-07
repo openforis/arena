@@ -5,6 +5,8 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
+import { CsvExportModel } from '@common/model/csvExport'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -24,7 +26,7 @@ import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
-import { CsvExportModel } from '@common/model/csvExport'
+import CSVDataImportJob from './dataImport/CSVDataImportJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -172,8 +174,19 @@ export const writeDataImportFromCSVTemplateToStream = async ({ surveyId, cycle, 
     }
     return { ...acc, [header]: value }
   }, {})
-
   await CSVWriter.writeToStream(outputStream, [dataRow])
+}
+
+export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityDefUuid }) => {
+  const job = new CSVDataImportJob({
+    user,
+    surveyId,
+    filePath,
+    cycle,
+    entityDefUuid,
+  })
+  JobManager.executeJobThread(job)
+  return job
 }
 
 /**

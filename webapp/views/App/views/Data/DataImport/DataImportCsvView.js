@@ -26,7 +26,7 @@ export const DataImportCsvView = () => {
   const dispatch = useDispatch()
 
   const [cycle, setCycle] = useState(surveyCycle)
-  const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(false)
+  const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
 
   const onEntitySelect = (entityDef) => setSelectedEntityDefUuid(NodeDef.getUuid(entityDef))
 
@@ -35,7 +35,7 @@ export const DataImportCsvView = () => {
       surveyId,
       file,
       cycle,
-      entityDefUuid,
+      entityDefUuid: selectedEntityDefUuid,
     })
     dispatch(
       JobActions.showJobMonitor({

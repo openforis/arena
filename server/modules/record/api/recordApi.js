@@ -76,14 +76,25 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
-    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+  app.post('/survey/:surveyId/record/importfromcsv', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
+      const filePath = Request.getFilePath(req)
 
-    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
-
-    await RecordService.writeDataImportFromCSVTemplateToStream({ surveyId, cycle, entityDefUuid, outputStream: res })
+      const job = RecordService.startCSVDataImportJob({
+        user,
+        surveyId,
+        filePath,
+        cycle,
+        entityDefUuid,
+      })
+      const jobSerialized = JobUtils.jobToJSON(job)
+      res.json({ job: jobSerialized })
+    } catch (error) {
+      next(error)
+    }
   })
-
   // ==== READ
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
@@ -178,6 +189,14 @@ export const init = (app) => {
     } catch (error) {
       next(error)
     }
+  })
+
+  app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
+    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+
+    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
+
+    await RecordService.writeDataImportFromCSVTemplateToStream({ surveyId, cycle, entityDefUuid, outputStream: res })
   })
 
   // ==== UPDATE
