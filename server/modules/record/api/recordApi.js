@@ -77,7 +77,6 @@ export const init = (app) => {
   })
 
   app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
-    const user = Request.getUser(req)
     const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
 
     setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
@@ -123,7 +122,7 @@ export const init = (app) => {
         search,
       })
       res.json(recordsSummary)
-  } catch (error) {
+    } catch (error) {
       next(error)
     }
   })
