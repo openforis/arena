@@ -10,7 +10,7 @@ import * as RecordStep from './recordStep'
 import { keys } from './_record/recordKeys'
 import * as RecordReader from './_record/recordReader'
 import * as RecordUpdater from './_record/recordUpdater'
-import * as RecordNodeDependentsUpdater from './_record/recordNodeDependentsUpdater'
+import { RecordNodesUpdater } from './_record/recordNodesUpdater'
 
 export { keys } from './_record/recordKeys'
 
@@ -69,7 +69,7 @@ export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = Reco
 
 // ====== UPDATE
 export const { assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
-export const { updateSelfAndDependentsApplicable, updateSelfAndDependentsDefaultValues } = RecordNodeDependentsUpdater
+export const { updateNodesDependents } = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE

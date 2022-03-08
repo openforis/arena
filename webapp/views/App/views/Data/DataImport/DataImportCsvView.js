@@ -36,6 +36,7 @@ export const DataImportCsvView = () => {
       file,
       cycle,
       entityDefUuid: selectedEntityDefUuid,
+      updateExistingRecords: true
     })
     dispatch(
       JobActions.showJobMonitor({

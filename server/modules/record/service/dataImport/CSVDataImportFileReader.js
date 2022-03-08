@@ -1,3 +1,4 @@
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as CSVReader from '@server/utils/file/csvReader'
@@ -7,31 +8,18 @@ export const createCSVDataImportReaderFromStream = async ({ stream, csvDataExpor
     stream,
     null,
     async (row) => {
-      const ancestorsKeyValuesByAncestorDefUuid = {}
-      const valuesByAttributeDefUuid = {}
+      const valuesByDefUuid = {}
 
       csvDataExportModel.columns.forEach((column) => {
-        const { header, nodeDef, parentDef } = column
+        const { header, nodeDef } = column
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
         const value = row[header]
 
-        if (nodeDef) {
-          if (NodeDef.isKey(nodeDef)) {
-            // ancestor key
-            const ancestorDefUuid = NodeDef.getUuid(parentDef)
-            ancestorsKeyValuesByAncestorDefUuid[ancestorDefUuid] = {
-              ...(ancestorsKeyValuesByAncestorDefUuid[ancestorDefUuid] || {}),
-              [nodeDefUuid]: value,
-            }
-          } else {
-            valuesByAttributeDefUuid[nodeDefUuid] = value
-          }
-        }
+        valuesByDefUuid[nodeDefUuid] = value
       })
 
       await onRowItem({
-        ancestorsKeyValuesByAncestorDefUuid,
-        valuesByAttributeDefUuid,
+        valuesByDefUuid,
       })
     },
     onTotalChange

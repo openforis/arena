@@ -92,7 +92,7 @@ export class CsvExportModel {
   }
 
   _extractAttributeDefsColumns() {
-    const { includeFiles } = this.options
+    const { includeFiles, includeAnalysis } = this.options
 
     let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
@@ -100,6 +100,9 @@ export class CsvExportModel {
 
     if (!includeFiles) {
       descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
+    }
+    if (!includeAnalysis) {
+      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
     }
     const descendantAttributeColumns = this._createColumnsFromAttributeDefs({
       attributeDefs: descendantDefs,

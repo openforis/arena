@@ -12,6 +12,8 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import { createCSVDataImportReaderFromStream } from './CSVDataImportFileReader'
 import { CsvExportModel } from '@common/model/csvExport'
+import { DataImportRecordUpdater } from './dataImportRecordUpdater'
+import { DataImportValues } from './dataImportValues'
 
 export default class CSVDataImportJob extends Job {
   constructor(params) {
@@ -21,7 +23,7 @@ export default class CSVDataImportJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    const { cycle, entityDefUuid, filePath } = this.context
+    const { cycle, entityDefUuid, filePath, updateExistingRecords } = this.context
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
@@ -44,7 +46,12 @@ export default class CSVDataImportJob extends Job {
     const csvDataExportModel = new CsvExportModel({
       survey,
       nodeDefContext: entityDef,
-      options: { includeCategoryItemsLabels: false, includeTaxonScientificName: false, includeFiles: false },
+      options: {
+        includeCategoryItemsLabels: false,
+        includeTaxonScientificName: false,
+        includeFiles: false,
+        includeAnalysis: false,
+      },
     })
 
     const stream = FileUtils.createReadStream(filePath)
@@ -59,20 +66,36 @@ export default class CSVDataImportJob extends Job {
     await reader.start()
   }
 
-  async onRowItem({ ancestorsKeyValuesByAncestorDefUuid, valuesByAttributeDefUuid }) {
-    const { recordsSummary, survey } = this.context
+  async onRowItem({ valuesByDefUuid }) {
+    const { recordsSummary, survey, entityDefUuid } = this.context
 
-    const rootDef = Survey.getNodeDefRoot(survey)
+    // find record
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
-    const rootKeyValuesByNodeDefUuid = ancestorsKeyValuesByAncestorDefUuid[NodeDef.getUuid(rootDef)]
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
-        const keyValueInRow = rootKeyValuesByNodeDefUuid[NodeDef.getUuid(rootKeyDef)]
-        return keyValueInRecord === keyValueInRow
+        const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+        return DataImportValues.isValueEqual({
+          survey,
+          nodeDef: rootKeyDef,
+          value: keyValueInRecord,
+          valueSearch: keyValueInRow,
+        })
       })
     )
+    console.log('---recordSummary', recordSummary)
     if (recordSummary) {
+      // find parent node
+      const record = await RecordManager.fetchRecordAndNodesByUuid(
+        { surveyId: this.surveyId, recordUuid: Record.getUuid(recordSummary), draft: false },
+        this.tx
+      )
+      const { record: recordUpdated, nodesUpdatedToPersist } = DataImportRecordUpdater.updateNodesWithValues({
+        survey,
+        record,
+        entityDefUuid,
+        valuesByDefUuid,
+      })
     } else {
       // TODO error record not found
     }
