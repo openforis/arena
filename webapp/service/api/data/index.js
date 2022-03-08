@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import * as A from '@core/arena'
 import { Query } from '@common/model/query'
+import { objectToFormData } from '..'
 
 // ==== DATA IMPORT
 export const startCollectRecordsImportJob = async ({
@@ -11,22 +12,15 @@ export const startCollectRecordsImportJob = async ({
   cycle,
   forceImport = false,
 } = {}) => {
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('deleteAllRecords', deleteAllRecords)
-  formData.append('cycle', cycle)
-  formData.append('forceImport', forceImport)
+  const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData)
   const { job } = data
   return job
 }
 
-export const startDataImportFromCsvJob = async ({ surveyId, cycle, entityDefUuid, file }) => {
-  const formData = new FormData()
-  formData.append('cycle', cycle)
-  formData.append('entityDefUuid', entityDefUuid)
-  formData.append('file', file)
+export const startDataImportFromCsvJob = async ({ surveyId, cycle, entityDefUuid, file, updateExistingRecords }) => {
+  const formData = objectToFormData({ cycle, entityDefUuid, file, updateExistingRecords })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData)
   const { job } = data

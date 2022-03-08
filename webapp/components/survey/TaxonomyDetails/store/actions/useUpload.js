@@ -29,8 +29,7 @@ export const useUpload = ({ setState }) => {
   return useCallback(async ({ state, file }) => {
     const taxonomy = State.getTaxonomy(state)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
-    const formData = new FormData()
-    formData.append('file', file)
+    const formData = API.objectToFormData({ file })
 
     const { data } = await API.uploadTaxa({ surveyId, taxonomyUuid, formData })
 
