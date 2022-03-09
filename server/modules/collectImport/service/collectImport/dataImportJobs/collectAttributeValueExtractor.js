@@ -28,18 +28,16 @@ const extractCodeValueAndMeta = (survey, nodeDef, record, node) => (collectNode)
 
   if (code) {
     const parentNode = Record.getParentNode(node)(record)
-    const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy(
+    const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
       nodeDef,
+      code,
       record,
       parentNode,
-      code
-    )(survey)
+    })(survey)
 
     return itemUuid
       ? {
-          value: {
-            [Node.valuePropsCode.itemUuid]: itemUuid,
-          },
+          value: Node.newNodeValueCode({ itemUuid }),
           meta: {
             [Node.metaKeys.hierarchyCode]: hierarchyCode,
           },

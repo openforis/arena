@@ -64,25 +64,27 @@ export const getCategoryItemByUuid = (categoryItemUuid) =>
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
   R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
 
-export const getCategoryItemUuidAndCodeHierarchy = (nodeDef, record, parentNode, code) => (survey) => {
-  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  let parentItemUuid = categoryItemNullParentUuid
-  let hierarchyCode = []
+export const getCategoryItemUuidAndCodeHierarchy =
+  ({ nodeDef, code, record = null, parentNode = null }) =>
+  (survey) => {
+    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+    const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    let parentItemUuid = categoryItemNullParentUuid
+    let hierarchyCode = []
 
-  if (levelIndex > 0) {
-    const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-    parentItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
-    hierarchyCode = R.append(parentItemUuid, Node.getHierarchyCode(parentCodeAttribute))
+    if (levelIndex > 0) {
+      const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+      parentItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
+      hierarchyCode = R.append(parentItemUuid, Node.getHierarchyCode(parentCodeAttribute))
+    }
+
+    const itemUuid = getCategoryItemUuid({ categoryUuid, parentItemUuid, code })(survey)
+
+    return {
+      itemUuid,
+      hierarchyCode,
+    }
   }
-
-  const itemUuid = getCategoryItemUuid({ categoryUuid, parentItemUuid, code })(survey)
-
-  return {
-    itemUuid,
-    hierarchyCode,
-  }
-}
 
 export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codePaths }) =>

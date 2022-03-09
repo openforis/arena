@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
+import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
@@ -232,6 +233,58 @@ export const getEntityKeyNodes = (survey, nodeEntity) => (record) => {
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
   R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))
+
+export const findChildByKeyValues = ({ survey, record, parentNode, childDefUuid, valuesByDefUuid }) => {
+  const childDef = SurveyNodeDefs.getNodeDefByUuid(childDefUuid)(survey)
+  const siblings = getNodeChildrenByDefUuidUnsorted(parentNode, childDefUuid)(record)
+  return siblings.find((sibling) => {
+    if (NodeDef.isSingleEntity(childDef)) {
+      return sibling
+    }
+    const keyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey)
+    return keyDefs.every((keyDef) => {
+      const keyDefUuid = NodeDef.getUuid(keyDef)
+      const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
+      const keyAttributeValue = Node.getValue(keyAttribute)
+      const keyAttributeValueSearch = valuesByDefUuid[keyDefUuid]
+
+      return NodeValues.isValueEqual({
+        survey,
+        nodeDef: keyDef,
+        record,
+        parentNode: sibling,
+        value: keyAttributeValue,
+        valueSearch: keyAttributeValueSearch,
+      })
+    })
+  })
+}
+
+export const findDescendantByKeyValues = ({ survey, record, descendantDefUuid, valuesByDefUuid }) => {
+  const entityDef = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
+  // start from root node
+  let currentNode = getRootNode(record)
+  // visit descendant nodes up to descendant def (excluding root entity)
+  const hierarchyToVisit = [...NodeDef.getMetaHierarchy(entityDef), descendantDefUuid]
+  hierarchyToVisit.shift()
+  hierarchyToVisit.some((ancestorDefUuid) => {
+    const ancestorNode = findChildByKeyValues({
+      survey,
+      record,
+      parentNode: currentNode,
+      childDefUuid: ancestorDefUuid,
+      valuesByDefUuid,
+    })
+    if (!ancestorNode) {
+      currentNode = null
+      return false // break the loop
+    }
+    currentNode = ancestorNode
+  })
+  return currentNode
+}
+
+// ===== Unique
 
 export const getAttributesUniqueSibling = ({ record, attribute, attributeDef }) => {
   const parentEntity = getParentNode(attribute)(record)

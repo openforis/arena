@@ -12,7 +12,7 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { DataImportFileReader } from './dataImportFileReader'
 import { CsvExportModel } from '@common/model/csvExport'
 import { dataImportRecordUpdater } from './dataImportRecordUpdater'
-import { dataImportValues } from './dataImportValues'
+import { NodeValues } from '../../../../core/record/nodeValues'
 
 export default class DataImportJob extends Job {
   constructor(params) {
@@ -57,6 +57,7 @@ export default class DataImportJob extends Job {
 
     const reader = await DataImportFileReader.createReader({
       stream,
+      survey,
       csvDataExportModel,
       onRowItem: (item) => this.onRowItem(item),
       onTotalChange: (total) => (this.total = total),
@@ -74,7 +75,7 @@ export default class DataImportJob extends Job {
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-        return dataImportValues.isValueEqual({
+        return NodeValues.isValueEqual({
           survey,
           nodeDef: rootKeyDef,
           value: keyValueInRecord,
@@ -82,14 +83,13 @@ export default class DataImportJob extends Job {
         })
       })
     )
-    console.log('---recordSummary', recordSummary)
     if (recordSummary) {
       // find parent node
       const record = await RecordManager.fetchRecordAndNodesByUuid(
         { surveyId: this.surveyId, recordUuid: Record.getUuid(recordSummary), draft: false },
         this.tx
       )
-      const { record: recordUpdated, nodesUpdatedToPersist } = dataImportRecordUpdater.updateNodesWithValues({
+      const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
         survey,
         record,
         entityDefUuid,
@@ -98,6 +98,7 @@ export default class DataImportJob extends Job {
     } else {
       // TODO error record not found
     }
+    this.incrementProcessedItems()
   }
 }
 

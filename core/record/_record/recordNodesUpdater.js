@@ -1,6 +1,8 @@
 import Queue from '@core/queue'
+import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
 
+import * as RecordReader from './recordReader'
 import * as RecordUpdater from './recordUpdater'
 import * as RecordNodeDependentsUpdater from './recordNodeDependentsUpdater'
 
@@ -69,7 +71,7 @@ const updateNodesDependents = ({ survey, record, nodes, logger }) => {
     }
   }
 
-  recordUpdated = RecordUpdater.mergeNodes(nodesReloaded)(recordUpdated)
+  recordUpdated = RecordUpdater.mergeNodes(nodesUpdated)(recordUpdated)
 
   return {
     record: recordUpdated,
@@ -78,6 +80,47 @@ const updateNodesDependents = ({ survey, record, nodes, logger }) => {
   }
 }
 
+export const updateNodesWithValues = ({ survey, record, entityDefUuid, valuesByDefUuid }) => {
+  const parentNodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const parentNode = RecordReader.findDescendantByKeyValues({
+    survey,
+    record,
+    descendantDefUuid: entityDefUuid,
+    valuesByDefUuid,
+  })
+  const attributesUpdated = {}
+  Object.entries(valuesByDefUuid).forEach(([attributeDefUuid, value]) => {
+    const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+    if (NodeDef.isDescendantOf(parentNodeDef)(attributeDef)) {
+      const attribute = RecordReader.getNodeChildByDefUuid(parentNode, attributeDefUuid)(record)
+      if (
+        !NodeValues.isValueEqual({
+          survey,
+          nodeDef: attributeDef,
+          value: Node.getValue(attribute),
+          valueSearch: value,
+          record,
+          parentNode,
+        })
+      ) {
+        const attributeUpdated = attribute // Node.assocValue(value)(attribute)
+        attributesUpdated[Node.getUuid(attribute)] = attributeUpdated
+      }
+    }
+  })
+  const {
+    record: recordUpdated,
+    nodesUpdated,
+    nodesUpdatedToPersist,
+  } = updateNodesDependents({
+    survey,
+    record,
+    nodes: attributesUpdated,
+  })
+  return { record: recordUpdated, nodes: nodesUpdated, nodesUpdatedToPersist }
+}
+
 export const RecordNodesUpdater = {
   updateNodesDependents,
+  updateNodesWithValues,
 }

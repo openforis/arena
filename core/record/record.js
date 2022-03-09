@@ -62,14 +62,14 @@ export const {
 export const { getDependentNodePointers, getParentCodeAttribute, getDependentCodeAttributes } = RecordReader
 
 // ====== Keys
-export const { getEntityKeyNodes, getEntityKeyValues } = RecordReader
+export const { getEntityKeyNodes, getEntityKeyValues, findDescendantByKeyValues, findChildByKeyValues } = RecordReader
 
 // ====== Unique
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
 export const { assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
-export const { updateNodesDependents } = RecordNodesUpdater
+export const { updateNodesDependents, updateNodesWithValues } = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE
