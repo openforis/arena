@@ -35,7 +35,7 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
     nodeDefContext: entityDef,
     options: { includeFiles: false, includeCategoryItemsLabels: false, includeTaxonScientificName: false },
   })
-  const dataRow = exportModel.columns.reduce((acc, column) => {
+  return exportModel.columns.reduce((acc, column) => {
     const { header, nodeDef, valueProp } = column
     let value
     if (nodeDef) {
@@ -45,7 +45,6 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
     }
     return { ...acc, [header]: value }
   }, {})
-  return dataRow
 }
 
 const writeDataImportTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
