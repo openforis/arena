@@ -3,7 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
-import { DataImportValues } from './dataImportValues'
+import { dataImportValues } from './dataImportValues'
 
 const findChildByKeyValues = ({ survey, record, parentNode, childDefUuid, valuesByDefUuid }) => {
   const childDef = Survey.getNodeDefByUuid(childDefUuid)(survey)
@@ -18,7 +18,7 @@ const findChildByKeyValues = ({ survey, record, parentNode, childDefUuid, values
       const keyAttribute = Record.getNodeChildByDefUuid(sibling, keyDefUuid)(record)
       const keyAttributeValue = Node.getValue(keyAttribute)
       const keyAttributeValueSearch = valuesByDefUuid[keyDefUuid]
-      return DataImportValues.isValueEqual({
+      return dataImportValues.isValueEqual({
         survey,
         nodeDef: keyDef,
         value: keyAttributeValue,
@@ -80,6 +80,6 @@ const updateNodesWithValues = ({ survey, record, entityDefUuid, valuesByDefUuid 
   return { record: recordUpdated, nodes: nodesUpdated, nodesUpdatedToPersist }
 }
 
-export const DataImportRecordUpdater = {
+export const dataImportRecordUpdater = {
   updateNodesWithValues,
 }

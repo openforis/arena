@@ -77,7 +77,7 @@ export class CsvExportModel {
   }
 
   _extractAncestorsKeysColumns() {
-    let ancestorsKeyColumns = []
+    const ancestorsKeyColumns = []
 
     Survey.visitAncestors(this.nodeDefContext, (nodeDefAncestor) => {
       const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
@@ -85,7 +85,7 @@ export class CsvExportModel {
         attributeDefs: ancestorKeyDefs,
         parentDef: nodeDefAncestor,
       })
-      ancestorsKeyColumns = [...ancestorKeyColumns, ...ancestorsKeyColumns]
+      ancestorsKeyColumns.unshift(...ancestorKeyColumns)
     })(this.survey)
 
     return ancestorsKeyColumns

@@ -1,9 +1,8 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
-export const createCSVDataImportReaderFromStream = async ({ stream, csvDataExportModel, onRowItem, onTotalChange }) => {
+const createReader = async ({ stream, csvDataExportModel, onRowItem, onTotalChange }) => {
   return CSVReader.createReaderFromStream(
     stream,
     null,
@@ -18,10 +17,12 @@ export const createCSVDataImportReaderFromStream = async ({ stream, csvDataExpor
         valuesByDefUuid[nodeDefUuid] = value
       })
 
-      await onRowItem({
-        valuesByDefUuid,
-      })
+      await onRowItem({ valuesByDefUuid })
     },
     onTotalChange
   )
+}
+
+export const DataImportFileReader = {
+  createReader,
 }

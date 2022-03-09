@@ -17,6 +17,7 @@ import {
   requireRecordViewPermission,
   requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
+import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -96,6 +97,7 @@ export const init = (app) => {
       next(error)
     }
   })
+
   // ==== READ
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
@@ -197,7 +199,12 @@ export const init = (app) => {
 
     setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
 
-    await RecordService.writeDataImportFromCSVTemplateToStream({ surveyId, cycle, entityDefUuid, outputStream: res })
+    await DataImportTemplateService.writeDataImportTemplateToStream({
+      surveyId,
+      cycle,
+      entityDefUuid,
+      outputStream: res,
+    })
   })
 
   // ==== UPDATE

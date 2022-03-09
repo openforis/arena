@@ -3,21 +3,20 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { createCSVDataImportReaderFromStream } from './CSVDataImportFileReader'
+import { DataImportFileReader } from './dataImportFileReader'
 import { CsvExportModel } from '@common/model/csvExport'
-import { DataImportRecordUpdater } from './dataImportRecordUpdater'
-import { DataImportValues } from './dataImportValues'
+import { dataImportRecordUpdater } from './dataImportRecordUpdater'
+import { dataImportValues } from './dataImportValues'
 
-export default class CSVDataImportJob extends Job {
+export default class DataImportJob extends Job {
   constructor(params) {
-    super(CSVDataImportJob.type, params)
+    super(DataImportJob.type, params)
   }
 
   async execute() {
@@ -56,7 +55,7 @@ export default class CSVDataImportJob extends Job {
 
     const stream = FileUtils.createReadStream(filePath)
 
-    const reader = await createCSVDataImportReaderFromStream({
+    const reader = await DataImportFileReader.createReader({
       stream,
       csvDataExportModel,
       onRowItem: (item) => this.onRowItem(item),
@@ -75,7 +74,7 @@ export default class CSVDataImportJob extends Job {
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-        return DataImportValues.isValueEqual({
+        return dataImportValues.isValueEqual({
           survey,
           nodeDef: rootKeyDef,
           value: keyValueInRecord,
@@ -90,7 +89,7 @@ export default class CSVDataImportJob extends Job {
         { surveyId: this.surveyId, recordUuid: Record.getUuid(recordSummary), draft: false },
         this.tx
       )
-      const { record: recordUpdated, nodesUpdatedToPersist } = DataImportRecordUpdater.updateNodesWithValues({
+      const { record: recordUpdated, nodesUpdatedToPersist } = dataImportRecordUpdater.updateNodesWithValues({
         survey,
         record,
         entityDefUuid,
@@ -102,4 +101,4 @@ export default class CSVDataImportJob extends Job {
   }
 }
 
-CSVDataImportJob.type = 'CSVDataImportJob'
+DataImportJob.type = 'DataImportJob'
