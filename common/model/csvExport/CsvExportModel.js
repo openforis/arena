@@ -61,10 +61,10 @@ export class CsvExportModel {
       descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
     }
 
-    let parentKeys = []
+    const parentKeys = []
     Survey.visitAncestors(this.nodeDefContext, (n) => {
       const keys = Survey.getNodeDefKeys(n)(this.survey)
-      a.unshift(...keys)
+      parentKeys.unshift(...keys)
     })(this.survey)
 
     this.attributeDefs = parentKeys.concat(descendantDefs)
