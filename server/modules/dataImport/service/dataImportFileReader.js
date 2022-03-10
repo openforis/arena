@@ -31,7 +31,7 @@ const valueConverterByNodeDefType = {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxonCode = value[Node.valuePropsTaxon.code]
     const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-    return taxon ? null : Node.newNodeValueTaxon({ taxonUuid: taxon.uuid })
+    return taxon ? Node.newNodeValueTaxon({ taxonUuid: taxon.uuid }) : null
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
   [NodeDef.nodeDefType.time]: singlePropValueConverter,

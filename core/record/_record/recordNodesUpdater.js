@@ -103,7 +103,7 @@ const updateNodesWithValues =
           let attributeUpdated
           if (!attribute) {
             // insert new attribute
-            attributeUpdated = Node.newNode(attributeDefUuid, RecordReader.getUuid(record), parentNode, value)
+            attributeUpdated = Node.newNode(attributeDefUuid, record.uuid, parentNode, value)
           } else if (
             !NodeValues.isValueEqual({
               survey,
