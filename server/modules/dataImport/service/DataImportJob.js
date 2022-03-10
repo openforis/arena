@@ -21,7 +21,7 @@ export default class DataImportJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    const { cycle, entityDefUuid, filePath, updateExistingRecords } = this.context
+    const { cycle, entityDefUuid, filePath } = this.context
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
@@ -66,7 +66,7 @@ export default class DataImportJob extends Job {
   }
 
   async onRowItem({ valuesByDefUuid }) {
-    const { recordsSummary, survey, entityDefUuid } = this.context
+    const { recordsSummary, survey, entityDefUuid, updateExistingRecords } = this.context
 
     // find record
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
@@ -88,13 +88,17 @@ export default class DataImportJob extends Job {
         { surveyId: this.surveyId, recordUuid: Record.getUuid(recordSummary), draft: false },
         this.tx
       )
-      const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
-        survey,
-        parentDefUuid: entityDefUuid,
-        valuesByDefUuid,
-      })(record)
+      if (updateExistingRecords) {
+        const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
+          survey,
+          parentDefUuid: entityDefUuid,
+          valuesByDefUuid,
+        })(record)
 
-      
+        if (!recordUpdated || !nodesUpdatedToPersist) {
+          throw new Error('error updating record')
+        }
+      }
     } else {
       // TODO error record not found
     }
