@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import { NodeValues } from '@core/record/nodeValues'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import Job from '@server/job/job'
@@ -11,8 +12,6 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import { DataImportFileReader } from './dataImportFileReader'
 import { CsvExportModel } from '@common/model/csvExport'
-import { dataImportRecordUpdater } from './dataImportRecordUpdater'
-import { NodeValues } from '../../../../core/record/nodeValues'
 
 export default class DataImportJob extends Job {
   constructor(params) {
@@ -91,10 +90,9 @@ export default class DataImportJob extends Job {
       )
       const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
         survey,
-        record,
-        entityDefUuid,
+        parentDefUuid: entityDefUuid,
         valuesByDefUuid,
-      })
+      })(record)
     } else {
       // TODO error record not found
     }
