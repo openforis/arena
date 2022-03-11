@@ -36,7 +36,7 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
     const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
     fileName = `${Category.getName(category) || 'category'}.csv`
   }
-  Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   if (categoryIsEmpty) {
     // template

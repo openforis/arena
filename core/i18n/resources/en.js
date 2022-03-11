@@ -378,15 +378,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
     },
-    recordsImport: {
-      confirmDeleteAllRecords: 'Delete all records before import?',
-      confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
-      deleteAllRecordsBeforeImport: 'Delete all records before import',
-      forceImportFromAnotherSurvey: 'Force import from another survey',
-      importFromCollect: 'Import data from Collect / Collect Mobile',
-      importComplete: 'Import complete. {{insertedRecords}} records imported',
-      importIntoCycle: 'Import into cycle',
-    },
   },
 
   activityLogView: {
@@ -472,6 +463,19 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       includeCategories: 'Include categories',
     },
     startCsvExport: 'Start CSV export',
+  },
+
+  dataImportView: {
+    confirmDeleteAllRecords: 'Delete all records before import?',
+    confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
+    deleteAllRecordsBeforeImport: 'Delete all records before import',
+    downloadTemplate: 'Download template',
+    forceImportFromAnotherSurvey: 'Force import from another survey',
+    importFromCollect: 'Import data from Collect / Collect Mobile',
+    importComplete: 'Import complete. {{insertedRecords}} records imported',
+    importIntoCycle: 'Import into cycle',
+    importIntoEntity: 'Import into entity',
+    selectCSVFileToImport: 'Select CSV file to import',
   },
 
   dataView: {

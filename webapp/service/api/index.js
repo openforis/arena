@@ -26,7 +26,9 @@ export {
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export {
-  importRecordsFromCollect,
+  startCollectRecordsImportJob,
+  startDataImportFromCsvJob,
+  getDataImportFromCsvTemplateUrl,
   updateRecordsStep,
   exportDataQueryToTempFile,
   downloadDataQueryExport,

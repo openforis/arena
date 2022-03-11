@@ -13,5 +13,9 @@
     .form-item {
       grid-template-columns: 0.5fr 0.5fr;
     }
+
+    .entity-selector-tree {
+      max-height: 50vh;
+    }
   }
 }

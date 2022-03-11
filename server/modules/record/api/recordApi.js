@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { sendOk, sendFileContent } from '@server/utils/response'
+import { sendOk, sendFileContent, setContentTypeFile, contentTypes } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
@@ -17,6 +17,7 @@ import {
   requireRecordViewPermission,
   requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
+import { DataImportTemplateService } from '@server/modules/dataImport/service/DataImportTemplateService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -74,6 +75,19 @@ export const init = (app) => {
     } catch (error) {
       next(error)
     }
+  })
+
+  app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
+    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+
+    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
+
+    await DataImportTemplateService.writeDataImportTemplateToStream({
+      surveyId,
+      cycle,
+      entityDefUuid,
+      outputStream: res,
+    })
   })
 
   // ==== READ
