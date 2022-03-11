@@ -58,13 +58,12 @@ const insertNodeAndDescendants = ({ survey, nodeDef, record, node }) => {
 const updateNodesDependents = ({ survey, record, nodes, logger }) => {
   // Output
   const nodesUpdated = { ...nodes }
-
   const nodesUpdatedToPersist = {}
+  let recordUpdated = record
+
   const nodesToVisit = new Queue(Object.values(nodes))
 
   const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
-
-  let recordUpdated = record
 
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
@@ -143,7 +142,11 @@ const updateOrAddAttribute =
       })
     ) {
       // update existing attribute (if value changed)
-      attributeUpdated = Node.assocValue(value)(attribute)
+      attributeUpdated = R.pipe(
+        Node.assocValue(value),
+        // reset default value applied flag
+        Node.assocMeta({ ...Node.getMeta(node), [Node.metaKeys.defaultValue]: false })
+      )(attribute)
     }
     const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
 
