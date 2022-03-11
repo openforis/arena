@@ -104,11 +104,10 @@ export class CsvExportModel {
     if (!includeAnalysis) {
       descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
     }
-    const descendantAttributeColumns = this._createColumnsFromAttributeDefs({
+    return this._createColumnsFromAttributeDefs({
       attributeDefs: descendantDefs,
       parentDef: this.nodeDefContext,
     })
-    return descendantAttributeColumns
   }
 
   get headers() {

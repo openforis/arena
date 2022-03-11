@@ -17,7 +17,9 @@ const valuesByNodeDefType = {
     Points.toString(PointFactory.createInstance({ srs: 'EPSG:4326', x: 41.8830209, y: 12.4879562 })),
   [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(new Date()),
   [NodeDef.nodeDefType.decimal]: () => 123.45,
-  [NodeDef.nodeDefType.file]: () => '', // TODO support file attribute import
+  [NodeDef.nodeDefType.file]: () => {
+    throw new Error('File attribute import not supported')
+  },
   [NodeDef.nodeDefType.integer]: () => 123,
   [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
   [NodeDef.nodeDefType.text]: () => 'Text',

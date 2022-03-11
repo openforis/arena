@@ -42,13 +42,13 @@ const createReader = async ({ stream, survey, csvDataExportModel, onRowItem, onT
     stream,
     null,
     async (row) => {
-      const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuid, column) => {
+      const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-        const value = valuesByDefUuid[nodeDefUuid] || {}
+        const value = valuesByDefUuidAcc[nodeDefUuid] || {}
         value[valueProp] = row[header]
-        return { ...valuesByDefUuid, [nodeDefUuid]: value }
+        return { ...valuesByDefUuidAcc, [nodeDefUuid]: value }
       }, {})
 
       const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, value]) => {

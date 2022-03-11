@@ -106,7 +106,7 @@ export default class DataImportJob extends Job {
         )
       }
     } else {
-      // TODO error record not found
+      throw new Error(`Record not found`)
     }
     return this.currentRecord
   }
