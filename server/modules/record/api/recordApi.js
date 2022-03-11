@@ -7,6 +7,7 @@ import * as Record from '@core/record/record'
 import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
 
+import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
@@ -17,7 +18,6 @@ import {
   requireRecordViewPermission,
   requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
-import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
 export const init = (app) => {
   // ==== CREATE
