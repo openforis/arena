@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import Queue from '@core/queue'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -142,10 +143,10 @@ const updateOrAddAttribute =
       })
     ) {
       // update existing attribute (if value changed)
-      attributeUpdated = R.pipe(
+      attributeUpdated = A.pipe(
         Node.assocValue(value),
         // reset default value applied flag
-        Node.assocMeta({ ...Node.getMeta(node), [Node.metaKeys.defaultValue]: false })
+        Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false })
       )(attribute)
     }
     const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
