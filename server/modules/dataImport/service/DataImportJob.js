@@ -11,7 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import { DataImportFileReader } from './dataImportFileReader'
-import { CsvExportModel } from '@common/model/csvExport'
+import { CsvDataExportModel } from '@common/model/csvExport'
 
 export default class DataImportJob extends Job {
   constructor(params) {
@@ -52,7 +52,7 @@ export default class DataImportJob extends Job {
     const { entityDefUuid, filePath, survey } = this.context
 
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const csvDataExportModel = new CsvExportModel({
+    const csvDataExportModel = new CsvDataExportModel({
       survey,
       nodeDefContext: entityDef,
       options: {

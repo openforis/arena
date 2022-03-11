@@ -1,14 +1,12 @@
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import { CsvExportModel } from '@common/model/csvExport'
+import { CsvDataExportModel } from '@common/model/csvExport'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
@@ -30,21 +28,16 @@ const valuesByNodeDefType = {
 }
 
 const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  const survey = await SurCsvDataExportModelchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const exportModel = new CsvExportModel({
+  const exportModel = new CsvDataExportModel({
     survey,
     nodeDefContext: entityDef,
     options: { includeFiles: false, includeCategoryItemsLabels: false, includeTaxonScientificName: false },
   })
   return exportModel.columns.reduce((acc, column) => {
     const { header, nodeDef, valueProp } = column
-    let value
-    if (nodeDef) {
-      value = valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp })
-    } else {
-      value = ''
-    }
+    const value = nodeDef ? valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp }) : ''
     return { ...acc, [header]: value }
   }, {})
 }

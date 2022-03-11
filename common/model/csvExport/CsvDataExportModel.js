@@ -3,40 +3,40 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
 const columnsByNodeDefType = {
-  [NodeDef.nodeDefType.code]: ({ parentDef, nodeDef, includeCategoryItemsLabels }) => {
+  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsCode.code, parentDef },
+      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsCode.code },
       ...(includeCategoryItemsLabels
-        ? [{ header: `${nodeDefName}_label`, nodeDef, valueProp: Node.valuePropsCode.label, parentDef }]
+        ? [{ header: `${nodeDefName}_label`, nodeDef, valueProp: Node.valuePropsCode.label }]
         : []),
     ]
   },
-  [NodeDef.nodeDefType.taxon]: ({ parentDef, nodeDef, includeTaxonScientificName }) => {
+  [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsTaxon.code, parentDef },
+      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsTaxon.code },
       ...(includeTaxonScientificName
-        ? [{ header: `${nodeDefName}_scientific_name`, nodeDef, valueProp: Node.valuePropsTaxon, parentDef }]
+        ? [{ header: `${nodeDefName}_scientific_name`, nodeDef, valueProp: Node.valuePropsTaxon }]
         : []),
     ]
   },
-  [NodeDef.nodeDefType.file]: ({ parentDef, nodeDef }) => {
+  [NodeDef.nodeDefType.file]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: `${nodeDefName}_file_uuid`, nodeDef, valueProp: Node.valuePropsFile.fileUuid, parentDef },
-      { header: `${nodeDefName}_file_name`, nodeDef, valueProp: Node.valuePropsFile.fileName, parentDef },
+      { header: `${nodeDefName}_file_uuid`, nodeDef, valueProp: Node.valuePropsFile.fileUuid },
+      { header: `${nodeDefName}_file_name`, nodeDef, valueProp: Node.valuePropsFile.fileName },
     ]
   },
 }
 
-const getMainColumn = ({ parentDef, nodeDef }) => ({ header: NodeDef.getName(nodeDef), nodeDef, parentDef })
+const getMainColumn = ({ nodeDef }) => ({ header: NodeDef.getName(nodeDef), nodeDef })
 
 const DEFAULT_OPTIONS = { includeCategoryItemsLabels: true, includeTaxonScientificName: true, includeFiles: true }
 
 const RECORD_CYCLE_HEADER = 'record_cycle'
 
-export class CsvExportModel {
+export class CsvDataExportModel {
   constructor({ survey, nodeDefContext, options = DEFAULT_OPTIONS }) {
     this.survey = survey
     this.nodeDefContext = nodeDefContext
@@ -64,14 +64,14 @@ export class CsvExportModel {
     ]
   }
 
-  _createColumnsFromAttributeDefs({ attributeDefs, parentDef }) {
+  _createColumnsFromAttributeDefs({ attributeDefs }) {
     const { includeCategoryItemsLabels, includeTaxonScientificName } = this.options
 
     return attributeDefs.reduce((acc, nodeDef) => {
       const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
       const columnsPerAttribute = columnsGetter
-        ? columnsGetter({ parentDef, nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
-        : [getMainColumn({ parentDef, nodeDef })]
+        ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
+        : [getMainColumn({ nodeDef })]
       return [...acc, ...columnsPerAttribute]
     }, [])
   }
@@ -83,7 +83,6 @@ export class CsvExportModel {
       const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
       const ancestorKeyColumns = this._createColumnsFromAttributeDefs({
         attributeDefs: ancestorKeyDefs,
-        parentDef: nodeDefAncestor,
       })
       ancestorsKeyColumns.unshift(...ancestorKeyColumns)
     })(this.survey)
@@ -104,10 +103,7 @@ export class CsvExportModel {
     if (!includeAnalysis) {
       descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
     }
-    return this._createColumnsFromAttributeDefs({
-      attributeDefs: descendantDefs,
-      parentDef: this.nodeDefContext,
-    })
+    return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 
   get headers() {
