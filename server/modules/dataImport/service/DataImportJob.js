@@ -19,15 +19,22 @@ export default class DataImportJob extends Job {
   }
 
   async execute() {
+    await this.fetchSurveyAndRecordsSummary()
+
+    await this.startCsvReader()
+  }
+
+  async fetchSurveyAndRecordsSummary() {
     const { surveyId, tx } = this
+    const { cycle } = this.context
 
-    const { cycle, entityDefUuid, filePath } = this.context
-
+    // fetch survey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
       tx
     )
 
+    // fetch all records summary once to make the record fetch faster
     const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId({
       surveyId,
       cycle,
@@ -39,6 +46,10 @@ export default class DataImportJob extends Job {
       survey,
       recordsSummary: recordsSummary.list,
     })
+  }
+
+  async startCsvReader() {
+    const { entityDefUuid, filePath, survey } = this.context
 
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const csvDataExportModel = new CsvExportModel({
@@ -65,10 +76,9 @@ export default class DataImportJob extends Job {
     await reader.start()
   }
 
-  async onRowItem({ valuesByDefUuid }) {
-    const { recordsSummary, survey, entityDefUuid, updateExistingRecords } = this.context
+  async getOrFetchRecord({ valuesByDefUuid }) {
+    const { recordsSummary, survey } = this.context
 
-    // find record
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
@@ -83,25 +93,43 @@ export default class DataImportJob extends Job {
       })
     )
     if (recordSummary) {
-      // find parent node
-      const record = await RecordManager.fetchRecordAndNodesByUuid(
-        { surveyId: this.surveyId, recordUuid: Record.getUuid(recordSummary), draft: false },
-        this.tx
-      )
-      if (updateExistingRecords) {
-        const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
-          survey,
-          parentDefUuid: entityDefUuid,
-          valuesByDefUuid,
-        })(record)
-
-        if (!recordUpdated || !nodesUpdatedToPersist) {
-          throw new Error('error updating record')
+      const recordUuid = Record.getUuid(recordSummary)
+      if (this.currentRecord?.uuid === recordUuid) {
+        // avoid loading the same record multiple times
+      } else {
+        if (this.currentRecord) {
+          // record changed, SAVE changes to record
         }
+        this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
+          { surveyId: this.surveyId, recordUuid, draft: false },
+          this.tx
+        )
       }
     } else {
       // TODO error record not found
     }
+    return this.currentRecord
+  }
+
+  async onRowItem({ valuesByDefUuid }) {
+    const { survey, entityDefUuid, updateExistingRecords } = this.context
+
+    const record = await this.getOrFetchRecord({ valuesByDefUuid })
+
+    if (updateExistingRecords) {
+      const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
+        survey,
+        parentDefUuid: entityDefUuid,
+        valuesByDefUuid,
+      })(record)
+
+      this.currentRecord = recordUpdated
+
+      if (!recordUpdated || !nodesUpdatedToPersist) {
+        throw new Error('error updating record')
+      }
+    }
+
     this.incrementProcessedItems()
   }
 }
