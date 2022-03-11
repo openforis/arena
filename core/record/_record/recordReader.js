@@ -262,34 +262,6 @@ export const findChildByKeyValues =
     })
   }
 
-export const visitDescendantsByKeyValues =
-  ({ survey, upToDescendantDefUuid, keyValuesByDefUuid, visitorFn }) =>
-  (record) => {
-    const entityDef = SurveyNodeDefs.getNodeDefByUuid(upToDescendantDefUuid)(survey)
-    // start from root node
-    let currentNode = getRootNode(record)
-    // visit descendant nodes up to descendant def (excluding root entity)
-    const hierarchyToVisit = [...NodeDef.getMetaHierarchy(entityDef), upToDescendantDefUuid]
-    hierarchyToVisit.shift()
-    hierarchyToVisit.some((nodeDefUuid) => {
-      const descendant = findChildByKeyValues({
-        survey,
-        parentNode: currentNode,
-        childDefUuid: nodeDefUuid,
-        keyValuesByDefUuid,
-      })(record)
-
-      visitorFn({ nodeDefUuid, descendant, parentNode: currentNode })
-
-      if (!descendant) {
-        currentNode = null
-        return false // break the loop
-      }
-      currentNode = descendant
-    })
-    return currentNode
-  }
-
 export const findDescendantByKeyValues =
   ({ survey, descendantDefUuid, keyValuesByDefUuid }) =>
   (record) => {

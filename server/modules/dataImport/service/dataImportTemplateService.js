@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
@@ -28,7 +29,7 @@ const valuesByNodeDefType = {
 }
 
 const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => {
-  const survey = await SurCsvDataExportModelchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const exportModel = new CsvDataExportModel({
     survey,

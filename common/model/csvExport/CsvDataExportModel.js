@@ -53,7 +53,7 @@ export class CsvDataExportModel {
   _initColumns() {
     const { addCycle } = this.options
 
-    const descendantAttributeColumns = this._extractAttributeDefsColumns()
+const descendantAttributeColumns = this._extractAttributeDefsColumns()
 
     const ancestorsKeyColumns = this._extractAncestorsKeysColumns()
 

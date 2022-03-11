@@ -1218,6 +1218,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     CyclesDeletedCheckJob: 'Deleted Cycles Check',
+    DataImportJob: 'Data Import',
     FilesImportJob: 'Files Import',
     NodeDefsImportJob: 'Node Definitions Import',
     NodeDefsValidationJob: 'Node Definitions Validation',

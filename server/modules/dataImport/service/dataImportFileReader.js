@@ -37,6 +37,9 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.time]: singlePropValueConverter,
 }
 
+/**
+ * Creates a CSV reader that transforms every row extracting a node value for each column associated to a node definition.
+ */
 const createReader = async ({ stream, survey, csvDataExportModel, onRowItem, onTotalChange }) =>
   CSVReader.createReaderFromStream(
     stream,
