@@ -22,7 +22,7 @@ const findPlotWithId = ({ plotId }) => {
     survey,
     parentNode: clusterNode,
     childDefUuid: plotDef.uuid,
-    valuesByDefUuid: { [plotIdDef.uuid]: plotId },
+    keyValuesByDefUuid: { [plotIdDef.uuid]: plotId },
   })(record)
 }
 
@@ -34,7 +34,7 @@ const findTreeWithId = ({ plotId, treeId }) => {
   return Record.findDescendantByKeyValues({
     survey,
     descendantDefUuid: treeDef.uuid,
-    valuesByDefUuid: {
+    keyValuesByDefUuid: {
       [plotIdDef.uuid]: plotId,
       [treeIdDef.uuid]: treeId,
     },
@@ -73,7 +73,7 @@ describe('RecordReader Test', () => {
     const plotFound = Record.findDescendantByKeyValues({
       survey,
       descendantDefUuid: plotDef.uuid,
-      valuesByDefUuid: {
+      keyValuesByDefUuid: {
         [plotIdDef.uuid]: 2,
       },
     })(record)

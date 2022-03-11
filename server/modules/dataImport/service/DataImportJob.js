@@ -117,9 +117,9 @@ export default class DataImportJob extends Job {
     const record = await this.getOrFetchRecord({ valuesByDefUuid })
 
     if (updateExistingRecords) {
-      const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateNodesWithValues({
+      const { record: recordUpdated, nodesUpdatedToPersist } = Record.updateAttributesWithValues({
         survey,
-        parentDefUuid: entityDefUuid,
+        entityDefUuid,
         valuesByDefUuid,
       })(record)
 
