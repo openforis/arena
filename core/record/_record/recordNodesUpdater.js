@@ -231,7 +231,7 @@ const _getOrCreateEntityByKeys =
 
 const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
   // output
-  let recordUpdated = record
+  let recordUpdated
   const nodesUpdated = { ...nodes }
 
   // 1. update dependent nodes
