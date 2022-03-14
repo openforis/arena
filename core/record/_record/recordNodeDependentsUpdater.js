@@ -13,16 +13,20 @@ const _logExpressionError = ({ error, expressionType, survey, nodeDef, expressio
   const surveyId = Survey.getId(survey)
   const nodeDefName = NodeDef.getName(nodeDef)
   const expressionsString = JSON.stringify(expressionsToEvaluate)
-  logger.error(
-    `error evaluating ${expressionType} in survey ${surveyId} for node def ${nodeDefName} / ${expressionsString}: ${error}`
-  )
+  const errorMessage = `error evaluating ${expressionType} in survey ${surveyId} for node def ${nodeDefName} / ${expressionsString}: ${error}`
+
+  if (logger?.errorEnabled) {
+    logger.error(errorMessage)
+  } else {
+    throw new Error(errorMessage)
+  }
 }
 
 /**
  * Module responsible for updating applicable and default values.
  */
 
-export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger }) => {
+export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger = null }) => {
   // Output
   const nodesUpdatedToPersist = {}
   const nodesWithApplicabilityUpdated = {}
@@ -87,7 +91,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
     } catch (error) {
       _logExpressionError({
         error,
-        type: 'applicable',
+        expressionType: 'applicable',
         survey,
         nodeDef: nodeDefNodePointer,
         expressionsToEvaluate,
@@ -103,7 +107,7 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
   }
 }
 
-export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, logger }) => {
+export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, logger = null }) => {
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)

@@ -40,7 +40,7 @@ const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
 
 export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
   // 1. validate nodes
-  const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
+  const nodesValidation = await RecordValidator.validateNodes({ survey, record, nodes })
 
   // 2. validate record uniqueness
   const recordUniqueNodesValidation =

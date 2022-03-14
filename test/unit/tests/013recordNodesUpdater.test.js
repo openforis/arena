@@ -22,13 +22,13 @@ describe('RecordNodesUpdater Test', () => {
     record = DataTest.createTestRecord({ user, survey })
   }, 10000)
 
-  it('Test update nodes with new values', () => {
+  it('Test update nodes with new values', async () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
     const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
-    const { record: recordUpdated, nodes: nodesUpdated } = Record.updateAttributesWithValues({
+    const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: treeDef.uuid,
       valuesByDefUuid: { [plotIdDef.uuid]: 1, [treeIdDef.uuid]: 2, [treeDbhDef.uuid]: 20 },
@@ -42,13 +42,13 @@ describe('RecordNodesUpdater Test', () => {
     expect(Node.getValue(dbhUpdatedNode)).toEqual(20)
   })
 
-  it('Test update nodes with new values does not have side effect on record', () => {
+  it('Test update nodes with new values does not have side effect on record', async () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
     const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
-    Record.updateAttributesWithValues({
+    await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: treeDef.uuid,
       valuesByDefUuid: { [plotIdDef.uuid]: 1, [treeIdDef.uuid]: 2, [treeDbhDef.uuid]: 20 },
@@ -65,23 +65,22 @@ describe('RecordNodesUpdater Test', () => {
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
     const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
-    const fn = () =>
+    expect(
       Record.updateAttributesWithValues({
         survey,
         entityDefUuid: treeDef.uuid,
         valuesByDefUuid: { [plotIdDef.uuid]: 1, [treeIdDef.uuid]: 3, [treeDbhDef.uuid]: 10 },
       })(record)
-
-    expect(fn).toThrow()
+    ).rejects.toThrow()
   })
 
-  it('Test update nodes (insertMissingNodes=true) with missing parent entity', () => {
+  it('Test update nodes (insertMissingNodes=true) with missing parent entity', async () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
     const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
-    const { record: recordUpdated, nodes: nodesUpdated } = Record.updateAttributesWithValues({
+    const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: treeDef.uuid,
       valuesByDefUuid: { [plotIdDef.uuid]: 1, [treeIdDef.uuid]: 3, [treeDbhDef.uuid]: 10 },
@@ -95,5 +94,64 @@ describe('RecordNodesUpdater Test', () => {
     // expect node value has been updated
     const dbhInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/dbh')(survey, recordUpdated)
     expect(Node.getValue(dbhInsertedNode)).toEqual(10)
+  })
+
+  it('Test update code attribute ', async () => {
+    const plotIdDef = getNodeDef('cluster/plot/plot_id')
+    const treeDef = getNodeDef('cluster/plot/tree')
+    const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
+    const treeStatusDef = getNodeDef('cluster/plot/tree/tree_status')
+
+    const treeStatusDeadCategoryItem = SurveyUtils.getCategoryItem({
+      survey,
+      categoryName: 'tree_status',
+      codesPath: ['D'],
+    })
+
+    const { record: recordUpdated } = await Record.updateAttributesWithValues({
+      survey,
+      entityDefUuid: treeDef.uuid,
+      valuesByDefUuid: {
+        [plotIdDef.uuid]: 1,
+        [treeIdDef.uuid]: 2,
+        [treeStatusDef.uuid]: Node.newNodeValueCode({ itemUuid: treeStatusDeadCategoryItem.uuid }),
+      },
+      insertMissingNodes: true,
+    })(record)
+
+    const treeNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]')(survey, recordUpdated)
+    const treeStatusNode = Record.getNodeChildByDefUuid(treeNode, treeStatusDef.uuid)(recordUpdated)
+
+    expect(Node.getCategoryItemUuid(treeStatusNode)).toEqual(treeStatusDeadCategoryItem.uuid)
+  })
+
+  it('Test update node updates dependent nodes (applicability)', async () => {
+    const plotIdDef = getNodeDef('cluster/plot/plot_id')
+    const treeDef = getNodeDef('cluster/plot/tree')
+    const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
+    const treeStatusDef = getNodeDef('cluster/plot/tree/tree_status')
+    const treeHeightDef = getNodeDef('cluster/plot/tree/tree_height')
+
+    const treeStatusDeadCategoryItem = SurveyUtils.getCategoryItem({
+      survey,
+      categoryName: 'tree_status',
+      codesPath: ['D'],
+    })
+
+    const { record: recordUpdated } = await Record.updateAttributesWithValues({
+      survey,
+      entityDefUuid: treeDef.uuid,
+      valuesByDefUuid: {
+        [plotIdDef.uuid]: 1,
+        [treeIdDef.uuid]: 2,
+        [treeStatusDef.uuid]: Node.newNodeValueCode({ itemUuid: treeStatusDeadCategoryItem.uuid }),
+      },
+      insertMissingNodes: true,
+    })(record)
+
+    // expect tree_height to be not applicable
+    const treeNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]')(survey, recordUpdated)
+    const treeHeightApplicable = Node.isChildApplicable(treeHeightDef.uuid)(treeNode)
+    expect(treeHeightApplicable).toBe(false)
   })
 })

@@ -87,9 +87,9 @@ export const getCategoryItemUuidAndCodeHierarchy =
   }
 
 export const getCategoryItemByHierarchicalCodes =
-  ({ categoryUuid, codePaths }) =>
+  ({ categoryUuid, codesPath }) =>
   (survey) => {
-    const itemUuid = codePaths.reduce(
+    const itemUuid = codesPath.reduce(
       (currentParentUuid, code) =>
         getCategoryItemUuid({ categoryUuid, parentItemUuid: currentParentUuid, code })(survey),
       categoryItemNullParentUuid

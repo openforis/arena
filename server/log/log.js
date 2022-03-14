@@ -36,19 +36,19 @@ class Logger {
     this.prefix = prefix
   }
 
-  isDebugEnabled() {
+  get debugEnabled() {
     return this._isLevelEnabled(levels.debug)
   }
 
-  isInfoEnabled() {
+  get infoEnabled() {
     return this._isLevelEnabled(levels.info)
   }
 
-  isWarnEnabled() {
+  get warnEnabled() {
     return this._isLevelEnabled(levels.warn)
   }
 
-  isErrorEnabled() {
+  get errorEnabled() {
     return this._isLevelEnabled(levels.error)
   }
 

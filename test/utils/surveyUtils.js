@@ -30,3 +30,11 @@ export const getNodeDefByPath = ({ survey, path }) => {
 
   return currentNodeDef
 }
+
+export const getCategoryItem = ({ survey, categoryName, codesPath }) => {
+  const category = Survey.getCategoryByName(categoryName)(survey)
+  return Survey.getCategoryItemByHierarchicalCodes({
+    categoryUuid: category.uuid,
+    codesPath,
+  })(survey)
+}

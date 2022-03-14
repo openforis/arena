@@ -11,13 +11,13 @@ import * as Node from '@core/record/node'
 import * as Expression from '@core/expressionParser/expression'
 
 export const recordExpressionFunctions = ({ survey, record }) => ({
-  [Expression.functionNames.categoryItemProp]: (categoryName, itemPropName, ...codePaths) => {
+  [Expression.functionNames.categoryItemProp]: (categoryName, itemPropName, ...codesPath) => {
     const category = Survey.getCategoryByName(categoryName)(survey)
     if (!category) return null
 
     const categoryItem = Survey.getCategoryItemByHierarchicalCodes({
       categoryUuid: Category.getUuid(category),
-      codePaths,
+      codesPath,
     })(survey)
     
     if (!categoryItem) return null
