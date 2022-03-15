@@ -1,5 +1,6 @@
 import { Points } from '@openforis/arena-core'
 
+import { CsvDataExportModel } from '@common/model/csvExport'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -40,17 +41,31 @@ const valueConverterByNodeDefType = {
 /**
  * Creates a CSV reader that transforms every row extracting a node value for each column associated to a node definition.
  */
-const createReader = async ({ stream, survey, csvDataExportModel, onRowItem, onTotalChange }) =>
-  CSVReader.createReaderFromStream(
-    stream,
+const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTotalChange }) => {
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const csvDataExportModel = new CsvDataExportModel({
+    survey,
+    nodeDefContext: entityDef,
+    options: {
+      includeCategoryItemsLabels: false,
+      includeTaxonScientificName: false,
+      includeFiles: false,
+      includeAnalysis: false,
+    },
+  })
+
+  return CSVReader.createReaderFromFile(
+    filePath,
     null,
     async (row) => {
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
-        const nodeDefUuid = NodeDef.getUuid(nodeDef)
+        if (!row.hasOwnProperty(header)) return valuesByDefUuidAcc
 
+        const cellValue = row[header]
+        const nodeDefUuid = NodeDef.getUuid(nodeDef)
         const value = valuesByDefUuidAcc[nodeDefUuid] || {}
-        value[valueProp] = row[header]
+        value[valueProp] = cellValue
         return { ...valuesByDefUuidAcc, [nodeDefUuid]: value }
       }, {})
 
@@ -65,6 +80,7 @@ const createReader = async ({ stream, survey, csvDataExportModel, onRowItem, onT
     },
     onTotalChange
   )
+}
 
 export const DataImportFileReader = {
   createReader,

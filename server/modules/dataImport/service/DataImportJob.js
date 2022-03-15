@@ -5,7 +5,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValues } from '@core/record/nodeValues'
-import * as FileUtils from '@server/utils/file/fileUtils'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -15,7 +14,6 @@ import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesI
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
 
 import { DataImportFileReader } from './dataImportFileReader'
-import { CsvDataExportModel } from '@common/model/csvExport'
 
 export default class DataImportJob extends Job {
   constructor(params) {
@@ -61,24 +59,10 @@ export default class DataImportJob extends Job {
   async startCsvReader() {
     const { entityDefUuid, filePath, survey } = this.context
 
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const csvDataExportModel = new CsvDataExportModel({
-      survey,
-      nodeDefContext: entityDef,
-      options: {
-        includeCategoryItemsLabels: false,
-        includeTaxonScientificName: false,
-        includeFiles: false,
-        includeAnalysis: false,
-      },
-    })
-
-    const stream = FileUtils.createReadStream(filePath)
-
     const reader = await DataImportFileReader.createReader({
-      stream,
+      filePath,
       survey,
-      csvDataExportModel,
+      entityDefUuid,
       onRowItem: (item) => this.onRowItem(item),
       onTotalChange: (total) => (this.total = total),
     })
