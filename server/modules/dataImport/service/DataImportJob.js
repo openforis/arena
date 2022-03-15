@@ -3,12 +3,16 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import { NodeValues } from '@core/record/nodeValues'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
+import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
+import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
 
 import { DataImportFileReader } from './dataImportFileReader'
 import { CsvDataExportModel } from '@common/model/csvExport'
@@ -19,6 +23,12 @@ export default class DataImportJob extends Job {
   }
 
   async execute() {
+    const { user, surveyId, tx } = this
+
+    this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
+    this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+    this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
+
     await this.fetchSurveyAndRecordsSummary()
 
     await this.startCsvReader()
@@ -94,30 +104,38 @@ export default class DataImportJob extends Job {
     )
     if (recordSummary) {
       const recordUuid = Record.getUuid(recordSummary)
-      if (this.currentRecord?.uuid === recordUuid) {
-        // avoid loading the same record multiple times
-      } else {
-        if (this.currentRecord) {
-          // record changed, SAVE changes to record
-        }
+
+      // avoid loading the same record multiple times
+      if (this.currentRecord?.uuid !== recordUuid) {
         this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
           { surveyId: this.surveyId, recordUuid, draft: false },
           this.tx
         )
       }
     } else {
-      throw new Error(`Record not found`)
+      const keyValuesText = rootKeyDefs
+        .map((rootKeyDef) => {
+          const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+          return JSON.stringify(keyValueInRow)
+        })
+        .join(',')
+      throw new Error(`Record with keys ${keyValuesText} not found`)
     }
     return this.currentRecord
   }
 
   async onRowItem({ valuesByDefUuid }) {
-    const { survey, entityDefUuid, updateExistingRecords } = this.context
+    const { survey, entityDefUuid, insertNewRecords } = this.context
 
     const record = await this.getOrFetchRecord({ valuesByDefUuid })
 
-    if (updateExistingRecords) {
-      const { record: recordUpdated, nodesUpdatedToPersist } = await Record.updateAttributesWithValues({
+    if (insertNewRecords) {
+      // handle inserting new records
+      if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) !== entityDefUuid) {
+        throw new Error('New records can be inserted only selecting the root entity definition')
+      }
+    } else {
+      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
         survey,
         entityDefUuid,
         valuesByDefUuid,
@@ -125,12 +143,25 @@ export default class DataImportJob extends Job {
 
       this.currentRecord = recordUpdated
 
-      if (!recordUpdated || !nodesUpdatedToPersist) {
-        throw new Error('error updating record')
-      }
+      await this.recordsValidationBatchPersister.addItem([
+        Record.getUuid(this.currentRecord),
+        Record.getValidation(this.currentRecord),
+      ])
+      const nodesArray = Object.values(nodesUpdated)
+      nodesArray.sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
+      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
     }
 
     this.incrementProcessedItems()
+  }
+
+  async beforeEnd() {
+    if (this.isRunning()) {
+      await this.recordsValidationBatchPersister.flush()
+      await this.nodesInsertBatchPersister.flush()
+      await this.nodesUpdateBatchPersister.flush()
+    }
   }
 }
 
