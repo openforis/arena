@@ -19,43 +19,40 @@ import * as RecordNodeDependentsUpdater from './recordNodeDependentsUpdater'
  */
 const MAX_DEPENDENTS_VISITING_TIMES = 2
 
-const getNodesToInsert = (nodeDef) => {
+const getNodesToInsertCount = (nodeDef) => {
   if (NodeDef.isSingle(nodeDef)) return 1
   const validations = NodeDef.getValidations(nodeDef)
   return Number(NodeDefValidations.getMinCount(validations)) || 0
 }
 
-const _addNodeAndDescendants = ({ survey, nodeDef, record, node }) => {
+const _addNodeAndDescendants = ({ survey, nodeDef, record, node, updateListener }) => {
   let recordUpdated = RecordUpdater.assocNode(node)(record)
 
   // Add children if entity
   const childDefs = NodeDef.isEntity(nodeDef) ? Survey.getNodeDefChildren(nodeDef)(survey) : []
 
   // Insert only child single nodes (it allows to apply default values)
-  const descendantNodes = childDefs.reduce((acc, childDef) => {
-    const nodesToInsert = getNodesToInsert(childDef)
+  childDefs.forEach((childDef) => {
+    const nodesToInsert = getNodesToInsertCount(childDef)
     if (nodesToInsert === 0) {
       return acc
     }
     const nodesToInsertArray = [...Array(Number(nodesToInsert)).keys()]
     nodesToInsertArray.forEach(() => {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-      const { record: recordUpdatedChild, nodes: childDescendantNodes } = _addNodeAndDescendants({
+      const recordUpdatedChild = _addNodeAndDescendants({
         survey,
         nodeDef: childDef,
         record: recordUpdated,
         node: childNode,
+        updateListener,
       })
       recordUpdated = recordUpdatedChild
-      Object.assign(acc, childDescendantNodes)
+      updateListener.nodeCreated({ record: recordUpdated, node: childNode })
     })
-    return acc
-  }, {})
+  })
 
-  return {
-    record: recordUpdated,
-    nodes: { ...descendantNodes, [Node.getUuid(node)]: node },
-  }
+  return recordUpdated
 }
 
 const updateNodesDependents = ({ survey, record, nodes, logger = null }) => {
@@ -126,16 +123,19 @@ const updateNodesDependents = ({ survey, record, nodes, logger = null }) => {
 }
 
 const _addOrUpdateAttribute =
-  ({ survey, entity, attributeDef, value }) =>
+  ({ survey, entity, attributeDef, value, updateListener }) =>
   (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
-    let attributeUpdated = null
 
     if (!attribute) {
-      // insert new attribute
-      attributeUpdated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
-    } else if (
+      // create new attribute
+      const attributeUpdated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
+      const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
+      updateListener.nodeCreated({ record: recordUpdated, node: attributeUpdated })
+      return recordUpdated
+    }
+    if (
       !NodeValues.isValueEqual({
         survey,
         nodeDef: attributeDef,
@@ -146,50 +146,51 @@ const _addOrUpdateAttribute =
       })
     ) {
       // update existing attribute (if value changed)
-      attributeUpdated = A.pipe(
+      const attributeUpdated = A.pipe(
         Node.assocValue(value),
         // reset default value applied flag
         Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false })
       )(attribute)
+      const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
+      updateListener.nodeUpdated({ record: recordUpdated, node: attributeUpdated })
+      return recordUpdated
     }
-    const recordUpdated = attributeUpdated ? RecordUpdater.assocNode(attributeUpdated)(record) : record
-    return { attribute: attributeUpdated, record: recordUpdated }
+    // no updates performed
+    return record
   }
 
 const _addEntityAndKeyValues =
-  ({ survey, entityDef, parentNode, keyValuesByDefUuid }) =>
+  ({ survey, entityDef, parentNode, keyValuesByDefUuid, updateListener }) =>
   (record) => {
-    const nodesUpdated = {}
     const entity = Node.newNode(NodeDef.getUuid(entityDef), record.uuid, parentNode)
-    const { record: recordUpdatedDescendants, nodes: nodeAndDescendants } = _addNodeAndDescendants({
+    const recordUpdatedDescendants = _addNodeAndDescendants({
       survey,
       nodeDef: entityDef,
       record,
       node: entity,
+      updateListener,
     })
-    Object.assign(nodesUpdated, nodeAndDescendants)
     let recordUpdated = recordUpdatedDescendants
 
     const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
     keyDefs.forEach((keyDef) => {
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
-      const { attribute: keyNodeUpdated, record: recordUpdatedKeyNode } = _addOrUpdateAttribute({
+      const recordUpdatedKeyNode = _addOrUpdateAttribute({
         survey,
         entity,
         attributeDef: keyDef,
         value: keyValue,
+        updateListener,
       })(recordUpdated)
 
-      nodesUpdated[Node.getUuid(keyNodeUpdated)] = keyNodeUpdated
       recordUpdated = recordUpdatedKeyNode
     })
-    return { record: recordUpdated, nodes: nodesUpdated, entity }
+    return { record: recordUpdated, entity }
   }
 
 const _getOrCreateEntityByKeys =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, updateListener }) =>
   (record) => {
-    const nodesUpdated = {}
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const entity = RecordReader.findDescendantByKeyValues({
       survey,
@@ -198,7 +199,7 @@ const _getOrCreateEntityByKeys =
     })(record)
 
     if (entity) {
-      return { entity, record, nodesUpdated }
+      return { entity, record }
     }
     if (!insertMissingNodes) {
       throw new Error('entity not found')
@@ -213,20 +214,15 @@ const _getOrCreateEntityByKeys =
     if (!entityParent) {
       throw new Error('cannot find ancestor node to create entity into')
     }
-    const {
-      entity: entityCreated,
-      record: recordUpdatedEntityInserted,
-      nodes: nodesUpdatedEntityInserted,
-    } = _addEntityAndKeyValues({
+    const { entity: entityCreated, record: recordUpdatedEntityInserted } = _addEntityAndKeyValues({
       survey,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
+      updateListener,
     })(record)
 
-    Object.assign(nodesUpdated, nodesUpdatedEntityInserted)
-
-    return { record: recordUpdatedEntityInserted, nodesUpdated, entity: entityCreated }
+    return { record: recordUpdatedEntityInserted, entity: entityCreated }
   }
 
 const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
@@ -271,18 +267,24 @@ const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
 const updateAttributesWithValues =
   ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false, logger = null }) =>
   async (record) => {
-    const nodesUpdated = {}
     let recordUpdated = { ...record }
+    const nodesUpdated = {}
+
+    const updateListener = {
+      nodeCreated: ({ node }) => (nodesUpdated[node.uuid] = node),
+      nodeUpdated: ({ node }) => (nodesUpdated[node.uuid] = node),
+    }
 
     // 1. get or create context entity
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const {
-      entity,
-      record: recordUpdatedEntity,
-      nodesUpdated: nodesUpdatedEntity,
-    } = _getOrCreateEntityByKeys({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes })(record)
+    const { entity, record: recordUpdatedEntity } = _getOrCreateEntityByKeys({
+      survey,
+      entityDefUuid,
+      valuesByDefUuid,
+      insertMissingNodes,
+      updateListener,
+    })(record)
 
-    Object.assign(nodesUpdated, nodesUpdatedEntity)
     recordUpdated = recordUpdatedEntity
 
     // 2. update attribute values
@@ -293,19 +295,13 @@ const updateAttributesWithValues =
         !NodeDef.isKey(attributeDef) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
-        const { attribute, record: recordUpdatedAttribute } = _addOrUpdateAttribute({
+        recordUpdated = _addOrUpdateAttribute({
           survey,
           entity,
           attributeDef,
           value,
+          updateListener,
         })(recordUpdated)
-
-        if (attribute) {
-          const attributeUuid = Node.getUuid(attribute)
-
-          nodesUpdated[attributeUuid] = attribute
-          recordUpdated = recordUpdatedAttribute
-        }
       }
     })
 
