@@ -94,6 +94,18 @@ describe('RecordNodesUpdater Test', () => {
     // expect node value has been updated
     const dbhInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/dbh')(survey, recordUpdated)
     expect(Node.getValue(dbhInsertedNode)).toEqual(10)
+
+    // expect default value on tree_status has been updated
+    const treeStatusInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/tree_status')(
+      survey,
+      recordUpdated
+    )
+    const treeStatusLiveCategoryItemUuid = SurveyUtils.getCategoryItemUuid({
+      survey,
+      categoryName: 'tree_status',
+      codesPath: ['L'],
+    })
+    expect(Node.getCategoryItemUuid(treeStatusInsertedNode)).toEqual(treeStatusLiveCategoryItemUuid)
   })
 
   it('Test update code attribute ', async () => {

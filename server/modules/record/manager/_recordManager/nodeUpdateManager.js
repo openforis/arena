@@ -236,11 +236,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
 }
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
-  const {
-    record: recordUpdatedDependents,
-    nodesUpdated,
-    nodesUpdatedToPersist,
-  } = Record.updateNodesDependents({
+  const { record: recordUpdatedDependents, nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
@@ -250,13 +246,13 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
   let recordUpdated = recordUpdatedDependents
 
   // persist updates in batch
-  if (!R.isEmpty(nodesUpdatedToPersist)) {
-    const nodesArray = Object.values(nodesUpdatedToPersist)
+  if (!R.isEmpty(nodesUpdated)) {
+    const nodesArray = Object.values(nodesUpdated)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
 
     // reload nodes to get nodes ref data
-    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
+    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdated }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
     recordUpdated = Record.mergeNodes(nodesReloaded)(recordUpdated)
   }

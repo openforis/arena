@@ -7,7 +7,7 @@ import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as RecordExpressionValueConverter from '@core/record/recordExpressionValueConverter'
 import * as RecordReader from './recordReader'
-import * as RecordUpdater from './recordUpdater'
+import RecordUpdateResult from './RecordUpdateResult'
 
 const _logExpressionError = ({ error, expressionType, survey, nodeDef, expressionsToEvaluate, logger }) => {
   const surveyId = Survey.getId(survey)
@@ -28,8 +28,7 @@ const _logExpressionError = ({ error, expressionType, survey, nodeDef, expressio
 
 export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger = null }) => {
   // Output
-  const nodesUpdatedToPersist = {}
-  const nodesWithApplicabilityUpdated = {}
+  const updateResult = new RecordUpdateResult({ record })
 
   // 1. fetch dependent nodes
   const nodePointersToUpdate = RecordReader.getDependentNodePointers(
@@ -48,21 +47,19 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
     })
   }
 
-  let recordUpdated = { ...record }
-
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   nodePointersToUpdate.forEach((nodePointer) => {
     const { nodeCtx: nodeCtxNodePointer, nodeDef: nodeDefNodePointer } = nodePointer
     const nodeCtxUuid = Node.getUuid(nodeCtxNodePointer)
     // nodeCtx could have been updated in a previous iteration
-    const nodeCtx = nodesUpdatedToPersist[nodeCtxUuid] || nodeCtxNodePointer
+    const nodeCtx = updateResult.getNodeByUuid(nodeCtxUuid) || nodeCtxNodePointer
     const expressionsToEvaluate = NodeDef.getApplicable(nodeDefNodePointer)
     try {
       // 3. evaluate applicable expression
       const exprEval = RecordExpressionParser.evalApplicableExpression(
         survey,
-        recordUpdated,
+        updateResult.record,
         nodeCtx,
         expressionsToEvaluate
       )
@@ -75,18 +72,17 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
       if (Node.isChildApplicable(nodeDefUuid)(nodeCtx) !== applicable) {
         // Applicability changed
 
-        // update node and add it to nodesUpdated
+        // update node and add it to nodes updated
         const nodeCtxUpdated = Node.assocChildApplicability({ nodeDefUuid, applicable })(nodeCtx)
-        nodesUpdatedToPersist[nodeCtxUuid] = nodeCtxUpdated
+        updateResult.addNode(nodeCtxUpdated)
 
-        const nodeCtxChildren = RecordReader.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(recordUpdated)
+        const nodeCtxChildren = RecordReader.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(updateResult.record)
         nodeCtxChildren.forEach((nodeCtxChild) => {
           // 5. add nodeCtxChild and its descendants to nodesUpdated
           RecordReader.visitDescendantsAndSelf(nodeCtxChild, (nodeDescendant) => {
-            nodesWithApplicabilityUpdated[Node.getUuid(nodeDescendant)] = nodeDescendant
-          })(recordUpdated)
+            updateResult.addNode(nodeDescendant)
+          })(updateResult.record)
         })
-        recordUpdated = RecordUpdater.assocNode(nodeCtxUpdated)(recordUpdated)
       }
     } catch (error) {
       _logExpressionError({
@@ -100,14 +96,12 @@ export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger
     }
   })
 
-  return {
-    nodesUpdatedToPersist,
-    nodesWithApplicabilityUpdated,
-    record: recordUpdated,
-  }
+  return updateResult
 }
 
 export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, logger = null }) => {
+  const updateResult = new RecordUpdateResult({ record })
+
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
@@ -126,11 +120,10 @@ export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, log
     nodeDependentPointersFilterFn
   )(record)
 
-  let recordUpdated = { ...record }
-
   // 2. update expr to node and dependent nodes
-  const nodesUpdated = nodePointersToUpdate.reduce((nodesUpdatedAcc, { nodeCtx, nodeDef }) => {
+  nodePointersToUpdate.forEach(({ nodeCtx, nodeDef }) => {
     const expressionsToEvaluate = NodeDef.getDefaultValues(nodeDef)
+
     try {
       // 3. evaluate applicable default value expression
       const exprEval = RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, expressionsToEvaluate)
@@ -145,31 +138,20 @@ export const updateSelfAndDependentsDefaultValues = ({ survey, record, node, log
       // 4
       // 4a. if node value is not changed, do nothing
       if (R.equals(oldValue, exprValue)) {
-        return nodesUpdatedAcc
+        return // do nothing
       }
 
       // 4b. update node value and meta and return updated node
-      const nodeCtxUuid = Node.getUuid(nodeCtx)
-      // 4c. update meta
       const defaultValueApplied = !A.isNull(exprEval)
       const nodeCtxUpdated = A.pipe(
         Node.assocIsDefaultValueApplied(defaultValueApplied),
         Node.assocValue(exprValue)
       )(nodeCtx)
-      recordUpdated = RecordUpdater.assocNode(nodeCtxUpdated)(recordUpdated)
-
-      return {
-        ...nodesUpdatedAcc,
-        [nodeCtxUuid]: nodeCtxUpdated,
-      }
+      updateResult.addNode(nodeCtxUpdated)
     } catch (error) {
       _logExpressionError({ error, type: 'default value', survey, nodeDef, expressionsToEvaluate, logger })
-      return nodesUpdatedAcc
     }
-  }, {})
+  })
 
-  return {
-    record: recordUpdated,
-    nodesUpdated,
-  }
+  return updateResult
 }

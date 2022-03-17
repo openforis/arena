@@ -38,3 +38,8 @@ export const getCategoryItem = ({ survey, categoryName, codesPath }) => {
     codesPath,
   })(survey)
 }
+
+export const getCategoryItemUuid = ({ survey, categoryName, codesPath }) => {
+  const categoryItem = getCategoryItem({ survey, categoryName, codesPath })
+  return categoryItem?.uuid
+}

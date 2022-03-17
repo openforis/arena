@@ -9,8 +9,8 @@ import * as Validation from '@core/validation/validation'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
-import * as RecordUpdater from './recordUpdater'
 import * as RecordNodeDependentsUpdater from './recordNodeDependentsUpdater'
+import RecordUpdateResult from './RecordUpdateResult'
 
 /**
  * Nodes can be visited maximum 2 times during the update of the dependent nodes, to avoid loops in the evaluation.
@@ -25,41 +25,40 @@ const getNodesToInsertCount = (nodeDef) => {
   return Number(NodeDefValidations.getMinCount(validations)) || 0
 }
 
-const _addNodeAndDescendants = ({ survey, nodeDef, record, node, updateListener }) => {
-  let recordUpdated = RecordUpdater.assocNode(node)(record)
+const _addNodeAndDescendants = ({ survey, record, parentNode, nodeDef }) => {
+  const node = Node.newNode(NodeDef.getUuid(nodeDef), record.uuid, parentNode)
+
+  const updateResult = new RecordUpdateResult({ record })
+  updateResult.addNode(node)
 
   // Add children if entity
-  const childDefs = NodeDef.isEntity(nodeDef) ? Survey.getNodeDefChildren(nodeDef)(survey) : []
+  if (NodeDef.isEntity(nodeDef)) {
+    const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
 
-  // Insert only child single nodes (it allows to apply default values)
-  childDefs.forEach((childDef) => {
-    const nodesToInsert = getNodesToInsertCount(childDef)
-    if (nodesToInsert === 0) {
-      return acc
-    }
-    const nodesToInsertArray = [...Array(Number(nodesToInsert)).keys()]
-    nodesToInsertArray.forEach(() => {
-      const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-      const recordUpdatedChild = _addNodeAndDescendants({
-        survey,
-        nodeDef: childDef,
-        record: recordUpdated,
-        node: childNode,
-        updateListener,
+    // Add only child single nodes (it allows to apply default values)
+    childDefs.forEach((childDef) => {
+      const nodesToInsert = getNodesToInsertCount(childDef)
+      if (nodesToInsert === 0) {
+        return // do nothing
+      }
+      const nodesToInsertArray = [...Array(Number(nodesToInsert)).keys()]
+      nodesToInsertArray.forEach(() => {
+        const childUpdateResult = _addNodeAndDescendants({
+          survey,
+          record: updateResult.record,
+          parentNode: node,
+          nodeDef: childDef,
+        })
+        updateResult.merge(childUpdateResult)
       })
-      recordUpdated = recordUpdatedChild
-      updateListener.nodeCreated({ record: recordUpdated, node: childNode })
     })
-  })
-
-  return recordUpdated
+  }
+  return updateResult
 }
 
 const updateNodesDependents = ({ survey, record, nodes, logger = null }) => {
   // Output
-  const nodesUpdated = { ...nodes }
-  const nodesUpdatedToPersist = {}
-  let recordUpdated = record
+  const updateResult = new RecordUpdateResult({ record, nodes })
 
   const nodesToVisit = new Queue(Object.values(nodes))
 
@@ -74,66 +73,54 @@ const updateNodesDependents = ({ survey, record, nodes, logger = null }) => {
 
     if (visitedCount < MAX_DEPENDENTS_VISITING_TIMES) {
       // Update node dependents (applicability)
-      const {
-        nodesUpdatedToPersist: nodesToPersistApplicability,
-        nodesWithApplicabilityUpdated,
-        record: recordUpdatedAvailability,
-      } = RecordNodeDependentsUpdater.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node, logger })
+      const applicabilityUpdateResult = RecordNodeDependentsUpdater.updateSelfAndDependentsApplicable({
+        survey,
+        record: updateResult.record,
+        node,
+        logger,
+      })
 
-      recordUpdated = recordUpdatedAvailability
-      Object.assign(nodesUpdatedToPersist, nodesToPersistApplicability)
+      updateResult.merge(applicabilityUpdateResult)
 
       // Update node dependents (default values)
-      const { nodesUpdated: nodesWithDefaultValueUpdated, record: recordUpdatedDefaultValues } =
-        RecordNodeDependentsUpdater.updateSelfAndDependentsDefaultValues({
-          survey,
-          record: recordUpdated,
-          node,
-          logger,
-        })
+      const defaultValuesUpdateResult = RecordNodeDependentsUpdater.updateSelfAndDependentsDefaultValues({
+        survey,
+        record: updateResult.record,
+        node,
+        logger,
+      })
 
-      recordUpdated = recordUpdatedDefaultValues
-      Object.assign(nodesUpdatedToPersist, nodesWithDefaultValueUpdated)
+      updateResult.merge(defaultValuesUpdateResult)
 
       // Update record nodes
       const nodesUpdatedCurrent = {
-        ...nodesToPersistApplicability,
-        ...nodesWithApplicabilityUpdated,
-        ...nodesWithDefaultValueUpdated,
+        ...applicabilityUpdateResult.nodes,
+        ...defaultValuesUpdateResult.nodes,
       }
 
       // Mark updated nodes to visit
       nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
-
-      // Update nodes to return
-      Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
       // Mark node visited
       visitedCountByUuid[nodeUuid] = visitedCount + 1
     }
   }
 
-  recordUpdated = RecordUpdater.mergeNodes(nodesUpdated)(recordUpdated)
-
-  return {
-    record: recordUpdated,
-    nodesUpdated,
-    nodesUpdatedToPersist,
-  }
+  return updateResult
 }
 
 const _addOrUpdateAttribute =
-  ({ survey, entity, attributeDef, value, updateListener }) =>
+  ({ survey, entity, attributeDef, value }) =>
   (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
 
     if (!attribute) {
       // create new attribute
-      const attributeUpdated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
-      const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
-      updateListener.nodeCreated({ record: recordUpdated, node: attributeUpdated })
-      return recordUpdated
+      const updateResult = new RecordUpdateResult({ record })
+      const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
+      updateResult.addNode(attributeCreated)
+      return updateResult
     }
     if (
       !NodeValues.isValueEqual({
@@ -151,45 +138,49 @@ const _addOrUpdateAttribute =
         // reset default value applied flag
         Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false })
       )(attribute)
-      const recordUpdated = RecordUpdater.assocNode(attributeUpdated)(record)
-      updateListener.nodeUpdated({ record: recordUpdated, node: attributeUpdated })
-      return recordUpdated
+
+      const updateResult = new RecordUpdateResult({ record })
+      updateResult.addNode(attributeUpdated)
+      return updateResult
     }
     // no updates performed
-    return record
+    return null
   }
 
 const _addEntityAndKeyValues =
-  ({ survey, entityDef, parentNode, keyValuesByDefUuid, updateListener }) =>
+  ({ survey, entityDef, parentNode, keyValuesByDefUuid }) =>
   (record) => {
-    const entity = Node.newNode(NodeDef.getUuid(entityDef), record.uuid, parentNode)
-    const recordUpdatedDescendants = _addNodeAndDescendants({
+    const updateResult = new RecordUpdateResult({ record })
+    const updateResultDescendants = _addNodeAndDescendants({
       survey,
-      nodeDef: entityDef,
       record,
-      node: entity,
-      updateListener,
+      parentNode,
+      nodeDef: entityDef,
     })
-    let recordUpdated = recordUpdatedDescendants
+    updateResult.merge(updateResultDescendants)
+
+    const entity = Object.values(updateResultDescendants.nodes).find(
+      (node) => Node.getNodeDefUuid(node) === NodeDef.getUuid(entityDef)
+    )
 
     const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
     keyDefs.forEach((keyDef) => {
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
-      const recordUpdatedKeyNode = _addOrUpdateAttribute({
+      const keyAttributeUpdateResult = _addOrUpdateAttribute({
         survey,
         entity,
         attributeDef: keyDef,
         value: keyValue,
-        updateListener,
-      })(recordUpdated)
-
-      recordUpdated = recordUpdatedKeyNode
+      })(updateResult.record)
+      if (keyAttributeUpdateResult) {
+        updateResult.merge(keyAttributeUpdateResult)
+      }
     })
-    return { record: recordUpdated, entity }
+    return { entity, updateResult }
   }
 
 const _getOrCreateEntityByKeys =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, updateListener }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes }) =>
   (record) => {
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const entity = RecordReader.findDescendantByKeyValues({
@@ -199,7 +190,7 @@ const _getOrCreateEntityByKeys =
     })(record)
 
     if (entity) {
-      return { entity, record }
+      return { entity, updateResult: null }
     }
     if (!insertMissingNodes) {
       throw new Error('entity not found')
@@ -214,78 +205,62 @@ const _getOrCreateEntityByKeys =
     if (!entityParent) {
       throw new Error('cannot find ancestor node to create entity into')
     }
-    const { entity: entityCreated, record: recordUpdatedEntityInserted } = _addEntityAndKeyValues({
+    const { entity: entityInserted, updateResult } = _addEntityAndKeyValues({
       survey,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
-      updateListener,
     })(record)
-
-    return { record: recordUpdatedEntityInserted, entity: entityCreated }
+    return { entity: entityInserted, updateResult }
   }
 
 const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
   // output
-  let recordUpdated
-  const nodesUpdated = { ...nodes }
+  const updateResult = new RecordUpdateResult({ record, nodes })
 
   // 1. update dependent nodes
-  const {
-    record: recordUpdatedDependents,
-    nodesUpdated: nodesUpdatedDependents,
-    nodesUpdatedToPersist,
-  } = updateNodesDependents({
+  const updateResultDependents = updateNodesDependents({
     survey,
     record,
     nodes,
     logger,
   })
-  Object.assign(nodesUpdated, nodesUpdatedDependents)
-  recordUpdated = recordUpdatedDependents
+
+  updateResult.merge(updateResultDependents)
 
   // 2. update node validations
   const nodesValidation = await RecordValidator.validateNodes({
     survey,
-    record: recordUpdated,
-    nodes: nodesUpdated,
+    record: updateResult.record,
+    nodes: updateResult.nodes,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,
     Validation.mergeValidation(nodesValidation),
     Validation.updateCounts
-  )(recordUpdated)
-  recordUpdated = Validation.assocValidation(recordValidationUpdated)(recordUpdated)
+  )(updateResult.record)
+  updateResult.record = Validation.assocValidation(recordValidationUpdated)(updateResult.record)
 
-  return {
-    record: recordUpdated,
-    nodes: nodesUpdated,
-    nodesUpdatedToPersist,
-  }
+  return updateResult
 }
 
 const updateAttributesWithValues =
   ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false, logger = null }) =>
   async (record) => {
-    let recordUpdated = { ...record }
-    const nodesUpdated = {}
-
-    const updateListener = {
-      nodeCreated: ({ node }) => (nodesUpdated[node.uuid] = node),
-      nodeUpdated: ({ node }) => (nodesUpdated[node.uuid] = node),
-    }
+    const updateResult = new RecordUpdateResult({ record })
 
     // 1. get or create context entity
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const { entity, record: recordUpdatedEntity } = _getOrCreateEntityByKeys({
+    const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
       survey,
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
-      updateListener,
     })(record)
 
-    recordUpdated = recordUpdatedEntity
+    if (updateResultEntity) {
+      updateResult.merge(updateResultEntity)
+    }
 
     // 2. update attribute values
     Object.entries(valuesByDefUuid).forEach(([attributeDefUuid, value]) => {
@@ -295,17 +270,20 @@ const updateAttributesWithValues =
         !NodeDef.isKey(attributeDef) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
-        recordUpdated = _addOrUpdateAttribute({
+        const attributeUpdateResult = _addOrUpdateAttribute({
           survey,
           entity,
           attributeDef,
           value,
-          updateListener,
-        })(recordUpdated)
+        })(updateResult.record)
+
+        if (attributeUpdateResult) {
+          updateResult.merge(attributeUpdateResult)
+        }
       }
     })
 
-    return _afterNodesUpdate({ survey, record: recordUpdated, nodes: nodesUpdated, logger })
+    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, logger })
   }
 
 export const RecordNodesUpdater = {
