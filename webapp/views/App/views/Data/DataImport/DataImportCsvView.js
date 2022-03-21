@@ -44,7 +44,7 @@ export const DataImportCsvView = () => {
   const onDataImportTypeChange = useCallback(
     (value) => {
       setDataImportType(value)
-      if (insertNewRecords) {
+      if (value === importTypes.insertNewRecords) {
         const nodeDefRoot = Survey.getNodeDefRoot(survey)
         setSelectedEntityDefUuid(NodeDef.getUuid(nodeDefRoot))
       }

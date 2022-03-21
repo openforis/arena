@@ -128,13 +128,13 @@ class RecordUpdateThread extends Thread {
         break
 
       case messageTypes.recordInit:
-        this.record = await RecordManager.initNewRecord(
-          this.user,
-          this.survey,
-          this.record,
-          this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this)
-        )
+        this.record = await RecordManager.initNewRecord({
+          user: this.user,
+          survey: this.survey,
+          record: this.record,
+          nodesUpdateListener: this.handleNodesUpdated.bind(this),
+          nodesValidationListener: this.handleNodesValidationUpdated.bind(this),
+        })
         break
 
       case messageTypes.nodePersist:

@@ -33,11 +33,7 @@ import * as NodeUpdateManager from './nodeUpdateManager'
 // ==== CREATE
 
 export const initNewRecord = async (
-  user,
-  survey,
-  record,
-  nodesUpdateListener = null,
-  nodesValidationListener = null,
+  { user, survey, record, nodesUpdateListener = null, nodesValidationListener = null },
   client = db
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)

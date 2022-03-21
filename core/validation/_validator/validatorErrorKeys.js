@@ -41,6 +41,10 @@ export const ValidatorErrorKeys = {
     invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
   },
 
+  dataImport: {
+    recordNotFound: 'validationErrors.dataImport.recordNotFound',
+  },
+
   expressions: {
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
