@@ -165,6 +165,16 @@ export default class DataImportJob extends Job {
       valuesByDefUuid,
     })(record)
 
+    console.log(
+      '===nodesUpdated',
+      Object.values(nodesUpdated).map(
+        (node) =>
+          `${NodeDef.getName(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))}: ${JSON.stringify(
+            Node.getValue(node)
+          )}`
+      )
+    )
+
     this.currentRecord = recordUpdated
 
     await this.recordsValidationBatchPersister.addItem([

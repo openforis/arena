@@ -202,7 +202,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     const { record: recordUpdated1, nodes: nodesUpdated } = await nodesUpdateFn(user, survey, record, node, t)
     let recordUpdated = recordUpdated1
 
-    const { record: recordUpdated2, updatedNodesAndDependents } = await _onNodesUpdate(
+    const { record: recordUpdated2, nodes: updatedNodesAndDependents } = await _onNodesUpdate(
       { survey, record: recordUpdated, nodesUpdated, nodesUpdateListener, nodesValidationListener },
       t
     )
@@ -301,7 +301,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 
   return {
     record,
-    updatedNodesAndDependents,
+    nodes: updatedNodesAndDependents,
   }
 }
 

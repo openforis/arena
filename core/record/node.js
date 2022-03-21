@@ -142,18 +142,22 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 // ======
 //
 
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.nodeDefUuid]: nodeDefUuid,
-  [keys.recordUuid]: recordUuid,
-  [keys.parentUuid]: getUuid(parentNode),
-  [keys.value]: value,
-  [keys.meta]: {
-    [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
-  },
-  [keys.created]: true,
-  [keys.dateCreated]: new Date(),
-})
+export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
+  const now = new Date()
+  return {
+    [keys.uuid]: uuidv4(),
+    [keys.nodeDefUuid]: nodeDefUuid,
+    [keys.recordUuid]: recordUuid,
+    [keys.parentUuid]: getUuid(parentNode),
+    [keys.value]: value,
+    [keys.meta]: {
+      [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+    },
+    [keys.created]: true,
+    [keys.dateCreated]: now,
+    [keys.dateModified]: now,
+  }
+}
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),

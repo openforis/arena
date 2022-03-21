@@ -182,7 +182,6 @@ const _addEntityAndKeyValues =
 const _getOrCreateEntityByKeys =
   ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes }) =>
   (record) => {
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const entity = RecordReader.findDescendantByKeyValues({
       survey,
       descendantDefUuid: entityDefUuid,
@@ -196,6 +195,7 @@ const _getOrCreateEntityByKeys =
       throw new Error('entity not found')
     }
     // insert entity node (with keys)
+    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const entityParentDef = Survey.getNodeDefAncestorMultipleEntity(entityDef)(survey)
     const entityParent = RecordReader.findDescendantByKeyValues({
       survey,
@@ -267,7 +267,7 @@ const updateAttributesWithValues =
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (
         NodeDef.isDescendantOf(entityDef)(attributeDef) &&
-        !NodeDef.isKey(attributeDef) &&
+        (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
         const attributeUpdateResult = _addOrUpdateAttribute({
