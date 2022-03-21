@@ -236,7 +236,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
 }
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
-  const { record: recordUpdatedDependents, nodesUpdated } = Record.updateNodesDependents({
+  const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
