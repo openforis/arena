@@ -108,7 +108,8 @@ export const visitDescendantsAndSelf = (node, visitor) => (record) => {
 }
 
 /**
- * Finds a descendant in single entities starting from the specified parent node.
+ * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
+ * the single entities, if any, down to the correct parent node.
  */
 export const getNodeParentInDescendantSingleEntities =
   ({ survey, parentNode, nodeDefUuid }) =>
