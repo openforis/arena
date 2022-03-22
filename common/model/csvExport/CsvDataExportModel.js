@@ -53,7 +53,7 @@ export class CsvDataExportModel {
   _initColumns() {
     const { addCycle } = this.options
 
-const descendantAttributeColumns = this._extractAttributeDefsColumns()
+    const descendantAttributeColumns = this._extractAttributeDefsColumns()
 
     const ancestorsKeyColumns = this._extractAncestorsKeysColumns()
 
@@ -97,12 +97,9 @@ const descendantAttributeColumns = this._extractAttributeDefsColumns()
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
 
-    if (!includeFiles) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
-    }
-    if (!includeAnalysis) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
-    }
+    descendantDefs = descendantDefs.filter(
+      (nodeDef) => (includeFiles || !NodeDef.isFile(nodeDef)) && (includeAnalysis || !NodeDef.isAnalysis(nodeDef))
+    )
     return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 
