@@ -97,12 +97,15 @@ export class CsvDataExportModel {
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
 
-    if (!includeFiles) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
-    }
-    if (!includeAnalysis) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
-    }
+    descendantDefs = descendantDefs.filter((nodeDef) => {
+      if (!includeFiles && NodeDef.isFile(nodeDef)) {
+        return false
+      }
+      if (!includeAnalysis && NodeDef.isAnalysis(nodeDef)) {
+        return false
+      }
+      return true
+    })
     return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 
