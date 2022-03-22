@@ -25,10 +25,20 @@ export default class RecordUpdateResult {
   addNode(node) {
     this._nodes[node.uuid] = node
     this._record = RecordUpdater.assocNode(node)(this._record)
+    return this
   }
 
-  merge(updateResult) {
-    this._record = updateResult.record
-    Object.assign(this._nodes, updateResult.nodes)
+  /**
+   * Merges this record update result with the specified one.
+   * The record of this record update result will be the one of the specified record update result
+   * and the nodes of the specified one will be added to the nodes of this one.
+   *
+   * @param {!RecordUpdateResult} recordUpdateResult - The record update result to merge with.
+   * @returns {RecordUpdateResult} - The updated object.
+   */
+  merge(recordUpdateResult) {
+    this._record = recordUpdateResult.record
+    Object.assign(this._nodes, recordUpdateResult.nodes)
+    return this
   }
 }
