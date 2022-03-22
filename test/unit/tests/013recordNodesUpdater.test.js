@@ -166,4 +166,26 @@ describe('RecordNodesUpdater Test', () => {
     const treeHeightApplicable = Node.isChildApplicable(treeHeightDef.uuid)(treeNode)
     expect(treeHeightApplicable).toBe(false)
   })
+
+  it('Test update node in nested single entities', async () => {
+    const plotDef = getNodeDef('cluster/plot')
+    const plotIdDef = getNodeDef('cluster/plot/plot_id')
+    const plotRemarksDef = getNodeDef('cluster/plot/plot_details/plot_remarks')
+
+    const { record: recordUpdated } = await Record.updateAttributesWithValues({
+      survey,
+      entityDefUuid: plotDef.uuid,
+      valuesByDefUuid: {
+        [plotIdDef.uuid]: 1,
+        [plotRemarksDef.uuid]: 'This is plot 1 (modified)',
+      },
+    })(record)
+
+    // expect plot remarks to be "This is plot 1 (modified)"
+    const plotRemarksNode = RecordUtils.findNodeByPath('cluster/plot[0]/plot_details/plot_remarks')(
+      survey,
+      recordUpdated
+    )
+    expect(Node.getValue(plotRemarksNode)).toBe('This is plot 1 (modified)')
+  })
 })

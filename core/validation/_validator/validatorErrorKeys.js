@@ -42,6 +42,7 @@ export const ValidatorErrorKeys = {
   },
 
   dataImport: {
+    recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
 

@@ -124,7 +124,12 @@ export default class DataImportJob extends Job {
     if (insertNewRecords) {
       // check if record with the same key values already exists
       if (recordSummary) {
-        throw new Error(`Record with keys ${keyValues} already existing.`)
+        this.addError({
+          error: Validation.newInstance(false, {}, [
+            { key: Validation.messageKeys.dataImport.recordAlreadyExisting, params: { keyValues } },
+          ]),
+        })
+        return null
       }
       const recordToInsert = Record.newRecord(user, cycle)
       const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
@@ -135,11 +140,12 @@ export default class DataImportJob extends Job {
     // insertNewRecords === false : updating existing record
 
     if (!recordSummary) {
-      this.addError(
-        Validation.newInstance(false, {}, [
+      this.addError({
+        error: Validation.newInstance(false, {}, [
           { key: Validation.messageKeys.dataImport.recordNotFound, params: { keyValues } },
-        ])
-      )
+        ]),
+      })
+      return null
     }
 
     const recordUuid = Record.getUuid(recordSummary)
@@ -158,34 +164,24 @@ export default class DataImportJob extends Job {
     const { survey, entityDefUuid } = this.context
 
     const record = await this.getOrFetchRecord({ valuesByDefUuid })
+    if (record) {
+      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
+        survey,
+        entityDefUuid,
+        valuesByDefUuid,
+      })(record)
 
-    const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
-      survey,
-      entityDefUuid,
-      valuesByDefUuid,
-    })(record)
+      this.currentRecord = recordUpdated
 
-    console.log(
-      '===nodesUpdated',
-      Object.values(nodesUpdated).map(
-        (node) =>
-          `${NodeDef.getName(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))}: ${JSON.stringify(
-            Node.getValue(node)
-          )}`
-      )
-    )
-
-    this.currentRecord = recordUpdated
-
-    await this.recordsValidationBatchPersister.addItem([
-      Record.getUuid(this.currentRecord),
-      Record.getValidation(this.currentRecord),
-    ])
-    const nodesArray = Object.values(nodesUpdated)
-    nodesArray.sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
-    await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-    await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
-
+      await this.recordsValidationBatchPersister.addItem([
+        Record.getUuid(this.currentRecord),
+        Record.getValidation(this.currentRecord),
+      ])
+      const nodesArray = Object.values(nodesUpdated)
+      nodesArray.sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
+      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+    }
     this.incrementProcessedItems()
   }
 

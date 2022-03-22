@@ -110,27 +110,32 @@ export const visitDescendantsAndSelf = (node, visitor) => (record) => {
 /**
  * Finds a descendant in single entities starting from the specified parent node.
  */
-export const getNodeDescendantInSingleEntitiesByDefUuid =
+export const getNodeParentInDescendantSingleEntities =
   ({ survey, parentNode, nodeDefUuid }) =>
   (record) => {
     const nodeDefParent = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
     const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
     if (!NodeDef.isDescendantOf(nodeDefParent)(nodeDef)) {
-      throw new Error('target node is not a descendant of the context entity')
+      throw new Error('target node is not a descendant of the specified parent entity')
     }
     const nodeDefHierarchy = NodeDef.getMetaHierarchy(nodeDef)
     const nodeDefParentHierarchy = NodeDef.getMetaHierarchy(nodeDefParent)
-    const hierarchyToVisit = nodeDefHierarchy.slice(nodeDefParentHierarchy.length - 1)
-    let currentParentNode = parentNode
-    hierarchyToVisit.forEach((descendantDefUuid) => {
+    const hierarchyToVisit =
+      nodeDefHierarchy.length > nodeDefParentHierarchy.length + 1
+        ? nodeDefHierarchy.slice(nodeDefParentHierarchy.length + 1)
+        : []
+    return hierarchyToVisit.reduce((parentNodeCurrent, descendantDefUuid) => {
       const nodeDefDescendant = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
       if (NodeDef.isSingleEntity(nodeDefDescendant)) {
-        currentParentNode = getNodeChildByDefUuid(currentParentNode, descendantDefUuid)(record)
+        return getNodeChildByDefUuid(parentNodeCurrent, descendantDefUuid)(record)
       } else {
-        throw new Error('the target node is inside a multiple entity')
+        throw new Error(
+          `the target node ${NodeDef.getName(nodeDef)} is inside a multiple entity: ${NodeDef.getName(
+            nodeDefDescendant
+          )}`
+        )
       }
-    })
-    return getNodeChildByDefUuid(currentParentNode, nodeDefUuid)(record)
+    }, parentNode)
   }
 
 /**
