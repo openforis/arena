@@ -57,7 +57,7 @@ const NodeDefCode = (props) => {
         ? nodes[0]
         : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
-    const value = { [Node.valuePropsCode.itemUuid]: CategoryItem.getUuid(item) }
+    const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
     const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
     const refData = { [NodeRefData.keys.categoryItem]: item }
 

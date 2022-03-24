@@ -36,53 +36,71 @@ const DEFAULT_OPTIONS = { includeCategoryItemsLabels: true, includeTaxonScientif
 
 const RECORD_CYCLE_HEADER = 'record_cycle'
 
-export class CsvExportModel {
+export class CsvDataExportModel {
   constructor({ survey, nodeDefContext, options = DEFAULT_OPTIONS }) {
     this.survey = survey
     this.nodeDefContext = nodeDefContext
     this.options = options
-    this.attributeDefs = [] // to be initialized
     this.columns = []
 
     this.init()
   }
 
   init() {
-    this._initAttributeDefs()
     this._initColumns()
   }
 
-  _initAttributeDefs() {
-    const { includeFiles } = this.options
-    let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
-      : [this.nodeDefContext] // Multiple attribute
-    if (!includeFiles) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
-    }
+  _initColumns() {
+    const { addCycle } = this.options
 
-    let parentKeys = []
-    Survey.visitAncestors(this.nodeDefContext, (n) => {
-      const keys = Survey.getNodeDefKeys(n)(this.survey)
-      parentKeys = parentKeys.concat(keys)
-    })(this.survey)
+    const descendantAttributeColumns = this._extractAttributeDefsColumns()
 
-    this.attributeDefs = parentKeys.reverse().concat(descendantDefs)
+    const ancestorsKeyColumns = this._extractAncestorsKeysColumns()
+
+    this.columns = [
+      ...(addCycle ? [{ header: RECORD_CYCLE_HEADER }] : []),
+      ...ancestorsKeyColumns,
+      ...descendantAttributeColumns,
+    ]
   }
 
-  _initColumns() {
-    const { includeCategoryItemsLabels, includeTaxonScientificName, addCycle } = this.options
+  _createColumnsFromAttributeDefs({ attributeDefs }) {
+    const { includeCategoryItemsLabels, includeTaxonScientificName } = this.options
 
-    const columns = []
-    this.attributeDefs.forEach((nodeDef) => {
+    return attributeDefs.reduce((acc, nodeDef) => {
       const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
       const columnsPerAttribute = columnsGetter
         ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
         : [getMainColumn({ nodeDef })]
-      columns.push(...columnsPerAttribute)
-    })
-    // Cycle is 0-based
-    this.columns = [...(addCycle ? [{ header: RECORD_CYCLE_HEADER }] : []), ...columns]
+      return [...acc, ...columnsPerAttribute]
+    }, [])
+  }
+
+  _extractAncestorsKeysColumns() {
+    const ancestorsKeyColumns = []
+
+    Survey.visitAncestors(this.nodeDefContext, (nodeDefAncestor) => {
+      const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
+      const ancestorKeyColumns = this._createColumnsFromAttributeDefs({
+        attributeDefs: ancestorKeyDefs,
+      })
+      ancestorsKeyColumns.unshift(...ancestorKeyColumns)
+    })(this.survey)
+
+    return ancestorsKeyColumns
+  }
+
+  _extractAttributeDefsColumns() {
+    const { includeFiles, includeAnalysis } = this.options
+
+    let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
+      : [this.nodeDefContext] // Multiple attribute
+
+    descendantDefs = descendantDefs.filter(
+      (nodeDef) => (includeFiles || !NodeDef.isFile(nodeDef)) && (includeAnalysis || !NodeDef.isAnalysis(nodeDef))
+    )
+    return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 
   get headers() {

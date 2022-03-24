@@ -26,7 +26,7 @@ export const DataImportCsvView = () => {
   const dispatch = useDispatch()
 
   const [cycle, setCycle] = useState(surveyCycle)
-  const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(false)
+  const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
 
   const onEntitySelect = (entityDef) => setSelectedEntityDefUuid(NodeDef.getUuid(entityDef))
 
@@ -35,7 +35,8 @@ export const DataImportCsvView = () => {
       surveyId,
       file,
       cycle,
-      entityDefUuid,
+      entityDefUuid: selectedEntityDefUuid,
+      insertNewRecords: false,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -73,13 +74,15 @@ export const DataImportCsvView = () => {
       <ButtonDownload
         href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
         label="dataImportView.downloadTemplate"
+        disabled={!selectedEntityDefUuid}
       />
 
       <UploadButton
         inputFieldId={TestId.recordsImport.importDataBtn}
-        label={i18n.t('dataImportView.importFromCsv')}
+        label={i18n.t('dataImportView.selectCSVFileToImport')}
         accept=".csv"
         onChange={(files) => onFileChange(files[0])}
+        disabled={!selectedEntityDefUuid}
       />
     </div>
   )

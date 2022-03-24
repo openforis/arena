@@ -1,3 +1,5 @@
+import * as PromiseUtils from '@core/promiseUtils'
+
 export default class BatchPersister {
   constructor(insertHandler, bufferSize = 1000) {
     this.insertHandler = insertHandler
@@ -11,6 +13,10 @@ export default class BatchPersister {
     if (this.insertBuffer.length === this.bufferSize) {
       await this.flush(t)
     }
+  }
+
+  async addItems(items, t) {
+    await PromiseUtils.each(items, async (item) => this.addItem(item, t))
   }
 
   async flush(t) {

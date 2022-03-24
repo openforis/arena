@@ -236,7 +236,7 @@ export default class Job {
 
   /**
    * Called before onEnd.
-   * Used to flushes the resources used by the job before it terminates completely.
+   * Used to flush the resources used by the job before it terminates completely.
    * (it runs INSIDE the current db transaction)
    */
   async beforeEnd() {

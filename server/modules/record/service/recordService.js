@@ -1,22 +1,19 @@
 import * as fs from 'fs'
 
-import { PointFactory, Points } from '@openforis/arena-core'
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
 import * as PromiseUtils from '@core/promiseUtils'
-import * as DateUtils from '@core/dateUtils'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -24,7 +21,6 @@ import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
-import { CsvExportModel } from '@common/model/csvExport'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -140,40 +136,17 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
   return job
 }
 
-export const writeDataImportFromCSVTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const exportModel = new CsvExportModel({
-    survey,
-    nodeDefContext: entityDef,
-    options: { includeFiles: false, includeCategoryItemsLabels: false, includeTaxonScientificName: false },
+export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityDefUuid, insertNewRecords = false }) => {
+  const job = new DataImportJob({
+    user,
+    surveyId,
+    filePath,
+    cycle,
+    entityDefUuid,
+    insertNewRecords,
   })
-  const dataRow = exportModel.columns.reduce((acc, column) => {
-    const { header, nodeDef, valueProp } = column
-    let value
-    if (nodeDef) {
-      const now = new Date()
-      const valuesByNodeDefType = {
-        [NodeDef.nodeDefType.boolean]: () => true,
-        [NodeDef.nodeDefType.code]: () => 'CATEGORY_CODE',
-        [NodeDef.nodeDefType.coordinate]: () =>
-          Points.toString(PointFactory.createInstance({ srs: 'EPSG:4326', x: 41.8830209, y: 12.4879562 })),
-        [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(now),
-        [NodeDef.nodeDefType.decimal]: () => 123.45,
-        [NodeDef.nodeDefType.file]: () => '', // TODO support file attribute import
-        [NodeDef.nodeDefType.integer]: () => 123,
-        [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
-        [NodeDef.nodeDefType.text]: () => 'Text',
-        [NodeDef.nodeDefType.time]: () => DateUtils.formatTime(now.getHours(), now.getMinutes()),
-      }
-      value = valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp })
-    } else {
-      value = ''
-    }
-    return { ...acc, [header]: value }
-  }, {})
-
-  await CSVWriter.writeToStream(outputStream, [dataRow])
+  JobManager.executeJobThread(job)
+  return job
 }
 
 /**
