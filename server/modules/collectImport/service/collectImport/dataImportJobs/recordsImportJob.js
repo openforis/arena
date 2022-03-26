@@ -1,9 +1,6 @@
 import * as R from 'ramda'
 
-import BatchPersister from '@server/db/batchPersister'
-
-import * as FileXml from '@server/utils/file/fileXml'
-import Queue from '@core/queue'
+import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,12 +8,15 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as PromiseUtils from '@core/promiseUtils'
-
+import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
+import BatchPersister from '@server/db/batchPersister'
+import * as FileXml from '@server/utils/file/fileXml'
 import Job from '@server/job/job'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../../record/manager/recordManager'
+import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
 
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
@@ -84,6 +84,16 @@ export default class RecordsImportJob extends Job {
 
       // this.logDebug(`${entryName} recordToCreate start`)
       const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson), step)
+
+      await ActivityLogManager.insert(
+        user,
+        surveyId,
+        ActivityLog.type.recordImportFromCollect,
+        { recordUuid: Record.getUuid(recordToCreate) },
+        false,
+        tx
+      )
+
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       // This.logDebug(`${entryName} recordToCreate end`)
 
@@ -347,7 +357,7 @@ export default class RecordsImportJob extends Job {
   }
 
   async nodesBatchInsertHandler(nodes, tx) {
-    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodes }, tx)
+    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodes, systemActivity: true }, tx)
   }
 }
 

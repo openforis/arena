@@ -61,6 +61,10 @@ $borderColor: $greyBorder;
   .category__level-items {
     height: calc(100vh - 25rem);
     overflow-y: auto;
+
+    .item-placeholder {
+      height: 35px;
+    }
   }
 
   &.single {

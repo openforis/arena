@@ -24,21 +24,13 @@ export const ChainSamplingDesignProps = (props) => {
 
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const hasBaseUnit = Boolean(baseUnitNodeDef)
 
   return (
     <>
-      <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
-        <Checkbox
-          checked={Chain.isSamplingDesign(chain)}
-          validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
-          onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
-          disabled={Boolean(baseUnitNodeDef)}
-        />
-      </FormItem>
+      {(Chain.isSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
-      {Chain.isSamplingDesign(chain) && <BaseUnitSelector />}
-
-      {baseUnitNodeDef && (
+      {hasBaseUnit && (
         <>
           <StratumAttributeSelector />
 

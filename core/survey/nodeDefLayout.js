@@ -34,7 +34,7 @@ export const displayIn = {
   ownPage: 'ownPage',
 }
 
-const widthRegEx = /(\d+)([a-z]+)/
+const widthRegEx = /^(\d+)([a-z]+)$/
 export const columnWidthMinPx = 160
 export const columnWidthMaxPx = 500
 

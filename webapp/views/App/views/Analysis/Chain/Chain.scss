@@ -7,6 +7,10 @@
     gap: 2rem;
     padding-bottom: 2rem;
 
+    .form-item {
+      grid-template-columns: 0.2fr 0.75fr;
+    }
+
     .stratum-attribute-dropdown {
       width: 30rem;
     }
