@@ -1,6 +1,3 @@
-import * as Validation from '@core/validation/validation'
-import SystemError from '@core/systemError'
-
 import * as RecordUtils from '../../utils/recordUtils'
 import * as DataTest from '../../utils/dataTest'
 import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
@@ -43,9 +40,9 @@ describe('RecordExpressionParser Test', () => {
     // 18 * 0.5 >= 12
     { q: '(cluster_distance * 0.5) >= cluster_id', r: false },
     // 1728
-    { q: 'pow(cluster_id, 3)', r: 1728 },
+    { q: 'Math.pow(cluster_id, 3)', r: 1728 },
     // 18 * 0.5 >= 1728
-    { q: '(cluster_distance * 0.5) >= pow(cluster_id, 3)', r: false },
+    { q: '(cluster_distance * 0.5) >= Math.pow(cluster_id, 3)', r: false },
     // visit_date must be before current date
     { q: 'visit_date <= now()', r: true },
     // cluster_id is not empty
@@ -168,8 +165,8 @@ describe('RecordExpressionParser Test', () => {
     // global objects (String)
     { q: 'String.fromCharCode(65, 66, 67)', r: 'ABC' },
     // global objects (unknown objects/functions)
-    { q: 'Invalid.func(1)', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
-    { q: 'Math.unknownFunc(1)', e: new SystemError('undefinedFunction') },
+    { q: 'Invalid.func(1)', e: true },
+    { q: 'Math.unknownFunc(1)', e: true },
     // native properties (number)
     { q: 'Math.PI.toFixed(2)', r: '3.14' },
     { q: 'plot[0].tree[1].dbh.toFixed(1)', r: '10.1' },
@@ -193,10 +190,10 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_date.year', r: 2021 },
     { q: 'visit_date.month', r: 1 },
     { q: 'visit_date.day', r: 1 },
-    { q: 'visit_date.week', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
+    { q: 'visit_date.week', e: true },
     { q: 'visit_time.hour', r: 10 },
     { q: 'visit_time.minute', r: 30 },
-    { q: 'visit_time.seconds', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
+    { q: 'visit_time.seconds', e: true },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })

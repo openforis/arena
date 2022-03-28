@@ -2,21 +2,24 @@ import * as R from 'ramda'
 
 import * as StringUtils from '@core/stringUtils'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Expression from '@core/expressionParser/expression'
 
 import { recordExpressionFunctions } from './recordEpressionFunctions'
 import { identifierEval } from './identifierEval'
 import { memberEval } from './memberEval'
+import { RecordExpressionEvaluator } from '@openforis/arena-core'
 
 export const evalNodeQuery = (survey, record, node, query) => {
-  const evaluators = {
-    [Expression.types.Identifier]: identifierEval(survey, record),
-    [Expression.types.MemberExpression]: memberEval,
-  }
-  const functions = recordExpressionFunctions({ survey, record, node })
-
-  return Expression.evalString(query, { node, evaluators, functions })
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  const nodeContext = NodeDef.isEntity(nodeDef) ? node : Record.getParentNode(node)(record)
+  const context = { survey, record, nodeContext, object: nodeContext }
+  const res = new RecordExpressionEvaluator().evaluate(query, context)
+  return res
 }
 
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
