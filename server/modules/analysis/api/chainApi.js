@@ -89,6 +89,22 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/summary',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const chainSummary = await AnalysisService.fetchChainSummary({ surveyId, chainUuid })
+
+        res.json(chainSummary)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== UPDATE - Chain
 
   app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
@@ -115,22 +131,18 @@ export const init = (app) => {
 
   // ====== DELETE - Chain
 
-  app.get(
-    '/survey/:surveyId/chains-clean',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.get('/survey/:surveyId/chains-clean', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        await AnalysisService.cleanChainsOrphans({ user, surveyId })
+      await AnalysisService.cleanChainsOrphans({ user, surveyId })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   app.delete(
     '/survey/:surveyId/chain/:chainUuid',

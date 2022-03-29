@@ -293,8 +293,7 @@ export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalys
 export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
 export const isSampling = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isSampling, false)(nodeDef))
 export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)
-export const isAreaBasedEstimatedOf = (nodeDef) =>
-  Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)(nodeDef))
+export const isAreaBasedEstimatedOf = (nodeDef) => Boolean(getAreaBasedEstimatedOf(nodeDef))
 
 // ==== CREATE
 
