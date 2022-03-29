@@ -125,10 +125,13 @@ export const getNodeParentInDescendantSingleEntities =
       nodeDefHierarchy.length > nodeDefParentHierarchy.length + 1
         ? nodeDefHierarchy.slice(nodeDefParentHierarchy.length + 1)
         : []
-    return hierarchyToVisit.reduce((parentNodeCurrent, descendantDefUuid) => {
+
+    let currentParentNode = parentNode
+
+    hierarchyToVisit.forEach((descendantDefUuid) => {
       const nodeDefDescendant = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
       if (NodeDef.isSingleEntity(nodeDefDescendant)) {
-        return getNodeChildByDefUuid(parentNodeCurrent, descendantDefUuid)(record)
+        currentParentNode = getNodeChildByDefUuid(currentParentNode, descendantDefUuid)(record)
       } else {
         throw new Error(
           `the target node ${NodeDef.getName(nodeDef)} is inside a multiple entity: ${NodeDef.getName(
@@ -136,7 +139,8 @@ export const getNodeParentInDescendantSingleEntities =
           )}`
         )
       }
-    }, parentNode)
+    })
+    return currentParentNode
   }
 
 /**

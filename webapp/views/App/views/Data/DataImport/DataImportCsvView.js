@@ -37,8 +37,6 @@ export const DataImportCsvView = () => {
   const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
   const [dataImportType, setDataImportType] = useState(importTypes.updateExistingRecords)
 
-  const insertNewRecords = dataImportType === importTypes.insertNewRecords
-
   const onEntitySelect = (entityDef) => setSelectedEntityDefUuid(NodeDef.getUuid(entityDef))
 
   const onDataImportTypeChange = useCallback(
@@ -49,7 +47,7 @@ export const DataImportCsvView = () => {
         setSelectedEntityDefUuid(NodeDef.getUuid(nodeDefRoot))
       }
     },
-    [insertNewRecords, setDataImportType]
+    [survey, setDataImportType, setSelectedEntityDefUuid]
   )
 
   const startImportJob = async (file) => {
@@ -58,7 +56,7 @@ export const DataImportCsvView = () => {
       file,
       cycle,
       entityDefUuid: selectedEntityDefUuid,
-      insertNewRecords,
+      insertNewRecords: dataImportType === importTypes.insertNewRecords,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -104,7 +102,7 @@ export const DataImportCsvView = () => {
         <EntitySelectorTree
           nodeDefUuidActive={selectedEntityDefUuid}
           onSelect={onEntitySelect}
-          isDisabled={() => insertNewRecords}
+          isDisabled={() => dataImportType === importTypes.insertNewRecords}
         />
       </FormItem>
 
