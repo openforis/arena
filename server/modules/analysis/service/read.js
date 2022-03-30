@@ -29,14 +29,12 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, lang: langParam =
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringVariances: Chain.isClusteringOnlyVariances(chain),
-    resultVariables: analysisNodeDefs.map(analysisNodeDef => {
-      return {
-        name: NodeDef.getName(analysisNodeDef),
-        label: NodeDef.getLabel(analysisNodeDef, lang),
-        areaBased: NodeDef.isAreaBasedEstimatedOf(analysisNodeDef),
-        type: NodeDef.getType(analyisNodeDef)
-      }
-
-    })
+    resultVariables: analysisNodeDefs.map((analysisNodeDef) => ({
+      name: NodeDef.getName(analysisNodeDef),
+      label: NodeDef.getLabel(analysisNodeDef, lang),
+      areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
+      type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
+      active: NodeDef.getActive(analysisNodeDef),
+    })),
   }
 }
