@@ -678,6 +678,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   chainView: {
+    downloadSummaryJSON: 'Download Summary (JSON)',
     formLabel: 'Processing chain label',
     basic: 'Basic',
     samplingDesign: 'Sampling Design',

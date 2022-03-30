@@ -22,6 +22,11 @@
 
     .button-bar {
       align-self: center;
+
+      .chain-summary-download-btn {
+        position: absolute;
+        left: 0;
+      }
     }
 
     .btn-rstudio-container {

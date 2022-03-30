@@ -1,4 +1,5 @@
 export { create } from './create'
+export { fetchChainSummary } from './read'
 export { update } from './update'
 
 export {
@@ -10,7 +11,7 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
-  cleanChainsOrphans
+  cleanChainsOrphans,
 } from '../manager'
 
 export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'

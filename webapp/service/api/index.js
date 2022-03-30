@@ -14,7 +14,7 @@ export {
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
 } from './categories'
-export { fetchChains } from './analysis'
+export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
 export {
   fetchTaxonomies,
