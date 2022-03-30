@@ -7,19 +7,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Expression from '@core/expressionParser/expression'
 
-import { recordExpressionFunctions } from './recordEpressionFunctions'
-import { identifierEval } from './identifierEval'
-import { memberEval } from './memberEval'
 import { RecordExpressionEvaluator } from '@openforis/arena-core'
 
 export const evalNodeQuery = (survey, record, node, query) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   const nodeContext = NodeDef.isEntity(nodeDef) ? node : Record.getParentNode(node)(record)
   const context = { survey, record, nodeContext, object: nodeContext }
-  const res = new RecordExpressionEvaluator().evaluate(query, context)
-  return res
+  return new RecordExpressionEvaluator().evaluate(query, context)
 }
 
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {

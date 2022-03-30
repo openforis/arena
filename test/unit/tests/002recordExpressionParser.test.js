@@ -82,8 +82,6 @@ describe('RecordExpressionParser Test', () => {
     { q: 'index(plot[0].plot_multiple_number[0])', r: 0 },
     { q: 'index(plot[0].plot_multiple_number[1])', r: 1 },
     { q: 'index(plot[0].plot_multiple_number[2])', r: -1 },
-    { q: 'index(plot_multiple_number)', r: 0, n: 'cluster/plot[0]/plot_multiple_number[0]' },
-    { q: 'index(plot_multiple_number)', r: 1, n: 'cluster/plot[0]/plot_multiple_number[1]' },
     // parent
     { q: 'parent(cluster)', r: null },
     { q: 'parent(remarks)', r: () => getNode('cluster') },
