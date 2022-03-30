@@ -1,6 +1,7 @@
 import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainManager from '../manager'
 
@@ -10,6 +11,9 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, lang: langParam =
   const lang = langParam || defaultLang
 
   const chain = await ChainManager.fetchChain({ surveyId, chainUuid })
+  if (!chain) {
+    throw new SystemError('chainNotFound', { chainUuid })
+  }
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const stratumAttributeDef = Survey.getNodeDefByUuid(Chain.getStratumNodeDefUuid(chain))(survey)

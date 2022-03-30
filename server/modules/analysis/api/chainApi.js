@@ -1,7 +1,6 @@
 import { ChainFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-import SystemError from '@core/systemError'
 import * as StringUtils from '@core/stringUtils'
 import * as Chain from '@common/analysis/chain'
 import * as ChainValidator from '@common/analysis/chainValidator'
@@ -100,9 +99,6 @@ export const init = (app) => {
         const { surveyId, chainUuid } = Request.getParams(req)
 
         const chainSummary = await AnalysisService.fetchChainSummary({ surveyId, chainUuid })
-        if (!chainSummary) {
-          throw new SystemError('chainNotFound')
-        }
         const chainName = StringUtils.normalizeName(chainSummary.label)
 
         Response.setContentTypeFile(res, `chain_${chainName}_summary.json`)
