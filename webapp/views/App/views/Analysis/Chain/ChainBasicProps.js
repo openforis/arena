@@ -12,6 +12,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -48,6 +49,8 @@ export const ChainBasicProps = (props) => {
           disabled={Chain.isSamplingDesign(chain) && Boolean(baseUnitNodeDef)}
         />
       </FormItem>
+
+      <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
     </>
   )
 }
