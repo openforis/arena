@@ -18,7 +18,7 @@ import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, onChange, onCategoryLoad } = props
+  const { disabled, categoryUuid, validation, showManage, showAdd, onChange, onCategoryLoad, filterFunction } = props
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -27,7 +27,10 @@ const CategorySelector = (props) => {
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
-  const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
+  const categoriesLookupFunction = async (value) => {
+    const categories = await API.fetchCategories({ surveyId, search: value })
+    return filterFunction ? categories.filter(filterFunction) : categories
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -119,6 +122,7 @@ CategorySelector.propTypes = {
   showAdd: PropTypes.bool,
   onChange: PropTypes.func,
   onCategoryLoad: PropTypes.func,
+  filterFunction: PropTypes.func,
 }
 
 CategorySelector.defaultProps = {
@@ -129,6 +133,7 @@ CategorySelector.defaultProps = {
   showAdd: true,
   onChange: () => ({}),
   onCategoryLoad: () => ({}),
+  filterFunction: null,
 }
 
 export default CategorySelector

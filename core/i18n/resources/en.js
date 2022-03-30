@@ -726,6 +726,8 @@ $t(common.cantUndoWarning)`,
     entities: {
       new: 'Virtual entity',
     },
+    reportingDataCategory: 'Reporting Data Category',
+    reportingDataAttribute: 'Reporting Data Attribute for {{level}}',
     samplingNodeDefs: 'Sampling NodeDefs',
   },
 
