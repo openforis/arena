@@ -21,9 +21,8 @@ const ButtonBar = () => {
     <div className="button-bar">
       <ButtonDownload
         className="chain-summary-download-btn"
-        href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
         label="chainView.downloadSummaryJSON"
-        onClick={() => {}}
+        href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
       />
       <ButtonDelete onClick={deleteChain} />
     </div>
