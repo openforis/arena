@@ -72,6 +72,10 @@ export const getAnalysisNodeDefs =
         return false
       }
 
+      if(!showInactiveResultVariables && !NodeDef.getActive(nodeDef)){
+          return false 
+      }
+
       return true
     })
 
