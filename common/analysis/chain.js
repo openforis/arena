@@ -26,6 +26,8 @@ export const keysProps = {
   areaWeightingMethod: 'areaWeightingMethod',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
   clusteringOnlyVariances: 'clusteringOnlyVariances',
+  reportingDataCategoryUuid: 'reportingDataCategoryUuid',
+  reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
 }
 
 export const statusExec = {
@@ -57,6 +59,10 @@ export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDe
 export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
 export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
+// ====== READ (reporting data)
+export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
+export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
+  R.pathOr(null, [keys.props, keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid])
 
 // ====== UPDATE
 export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
@@ -68,6 +74,18 @@ export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
   ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
+// ====== UPDATE (reporting data)
+const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([
+  keys.props,
+  keysProps.reportingDataAttributeDefsByLevelUuid,
+])
+export const assocReportingDataCategoryUuid = (reportingDataCategoryUuid) =>
+  R.pipe(
+    dissocReportingDataAttributeDefsByLevelUuid,
+    ObjectUtils.setProp(keysProps.reportingDataCategoryUuid, reportingDataCategoryUuid)
+  )
+export const assocReportingDataAttributeDefUuid = ({ categoryLevelUuid, nodeDefUuid }) =>
+  R.assocPath([keys.props, keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid], nodeDefUuid)
 
 // ====== CHECK
 
