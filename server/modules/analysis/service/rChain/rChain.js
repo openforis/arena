@@ -261,7 +261,7 @@ class RChain {
 
       await PromiseUtils.each(
         analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
-        async (nodeDef, index) => {
+        async (nodeDef) => {
           await this._initNodeDefFile({ nodeDef, path: _entityPath })
           const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
 
