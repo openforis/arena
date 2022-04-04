@@ -96,9 +96,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const chainSummary = await AnalysisService.fetchChainSummary({ surveyId, chainUuid })
+        const chainSummary = await AnalysisService.fetchChainSummary({ surveyId, chainUuid, cycle })
         const chainName = StringUtils.normalizeName(chainSummary.label)
 
         Response.setContentTypeFile(res, `chain_${chainName}_summary.json`)
