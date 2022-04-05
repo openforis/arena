@@ -14,6 +14,7 @@ import { Checkbox } from '@webapp/components/form'
 import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
+import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -59,6 +60,8 @@ export const ChainSamplingDesignProps = (props) => {
           )}
         </>
       )}
+
+      <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
     </>
   )
 }
