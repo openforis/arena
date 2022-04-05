@@ -190,6 +190,7 @@ class RChain {
       dir: this.dir,
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
+      cycle: this.cycle,
     })
 
     await Promise.all([
