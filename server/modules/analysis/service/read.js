@@ -5,8 +5,10 @@ import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainManager from '../manager'
 
-export const fetchChainSummary = async ({ surveyId, chainUuid, lang: langParam = null }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
+
+export const fetchChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
   const lang = langParam || defaultLang
 
@@ -26,19 +28,24 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, lang: langParam =
 
   return {
     label: Chain.getLabel(lang, defaultLang)(chain),
-    cycles: Chain.getCycles(chain),
+    selectedCycle: getCycleLabel(cycle),
+    cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.isSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     stratumAttribute: NodeDef.getName(stratumAttributeDef),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringVariances: Chain.isClusteringOnlyVariances(chain),
-    resultVariables: analysisNodeDefs.map((analysisNodeDef) => ({
-      name: NodeDef.getName(analysisNodeDef),
-      label: NodeDef.getLabel(analysisNodeDef, lang),
-      areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
-      type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
-      active: NodeDef.getActive(analysisNodeDef),
-    })),
+    resultVariables: analysisNodeDefs.map((analysisNodeDef) => {
+      const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
+      return {
+        name: NodeDef.getName(analysisNodeDef),
+        entity: NodeDef.getName(entity),
+        label: NodeDef.getLabel(analysisNodeDef, lang),
+        areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
+        type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
+        active: NodeDef.getActive(analysisNodeDef),
+      }
+    }),
   }
 }
