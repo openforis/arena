@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
+import { JavascriptExpressionParser } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
-import jsep from './helpers/jsep'
 import * as Evaluator from './helpers/evaluator'
 import * as ExpressionUtils from './helpers/utils'
 
@@ -41,7 +42,7 @@ export const fromString = (string, exprMode = modes.json) => {
           R.replace(/<==/g, '<=')
         )(string)
 
-  return jsep(exprString)
+  return new JavascriptExpressionParser().parse(exprString)
 }
 
 export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
