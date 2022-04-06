@@ -678,6 +678,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   chainView: {
+    downloadSummaryJSON: 'Download Summary (JSON)',
     formLabel: 'Processing chain label',
     basic: 'Basic',
     samplingDesign: 'Sampling Design',
@@ -725,6 +726,8 @@ $t(common.cantUndoWarning)`,
     entities: {
       new: 'Virtual entity',
     },
+    reportingDataCategory: 'Reporting Data Category',
+    reportingDataAttribute: 'Reporting Data Attribute for {{level}}',
     samplingNodeDefs: 'Sampling NodeDefs',
   },
 
