@@ -96,7 +96,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.78",
+    "@openforis/arena-core": "^0.0.79",
     "@openforis/arena-server": "^0.1.17",
     "@sendgrid/mail": "^7.6.0",
     "@shopify/draggable": "^1.0.0-beta.8",
@@ -116,7 +116,6 @@
     "d3": "^7.1.1",
     "d3-interpolate-path": "^2.2.1",
     "d3-tip": "^0.9.1",
-    "date-fns": "^2.27.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
