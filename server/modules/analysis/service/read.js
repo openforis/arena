@@ -101,6 +101,7 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, cycle, lang: lang
     stratumAttribute: NodeDef.getName(stratumAttributeDef),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
+    clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
     clusteringVariances: Chain.isClusteringOnlyVariances(chain),
     resultVariables: analysisNodeDefs.map((analysisNodeDef) => {
       const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
