@@ -2,6 +2,7 @@ import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -24,8 +25,8 @@ const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
   }
   const levels = Category.getLevelsArray(category)
 
+  // items summary
   const reportingCategoryItems = []
-
   await PromiseUtils.each(levels, async (_level, levelIndex) => {
     const items = await CategoryManager.fetchItemsByLevelIndex({
       surveyId: Survey.getId(survey),
@@ -52,8 +53,20 @@ const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
     }, {}),
   }))
 
+  // attributes summary
+  const attributePerLevelSummary = levels.reduce((acc, level, levelIndex) => {
+    const categoryLevelUuid = CategoryLevel.getUuid(level)
+    const attributeDefUuid = Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain)
+    if (!attributeDefUuid) {
+      return acc
+    }
+    const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+    return { ...acc, [`attributeLevel${levelIndex + 1}`]: NodeDef.getName(attributeDef) }
+  }, {})
+
   return {
     name: Category.getName(category),
+    attributes: attributePerLevelSummary,
     items: reportingCategoryTransformedItems,
   }
 }
