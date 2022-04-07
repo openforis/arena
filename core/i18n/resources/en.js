@@ -476,6 +476,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
     importIntoEntity: 'Import into entity',
+    importType: {
+      label: 'Import type',
+      insertNewRecords: 'Insert new records',
+      updateExistingRecords: 'Update existing records',
+    },
     selectCSVFileToImport: 'Select CSV file to import',
   },
 

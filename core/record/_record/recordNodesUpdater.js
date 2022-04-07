@@ -182,7 +182,9 @@ const _addEntityAndKeyValues =
 const _getOrCreateEntityByKeys =
   ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes }) =>
   (record) => {
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+    if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
+      return { entity: RecordReader.getRootNode(record), updateResult: null }
+    }
     const entity = RecordReader.findDescendantByKeyValues({
       survey,
       descendantDefUuid: entityDefUuid,
@@ -196,6 +198,7 @@ const _getOrCreateEntityByKeys =
       throw new Error('entity not found')
     }
     // insert entity node (with keys)
+    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const entityParentDef = Survey.getNodeDefAncestorMultipleEntity(entityDef)(survey)
     const entityParent = RecordReader.findDescendantByKeyValues({
       survey,
@@ -250,7 +253,6 @@ const updateAttributesWithValues =
     const updateResult = new RecordUpdateResult({ record })
 
     // 1. get or create context entity
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
       survey,
       entityDefUuid,
@@ -263,16 +265,22 @@ const updateAttributesWithValues =
     }
 
     // 2. update attribute values
+    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
     Object.entries(valuesByDefUuid).forEach(([attributeDefUuid, value]) => {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (
         NodeDef.isDescendantOf(entityDef)(attributeDef) &&
-        !NodeDef.isKey(attributeDef) &&
+        (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
+        const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
+          survey,
+          parentNode: entity,
+          nodeDefUuid: attributeDefUuid,
+        })(record)
         const attributeUpdateResult = _addOrUpdateAttribute({
           survey,
-          entity,
+          entity: attributeParentEntity,
           attributeDef,
           value,
         })(updateResult.record)

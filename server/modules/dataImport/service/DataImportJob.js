@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValues } from '@core/record/nodeValues'
+import * as Validation from '@core/validation/validation'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -27,33 +28,58 @@ export default class DataImportJob extends Job {
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
 
-    await this.fetchSurveyAndRecordsSummary()
+    await this.fetchSurvey()
+
+    this.validateParameters()
+
+    await this.fetchRecordsSummary()
 
     await this.startCsvReader()
   }
 
-  async fetchSurveyAndRecordsSummary() {
+  validateParameters() {
+    const { survey, entityDefUuid, insertNewRecords } = this.context
+
+    if (!entityDefUuid || !Survey.getNodeDefByUuid(entityDefUuid)(survey)) {
+      throw new Error('Entity to import data into not specified')
+    }
+
+    if (insertNewRecords) {
+      // when inserting new records, only root entity can be selected
+      const rootEntityDef = Survey.getNodeDefRoot(survey)
+      if (NodeDef.getUuid(rootEntityDef) !== entityDefUuid) {
+        throw new Error('New records can be inserted only selecting the root entity definition')
+      }
+    }
+  }
+
+  async fetchSurvey() {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
-    // fetch survey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
       tx
     )
+    this.setContext({ survey })
+  }
+
+  async fetchRecordsSummary() {
+    const { surveyId, tx } = this
+    const { cycle } = this.context
 
     // fetch all records summary once to make the record fetch faster
-    const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId({
-      surveyId,
-      cycle,
-      offset: 0,
-      limit: null,
-    })
+    const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId(
+      {
+        surveyId,
+        cycle,
+        offset: 0,
+        limit: null,
+      },
+      tx
+    )
 
-    this.setContext({
-      survey,
-      recordsSummary: recordsSummary.list,
-    })
+    this.setContext({ recordsSummary: recordsSummary.list })
   }
 
   async startCsvReader() {
@@ -71,8 +97,10 @@ export default class DataImportJob extends Job {
   }
 
   async getOrFetchRecord({ valuesByDefUuid }) {
-    const { recordsSummary, survey } = this.context
+    const { user } = this
+    const { cycle, insertNewRecords, recordsSummary, survey } = this.context
 
+    // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
@@ -86,39 +114,57 @@ export default class DataImportJob extends Job {
         })
       })
     )
-    if (recordSummary) {
-      const recordUuid = Record.getUuid(recordSummary)
+    const keyValues = rootKeyDefs
+      .map((rootKeyDef) => {
+        const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+        return JSON.stringify(keyValueInRow)
+      })
+      .join(',')
 
-      // avoid loading the same record multiple times
-      if (this.currentRecord?.uuid !== recordUuid) {
-        this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
-          { surveyId: this.surveyId, recordUuid, draft: false },
-          this.tx
-        )
-      }
-    } else {
-      const keyValuesText = rootKeyDefs
-        .map((rootKeyDef) => {
-          const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-          return JSON.stringify(keyValueInRow)
+    if (insertNewRecords) {
+      // check if record with the same key values already exists
+      if (recordSummary) {
+        this.addError({
+          error: Validation.newInstance(false, {}, [
+            { key: Validation.messageKeys.dataImport.recordAlreadyExisting, params: { keyValues } },
+          ]),
         })
-        .join(',')
-      throw new Error(`Record with keys ${keyValuesText} not found`)
+        return null
+      }
+      const recordToInsert = Record.newRecord(user, cycle)
+      const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
+      this.currentRecord = await RecordManager.initNewRecord({ user, survey, record }, this.tx)
+      return this.currentRecord
+    }
+
+    // insertNewRecords === false : updating existing record
+
+    if (!recordSummary) {
+      this.addError({
+        error: Validation.newInstance(false, {}, [
+          { key: Validation.messageKeys.dataImport.recordNotFound, params: { keyValues } },
+        ]),
+      })
+      return null
+    }
+
+    const recordUuid = Record.getUuid(recordSummary)
+
+    // avoid loading the same record multiple times
+    if (this.currentRecord?.uuid !== recordUuid) {
+      this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
+        { surveyId: this.surveyId, recordUuid, draft: false },
+        this.tx
+      )
     }
     return this.currentRecord
   }
 
   async onRowItem({ valuesByDefUuid }) {
-    const { survey, entityDefUuid, insertNewRecords } = this.context
+    const { survey, entityDefUuid } = this.context
 
     const record = await this.getOrFetchRecord({ valuesByDefUuid })
-
-    if (insertNewRecords) {
-      // handle inserting new records
-      if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) !== entityDefUuid) {
-        throw new Error('New records can be inserted only selecting the root entity definition')
-      }
-    } else {
+    if (record) {
       const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
         survey,
         entityDefUuid,
@@ -136,7 +182,6 @@ export default class DataImportJob extends Job {
       await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
       await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
     }
-
     this.incrementProcessedItems()
   }
 

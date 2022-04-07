@@ -16,7 +16,7 @@ export const insertAndInitRecord = async (user, survey, preview = false, client 
   client.tx(async (t) => {
     const record = newRecord(user, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, t)
-    return RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
+    return RecordManager.initNewRecord({ user, survey, record: recordDb }, t)
   })
 
 export const getNodePath = (node) => (survey, record) => {

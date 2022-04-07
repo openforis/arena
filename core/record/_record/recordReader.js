@@ -108,6 +108,42 @@ export const visitDescendantsAndSelf = (node, visitor) => (record) => {
 }
 
 /**
+ * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
+ * the single entities, if any, down to the correct parent node.
+ */
+export const getNodeParentInDescendantSingleEntities =
+  ({ survey, parentNode, nodeDefUuid }) =>
+  (record) => {
+    const nodeDefParent = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
+    const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
+    if (!NodeDef.isDescendantOf(nodeDefParent)(nodeDef)) {
+      throw new Error('target node is not a descendant of the specified parent entity')
+    }
+    const nodeDefHierarchy = NodeDef.getMetaHierarchy(nodeDef)
+    const nodeDefParentHierarchy = NodeDef.getMetaHierarchy(nodeDefParent)
+    const hierarchyToVisit =
+      nodeDefHierarchy.length > nodeDefParentHierarchy.length + 1
+        ? nodeDefHierarchy.slice(nodeDefParentHierarchy.length + 1)
+        : []
+
+    let currentParentNode = parentNode
+
+    hierarchyToVisit.forEach((descendantDefUuid) => {
+      const nodeDefDescendant = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
+      if (NodeDef.isSingleEntity(nodeDefDescendant)) {
+        currentParentNode = getNodeChildByDefUuid(currentParentNode, descendantDefUuid)(record)
+      } else {
+        throw new Error(
+          `the target node ${NodeDef.getName(nodeDef)} is inside a multiple entity: ${NodeDef.getName(
+            nodeDefDescendant
+          )}`
+        )
+      }
+    })
+    return currentParentNode
+  }
+
+/**
  * Returns true if a node and all its ancestors are applicable
  */
 export const isNodeApplicable = (node) => (record) => {
@@ -265,10 +301,15 @@ export const findChildByKeyValues =
 export const findDescendantByKeyValues =
   ({ survey, descendantDefUuid, keyValuesByDefUuid }) =>
   (record) => {
-    const entityDef = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
     // start from root node
-    let currentNode = getRootNode(record)
+    const rootNode = getRootNode(record)
+    if (NodeDef.getUuid(SurveyNodeDefs.getNodeDefRoot(survey)) === descendantDefUuid) {
+      // the descendant is the root entity
+      return rootNode
+    }
+    let currentNode = rootNode
     // visit descendant nodes up to descendant def (excluding root entity)
+    const entityDef = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
     const hierarchyToVisit = [...NodeDef.getMetaHierarchy(entityDef), descendantDefUuid]
     hierarchyToVisit.shift()
     hierarchyToVisit.some((nodeDefUuid) => {

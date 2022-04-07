@@ -25,6 +25,7 @@ export const createTestSurvey = ({ user }) =>
         SB.attribute('plot_id', NodeDef.nodeDefType.integer).key(),
         SB.attribute('plot_location', NodeDef.nodeDefType.coordinate),
         SB.attribute('plot_multiple_number', NodeDef.nodeDefType.integer).multiple(),
+        SB.entity('plot_details', SB.attribute('plot_remarks', NodeDef.nodeDefType.text)),
         SB.entity(
           'tree',
           SB.attribute('tree_id', NodeDef.nodeDefType.integer).key(),
@@ -145,6 +146,7 @@ export const createTestRecord = ({ user, survey }) => {
         }),
         RB.attribute('plot_multiple_number', 10),
         RB.attribute('plot_multiple_number', 20),
+        RB.entity('plot_details', RB.attribute('plot_remarks', 'This is plot 1')),
         RB.entity(
           'tree',
           RB.attribute('tree_id', 1),
@@ -172,6 +174,7 @@ export const createTestRecord = ({ user, survey }) => {
           [Node.valuePropsCoordinate.x]: 41.823012,
           [Node.valuePropsCoordinate.y]: 12.409056,
         }),
+        RB.entity('plot_details', RB.attribute('plot_remarks', 'This is plot 2')),
         RB.entity(
           'tree',
           RB.attribute('tree_id', 1),
@@ -198,6 +201,7 @@ export const createTestRecord = ({ user, survey }) => {
         'plot',
         RB.attribute('plot_id', 3),
         RB.attribute('plot_multiple_number', 30),
+        RB.entity('plot_details', RB.attribute('plot_remarks', 'This is plot 3')),
         RB.entity(
           'tree',
           RB.attribute('tree_id', 1),
