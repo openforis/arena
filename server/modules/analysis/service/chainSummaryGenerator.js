@@ -13,7 +13,12 @@ import * as ChainManager from '../manager'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
-const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
+const getExtraPropArea = (item) => {
+  const area = CategoryItem.getExtraProp(Category.reportingDataItemExtraDefKeys.area)(item)
+  return StringUtils.isBlank(area) ? '' : Number(area)
+}
+
+const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => {
   const surveyId = Survey.getId(survey)
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
     surveyId,
@@ -40,6 +45,7 @@ const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
   const reportingCategoryTransformedItems = reportingCategoryItems.map((item) => ({
     code: CategoryItem.getCode(item),
     label: CategoryItem.getLabel(lang)(item),
+
     // ancestor codes
     ...levels.reduce((acc, _level, levelIndex) => {
       // level code prop is 0 based when it's fetched from DB
@@ -51,6 +57,13 @@ const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
       // level code prop is 1 based in the summary
       return { ...acc, [`level${levelIndex + 1}Code`]: levelCode }
     }, {}),
+
+    // area (only for last level items)
+    ...(Category.isItemLeaf(item)(category)
+      ? {
+          area: getExtraPropArea(item),
+        }
+      : {}),
   }))
 
   // attributes summary
@@ -71,7 +84,7 @@ const fetchReportingDataCategorySummary = async ({ survey, chain, lang }) => {
   }
 }
 
-export const fetchChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
+const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
   const lang = langParam || defaultLang
@@ -90,7 +103,7 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, cycle, lang: lang
     showInactiveResultVariables: true,
   })(survey)
 
-  const reportingCategorySummary = await fetchReportingDataCategorySummary({ survey, chain, lang })
+  const reportingCategorySummary = await generateReportingDataCategorySummary({ survey, chain, lang })
 
   return {
     label: Chain.getLabel(lang, defaultLang)(chain),
@@ -120,4 +133,8 @@ export const fetchChainSummary = async ({ surveyId, chainUuid, cycle, lang: lang
         }
       : {}),
   }
+}
+
+export const ChainSummaryGenerator = {
+  generateChainSummary,
 }

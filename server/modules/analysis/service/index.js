@@ -1,6 +1,8 @@
 export { create } from './create'
-export { fetchChainSummary } from './read'
 export { update } from './update'
+import { ChainSummaryGenerator } from './chainSummaryGenerator'
+const { generateChainSummary } = ChainSummaryGenerator
+export { generateChainSummary }
 
 export {
   // ======  READ - Chain
