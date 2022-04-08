@@ -1,7 +1,7 @@
 export { create } from './create'
 export { update } from './update'
 import { ChainSummaryGenerator } from './chainSummaryGenerator'
-const { generateSummary: generateChainSummary } = ChainSummaryGenerator
+const { generateChainSummary } = ChainSummaryGenerator
 export { generateChainSummary }
 
 export {

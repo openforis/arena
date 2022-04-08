@@ -84,7 +84,7 @@ const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => 
   }
 }
 
-const generateSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
+const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
   const lang = langParam || defaultLang
@@ -136,5 +136,5 @@ const generateSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = n
 }
 
 export const ChainSummaryGenerator = {
-  generateSummary,
+  generateChainSummary,
 }
