@@ -25,10 +25,12 @@ export const ReportingDataAttributeDefs = (props) => {
       <FormItem label={i18n.t('chainView.reportingDataCategory')}>
         <CategorySelector
           categoryUuid={Chain.getReportingDataCategoryUuid(chain)}
+          emptySelection
           filterFunction={Category.isReportingData}
           onChange={(category) => {
-            updateChain(Chain.assocReportingDataCategoryUuid(Category.getUuid(category))(chain))
-            if (!category) setReportingDataCategory(null)
+            const categoryUuid = Category.getUuid(category)
+            updateChain(Chain.assocReportingDataCategoryUuid(categoryUuid)(chain))
+            if (!categoryUuid) setReportingDataCategory(null)
           }}
           onCategoryLoad={setReportingDataCategory}
           showAdd={false}
