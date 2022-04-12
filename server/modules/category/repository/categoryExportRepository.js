@@ -145,22 +145,48 @@ const generateCategoryExportQuery = ({ surveyId, category, headers, languages })
   ) AS sel`
 }
 
+const _getLevelCodeHeader = ({ level }) => `${CategoryLevel.getName(level)}_code`
+const _getLabelHeader = ({ language }) => `label_${language}`
+
 export const getCategoryExportHeaders = ({ category, languages }) => {
   const levels = Category.getLevelsArray(category)
   return levels
     .sort((la, lb) => la.index - lb.index)
-    .reduce((headers, level) => [...headers, `${CategoryLevel.getName(level)}_code`], [])
-    .concat([...(languages || []).map((language) => `label_${language}`)])
+    .reduce((headers, level) => [...headers, _getLevelCodeHeader({ level })], [])
+    .concat([...(languages || []).map((language) => _getLabelHeader({ language }))])
     .concat(Category.getItemExtraDefKeys(category))
 }
 
-export const writeCategoryExportTemplateToStream = async ({ outputStream }) => {
-  await CSVWriter.writeToStream(outputStream, [
-    { level_1_code: 1, level_2_code: '', label_en: 'label_1' },
-    { level_1_code: 1, level_2_code: 1, label_en: 'label_1_1' },
-    { level_1_code: 1, level_2_code: 2, label_en: 'label_1_2' },
-    { level_1_code: 2, level_2_code: '', label_en: 'label_2' },
-  ])
+export const writeCategoryExportTemplateToStream = async ({ outputStream, levels, languages }) => {
+  const items = [
+    { levelCodes: [1] },
+    { levelCodes: [1, 1] },
+    { levelCodes: [1, 2] },
+    { levelCodes: [2] },
+    { levelCodes: [2, 1] },
+    { levelCodes: [2, 2] },
+  ]
+  const templateData = items.map((item) => ({
+    // levelCodes
+    ...levels.reduce(
+      (acc, level, levelIndex) => ({
+        ...acc,
+        [_getLevelCodeHeader({ level })]: item.levelCodes[levelIndex] || '',
+      }),
+      {}
+    ),
+    // labels
+    ...languages.reduce(
+      (acc, language) => ({
+        ...acc,
+        [_getLabelHeader({ language })]: `Item ${item.levelCodes.join('-')} label (${language})`,
+      }),
+      {}
+    ),
+    // extra: TODO
+  }))
+
+  await CSVWriter.writeToStream(outputStream, templateData)
 }
 
 export const generateCategoryExportStreamAndHeaders = ({ surveyId, category, languages }) => {
