@@ -18,7 +18,17 @@ import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
 const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, onChange, onCategoryLoad, filterFunction } = props
+  const {
+    disabled,
+    categoryUuid,
+    validation,
+    showManage,
+    showAdd,
+    onChange,
+    onCategoryLoad,
+    filterFunction,
+    emptySelection,
+  } = props
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -27,9 +37,12 @@ const CategorySelector = (props) => {
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
+  const emptyItem = { uuid: null, label: i18n.t('common.notSpecified') }
+
   const categoriesLookupFunction = async (value) => {
     const categories = await API.fetchCategories({ surveyId, search: value })
-    return filterFunction ? categories.filter(filterFunction) : categories
+    const filteredCategories = filterFunction ? categories.filter(filterFunction) : categories
+    return emptySelection ? [emptyItem, ...filteredCategories] : filteredCategories
   }
 
   useEffect(() => {
@@ -67,7 +80,7 @@ const CategorySelector = (props) => {
         disabled={disabled}
         items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
-        itemLabel={Category.getName}
+        itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
         selection={category}
         onChange={onChange}
@@ -123,6 +136,7 @@ CategorySelector.propTypes = {
   onChange: PropTypes.func,
   onCategoryLoad: PropTypes.func,
   filterFunction: PropTypes.func,
+  emptySelection: PropTypes.bool,
 }
 
 CategorySelector.defaultProps = {
@@ -134,6 +148,7 @@ CategorySelector.defaultProps = {
   onChange: () => ({}),
   onCategoryLoad: () => ({}),
   filterFunction: null,
+  emptySelection: false,
 }
 
 export default CategorySelector
