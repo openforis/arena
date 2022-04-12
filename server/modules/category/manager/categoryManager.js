@@ -154,7 +154,6 @@ export const {
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
-  getCategoryStreamAndHeaders,
   fetchItemsByParentUuid,
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
@@ -166,26 +165,18 @@ export const {
 export const exportCategoryToStream = async ({ surveyId, categoryUuid, draft, outputStream }, client = db) => {
   const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
 
-  const levels = Category.getLevelsArray(category)
-
   // get survey languages
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft })
   const languages = Survey.getLanguages(surveyInfo)
 
-  const {
-    stream: categoryStream,
-    headers = [],
-    extraPropsHeaders = [],
-  } = getCategoryStreamAndHeaders({
+  const { stream: categoryStream, headers } = CategoryRepository.generateCategoryExportStreamAndHeaders({
     surveyId,
-    categoryUuid,
-    levels,
-    languages,
     category,
+    languages,
   })
 
   return client.stream(categoryStream, (dbStream) => {
-    dbStream.pipe(CSVWriter.transformToStream(outputStream, [...headers, ...extraPropsHeaders]))
+    dbStream.pipe(CSVWriter.transformToStream(outputStream, headers))
   })
 }
 

@@ -26,24 +26,15 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 }
 
 export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
-  const numberOfItemsInCategory = await CategoryManager.countItemsByCategoryUuid(surveyId, categoryUuid)
-  const categoryIsEmpty = numberOfItemsInCategory <= 0
-
-  let fileName
-  if (categoryIsEmpty) {
-    fileName = 'template_category_hierarchical.csv'
-  } else {
-    const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-    fileName = `${Category.getName(category) || 'category'}.csv`
-  }
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+  const fileName = `${Category.getName(category) || 'category'}.csv`
   Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
-  if (categoryIsEmpty) {
-    // template
-    await CategoryManager.writeCategoryExportTemplateToStream({ outputStream: res })
-  } else {
-    await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid, draft, outputStream: res })
-  }
+  await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid, draft, outputStream: res })
+}
+
+export const exportCategoryImportTemplate = async ({ res }) => {
+  await CategoryManager.writeCategoryExportTemplateToStream({ outputStream: res })
 }
 
 export const exportAllCategories = ({ user, surveyId, draft }) => {

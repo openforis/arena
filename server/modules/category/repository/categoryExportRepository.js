@@ -2,6 +2,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Category from '@core/survey/category'
 import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as DbUtils from '@server/db/dbUtils'
 
 const getEmpty = ({ header }) => `'' AS ${header}`
 
@@ -68,7 +69,7 @@ const getSelectFields = ({ levelIndex, levels, headers, extraProps, languages })
     }, [])
     .concat([
       ...getFieldsLabels({ levels, languages, headers, levelIndex }),
-      ...(extraProps ? getExtraProps({ languages, headers, extraProps, levels, levelIndex }) : []),
+      ...(extraProps ? getExtraProps({ extraProps, levels, levelIndex }) : []),
     ])
     .join(', ')
 
@@ -117,12 +118,15 @@ const getSubqueryByLevel = ({ surveyId, languages, levels, headers, extraProps, 
  *
  * @returns {string} The query to be used to export the category.
  */
-export const generateCategoryExportQuery = ({ surveyId, levels, headers, extraPropsHeaders = [], languages }) => {
+const generateCategoryExportQuery = ({ surveyId, category, headers, languages }) => {
+  const levels = Category.getLevelsArray(category)
+  const extraProps = Category.getItemExtraDefKeys(category)
+
   // code_column + # of languages
   const numColumnsPerLevel = 1 + languages.length
 
   // iterate over the levels to build the query
-  return `SELECT ${[...headers, ...extraPropsHeaders]} FROM (
+  return `SELECT ${headers} FROM (
     ${levels
       .map((_, levelIndex) =>
         getSubqueryByLevel({
@@ -130,7 +134,7 @@ export const generateCategoryExportQuery = ({ surveyId, levels, headers, extraPr
           languages,
           levels,
           headers,
-          extraProps: extraPropsHeaders,
+          extraProps,
           numColumnsPerLevel,
           levelIndex,
         })
@@ -141,13 +145,14 @@ export const generateCategoryExportQuery = ({ surveyId, levels, headers, extraPr
   ) AS sel`
 }
 
-export const getCategoryExportHeaders = ({ levels, languages }) =>
-  levels
+export const getCategoryExportHeaders = ({ category, languages }) => {
+  const levels = Category.getLevelsArray(category)
+  return levels
     .sort((la, lb) => la.index - lb.index)
     .reduce((headers, level) => [...headers, `${CategoryLevel.getName(level)}_code`], [])
     .concat([...(languages || []).map((language) => `label_${language}`)])
-
-export const getCategoryExportHeadersExtraProps = ({ category }) => Category.getItemExtraDefKeys(category)
+    .concat(Category.getItemExtraDefKeys(category))
+}
 
 export const writeCategoryExportTemplateToStream = async ({ outputStream }) => {
   await CSVWriter.writeToStream(outputStream, [
@@ -156,4 +161,12 @@ export const writeCategoryExportTemplateToStream = async ({ outputStream }) => {
     { level_1_code: 1, level_2_code: 2, label_en: 'label_1_2' },
     { level_1_code: 2, level_2_code: '', label_en: 'label_2' },
   ])
+}
+
+export const generateCategoryExportStreamAndHeaders = ({ surveyId, category, languages }) => {
+  const headers = getCategoryExportHeaders({ category, languages })
+  const query = generateCategoryExportQuery({ surveyId, category, headers, languages })
+  const categoryUuid = Category.getUuid(category)
+  const queryFormatted = DbUtils.formatQuery(query, [categoryUuid])
+  return { stream: new DbUtils.QueryStream(queryFormatted), headers }
 }

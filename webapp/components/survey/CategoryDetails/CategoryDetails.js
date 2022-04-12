@@ -79,6 +79,11 @@ const CategoryDetails = (props) => {
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
             label={'common.csvExport'}
           />
+          <ButtonDownload
+            testId={TestId.categoryDetails.templateForDataImportBtn}
+            href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+            label={'categoryEdit.templateForDataImport'}
+          />
           {Category.isReportingData(category) && (
             <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
               <Checkbox checked disabled={readOnly} onChange={Actions.convertToSimpleCategory} />
