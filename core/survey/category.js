@@ -92,7 +92,7 @@ export const assocLevel =
 // ITEMS
 // ========
 
-const getItemLevelIndex = (item) => (category) =>
+export const getItemLevelIndex = (item) => (category) =>
   R.pipe(CategoryItem.getLevelUuid, (levelUuid) => getLevelByUuid(levelUuid)(category), CategoryLevel.getIndex)(item)
 
 export const isItemLeaf = (item) => (category) =>
