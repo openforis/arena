@@ -13,24 +13,28 @@ import * as ChainManager from '../manager'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
+const generateReportingDataCategoryAttributesSummary = ({ survey, category, chain }) => {
+  const levels = Category.getLevelsArray(category)
+
+  return levels.reduce((acc, level, levelIndex) => {
+    const categoryLevelUuid = CategoryLevel.getUuid(level)
+    const attributeDefUuid = Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain)
+    if (!attributeDefUuid) {
+      return acc
+    }
+    const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+    return { ...acc, [`attributeLevel${levelIndex + 1}`]: NodeDef.getName(attributeDef) }
+  }, {})
+}
+
 const getExtraPropArea = (item) => {
   const area = CategoryItem.getExtraProp(Category.reportingDataItemExtraDefKeys.area)(item)
   return StringUtils.isBlank(area) ? '' : Number(area)
 }
 
-const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => {
-  const surveyId = Survey.getId(survey)
-  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
-    surveyId,
-    categoryUuid: Chain.getReportingDataCategoryUuid(chain),
-    draft: true,
-  })
-  if (!category) {
-    return null
-  }
+const generateReportingDataCategoryItemsSummary = async ({ survey, category, lang }) => {
   const levels = Category.getLevelsArray(category)
 
-  // items summary
   const reportingCategoryItems = []
   await PromiseUtils.each(levels, async (_level, levelIndex) => {
     const items = await CategoryManager.fetchItemsByLevelIndex({
@@ -42,14 +46,13 @@ const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => 
     reportingCategoryItems.push(...items)
   })
 
-  const reportingCategoryTransformedItems = reportingCategoryItems.map((item) => ({
-    code: CategoryItem.getCode(item),
-    label: CategoryItem.getLabel(lang)(item),
-
-    // ancestor codes
-    ...levels.reduce((acc, _level, levelIndex) => {
-      // level code prop is 0 based when it's fetched from DB
-      const levelCode = item[`level${levelIndex}Code`]
+  return reportingCategoryItems.map((item) => ({
+    // level codes
+    ...levels.reduce((acc, level, levelIndex) => {
+      const levelCode =
+        CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(level)
+          ? CategoryItem.getCode(item) // item is in current level
+          : item[`level${levelIndex}Code`] // level code prop is 0 based when it's fetched from DB
 
       if (StringUtils.isBlank(levelCode)) {
         return acc
@@ -58,6 +61,9 @@ const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => 
       return { ...acc, [`level${levelIndex + 1}Code`]: levelCode }
     }, {}),
 
+    // label
+    label: CategoryItem.getLabel(lang)(item),
+
     // area (only for last level items)
     ...(Category.isItemLeaf(item)(category)
       ? {
@@ -65,22 +71,25 @@ const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => 
         }
       : {}),
   }))
+}
 
-  // attributes summary
-  const attributePerLevelSummary = levels.reduce((acc, level, levelIndex) => {
-    const categoryLevelUuid = CategoryLevel.getUuid(level)
-    const attributeDefUuid = Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain)
-    if (!attributeDefUuid) {
-      return acc
-    }
-    const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
-    return { ...acc, [`attributeLevel${levelIndex + 1}`]: NodeDef.getName(attributeDef) }
-  }, {})
+const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => {
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
+    surveyId: Survey.getId(survey),
+    categoryUuid: Chain.getReportingDataCategoryUuid(chain),
+    draft: true,
+  })
+  if (!category) {
+    return null
+  }
+  const attributes = generateReportingDataCategoryAttributesSummary({ survey, category, chain })
+
+  const items = await generateReportingDataCategoryItemsSummary({ survey, category, lang })
 
   return {
     name: Category.getName(category),
-    attributes: attributePerLevelSummary,
-    items: reportingCategoryTransformedItems,
+    attributes,
+    items,
   }
 }
 
