@@ -79,17 +79,28 @@ const CategoryDetails = (props) => {
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
             label="common.csvExport"
           />
-          <ButtonDownload
-            testId={TestId.categoryDetails.templateForDataImportBtn}
-            href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+          <ButtonMenu
             label="categoryEdit.templateForDataImport"
+            iconClassName="icon-download2 icon-14px"
+            popupComponent={
+              <>
+                <ButtonDownload
+                  className="btn-transparent"
+                  testId={TestId.categoryDetails.templateForDataImportBtn}
+                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                  label="categoryEdit.templateForDataImport"
+                />
+                <ButtonDownload
+                  className="btn-transparent"
+                  testId={TestId.categoryDetails.templateForDataImportGenericBtn}
+                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                  requestParams={{ generic: true }}
+                  label="categoryEdit.templateForDataImportGeneric"
+                />
+              </>
+            }
           />
-          <ButtonDownload
-            testId={TestId.categoryDetails.templateForDataImportGenericBtn}
-            href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-            requestParams={{ generic: true }}
-            label="categoryEdit.templateForDataImportGeneric"
-          />
+
           {Category.isReportingData(category) && (
             <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
               <Checkbox checked disabled={readOnly} onChange={Actions.convertToSimpleCategory} />
@@ -99,16 +110,18 @@ const CategoryDetails = (props) => {
             <ButtonMenu
               iconClassName="icon-cog icon-14px"
               popupComponent={
-                <div>
+                <>
                   <Button
+                    className="btn-transparent"
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
                     onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
                   />
                   <Button
+                    className="btn-transparent"
                     label="categoryEdit.extraPropertiesEditor.title"
                     onClick={Actions.toggleEditExtraPropertiesPanel}
                   />
-                </div>
+                </>
               }
             />
           )}

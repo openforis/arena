@@ -10,7 +10,7 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: grid;
-  grid-template-columns: 1fr repeat(5, 10rem);
+  grid-template-columns: 1fr repeat(4, 12rem);
   column-gap: 1rem;
 
   .form-item.check {
