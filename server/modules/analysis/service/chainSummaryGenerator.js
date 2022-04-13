@@ -64,6 +64,9 @@ const generateReportingDataCategoryItemsSummary = async ({ survey, category, lan
     // label
     label: CategoryItem.getLabel(lang)(item),
 
+    // level index (1 based)
+    levelIndex: Category.getItemLevelIndex(item)(category) + 1,
+
     // area (only for last level items)
     ...(Category.isItemLeaf(item)(category)
       ? {
