@@ -30,28 +30,28 @@ const generateDescendantItems = ({ levels, levelIndex = 0, previousLevelCodes = 
 
 const generateItems = ({ levels, numItemsPerLevel = 2 }) => generateDescendantItems({ levels, numItemsPerLevel })
 
+const generateCategoryTemplate = () => {
+  let category = Category.newCategory({ [Category.keysProps.name]: 'template' })
+  // levels (1st level already created when creating the category)
+  category = Category.assocLevel({ level: Category.newLevel(category) })(category)
+  category = Category.assocLevel({ level: Category.newLevel(category) })(category)
+  // extra props
+  category = Category.assocItemExtraDef({
+    ['extra_prop_text']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
+    ['extra_prop_number']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.number }),
+    ['extra_prop_geometry']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.geometryPoint }),
+  })(category)
+  return category
+}
+
 const generateTemplate = ({ category: categoryProp = null, languages }) => {
-  let category = null
-  if (categoryProp === null) {
-    category = Category.newCategory({ [Category.keysProps.name]: 'template' })
-    // levels (1st level already created when creating the category)
-    category = Category.assocLevel({ level: Category.newLevel(category) })(category)
-    category = Category.assocLevel({ level: Category.newLevel(category) })(category)
-    // extra props
-    category = Category.assocItemExtraDef({
-      ['extra_prop_text']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
-      ['extra_prop_number']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.number }),
-      ['extra_prop_geometry']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.geometryPoint }),
-    })(category)
-  } else {
-    category = categoryProp
-  }
+  const category = categoryProp === null ? generateCategoryTemplate() : categoryProp
   const levels = Category.getLevelsArray(category)
   const extraDefs = Category.getItemExtraDefsArray(category)
 
   const items = generateItems({ levels })
 
-  const templateData = items.map((item) => ({
+  return items.map((item) => ({
     // levelCodes
     ...levels.reduce(
       (acc, level, levelIndex) => ({
@@ -77,8 +77,6 @@ const generateTemplate = ({ category: categoryProp = null, languages }) => {
       {}
     ),
   }))
-
-  return templateData
 }
 
 const templateExtraValueByType = {
