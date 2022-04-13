@@ -337,7 +337,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const { generateCategoryExportStreamAndHeaders, writeCategoryExportTemplateToStream } = CategoryExportRepository
+export const { generateCategoryExportStreamAndHeaders } = CategoryExportRepository
 
 // ============== UPDATE
 

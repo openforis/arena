@@ -2,11 +2,11 @@ import { Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
@@ -14,6 +14,7 @@ import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
 import * as CategoryManager from '../manager/categoryManager'
+import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -36,18 +37,28 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid, draft, outputStream: res })
 }
 
-export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res }) => {
-  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-  const levels = Category.getLevelsArray(category)
-  if (levels.length === 0) {
-    levels.push(
-      Category.newLevel(category, { [CategoryLevel.keysProps.name]: 'level_1' }),
-      Category.newLevel(category, { [CategoryLevel.keysProps.name]: 'level_2' })
-    )
-  }
+export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
-  await CategoryManager.writeCategoryExportTemplateToStream({ outputStream: res, levels, languages })
+
+  const templateData = CategoryImportTemplateGenerator.generateTemplate({ languages })
+  const fileName = 'category_import_template.csv'
+  Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+  await CSVWriter.writeToStream(res, templateData)
+}
+
+export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res }) => {
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
+
+  const templateData = CategoryImportTemplateGenerator.generateTemplate({ category, languages })
+  const fileName = `${Category.getName(category) || 'category'}_import_template.csv`
+
+  Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+
+  await CSVWriter.writeToStream(res, templateData)
 }
 
 export const exportAllCategories = ({ user, surveyId, draft }) => {

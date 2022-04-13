@@ -24,6 +24,7 @@ export const TestId = {
     itemLabel: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-label`),
     exportBtn: 'category-export-btn',
     templateForDataImportBtn: 'category-template-data-import-btn',
+    templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
   },
   categorySelector: {
     category: 'category-selector-category',

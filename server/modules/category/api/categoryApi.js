@@ -227,9 +227,13 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft = true, generic = false } = Request.getParams(req)
 
-        await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, outputStream: res })
+        if (generic) {
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res })
+        } else {
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res })
+        }
       } catch (error) {
         next(error)
       }

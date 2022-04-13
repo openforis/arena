@@ -1,8 +1,8 @@
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Category from '@core/survey/category'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import { CategoryExportFile } from '@core/survey/categoryExportFile'
+
 import * as DbUtils from '@server/db/dbUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 const getEmpty = ({ header }) => `'' AS ${header}`
 
@@ -145,48 +145,13 @@ const generateCategoryExportQuery = ({ surveyId, category, headers, languages })
   ) AS sel`
 }
 
-const _getLevelCodeHeader = ({ level }) => `${CategoryLevel.getName(level)}_code`
-const _getLabelHeader = ({ language }) => `label_${language}`
-
 export const getCategoryExportHeaders = ({ category, languages }) => {
   const levels = Category.getLevelsArray(category)
   return levels
     .sort((la, lb) => la.index - lb.index)
-    .reduce((headers, level) => [...headers, _getLevelCodeHeader({ level })], [])
-    .concat([...(languages || []).map((language) => _getLabelHeader({ language }))])
+    .reduce((headers, level) => [...headers, CategoryExportFile.getLevelCodeHeader({ level })], [])
+    .concat([...(languages || []).map((language) => CategoryExportFile.getLabelHeader({ language }))])
     .concat(Category.getItemExtraDefKeys(category))
-}
-
-export const writeCategoryExportTemplateToStream = async ({ outputStream, levels, languages }) => {
-  const items = [
-    { levelCodes: [1] },
-    { levelCodes: [1, 1] },
-    { levelCodes: [1, 2] },
-    { levelCodes: [2] },
-    { levelCodes: [2, 1] },
-    { levelCodes: [2, 2] },
-  ]
-  const templateData = items.map((item) => ({
-    // levelCodes
-    ...levels.reduce(
-      (acc, level, levelIndex) => ({
-        ...acc,
-        [_getLevelCodeHeader({ level })]: item.levelCodes[levelIndex] || '',
-      }),
-      {}
-    ),
-    // labels
-    ...languages.reduce(
-      (acc, language) => ({
-        ...acc,
-        [_getLabelHeader({ language })]: `Item ${item.levelCodes.join('-')} label (${language})`,
-      }),
-      {}
-    ),
-    // extra: TODO
-  }))
-
-  await CSVWriter.writeToStream(outputStream, templateData)
 }
 
 export const generateCategoryExportStreamAndHeaders = ({ surveyId, category, languages }) => {

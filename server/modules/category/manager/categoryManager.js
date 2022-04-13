@@ -158,7 +158,6 @@ export const {
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
-  writeCategoryExportTemplateToStream,
   insertItems: insertItemsInBatch,
 } = CategoryRepository
 

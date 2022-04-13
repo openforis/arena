@@ -1040,6 +1040,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     reportingData: 'Reporting data',
     templateForDataImport: 'Template for data import',
+    templateForDataImportGeneric: 'Template for data import (generic)',
   },
 
   // ===== All validation errors

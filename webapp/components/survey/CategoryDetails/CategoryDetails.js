@@ -77,12 +77,18 @@ const CategoryDetails = (props) => {
           <ButtonDownload
             testId={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label={'common.csvExport'}
+            label="common.csvExport"
           />
           <ButtonDownload
             testId={TestId.categoryDetails.templateForDataImportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-            label={'categoryEdit.templateForDataImport'}
+            label="categoryEdit.templateForDataImport"
+          />
+          <ButtonDownload
+            testId={TestId.categoryDetails.templateForDataImportGenericBtn}
+            href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+            requestParams={{ generic: true }}
+            label="categoryEdit.templateForDataImportGeneric"
           />
           {Category.isReportingData(category) && (
             <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
