@@ -43,7 +43,9 @@ const AdvancedExpressionEditorPopup = function (props) {
         }))
     : variables
 
-  const variablesIds = variablesVisible.map(A.prop('options')).flat().map(A.prop('value'))
+  const variablesIds = variablesVisible
+    .map((variable) => (variable.options ? variable.options : [variable]))
+    .flatMap(A.prop('value'))
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {

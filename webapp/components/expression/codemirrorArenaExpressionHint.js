@@ -46,7 +46,16 @@ const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, ma
 const getVariableCompletion = ({ group = null, variable, token }) => {
   const { label, value } = variable
 
-  const text = `${group ? `${group.label} / ` : ''}${label && label !== value ? `${label} (${value})` : value}`
+  const textParts = []
+  if (group) {
+    textParts.push(`${group.label}`)
+  }
+  if (label && label !== value) {
+    textParts.push(`${label} (${value})`)
+  } else {
+    textParts.push(value)
+  }
+  const text = textParts.join(' / ')
   const data = { text, value }
 
   return {
