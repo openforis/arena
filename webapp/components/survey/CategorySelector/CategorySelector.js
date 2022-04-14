@@ -61,11 +61,11 @@ const CategorySelector = function (props) {
   }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
 
   const checkEditCategoryNameSpecified = useCallback(async () => {
-    // const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
-    // if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
-    //   notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
-    //   return false
-    // }
+    const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
+    if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
+      notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
+      return false
+    }
     return true
   }, [surveyId, categoryToEdit, notifyWarning])
 
@@ -77,16 +77,18 @@ const CategorySelector = function (props) {
         // previously selected category has been deleted, deselect it from dropdown
         onChange(null)
       }
-      // close edit panel
-      setCategoryToEdit(null)
-      return
-    }
-    if (await checkEditCategoryNameSpecified()) {
-      // update category dropdown with latest changes
+    } else {
       onChange(categoryToEdit)
-      // close edit panel
-      setCategoryToEdit(null)
     }
+    // close edit panel
+    setCategoryToEdit(null)
+
+    // if (await checkEditCategoryNameSpecified()) {
+    //   // update category dropdown with latest changes
+    //   onChange(categoryToEdit)
+    //   // close edit panel
+    //   setCategoryToEdit(null)
+    // }
   }, [categoryUuid, categoryToEdit, onChange, surveyId, setCategoryToEdit, checkEditCategoryNameSpecified])
 
   return (
