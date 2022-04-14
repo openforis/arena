@@ -26,12 +26,13 @@ export const persistNodeDefChanges = (nodeDef) =>
   test(`${nodeDef.label} persist changes`, async () => {
     await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefEditContainer))
 
-    // Save and back
+    // Save
     await Promise.all([
-      page.waitForNavigation(),
       page.waitForResponse('**/api/survey/**'),
-      page.click(getSelector(TestId.nodeDefDetails.saveAndBackBtn, 'button')),
+      page.click(getSelector(TestId.nodeDefDetails.saveBtn, 'button')),
     ])
+    // Back
+    await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button'))])
 
     await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
 
