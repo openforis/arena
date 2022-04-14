@@ -109,7 +109,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
 }
 
 const getVariablesGroupedByParentUuid = ({ variables, survey, nodeDefCurrent }) => {
-  const variablesGroupedByParentUuid = (variables || []).reduce(
+  const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
       [variable.parentUuid]: [...(byParentUuid[variable.parentUuid] || []), variable],
