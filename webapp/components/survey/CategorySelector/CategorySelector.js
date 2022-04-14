@@ -19,7 +19,7 @@ import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
-const CategorySelector = (props) => {
+const CategorySelector = function (props) {
   const {
     disabled,
     categoryUuid,
@@ -60,14 +60,14 @@ const CategorySelector = (props) => {
     })()
   }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
 
-  const checkEditCategoryNameSpecified = async () => {
+  const checkEditCategoryNameSpecified = useCallback(async () => {
     const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
     if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
       notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
       return false
     }
     return true
-  }
+  }, [surveyId, categoryToEdit, notifyWarning])
 
   const onCategoryEditPanelClose = useCallback(async () => {
     const categoryEditedUuid = categoryToEdit.uuid
