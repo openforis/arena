@@ -24,11 +24,15 @@ const editFnTypes = {
 
 export const persistNodeDefChanges = (nodeDef) =>
   test(`${nodeDef.label} persist changes`, async () => {
+    await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefEditContainer))
+
     // Save and back
     await Promise.all([
       page.waitForNavigation(),
+      page.waitForResponse('**/api/survey/**'),
       page.click(getSelector(TestId.nodeDefDetails.saveAndBackBtn, 'button')),
     ])
+
     await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
 
     await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
