@@ -16,7 +16,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
-const AdvancedExpressionEditorPopup = (props) => {
+const AdvancedExpressionEditorPopup = function (props) {
   const {
     query,
     mode,
@@ -35,13 +35,17 @@ const AdvancedExpressionEditorPopup = (props) => {
   const [errorMessage, setErrorMessage] = useState(null)
 
   const variablesVisible = excludeCurrentNodeDef
-    ? variables.map((group) => ({
-        ...group,
-        options: group.options.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
-      }))
+    ? variables
+        .filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent))
+        .map((group) => ({
+          ...group,
+          options: group.options?.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
+        }))
     : variables
 
-  const variablesIds = variablesVisible.map(A.prop('options')).flat().map(A.prop('value'))
+  const variablesIds = variablesVisible
+    .map((variable) => (variable.options ? variable.options : [variable]))
+    .flatMap(A.prop('value'))
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
