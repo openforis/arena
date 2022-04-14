@@ -108,8 +108,8 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
   return variables
 }
 
-const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
-  const variablesGroupedByParentUuid = (variables || []).reduce(
+const getVariablesGroupedByParentUuid = ({ variables, survey, nodeDefCurrent }) => {
+  const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
       [variable.parentUuid]: [...(byParentUuid[variable.parentUuid] || []), variable],
@@ -117,7 +117,7 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
     {}
   )
 
-  return Object.entries(variablesGroupedByParentUuid)
+  const groups = Object.entries(variablesGroupedByParentUuid)
     .map(([parentUuid, variablesParent]) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
       return {
@@ -127,6 +127,10 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
       }
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
+
+  // always show current variable at the beginning
+  const currentVariable = variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  return [currentVariable, ...groups]
 }
 
 const _sortVariables = ({ nodeDefCurrent, variables }) => {
@@ -159,7 +163,7 @@ export const getVariables = ({
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
 }
 
 export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, groupByParent }) => {
@@ -175,5 +179,5 @@ export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, m
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
 }
