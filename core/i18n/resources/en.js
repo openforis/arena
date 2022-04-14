@@ -1072,6 +1072,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       itemsEmpty: 'Define at least one item',
       levelDuplicate: 'Level name is duplicate',
       levelsInvalid: 'At least one invalid level',
+      nameNotSpecified: 'Category name not specified',
     },
 
     categoryImport: {

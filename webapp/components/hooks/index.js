@@ -28,4 +28,9 @@ export { useShouldShowFirstTimeHelp } from './useShouldShowFirstTimeHelp'
 export { useSRSs } from './useSRSs'
 export { useQuery } from './useQuery'
 export { useWebSocket } from './useWebSocket'
+// confirm dialog
 export { useConfirm } from './useConfirm'
+// notification dialogs
+export { useNotifyError } from './useNotifyError'
+export { useNotifyInfo } from './useNotifyInfo'
+export { useNotifyWarning } from './useNotifyWarning'

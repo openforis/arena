@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
@@ -11,6 +12,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 import { TestId } from '@webapp/utils/testId'
 
+import { useNotifyWarning } from '@webapp/components/hooks'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
@@ -32,6 +34,7 @@ const CategorySelector = (props) => {
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const notifyWarning = useNotifyWarning()
 
   const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
@@ -55,7 +58,16 @@ const CategorySelector = (props) => {
         setCategory(null)
       }
     })()
-  }, [categoryUuid, showCategoriesPanel])
+  }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
+
+  const checkEditCategoryNameSpecified = async () => {
+    const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
+    if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
+      notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
+      return false
+    }
+    return true
+  }
 
   const onCategoryEditPanelClose = useCallback(async () => {
     const categoryEditedUuid = categoryToEdit.uuid
@@ -65,13 +77,17 @@ const CategorySelector = (props) => {
         // previously selected category has been deleted, deselect it from dropdown
         onChange(null)
       }
-    } else {
+      // close edit panel
+      setCategoryToEdit(null)
+      return
+    }
+    if (await checkEditCategoryNameSpecified()) {
       // update category dropdown with latest changes
       onChange(categoryToEdit)
+      // close edit panel
+      setCategoryToEdit(null)
     }
-    // close edit panel
-    setCategoryToEdit(null)
-  }, [categoryToEdit])
+  }, [categoryUuid, categoryToEdit, onChange, surveyId, setCategoryToEdit, checkEditCategoryNameSpecified])
 
   return (
     <div className="category-selector">
