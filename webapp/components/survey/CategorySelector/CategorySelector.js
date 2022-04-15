@@ -19,7 +19,7 @@ import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
-const CategorySelector = (props) => {
+export const CategorySelector = (props) => {
   const {
     disabled,
     categoryUuid,
@@ -174,5 +174,3 @@ CategorySelector.defaultProps = {
   filterFunction: null,
   emptySelection: false,
 }
-
-export default CategorySelector

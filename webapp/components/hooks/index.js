@@ -31,6 +31,4 @@ export { useWebSocket } from './useWebSocket'
 // confirm dialog
 export { useConfirm } from './useConfirm'
 // notification dialogs
-export { useNotifyError } from './useNotifyError'
-export { useNotifyInfo } from './useNotifyInfo'
-export { useNotifyWarning } from './useNotifyWarning'
+export { useNotifyInfo, useNotifyError, useNotifyWarning } from './useNotification'
