@@ -79,7 +79,8 @@ const CategorySelector = function (props) {
       }
       // close edit panel
       setCategoryToEdit(null)
-    } else if (await checkEditCategoryNameSpecified()) {
+    } else {
+      // } else if (await checkEditCategoryNameSpecified()) {
       // update category dropdown with latest changes
       onChange(categoryToEdit)
       // close edit panel
