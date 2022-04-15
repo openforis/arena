@@ -62,7 +62,7 @@ const CategorySelector = function (props) {
 
   const checkEditCategoryNameSpecified = useCallback(async () => {
     const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
-    if (!reloadedCategory) return true
+    if (reloadedCategory) return true
 
     if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
       notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
