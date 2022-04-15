@@ -61,8 +61,8 @@ const CategorySelector = function (props) {
   }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
 
   const onCategoryUpdate = useCallback(
-    ({ category }) => {
-      setCategoryToEdit(category)
+    ({ category: categoryUpdated }) => {
+      setCategoryToEdit(categoryUpdated)
     },
     [setCategoryToEdit]
   )

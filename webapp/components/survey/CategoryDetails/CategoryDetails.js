@@ -145,13 +145,13 @@ const CategoryDetails = (props) => {
 
 CategoryDetails.propTypes = {
   categoryUuid: PropTypes.string,
-  onCategoryCreated: PropTypes.func,
+  onCategoryUpdate: PropTypes.func,
   showClose: PropTypes.bool,
 }
 
 CategoryDetails.defaultProps = {
   categoryUuid: null,
-  onCategoryCreated: null,
+  onCategoryUpdate: null,
   showClose: true,
 }
 
