@@ -24,8 +24,6 @@ const editFnTypes = {
 
 export const persistNodeDefChanges = (nodeDef) =>
   test(`${nodeDef.label} persist changes`, async () => {
-    await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefEditContainer))
-
     // Save
     await Promise.all([
       page.waitForResponse('**/api/survey/**'),
