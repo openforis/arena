@@ -27,7 +27,7 @@ import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 const MAX_LEVELS = 5
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryCreated, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
+  const { showClose, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
@@ -37,7 +37,6 @@ const CategoryDetails = (props) => {
 
   const { state, setState } = useLocalState({
     categoryUuid: categoryUuidProp || categoryUuidParam,
-    onCategoryCreated,
     onCategoryUpdate,
   })
   const Actions = useActions({ setState })
@@ -95,7 +94,7 @@ const CategoryDetails = (props) => {
                 <div>
                   <Button
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
-                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
+                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate })}
                   />
                   <Button
                     label="categoryEdit.extraPropertiesEditor.title"

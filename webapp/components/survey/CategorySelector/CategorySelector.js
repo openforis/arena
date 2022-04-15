@@ -105,7 +105,7 @@ const CategorySelector = function (props) {
         selection={category}
         onChange={onChange}
       />
-      {showAdd && (
+      {!disabled && showAdd && (
         <ButtonMetaItemAdd
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
@@ -130,7 +130,7 @@ const CategorySelector = function (props) {
           header={i18n.t('appModules.categories')}
         >
           <CategoryList
-            canSelect
+            canSelect={!disabled}
             selectedItemUuid={categoryUuid}
             onSelect={onChange}
             onCategoryCreated={setCategoryToEdit}
