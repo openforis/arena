@@ -62,6 +62,8 @@ const CategorySelector = function (props) {
 
   const checkEditCategoryNameSpecified = useCallback(async () => {
     const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
+    if (!reloadedCategory) return true
+
     if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
       notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
       return false
@@ -79,8 +81,7 @@ const CategorySelector = function (props) {
       }
       // close edit panel
       setCategoryToEdit(null)
-    } else {
-      // } else if (await checkEditCategoryNameSpecified()) {
+    } else if (await checkEditCategoryNameSpecified()) {
       // update category dropdown with latest changes
       onChange(categoryToEdit)
       // close edit panel
