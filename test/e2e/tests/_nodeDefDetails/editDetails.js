@@ -31,7 +31,6 @@ export const persistNodeDefChanges = (nodeDef) =>
     ])
     // Back
     await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button'))])
-
     await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
 
     await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
