@@ -60,16 +60,15 @@ const CategorySelector = function (props) {
     })()
   }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
 
-  const checkEditCategoryNameSpecified = useCallback(async () => {
-    const reloadedCategory = await API.fetchCategory({
-      surveyId,
-      categoryUuid: Category.getUuid(categoryToEdit),
-      draft: true,
-      validate: false,
-    })
-    return true
+  const onCategoryUpdate = useCallback(
+    ({ category }) => {
+      setCategoryToEdit(category)
+    },
+    [setCategoryToEdit]
+  )
 
-    if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
+  const checkEditCategoryNameSpecified = useCallback(() => {
+    if (StringUtils.isBlank(Category.getName(categoryToEdit))) {
       notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
       return false
     }
@@ -86,7 +85,7 @@ const CategorySelector = function (props) {
       }
       // close edit panel
       setCategoryToEdit(null)
-    } else if (await checkEditCategoryNameSpecified()) {
+    } else if (checkEditCategoryNameSpecified()) {
       // update category dropdown with latest changes
       onChange(categoryToEdit)
       // close edit panel
@@ -141,7 +140,11 @@ const CategorySelector = function (props) {
       )}
       {categoryToEdit && (
         <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')}>
-          <CategoryDetails categoryUuid={Category.getUuid(categoryToEdit)} showClose={false} />
+          <CategoryDetails
+            categoryUuid={Category.getUuid(categoryToEdit)}
+            onCategoryUpdate={onCategoryUpdate}
+            showClose={false}
+          />
         </PanelRight>
       )}
     </div>

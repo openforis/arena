@@ -27,7 +27,7 @@ import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 const MAX_LEVELS = 5
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
+  const { showClose, onCategoryCreated, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
@@ -35,7 +35,11 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state, setState } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const { state, setState } = useLocalState({
+    categoryUuid: categoryUuidProp || categoryUuidParam,
+    onCategoryCreated,
+    onCategoryUpdate,
+  })
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
