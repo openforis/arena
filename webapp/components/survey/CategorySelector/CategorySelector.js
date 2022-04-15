@@ -77,18 +77,14 @@ const CategorySelector = function (props) {
         // previously selected category has been deleted, deselect it from dropdown
         onChange(null)
       }
-    } else {
+      // close edit panel
+      setCategoryToEdit(null)
+    } else if (await checkEditCategoryNameSpecified()) {
+      // update category dropdown with latest changes
       onChange(categoryToEdit)
+      // close edit panel
+      setCategoryToEdit(null)
     }
-    // close edit panel
-    setCategoryToEdit(null)
-
-    // if (await checkEditCategoryNameSpecified()) {
-    //   // update category dropdown with latest changes
-    //   onChange(categoryToEdit)
-    //   // close edit panel
-    //   setCategoryToEdit(null)
-    // }
   }, [categoryUuid, categoryToEdit, onChange, surveyId, setCategoryToEdit, checkEditCategoryNameSpecified])
 
   return (
