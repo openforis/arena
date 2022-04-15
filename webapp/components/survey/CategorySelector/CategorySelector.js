@@ -61,7 +61,12 @@ const CategorySelector = function (props) {
   }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
 
   const checkEditCategoryNameSpecified = useCallback(async () => {
-    const reloadedCategory = await API.fetchCategory({ surveyId, categoryUuid: categoryToEdit.uuid, draft: true })
+    const reloadedCategory = await API.fetchCategory({
+      surveyId,
+      categoryUuid: categoryToEdit.uuid,
+      draft: true,
+      validate: false,
+    })
     if (reloadedCategory) return true
 
     if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
