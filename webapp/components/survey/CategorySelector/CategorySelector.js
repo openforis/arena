@@ -67,8 +67,6 @@ const CategorySelector = function (props) {
       draft: true,
       validate: false,
     })
-    if (reloadedCategory) return true
-
     if (StringUtils.isBlank(Category.getName(reloadedCategory))) {
       notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
       return false

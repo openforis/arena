@@ -36,7 +36,7 @@ export const persistNodeDefChanges = (nodeDef) =>
 
     await expect(page.url()).toBe(`${BASE_URL}/app/designer/formDesigner/`)
     await expect(page).toHaveText(nodeDef.label)
-  })
+  }, 20000)
 
 export const editNodeDefDetails = (nodeDef) => {
   test(`${nodeDef.label} edit details`, async () => {
