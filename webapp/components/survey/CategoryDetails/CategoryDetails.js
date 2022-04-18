@@ -27,7 +27,7 @@ import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 const MAX_LEVELS = 5
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
+  const { showClose, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
@@ -35,7 +35,10 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state, setState } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const { state, setState } = useLocalState({
+    categoryUuid: categoryUuidProp || categoryUuidParam,
+    onCategoryUpdate,
+  })
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
@@ -91,7 +94,7 @@ const CategoryDetails = (props) => {
                 <div>
                   <Button
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
-                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
+                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate })}
                   />
                   <Button
                     label="categoryEdit.extraPropertiesEditor.title"
@@ -142,13 +145,13 @@ const CategoryDetails = (props) => {
 
 CategoryDetails.propTypes = {
   categoryUuid: PropTypes.string,
-  onCategoryCreated: PropTypes.func,
+  onCategoryUpdate: PropTypes.func,
   showClose: PropTypes.bool,
 }
 
 CategoryDetails.defaultProps = {
   categoryUuid: null,
-  onCategoryCreated: null,
+  onCategoryUpdate: null,
   showClose: true,
 }
 

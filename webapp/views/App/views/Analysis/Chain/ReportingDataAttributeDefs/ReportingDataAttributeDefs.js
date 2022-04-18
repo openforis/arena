@@ -6,7 +6,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Chain from '@common/analysis/chain'
 
-import CategorySelector from '@webapp/components/survey/CategorySelector'
+import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'

@@ -11,10 +11,10 @@ export const useInit = ({ setState }) => {
   const surveyId = useSurveyId()
   const fetchLevelItems = useFetchLevelItems({ setState })
 
-  return useCallback(async ({ categoryUuid }) => {
+  return useCallback(async ({ categoryUuid, onCategoryUpdate }) => {
     const category = await API.fetchCategory({ surveyId, categoryUuid })
 
-    const stateUpdated = State.create({ category })
+    const stateUpdated = State.create({ category, onCategoryUpdate })
     setState(stateUpdated)
     await fetchLevelItems({ state: stateUpdated })
   }, [])
