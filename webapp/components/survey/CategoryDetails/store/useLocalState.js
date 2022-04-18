@@ -6,7 +6,7 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useLocalState = (props) => {
-  const { categoryUuid } = props
+  const { categoryUuid, onCategoryUpdate } = props
 
   const inCategoriesPath = useIsCategoriesRoute()
 
@@ -18,7 +18,7 @@ export const useLocalState = (props) => {
 
   useEffect(() => {
     ;(async () => {
-      await Actions.init({ state, categoryUuid })
+      await Actions.init({ state, categoryUuid, onCategoryUpdate })
     })()
   }, [])
 
