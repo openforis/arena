@@ -16,7 +16,10 @@ const removeItemAtIndex =
   (array) =>
     [...array.slice(0, index), ...array.slice(index + 1)]
 
+const fromNumberOfElements = (numOfElements) => Array.from(Array(numOfElements).keys())
+
 export const ArrayUtils = {
   addOrRemoveItem,
   removeItemAtIndex,
+  fromNumberOfElements,
 }

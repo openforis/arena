@@ -310,14 +310,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
         secondary: `
         <p>If the name and label are right then create the first attribute
-        <linkWithIcon>Survey \> Form Designer</linkWithIcon>
+        <linkWithIcon>Survey > Form Designer</linkWithIcon>
         </p>
         `,
       },
       nodeDefCreate: {
         main: `<title>Let's create the first attribute of {{surveyName}} </title>
         
-        <p>Go to <linkWithIcon>Survey \> Form Designer</linkWithIcon></p>
+        <p>Go to <linkWithIcon>Survey > Form Designer</linkWithIcon></p>
         <br />
         `,
       },
@@ -1039,6 +1039,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     reportingData: 'Reporting data',
+    templateForDataImport: 'Template for data import',
+    templateForDataImportGeneric: 'Template for data import (generic)',
   },
 
   // ===== All validation errors

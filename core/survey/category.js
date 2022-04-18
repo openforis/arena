@@ -23,12 +23,6 @@ export const keysProps = {
   reportingData: 'reportingData',
 }
 
-export const itemExtraDefDataTypes = {
-  text: 'text',
-  number: 'number',
-  geometryPoint: 'geometryPoint',
-}
-
 export const reportingDataItemExtraDefKeys = {
   area: 'area',
 }
