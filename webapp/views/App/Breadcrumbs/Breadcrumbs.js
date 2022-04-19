@@ -1,7 +1,9 @@
-import * as AppModules from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
 import React from 'react'
 import { useLocation } from 'react-router'
+
+import * as AppModules from '@webapp/app/appModules'
+
+import { useI18n } from '@webapp/store/system'
 
 export const Breadcrumbs = () => {
   const location = useLocation()
@@ -9,13 +11,23 @@ export const Breadcrumbs = () => {
 
   const { pathname } = location
   const pathParts = pathname.split('/')
-  const pathNames = pathParts
-    .filter((part) => part && part !== AppModules.app)
-    .map((part) => i18n.t(`appModules.${part}`))
 
-  const pathComponents = pathNames.reduce((acc, pathName, index) => {
+  const validPathParts = pathParts.filter((pathPart) => pathPart && pathPart !== AppModules.app)
+
+  const pathComponents = validPathParts.reduce((acc, pathPart, levelIndex) => {
+    const moduleKey = AppModules.getModuleKeyByPathPart({ levelIndex, pathPart })
+    if (!moduleKey) return acc
+
+    const pathName = i18n.t(`appModules.${moduleKey}`)
+    const isLast = levelIndex === validPathParts.length - 1
+
     acc.push(<span>{pathName}</span>)
-    if (index < pathNames.length - 1) acc.push(<span> / </span>)
+
+    if (!isLast) {
+      // add separator
+      acc.push(<span> / </span>)
+    }
+
     return acc
   }, [])
 

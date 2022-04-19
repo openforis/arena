@@ -232,7 +232,7 @@ Do you want to proceed?`,
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instances',
 
-    help: 'help',
+    help: 'Help',
     about: 'About',
     disclaimer: 'Disclaimer',
     userManual: 'User Manual',
