@@ -13,6 +13,7 @@ import Header from './Header'
 import JobMonitor from './JobMonitor'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
+import { Breadcrumbs } from './Breadcrumbs'
 
 import Analysis from './views/Analysis' // TODO load Analysis module lazily
 const Data = React.lazy(() => import('./views/Data'))
@@ -35,6 +36,8 @@ const AppView = () => {
       <div className="app__container">
         <SideBar />
         <div className="app-module">
+          <Breadcrumbs />
+
           <ModuleSwitch
             moduleDefault={appModules.home}
             modules={[
