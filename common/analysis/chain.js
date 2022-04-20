@@ -28,12 +28,21 @@ export const keysProps = {
   clusteringOnlyVariances: 'clusteringOnlyVariances',
   reportingDataCategoryUuid: 'reportingDataCategoryUuid',
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
+  samplingStrategy: 'samplingStrategy',
 }
 
 export const statusExec = {
   error: 'error',
   success: 'success',
   running: 'running',
+}
+
+export const samplingStrategies = {
+  simpleRandom: 'simpleRandom',
+  systematic: 'systematic',
+  stratifiedRandom: 'stratifiedRandom',
+  stratifiedSystematic: 'stratifiedSystematic',
+  // doublePhase: 'doublePhase'
 }
 
 // ====== READ
@@ -59,6 +68,7 @@ export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDe
 export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
 export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
+export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrategy)
 // ====== READ (reporting data)
 export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
 export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
@@ -74,6 +84,8 @@ export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
   ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
+export const assocSamplingStrategy = (samplingStrategy) =>
+  ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)
 // ====== UPDATE (reporting data)
 const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([
   keys.props,
