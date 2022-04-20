@@ -2,10 +2,14 @@
 
 .header {
   height: 45px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 70px 1fr 1fr 1fr 70px;
   align-items: center;
-  justify-content: space-between;
   border-bottom: 1px solid $greyBorder;
+
+  &.sidebar-open {
+    grid-template-columns: 200px 1fr 1fr 1fr 70px; 
+  }
 }
 
 .header__logo {

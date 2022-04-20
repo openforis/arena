@@ -87,7 +87,7 @@ const UserPopupMenu = (props) => {
         className="btn-s btn-transparent"
       >
         <span className="icon icon-paragraph-justify icon-12px icon-left" />
-        {i18n.t('appModules.surveyList')}
+        {i18n.t('appModules.surveys')}
       </Link>
 
       {canCreateSurvey && (
@@ -113,7 +113,7 @@ const UserPopupMenu = (props) => {
               className="btn-s btn-transparent"
             >
               <span className="icon icon-paragraph-justify icon-12px icon-left" />
-              {i18n.t('appModules.templateList')}
+              {i18n.t('appModules.templates')}
             </Link>
           )}
           {canCreateTemplate && (
