@@ -200,8 +200,8 @@ Do you want to proceed?`,
   appModules: {
     home: 'Home',
     dashboard: 'Dashboard',
-    surveyList: 'My Surveys',
-    templateList: 'My Templates',
+    surveys: 'Surveys',
+    templates: 'Templates',
     usersAccessRequests: 'Users access requests',
     collectImportReport: 'Collect Import Report',
 

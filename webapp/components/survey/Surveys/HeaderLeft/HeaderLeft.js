@@ -3,18 +3,15 @@ import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 
-import Header from '@webapp/components/header'
 import { FormItem } from '@webapp/components/form/Input'
 
 const HeaderLeft = (props) => {
-  const { handleSearch, search, title } = props
+  const { handleSearch, search } = props
 
   const i18n = useI18n()
 
   return (
-    <Header>
-      <h6>{i18n.t(title)}</h6>
-
+    <header>
       <FormItem label={i18n.t('surveysView.filter')}>
         <input
           className="surveys__header-left__input-search"
@@ -23,12 +20,13 @@ const HeaderLeft = (props) => {
           onChange={(e) => handleSearch(e.target.value)}
         />
       </FormItem>
-    </Header>
+    </header>
   )
 }
 
 HeaderLeft.propTypes = {
-  title: PropTypes.string.isRequired,
+  handleSearch: PropTypes.func.isRequired,
+  search: PropTypes.string.isRequired,
 }
 
 export default HeaderLeft

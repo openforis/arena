@@ -12,7 +12,7 @@
   flex-grow: 1;
   padding: 15px 25px;
 
-  > :nth-child(2) {
+  > :first-child {
     height: 100%;
     overflow: auto;
   }

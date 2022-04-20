@@ -1,3 +1,5 @@
+import './Breadcrumbs.scss'
+
 import React from 'react'
 import { useLocation } from 'react-router'
 
@@ -31,5 +33,10 @@ export const Breadcrumbs = () => {
     return acc
   }, [])
 
-  return <div>{pathComponents}</div>
+  return (
+    <div className="breadcrumbs">
+      <div className="separator" />
+      <div>{pathComponents}</div>
+    </div>
+  )
 }
