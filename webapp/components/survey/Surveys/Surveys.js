@@ -134,10 +134,6 @@ Surveys.propTypes = {
    * If true, show only survey templates.
    */
   template: PropTypes.bool,
-  /**
-   * Title to be shown in the top header.
-   */
-  title: PropTypes.string.isRequired,
 }
 
 Surveys.defaultProps = {
