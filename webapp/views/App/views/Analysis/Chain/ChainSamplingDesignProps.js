@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 
@@ -15,6 +16,7 @@ import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
+import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -33,6 +35,8 @@ export const ChainSamplingDesignProps = (props) => {
 
       {hasBaseUnit && (
         <>
+          <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+
           <StratumAttributeSelector />
 
           <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
@@ -64,4 +68,8 @@ export const ChainSamplingDesignProps = (props) => {
       <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
     </>
   )
+}
+
+ChainSamplingDesignProps.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }
