@@ -254,7 +254,7 @@ const _getModulePathParts = (module) => [..._getModuleParentPathParts(module), m
 const _getModuleInModuleGroupByPathPart = ({ moduleGroup, pathPart }) =>
   Object.values(moduleGroup).find((module) => module.path === pathPart)
 
-export const getModuleKeyByPathPart = ({ levelIndex, pathPart }) => {
+export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
   let foundModule = null
 
   const moduleGroups = levelIndex === 0 ? [appModules] : allAppModuleGroups
@@ -264,7 +264,7 @@ export const getModuleKeyByPathPart = ({ levelIndex, pathPart }) => {
     foundModule = module
     if (foundModule) return true
   })
-  return foundModule?.key
+  return foundModule
 }
 
 export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`

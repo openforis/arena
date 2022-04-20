@@ -15,12 +15,12 @@ const HeaderLeft = (props) => {
   const i18n = useI18n()
 
   return (
-    <>
+    <header>
       <FormItem className="exclude-resolved" label={i18n.t('homeView.collectImportReport.excludeResolvedItems')}>
         <Checkbox checked={excludeResolved} onChange={(value) => setExcludeResolved(value)} />
       </FormItem>
       <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.csvExport" />
-    </>
+    </header>
   )
 }
 

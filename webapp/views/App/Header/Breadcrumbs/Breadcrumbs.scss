@@ -1,13 +1,4 @@
-@import "~@webapp/style/vars";
-
 .breadcrumbs {
   margin-left: 20px;
-
-  .separator {
-    position: absolute;
-    top: 10px;
-    width: 50px;
-    height: 2px;
-    background-color: $blue;
-  }
+  display: flex;
 }
