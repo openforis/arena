@@ -3,6 +3,7 @@ import './Header.scss'
 import React, { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import classNames from 'classnames'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -23,12 +24,15 @@ import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/Surve
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 import UserPopupMenu from './UserPopupMenu'
+import { Breadcrumbs } from './Breadcrumbs'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 
 const Header = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const lang = useLang()
   const appSaving = useIsAppSaving()
+  const isSideBarOpen = useIsSidebarOpened()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const canEditSurvey = useAuthCanEditSurvey()
@@ -42,12 +46,14 @@ const Header = () => {
   pictureUpdateKeyRef.current += prevUser !== user
 
   return (
-    <div className="header">
+    <div className={classNames('header', { 'sidebar-open': isSideBarOpen })}>
       <div className="header__logo">
         <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer" className="flex-center">
           <img src="/img/of_icon.png" alt="Open Foris" />
         </a>
       </div>
+
+      <Breadcrumbs />
 
       <div className="header__survey">
         {Survey.isValid(surveyInfo) &&
@@ -75,6 +81,9 @@ const Header = () => {
             </>
           ))}
       </div>
+
+      {/* Placeholder to make the header symmetric */}
+      <div></div>
 
       <button
         className="header__btn-user"
