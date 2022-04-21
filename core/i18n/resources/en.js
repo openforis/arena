@@ -210,6 +210,7 @@ Do you want to proceed?`,
     surveyHierarchy: 'Hierarchy',
     category: 'Category',
     categories: 'Categories',
+    nodeDef: 'Node Definition',
     taxonomy: 'Taxonomy',
     taxonomies: 'Taxonomies',
 
