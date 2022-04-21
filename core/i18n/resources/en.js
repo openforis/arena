@@ -766,6 +766,8 @@ $t(common.appNameFull)
  
  * Developed by: [Open Foris](https://www.openforis.org/)
  * Version: {{version}}
+ * Support: [https://openforis.support](https://openforis.support)
+ * Arena in GitHub: [https://github.com/openforis/arena](https://github.com/openforis/arena)
 `,
     },
   },
