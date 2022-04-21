@@ -140,7 +140,7 @@ const UserPopupMenu = (props) => {
             className="btn-s btn-transparent"
           >
             <span className="icon icon-paragraph-justify icon-12px icon-left" />
-            {i18n.t('appModules.usersAccessRequests')}
+            {i18n.t('appModules.usersAccessRequest')}
           </Link>
         </>
       )}
