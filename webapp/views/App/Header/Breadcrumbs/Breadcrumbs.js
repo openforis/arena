@@ -16,13 +16,14 @@ export const Breadcrumbs = () => {
   const pathParts = pathname.split('/')
 
   const validPathParts = pathParts.filter((pathPart) => pathPart && pathPart !== AppModules.app)
+  const pathPartsWithModules = validPathParts.filter((pathPart, levelIndex) =>
+    Boolean(AppModules.getModuleByPathPart({ levelIndex, pathPart }))
+  )
 
-  const pathComponents = validPathParts.reduce((acc, pathPart, levelIndex) => {
+  const pathComponents = pathPartsWithModules.reduce((acc, pathPart, levelIndex) => {
     const module = AppModules.getModuleByPathPart({ levelIndex, pathPart })
-    if (!module) return acc
-
     const pathName = i18n.t(`appModules.${module.key}`)
-    const isLast = levelIndex === validPathParts.length - 1
+    const isLast = levelIndex === pathPartsWithModules.length - 1
 
     acc.push(
       <div className="breadcrumbs-item" key={module.key}>
