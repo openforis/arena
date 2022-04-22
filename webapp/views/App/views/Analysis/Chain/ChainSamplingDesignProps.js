@@ -37,7 +37,7 @@ export const ChainSamplingDesignProps = (props) => {
         <>
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          <StratumAttributeSelector />
+          {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
 
           <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
             <Checkbox
