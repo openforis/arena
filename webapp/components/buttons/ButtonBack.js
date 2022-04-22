@@ -1,17 +1,21 @@
 import React from 'react'
 import { useNavigate } from 'react-router'
+import classNames from 'classnames'
 
 import { Button } from './Button'
 
 export const ButtonBack = (props) => {
-  const { className = '' } = props
+  const { className, ...otherProps } = props
 
   const navigate = useNavigate()
 
-  return <Button onClick={() => navigate(-1)} {...props} className={`btn-secondary btn-back ${className}`} />
+  return (
+    <Button {...otherProps} onClick={() => navigate(-1)} className={classNames('btn-secondary btn-back', className)} />
+  )
 }
 
 // onClick prop is not required in ButtonBack
+/* eslint-disable no-unused-vars */
 const { onClick, ...otherButtonPropTypes } = Button.propTypes
 
 ButtonBack.propTypes = {
