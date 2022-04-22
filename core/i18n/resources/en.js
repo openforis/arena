@@ -315,14 +315,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
         secondary: `
         <p>If the name and label are right then create the first attribute
-        <linkWithIcon>Survey > Form Designer</linkWithIcon>
+        <linkWithIcon>Survey &gt; Form Designer</linkWithIcon>
         </p>
         `,
       },
       nodeDefCreate: {
         main: `<title>Let's create the first attribute of {{surveyName}} </title>
         
-        <p>Go to <linkWithIcon>Survey > Form Designer</linkWithIcon></p>
+        <p>Go to <linkWithIcon>Survey &gt; Form Designer</linkWithIcon></p>
         <br />
         `,
       },
@@ -1366,17 +1366,21 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     signature: `<p>Thank you,<br>
       The $t(common.appNameFull) team
       </p>`,
-    temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
+    temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
     userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyName}} - {{surveyLabel}}</strong> as {{groupLabel}}</p>
-      <p>With the role of {{groupLabel}} you have the following permissions: <br/> 
+      <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,
     userInvite: {
       subject: 'You have been invited to $t(common.appNameFull)!',
       body: `<p>Hello,</p>
              $t(emails.userInviteCommon)
-             <p><a href="{{urlResetPassword}}">Click here to access $t(common.appNameFull)</a></p>
+             <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
+             <p>If it doesn't work, please copy and paste the following link in your browser: {{urlResetPassword}}</p>
              $t(emails.temporaryMsg)
+             <p><i>You have received this email because you have requested access to $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
+             <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
+             <p>In case of problems please raise a ticket in our <b>Support Forum</b> at <a href="https://openforis.support">https://openforis.support</a></p>
              $t(emails.signature)`,
     },
     userInviteExistingUser: {
@@ -1384,6 +1388,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       body: `<p>Hello,</p>
              $t(emails.userInviteCommon)
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+             <p>If it doesn't work, please copy and paste the following link in your browser: {{serverUrl}}</p>
              $t(emails.signature)`,
     },
     userAccessRequest: {
