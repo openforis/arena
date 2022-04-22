@@ -166,7 +166,7 @@ export const dataModules = {
 
 export const userModules = {
   users: {
-    key: 'users',
+    key: 'usersList',
     path: 'users',
   },
   usersSurvey: {
