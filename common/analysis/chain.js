@@ -78,14 +78,20 @@ export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
 export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
 export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)
+export const dissocStratumNodeDefUuid = ObjectUtils.dissocProp(keysProps.stratumNodeDefUuid)
 export const assocAreaWeightingMethod = (areaWeightingMethod) =>
   ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
 export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
   ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
-export const assocSamplingStrategy = (samplingStrategy) =>
-  ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)
+export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
+  let chainUpdated = ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)(chain)
+  if (!isStratificationEnabled(chainUpdated)) {
+    chainUpdated = dissocStratumNodeDefUuid(chainUpdated)
+  }
+  return chainUpdated
+}
 // ====== UPDATE (reporting data)
 const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([
   keys.props,
@@ -104,6 +110,17 @@ export const assocReportingDataAttributeDefUuid = ({ categoryLevelUuid, nodeDefU
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
   DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
+export const isStratificationEnabled = (chain) => {
+  const samplingStrategy = getSamplingStrategy(chain)
+  return (
+    samplingStrategy && ![samplingStrategies.simpleRandom, samplingStrategies.systematic].includes(samplingStrategy)
+  )
+}
+export const isStratificationNotSpecifiedAllowed = () => {
+  return false
+  // TODO return true if samplingStrategy is double phase
+  // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
+}
 
 // ====== VALIDATION
 // The validation object contains the validation of chain index by uuids

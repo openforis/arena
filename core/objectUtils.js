@@ -75,25 +75,29 @@ export const mergeProps = (props) => (obj) =>
 
 export const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
-export const setInPath = (pathArray, value, includeEmpty = true) => (obj) => {
-  if (!includeEmpty && isBlank(value)) {
+export const dissocProp = (key) => R.dissocPath([keys.props, key])
+
+export const setInPath =
+  (pathArray, value, includeEmpty = true) =>
+  (obj) => {
+    if (!includeEmpty && isBlank(value)) {
+      return obj
+    }
+
+    let objCurrent = obj
+    pathArray.forEach((pathPart, i) => {
+      if (i === pathArray.length - 1) {
+        objCurrent[pathPart] = value
+      } else {
+        if (!Object.prototype.hasOwnProperty.call(objCurrent, pathPart)) {
+          objCurrent[pathPart] = {}
+        }
+
+        objCurrent = objCurrent[pathPart]
+      }
+    })
     return obj
   }
-
-  let objCurrent = obj
-  pathArray.forEach((pathPart, i) => {
-    if (i === pathArray.length - 1) {
-      objCurrent[pathPart] = value
-    } else {
-      if (!Object.prototype.hasOwnProperty.call(objCurrent, pathPart)) {
-        objCurrent[pathPart] = {}
-      }
-
-      objCurrent = objCurrent[pathPart]
-    }
-  })
-  return obj
-}
 
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
