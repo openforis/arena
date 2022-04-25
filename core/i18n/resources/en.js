@@ -200,9 +200,11 @@ Do you want to proceed?`,
   appModules: {
     home: 'Home',
     dashboard: 'Dashboard',
+    surveyNew: 'New Survey',
     surveys: 'Surveys',
+    templateNew: 'New Template',
     templates: 'Templates',
-    usersAccessRequest: 'Users access requests',
+    usersAccessRequest: 'Users Access Requests',
     collectImportReport: 'Collect Import Report',
 
     designer: 'Survey',
@@ -315,14 +317,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
         secondary: `
         <p>If the name and label are right then create the first attribute
-        <linkWithIcon>Survey &gt; Form Designer</linkWithIcon>
+        <linkWithIcon>Survey \u003E Form Designer</linkWithIcon>
         </p>
         `,
       },
       nodeDefCreate: {
         main: `<title>Let's create the first attribute of {{surveyName}} </title>
         
-        <p>Go to <linkWithIcon>Survey &gt; Form Designer</linkWithIcon></p>
+        <p>Go to <linkWithIcon>Survey \u003E Form Designer</linkWithIcon></p>
         <br />
         `,
       },
@@ -896,7 +898,7 @@ $t(common.appNameFull)
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
-    schemaSummary: 'Schema Summary',
+    schemaSummary: 'Schema summary',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
     movePageUp: 'Move page up',
