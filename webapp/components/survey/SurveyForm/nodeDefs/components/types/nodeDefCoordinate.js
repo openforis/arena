@@ -1,6 +1,7 @@
 import './nodeDefCoordinate.scss'
 
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 
@@ -160,13 +161,28 @@ const NodeDefCoordinate = (props) => {
 
   return (
     <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canUseMap })}>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
-      <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+      <div className="form-items">
+        <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
+        <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
+        <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+      </div>
       {mapTriggerButton}
       {mapPanelRight}
     </div>
   )
+}
+
+NodeDefCoordinate.propTypes = {
+  canEditRecord: PropTypes.bool.isRequired,
+  edit: PropTypes.bool.isRequired,
+  entry: PropTypes.bool.isRequired,
+  insideTable: PropTypes.bool.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  nodes: PropTypes.array.isRequired,
+  readOnly: PropTypes.bool.isRequired,
+  renderType: PropTypes.string.isRequired,
+  surveyInfo: PropTypes.object.isRequired,
+  updateNode: PropTypes.func.isRequired,
 }
 
 export default NodeDefCoordinate
