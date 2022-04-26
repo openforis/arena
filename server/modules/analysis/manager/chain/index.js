@@ -105,9 +105,39 @@ export const cleanChainsOrphans = async ({ user, surveyId }, client = DB.client)
     const orphanNodeDefsUuids = Survey.getNodeDefsArray(survey)
       .filter((_nodeDef) => NodeDef.getChainUuid(_nodeDef) && !chainsUuids.includes(NodeDef.getChainUuid(_nodeDef)))
       .map(NodeDef.getUuid)
-      console.log("orphanNodeDefsUuids", orphanNodeDefsUuids)
+    console.log('orphanNodeDefsUuids', orphanNodeDefsUuids)
 
     return NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: orphanNodeDefsUuids }, client)
+  })
+
+export const cleanChains = async ({ user, surveyId }, client = DB.client) =>
+  client.tx(async (tx) => {
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx)
+    const chains = await ChainRepository.fetchChains({ surveyId }, tx)
+    const chainsUuids = chains.map(Chain.getUuid)
+
+    const orphanNodeDefsUuids = []
+
+    Survey.getNodeDefsArray(survey)
+      .forEach((nodeDef) => {
+        if (NodeDef.getChainUuid(nodeDef)) {
+          if (!chainsUuids.includes(NodeDef.getChainUuid(nodeDef))) {
+            orphanNodeDefsUuids.push(NodeDef.getUuid(nodeDef))
+          } else {
+            const areaBasedEstimatedOf = Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey)
+            if (areaBasedEstimatedOf) {
+
+            }
+          }
+        }
+      })
+    console.log('orphanNodeDefsUuids', orphanNodeDefsUuids)
+
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefsDeleted(
+      { user, surveyId, nodeDefUuids: orphanNodeDefsUuids },
+      client
+    )
+    return { nodeDefsUpdated, nodeDefsValidation }
   })
 
 export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
