@@ -10,7 +10,7 @@ import * as Chain from '@common/analysis/chain'
 import { useI18n } from '@webapp/store/system'
 import { useChain } from '@webapp/store/ui/chain'
 import { FormItem } from '@webapp/components/form/Input'
-import { useSurvey, useSurveyCycleKeys, NodeDefsActions } from '@webapp/store/survey'
+import { useSurvey, NodeDefsActions } from '@webapp/store/survey'
 import Checkbox from '@webapp/components/form/checkbox'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
 
@@ -21,7 +21,6 @@ const AreaBasedEstimated = (props) => {
   const dispatch = useDispatch()
 
   const survey = useSurvey()
-  const cycleKeys = useSurveyCycleKeys()
   const chain = useChain()
 
   const i18n = useI18n()
@@ -38,7 +37,6 @@ const AreaBasedEstimated = (props) => {
       const chainUuid = Chain.getUuid(chain)
       const _nodeDef = AreaBasedEstimatedOfNodeDef.newNodeDef({
         survey,
-        cycleKeys,
         chainUuid,
         estimatedOfNodeDef: nodeDef,
       })

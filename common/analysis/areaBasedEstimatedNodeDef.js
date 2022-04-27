@@ -1,21 +1,24 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { SamplingNodeDef } from './samplingNodeDefs'
+
 const getName = ({ estimatedOfNodeDef }) => `${NodeDef.getName(estimatedOfNodeDef)}_ha`
 
-const getScript = ({ survey, chainUuid, estimatedOfNodeDef }) => {
+const getScript = ({ survey, chain, estimatedOfNodeDef }) => {
   const nodeDefName = getName({ estimatedOfNodeDef })
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
   const parentName = NodeDef.getName(nodeDefParent)
 
-  const samplingNodeDefInParent = Survey.getSamplingNodeDefChild({ nodeDefParent, chainUuid })(survey)
+  const estimatedOfNodeDefName = NodeDef.getName(estimatedOfNodeDef)
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const samplingNodeDefName = SamplingNodeDef.getNodeDefName({ nodeDefParent, baseUnitNodeDef })
 
-  return `${parentName}$${nodeDefName} <- ${parentName}$${NodeDef.getName(
-    estimatedOfNodeDef
-  )} / ${parentName}$${NodeDef.getName(samplingNodeDefInParent)}`
+  return `${parentName}$${nodeDefName} <- ${parentName}$${estimatedOfNodeDefName} / ${parentName}$${samplingNodeDefName}`
 }
 
-const newNodeDef = ({ survey, cycleKeys, chainUuid, estimatedOfNodeDef }) => {
+const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
+  const cycleKeys = Survey.getCycleKeys(Survey.getSurveyInfo(survey))
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
 
   const props = {
