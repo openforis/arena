@@ -5,16 +5,10 @@ const getName = ({ estimatedOfNodeDef }) => `${NodeDef.getName(estimatedOfNodeDe
 
 const getScript = ({ survey, chainUuid, estimatedOfNodeDef }) => {
   const nodeDefName = getName({ estimatedOfNodeDef })
-  const parentNodeDef = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
-  const parentName = NodeDef.getName(parentNodeDef)
+  const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
+  const parentName = NodeDef.getName(nodeDefParent)
 
-  const samplingNodeDefInParent = Survey.getNodeDefsArray(survey).find(
-    (_nodeDef) =>
-      NodeDef.isSampling(_nodeDef) &&
-      NodeDef.getParentUuid(_nodeDef) === NodeDef.getUuid(parentNodeDef) &&
-      NodeDef.getChainUuid(_nodeDef) === chainUuid &&
-      !NodeDef.isDeleted(_nodeDef)
-  )
+  const samplingNodeDefInParent = Survey.getSamplingNodeDefChild({ nodeDefParent, chainUuid })(survey)
 
   return `${parentName}$${nodeDefName} <- ${parentName}$${NodeDef.getName(
     estimatedOfNodeDef
@@ -22,7 +16,7 @@ const getScript = ({ survey, chainUuid, estimatedOfNodeDef }) => {
 }
 
 const newNodeDef = ({ survey, cycleKeys, chainUuid, estimatedOfNodeDef }) => {
-  const parentNodeDef = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
 
   const props = {
     [NodeDef.propKeys.name]: AreaBasedEstimatedOfNodeDef.getName({ estimatedOfNodeDef }),
@@ -45,7 +39,7 @@ const newNodeDef = ({ survey, cycleKeys, chainUuid, estimatedOfNodeDef }) => {
   const virtual = false
   const nodeDefType = NodeDef.nodeDefType.decimal
 
-  return NodeDef.newNodeDef(parentNodeDef, nodeDefType, cycleKeys, props, advancedProps, temporary, virtual)
+  return NodeDef.newNodeDef(nodeDefParent, nodeDefType, cycleKeys, props, advancedProps, temporary, virtual)
 }
 
 export const AreaBasedEstimatedOfNodeDef = {
