@@ -38,11 +38,11 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
     }),
   }
 
-  const temporary = true
+  const analysis = true
   const virtual = false
   const nodeDefType = NodeDef.nodeDefType.decimal
 
-  return NodeDef.newNodeDef(nodeDefParent, nodeDefType, cycleKeys, props, advancedProps, temporary, virtual)
+  return NodeDef.newNodeDef(nodeDefParent, nodeDefType, cycleKeys, props, advancedProps, analysis, virtual)
 }
 
 export const AreaBasedEstimatedOfNodeDef = {
