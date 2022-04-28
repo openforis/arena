@@ -112,5 +112,3 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
 
 export const deleteChainWithoutCycle = async ({ surveyId }, client = DB.client) =>
   client.tx(async (tx) => _deleteChain({ surveyId, noCycle: true }, tx))
-
-export { cleanChains } from './chainsCleanManager'

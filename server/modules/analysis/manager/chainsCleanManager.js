@@ -12,7 +12,7 @@ import * as Log from '@server/log/log'
 
 import * as DB from '@server/db'
 
-const Logger = Log.getLogger('ChainManager')
+const Logger = Log.getLogger('ChainsCleanManager')
 
 const _cleanChainsOrphans = async ({ user, surveyId }, tx) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx)

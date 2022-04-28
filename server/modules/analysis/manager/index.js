@@ -8,5 +8,6 @@ export {
   removeChainCycles,
   deleteChain,
   deleteChainWithoutCycle,
-  cleanChains,
 } from './chain'
+
+export { cleanChains } from './chainsCleanManager'
