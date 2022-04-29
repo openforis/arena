@@ -30,20 +30,6 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
   return scripts
 }
 
-function* initPersistChainEntitiesResults() {
-  const { entities } = this.rChain
-
-  for (let i = 0; i < entities.length; i += 1) {
-    const entity = entities[i]
-    const dfResults = new DfResults(this.rChain, entity)
-
-    yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
-    yield this.appendContent(...dfResults.scripts)
-    yield this.appendContent(...getPutResultsScripts({ rChain: this.rChain, entity, dfResults }))
-    yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
-  }
-}
-
 export default class RFilePersistResults extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'persist-results')
@@ -71,15 +57,27 @@ export default class RFilePersistResults extends RFileSystem {
     await this.initPersistScripts({ dirName: dirNames.sampling, zipName: 'samplingScripts.zip' })
   }
 
+  async initPersistChainEntitiesResults() {
+    const { entities } = this.rChain
+
+    await PromiseUtils.each(entities, async (entity) => {
+      const dfResults = new DfResults(this.rChain, entity)
+
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
+      await this.appendContent(...dfResults.scripts)
+      await this.appendContent(...getPutResultsScripts({ rChain: this.rChain, entity, dfResults }))
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
+    })
+  }
+
   async init() {
     await super.init()
     const { dirResults } = this.rChain
-    this.initPersistChainEntitiesResults = initPersistChainEntitiesResults.bind(this)
 
     // create results dir
     await this.appendContent(dirCreate(dirResults))
     // persist chainEntitiesResults
-    await PromiseUtils.resolveGenerator(this.initPersistChainEntitiesResults())
+    await this.initPersistChainEntitiesResults()
     // persist base unit scripts
     await this.initPersistSamplingScripts()
     // persist user scripts
