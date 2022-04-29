@@ -72,8 +72,8 @@ export const getAnalysisNodeDefs =
         return false
       }
 
-      if(!showInactiveResultVariables && !NodeDef.getActive(nodeDef)){
-          return false 
+      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+        return false
       }
 
       return true
@@ -122,3 +122,16 @@ export const getBaseUnitNodeDef =
 
     return baseUnitNodeDef
   }
+
+export const getSamplingNodeDefChild =
+  ({ nodeDefParent, chainUuid }) =>
+  (survey) =>
+    SurveyNodeDefs.getNodeDefChildren(
+      nodeDefParent,
+      true
+    )(survey).find(
+      (nodeDefChild) =>
+        NodeDef.isSampling(nodeDefChild) &&
+        NodeDef.getChainUuid(nodeDefChild) === chainUuid &&
+        !NodeDef.isDeleted(nodeDefChild)
+    )

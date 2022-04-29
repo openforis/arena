@@ -7,11 +7,10 @@ import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Chain from '@common/analysis/chain'
 
 import { useChain } from '@webapp/store/ui/chain'
 
-import { useSurvey, useSurveyCycleKeys, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
@@ -19,6 +18,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { ButtonSave, ButtonDelete } from '@webapp/components'
 
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { SamplingNodeDef as SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 /*
     BASE_UNIT annotations
@@ -46,7 +46,6 @@ const BaseUnitSelector = () => {
   const survey = useSurvey()
 
   const dispatch = useDispatch()
-  const cycleKeys = useSurveyCycleKeys()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
@@ -75,44 +74,11 @@ const BaseUnitSelector = () => {
 
       const referenceNodeDef = Survey.getNodeDefByUuid(entityReferenceUuid)(survey)
       if (A.isEmpty(referenceNodeDef)) return
-      const descentants = Survey.getDescendants({ nodeDef: referenceNodeDef })(survey)
-      const descendantEntities = descentants
-        .filter(NodeDef.isEntity)
-        .filter((_nodeDef) => NodeDef.isMultiple(_nodeDef) || NodeDef.isRoot(_nodeDef))
 
-      let _samplingNodeDefsToCreate = [] // store nodeDefs to trigger to the backend
-      const chainUuid = Chain.getUuid(chain)
-
-      descendantEntities.forEach((nodeDef) => {
-        const isBaseUnit = NodeDef.isEqual(nodeDef)(referenceNodeDef)
-        const name = isBaseUnit ? `weight` : `${NodeDef.getName(nodeDef)}_${NodeDef.getName(referenceNodeDef)}_area`
-
-        const props = {
-          [NodeDef.propKeys.name]: name,
-        }
-        const defaultValue = isBaseUnit ? `1` : `NA`
-
-        const advancedProps = {
-          [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
-          [NodeDef.keysPropsAdvanced.active]: true,
-          [NodeDef.keysPropsAdvanced.index]: -1,
-          [NodeDef.keysPropsAdvanced.isBaseUnit]: isBaseUnit,
-          [NodeDef.keysPropsAdvanced.isSampling]: true,
-          [NodeDef.keysPropsAdvanced.script]: `${NodeDef.getName(nodeDef)}$${name} <- ${defaultValue}`,
-        }
-        const parentNodeDef = isBaseUnit ? referenceNodeDef : nodeDef
-        const temporary = true
-        const virtual = false
-        const _nodeDef = NodeDef.newNodeDef(
-          parentNodeDef,
-          NodeDef.nodeDefType.decimal,
-          cycleKeys,
-          props,
-          advancedProps,
-          temporary,
-          virtual
-        )
-        _samplingNodeDefsToCreate.push(_nodeDef)
+      const _samplingNodeDefsToCreate = SamplingNodeDefs.newNodeDefs({
+        survey,
+        chain,
+        baseUnitNodeDef: referenceNodeDef,
       })
 
       setSamplingNodeDefsToCreate(_samplingNodeDefsToCreate)
