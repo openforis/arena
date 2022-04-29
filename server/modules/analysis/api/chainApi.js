@@ -140,7 +140,7 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await AnalysisService.cleanChainsOrphans({ user, surveyId })
+      await AnalysisService.cleanChains({ user, surveyId })
 
       Response.sendOk(res)
     } catch (error) {
