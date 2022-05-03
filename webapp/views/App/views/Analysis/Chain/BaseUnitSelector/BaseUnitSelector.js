@@ -14,6 +14,7 @@ import { useSurvey, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@w
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
+import { useConfirm } from '@webapp/components/hooks'
 
 import { ButtonSave, ButtonDelete } from '@webapp/components'
 
@@ -46,6 +47,7 @@ const BaseUnitSelector = () => {
   const survey = useSurvey()
 
   const dispatch = useDispatch()
+  const confirm = useConfirm()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
@@ -60,10 +62,15 @@ const BaseUnitSelector = () => {
   }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, samplingNodeDefsToCreate, setSamplingNodeDefsToCreate])
 
   const handleDeleteBaseUnitAndSamplingNodeDefs = useCallback(() => {
-    dispatch(NodeDefsActions.resetSamplingNodeDefs({ surveyId, surveyCycleKey, chain }))
-    setSamplingNodeDefsToCreate([])
-    setHadBaseUnitNodeDef(false)
-    setBaseUnitNodeDef(null)
+    confirm({
+      key: 'chainView.baseUnit.confirmDelete',
+      onOk: () => {
+        dispatch(NodeDefsActions.resetSamplingNodeDefs({ surveyId, surveyCycleKey, chain }))
+        setSamplingNodeDefsToCreate([])
+        setHadBaseUnitNodeDef(false)
+        setBaseUnitNodeDef(null)
+      },
+    })
   }, [surveyId, surveyCycleKey, chain])
 
   const handleUpdateBaseUnit = useCallback(
