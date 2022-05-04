@@ -100,12 +100,14 @@ export const insertUser = async (
 
 export const generateResetPasswordUuid = async (email, client = db) => {
   const user = await UserRepository.fetchUserByEmail(email, client)
-  if (user) {
-    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
-    return { uuid, user }
+  if (!user) {
+    throw new Error(Validation.messageKeys.user.emailNotFound)
   }
-
-  throw new Error(Validation.messageKeys.user.emailNotFound)
+  if (User.isInvited(user)) {
+    throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
+  }
+  const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
+  return { uuid, user }
 }
 
 export { insertUserAccessRequest } from '../repository/userAccessRequestRepository'
