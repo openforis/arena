@@ -120,9 +120,9 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
 
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
+    const invitation = invitationsByUserUuid[userUuid]
     const invitationValid =
-      invitationsByUserUuid[userUuid] ||
-      (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
+      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -177,7 +177,6 @@ export const fetchUsersBySurveyId = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    console.log('here')
     const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
       User.dissocPrivateProps
     )

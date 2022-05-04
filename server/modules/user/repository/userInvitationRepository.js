@@ -17,8 +17,15 @@ export const insertUserInvitation = async ({ user, survey, userToInvite }, clien
     [User.getUuid(userToInvite), Survey.getUuid(Survey.getSurveyInfo(survey)), User.getUuid(user)]
   )
 
+export const deleteUserInvitation = async ({ surveyUuid, userUuid }, client = db) =>
+  client.query(
+    `DELETE FROM ${tableName} 
+    WHERE survey_uuid = $1 AND user_uuid = $2`,
+    [surveyUuid, userUuid]
+  )
+
 export const updateRemovedDate = async ({ survey, userUuidToRemove }, client = db) =>
-  client.one(
+  client.oneOrNone(
     `UPDATE ${tableName}
     SET removed_date = (now() AT TIME ZONE 'UTC')
     WHERE user_uuid = $1 AND survey_uuid = $2
@@ -27,11 +34,20 @@ export const updateRemovedDate = async ({ survey, userUuidToRemove }, client = d
     [userUuidToRemove, Survey.getUuid(Survey.getSurveyInfo(survey))]
   )
 
+export const fetchUserInvitationBySurveyAndUserUuid = async ({ surveyUuid, userUuid }, client = db) =>
+  client.oneOrNone(
+    `SELECT *
+    FROM user_invitation
+    WHERE survey_uuid = $1 AND user_uuid = $2
+    `,
+    [surveyUuid, userUuid],
+    camelize
+  )
+
 export const fetchUserInvitationsBySurveyUuid = async ({ surveyUuid }, client = db) =>
   client.map(
     `
-    SELECT 
-        *
+    SELECT *
     FROM user_invitation
     WHERE survey_uuid = $1
     `,

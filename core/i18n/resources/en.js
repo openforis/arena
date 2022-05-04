@@ -228,6 +228,7 @@ Do you want to proceed?`,
     validationReport: 'Validation report',
 
     users: 'Users',
+    userInvite: 'Invite user',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
 

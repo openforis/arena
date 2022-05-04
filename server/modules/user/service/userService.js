@@ -4,7 +4,8 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as UserInvite from '@core/user/userInvite'
+import { UserInvitation } from '@core/user/userInvitation'
+import * as UserGroupInvitation from '@core/user/userGroupInvitation'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
@@ -105,16 +106,17 @@ export const inviteUser = async (
   { user, surveyId, surveyCycleKey, userToInvite: userToInviteParam, serverUrl, repeatInvitation = false },
   client = db
 ) => {
-  const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
+  const groupUuid = UserGroupInvitation.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
   const groupName = AuthGroup.getName(group)
 
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyUuid = Survey.getUuid(surveyInfo)
 
   _checkCanInviteToGroup({ user, group, surveyInfo })
 
-  const email = UserInvite.getEmail(userToInviteParam)
+  const email = UserGroupInvitation.getEmail(userToInviteParam)
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const emailParams = {
@@ -127,12 +129,14 @@ export const inviteUser = async (
 
   return client.tx(async (t) => {
     if (userToInvite) {
+      const userToInviteUuid = User.getUuid(userToInvite)
+
       // User to invite already exists
 
       if (User.hasAccepted(userToInvite)) {
         // User has already accepted an invitation previously
         // Check can be invited
-        _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
+        _checkUserCanBeInvited(userToInvite, surveyUuid)
 
         // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
@@ -142,10 +146,25 @@ export const inviteUser = async (
         // User has a pending invitation still
         // Generate reset password and send email again
         await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
-        await UserInvitationManager.cleanOldInvitations({ survey, userUuidToRemove: User.getUuid(userToInvite) }, t)
+        await UserInvitationManager.deleteUserInvitation({ surveyUuid, userUuid: userToInviteUuid }, t)
         await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
       } else {
-        throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+        // check if there is an old removed invitation; in that case allow the user to be invited again;
+        const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+          surveyUuid,
+          userUuid: userToInviteUuid,
+        })
+        if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
+          throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+        } else {
+          // Add user to group
+          await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+
+          // Generate reset password and send email again
+          await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+          await UserInvitationManager.deleteUserInvitation({ surveyUuid, userUuid: userToInviteUuid }, t)
+          await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
+        }
       }
       return { userInvited: userToInvite }
     } else {
@@ -292,7 +311,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
         user,
         surveyId: Survey.getId(survey),
         surveyCycleKey: Survey.cycleOneKey,
-        userToInvite: UserInvite.newUserInvite(email, AuthGroup.getUuid(group)),
+        userToInvite: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
         serverUrl,
       },
       t
