@@ -49,10 +49,7 @@ export const PostStratificationAttributeSelector = () => {
   const selectedItem = selectedCodeAttributeDef ? codeAttributeDefToItem(selectedCodeAttributeDef) : emptyItem
 
   const onChange = (item) => {
-    const postStratificationAttributeDefUuid = item?.key
-    const chainUpdated = postStratificationAttributeDefUuid
-      ? Chain.assocPostStratificationAttributeDefUuid(postStratificationAttributeDefUuid)(chain)
-      : Chain.dissocPostStratificationAttributeDefUuid(chain)
+    const chainUpdated = Chain.assocPostStratificationAttributeDefUuid(item?.key)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
