@@ -427,7 +427,26 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
 }
 
 // DELETE
-export const { deleteUser, deleteUserResetPasswordExpired } = UserManager
+export const { deleteUserResetPasswordExpired } = UserManager
+
+export const deleteUser = async ({ user, userUuidToRemove, surveyId }) => {
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
+  const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove)
+
+  await UserManager.deleteUser({ user, userUuidToRemove, survey })
+
+  if (User.hasAccepted(userToDelete)) {
+    // Send email
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const msgParams = {
+      name: User.getName(userToDelete),
+      surveyName: Survey.getName(surveyInfo),
+      surveyLabel: Survey.getDefaultLabel(surveyInfo),
+    }
+    const lang = User.getLang(user)
+    await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
+  }
+}
 
 // ==== User prefs
 export const { updateUserPrefs } = UserManager

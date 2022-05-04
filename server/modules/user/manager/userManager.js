@@ -328,6 +328,7 @@ export const updateUserPrefs = async (user) => ({
 export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
+    const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))
     return Promise.all([
       AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
       ActivityLogRepository.insert(
@@ -338,6 +339,6 @@ export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db
         false,
         t
       ),
-      UserInvitationManager.updateRemovedDate({ survey, userUuidToRemove }, t),
+      UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
   })

@@ -1375,7 +1375,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       The $t(common.appNameFull) team
       </p>`,
     temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
-    userInviteCommon: `<p>You have been invited to join the survey <strong>{{surveyName}} - {{surveyLabel}}</strong> as {{groupLabel}}</p>
+    userInviteCommon: `<p>You have been invited to join the survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,
@@ -1392,7 +1392,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.signature)`,
     },
     userInviteExistingUser: {
-      subject: 'You have been invited to join the survey <strong>{{surveyLabel}}</strong> in $t(common.appNameFull)!',
+      subject: `You have been invited to join the survey '{{surveyLabel}}' in $t(common.appNameFull)!`,
       body: `<p>Hello,</p>
              $t(emails.userInviteCommon)
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
@@ -1428,6 +1428,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.temporaryMsg)
              <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
              $t(emails.signature)`,
+    },
+    userDeleted: {
+      subject: `You have been deleted from the survey {{surveyLabel}} in $t(common.appNameFull)`,
+      body: `<p>Hello {{name}},</p>
+      <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
+      <p>If you want to have access again to that survey, please contact the survey administrator.</p>
+      $t(emails.signature)`,
     },
   },
 }

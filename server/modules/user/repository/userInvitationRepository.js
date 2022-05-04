@@ -24,14 +24,14 @@ export const deleteUserInvitation = async ({ surveyUuid, userUuid }, client = db
     [surveyUuid, userUuid]
   )
 
-export const updateRemovedDate = async ({ survey, userUuidToRemove }, client = db) =>
+export const updateRemovedDate = async ({ surveyUuid, userUuidToRemove }, client = db) =>
   client.oneOrNone(
     `UPDATE ${tableName}
     SET removed_date = (now() AT TIME ZONE 'UTC')
     WHERE user_uuid = $1 AND survey_uuid = $2
     AND removed_date is null
     RETURNING id`,
-    [userUuidToRemove, Survey.getUuid(Survey.getSurveyInfo(survey))]
+    [userUuidToRemove, surveyUuid]
   )
 
 export const fetchUserInvitationBySurveyAndUserUuid = async ({ surveyUuid, userUuid }, client = db) =>
