@@ -78,8 +78,6 @@ export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
 
 // ====== UPDATE
 export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
-export const assocStratumNodeDefUuid = (stratumNodeDefUuid) =>
-  ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)
 export const dissocStratumNodeDefUuid = ObjectUtils.dissocProp(keysProps.stratumNodeDefUuid)
 export const assocAreaWeightingMethod = (areaWeightingMethod) =>
   ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
@@ -92,6 +90,13 @@ export const assocPostStratificationAttributeDefUuid = (postStratificationAttrib
 export const dissocPostStratificationAttributeDefUuid = ObjectUtils.dissocProp(
   keysProps.postStratificationAttributeDefUuid
 )
+export const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (chain) => {
+  let chainUpdated = ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)(chain)
+  if (getPostStratificationAttributeDefUuid(chainUpdated) === stratumNodeDefUuid) {
+    chainUpdated = dissocPostStratificationAttributeDefUuid(chainUpdated)
+  }
+  return chainUpdated
+}
 export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
   let chainUpdated = ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)(chain)
   if (!isStratificationEnabled(chainUpdated)) {
