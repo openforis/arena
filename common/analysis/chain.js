@@ -29,6 +29,7 @@ export const keysProps = {
   reportingDataCategoryUuid: 'reportingDataCategoryUuid',
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   samplingStrategy: 'samplingStrategy',
+  postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
 }
 
 export const statusExec = {
@@ -69,6 +70,7 @@ export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeight
 export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
 export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrategy)
+export const getPostStratificationAttributeDefUuid = ObjectUtils.getProp(keysProps.postStratificationAttributeDefUuid)
 // ====== READ (reporting data)
 export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
 export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
@@ -85,13 +87,22 @@ export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
   ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
+export const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
+  ObjectUtils.setProp(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
+export const dissocPostStratificationAttributeDefUuid = ObjectUtils.dissocProp(
+  keysProps.postStratificationAttributeDefUuid
+)
 export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
   let chainUpdated = ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)(chain)
   if (!isStratificationEnabled(chainUpdated)) {
     chainUpdated = dissocStratumNodeDefUuid(chainUpdated)
   }
+  if (!isPostStratificationEnabled(chainUpdated)) {
+    chainUpdated = dissocPostStratificationAttributeDefUuid(chainUpdated)
+  }
   return chainUpdated
 }
+
 // ====== UPDATE (reporting data)
 const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([
   keys.props,
@@ -114,6 +125,13 @@ export const isStratificationEnabled = (chain) => {
   const samplingStrategy = getSamplingStrategy(chain)
   return (
     samplingStrategy && ![samplingStrategies.simpleRandom, samplingStrategies.systematic].includes(samplingStrategy)
+  )
+}
+export const isPostStratificationEnabled = (chain) => {
+  const samplingStrategy = getSamplingStrategy(chain)
+  return (
+    samplingStrategy &&
+    [samplingStrategies.simpleRandom, samplingStrategies.stratifiedSystematic].includes(samplingStrategy)
   )
 }
 export const isStratificationNotSpecifiedAllowed = () => {
