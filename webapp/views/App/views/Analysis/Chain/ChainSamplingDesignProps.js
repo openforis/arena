@@ -17,6 +17,7 @@ import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
+import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -38,6 +39,8 @@ export const ChainSamplingDesignProps = (props) => {
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
           {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
+
+          {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
 
           <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
             <Checkbox
