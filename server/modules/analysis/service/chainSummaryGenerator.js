@@ -105,10 +105,14 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   if (!chain) {
     throw new SystemError('chainNotFound', { chainUuid })
   }
-  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-  const stratumAttributeDef = Survey.getNodeDefByUuid(Chain.getStratumNodeDefUuid(chain))(survey)
-  const clusteringNodeDef = Survey.getNodeDefByUuid(Chain.getClusteringNodeDefUuid(chain))(survey)
+  const getNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(survey)
+
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const samplingStrategyIndex = Object.values(Chain.samplingStrategies).indexOf(Chain.getSamplingStrategy(chain))
+  const stratumAttributeDef = getNodeDefByUuid(Chain.getStratumNodeDefUuid(chain))
+  const postStratificationAttributeDef = getNodeDefByUuid(Chain.getPostStratificationAttributeDefUuid(chain))
+  const clusteringNodeDef = getNodeDefByUuid(Chain.getClusteringNodeDefUuid(chain))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
     showSamplingNodeDefs: true,
@@ -123,7 +127,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.isSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
+    ...(samplingStrategyIndex >= 0 ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     stratumAttribute: NodeDef.getName(stratumAttributeDef),
+    postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
