@@ -685,6 +685,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   chainView: {
+    baseUnit: {
+      confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
+    },
     downloadSummaryJSON: 'Download Summary (JSON)',
     formLabel: 'Processing chain label',
     basic: 'Basic',
