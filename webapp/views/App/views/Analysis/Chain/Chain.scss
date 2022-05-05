@@ -39,16 +39,15 @@
       }
     }
 
-    .sampling-strategy-dropdown {
-      width: 20rem;
-    }
-
-    .category-selector {
-      width: 40rem;
-    }
-
+    .sampling-strategy-dropdown,
+    .post-stratification-attribute-dropdown,
     .reporting-data-node-def-dropdown {
       width: 30rem;
     }
+
+    .category-selector {
+      width: 44rem;
+    }
+
   }
 }
