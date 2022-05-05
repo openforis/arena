@@ -8,12 +8,12 @@ Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using
 
 ### GitHub packages: authentication
 
-Arena requires some GitHub packages (@openforis/arena-server).
+Arena requires some GitHub packages (@openforis/arena-core and @openforis/arena-server).
 In order to do that, you must use a token with (at least) the `read:packages` scope.
 
 You can authenticate to GitHub Packages with npm by either editing your per-user ~/.npmrc file to include your personal access token or by logging in to npm on the command line using your username and personal access token.
 
-To authenticate by adding your personal access token to your ~/.npmrc file, edit the ~/.npmrc file for your project to include the following line, replacing TOKEN with your personal access token. Create a new ~/.npmrc file if one doesn't exist.
+To authenticate by adding your personal access token to your ~/.npmrc file, edit the ~/.npmrc file for your project to include the following line, replacing TOKEN with your personal access token. Create a new ~/.npmrc file if one doesn't exist and replace TOKEN with your personal access token.
 
 ```shell
 //npm.pkg.github.com/:_authToken=TOKEN
@@ -39,6 +39,18 @@ To install local database:
 ```shell script
 sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
 ``` 
+
+In order to access Arena when it's installed on a remote server, you need to request access to it or being invited to it.
+To simplify this process when working locally, you can insert a test user with System Administrator rights (username: test@openforis-arena.org - password: test) directly into the database running this SQL script with the SQL client you prefer:
+```
+INSERT INTO "user" (name, email, PASSWORD, status)
+VALUES ('Tester', 'test@openforis-arena.org', '$2a$10$6y2oUZVrQ7aXed.47h4sHeJA8VVA2dW9ObtO/XLveXSzQKBvTOyou', 'ACCEPTED');
+
+INSERT INTO auth_group_user (user_uuid, group_uuid)
+SELECT u.uuid, g.uuid
+FROM "user" u 
+    JOIN auth_group g ON u.email = 'test@openforis-arena.org' AND g.name = 'systemAdmin';
+```
 
 To restart local database:
 ```shell script
