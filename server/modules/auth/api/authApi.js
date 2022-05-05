@@ -47,14 +47,6 @@ export const init = (app) => {
     }
   })
 
-  // app.post('/auth/login', async (req, res, next) => {
-  //   passport.authenticate('local', (err, user, info) => {
-  //     if (err) return next(err)
-  //     if (!user) res.json(info)
-  //     else authenticationSuccessful(req, res, next, user)
-  //   })(req, res, next)
-  // })
-
   app.post('/auth/logout', async (req, res, next) => {
     try {
       // Before logout checkOut record if there's an opened thread
