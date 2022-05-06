@@ -98,7 +98,7 @@
   },
   "dependencies": {
     "@openforis/arena-core": "^0.0.75",
-    "@openforis/arena-server": "file://home/ste/dev/projects/openforis/arena-server/",
+    "@openforis/arena-server": "^0.1.20",
     "@sendgrid/mail": "^7.6.0",
     "@shopify/draggable": "^1.0.0-beta.8",
     "ace-builds": "^1.4.13",
