@@ -37,3 +37,10 @@ arena.getQuotedFileContent <- function(filename) {
 
 # processing chain starting time
 arena.startTime <- Sys.time()
+
+# processing chain summary info
+chain_summary_json <- paste(getwd(), 'chain_summary.json', sep = .Platform$file.sep)
+if ( file.exists( chain_summary_json ) ) {
+  arena.chainSummary <- jsonlite::fromJSON( chain_summary_json )
+}
+rm( chain_summary_json )

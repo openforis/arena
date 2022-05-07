@@ -20,8 +20,10 @@ export const StratumAttributeSelector = () => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const onChange = (item) => {
-    const stratumNodeDefUuid = item.key
-    const chainUpdated = Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
+    const stratumNodeDefUuid = item?.key
+    const chainUpdated = stratumNodeDefUuid
+      ? Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
+      : Chain.dissocStratumNodeDefUuid(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
@@ -37,7 +39,10 @@ export const StratumAttributeSelector = () => {
   const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getName(nodeDef) })
 
   const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
-  const selectableItems = [emptySelectionItem, ...selectableDefs.map(nodeDefToItem)]
+  const selectableItems = [
+    ...(Chain.isStratificationNotSpecifiedAllowed(chain) ? [emptySelectionItem] : []),
+    ...selectableDefs.map(nodeDefToItem),
+  ]
 
   const selectedNodeDefUuid = Chain.getStratumNodeDefUuid(chain)
   const selectedNodeDef = selectedNodeDefUuid ? Survey.getNodeDefByUuid(selectedNodeDefUuid)(survey) : null

@@ -1,6 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-import Header from '@webapp/components/header'
 import { ButtonDownload } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -15,14 +15,18 @@ const HeaderLeft = (props) => {
   const i18n = useI18n()
 
   return (
-    <Header>
-      <h6>{i18n.t('homeView.collectImportReport.title')}</h6>
+    <header>
       <FormItem className="exclude-resolved" label={i18n.t('homeView.collectImportReport.excludeResolvedItems')}>
         <Checkbox checked={excludeResolved} onChange={(value) => setExcludeResolved(value)} />
       </FormItem>
       <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.csvExport" />
-    </Header>
+    </header>
   )
+}
+
+HeaderLeft.propTypes = {
+  excludeResolved: PropTypes.bool.isRequired,
+  setExcludeResolved: PropTypes.func.isRequired,
 }
 
 export default HeaderLeft

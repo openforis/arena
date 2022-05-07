@@ -46,7 +46,7 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang, editorType }) => {
+const getChildDefVariables = ({ survey, childDef, mode, lang, editorType, nodeDefCurrent = null }) => {
   if (Expression.isValidExpressionType(childDef)) {
     // exclude nodes that reference the current one
     const referenceCurrentNode =
@@ -65,7 +65,7 @@ const getChildDefVariables = ({ survey, nodeDefCurrent, childDef, mode, lang, ed
   return []
 }
 
-const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, editorType }) => {
+const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorType, nodeDefCurrent = null }) => {
   const variables = []
   const stack = []
   const entitiesVisitedByUuid = {}
@@ -93,7 +93,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
       // get variables from every child def
       const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
       nodeDefChildren.forEach((childDef) => {
-        variables.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang, editorType }))
+        variables.push(...getChildDefVariables({ survey, childDef, mode, lang, editorType, nodeDefCurrent }))
 
         // if the child def is a single entity, include variables from the descendants of that entity
         if (NodeDef.isSingleEntity(childDef)) {
@@ -108,8 +108,8 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, nodeDefCurrent, mod
   return variables
 }
 
-const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
-  const variablesGroupedByParentUuid = (variables || []).reduce(
+const getVariablesGroupedByParentUuid = ({ variables, survey, nodeDefCurrent = null }) => {
+  const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
       [variable.parentUuid]: [...(byParentUuid[variable.parentUuid] || []), variable],
@@ -117,7 +117,7 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
     {}
   )
 
-  return Object.entries(variablesGroupedByParentUuid)
+  const groups = Object.entries(variablesGroupedByParentUuid)
     .map(([parentUuid, variablesParent]) => {
       const parentNodeDef = Survey.getNodeDefByUuid(parentUuid)(survey)
       return {
@@ -127,6 +127,13 @@ const getVariablesGroupedByParentUuid = ({ variables, survey }) => {
       }
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
+
+  if (!nodeDefCurrent) {
+    return groups
+  }
+  // always show current variable at the beginning
+  const currentVariable = variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  return [currentVariable, ...groups]
 }
 
 const _sortVariables = ({ nodeDefCurrent, variables }) => {
@@ -146,11 +153,11 @@ const _sortVariables = ({ nodeDefCurrent, variables }) => {
 export const getVariables = ({
   survey: surveyParam,
   nodeDefContext,
-  nodeDefCurrent,
   mode,
   lang: langPreferred,
   groupByParent,
   editorType,
+  nodeDefCurrent = null,
 }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
@@ -159,7 +166,7 @@ export const getVariables = ({
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
 }
 
 export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, groupByParent }) => {
@@ -169,11 +176,11 @@ export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, m
   const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext)(survey)
 
   const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
-    variablesAcc.push(...getChildDefVariables({ survey, nodeDefCurrent, childDef, mode, lang }))
+    variablesAcc.push(...getChildDefVariables({ survey, childDef, mode, lang, nodeDefCurrent }))
     return variablesAcc
   }, [])
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey }) : variables
+  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
 }

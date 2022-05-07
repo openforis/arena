@@ -15,7 +15,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import CategorySelector from '@webapp/components/survey/CategorySelector'
+import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
 

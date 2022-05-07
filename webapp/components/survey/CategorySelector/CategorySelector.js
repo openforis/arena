@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
@@ -11,23 +12,41 @@ import { useSurveyId } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 import { TestId } from '@webapp/utils/testId'
 
+import { useNotifyWarning } from '@webapp/components/hooks'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 
-const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, onChange, onCategoryLoad } = props
+export const CategorySelector = (props) => {
+  const {
+    disabled,
+    categoryUuid,
+    validation,
+    showManage,
+    showAdd,
+    onChange,
+    onCategoryLoad,
+    filterFunction,
+    emptySelection,
+  } = props
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const notifyWarning = useNotifyWarning()
 
   const [category, setCategory] = useState({})
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
-  const categoriesLookupFunction = async (value) => API.fetchCategories({ surveyId, search: value })
+  const emptyItem = { uuid: null, label: i18n.t('common.notSpecified') }
+
+  const categoriesLookupFunction = async (value) => {
+    const categories = await API.fetchCategories({ surveyId, search: value })
+    const filteredCategories = filterFunction ? categories.filter(filterFunction) : categories
+    return emptySelection ? [emptyItem, ...filteredCategories] : filteredCategories
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -39,23 +58,40 @@ const CategorySelector = (props) => {
         setCategory(null)
       }
     })()
-  }, [categoryUuid, showCategoriesPanel])
+  }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
+
+  const onCategoryUpdate = useCallback(
+    ({ category: categoryUpdated }) => {
+      setCategoryToEdit(categoryUpdated)
+    },
+    [setCategoryToEdit]
+  )
+
+  const checkEditCategoryNameSpecified = useCallback(() => {
+    if (StringUtils.isBlank(Category.getName(categoryToEdit))) {
+      notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
+      return false
+    }
+    return true
+  }, [surveyId, categoryToEdit, notifyWarning])
 
   const onCategoryEditPanelClose = useCallback(async () => {
-    const categoryEditedUuid = categoryToEdit.uuid
+    const categoryEditedUuid = Category.getUuid(categoryToEdit)
     const { deleted } = await API.cleanupCategory({ surveyId, categoryUuid: categoryEditedUuid })
     if (deleted) {
       if (categoryUuid === categoryEditedUuid) {
         // previously selected category has been deleted, deselect it from dropdown
         onChange(null)
       }
-    } else {
+      // close edit panel
+      setCategoryToEdit(null)
+    } else if (checkEditCategoryNameSpecified()) {
       // update category dropdown with latest changes
       onChange(categoryToEdit)
+      // close edit panel
+      setCategoryToEdit(null)
     }
-    // close edit panel
-    setCategoryToEdit(null)
-  }, [categoryToEdit])
+  }, [categoryUuid, categoryToEdit, onChange, surveyId, setCategoryToEdit, checkEditCategoryNameSpecified])
 
   return (
     <div className="category-selector">
@@ -64,12 +100,12 @@ const CategorySelector = (props) => {
         disabled={disabled}
         items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}
-        itemLabel={Category.getName}
+        itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
         selection={category}
         onChange={onChange}
       />
-      {showAdd && (
+      {!disabled && showAdd && (
         <ButtonMetaItemAdd
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
@@ -94,7 +130,7 @@ const CategorySelector = (props) => {
           header={i18n.t('appModules.categories')}
         >
           <CategoryList
-            canSelect
+            canSelect={!disabled}
             selectedItemUuid={categoryUuid}
             onSelect={onChange}
             onCategoryCreated={setCategoryToEdit}
@@ -104,7 +140,11 @@ const CategorySelector = (props) => {
       )}
       {categoryToEdit && (
         <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')}>
-          <CategoryDetails categoryUuid={Category.getUuid(categoryToEdit)} showClose={false} />
+          <CategoryDetails
+            categoryUuid={Category.getUuid(categoryToEdit)}
+            onCategoryUpdate={onCategoryUpdate}
+            showClose={false}
+          />
         </PanelRight>
       )}
     </div>
@@ -119,6 +159,8 @@ CategorySelector.propTypes = {
   showAdd: PropTypes.bool,
   onChange: PropTypes.func,
   onCategoryLoad: PropTypes.func,
+  filterFunction: PropTypes.func,
+  emptySelection: PropTypes.bool,
 }
 
 CategorySelector.defaultProps = {
@@ -129,6 +171,6 @@ CategorySelector.defaultProps = {
   showAdd: true,
   onChange: () => ({}),
   onCategoryLoad: () => ({}),
+  filterFunction: null,
+  emptySelection: false,
 }
-
-export default CategorySelector

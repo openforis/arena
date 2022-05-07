@@ -43,10 +43,19 @@ const getVariableNameStart = ({ value, end }) => _findCharIndex({ value, end, ma
 const variablesSeparatorRegex = /[\s\-+*/&|]/
 const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: variablesSeparatorRegex })
 
-const getVariableCompletion = ({ group, variable, token }) => {
+const getVariableCompletion = ({ group = null, variable, token }) => {
   const { label, value } = variable
 
-  const text = `${group.label} / ${label && label !== value ? `${label} (${value})` : value}`
+  const textParts = []
+  if (group) {
+    textParts.push(`${group.label}`)
+  }
+  if (label && label !== value) {
+    textParts.push(`${label} (${value})`)
+  } else {
+    textParts.push(value)
+  }
+  const text = textParts.join(' / ')
   const data = { text, value }
 
   return {
@@ -85,16 +94,25 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
   const completions = []
   const start = token.string.toLowerCase().slice(token.start, token.end)
 
+  const includeVariableIfStartsWith = ({ group = null, variable }) => {
+    ;[variable.value, variable.label].some((varName) => {
+      if (varName && varName.toLowerCase().startsWith(start)) {
+        completions.push(getVariableCompletion({ group, variable, token }))
+        // Either node.value or node.label matches - no need for both
+        return true
+      }
+      return false
+    })
+  }
+
   variablesGroupedByParentEntity.forEach((group) => {
-    group.options.forEach((variable) => {
-      ;[variable.value, variable.label].some((varName) => {
-        if (varName && varName.toLowerCase().startsWith(start)) {
-          completions.push(getVariableCompletion({ group, variable, token }))
-          // Either node.value or node.label matches - no need for both
-          return true
-        }
-        return false
-      })
+    // group can be a variable (current node def variable)
+    if (group.value) {
+      includeVariableIfStartsWith({ variable: group })
+    }
+
+    group.options?.forEach((variable) => {
+      includeVariableIfStartsWith({ group, variable })
     })
   })
 

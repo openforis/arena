@@ -264,7 +264,7 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
-export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex, draft = false }, client = db) =>
+export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) =>
   client.one(
     `SELECT COUNT(i.*) 
      FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -337,24 +337,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
-export const getCategoryStreamAndHeaders = ({ surveyId, categoryUuid, levels, languages, category }) => {
-  const headers = CategoryExportRepository.getCategoryExportHeaders({ levels, languages, category })
-  const extraPropsHeaders = CategoryExportRepository.getCategoryExportHeadersExtraProps({ levels, languages, category })
-
-  const query = CategoryExportRepository.generateCategoryExportQuery({
-    surveyId,
-    categoryUuid,
-    levels,
-    headers,
-    extraPropsHeaders,
-    languages,
-  })
-
-  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(query, [categoryUuid]))
-  return { stream, headers, extraPropsHeaders }
-}
-
-export const { writeCategoryExportTemplateToStream } = CategoryExportRepository
+export const { generateCategoryExportStreamAndHeaders } = CategoryExportRepository
 
 // ============== UPDATE
 

@@ -22,6 +22,11 @@
 
     .button-bar {
       align-self: center;
+
+      .chain-summary-download-btn {
+        position: absolute;
+        left: 0;
+      }
     }
 
     .btn-rstudio-container {
@@ -33,5 +38,16 @@
         max-width: 120px;
       }
     }
+
+    .sampling-strategy-dropdown,
+    .post-stratification-attribute-dropdown,
+    .reporting-data-node-def-dropdown {
+      width: 30rem;
+    }
+
+    .category-selector {
+      width: 44rem;
+    }
+
   }
 }
