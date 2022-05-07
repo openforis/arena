@@ -5,7 +5,6 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Expression from '@core/expressionParser/expression'
 
-import { recordExpressionFunctions } from './recordEpressionFunctions'
 import { identifierEval } from './identifierEval'
 import { memberEval } from './memberEval'
 
@@ -14,9 +13,9 @@ export const evalNodeQuery = (survey, record, node, query) => {
     [Expression.types.Identifier]: identifierEval(survey, record),
     [Expression.types.MemberExpression]: memberEval,
   }
-  const functions = recordExpressionFunctions({ survey, record, node })
 
-  return Expression.evalString(query, { node, evaluators, functions })
+  console.log('evalNodeQuery', query, { node, evaluators })
+  return Expression.evalString(query, { node, evaluators })
 }
 
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {

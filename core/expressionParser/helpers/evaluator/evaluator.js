@@ -160,6 +160,7 @@ const _evalExpressionInternal = (expr, ctx) => {
 }
 
 export const evalExpression = (expr, ctx = {}) => {
+  console.log('evalExpression', expr, JSON.stringify(ctx, null, 2))
   const { evaluators: evaluatorsCtx } = ctx
   const evaluators = { ...evaluatorsDefault({ evalExpression: _evalExpressionInternal }), ...evaluatorsCtx }
   return _evalExpressionInternal(expr, { ...ctx, evaluators })
