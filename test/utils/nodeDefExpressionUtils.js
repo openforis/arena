@@ -15,7 +15,7 @@ const _expectResult = ({ result, resultExpected }) => {
 }
 
 const _testExpressions = ({ queries, expressionEvaluator }) =>
-  queries.forEach(({ q, r, n = null, e: errorExpected = false, s = true }) => {
+  queries.forEach(({ q, r, n = null, e = null, s = true }) => {
     const testTitle = `${q}${n ? ` (${n})` : ''}`
 
     it(testTitle, () => {
@@ -23,8 +23,8 @@ const _testExpressions = ({ queries, expressionEvaluator }) =>
         const result = expressionEvaluator({ nodePath: n, query: q, selfReferenceAllowed: s })
         _expectResult({ result, resultExpected: r })
       } catch (error) {
-        if (errorExpected) {
-          expect(error).not.toBeNull()
+        if (e) {
+          expect(error).toEqual(e)
         } else {
           throw error
         }

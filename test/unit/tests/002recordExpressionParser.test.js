@@ -1,3 +1,6 @@
+import * as Validation from '@core/validation/validation'
+import { SystemError } from '@openforis/arena-core'
+
 import * as RecordUtils from '../../utils/recordUtils'
 import * as DataTest from '../../utils/dataTest'
 import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
@@ -163,8 +166,8 @@ describe('RecordExpressionParser Test', () => {
     // global objects (String)
     { q: 'String.fromCharCode(65, 66, 67)', r: 'ABC' },
     // global objects (unknown objects/functions)
-    { q: 'Invalid.func(1)', e: true },
-    { q: 'Math.unknownFunc(1)', e: true },
+    { q: 'Invalid.func(1)', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
+    { q: 'Math.unknownFunc(1)', e: new SystemError('undefinedFunction') },
     // native properties (number)
     { q: 'Math.PI.toFixed(2)', r: '3.14' },
     { q: 'plot[0].tree[1].dbh.toFixed(1)', r: '10.1' },
@@ -188,10 +191,10 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_date.year', r: 2021 },
     { q: 'visit_date.month', r: 1 },
     { q: 'visit_date.day', r: 1 },
-    { q: 'visit_date.week', e: true },
+    { q: 'visit_date.week', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
     { q: 'visit_time.hour', r: 10 },
     { q: 'visit_time.minute', r: 30 },
-    { q: 'visit_time.seconds', e: true },
+    { q: 'visit_time.seconds', e: new SystemError(Validation.messageKeys.expressions.unableToFindNode) },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
