@@ -159,7 +159,7 @@ export const {
 export const {
   addNodeDefDependencies,
   getDependencyGraph,
-  getNodeDefDependencies,
+  getNodeDefDependenciesUuids,
   hasDependencyGraph,
   isNodeDefDependentOn,
   removeNodeDefDependencies,

@@ -64,21 +64,23 @@ export const hasDependencyGraph = (survey) => {
   return !R.isEmpty(graph)
 }
 
-export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => (survey) => {
-  const dependencyGraphsByType = getDependencyGraph(survey)
-  if (dependencyType) {
-    return R.pathOr([], [dependencyType, nodeDefUuid])(dependencyGraphsByType)
-  }
-  // Return all node def dependents
-  const nodeDefDependents = Object.values(dependencyGraphsByType).reduce((accDependents, graph) => {
-    const dependents = R.propOr([], nodeDefUuid)(graph)
-    if (R.isEmpty(dependents)) {
-      return accDependents
+export const getNodeDefDependenciesUuids =
+  (nodeDefUuid, dependencyType = null) =>
+  (survey) => {
+    const dependencyGraphsByType = getDependencyGraph(survey)
+    if (dependencyType) {
+      return R.pathOr([], [dependencyType, nodeDefUuid])(dependencyGraphsByType)
     }
-    return [...accDependents, ...dependents]
-  }, [])
-  return R.uniq(nodeDefDependents)
-}
+    // Return all node def dependents
+    const nodeDefDependents = Object.values(dependencyGraphsByType).reduce((accDependents, graph) => {
+      const dependents = R.propOr([], nodeDefUuid)(graph)
+      if (R.isEmpty(dependents)) {
+        return accDependents
+      }
+      return [...accDependents, ...dependents]
+    }, [])
+    return R.uniq(nodeDefDependents)
+  }
 
 /**
  * Determines if the specified nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
@@ -106,12 +108,12 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 
     visitedUuids.add(nodeDefUuidCurrent)
 
-    const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
+    const dependenciesDefUuids = getNodeDefDependenciesUuids(nodeDefUuidCurrent)(survey)
     R.forEach((nodeDefUuidDependent) => {
       if (!visitedUuids.has(nodeDefUuidDependent)) {
         stack.push(nodeDefUuidDependent)
       }
-    })(dependencies)
+    })(dependenciesDefUuids)
   }
 
   return false
@@ -151,17 +153,19 @@ export const buildAndAssocDependencyGraph = (survey) =>
   R.pipe(buildGraph, (graph) => assocDependencyGraph(graph)(survey))(survey)
 
 // DELETE
-export const removeNodeDefDependencies = (nodeDefUuid, dependencyType = null) => (survey) => {
-  const dependencyGraph = getDependencyGraph(survey)
-  let dependencyGraphUpdated
-  if (dependencyType) {
-    dependencyGraphUpdated = R.dissocPath([dependencyType, nodeDefUuid])(dependencyGraph)
-  } else {
-    const dependencyTypes = Object.keys(dependencyGraph)
-    dependencyGraphUpdated = dependencyTypes.reduce(
-      (dependencyGraphAcc, type) => R.dissocPath([type, nodeDefUuid])(dependencyGraphAcc),
-      dependencyGraph
-    )
+export const removeNodeDefDependencies =
+  (nodeDefUuid, dependencyType = null) =>
+  (survey) => {
+    const dependencyGraph = getDependencyGraph(survey)
+    let dependencyGraphUpdated
+    if (dependencyType) {
+      dependencyGraphUpdated = R.dissocPath([dependencyType, nodeDefUuid])(dependencyGraph)
+    } else {
+      const dependencyTypes = Object.keys(dependencyGraph)
+      dependencyGraphUpdated = dependencyTypes.reduce(
+        (dependencyGraphAcc, type) => R.dissocPath([type, nodeDefUuid])(dependencyGraphAcc),
+        dependencyGraph
+      )
+    }
+    return assocDependencyGraph(dependencyGraphUpdated)(survey)
   }
-  return assocDependencyGraph(dependencyGraphUpdated)(survey)
-}

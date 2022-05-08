@@ -177,7 +177,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
   const nodeDefDependentsUuids = R.pipe(
     Survey.buildAndAssocDependencyGraph,
-    Survey.getNodeDefDependencies(nodeDefUuid),
+    Survey.getNodeDefDependenciesUuids(nodeDefUuid),
     // exclude self-dependencies
     R.without(nodeDefUuid)
   )(survey)

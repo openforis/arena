@@ -14,7 +14,7 @@ export const evalNodeQuery = (survey, record, node, query) => {
     [Expression.types.MemberExpression]: memberEval,
   }
 
-  console.log('evalNodeQuery', query, { node, evaluators })
+  console.log('AAAAAA', node)
   return Expression.evalString(query, { node, evaluators })
 }
 

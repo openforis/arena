@@ -23,6 +23,7 @@ const _logExpressionError = ({ error, expressionType, survey, nodeDef, expressio
  */
 
 export const updateSelfAndDependentsApplicable = ({ survey, record, node, logger }) => {
+  //console.log("updateSelfAndDependentsApplicable", JSON.stringify({ survey, record, node, logger }, null, 2))
   // Output
   const nodesUpdatedToPersist = {}
   const nodesWithApplicabilityUpdated = {}

@@ -177,7 +177,6 @@ export const fetchUsersBySurveyId = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    console.log('here')
     const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
       User.dissocPrivateProps
     )

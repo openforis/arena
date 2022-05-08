@@ -139,12 +139,12 @@ export const getDependentNodePointers =
   (record) => {
     const nodeDefUuid = Node.getNodeDefUuid(node)
     const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
-    const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
+    const dependentDefUuids = SurveyDependencies.getNodeDefDependenciesUuids(nodeDefUuid, dependencyType)(survey)
 
     const nodePointers = []
 
-    if (dependentUuids) {
-      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
+    if (dependentDefUuids) {
+      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentDefUuids)(survey)
 
       for (const dependentDef of dependentDefs) {
         // 1 find common parent def
