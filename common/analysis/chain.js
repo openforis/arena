@@ -30,6 +30,7 @@ export const keysProps = {
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   samplingStrategy: 'samplingStrategy',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
+  nonResponseBiasCorrection: 'nonResponseBiasCorrection',
   pValue: 'pValue',
 }
 
@@ -75,6 +76,7 @@ export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clustering
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
 export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrategy)
 export const getPostStratificationAttributeDefUuid = ObjectUtils.getProp(keysProps.postStratificationAttributeDefUuid)
+export const isNonResponseBiasCorrection = ObjectUtils.isPropTrue(keysProps.nonResponseBiasCorrection)
 export const getPValue = ObjectUtils.getProp(keysProps.pValue, pValueDefault)
 
 // ====== READ (reporting data)
@@ -106,6 +108,9 @@ export const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (chain) => {
   return chainUpdated
 }
 const resetStratumNodeDefUuid = assocStratumNodeDefUuid(null)
+
+export const assocNonResponseBiasCorrection = (nonResponseBiasCorrection) =>
+  ObjectUtils.setProp(keysProps.nonResponseBiasCorrection, nonResponseBiasCorrection)
 
 export const assocPValue = (pValue) => ObjectUtils.setProp(keysProps.pValue, pValue)
 const resetPValue = assocPValue(null)
