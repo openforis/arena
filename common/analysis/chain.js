@@ -30,6 +30,7 @@ export const keysProps = {
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   samplingStrategy: 'samplingStrategy',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
+  pValue: 'pValue',
 }
 
 export const statusExec = {
@@ -45,6 +46,9 @@ export const samplingStrategies = {
   stratifiedSystematic: 'stratifiedSystematic',
   // doublePhase: 'doublePhase'
 }
+
+export const pValues = [0.99, 0.98, 0.95, 0.9, 0.8]
+export const pValueDefault = 0.95
 
 // ====== READ
 
@@ -71,6 +75,8 @@ export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clustering
 export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
 export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrategy)
 export const getPostStratificationAttributeDefUuid = ObjectUtils.getProp(keysProps.postStratificationAttributeDefUuid)
+export const getPValue = ObjectUtils.getProp(keysProps.pValue, pValueDefault)
+
 // ====== READ (reporting data)
 export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
 export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
@@ -78,18 +84,20 @@ export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
 
 // ====== UPDATE
 export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
-export const dissocStratumNodeDefUuid = ObjectUtils.dissocProp(keysProps.stratumNodeDefUuid)
+
 export const assocAreaWeightingMethod = (areaWeightingMethod) =>
   ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
+
 export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
+
 export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
   ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
+
 export const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
   ObjectUtils.setProp(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
-export const dissocPostStratificationAttributeDefUuid = ObjectUtils.dissocProp(
-  keysProps.postStratificationAttributeDefUuid
-)
+const resetPostStratificationAttributeDefUuid = assocPostStratificationAttributeDefUuid(null)
+
 export const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (chain) => {
   let chainUpdated = ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)(chain)
   if (getPostStratificationAttributeDefUuid(chainUpdated) === stratumNodeDefUuid) {
@@ -97,13 +105,21 @@ export const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (chain) => {
   }
   return chainUpdated
 }
+const resetStratumNodeDefUuid = assocStratumNodeDefUuid(null)
+
+export const assocPValue = (pValue) => ObjectUtils.setProp(keysProps.pValue, pValue)
+const resetPValue = assocPValue(null)
+
 export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
   let chainUpdated = ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)(chain)
   if (!isStratificationEnabled(chainUpdated) && getStratumNodeDefUuid(chainUpdated)) {
-    chainUpdated = assocStratumNodeDefUuid(null)(chainUpdated)
+    chainUpdated = resetStratumNodeDefUuid(chainUpdated)
   }
   if (!isPostStratificationEnabled(chainUpdated) && getPostStratificationAttributeDefUuid(chainUpdated)) {
-    chainUpdated = assocPostStratificationAttributeDefUuid(null)(chainUpdated)
+    chainUpdated = resetPostStratificationAttributeDefUuid(chainUpdated)
+  }
+  if (!samplingStrategy) {
+    chainUpdated = resetPValue(chainUpdated)
   }
   return chainUpdated
 }
@@ -147,10 +163,7 @@ export const isStratificationNotSpecifiedAllowed = () => {
 
 // ====== VALIDATION
 // The validation object contains the validation of chain index by uuids
-export const { getValidation } = Validation
-export const { hasValidation } = Validation
-export const { assocValidation } = Validation
-export const { dissocValidation } = Validation
+export const { getValidation, hasValidation, assocValidation, dissocValidation } = Validation
 
 export const getItemValidationByUuid = (uuid) => R.pipe(getValidation, Validation.getFieldValidation(uuid))
 export const assocItemValidation = (uuid, validation) => (chain) =>
