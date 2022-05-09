@@ -61,3 +61,5 @@ export const hasEmptyLevels = (state) => {
 export const isCleaned = A.propOr(false, keys.cleaned)
 
 export const isEditingItemExtraDefs = A.propOr(false, keys.editingItemExtraDefs)
+
+export const getOnCategoryUpdate = A.propOr(null, keys.onCategoryUpdate)

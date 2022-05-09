@@ -27,7 +27,7 @@ import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 const MAX_LEVELS = 5
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryCreated, categoryUuid: categoryUuidProp } = props
+  const { showClose, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
@@ -35,7 +35,10 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
 
-  const { state, setState } = useLocalState({ onCategoryCreated, categoryUuid: categoryUuidProp || categoryUuidParam })
+  const { state, setState } = useLocalState({
+    categoryUuid: categoryUuidProp || categoryUuidParam,
+    onCategoryUpdate,
+  })
   const Actions = useActions({ setState })
 
   const category = State.getCategory(state)
@@ -77,8 +80,30 @@ const CategoryDetails = (props) => {
           <ButtonDownload
             testId={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label={'common.csvExport'}
+            label="common.csvExport"
           />
+          <ButtonMenu
+            label="categoryEdit.templateForDataImport"
+            iconClassName="icon-download2 icon-14px"
+            popupComponent={
+              <>
+                <ButtonDownload
+                  className="btn-transparent"
+                  testId={TestId.categoryDetails.templateForDataImportBtn}
+                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                  label="categoryEdit.templateForDataImport"
+                />
+                <ButtonDownload
+                  className="btn-transparent"
+                  testId={TestId.categoryDetails.templateForDataImportGenericBtn}
+                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                  requestParams={{ generic: true }}
+                  label="categoryEdit.templateForDataImportGeneric"
+                />
+              </>
+            }
+          />
+
           {Category.isReportingData(category) && (
             <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
               <Checkbox checked disabled={readOnly} onChange={Actions.convertToSimpleCategory} />
@@ -88,16 +113,18 @@ const CategoryDetails = (props) => {
             <ButtonMenu
               iconClassName="icon-cog icon-14px"
               popupComponent={
-                <div>
+                <>
                   <Button
+                    className="btn-transparent"
                     label="categoryEdit.convertToReportingDataCategory.buttonLabel"
-                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid })}
+                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate })}
                   />
                   <Button
+                    className="btn-transparent"
                     label="categoryEdit.extraPropertiesEditor.title"
                     onClick={Actions.toggleEditExtraPropertiesPanel}
                   />
-                </div>
+                </>
               }
             />
           )}
@@ -142,13 +169,13 @@ const CategoryDetails = (props) => {
 
 CategoryDetails.propTypes = {
   categoryUuid: PropTypes.string,
-  onCategoryCreated: PropTypes.func,
+  onCategoryUpdate: PropTypes.func,
   showClose: PropTypes.bool,
 }
 
 CategoryDetails.defaultProps = {
   categoryUuid: null,
-  onCategoryCreated: null,
+  onCategoryUpdate: null,
   showClose: true,
 }
 

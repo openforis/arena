@@ -6,7 +6,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Chain from '@common/analysis/chain'
 
-import CategorySelector from '@webapp/components/survey/CategorySelector'
+import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
@@ -25,10 +25,12 @@ export const ReportingDataAttributeDefs = (props) => {
       <FormItem label={i18n.t('chainView.reportingDataCategory')}>
         <CategorySelector
           categoryUuid={Chain.getReportingDataCategoryUuid(chain)}
+          emptySelection
           filterFunction={Category.isReportingData}
           onChange={(category) => {
-            updateChain(Chain.assocReportingDataCategoryUuid(Category.getUuid(category))(chain))
-            if (!category) setReportingDataCategory(null)
+            const categoryUuid = Category.getUuid(category)
+            updateChain(Chain.assocReportingDataCategoryUuid(categoryUuid)(chain))
+            if (!categoryUuid) setReportingDataCategory(null)
           }}
           onCategoryLoad={setReportingDataCategory}
           showAdd={false}

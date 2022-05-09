@@ -26,7 +26,7 @@ export const insertTestUser = async () =>
             g.uuid
         FROM
             "user" u
-        JOIN auth_group g ON u.email = 'test@arena.com'
+        JOIN auth_group g ON u.email = 'test@openforis-arena.org'
             AND g.name = 'systemAdmin'`
     )
   })

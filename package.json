@@ -35,11 +35,13 @@
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",
     "watch:server": "cross-env NODE_ENV=development webpack --config webpack.config.server.babel.js --watch",
     "watch": "npm run build:server:dev && npm-run-all --parallel client:dev-server dev:server:nodemon watch:server",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.0",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.16.4",
@@ -47,18 +49,17 @@
     "@babel/register": "^7.16.0",
     "@babel/runtime-corejs3": "^7.16.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
-    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.3",
     "cache-loader": "^4.1.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "csv-load-sync": "^2.3.1",
-    "eslint": "^8.3.0",
-    "eslint-config-airbnb": "^19.0.1",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^26.1.4",
     "eslint-plugin-jest-playwright": "^0.6.0",
     "eslint-plugin-jsdoc": "^37.1.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
@@ -198,11 +199,6 @@
     "last 2 versions"
   ],
   "version": "0.3.9",
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint-staged"
-    }
-  },
   "lint-staged": {
     "{common,core,server,test,webapp}/**/*.js": "eslint --cache --fix"
   }

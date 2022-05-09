@@ -54,6 +54,7 @@ const _getRStudioCode = ({
   unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");\r\n
   file.remove("${zipFile}");\r\n
   ${isLocal ? `setwd('${localDir}');` : ''}\r\n
+  ${isLocal ? `rstudioapi::executeCommand('activateFiles');` : ''}\r\n
   ${isLocal ? `rstudioapi::filesPaneNavigate(getwd());` : ''}\r\n
   rstudioapi::navigateToFile("arena.R")\r\n
   `

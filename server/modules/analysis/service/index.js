@@ -1,6 +1,8 @@
 export { create } from './create'
-export { fetchChainSummary } from './read'
 export { update } from './update'
+import { ChainSummaryGenerator } from './chainSummaryGenerator'
+const { generateChainSummary } = ChainSummaryGenerator
+export { generateChainSummary }
 
 export {
   // ======  READ - Chain
@@ -11,7 +13,8 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
-  cleanChainsOrphans,
+  // ======  UTILS
+  cleanChains,
 } from '../manager'
 
 export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'

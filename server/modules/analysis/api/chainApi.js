@@ -98,7 +98,7 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const chainSummary = await AnalysisService.fetchChainSummary({ surveyId, chainUuid, cycle })
+        const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle })
         const chainName = StringUtils.normalizeName(chainSummary.label)
 
         Response.setContentTypeFile(res, `chain_${chainName}_summary.json`)
@@ -140,7 +140,7 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await AnalysisService.cleanChainsOrphans({ user, surveyId })
+      await AnalysisService.cleanChains({ user, surveyId })
 
       Response.sendOk(res)
     } catch (error) {

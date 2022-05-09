@@ -8,7 +8,7 @@ export const keys = {
 }
 
 // ===== CREATE
-export const newUserInvite = (email, groupUuid) => ({
+export const newUserGroupInvitation = (email, groupUuid) => ({
   [keys.email]: email,
   [keys.groupUuid]: groupUuid,
 })

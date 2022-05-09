@@ -5,4 +5,5 @@ export const keys = {
   items: 'items',
   itemsActive: 'itemsActive',
   cleaned: 'cleaned',
+  onCategoryUpdate: 'onCategoryUpdate',
 }

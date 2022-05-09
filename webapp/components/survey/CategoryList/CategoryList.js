@@ -75,7 +75,9 @@ const CategoryList = (props) => {
       {
         key: 'warning',
         renderItem: ({ item: category }) => {
-          const unused = A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
+          const unused =
+            !Category.isReportingData(category) &&
+            A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
           return <WarningBadge show={unused} label={i18n.t('itemsTable.unused')} />
         },
         width: '85px',
