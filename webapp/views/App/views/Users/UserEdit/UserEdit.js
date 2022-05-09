@@ -168,7 +168,7 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
-      {(canEdit || invitationExpired) && (
+      {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
           {!hideSurveyGroup && canRemove && (
             <ButtonDelete
