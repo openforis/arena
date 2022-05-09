@@ -7,13 +7,15 @@ import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useLang } from '@webapp/store/system'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useConfirm } from '@webapp/components/hooks'
 
 export const useOnRemove = ({ userToUpdate }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const confirm = useConfirm()
   const lang = useLang()
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
@@ -40,17 +42,13 @@ export const useOnRemove = ({ userToUpdate }) => {
   }
 
   return () => {
-    ;(async () => {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'userView.confirmRemove',
-          params: {
-            user: User.getName(userToUpdate),
-            survey: Survey.getLabel(surveyInfo, lang),
-          },
-          onOk: remove,
-        })
-      )
-    })()
+    confirm({
+      key: 'userView.confirmRemove',
+      params: {
+        user: User.getName(userToUpdate),
+        survey: Survey.getLabel(surveyInfo, lang),
+      },
+      onOk: remove,
+    })
   }
 }

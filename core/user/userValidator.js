@@ -1,5 +1,5 @@
 import * as User from '@core/user/user'
-import * as UserInvite from '@core/user/userInvite'
+import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 

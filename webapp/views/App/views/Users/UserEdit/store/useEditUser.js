@@ -52,7 +52,7 @@ export const useEditUser = ({ userUuid }) => {
   const [userToUpdate, setUserToUpdate] = useState({})
   const dispatch = useDispatch()
 
-  const { hideSurveyGroup = true } = useQuery()
+  const { hideSurveyGroup = false } = useQuery()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
