@@ -1,5 +1,9 @@
 import * as UserInvitationRepository from '@server/modules/user/repository/userInvitationRepository'
 
-export const { insertUserInvitation, updateRemovedDate, fetchUserInvitationsBySurveyUuid } = UserInvitationRepository
-
-export const cleanOldInvitations = updateRemovedDate
+export const {
+  insertUserInvitation,
+  updateRemovedDate,
+  fetchUserInvitationBySurveyAndUserUuid,
+  fetchUserInvitationsBySurveyUuid,
+  deleteUserInvitation,
+} = UserInvitationRepository

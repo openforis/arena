@@ -100,12 +100,14 @@ export const insertUser = async (
 
 export const generateResetPasswordUuid = async (email, client = db) => {
   const user = await UserRepository.fetchUserByEmail(email, client)
-  if (user) {
-    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
-    return { uuid, user }
+  if (!user) {
+    throw new Error(Validation.messageKeys.user.emailNotFound)
   }
-
-  throw new Error(Validation.messageKeys.user.emailNotFound)
+  if (User.isInvited(user)) {
+    throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
+  }
+  const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
+  return { uuid, user }
 }
 
 export { insertUserAccessRequest } from '../repository/userAccessRequestRepository'
@@ -120,9 +122,9 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
 
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
+    const invitation = invitationsByUserUuid[userUuid]
     const invitationValid =
-      invitationsByUserUuid[userUuid] ||
-      (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
+      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -328,6 +330,7 @@ export const updateUserPrefs = async (user) => ({
 export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
+    const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))
     return Promise.all([
       AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
       ActivityLogRepository.insert(
@@ -338,6 +341,6 @@ export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db
         false,
         t
       ),
-      UserInvitationManager.updateRemovedDate({ survey, userUuidToRemove }, t),
+      UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
   })
