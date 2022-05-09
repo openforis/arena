@@ -13,7 +13,7 @@ import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
 
 /**
- * === simple getters
+ * === simple getters.
  */
 export const getNodes = R.propOr({}, keys.nodes)
 
@@ -27,8 +27,10 @@ export const getNodesByDefUuid = (nodeDefUuid) => (record) =>
     R.map((uuid) => getNodeByUuid(uuid)(record))
   )(record)
 
-/**
+/**.
  * ==== hierarchy
+ *
+ * @param node
  */
 // ancestors
 export const getParentNode = (node) => getNodeByUuid(Node.getParentUuid(node))
@@ -43,8 +45,10 @@ export const visitAncestorsAndSelf =
     }
   }
 
-/**
+/**.
  * Returns the list of ancestors from the given node to the root entity
+ *
+ * @param node
  */
 export const getAncestorsAndSelf = (node) => (record) => {
   const ancestors = []
@@ -106,8 +110,10 @@ export const visitDescendantsAndSelf = (node, visitor) => (record) => {
   }
 }
 
-/**
+/**.
  * Returns true if a node and all its ancestors are applicable
+ *
+ * @param node
  */
 export const isNodeApplicable = (node) => (record) => {
   if (Node.isRoot(node)) {
@@ -124,7 +130,7 @@ export const isNodeApplicable = (node) => (record) => {
 }
 
 /**
- * ==== dependency
+ * ==== dependency.
  */
 /**
  * Returns a list of dependent node pointers.
@@ -132,19 +138,25 @@ export const isNodeApplicable = (node) => (record) => {
  * {
  *   nodeCtx, //context node
  *   nodeDef, //node definition
- * }
+ * }.
+ *
+ * @param survey
+ * @param node
+ * @param dependencyType
+ * @param includeSelf
+ * @param filterFn
  */
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
   (record) => {
     const nodeDefUuid = Node.getNodeDefUuid(node)
     const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
-    const dependentDefUuids = SurveyDependencies.getNodeDefDependenciesUuids(nodeDefUuid, dependencyType)(survey)
+    const dependentNodeDefUuids = SurveyDependencies.getNodeDefDependenciesUuids(nodeDefUuid, dependencyType)(survey)
 
     const nodePointers = []
 
-    if (dependentDefUuids) {
-      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentDefUuids)(survey)
+    if (dependentNodeDefUuids) {
+      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentNodeDefUuids)(survey)
 
       for (const dependentDef of dependentDefs) {
         // 1 find common parent def

@@ -1,5 +1,3 @@
-import { evalExpr } from 'jse-eval'
-
 import * as R from 'ramda'
 
 import SystemError from '@core/systemError'
@@ -158,13 +156,11 @@ const _evalExpressionInternal = (expr, ctx) => {
   if (!fn) {
     throw new SystemError('unsupportedFunctionType', { exprType })
   }
-  console.log('fn(expr, ctx)', fn(expr, ctx), evalExpr(expr, ctx), JSON.stringify({ expr, ctx }, null, 2))
-  return evalExpr(expr, ctx)
+  return fn(expr, ctx)
 }
 
 export const evalExpression = (expr, ctx = {}) => {
   const { evaluators: evaluatorsCtx } = ctx
   const evaluators = { ...evaluatorsDefault({ evalExpression: _evalExpressionInternal }), ...evaluatorsCtx }
-  console.log('evaluators', JSON.stringify(evaluatorsCtx))
   return _evalExpressionInternal(expr, { ...ctx, evaluators })
 }

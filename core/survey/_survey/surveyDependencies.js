@@ -108,12 +108,12 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 
     visitedUuids.add(nodeDefUuidCurrent)
 
-    const dependenciesDefUuids = getNodeDefDependenciesUuids(nodeDefUuidCurrent)(survey)
+    const dependentNodeDefUuids = getNodeDefDependenciesUuids(nodeDefUuidCurrent)(survey)
     R.forEach((nodeDefUuidDependent) => {
       if (!visitedUuids.has(nodeDefUuidDependent)) {
         stack.push(nodeDefUuidDependent)
       }
-    })(dependenciesDefUuids)
+    })(dependentNodeDefUuids)
   }
 
   return false
