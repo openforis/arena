@@ -8,7 +8,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import * as UserInvite from '@core/user/userInvite'
+import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'

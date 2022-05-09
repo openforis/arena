@@ -313,8 +313,7 @@ export const init = (app) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const survey = await SurveyManager.fetchSurveyById({ surveyId })
-      await UserService.deleteUser({ user, userUuidToRemove: userUuid, survey })
+      await UserService.deleteUser({ user, userUuidToRemove: userUuid, surveyId })
 
       Response.sendOk(res)
     } catch (error) {

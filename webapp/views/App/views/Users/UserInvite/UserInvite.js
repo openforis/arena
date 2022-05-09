@@ -5,7 +5,7 @@ import React from 'react'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
-import * as UserInvite from '@core/user/userInvite'
+import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validation from '@core/validation/validation'
 
 import { useSurveyInfo } from '@webapp/store/survey'
