@@ -8,3 +8,6 @@ export const fetchChains = async ({ surveyId, params } = {}) => {
   } = await axios.get(`/api/survey/${surveyId}/processing-chains`, { params })
   return { chains }
 }
+
+export const getChainSummaryExportUrl = ({ surveyId, chainUuid }) =>
+  `/api/survey/${surveyId}/chain/${chainUuid}/summary`

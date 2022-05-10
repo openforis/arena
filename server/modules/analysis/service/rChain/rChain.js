@@ -23,6 +23,7 @@ import {
 } from './rFile/system'
 import { RFileCommon } from './rFile/user'
 import RFile, { padStart } from './rFile'
+import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
 
 import { dfVar, NA, setVar } from './rFunctions'
 
@@ -47,6 +48,7 @@ class RChain {
     // Root files
     this._fileArena = null
     this._fileRStudioProject = null
+    this._fileChainSummaryJsonPath = null
     // System files
     this._fileInit = null
     this._fileLogin = null
@@ -117,6 +119,10 @@ class RChain {
     return this._fileArena
   }
 
+  get fileChainSummaryJsonPath() {
+    return this._fileChainSummaryJsonPath
+  }
+
   get listCategories() {
     return this._listCategories
   }
@@ -180,6 +186,12 @@ class RChain {
     // Init root files
     this._fileArena = FileUtils.join(this._dir, 'arena.R')
     this._fileRStudioProject = FileUtils.join(this._dir, 'r_studio_project.Rproj')
+    this._fileChainSummaryJsonPath = await FileChainSummaryJson.initFile({
+      dir: this.dir,
+      surveyId: this.surveyId,
+      chainUuid: this.chainUuid,
+      cycle: this.cycle,
+    })
 
     await Promise.all([
       FileUtils.appendFile(this._fileArena),
@@ -199,7 +211,9 @@ class RChain {
     const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
     const entityName = NodeDef.getName(parentEntity)
     let attributeName = NodeDef.getName(nodeDef)
-    const fileIndex = padStart(Number((index || index === 0 ) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1)
+    const fileIndex = padStart(
+      Number((index || index === 0) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1
+    )
 
     let prefix = `-${entityName}`
     let attributeNameInFile = attributeName
@@ -209,7 +223,7 @@ class RChain {
 
     if (NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef) && !NodeDef.isBaseUnit(nodeDef)) {
       prefix = ''
-      attributeNameInFile = attributeNameInFile.replace(`${entityName}_`,`${entityName}-`)
+      attributeNameInFile = attributeNameInFile.replace(`${entityName}_`, `${entityName}-`)
     }
 
     const fileName = `${fileIndex}${prefix}-${attributeNameInFile}`
@@ -248,14 +262,18 @@ class RChain {
 
       await PromiseUtils.each(
         analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
-        async (nodeDef, index) => {
+        async (nodeDef) => {
           await this._initNodeDefFile({ nodeDef, path: _entityPath })
           const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
-          
+
           // at this moment we dont like to have the areaBasedEstimated files
           const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
-          if(areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES){
-            await this._initNodeDefFile({ nodeDef: areaBasedEstimated, path: _entityPath, index: NodeDef.getChainIndex(nodeDef) })
+          if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
+            await this._initNodeDefFile({
+              nodeDef: areaBasedEstimated,
+              path: _entityPath,
+              index: NodeDef.getChainIndex(nodeDef),
+            })
           }
         }
       )

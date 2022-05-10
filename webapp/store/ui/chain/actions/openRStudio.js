@@ -13,16 +13,13 @@ import { SurveyState } from '@webapp/store/survey'
 import { UserState } from '@webapp/store/user'
 import * as API from '@webapp/service/api'
 
-const _getRStudioParams = async ({ userUuid, isLocal }) => {
-  if (isLocal) {
-    return false
-  }
+const _getRStudioParams = async ({ userUuid }) => {
   if (ProcessUtils.ENV.rStudioServerUrl) {
-    return ProcessUtils.ENV.rStudioServerUrl
+    return { rStudioUrl: ProcessUtils.ENV.rStudioServerUrl }
   }
 
   const { instanceId, rStudioProxyUrl } = await API.createInstance()
-  let rStudioUrl = instanceId && rStudioProxyUrl ? `${rStudioProxyUrl}${instanceId}_${userUuid}` : false
+  const rStudioUrl = instanceId && rStudioProxyUrl ? `${rStudioProxyUrl}${instanceId}_${userUuid}` : false
 
   if (rStudioUrl && instanceId) {
     return { rStudioUrl, instanceId }
@@ -35,30 +32,40 @@ const _getRStudioParams = async ({ userUuid, isLocal }) => {
   ProcessUtils.ENV.rStudioDownloadServerUrl is needed because when you are into localhost you need to connect RStudio to the local server through a tunnel.
   The address of this tunnel should be set into the env vars. In production the serverURL comes from the server.
  */
-const _getRStudioCode = ({ surveyId, chainUuid, token, serverUrl, isLocal = false, surveyInfo, surveyCycleKey}) =>
-  `
-  url <- "${
-    ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrl
-  }/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=${surveyCycleKey}&token=${token}";\r\n
+const _getRStudioCode = ({
+  surveyId,
+  chainUuid,
+  token,
+  serverUrl: serverUrlParam,
+  isLocal = false,
+  surveyInfo,
+  surveyCycleKey,
+}) => {
+  const serverUrl = ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrlParam
+  const scriptUrl = `${serverUrl}/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=${surveyCycleKey}&token=${token}`
+  const localDir = `./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}`
+  const zipFile = `./${token}.zip`
+
+  return `
   ${isLocal ? `setwd(Sys.getenv("HOME"));` : ''}\r\n
-  download.file(url,"./${token}.zip" ${isLocal ? `, mode="wb"` : ''});\r\n
-  ${
-    isLocal
-      ? `dir.create("./arena/arena-${Survey.getName(
-          surveyInfo
-        )}-${DateUtils.nowFormatDefault()}", mode="0777", recursive=TRUE);\r\n`
-      : ''
-  }
-  unzip("./${token}.zip",exdir=".${
-    isLocal ? `/arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}` : ''
-  }");\r\n
-  file.remove("./${token}.zip");\r\n
-  ${isLocal ? `setwd('./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}');` : ''}\r\n
+  url <- "${scriptUrl}";\r\n
+  download.file(url,"${zipFile}" ${isLocal ? `, mode="wb"` : ''});\r\n
+  ${isLocal ? `dir.create("${localDir}", mode="0777", recursive=TRUE);\r\n` : ''}
+  unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");\r\n
+  file.remove("${zipFile}");\r\n
+  ${isLocal ? `setwd('${localDir}');` : ''}\r\n
+  ${isLocal ? `rstudioapi::executeCommand('activateFiles');` : ''}\r\n
   ${isLocal ? `rstudioapi::filesPaneNavigate(getwd());` : ''}\r\n
   rstudioapi::navigateToFile("arena.R")\r\n
   `
+}
 
 const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
+
+const isInstanceRunning = async () => {
+  const currentInstance = await API.getCurrentInstance()
+  return Boolean(currentInstance?.instanceId)
+}
 
 export const openRStudio =
   ({ chain, isLocal = false }) =>
@@ -75,18 +82,13 @@ export const openRStudio =
     const config = { params: { surveyCycleKey } }
     const chainUuid = Chain.getUuid(chain)
 
-    let hadInstance = false
-
-    const currentInstance = await API.getCurrentInstance()
-    if (currentInstance?.instanceId) {
-      hadInstance = true
-    }
+    const hadInstance = !isLocal && (await isInstanceRunning())
 
     const { data } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
-    const { instanceId, rStudioUrl } = await _getRStudioParams({ userUuid, isLocal })
-
     const { token, serverUrl } = data
+
+    const { instanceId, rStudioUrl } = isLocal ? {} : await _getRStudioParams({ userUuid })
 
     const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl, isLocal, surveyInfo, surveyCycleKey })
 

@@ -14,7 +14,12 @@ const _putCategoryProp =
   async (dispatch) => {
     const category = await API.updateCategoryProp({ surveyId, categoryUuid, key, value })
 
-    setState(State.assocCategory({ category }))
+    setState((statePrev) => {
+      const stateUpdated = State.assocCategory({ category })(statePrev)
+      const onCategoryUpdate = State.getOnCategoryUpdate(stateUpdated)
+      onCategoryUpdate?.({ category })
+      return stateUpdated
+    })
 
     dispatch(SurveyActions.metaUpdated())
   }

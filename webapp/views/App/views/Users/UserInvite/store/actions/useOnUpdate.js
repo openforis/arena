@@ -1,4 +1,4 @@
-import * as UserInvite from '@core/user/userInvite'
+import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { validateUserInvite } from './validate'
 

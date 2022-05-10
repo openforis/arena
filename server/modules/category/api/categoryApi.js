@@ -222,6 +222,24 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/import-template/',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, generic = false } = Request.getParams(req)
+
+        if (generic) {
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res })
+        } else {
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res })
+        }
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // Fetch items by parent item uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/items',

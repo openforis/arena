@@ -12,14 +12,14 @@ export const useConvertToReportingDataCategory = ({ setState }) => {
   const surveyId = useSurveyId()
   const init = useInit({ setState })
 
-  return useCallback(async ({ categoryUuid }) => {
+  return useCallback(async ({ categoryUuid, onCategoryUpdate }) => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
         key: 'categoryEdit.convertToReportingDataCategory.confirmMessage',
         onOk: async () => {
           await API.convertToReportingDataCategory({ surveyId, categoryUuid })
           // reset state
-          init({ categoryUuid })
+          init({ categoryUuid, onCategoryUpdate })
         },
       })
     )

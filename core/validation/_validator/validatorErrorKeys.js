@@ -137,6 +137,7 @@ export const ValidatorErrorKeys = {
 
     userNotFound: 'validationErrors.user.userNotFound',
     passwordChangeRequired: 'validationErrors.user.passwordChangeRequired',
+    passwordResetNotAllowedWithPendingInvitation: 'validationErrors.user.passwordResetNotAllowedWithPendingInvitation',
   },
 
   userAccessRequest: {

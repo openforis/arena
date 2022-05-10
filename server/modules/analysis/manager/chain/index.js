@@ -96,20 +96,6 @@ export const _deleteChain = async ({ user, surveyId, chainUuid = false, noCycle 
   return chains
 }
 
-export const cleanChainsOrphans = async ({ user, surveyId }, client = DB.client) =>
-  client.tx(async (tx) => {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx)
-    const chains = await ChainRepository.fetchChains({ surveyId }, tx)
-    const chainsUuids = chains.map(Chain.getUuid)
-
-    const orphanNodeDefsUuids = Survey.getNodeDefsArray(survey)
-      .filter((_nodeDef) => NodeDef.getChainUuid(_nodeDef) && !chainsUuids.includes(NodeDef.getChainUuid(_nodeDef)))
-      .map(NodeDef.getUuid)
-      console.log("orphanNodeDefsUuids", orphanNodeDefsUuids)
-
-    return NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: orphanNodeDefsUuids }, client)
-  })
-
 export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
   client.tx(async (tx) => {
     const chains = await _deleteChain({ user, surveyId, chainUuid }, tx)

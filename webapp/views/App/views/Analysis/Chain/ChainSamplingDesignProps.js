@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 
@@ -14,6 +15,10 @@ import { Checkbox } from '@webapp/components/form'
 import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
+import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
+import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
+import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
+import { PValueSelector } from './PValueSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -32,17 +37,21 @@ export const ChainSamplingDesignProps = (props) => {
 
       {hasBaseUnit && (
         <>
-          <StratumAttributeSelector />
+          <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
+          {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
+
+          <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
             <Checkbox
-              checked={Chain.isAreaWeightingMethod(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
-              onChange={(areaWeightingMethod) =>
-                updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
-              }
+              checked={Chain.isNonResponseBiasCorrection(chain)}
+              validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
+              onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
             />
           </FormItem>
+
+          {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
+
+          {Chain.getSamplingStrategy(chain) && <PValueSelector />}
 
           <ClusteringEntitySelector />
 
@@ -59,6 +68,12 @@ export const ChainSamplingDesignProps = (props) => {
           )}
         </>
       )}
+
+      <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
     </>
   )
+}
+
+ChainSamplingDesignProps.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }

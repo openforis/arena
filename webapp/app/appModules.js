@@ -166,7 +166,7 @@ export const dataModules = {
 
 export const userModules = {
   users: {
-    key: 'users',
+    key: 'usersList',
     path: 'users',
   },
   usersSurvey: {
@@ -231,6 +231,8 @@ export const helpModules = {
   },
 }
 
+const allAppModuleGroups = [homeModules, designerModules, dataModules, userModules, analysisModules, helpModules]
+
 export const app = 'app'
 
 const _getModuleParentPathParts = (module) => {
@@ -248,5 +250,21 @@ const _getModuleParentPathParts = (module) => {
 }
 
 const _getModulePathParts = (module) => [..._getModuleParentPathParts(module), module.path]
+
+const _getModuleInModuleGroupByPathPart = ({ moduleGroup, pathPart }) =>
+  Object.values(moduleGroup).find((module) => module.path === pathPart)
+
+export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
+  let foundModule = null
+
+  const moduleGroups = levelIndex === 0 ? [appModules] : allAppModuleGroups
+
+  moduleGroups.some((moduleGroup) => {
+    const module = _getModuleInModuleGroupByPathPart({ moduleGroup, pathPart })
+    foundModule = module
+    if (foundModule) return true
+  })
+  return foundModule
+}
 
 export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`

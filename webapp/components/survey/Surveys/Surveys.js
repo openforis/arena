@@ -20,7 +20,7 @@ import Table from '@webapp/components/Table'
 import HeaderLeft from './HeaderLeft'
 
 const Surveys = (props) => {
-  const { module, moduleApiUri, template, title } = props
+  const { module, moduleApiUri, template } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -59,7 +59,6 @@ const Surveys = (props) => {
       moduleApiUri={moduleApiUri}
       restParams={{ lang, template, requestedAt }}
       headerLeftComponent={HeaderLeft}
-      headerProps={{ title }}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
       cellTestIdExtractor={({ column, item }) =>
@@ -135,10 +134,6 @@ Surveys.propTypes = {
    * If true, show only survey templates.
    */
   template: PropTypes.bool,
-  /**
-   * Title to be shown in the top header.
-   */
-  title: PropTypes.string.isRequired,
 }
 
 Surveys.defaultProps = {

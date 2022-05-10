@@ -1,12 +1,14 @@
 import { ChainFactory } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
+import * as StringUtils from '@core/stringUtils'
+import * as Chain from '@common/analysis/chain'
+import * as ChainValidator from '@common/analysis/chainValidator'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as Survey from '@core/survey/survey'
-import * as Chain from '@common/analysis/chain'
-import * as ChainValidator from '@common/analysis/chainValidator'
 
 import * as AnalysisService from '../service'
 
@@ -89,6 +91,24 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/summary',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+
+        const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle })
+        const chainName = StringUtils.normalizeName(chainSummary.label)
+
+        Response.setContentTypeFile(res, `chain_${chainName}_summary.json`)
+        res.json(chainSummary)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== UPDATE - Chain
 
   app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
@@ -115,22 +135,18 @@ export const init = (app) => {
 
   // ====== DELETE - Chain
 
-  app.get(
-    '/survey/:surveyId/chains-clean',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.get('/survey/:surveyId/chains-clean', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        await AnalysisService.cleanChainsOrphans({ user, surveyId })
+      await AnalysisService.cleanChains({ user, surveyId })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   app.delete(
     '/survey/:surveyId/chain/:chainUuid',
