@@ -4,6 +4,7 @@ import CategoriesExportJob from '@server/modules/category/service/CategoriesExpo
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
+import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import ExportCsvDataJob from '@server/modules/survey/service/export/exportCsvDataJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
@@ -17,6 +18,7 @@ const jobClasses = [
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,
+  DataImportJob,
   SurveyPublishJob,
   ExportCsvDataJob,
   TaxonomyImportJob,

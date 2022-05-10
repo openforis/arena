@@ -153,6 +153,7 @@ export const {
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,
   getNodeDefAncestorsKeyAttributes,
+  getNodeDefAncestorsKeyAttributesByAncestorUuid,
 } = SurveyNodeDefs
 
 // ====== READ dependencies

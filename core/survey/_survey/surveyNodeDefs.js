@@ -224,6 +224,15 @@ export const getNodeDefAncestorsKeyAttributes = (nodeDef) => (survey) => {
   return ancestorsKeyAttributes
 }
 
+export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (survey) => {
+  let ancestorsKeyAttributesIndexed = {}
+  visitAncestors(nodeDef, (ancestorDef) => {
+    const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
+    ancestorsKeyAttributesIndexed[NodeDef.getUuid(ancestorDef)] = ancestorKeyAttributes
+  })(survey)
+  return ancestorsKeyAttributesIndexed
+}
+
 export const getNodeDefPath =
   ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true }) =>
   (survey) => {
