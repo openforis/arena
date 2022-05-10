@@ -110,6 +110,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const samplingStrategyIndex = Object.values(Chain.samplingStrategies).indexOf(Chain.getSamplingStrategy(chain))
+  const samplingStrategySpecified = samplingStrategyIndex >= 0
   const stratumAttributeDef = getNodeDefByUuid(Chain.getStratumNodeDefUuid(chain))
   const postStratificationAttributeDef = getNodeDefByUuid(Chain.getPostStratificationAttributeDefUuid(chain))
   const clusteringNodeDef = getNodeDefByUuid(Chain.getClusteringNodeDefUuid(chain))
@@ -127,9 +128,14 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.isSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
-    ...(samplingStrategyIndex >= 0 ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
-    stratumAttribute: NodeDef.getName(stratumAttributeDef),
-    postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
+    ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
+    ...(Chain.isStratificationEnabled(chain)
+      ? {
+          stratumAttribute: NodeDef.getName(stratumAttributeDef),
+          postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
+        }
+      : {}),
+    ...(samplingStrategySpecified ? { arenaPValue: Chain.getPValue(chain) } : {}),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
