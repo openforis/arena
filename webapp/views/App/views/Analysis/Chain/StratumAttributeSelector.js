@@ -21,9 +21,7 @@ export const StratumAttributeSelector = () => {
 
   const onChange = (item) => {
     const stratumNodeDefUuid = item?.key
-    const chainUpdated = stratumNodeDefUuid
-      ? Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
-      : Chain.dissocStratumNodeDefUuid(chain)
+    const chainUpdated = Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
