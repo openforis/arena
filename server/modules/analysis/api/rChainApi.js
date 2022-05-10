@@ -1,3 +1,4 @@
+import * as Category from '../../../../core/survey/category'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 import * as Taxon from '../../../../core/survey/taxon'
@@ -23,7 +24,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
-        
+
         const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false })
         res.json(data)
       } catch (error) {
@@ -40,12 +41,18 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, language, draft } = Request.getParams(req)
 
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+        const extraDefKeys = Category.getItemExtraDefKeys(category)
         const items = await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, null, draft)
 
         const itemsSummary = items.map((item) => ({
           uuid: CategoryItem.getUuid(item),
           code: CategoryItem.getCode(item),
           label: CategoryItem.getLabel(language)(item),
+          ...extraDefKeys.reduce(
+            (acc, extraDefKey) => ({ ...acc, [extraDefKey]: CategoryItem.getExtraProp(extraDefKey)(item) }),
+            {}
+          ),
         }))
         res.json(itemsSummary)
       } catch (error) {
@@ -99,7 +106,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const filePath = Request.getFilePath(req)
-        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)      
+        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
         await AnalysisService.persistResults({ surveyId, cycle, entityDefUuid, chainUuid, filePath })
 
         Response.sendOk(res)
