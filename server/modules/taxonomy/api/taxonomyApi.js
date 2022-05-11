@@ -176,7 +176,7 @@ export const init = (app) => {
         ])
         const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
         const fileName = `${surveyName}_taxonomy_${Taxonomy.getName(taxonomy)}_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
         await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
       } catch (error) {

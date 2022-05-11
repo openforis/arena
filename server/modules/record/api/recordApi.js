@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { sendOk, sendFileContent } from '@server/utils/response'
+import { sendOk, sendFileContent, setContentTypeFile, contentTypes } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
@@ -17,6 +17,7 @@ import {
   requireRecordViewPermission,
   requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
+import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -68,6 +69,27 @@ export const init = (app) => {
         deleteAllRecords,
         cycle,
         forceImport,
+      })
+      const jobSerialized = JobUtils.jobToJSON(job)
+      res.json({ job: jobSerialized })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/importfromcsv', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, cycle, entityDefUuid, insertNewRecords } = Request.getParams(req)
+      const filePath = Request.getFilePath(req)
+
+      const job = RecordService.startCSVDataImportJob({
+        user,
+        surveyId,
+        filePath,
+        cycle,
+        entityDefUuid,
+        insertNewRecords,
       })
       const jobSerialized = JobUtils.jobToJSON(job)
       res.json({ job: jobSerialized })
@@ -170,6 +192,19 @@ export const init = (app) => {
     } catch (error) {
       next(error)
     }
+  })
+
+  app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
+    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+
+    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
+
+    await DataImportTemplateService.writeDataImportTemplateToStream({
+      surveyId,
+      cycle,
+      entityDefUuid,
+      outputStream: res,
+    })
   })
 
   // ==== UPDATE

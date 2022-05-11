@@ -181,26 +181,28 @@ const _identifierEvalNode = ({ survey, record, node, nodeDef, propName, evaluate
   return single ? referencedNodes[0] : referencedNodes
 }
 
-export const identifierEval = (survey, record) => (expr, { node, evaluateToNode }) => {
-  const exprName = Expression.getName(expr)
+export const identifierEval =
+  (survey, record) =>
+  (expr, { node, evaluateToNode }) => {
+    const exprName = Expression.getName(expr)
 
-  // global object property or function
-  const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext: node })
-  if (globalIdentifierEvalResult !== null) {
-    return globalIdentifierEvalResult
-  }
+    // global object property or function
+    const globalIdentifierEvalResult = Expression.globalIdentifierEval({ identifierName: exprName, nodeContext: node })
+    if (globalIdentifierEvalResult !== null) {
+      return globalIdentifierEvalResult
+    }
 
-  // native property or function
-  const nativePropEvalResult = _nativePropEval({ obj: node, propName: exprName })
-  if (nativePropEvalResult !== undefined) {
-    return nativePropEvalResult
-  }
+    // native property or function
+    const nativePropEvalResult = _nativePropEval({ obj: node, propName: exprName })
+    if (nativePropEvalResult !== undefined) {
+      return nativePropEvalResult
+    }
 
-  // node or a node value property
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  const nodeDef = nodeDefUuid ? Survey.getNodeDefByUuid(nodeDefUuid)(survey) : null
-  if (nodeDef) {
-    return _identifierEvalNode({ survey, record, node, nodeDef, propName: exprName, evaluateToNode })
+    // node or a node value property
+    const nodeDefUuid = Node.getNodeDefUuid(node)
+    const nodeDef = nodeDefUuid ? Survey.getNodeDefByUuid(nodeDefUuid)(survey) : null
+    if (nodeDef) {
+      return _identifierEvalNode({ survey, record, node, nodeDef, propName: exprName, evaluateToNode })
+    }
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
   }
-  throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: exprName })
-}

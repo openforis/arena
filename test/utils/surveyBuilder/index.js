@@ -159,7 +159,7 @@ export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefB
 export const entity = (name, ...childBuilders) => new NodeDefEntityBuilder(name, ...childBuilders)
 export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefAttributeBuilder(name, type)
 // ==== category
-export const category = (name, ...itemBuilders) => new CategoryBuilder(name, ...itemBuilders)
+export const category = (name) => new CategoryBuilder(name)
 export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>

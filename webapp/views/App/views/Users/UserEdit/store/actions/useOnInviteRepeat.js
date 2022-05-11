@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
-import * as UserInvite from '@core/user/userInvite'
+import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
@@ -28,7 +28,7 @@ export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
         // authGroups is never empty when repeating an invitation
         const authGroup = authGroups[0]
 
-        const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), authGroup.uuid)
+        const userInvite = UserInvite.newUserGroupInvitation(User.getEmail(userToInvite), authGroup.uuid)
         const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
 
         const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
