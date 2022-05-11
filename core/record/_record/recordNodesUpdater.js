@@ -1,5 +1,6 @@
 import * as A from '@core/arena'
 import Queue from '@core/queue'
+import { RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -56,58 +57,7 @@ const _addNodeAndDescendants = ({ survey, record, parentNode, nodeDef }) => {
   return updateResult
 }
 
-const updateNodesDependents = ({ survey, record, nodes, logger = null }) => {
-  // Output
-  const updateResult = new RecordUpdateResult({ record, nodes })
-
-  const nodesToVisit = new Queue(Object.values(nodes))
-
-  const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
-
-  while (!nodesToVisit.isEmpty()) {
-    const node = nodesToVisit.dequeue()
-
-    const nodeUuid = Node.getUuid(node)
-
-    const visitedCount = visitedCountByUuid[nodeUuid] || 0
-
-    if (visitedCount < MAX_DEPENDENTS_VISITING_TIMES) {
-      // Update node dependents (applicability)
-      const applicabilityUpdateResult = RecordNodeDependentsUpdater.updateSelfAndDependentsApplicable({
-        survey,
-        record: updateResult.record,
-        node,
-        logger,
-      })
-
-      updateResult.merge(applicabilityUpdateResult)
-
-      // Update node dependents (default values)
-      const defaultValuesUpdateResult = RecordNodeDependentsUpdater.updateSelfAndDependentsDefaultValues({
-        survey,
-        record: updateResult.record,
-        node,
-        logger,
-      })
-
-      updateResult.merge(defaultValuesUpdateResult)
-
-      // Update record nodes
-      const nodesUpdatedCurrent = {
-        ...applicabilityUpdateResult.nodes,
-        ...defaultValuesUpdateResult.nodes,
-      }
-
-      // Mark updated nodes to visit
-      nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
-
-      // Mark node visited
-      visitedCountByUuid[nodeUuid] = visitedCount + 1
-    }
-  }
-
-  return updateResult
-}
+const updateNodesDependents = CoreRecordNodesUpdater.updateNodesDependents
 
 const _addOrUpdateAttribute =
   ({ survey, entity, attributeDef, value }) =>
@@ -217,7 +167,7 @@ const _getOrCreateEntityByKeys =
     return { entity: entityInserted, updateResult }
   }
 
-const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
+const _afterNodesUpdate = async ({ survey, record, nodes }) => {
   // output
   const updateResult = new RecordUpdateResult({ record, nodes })
 
@@ -226,7 +176,6 @@ const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
     survey,
     record,
     nodes,
-    logger,
   })
 
   updateResult.merge(updateResultDependents)
@@ -248,7 +197,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, logger }) => {
 }
 
 const updateAttributesWithValues =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false, logger = null }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -291,7 +240,7 @@ const updateAttributesWithValues =
       }
     })
 
-    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, logger })
+    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes })
   }
 
 export const RecordNodesUpdater = {
