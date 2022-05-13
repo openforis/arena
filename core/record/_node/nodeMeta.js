@@ -7,7 +7,7 @@ const keys = {
 const metaKeys = {
   hierarchy: 'h', // Ancestor nodes uuids hierarchy
   childApplicability: 'childApplicability', // Applicability by child def uuid
-  defaultValue: 'defaultValue', // True if default value has been applied, false if the value is user defined
+  defaultValue: 'defaultValueApplied', // True if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
