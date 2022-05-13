@@ -32,7 +32,7 @@ const AdvancedExpressionEditorPopup = function (props) {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const [validationResult, setValidationResult] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const variablesVisible = excludeCurrentNodeDef
     ? variables
@@ -62,7 +62,7 @@ const AdvancedExpressionEditorPopup = function (props) {
     editor.on('change', (cm) => {
       const exprString = cm.getValue()
       const valueTrimmed = exprString.trim()
-      const newValidationResult =
+      const newErrorMessage =
         valueTrimmed === ''
           ? null
           : NodeDefExpressionValidator.validate({
@@ -72,8 +72,8 @@ const AdvancedExpressionEditorPopup = function (props) {
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
             })
-      const valid = !newValidationResult
-      setValidationResult(newValidationResult)
+      setErrorMessage(newErrorMessage)
+      const valid = !newErrorMessage
       setExpressionCanBeApplied(query !== exprString && valid)
       if (valid) {
         updateDraftQuery(valueTrimmed)
@@ -85,9 +85,9 @@ const AdvancedExpressionEditorPopup = function (props) {
 
   return (
     <>
-      {validationResult ? (
+      {errorMessage ? (
         <div className="expression-editor__query-container">
-          <div className="query invalid">{i18n.t(validationResult.messageKey, validationResult.messageParams)}</div>
+          <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>
         </div>
       ) : (
         <div style={{ height: '34px' }} />

@@ -145,12 +145,11 @@ const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextP
 
   if (nodeDefContextPath) {
     try {
-      const { result } = NodeDefExpressionValidator.evaluateExpression({
+      nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
         survey,
         nodeDef: nodeDefCurrent,
         exprString: nodeDefContextPath,
       })
-      nodeDefContext = result
     } catch (e) {
       // ignore it
     }

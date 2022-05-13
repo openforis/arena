@@ -1,1 +1,1 @@
-export { evaluateExpression, validate, findReferencedNodeDefs } from './nodeDefExpressionValidator'
+export { validate, findReferencedNodeDefs, findReferencedNodeDefLast } from './nodeDefExpressionValidator'
