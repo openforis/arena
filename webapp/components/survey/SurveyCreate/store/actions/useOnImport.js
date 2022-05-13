@@ -1,12 +1,13 @@
-import axios from 'axios'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import axios from 'axios'
 
 import * as Validation from '@core/validation/validation'
 
+import { objectToFormData } from '@webapp/service/api'
 import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 import * as JobSerialized from '@common/job/jobSerialized'
-import { useCallback } from 'react'
 
 export const importSources = {
   collect: 'collect',
@@ -21,9 +22,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.co
 
   return useCallback(
     async ({ file }) => {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('survey', JSON.stringify(newSurvey))
+      const formData = objectToFormData({ file, survey: JSON.stringify(newSurvey) })
 
       const { data } = await axios.post(urlBasedOnSource[source], formData)
       const { job, validation } = data

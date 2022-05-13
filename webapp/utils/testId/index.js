@@ -47,6 +47,10 @@ export const TestId = {
     exportCSV: 'exportCSV',
     prepareExport: 'prepareExport',
   },
+  dataImport: {
+    importFromCollectTab: 'importFromCollectTab',
+    importFromCsvTab: 'importFromCsvTab',
+  },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,

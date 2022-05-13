@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
@@ -140,6 +142,22 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
       recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
     )
     return { count: recordsToMove.length }
+  })
+
+export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
+  client.tx(async (t) => {
+    const activities = nodes.map((node) => {
+      const logContent = R.pick([
+        Node.keys.uuid,
+        Node.keys.recordUuid,
+        Node.keys.nodeDefUuid,
+        Node.keys.meta,
+        Node.keys.value,
+      ])(node)
+      return ActivityLog.newActivity(ActivityLog.type.nodeValueUpdate, logContent, true)
+    })
+    await ActivityLogRepository.insertMany(user, surveyId, activities, t)
+    await NodeRepository.updateNodes({ surveyId, nodes }, t)
   })
 
 // ==== DELETE

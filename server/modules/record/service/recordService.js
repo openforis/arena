@@ -13,6 +13,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
+import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -130,6 +131,19 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
     deleteAllRecords,
     cycle,
     forceImport,
+  })
+  JobManager.executeJobThread(job)
+  return job
+}
+
+export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityDefUuid, insertNewRecords = false }) => {
+  const job = new DataImportJob({
+    user,
+    surveyId,
+    filePath,
+    cycle,
+    entityDefUuid,
+    insertNewRecords,
   })
   JobManager.executeJobThread(job)
   return job
