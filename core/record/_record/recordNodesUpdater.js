@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-import Queue from '@core/queue'
 import { RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,15 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
-import * as RecordNodeDependentsUpdater from './recordNodeDependentsUpdater'
 import RecordUpdateResult from './RecordUpdateResult'
-
-/**
- * Nodes can be visited maximum 2 times during the update of the dependent nodes, to avoid loops in the evaluation.
- * The first time the applicability can depend on attributes with default values not applied yet.
- * The second time the applicability expression can be evaluated correctly.
- */
-const MAX_DEPENDENTS_VISITING_TIMES = 2
 
 const getNodesToInsertCount = (nodeDef) => {
   if (NodeDef.isSingle(nodeDef)) return 1
