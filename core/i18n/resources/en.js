@@ -1120,6 +1120,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
     },
 
+    expression: {
+      invalid: `Invalid expression. Details: {{details}}`,
+    },
+
     expressions: {
       cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
