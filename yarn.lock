@@ -1860,8 +1860,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openforis/arena-core@../arena-core":
-  version "0.0.85"
+"@openforis/arena-core@^0.0.83":
+  version "0.0.83"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.83/48458e9247a92defc41d0e0932cd4663f5b68b088b17b0825af5d238cbe8e17d#ddbc12d241529ae2bb6e16182be5a30997dad74a"
+  integrity sha512-yyN8Boxx0Vek5vK5jQL1nDzQ4dJnuz+YxjYQ9tYbubRhh4fxmCkRpeXlmOnLvGqe7bY2X2qcu/G7ElmqwyZUVw==
   dependencies:
     "@esri/proj-codes" "^2.9.0"
     date-fns "^2.28.0"
@@ -1873,10 +1875,10 @@
     proj4 "^2.8.0"
     uuid "^8.3.2"
 
-"@openforis/arena-core@^0.0.83":
-  version "0.0.83"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.83/48458e9247a92defc41d0e0932cd4663f5b68b088b17b0825af5d238cbe8e17d#ddbc12d241529ae2bb6e16182be5a30997dad74a"
-  integrity sha512-yyN8Boxx0Vek5vK5jQL1nDzQ4dJnuz+YxjYQ9tYbubRhh4fxmCkRpeXlmOnLvGqe7bY2X2qcu/G7ElmqwyZUVw==
+"@openforis/arena-core@^0.0.86":
+  version "0.0.86"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.86/6854156228bfa9109607756cb272842d59878f7cef138440ec1d2a90d6d7d587#08b1c80285111d4de0c3a1d2b91f55d0ef5bbb17"
+  integrity sha512-KZxRw6wd2g6NfXUvZEA4bxgb5VA+Gezu9UqZzcDxsy4f6K2lVkDH/by4a8w/SAuGtSvil2IL4EXnfMdVuPa/Mg==
   dependencies:
     "@esri/proj-codes" "^2.9.0"
     date-fns "^2.28.0"
