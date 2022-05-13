@@ -44,7 +44,7 @@ import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const keys = {
   // Root path key
-  indexRefData: '_indexRefData',
+  indexRefData: 'refData',
   // Ref data indexes
   categoryItemUuidIndex: 'categoryItemUuidIndex', // items by category uuid, parent item uuid and item code
   categoryItemIndex: 'categoryItemIndex', // items by item uuid
