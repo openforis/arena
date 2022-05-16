@@ -1,51 +1,16 @@
-import * as R from 'ramda'
+import { RecordExpressionEvaluator } from '@openforis/arena-core'
 
-import * as StringUtils from '@core/stringUtils'
+export const evalNodeQuery = (survey, record, node, query) =>
+  new RecordExpressionEvaluator().evalNodeQuery({ survey, record, node, query })
 
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Expression from '@core/expressionParser/expression'
-
-import { recordExpressionFunctions } from './recordEpressionFunctions'
-import { identifierEval } from './identifierEval'
-import { memberEval } from './memberEval'
-
-export const evalNodeQuery = (survey, record, node, query) => {
-  const evaluators = {
-    [Expression.types.Identifier]: identifierEval(survey, record),
-    [Expression.types.MemberExpression]: memberEval,
-  }
-  const functions = recordExpressionFunctions({ survey, record, node })
-
-  return Expression.evalString(query, { node, evaluators, functions })
-}
-
-const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = []
-  for (let i = 0; i < expressions.length; i += 1) {
-    const expression = expressions[i]
-
-    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
-
-    if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
-      applicableExpressions.push(expression)
-
-      if (stopAtFirstFound) {
-        return applicableExpressions
-      }
-    }
-  }
-
-  return applicableExpressions
-}
-
-export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
-
-  return applicableExpressions.map((expression) => ({
-    expression,
-    value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression)),
-  }))
-}
+export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) =>
+  new RecordExpressionEvaluator().evalApplicableExpressions({
+    survey,
+    record,
+    nodeCtx: node,
+    expressions,
+    stopAtFirstFound,
+  })
 
 export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
-  R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
+  new RecordExpressionEvaluator().evalApplicableExpression({ survey, record, nodeCtx, expressions })

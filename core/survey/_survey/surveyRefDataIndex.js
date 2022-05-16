@@ -44,7 +44,7 @@ import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const keys = {
   // Root path key
-  indexRefData: 'refData',
+  refData: 'refData',
   // Ref data indexes
   categoryItemUuidIndex: 'categoryItemUuidIndex', // items by category uuid, parent item uuid and item code
   categoryItemIndex: 'categoryItemIndex', // items by item uuid
@@ -59,10 +59,10 @@ const categoryItemNullParentUuid = 'null'
 // ==== category index
 
 export const getCategoryItemByUuid = (categoryItemUuid) =>
-  R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+  R.pathOr(null, [keys.refData, keys.categoryItemIndex, categoryItemUuid])
 
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
-  R.path([keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
+  R.path([keys.refData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
 
 export const getCategoryItemUuidAndCodeHierarchy =
   ({ nodeDef, code, record = null, parentNode = null }) =>
@@ -99,12 +99,12 @@ export const getCategoryItemByHierarchicalCodes =
 
 // ==== taxonomy index
 
-export const getTaxonByUuid = (taxonUuid) => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
+export const getTaxonByUuid = (taxonUuid) => R.path([keys.refData, keys.taxonIndex, taxonUuid])
 
 export const getTaxonByCode =
   ({ taxonomyUuid, taxonCode }) =>
   (survey) => {
-    const taxonUuid = R.path([keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode])(survey)
+    const taxonUuid = R.path([keys.refData, keys.taxonUuidIndex, taxonomyUuid, taxonCode])(survey)
     return taxonUuid ? getTaxonByUuid(taxonUuid)(survey) : null
   }
 
@@ -169,6 +169,6 @@ export const assocRefData =
     }
     return {
       ...survey,
-      [keys.indexRefData]: refDataIndex,
+      [keys.refData]: refDataIndex,
     }
   }
