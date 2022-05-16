@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import * as Validation from '@core/validation/validation'
-
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { SystemActions } from '@webapp/store/system'
@@ -21,7 +19,8 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
 
     await handlerFn(dispatch, getState)
   } catch (error) {
-    dispatch(setLoginError(Validation.messageKeys.user[error.code]))
+    const messageKey = error?.response?.data?.message || error.toString()
+    dispatch(setLoginError(messageKey))
   } finally {
     dispatch(LoaderActions.hideLoader())
   }

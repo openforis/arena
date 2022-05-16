@@ -57,7 +57,7 @@ describe('NodeDefsIndex Test', () => {
     const childrenUuids = childDefUuidsByParentUuid[plot.uuid]
     expect(childrenUuids).toBeDefined()
 
-    const childrenNames = ['plot_id', 'plot_location', 'plot_multiple_number', 'tree']
+    const childrenNames = ['plot_id', 'plot_location', 'plot_multiple_number', 'plot_details', 'tree']
     expect(childrenUuids.length).toBe(childrenNames.length)
 
     childrenNames.forEach((childName) => {

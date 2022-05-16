@@ -293,11 +293,12 @@ export const fetchItemsByLevelIndex = async (
       `level_${ancstorLevelIdx}_code`
     )
   )
-  const ancestorItemsJoins = ancestorLevelIndexes.reduce(
-    (joinConditionsAcc, ancstorLevelIdx) => [
+  const ancestorLevelIndexesReverse = [...ancestorLevelIndexes].reverse()
+  const ancestorItemsJoins = ancestorLevelIndexesReverse.reduce(
+    (joinConditionsAcc, ancestorLevelIdx) => [
       ...joinConditionsAcc,
-      `JOIN ${schema}.category_item i${ancstorLevelIdx} 
-        ON i${ancstorLevelIdx}.uuid = i${ancstorLevelIdx + 1}.parent_uuid`,
+      `JOIN ${schema}.category_item i${ancestorLevelIdx} 
+        ON i${ancestorLevelIdx + 1}.parent_uuid = i${ancestorLevelIdx}.uuid`,
     ],
     []
   )
@@ -306,7 +307,7 @@ export const fetchItemsByLevelIndex = async (
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid
-      ${ancestorItemsJoins.join(' ')}
+      ${ancestorItemsJoins.join('\n')}
      WHERE l.category_uuid = $/categoryUuid/
        AND l.index = $/levelIndex/
     ${limit ? `LIMIT $/limit/` : ''}

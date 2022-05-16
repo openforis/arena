@@ -2,8 +2,6 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import Queue from '@core/queue'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -219,13 +217,6 @@ export const persistNode = async (user, survey, record, node, system, t) => {
   return insertNode({ user, survey, record, node, system }, t)
 }
 
-/**
- * Nodes can be visited maximum 2 times during the update of the dependent nodes, to avoid loops in the evaluation.
- * The first time the applicability can depend on attributes with default values not applied yet.
- * The second time the applicability expression can be evaluated correctly.
- */
-const MAX_VISITING_TIMES = 2
-
 const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   const nodesReloadedArray = (
     await NodeRepository.fetchNodesWithRefDataByUuids(
@@ -245,66 +236,23 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
 }
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
-  // Output
-  const nodesUpdated = { ...nodes }
+  const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
+    survey,
+    record,
+    nodes,
+    logger,
+  })
 
-  const nodesUpdatedToPersist = {}
-  const nodesToVisit = new Queue(R.values(nodes))
-
-  const visitedCountByUuid = {} // Avoid loops: visit the same node maximum 2 times (the second time the applicability could have been changed)
-
-  let recordUpdated = record
-
-  while (!nodesToVisit.isEmpty()) {
-    const node = nodesToVisit.dequeue()
-    const nodeUuid = Node.getUuid(node)
-
-    const visitedCount = visitedCountByUuid[nodeUuid] || 0
-
-    if (visitedCount < MAX_VISITING_TIMES) {
-      // Update node dependents (applicability)
-      const {
-        nodesUpdatedToPersist: nodesToPersistApplicability,
-        nodesWithApplicabilityUpdated,
-        record: recordUpdatedAvailability,
-      } = Record.updateSelfAndDependentsApplicable({ survey, record: recordUpdated, node, logger })
-
-      recordUpdated = recordUpdatedAvailability
-      Object.assign(nodesUpdatedToPersist, nodesToPersistApplicability)
-
-      // Update node dependents (default values)
-      const { nodesUpdated: nodesWithDefaultValueUpdated, record: recordUpdatedDefaultValues } =
-        Record.updateSelfAndDependentsDefaultValues({ survey, record: recordUpdated, node, logger })
-
-      recordUpdated = recordUpdatedDefaultValues
-      Object.assign(nodesUpdatedToPersist, nodesWithDefaultValueUpdated)
-
-      // Update record nodes
-      const nodesUpdatedCurrent = {
-        ...nodesToPersistApplicability,
-        ...nodesWithApplicabilityUpdated,
-        ...nodesWithDefaultValueUpdated,
-      }
-
-      // Mark updated nodes to visit
-      nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
-
-      // Update nodes to return
-      Object.assign(nodesUpdated, nodesUpdatedCurrent)
-
-      // Mark node visited
-      visitedCountByUuid[nodeUuid] = visitedCount + 1
-    }
-  }
+  let recordUpdated = recordUpdatedDependents
 
   // persist updates in batch
-  if (!R.isEmpty(nodesUpdatedToPersist)) {
-    const nodesArray = Object.values(nodesUpdatedToPersist)
+  if (!R.isEmpty(nodesUpdated)) {
+    const nodesArray = Object.values(nodesUpdated)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
 
     // reload nodes to get nodes ref data
-    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdatedToPersist }, tx)
+    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdated }, tx)
     Object.assign(nodesUpdated, nodesReloaded)
     recordUpdated = Record.mergeNodes(nodesReloaded)(recordUpdated)
   }

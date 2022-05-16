@@ -1,13 +1,15 @@
 import * as R from 'ramda'
 
+import { Records } from '@openforis/arena-core'
+
 import Queue from '@core/queue'
 
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
-import * as SurveyDependencies from '@core/survey/_survey/surveyDependencies'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
+import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
@@ -107,6 +109,42 @@ export const visitDescendantsAndSelf = (node, visitor) => (record) => {
 }
 
 /**
+ * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
+ * the single entities, if any, down to the correct parent node.
+ */
+export const getNodeParentInDescendantSingleEntities =
+  ({ survey, parentNode, nodeDefUuid }) =>
+  (record) => {
+    const nodeDefParent = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
+    const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
+    if (!NodeDef.isDescendantOf(nodeDefParent)(nodeDef)) {
+      throw new Error('target node is not a descendant of the specified parent entity')
+    }
+    const nodeDefHierarchy = NodeDef.getMetaHierarchy(nodeDef)
+    const nodeDefParentHierarchy = NodeDef.getMetaHierarchy(nodeDefParent)
+    const hierarchyToVisit =
+      nodeDefHierarchy.length > nodeDefParentHierarchy.length + 1
+        ? nodeDefHierarchy.slice(nodeDefParentHierarchy.length + 1)
+        : []
+
+    let currentParentNode = parentNode
+
+    hierarchyToVisit.forEach((descendantDefUuid) => {
+      const nodeDefDescendant = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
+      if (NodeDef.isSingleEntity(nodeDefDescendant)) {
+        currentParentNode = getNodeChildByDefUuid(currentParentNode, descendantDefUuid)(record)
+      } else {
+        throw new Error(
+          `the target node ${NodeDef.getName(nodeDef)} is inside a multiple entity: ${NodeDef.getName(
+            nodeDefDescendant
+          )}`
+        )
+      }
+    })
+    return currentParentNode
+  }
+
+/**
  * Returns true if a node and all its ancestors are applicable
  */
 export const isNodeApplicable = (node) => (record) => {
@@ -136,63 +174,8 @@ export const isNodeApplicable = (node) => (record) => {
  */
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
-  (record) => {
-    const nodeDefUuid = Node.getNodeDefUuid(node)
-    const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
-    const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
-
-    const nodePointers = []
-
-    if (dependentUuids) {
-      const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
-
-      for (const dependentDef of dependentDefs) {
-        // 1 find common parent def
-        const commonParentDefUuid = R.pipe(
-          R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
-          R.last
-        )(NodeDef.getMetaHierarchy(dependentDef))
-
-        // 2 find common parent node
-        const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
-
-        // 3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
-        const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
-
-        const nodeDefUuidDependent = isDependencyApplicable
-          ? NodeDef.getParentUuid(dependentDef)
-          : NodeDef.getUuid(dependentDef)
-
-        const nodeDependents = getNodesByDefUuid(nodeDefUuidDependent)(record)
-        for (const nodeDependent of nodeDependents) {
-          if (
-            Node.isDescendantOf(commonParentNode)(nodeDependent) ||
-            (isDependencyApplicable && Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode))
-          ) {
-            const nodePointer = {
-              nodeDef: dependentDef,
-              nodeCtx: nodeDependent,
-            }
-            if (filterFn === null || filterFn(nodePointer)) {
-              nodePointers.push(nodePointer)
-            }
-          }
-        }
-      }
-    }
-
-    if (includeSelf) {
-      const nodePointerSelf = {
-        nodeDef,
-        nodeCtx: node,
-      }
-      if (filterFn === null || filterFn(nodePointerSelf)) {
-        nodePointers.push(nodePointerSelf)
-      }
-    }
-
-    return nodePointers
-  }
+  (record) =>
+    Records.getDependentNodePointers({ survey, record, node, dependencyType, includeSelf, filterFn })
 
 // Code attributes
 export const getDependentCodeAttributes = (node) => (record) =>
@@ -232,6 +215,67 @@ export const getEntityKeyNodes = (survey, nodeEntity) => (record) => {
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
   R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))
+
+export const findChildByKeyValues =
+  ({ survey, parentNode, childDefUuid, keyValuesByDefUuid }) =>
+  (record) => {
+    const childDef = SurveyNodeDefs.getNodeDefByUuid(childDefUuid)(survey)
+    const siblings = getNodeChildrenByDefUuidUnsorted(parentNode, childDefUuid)(record)
+    return siblings.find((sibling) => {
+      if (NodeDef.isSingleEntity(childDef)) {
+        return sibling
+      }
+      const keyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey)
+      return keyDefs.every((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
+        const keyAttributeValue = Node.getValue(keyAttribute)
+        const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
+
+        return NodeValues.isValueEqual({
+          survey,
+          nodeDef: keyDef,
+          record,
+          parentNode: sibling,
+          value: keyAttributeValue,
+          valueSearch: keyAttributeValueSearch,
+        })
+      })
+    })
+  }
+
+export const findDescendantByKeyValues =
+  ({ survey, descendantDefUuid, keyValuesByDefUuid }) =>
+  (record) => {
+    // start from root node
+    const rootNode = getRootNode(record)
+    if (NodeDef.getUuid(SurveyNodeDefs.getNodeDefRoot(survey)) === descendantDefUuid) {
+      // the descendant is the root entity
+      return rootNode
+    }
+    let currentNode = rootNode
+    // visit descendant nodes up to descendant def (excluding root entity)
+    const entityDef = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
+    const hierarchyToVisit = [...NodeDef.getMetaHierarchy(entityDef), descendantDefUuid]
+    hierarchyToVisit.shift()
+    hierarchyToVisit.some((nodeDefUuid) => {
+      const descendant = findChildByKeyValues({
+        survey,
+        parentNode: currentNode,
+        childDefUuid: nodeDefUuid,
+        keyValuesByDefUuid,
+      })(record)
+
+      if (!descendant) {
+        currentNode = null
+        return false // break the loop
+      }
+      currentNode = descendant
+    })
+    return currentNode
+  }
+
+// ===== Unique
 
 export const getAttributesUniqueSibling = ({ record, attribute, attributeDef }) => {
   const parentEntity = getParentNode(attribute)(record)

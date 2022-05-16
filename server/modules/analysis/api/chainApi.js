@@ -101,7 +101,7 @@ export const init = (app) => {
         const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle })
         const chainName = StringUtils.normalizeName(chainSummary.label)
 
-        Response.setContentTypeFile(res, `chain_${chainName}_summary.json`)
+        Response.setContentTypeFile({ res, fileName: `chain_${chainName}_summary.json` })
         res.json(chainSummary)
       } catch (error) {
         next(error)

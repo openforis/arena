@@ -18,6 +18,7 @@ import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
+import { PValueSelector } from './PValueSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -40,17 +41,17 @@ export const ChainSamplingDesignProps = (props) => {
 
           {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
 
-          {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
-
-          <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
+          <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
             <Checkbox
-              checked={Chain.isAreaWeightingMethod(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
-              onChange={(areaWeightingMethod) =>
-                updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
-              }
+              checked={Chain.isNonResponseBiasCorrection(chain)}
+              validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
+              onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
             />
           </FormItem>
+
+          {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
+
+          {Chain.getSamplingStrategy(chain) && <PValueSelector />}
 
           <ClusteringEntitySelector />
 
