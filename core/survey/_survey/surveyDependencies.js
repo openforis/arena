@@ -2,60 +2,10 @@ import * as R from 'ramda'
 
 import { Surveys } from '@openforis/arena-core'
 
-import * as ObjectUtils from '@core/objectUtils'
-
-import * as NodeDefExpression from '../nodeDefExpression'
-import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
-import * as NodeDef from '../nodeDef'
-import * as SurveyNodeDefs from './surveyNodeDefs'
-import * as SurveyDependencyTypes from './surveyDependencyTypes'
-
 export { dependencyTypes } from './surveyDependencyTypes'
 
 const keys = {
   dependencyGraph: 'dependencyGraph',
-}
-
-const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
-
-const _addDep = (type, nodeDefUuid, nodeDefDepUuid) => (graph) => {
-  const deps = _getDeps(type, nodeDefUuid)(graph)
-  const depsUpdated = [...deps, nodeDefDepUuid]
-  return ObjectUtils.setInPath([type, nodeDefUuid], depsUpdated)(graph)
-}
-
-const addDeps = (survey, nodeDef, type, expressions) => (graph) => {
-  const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[type]
-  const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[type]
-
-  const findReferencedNodeDefs = ({ exprString }) => {
-    try {
-      return NodeDefExpressionValidator.findReferencedNodeDefs({
-        survey,
-        nodeDef,
-        exprString,
-        isContextParent,
-        selfReferenceAllowed,
-      })
-    } catch (e) {
-      // TODO ignore it?
-      return {}
-    }
-  }
-  const referencedNodeDefs = expressions.reduce(
-    (referencedAcc, nodeDefExpr) => ({
-      ...referencedAcc,
-      ...findReferencedNodeDefs({ exprString: NodeDefExpression.getExpression(nodeDefExpr) }),
-      ...findReferencedNodeDefs({ exprString: NodeDefExpression.getApplyIf(nodeDefExpr) }),
-    }),
-    {}
-  )
-
-  Object.values(referencedNodeDefs).forEach((nodeDefRef) => {
-    _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
-  })
-
-  return graph
 }
 
 // READ
@@ -112,29 +62,10 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 export const assocDependencyGraph = (dependencyGraph) => R.assoc(keys.dependencyGraph, dependencyGraph)
 
 // ====== CREATE
-export const addNodeDefDependencies = (nodeDef) => (survey) => {
-  const graph = getDependencyGraph(survey)
-  const graphUpdated = R.pipe(
-    addDeps(survey, nodeDef, SurveyDependencyTypes.dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
-    addDeps(survey, nodeDef, SurveyDependencyTypes.dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
-    addDeps(
-      survey,
-      nodeDef,
-      SurveyDependencyTypes.dependencyTypes.validations,
-      NodeDef.getValidationExpressions(nodeDef)
-    )
-  )(graph)
-  return assocDependencyGraph(graphUpdated)(survey)
-}
+export const addNodeDefDependencies = (nodeDef) => (survey) => Surveys.addNodeDefDependencies({ nodeDef, survey })
 
 export const buildGraph = (survey) => {
-  // reset survey dependency graph
-  let surveyUpdated = assocDependencyGraph({})(survey)
-  // add dependencies for every node def
-  surveyUpdated = SurveyNodeDefs.getNodeDefsArray(survey).reduce(
-    (surveyUpdatedAcc, nodeDef) => addNodeDefDependencies(nodeDef)(surveyUpdatedAcc),
-    surveyUpdated
-  )
+  const surveyUpdated = Surveys.buildAndAssocDependencyGraph(survey)
   return getDependencyGraph(surveyUpdated)
 }
 
