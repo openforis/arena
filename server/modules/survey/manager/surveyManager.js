@@ -29,7 +29,7 @@ import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtil
 import * as SurveyRepository from '../repository/surveyRepository'
 import SystemError from '@core/systemError'
 
-const assocSurveyInfo = (info) => ({ info })
+const assocSurveyInfo = (survey) => survey
 
 // ====== VALIDATION
 

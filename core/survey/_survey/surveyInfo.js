@@ -37,7 +37,7 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
-export const getInfo = R.propOr({}, keys.info)
+export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // ====== READ surveyInfo
 export const { getId, getUuid, getProps, getPropsDraft } = ObjectUtils
