@@ -1,10 +1,9 @@
 import * as A from '@core/arena'
-import { RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
+import { RecordNodesUpdater as CoreRecordNodesUpdater, RecordValidator } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
-import * as RecordValidator from '@core/record/recordValidator'
 import * as Validation from '@core/validation/validation'
 
 import { NodeValues } from '../nodeValues'
