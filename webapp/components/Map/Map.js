@@ -1,7 +1,7 @@
 import './Map.scss'
 
 import React from 'react'
-import { MapContainer } from 'react-leaflet'
+import { MapContainer, ScaleControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { Points } from '@openforis/arena-core'
@@ -44,6 +44,7 @@ export const Map = (props) => {
 
       <MapContextProvider>
         <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={4} eventHandlers={mapEventHandlers}>
+          <ScaleControl position="topleft" />
           <MapLayersControl layers={layers} />
           <MapMarker
             editable={editable}

@@ -1,4 +1,3 @@
-import jsep from '@core/expressionParser/helpers/jsep'
 import * as Expression from '@core/expressionParser/expression'
 
 const goodExpressions = [
@@ -83,14 +82,14 @@ const badExpressions = [
 describe('dataFilter test', () => {
   goodExpressions.forEach(({ q, r }) => {
     test(q, () => {
-      const ps = Expression.toSql(jsep(q))
+      const ps = Expression.toSql(Expression.fromString(q))
       expect(ps).toEqual(r)
     })
   })
 
   badExpressions.forEach(({ q }) => {
     test(q, () => {
-      const ps = () => Expression.toSql(jsep(q))
+      const ps = () => Expression.toSql(Expression.fromString(q))
       expect(ps).toThrow()
     })
   })

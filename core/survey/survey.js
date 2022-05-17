@@ -69,9 +69,9 @@ export const samplingPointDataCategoryName = 'sampling_point_data'
 export const { getDefaultAuthGroups } = SurveyDefaults
 
 // READ
-export const getId = R.pipe(SurveyInfo.getInfo, SurveyInfo.getId)
-export const getIdSurveyInfo = SurveyInfo.getId
 export const getSurveyInfo = SurveyInfo.getInfo
+export const getId = R.pipe(getSurveyInfo, SurveyInfo.getId)
+export const getIdSurveyInfo = SurveyInfo.getId
 
 // === context is surveyInfo
 export const {

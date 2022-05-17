@@ -564,7 +564,7 @@ export default class NodeDefsImportJob extends Job {
   get survey() {
     const { surveyId } = this.context
     // dependency graph generation not necessary
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })({ info: { id: surveyId } })
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })({ id: surveyId })
   }
 }
 
