@@ -71,7 +71,7 @@ export const { getDefaultAuthGroups } = SurveyDefaults
 // READ
 export const getId = R.pipe(SurveyInfo.getInfo, SurveyInfo.getId)
 export const getIdSurveyInfo = SurveyInfo.getId
-export const getSurveyInfo = SurveyInfo.getInfo
+export const getSurveyInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // === context is surveyInfo
 export const {
