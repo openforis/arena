@@ -64,6 +64,12 @@ export const assocDependencyGraph = (dependencyGraph) => R.assoc(keys.dependency
 // ====== CREATE
 export const addNodeDefDependencies = (nodeDef) => (survey) => Surveys.addNodeDefDependencies({ nodeDef, survey })
 
+export const addNodeDefsDependencies = (nodeDefsIndexedByUuid) => (survey) =>
+  Object.values(nodeDefsIndexedByUuid).reduce(
+    (surveyUpdated, nodeDef) => addNodeDefDependencies(nodeDef)(surveyUpdated),
+    survey
+  )
+
 export const buildGraph = (survey) => {
   const surveyUpdated = Surveys.buildAndAssocDependencyGraph(survey)
   return getDependencyGraph(surveyUpdated)
