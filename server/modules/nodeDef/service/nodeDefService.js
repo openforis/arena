@@ -25,20 +25,29 @@ const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
   return Survey.hasDependencyGraph(surveyDb) ? surveyDb : Survey.buildAndAssocDependencyGraph(surveyDb)
 }
 
-const afterNodeDefUpdate = async ({ survey, nodeDef, nodeDefsDependent = [], nodeDefsUpdated }, client = db) => {
+const afterNodeDefUpdate = async (
+  { survey, nodeDef = null, nodeDefsDependent = [], nodeDefsUpdated = {} },
+  client = db
+) => {
   // merge node defs with existing ones
   let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
 
   // add dependent node defs to dependency graph
-  surveyUpdated = Survey.addNodeDefDependencies(nodeDef)(surveyUpdated)
+  if (nodeDef) {
+    surveyUpdated = Survey.addNodeDefDependencies(nodeDef)(surveyUpdated)
+  }
+  surveyUpdated = Survey.addNodeDefsDependencies(nodeDefsUpdated)(surveyUpdated)
+
   await SurveyManager.updateSurveyDependencyGraphs(
     Survey.getId(survey),
     Survey.getDependencyGraph(surveyUpdated),
     client
   )
 
+  const nodeDefParent = !nodeDef || NodeDef.isRoot(nodeDef) ? null : Survey.getNodeDefParent(nodeDef)(surveyUpdated)
+
   const nodeDefsToValidate = [
-    ...(NodeDef.isRoot(nodeDef) ? [] : [Survey.getNodeDefParent(nodeDef)(surveyUpdated)]), // always re-validate parent entity (keys may have been changed)
+    ...(nodeDefParent ? [nodeDefParent] : []), // always re-validate parent entity (keys may have been changed)
     ...Object.values(nodeDefsUpdated),
     ...nodeDefsDependent.map((uuid) => Survey.getNodeDefByUuid(uuid)(surveyUpdated)),
   ].filter(Boolean) // exclude null node defs (deleted or invalid reference in dependency graph)
