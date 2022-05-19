@@ -159,6 +159,7 @@ export const {
 // ====== READ dependencies
 export const {
   addNodeDefDependencies,
+  addNodeDefsDependencies,
   getDependencyGraph,
   getNodeDefDependencies,
   hasDependencyGraph,

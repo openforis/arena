@@ -23,14 +23,14 @@ const AnalysisNodeDefs = () => {
   const validation = Chain.getValidation(chain)
   const survey = useSurvey()
 
-  const analysisNodeDefsRef = useRef(null)
+  const analysisNodeDefsContainerRef = useRef(null)
 
   const _analysisNodeDefsToShow = useMemo(
     () => Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs, showInactiveResultVariables: true })(survey),
     [chain, survey, entityDefUuid, showSamplingNodeDefs]
   )
 
-  useSortAnalysisNodeDefs({ analysisNodeDefsRef, analysisNodeDefs: _analysisNodeDefsToShow })
+  useSortAnalysisNodeDefs({ analysisNodeDefsContainerRef, analysisNodeDefs: _analysisNodeDefsToShow })
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {
@@ -40,7 +40,7 @@ const AnalysisNodeDefs = () => {
   }, [Chain.isSamplingDesign(chain)])
 
   return (
-    <div className="analysis-node-defs" ref={analysisNodeDefsRef}>
+    <div className="analysis-node-defs">
       {!entityDefUuid && Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey).length === 0 && (
         <div className="analysis-node-defs-error">
           <ErrorBadge validation={validation} showLabel={false} showIcon />
@@ -67,7 +67,7 @@ const AnalysisNodeDefs = () => {
               <div />
             </div>
 
-            <div className="analysis-node-defs__list-content">
+            <div className="analysis-node-defs__list-content" ref={analysisNodeDefsContainerRef}>
               {_analysisNodeDefsToShow.map((analysisNodeDef) => (
                 <AnalysisNodeDef
                   key={NodeDef.getUuid(analysisNodeDef)}
