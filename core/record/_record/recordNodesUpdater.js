@@ -216,7 +216,7 @@ const updateAttributesWithValues =
           survey,
           parentNode: entity,
           nodeDefUuid: attributeDefUuid,
-        })(record)
+        })(updateResult.record)
         const attributeUpdateResult = _addOrUpdateAttribute({
           survey,
           entity: attributeParentEntity,
