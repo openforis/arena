@@ -58,28 +58,30 @@ const getValidationFieldErrorMessage = (survey, field, i18n) =>
     )
   )
 
-export const getValidationFieldMessages = (i18n, survey, showKeys = true) => (validation) => {
-  const messages = [] // Every message is an array with 2 items (severity and message)
+export const getValidationFieldMessages =
+  (i18n, survey, showKeys = true) =>
+  (validation) => {
+    const messages = [] // Every message is an array with 2 items (severity and message)
 
-  // Add messages from fields
-  R.pipe(
-    Validation.getFieldValidations,
-    Object.entries,
-    // Extract invalid fields error messages
-    R.forEach(([field, childValidation]) => {
-      const [severity, message] = getValidationFieldErrorMessage(survey, field, i18n)(childValidation)
-      messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
-    })
-  )(validation)
+    // Add messages from fields
+    R.pipe(
+      Validation.getFieldValidations,
+      Object.entries,
+      // Extract invalid fields error messages
+      R.forEach(([field, childValidation]) => {
+        const [severity, message] = getValidationFieldErrorMessage(survey, field, i18n)(childValidation)
+        messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
+      })
+    )(validation)
 
-  // Add messages from validation errors and warnings
-  R.pipe(
-    getValidationErrorMessages(survey, i18n),
-    R.unless(R.isEmpty, (message) => messages.push(message))
-  )(validation)
+    // Add messages from validation errors and warnings
+    R.pipe(
+      getValidationErrorMessages(survey, i18n),
+      R.unless(R.isEmpty, (message) => messages.push(message))
+    )(validation)
 
-  return messages
-}
+    return messages
+  }
 
 const ValidationFieldMessages = (props) => {
   const { messages, showIcons } = props

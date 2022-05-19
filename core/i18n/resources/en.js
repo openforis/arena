@@ -1158,19 +1158,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       validationsInvalid: 'Invalid "Validations"',
     },
 
-    record: {
-      keyDuplicate: 'Duplicate record key',
-      oneOrMoreInvalidValues: 'One or more values are invalid',
-
-      entityKeyDuplicate: 'Duplicate entity key',
-      nodesMaxCountExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
-      nodesMinCountNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
-      nodesCountInvalid: '{{nodeDefName}} nodes must be exactly {{count}}',
-      uniqueAttributeDuplicate: 'Duplicate value',
-      valueInvalid: 'Invalid value',
-      valueRequired: 'Required value',
-    },
-
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
@@ -1328,6 +1315,28 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
   systemErrors: {
     somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.',
+  },
+
+  record: {
+    keyDuplicate: 'Duplicate record key',
+    oneOrMoreInvalidValues: 'One or more values are invalid',
+    uniqueAttributeDuplicate: 'Duplicate value',
+
+    attribute: {
+      uniqueDuplicate: 'Duplicate value',
+      valueInvalid: 'Invalid value',
+      valueRequired: 'Required value',
+    },
+    entity: {
+      keyDuplicate: 'Duplicate entity key',
+    },
+    nodes: {
+      count: {
+        invalid: '{{nodeDefName}} nodes must be exactly {{count}}',
+        maxExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
+        minNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
+      },
+    },
   },
 
   // ====== Common components
