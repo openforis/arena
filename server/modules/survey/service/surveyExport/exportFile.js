@@ -1,5 +1,4 @@
-import * as FileUtils from '../../../../utils/file/fileUtils'
-
+const separator = '/'
 const dir = {
   activityLog: 'activitylog',
   categories: 'categories',
@@ -8,27 +7,27 @@ const dir = {
   records: 'records',
   taxonomies: 'taxonomies',
   users: 'users',
-  userProfilePictures: FileUtils.join('users', 'profilepictures'),
+  userProfilePictures: ['users', 'profilepictures'].join(separator),
 }
 
 export const ExportFile = {
-  activityLog: ({ index }) => FileUtils.join(dir.activityLog, `activityLog_${index}.json`),
-  categories: FileUtils.join(dir.categories, 'categories.json'),
-  categoryItems: ({ categoryUuid }) => FileUtils.join(dir.categories, `${categoryUuid}.json`),
-  chains: FileUtils.join(dir.chains, 'chains.json'),
-  chain: ({ chainUuid }) => FileUtils.join(dir.chains, `${chainUuid}.json`),
+  activityLog: ({ index }) => [dir.activityLog, `activityLog_${index}.json`].join(separator),
+  categories: [dir.categories, 'categories.json'].join(separator),
+  categoryItems: ({ categoryUuid }) => [dir.categories, `${categoryUuid}.json`].join(separator),
+  chains: [dir.chains, 'chains.json'].join(separator),
+  chain: ({ chainUuid }) => [dir.chains, `${chainUuid}.json`].join(separator),
   filesDir: dir.files,
-  filesSummaries: FileUtils.join(dir.files, 'files.json'),
-  file: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.bin`),
-  records: FileUtils.join(dir.records, 'records.json'),
-  record: ({ recordUuid }) => FileUtils.join(dir.records, `${recordUuid}.json`),
+  filesSummaries: [dir.files, 'files.json'].join(separator),
+  file: ({ fileUuid }) => [dir.files, `${fileUuid}.bin`].join(separator),
+  records: [dir.records, 'records.json'].join(separator),
+  record: ({ recordUuid }) => [dir.records, `${recordUuid}.json`].join(separator),
   survey: 'survey.json',
-  taxonomies: FileUtils.join(dir.taxonomies, 'taxonomies.json'),
-  taxa: ({ taxonomyUuid }) => FileUtils.join(dir.taxonomies, `${taxonomyUuid}.json`),
-  users: FileUtils.join(dir.users, 'users.json'),
-  userInvitations: FileUtils.join(dir.users, 'userInvitations.json'),
-  userProfilePicture: ({ userUuid }) => FileUtils.join(dir.userProfilePictures, userUuid),
+  taxonomies: [dir.taxonomies, 'taxonomies.json'].join(separator),
+  taxa: ({ taxonomyUuid }) => [dir.taxonomies, `${taxonomyUuid}.json`].join(separator),
+  users: [dir.users, 'users.json'].join(separator),
+  userInvitations: [dir.users, 'userInvitations.json'].join(separator),
+  userProfilePicture: ({ userUuid }) => [dir.userProfilePictures, userUuid].join(separator),
 
   // Deprecated (old export format)
-  fileOld: ({ fileUuid }) => FileUtils.join(dir.files, `${fileUuid}.json`),
+  fileOld: ({ fileUuid }) => [dir.files, `${fileUuid}.json`].join(separator),
 }
