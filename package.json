@@ -97,7 +97,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.89",
+    "@openforis/arena-core": "^0.0.90",
     "@openforis/arena-server": "^0.1.20",
     "@sendgrid/mail": "^7.6.0",
     "@shopify/draggable": "^1.0.0-beta.8",
