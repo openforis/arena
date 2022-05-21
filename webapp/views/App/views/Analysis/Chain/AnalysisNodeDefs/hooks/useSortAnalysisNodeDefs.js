@@ -4,14 +4,14 @@ import { Sortable } from '@shopify/draggable'
 import * as NodeDef from '@core/survey/nodeDef'
 import { NodeDefsActions } from '@webapp/store/survey'
 
-export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs = [] }) => {
+export const useSortAnalysisNodeDefs = ({ analysisNodeDefsContainerRef, analysisNodeDefs = [] }) => {
   const dispatch = useDispatch()
 
   const sortableRef = useRef(null)
 
   const initSortable = useCallback(() => {
-    if (analysisNodeDefs.length > 0 && analysisNodeDefsRef.current !== null) {
-      sortableRef.current = new Sortable(analysisNodeDefsRef.current, {
+    if (analysisNodeDefs.length > 0 && analysisNodeDefsContainerRef.current !== null) {
+      sortableRef.current = new Sortable(analysisNodeDefsContainerRef.current, {
         draggable: '.analysis-node-def',
         handle: '.analysis-node-def__btn-move',
         mirror: {
@@ -39,7 +39,7 @@ export const useSortAnalysisNodeDefs = ({ analysisNodeDefsRef, analysisNodeDefs 
         dispatch(NodeDefsActions.putNodeDefsProps({ nodeDefs: newAnalysisNodeDefsSorted }))
       })
     }
-  }, [analysisNodeDefs, analysisNodeDefsRef])
+  }, [analysisNodeDefs, analysisNodeDefsContainerRef])
 
   const destroySortable = useCallback(() => {
     if (sortableRef.current) sortableRef.current.destroy()
