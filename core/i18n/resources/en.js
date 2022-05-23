@@ -1328,6 +1328,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     uniqueAttributeDuplicate: 'Duplicate value',
 
     attribute: {
+      customValidation: 'Invalid value',
       uniqueDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
