@@ -1158,6 +1158,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       validationsInvalid: 'Invalid "Validations"',
     },
 
+    record: {
+      keyDuplicate: 'Duplicate record key',
+      uniqueAttributeDuplicate: 'Duplicate value',
+    },
+
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
