@@ -135,3 +135,32 @@ export const getSamplingNodeDefChild =
         NodeDef.getChainUuid(nodeDefChild) === chainUuid &&
         !NodeDef.isDeleted(nodeDefChild)
     )
+
+/**
+ * Returns the availble reporting data node defs
+ * (code attribute definitions belonging to the base unit or its ancestors).
+ *
+ * @param {!object} param - The parameters.
+ * @param {!object} [param.chain] - The chain parameter.
+ * @returns {NodeDef[]} - List of available reporting data node defs.
+ */
+export const getAvailableReportingDataNodeDefs =
+  ({ chain }) =>
+  (survey) => {
+    const baseUnitNodeDef = getBaseUnitNodeDef({ chain })(survey)
+
+    const availableReportingDataNodeDefs = []
+    if (baseUnitNodeDef) {
+      SurveyNodeDefs.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDefAncestor) => {
+        SurveyNodeDefs.getNodeDefChildren(
+          nodeDefAncestor,
+          true
+        )(survey).forEach((nodeDef) => {
+          if (NodeDef.isSingleAttribute(nodeDef) && NodeDef.isCode(nodeDef)) {
+            availableReportingDataNodeDefs.push(nodeDef)
+          }
+        })
+      })(survey)
+    }
+    return availableReportingDataNodeDefs
+  }
