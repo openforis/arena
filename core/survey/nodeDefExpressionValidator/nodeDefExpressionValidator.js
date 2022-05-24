@@ -26,6 +26,7 @@ const _evaluateExpression = ({ survey, nodeDef, exprString, isContextParent = tr
     [Expression.types.Identifier]: (expr, ctx) =>
       addReferencedNodeDef(identifierEval({ survey, nodeDefCurrent: nodeDef })(expr, ctx)),
     [Expression.types.MemberExpression]: (expr, ctx) => addReferencedNodeDef(memberEval(expr, ctx)),
+    [Expression.types.ThisExpression]: () => addReferencedNodeDef(nodeDef),
   }
   const functions = {
     [Expression.functionNames.parent]: (nodeDefArg) => {

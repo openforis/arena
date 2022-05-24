@@ -36,15 +36,18 @@ const ExpressionNode = (props) => {
     variables,
   } = props
 
-  const componentFn = componentFns[node.type]
-  const component = componentFn(node)
+  // transform a "this" expression into an Identifier expression
+  const componentNode =
+    node.type === Expression.types.ThisExpression ? { type: Expression.types.Identifier, name: 'this' } : node
+  const componentFn = componentFns[componentNode.type]
+  const component = componentFn(componentNode)
 
   return React.createElement(component, {
     canDelete,
     isBoolean,
     level,
     expressionNodeParent,
-    node,
+    node: componentNode,
     nodeDefCurrent,
     renderNode: ExpressionNode,
     onChange,
