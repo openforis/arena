@@ -59,7 +59,7 @@ export const createNodeDef = (parent, type, props, navigate) => async (dispatch,
 
 export const createNodeDefs =
   ({ surveyId, surveyCycleKey, nodeDefs }) =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDefs({ surveyId, surveyCycleKey, nodeDefs })
 
     dispatch(
@@ -251,7 +251,6 @@ export const resetSamplingNodeDefs =
     const survey = SurveyState.getSurvey(state)
     const nodeDefs = Survey.getAnalysisNodeDefs({
       chain,
-      hideSamplingNodeDefsWithoutSibilings: false,
       hideAreaBasedEstimate: false,
       showInactiveResultVariables: true,
     })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
