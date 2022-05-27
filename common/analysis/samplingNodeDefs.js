@@ -3,12 +3,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
 
+const PLOT_AREA_SUFFIX = '_plot_area_'
 const SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME = 'weight'
-const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = /_\w+_plot_area/
+const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(`^\\w+${PLOT_AREA_SUFFIX}$`)
 
 const getEntityAreaNodeDefName = ({ nodeDefParent, baseUnitNodeDef }) => {
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
-  return isBaseUnit ? SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME : `_${NodeDef.getName(nodeDefParent)}_plot_area`
+  return isBaseUnit
+    ? SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME
+    : `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 }
 
 const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, baseUnitNodeDef, includeOnlyValid = true }) => {
