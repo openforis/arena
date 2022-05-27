@@ -162,7 +162,9 @@ export const isPostStratificationEnabled = (chain) => {
   const samplingStrategy = getSamplingStrategy(chain)
   return (
     samplingStrategy &&
-    [samplingStrategies.simpleRandom, samplingStrategies.stratifiedSystematic].includes(samplingStrategy)
+    [samplingStrategies.simpleRandom, samplingStrategies.systematic, samplingStrategies.stratifiedSystematic].includes(
+      samplingStrategy
+    )
   )
 }
 export const isStratificationNotSpecifiedAllowed = () => {

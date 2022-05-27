@@ -53,7 +53,7 @@ export const ReportingDataAttributeDefs = (props) => {
                 survey
               )}
               itemKey="uuid"
-              itemLabel={NodeDef.getName}
+              itemLabel={(nodeDef) => NodeDef.getName(nodeDef) + (NodeDef.isAnalysis(nodeDef) ? ' (C)' : '')}
               onChange={(def) =>
                 updateChain(
                   Chain.assocReportingDataAttributeDefUuid({

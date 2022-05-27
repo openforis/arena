@@ -43,11 +43,16 @@ export const ChainSamplingDesignProps = (props) => {
             <>
               <StratumAttributeSelector />
               <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
-                <Checkbox
-                  checked={Chain.isNonResponseBiasCorrection(chain)}
-                  validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
-                  onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
-                />
+                <div className="nonResponseBiasCorrectionContainer">
+                  <Checkbox
+                    checked={Chain.isNonResponseBiasCorrection(chain)}
+                    validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
+                    onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
+                  />
+                  <label className="nonResponseBiasCorrectionTip">
+                    {i18n.t('chainView.nonResponseBiasCorrectionTip')}
+                  </label>
+                </div>
               </FormItem>
             </>
           )}
