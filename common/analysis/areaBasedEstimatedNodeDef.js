@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SamplingNodeDef } from './samplingNodeDefs'
+import { SamplingNodeDefs } from './samplingNodeDefs'
 
 const getName = ({ estimatedOfNodeDef }) => `${NodeDef.getName(estimatedOfNodeDef)}_ha`
 
@@ -12,7 +12,7 @@ const getScript = ({ survey, chain, estimatedOfNodeDef }) => {
 
   const estimatedOfNodeDefName = NodeDef.getName(estimatedOfNodeDef)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const samplingNodeDefName = SamplingNodeDef.getNodeDefName({ nodeDefParent, baseUnitNodeDef })
+  const samplingNodeDefName = SamplingNodeDefs.getNodeDefName({ nodeDefParent, baseUnitNodeDef })
 
   return `${parentName}$${nodeDefName} <- ${parentName}$${estimatedOfNodeDefName} / ${parentName}$${samplingNodeDefName}`
 }

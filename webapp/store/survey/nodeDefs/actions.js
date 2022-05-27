@@ -57,6 +57,7 @@ export const createNodeDef = (parent, type, props, navigate) => async (dispatch,
   return nodeDef
 }
 
+// TODO check if it's referenced
 export const createNodeDefs =
   ({ surveyId, surveyCycleKey, nodeDefs }) =>
   async (dispatch) => {
@@ -244,6 +245,7 @@ export const removeNodeDef =
     }
   }
 
+// TODO check if it's referenced
 export const resetSamplingNodeDefs =
   ({ surveyId, surveyCycleKey, chain }) =>
   async (dispatch, getState) => {

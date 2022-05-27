@@ -56,7 +56,7 @@ const newNodeDefs = ({ baseUnitNodeDef, survey, chain }) => {
   const chainUuid = Chain.getUuid(chain)
 
   descendantEntities.forEach((entityDef) => {
-    const samplingNodeDef = SamplingNodeDef.newNodeDef({
+    const samplingNodeDef = SamplingNodeDefs.newNodeDef({
       nodeDefParent: entityDef,
       baseUnitNodeDef: baseUnitNodeDef,
       chainUuid,
@@ -67,7 +67,7 @@ const newNodeDefs = ({ baseUnitNodeDef, survey, chain }) => {
   return _samplingNodeDefsToCreate
 }
 
-export const SamplingNodeDef = {
+export const SamplingNodeDefs = {
   SAMPLING_NODE_DEF_BASE_UNIT_NAME,
   getNodeDefName,
   newNodeDef,
