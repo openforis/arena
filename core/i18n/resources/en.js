@@ -703,6 +703,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     formLabel: 'Processing chain label',
     basic: 'Basic',
     nonResponseBiasCorrection: 'Non-Response Bias Correction',
+    nonResponseBiasCorrectionTip: `To implement this method, add a category named 'sampling_units_plan'`,
     pValue: 'P Value',
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
@@ -1328,6 +1329,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     uniqueAttributeDuplicate: 'Duplicate value',
 
     attribute: {
+      customValidation: 'Invalid value',
       uniqueDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
