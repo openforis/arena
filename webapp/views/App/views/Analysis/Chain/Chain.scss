@@ -53,5 +53,15 @@
       width: 44rem;
     }
 
+    .nonResponseBiasCorrectionContainer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      
+      .nonResponseBiasCorrectionTip {
+        color: red;
+      }  
+    }
+
   }
 }
