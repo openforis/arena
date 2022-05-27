@@ -3,23 +3,24 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
 
-const SAMPLING_NODE_DEF_BASE_UNIT_NAME = 'weight'
+const SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME = 'weight'
+const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = /_\w+_plot_area/
 
 const getEntityAreaNodeDefName = ({ nodeDefParent, baseUnitNodeDef }) => {
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
-  return isBaseUnit
-    ? SAMPLING_NODE_DEF_BASE_UNIT_NAME
-    : `${NodeDef.getName(nodeDefParent)}_${NodeDef.getName(baseUnitNodeDef)}_area`
+  return isBaseUnit ? SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME : `_${NodeDef.getName(nodeDefParent)}_plot_area`
 }
 
 const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, baseUnitNodeDef, includeOnlyValid = true }) => {
+  if (!NodeDef.isSampling(nodeDef)) return false
+
   const name = NodeDef.getName(nodeDef)
+  const isBaseUnitName = name === SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME
+  const isNestedEntityName = SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX.test(name)
+
   return (
-    NodeDef.isSampling(nodeDef) &&
-    ((includeOnlyValid && name === getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })) ||
-      (!includeOnlyValid &&
-        (name === SAMPLING_NODE_DEF_BASE_UNIT_NAME ||
-          name === getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef }))))
+    (includeOnlyValid && name === getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })) ||
+    (!includeOnlyValid && (isBaseUnitName || isNestedEntityName))
   )
 }
 
@@ -116,7 +117,7 @@ const determineSamplingNodeDefs = ({ survey, chain }) => {
 }
 
 export const SamplingNodeDefs = {
-  SAMPLING_NODE_DEF_BASE_UNIT_NAME,
+  SAMPLING_NODE_DEF_BASE_UNIT_NAME: SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME,
   getEntityAreaNodeDefName,
   determineSamplingNodeDefs,
 }
