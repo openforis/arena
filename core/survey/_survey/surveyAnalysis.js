@@ -106,22 +106,8 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }) =>
-  (survey) => {
-    let baseUnitNodeDef = null
-
-    const hierarchy = SurveyNodeDefs.getHierarchy()(survey)
-    SurveyNodeDefs.traverseHierarchyItemSync(hierarchy.root, (visitedEntityDef) => {
-      if (NodeDef.isRoot(visitedEntityDef) || NodeDef.isMultipleEntity(visitedEntityDef)) {
-        const nodeDefs = getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(visitedEntityDef) })(survey)
-        const _baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
-        if (!baseUnitNodeDef && _baseUnitNodeDef) {
-          baseUnitNodeDef = SurveyNodeDefs.getNodeDefParent(_baseUnitNodeDef)(survey)
-        }
-      }
-    })
-
-    return baseUnitNodeDef
-  }
+  (survey) =>
+    SurveyNodeDefs.getNodeDefByUuid(Chain.getBaseUnitNodeDefUuid(chain))(survey)
 
 export const getSamplingNodeDefChild =
   ({ nodeDefParent, chainUuid }) =>

@@ -12,7 +12,7 @@ const getScript = ({ survey, chain, estimatedOfNodeDef }) => {
 
   const estimatedOfNodeDefName = NodeDef.getName(estimatedOfNodeDef)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const samplingNodeDefName = SamplingNodeDefs.getNodeDefName({ nodeDefParent, baseUnitNodeDef })
+  const samplingNodeDefName = SamplingNodeDefs.getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })
 
   return `${parentName}$${nodeDefName} <- ${parentName}$${estimatedOfNodeDefName} / ${parentName}$${samplingNodeDefName}`
 }
