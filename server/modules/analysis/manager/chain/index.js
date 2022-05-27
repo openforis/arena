@@ -79,30 +79,31 @@ export const persistChain = async ({ user, surveyId, chain }, client) => {
 // ====== DELETE
 
 export const _deleteChain = async ({ user, surveyId, chainUuid = false, noCycle = false }, client = DB.client) => {
-  const chains = await ChainRepository.deleteChain({ surveyId, chainUuid, noCycle }, client)
+  const deletedChains = await ChainRepository.deleteChain({ surveyId, chainUuid, noCycle }, client)
 
-  const chainsUuids = chains.map(Chain.getUuid)
+  const deletedChainsUuids = deletedChains.map(Chain.getUuid)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, draft: true, advanced: true },
+    { surveyId, draft: true, advanced: true, includeAnalysis: true },
     (client = DB.client)
   )
 
   const nodeDefsUuidsInDeleteChains = Survey.getNodeDefsArray(survey)
-    .filter((_nodeDef) => chainsUuids.includes(NodeDef.getChainUuid(_nodeDef)))
+    .filter((_nodeDef) => deletedChainsUuids.includes(NodeDef.getChainUuid(_nodeDef)))
     .map(NodeDef.getUuid)
 
   await NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: nodeDefsUuidsInDeleteChains }, client)
 
-  return chains
+  return deletedChains
 }
 
 export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
   client.tx(async (tx) => {
-    const chains = await _deleteChain({ user, surveyId, chainUuid }, tx)
+    const deletedChains = await _deleteChain({ user, surveyId, chainUuid }, tx)
+    const deletedChain = deletedChains[0]
 
     const content = {
       [ActivityLog.keysContent.uuid]: chainUuid,
-      [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
+      [ActivityLog.keysContent.labels]: Chain.getLabels(deletedChain),
     }
     return tx.batch([
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
