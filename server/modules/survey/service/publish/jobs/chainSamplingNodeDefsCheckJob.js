@@ -21,7 +21,7 @@ export default class ChainSamplingNodeDefsCheckJob extends Job {
     )
     const chains = await AnalysisManager.fetchChains({ surveyId }, tx)
     await Promises.each(chains, async (chain) => {
-      const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determineSamplingNodeDefs({ survey, chain })
+      const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({ survey, chain })
       if (!Objects.isEmpty(nodeDefsToDelete)) {
         await Promises.each(nodeDefsToDelete, async (nodeDefToDelete) => {
           await NodeDefManager.markNodeDefDeleted({ user, survey, nodeDefUuid: nodeDefToDelete.uuid }, tx)

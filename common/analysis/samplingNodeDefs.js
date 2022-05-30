@@ -68,7 +68,7 @@ const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycle
   )
 }
 
-const determineSamplingNodeDefs = ({ survey, chain }) => {
+const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   const nodeDefsToCreate = []
   const nodeDefsToDelete = []
   const validNodeDefsAlreadyExisting = []
@@ -122,5 +122,5 @@ const determineSamplingNodeDefs = ({ survey, chain }) => {
 export const SamplingNodeDefs = {
   SAMPLING_NODE_DEF_BASE_UNIT_NAME: SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME,
   getEntityAreaNodeDefName,
-  determineSamplingNodeDefs,
+  determinePlotAreaNodeDefs,
 }
