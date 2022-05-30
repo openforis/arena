@@ -1,5 +1,5 @@
 import React from 'react'
-
+import PropTypes from 'prop-types'
 import RawChartBuilder from './components/RawChartBuilder'
 
 const Panel = ({ dimensions, spec, onUpdateSpec }) => {
@@ -10,6 +10,10 @@ const Panel = ({ dimensions, spec, onUpdateSpec }) => {
   )
 }
 
-Panel.propTypes = {}
+Panel.propTypes = {
+  spec: PropTypes.string.isRequired,
+  onUpdateSpec: PropTypes.func.isRequired,
+  dimensions: PropTypes.arrayOf(Object).isRequired,
+}
 
 export default Panel
