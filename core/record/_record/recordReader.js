@@ -12,38 +12,28 @@ import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
-import * as NodesIndex from './recordNodesIndex'
 
 /**
  * === simple getters
  */
 export const getNodes = R.propOr({}, keys.nodes)
 
-export const getNodeByUuid = (uuid) => R.path([keys.nodes, uuid])
+export const getNodeByUuid = (uuid) => (record) => Records.getNodeByUuid(uuid)(record)
 
-export const getRootNode = (record) => R.pipe(NodesIndex.getNodeRootUuid, (uuid) => getNodeByUuid(uuid)(record))(record)
+export const getRootNode = (record) => Records.getRoot(record)
 
-export const getNodesByDefUuid = (nodeDefUuid) => (record) =>
-  R.pipe(
-    NodesIndex.getNodeUuidsByDef(nodeDefUuid),
-    R.map((uuid) => getNodeByUuid(uuid)(record))
-  )(record)
+export const getNodesByDefUuid = (nodeDefUuid) => (record) => Records.getNodesByDefUuid(nodeDefUuid)(record)
 
 /**
  * ==== hierarchy
  */
 // ancestors
-export const getParentNode = (node) => getNodeByUuid(Node.getParentUuid(node))
+export const getParentNode = (node) => (record) => Records.getParent(node)(record)
 
 export const visitAncestorsAndSelf =
   ({ node, visitor }) =>
-  (record) => {
-    let currentNode = node
-    while (currentNode) {
-      visitor(currentNode)
-      currentNode = getParentNode(currentNode)(record)
-    }
-  }
+  (record) =>
+    Records.visitAncestorsAndSelf(node, visitor)(record)
 
 /**
  * Returns the list of ancestors from the given node to the root entity
@@ -67,17 +57,10 @@ export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
   )(record)
 
 // Descendants
-export const getNodeChildren = (node) => (record) =>
-  R.pipe(
-    NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
-    R.map((uuid) => getNodeByUuid(uuid)(record))
-  )(record)
+export const getNodeChildren = (node) => (record) => Records.getChildren(node)(record)
 
 export const getNodeChildrenByDefUuidUnsorted = (parentNode, nodeDefUuid) => (record) =>
-  R.pipe(
-    NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
-    R.map((uuid) => getNodeByUuid(uuid)(record))
-  )(record)
+  Records.getChildren(parentNode, nodeDefUuid)(record)
 
 export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) => {
   const children = getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid)(record)
@@ -178,28 +161,10 @@ export const getDependentNodePointers =
     Records.getDependentNodePointers({ survey, record, node, dependencyType, includeSelf, filterFn })
 
 // Code attributes
-export const getDependentCodeAttributes = (node) => (record) =>
-  R.pipe(
-    NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
-    R.map((uuid) => getNodeByUuid(uuid)(record))
-  )(record)
+export const getDependentCodeAttributes = (node) => (record) => Records.getDependentCodeAttributes(node)(record)
 
-export const getParentCodeAttribute = (survey, parentNode, nodeDef) => (record) => {
-  const parentCodeDefUuid = NodeDef.getParentCodeDefUuid(nodeDef)
-
-  if (parentCodeDefUuid) {
-    const ancestors = getAncestorsAndSelf(parentNode)(record)
-    for (const ancestor of ancestors) {
-      const children = getNodeChildren(ancestor)(record)
-      const nodeFound = children.find((node) => Node.getNodeDefUuid(node) === parentCodeDefUuid)
-      if (nodeFound) {
-        return nodeFound
-      }
-    }
-  }
-
-  return null
-}
+export const getParentCodeAttribute = (_survey, parentNode, nodeDef) => (record) =>
+  Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
 
 // ====== Keys
 
