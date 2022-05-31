@@ -10,10 +10,6 @@ const Panel = ({ dimensions, spec, onUpdateSpec }) => {
   )
 }
 
-Panel.propTypes = {
-  spec: PropTypes.string.isRequired,
-  onUpdateSpec: PropTypes.func.isRequired,
-  dimensions: PropTypes.arrayOf(Object).isRequired,
-}
+Panel.propTypes = {}
 
 export default Panel
