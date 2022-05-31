@@ -100,7 +100,7 @@ const dimensions = [
 const Charts = () => {
   const [entityDefUuid, setEntityDefUuid] = useState(null)
 
-  const { spec, updateSpec, chartImage, renderChart } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
+  const { spec, updateSpec, chartImage } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
 
   return (
     <div className="charts">

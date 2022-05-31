@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { useSurvey } from '@webapp/store/survey'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
@@ -25,15 +24,13 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid }) => {
       />
 
       <br />
-
-      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
     </div>
   )
 }
 
 DataSelector.propTypes = {
+  entityDefUuid: PropTypes.string.isRequired,
   setEntityDefUuid: PropTypes.func.isRequired,
-  toggleLabelFunction: PropTypes.func.isRequired,
 }
 
 export default DataSelector
