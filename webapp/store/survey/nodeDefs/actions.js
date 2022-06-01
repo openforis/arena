@@ -175,23 +175,22 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const nodeDefDependentsUuids = R.pipe(
+  const nodeDefDependents = R.pipe(
     Survey.buildAndAssocDependencyGraph,
     Survey.getNodeDefDependencies(nodeDefUuid),
     // exclude self-dependencies
     R.without(nodeDefUuid)
   )(survey)
 
-  const nodeDefDependents = nodeDefDependentsUuids
-    .map((uuid) => Survey.getNodeDefByUuid(uuid)(survey))
+  const nodeDefDependentsNotDescendants = nodeDefDependents
     // exclude dependents that are descendants of the node def being deleted
     .filter((dependent) => !NodeDef.isDescendantOf(nodeDef)(dependent))
 
-  if (R.isEmpty(nodeDefDependents)) {
+  if (R.isEmpty(nodeDefDependentsNotDescendants)) {
     return true
   }
 
-  const nodeDefDependentsText = nodeDefDependents
+  const nodeDefDependentsText = nodeDefDependentsNotDescendants
     .map((dependent) => `${NodeDef.getLabel(dependent, lang)} (${NodeDef.getName(dependent)})`)
     .join(', ')
 
