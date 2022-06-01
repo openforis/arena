@@ -143,18 +143,12 @@ const Charts = () => {
         toggleLabelFunction={toggleLabelFunction}
         dimensions={dimensions}
       />
-      <Panel
-        setEntityDefUuid={setEntityDefUuid}
-        entityDefUuid={entityDefUuid}
-        spec={spec}
-        onUpdateSpec={updateSpec}
-        dimensions={dimensions}
-      />
+      <Panel />
 
       <div className="charts_chart__container">
         {draft && <button onClick={renderChart}>rerender</button>}
         <Chart
-          src={chartImage ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}` : false}
+          src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
         />
       </div>
     </div>
