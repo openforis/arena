@@ -140,9 +140,7 @@ const Charts = () => {
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { spec, updateSpec, draft, chartImage, renderChart } = useChart(
-    entityDefUuid ? Query.create({ entityDefUuid }) : null
-  )
+  const { draft, chartImage, renderChart } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
 
   return (
     <div className="charts">
