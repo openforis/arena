@@ -13,22 +13,25 @@ import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
 
+const {
+  getChildren: getNodeChildren,
+  getNodeByUuid,
+  getNodesByDefUuid,
+  getParent: getParentNode,
+  getRoot: getRootNode,
+} = Records
+
 /**
  * === simple getters
  */
 export const getNodes = R.propOr({}, keys.nodes)
 
-export const getNodeByUuid = (uuid) => (record) => Records.getNodeByUuid(uuid)(record)
-
-export const getRootNode = (record) => Records.getRoot(record)
-
-export const getNodesByDefUuid = (nodeDefUuid) => (record) => Records.getNodesByDefUuid(nodeDefUuid)(record)
+export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
 
 /**
  * ==== hierarchy
  */
 // ancestors
-export const getParentNode = (node) => (record) => Records.getParent(node)(record)
 
 export const visitAncestorsAndSelf =
   ({ node, visitor }) =>
@@ -57,10 +60,8 @@ export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
   )(record)
 
 // Descendants
-export const getNodeChildren = (node) => (record) => Records.getChildren(node)(record)
-
 export const getNodeChildrenByDefUuidUnsorted = (parentNode, nodeDefUuid) => (record) =>
-  Records.getChildren(parentNode, nodeDefUuid)(record)
+  getNodeChildren(parentNode, nodeDefUuid)(record)
 
 export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) => {
   const children = getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid)(record)
