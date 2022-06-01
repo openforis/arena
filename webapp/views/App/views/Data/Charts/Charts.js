@@ -123,7 +123,7 @@ const useGetDimensionsFromArena = (nodeDefLabelType) => {
     generateDimensions()
   }, [generateDimensions])
 
-  return { dimensions, setDimensions, entityDefUuid, setEntityDefUuid }
+  return { dimensions, setDimensions, entityDefUuid, setEntityDefUuid, query }
 }
 
 const Charts = () => {

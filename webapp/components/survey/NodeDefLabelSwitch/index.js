@@ -1,1 +1,1 @@
-export { default } from './NodeDefLabelSwitch'
+export { default, useNodeDefLabelSwitch } from './NodeDefLabelSwitch'

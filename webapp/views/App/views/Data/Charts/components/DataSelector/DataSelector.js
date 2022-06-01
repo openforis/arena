@@ -31,7 +31,7 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
       {dimensions?.map((dimensionGroup) => (
         <div key={dimensionGroup.label}>
           <p>{dimensionGroup.label}</p>
-          {dimensionGroup?.options?.map((dimension) => (
+          {dimensionGroup.options?.map((dimension) => (
             <p key={dimension.name}>{dimension.label}</p>
           ))}
         </div>
@@ -45,7 +45,6 @@ DataSelector.propTypes = {
   entityDefUuid: PropTypes.string.isRequired,
   setEntityDefUuid: PropTypes.func.isRequired,
   toggleLabelFunction: PropTypes.func.isRequired,
-  entityDefUuid: PropTypes.string.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   dimensions: PropTypes.any,
 }
