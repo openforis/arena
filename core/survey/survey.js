@@ -146,7 +146,7 @@ export const {
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
-  getDescendants,
+  getDescendantsAndSelf,
   visitDescendants,
   findDescendants,
   getNodeDefDescendantsInSingleEntities,

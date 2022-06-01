@@ -1,25 +1,21 @@
 import './BaseUnitSelector.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as Chain from '@common/analysis/chain'
+
 import * as A from '@core/arena'
-
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
-import { useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-import { useSurvey, useSurveyInfo, NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-import { useConfirm } from '@webapp/components/hooks'
-
-import { ButtonSave, ButtonDelete } from '@webapp/components'
 
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { SamplingNodeDef as SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 /*
     BASE_UNIT annotations
@@ -39,73 +35,19 @@ import { SamplingNodeDef as SamplingNodeDefs } from '@common/analysis/samplingNo
 */
 
 const BaseUnitSelector = () => {
-  const [baseUnitNodeDef, setBaseUnitNodeDef] = useState(null)
-  const [hadBaseUnitNodeDef, setHadBaseUnitNodeDef] = useState(false)
-  const [samplingNodeDefsToCreate, setSamplingNodeDefsToCreate] = useState([])
-
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const dispatch = useDispatch()
-  const confirm = useConfirm()
-  const surveyInfo = useSurveyInfo()
-  const surveyCycleKey = useSurveyCycleKey()
   const chain = useChain()
-  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-  const handleSaveSamplingNodeDefs = useCallback(() => {
-    dispatch(NodeDefsActions.createNodeDefs({ surveyId, surveyCycleKey, nodeDefs: samplingNodeDefsToCreate }))
-
-    setBaseUnitNodeDef(Survey.getNodeDefParent(samplingNodeDefsToCreate[0])(survey))
-    setHadBaseUnitNodeDef(true)
-    setSamplingNodeDefsToCreate([])
-  }, [setBaseUnitNodeDef, baseUnitNodeDef, survey, samplingNodeDefsToCreate, setSamplingNodeDefsToCreate])
-
-  const handleDeleteBaseUnitAndSamplingNodeDefs = useCallback(() => {
-    confirm({
-      key: 'chainView.baseUnit.confirmDelete',
-      onOk: () => {
-        dispatch(NodeDefsActions.resetSamplingNodeDefs({ surveyId, surveyCycleKey, chain }))
-        setSamplingNodeDefsToCreate([])
-        setHadBaseUnitNodeDef(false)
-        setBaseUnitNodeDef(null)
-      },
-    })
-  }, [surveyId, surveyCycleKey, chain])
-
-  const handleUpdateBaseUnit = useCallback(
-    (entityReferenceUuid) => {
-      // TODO -> in case of changes or remove this nodedef we should:  ( Not needed at this moment )
-      // -> deleteAllSamplingNodeDefs in chain to restart this base unit items ( add a new state with nodeDefsToDelete )
-      // -> If entityReferenceUuid is null delete base unit node_defs -> this is solved with the previus line
-
-      const referenceNodeDef = Survey.getNodeDefByUuid(entityReferenceUuid)(survey)
-      if (A.isEmpty(referenceNodeDef)) return
-
-      const _samplingNodeDefsToCreate = SamplingNodeDefs.newNodeDefs({
-        survey,
-        chain,
-        baseUnitNodeDef: referenceNodeDef,
-      })
-
-      setSamplingNodeDefsToCreate(_samplingNodeDefsToCreate)
-      setBaseUnitNodeDef(Survey.getNodeDefParent(_samplingNodeDefsToCreate[0])(survey))
+  const onBaseUnitChange = useCallback(
+    (entityDefUuid) => {
+      const chainUpdated = Chain.assocBaseUnitNodeDefUuid(entityDefUuid)(chain)
+      dispatch(ChainActions.updateChain({ chain: chainUpdated }))
     },
-    [setBaseUnitNodeDef, baseUnitNodeDef, survey]
+    [dispatch, chain]
   )
-
-  useEffect(() => {
-    // TODO if survey has other base unit nodedef into other chain, the user is not able to create "base unit/weight" nodedef
-    const _baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-    if (_baseUnitNodeDef) {
-      setBaseUnitNodeDef(_baseUnitNodeDef)
-      setHadBaseUnitNodeDef(true)
-    }
-
-    return () => {
-      return
-    }
-  }, [chain])
 
   if (!chain || A.isEmpty(chain)) return null
 
@@ -114,24 +56,12 @@ const BaseUnitSelector = () => {
       <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
-          nodeDefUuidEntity={NodeDef.getUuid(baseUnitNodeDef)}
-          onChange={handleUpdateBaseUnit}
+          nodeDefUuidEntity={Chain.getBaseUnitNodeDefUuid(chain)}
+          onChange={onBaseUnitChange}
           showSingleEntities={false}
-          disabled={hadBaseUnitNodeDef}
           useNameAsLabel={true}
           allowEmptySelection={true}
         />
-        {samplingNodeDefsToCreate.length > 0 && (
-          <div>
-            <ButtonSave onClick={handleSaveSamplingNodeDefs} />
-          </div>
-        )}
-
-        {hadBaseUnitNodeDef && (
-          <div>
-            <ButtonDelete onClick={handleDeleteBaseUnitAndSamplingNodeDefs} />
-          </div>
-        )}
       </div>
     </FormItem>
   )
