@@ -242,21 +242,3 @@ export const removeNodeDef =
       )
     }
   }
-
-export const resetSamplingNodeDefs =
-  ({ surveyId, surveyCycleKey, chain }) =>
-  async (dispatch, getState) => {
-    const state = getState()
-    const survey = SurveyState.getSurvey(state)
-    const nodeDefs = Survey.getAnalysisNodeDefs({
-      chain,
-      hideAreaBasedEstimate: false,
-      showInactiveResultVariables: true,
-    })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
-
-    const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
-
-    await API.deleteNodeDefs({ surveyId, nodeDefUuids, surveyCycleKey })
-
-    dispatch({ type: nodeDefsDelete, nodeDefs, nodeDefUuids })
-  }
