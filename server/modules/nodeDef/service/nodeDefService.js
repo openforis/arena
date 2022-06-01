@@ -4,6 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
@@ -29,14 +30,16 @@ const afterNodeDefUpdate = async (
   { survey, nodeDef = null, nodeDefsDependent = [], nodeDefsUpdated = {} },
   client = db
 ) => {
+  const allUpdatedNodeDefs = { ...(nodeDef ? { [nodeDef.uuid]: nodeDef } : nodeDefsUpdated) }
+
   // merge node defs with existing ones
-  let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+  let surveyUpdated = Survey.mergeNodeDefs(allUpdatedNodeDefs)(survey)
 
   // add dependent node defs to dependency graph
-  if (nodeDef) {
-    surveyUpdated = Survey.addNodeDefDependencies(nodeDef)(surveyUpdated)
-  }
-  surveyUpdated = Survey.addNodeDefsDependencies(nodeDefsUpdated)(surveyUpdated)
+  surveyUpdated = Survey.addNodeDefsDependencies({
+    ...allUpdatedNodeDefs,
+    ...ObjectUtils.toUuidIndexedObj(nodeDefsDependent),
+  })(surveyUpdated)
 
   await SurveyManager.updateSurveyDependencyGraphs(
     Survey.getId(survey),
@@ -48,8 +51,8 @@ const afterNodeDefUpdate = async (
 
   const nodeDefsToValidate = [
     ...(nodeDefParent ? [nodeDefParent] : []), // always re-validate parent entity (keys may have been changed)
-    ...Object.values(nodeDefsUpdated),
-    ...nodeDefsDependent.map((uuid) => Survey.getNodeDefByUuid(uuid)(surveyUpdated)),
+    ...Object.values(allUpdatedNodeDefs),
+    ...nodeDefsDependent,
   ].filter(Boolean) // exclude null node defs (deleted or invalid reference in dependency graph)
 
   const nodeDefsValidationArray = await Promise.all(
