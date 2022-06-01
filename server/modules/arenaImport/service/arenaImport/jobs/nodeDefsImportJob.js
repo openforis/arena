@@ -15,12 +15,14 @@ export default class NodeDefsImportJob extends Job {
     const nodeDefs = Survey.getNodeDefsArray(arenaSurvey)
     if (nodeDefs.length === 0) return
 
-    await NodeDefManager.insertNodeDefsBatch({
-      surveyId,
-      nodeDefs,
-      backup,
-      client: this.tx,
-    })
+    await NodeDefManager.insertNodeDefsBatch(
+      {
+        surveyId,
+        nodeDefs,
+        backup,
+      },
+      this.tx
+    )
 
     const surveyUpdated = Survey.assocNodeDefs({ nodeDefs: Survey.getNodeDefs(arenaSurvey) })(survey)
     this.setContext({ survey: surveyUpdated })

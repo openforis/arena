@@ -98,11 +98,13 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
-    await NodeDefManager.insertNodeDefsBatch({
-      surveyId,
-      nodeDefs,
-      client: t,
-    })
+    await NodeDefManager.insertNodeDefsBatch(
+      {
+        surveyId,
+        nodeDefs,
+      },
+      t
+    )
 
     const surveyUpdated = Survey.assocNodeDefs({ nodeDefs })(survey)
 
