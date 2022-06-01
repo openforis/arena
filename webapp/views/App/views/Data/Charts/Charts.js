@@ -82,20 +82,6 @@ const useChart = (query) => {
 
   return { spec, updateSpec, draft, chartImage, renderChart }
 }
-const dimensions = [
-  {
-    name: 'city_label',
-    value: 'city_label',
-    label: 'City',
-    type: 'nominal',
-  },
-  {
-    name: 'inhabitants',
-    value: 'inhabitants',
-    label: 'Inhabitants',
-    type: 'quantitative',
-  },
-]
 
 const Charts = () => {
   const [entityDefUuid, setEntityDefUuid] = useState(null)
