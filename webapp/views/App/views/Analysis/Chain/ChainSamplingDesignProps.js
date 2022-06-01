@@ -39,19 +39,24 @@ export const ChainSamplingDesignProps = (props) => {
         <>
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
-
-          <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
-            <Checkbox
-              checked={Chain.isNonResponseBiasCorrection(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
-              onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
-            />
-          </FormItem>
-
+          {Chain.isStratificationEnabled(chain) && (
+            <>
+              <StratumAttributeSelector />
+              <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
+                <div className="nonResponseBiasCorrectionContainer">
+                  <Checkbox
+                    checked={Chain.isNonResponseBiasCorrection(chain)}
+                    validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
+                    onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
+                  />
+                  <label className="nonResponseBiasCorrectionTip">
+                    {i18n.t('chainView.nonResponseBiasCorrectionTip')}
+                  </label>
+                </div>
+              </FormItem>
+            </>
+          )}
           {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
-
-          {Chain.getSamplingStrategy(chain) && <PValueSelector />}
 
           <ClusteringEntitySelector />
 
@@ -70,6 +75,8 @@ export const ChainSamplingDesignProps = (props) => {
       )}
 
       <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
+
+      {Chain.getSamplingStrategy(chain) && <PValueSelector />}
     </>
   )
 }

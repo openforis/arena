@@ -132,10 +132,15 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(Chain.isStratificationEnabled(chain)
       ? {
           stratumAttribute: NodeDef.getName(stratumAttributeDef),
+          nonResponseBiasCorrection: Chain.isNonResponseBiasCorrection(chain),
+        }
+      : {}),
+    ...(Chain.isPostStratificationEnabled(chain)
+      ? {
           postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
         }
       : {}),
-    ...(samplingStrategySpecified ? { arenaPValue: Chain.getPValue(chain) } : {}),
+    ...(samplingStrategySpecified ? { pValue: Chain.getPValue(chain) } : {}),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
