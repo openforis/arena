@@ -106,17 +106,11 @@ const Charts = () => {
     <div className="charts">
       <DataSelector setEntityDefUuid={setEntityDefUuid} entityDefUuid={entityDefUuid} />
 
-      <Panel
-        setEntityDefUuid={setEntityDefUuid}
-        entityDefUuid={entityDefUuid}
-        spec={spec}
-        onUpdateSpec={updateSpec}
-        dimensions={dimensions}
-      />
+      <Panel />
 
       <div className="charts_chart__container">
         <Chart
-          src={chartImage ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chartImage)))}` : false}
+          src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
         />
       </div>
     </div>
