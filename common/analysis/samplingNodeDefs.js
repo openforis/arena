@@ -87,7 +87,7 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
     )
     const hasAreaBasedDef = childDefs.some((childDef) => NodeDef.isAreaBasedEstimatedOf(childDef))
 
-    if (hasAreaBasedDef) {
+    if (hasAreaBasedDef || NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)) {
       if (existingEntityAreaNodeDef) {
         // entity area node def already existing
         validNodeDefsAlreadyExisting.push(existingEntityAreaNodeDef)
