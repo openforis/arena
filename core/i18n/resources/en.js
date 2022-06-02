@@ -1155,6 +1155,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
       nameInvalid:
         'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
+      parentEntityRequired: 'Parent entity is required',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
     },

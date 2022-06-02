@@ -77,6 +77,7 @@ export const ValidatorErrorKeys = {
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     maxFileSizeInvalid: 'validationErrors.nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
+    parentEntityRequired: 'validationErrors.nodeDefEdit.parentEntityRequired',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',
   },
