@@ -1137,6 +1137,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     nodeDefEdit: {
+      analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
       columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
