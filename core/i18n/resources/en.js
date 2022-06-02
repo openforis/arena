@@ -779,6 +779,10 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'No items added',
   },
 
+  expression: {
+    undefinedFunction: 'Undefined function: {{name}}',
+  },
+
   // ====== Help views
   helpView: {
     about: {

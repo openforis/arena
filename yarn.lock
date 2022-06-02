@@ -1875,10 +1875,10 @@
     proj4 "^2.8.0"
     uuid "^8.3.2"
 
-"@openforis/arena-core@^0.0.91":
-  version "0.0.91"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.91/1f9cce119ff106f874b18a6ea61e2258e0cea1c976edd3eca3558912bfdee2eb#9be02f7326701eb89cfbfbac7d33dd062155b344"
-  integrity sha512-b3hyl/v6zqKSOgJoSgCs0xJUaF8CeIRHPUTWPo0S543z9g4i//CxzqLroJALT7WE7wAFxcC9wHJxZQbgTi5bxQ==
+"@openforis/arena-core@^0.0.95":
+  version "0.0.95"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.95/d9943554ee8bfca74618913917dc95c15277e260c9a6229a8a03ddba5d86bce7#ecdfb70bcd8fd759f0f3c73141dd8a9ad49bf334"
+  integrity sha512-VbQJUXN0GwUz2DDLwrY/9Zx8Lxs1bp5GSeFoI98FTUVMrhSlpIZ0h6CSdZ7HV6rKBJa/hepWaQdTRk1dYYlKIQ==
   dependencies:
     "@esri/proj-codes" "^2.9.0"
     date-fns "^2.28.0"

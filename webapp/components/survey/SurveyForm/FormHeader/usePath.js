@@ -37,20 +37,22 @@ export const usePath = (entry) => {
     // get page node
     const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
     const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
-    const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
-      ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
-      : Record.getNodeByUuid(nodeUuidCurrent)(record)
 
-    // if entry mode add node key values
-    if (entry && nodeCurrent) {
-      const nodeDefKeys = Survey.getNodeDefKeys(nodeDefCurrent)(survey)
-      const keys = nodeDefKeys.map((nodeDefKey) => {
-        const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
-        return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
-      })
-      label += `[${keys.flat().join(', ')}]`
+    if (entry && record) {
+      // if entry mode add node key values
+      const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
+        ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
+        : Record.getNodeByUuid(nodeUuidCurrent)(record)
+
+      if (nodeCurrent) {
+        const nodeDefKeys = Survey.getNodeDefKeys(nodeDefCurrent)(survey)
+        const keys = nodeDefKeys.map((nodeDefKey) => {
+          const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
+          return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
+        })
+        label += `[${keys.flat().join(', ')}]`
+      }
     }
-
     labels.unshift(label)
 
     nodeDefCurrent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
