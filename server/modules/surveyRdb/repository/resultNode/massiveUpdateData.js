@@ -13,9 +13,10 @@ const { Column } = pgp.helpers
 
 export default class MassiveUpdateData extends MassiveUpdate {
   constructor({ survey, entity, chain, cycle }, tx) {
-    const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
-      NodeDef.isAnalysis
-    )
+    const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(
+      entity,
+      true
+    )(survey).filter(NodeDef.isAnalysis)
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
       includeExtendedCols: true,
@@ -71,7 +72,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
             value = rowResult[columnName]
           }
         }
- 
+
         return {
           ...values,
           [columnName]: value,
@@ -80,7 +81,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
       {
         [TableDataNodeDef.columnSet.recordUuid]: rowResult[TableDataNodeDef.columnSet.recordUuid],
         // in this table the coloumn uuid is the parent_uuid of the result
-        [TableDataNodeDef.columnSet.uuid]: rowResult[TableDataNodeDef.columnSet.parentUuid], 
+        [TableDataNodeDef.columnSet.uuid]: rowResult[TableDataNodeDef.columnSet.parentUuid],
       }
     )
 
