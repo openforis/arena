@@ -39,7 +39,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
     )
 
     dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
-  }, [NodeDef.getActive(nodeDef)])
+  }, [nodeDef])
 
   return (
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
@@ -53,7 +53,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div>
         {NodeDef.isDecimal(nodeDef)
-          ? Boolean(Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey))
+          ? Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
             ? i18n.t('common.true')
             : i18n.t('common.false')
           : '-'}
