@@ -1,17 +1,9 @@
 @import 'webapp/style/vars';
 
 .analysis-node-defs-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-column-gap: 64px;
-  align-items: center;
+  display: flex;
+  justify-content: end;
 }
-
-.analysis-node-defs__header-label {
-  font-weight: 600;
-}
-
-
 
 .analysis-node-defs-header__buttons {
   background-color: rgba($greyBorder, 0.6);
