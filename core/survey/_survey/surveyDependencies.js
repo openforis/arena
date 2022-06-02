@@ -48,9 +48,9 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
     visitedUuids.add(nodeDefUuidCurrent)
 
     const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
-    R.forEach((nodeDefUuidDependent) => {
-      if (!visitedUuids.has(nodeDefUuidDependent)) {
-        stack.push(nodeDefUuidDependent)
+    R.forEach((nodeDefDependent) => {
+      if (!visitedUuids.has(nodeDefDependent.uuid)) {
+        stack.push(nodeDefDependent.uuid)
       }
     })(dependencies)
   }

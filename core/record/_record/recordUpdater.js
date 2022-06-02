@@ -5,8 +5,8 @@ import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 
 import { keys } from './recordKeys'
-import * as NodesIndex from './recordNodesIndex'
 import * as RecordReader from './recordReader'
+import { Records } from '@openforis/arena-core'
 
 // ====== UPDATE
 
@@ -44,8 +44,7 @@ export const mergeNodes =
         if (toBeAdded) {
           // Remove "updated" and "created" flags (used by Survey RDB generation)
           const nodeUpdated = removeFlags ? R.omit([Node.keys.updated, Node.keys.created], n) : n
-          recordUpdated[keys.nodes][nodeUuid] = nodeUpdated
-          recordUpdated = NodesIndex.addOrUpdateNode(nodeUpdated)(recordUpdated)
+          recordUpdated = Records.addNode(nodeUpdated)(recordUpdated)
         }
       }
     })
@@ -57,14 +56,7 @@ export const assocNode = (node) => (record) => {
   if (Node.isDeleted(node)) {
     return deleteNode(node)(record)
   } else {
-    let recordUpdated = {
-      ...record,
-      [keys.nodes]: {
-        ...RecordReader.getNodes(record),
-        [Node.getUuid(node)]: node,
-      },
-    }
-    return NodesIndex.addOrUpdateNode(node)(recordUpdated)
+    return Records.addNode(node)(record)
   }
 }
 
@@ -79,10 +71,8 @@ export const assocNode = (node) => (record) => {
  */
 export const assocNodes =
   ({ nodes, updateNodesIndex = true }) =>
-  (record) => {
-    const recordUpdated = { ...record, [keys.nodes]: nodes }
-    return updateNodesIndex ? NodesIndex.addNewNodes(nodes)(recordUpdated) : recordUpdated
-  }
+  (record) =>
+    Records.addNodes(nodes, { updateNodesIndex })(record)
 
 export const mergeNodeValidations = (nodeValidations) => (record) =>
   R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
@@ -100,10 +90,10 @@ export const deleteNode = (node) => (record) => {
   const children = RecordReader.getNodeChildren(node)(record)
 
   // 2. remove node from index
-  let recordUpdated = NodesIndex.removeNode(node)(record)
+  let recordUpdated = Records.removeNode(node)(record)
 
   // 3. delete children
-  recordUpdated = children.reduce((recordAcc, child) => deleteNode(child)(recordAcc), record)
+  recordUpdated = children.reduce((recordAcc, child) => deleteNode(child)(recordAcc), recordUpdated)
 
   // 4. update validation
   recordUpdated = R.pipe(
