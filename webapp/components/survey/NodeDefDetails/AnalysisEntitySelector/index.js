@@ -17,7 +17,7 @@ const AnalysisEntitySelector = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const { nodeDef, onChange } = props
+  const { nodeDef, onChange, validation } = props
   const [hadParent] = useState(A.isEmpty(NodeDef.getParentUuid(nodeDef)))
 
   return (
@@ -29,6 +29,7 @@ const AnalysisEntitySelector = (props) => {
         showSingleEntities={false}
         disabled={!hadParent}
         useNameAsLabel={true}
+        validation={validation}
       />
     </FormItem>
   )
@@ -37,6 +38,7 @@ const AnalysisEntitySelector = (props) => {
 AnalysisEntitySelector.propTypes = {
   onChange: PropTypes.func.isRequired,
   nodeDef: PropTypes.object.isRequired,
+  validation: PropTypes.object.isRequired,
 }
 
 export default AnalysisEntitySelector

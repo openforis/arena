@@ -58,6 +58,7 @@ export const ValidatorErrorKeys = {
   },
 
   nodeDefEdit: {
+    analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
     columnWidthCannotBeGreaterThan: 'validationErrors.nodeDefEdit.columnWidthCannotBeGreaterThan',
