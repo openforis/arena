@@ -1,51 +1,14 @@
-import * as A from '@core/arena'
 import { RecordNodesUpdater as CoreRecordNodesUpdater, RecordValidator } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
 import RecordUpdateResult from './RecordUpdateResult'
-
-const getNodesToInsertCount = (nodeDef) => {
-  if (NodeDef.isSingle(nodeDef)) return 1
-  const validations = NodeDef.getValidations(nodeDef)
-  return Number(NodeDefValidations.getMinCount(validations)) || 0
-}
-
-const _addNodeAndDescendants = ({ survey, record, parentNode, nodeDef }) => {
-  const node = Node.newNode(NodeDef.getUuid(nodeDef), record.uuid, parentNode)
-
-  const updateResult = new RecordUpdateResult({ record })
-  updateResult.addNode(node)
-
-  // Add children if entity
-  if (NodeDef.isEntity(nodeDef)) {
-    const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
-
-    // Add only child single nodes (it allows to apply default values)
-    childDefs.forEach((childDef) => {
-      const nodesToInsert = getNodesToInsertCount(childDef)
-      if (nodesToInsert === 0) {
-        return // do nothing
-      }
-      const nodesToInsertArray = [...Array(Number(nodesToInsert)).keys()]
-      nodesToInsertArray.forEach(() => {
-        const childUpdateResult = _addNodeAndDescendants({
-          survey,
-          record: updateResult.record,
-          parentNode: node,
-          nodeDef: childDef,
-        })
-        updateResult.merge(childUpdateResult)
-      })
-    })
-  }
-  return updateResult
-}
 
 const updateNodesDependents = CoreRecordNodesUpdater.updateNodesDependents
 
@@ -91,7 +54,7 @@ const _addEntityAndKeyValues =
   ({ survey, entityDef, parentNode, keyValuesByDefUuid }) =>
   (record) => {
     const updateResult = new RecordUpdateResult({ record })
-    const updateResultDescendants = _addNodeAndDescendants({
+    const updateResultDescendants = CoreRecordNodesUpdater.addNodeAndDescendants({
       survey,
       record,
       parentNode,
