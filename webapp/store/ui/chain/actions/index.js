@@ -3,7 +3,6 @@ import { fetchChain } from './fetchChain'
 import { updateChain } from './updateChain'
 import { deleteChain } from './deleteChain'
 import { resetChainStore } from './resetChainStore'
-import { updateEntityDefUuid } from './updateEntityDefUuid'
 import { createNodeDef } from './createNodeDef'
 import { openRStudio } from './openRStudio'
 
@@ -15,7 +14,6 @@ export const ChainActions = {
   updateChain,
   deleteChain,
   resetChainStore,
-  updateEntityDefUuid,
   createNodeDef,
   openRStudio,
 }

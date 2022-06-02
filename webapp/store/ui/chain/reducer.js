@@ -6,7 +6,6 @@ import { ChainActionTypes } from './actions'
 
 const initialState = {
   chain: null,
-  entityDefUuid: null,
 }
 
 const reset = () => initialState
@@ -24,11 +23,6 @@ const actionHandlers = {
     ...state,
     chain,
   }),
-
-  [ChainActionTypes.entityDefUuidUpdate]: (state, { entityDefUuid }) => ({ ...state, entityDefUuid }),
-
-
-
 }
 
 export const ChainReducer = exportReducer(actionHandlers, initialState)
