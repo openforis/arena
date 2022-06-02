@@ -1245,6 +1245,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
+    ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
     ChainsValidationJob: 'Processing Chains Validation',
     ChainsImportJob: 'Chains Import',
     CollectDataImportJob: 'Collect Data Import',
