@@ -11,7 +11,7 @@ import CategoriesValidationJob from './jobs/categoriesValidationJob'
 import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
 import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
 import ChainsCyclesCheckJob from './jobs/chainsCyclesCheckJob'
-import ChainSamplingNodeDefsCheckJob from './jobs/chainSamplingNodeDefsCheckJob'
+import ChainsSamplingNodeDefsCheckJob from './jobs/chainsSamplingNodeDefsCheckJob'
 import ChainsValidationJob from './jobs/chainsValidationJob'
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
@@ -26,7 +26,7 @@ export default class SurveyPublishJob extends Job {
       new SurveyInfoValidationJob(),
       new CyclesDeletedCheckJob(),
       new ChainsCyclesCheckJob(),
-      new ChainSamplingNodeDefsCheckJob(),
+      new ChainsSamplingNodeDefsCheckJob(),
       new ChainsValidationJob(),
       // Record check must be executed before publishing survey props
       new RecordCheckJob(),
