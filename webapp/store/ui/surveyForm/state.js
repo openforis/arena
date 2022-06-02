@@ -71,6 +71,8 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)
   const record = RecordState.getRecord(state)
 
+  if (!record) return null
+
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   if (nodeDefParent) {
     if (NodeDef.isRoot(nodeDefParent)) {
