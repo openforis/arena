@@ -7,9 +7,9 @@ import * as AnalysisManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
-export default class ChainSamplingNodeDefsCheckJob extends Job {
+export default class ChainsSamplingNodeDefsCheckJob extends Job {
   constructor(params) {
-    super(ChainSamplingNodeDefsCheckJob.type, params)
+    super(ChainsSamplingNodeDefsCheckJob.type, params)
   }
 
   async execute() {
@@ -34,4 +34,4 @@ export default class ChainSamplingNodeDefsCheckJob extends Job {
   }
 }
 
-ChainSamplingNodeDefsCheckJob.type = 'ChainSamplingNodeDefsCheckJob'
+ChainsSamplingNodeDefsCheckJob.type = 'ChainsSamplingNodeDefsCheckJob'
