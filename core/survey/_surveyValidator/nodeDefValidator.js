@@ -84,10 +84,10 @@ const validateReadOnly = (propName, nodeDef) =>
     : null
 
 const validateParentEntityUuid = (_propName, nodeDef) => {
-  if (R.isNil(NodeDef.getParentUuid(nodeDef))) {
+  if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {
     const errorKey = NodeDef.isVirtual(nodeDef)
       ? Validation.messageKeys.nodeDefEdit.entitySourceRequired
-      : Validation.messageKeys.nodeDefEdit.parentEntityRequired
+      : Validation.messageKeys.nodeDefEdit.analysisParentEntityRequired
     return { key: errorKey }
   }
   return null

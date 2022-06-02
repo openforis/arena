@@ -1133,6 +1133,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     nodeDefEdit: {
+      analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
       columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
@@ -1155,7 +1156,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
       nameInvalid:
         'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
-      parentEntityRequired: 'Parent entity is required',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
     },

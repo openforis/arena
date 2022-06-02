@@ -58,6 +58,7 @@ export const ValidatorErrorKeys = {
   },
 
   nodeDefEdit: {
+    analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
     columnWidthCannotBeGreaterThan: 'validationErrors.nodeDefEdit.columnWidthCannotBeGreaterThan',
@@ -77,7 +78,6 @@ export const ValidatorErrorKeys = {
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     maxFileSizeInvalid: 'validationErrors.nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
-    parentEntityRequired: 'validationErrors.nodeDefEdit.parentEntityRequired',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',
   },
