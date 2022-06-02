@@ -174,7 +174,7 @@ const mapStateToProps = (state, props) => {
     label,
     lang,
     applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
-    ...(entry ? mapEntryProps() : {}),
+    ...(entry && record ? mapEntryProps() : {}),
   }
 }
 
