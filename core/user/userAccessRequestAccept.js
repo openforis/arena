@@ -8,8 +8,4 @@ export const keys = {
   role: 'role',
 }
 
-export const requestAcceptRoles = [
-  AuthGroup.groupNames.systemAdmin,
-  AuthGroup.groupNames.surveyManager,
-  AuthGroup.groupNames.surveyAdmin,
-]
+export const requestAcceptRoles = [AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager]
