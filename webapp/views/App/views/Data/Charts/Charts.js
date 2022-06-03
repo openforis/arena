@@ -130,7 +130,9 @@ const Charts = () => {
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { draft, chartImage, renderChart } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
+  const { spec, updateSpec, draft, chartImage, renderChart } = useChart(
+    entityDefUuid ? Query.create({ entityDefUuid }) : null
+  )
 
   return (
     <div className="charts">
@@ -141,7 +143,7 @@ const Charts = () => {
         toggleLabelFunction={toggleLabelFunction}
         dimensions={dimensions}
       />
-      <Panel />
+      <Panel spec={spec} onUpdateSpec={updateSpec} />
 
       <div className="charts_chart__container">
         {draft && <button onClick={renderChart}>rerender</button>}

@@ -1,0 +1,16 @@
+@import '~@webapp/style/vars';
+
+.raw-chart-builder {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.raw-chart-builder__editor{
+    flex: 1;
+}
+
+.raw-chart-builder__buttons-container{
+    display: flex;
+    flex-direction: row;
+}

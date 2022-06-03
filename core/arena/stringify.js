@@ -5,9 +5,11 @@ import { isNull } from './isNull'
  * It handles objects, arrays, Map, Set, String, Number.
  *
  * @param {*} object - The value, object, to stringify.
+ * @param _replacer
+ * @param space
  * @returns {*} - The stringified object.
  */
-export const stringify = (object) => {
+export const stringify = (object, _replacer, space = null) => {
   if (isNull(object)) return null
 
   const replacer = (key, value) => {
@@ -28,5 +30,5 @@ export const stringify = (object) => {
       }
     return value
   }
-  return JSON.stringify(object, replacer)
+  return JSON.stringify(object, replacer, space)
 }
