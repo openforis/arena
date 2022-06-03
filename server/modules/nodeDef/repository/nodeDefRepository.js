@@ -70,7 +70,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
 
-export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false, client = DB }) =>
+export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) =>
   client.tx(async (tx) => {
     const schema = getSurveyDBSchema(surveyId)
     await tx.batch([

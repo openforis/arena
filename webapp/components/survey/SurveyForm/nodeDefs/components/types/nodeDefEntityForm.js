@@ -58,9 +58,10 @@ NodeDefEntityForm.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { nodeDef, entry } = props
 
+  const record = RecordState.getRecord(state)
+
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
-    const record = RecordState.getRecord(state)
 
     const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
 
@@ -72,7 +73,7 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  return entry ? getEntryProps() : {}
+  return entry && record ? getEntryProps() : {}
 }
 
 export default connect(mapStateToProps)(NodeDefEntityForm)

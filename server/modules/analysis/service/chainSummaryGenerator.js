@@ -132,7 +132,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(Chain.isStratificationEnabled(chain)
       ? {
           stratumAttribute: NodeDef.getName(stratumAttributeDef),
-          nonReponseBiasCorrection: Chain.isNonResponseBiasCorrection(chain),
+          nonResponseBiasCorrection: Chain.isNonResponseBiasCorrection(chain),
         }
       : {}),
     ...(Chain.isPostStratificationEnabled(chain)

@@ -9,17 +9,16 @@ export const createNodeDef =
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
-    const { entityDefUuid, chain } = state.ui.chain
+    const { chain } = state.ui.chain
     const { uuid: chainUuid } = chain
 
     const surveyInfo = Survey.getSurveyInfo(survey)
     const cycleKeys = Survey.getCycleKeys(surveyInfo)
-    const nodeDefParent = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ chain, entityDefUuid, showInactiveResultVariables: true })(survey)
+    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain, showInactiveResultVariables: true })(survey)
 
-    const defaultAdvancedProps = { chainUuid, active: true, index: analysisNodeDefsInEntity.length }
-    const nodeDef = NodeDef.newNodeDef(nodeDefParent, type, cycleKeys, {}, defaultAdvancedProps, true, virtual)
+    const avancedProps = { chainUuid, active: true, index: analysisNodeDefs.length }
+    const nodeDef = NodeDef.newNodeDef(null, type, cycleKeys, {}, avancedProps, true, virtual)
 
     await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
     navigate(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)

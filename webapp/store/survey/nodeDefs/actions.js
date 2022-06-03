@@ -175,23 +175,22 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const nodeDefDependentsUuids = R.pipe(
+  const nodeDefDependents = R.pipe(
     Survey.buildAndAssocDependencyGraph,
     Survey.getNodeDefDependencies(nodeDefUuid),
     // exclude self-dependencies
     R.without(nodeDefUuid)
   )(survey)
 
-  const nodeDefDependents = nodeDefDependentsUuids
-    .map((uuid) => Survey.getNodeDefByUuid(uuid)(survey))
+  const nodeDefDependentsNotDescendants = nodeDefDependents
     // exclude dependents that are descendants of the node def being deleted
     .filter((dependent) => !NodeDef.isDescendantOf(nodeDef)(dependent))
 
-  if (R.isEmpty(nodeDefDependents)) {
+  if (R.isEmpty(nodeDefDependentsNotDescendants)) {
     return true
   }
 
-  const nodeDefDependentsText = nodeDefDependents
+  const nodeDefDependentsText = nodeDefDependentsNotDescendants
     .map((dependent) => `${NodeDef.getLabel(dependent, lang)} (${NodeDef.getName(dependent)})`)
     .join(', ')
 
@@ -242,22 +241,4 @@ export const removeNodeDef =
         })
       )
     }
-  }
-
-export const resetSamplingNodeDefs =
-  ({ surveyId, surveyCycleKey, chain }) =>
-  async (dispatch, getState) => {
-    const state = getState()
-    const survey = SurveyState.getSurvey(state)
-    const nodeDefs = Survey.getAnalysisNodeDefs({
-      chain,
-      hideAreaBasedEstimate: false,
-      showInactiveResultVariables: true,
-    })(survey).filter((_nodeDef) => NodeDef.isSampling(_nodeDef) || NodeDef.isBaseUnit(_nodeDef))
-
-    const nodeDefUuids = nodeDefs.map(NodeDef.getUuid)
-
-    await API.deleteNodeDefs({ surveyId, nodeDefUuids, surveyCycleKey })
-
-    dispatch({ type: nodeDefsDelete, nodeDefs, nodeDefUuids })
   }
