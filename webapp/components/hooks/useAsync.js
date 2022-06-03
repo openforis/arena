@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useRef } from 'react'
+import { useCallback, useReducer } from 'react'
 import axios from 'axios'
 
 import useIsMountedRef from './useIsMountedRef'
