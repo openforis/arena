@@ -158,15 +158,8 @@ export const isStratificationEnabled = (chain) => {
     samplingStrategy && ![samplingStrategies.simpleRandom, samplingStrategies.systematic].includes(samplingStrategy)
   )
 }
-export const isPostStratificationEnabled = (chain) => {
-  const samplingStrategy = getSamplingStrategy(chain)
-  return (
-    samplingStrategy &&
-    [samplingStrategies.simpleRandom, samplingStrategies.systematic, samplingStrategies.stratifiedSystematic].includes(
-      samplingStrategy
-    )
-  )
-}
+export const isPostStratificationEnabled = (chain) => Boolean(getSamplingStrategy(chain))
+
 export const isStratificationNotSpecifiedAllowed = () => {
   return false
   // TODO return true if samplingStrategy is double phase
