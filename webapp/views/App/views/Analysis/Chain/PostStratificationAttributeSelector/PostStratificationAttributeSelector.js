@@ -45,7 +45,7 @@ export const PostStratificationAttributeSelector = () => {
 
   const codeAttributeDefToItem = (codeAttributeDef) => ({
     key: codeAttributeDef.uuid,
-    label: NodeDef.getName(codeAttributeDef),
+    label: NodeDef.getLabel(codeAttributeDef, null, NodeDef.NodeDefLabelTypes.name),
   })
 
   const emptyItem = { key: null, label: i18n.t('common.notSpecified') }

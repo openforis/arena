@@ -43,7 +43,10 @@ export const StratumAttributeSelector = () => {
     })(survey)
   }
 
-  const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getName(nodeDef) })
+  const nodeDefToItem = (nodeDef) => ({
+    key: NodeDef.getUuid(nodeDef),
+    value: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
+  })
 
   const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
   const selectableItems = [
