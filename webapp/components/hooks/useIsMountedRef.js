@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 
-export default ({ delay = 200 } = { delay: 200 }) => {
+export default ({ delay = 0 } = { delay: 0 }) => {
   const mountedRef = useRef(false)
   const mountedTimeoutRef = useRef(null) // avoid a render after unmount
 

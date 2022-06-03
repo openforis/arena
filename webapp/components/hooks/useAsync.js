@@ -42,7 +42,7 @@ export default ({ method, url, data, ...rest }) => {
         _dispatch({ type: ACTION_TYPES.error, payload: error })
       }
     }
-  }, [state, isMountedRef, method, url, data, rest])
+  }, [state, method, url, data, rest])
 
   const setState = (stateUpdate) => {
     _dispatch({ type: ACTION_TYPES.loading, payload: stateUpdate })
