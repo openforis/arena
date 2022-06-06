@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -13,6 +13,7 @@ import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDef
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useIsMountedRef } from '@webapp/components/hooks'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -26,13 +27,7 @@ const NodeDefEntityFormGrid = (props) => {
 
   const canEditDef = useAuthCanEditSurvey()
 
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setTimeout(() => {
-      setMounted(true)
-    }, 200)
-  }, [])
+  const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
 
@@ -69,7 +64,7 @@ const NodeDefEntityFormGrid = (props) => {
       compactType={null}
       useCSSTransforms={true}
       preventCollision={true}
-      className={mounted ? 'mounted' : ''}
+      className={mountedRef.current ? 'mounted' : ''}
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >

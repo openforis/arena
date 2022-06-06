@@ -205,26 +205,22 @@ export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
 export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
-  const name = getName(nodeDef)
+  let firstPart = null
+
   if (type === NodeDefLabelTypes.name) {
-    return name
+    firstPart = getName(nodeDef)
+  } else {
+    let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+    if (StringUtils.isBlank(label)) {
+      firstPart = getName(nodeDef)
+    } else {
+      firstPart = label
+    }
   }
 
-  let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
 
-  if (StringUtils.isBlank(label)) {
-    label = name
-  }
-
-  if (isVirtual(nodeDef)) {
-    return `${label}${' (V)'}`
-  }
-
-  if (isAnalysis(nodeDef) && isAttribute(nodeDef)) {
-    return `${label}${' (C)'}`
-  }
-
-  return label
+  return firstPart + suffix
 }
 export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
