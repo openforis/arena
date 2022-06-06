@@ -4,10 +4,11 @@ import axios from 'axios'
 import * as A from '@core/arena'
 
 import { Query } from '@common/model/query'
-import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyId, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import Chart from './components/Chart'
 import Panel from './components/Panel'
 import DataSelector from './components/DataSelector'
+import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 
 export const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Query.getEntityDefUuid(query)}/chart`
 
@@ -82,19 +83,70 @@ const useChart = (query) => {
 
   return { spec, updateSpec, draft, chartImage, renderChart }
 }
+const _dimensions = [
+  {
+    label: 'LABEL',
+    options: [
+      {
+        name: 'city_label',
+        value: 'city_label',
+        label: 'City',
+        type: 'nominal',
+      },
+      {
+        name: 'inhabitants',
+        value: 'inhabitants',
+        label: 'Inhabitants',
+        type: 'quantitative',
+      },
+    ],
+  },
+]
+
+const useGetDimensionsFromArena = (nodeDefLabelType) => {
+  const survey = useSurvey()
+  const language = useSurveyPreferredLang()
+  const [entityDefUuid, setEntityDefUuid] = useState(null)
+  const [query, setQuery] = useState([])
+  const [dimensions, setDimensions] = useState([])
+
+  const generateDimensions = useCallback(() => {
+    setDimensions(_dimensions)
+  }, [entityDefUuid, language, survey, nodeDefLabelType])
+
+  useEffect(() => {
+    setQuery(entityDefUuid ? Query.create({ entityDefUuid }) : null)
+    generateDimensions()
+  }, [entityDefUuid])
+
+  useEffect(() => {
+    generateDimensions()
+  }, [generateDimensions])
+
+  return { dimensions, setDimensions, entityDefUuid, setEntityDefUuid, query }
+}
 
 const Charts = () => {
-  const [entityDefUuid, setEntityDefUuid] = useState(null)
+  const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
+  const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { chartImage } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
+  const { spec, updateSpec, draft, chartImage, renderChart } = useChart(
+    entityDefUuid ? Query.create({ entityDefUuid }) : null
+  )
 
   return (
     <div className="charts">
-      <DataSelector setEntityDefUuid={setEntityDefUuid} entityDefUuid={entityDefUuid} />
-
-      <Panel />
+      <DataSelector
+        setEntityDefUuid={setEntityDefUuid}
+        entityDefUuid={entityDefUuid}
+        nodeDefLabelType={nodeDefLabelType}
+        toggleLabelFunction={toggleLabelFunction}
+        dimensions={dimensions}
+      />
+      <Panel spec={spec} onUpdateSpec={updateSpec} />
 
       <div className="charts_chart__container">
+        {draft && <button onClick={renderChart}>rerender</button>}
         <Chart
           src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
         />

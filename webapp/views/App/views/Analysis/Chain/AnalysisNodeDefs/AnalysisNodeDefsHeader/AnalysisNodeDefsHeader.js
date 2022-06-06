@@ -4,11 +4,9 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import * as Chain from '@common/analysis/chain'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { ChainActions, useChain, useChainEntityDefUuid } from '@webapp/store/ui/chain'
-import { useNodeDefLabel, useSurvey } from '@webapp/store/survey'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
@@ -17,18 +15,12 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
-  const survey = useSurvey()
   const chain = useChain()
-  const entityDefUuid = useChainEntityDefUuid()
-  const nodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const nodeDefLabel = useNodeDefLabel(nodeDef)
 
   const createNodeDef = (type) => dispatch(ChainActions.createNodeDef({ navigate, type }))
 
   return (
     <div className="analysis-node-defs-header">
-      <div className="analysis-node-defs__header-label">{nodeDefLabel}</div>
-
       <div className="analysis-node-defs-header__buttons_container">
         {Chain.isSamplingDesign(chain) && (
           <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">

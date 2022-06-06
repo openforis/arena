@@ -60,11 +60,16 @@
       }
     }
     .leaflet-control-layers-overlays {
-      label div,
-      label div span {
+      label span,
+      label span span {
         display: flex;
         column-gap: 5px;
         vertical-align: middle;
+      }
+
+      label span span {
+        width: 100%;
+        justify-content: space-between;
       }
 
       .leaflet-control-layers-selector {
