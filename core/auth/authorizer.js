@@ -180,6 +180,9 @@ export const getUserGroupsCanAssign = ({
     surveyGroups = [Survey.getAuthGroupAdmin(surveyInfo)]
   }
 
+  // do not allow surveyEditor group selection (remove surveyEditor group completely?)
+  surveyGroups = surveyGroups.filter((group) => AuthGroup.getName(group) !== AuthGroup.groupNames.surveyEditor)
+
   const groups = []
   if (!showOnlySurveyGroups && (User.isSystemAdmin(user) || User.isSurveyManager(user))) {
     // Add SystemAdmin or SurveyManager group if current user is a SystemAdmin or SurveyManager himself

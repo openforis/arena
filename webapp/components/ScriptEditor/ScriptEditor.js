@@ -61,7 +61,7 @@ export const ScriptEditor = (props) => {
 
 ScriptEditor.propTypes = {
   name: PropTypes.string.isRequired,
-  mode: PropTypes.oneOf(['r', 'sql']).isRequired,
+  mode: PropTypes.oneOf(['r', 'sql', 'json']).isRequired,
   completer: PropTypes.shape({
     getCompletions: PropTypes.func.isRequired,
   }),
