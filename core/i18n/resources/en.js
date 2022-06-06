@@ -779,6 +779,10 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'No items added',
   },
 
+  expression: {
+    undefinedFunction: 'Undefined function: {{name}}',
+  },
+
   // ====== Help views
   helpView: {
     about: {
@@ -1133,6 +1137,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     nodeDefEdit: {
+      analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
       columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
@@ -1240,6 +1245,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
+    ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
     ChainsValidationJob: 'Processing Chains Validation',
     ChainsImportJob: 'Chains Import',
     CollectDataImportJob: 'Collect Data Import',

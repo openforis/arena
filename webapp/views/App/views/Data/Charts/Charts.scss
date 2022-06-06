@@ -24,3 +24,11 @@
   flex-direction: column;
   display: flex;
 }
+
+.charts_panel__container {
+  width: 350px;
+  overflow-y: scroll;
+  border-right: 1px solid $greyBorder;
+  flex-direction: column;
+  display: flex;
+}

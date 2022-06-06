@@ -207,7 +207,7 @@ const mapStateToProps = (state, props) => {
     hasNodeDefAddChildTo,
     showPageNavigation,
     analysis: Record.isInAnalysisStep(record),
-    ...(props.entry ? mapEntryProps() : {}),
+    ...(props.entry && record ? mapEntryProps() : {}),
   }
 }
 

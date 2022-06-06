@@ -83,10 +83,15 @@ const validateReadOnly = (propName, nodeDef) =>
     ? { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
     : null
 
-const validateVirtualEntitySoruceUuid = (propName, nodeDef) =>
-  NodeDef.isVirtual(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))
-    ? { key: Validation.messageKeys.nodeDefEdit.entitySourceRequired }
-    : null
+const validateParentEntityUuid = (_propName, nodeDef) => {
+  if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {
+    const errorKey = NodeDef.isVirtual(nodeDef)
+      ? Validation.messageKeys.nodeDefEdit.entitySourceRequired
+      : Validation.messageKeys.nodeDefEdit.analysisParentEntityRequired
+    return { key: errorKey }
+  }
+  return null
+}
 
 const validateVirtualEntityFormula = (survey, nodeDef) =>
   NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))
@@ -144,7 +149,7 @@ const propsValidations = (survey) => ({
   [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
   [keysValidationFields.children]: [validateChildren(survey)],
   // Virtual Entity
-  [`${keys.parentUuid}`]: [validateVirtualEntitySoruceUuid],
+  [`${keys.parentUuid}`]: [validateParentEntityUuid],
   // Layout
   [`${keys.props}.${propKeys.layout}.${NodeDefLayout.keys.columnWidth}`]: [validateColumnWidth({ survey })],
   // Decimal
