@@ -143,7 +143,7 @@ const Charts = () => {
         toggleLabelFunction={toggleLabelFunction}
         dimensions={dimensions}
       />
-      <Panel spec={spec} onUpdateSpec={updateSpec} />
+      <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
 
       <Chart
         draft={draft}
