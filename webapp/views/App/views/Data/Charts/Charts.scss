@@ -8,15 +8,6 @@
   border: 1px solid $greyBorder;
 }
 
-.charts_data-selector__container {
-  width: 180px;
-  overflow-y: scroll;
-  border-right: 1px solid $greyBorder;
-  flex-direction: column;
-  display: flex;
-  padding: 12px;
-}
-
 .charts_panel__container {
   width: 350px;
   overflow-y: scroll;
