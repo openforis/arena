@@ -55,6 +55,8 @@ const _gotoSubModule =
   (module, subModule, waitForApiPaths = null) =>
   () =>
     test(`Goto ${module}->${subModule}`, async () => {
+      await page.mouse.move(0, 0, { steps: 1 })
+
       await page.hover(getSelector(TestId.sidebar.module(module)))
 
       await Promise.all([
