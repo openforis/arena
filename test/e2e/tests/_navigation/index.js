@@ -58,7 +58,7 @@ const _gotoSubModule =
       await page.mouse.move(0, 0, { steps: 1 })
 
       // give time for module popup to close (if open)
-      await page.waitForTimeout(2000)
+      await page.waitForTimeout(1000)
 
       const moduleSelector = getSelector(TestId.sidebar.module(module))
       await page.waitForSelector(moduleSelector, { timeout: 5000 })
