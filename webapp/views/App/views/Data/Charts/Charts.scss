@@ -25,6 +25,10 @@
   display: flex;
 }
 
-.charts_chart__container {
-  flex: 1;
+.charts_panel__container {
+  width: 350px;
+  overflow-y: scroll;
+  border-right: 1px solid $greyBorder;
+  flex-direction: column;
+  display: flex;
 }
