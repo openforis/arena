@@ -90,8 +90,9 @@ export const useSamplingPointDataLayer = (props) => {
     loaded: false,
     loading: false,
     points: [],
+    items: [],
   })
-  const { loaded, loading, points } = state
+  const { loaded, loading, points, items } = state
 
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
@@ -116,7 +117,7 @@ export const useSamplingPointDataLayer = (props) => {
           // pan map into layer bounds center
           map.panTo(bounds.getCenter())
 
-          setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points }))
+          setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
         })()
       }
       setState((statePrev) => ({ ...statePrev, loading: shouldLoadItems }))
@@ -133,12 +134,12 @@ export const useSamplingPointDataLayer = (props) => {
   }, [])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
-
   return {
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     overlayName,
     totalPoints: points.length,
+    items,
   }
 }

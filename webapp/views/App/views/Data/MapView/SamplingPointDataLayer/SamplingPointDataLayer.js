@@ -11,9 +11,25 @@ const markerRadius = 10
 export const SamplingPointDataLayer = (props) => {
   const { markersColor } = props
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints } =
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints, items } =
     useSamplingPointDataLayer(props)
+  const getPointIndex = (uuid) => {
+    let index
+    items.forEach((p, i) => {
+      if (p.uuid == uuid) index = i
+      return
+    })
+    return index
+  }
 
+  const getNextPoint = (uuid) => {
+    const index = getPointIndex(uuid)
+    return items[(index + 1) % items.length]
+  }
+  const getPreviousPoint = (uuid) => {
+    let index = getPointIndex(uuid)
+    return items[index > 0 ? index - 1 : items.length - 1]
+  }
   return (
     <LayersControl.Overlay name={overlayName}>
       <LayerGroup>
@@ -39,7 +55,13 @@ export const SamplingPointDataLayer = (props) => {
           // we have a single point (sampling point item) to render
           return (
             <CircleMarker key={itemUuid} center={[latitude, longitude]} radius={markerRadius} color={markersColor}>
-              <SamplingPointDataItemPopup location={location} codes={itemCodes} />
+              <SamplingPointDataItemPopup
+                location={location}
+                codes={itemCodes}
+                itemUuid={itemUuid}
+                getNextPoint={getNextPoint}
+                getPreviousPoint={getPreviousPoint}
+              />
             </CircleMarker>
           )
         })}
@@ -50,6 +72,7 @@ export const SamplingPointDataLayer = (props) => {
 
 SamplingPointDataLayer.propTypes = {
   levelIndex: PropTypes.number,
+  markersColor: PropTypes.any,
 }
 
 SamplingPointDataLayer.defaultProps = {
