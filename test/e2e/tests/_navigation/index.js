@@ -55,12 +55,22 @@ const _gotoSubModule =
   (module, subModule, waitForApiPaths = null) =>
   () =>
     test(`Goto ${module}->${subModule}`, async () => {
-      await page.hover(getSelector(TestId.sidebar.module(module)))
+      await page.mouse.move(0, 0, { steps: 1 })
+
+      // give time for module popup to close (if open)
+      await page.waitForTimeout(1000)
+
+      const moduleSelector = getSelector(TestId.sidebar.module(module))
+      await page.waitForSelector(moduleSelector, { timeout: 5000 })
+      await page.hover(moduleSelector)
+
+      const subModuleSelector = getSelector(TestId.sidebar.moduleBtn(subModule), 'a')
+      await page.waitForSelector(subModuleSelector, { timeout: 5000 })
 
       await Promise.all([
         ...(waitForApiPaths ? waitForApiPaths.map((path) => page.waitForResponse(path)) : []),
         page.waitForNavigation(),
-        page.click(getSelector(TestId.sidebar.moduleBtn(subModule), 'a')),
+        page.click(subModuleSelector),
       ])
 
       expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
