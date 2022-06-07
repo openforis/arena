@@ -83,7 +83,9 @@
     position: relative;
 
     .entity-selector-tree {
+      position: absolute;
       height: 100%;
+      width: 100%;
       border: $formBorder;
       background-color: $white;
     }
@@ -91,7 +93,7 @@
     .survey-form__page-edit-buttons {
       position: absolute;
       bottom: 0;
-      right: 0;
+      right: 18px;
     }
   }
 

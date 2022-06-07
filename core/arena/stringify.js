@@ -9,7 +9,7 @@ import { isNull } from './isNull'
  * @param space
  * @returns {*} - The stringified object.
  */
-export const stringify = (object, _replacer, space = null) => {
+export const stringify = (object, _replacer, space = null ) => {
   if (isNull(object)) return null
 
   const replacer = (key, value) => {

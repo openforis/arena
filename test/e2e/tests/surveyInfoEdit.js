@@ -14,6 +14,8 @@ export default () =>
     test('Verify name required', async () => {
       await page.fill(surveyName, '')
       await page.click(saveBtn)
+      // wait for validation feedback
+      await page.waitForTimeout(1000)
 
       await page.hover(surveyName)
       await expect(page).toHaveText('Name is required')

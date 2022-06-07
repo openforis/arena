@@ -143,14 +143,13 @@ const Charts = () => {
         toggleLabelFunction={toggleLabelFunction}
         dimensions={dimensions}
       />
-      <Panel spec={spec} onUpdateSpec={updateSpec} />
+      <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
 
-      <div className="charts_chart__container">
-        {draft && <button onClick={renderChart}>rerender</button>}
-        <Chart
-          src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
-        />
-      </div>
+      <Chart
+        draft={draft}
+        renderChart={renderChart}
+        src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
+      />
     </div>
   )
 }
