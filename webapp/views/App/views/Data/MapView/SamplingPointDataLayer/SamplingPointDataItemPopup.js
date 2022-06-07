@@ -29,7 +29,7 @@ ${codes
   const onClickNext = () => {
     const nextPoint = getNextPoint(itemUuid)
     map.flyTo(nextPoint.latLng)
-    map.openPopup(nextPoint.latLng)
+    //map.openPopup(nextPoint.latLng)
   }
 
   const onClickPrevious = () => {
@@ -47,7 +47,7 @@ ${codes
 }
 
 SamplingPointDataItemPopup.propTypes = {
-  location: PropTypes.array,
+  location: PropTypes.string,
   codes: PropTypes.any,
   itemUuid: PropTypes.string,
   getNextPoint: PropTypes.func,
