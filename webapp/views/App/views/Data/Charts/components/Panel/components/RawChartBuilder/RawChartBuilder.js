@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
+import * as ace from 'ace-builds'
 import AceEditor from 'react-ace'
 import { useI18n } from '@webapp/store/system'
 
@@ -16,6 +17,80 @@ const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
 
 import './RawChartBuilder.scss'
+
+const getDimensionsCompleter = ({ dimensions }) => {
+  return {
+    getCompletions: (_editor, _session, _pos, _prefix, callback) => {
+      callback(
+        null,
+        dimensions
+          .flatMap((group) => group.options || [])
+          .map((dimension) => ({
+            caption: `${dimension.name}: ${dimension.label}`,
+            value: `${dimension.name}`,
+            meta: 'Dimensions',
+          }))
+      )
+    },
+  }
+}
+
+const getAggregationsCompleter = () => {
+  const aggregations = [
+    [
+      { value: 'count', caption: 'count: The total count of data objects in the group.' },
+      { value: 'valid', caption: 'valid: The count of field values that are not missing or NaN.' },
+      { value: 'missing', caption: "missing: The count of null, undefined, or empty string ('') field values." },
+      { value: 'distinct', caption: 'distinct: The count of distinct field values.' },
+      { value: 'sum', caption: 'sum: The sum of field values.' },
+      { value: 'product', caption: 'product: The product of field values. ≥ 5.10' },
+      { value: 'mean', caption: 'mean: The mean (average) field value.' },
+      { value: 'average', caption: 'average: The mean (average) field value. Identical to mean.' },
+      { value: 'variance', caption: 'variance: The sample variance of field values.' },
+      { value: 'variancep', caption: 'variancep: The population variance of field values.' },
+      { value: 'stdev', caption: 'stdev: The sample standard deviation of field values.' },
+      { value: 'stdevp', caption: 'stdevp: The population standard deviation of field values.' },
+      { value: 'stderr', caption: 'stderr: The standard error of field values.' },
+      { value: 'median', caption: 'median: The median field value.' },
+      { value: 'q1', caption: 'q1: The lower quartile boundary of field values.' },
+      { value: 'q3', caption: 'q3: The upper quartile boundary of field values.' },
+      {
+        value: 'ci0',
+        caption: 'ci0: The lower boundary of the bootstrapped 95% confidence interval of the mean field value.',
+      },
+      {
+        value: 'ci1',
+        caption: 'ci1: The upper boundary of the bootstrapped 95% confidence interval of the mean field value.',
+      },
+      { value: 'min', caption: 'min: The minimum field value.' },
+      { value: 'max', caption: 'max: The maximum field value.' },
+      { value: 'argmin', caption: 'argmin: An input data object containing the minimum field value.' },
+      { value: 'argmax', caption: 'argmax: An input data object containing the maximum field value.' },
+      { value: 'values', caption: 'values: The list of data objects in the group.' },
+    ],
+  ]
+  return {
+    getCompletions: (_editor, _session, _pos, _prefix, callback) => {
+      callback(
+        null,
+        aggregations.map((aggregation) => ({
+          ...aggregation,
+          meta: 'Aggregations Operation',
+        }))
+      )
+    },
+  }
+}
+
+const populateVegaRawEditorCompleters =
+  ({ dimensions }) =>
+  (editor) => {
+    // reset completers
+    editor.completers = [...defaultCompleters]
+
+    editor.completers.push(getDimensionsCompleter({ dimensions }))
+    editor.completers.push(getAggregationsCompleter())
+  }
 
 const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
   const i18n = useI18n()
@@ -42,26 +117,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
 
   useEffect(() => {
     const { editor } = editorRef.current
-
-    // reset completers
-    editor.completers = [...defaultCompleters]
-
-    const dimensionsCompleter = {
-      getCompletions: (_editor, _session, _pos, _prefix, callback) => {
-        callback(
-          null,
-          dimensions
-            .flatMap((group) => group.options || [])
-            .map((dimension) => ({
-              caption: `${dimension.name}: ${dimension.label}`,
-              value: `${dimension.name}`,
-              meta: 'Dimensions',
-            }))
-        )
-      },
-    }
-
-    editor.completers.push(dimensionsCompleter)
+    populateVegaRawEditorCompleters({ dimensions })(editor)
   }, [dimensions])
 
   return (
