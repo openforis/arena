@@ -142,18 +142,22 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 // ======
 //
 
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.nodeDefUuid]: nodeDefUuid,
-  [keys.recordUuid]: recordUuid,
-  [keys.parentUuid]: getUuid(parentNode),
-  [keys.value]: value,
-  [keys.meta]: {
-    [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
-  },
-  [keys.created]: true,
-  [keys.dateCreated]: new Date(),
-})
+export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
+  const now = new Date()
+  return {
+    [keys.uuid]: uuidv4(),
+    [keys.nodeDefUuid]: nodeDefUuid,
+    [keys.recordUuid]: recordUuid,
+    [keys.parentUuid]: getUuid(parentNode),
+    [keys.value]: value,
+    [keys.meta]: {
+      [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+    },
+    [keys.created]: true,
+    [keys.dateCreated]: now,
+    [keys.dateModified]: now,
+  }
+}
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
@@ -199,6 +203,8 @@ export const isValueBlank = (node) => {
 // Code
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
+export const newNodeValueCode = ({ itemUuid }) => ({ [valuePropsCode.itemUuid]: itemUuid })
+
 // Coordinate
 const _getValuePropNumber = ({ node, prop }) => {
   const value = _getValuePropRaw(prop)(node)
@@ -209,6 +215,12 @@ export const getCoordinateY = (node) => _getValuePropNumber({ node, prop: valueP
 
 export const getCoordinateSrs = (node, defaultValue = null) =>
   _getValuePropRaw(valuePropsCoordinate.srs, defaultValue)(node)
+
+export const newNodeValueCoordinate = ({ x, y, srsId }) => ({
+  [valuePropsCoordinate.x]: x,
+  [valuePropsCoordinate.y]: y,
+  [valuePropsCoordinate.srs]: srsId,
+})
 
 // Date
 const _getDatePart = (index) =>
@@ -229,6 +241,8 @@ export const getTaxonUuid = _getValuePropRaw(valuePropsTaxon.taxonUuid)
 export const getVernacularNameUuid = _getValuePropRaw(valuePropsTaxon.vernacularNameUuid)
 export const getScientificName = _getValuePropRaw(valuePropsTaxon.scientificName, '')
 export const getVernacularName = _getValuePropRaw(valuePropsTaxon.vernacularName, '')
+
+export const newNodeValueTaxon = ({ taxonUuid }) => ({ [valuePropsTaxon.taxonUuid]: taxonUuid })
 
 // Time
 const _getTimePart = (index) =>

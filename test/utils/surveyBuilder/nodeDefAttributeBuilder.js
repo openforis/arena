@@ -47,8 +47,8 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
 
     def[NodeDef.keys.analysis] = this._analysis
 
-    if (this.categoryName) {
-      const category = Survey.getCategoryByName(this.categoryName)(survey)
+    if (this._categoryName) {
+      const category = Survey.getCategoryByName(this._categoryName)(survey)
       def.props[NodeDef.propKeys.categoryUuid] = category?.uuid
     }
     return {

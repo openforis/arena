@@ -68,17 +68,18 @@ class SurveyBuilder {
     })
 
     // categories
-    const categories = []
+    const categoriesByUuid = {}
     const categoryItemsRefData = []
     this.categoryBuilders.forEach((categoryBuilder) => {
       const { category, items } = categoryBuilder.build()
-      categories.push(category)
+      const categoryUuid = Category.getUuid(category)
+      categoriesByUuid[categoryUuid] = category
       // add category uuid to category items
-      categoryItemsRefData.push(...items.map((item) => ({ ...item, categoryUuid: Category.getUuid(category) })))
+      categoryItemsRefData.push(...items.map((item) => ({ ...item, categoryUuid })))
     })
 
     // taxonomies
-    const taxonomies = []
+    const taxonomiesByUuid = {}
     const taxaIndexRefData = []
     this.taxonomyBuilders.forEach((taxonomyBuilder) => {
       const { taxonomy, taxa } = taxonomyBuilder.build()
@@ -93,12 +94,12 @@ class SurveyBuilder {
           extraPropsDefs[extraPropKey] = { key: extraPropKey }
         })
       })
-      taxonomies.push(Taxonomy.assocExtraPropsDefs(extraPropsDefs)(taxonomy))
+      taxonomiesByUuid[Taxonomy.getUuid(taxonomy)] = Taxonomy.assocExtraPropsDefs(extraPropsDefs)(taxonomy)
     })
 
     survey = A.pipe(
-      Survey.assocCategories(categories),
-      Survey.assocTaxonomies(taxonomies),
+      Survey.assocCategories(categoriesByUuid),
+      Survey.assocTaxonomies(taxonomiesByUuid),
       Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })
     )(survey)
 
@@ -159,7 +160,7 @@ export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefB
 export const entity = (name, ...childBuilders) => new NodeDefEntityBuilder(name, ...childBuilders)
 export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefAttributeBuilder(name, type)
 // ==== category
-export const category = (name, ...itemBuilders) => new CategoryBuilder(name, ...itemBuilders)
+export const category = (name) => new CategoryBuilder(name)
 export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>

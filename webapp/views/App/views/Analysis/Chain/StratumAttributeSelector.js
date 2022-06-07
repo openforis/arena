@@ -21,9 +21,7 @@ export const StratumAttributeSelector = () => {
 
   const onChange = (item) => {
     const stratumNodeDefUuid = item?.key
-    const chainUpdated = stratumNodeDefUuid
-      ? Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
-      : Chain.dissocStratumNodeDefUuid(chain)
+    const chainUpdated = Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
@@ -31,12 +29,24 @@ export const StratumAttributeSelector = () => {
   const selectableDefs = []
   if (baseUnitNodeDef) {
     Survey.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDef) => {
-      const childrenDefs = Survey.getNodeDefChildren(nodeDef, true)(survey)
-      selectableDefs.push(...childrenDefs.filter(NodeDef.isCode))
+      // search inside single entities
+      const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDef, true)(survey)
+      selectableDefs.push(
+        ...descendantDefs.filter(
+          (descendantDef) =>
+            //  only code attributes
+            NodeDef.isCode(descendantDef) &&
+            // adoid duplicates
+            !selectableDefs.some(NodeDef.isEqual(descendantDef))
+        )
+      )
     })(survey)
   }
 
-  const nodeDefToItem = (nodeDef) => ({ key: NodeDef.getUuid(nodeDef), value: NodeDef.getName(nodeDef) })
+  const nodeDefToItem = (nodeDef) => ({
+    key: NodeDef.getUuid(nodeDef),
+    value: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
+  })
 
   const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
   const selectableItems = [

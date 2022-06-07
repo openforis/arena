@@ -16,11 +16,7 @@ export const getValidationChildrenCountKey = (nodeParentUuid, nodeDefChildUuid) 
   `${prefixValidationFieldChildrenCount}${nodeParentUuid}_${nodeDefChildUuid}`
 export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
 export const isValidationResultErrorCount = (validationResult) =>
-  R.includes(ValidationResult.getKey(validationResult), [
-    Validation.messageKeys.record.nodesMinCountNotReached,
-    Validation.messageKeys.record.nodesMaxCountExceeded,
-    Validation.messageKeys.record.nodesCountInvalid,
-  ])
+  ValidationResult.getKey(validationResult).startsWith('record.nodes.count.')
 export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)
 
 // ===== CREATE

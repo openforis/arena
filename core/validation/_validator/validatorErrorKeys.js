@@ -41,6 +41,11 @@ export const ValidatorErrorKeys = {
     invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
   },
 
+  dataImport: {
+    recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
+    recordNotFound: 'validationErrors.dataImport.recordNotFound',
+  },
+
   expressions: {
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
@@ -53,6 +58,7 @@ export const ValidatorErrorKeys = {
   },
 
   nodeDefEdit: {
+    analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
     columnWidthCannotBeGreaterThan: 'validationErrors.nodeDefEdit.columnWidthCannotBeGreaterThan',
@@ -78,13 +84,8 @@ export const ValidatorErrorKeys = {
 
   record: {
     keyDuplicate: 'validationErrors.record.keyDuplicate',
-    entityKeyDuplicate: 'validationErrors.record.entityKeyDuplicate',
-    nodesMaxCountExceeded: 'validationErrors.record.nodesMaxCountExceeded',
-    nodesMinCountNotReached: 'validationErrors.record.nodesMinCountNotReached',
-    nodesCountInvalid: 'validationErrors.record.nodesCountInvalid',
     oneOrMoreInvalidValues: 'validationErrors.record.oneOrMoreInvalidValues',
     uniqueAttributeDuplicate: 'validationErrors.record.uniqueAttributeDuplicate',
-    valueInvalid: 'validationErrors.record.valueInvalid',
     valueRequired: 'validationErrors.record.valueRequired',
   },
 

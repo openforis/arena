@@ -1,11 +1,12 @@
 import * as R from 'ramda'
 
+import { RecordValidator } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as Record from '@core/record/record'
-import * as RecordValidator from '@core/record/recordValidator'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
@@ -40,7 +41,7 @@ const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
 
 export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
   // 1. validate nodes
-  const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
+  const nodesValidation = await RecordValidator.validateNodes({ survey, record, nodes })
 
   // 2. validate record uniqueness
   const recordUniqueNodesValidation =

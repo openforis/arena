@@ -20,6 +20,8 @@ RUN apt-get update; \
 RUN npm install -g chromium --unsafe-perm
 # Install PM2
 RUN npm install pm2 -g
+# Install cross-env
+RUN npm install cross-env -g
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/

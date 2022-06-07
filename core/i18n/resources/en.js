@@ -386,15 +386,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
     },
-    recordsImport: {
-      confirmDeleteAllRecords: 'Delete all records before import?',
-      confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
-      deleteAllRecordsBeforeImport: 'Delete all records before import',
-      forceImportFromAnotherSurvey: 'Force import from another survey',
-      importFromCollect: 'Import data from Collect / Collect Mobile',
-      importComplete: 'Import complete. {{insertedRecords}} records imported',
-      importIntoCycle: 'Import into cycle',
-    },
   },
 
   activityLogView: {
@@ -480,6 +471,25 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       includeCategories: 'Include categories',
     },
     startCsvExport: 'Start CSV export',
+  },
+
+  dataImportView: {
+    confirmDeleteAllRecords: 'Delete all records before import?',
+    confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
+    deleteAllRecordsBeforeImport: 'Delete all records before import',
+    downloadTemplate: 'Download template',
+    forceImportFromAnotherSurvey: 'Force import from another survey',
+    importComplete: 'Import complete. {{insertedRecords}} records imported',
+    importFromCollect: 'Import data from Collect / Collect Mobile',
+    importFromCsv: 'Import data from CSV',
+    importIntoCycle: 'Import into cycle',
+    importIntoEntity: 'Import into entity',
+    importType: {
+      label: 'Import type',
+      insertNewRecords: 'Insert new records',
+      updateExistingRecords: 'Update existing records',
+    },
+    selectCSVFileToImport: 'Select CSV file to import',
   },
 
   dataView: {
@@ -692,9 +702,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     downloadSummaryJSON: 'Download Summary (JSON)',
     formLabel: 'Processing chain label',
     basic: 'Basic',
+    nonResponseBiasCorrection: 'Non-response bias correction',
+    nonResponseBiasCorrectionTip: `To implement this method, add a category named 'sampling_units_plan'`,
+    pValue: 'P-value',
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
-    samplingStrategyLabel: 'Sampling Strategy',
+    samplingStrategyLabel: 'Sampling strategy',
     samplingStrategy: {
       simpleRandom: 'Simple Random Sampling',
       systematic: 'Systematic Sampling',
@@ -702,10 +715,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       stratifiedSystematic: 'Stratified Systematic Sampling',
     },
     stratumAttribute: 'Stratum attribute',
-    postStratificationAttribute: 'Post Stratification Attribute',
+    postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
-    clusteringEntity: 'Clustering Entity',
-    clusteringOnlyVariances: 'Clustering Only Variances',
+    clusteringEntity: 'Clustering entity',
+    clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     surveyShouldBePublished: 'The survey should be published to run analysis',
@@ -745,8 +758,8 @@ $t(common.cantUndoWarning)`,
     entities: {
       new: 'Virtual entity',
     },
-    reportingDataCategory: 'Reporting Data Category',
-    reportingDataAttribute: 'Reporting Data Attribute for {{level}}',
+    reportingDataCategory: 'Reporting data category',
+    reportingDataAttribute: 'Reporting data attribute for {{level}}',
     samplingNodeDefs: 'Sampling NodeDefs',
   },
 
@@ -764,6 +777,10 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
+  },
+
+  expression: {
+    undefinedFunction: 'Undefined function: {{name}}',
   },
 
   // ====== Help views
@@ -1120,6 +1137,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     nodeDefEdit: {
+      analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
       columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
@@ -1148,15 +1166,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     record: {
       keyDuplicate: 'Duplicate record key',
-      oneOrMoreInvalidValues: 'One or more values are invalid',
-
-      entityKeyDuplicate: 'Duplicate entity key',
-      nodesMaxCountExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
-      nodesMinCountNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
-      nodesCountInvalid: '{{nodeDefName}} nodes must be exactly {{count}}',
       uniqueAttributeDuplicate: 'Duplicate value',
-      valueInvalid: 'Invalid value',
-      valueRequired: 'Required value',
     },
 
     surveyInfoEdit: {
@@ -1235,12 +1245,14 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
+    ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
     ChainsValidationJob: 'Processing Chains Validation',
     ChainsImportJob: 'Chains Import',
     CollectDataImportJob: 'Collect Data Import',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     CyclesDeletedCheckJob: 'Deleted Cycles Check',
+    DataImportJob: 'Data Import',
     FilesImportJob: 'Files Import',
     NodeDefsImportJob: 'Node Definitions Import',
     NodeDefsValidationJob: 'Node Definitions Validation',
@@ -1315,6 +1327,29 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
   systemErrors: {
     somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.',
+  },
+
+  record: {
+    keyDuplicate: 'Duplicate record key',
+    oneOrMoreInvalidValues: 'One or more values are invalid',
+    uniqueAttributeDuplicate: 'Duplicate value',
+
+    attribute: {
+      customValidation: 'Invalid value',
+      uniqueDuplicate: 'Duplicate value',
+      valueInvalid: 'Invalid value',
+      valueRequired: 'Required value',
+    },
+    entity: {
+      keyDuplicate: 'Duplicate entity key',
+    },
+    nodes: {
+      count: {
+        invalid: '{{nodeDefName}} nodes must be exactly {{count}}',
+        maxExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
+        minNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
+      },
+    },
   },
 
   // ====== Common components

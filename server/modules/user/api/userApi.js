@@ -150,7 +150,7 @@ export const init = (app) => {
   app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
     try {
       const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
       await UserService.exportUsersIntoStream({ outputStream: res })
     } catch (error) {
@@ -230,7 +230,7 @@ export const init = (app) => {
     async (_req, res, next) => {
       try {
         const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
+        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
         await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
       } catch (error) {

@@ -18,6 +18,7 @@ import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
+import { PValueSelector } from './PValueSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -38,19 +39,24 @@ export const ChainSamplingDesignProps = (props) => {
         <>
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
-
+          {Chain.isStratificationEnabled(chain) && (
+            <>
+              <StratumAttributeSelector />
+              <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
+                <div className="nonResponseBiasCorrectionContainer">
+                  <Checkbox
+                    checked={Chain.isNonResponseBiasCorrection(chain)}
+                    validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
+                    onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
+                  />
+                  <label className="nonResponseBiasCorrectionTip">
+                    {i18n.t('chainView.nonResponseBiasCorrectionTip')}
+                  </label>
+                </div>
+              </FormItem>
+            </>
+          )}
           {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
-
-          <FormItem label={i18n.t('chainView.areaWeightingMethod')}>
-            <Checkbox
-              checked={Chain.isAreaWeightingMethod(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.areaWeightingMethod)(validation)}
-              onChange={(areaWeightingMethod) =>
-                updateChain(Chain.assocAreaWeightingMethod(areaWeightingMethod)(chain))
-              }
-            />
-          </FormItem>
 
           <ClusteringEntitySelector />
 
@@ -69,6 +75,8 @@ export const ChainSamplingDesignProps = (props) => {
       )}
 
       <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
+
+      {Chain.getSamplingStrategy(chain) && <PValueSelector />}
     </>
   )
 }

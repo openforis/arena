@@ -21,9 +21,7 @@ export default () =>
     gotoSurveyCreate()
 
     test(`Import survey `, async () => {
-      await page.click(
-        getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' }))
-      )
+      await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' })))
       const input = await page.$(getSelector(TestId.surveyCreate.importFromArena), 'input')
       await Promise.all([
         page.waitForResponse('**/survey/**'), // job status response
@@ -37,7 +35,7 @@ export default () =>
 
       const json = await response.json()
 
-      surveyImport.name = json.survey.info.props.name
+      surveyImport.name = json.survey.props.name
       await page.reload()
     })
 

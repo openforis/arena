@@ -71,7 +71,7 @@ export const getNodeDefChildrenInOwnPage =
   }
 
 export const getNodeDefDescendantsInSingleEntities =
-  ({ nodeDef, filterFn }) =>
+  ({ nodeDef, includeAnalysis, filterFn }) =>
   (survey) => {
     const descendants = []
 
@@ -80,7 +80,7 @@ export const getNodeDefDescendantsInSingleEntities =
 
     while (!queue.isEmpty()) {
       const entityDefCurrent = queue.dequeue()
-      const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent)(survey)
+      const entityDefCurrentChildren = getNodeDefChildren(entityDefCurrent, includeAnalysis)(survey)
 
       descendants.push(...entityDefCurrentChildren.filter(filterFn))
 
@@ -90,8 +90,8 @@ export const getNodeDefDescendantsInSingleEntities =
     return descendants
   }
 
-export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef) =>
-  getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isSingleAttribute })
+export const getNodeDefDescendantAttributesInSingleEntities = (nodeDef, includeAnalysis = false) =>
+  getNodeDefDescendantsInSingleEntities({ nodeDef, includeAnalysis, filterFn: NodeDef.isSingleAttribute })
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   if (NodeDef.isAttribute(nodeDef)) {
@@ -224,6 +224,15 @@ export const getNodeDefAncestorsKeyAttributes = (nodeDef) => (survey) => {
   return ancestorsKeyAttributes
 }
 
+export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (survey) => {
+  let ancestorsKeyAttributesIndexed = {}
+  visitAncestors(nodeDef, (ancestorDef) => {
+    const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
+    ancestorsKeyAttributesIndexed[NodeDef.getUuid(ancestorDef)] = ancestorKeyAttributes
+  })(survey)
+  return ancestorsKeyAttributesIndexed
+}
+
 export const getNodeDefPath =
   ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true }) =>
   (survey) => {
@@ -310,8 +319,8 @@ export const findDescendants =
     return descendants
   }
 
-export const getDescendants =
-  ({ nodeDef }) =>
+export const getDescendantsAndSelf =
+  ({ nodeDef = null }) =>
   (survey) => {
     const descendants = []
     const queue = new Queue()

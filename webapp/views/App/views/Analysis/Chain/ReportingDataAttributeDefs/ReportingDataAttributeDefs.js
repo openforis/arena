@@ -20,6 +20,8 @@ export const ReportingDataAttributeDefs = (props) => {
 
   const [reportingDataCategory, setReportingDataCategory] = useState(null)
 
+  const availableReportingDataNodeDefs = Survey.getAvailableReportingDataNodeDefs({ chain })(survey)
+
   return (
     <>
       <FormItem label={i18n.t('chainView.reportingDataCategory')}>
@@ -46,14 +48,12 @@ export const ReportingDataAttributeDefs = (props) => {
           >
             <Dropdown
               className="reporting-data-node-def-dropdown"
-              items={Survey.getNodeDefsArray(survey).filter(
-                (def) => NodeDef.isSingleAttribute(def) && !NodeDef.isAnalysis(def)
-              )}
+              items={availableReportingDataNodeDefs}
               selection={Survey.getNodeDefByUuid(Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain))(
                 survey
               )}
               itemKey="uuid"
-              itemLabel={NodeDef.getName}
+              itemLabel={(nodeDef) => NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name)}
               onChange={(def) =>
                 updateChain(
                   Chain.assocReportingDataAttributeDefUuid({
