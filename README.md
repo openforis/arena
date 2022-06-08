@@ -36,34 +36,39 @@ $ npm login --scope=@OWNER --registry=https://npm.pkg.github.com
 ## Development
 
 To install local database:
+
 ```shell script
 sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
-``` 
+```
 
 In order to access Arena when it's installed on a remote server, you need to request access to it or being invited to it.
 To simplify this process when working locally, you can insert a test user with System Administrator rights (username: test@openforis-arena.org - password: test) directly into the database running this SQL script with the SQL client you prefer:
+
 ```
 INSERT INTO "user" (name, email, PASSWORD, status)
 VALUES ('Tester', 'test@openforis-arena.org', '$2a$10$6y2oUZVrQ7aXed.47h4sHeJA8VVA2dW9ObtO/XLveXSzQKBvTOyou', 'ACCEPTED');
 
 INSERT INTO auth_group_user (user_uuid, group_uuid)
 SELECT u.uuid, g.uuid
-FROM "user" u 
+FROM "user" u
     JOIN auth_group g ON u.email = 'test@openforis-arena.org' AND g.name = 'systemAdmin';
 ```
 
 To restart local database:
+
 ```shell script
 docker container restart arena-db
 ```
 
 To install dependencies:
+
 ```shell
 yarn
 npm rebuild node-sass # Sometimes needed
 ```
 
 To run the server and the Web app in parallel with "hot reload" on any changes:
+
 ```shell
 yarn watch
 ```
@@ -73,7 +78,6 @@ yarn watch
 The .env file is needed for development and locally running the stack.
 
 must be added to the root directory of the project and must match the template `.env.template`.
-
 
 ## Running the test suite
 
@@ -88,14 +92,16 @@ yarn test:docker
 ## Run R Studio Server locally
 
 To install RStudio Server as a Docker container run the following command:
+
 - replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable
 - replace YOUR_IP with your machine ip address
 
 ```shell script
-docker run -d --name arena-rstudio --add-host="localhost:YOUR_IP" -p 127.0.0.1:8787:8787 -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+docker run -d --name arena-rstudio --add-host="localhost:YOUR_IP" -p 8787:8787 -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
 ```
 
 To restart RStudio server run
+
 ```shell script
 docker container restart arena-rstudio
 ```
