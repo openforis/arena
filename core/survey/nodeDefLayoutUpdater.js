@@ -271,7 +271,7 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
       nodeDef,
       updateFn: _addNodeDefInParentLayoutCycle,
     })
-    surveyUpdated = SurveyNodeDefs.assocNodeDef({ nodeDef: nodeDefParentUpdated })
+    surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDefParentUpdated)(surveyUpdated)
   })
 
   // update layout of removed cycles
@@ -282,7 +282,7 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
       nodeDef,
       updateFn: _removeNodeDefFromParentLayoutCycle,
     })
-    surveyUpdated = SurveyNodeDefs.assocNodeDef({ nodeDef: nodeDefParentUpdated })
+    surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDefParentUpdated)(surveyUpdated)
   })
 
   // Update parent node def layout in DB (if changed)
