@@ -1,3 +1,5 @@
+import './DataSelector.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -27,13 +29,20 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
       <br />
 
       <p>{i18n.t('common.dimension_plural')}</p>
-
+      <br />
       {dimensions?.map((dimensionGroup) => (
-        <div key={dimensionGroup.label}>
-          <p>{dimensionGroup.label}</p>
-          {dimensionGroup.options?.map((dimension) => (
-            <p key={dimension.name}>{dimension.label}</p>
-          ))}
+        <div className="charts_data-selector_group-dimension" key={dimensionGroup.label}>
+          <p>
+            <b>{dimensionGroup.label}</b>
+          </p>
+          <div className="charts_data-selector_group-dimension">
+            {dimensionGroup.options?.map((dimension) => (
+              <div key={dimension.name} className="charts_data-selector_dimension">
+                {dimension.label}
+                {dimension.icon}
+              </div>
+            ))}
+          </div>
         </div>
       ))}
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
