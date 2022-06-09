@@ -2,10 +2,10 @@ import React from 'react'
 
 import RawChartBuilder from './components/RawChartBuilder'
 
-const Panel = ({ spec, onUpdateSpec }) => {
+const Panel = ({ dimensions, spec, onUpdateSpec }) => {
   return (
     <div className="charts_panel__container">
-      <RawChartBuilder spec={spec} onUpdateSpec={onUpdateSpec} />
+      <RawChartBuilder dimensions={dimensions} spec={spec} onUpdateSpec={onUpdateSpec} />
     </div>
   )
 }

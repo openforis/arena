@@ -207,6 +207,7 @@ Do you want to proceed?`,
     usersAccessRequest: 'Users Access Requests',
     collectImportReport: 'Collect Import Report',
 
+    surveyInfo: 'Survey Info',
     designer: 'Survey',
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',

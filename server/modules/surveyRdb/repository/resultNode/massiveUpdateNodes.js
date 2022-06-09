@@ -11,6 +11,23 @@ import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 const pgp = pgPromise()
 const { Column } = pgp.helpers
 
+const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
+  const cellValue = rowResult[columnName]
+
+  if (cellValue && cellValue !== NA) {
+    if (NodeDef.isCode(nodeDef)) {
+      const categoryItemUuidColumnName = `${NodeDef.getName(nodeDef)}_uuid`
+      const itemUuid = rowResult[categoryItemUuidColumnName]
+      return itemUuid ? { itemUuid } : null
+    }
+    if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
+      return String(Number(cellValue))
+    }
+    return cellValue
+  }
+  return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
+}
+
 export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
     const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(
@@ -56,16 +73,8 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   async push(rowResult) {
     Object.keys(this.nodeDefsByColumnName).forEach((columnName) => {
       const nodeDef = this.nodeDefsByColumnName[columnName]
-      let value = NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
-      if (rowResult[columnName] && rowResult[columnName] !== NA) {
-        value = rowResult[columnName]
-        if (NodeDef.isCode(nodeDef)) {
-          value = { itemUuid: rowResult[columnName.replace('_code', '_uuid').replace('_label', '_uuid')] }
-        }
-        if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
-          value = String(Number(rowResult[columnName]))
-        }
-      }
+
+      const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
 
       const values = {
         [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],

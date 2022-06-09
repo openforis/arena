@@ -9,6 +9,7 @@ import Chart from './components/Chart'
 import Panel from './components/Panel'
 import DataSelector from './components/DataSelector'
 import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 export const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Query.getEntityDefUuid(query)}/chart`
 
@@ -92,12 +93,21 @@ const _dimensions = [
         value: 'city_label',
         label: 'City',
         type: 'nominal',
+        icon: NodeDefUIProps.getIconByType('integer'),
       },
       {
         name: 'inhabitants',
         value: 'inhabitants',
         label: 'Inhabitants',
         type: 'quantitative',
+        icon: NodeDefUIProps.getIconByType('code'),
+      },
+      {
+        name: 'name',
+        value: 'name',
+        label: 'name',
+        type: 'nominal',
+        icon: NodeDefUIProps.getIconByType('text'),
       },
     ],
   },
@@ -130,9 +140,7 @@ const Charts = () => {
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { spec, updateSpec, draft, chartImage, renderChart } = useChart(
-    entityDefUuid ? Query.create({ entityDefUuid }) : null
-  )
+  const { draft, chartImage, renderChart } = useChart(entityDefUuid ? Query.create({ entityDefUuid }) : null)
 
   return (
     <div className="charts">
@@ -143,14 +151,13 @@ const Charts = () => {
         toggleLabelFunction={toggleLabelFunction}
         dimensions={dimensions}
       />
-      <Panel spec={spec} onUpdateSpec={updateSpec} />
+      <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
 
-      <div className="charts_chart__container">
-        {draft && <button onClick={renderChart}>rerender</button>}
-        <Chart
-          src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
-        />
-      </div>
+      <Chart
+        draft={draft}
+        renderChart={renderChart}
+        src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
+      />
     </div>
   )
 }
