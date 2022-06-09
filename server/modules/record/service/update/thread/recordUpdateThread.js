@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
+import { SRSs, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -12,7 +12,6 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import Queue from '@core/queue'
 
-import SystemError from '@core/systemError'
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordUpdateThreadParams from './recordUpdateThreadParams'

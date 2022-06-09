@@ -176,13 +176,19 @@ NodeDefCoordinate.propTypes = {
   canEditRecord: PropTypes.bool.isRequired,
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,
-  insideTable: PropTypes.bool.isRequired,
+  insideTable: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array.isRequired,
-  readOnly: PropTypes.bool.isRequired,
-  renderType: PropTypes.string.isRequired,
+  readOnly: PropTypes.bool,
+  renderType: PropTypes.string,
   surveyInfo: PropTypes.object.isRequired,
   updateNode: PropTypes.func.isRequired,
+}
+
+NodeDefCoordinate.defaultProps = {
+  insideTable: false,
+  readOnly: false,
+  renderType: undefined,
 }
 
 export default NodeDefCoordinate
