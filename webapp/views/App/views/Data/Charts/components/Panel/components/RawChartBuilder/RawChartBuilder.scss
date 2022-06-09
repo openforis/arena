@@ -13,4 +13,11 @@
 .raw-chart-builder__buttons-container{
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+}
+
+.panel-vega-doc{
+    .panel-right__content{
+        padding: 0;
+    }
 }

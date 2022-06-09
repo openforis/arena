@@ -5,6 +5,7 @@ import * as A from '@core/arena'
 import * as ace from 'ace-builds'
 import AceEditor from 'react-ace'
 import { useI18n } from '@webapp/store/system'
+import PanelRight from '@webapp/components/PanelRight'
 
 import 'ace-builds/webpack-resolver'
 import 'ace-builds/src-noconflict/mode-json'
@@ -96,6 +97,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
   const i18n = useI18n()
   const [draftSpec, setDraftSpec] = useState(A.stringify(spec, null, 2))
   const [draft, setDraft] = useState(false)
+  const [helpOpened, setHelpOpened] = useState(false)
   const editorRef = useRef()
 
   const discardChanges = useCallback(() => {
@@ -119,6 +121,10 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
     const { editor } = editorRef.current
     populateVegaRawEditorCompleters({ dimensions })(editor)
   }, [dimensions])
+
+  const toggleHelp = useCallback(() => {
+    setHelpOpened(!helpOpened)
+  }, [helpOpened])
 
   return (
     <div className="raw-chart-builder">
@@ -146,13 +152,30 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
       </div>
 
       <div className="raw-chart-builder__buttons-container">
-        <button onClick={discardChanges} disabled={!draft}>
-          {i18n.t('common.reset')}
-        </button>
-        <button onClick={saveChanges} disabled={!draft}>
-          {i18n.t('common.save')}
+        <div className="raw-chart-builder__buttons-container__left">
+          <button onClick={discardChanges} disabled={!draft}>
+            {i18n.t('common.reset')}
+          </button>
+          <button onClick={saveChanges} disabled={!draft}>
+            {i18n.t('common.save')}
+          </button>
+        </div>
+        <button onClick={toggleHelp}>
+          <span className="icon icon-question icon-left icon-12px" />
+          {i18n.t('common.help')}
         </button>
       </div>
+      {helpOpened && (
+        <PanelRight onClose={toggleHelp} header={i18n.t('common.help')} className="panel-vega-doc">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://vega.github.io/vega/docs"
+            title="Vega help"
+            frameBorder="0"
+          ></iframe>
+        </PanelRight>
+      )}
     </div>
   )
 }
