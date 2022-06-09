@@ -1,0 +1,29 @@
+@import '~@webapp/style/vars';
+
+.charts_data-selector__container{
+        width: 180px;
+        overflow-y: scroll;
+        border-right: 1px solid $greyBorder;
+        flex-direction: column;
+        display: flex;
+        padding: 12px;
+}
+
+.charts_data-selector_group-dimension{
+    padding-left: 8px;
+}
+
+.charts_data-selector_dimension{
+    justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0px;
+    .icon-left {
+        font-size: 12px !important;
+    }
+    .icon{
+        font-size: 12px !important;
+    }
+    
+}
