@@ -21,30 +21,36 @@ export const PostStratificationAttributeSelector = () => {
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-  const availableCodeAttributeDefs = []
+  const selectableDefs = []
   Survey.visitAncestorsAndSelf(baseUnitNodeDef, (entityDef) => {
-    availableCodeAttributeDefs.push(
-      ...Survey.getNodeDefChildren(
-        entityDef,
-        true
-      )(survey).filter(
-        (nodeDef) => NodeDef.isCode(nodeDef) && NodeDef.getUuid(nodeDef) !== Chain.getStratumNodeDefUuid(chain)
+    // search inside single entities
+    const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entityDef, true)(survey)
+
+    selectableDefs.push(
+      ...descendantDefs.filter(
+        (descendantDef) =>
+          // only code attributes
+          NodeDef.isCode(descendantDef) &&
+          // do not allow selecting stratum attribute def
+          NodeDef.getUuid(descendantDef) !== Chain.getStratumNodeDefUuid(chain) &&
+          // avoid duplicates
+          !selectableDefs.some(NodeDef.isEqual(descendantDef))
       )
     )
   })(survey)
 
-  const selectedCodeAttributeDef = availableCodeAttributeDefs.find(
+  const selectedCodeAttributeDef = selectableDefs.find(
     (nodeDef) => NodeDef.getUuid(nodeDef) === Chain.getPostStratificationAttributeDefUuid(chain)
   )
 
   const codeAttributeDefToItem = (codeAttributeDef) => ({
     key: codeAttributeDef.uuid,
-    label: NodeDef.getName(codeAttributeDef),
+    label: NodeDef.getLabel(codeAttributeDef, null, NodeDef.NodeDefLabelTypes.name),
   })
 
   const emptyItem = { key: null, label: i18n.t('common.notSpecified') }
 
-  const items = [emptyItem, ...availableCodeAttributeDefs.map(codeAttributeDefToItem)]
+  const items = [emptyItem, ...selectableDefs.map(codeAttributeDefToItem)]
 
   const selectedItem = selectedCodeAttributeDef ? codeAttributeDefToItem(selectedCodeAttributeDef) : emptyItem
 

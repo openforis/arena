@@ -25,7 +25,9 @@ const NodeDefEntityForm = (props) => {
   useEffect(() => {
     if (entry && !selectedNode && !R.isEmpty(nodes)) {
       const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
-      dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
+      if (nodeUuid) {
+        dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
+      }
     }
   }, [entry, selectedNode, nodes, NodeDef.getUuid(nodeDef)])
 
