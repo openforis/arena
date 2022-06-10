@@ -54,7 +54,7 @@ const _addEntityAndKeyValues =
   ({ survey, entityDef, parentNode, keyValuesByDefUuid }) =>
   (record) => {
     const updateResult = new RecordUpdateResult({ record })
-    const updateResultDescendants = CoreRecordNodesUpdater.addNodeAndDescendants({
+    const updateResultDescendants = CoreRecordNodesUpdater.createNodeAndDescendants({
       survey,
       record,
       parentNode,
