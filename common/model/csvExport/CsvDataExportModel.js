@@ -94,12 +94,11 @@ export class CsvDataExportModel {
     const { includeFiles, includeAnalysis } = this.options
 
     let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext)(this.survey)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext, includeAnalysis)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
 
-    descendantDefs = descendantDefs.filter(
-      (nodeDef) => (includeFiles || !NodeDef.isFile(nodeDef)) && (includeAnalysis || !NodeDef.isAnalysis(nodeDef))
-    )
+    descendantDefs = descendantDefs.filter((nodeDef) => includeFiles || !NodeDef.isFile(nodeDef))
+
     return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 

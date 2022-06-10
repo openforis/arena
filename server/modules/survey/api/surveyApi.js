@@ -142,11 +142,17 @@ export const init = (app) => {
   // generate zip with CSV
   app.post('/survey/:surveyId/export-csv-data', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, includeCategories, includeCategoryItemsLabels } = Request.getParams(req)
+      const { surveyId, includeCategories, includeCategoryItemsLabels, includeAnalysis } = Request.getParams(req)
 
       const user = Request.getUser(req)
 
-      const job = SurveyService.startExportCsvDataJob({ surveyId, user, includeCategories, includeCategoryItemsLabels })
+      const job = SurveyService.startExportCsvDataJob({
+        surveyId,
+        user,
+        includeCategories,
+        includeCategoryItemsLabels,
+        includeAnalysis,
+      })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
       next(error)
