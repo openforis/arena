@@ -848,6 +848,7 @@ $t(common.appNameFull)
     },
     advancedProps: {
       defaultValues: 'Default values',
+      defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
