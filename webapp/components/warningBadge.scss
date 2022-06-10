@@ -1,7 +1,7 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .warning-badge {
-  background-color: $yellow;
-  color: black;
+  background-color: $orange;
+  color: white;
   text-transform: uppercase;
 }
