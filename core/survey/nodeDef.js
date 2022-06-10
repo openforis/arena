@@ -105,6 +105,7 @@ export const fileTypeValues = {
 export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
+  defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
   validations: 'validations',
   formula: 'formula',
 
@@ -260,6 +261,7 @@ const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
