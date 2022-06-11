@@ -1,3 +1,5 @@
+load_dot_env(file = ".env")
+
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
@@ -50,21 +52,30 @@ arena.delete = function(url, body) {
 }
 
 arena.login = function(tentative) {
-  if (missing(tentative)) {
-    tentative <- 1
-  }
-  if (tentative==1) 
-      user <- getPass::getPass("Enter your username (email): ")
-    else 
-    {
-      sText <- "Invalid email or password specified, try again! \n\nEnter your username (email): "
-      user <- getPass::getPass( sText )
+  env_user <- Sys.getenv("USER")
+  env_password <- Sys.getenv("PASSWORD")
+
+  if(env_user == '' || env_password == ''){
+    if (missing(tentative)) {
+      tentative <- 1
     }
-  user <- trimws(user)
-  
-  password <- getPass::getPass("Enter your password: ")
-  password <- trimws(password)
-  
+    if (tentative==1) 
+        user <- getPass::getPass("Enter your username (email): ")
+      else 
+      {
+        sText <- "Invalid email or password specified, try again! \n\nEnter your username (email): "
+        user <- getPass::getPass( sText )
+      }
+    user <- trimws(user)
+    
+    password <- getPass::getPass("Enter your password: ")
+    password <- trimws(password)
+  }else{
+    user <- env_user
+    password <- env_password
+    tentative <- 5
+  }
+    
   resp <- httr::POST(
     paste0(arena.host, 'auth/login'),
     body = list(email = user, password = password)

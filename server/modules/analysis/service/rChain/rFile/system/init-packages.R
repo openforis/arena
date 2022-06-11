@@ -64,3 +64,4 @@ usePackage('rlang')
 # usePackage('BIOMASS')
 
 # usePackage('BiodiversityR') -> there is an error on the load 
+usePackage('dotenv')
