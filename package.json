@@ -141,7 +141,6 @@
     "pg-query-stream": "^4.2.3",
     "proj4": "^2.8.0",
     "prop-types": "^15.8.1",
-    "r-script": "^0.0.4",
     "ramda": "^0.28.0",
     "react": "^17.0.1",
     "react-ace": "^10.1.0",
