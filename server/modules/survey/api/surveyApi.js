@@ -190,12 +190,12 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle } = Request.getParams(req)
 
       const fileName = await generateOutputFileName({ surveyId, fileType: 'schema_summary', extension: 'csv' })
       Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-      await SurveyService.exportSchemaSummary({ surveyId, outputStream: res })
+      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res })
     } catch (error) {
       next(error)
     }

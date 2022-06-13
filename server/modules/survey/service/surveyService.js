@@ -46,8 +46,8 @@ export const startExportCsvDataJob = ({
   return job
 }
 
-export const exportSchemaSummary = async ({ surveyId, outputStream }) =>
-  SchemaSummary.exportSchemaSummary({ surveyId, outputStream })
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
+  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
 
 export const {
   // CREATE
