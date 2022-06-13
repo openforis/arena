@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as Validation from '@core/validation/validation'
 
 import Table from '@webapp/components/Table'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -69,7 +70,11 @@ const CategoryList = (props) => {
     columns.push(
       {
         key: 'error',
-        renderItem: ({ item: category }) => <ErrorBadge validation={Category.getValidation(category)} />,
+        renderItem: ({ item: category }) => {
+          const validation = Category.getValidation(category)
+          if (Validation.isValid(validation) || !Validation.isError(validation)) return null
+          return <ErrorBadge validation={validation} />
+        },
         width: '85px',
       },
       {
@@ -78,7 +83,14 @@ const CategoryList = (props) => {
           const unused =
             !Category.isReportingData(category) &&
             A.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
-          return <WarningBadge show={unused} label={i18n.t('itemsTable.unused')} />
+
+          if (unused) {
+            return <WarningBadge show={unused} label={i18n.t('itemsTable.unused')} />
+          }
+          const validation = Category.getValidation(category)
+          if (Validation.isValid(validation) || Validation.isError(validation)) return null
+
+          return <ErrorBadge showIcon showLabel={false} validation={validation} />
         },
         width: '85px',
       }
