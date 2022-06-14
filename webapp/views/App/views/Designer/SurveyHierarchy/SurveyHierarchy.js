@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import Tree from './Tree'
 import { useI18n } from '@webapp/store/system'
@@ -17,12 +17,12 @@ const SurveyHierarchy = () => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
   const i18n = useI18n()
+  const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
-  const [nodeDefLabelType, setNodeDefLabelType] = useState(NodeDef.NodeDefLabelTypes.label)
 
   const treeRef = useRef(null)
 
@@ -44,14 +44,6 @@ const SurveyHierarchy = () => {
   useEffect(() => {
     if (tree) tree.lang = lang
   }, [lang, tree])
-
-  const toggleLabelFunction = () => {
-    setNodeDefLabelType(
-      nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
-        ? NodeDef.NodeDefLabelTypes.name
-        : NodeDef.NodeDefLabelTypes.label
-    )
-  }
 
   return (
     <div className="survey-hierarchy">
