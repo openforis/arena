@@ -13,21 +13,27 @@ export const useEntityViewDataCounts = ({ nodeDefs }) => {
   const [countsByEntityDefUuid, setCountsByEntityDefUuid] = useState({})
 
   const entityDefUuids = useMemo(() => {
-    const uuidsSet = nodeDefs.reduce(
-      (entityDefUuidsSet, analysisNodeDef) => entityDefUuidsSet.add(NodeDef.getParentUuid(analysisNodeDef)),
-      new Set()
-    )
+    const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, analysisNodeDef) => {
+      const parentUuid = NodeDef.getParentUuid(analysisNodeDef)
+      if (parentUuid) {
+        entityDefUuidsSet.add(parentUuid)
+      }
+      return entityDefUuidsSet
+    }, new Set())
     return [...uuidsSet.values()]
   }, [nodeDefs])
 
   const updateCounts = useCallback(async () => {
-    setCountsByEntityDefUuid(
-      await SurveyRdbApi.fetchEntityViewDataCounts({
-        surveyId: Survey.getId(survey),
-        cycle,
-        entityDefUuids: [...entityDefUuids.values()],
-      })
-    )
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
+      setCountsByEntityDefUuid(
+        await SurveyRdbApi.fetchEntityViewDataCounts({
+          surveyId: Survey.getId(survey),
+          cycle,
+          entityDefUuids: [...entityDefUuids.values()],
+        })
+      )
+    }
   }, [survey, cycle, entityDefUuids])
 
   useEffect(() => {
