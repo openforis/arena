@@ -1,5 +1,8 @@
 import { Query } from '../../../../common/model/query'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
@@ -64,6 +67,24 @@ export const countTable = async (params) => {
   return Query.isModeAggregate(query)
     ? SurveyRdbManager.countViewDataAgg({ survey, cycle, query })
     : SurveyRdbManager.countTable({ survey, cycle, query })
+}
+
+export const countTables = async (params) => {
+  const { surveyId, cycle, entityDefUuids: entityDefUuidsParam = [] } = params
+
+  const survey = await _fetchSurvey(surveyId, cycle)
+
+  const entityDefUuids =
+    entityDefUuidsParam.length > 0
+      ? entityDefUuidsParam
+      : Survey.getNodeDefsArray(survey).filter(NodeDef.isMultipleEntity).map(NodeDef.getUuid)
+
+  const countsArray = await Promise.all(
+    entityDefUuids.map((entityDefUuid) =>
+      SurveyRdbManager.countTable({ survey, cycle, query: Query.create({ entityDefUuid }) })
+    )
+  )
+  return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
 }
 
 export const refreshAllRdbs = async () => {

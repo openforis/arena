@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Query } from '@common/model/query'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -23,17 +21,12 @@ export const useEntityViewDataCounts = ({ nodeDefs }) => {
   }, [nodeDefs])
 
   const updateCounts = useCallback(async () => {
-    const counts = await Promise.all(
-      [...entityDefUuids.values()].map((analysisEntityDefUuid) =>
-        SurveyRdbApi.fetchEntityViewCount({
-          surveyId: Survey.getId(survey),
-          query: Query.create({ entityDefUuid: analysisEntityDefUuid }),
-          cycle,
-        })
-      )
-    )
     setCountsByEntityDefUuid(
-      entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: counts[index] }), {})
+      await SurveyRdbApi.fetchEntityViewDataCounts({
+        surveyId: Survey.getId(survey),
+        cycle,
+        entityDefUuids: [...entityDefUuids.values()],
+      })
     )
   }, [survey, cycle, entityDefUuids])
 
