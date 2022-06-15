@@ -226,6 +226,28 @@ export const countTable = async ({ survey, cycle, query }) => {
   return DataViewRepository.runCount({ surveyId, cycle, tableName, filter })
 }
 
+/**
+ * Returns the count of rows in the data views of the specified entity defs, indexed by entity def UUID.
+ * If entityDefUuids is not specified, all the entity defs will be considered.
+ *
+ * @param {!object} params - The parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
+ * @returns {Promise<object>} - Count of view data tables indexed by entity def UUID.
+ */
+export const countTables = async ({ survey, cycle, entityDefUuids: entityDefUuidsParam = [] }) => {
+  const entityDefUuids =
+    entityDefUuidsParam?.length > 0
+      ? entityDefUuidsParam
+      : Survey.getNodeDefsArray(survey).filter(NodeDef.isMultipleEntity).map(NodeDef.getUuid)
+
+  const countsArray = await Promise.all(
+    entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }))
+  )
+  return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
+}
+
 export const { populateTable } = DataTableInsertRepository
 
 export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository

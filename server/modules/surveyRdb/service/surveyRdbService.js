@@ -70,21 +70,11 @@ export const countTable = async (params) => {
 }
 
 export const countTables = async (params) => {
-  const { surveyId, cycle, entityDefUuids: entityDefUuidsParam = [] } = params
+  const { surveyId, cycle, entityDefUuids = [] } = params
 
   const survey = await _fetchSurvey(surveyId, cycle)
 
-  const entityDefUuids =
-    entityDefUuidsParam.length > 0
-      ? entityDefUuidsParam
-      : Survey.getNodeDefsArray(survey).filter(NodeDef.isMultipleEntity).map(NodeDef.getUuid)
-
-  const countsArray = await Promise.all(
-    entityDefUuids.map((entityDefUuid) =>
-      SurveyRdbManager.countTable({ survey, cycle, query: Query.create({ entityDefUuid }) })
-    )
-  )
-  return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
+  return SurveyRdbManager.countTables({ survey, cycle, entityDefUuids })
 }
 
 export const refreshAllRdbs = async () => {
