@@ -1,47 +1,9 @@
-import * as R from 'ramda'
-
-import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
-import { identifierEval } from './identifierEval'
-import { memberEval } from './memberEval'
-import { NodeDefExpressionValidator as CoreNodeDefExpressionValidator } from '@openforis/arena-core'
-
-const _evaluateExpression = ({ survey, nodeDef, exprString, isContextParent = true, selfReferenceAllowed = true }) => {
-  if (!exprString) {
-    return []
-  }
-  const referencedNodeDefs = {}
-  const addReferencedNodeDef = (nodeDefRef) => {
-    if (nodeDefRef && !R.isEmpty(nodeDefRef)) {
-      referencedNodeDefs[NodeDef.getUuid(nodeDefRef)] = nodeDefRef
-    }
-    return nodeDefRef
-  }
-  const evaluators = {
-    [Expression.types.Identifier]: (expr, ctx) =>
-      addReferencedNodeDef(identifierEval({ survey, nodeDefCurrent: nodeDef })(expr, ctx)),
-    [Expression.types.MemberExpression]: (expr, ctx) => addReferencedNodeDef(memberEval(expr, ctx)),
-  }
-  const functions = {
-    [Expression.functionNames.parent]: (nodeDefArg) => {
-      if (NodeDef.isRoot(nodeDefArg)) {
-        return null
-      }
-      const parentDef = Survey.getNodeDefParent(nodeDefArg)(survey)
-      return addReferencedNodeDef(parentDef)
-    },
-  }
-  const nodeDefContext = isContextParent ? Survey.getNodeDefParent(nodeDef)(survey) : nodeDef
-  const result = Expression.evalString(exprString, {
-    evaluators,
-    functions,
-    node: nodeDefContext,
-    selfReferenceAllowed,
-  })
-  return { referencedNodeDefs, result }
-}
+import {
+  NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
+  NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
+} from '@openforis/arena-core'
 
 export const findReferencedNodeDefs = ({
   survey,
@@ -67,14 +29,13 @@ export const findReferencedNodeDefLast = ({
   isContextParent = true,
   selfReferenceAllowed = true,
 }) => {
-  const { result } = _evaluateExpression({
+  return new CoreNodeDefExpressionEvaluator().evalExpression({
     survey,
     nodeDef,
-    exprString,
+    expression: exprString,
     isContextParent,
     selfReferenceAllowed,
   })
-  return result
 }
 
 export const validate = ({
@@ -94,15 +55,4 @@ export const validate = ({
   if (validationResult === null || validationResult.valid) return null
 
   return validationResult
-
-  // try {
-  //   findReferencedNodeDefs({ survey, nodeDef: nodeDefCurrent, exprString, isContextParent, selfReferenceAllowed })
-  //   return null
-  // } catch (error) {
-  //   const details = R.is(SystemError, error) ? `$t(${error.key})` : error.toString()
-  //   return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, {
-  //     details,
-  //     ...error.params,
-  //   })
-  // }
 }
