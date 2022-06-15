@@ -3,7 +3,9 @@ import React, { useRef, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+
 import * as Chain from '@common/analysis/chain'
+
 import { useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -13,6 +15,7 @@ import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { AnalysisNodeDef } from './AnalysisNodeDef'
 import { useSortAnalysisNodeDefs } from './hooks'
 import { useOnUpdate } from '@webapp/components/hooks'
+import { useEntityViewDataCounts } from './hooks/useEntityViewDataCounts'
 
 const AnalysisNodeDefs = () => {
   const [showSamplingNodeDefs, setShowSamplingNodeDefs] = useState(false)
@@ -30,6 +33,8 @@ const AnalysisNodeDefs = () => {
   )
 
   useSortAnalysisNodeDefs({ analysisNodeDefsContainerRef, analysisNodeDefs: analysisNodeDefsToShow })
+
+  const entityViewDataCountsByUuid = useEntityViewDataCounts({ nodeDefs: analysisNodeDefsToShow })
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {
@@ -70,6 +75,7 @@ const AnalysisNodeDefs = () => {
                 <AnalysisNodeDef
                   key={NodeDef.getUuid(analysisNodeDef)}
                   nodeDefUuid={NodeDef.getUuid(analysisNodeDef)}
+                  dataCount={entityViewDataCountsByUuid[NodeDef.getParentUuid(analysisNodeDef)]}
                 />
               ))}
             </div>
