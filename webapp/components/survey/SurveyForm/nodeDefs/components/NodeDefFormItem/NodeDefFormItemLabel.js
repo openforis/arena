@@ -10,11 +10,9 @@ const NodeDefFormItemLabel = (props) => {
 
   return (
     <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
-      <div>
-        <NodeDefIconKey nodeDef={nodeDef} />
-        {label}
-        <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
-      </div>
+      <NodeDefIconKey nodeDef={nodeDef} />
+      {label}
+      <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
     </NodeDefErrorBadge>
   )
 }

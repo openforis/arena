@@ -82,7 +82,7 @@
     "nodemon": "^2.0.16",
     "npm-run-all": "^4.1.5",
     "optimize-css-assets-webpack-plugin": "^6.0.1",
-    "playwright": "1.15.2",
+    "playwright": "^1.22.2",
     "prettier": "^2.6.2",
     "react-refresh": "^0.13.0",
     "rimraf": "^3.0.2",
@@ -94,10 +94,11 @@
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.9.1",
-    "webpack-node-externals": "^3.0.0"
+    "webpack-node-externals": "^3.0.0",
+    "yarn-audit-fix": "^9.3.1"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.95",
+    "@openforis/arena-core": "^0.0.99",
     "@openforis/arena-server": "^0.1.20",
     "@sendgrid/mail": "^7.7.0",
     "@shopify/draggable": "^1.0.0-beta.8",
