@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { useMap } from 'react-leaflet'
 
 export const SamplingPointDataItemPopup = (props) => {
-  const { location, codes, itemUuid, getNextPoint, getPreviousPoint } = props
+  const { location, codes, itemUuid, getNextPoint, getPreviousPoint, openPopupOfUuid } = props
 
   const i18n = useI18n()
   const map = useMap()
@@ -28,20 +28,21 @@ ${codes
 `
   const onClickNext = () => {
     const nextPoint = getNextPoint(itemUuid)
-    map.flyTo(nextPoint.latLng)
-    //map.openPopup(nextPoint.latLng)
+    map.flyTo(nextPoint.latLng, 15)
+    map.once('zoomend', () => openPopupOfUuid(nextPoint.uuid))
   }
 
   const onClickPrevious = () => {
     const previousPoint = getPreviousPoint(itemUuid)
     map.flyTo(previousPoint.latLng)
+    map.once('zoomend', () => openPopupOfUuid(previousPoint.uuid))
   }
 
   return (
     <Popup>
       <Markdown source={content} />
       <button onClick={onClickPrevious}>Previous</button>
-      <button onClick={onClickNext}>Next</button>
+      <button onClick={onClickNext}>Next </button>
     </Popup>
   )
 }
@@ -52,4 +53,5 @@ SamplingPointDataItemPopup.propTypes = {
   itemUuid: PropTypes.string,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
+  openPopupOfUuid: PropTypes.func,
 }

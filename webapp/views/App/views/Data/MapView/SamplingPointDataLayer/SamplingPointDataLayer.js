@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { CircleMarker, LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -13,6 +13,14 @@ export const SamplingPointDataLayer = (props) => {
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints, items } =
     useSamplingPointDataLayer(props)
+
+  // Have a Reference to points for opening popups automatically
+  let markerRefs = useRef([])
+
+  const openPopupOfUuid = (uuid) => {
+    markerRefs.current[uuid].openPopup()
+  }
+
   const getPointIndex = (uuid) => {
     let index
     items.forEach((p, i) => {
@@ -30,6 +38,7 @@ export const SamplingPointDataLayer = (props) => {
     let index = getPointIndex(uuid)
     return items[index > 0 ? index - 1 : items.length - 1]
   }
+
   return (
     <LayersControl.Overlay name={overlayName}>
       <LayerGroup>
@@ -54,13 +63,22 @@ export const SamplingPointDataLayer = (props) => {
 
           // we have a single point (sampling point item) to render
           return (
-            <CircleMarker key={itemUuid} center={[latitude, longitude]} radius={markerRadius} color={markersColor}>
+            <CircleMarker
+              key={itemUuid}
+              center={[latitude, longitude]}
+              radius={markerRadius}
+              color={markersColor}
+              ref={(ref) => {
+                if (ref != null) markerRefs.current[itemUuid] = ref
+              }}
+            >
               <SamplingPointDataItemPopup
                 location={location}
                 codes={itemCodes}
                 itemUuid={itemUuid}
                 getNextPoint={getNextPoint}
                 getPreviousPoint={getPreviousPoint}
+                openPopupOfUuid={openPopupOfUuid}
               />
             </CircleMarker>
           )
