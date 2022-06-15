@@ -52,13 +52,21 @@ const _selectsByNodeDefType =
     return namesFull
   }
 
-const _prepareSelectFields = ({ queryBuilder, viewDataNodeDef, columnNodeDefs, nodeDefCols, editMode, streamMode }) => {
+const _prepareSelectFields = ({
+  queryBuilder,
+  viewDataNodeDef,
+  columnNodeDefs,
+  nodeDefCols,
+  editMode,
+  streamMode,
+  includeFileAttributeDefs = true,
+}) => {
   if (columnNodeDefs) {
     queryBuilder.select(
       viewDataNodeDef.columnRecordUuid,
-      ...viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) =>
-        _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)
-      ),
+      ...viewDataNodeDef.columnNodeDefs
+        .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
+        .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)),
       `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
     )
     // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
@@ -147,6 +155,7 @@ const _dbTransformCallbackSelect =
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
@@ -155,7 +164,16 @@ const _dbTransformCallbackSelect =
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {
-  const { survey, cycle, query, columnNodeDefs, offset = null, limit = null, stream = false } = params
+  const {
+    survey,
+    cycle,
+    query,
+    columnNodeDefs,
+    includeFileAttributeDefs = true,
+    offset = null,
+    limit = null,
+    stream = false,
+  } = params
 
   const editMode = Query.isModeRawEdit(query)
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -172,6 +190,7 @@ export const fetchViewData = async (params, client = db) => {
     nodeDefCols,
     editMode,
     streamMode: stream,
+    includeFileAttributeDefs,
   })
 
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })

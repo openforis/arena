@@ -1,8 +1,5 @@
 import { Query } from '../../../../common/model/query'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
@@ -26,7 +23,7 @@ const _fetchSurvey = async (surveyId, cycle) => {
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {Stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
