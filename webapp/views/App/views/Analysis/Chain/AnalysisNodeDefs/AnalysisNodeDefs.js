@@ -8,7 +8,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
-import { useEntityViewDataCounts } from '@webapp/store/surveyRdb/hooks'
+import { useDataCountByEntityDefUuid } from '@webapp/store/surveyRdb/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -35,7 +35,7 @@ const AnalysisNodeDefs = () => {
 
   useSortAnalysisNodeDefs({ analysisNodeDefsContainerRef, analysisNodeDefs: analysisNodeDefsToShow })
 
-  const entityViewDataCountsByUuid = useEntityViewDataCounts({ nodeDefs: analysisNodeDefsToShow })
+  const entityViewDataCountsByUuid = useDataCountByEntityDefUuid({ nodeDefs: analysisNodeDefsToShow })
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {

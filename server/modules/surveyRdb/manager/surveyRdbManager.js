@@ -237,9 +237,13 @@ export const countTable = async ({ survey, cycle, query }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
- * @returns {Promise<object>} - Count of view data tables indexed by entity def UUID.
+ * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
  */
-export const countTables = async ({ survey, cycle, entityDefUuids: entityDefUuidsParam = [] }) => {
+export const fetchTableRowsCountByEntityDefUuid = async ({
+  survey,
+  cycle,
+  entityDefUuids: entityDefUuidsParam = [],
+}) => {
   const entityDefUuids =
     entityDefUuidsParam?.length > 0
       ? entityDefUuidsParam
@@ -249,6 +253,15 @@ export const countTables = async ({ survey, cycle, entityDefUuids: entityDefUuid
     entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }))
   )
   return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
+}
+
+export const filterEntitiesWithData = async ({ survey, cycle, entityDefs }) => {
+  const entityDefUuids = entityDefs.map(NodeDef.getUuid)
+  const dataViewCountsByEntityDefUuid = await fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
+  return entityDefs.filter((entityDef) => {
+    const dataViewCount = dataViewCountsByEntityDefUuid[NodeDef.getUuid(entityDef)]
+    return dataViewCount > 0
+  })
 }
 
 export const { populateTable } = DataTableInsertRepository

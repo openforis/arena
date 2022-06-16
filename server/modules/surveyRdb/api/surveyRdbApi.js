@@ -56,7 +56,11 @@ export const init = (app) => {
     try {
       const { surveyId, cycle, entityDefUuids } = Request.getParams(req)
 
-      const countsByUuid = await SurveyRdbService.countTables({ surveyId, cycle, entityDefUuids })
+      const countsByUuid = await SurveyRdbService.fetchTableRowsCountByEntityDefUuid({
+        surveyId,
+        cycle,
+        entityDefUuids,
+      })
 
       res.json(countsByUuid)
     } catch (error) {

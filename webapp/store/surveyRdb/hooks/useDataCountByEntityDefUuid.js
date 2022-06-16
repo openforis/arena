@@ -6,11 +6,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyRdbApi from '@webapp/service/api/surveyRdb'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-export const useEntityViewDataCounts = ({ nodeDefs }) => {
+export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
-  const [countsByEntityDefUuid, setCountsByEntityDefUuid] = useState({})
+  const [dataCountByEntityDefUuid, setDataCountsByEntityDefUuid] = useState({})
 
   const entityDefUuids = useMemo(() => {
     const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, analysisNodeDef) => {
@@ -26,7 +26,7 @@ export const useEntityViewDataCounts = ({ nodeDefs }) => {
   const updateCounts = useCallback(async () => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
-      setCountsByEntityDefUuid(
+      setDataCountsByEntityDefUuid(
         await SurveyRdbApi.fetchEntityViewDataCounts({
           surveyId: Survey.getId(survey),
           cycle,
@@ -40,5 +40,5 @@ export const useEntityViewDataCounts = ({ nodeDefs }) => {
     updateCounts()
   }, [updateCounts])
 
-  return countsByEntityDefUuid
+  return dataCountByEntityDefUuid
 }

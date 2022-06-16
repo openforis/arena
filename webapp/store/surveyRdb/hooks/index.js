@@ -1,1 +1,1 @@
-export { useEntityViewDataCounts } from './useEntityViewDataCounts'
+export { useDataCountByEntityDefUuid } from './useDataCountByEntityDefUuid'

@@ -139,14 +139,10 @@ class RChain {
   async _initEntities() {
     const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
 
-    const dataViewCountsByEntityDefUuid = await SurveyRdbManager.countTables({
+    const entitiesWithData = await SurveyRdbManager.filterEntitiesWithData({
       survey: this.survey,
       cycle: this.cycle,
-      entityDefUuids: entityDefs.map(NodeDef.getUuid),
-    })
-    const entitiesWithData = entityDefs.filter((entityDef) => {
-      const dataViewCount = dataViewCountsByEntityDefUuid[NodeDef.getUuid(entityDef)]
-      return dataViewCount > 0
+      entityDefs,
     })
 
     this._entities = entitiesWithData
