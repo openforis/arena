@@ -52,6 +52,22 @@ export const init = (app) => {
     }
   )
 
+  app.get('/surveyRdb/:surveyId/view_data_rows_counts', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, entityDefUuids } = Request.getParams(req)
+
+      const countsByUuid = await SurveyRdbService.fetchTableRowsCountByEntityDefUuid({
+        surveyId,
+        cycle,
+        entityDefUuids,
+      })
+
+      res.json(countsByUuid)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post(
     '/surveyRdb/:surveyId/:nodeDefUuidTable/export/start',
     requireRecordListViewPermission,
