@@ -4,7 +4,6 @@ import { JavascriptExpressionParser } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as Evaluator from './helpers/evaluator'
 import * as ExpressionUtils from './helpers/utils'
 
 import { types } from './helpers/types'
@@ -45,10 +44,6 @@ export const fromString = (string, exprMode = modes.json) => {
   return new JavascriptExpressionParser().parse(exprString)
 }
 
-export const evalExpr = ({ expr, ctx }) => Evaluator.evalExpression(expr, ctx)
-
-export const evalString = (query, ctx) => evalExpr({ expr: fromString(query), ctx })
-
 export const { isValid } = ExpressionUtils
 
 // ====== Type checking
@@ -83,5 +78,3 @@ export const newBinary = ({ left, right, operator = '' }) => ({
   left,
   right,
 })
-
-export const globalIdentifierEval = Evaluator.globalIdentifierEval
