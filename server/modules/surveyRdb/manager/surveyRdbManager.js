@@ -166,10 +166,10 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  { surveyId, outputDir, includeCategoryItemsLabels, callback },
+  { surveyId, outputDir, includeCategoryItemsLabels, includeAnalysis, callback },
   client
 ) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, client)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, includeAnalysis }, client)
 
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
@@ -182,7 +182,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     const stream = FileUtils.createWriteStream(FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`))
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
       : [nodeDefContext] // Multiple attribute
 
     let parentKeys = []
