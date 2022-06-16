@@ -64,6 +64,7 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
@@ -76,6 +77,7 @@ export const fetchViewData = async (params) => {
     cycle,
     query,
     columnNodeDefs = false,
+    includeFileAttributeDefs = true,
     offset = 0,
     limit = null,
     streamOutput = null,
@@ -89,6 +91,7 @@ export const fetchViewData = async (params) => {
     cycle,
     query,
     columnNodeDefs,
+    includeFileAttributeDefs,
     offset,
     limit,
     stream: Boolean(streamOutput),
@@ -224,6 +227,41 @@ export const countTable = async ({ survey, cycle, query }) => {
   const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
   const filter = Query.getFilter(query)
   return DataViewRepository.runCount({ surveyId, cycle, tableName, filter })
+}
+
+/**
+ * Returns the count of rows in the data views of the specified entity defs, indexed by entity def UUID.
+ * If entityDefUuids is not specified, all the entity defs will be considered.
+ *
+ * @param {!object} params - The parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
+ * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
+ */
+export const fetchTableRowsCountByEntityDefUuid = async ({
+  survey,
+  cycle,
+  entityDefUuids: entityDefUuidsParam = [],
+}) => {
+  const entityDefUuids =
+    entityDefUuidsParam?.length > 0
+      ? entityDefUuidsParam
+      : Survey.getNodeDefsArray(survey).filter(NodeDef.isMultipleEntity).map(NodeDef.getUuid)
+
+  const countsArray = await Promise.all(
+    entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }))
+  )
+  return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
+}
+
+export const filterEntitiesWithData = async ({ survey, cycle, entityDefs }) => {
+  const entityDefUuids = entityDefs.map(NodeDef.getUuid)
+  const dataViewCountsByEntityDefUuid = await fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
+  return entityDefs.filter((entityDef) => {
+    const dataViewCount = dataViewCountsByEntityDefUuid[NodeDef.getUuid(entityDef)]
+    return dataViewCount > 0
+  })
 }
 
 export const { populateTable } = DataTableInsertRepository

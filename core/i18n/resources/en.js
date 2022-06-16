@@ -774,6 +774,8 @@ $t(common.cantUndoWarning)`,
     categorical: 'Categorical',
     emptyNodeDefs:
       '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
+    entityWithoutData:
+      'Entity {{name}} has no data: the entity and all the related result variables will be excluded in the RStudio scripts',
   },
 
   itemsTable: {
