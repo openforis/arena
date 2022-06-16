@@ -28,11 +28,7 @@ const Charts = () => {
       />
       <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
 
-      <Chart
-        draft={draft}
-        renderChart={renderChart}
-        src={chartImage ? `data:image/svg+xml;base64,${btoa(decodeURI(encodeURIComponent(chartImage)))}` : false}
-      />
+      <Chart draft={draft} renderChart={renderChart} src={chartImage} />
     </div>
   )
 }
