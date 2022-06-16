@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import useChartSpec from './useChartSpec'
 import useChartRender from './useChartRender'
