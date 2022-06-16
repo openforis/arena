@@ -27,7 +27,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
       setDataCountsByEntityDefUuid(
-        await SurveyRdbApi.fetchEntityViewDataCounts({
+        await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
           surveyId: Survey.getId(survey),
           cycle,
           entityDefUuids: [...entityDefUuids.values()],

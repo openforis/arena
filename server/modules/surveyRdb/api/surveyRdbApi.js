@@ -52,7 +52,7 @@ export const init = (app) => {
     }
   )
 
-  app.get('/surveyRdb/:surveyId/view_data_counts', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/surveyRdb/:surveyId/view_data_rows_counts', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, entityDefUuids } = Request.getParams(req)
 
