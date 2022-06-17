@@ -1,7 +1,7 @@
 import { RecordExpressionEvaluator } from '@openforis/arena-core'
 
 export const evalNodeQuery = (survey, record, node, query) =>
-  new RecordExpressionEvaluator().evalNodeQuery({ survey, record, node, query })
+  new RecordExpressionEvaluator().evalExpression({ survey, record, node, query })
 
 export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) =>
   new RecordExpressionEvaluator().evalApplicableExpressions({

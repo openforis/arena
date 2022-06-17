@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import * as A from '@core/arena'
 
 const BASE_SPEC = {
