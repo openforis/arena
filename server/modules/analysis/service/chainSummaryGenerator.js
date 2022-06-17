@@ -27,6 +27,15 @@ const generateReportingDataCategoryAttributesSummary = ({ survey, category, chai
   }, {})
 }
 
+const fetchCategoryNameByUuid = async ({ survey, categoryUuid }) => {
+  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
+    surveyId: Survey.getId(survey),
+    categoryUuid,
+    draft: true,
+  })
+  return Category.getName(category)
+}
+
 const getExtraPropArea = (item) => {
   const area = CategoryItem.getExtraProp(Category.reportingDataItemExtraDefKeys.area)(item)
   return StringUtils.isBlank(area) ? '' : Number(area)
@@ -132,8 +141,16 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(Chain.isStratificationEnabled(chain)
       ? {
           stratumAttribute: NodeDef.getName(stratumAttributeDef),
-          nonReponseBiasCorrection: Chain.isNonResponseBiasCorrection(chain),
+          nonResponseBiasCorrection: Chain.isNonResponseBiasCorrection(chain),
+        }
+      : {}),
+    ...(Chain.isPostStratificationEnabled(chain)
+      ? {
           postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
+          postStratificationCategory: await fetchCategoryNameByUuid({
+            survey,
+            categoryUuid: NodeDef.getCategoryUuid(postStratificationAttributeDef),
+          }),
         }
       : {}),
     ...(samplingStrategySpecified ? { pValue: Chain.getPValue(chain) } : {}),

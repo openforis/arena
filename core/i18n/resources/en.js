@@ -207,6 +207,7 @@ Do you want to proceed?`,
     usersAccessRequest: 'Users Access Requests',
     collectImportReport: 'Collect Import Report',
 
+    surveyInfo: 'Survey Info',
     designer: 'Survey',
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',
@@ -469,6 +470,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       header: 'Options',
       includeCategoryItemsLabels: 'Include category items labels',
       includeCategories: 'Include categories',
+      includeResultVariables: 'Include result variables',
     },
     startCsvExport: 'Start CSV export',
   },
@@ -702,11 +704,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     downloadSummaryJSON: 'Download Summary (JSON)',
     formLabel: 'Processing chain label',
     basic: 'Basic',
-    nonResponseBiasCorrection: 'Non-Response Bias Correction',
-    pValue: 'P Value',
+    nonResponseBiasCorrection: 'Non-response bias correction',
+    nonResponseBiasCorrectionTip: `To implement this method, add a category named 'sampling_units_plan'`,
+    pValue: 'P-value',
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
-    samplingStrategyLabel: 'Sampling Strategy',
+    samplingStrategyLabel: 'Sampling strategy',
     samplingStrategy: {
       simpleRandom: 'Simple Random Sampling',
       systematic: 'Systematic Sampling',
@@ -714,10 +717,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       stratifiedSystematic: 'Stratified Systematic Sampling',
     },
     stratumAttribute: 'Stratum attribute',
-    postStratificationAttribute: 'Post Stratification Attribute',
+    postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
-    clusteringEntity: 'Clustering Entity',
-    clusteringOnlyVariances: 'Clustering Only Variances',
+    clusteringEntity: 'Clustering entity',
+    clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
     surveyShouldBePublished: 'The survey should be published to run analysis',
@@ -757,8 +760,8 @@ $t(common.cantUndoWarning)`,
     entities: {
       new: 'Virtual entity',
     },
-    reportingDataCategory: 'Reporting Data Category',
-    reportingDataAttribute: 'Reporting Data Attribute for {{level}}',
+    reportingDataCategory: 'Reporting data category',
+    reportingDataAttribute: 'Reporting data attribute for {{level}}',
     samplingNodeDefs: 'Sampling NodeDefs',
   },
 
@@ -771,11 +774,17 @@ $t(common.cantUndoWarning)`,
     categorical: 'Categorical',
     emptyNodeDefs:
       '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
+    entityWithoutData:
+      'Entity {{name}} has no data: the entity and all the related result variables will be excluded in the RStudio scripts',
   },
 
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
+  },
+
+  expression: {
+    undefinedFunction: 'Undefined function: {{name}}',
   },
 
   // ====== Help views
@@ -842,6 +851,7 @@ $t(common.appNameFull)
     },
     advancedProps: {
       defaultValues: 'Default values',
+      defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
@@ -1132,6 +1142,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     nodeDefEdit: {
+      analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
       applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
       columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
@@ -1239,6 +1250,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
+    ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
     ChainsValidationJob: 'Processing Chains Validation',
     ChainsImportJob: 'Chains Import',
     CollectDataImportJob: 'Collect Data Import',
@@ -1328,6 +1340,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     uniqueAttributeDuplicate: 'Duplicate value',
 
     attribute: {
+      customValidation: 'Invalid value',
       uniqueDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',

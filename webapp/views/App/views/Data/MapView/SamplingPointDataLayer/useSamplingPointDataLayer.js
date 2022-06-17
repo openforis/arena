@@ -7,7 +7,7 @@ import { PointFactory } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import { useIsMounted } from '@webapp/components/hooks'
+import { useIsMountedRef } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 
 import { useSurvey } from '@webapp/store/survey'
@@ -82,7 +82,7 @@ export const useSamplingPointDataLayer = (props) => {
   const { levelIndex, markersColor } = props
 
   const i18n = useI18n()
-  const isMountedRef = useIsMounted()
+  const isMountedRef = useIsMountedRef()
   const map = useMap()
 
   const fetchCancelRef = useRef(null)

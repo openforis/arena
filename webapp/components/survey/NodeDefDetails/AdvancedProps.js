@@ -51,6 +51,19 @@ const AdvancedProps = (props) => {
             canBeConstant
             isBoolean={NodeDef.isBoolean(nodeDef)}
           />
+
+          <FormItem label={i18n.t('nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime')}>
+            <Checkbox
+              checked={NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)}
+              disabled={readOnly}
+              validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
+                validation
+              )}
+              onChange={(value) =>
+                Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
+              }
+            />
+          </FormItem>
         </>
       )}
 

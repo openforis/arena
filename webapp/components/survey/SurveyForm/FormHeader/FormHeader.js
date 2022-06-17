@@ -87,6 +87,7 @@ const FormHeader = (props) => {
           <ButtonDownload
             testId={TestId.surveyForm.schemaSummary}
             href={`/api/survey/${surveyId}/schema-summary/`}
+            requestParams={{ cycle: surveyCycleKey }}
             label={'surveyForm.schemaSummary'}
           />
         )}

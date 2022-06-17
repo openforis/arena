@@ -33,7 +33,13 @@ export const fetchEntityData = async ({ surveyId, cycle, entityDefUuid, draft = 
 
   const query = Query.create({ entityDefUuid })
 
-  return SurveyRdbManager.fetchViewData({ survey: surveyAndNodeDefs, cycle, query, columnNodeDefs: true })
+  return SurveyRdbManager.fetchViewData({
+    survey: surveyAndNodeDefs,
+    cycle,
+    query,
+    columnNodeDefs: true,
+    includeFileAttributeDefs: false,
+  })
 }
 
 // ==== UPDATE
@@ -102,7 +108,9 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
     const entities = Survey.getAnalysisEntities({ chain })(survey)
 
     await PromiseUtils.each(entities, async (entity) => {
-      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, hideAreaBasedEstimate: false  })(survey)
+      const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, hideAreaBasedEstimate: false })(
+        survey
+      )
 
       if (analysisNodeDefsInEntity.length > 0) {
         await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
@@ -111,13 +119,13 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const parentUuid = NodeDef.getParentUuid(nodeDef)
 
           let name = `${NodeDef.getName(entity)}-${nodeDefName}`
-          if(NodeDef.isBaseUnit(nodeDef)){
+          if (NodeDef.isBaseUnit(nodeDef)) {
             name = `base-unit-${nodeDefName}`
           }
-          if(NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef) && !NodeDef.isBaseUnit(nodeDef)){
-            name = nodeDefName.replace(`${NodeDef.getName(entity)}_`,`${NodeDef.getName(entity)}-`)
+          if (NodeDef.isSampling(nodeDef) && !NodeDef.isAreaBasedEstimatedOf(nodeDef) && !NodeDef.isBaseUnit(nodeDef)) {
+            name = nodeDefName.replace(`${NodeDef.getName(entity)}_`, `${NodeDef.getName(entity)}-`)
           }
-           
+
           const script = (await fileZip.getEntryAsText(findEntry({ name })))?.trim()
 
           if (script) {

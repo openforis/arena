@@ -38,6 +38,7 @@ const NodeDefDetails = () => {
         {NodeDef.isAnalysis(nodeDef) && (
           <AnalysisEntitySelector
             onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
+            validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
             nodeDef={nodeDef}
           />
         )}

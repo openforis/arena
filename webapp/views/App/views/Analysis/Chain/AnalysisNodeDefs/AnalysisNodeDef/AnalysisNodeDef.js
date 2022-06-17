@@ -13,8 +13,9 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
+import WarningBadge from '@webapp/components/warningBadge'
 
-const AnalysisNodeDef = ({ nodeDefUuid }) => {
+const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
   const survey = useSurvey()
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -23,6 +24,8 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
   const lang = useSurveyPreferredLang()
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
+  const parentEntity = Survey.getNodeDefParent(nodeDef)(survey)
+  const parentEntityName = NodeDef.getName(parentEntity)
 
   const handleSetActive = useCallback(() => {
     const active = NodeDef.getActive(nodeDef)
@@ -39,7 +42,7 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
     )
 
     dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
-  }, [NodeDef.getActive(nodeDef)])
+  }, [nodeDef])
 
   return (
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
@@ -48,12 +51,17 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
           <span className="icon icon-menu" />
         </button>
       </div>
-      <div>{NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey))}</div>
+      <div className={classNames('analysis-node-def__entity-name', { 'no-data': dataCount === 0 })}>
+        <span className="entity-label" title={parentEntityName}>
+          {parentEntityName}
+        </span>
+        <WarningBadge show={dataCount === 0} title="chain.entityWithoutData" titleParams={{ name: parentEntityName }} />
+      </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div>
         {NodeDef.isDecimal(nodeDef)
-          ? Boolean(Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey))
+          ? Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
             ? i18n.t('common.true')
             : i18n.t('common.false')
           : '-'}
@@ -83,6 +91,11 @@ const AnalysisNodeDef = ({ nodeDefUuid }) => {
 
 AnalysisNodeDef.propTypes = {
   nodeDefUuid: PropTypes.string.isRequired,
+  dataCount: PropTypes.number,
+}
+
+AnalysisNodeDef.defaultProps = {
+  dataCount: undefined,
 }
 
 export { AnalysisNodeDef }

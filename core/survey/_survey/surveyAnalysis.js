@@ -10,10 +10,10 @@ import { getHierarchy, traverseHierarchyItemSync } from './surveyNodeDefs'
 export const getAnalysisNodeDefs =
   ({
     chain,
-    entity,
-    entityDefUuid,
+    entity = null,
+    entityDefUuid = null,
     showSamplingNodeDefs = true,
-    hideSamplingNodeDefsWithoutSibilings = true,
+    hideSamplingNodeDefsWithoutSiblings = false,
     hideAreaBasedEstimate = true,
     showInactiveResultVariables = false,
   }) =>
@@ -39,21 +39,21 @@ export const getAnalysisNodeDefs =
 
       if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
 
-      // show base unit nodeDefs with nodeDef analysis sibilings
+      // show base unit nodeDefs with nodeDef analysis siblings
       if (
         showSamplingNodeDefs &&
-        hideSamplingNodeDefsWithoutSibilings &&
+        hideSamplingNodeDefsWithoutSiblings &&
         NodeDef.isSampling(nodeDef) &&
         !NodeDef.isBaseUnit(nodeDef)
       ) {
-        const hasAnalysisSibilings = _nodeDefs.some(
+        const hasAnalysisSiblings = _nodeDefs.some(
           (_nodeDef) =>
             NodeDef.isSampling(_nodeDef) &&
             NodeDef.getParentUuid(nodeDef) === NodeDef.getParentUuid(_nodeDef) &&
             NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
         )
 
-        if (!hasAnalysisSibilings) return false
+        if (!hasAnalysisSiblings) return false
       }
 
       if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
@@ -88,13 +88,9 @@ export const getAnalysisEntities =
     const { root } = getHierarchy()(survey)
 
     const entities = []
-    if (getAnalysisNodeDefs({ entity: root, chain })(survey).length > 0) {
-      entities.push(root)
-    }
     traverseHierarchyItemSync(root, (nodeDef) => {
       if (
-        NodeDef.isEntity(nodeDef) &&
-        NodeDef.isMultipleEntity(nodeDef) &&
+        (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) &&
         getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
       ) {
         entities.push(nodeDef)
@@ -106,22 +102,8 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }) =>
-  (survey) => {
-    let baseUnitNodeDef = null
-
-    const hierarchy = SurveyNodeDefs.getHierarchy()(survey)
-    SurveyNodeDefs.traverseHierarchyItemSync(hierarchy.root, (visitedEntityDef) => {
-      if (NodeDef.isRoot(visitedEntityDef) || NodeDef.isMultipleEntity(visitedEntityDef)) {
-        const nodeDefs = getAnalysisNodeDefs({ chain, entityDefUuid: NodeDef.getUuid(visitedEntityDef) })(survey)
-        const _baseUnitNodeDef = nodeDefs.find(NodeDef.isBaseUnit)
-        if (!baseUnitNodeDef && _baseUnitNodeDef) {
-          baseUnitNodeDef = SurveyNodeDefs.getNodeDefParent(_baseUnitNodeDef)(survey)
-        }
-      }
-    })
-
-    return baseUnitNodeDef
-  }
+  (survey) =>
+    SurveyNodeDefs.getNodeDefByUuid(Chain.getBaseUnitNodeDefUuid(chain))(survey)
 
 export const getSamplingNodeDefChild =
   ({ nodeDefParent, chainUuid }) =>
@@ -152,7 +134,7 @@ export const getAvailableReportingDataNodeDefs =
     const availableReportingDataNodeDefs = []
     if (baseUnitNodeDef) {
       SurveyNodeDefs.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDefAncestor) => {
-        SurveyNodeDefs.getNodeDefChildren(
+        SurveyNodeDefs.getNodeDefDescendantAttributesInSingleEntities(
           nodeDefAncestor,
           true
         )(survey).forEach((nodeDef) => {

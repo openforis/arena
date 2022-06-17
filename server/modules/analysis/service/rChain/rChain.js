@@ -7,6 +7,7 @@ import * as Chain from '@common/analysis/chain'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisManager from '../../manager'
@@ -136,7 +137,15 @@ class RChain {
   }
 
   async _initEntities() {
-    this._entities = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
+    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
+
+    const entitiesWithData = await SurveyRdbManager.filterEntitiesWithData({
+      survey: this.survey,
+      cycle: this.cycle,
+      entityDefs,
+    })
+
+    this._entities = entitiesWithData
   }
 
   async _initSurveyAndChain() {
@@ -244,26 +253,28 @@ class RChain {
   }
 
   async _initAnalysisNodeDefsFiles() {
-    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain: this.chain })(this.survey)
+    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain: this.chain })(this.survey).filter((nodeDef) =>
+      this.entities.find((entityDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entityDef))
+    )
 
     if (analysisNodeDefs.length > 0) {
-      const _samplingPath = FileUtils.join(this.dirSampling)
-      await FileUtils.mkdir(_samplingPath)
+      const samplingPath = this.dirSampling
+      await FileUtils.mkdir(samplingPath)
 
       await PromiseUtils.each(
         analysisNodeDefs.filter((_nodeDef) => NodeDef.isSampling(_nodeDef)),
         async (nodeDef, index) => {
-          await this._initNodeDefFile({ nodeDef, index: index - 1, path: _samplingPath })
+          await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
         }
       )
 
-      const _entityPath = FileUtils.join(this.dirUser)
-      await FileUtils.mkdir(_entityPath)
+      const entityPath = this.dirUser
+      await FileUtils.mkdir(entityPath)
 
       await PromiseUtils.each(
         analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
         async (nodeDef) => {
-          await this._initNodeDefFile({ nodeDef, path: _entityPath })
+          await this._initNodeDefFile({ nodeDef, path: entityPath })
           const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
 
           // at this moment we dont like to have the areaBasedEstimated files
@@ -271,7 +282,7 @@ class RChain {
           if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
             await this._initNodeDefFile({
               nodeDef: areaBasedEstimated,
-              path: _entityPath,
+              path: entityPath,
               index: NodeDef.getChainIndex(nodeDef),
             })
           }

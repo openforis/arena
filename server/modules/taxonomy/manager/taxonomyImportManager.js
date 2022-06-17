@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import BatchPersister from '@server/db/batchPersister'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -61,7 +63,9 @@ export default class TaxonomyImportManager {
     if (taxonExisting) {
       // Update existing item
       const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
-      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
+      if (!Objects.isEqual(taxonUpdated, taxonExisting)) {
+        await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
+      }
     } else {
       // Insert new one
       await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
@@ -97,7 +101,8 @@ export default class TaxonomyImportManager {
 
     // cleanup extra props defs (remove originalHeader prop)
     const extraPropsDefsCleaned = Object.entries(this.extraPropsDefs).reduce((extraPropsDefsAcc, [key, extraProp]) => {
-      const { originalHeader, ...extraPropProps } = extraProp
+      const extraPropProps = { ...extraProp }
+      delete extraPropProps['originalHeader']
       return { ...extraPropsDefsAcc, [key]: { ...extraPropProps } }
     }, {})
 

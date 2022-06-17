@@ -1,9 +1,12 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 export const clickSurvey = async (survey) => {
+  const surveyRowSelector = getSelector(survey.name)
+  await page.waitForSelector(surveyRowSelector, { timeout: 5000 })
+
   await Promise.all([
     page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
-    page.click(getSelector(survey.name)),
+    page.click(surveyRowSelector),
   ])
 
   const labelSelector = getSelector(TestId.dashboard.surveyName, 'h3')

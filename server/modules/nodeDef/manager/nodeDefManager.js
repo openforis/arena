@@ -20,7 +20,7 @@ export {
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
   insertNodeDefsBatch,
-  updateNodeDefPropsInBatch
+  updateNodeDefPropsInBatch,
 } from '../repository/nodeDefRepository'
 
 const _persistNodeDefLayout = async ({ surveyId, nodeDef }, client = db) => {
@@ -111,11 +111,19 @@ export const insertNodeDef = async (
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
 export const fetchNodeDefsBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true},
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    includeDeleted = false,
+    backup = false,
+    includeAnalysis = true,
+  },
   client = db
 ) => {
   const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(
-    { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis},
+    { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
     client
   )
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
@@ -219,12 +227,13 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
 // ======= DELETE
 
-export const markNodeDefDeleted = async ({ user, survey, cycle, nodeDefUuid }, client = db) =>
+export const markNodeDefDeleted = async ({ user, survey, nodeDefUuid, cycle = null }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
-    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesDeleted: [cycle] })
+    const cyclesDeleted = cycle ? [cycle] : Survey.getCycleKeys(survey)
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesDeleted })
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
     }

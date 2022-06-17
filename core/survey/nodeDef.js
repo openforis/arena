@@ -105,6 +105,7 @@ export const fileTypeValues = {
 export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
+  defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
   validations: 'validations',
   formula: 'formula',
 
@@ -205,26 +206,22 @@ export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
 export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
-  const name = getName(nodeDef)
+  let firstPart = null
+
   if (type === NodeDefLabelTypes.name) {
-    return name
+    firstPart = getName(nodeDef)
+  } else {
+    let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+    if (StringUtils.isBlank(label)) {
+      firstPart = getName(nodeDef)
+    } else {
+      firstPart = label
+    }
   }
 
-  let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
 
-  if (StringUtils.isBlank(label)) {
-    label = name
-  }
-
-  if (isVirtual(nodeDef)) {
-    return `${label}${' (V)'}`
-  }
-
-  if (isAnalysis(nodeDef) && isAttribute(nodeDef)) {
-    return `${label}${' (C)'}`
-  }
-
-  return label
+  return firstPart + suffix
 }
 export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
@@ -264,6 +261,7 @@ const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)

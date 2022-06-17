@@ -11,11 +11,29 @@ import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 const pgp = pgPromise()
 const { Column } = pgp.helpers
 
+const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
+  const cellValue = rowResult[columnName]
+
+  if (cellValue && cellValue !== NA) {
+    if (NodeDef.isCode(nodeDef)) {
+      const categoryItemUuidColumnName = `${NodeDef.getName(nodeDef)}_uuid`
+      const itemUuid = rowResult[categoryItemUuidColumnName]
+      return itemUuid ? { itemUuid } : null
+    }
+    if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
+      return String(Number(cellValue))
+    }
+    return cellValue
+  }
+  return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
+}
+
 export default class MassiveUpdateNodes extends MassiveUpdate {
   constructor({ surveyId, survey, entity, chain }, tx) {
-    const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(entity)(survey).filter(
-      NodeDef.isAnalysis
-    )
+    const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(
+      entity,
+      true
+    )(survey).filter(NodeDef.isAnalysis)
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefsInEntity,
       includeExtendedCols: true,
@@ -26,7 +44,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       `?${TableNode.columnSet.recordUuid}`,
       `?${TableNode.columnSet.nodeDefUuid}`,
       `?${TableNode.columnSet.parentUuid}`,
-      
+
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
@@ -53,31 +71,20 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    Object.keys(this.nodeDefsByColumnName).forEach(
-      (columnName) => {
-        const nodeDef = this.nodeDefsByColumnName[columnName]
-        let value =
-          NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
-        if (rowResult[columnName] && rowResult[columnName] !== NA) {
-          value = rowResult[columnName]
-          if (NodeDef.isCode(nodeDef)) {
-            value = { itemUuid: rowResult[columnName.replace('_code', '_uuid').replace('_label', '_uuid')] }
-          }
-          if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
-            value = String(Number(rowResult[columnName]))
-          }
-        }
+    Object.keys(this.nodeDefsByColumnName).forEach((columnName) => {
+      const nodeDef = this.nodeDefsByColumnName[columnName]
 
-        const values = {
-          [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
-          [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
-          [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-          [TableNode.columnSet.value]: value,
-        }
+      const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
 
-        super.push(values)
+      const values = {
+        [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
+        [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
+        [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
+        [TableNode.columnSet.value]: value,
       }
-    )
+
+      super.push(values)
+    })
 
     return true
   }

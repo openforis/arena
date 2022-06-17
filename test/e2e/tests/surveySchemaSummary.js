@@ -77,9 +77,13 @@ export default () =>
           'label_en',
           'label_fr',
           'key',
+          'multiple',
           'readOnly',
           'applyIf',
+          'hiddenWhenNotApplicable',
+          'defaultValue',
           'required',
+          'unique',
           'validations',
           'cycle',
         ])
