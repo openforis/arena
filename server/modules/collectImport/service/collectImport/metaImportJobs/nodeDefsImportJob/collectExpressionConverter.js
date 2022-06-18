@@ -19,7 +19,8 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
-    { pattern: '\\$this', replace: NodeDef.getName(nodeDefCurrent) },
+    { pattern: '\\$this', replace: 'this' },
+    { pattern: '\\$context', replace: 'parent(this)' },
     // not function
     { pattern: /not\(/, replace: '!(' },
     // parent function

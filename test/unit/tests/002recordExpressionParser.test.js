@@ -194,6 +194,13 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_time.hour', r: 10 },
     { q: 'visit_time.minute', r: 30 },
     { q: 'visit_time.seconds', e: new SystemError('expression.invalidAttributeValuePropertyName') },
+    // this
+    { q: 'this', n: 'cluster_id', r: 12 },
+    {
+      q: `distance(this, 'SRID=EPSG:4326;POINT(50.84805423 5.697799)').toFixed(2)`,
+      n: 'plot[1].plot_location',
+      r: '12.75',
+    },
   ]
 
   NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
