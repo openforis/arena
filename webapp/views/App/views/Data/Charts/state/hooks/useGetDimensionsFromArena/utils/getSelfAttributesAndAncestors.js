@@ -1,12 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-
-import * as A from '@core/arena'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { Query } from '@common/model/query'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 

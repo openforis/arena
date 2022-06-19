@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Query } from '@common/model/query'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -13,10 +13,8 @@ const useGetDimensionsFromArena = (nodeDefLabelType) => {
   const [dimensions, setDimensions] = useState([])
 
   const generateDimensions = useCallback(() => {
-    const dimensions = getArenaDimensions({ nodeDefUuid: entityDefUuid, survey, language, nodeDefLabelType })
-    if (dimensions) {
-      setDimensions(dimensions)
-    }
+    const _dimensions = getArenaDimensions({ nodeDefUuid: entityDefUuid, survey, language, nodeDefLabelType })
+    setDimensions(_dimensions)
   }, [entityDefUuid, language, survey, nodeDefLabelType])
 
   useEffect(() => {
