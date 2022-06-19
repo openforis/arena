@@ -115,6 +115,7 @@ const _validateItemExtraProps = (extraDefs, validation) => (item) => {
 
 const validateItems = async (category, itemsByParentUuid) => {
   const itemsValidationsByUuid = {}
+  let errorFound = false
 
   // Visit the items from the first to the lowest level (DFS)
   // validate first the leaf items, then up to the first level
@@ -168,10 +169,15 @@ const validateItems = async (category, itemsByParentUuid) => {
       )(itemChildren)
 
       if (!childrenValid) {
+        const childrenHasErrors = itemChildren.some((itemChild) => {
+          const childValidation = itemsValidationsByUuid[CategoryItem.getUuid(itemChild)]
+          return Validation.isError(childValidation)
+        })
+        const validationResult = { key: Validation.messageKeys.categoryEdit.childrenInvalid }
         validation = R.pipe(
           R.defaultTo(Validation.newInstance()),
           Validation.setValid(false),
-          Validation.setErrors([{ key: Validation.messageKeys.categoryEdit.childrenInvalid }])
+          childrenHasErrors ? Validation.setErrors([validationResult]) : Validation.setWarnings([validationResult])
         )(validation)
       }
 
@@ -182,18 +188,22 @@ const validateItems = async (category, itemsByParentUuid) => {
     }
 
     // Keep only invalid validations
-    if (!Validation.isValid(validation)) itemsValidationsByUuid[itemUuid] = validation
+    if (!Validation.isValid(validation)) {
+      itemsValidationsByUuid[itemUuid] = validation
+      errorFound = errorFound || Validation.isError(validation)
+    }
 
     visitedIds[item.id] = true
   }
 
   const valid = R.isEmpty(itemsValidationsByUuid)
+  if (valid) return null
 
-  return valid
-    ? null
-    : Validation.newInstance(false, { ...itemsValidationsByUuid }, [
-        { key: Validation.messageKeys.categoryEdit.itemsInvalid },
-      ])
+  const validationResult = { key: Validation.messageKeys.categoryEdit.itemsInvalid }
+  const errors = errorFound ? [validationResult] : []
+  const warnings = errorFound ? [] : [validationResult]
+
+  return Validation.newInstance(false, { ...itemsValidationsByUuid }, errors, warnings)
 }
 
 // ====== CATEGORY

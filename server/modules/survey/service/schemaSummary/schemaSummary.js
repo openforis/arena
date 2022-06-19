@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -9,8 +10,15 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
-  Survey.visitAncestorsAndSelf(nodeDef, (n) => pathParts.unshift(n.props.name))(survey)
+  Survey.visitAncestorsAndSelf(nodeDef, (ancestorDef) => pathParts.unshift(NodeDef.getName(ancestorDef)))(survey)
   return pathParts.join('.')
+}
+
+const getDefaultValuesSummary = ({ nodeDef }) => {
+  const defaultValues = NodeDef.getDefaultValues(nodeDef)
+  return defaultValues.length > 0
+    ? defaultValues.map((defaultValue) => NodeDefExpression.getExpression(defaultValue)).join('; ')
+    : ''
 }
 
 const getValidationsSummary = ({ nodeDef }) => {
@@ -29,7 +37,7 @@ const getValidationsSummary = ({ nodeDef }) => {
     .join('\n')
 }
 
-export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = Survey.getNodeDefsArray(survey)
   const pathByNodeDefUuid = nodeDefs.reduce(
@@ -63,9 +71,13 @@ export const exportSchemaSummary = async ({ surveyId, outputStream }) => {
         {}
       ),
       key: String(NodeDef.isKey(nodeDef)),
+      multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       applyIf,
+      hiddenWhenNotApplicable: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
+      defaultValue: getDefaultValuesSummary({ nodeDef }),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+      unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
       cycle: String(NodeDef.getCycles(nodeDef).map((val) => String(Number(val) + 1))), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }

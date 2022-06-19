@@ -3,10 +3,14 @@ import React, { useRef, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+
 import * as Chain from '@common/analysis/chain'
+
 import { useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
+import { useDataCountByEntityDefUuid } from '@webapp/store/surveyRdb/hooks'
 import { useI18n } from '@webapp/store/system'
+
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
@@ -30,6 +34,8 @@ const AnalysisNodeDefs = () => {
   )
 
   useSortAnalysisNodeDefs({ analysisNodeDefsContainerRef, analysisNodeDefs: analysisNodeDefsToShow })
+
+  const entityViewDataCountsByUuid = useDataCountByEntityDefUuid({ nodeDefs: analysisNodeDefsToShow })
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {
@@ -70,6 +76,7 @@ const AnalysisNodeDefs = () => {
                 <AnalysisNodeDef
                   key={NodeDef.getUuid(analysisNodeDef)}
                   nodeDefUuid={NodeDef.getUuid(analysisNodeDef)}
+                  dataCount={entityViewDataCountsByUuid[NodeDef.getParentUuid(analysisNodeDef)]}
                 />
               ))}
             </div>
