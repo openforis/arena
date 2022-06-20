@@ -4,8 +4,8 @@
 .analysis-node-defs__list-header {
   position: relative;
   display: grid;
-  grid-template-columns: 40px 120px 200px 1fr 120px 120px repeat(2, 80px);
-  grid-column-gap: 32px;
+  grid-template-columns: 40px 150px 200px 1fr 120px 120px repeat(2, 80px);
+  grid-column-gap: 22px;
   align-items: center;
 
   > div {
@@ -37,6 +37,25 @@
 
     input {
       border: unset;
+    }
+  }
+
+  .analysis-node-def__entity-name {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    &.no-data {
+      grid-template-columns: 1fr 25px;
+
+      .entity-label,
+      .badge {
+        position: relative;
+      }
+
+      .entity-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 }
