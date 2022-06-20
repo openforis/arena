@@ -2019,10 +2019,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.101":
-  version "0.0.101"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.101/ab6626f52f243ed53d042b89ee39ef5df1f0d79708e031fd55cdbfc948d522fb#d8107b32ab3065485745732f83b1bc814c949786"
-  integrity sha512-d8ZymSRM2VCUcHFSCOcPTf1eAT+uZnmrKqj6EN93EZarsQBgb2m6tYPi7z0Jt/YqPZusbn5MZIJv3gGXmLswGw==
+"@openforis/arena-core@^0.0.102":
+  version "0.0.102"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.102/981fab4083be67b57311d7e31c1f25596c9d44e02b3dcb0eef498cf02b6c9c22#e32a7677a5dcfde4b86e6171ef5148283c6eef79"
+  integrity sha512-v70NXGRGTVdLynkSbgIIUXktOR0uOnr3lPHbSGDzL37HTPZIx4jeZVWCoH1DlDoU5Jhra/OLW84x8FF6D7worg==
   dependencies:
     "@esri/proj-codes" "^2.9.0"
     date-fns "^2.28.0"
