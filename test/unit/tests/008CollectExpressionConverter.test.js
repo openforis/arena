@@ -30,12 +30,12 @@ describe('CollectExpressionConverter Test', () => {
       n: 'tree_id',
     },
     // predefined variables
-    { q: '$this', r: 'cluster_id' },
-    { q: '$this < 10 and $this > 0', r: 'cluster_id < 10 && cluster_id > 0' },
-    { q: '$this >= 1 and $this < 20', r: 'cluster_id >= 1 && cluster_id < 20' },
+    { q: '$this', r: 'this' },
+    { q: '$this < 10 and $this > 0', r: 'this < 10 && this > 0' },
+    { q: '$this >= 1 and $this < 20', r: 'this >= 1 && this < 20' },
     // not function
     { q: 'not(cluster_accessible)', r: '!(cluster_accessible)' },
-    { q: 'not($this)', r: '!(cluster_accessible)', n: 'cluster_accessible' },
+    { q: 'not($this)', r: '!(this)', n: 'cluster_accessible' },
     // parent function
     { q: 'parent()/remarks', r: 'cluster.remarks', n: 'plot_id' },
     { q: 'parent()/tree[1]', r: 'plot.tree[1]', n: 'tree_id' },
