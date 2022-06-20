@@ -1,5 +1,4 @@
 import React from 'react'
-
 import RawChartBuilder from './components/RawChartBuilder'
 
 const Panel = ({ dimensions, spec, onUpdateSpec }) => {
