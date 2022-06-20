@@ -22,12 +22,7 @@ export const SamplingPointDataLayer = (props) => {
   }
 
   const getPointIndex = (uuid) => {
-    let index
-    items.forEach((p, i) => {
-      if (p.uuid == uuid) index = i
-      return
-    })
-    return index
+    return items.findIndex((item) => item.uuid === uuid)
   }
 
   const getNextPoint = (uuid) => {

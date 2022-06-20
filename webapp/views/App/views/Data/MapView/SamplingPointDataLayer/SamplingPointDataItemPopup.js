@@ -41,8 +41,8 @@ ${codes
   return (
     <Popup>
       <Markdown source={content} />
-      <button onClick={onClickPrevious}>Previous</button>
-      <button onClick={onClickNext}>Next </button>
+      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
+      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
     </Popup>
   )
 }
