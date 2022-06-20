@@ -2,15 +2,26 @@
 
 .charts_data-selector__container{
         width: 180px;
-        overflow-y: scroll;
         border-right: 1px solid $greyBorder;
-        flex-direction: column;
         display: flex;
+        flex-direction: column;
         padding: 12px;
 }
 
+.charts_data-selector_group-dimension_container{
+    overflow-y: scroll;
+    flex: 1;
+
+}
 .charts_data-selector_group-dimension{
     padding-left: 8px;
+
+    .btn-toggle{
+        border: none;
+        &.rotate{
+            transform: rotate(90deg);
+        }
+    }
 }
 
 .charts_data-selector_dimension{
@@ -27,3 +38,4 @@
     }
     
 }
+
