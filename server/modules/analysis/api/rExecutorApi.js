@@ -1,17 +1,22 @@
-import R from 'r-script'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Request from '@server/utils/request'
 
 export const init = (app) => {
-  // ====== READ - Chain entity data
-  app.get('/r-executor', async (req, res, next) => {
+  app.post('/r-executor/survey/:surveyId/chain/:chainUuid/script/execute/start', async (req, res, next) => {
     try {
-      const fileName = '../rScripts/survey.R'
-      const fileInitSrc = FileUtils.join(__dirname, fileName)
+      const filePath = Object.values(req.files)[0].tempFilePath
+      const content = await FileUtils.readFile(filePath)
+      res.json({ a: 'OK' })
+    } catch (error) {
+      next(error)
+    }
+  })
 
-      const out = R(fileInitSrc).data('hello world', new Date().toISOString()).callSync()
-
-      const data = { hello: out }
-      res.json(data)
+  app.post('/r-executor/survey/:surveyId/chain/:chainUuid/script/execute/status', async (req, res, next) => {
+    try {
+      const filePath = Object.values(req.files)[0].tempFilePath
+      const content = await FileUtils.readFile(filePath)
+      res.json({ a: 'OK' })
     } catch (error) {
       next(error)
     }
