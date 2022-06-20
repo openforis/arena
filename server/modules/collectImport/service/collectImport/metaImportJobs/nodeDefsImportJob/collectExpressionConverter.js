@@ -136,6 +136,8 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
   })
 
   if (validationResult) {
+    console.error('expression', expression)
+    console.error('validationResult', validationResult)
     return null
   }
   return converted
