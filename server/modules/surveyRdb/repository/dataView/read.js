@@ -26,29 +26,30 @@ const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColumnName(nodeDefParent)
 }
 
+const columnTransformByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: ({ nodeDefCol, streamMode, nameFull, alias }) => {
+    if (streamMode && NodeDef.isBooleanLabelYesNo(nodeDefCol)) {
+      return [`CASE WHEN ${nameFull}::boolean = True THEN 'Yes' ELSE 'No' END AS ${alias}`]
+    }
+    return [`${nameFull}::boolean AS ${alias}`]
+  },
+  [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias }) => [
+    `'SRID=EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
+  ],
+  [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`],
+  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
+}
+
 const _selectsByNodeDefType =
-  ({ viewDataNodeDef, streamMode, joinCodes = false }) =>
+  ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
     const { name: alias, nameFull, namesFull } = columnNodeDef
 
-    if (streamMode) {
-      if (NodeDef.isBooleanLabelYesNo(nodeDefCol)) {
-        return [`CASE WHEN ${nameFull}::boolean = True THEN 'Yes' ELSE 'No' END AS ${alias}`]
-      }
-      if (NodeDef.isDate(nodeDefCol)) {
-        return [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`]
-      }
-      if (NodeDef.isTime(nodeDefCol)) {
-        return [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`]
-      }
+    const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
+    if (columnTransform) {
+      return columnTransform({ streamMode, nodeDefCol, nameFull, alias })
     }
-    if (NodeDef.isCoordinate(nodeDefCol)) {
-      return [
-        `'SRID=EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
-      ]
-    }
-
     return namesFull
   }
 
