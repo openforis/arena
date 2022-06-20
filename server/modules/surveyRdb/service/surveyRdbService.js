@@ -23,7 +23,7 @@ const _fetchSurvey = async (surveyId, cycle) => {
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {Stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -64,6 +64,14 @@ export const countTable = async (params) => {
   return Query.isModeAggregate(query)
     ? SurveyRdbManager.countViewDataAgg({ survey, cycle, query })
     : SurveyRdbManager.countTable({ survey, cycle, query })
+}
+
+export const fetchTableRowsCountByEntityDefUuid = async (params) => {
+  const { surveyId, cycle, entityDefUuids = [] } = params
+
+  const survey = await _fetchSurvey(surveyId, cycle)
+
+  return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
 }
 
 export const refreshAllRdbs = async () => {
