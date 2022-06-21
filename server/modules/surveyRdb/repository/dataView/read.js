@@ -28,10 +28,15 @@ const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
 
 const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ nodeDefCol, streamMode, nameFull, alias }) => {
-    if (streamMode && NodeDef.isBooleanLabelYesNo(nodeDefCol)) {
+    if (!streamMode) {
+      // boolean value, not text
+      return [`${nameFull}::boolean AS ${alias}`]
+    }
+    if (NodeDef.isBooleanLabelYesNo(nodeDefCol)) {
+      // boolean as 'Yes' and 'No' values
       return [`CASE WHEN ${nameFull}::boolean = True THEN 'Yes' ELSE 'No' END AS ${alias}`]
     }
-    return [`${nameFull}::boolean AS ${alias}`]
+    return undefined // transform not applied
   },
   [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias }) => [
     `'SRID=EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
