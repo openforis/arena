@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { CircleMarker, LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -11,8 +11,28 @@ const markerRadius = 10
 export const SamplingPointDataLayer = (props) => {
   const { markersColor } = props
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints } =
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints, items } =
     useSamplingPointDataLayer(props)
+
+  // Have a Reference to points for opening popups automatically
+  let markerRefs = useRef([])
+
+  const openPopupOfUuid = (uuid) => {
+    markerRefs.current[uuid].openPopup()
+  }
+
+  const getPointIndex = (uuid) => {
+    return items.findIndex((item) => item.uuid === uuid)
+  }
+
+  const getNextPoint = (uuid) => {
+    const index = getPointIndex(uuid)
+    return items[(index + 1) % items.length]
+  }
+  const getPreviousPoint = (uuid) => {
+    let index = getPointIndex(uuid)
+    return items[index > 0 ? index - 1 : items.length - 1]
+  }
 
   return (
     <LayersControl.Overlay name={overlayName}>
@@ -38,8 +58,23 @@ export const SamplingPointDataLayer = (props) => {
 
           // we have a single point (sampling point item) to render
           return (
-            <CircleMarker key={itemUuid} center={[latitude, longitude]} radius={markerRadius} color={markersColor}>
-              <SamplingPointDataItemPopup location={location} codes={itemCodes} />
+            <CircleMarker
+              key={itemUuid}
+              center={[latitude, longitude]}
+              radius={markerRadius}
+              color={markersColor}
+              ref={(ref) => {
+                if (ref != null) markerRefs.current[itemUuid] = ref
+              }}
+            >
+              <SamplingPointDataItemPopup
+                location={location}
+                codes={itemCodes}
+                itemUuid={itemUuid}
+                getNextPoint={getNextPoint}
+                getPreviousPoint={getPreviousPoint}
+                openPopupOfUuid={openPopupOfUuid}
+              />
             </CircleMarker>
           )
         })}
@@ -50,6 +85,7 @@ export const SamplingPointDataLayer = (props) => {
 
 SamplingPointDataLayer.propTypes = {
   levelIndex: PropTypes.number,
+  markersColor: PropTypes.any,
 }
 
 SamplingPointDataLayer.defaultProps = {

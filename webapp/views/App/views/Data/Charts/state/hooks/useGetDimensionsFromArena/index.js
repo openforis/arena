@@ -3,36 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Query } from '@common/model/query'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
-const _dimensions = [
-  {
-    label: 'LABEL',
-    options: [
-      {
-        name: 'city_label',
-        value: 'city_label',
-        label: 'City',
-        type: 'nominal',
-        icon: NodeDefUIProps.getIconByType('integer'),
-      },
-      {
-        name: 'inhabitants',
-        value: 'inhabitants',
-        label: 'Inhabitants',
-        type: 'quantitative',
-        icon: NodeDefUIProps.getIconByType('code'),
-      },
-      {
-        name: 'name',
-        value: 'name',
-        label: 'name',
-        type: 'nominal',
-        icon: NodeDefUIProps.getIconByType('text'),
-      },
-    ],
-  },
-]
+import getArenaDimensions from './utils/getSelfAttributesAndAncestors'
 
 const useGetDimensionsFromArena = (nodeDefLabelType) => {
   const survey = useSurvey()
@@ -42,6 +13,7 @@ const useGetDimensionsFromArena = (nodeDefLabelType) => {
   const [dimensions, setDimensions] = useState([])
 
   const generateDimensions = useCallback(() => {
+    const _dimensions = getArenaDimensions({ nodeDefUuid: entityDefUuid, survey, language, nodeDefLabelType })
     setDimensions(_dimensions)
   }, [entityDefUuid, language, survey, nodeDefLabelType])
 
