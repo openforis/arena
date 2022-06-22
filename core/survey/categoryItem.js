@@ -14,6 +14,7 @@ export const keysProps = {
   code: 'code',
   extra: 'extra',
   labels: ObjectUtils.keysProps.labels,
+  descriptions: ObjectUtils.keysProps.descriptions,
 }
 
 // ====== CREATE

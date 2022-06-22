@@ -227,7 +227,7 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
   }, [])
 
   if (itemsUpdated.length > 0) {
-    await CategoryRepository.updateItems(surveyId, itemsUpdated, t)
+    await CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t)
   }
 }
 
@@ -346,20 +346,14 @@ export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key
     }
   })
 
-export const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db) =>
+export const updateItemsProps = async (user, surveyId, categoryUuid, items, client = db) =>
   client.tx(async (t) => {
     const logActivities = items.map((item) =>
-      _newCategoryItemUpdateLogActivity(
-        categoryUuid,
-        item,
-        CategoryItem.keysProps.extra,
-        CategoryItem.getExtra(item),
-        true
-      )
+      _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.keys.props, CategoryItem.getProps(item), true)
     )
     await Promise.all([
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItems(surveyId, items, t),
+      CategoryRepository.updateItemsProps(surveyId, items, t),
     ])
   })
 
