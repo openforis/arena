@@ -4,16 +4,18 @@ import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
-  uuid: 'uuid',
-  props: 'props',
+  uuid: ObjectUtils.keys.uuid,
+  props: ObjectUtils.keys.props,
   parentUuid: 'parentUuid',
   levelUuid: 'levelUuid',
+  published: ObjectUtils.keys.published,
 }
 
 export const keysProps = {
   code: 'code',
   extra: 'extra',
   labels: ObjectUtils.keysProps.labels,
+  descriptions: ObjectUtils.keysProps.descriptions,
 }
 
 // ====== CREATE
@@ -25,7 +27,8 @@ export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-export const { getDescription, getDescriptions, getLabels, getProps, getPropsDraft, getUuid, isEqual } = ObjectUtils
+export const { getDescription, getDescriptions, getLabels, getProps, getPropsDraft, getUuid, isEqual, isPublished } =
+  ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')

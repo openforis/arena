@@ -130,8 +130,18 @@ const MAX_FILE_SIZE_DEFAULT = 10
 
 // ==== READ
 
-export const { getLabels, getParentUuid, getProp, getProps, getPropsDraft, getUuid, getId, isEqual, isTemporary } =
-  ObjectUtils
+export const {
+  getLabels,
+  getParentUuid,
+  getProp,
+  getProps,
+  getPropsDraft,
+  getUuid,
+  getId,
+  isEqual,
+  isPublished,
+  isTemporary,
+} = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
@@ -172,7 +182,6 @@ export const isReadOnly = getProp(propKeys.readOnly, false)
 
 export const getLayout = getProp(propKeys.layout, {})
 
-export const isPublished = ObjectUtils.isKeyTrue(keys.published)
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 
 export const getDescriptions = getProp(propKeys.descriptions, {})
