@@ -5,6 +5,7 @@ import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
+  deleteSurveySchemaTableRecords,
   deleteSurveySchemaTableProp,
   dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
@@ -92,7 +93,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
               'propsDraft', ${tableAlias}.props_draft`
     }
     // combine props and props_draft column into one
-    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''}`
+    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
+            'published', ${tableAlias}.props::text <> '{}'`
   }
 
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
@@ -367,7 +369,7 @@ export const updateLevelProp = async (surveyId, levelUuid, key, value, client = 
 export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
-export const updateItems = async (surveyId, items, client = db) => {
+export const updateItemsProps = async (surveyId, items, client = db) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
   await client.none(
     DbUtils.updateAllQuery(
@@ -416,6 +418,9 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
+
+export const deleteItems = async (surveyId, itemUuids, client = db) =>
+  deleteSurveySchemaTableRecords(surveyId, 'category_item', itemUuids, client)
 
 export const deleteItemLabels = async (surveyId, langCode, client = db) =>
   deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)
