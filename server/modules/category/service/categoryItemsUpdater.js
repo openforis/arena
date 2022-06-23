@@ -98,6 +98,7 @@ export default class CategoryItemsUpdater {
           item = await this._insertNewItem({ level, parentItemUuid, itemProps })
         }
       } else {
+        // when category is not published, always insert new items (old items deleted previously)
         item = await this._insertNewItem({ level, parentItemUuid, itemProps })
       }
     }
@@ -112,7 +113,7 @@ export default class CategoryItemsUpdater {
   }
 
   async flush() {
-    if (!(await this._checkNotDeletedItems())) {
+    if (!(await this._deleteNotProcessedDraftItems())) {
       return false
     }
     await this.itemsBatchInserter.flush()
@@ -120,21 +121,42 @@ export default class CategoryItemsUpdater {
     return true
   }
 
-  async _checkNotDeletedItems() {
+  async _deleteNotProcessedDraftItems() {
     const { category } = this
+
     if (!Category.isPublished(category)) {
+      // items already deleted before inserting new ones
       return true
     }
+
     const existingItemsNotProcessed = this.existingItems.filter(
       (existingItem) => !this.existingItemsProcessedByUuid[CategoryItem.getUuid(existingItem)]
     )
-    if (existingItemsNotProcessed.length > 0) {
-      const deletedItemCodes = existingItemsNotProcessed.flatMap(CategoryItem.getCode)
+
+    // check that there are no published items that have not been processed
+    const publishedItemsNotProcessed = existingItemsNotProcessed.filter(CategoryItem.isPublished)
+    if (publishedItemsNotProcessed.length > 0) {
+      const deletedItemCodes = publishedItemsNotProcessed.flatMap(CategoryItem.getCode)
       this.errorHandler(Validation.messageKeys.categoryImport.cannotDeleteItemsOfPublishedCategory, {
         deletedItemCodes,
       })
       return false
     }
+
+    // not published items can be deleted safely
+    const draftItemsNotProcessed = existingItemsNotProcessed.filter((item) => !CategoryItem.isPublished(item))
+    if (draftItemsNotProcessed.length > 0) {
+      await CategoryManager.deleteItems(
+        {
+          user: this.user,
+          surveyId: this.surveyId,
+          categoryUuid: Category.getUuid(this.category),
+          items: draftItemsNotProcessed,
+        },
+        this.tx
+      )
+    }
+
     return true
   }
 

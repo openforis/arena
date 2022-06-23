@@ -279,9 +279,8 @@ export default class CategoryImportJob extends Job {
       } else if (!itemCached) {
         const levels = Category.getLevelsArray(this.category)
         const level = levels[levelIndex]
-        // Insert new items if not inserted already
-        // update existing items (only when last level is reached)
-        await this._insertOrUpdateItem({
+
+        const { inserted } = await this.itemsUpdater.insertOrUpdateItem({
           itemCodes: codes,
           level,
           placeholder: false,
@@ -289,28 +288,14 @@ export default class CategoryImportJob extends Job {
           descriptionsByLang,
           extra,
         })
+
+        if (inserted) {
+          this.totalItemsInserted++
+        }
       }
     }
 
     this.incrementProcessedItems()
-  }
-
-  /**
-   * Insert new item if not already created or update in previous level
-   */
-  async _insertOrUpdateItem({ itemCodes, level, placeholder, labelsByLang, descriptionsByLang, extra }) {
-    const { inserted } = await this.itemsUpdater.insertOrUpdateItem({
-      itemCodes,
-      level,
-      placeholder,
-      labelsByLang,
-      descriptionsByLang,
-      extra,
-    })
-
-    if (inserted) {
-      this.totalItemsInserted++
-    }
   }
 
   _checkCodesNotEmpty(codes) {

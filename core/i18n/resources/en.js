@@ -1123,9 +1123,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     categoryImport: {
       cannotDeleteItemsOfPublishedCategory:
-        'Cannot delete published category items. Deleted items: {{deletedItemCodes}}',
+        'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',
       cannotDeleteLevelsOfPublishedCategory:
-        'Cannot delete levels of published category. Delete levels: {{deletedLevelNames}}',
+        'Cannot delete levels of published category. Levels missing in imported file: {{deletedLevelNames}}',
       codeColumnMissing: 'There should be at least one "code" column',
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',

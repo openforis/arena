@@ -564,3 +564,20 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
 
     return validateCategory(surveyId, categoryUuid, t)
   })
+
+export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = db) => {
+  const activities = items.map((item) => {
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: CategoryItem.getUuid(item),
+      [ActivityLog.keysContent.categoryUuid]: categoryUuid,
+      [ActivityLog.keysContent.levelUuid]: CategoryItem.getLevelUuid(item),
+      [ActivityLog.keysContent.code]: CategoryItem.getCode(item),
+    }
+    return ActivityLog.newActivity(ActivityLog.type.categoryItemDelete, logContent)
+  })
+  await Promise.all([
+    markSurveyDraft(surveyId, t),
+    ActivityLogRepository.insertMany(user, surveyId, activities, t),
+    CategoryRepository.deleteItems(surveyId, items.map(CategoryItem.getUuid), t),
+  ])
+}
