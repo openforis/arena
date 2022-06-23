@@ -48,17 +48,6 @@ export default class CategoryImportJob extends Job {
 
     await this.logCategoryImportActivity()
 
-    // 2.a. init items updater
-    this.itemsUpdater = new CategoryItemsUpdater({
-      surveyId: this.surveyId,
-      category: this.category,
-      user: this.user,
-      tx: this.tx,
-      errorHandler: this._addError.bind(this),
-      itemExtraPropsExtrator: this.extractItemExtraProps.bind(this),
-    })
-    await this.itemsUpdater.init()
-
     // 3. import levels
     await this._importLevels()
     // 4. import item extra def
@@ -166,7 +155,7 @@ export default class CategoryImportJob extends Job {
     const levelNames = CategoryImportSummary.getLevelNames(summary)
 
     if (Category.isPublished(category)) {
-      this._updateExistingLevels()
+      await this._updateExistingLevels()
     } else {
       this.logDebug('draft category: replacing levels')
       // Delete existing levels and insert new ones using level names from summary
@@ -183,9 +172,12 @@ export default class CategoryImportJob extends Job {
 
     const levelNames = CategoryImportSummary.getLevelNames(summary)
 
-    const levelsOld = Category.getLevelsArray(category)
-    if (levelsOld.length > levelNames.length) {
-      const deletedLevelNames = levelsOld
+    const levelsExisting = Category.getLevelsArray(category)
+
+    // check that there are no published levels missing in the imported file
+    const publishedLevelsExisting = levelsExisting.filter(CategoryLevel.isPublished)
+    if (levelNames.length < publishedLevelsExisting.length) {
+      const deletedLevelNames = publishedLevelsExisting
         .map(CategoryLevel.getName)
         .filter((oldLevelName) => !levelNames.includes(oldLevelName))
         .flat()
@@ -195,7 +187,7 @@ export default class CategoryImportJob extends Job {
     }
 
     await PromiseUtils.each(levelNames, async (levelName, index) => {
-      const levelOld = levelsOld[index]
+      const levelOld = levelsExisting[index]
       if (!levelOld) {
         // insert new level
         const level = Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
@@ -218,6 +210,21 @@ export default class CategoryImportJob extends Job {
         this.category = categoryUpdated
       }
     })
+
+    if (levelNames.length < levelsExisting.length) {
+      // delete draft levels missing in imported file (starting from the last level)
+      const levelsToDelete = levelsExisting.slice(levelNames.length).reverse()
+
+      await PromiseUtils.each(levelsToDelete, async (levelToDelete) => {
+        this.category = await CategoryManager.deleteLevel(
+          user,
+          surveyId,
+          Category.getUuid(category),
+          CategoryLevel.getUuid(levelToDelete),
+          tx
+        )
+      })
+    }
   }
 
   async _importItemExtraDef() {
@@ -245,6 +252,17 @@ export default class CategoryImportJob extends Job {
 
   async _readItems() {
     this.logDebug('reading CSV file rows')
+
+    // init items updater
+    this.itemsUpdater = new CategoryItemsUpdater({
+      surveyId: this.surveyId,
+      category: this.category,
+      user: this.user,
+      errorHandler: this._addError.bind(this),
+      itemExtraPropsExtrator: this.extractItemExtraProps.bind(this),
+      tx: this.tx,
+    })
+    await this.itemsUpdater.init()
 
     const reader = await CategoryImportCSVParser.createRowsReaderFromStream(
       await this.createReadStream(),

@@ -130,7 +130,5 @@ export const newCategory = (props = {}, levels = null) => {
 }
 
 // UTILS
-export const isLevelDeleteAllowed = (level) =>
-  R.pipe(getLevelsArray, R.length, (levelsCount) =>
-    R.and(CategoryLevel.getIndex(level) > 0, CategoryLevel.getIndex(level) === levelsCount - 1)
-  )
+export const isLevelDeleteAllowed = (level) => (category) =>
+  !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1

@@ -1,13 +1,15 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
+import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
 import BatchPersister from '@server/db/batchPersister'
 import * as CategoryManager from '../manager/categoryManager'
-import { Objects } from '@openforis/arena-core'
 
 export default class CategoryItemsUpdater {
   constructor({ surveyId, category, user, tx, errorHandler, itemExtraPropsExtrator }) {
@@ -40,7 +42,7 @@ export default class CategoryItemsUpdater {
 
   async init() {
     if (Category.isPublished(this.category)) {
-      // 2.a. fetch existing items (only for puslished category update)
+      // fetch existing items (only for puslished category update)
       this.existingItems = await CategoryManager.fetchItemsByCategoryUuid(
         { surveyId: this.surveyId, categoryUuid: Category.getUuid(this.category), draft: true },
         this.tx
@@ -49,16 +51,12 @@ export default class CategoryItemsUpdater {
   }
 
   async insertOrUpdateItem({ itemCodes, level, placeholder, labelsByLang, descriptionsByLang, extra }) {
-    const { category } = this
-
     const itemCached = this.getItemCachedByCodes(itemCodes)
 
     let item = null
 
-    const code = itemCodes[itemCodes.length - 1]
-
     const itemProps = {
-      [CategoryItem.keysProps.code]: code,
+      [CategoryItem.keysProps.code]: ArrayUtils.last(itemCodes),
     }
     ObjectUtils.setInPath([CategoryItem.keysProps.labels], labelsByLang, false)(itemProps)
     ObjectUtils.setInPath([CategoryItem.keysProps.descriptions], descriptionsByLang, false)(itemProps)
@@ -78,29 +76,7 @@ export default class CategoryItemsUpdater {
         await this.itemsBatchUpdater.addItem(item)
       }
     } else {
-      const parentItemUuid = this._getParentItemUuid(itemCodes)
-
-      if (Category.isPublished(category)) {
-        const existingItem = this.existingItems.find(
-          (existingItem) =>
-            CategoryItem.getParentUuid(existingItem) === parentItemUuid && CategoryItem.getCode(existingItem) === code
-        )
-        if (existingItem) {
-          const itemUuid = CategoryItem.getUuid(existingItem)
-          if (!Objects.isEqual(itemProps, CategoryItem.getProps(existingItem))) {
-            item = { uuid: itemUuid, props: itemProps }
-            await this.itemsBatchUpdater.addItem(item)
-          } else {
-            item = existingItem
-          }
-          this.existingItemsProcessedByUuid[itemUuid] = true
-        } else {
-          item = await this._insertNewItem({ level, parentItemUuid, itemProps })
-        }
-      } else {
-        // when category is not published, always insert new items (old items deleted previously)
-        item = await this._insertNewItem({ level, parentItemUuid, itemProps })
-      }
+      item = await this._insertOrUpdateNewProcessedItem({ level, itemCodes, itemProps })
     }
 
     item.placeholder = placeholder
@@ -110,6 +86,44 @@ export default class CategoryItemsUpdater {
       item,
       inserted: !itemCached,
     }
+  }
+
+  async _insertOrUpdateNewProcessedItem({ level, itemCodes, itemProps }) {
+    const { category } = this
+
+    const parentItemUuid = this._getParentItemUuid(itemCodes)
+
+    let item = null
+
+    if (Category.isPublished(category)) {
+      const code = ArrayUtils.last(itemCodes)
+      item = await this._insertOrUpdateItemOfPublishedCategory({ level, parentItemUuid, code, itemProps, item })
+    } else {
+      // when category is not published, always insert new items (old items deleted previously)
+      item = await this._insertNewItem({ level, parentItemUuid, itemProps })
+    }
+    return item
+  }
+
+  async _insertOrUpdateItemOfPublishedCategory({ level, parentItemUuid, code, itemProps }) {
+    let item = null
+    const existingItem = this.existingItems.find(
+      (existingItem) =>
+        CategoryItem.getParentUuid(existingItem) === parentItemUuid && CategoryItem.getCode(existingItem) === code
+    )
+    if (existingItem) {
+      const itemUuid = CategoryItem.getUuid(existingItem)
+      if (Objects.isEqual(itemProps, CategoryItem.getProps(existingItem))) {
+        item = existingItem
+      } else {
+        item = { uuid: itemUuid, props: itemProps }
+        await this.itemsBatchUpdater.addItem(item)
+      }
+      this.existingItemsProcessedByUuid[itemUuid] = true
+    } else {
+      item = await this._insertNewItem({ level, parentItemUuid, itemProps })
+    }
+    return item
   }
 
   async flush() {
