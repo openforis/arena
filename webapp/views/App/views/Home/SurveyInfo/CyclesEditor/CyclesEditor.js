@@ -1,6 +1,6 @@
 import './CyclesEditor.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -9,20 +9,29 @@ import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
 import CycleEditor from './CycleEditor'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 const CyclesEditor = (props) => {
   const { cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
+
+  const currentCycleKey = useSurveyCycleKey()
 
   const onDelete = (stepToDelete) => {
     delete cycles[stepToDelete]
     setCycles(cycles)
   }
 
+  const canDeleteCycle = useCallback(
+    ({ cycleKey, index }) =>
+      !readOnly && cycleKey !== Survey.cycleOneKey && index === cycleEntries.length - 1 && cycleKey !== currentCycleKey,
+    [readOnly, cycleEntries, currentCycleKey]
+  )
+
   return (
     <div className="home-survey-info__cycles-editor">
       <div className="cycles">
-        {cycleEntries.map(([cycleKey, cycle], i) => (
+        {cycleEntries.map(([cycleKey, cycle], index) => (
           <CycleEditor
             key={cycleKey}
             cycleKey={cycleKey}
@@ -30,7 +39,7 @@ const CyclesEditor = (props) => {
             readOnly={readOnly}
             validation={Validation.getFieldValidation(cycleKey)(validation)}
             onChange={(cycleUpdate) => setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))}
-            canDelete={!readOnly && cycleKey !== Survey.cycleOneKey && i === cycleEntries.length - 1}
+            canDelete={canDeleteCycle({ cycleKey, index })}
             onDelete={onDelete}
           />
         ))}
