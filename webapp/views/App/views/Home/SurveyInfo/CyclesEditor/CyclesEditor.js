@@ -11,16 +11,29 @@ import * as Validation from '@core/validation/validation'
 import CycleEditor from './CycleEditor'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
+import { useConfirmDelete } from '@webapp/components/hooks'
 
 const CyclesEditor = (props) => {
   const { cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
 
+  const confirmDelete = useConfirmDelete()
   const currentCycleKey = useSurveyCycleKey()
 
-  const onDelete = (stepToDelete) => {
-    delete cycles[stepToDelete]
-    setCycles(cycles)
+  const onDelete = (cycleKeyToDelete) => {
+    const cycleLabel = Number(cycleKeyToDelete) + 1
+
+    confirmDelete({
+      key: 'homeView.surveyInfo.confirmDeleteCycle',
+      params: { cycle: cycleKeyToDelete },
+      headerText: 'homeView.surveyInfo.confirmDeleteCycleHeader',
+      onOk: () => {
+        delete cycles[cycleKeyToDelete]
+        setCycles(cycles)
+      },
+      strongConfirm: true,
+      strongConfirmRequiredText: `delete cycle ${cycleLabel}`,
+    })
   }
 
   const canDeleteCycle = useCallback(

@@ -171,7 +171,7 @@ Do you want to proceed?`,
   },
 
   confirm: {
-    strongConfirmInputLabel: 'To confirm type the text: {{strongConfirmRequiredText}}',
+    strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
   },
 
   error: {
@@ -338,7 +338,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
+      confirmDeleteCycleHeader: 'Delete this cycle?',
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
+If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',

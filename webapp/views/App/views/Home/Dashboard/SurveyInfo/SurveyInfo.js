@@ -18,7 +18,7 @@ import { Button, ButtonDownload } from '@webapp/components'
 
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { ButtonMenu } from '@webapp/components/buttons'
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirmDelete } from '@webapp/components/hooks'
 
 const SurveyInfo = () => {
   const i18n = useI18n()
@@ -32,16 +32,13 @@ const SurveyInfo = () => {
 
   const surveyName = Survey.getName(surveyInfo)
 
-  const confirmDelete = useConfirm()
+  const confirmDelete = useConfirmDelete()
 
   const onDeleteClick = useCallback(() => {
     confirmDelete({
       key: 'homeView.deleteSurveyDialog.deleteWarning',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteSurvey(navigate)),
-      okButtonLabel: 'common.delete',
-      okButtonClass: 'btn-danger btn-delete',
-      okButtonIconClass: 'icon-bin icon-12px',
       headerText: 'homeView.deleteSurveyDialog.confirmDelete',
       strongConfirm: true,
       strongConfirmInputLabel: 'homeView.deleteSurveyDialog.confirmName',

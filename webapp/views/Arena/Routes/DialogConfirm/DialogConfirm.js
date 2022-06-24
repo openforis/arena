@@ -40,7 +40,7 @@ const DialogConfirm = () => {
 
         {strongConfirm && (
           <>
-            <div className="text-center">{i18n.t(strongConfirmInputLabel, { strongConfirmRequiredText })}</div>
+            <Markdown className="text-center" source={i18n.t(strongConfirmInputLabel, { strongConfirmRequiredText })} />
 
             <input
               type="text"
