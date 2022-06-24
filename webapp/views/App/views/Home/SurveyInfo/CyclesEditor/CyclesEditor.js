@@ -37,9 +37,11 @@ const CyclesEditor = (props) => {
   }
 
   const canDeleteCycle = useCallback(
-    ({ cycleKey, index }) =>
-      !readOnly && cycleKey !== Survey.cycleOneKey && index === cycleEntries.length - 1 && cycleKey !== currentCycleKey,
-    [readOnly, cycleEntries, currentCycleKey]
+    ({ cycleKey, index }) => {
+      const lastCycleIndex = Object.values(cycles).length - 1
+      return !readOnly && cycleKey !== Survey.cycleOneKey && index === lastCycleIndex && cycleKey !== currentCycleKey
+    },
+    [readOnly, cycles, currentCycleKey]
   )
 
   return (
