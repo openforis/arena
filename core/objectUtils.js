@@ -15,6 +15,7 @@ export const keys = {
   parentUuid: 'parentUuid',
   props: 'props',
   propsDraft: 'propsDraft',
+  published: 'published',
   uuid: 'uuid',
   temporary: 'temporary', // True when the object has been created but not persisted yet
 }
@@ -54,6 +55,7 @@ export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.propOr([], keys.authGroups)
 
 export const isTemporary = isKeyTrue(keys.temporary)
+export const isPublished = isKeyTrue(keys.published)
 
 // ====== CHECK
 const isBlank = (value) => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)

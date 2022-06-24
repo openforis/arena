@@ -18,8 +18,11 @@ const removeItemAtIndex =
 
 const fromNumberOfElements = (numOfElements) => Array.from(Array(numOfElements).keys())
 
+const last = (array) => array[array.length - 1]
+
 export const ArrayUtils = {
   addOrRemoveItem,
   removeItemAtIndex,
   fromNumberOfElements,
+  last,
 }

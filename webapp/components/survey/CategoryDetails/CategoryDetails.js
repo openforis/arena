@@ -74,7 +74,6 @@ const CategoryDetails = (props) => {
               label={i18n.t('common.csvImport')}
               accept=".csv"
               onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
-              disabled={Category.isPublished(category)}
             />
           )}
           <ButtonDownload
