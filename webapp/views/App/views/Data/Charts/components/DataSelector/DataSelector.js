@@ -66,10 +66,9 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
           <p>{i18n.t('common.dimension_plural')}</p>
           <br />
           <div className="charts_data-selector_group-dimension_container">
-            {dimensions.length > 0 &&
-              dimensions.map((dimensionGroup) => (
-                <DimensionGroup key={dimensionGroup.label} dimensionGroup={dimensionGroup} />
-              ))}
+            {dimensions.map((dimensionGroup) => (
+              <DimensionGroup key={dimensionGroup.label} dimensionGroup={dimensionGroup} />
+            ))}
           </div>
         </>
       )}
