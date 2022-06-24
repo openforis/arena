@@ -170,6 +170,10 @@ Do you want to proceed?`,
     },
   },
 
+  confirm: {
+    strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
+  },
+
   error: {
     pageNotFound: 'Page not found',
   },
@@ -334,7 +338,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
+      confirmDeleteCycleHeader: 'Delete this cycle?',
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
+If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
@@ -342,7 +348,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
-      deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
+      deleteWarning: `Deleting the **{{surveyName}}** survey will delete all of its data.\n\n
+
+$t(common.cantUndoWarning)`,
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyList: {

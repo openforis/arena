@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 
 import * as SurveyCycle from '@core/survey/surveyCycle'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
-
+import { Button } from '@webapp/components'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import DateContainer from './DateContainer'
@@ -14,7 +12,6 @@ const CycleEditor = (props) => {
   const { cycleKey, cycle, readOnly, validation, canDelete, onChange, onDelete } = props
 
   const stepNum = Number(cycleKey) + 1
-  const dispatch = useDispatch()
 
   return (
     <ValidationTooltip validation={validation} showKeys={false}>
@@ -36,21 +33,12 @@ const CycleEditor = (props) => {
         )}
 
         {canDelete && (
-          <button
-            type="button"
-            className="btn-s btn-transparent btn-delete"
-            onClick={() =>
-              dispatch(
-                DialogConfirmActions.showDialogConfirm({
-                  key: 'homeView.surveyInfo.confirmDeleteCycle',
-                  params: { cycle: stepNum },
-                  onOk: () => onDelete(cycleKey),
-                })
-              )
-            }
-          >
-            <span className="icon icon-bin2 icon-12px" />
-          </button>
+          <Button
+            className="btn-transparent btn-delete"
+            iconClassName="icon-bin2 icon-12px"
+            size="small"
+            onClick={() => onDelete(cycleKey)}
+          />
         )}
       </div>
     </ValidationTooltip>
