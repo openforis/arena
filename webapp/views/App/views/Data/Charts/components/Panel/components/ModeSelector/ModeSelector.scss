@@ -1,0 +1,21 @@
+@import '~@webapp/style/vars';
+
+.mode-selector {
+    display: flex;
+    flex-direction: row;
+}
+
+.mode-selector__option{
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid $greyBorder;
+    cursor: pointer;
+    
+    &.active {
+        border-bottom: 2px solid $blue;
+    }
+    &:hover {
+        color: $greyBorder;
+        cursor: pointer;
+    }
+}
