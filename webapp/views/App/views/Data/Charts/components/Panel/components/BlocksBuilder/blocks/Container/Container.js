@@ -3,7 +3,7 @@ import React from 'react'
 import './Container.scss'
 
 const ContainerBlock = ({ dimensions, block, spec, onUpdateSpec }) => {
-  const { title, subtitle, blocks, order, type } = block
+  const { title, subtitle, blocks, order } = block
 
   return (
     <div className="block block-container">

@@ -4,7 +4,7 @@ import Select from 'react-select'
 import './Input.scss'
 
 const InputBlock = ({ dimensions, block, spec, onUpdateSpec }) => {
-  const { title, subtitle, blocks, order, type, id } = block
+  const { title, subtitle, id } = block
 
   const handleChange = useCallback(
     (dimensionsSelected) => {
