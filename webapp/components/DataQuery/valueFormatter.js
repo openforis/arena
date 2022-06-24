@@ -11,7 +11,6 @@ const formatters = {
   [NodeDef.nodeDefType.decimal]: ({ value, nodeDef }) =>
     NumberUtils.formatDecimal(value, NodeDef.getMaxNumberDecimalDigits(nodeDef)),
   [NodeDef.nodeDefType.integer]: ({ value }) => NumberUtils.formatInteger(value),
-  [NodeDef.nodeDefType.time]: ({ value }) => DateUtils.format(DateUtils.parse(value, 'HH:mm:ss'), 'HH:mm'),
 }
 
 const format = ({ value, i18n, nodeDef }) => {

@@ -1,6 +1,5 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import SystemError from '@core/systemError'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -32,17 +31,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid } = Request.getParams(req)
+        const filePath = Request.getFilePath(req)
 
-        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid })
-
-        if (Category.isPublished(category)) {
-          throw new SystemError('categoryEdit.cantImportCsvIntoPublishedCategory')
-        }
-
-        const file = Request.getFile(req)
-
-        const summary = await CategoryService.createImportSummary(file.tempFilePath)
+        const summary = await CategoryService.createImportSummary(filePath)
 
         res.json(summary)
       } catch (error) {

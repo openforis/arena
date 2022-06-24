@@ -55,7 +55,7 @@ const propsUI = {
 
   [boolean]: {
     component: NodeDefBoolean,
-    icon: <span className="icon icon-radio-checked2 icon-left" />,
+    icon: <span className="icon icon-checkbox-checked icon-left" />,
     defaultValue: '',
   },
 

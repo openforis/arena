@@ -32,6 +32,8 @@ export const ValidatorErrorKeys = {
   },
 
   categoryImport: {
+    cannotDeleteLevelsOfPublishedCategory: 'validationErrors.categoryImport.cannotDeleteLevelsOfPublishedCategory',
+    cannotDeleteItemsOfPublishedCategory: 'validationErrors.categoryImport.cannotDeleteItemsOfPublishedCategory',
     codeColumnMissing: 'validationErrors.categoryImport.codeColumnMissing',
     codeDuplicate: 'validationErrors.categoryImport.codeDuplicate',
     codeRequired: 'validationErrors.categoryImport.codeRequired',
