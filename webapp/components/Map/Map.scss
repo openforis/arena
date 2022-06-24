@@ -59,6 +59,7 @@
         padding: 0.3rem;
       }
     }
+
     .leaflet-control-layers-overlays {
       label span,
       label span span {
@@ -84,6 +85,10 @@
         border-style: solid;
         border-width: 2px;
       }
+    }
+
+    .leaflet-control-attribution svg {
+      display: none !important;
     }
   }
 
