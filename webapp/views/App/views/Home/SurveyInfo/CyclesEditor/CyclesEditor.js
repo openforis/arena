@@ -10,6 +10,7 @@ import * as Validation from '@core/validation/validation'
 
 import CycleEditor from './CycleEditor'
 import { useSurveyCycleKey } from '@webapp/store/survey'
+import { ButtonAdd } from '@webapp/components'
 
 const CyclesEditor = (props) => {
   const { cycles, readOnly, setCycles, validation } = props
@@ -45,13 +46,11 @@ const CyclesEditor = (props) => {
         ))}
 
         {!readOnly && (
-          <button
-            type="button"
-            className="btn-s btn-add"
+          <ButtonAdd
+            showLabel={false}
+            size="small"
             onClick={() => setCycles(R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles))}
-          >
-            <span className="icon icon-plus icon-10px" />
-          </button>
+          />
         )}
       </div>
     </div>
