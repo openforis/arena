@@ -1,6 +1,7 @@
 import React from 'react'
-
 import './Container.scss'
+
+import RenderByType from '../BlockRenderer/BlockRenderer'
 
 const ContainerBlock = ({ dimensions, block, spec, onUpdateSpec }) => {
   const { title, subtitle, blocks, order, type } = block
