@@ -7,12 +7,32 @@ export const useConfirm = () => {
   const dispatch = useDispatch()
 
   return useCallback(
-    ({ key, params = {}, onOk }) => {
+    ({
+      key,
+      params = {},
+      onOk,
+      onCancel,
+      okButtonLabel = undefined,
+      okButtonClass = undefined,
+      okButtonIconClass = undefined,
+      headerText = undefined,
+      strongConfirm = false,
+      strongConfirmInputLabel = undefined,
+      strongConfirmRequiredText = undefined,
+    }) => {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key,
           params,
           onOk,
+          onCancel,
+          okButtonLabel,
+          okButtonClass,
+          okButtonIconClass,
+          headerText,
+          strongConfirm,
+          strongConfirmInputLabel,
+          strongConfirmRequiredText,
         })
       )
     },

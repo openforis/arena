@@ -1,6 +1,6 @@
 import './SurveyInfo.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -16,13 +16,11 @@ import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDownload } from '@webapp/components'
 
-import DeleteSurveyDialog from './DeleteSurveyDialog'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { ButtonMenu } from '@webapp/components/buttons'
+import { useConfirm } from '@webapp/components/hooks'
 
 const SurveyInfo = () => {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -33,6 +31,23 @@ const SurveyInfo = () => {
   const canExportSurvey = useAuthCanExportSurvey()
 
   const surveyName = Survey.getName(surveyInfo)
+
+  const confirmDelete = useConfirm()
+
+  const onDeleteClick = useCallback(() => {
+    confirmDelete({
+      key: 'homeView.deleteSurveyDialog.deleteWarning',
+      params: { surveyName },
+      onOk: () => dispatch(SurveyActions.deleteSurvey(navigate)),
+      okButtonLabel: 'common.delete',
+      okButtonClass: 'btn-danger btn-delete',
+      okButtonIconClass: 'icon-bin icon-12px',
+      headerText: 'homeView.deleteSurveyDialog.confirmDelete',
+      strongConfirm: true,
+      strongConfirmInputLabel: 'homeView.deleteSurveyDialog.confirmName',
+      strongConfirmRequiredText: surveyName,
+    })
+  }, [dispatch, navigate, confirmDelete, surveyName])
 
   return (
     <>
@@ -101,7 +116,7 @@ const SurveyInfo = () => {
             <Button
               className="btn-s btn-transparent"
               testId={TestId.dashboard.surveyDeleteBtn}
-              onClick={() => setShowDeleteDialog(true)}
+              onClick={onDeleteClick}
               iconClassName="icon-bin icon-12px icon-left"
               label="common.delete"
             />
@@ -119,14 +134,6 @@ const SurveyInfo = () => {
           )}
         </div>
       </div>
-
-      {showDeleteDialog && (
-        <DeleteSurveyDialog
-          onCancel={() => setShowDeleteDialog(false)}
-          onDelete={() => dispatch(SurveyActions.deleteSurvey(navigate))}
-          surveyName={Survey.getName(surveyInfo)}
-        />
-      )}
     </>
   )
 }
