@@ -48,15 +48,20 @@ export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUui
     (def) => dbTransformCallback(def, true)
   )
 
-export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) =>
-  client.one(
+export const deleteSurveySchemaTableRecords = async (surveyId, tableName, recordUuids, client = db) =>
+  client.map(
     `
     DELETE 
     FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
-    WHERE uuid = $1 RETURNING *`,
-    [recordUuid],
+    WHERE uuid IN ($1:csv) RETURNING *`,
+    [recordUuids],
     (def) => dbTransformCallback(def, true)
   )
+
+export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) => {
+  const recordsDeleted = await deleteSurveySchemaTableRecords(surveyId, tableName, [recordUuid], client)
+  return recordsDeleted[0]
+}
 
 export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
   client.none(`

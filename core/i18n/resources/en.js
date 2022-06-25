@@ -70,6 +70,7 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
     group: 'Group',
+    help: 'Help',
     hide: 'Hide',
     id: 'id',
     import: 'Import',
@@ -167,6 +168,10 @@ Do you want to proceed?`,
       nextPage: 'Next page',
       previousPage: 'Previous page',
     },
+  },
+
+  confirm: {
+    strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
   },
 
   error: {
@@ -333,7 +338,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
+      confirmDeleteCycleHeader: 'Delete this cycle?',
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
+If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
@@ -341,7 +348,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
-      deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
+      deleteWarning: `Deleting the **{{surveyName}}** survey will delete all of its data.\n\n
+
+$t(common.cantUndoWarning)`,
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyList: {
@@ -1121,6 +1130,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     categoryImport: {
+      cannotDeleteItemsOfPublishedCategory:
+        'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',
+      cannotDeleteLevelsOfPublishedCategory:
+        'Cannot delete levels of published category. Levels missing in imported file: {{deletedLevelNames}}',
       codeColumnMissing: 'There should be at least one "code" column',
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',

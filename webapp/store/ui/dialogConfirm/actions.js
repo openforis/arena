@@ -2,9 +2,13 @@ import * as DialogConfirmState from './state'
 
 export const DIALOG_CONFIRM_SHOW = 'ui/dialogConfirm/show'
 export const DIALOG_CONFIRM_HIDE = 'ui/dialogConfirm/hide'
+export const DIALOG_CONFIRM_TEXT_CHANGE = 'ui/dialogConfirm/textChange'
 
-export const showDialogConfirm = ({ key, params, onOk, onCancel = null }) => (dispatch) =>
-  dispatch({ type: DIALOG_CONFIRM_SHOW, key, params, onOk, onCancel })
+export const showDialogConfirm = (params) => (dispatch) =>
+  dispatch({
+    type: DIALOG_CONFIRM_SHOW,
+    ...params,
+  })
 
 export const hideDialogConfirm = () => (dispatch) => dispatch({ type: DIALOG_CONFIRM_HIDE })
 
@@ -22,3 +26,5 @@ export const onDialogConfirmCancel = () => (dispatch, getState) => {
 
   dispatch(hideDialogConfirm())
 }
+
+export const onDialogConfirmTextChange = (text) => (dispatch) => dispatch({ type: DIALOG_CONFIRM_TEXT_CHANGE, text })

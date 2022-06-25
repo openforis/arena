@@ -5,7 +5,14 @@ import * as ApiRoutes from '@common/apiRoutes'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGet, asNumeric } from '../../rFunctions'
+import { dfVar, setVar, arenaGet, asCharacter, asLogical, asNumeric } from '../../rFunctions'
+
+const dataTypeConvertersByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: asLogical,
+  [NodeDef.nodeDefType.decimal]: asNumeric,
+  [NodeDef.nodeDefType.integer]: asNumeric,
+  [NodeDef.nodeDefType.text]: asCharacter,
+}
 
 export default class RFileReadData extends RFileSystem {
   constructor(rChain) {
@@ -22,25 +29,35 @@ export default class RFileReadData extends RFileSystem {
           surveyId: Survey.getId(survey),
           cycle,
           chainUuid,
-          entityUuid: NodeDef.getUuid(entityDef)
+          entityUuid: NodeDef.getUuid(entityDef),
         })
       )
       const dfEntity = NodeDef.getName(entityDef)
       await this.appendContent(setVar(dfEntity, getEntityData))
 
-      // Convert numeric node def values
-      const contentConvertNumericFields = []
-      Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-        Survey.getNodeDefChildren(ancestorDef)(survey)
-          .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
-          .filter((nodeDef) => !NodeDef.isAnalysis(nodeDef))
-          .forEach((nodeDef) => {
-            const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColumnName(nodeDef))
-            contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
-          })
-      })(survey)
-      await this.appendContent(...contentConvertNumericFields)
+      await this.appendContentToConvertDataTypes({ entityDef })
     })
+  }
+
+  async appendContentToConvertDataTypes({ entityDef }) {
+    const { survey } = this.rChain
+    const dfEntity = NodeDef.getName(entityDef)
+
+    const contentConvertDataTypes = []
+
+    Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
+      Survey.getNodeDefChildren(
+        ancestorDef,
+        false
+      )(survey).forEach((nodeDef) => {
+        const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColumnName(nodeDef))
+        const dataTypeConverter = dataTypeConvertersByNodeDefType[NodeDef.getType(nodeDef)]
+        if (dataTypeConverter) {
+          contentConvertDataTypes.push(setVar(nodeDefDfVar, dataTypeConverter(nodeDefDfVar)))
+        }
+      })
+    })(survey)
+    await this.appendContent(...contentConvertDataTypes)
   }
 
   async init() {
