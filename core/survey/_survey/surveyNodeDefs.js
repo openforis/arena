@@ -234,7 +234,7 @@ export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (surv
 }
 
 export const getNodeDefPath =
-  ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true }) =>
+  ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true, separator = ' / ' }) =>
   (survey) => {
     const pathParts = []
 
@@ -244,7 +244,7 @@ export const getNodeDefPath =
       pathParts.unshift(pathPart)
     })(survey)
 
-    return pathParts.join(' / ')
+    return pathParts.join(separator)
   }
 
 export const getHierarchy =

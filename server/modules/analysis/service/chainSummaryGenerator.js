@@ -114,6 +114,7 @@ const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) 
   return {
     name: NodeDef.getName(analysisNodeDef),
     entity: NodeDef.getName(entity),
+    entityPath: Survey.getNodeDefPath({ nodeDef: entity, separator: '/' })(survey),
     label: NodeDef.getLabel(analysisNodeDef, lang),
     areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
     type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
