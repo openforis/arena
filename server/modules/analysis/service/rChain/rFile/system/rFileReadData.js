@@ -9,9 +9,14 @@ import { dfVar, setVar, arenaGet, asCharacter, asLogical, asNumeric } from '../.
 
 const dataTypeConvertersByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: asLogical,
+  [NodeDef.nodeDefType.code]: asCharacter,
+  [NodeDef.nodeDefType.coordinate]: asCharacter,
+  [NodeDef.nodeDefType.date]: asCharacter,
   [NodeDef.nodeDefType.decimal]: asNumeric,
   [NodeDef.nodeDefType.integer]: asNumeric,
+  [NodeDef.nodeDefType.taxon]: asCharacter,
   [NodeDef.nodeDefType.text]: asCharacter,
+  [NodeDef.nodeDefType.time]: asCharacter,
 }
 
 export default class RFileReadData extends RFileSystem {
@@ -41,23 +46,31 @@ export default class RFileReadData extends RFileSystem {
 
   async appendContentToConvertDataTypes({ entityDef }) {
     const { survey } = this.rChain
-    const dfEntity = NodeDef.getName(entityDef)
-
     const contentConvertDataTypes = []
 
     Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
       Survey.getNodeDefChildren(
         ancestorDef,
         false
-      )(survey).forEach((nodeDef) => {
-        const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColumnName(nodeDef))
-        const dataTypeConverter = dataTypeConvertersByNodeDefType[NodeDef.getType(nodeDef)]
-        if (dataTypeConverter) {
-          contentConvertDataTypes.push(setVar(nodeDefDfVar, dataTypeConverter(nodeDefDfVar)))
-        }
+      )(survey).forEach((childDef) => {
+        contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
       })
     })(survey)
     await this.appendContent(...contentConvertDataTypes)
+  }
+
+  createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }) {
+    const content = []
+    const dfEntity = NodeDef.getName(entityDef)
+    const columnNames = NodeDefTable.getColumnNames(childDef)
+    columnNames.forEach((columnName) => {
+      const nodeDefDfVar = dfVar(dfEntity, columnName)
+      const dataTypeConverter = dataTypeConvertersByNodeDefType[NodeDef.getType(childDef)]
+      if (dataTypeConverter) {
+        content.push(setVar(nodeDefDfVar, dataTypeConverter(nodeDefDfVar)))
+      }
+    })
+    return content
   }
 
   async init() {
