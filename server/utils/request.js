@@ -24,8 +24,8 @@ export const getJsonParam = (req, param, defaultValue = null) => {
   return defaultValue
 }
 
-export const getFile = R.pathOr(null, ['files', 'file'])
-export const getFilePath = R.pipe(getFile, R.propOr(null, 'tempFilePath'))
+export const getFile = (req) => req?.files || req?.file || null
+export const getFilePath = (req) => getFile(req)?.tempFilePath || null
 
 export const getBody = R.propOr(null, 'body')
 
