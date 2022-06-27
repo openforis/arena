@@ -84,16 +84,29 @@ $borderColor: $greyBorder;
   border-bottom: 1px dotted $borderColor;
   display: grid;
   align-content: center;
-  grid-template-columns: 80px 35px 1fr;
+  grid-template-columns: 80px auto 1fr;
+  column-gap: 10px;
   min-height: 35px;
   grid-row-gap: 2rem;
   font-size: 0.9rem;
+
+  &.not-valid {
+    grid-template-columns: 26px 44px auto 1fr;
+
+    .badge {
+      position: relative;
+    }
+  }
 
   &.active {
     grid-template-columns: 1fr;
     border: 2px dashed $borderColor;
     background-color: rgba($grey, 0.4);
     padding: 1.5rem 0;
+
+    .badge {
+      position: absolute;
+    }
   }
 
   &:not(.active):hover {
