@@ -22,6 +22,7 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
+import classNames from 'classnames'
 
 const ItemDetails = (props) => {
   const { level, index, item, state, setState } = props
@@ -71,7 +72,7 @@ const ItemDetails = (props) => {
     <div
       id={prefixId}
       data-testid={TestId.categoryDetails.item(levelIndex, index)}
-      className={`category__item ${active ? 'active' : ''}`}
+      className={classNames('category__item', { active, 'not-valid': !Validation.isValid(validation) })}
       onKeyDown={setActive}
       onClick={setActive}
       ref={elemRef}
@@ -144,7 +145,7 @@ const ItemDetails = (props) => {
       ) : (
         <>
           <div className="ellipsis">{CategoryItem.getCode(item)}</div>
-          <div className="ellipsis">
+          <div>
             {'\u00A0'}-{'\u00A0'}
           </div>
           <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
