@@ -1319,6 +1319,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     ArenaSurveyReaderJob: 'Arena Survey Reader',
     CreateRdbJob: 'Survey RDB Creation',
     UsersImportJob: 'Users Import',
+    // ArenaMobileImportJob: 'Arena import',
+    ArenaMobileImportJob: 'Arena mobile import',
     // clone survey
     SurveyCloneJob: 'Clone survey',
     CloneSurveyJob: 'Clone survey',
