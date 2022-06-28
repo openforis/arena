@@ -105,6 +105,24 @@ const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => 
   }
 }
 
+const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) => {
+  const categoryName = NodeDef.isCode(analysisNodeDef)
+    ? await fetchCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(analysisNodeDef) })
+    : ''
+  const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
+
+  return {
+    name: NodeDef.getName(analysisNodeDef),
+    entity: NodeDef.getName(entity),
+    entityPath: Survey.getNodeDefPath({ nodeDef: entity, separator: '/' })(survey),
+    label: NodeDef.getLabel(analysisNodeDef, lang),
+    areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
+    type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
+    categoryName,
+    active: NodeDef.getActive(analysisNodeDef),
+  }
+}
+
 const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
@@ -158,17 +176,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
     clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
     clusteringVariances: Chain.isClusteringOnlyVariances(chain),
-    resultVariables: analysisNodeDefs.map((analysisNodeDef) => {
-      const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
-      return {
-        name: NodeDef.getName(analysisNodeDef),
-        entity: NodeDef.getName(entity),
-        label: NodeDef.getLabel(analysisNodeDef, lang),
-        areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
-        type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
-        active: NodeDef.getActive(analysisNodeDef),
-      }
-    }),
+    resultVariables: await Promise.all(
+      analysisNodeDefs.map((analysisNodeDef) => generateResultVariableSummary({ survey, analysisNodeDef, lang }))
+    ),
     ...(reportingCategorySummary
       ? {
           reportingCategory: reportingCategorySummary,

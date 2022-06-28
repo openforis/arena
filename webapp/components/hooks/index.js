@@ -29,6 +29,6 @@ export { useSRSs } from './useSRSs'
 export { useQuery } from './useQuery'
 export { useWebSocket } from './useWebSocket'
 // confirm dialog
-export { useConfirm } from './useConfirm'
+export { useConfirm, useConfirmDelete } from './useConfirm'
 // notification dialogs
 export { useNotifyInfo, useNotifyError, useNotifyWarning } from './useNotification'

@@ -8,6 +8,7 @@ export const keys = {
   index: ObjectUtils.keys.index,
   items: 'items',
   props: ObjectUtils.keys.props,
+  published: ObjectUtils.keys.published,
 }
 
 export const keysProps = {
@@ -15,7 +16,7 @@ export const keysProps = {
 }
 
 // READ
-export const { getProps, getPropsDraft, getUuid } = ObjectUtils
+export const { getProps, getPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getIndex = R.prop(keys.index)
 export const getName = ObjectUtils.getProp(keysProps.name)
 export const getCategoryUuid = R.prop(keys.categoryUuid)
