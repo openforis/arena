@@ -46,7 +46,7 @@ const pie = {
                   return
                 }
 
-                const { name, type, label } = dimension
+                const { name, type } = dimension
 
                 const newSpec = {
                   ...spec,
@@ -86,7 +86,7 @@ const pie = {
                   return
                 }
 
-                const { name, type, label } = dimension
+                const { name, type } = dimension
 
                 const newSpec = {
                   ...spec,
