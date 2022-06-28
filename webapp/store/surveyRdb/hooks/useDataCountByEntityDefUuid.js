@@ -16,7 +16,10 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
     const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, analysisNodeDef) => {
       const parentUuid = NodeDef.getParentUuid(analysisNodeDef)
       if (parentUuid) {
-        entityDefUuidsSet.add(parentUuid)
+        const parentEntityDef = Survey.getNodeDefByUuid(parentUuid)(survey)
+        if (parentEntityDef && NodeDef.isInCycle(cycle)(parentEntityDef)) {
+          entityDefUuidsSet.add(parentUuid)
+        }
       }
       return entityDefUuidsSet
     }, new Set())
