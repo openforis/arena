@@ -137,7 +137,9 @@ class RChain {
   }
 
   async _initEntities() {
-    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
+    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey).filter(
+      NodeDef.isInCycle(this.cycle)
+    )
 
     const entitiesWithData = await SurveyRdbManager.filterEntitiesWithData({
       survey: this.survey,
