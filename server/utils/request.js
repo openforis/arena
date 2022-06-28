@@ -25,6 +25,7 @@ export const getJsonParam = (req, param, defaultValue = null) => {
 }
 
 export const getFile = (req) => req?.files || req?.file || null
+export const getFiles = (req) => req?.files || req?.file || null
 export const getFilePath = (req) => getFile(req)?.tempFilePath || null
 
 export const getBody = R.propOr(null, 'body')
