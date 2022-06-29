@@ -1,0 +1,26 @@
+@import "~@webapp/style/vars";
+
+.block-container {
+  margin-bottom: 16px;
+
+  .block {
+    padding: 8px;
+    padding-right: 0px;
+  }
+}
+
+.block-container__title {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.block-container__subtitle {
+  font-size: 0.8rem;
+  color: $grey;
+}
+
+.block-container__separator {
+  margin: 2px 0px;
+  background: $greyBorder;
+  opacity: 0.5;
+}

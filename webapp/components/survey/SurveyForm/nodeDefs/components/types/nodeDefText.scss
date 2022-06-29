@@ -29,10 +29,6 @@
 
   &:last-child {
     border-bottom: $formBorder;
-
-    .form-input {
-      width: calc(100% - 27px);
-    }
   }
 
   &:focus-within {
