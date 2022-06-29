@@ -24,10 +24,10 @@ export default class RFileReadData extends RFileSystem {
     super(rChain, 'read-data')
   }
 
-  async initEntitiesNodeDefs(entitiesNodeDefs) {
-    const { chainUuid, survey, cycle } = this.rChain
+  async initEntitiesData() {
+    const { chainUuid, survey, cycle, entities } = this.rChain
 
-    await PromiseUtils.each(entitiesNodeDefs, async (entityDef) => {
+    await PromiseUtils.each(entities, async (entityDef) => {
       // Fetch entity data
       const getEntityData = arenaGet(
         ApiRoutes.rChain.entityData({
@@ -38,6 +38,7 @@ export default class RFileReadData extends RFileSystem {
         })
       )
       const dfEntity = NodeDef.getName(entityDef)
+
       await this.appendContent(setVar(dfEntity, getEntityData))
 
       await this.appendContentToConvertDataTypes({ entityDef })
@@ -77,11 +78,10 @@ export default class RFileReadData extends RFileSystem {
 
   async init() {
     await super.init()
-    this.initEntitiesNodeDefs = this.initEntitiesNodeDefs.bind(this)
 
-    const { listCategories, listTaxonomies, entities } = this.rChain
+    const { listCategories, listTaxonomies } = this.rChain
 
-    await this.initEntitiesNodeDefs(entities)
+    await this.initEntitiesData()
 
     // Append categories and taxoniomies initialization
     await this.appendContent(...listCategories.scripts)
