@@ -238,6 +238,8 @@ export const getDescription = (lang) => (nodeDef) => R.propOr('', lang, getDescr
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
 
+export const isInCycle = (cycle) => (nodeDef) => getCycles(nodeDef).includes(cycle)
+
 export const isAncestorOf = (nodeDefDescendant) => (nodeDef) =>
   R.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
 
