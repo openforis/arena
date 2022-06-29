@@ -53,7 +53,9 @@ export default class RFileReadData extends RFileSystem {
         ancestorDef,
         false
       )(survey).forEach((childDef) => {
-        contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
+        if (NodeDef.isSingleAttribute(childDef)) {
+          contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
+        }
       })
     })(survey)
     await this.appendContent(...contentConvertDataTypes)
