@@ -13,6 +13,7 @@ const RenderByType = {
 
 const BlocksBuilder = ({ dimensions, spec, onUpdateSpec }) => {
   const [type, setType] = useState(null)
+  const builderBlocks = chartsConfig[type].builderBlocks
   return (
     <div className="blocks-builder">
       {Object.keys(chartsConfig).map((configKey) => (
@@ -27,7 +28,7 @@ const BlocksBuilder = ({ dimensions, spec, onUpdateSpec }) => {
         </button>
       ))}
       {type &&
-        chartsConfig[type].builderBlocks.order.map((blockKey) =>
+        builderBlocks.order.map((blockKey) =>
           React.createElement(RenderByType[chartsConfig[type].builderBlocks.blocks[blockKey].type], {
             key: blockKey,
             dimensions,
