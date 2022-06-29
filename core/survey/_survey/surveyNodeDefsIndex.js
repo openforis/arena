@@ -120,3 +120,8 @@ export const initNodeDefsIndex = (survey) => {
   })
   return nodeDefsIndex
 }
+
+export const initAndAssocNodeDefsIndex = (survey) => {
+  const nodeDefsIndex = initNodeDefsIndex(survey)
+  return { ...survey, nodeDefsIndex }
+}

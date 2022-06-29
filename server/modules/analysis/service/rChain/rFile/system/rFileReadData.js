@@ -37,11 +37,30 @@ export default class RFileReadData extends RFileSystem {
           entityUuid: NodeDef.getUuid(entityDef),
         })
       )
-      const dfEntity = NodeDef.getName(entityDef)
-
-      await this.appendContent(setVar(dfEntity, getEntityData))
+      const dfName = NodeDef.getName(entityDef)
+      await this.appendContent(setVar(dfName, getEntityData))
 
       await this.appendContentToConvertDataTypes({ entityDef })
+
+      await this.initMultipleAttributesData({ entityDef })
+    })
+  }
+
+  async initMultipleAttributesData({ entityDef }) {
+    const { chainUuid, survey, cycle } = this.rChain
+
+    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
+    await PromiseUtils.each(multipleAttrDefs, async (multipleAttrDef) => {
+      const getMultipleAttributeData = arenaGet(
+        ApiRoutes.rChain.multipleAttributeData({
+          surveyId: Survey.getId(survey),
+          cycle,
+          chainUuid,
+          attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
+        })
+      )
+      const dfName = NodeDef.getName(multipleAttrDef)
+      await this.appendContent(setVar(dfName, getMultipleAttributeData))
     })
   }
 

@@ -17,3 +17,6 @@ export const taxonomyItemsData = (surveyId, taxonomyUuid) => `${getRChainPath(su
 // entity
 export const entityData = ({ surveyId, cycle, chainUuid, entityUuid }) =>
   `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/entities/${entityUuid}/data`
+
+export const multipleAttributeData = ({ surveyId, cycle, chainUuid, attributeDefUuid }) =>
+  `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/attributes/${attributeDefUuid}/data`
