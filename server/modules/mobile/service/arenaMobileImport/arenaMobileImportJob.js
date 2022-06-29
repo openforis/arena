@@ -31,7 +31,7 @@ export default class ArenaMobileImportJob extends Job {
    * @returns {ArenaMobileImportJob} - The import job.
    */
   constructor(params) {
-    super(ArenaMobileImportJob.type, params, createInnerJobs(params))
+    super(ArenaMobileImportJob.type, params, createInnerJobs())
   }
 
   async onStart() {
