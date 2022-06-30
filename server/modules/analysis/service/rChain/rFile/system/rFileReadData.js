@@ -24,10 +24,10 @@ export default class RFileReadData extends RFileSystem {
     super(rChain, 'read-data')
   }
 
-  async initEntitiesNodeDefs(entitiesNodeDefs) {
-    const { chainUuid, survey, cycle } = this.rChain
+  async initEntitiesData() {
+    const { chainUuid, survey, cycle, entities } = this.rChain
 
-    await PromiseUtils.each(entitiesNodeDefs, async (entityDef) => {
+    await PromiseUtils.each(entities, async (entityDef) => {
       // Fetch entity data
       const getEntityData = arenaGet(
         ApiRoutes.rChain.entityData({
@@ -37,10 +37,30 @@ export default class RFileReadData extends RFileSystem {
           entityUuid: NodeDef.getUuid(entityDef),
         })
       )
-      const dfEntity = NodeDef.getName(entityDef)
-      await this.appendContent(setVar(dfEntity, getEntityData))
+      const dfName = NodeDef.getName(entityDef)
+      await this.appendContent(setVar(dfName, getEntityData))
 
       await this.appendContentToConvertDataTypes({ entityDef })
+
+      await this.initMultipleAttributesData({ entityDef })
+    })
+  }
+
+  async initMultipleAttributesData({ entityDef }) {
+    const { chainUuid, survey, cycle } = this.rChain
+
+    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
+    await PromiseUtils.each(multipleAttrDefs, async (multipleAttrDef) => {
+      const getMultipleAttributeData = arenaGet(
+        ApiRoutes.rChain.multipleAttributeData({
+          surveyId: Survey.getId(survey),
+          cycle,
+          chainUuid,
+          attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
+        })
+      )
+      const dfName = NodeDef.getName(multipleAttrDef)
+      await this.appendContent(setVar(dfName, getMultipleAttributeData))
     })
   }
 
@@ -53,7 +73,9 @@ export default class RFileReadData extends RFileSystem {
         ancestorDef,
         false
       )(survey).forEach((childDef) => {
-        contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
+        if (NodeDef.isSingleAttribute(childDef)) {
+          contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
+        }
       })
     })(survey)
     await this.appendContent(...contentConvertDataTypes)
@@ -75,11 +97,10 @@ export default class RFileReadData extends RFileSystem {
 
   async init() {
     await super.init()
-    this.initEntitiesNodeDefs = this.initEntitiesNodeDefs.bind(this)
 
-    const { listCategories, listTaxonomies, entities } = this.rChain
+    const { listCategories, listTaxonomies } = this.rChain
 
-    await this.initEntitiesNodeDefs(entities)
+    await this.initEntitiesData()
 
     // Append categories and taxoniomies initialization
     await this.appendContent(...listCategories.scripts)
