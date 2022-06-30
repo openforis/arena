@@ -18,5 +18,5 @@ export {
   cleanChains,
 } from '../manager'
 
-export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'
+export { generateScript, fetchNodeData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'

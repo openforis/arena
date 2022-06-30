@@ -25,7 +25,33 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchEntityData({ surveyId, cycle, entityDefUuid, draft: false })
+        const data = await AnalysisService.fetchNodeData({ surveyId, cycle, nodeDefUuid: entityDefUuid, draft: false })
+        res.json(data)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // ====== READ - Chain multiple attribute data
+  app.get(
+    ApiRoutes.rChain.multipleAttributeData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+      attributeDefUuid: ':attributeDefUuid',
+    }),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
+
+        const data = await AnalysisService.fetchNodeData({
+          surveyId,
+          cycle,
+          nodeDefUuid: attributeDefUuid,
+          draft: false,
+        })
         res.json(data)
       } catch (error) {
         next(error)
