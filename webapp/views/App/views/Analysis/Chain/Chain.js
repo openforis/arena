@@ -29,10 +29,11 @@ const ChainComponent = () => {
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
   const chain = useChain()
-  const validation = Chain.getValidation(chain)
   const survey = useSurvey()
+
   const surveyInfo = Survey.getSurveyInfo(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const validation = Chain.getValidation(chain)
 
   const _openRStudio = () => {
     dispatch(ChainActions.openRStudio({ chain }))

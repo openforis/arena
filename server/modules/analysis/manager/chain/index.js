@@ -1,24 +1,47 @@
+import { ChainFactory } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { TableChain } from '@common/model/db'
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ChainValidator from '@common/analysis/chainValidator'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-import * as DB from '../../../../db'
+import * as DB from '@server/db'
 
-import { TableChain } from '../../../../../common/model/db'
-import * as ActivityLog from '../../../../../common/activityLog/activityLog'
-
-import { markSurveyDraft } from '../../../survey/repository/surveySchemaRepositoryUtils'
-import * as ActivityLogRepository from '../../../activityLog/repository/activityLogRepository'
 import * as ChainRepository from '../../repository/chain'
 
 // ====== CREATE
-const _insertChain = async ({ user, surveyId, chain }, client) => {
-  const chainDb = await ChainRepository.insertChain({ surveyId, chain }, client)
-  await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, chainDb, false, client)
+
+export const insertChain = async ({ user, surveyId, chain }, client = DB.client) =>
+  client.tx(async (t) => {
+    const chainDb = await ChainRepository.insertChain({ surveyId, chain }, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, chainDb, false, t)
+    await markSurveyDraft(surveyId, t)
+    return chainDb
+  })
+
+export const create = async ({ user, surveyId, cycle }) => {
+  let newChain = ChainFactory.createInstance({ cycles: [cycle] })
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+  const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+  const validation = await ChainValidator.validateChain({ chain: newChain, defaultLang, survey })
+
+  newChain = Chain.assocValidation(validation)(newChain)
+
+  return insertChain({
+    surveyId,
+    user,
+    chain: newChain,
+  })
 }
 
 // ====== READ
@@ -73,7 +96,7 @@ export const persistChain = async ({ user, surveyId, chain }, client) => {
   const chainDb = await ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain) }, client)
   return !A.isEmpty(chainDb)
     ? _updateChain({ user, surveyId, chain, chainDb }, client)
-    : _insertChain({ user, surveyId, chain }, client)
+    : insertChain({ user, surveyId, chain }, client)
 }
 
 // ====== DELETE
