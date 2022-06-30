@@ -11,11 +11,11 @@ const RenderByType = {
   input: InputBlock,
 }
 
-const BlocksBuilder = ({ dimensions, spec, onUpdateSpec }) => {
+const BlocksBuilder = ({ visible, dimensions, spec, onUpdateSpec }) => {
   const [type, setType] = useState(null)
-  const builderBlocks = chartsConfig[type].builderBlocks
+  const builderBlocks = chartsConfig?.[type]?.builderBlocks
   return (
-    <div className="blocks-builder">
+    <div className={`blocks-builder ${visible ? 'visible' : ''}`}>
       {Object.keys(chartsConfig).map((configKey) => (
         <button
           key={configKey}
@@ -29,12 +29,12 @@ const BlocksBuilder = ({ dimensions, spec, onUpdateSpec }) => {
       ))}
       {type &&
         builderBlocks.order.map((blockKey) =>
-          React.createElement(RenderByType[chartsConfig[type].builderBlocks.blocks[blockKey].type], {
+          React.createElement(RenderByType[builderBlocks?.blocks[blockKey].type], {
             key: blockKey,
             dimensions,
             spec,
             onUpdateSpec,
-            block: chartsConfig[type].builderBlocks.blocks[blockKey],
+            block: builderBlocks?.blocks[blockKey],
           })
         )}
     </div>
@@ -42,8 +42,10 @@ const BlocksBuilder = ({ dimensions, spec, onUpdateSpec }) => {
 }
 
 BlocksBuilder.propTypes = {
+  visible: PropTypes.bool.isRequired,
   spec: PropTypes.string.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
+  dimensions: PropTypes.arrayOf(PropTypes.any),
 }
 
 export default BlocksBuilder

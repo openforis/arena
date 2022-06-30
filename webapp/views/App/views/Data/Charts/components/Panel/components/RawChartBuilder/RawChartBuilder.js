@@ -93,7 +93,7 @@ const populateVegaRawEditorCompleters =
     editor.completers.push(getAggregationsCompleter())
   }
 
-const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
+const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
   const i18n = useI18n()
   const [draftSpec, setDraftSpec] = useState(A.stringify(spec, null, 2))
   const [draft, setDraft] = useState(false)
@@ -127,7 +127,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
   }, [helpOpened])
 
   return (
-    <div className="raw-chart-builder">
+    <div className={`raw-chart-builder ${visible ? 'visiable' : ''}`}>
       <div className="raw-chart-builder__editor">
         <AceEditor
           ref={editorRef}
@@ -181,6 +181,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
 }
 
 RawChartBuilder.propTypes = {
+  visible: PropTypes.bool.isRequired,
   spec: PropTypes.string.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.any,

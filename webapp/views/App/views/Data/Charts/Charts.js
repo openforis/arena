@@ -7,6 +7,8 @@ import Panel from './components/Panel'
 import DataSelector from './components/DataSelector'
 import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 
+import Split from 'react-split'
+
 import { useGetDimensionsFromArena, useChart } from './state/hooks'
 
 const Charts = () => {
@@ -19,16 +21,19 @@ const Charts = () => {
 
   return (
     <div className="charts">
-      <DataSelector
-        setEntityDefUuid={setEntityDefUuid}
-        entityDefUuid={entityDefUuid}
-        nodeDefLabelType={nodeDefLabelType}
-        toggleLabelFunction={toggleLabelFunction}
-        dimensions={dimensions}
-      />
-      <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
+      <Split sizes={[20, 20, 60]} expandToMin={true} minSize={[20, 20, 30]} class="wrap">
+        <DataSelector
+          setEntityDefUuid={setEntityDefUuid}
+          entityDefUuid={entityDefUuid}
+          nodeDefLabelType={nodeDefLabelType}
+          toggleLabelFunction={toggleLabelFunction}
+          dimensions={dimensions}
+        />
 
-      <Chart draft={draft} renderChart={renderChart} src={chartImage} />
+        <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
+
+        <Chart draft={draft} renderChart={renderChart} src={chartImage} />
+      </Split>
     </div>
   )
 }

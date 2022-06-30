@@ -2,9 +2,14 @@
 
 .blocks-builder {
   padding: 12px;
-  display: flex;
   flex-direction: column;
   flex: 1;
+  display: none;
+  
+  &.visible {
+    display: flex;
+  }
+
 }
 
 .block {
