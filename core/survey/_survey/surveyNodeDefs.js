@@ -37,8 +37,9 @@ export const getNodeDefChildren =
   (nodeDef, includeAnalysis = true) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
-    let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
-    // the next line filters the sampling analysis nodeDefs without siblings
+    let childDefs = SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
+    childDefs = includeAnalysis ? childDefs : childDefs.filter((childDef) => !NodeDef.isAnalysis(childDef))
+    // the next line filters the sampling analysis nodeDefs without sibilinings
     childDefs = childDefs.filter(
       (childDef) =>
         !NodeDef.isSampling(childDef) ||

@@ -31,4 +31,7 @@ export const initNodeDefsIndex = (survey) => {
   return surveyUpdated.nodeDefsIndex
 }
 
-export const initAndAssocNodeDefsIndex = (survey) => Surveys.buildAndAssocNodeDefsIndex(survey)
+export const initAndAssocNodeDefsIndex = (survey) => {
+  const nodeDefsIndex = initNodeDefsIndex(survey)
+  return { ...survey, nodeDefsIndex }
+}
