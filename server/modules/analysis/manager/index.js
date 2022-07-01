@@ -1,5 +1,6 @@
 // ====== Chain
 export {
+  create,
   countChains,
   fetchChains,
   fetchChain,

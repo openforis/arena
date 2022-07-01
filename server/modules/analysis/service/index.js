@@ -1,10 +1,11 @@
-export { create } from './create'
 export { update } from './update'
 import { ChainSummaryGenerator } from './chainSummaryGenerator'
 const { generateChainSummary } = ChainSummaryGenerator
 export { generateChainSummary }
 
 export {
+  // ====== CREATE - Chain
+  create,
   // ======  READ - Chain
   countChains,
   fetchChains,
