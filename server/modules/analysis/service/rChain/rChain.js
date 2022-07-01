@@ -157,6 +157,7 @@ class RChain {
       advanced: true,
       draft: true,
     })
+    this._survey = Survey.initAndAssocNodeDefsIndex(this._survey)
 
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId: this.surveyId })
     const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId: this.surveyId })
