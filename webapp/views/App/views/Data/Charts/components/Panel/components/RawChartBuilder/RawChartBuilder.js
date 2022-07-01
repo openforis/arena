@@ -189,7 +189,7 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
 
 RawChartBuilder.propTypes = {
   visible: PropTypes.bool.isRequired,
-  spec: PropTypes.object.isRequired,
+  spec: PropTypes.string.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.any,
 }
