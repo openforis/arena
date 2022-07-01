@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import ModeSelector from './components/ModeSelector'
 import RawChartBuilder from './components/RawChartBuilder'
@@ -22,16 +23,27 @@ const Panel = ({ dimensions, spec, onUpdateSpec }) => {
     <div className="charts_panel__container">
       <ModeSelector modes={panelModes} currentMode={currentMode} onSelectMode={onSelectMode} />
 
-      {currentMode === panelModes.RAW && (
-        <RawChartBuilder dimensions={dimensions} spec={spec} onUpdateSpec={onUpdateSpec} />
-      )}
-      {currentMode === panelModes.BUILDER && (
-        <BlocksBuilder spec={spec} onUpdateSpec={onUpdateSpec} dimensions={dimensions} />
-      )}
+      <RawChartBuilder
+        visible={currentMode === panelModes.RAW}
+        dimensions={dimensions}
+        spec={spec}
+        onUpdateSpec={onUpdateSpec}
+      />
+
+      <BlocksBuilder
+        visible={currentMode === panelModes.BUILDER}
+        spec={spec}
+        onUpdateSpec={onUpdateSpec}
+        dimensions={dimensions}
+      />
     </div>
   )
 }
 
-Panel.propTypes = {}
+Panel.propTypes = {
+  spec: PropTypes.string.isRequired,
+  onUpdateSpec: PropTypes.func.isRequired,
+  dimensions: PropTypes.arrayOf(PropTypes.any),
+}
 
 export default Panel
