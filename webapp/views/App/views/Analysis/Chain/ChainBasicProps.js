@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -13,14 +13,33 @@ import { Checkbox } from '@webapp/components/form'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
+import * as API from '@webapp/service/api'
+
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
 
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
+
+  const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
+
+  useEffect(() => {
+    const fetchChains = async () => {
+      const { chains } = await API.fetchChains({ surveyId: Survey.getId(survey) })
+      setExistsAnotherChainWithSamplingDesign(
+        chains.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.isSamplingDesign(_chain))
+      )
+    }
+
+    fetchChains()
+  }, [survey, chain])
+
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+
+  const samplingDesignDisabled =
+    existsAnotherChainWithSamplingDesign || (Chain.isSamplingDesign(chain) && Boolean(baseUnitNodeDef))
 
   return (
     <>
@@ -45,7 +64,7 @@ export const ChainBasicProps = (props) => {
           checked={Chain.isSamplingDesign(chain)}
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
           onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
-          disabled={Chain.isSamplingDesign(chain) && Boolean(baseUnitNodeDef)}
+          disabled={samplingDesignDisabled}
         />
       </FormItem>
     </>
