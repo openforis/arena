@@ -1,34 +1,29 @@
 @import '~@webapp/style/vars';
 
 .charts {
-  display: flex;
-  flex-direction: row;
+  
   background: $white;
   border-radius: 4px;
   border: 1px solid $greyBorder;
 }
 
-.charts_data-selector__container {
-  width: 180px;
-  overflow-y: scroll;
-  border-right: 1px solid $greyBorder;
-  flex-direction: column;
+.wrap{
   display: flex;
-  padding: 12px;
+  height: 100%;
+    width: 100%;
+}
+.gutter {
+  background-color: #e5e7eb;
+  background-repeat: no-repeat;
+  background-position: 50%;
 }
 
-.charts_panel__container {
-  width: 350px;
-  overflow-y: scroll;
-  border-right: 1px solid $greyBorder;
-  flex-direction: column;
-  display: flex;
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
 }
 
-.charts_panel__container {
-  width: 350px;
-  overflow-y: scroll;
-  border-right: 1px solid $greyBorder;
-  flex-direction: column;
-  display: flex;
+.gutter.gutter-vertical {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  cursor: row-resize;
 }

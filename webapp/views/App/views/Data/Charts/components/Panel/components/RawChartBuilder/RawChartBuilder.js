@@ -13,11 +13,12 @@ import 'ace-builds/src-noconflict/theme-github'
 import 'ace-builds/src-noconflict/ext-searchbox'
 import 'ace-builds/src-noconflict/ext-language_tools'
 
+import './RawChartBuilder.scss'
+import classNames from 'classnames'
+
 const aceLangTools = ace.require('ace/ext/language_tools')
 const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
-
-import './RawChartBuilder.scss'
 
 const getDimensionsCompleter = ({ dimensions }) => {
   return {
@@ -93,7 +94,7 @@ const populateVegaRawEditorCompleters =
     editor.completers.push(getAggregationsCompleter())
   }
 
-const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
+const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
   const i18n = useI18n()
   const [draftSpec, setDraftSpec] = useState(A.stringify(spec, null, 2))
   const [draft, setDraft] = useState(false)
@@ -127,7 +128,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
   }, [helpOpened])
 
   return (
-    <div className="raw-chart-builder">
+    <div className={classNames(`raw-chart-builder`, { visible })}>
       <div className="raw-chart-builder__editor">
         <AceEditor
           ref={editorRef}
@@ -181,6 +182,7 @@ const RawChartBuilder = ({ spec, onUpdateSpec, dimensions }) => {
 }
 
 RawChartBuilder.propTypes = {
+  visible: PropTypes.bool.isRequired,
   spec: PropTypes.string.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.any,
