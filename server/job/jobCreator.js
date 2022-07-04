@@ -10,7 +10,6 @@ import ExportCsvDataJob from '@server/modules/survey/service/export/exportCsvDat
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
-import ArenaMobileImportJob from '@server/modules/mobile/service/arenaMobileImport/arenaMobileImportJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 
@@ -24,7 +23,6 @@ const jobClasses = [
   ExportCsvDataJob,
   TaxonomyImportJob,
   ArenaImportJob,
-  ArenaMobileImportJob,
   SurveyCloneJob,
   SurveyExportJob,
   SurveysRdbRefreshJob,
