@@ -1,0 +1,18 @@
+@import "~@webapp/style/vars";
+
+.blocks-builder {
+  padding: 12px;
+  flex-direction: column;
+  flex: 1;
+  display: none;
+  
+  &.visible {
+    display: flex;
+  }
+
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+}

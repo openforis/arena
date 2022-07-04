@@ -44,7 +44,7 @@
     display: grid;
     grid-template-columns: 1fr;
 
-    &.no-data {
+    &.with-warning {
       grid-template-columns: 1fr 25px;
 
       .entity-label,

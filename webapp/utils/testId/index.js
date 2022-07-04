@@ -51,6 +51,9 @@ export const TestId = {
     importFromCollectTab: 'importFromCollectTab',
     importFromCsvTab: 'importFromCsvTab',
   },
+  dialogConfirm: {
+    strongConfirmInput: 'dialog-confirm__strong-confirm-input',
+  },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,
@@ -143,9 +146,6 @@ export const TestId = {
     surveyCloneFrom: 'survey-clone-from',
     surveyName: 'survey-name',
     surveyLabel: 'survey-label',
-  },
-  surveyDelete: {
-    confirmNameInput: 'survey-delete-confirm-name',
   },
   surveyExport: {
     downloadBtn: 'text="Download"',

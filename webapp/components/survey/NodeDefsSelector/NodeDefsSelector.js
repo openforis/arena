@@ -24,6 +24,7 @@ const NodeDefsSelector = (props) => {
     nodeDefUuidEntity,
     hierarchy,
     canSelectAttributes,
+    showAnalysisAttributes,
     showAncestors,
     showMultipleAttributes,
     onChangeAttributes,
@@ -101,6 +102,7 @@ const NodeDefsSelector = (props) => {
           filterTypes={filterTypes}
           filterChainUuids={filterChainUuids}
           canSelectAttributes={canSelectAttributes}
+          showAnalysisAttributes={showAnalysisAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
           showSiblingsInSingleEntities={true}
@@ -116,6 +118,7 @@ NodeDefsSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.arrayOf(String),
   hierarchy: PropTypes.object,
   canSelectAttributes: PropTypes.bool,
+  showAnalysisAttributes: PropTypes.bool,
   showAncestors: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
   onChangeAttributes: PropTypes.func,
@@ -128,6 +131,7 @@ NodeDefsSelector.defaultProps = {
   nodeDefUuidsAttributes: [],
   hierarchy: null,
   canSelectAttributes: true,
+  showAnalysisAttributes: false,
   showAncestors: true,
   showMultipleAttributes: true,
   onChangeEntity: () => {},

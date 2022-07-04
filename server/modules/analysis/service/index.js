@@ -1,10 +1,11 @@
-export { create } from './create'
 export { update } from './update'
 import { ChainSummaryGenerator } from './chainSummaryGenerator'
 const { generateChainSummary } = ChainSummaryGenerator
 export { generateChainSummary }
 
 export {
+  // ====== CREATE - Chain
+  create,
   // ======  READ - Chain
   countChains,
   fetchChains,
@@ -17,5 +18,5 @@ export {
   cleanChains,
 } from '../manager'
 
-export { generateScript, fetchEntityData, persistResults, persistUserScripts } from './rChain'
+export { generateScript, fetchNodeData, persistResults, persistUserScripts } from './rChain'
 export { generateRStudioToken, checkRStudioToken } from './rStudio'

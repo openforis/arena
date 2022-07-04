@@ -12,7 +12,7 @@ export const keys = {
   ownerUuid: 'ownerUuid',
   ownerName: 'ownerName',
   draft: 'draft',
-  published: 'published',
+  published: ObjectUtils.keys.published,
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
   // Props
@@ -40,7 +40,7 @@ export const cycleOneKey = '0'
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // ====== READ surveyInfo
-export const { getId, getUuid, getProps, getPropsDraft } = ObjectUtils
+export const { getId, getUuid, getProps, getPropsDraft, isPublished } = ObjectUtils
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 
@@ -49,8 +49,6 @@ export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
-
-export const isPublished = R.propEq(keys.published, true)
 
 export const isDraft = R.propEq(keys.draft, true)
 

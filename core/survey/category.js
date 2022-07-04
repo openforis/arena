@@ -9,11 +9,11 @@ import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
 
 export const keys = {
-  uuid: 'uuid',
+  uuid: ObjectUtils.keys.uuid,
   levels: 'levels',
-  props: 'props',
+  props: ObjectUtils.keys.props,
   items: 'items',
-  published: 'published',
+  published: ObjectUtils.keys.published,
   levelsCount: 'levelsCount', // populated only on fetch
 }
 
@@ -32,7 +32,7 @@ export const reportingDataItemExtraDefKeys = {
 // ========
 
 // ====== READ
-export const { getProps, getPropsDraft, getUuid } = ObjectUtils
+export const { getProps, getPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
@@ -45,8 +45,6 @@ export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
 
 export const getLevelsCount = (category) =>
   Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
-
-export const isPublished = R.propOr(false, keys.published)
 
 export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
@@ -132,7 +130,5 @@ export const newCategory = (props = {}, levels = null) => {
 }
 
 // UTILS
-export const isLevelDeleteAllowed = (level) =>
-  R.pipe(getLevelsArray, R.length, (levelsCount) =>
-    R.and(CategoryLevel.getIndex(level) > 0, CategoryLevel.getIndex(level) === levelsCount - 1)
-  )
+export const isLevelDeleteAllowed = (level) => (category) =>
+  !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1

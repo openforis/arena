@@ -9,6 +9,7 @@ import { useSurvey } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 import AttributeSelector from './AttributeSelector'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const AttributesSelector = (props) => {
   const {
@@ -20,6 +21,7 @@ const AttributesSelector = (props) => {
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
+    showAnalysisAttributes,
     showAncestors,
     showAncestorsLabel,
     showLabel,
@@ -29,6 +31,8 @@ const AttributesSelector = (props) => {
   } = props
 
   const survey = useSurvey()
+  const canUseAnalysis = useAuthCanUseAnalysis()
+
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
 
   if (!nodeDefContext) return null
@@ -39,10 +43,11 @@ const AttributesSelector = (props) => {
 
   let childDefs = []
   if (NodeDef.isEntity(nodeDefContext)) {
+    const includeAnalysis = showAnalysisAttributes && canUseAnalysis
     if (showSiblingsInSingleEntities) {
-      childDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+      childDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
     } else {
-      childDefs = Survey.getNodeDefChildren(nodeDefContext)(survey)
+      childDefs = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
     }
   } else {
     childDefs = [nodeDefContext] // Multiple attribute
@@ -101,6 +106,7 @@ AttributesSelector.propTypes = {
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
   showLabel: PropTypes.bool,
+  showAnalysisAttributes: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
   showSiblingsInSingleEntities: PropTypes.bool,
@@ -114,6 +120,7 @@ AttributesSelector.defaultProps = {
   filterChainUuids: [],
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
+  showAnalysisAttributes: false,
   showAncestors: true,
   showAncestorsLabel: true,
   showLabel: false,

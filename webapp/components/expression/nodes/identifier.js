@@ -2,14 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
+import * as Expression from '@core/expressionParser/expression'
 
 import Select from '@webapp/components/form/Select'
 
 const findVariableByValue = ({ variables, value }) => variables.find((variable) => variable.value === value)
 
-const findValue = ({ variables, node }) => {
-  const value = findVariableByValue({ variables, value: node.name })
-  if (!A.isEmpty(value)) return value
+const getSelectedVariable = ({ variables, node }) => {
+  const value = node.type === Expression.types.ThisExpression ? 'this' : node.name
+  const variable = findVariableByValue({ variables, value })
+  if (!A.isEmpty(variable)) return variable
 
   const options = variables.reduce((optionsAggregator, group) => [...optionsAggregator, ...(group.options || [])], [])
   return findVariableByValue({ variables: options, value: node.name })
@@ -37,7 +39,7 @@ const Identifier = ({ node, variables, onChange }) => {
     <Select
       className="identifier"
       options={variablesFiltered}
-      value={findValue({ variables: variablesFiltered, node })}
+      value={getSelectedVariable({ variables: variablesFiltered, node })}
       onChange={(item) => {
         const name = item.value || ''
         const expressionNodeUpdated = { ...node, name }

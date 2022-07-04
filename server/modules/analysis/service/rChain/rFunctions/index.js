@@ -18,6 +18,8 @@ export {
   vector,
   rm,
   sqldf,
+  asCharacter,
+  asLogical,
   asNumeric,
   paste,
   paste0,

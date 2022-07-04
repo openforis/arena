@@ -2,11 +2,29 @@
 
 .dialog-confirm {
   .modal-content {
-    background-color: $white;
     text-align: center;
 
     ul {
       text-align: left;
+    }
+  }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+
+    .highlight {
+      background-color: $yellow;
+      color: black;
+      line-height: 3rem;
+      text-align: center;
+    }
+
+    .dialog-confirm__input-text {
+      background-color: white;
+      padding: 1rem;
+      text-align: center;
     }
   }
 }

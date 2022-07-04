@@ -227,7 +227,7 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
   }, [])
 
   if (itemsUpdated.length > 0) {
-    await CategoryRepository.updateItems(surveyId, itemsUpdated, t)
+    await CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t)
   }
 }
 
@@ -346,20 +346,14 @@ export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key
     }
   })
 
-export const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db) =>
+export const updateItemsProps = async (user, surveyId, categoryUuid, items, client = db) =>
   client.tx(async (t) => {
     const logActivities = items.map((item) =>
-      _newCategoryItemUpdateLogActivity(
-        categoryUuid,
-        item,
-        CategoryItem.keysProps.extra,
-        CategoryItem.getExtra(item),
-        true
-      )
+      _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.keys.props, CategoryItem.getProps(item), true)
     )
     await Promise.all([
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItems(surveyId, items, t),
+      CategoryRepository.updateItemsProps(surveyId, items, t),
     ])
   })
 
@@ -570,3 +564,20 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
 
     return validateCategory(surveyId, categoryUuid, t)
   })
+
+export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = db) => {
+  const activities = items.map((item) => {
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: CategoryItem.getUuid(item),
+      [ActivityLog.keysContent.categoryUuid]: categoryUuid,
+      [ActivityLog.keysContent.levelUuid]: CategoryItem.getLevelUuid(item),
+      [ActivityLog.keysContent.code]: CategoryItem.getCode(item),
+    }
+    return ActivityLog.newActivity(ActivityLog.type.categoryItemDelete, logContent)
+  })
+  await Promise.all([
+    markSurveyDraft(surveyId, t),
+    ActivityLogRepository.insertMany(user, surveyId, activities, t),
+    CategoryRepository.deleteItems(surveyId, items.map(CategoryItem.getUuid), t),
+  ])
+}

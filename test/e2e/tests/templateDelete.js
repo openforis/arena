@@ -20,7 +20,7 @@ export default () =>
         const { name } = template
 
         await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
-        await page.fill(getSelector(TestId.surveyDelete.confirmNameInput), name)
+        await page.fill(getSelector(TestId.dialogConfirm.strongConfirmInput), name)
 
         // Click div[role="dialog"] >> text="Delete"
         await Promise.all([

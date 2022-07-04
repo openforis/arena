@@ -9,7 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
   const {
@@ -28,10 +28,12 @@ const AttributeSelector = (props) => {
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
 
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+    NodeDef.getCycles(nodeDef).includes(cycle) &&
     (filterFunction === null || filterFunction(nodeDef)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes)) &&
     (R.isEmpty(filterChainUuids) ||
