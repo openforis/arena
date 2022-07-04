@@ -11,13 +11,13 @@ import BatchPersister from '@server/db/batchPersister'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
-import * as ArenaSurveyFileZip from '@server/modules/mobile/service/arenaMobileImport/model/arenaSurveyFileZip'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 const NODES_INSERT_BATCH_SIZE = 10000
 
-export default class RecordsImportJob extends Job {
+export default class RecordsMobileImportJob extends Job {
   constructor(params) {
-    super(RecordsImportJob.type, params)
+    super(RecordsMobileImportJob.type, params)
   }
 
   async execute() {
@@ -86,4 +86,4 @@ export default class RecordsImportJob extends Job {
   }
 }
 
-RecordsImportJob.type = 'RecordsImportJob'
+RecordsMobileImportJob.type = 'RecordsMobileImportJob'
