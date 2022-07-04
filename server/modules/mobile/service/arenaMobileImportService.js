@@ -4,7 +4,7 @@ import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/aren
 
 // ARENA SURVEY IMPORT
 export const startArenaMobileImportJob = ({ user, filePath, survey, surveyId }) => {
-  const job = new ArenaImportJob({ user, filePath, survey, surveyId })
+  const job = new ArenaImportJob({ user, filePath, survey, surveyId, mobile: true })
 
   JobManager.executeJobThread(job)
 

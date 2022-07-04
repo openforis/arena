@@ -22,7 +22,15 @@ export default class RecordsImportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, survey, arenaSurveyFileZip, includingUsers, userUuidNewByUserUuid } = this.context
+    const {
+      surveyId: _surveyId,
+      survey,
+      arenaSurveyFileZip,
+      includingUsers,
+      userUuidNewByUserUuid,
+      mobile,
+    } = this.context
+    let surveyId = mobile ? Survey.getId(survey) : _surveyId
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
@@ -52,12 +60,14 @@ export default class RecordsImportJob extends Job {
 
       // insert record
       let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
-      const ownerUuid = includingUsers
-        ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
-          userUuidNewByUserUuid[Record.getOwnerUuid(record)]
-        : // ignore owner in imported file; consider current user as owner
-          User.getUuid(this.user)
-      record = Record.assocOwnerUuid(ownerUuid)(record)
+      if (!mobile) {
+        const ownerUuid = includingUsers
+          ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
+            userUuidNewByUserUuid[Record.getOwnerUuid(record)]
+          : // ignore owner in imported file; consider current user as owner
+            User.getUuid(this.user)
+        record = Record.assocOwnerUuid(ownerUuid)(record)
+      }
 
       const recordToStore = this.prepareRecordToStore(record)
       await RecordManager.insertRecord(this.user, surveyId, recordToStore, true, this.tx)

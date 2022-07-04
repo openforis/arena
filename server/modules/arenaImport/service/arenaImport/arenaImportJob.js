@@ -12,7 +12,6 @@ import CategoriesImportJob from './jobs/categoriesImportJob'
 import TaxonomiesImportJob from './jobs/taxonomiesImportJob'
 import NodeDefsImportJob from './jobs/nodeDefsImportJob'
 import RecordsImportJob from './jobs/recordsImportJob'
-import RecordsMobileImportJob from './jobs/recordsMobileImportJob'
 import FilesImportJob from './jobs/filesImportJob'
 import UsersImportJob from './jobs/usersImportJob'
 import ChainsImportJob from './jobs/chainsImportJob'
@@ -35,7 +34,7 @@ const createInnerJobs = (params) => {
           ...(backup ? [new ActivityLogImportJob()] : []),
         ]
       : []),
-    ...(backup ? [mobile ? new RecordsMobileImportJob() : new RecordsImportJob()] : []),
+    ...(backup ? [new RecordsImportJob()] : []),
     ...(backup ? [new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
