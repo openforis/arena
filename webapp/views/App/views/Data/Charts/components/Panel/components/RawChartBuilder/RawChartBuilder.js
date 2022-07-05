@@ -101,9 +101,11 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
   const [helpOpened, setHelpOpened] = useState(false)
   const editorRef = useRef()
 
-  const discardChanges = useCallback(() => {
+  const setSpecAsValue = useCallback(() => {
     editorRef.current.editor.session.setValue(A.stringify(spec, null, 2))
-  }, [])
+  }, [spec])
+
+  const discardChanges = useCallback(setSpecAsValue, [setSpecAsValue])
 
   const saveChanges = useCallback(() => {
     onUpdateSpec(draftSpec)
@@ -117,6 +119,10 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
   useEffect(() => {
     setDraft(false)
   }, [spec])
+
+  useEffect(() => {
+    setSpecAsValue()
+  }, [setSpecAsValue, visible])
 
   useEffect(() => {
     const { editor } = editorRef.current
@@ -183,7 +189,7 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
 
 RawChartBuilder.propTypes = {
   visible: PropTypes.bool.isRequired,
-  spec: PropTypes.string.isRequired,
+  spec: PropTypes.object.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.any,
 }
