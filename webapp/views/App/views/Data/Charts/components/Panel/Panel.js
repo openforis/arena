@@ -41,7 +41,7 @@ const Panel = ({ dimensions, spec, onUpdateSpec }) => {
 }
 
 Panel.propTypes = {
-  spec: PropTypes.string.isRequired,
+  spec: PropTypes.object.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.arrayOf(PropTypes.any),
 }
