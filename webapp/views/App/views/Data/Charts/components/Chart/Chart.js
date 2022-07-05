@@ -23,8 +23,8 @@ const Chart = ({ src, draft, renderChart }) => {
 }
 
 Chart.propTypes = {
-  src: PropTypes.string.isRequired,
-  draft: PropTypes.bool.isRequired,
+  src: PropTypes.string,
+  draft: PropTypes.bool,
   renderChart: PropTypes.func.isRequired,
 }
 
