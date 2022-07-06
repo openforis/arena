@@ -253,7 +253,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
 export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) =>
   db.tx(async (t) => {
-    const { accessRequestUuid, surveyName, surveyLabel, role } = accessRequestAccept
+    const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
     // 1) validation
     // check access request exists

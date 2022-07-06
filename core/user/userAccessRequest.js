@@ -14,7 +14,7 @@ export const keysProps = {
   institution: 'institution',
   purpose: 'purpose',
   surveyName: 'surveyName',
-  template: 'template',
+  templateUuid: 'templateUuid',
 }
 
 export const keysPropsNamesLowercase = Object.values(keysProps).map((prop) => prop.toLowerCase())
@@ -33,7 +33,7 @@ export const editableFields = [
   { name: `props.${keysProps.country}` },
   { name: `props.${keysProps.purpose}`, required: true },
   { name: `props.${keysProps.surveyName}`, required: true, normalizeFn: normalizeName },
-  { name: `props.${keysProps.template}`, required: false },
+  { name: `props.${keysProps.templateUuid}`, required: false },
 ]
 
 export const getEmail = A.prop(keys.email)

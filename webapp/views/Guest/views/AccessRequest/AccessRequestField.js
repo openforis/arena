@@ -17,7 +17,7 @@ import { LoadingBar } from '@webapp/components'
 
 const itemsFetchFunctionByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: () => Countries.list(),
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.template}`]: async () =>
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: async () =>
     API.fetchSurveyTemplatesPublished(),
 }
 
@@ -26,7 +26,7 @@ const toDropdownItemsFunctionByFieldName = {
     key: item.code,
     value: item.name,
   }),
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.template}`]: (item) => ({
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: (item) => ({
     key: Survey.getUuid(item),
     value: Survey.getLabel(item, Survey.getDefaultLanguage(item)),
   }),
