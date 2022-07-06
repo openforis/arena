@@ -43,8 +43,7 @@ const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dime
 
 BlocksBuilder.propTypes = {
   visible: PropTypes.bool.isRequired,
-  spec: PropTypes.object.isRequired,
-  onUpdateSpec: PropTypes.func.isRequired,
+
   dimensions: PropTypes.arrayOf(PropTypes.any),
 }
 
