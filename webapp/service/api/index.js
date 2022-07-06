@@ -37,7 +37,7 @@ export {
   downloadExportedDataToCSVUrl,
 } from './data'
 export { fetchAvailableMapPeriods, testMapApiKey } from './map'
-export { fetchSurveys, insertSurvey } from './survey'
+export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
 export {
   fetchNodeDef,
   fetchNodeDefs,

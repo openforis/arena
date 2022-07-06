@@ -95,6 +95,22 @@ export const init = (app) => {
     }
   })
 
+  app.get('/surveyTemplates', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+
+      const list = await SurveyService.fetchUserSurveysInfo({
+        user,
+        draft: false,
+        template: true,
+      })
+
+      res.json({ list })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
