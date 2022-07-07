@@ -416,11 +416,12 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
       (
         SELECT
           v.taxon_uuid,
-          json_agg( json_build_object(${DbUtils.getPropColCombined(
-            TaxonVernacularName.keysProps.name,
-            draft,
-            'v.'
-          )}, v.uuid::text) ) AS vernacular_names
+          json_agg(
+            json_build_object(
+                '${TaxonVernacularName.keys.uuid}', v.uuid,
+                '${TaxonVernacularName.keys.props}', v.props${draft ? ' || v.props_draft' : ''}
+            )
+          ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
             
