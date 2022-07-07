@@ -20,7 +20,6 @@ const useChart = (query, table, setTable) => {
     setDraft(true)
   }, [spec])
 
-  console.log('config', config)
   return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartImage, renderChart }
 }
 

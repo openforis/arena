@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect, useMemo } from 'react'
-import { uuidv4 } from '@core/uuid'
 
 const defaultConfig = {
   type: 'pie',
@@ -10,10 +9,28 @@ const defaultConfig = {
 const getItemsByPath = (config) =>
   (config?.items || []).reduce((acc, item) => Object.assign({}, acc, { [item.blockPath]: item }), {})
 
+const addItemByPath = (blockPath, item) => (obj) => {
+  let _value = obj[blockPath]?.value || []
+  _value.push(item)
+  obj[blockPath] = { ...(obj[blockPath] || { blockPath }), value: _value }
+  return obj
+}
+
+const updateItemByPathAndKey = (blockPath, value) => (obj) => {
+  let _value = obj[blockPath]?.value || []
+  _value = _value.map((_val) => {
+    if (_val.key === value.key) {
+      return value
+    }
+    return _val
+  })
+  obj[blockPath] = { ...(obj[blockPath] || { blockPath }), value: _value }
+  return obj
+}
+
 const useChartConfig = ({ table, setTable }) => {
-  const [initialConfig, setInitialConfig] = useState(defaultConfig)
-  const [config, setConfig] = useState(_config)
-  const [configItemsByPath, setConfigItemsByPath] = useState(defaultConfig)
+  const [config, setConfig] = useState(defaultConfig)
+  const [configItemsByPath, setConfigItemsByPath] = useState({})
 
   useEffect(() => {
     setConfigItemsByPath(getItemsByPath(config))
@@ -29,12 +46,70 @@ const useChartConfig = ({ table, setTable }) => {
   const changeType = useCallback((type) => {
     setConfig((config) => Object.assign({}, config, { type }))
   }, [])
+  const addValue = useCallback(
+    (payload) => {
+      const { blockPath, value } = payload
+
+      setConfigItemsByPath((_configItemsByPath) => {
+        const newItems = Object.assign({}, _configItemsByPath)
+        addItemByPath(blockPath, value)(newItems)
+        return newItems
+      })
+    },
+    [setConfigItemsByPath]
+  )
+
+  const replaceValue = useCallback(
+    (payload) => {
+      const { blockPath, value } = payload
+      setConfigItemsByPath((_configItemsByPath) => {
+        const newItems = Object.assign({}, _configItemsByPath)
+        newItems[blockPath] = { ...(newItems[blockPath] || { blockPath }), value }
+        return newItems
+      })
+    },
+    [setConfigItemsByPath]
+  )
+
+  const removeValue = useCallback(
+    (payload) => {
+      const { blockPath, value } = payload
+
+      setConfigItemsByPath((_configItemsByPath) => {
+        const newItems = Object.assign({}, _configItemsByPath)
+        let _value = newItems[blockPath]?.value || []
+        _value = _value.filter((_val) => _val.key !== value.key)
+        newItems[blockPath] = { ...(newItems[blockPath] || { blockPath }), value: _value }
+        return newItems
+      })
+    },
+    [setConfigItemsByPath]
+  )
+
+  const updateValue = useCallback(
+    (payload) => {
+      const { blockPath, value } = payload
+
+      setConfigItemsByPath((_configItemsByPath) => {
+        const newItems = Object.assign({}, _configItemsByPath)
+
+        updateItemByPathAndKey(blockPath, value)(newItems)
+
+        return newItems
+      })
+    },
+    [setConfigItemsByPath]
+  )
 
   const configActions = useMemo(() => {
     return {
       changeType,
+      addValue,
+      updateValue,
+      removeValue,
+      replaceValue,
     }
-  }, [changeType])
+  }, [changeType, addValue, updateValue, removeValue, replaceValue])
 
   return { config, configItemsByPath, configActions }
 }

@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 
 import { chartsConfig } from '../../../../state/config'
 import ContainerBlock from './blocks/Container'
-import InputBlock from './blocks/Input'
+import SelectBlock from './blocks/Select'
 import './BlocksBuilder.scss'
 
 const RenderByType = {
   container: ContainerBlock,
-  input: InputBlock,
+  select: SelectBlock,
 }
 
 const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dimensions, blockPath = '' }) => {
