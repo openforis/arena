@@ -81,7 +81,7 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
 }
 
 DataSelector.propTypes = {
-  entityDefUuid: PropTypes.string.isRequired,
+  entityDefUuid: PropTypes.string,
   setEntityDefUuid: PropTypes.func.isRequired,
   toggleLabelFunction: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
