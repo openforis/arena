@@ -16,6 +16,7 @@ const useChartRender = (spec, query) => {
   const renderChart = useCallback(async () => {
     try {
       if (!query) return
+      setChartImage(null)
       const { data } = await axios.post(getUrl({ surveyId, query }), {
         cycle,
         query: A.stringify(query),
