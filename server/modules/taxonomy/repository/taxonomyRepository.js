@@ -204,10 +204,10 @@ export const fetchTaxaWithVernacularNames = async (
           ) as names
         FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
         ${
-          draft
-            ? ''
-            : `--exclude not published vernacular names if not draft
+          !backup && !draft
+            ? `--exclude not published vernacular names if not draft
           WHERE vn.props <> '{}'::jsonb`
+            : ''
         }
         GROUP BY vn.taxon_uuid, (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.lang}'
       )
@@ -224,12 +224,12 @@ export const fetchTaxaWithVernacularNames = async (
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
       ${
-        draft
-          ? ''
-          : `--exclude not published taxonomies if not draft
+        !backup && !draft
+          ? `--exclude not published taxonomies if not draft
         JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
           ON t.taxonomy_uuid = taxonomy.uuid 
           AND taxonomy.props <> '{}'::jsonb`
+          : ''
       }
       LEFT OUTER JOIN
           vernacular_names vn
