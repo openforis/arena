@@ -17,6 +17,8 @@ export const useAcceptRequestPanel = (props) => {
   const { userAccessRequest, onRequestAccepted } = props
   const { uuid: accessRequestUuid, email, props: requestProps } = userAccessRequest
 
+  const { templateUuid } = requestProps
+
   const dispatch = useDispatch()
   const i18n = useI18n()
 
@@ -26,9 +28,8 @@ export const useAcceptRequestPanel = (props) => {
     surveyName: requestProps.surveyName,
     surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
     role: AuthGroup.groupNames.surveyManager,
+    templateUuid,
   })
-
-  const { templateUuid } = requestProps
 
   const { role, surveyName } = accessRequestAccept
 

@@ -40,8 +40,10 @@ export const UsersAccessRequest = () => {
   const columnContentRendererByFieldName = {
     [`props.${UserAccessRequest.keysProps.country}`]: ({ fieldValue }) =>
       Countries.getCountryName({ code: fieldValue }),
-    [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue }) => {
-      if (!fieldValue) return ''
+    [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue, i18n }) => {
+      if (!fieldValue) {
+        return i18n.t('usersAccessRequestView.acceptRequest.templateNotSelected')
+      }
       const template = surveyTemplates.find((t) => t.uuid === fieldValue)
       return Survey.getLabel(template, Survey.getDefaultLanguage(template))
     },
@@ -75,7 +77,7 @@ export const UsersAccessRequest = () => {
             renderItem: ({ item }) => {
               const fieldValue = Objects.path(name.split('.'))(item) || ''
               const renderer = columnContentRendererByFieldName[name]
-              const label = renderer ? renderer({ fieldValue }) : fieldValue
+              const label = renderer ? renderer({ fieldValue, i18n }) : fieldValue
               return <LabelWithTooltip key={name} label={label} />
             },
             width: name === 'email' ? '20rem' : '1fr',

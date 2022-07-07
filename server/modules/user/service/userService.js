@@ -262,7 +262,7 @@ const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t)
   const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
   if (templateId) {
     const job = new SurveyCloneJob({ user, surveyId: templateId, surveyInfoTarget })
-    await job.start(t)
+    await job.start() // do not clone survey under the same transaction; if job fails, the temporary survey will be deleted automatically;
     if (job.isFailed()) {
       throw new SystemError('systemError.userAccessRequest.acceptFailed.errorCloningTemplate', { templateUuid })
     } else {
