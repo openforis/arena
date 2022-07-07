@@ -25,6 +25,7 @@ import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
+import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 
 // ====== CREATE
 
@@ -251,6 +252,27 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
   }
 }
 
+const _fetchSurveyTemplateId = async ({ user, templateUuid }) => {
+  const templates = await SurveyManager.fetchUserSurveysInfo({ user, draft: false, template: true })
+  const template = templates.find((t) => t.uuid === templateUuid)
+  return template ? Survey.getId(template) : null
+}
+
+const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t) => {
+  const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
+  if (templateId) {
+    const job = new SurveyCloneJob({ user, surveyId: templateId, surveyInfoTarget })
+    await job.start(t)
+    if (job.isFailed()) {
+      throw new SystemError('systemError.userAccessRequest.acceptFailed.errorCloningTemplate', { templateUuid })
+    } else {
+      const surveyId = job.result.surveyId
+      return await SurveyManager.fetchSurveyById({ surveyId, draft: true })
+    }
+  }
+  return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false }, t)
+}
+
 export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) =>
   db.tx(async (t) => {
     const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
@@ -294,7 +316,8 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       label: surveyLabel,
       languages: ['en'],
     })
-    const survey = await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false }, t)
+
+    const survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
 
     // 3) find group to associate to the user
     let group = null

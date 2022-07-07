@@ -89,11 +89,14 @@ export const insertUser = async (
     await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
 
     // accept user access request (if any)
-    await UserAccessRequestRepository.updateUserAccessRequestStatus({
-      email,
-      status: UserAccessRequest.status.ACCEPTED,
-      userUuid: User.getUuid(user),
-    })
+    await UserAccessRequestRepository.updateUserAccessRequestStatus(
+      {
+        email,
+        status: UserAccessRequest.status.ACCEPTED,
+        userUuid: User.getUuid(user),
+      },
+      t
+    )
 
     return newUser
   })
