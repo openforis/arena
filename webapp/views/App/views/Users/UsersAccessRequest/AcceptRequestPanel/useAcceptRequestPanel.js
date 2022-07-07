@@ -34,7 +34,7 @@ export const useAcceptRequestPanel = (props) => {
 
   const [validation, setValidation] = useState(null)
 
-  const [templateLabel, setTemplateLabel] = useState(null)
+  const [templateLabel, setTemplateLabel] = useState('')
 
   // load template label (if template is defined in the access request)
   useEffect(() => {
