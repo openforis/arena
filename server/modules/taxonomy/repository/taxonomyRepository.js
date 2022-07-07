@@ -187,7 +187,7 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
   )
 
 export const fetchTaxaWithVernacularNames = async (
-  { surveyId, taxonomyUuid, draft = false, backup = false, limit = null, offset = 0 },
+  { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
   client = db
 ) =>
   client.map(
@@ -199,10 +199,16 @@ export const fetchTaxaWithVernacularNames = async (
           array_agg(
             json_build_object(
               '${TaxonVernacularName.keys.uuid}', vn.uuid,
-              '${TaxonVernacularName.keys.props}', vn.props || vn.props_draft
+              '${TaxonVernacularName.keys.props}', vn.props${draft ? ' || vn.props_draft' : ''}
             )
           ) as names
         FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+        ${
+          draft
+            ? ''
+            : `--exclude not published vernacular names if not draft
+          WHERE vn.props <> '{}'::jsonb`
+        }
         GROUP BY vn.taxon_uuid, (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.lang}'
       )
 
@@ -217,20 +223,27 @@ export const fetchTaxaWithVernacularNames = async (
           ) as vernacular_names
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
+      ${
+        draft
+          ? ''
+          : `--exclude not published taxonomies if not draft
+        JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
+          ON t.taxonomy_uuid = taxonomy.uuid 
+          AND taxonomy.props <> '{}'::jsonb`
+      }
       LEFT OUTER JOIN
           vernacular_names vn
       ON
           vn.taxon_uuid = t.uuid
-      WHERE
-          t.taxonomy_uuid = $1
+      ${taxonomyUuid ? 'WHERE t.taxonomy_uuid = $/taxonomyUuid/' : ''}
       GROUP BY
-          t.id
+          t.taxonomy_uuid, t.id
       ORDER BY
           t.id
       LIMIT ${limit ? limit : 'ALL'} 
-      OFFSET $2
+      OFFSET $/offset/
     `,
-    [taxonomyUuid, offset],
+    { taxonomyUuid, offset },
     (record) => DB.transformCallback(record, draft, true, backup)
   )
 
@@ -389,55 +402,6 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
     `,
     [uuid],
     (record) => dbTransformCallback(record, draft, true)
-  )
-
-// ============== Index
-export const fetchIndex = async (surveyId, draft = false, client = db) =>
-  client.map(
-    `
-    SELECT
-      t.taxonomy_uuid,
-      t.uuid,
-      t.props,
-      t.props_draft,
-      v.vernacular_names
-    FROM
-      ${getSurveyDBSchema(surveyId)}.taxon t
-    
-    ${
-      draft
-        ? ''
-        : `--exclude not published taxonomies if not draft
-      JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
-        ON t.taxonomy_uuid = taxonomy.uuid 
-        AND taxonomy.props <> '{}'::jsonb`
-    }
-    LEFT OUTER JOIN
-      (
-        SELECT
-          v.taxon_uuid,
-          json_agg(
-            json_build_object(
-                '${TaxonVernacularName.keys.uuid}', v.uuid,
-                '${TaxonVernacularName.keys.props}', v.props${draft ? ' || v.props_draft' : ''}
-            )
-          ) AS vernacular_names
-        FROM
-          ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
-            
-        ${
-          draft
-            ? ''
-            : `--exclude not published vernacular names if not draft
-          WHERE v.props <> '{}'::jsonb`
-        }  
-        GROUP BY
-          v.taxon_uuid ) v
-    ON
-      v.taxon_uuid = t.uuid
-    `,
-    [],
-    (indexItem) => dbTransformCallback(indexItem, draft, true)
   )
 
 // ============== UPDATE

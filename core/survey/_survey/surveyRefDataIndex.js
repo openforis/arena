@@ -6,7 +6,6 @@ import * as Node from '@core/record/node'
 
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 import { Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
 
@@ -116,17 +115,6 @@ export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUu
 
 // ====== UPDATE
 
-const _groupVernacularNamesByLang = (vernacularNames) => {
-  const vernacularNamesByLang = {}
-  vernacularNames?.forEach((vernacularName) => {
-    const lang = TaxonVernacularName.getLang(vernacularName)
-    const vernacularNamesPerLang = vernacularNamesByLang[lang] || []
-    vernacularNamesPerLang.push(vernacularName)
-    vernacularNamesByLang[lang] = vernacularNamesPerLang
-  })
-  return vernacularNamesByLang
-}
-
 export const assocRefData =
   ({ categoryItemsRefData = [], taxaIndexRefData = [] }) =>
   (survey) => {
@@ -141,7 +129,7 @@ export const assocRefData =
     const taxonIndex = {}
     const taxonUuidIndex = {}
     taxaIndexRefData.forEach((item) => {
-      item.vernacularNames = _groupVernacularNamesByLang(item.vernacularNames)
+      // item.vernacularNames = _groupVernacularNamesByLang(item.vernacularNames)
       const uuid = Taxon.getUuid(item)
       taxonIndex[uuid] = item
       Objects.setInPath({ obj: taxonUuidIndex, path: [Taxon.getTaxonomyUuid(item), Taxon.getCode(item)], value: uuid })
