@@ -1,15 +1,13 @@
 import * as R from 'ramda'
 
-import * as ObjectUtils from '@core/objectUtils'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
 
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxon from '@core/survey/taxon'
 import * as SurveyNodeDefs from './surveyNodeDefs'
+import { Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
 
 /*
  * CategoryItemUuidIndex : {
@@ -58,8 +56,7 @@ const categoryItemNullParentUuid = 'null'
 
 // ==== category index
 
-export const getCategoryItemByUuid = (categoryItemUuid) =>
-  R.pathOr(null, [keys.refData, keys.categoryItemIndex, categoryItemUuid])
+export const getCategoryItemByUuid = (itemUuid) => (survey) => Surveys.getCategoryItemByUuid({ survey, itemUuid })
 
 const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
   R.path([keys.refData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
@@ -88,25 +85,17 @@ export const getCategoryItemUuidAndCodeHierarchy =
 
 export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codesPath }) =>
-  (survey) => {
-    const itemUuid = codesPath.reduce(
-      (currentParentUuid, code) =>
-        getCategoryItemUuid({ categoryUuid, parentItemUuid: currentParentUuid, code })(survey),
-      categoryItemNullParentUuid
-    )
-    return getCategoryItemByUuid(itemUuid)(survey)
-  }
+  (survey) =>
+    Surveys.getCategoryItemByCodePaths({ survey, categoryUuid, codePaths: codesPath })
 
 // ==== taxonomy index
 
-export const getTaxonByUuid = (taxonUuid) => R.path([keys.refData, keys.taxonIndex, taxonUuid])
+export const getTaxonByUuid = (taxonUuid) => (survey) => Surveys.getTaxonByUuid({ survey, taxonUuid })
 
 export const getTaxonByCode =
   ({ taxonomyUuid, taxonCode }) =>
-  (survey) => {
-    const taxonUuid = R.path([keys.refData, keys.taxonUuidIndex, taxonomyUuid, taxonCode])(survey)
-    return taxonUuid ? getTaxonByUuid(taxonUuid)(survey) : null
-  }
+  (survey) =>
+    Surveys.getTaxonByCode({ survey, taxonomyUuid, taxonCode })
 
 export const getTaxonUuid = (nodeDef, taxonCode) => (survey) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
@@ -121,54 +110,34 @@ export const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) =
   return vernacularNamesUuidByName[vernacularName]
 }
 
-export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => (survey) => {
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-  const vernacularNamesUuidByName = Taxon.getVernacularNames(taxon)
-  return Object.values(vernacularNamesUuidByName).includes(vernacularNameUuid)
-}
+export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => (survey) =>
+  Surveys.includesTaxonVernacularName({ survey, nodeDef, taxonCode, vernacularNameUuid })
 
 // ====== UPDATE
-
-const _getCategoryIndex = R.reduce((accIndex, row) => {
-  ObjectUtils.setInPath(
-    [
-      keys.categoryItemUuidIndex,
-      CategoryLevel.getCategoryUuid(row),
-      CategoryItem.getParentUuid(row) || categoryItemNullParentUuid,
-      CategoryItem.getCode(row),
-    ],
-    CategoryItem.getUuid(row)
-  )(accIndex)
-
-  ObjectUtils.setInPath([keys.categoryItemIndex, CategoryItem.getUuid(row)], row)(accIndex)
-
-  return accIndex
-}, {})
-
-const _getTaxonomyIndex = R.reduce((accIndex, row) => {
-  const taxonomyUuid = Taxon.getTaxonomyUuid(row)
-  const taxonUuid = Taxon.getUuid(row)
-  const taxonCode = Taxon.getCode(row)
-
-  ObjectUtils.setInPath([keys.taxonUuidIndex, taxonomyUuid, taxonCode], taxonUuid)(accIndex)
-
-  const vernacularNamesMerged = R.pipe(R.prop(Taxon.keys.vernacularNames), R.mergeAll)(row)
-  const taxonUpdated = { ...row, [Taxon.keys.vernacularNames]: vernacularNamesMerged }
-  ObjectUtils.setInPath([keys.taxonIndex, taxonUuid], taxonUpdated)(accIndex)
-
-  return accIndex
-}, {})
 
 export const assocRefData =
   ({ categoryItemsRefData = [], taxaIndexRefData = [] }) =>
   (survey) => {
-    const refDataIndex = {
-      ..._getCategoryIndex(categoryItemsRefData),
-      ..._getTaxonomyIndex(taxaIndexRefData),
-    }
+    const itemsByCategoryUuid = {}
+    categoryItemsRefData.forEach((categoryItemRefData) => {
+      const categoryUuid = CategoryLevel.getCategoryUuid(categoryItemRefData)
+      const itemsInCategory = itemsByCategoryUuid[categoryUuid] || []
+      itemsInCategory.push(categoryItemRefData)
+      itemsByCategoryUuid[categoryUuid] = itemsInCategory
+    })
+
+    const taxonIndex = {}
+    const taxonUuidIndex = {}
+    taxaIndexRefData.forEach((item) => {
+      // item.vernacularNames = _groupVernacularNamesByLang(item.vernacularNames)
+      const uuid = Taxon.getUuid(item)
+      taxonIndex[uuid] = item
+      Objects.setInPath({ obj: taxonUuidIndex, path: [Taxon.getTaxonomyUuid(item), Taxon.getCode(item)], value: uuid })
+    })
+    const refData = SurveyRefDataFactory.createInstance({ itemsByCategoryUuid, taxonIndex, taxonUuidIndex })
+
     return {
       ...survey,
-      [keys.refData]: refDataIndex,
+      [keys.refData]: refData,
     }
   }

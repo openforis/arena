@@ -106,9 +106,9 @@ export const generateResetPasswordUuid = async (email, client = db) => {
   if (!user) {
     throw new Error(Validation.messageKeys.user.emailNotFound)
   }
-  if (User.isInvited(user)) {
-    throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
-  }
+  // if (User.isInvited(user)) {
+  //   throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
+  // }
   const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
   return { uuid, user }
 }

@@ -43,7 +43,7 @@ const BlocksBuilder = ({ visible, dimensions, spec, onUpdateSpec }) => {
 
 BlocksBuilder.propTypes = {
   visible: PropTypes.bool.isRequired,
-  spec: PropTypes.string.isRequired,
+  spec: PropTypes.object.isRequired,
   onUpdateSpec: PropTypes.func.isRequired,
   dimensions: PropTypes.arrayOf(PropTypes.any),
 }
