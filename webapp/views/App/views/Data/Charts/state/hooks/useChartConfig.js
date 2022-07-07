@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect, useMemo } from 'react'
-import { uuidv4 } from '@core/uuid'
 
 const defaultConfig = {
   type: 'pie',
@@ -11,7 +10,6 @@ const getItemsByPath = (config) =>
   (config?.items || []).reduce((acc, item) => Object.assign({}, acc, { [item.blockPath]: item }), {})
 
 const useChartConfig = ({ table, setTable }) => {
-  const [initialConfig, setInitialConfig] = useState(defaultConfig)
   const [config, setConfig] = useState(_config)
   const [configItemsByPath, setConfigItemsByPath] = useState(defaultConfig)
 
