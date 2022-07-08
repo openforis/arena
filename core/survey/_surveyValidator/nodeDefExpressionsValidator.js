@@ -68,8 +68,14 @@ const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
     ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
     : null
 
-const _validateExpression = async (survey, nodeDef, dependencyType, nodeDefExpressions, index) => {
-  const nodeDefExpression = nodeDefExpressions[index]
+const _validateExpression = async ({
+  survey,
+  nodeDef,
+  dependencyType,
+  nodeDefExpressions,
+  nodeDefExpression,
+  index,
+}) => {
   const validateApplyIfUniqueness = applyIfUniquenessByDependencyType[dependencyType]
 
   const validation = await Validator.validate(nodeDefExpression, {
@@ -103,7 +109,7 @@ export const validate = async (survey, nodeDef, dependencyType) => {
 
   const validations = await Promise.all(
     nodeDefExpressions.map((nodeDefExpression, index) =>
-      _validateExpression(survey, nodeDef, dependencyType, nodeDefExpressions, index)
+      _validateExpression({ survey, nodeDef, dependencyType, nodeDefExpressions, nodeDefExpression, index })
     )
   )
 
