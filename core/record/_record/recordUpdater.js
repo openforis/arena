@@ -52,13 +52,15 @@ export const mergeNodes =
     return recordUpdated
   }
 
-export const assocNode = (node) => (record) => {
-  if (Node.isDeleted(node)) {
-    return deleteNode(node)(record)
-  } else {
-    return Records.addNode(node)(record)
+export const assocNode =
+  (node, { sideEffect = false } = {}) =>
+  (record) => {
+    if (Node.isDeleted(node)) {
+      return deleteNode(node)(record)
+    } else {
+      return Records.addNode(node, { sideEffect })(record)
+    }
   }
-}
 
 /**
  * Adds new nodes to the record.
@@ -67,12 +69,13 @@ export const assocNode = (node) => (record) => {
  * @param {!object} params - The parameters.
  * @param {!object} [params.nodes] - The nodes to be added.
  * @param {boolean} [params.updateNodesIndex = true] - True if the nodes must be added to the index (slower), false otherwise (faster).
+ * @param {boolean} [params.sideEffect = true] - True if the passed record object can be modified by calling this function (faster), false otherwise.
  * @returns {object} - The updated record.
  */
 export const assocNodes =
-  ({ nodes, updateNodesIndex = true }) =>
+  ({ nodes, updateNodesIndex = true, sideEffect = false }) =>
   (record) =>
-    Records.addNodes(nodes, { updateNodesIndex })(record)
+    Records.addNodes(nodes, { updateNodesIndex, sideEffect })(record)
 
 export const mergeNodeValidations = (nodeValidations) => (record) =>
   R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
