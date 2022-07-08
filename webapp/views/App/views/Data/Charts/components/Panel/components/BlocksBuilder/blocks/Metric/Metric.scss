@@ -1,0 +1,98 @@
+@import 'webapp/style/vars';
+
+.block-metric {
+}
+
+.block-metric-header {
+  display: flex;
+  padding: 4px 0px;
+  .block-metric-header-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .block-metric-button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    button{
+      padding: 0.2rem;
+    }
+  }
+}
+
+.option {
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 2px 0px;
+  .icon-left {
+    font-size: 12px !important;
+  }
+  .icon {
+    font-size: 12px !important;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+  &.selected {
+    background-color: $greyBorder;
+  }
+}
+
+.multi-option-with-modal {
+  width: 100%;
+  background-color: $grey;
+  padding: 4px 8px;
+  border-radius: 4px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.custom-option-modal-container {
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #d1d1dd;
+  margin: 4px;
+  min-width: 300px;
+
+  .custom-option-modal-header {
+    padding: 8px;
+    border-bottom: 1px solid $greyBorder;
+  }
+  .custom-option-modal-blocks {
+    padding: 16px 8px;
+  }
+  .custom-option-modal-actions {
+    padding: 8px;
+    border-top: 1px solid $greyBorder;
+  }
+}
+
+.block-metric-metrics-container {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 4px;
+  border: 1px solid $greyBorder;
+  flex-wrap: wrap;
+    padding: 8px;
+    padding: 2px 8px;
+
+    .block-metric-metrics-item{
+      background-color: hsl(0, 0%, 90%);
+      border-radius: 2px;  
+      display: flex;
+      margin: 2px;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 4px 8px;
+      &:hover{
+        cursor: pointer;
+        opacity: 0.8;
+      }
+    }
+
+}

@@ -106,6 +106,35 @@ const useChartConfig = ({ table, setTable }) => {
     [setConfigItemsByPath]
   )
 
+  const addOrUpdateMetric = useCallback(
+    (payload) => {
+      const { blockPath, values = {}, metric } = payload
+
+      const exists = configItemsByPath?.[blockPath]?.value?.some((item) => item.key === metric.key)
+      if (exists) {
+        setConfigItemsByPath((_configItemsByPath) => {
+          const newItems = Object.assign({}, _configItemsByPath)
+          Object.entries(values).forEach(([key, value]) => {
+            const _blockPath = `${blockPath}.${key}`
+            updateItemByPathAndKey(_blockPath, value[0])(newItems)
+          })
+
+          return newItems
+        })
+      } else {
+        setConfigItemsByPath((_configItemsByPath) => {
+          const newItems = Object.assign({}, _configItemsByPath)
+          addItemByPath(blockPath, metric)(newItems)
+          Object.entries(values).forEach(([key, value]) => {
+            addItemByPath(`${blockPath}.${key}`, value[0])(newItems)
+          })
+          return newItems
+        })
+      }
+    },
+    [configItemsByPath]
+  )
+
   const configActions = useMemo(() => {
     return {
       changeType,
@@ -113,8 +142,9 @@ const useChartConfig = ({ table, setTable }) => {
       updateValue,
       removeValue,
       replaceValue,
+      addOrUpdateMetric,
     }
-  }, [changeType, addValue, updateValue, removeValue, replaceValue])
+  }, [changeType, addValue, updateValue, removeValue, replaceValue, addOrUpdateMetric])
 
   return { config, configItemsByPath, configActions }
 }

@@ -4,11 +4,13 @@ import PropTypes from 'prop-types'
 import { chartsConfig } from '../../../../state/config'
 import ContainerBlock from './blocks/Container'
 import SelectBlock from './blocks/Select'
+import MetricBlock from './blocks/Metric'
 import './BlocksBuilder.scss'
 
 const RenderByType = {
   container: ContainerBlock,
   select: SelectBlock,
+  metric: MetricBlock,
 }
 
 const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dimensions, blockPath = '' }) => {
