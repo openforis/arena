@@ -89,11 +89,14 @@ export const insertUser = async (
     await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
 
     // accept user access request (if any)
-    await UserAccessRequestRepository.updateUserAccessRequestStatus({
-      email,
-      status: UserAccessRequest.status.ACCEPTED,
-      userUuid: User.getUuid(user),
-    })
+    await UserAccessRequestRepository.updateUserAccessRequestStatus(
+      {
+        email,
+        status: UserAccessRequest.status.ACCEPTED,
+        userUuid: User.getUuid(user),
+      },
+      t
+    )
 
     return newUser
   })
@@ -103,9 +106,9 @@ export const generateResetPasswordUuid = async (email, client = db) => {
   if (!user) {
     throw new Error(Validation.messageKeys.user.emailNotFound)
   }
-  if (User.isInvited(user)) {
-    throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
-  }
+  // if (User.isInvited(user)) {
+  //   throw new Error(Validation.messageKeys.user.passwordResetNotAllowedWithPendingInvitation)
+  // }
   const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
   return { uuid, user }
 }
