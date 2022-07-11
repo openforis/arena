@@ -80,13 +80,13 @@ export const UsersAccessRequest = () => {
               const label = renderer ? renderer({ fieldValue, i18n }) : fieldValue
               return <LabelWithTooltip key={name} label={label} />
             },
-            width: name === 'email' ? '20rem' : '1fr',
+            width: name === 'email' ? '15rem' : '1fr',
           })),
           {
             key: 'dateCreated',
             header: 'common.dateCreated',
-            renderItem: ({ item }) => DateUtils.formatDateTimeDefault(UserAccessRequest.getDateCreated(item)),
-            width: '5rem',
+            renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(UserAccessRequest.getDateCreated(item)),
+            width: '10rem',
           },
           {
             key: 'status',

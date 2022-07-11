@@ -42,7 +42,7 @@ export const useAcceptRequestPanel = (props) => {
     const loadTemplateLabel = async () => {
       const templates = await API.fetchSurveyTemplatesPublished()
       const template = templates.find((template) => Survey.getUuid(template) === templateUuid)
-      setTemplateLabel(Survey.getLabel(template, Survey.getDefaultLanguage(template)))
+      setTemplateLabel(Survey.getDefaultLabel(template))
     }
     if (templateUuid) {
       loadTemplateLabel()
