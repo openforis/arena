@@ -40,7 +40,7 @@ export const SurveyTemplateSelect = (props) => {
       setState({ loading: false, items: fetchedItems })
     }
     loadItems()
-  }, [name])
+  }, [])
 
   const options = items?.map((item) => ({
     value: Survey.getUuid(item),
@@ -57,7 +57,7 @@ ${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`,
       isClearable
       defaultValue={defaultValue}
       options={options}
-      onChange={(item) => onChange({ name, value: item?.value })}
+      onChange={(item) => onChange(item?.value)}
       placeholder={i18n.t('accessRequestView.templateNotSelected')}
     />
   )
