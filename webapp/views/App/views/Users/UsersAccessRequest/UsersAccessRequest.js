@@ -118,7 +118,7 @@ export const UsersAccessRequest = () => {
           <AcceptRequestPanel
             userAccessRequest={currentUserAccessRequest}
             onRequestAccepted={() => {
-              onRowChange(currentUserAccessRequest)
+              onRowChange()
               setCurrentUserAccessRequest(null)
             }}
           />

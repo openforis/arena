@@ -1,10 +1,10 @@
+import './SurveyTemplateSelect.scss'
+
 import React, { useEffect, useState } from 'react'
 import Select, { components } from 'react-select'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
-
-import Markdown from '@webapp/components/markdown'
 
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -13,15 +13,15 @@ import { LoadingBar } from '@webapp/components'
 const OptionWithDescription = (props) => {
   const { data } = props
 
-  const description = (data.description || '').replaceAll('\n', '\n\n') // double line breaks to render breakdown line breaks
-
-  const markdownSource = `**${data.label}**
-  
-    ${description}`
+  const { label, description: descriptionProp } = data
+  const description = descriptionProp || ''
 
   return (
     <components.Option {...props}>
-      <Markdown source={markdownSource} />
+      <div className="select-option">
+        <span className="select-option__label">{label}</span>
+        <span className="select-option__description">{description}</span>
+      </div>
     </components.Option>
   )
 }
@@ -45,8 +45,12 @@ export const SurveyTemplateSelect = (props) => {
   const options = items?.map((item) => ({
     value: Survey.getUuid(item),
     label: Survey.getDefaultLabel(item) || Survey.getName(item),
-    description: `${Survey.getDefaultDescription(item)}
-${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`,
+    description: [
+      Survey.getDefaultDescription(item),
+      `${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`,
+    ]
+      .filter(Boolean)
+      .join('\n\n'), // separate Languages from description only if description is not empty
   }))
 
   if (loading) return <LoadingBar />
