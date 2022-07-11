@@ -42,7 +42,7 @@ export const UsersAccessRequest = () => {
       Countries.getCountryName({ code: fieldValue }),
     [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue, i18n }) => {
       if (!fieldValue) {
-        return i18n.t('usersAccessRequestView.acceptRequest.templateNotSelected')
+        return i18n.t('accessRequestView.templateNotSelected')
       }
       const template = surveyTemplates.find((t) => t.uuid === fieldValue)
       return Survey.getLabel(template, Survey.getDefaultLanguage(template))

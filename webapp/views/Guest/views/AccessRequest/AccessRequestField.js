@@ -1,36 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
+import Select from 'react-select'
 
 import { Objects } from '@openforis/arena-core'
 
 import { Countries } from '@core/Countries'
-import * as Survey from '@core/survey/survey'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 
-import { Dropdown } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 
-import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
-import { LoadingBar } from '@webapp/components'
-
-const itemsFetchFunctionByFieldName = {
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: () => Countries.list(),
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: async () =>
-    API.fetchSurveyTemplatesPublished(),
-}
-
-const toDropdownItemsFunctionByFieldName = {
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: (item) => ({
-    key: item.code,
-    value: item.name,
-  }),
-  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: (item) => ({
-    key: Survey.getUuid(item),
-    value: Survey.getLabel(item, Survey.getDefaultLanguage(item)),
-  }),
-}
+import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 
 export const AccessRequestField = (props) => {
   const { field, onChange, request, validation } = props
@@ -39,39 +20,22 @@ export const AccessRequestField = (props) => {
 
   const { name, normalizeFn, required, defaultValue } = field
 
-  const [state, setState] = useState({ loading: true, items: null })
-
-  useEffect(() => {
-    const loadItems = async () => {
-      const fetchFunction = itemsFetchFunctionByFieldName[name]
-      const fetchedItems = fetchFunction ? await fetchFunction() : null
-      setState({ loading: false, items: fetchedItems })
-    }
-    loadItems()
-  }, [name])
-
-  const { loading, items } = state
-
   const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
   const value = Objects.path(name.split('.'))(request)
-  const dropdownItems = items?.map((item) => {
-    const toDropdownItemFunction = toDropdownItemsFunctionByFieldName[name]
-    return toDropdownItemFunction ? toDropdownItemFunction(item) : item
-  })
-  const dropdownSelection = dropdownItems?.find((item) => item.key === (value || defaultValue))
 
   return (
     <FormItem key={name} label={i18n.t(`accessRequestView.fields.${name}`)} required={required}>
       <>
-        {loading && <LoadingBar />}
-        {!loading && items && (
-          <Dropdown
-            selection={dropdownSelection}
-            items={dropdownItems}
-            onChange={(item) => onChange({ name, value: item?.key })}
+        {name === `${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}` ? (
+          <Select
+            isClearable
+            defaultValue={defaultValue}
+            options={Countries.list().map((countryItem) => ({ value: countryItem.code, label: countryItem.name }))}
+            onChange={(item) => onChange({ name, value: item?.value })}
           />
-        )}
-        {!loading && !items && (
+        ) : name === `${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}` ? (
+          <SurveyTemplateSelect defaultValue={defaultValue} onChange={onChange} />
+        ) : (
           <Input
             value={value}
             onChange={(val) => {

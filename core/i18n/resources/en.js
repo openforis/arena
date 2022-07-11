@@ -80,6 +80,7 @@ Please check also the Spam/Junk mail folder.`,
     label: 'Label',
     label_plural: 'Labels',
     language: 'Language',
+    language_plural: 'Languages',
     leavePageConfirmMessage: `There are unsaved changes in the form. 
 
 By confirming, all changes will be lost.
@@ -297,6 +298,7 @@ We will send soon an email to **{{email}}** with the instructions on how to acce
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
+    templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
   },
 
@@ -593,7 +595,6 @@ $t(common.cantUndoWarning)`,
       surveyName: 'Survey Name',
       role: 'Role',
       template: 'Template',
-      templateNotSelected: 'Not selected (start from scratch)',
     },
   },
 
