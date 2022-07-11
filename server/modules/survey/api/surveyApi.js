@@ -59,7 +59,7 @@ export const init = (app) => {
   })
 
   // ==== READ
-  app.get('/surveys', async (req, res, next) => {
+  app.get('/surveys', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { draft = true, template = false, offset, limit, lang, search, sortBy, sortOrder } = Request.getParams(req)
@@ -82,7 +82,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/surveys/count', async (req, res, next) => {
+  app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { template = false, search = null, lang = null } = Request.getParams(req)
