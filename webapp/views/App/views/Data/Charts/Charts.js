@@ -17,8 +17,10 @@ const Charts = () => {
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { spec, updateSpec, draft, chartImage, renderChart } = useChart(
-    entityDefUuid ? Query.create({ entityDefUuid }) : null
+  const { config, configItemsByPath, configActions, spec, updateSpec, draft, chartImage, renderChart } = useChart(
+    entityDefUuid ? Query.create({ entityDefUuid }) : null,
+    entityDefUuid,
+    setEntityDefUuid
   )
 
   return (
@@ -39,7 +41,14 @@ const Charts = () => {
           dimensions={dimensions}
         />
 
-        <Panel spec={spec} onUpdateSpec={updateSpec} dimensions={dimensions} />
+        <Panel
+          config={config}
+          configItemsByPath={configItemsByPath}
+          configActions={configActions}
+          spec={spec}
+          onUpdateSpec={updateSpec}
+          dimensions={dimensions}
+        />
 
         <Chart draft={draft} renderChart={renderChart} src={chartImage} />
       </Split>

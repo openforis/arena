@@ -1,3 +1,4 @@
+import './Panel.scss'
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
@@ -16,7 +17,7 @@ const useModeSelector = () => {
 
   return { currentMode, onSelectMode }
 }
-const Panel = ({ dimensions, spec, onUpdateSpec }) => {
+const Panel = ({ config, configItemsByPath, configActions, dimensions, spec, onUpdateSpec }) => {
   const { currentMode, onSelectMode } = useModeSelector()
 
   return (
@@ -32,9 +33,10 @@ const Panel = ({ dimensions, spec, onUpdateSpec }) => {
 
       <BlocksBuilder
         visible={currentMode === panelModes.BUILDER}
-        spec={spec}
-        onUpdateSpec={onUpdateSpec}
         dimensions={dimensions}
+        config={config}
+        configItemsByPath={configItemsByPath}
+        configActions={configActions}
       />
     </div>
   )

@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 
 import useChartSpec from './useChartSpec'
+import useChartConfig from './useChartConfig'
 import useChartRender from './useChartRender'
 
-const useChart = (query) => {
+const useChart = (query, table, setTable) => {
   const [draft, setDraft] = useState(null)
 
-  const { spec, updateSpec } = useChartSpec()
+  const { config, configItemsByPath, configActions } = useChartConfig({ table, setTable })
+  const { spec, updateSpec } = useChartSpec({ config, configItemsByPath })
+
   const { chartImage, renderChart } = useChartRender(spec, query)
 
   useEffect(() => {
@@ -17,7 +20,7 @@ const useChart = (query) => {
     setDraft(true)
   }, [spec])
 
-  return { spec, updateSpec, draft, chartImage, renderChart }
+  return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartImage, renderChart }
 }
 
 export default useChart
