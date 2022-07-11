@@ -3,7 +3,7 @@ import './Container.scss'
 import { Button } from '@webapp/components'
 import RenderByType from '../BlockRenderer/BlockRenderer'
 import classNames from 'classnames'
-const ContainerBlock = ({ dimensions, block }) => {
+const ContainerBlock = ({ config, configItemsByPath, configActions, blockPath = '', dimensions, block }) => {
   const [isVisible, setIsVisible] = useState(true)
   const { title, subtitle, blocks, order } = block
 
@@ -32,6 +32,10 @@ const ContainerBlock = ({ dimensions, block }) => {
             dimensions,
 
             block: blocks[blockKey],
+            config,
+            configItemsByPath,
+            configActions,
+            blockPath: blockPath ? blockPath.split('.').concat([blockKey]).join('.') : blockKey,
           })
         )}
       </div>

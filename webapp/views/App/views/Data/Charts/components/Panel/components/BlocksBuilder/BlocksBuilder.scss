@@ -1,7 +1,7 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .blocks-builder {
-  padding: 12px;
+  
   flex-direction: column;
   flex: 1;
   display: none;
@@ -15,4 +15,19 @@
 .block {
   display: flex;
   flex-direction: column;
+}
+
+.block__title {
+  font-size: 0.9rem;
+  color: $blue;
+}
+
+.block__subtitle {
+  font-size: 0.7rem;
+  color: $black;
+}
+
+.block__number-options{
+  font-size: 0.6rem;
+  color: $black;
 }
