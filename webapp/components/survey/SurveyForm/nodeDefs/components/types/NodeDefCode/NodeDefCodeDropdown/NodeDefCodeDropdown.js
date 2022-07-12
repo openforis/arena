@@ -28,7 +28,7 @@ const NodeDefCodeDropdown = (props) => {
 
   return (
     <div className="survey-form__node-def-code">
-      {NodeDef.isMultiple(nodeDef) && !entryDataQuery ? (
+      {NodeDef.isMultiple(nodeDef) && !edit && !entryDataQuery ? (
         <InputChips
           readOnly={entryDisabled}
           items={items}
