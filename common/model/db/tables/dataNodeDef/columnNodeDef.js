@@ -31,7 +31,7 @@ const colTypesByType = {
 
 const getColumnNames = (nodeDef, tableNodeDef = null) => {
   const nodeDefName = NodeDef.getName(nodeDef)
-  if (tableNodeDef && NodeDef.isMultipleAttribute(nodeDef) && !NodeDef.isEqual(tableNodeDef)) {
+  if (tableNodeDef && NodeDef.isMultipleAttribute(nodeDef) && !NodeDef.isEqual(nodeDef)(tableNodeDef)) {
     return [nodeDefName]
   }
   const colsSuffix = columnNamesSuffixByType[NodeDef.getType(nodeDef)]
