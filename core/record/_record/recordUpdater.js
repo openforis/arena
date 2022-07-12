@@ -6,7 +6,7 @@ import * as RecordValidation from '@core/record/recordValidation'
 
 import { keys } from './recordKeys'
 import * as RecordReader from './recordReader'
-import { Records } from '@openforis/arena-core'
+import { Records, RecordNodesUpdater } from '@openforis/arena-core'
 
 // ====== UPDATE
 
@@ -93,7 +93,7 @@ export const deleteNode = (node) => (record) => {
   const children = RecordReader.getNodeChildren(node)(record)
 
   // 2. remove node from index
-  let recordUpdated = Records.removeNode(node)(record)
+  let recordUpdated = RecordNodesUpdater.removeNode(node)(record)
 
   // 3. delete children
   recordUpdated = children.reduce((recordAcc, child) => deleteNode(child)(recordAcc), recordUpdated)
