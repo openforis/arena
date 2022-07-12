@@ -44,7 +44,6 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
         // ===== create table and view
         this.logDebug(`create data table ${nodeDefName} - start`)
         await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
-        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
         this.logDebug(`create data table ${nodeDefName} - end`)
 
         // ===== insert into table
@@ -56,6 +55,13 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       },
       () => this.isCanceled()
     )
+    // create views
+    await PromiseUtils.each(descendantMultipleDefs, async (nodeDef) => {
+      const nodeDefName = NodeDef.getName(nodeDef)
+      this.logDebug(`create view for ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+      this.logDebug(`create view for ${nodeDefName} - end`)
+    })
 
     this.logDebug('create node keys view - start')
     await SurveyRdbManager.createNodeKeysView(survey, tx)
