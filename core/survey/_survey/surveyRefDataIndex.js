@@ -58,8 +58,10 @@ const categoryItemNullParentUuid = 'null'
 
 export const getCategoryItemByUuid = (itemUuid) => (survey) => Surveys.getCategoryItemByUuid({ survey, itemUuid })
 
-const getCategoryItemUuid = ({ categoryUuid, parentItemUuid, code }) =>
-  R.path([keys.refData, keys.categoryItemUuidIndex, categoryUuid, parentItemUuid, code])
+const getCategoryItemUuid =
+  ({ categoryUuid, parentItemUuid, code }) =>
+  (survey) =>
+    Surveys.getCategoryItemUuidByCode({ survey, categoryUuid, parentItemUuid, code })
 
 export const getCategoryItemUuidAndCodeHierarchy =
   ({ nodeDef, code, record = null, parentNode = null }) =>
