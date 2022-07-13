@@ -22,11 +22,11 @@ describe('NodeDefsIndex Test', () => {
 
   it('cluster children', () => {
     const { nodeDefsIndex: index } = survey
-    const { childDefUuidsByParentUuid } = index
+    const { childDefUuidPresenceByParentUuid } = index
 
     const cluster = Survey.getNodeDefByName('cluster')(survey)
 
-    const childrenUuids = childDefUuidsByParentUuid[cluster.uuid]
+    const childrenUuids = Object.keys(childDefUuidPresenceByParentUuid[cluster.uuid] || {})
     expect(childrenUuids).toBeDefined()
 
     const childrenNames = [
@@ -50,11 +50,11 @@ describe('NodeDefsIndex Test', () => {
 
   it('plot children', () => {
     const { nodeDefsIndex: index } = survey
-    const { childDefUuidsByParentUuid } = index
+    const { childDefUuidPresenceByParentUuid } = index
 
     const plot = Survey.getNodeDefByName('plot')(survey)
 
-    const childrenUuids = childDefUuidsByParentUuid[plot.uuid]
+    const childrenUuids = Object.keys(childDefUuidPresenceByParentUuid[plot.uuid] || {})
     expect(childrenUuids).toBeDefined()
 
     const childrenNames = ['plot_id', 'plot_location', 'plot_multiple_number', 'plot_details', 'tree']
@@ -73,9 +73,9 @@ describe('NodeDefsIndex Test', () => {
     const surveyUpdated = Survey.assocNodeDef({ nodeDef })(survey)
 
     const { nodeDefsIndex: index } = surveyUpdated
-    const { childDefUuidsByParentUuid } = index
+    const { childDefUuidPresenceByParentUuid } = index
 
-    const childrenUuids = childDefUuidsByParentUuid[cluster.uuid]
+    const childrenUuids = Object.keys(childDefUuidPresenceByParentUuid[cluster.uuid] || {})
     expect(childrenUuids.length).toBe(10)
     expect(childrenUuids.includes(nodeDef.uuid)).toBeTruthy()
   })

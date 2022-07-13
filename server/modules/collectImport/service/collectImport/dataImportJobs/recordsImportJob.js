@@ -207,7 +207,7 @@ export default class RecordsImportJob extends Job {
 
           nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
 
-          recordUpdated = Record.assocNode(nodeToInsert)(recordUpdated)
+          recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(recordUpdated)
 
           if (NodeDef.isEntity(nodeDef)) {
             // Create child items to insert
@@ -349,7 +349,7 @@ export default class RecordsImportJob extends Job {
         })
         if (!R.isEmpty(childrenApplicability)) {
           const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
-          recordUpdated = Record.assocNode(nodeUpdated)(recordUpdated)
+          recordUpdated = Record.assocNode(nodeUpdated, { sideEffect: true })(recordUpdated)
         }
       }
     }
