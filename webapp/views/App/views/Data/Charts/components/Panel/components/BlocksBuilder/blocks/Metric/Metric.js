@@ -48,7 +48,7 @@ const PopoverContent = (props) => {
   return (
     <div className="custom-option-modal-container">
       <div className="custom-option-modal-header">
-        <p>Hi! I'm popover content.</p>
+        <p>Add a new metric aggregation.</p>
       </div>
       <div className="custom-option-modal-blocks">
         {draftMetric?.key &&
@@ -67,7 +67,7 @@ const PopoverContent = (props) => {
           )}
       </div>
       <div className="custom-option-modal-actions">
-        <button onClick={() => setIsPopoverOpen(false)}></button>
+        <button onClick={() => setIsPopoverOpen(false)}>close</button>
         <button onClick={handleSaveOrUpdate}>save</button>
       </div>
     </div>
