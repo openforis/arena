@@ -510,7 +510,10 @@ $t(common.cantUndoWarning)`,
     editSelectedRecord: 'Edit selected record',
     editMode: 'Edit Mode',
     filterAttributeTypes: 'Filter attribute types',
-    filterRecords: 'Filter records',
+    filterRecords: {
+      buttonTitle: 'Filter records',
+      expressionEditorHeader: 'Expression to filter records',
+    },
     invalidRecord: 'Invalid record',
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
