@@ -18,7 +18,7 @@ const format = ({ value, i18n, nodeDef }) => {
     return ''
   }
   const formatter = formatters[NodeDef.getType(nodeDef)]
-  const formatValue = (value) => (formatter ? formatter({ value, i18n, nodeDef }) : value)
+  const formatValue = (v) => (formatter ? formatter({ value: v, i18n, nodeDef }) : value)
 
   return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }
