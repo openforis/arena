@@ -17,8 +17,10 @@ import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props
 
+  const i18n = useI18n()
+
   return (
-    <React.Fragment>
+    <>
       {R.values(NodeDef.nodeDefType).map((type) => {
         const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
@@ -28,18 +30,18 @@ const AddNodeDefButtons = (props) => {
         return (
           <button
             key={type}
-            className="btn btn-s btn-add-node-def"
+            className={`btn btn-s btn-add-node-def ${type}`}
             onClick={() => {
               addNodeDef(type, nodeDefProps)
             }}
             aria-disabled={disabled}
           >
-            {type}
+            {i18n.t(`surveyForm.addChildToTypes.${type}`)}
             {NodeDefUIProps.getIconByType(type)}
           </button>
         )
       })}
-    </React.Fragment>
+    </>
   )
 }
 
