@@ -1709,6 +1709,11 @@
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.9.0.tgz#7e393bbc9a243fdeacf601733d3568368e4046a2"
   integrity sha512-7wSuiLDERoGHQeAyqdcBtntnCw/UmpAwizZRl3YXIUepoS1m56BMbCwOspKTe4RbJLGzfJJojimoVyy/z4DOfw==
 
+"@esri/proj-codes@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-3.0.0.tgz#c7d1cef10609f3e169ec8b640bee6bf685241bf4"
+  integrity sha512-4yxeWoLpB50tGIVs2Mmjn6UloWx52pM9P9KloqZcBV4AkdWqeOyWrYT3TbWTg0yiCtGJKX0wRlQdQekdGMuHmg==
+
 "@gar/promisify@^1.0.1":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -2019,14 +2024,14 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.103":
-  version "0.0.103"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.103/18f316336cfd1f0acd8a795be5c1522ed06301490fe698105e6ffd17d84503f7#358a09c25ea75ab749c2a300a7d526d9a7b63057"
-  integrity sha512-FmsRme7hEiDREQp6jEeYA4klpi4H49W/ZpqL6dpZ+6aELt5Pqt5VfNDlkL64COZ6KJcOJGFHhtaa/7KZ42QLhw==
+"@openforis/arena-core@^0.0.107":
+  version "0.0.107"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.107/4380b84920f81d81c6c22c6b303e2fd725c41838ab72eaba1763c68504007277#bb9e8f35f59f3e3cb1a85595fbf92a376b081c9e"
+  integrity sha512-wLjiiShU+Cnu8RGMeA27Gusi31XfULp5UOBp8QS6coNER1tLtM2auSpymUwfmlqPPFblKhXJqp3692sjf3Zg7w==
   dependencies:
-    "@esri/proj-codes" "^2.9.0"
+    "@esri/proj-codes" "^3.0.0"
     date-fns "^2.28.0"
-    jsep "^1.3.4"
+    jsep "^1.3.6"
     lodash.differencewith "^4.5.0"
     lodash.frompairs "^4.0.1"
     lodash.isequal "^4.5.0"
@@ -8421,7 +8426,7 @@ jsdom@^16.6.0:
     ws "^7.4.5"
     xml-name-validator "^3.0.0"
 
-jsep@^1.3.4:
+jsep@^1.3.4, jsep@^1.3.6:
   version "1.3.6"
   resolved "https://registry.yarnpkg.com/jsep/-/jsep-1.3.6.tgz#23fbf8c9479891611a237362e9e25d7746fac9d5"
   integrity sha512-o7fP1eZVROIChADx7HKiwGRVI0tUqgUUGhaok6DP7cMxpDeparuooREDBDeNk2G5KIB49MBSkRYsCOu4PmZ+1w==
