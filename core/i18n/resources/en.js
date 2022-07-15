@@ -1396,6 +1396,18 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group',
     var: 'Var',
     const: 'Const',
+
+    header: {
+      editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+    },
+
+    qualifier: {
+      'default-values': 'default value',
+      'default-values-apply-if': 'default value apply if',
+      'relevant-if': 'relevant if',
+      validations: 'validation rule',
+      'validations-apply-if': 'validation rule apply if',
+    },
   },
 
   // ====== Auth
