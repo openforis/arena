@@ -34,23 +34,25 @@ export const usePath = (entry) => {
   while (nodeDefCurrent) {
     let label = NodeDef.getLabel(nodeDefCurrent, lang, labelType)
 
-    // get page node
-    const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
-    const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
+    if (NodeDef.isRoot(nodeDefCurrent) || NodeDef.isMultipleEntity(nodeDefCurrent)) {
+      // get page node
+      const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
+      const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
 
-    if (entry && record) {
-      // if entry mode add node key values
-      const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
-        ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
-        : Record.getNodeByUuid(nodeUuidCurrent)(record)
+      if (entry && record) {
+        // if entry mode add node key values
+        const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
+          ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
+          : Record.getNodeByUuid(nodeUuidCurrent)(record)
 
-      if (nodeCurrent) {
-        const nodeDefKeys = Survey.getNodeDefKeys(nodeDefCurrent)(survey)
-        const keys = nodeDefKeys.map((nodeDefKey) => {
-          const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
-          return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
-        })
-        label += `[${keys.flat().join(', ')}]`
+        if (nodeCurrent) {
+          const nodeDefKeys = Survey.getNodeDefKeys(nodeDefCurrent)(survey)
+          const keys = nodeDefKeys.map((nodeDefKey) => {
+            const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
+            return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
+          })
+          label += ` [${keys.flat().join(', ')}]`
+        }
       }
     }
     labels.unshift(label)
