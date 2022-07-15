@@ -855,7 +855,7 @@ $t(common.appNameFull)
       displayIn: 'Display in',
       form: 'Form',
       table: 'Table',
-      parentPage: 'Parent page',
+      parentPage: 'Parent page ({{parentPage}})',
       ownPage: 'Its own page',
       analysis: 'Analysis',
       entitySource: 'Entity Source',
