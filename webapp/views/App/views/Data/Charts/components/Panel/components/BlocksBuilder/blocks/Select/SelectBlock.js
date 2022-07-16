@@ -52,7 +52,7 @@ const useOptionsAndDefaultValues = ({ block, dimensions }) => {
 }
 
 const useDefaultValue = ({ configItemsByPath, flatOptions, block, values, blockPath }) => {
-  const defaultValues = useMemo(() => {
+  return useMemo(() => {
     if (flatOptions.length > 0) {
       let blockValues = []
       if (values) {
@@ -63,14 +63,9 @@ const useDefaultValue = ({ configItemsByPath, flatOptions, block, values, blockP
         return blockValues
       }
 
-      /*if (value?.[block?.id]) {
-        blockValues = [{ value: value[block.id] }]
-      }*/
-
       return flatOptions.filter((option) => blockValues.some((val) => val.value === option.value))
     }
   }, [configItemsByPath, blockPath, flatOptions])
-  return defaultValues
 }
 const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, block, onChange, values }) => {
   const { title, subtitle, id, isMulti, optionsParams = {} } = block

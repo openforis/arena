@@ -1,5 +1,5 @@
 import ContainerBlock from '../Container/Container'
-import SelectBlock from '../Select/Select'
+import SelectBlock from '../Select/SelectBlock'
 
 const RenderByType = {
   container: ContainerBlock,
