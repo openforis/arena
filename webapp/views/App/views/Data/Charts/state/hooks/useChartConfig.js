@@ -17,20 +17,20 @@ const getItemsByPath = (config) =>
   (config?.items || []).reduce((acc, item) => Object.assign({}, acc, { [item.blockPath]: item }), {})
 
 const addItemByPath = (blockPath, item) => (obj) => {
+  let _value = getValueByBlockPath({ obj, blockPath })
   _value.push(item)
   return updateObjectValueByPath({ obj, blockPath, value: _value })
 }
 
 const updateItemByPathAndKey = (blockPath, value) => (obj) => {
-  let _value = obj[blockPath]?.value || []
+  let _value = getValueByBlockPath({ obj, blockPath })
   _value = _value.map((_val) => {
     if (_val.key === value.key) {
       return value
     }
     return _val
   })
-  obj[blockPath] = { ...(obj[blockPath] || { blockPath }), value: _value }
-  return obj
+  return updateObjectValueByPath({ obj, blockPath, value: _value })
 }
 
 const useChartConfig = ({ table, setTable }) => {
