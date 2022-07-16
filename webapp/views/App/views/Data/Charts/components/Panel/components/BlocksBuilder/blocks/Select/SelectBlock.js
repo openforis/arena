@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { uuidv4 } from '@core/uuid'
 import Select, { components } from 'react-select'
-import './Select.scss'
+import './SelectBlock.scss'
 
 const icons = {
   quantitative: <span className="icon-left node_def__icon">1.23</span>,
