@@ -6,14 +6,19 @@ const defaultConfig = {
   items: [],
 }
 
+const getValueByBlockPath = ({ obj, blockPath }) => obj[blockPath]?.value || []
+
+const updateObjectValueByPath = ({ obj, blockPath, value }) => {
+  obj[blockPath] = { ...(obj[blockPath] || { blockPath }), value }
+  return obj
+}
+
 const getItemsByPath = (config) =>
   (config?.items || []).reduce((acc, item) => Object.assign({}, acc, { [item.blockPath]: item }), {})
 
 const addItemByPath = (blockPath, item) => (obj) => {
-  let _value = obj[blockPath]?.value || []
   _value.push(item)
-  obj[blockPath] = { ...(obj[blockPath] || { blockPath }), value: _value }
-  return obj
+  return updateObjectValueByPath({ obj, blockPath, value: _value })
 }
 
 const updateItemByPathAndKey = (blockPath, value) => (obj) => {
