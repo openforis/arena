@@ -103,6 +103,7 @@ const pie = {
             },
             order: ['column', 'aggregation'],
             valuesToSpec: ({ value = [], spec = {} }) => {
+              console.log('in', value)
               /*
                 if (!dimension) {
                   const newSpec = {
