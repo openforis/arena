@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect, useMemo } from 'react'
+import { uuidv4 } from '@core/uuid'
 
 const defaultConfig = {
   type: 'pie',
@@ -15,6 +16,11 @@ const updateObjectValueByPath = ({ obj, blockPath, value }) => {
 
 const getItemsByPath = (config) =>
   (config?.items || []).reduce((acc, item) => Object.assign({}, acc, { [item.blockPath]: item }), {})
+
+const updateHistory = (item) => (history) => {
+  history.push(item)
+  return history
+}
 
 const addItemByPath = (blockPath, item) => (obj) => {
   let _value = getValueByBlockPath({ obj, blockPath })
@@ -34,6 +40,8 @@ const updateItemByPathAndKey = (blockPath, value) => (obj) => {
 }
 
 const useChartConfig = ({ table, setTable }) => {
+  const [initialConfig, setInitialConfig] = useState(defaultConfig)
+  const [history, setHistory] = useState([])
   const [config, setConfig] = useState(defaultConfig)
   const [configItemsByPath, setConfigItemsByPath] = useState({})
 
@@ -46,10 +54,12 @@ const useChartConfig = ({ table, setTable }) => {
 
   useEffect(() => {
     setConfig((config) => Object.assign({}, config, { table }))
+    setHistory(updateHistory({ action: 'set_table', payload: { table } }))
   }, [table])
 
   const changeType = useCallback((type) => {
     setConfig((config) => Object.assign({}, config, { type }))
+    setHistory(updateHistory({ action: 'set_type', payload: { type } }))
   }, [])
   const addValue = useCallback(
     (payload) => {
@@ -60,6 +70,8 @@ const useChartConfig = ({ table, setTable }) => {
         addItemByPath(blockPath, value)(newItems)
         return newItems
       })
+
+      setHistory(updateHistory({ action: 'add', payload }))
     },
     [setConfigItemsByPath]
   )
@@ -72,6 +84,7 @@ const useChartConfig = ({ table, setTable }) => {
         newItems[blockPath] = { ...(newItems[blockPath] || { blockPath }), value }
         return newItems
       })
+      setHistory(updateHistory({ action: 'replace', payload }))
     },
     [setConfigItemsByPath]
   )
@@ -87,6 +100,8 @@ const useChartConfig = ({ table, setTable }) => {
         newItems[blockPath] = { ...(newItems[blockPath] || { blockPath }), value: _value }
         return newItems
       })
+
+      setHistory(updateHistory({ action: 'remove', payload }))
     },
     [setConfigItemsByPath]
   )
@@ -102,6 +117,8 @@ const useChartConfig = ({ table, setTable }) => {
 
         return newItems
       })
+
+      setHistory(updateHistory({ action: 'update', payload }))
     },
     [setConfigItemsByPath]
   )
@@ -131,6 +148,8 @@ const useChartConfig = ({ table, setTable }) => {
           return newItems
         })
       }
+
+      setHistory(updateHistory({ action: 'addOrUpdateMetric', payload }))
     },
     [configItemsByPath]
   )
