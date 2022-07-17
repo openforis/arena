@@ -19,8 +19,11 @@ const makeEditButtonsVisible = async ({ nodeDefName }) => {
 export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
     await makeEditButtonsVisible({ nodeDefName: nodeDefParent.name })
-    await page.click(getSelector(TestId.surveyForm.nodeDefAddChildBtn(nodeDefParent.name), 'button'))
-    await Promise.all([page.waitForNavigation(), page.click(`text="${nodeDefChild.type}"`)])
+    await page.click(getSelector(TestId.surveyForm.nodeDefAddChildToBtn(nodeDefParent.name), 'button'))
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click(getSelector(TestId.surveyForm.nodeDefAddChildOfTypeBtn(nodeDefChild.type), 'button')),
+    ])
   })
 
   if (editDetails) editNodeDefDetails(nodeDefChild)

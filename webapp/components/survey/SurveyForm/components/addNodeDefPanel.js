@@ -11,6 +11,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
@@ -31,6 +32,7 @@ const AddNodeDefButtons = (props) => {
           <button
             key={type}
             className={`btn btn-s btn-add-node-def ${type}`}
+            data-testid={TestId.surveyForm.nodeDefAddChildOfTypeBtn(type)}
             onClick={() => {
               addNodeDef(type, nodeDefProps)
             }}
