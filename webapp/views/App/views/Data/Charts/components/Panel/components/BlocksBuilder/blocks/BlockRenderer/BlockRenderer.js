@@ -1,6 +1,6 @@
 import ContainerBlock from '../Container/Container'
 import MetricBlock from '../Metric/Metric'
-import SelectBlock from '../Select/Select'
+import SelectBlock from '../Select/SelectBlock'
 
 const RenderByType = {
   container: ContainerBlock,
