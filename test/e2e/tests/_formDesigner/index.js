@@ -8,6 +8,7 @@ const makeEditButtonsVisible = async ({ nodeDefName }) => {
   await page.waitForSelector(wrapperSelector)
   const wrapperEl = await page.$(wrapperSelector)
   await expect(wrapperEl).not.toBeNull()
+  await wrapperEl.scrollIntoViewIfNeeded()
 
   // move mouse inside node def wrapper to make edit buttons appear
   const boundingBox = await wrapperEl.boundingBox()
