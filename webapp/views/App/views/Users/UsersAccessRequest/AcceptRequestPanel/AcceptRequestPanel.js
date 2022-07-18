@@ -15,10 +15,11 @@ export const AcceptRequestPanel = (props) => {
   const { userAccessRequest, onRequestAccepted } = props
   const { email } = userAccessRequest
 
-  const { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation } = useAcceptRequestPanel({
-    userAccessRequest,
-    onRequestAccepted,
-  })
+  const { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation, templateLabel } =
+    useAcceptRequestPanel({
+      userAccessRequest,
+      onRequestAccepted,
+    })
 
   const { surveyName, surveyLabel, role } = accessRequestAccept
 
@@ -42,6 +43,9 @@ export const AcceptRequestPanel = (props) => {
           validation={Validation.getFieldValidation(UserAccessRequestAccept.keys.surveyLabel)(validation)}
           onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.surveyLabel, value })}
         />
+      </FormItem>
+      <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.template')}>
+        <Input value={templateLabel} disabled />
       </FormItem>
       <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.role')}>
         <Dropdown

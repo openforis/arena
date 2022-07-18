@@ -64,6 +64,11 @@ const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   }
 }
 
+export const requireLoggedInUser = async (req, _res, next) => {
+  const user = Request.getUser(req)
+  return user ? next() : next(new UnauthorizedError())
+}
+
 // Survey
 export const requireSurveyCreatePermission = async (req, _res, next) => {
   const user = Request.getUser(req)

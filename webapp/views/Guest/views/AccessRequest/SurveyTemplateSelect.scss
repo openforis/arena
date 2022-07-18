@@ -1,0 +1,13 @@
+.select-option {
+  display: flex;
+  flex-direction: column;
+
+  .select-option__label {
+    font-weight: bold;
+  }
+
+  .select-option__description {
+    font-size: small;
+    white-space: pre-line;
+  }
+}
