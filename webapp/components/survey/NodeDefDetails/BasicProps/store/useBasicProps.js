@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
@@ -16,6 +16,7 @@ export const useBasicProps = (props) => {
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
@@ -41,6 +42,8 @@ export const useBasicProps = (props) => {
   const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
+  const nodeDefParentLabel = NodeDef.getLabel(nodeDefParent, lang)
+
   return {
     nodeDef,
     validation,
@@ -55,5 +58,6 @@ export const useBasicProps = (props) => {
     renderType,
     displayIn,
     cyclesNodeDef,
+    nodeDefParentLabel,
   }
 }

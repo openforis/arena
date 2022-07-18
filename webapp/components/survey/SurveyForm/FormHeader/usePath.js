@@ -34,11 +34,11 @@ export const usePath = (entry) => {
   while (nodeDefCurrent) {
     let label = NodeDef.getLabel(nodeDefCurrent, lang, labelType)
 
-    // get page node
-    const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
-    const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
+    if (entry && record && (NodeDef.isRoot(nodeDefCurrent) || NodeDef.isMultipleEntity(nodeDefCurrent))) {
+      // get page node
+      const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
+      const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
 
-    if (entry && record) {
       // if entry mode add node key values
       const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
         ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
@@ -50,7 +50,7 @@ export const usePath = (entry) => {
           const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
           return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
         })
-        label += `[${keys.flat().join(', ')}]`
+        label += ` [${keys.flat().join(', ')}]`
       }
     }
     labels.unshift(label)
