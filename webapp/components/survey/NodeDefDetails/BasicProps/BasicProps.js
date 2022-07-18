@@ -47,6 +47,7 @@ const BasicProps = (props) => {
     renderType,
     displayIn,
     cyclesNodeDef,
+    nodeDefParentLabel,
   } = useBasicProps(props)
 
   return (
@@ -138,7 +139,7 @@ const BasicProps = (props) => {
             items={[
               {
                 key: NodeDefLayout.displayIn.parentPage,
-                label: i18n.t('nodeDefEdit.basicProps.parentPage'),
+                label: i18n.t('nodeDefEdit.basicProps.parentPage', { parentPage: nodeDefParentLabel }),
                 disabled: displayInParentPageDisabled,
               },
               {

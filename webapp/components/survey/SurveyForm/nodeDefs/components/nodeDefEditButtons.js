@@ -97,7 +97,7 @@ const NodeDefEditButtons = (props) => {
 
       {NodeDef.isEntity(nodeDef) && (
         <Button
-          testId={TestId.surveyForm.nodeDefAddChildBtn(nodeDefName)}
+          testId={TestId.surveyForm.nodeDefAddChildToBtn(nodeDefName)}
           className="btn-s btn-transparent"
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
           onMouseDown={(e) => {

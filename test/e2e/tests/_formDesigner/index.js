@@ -8,6 +8,7 @@ const makeEditButtonsVisible = async ({ nodeDefName }) => {
   await page.waitForSelector(wrapperSelector)
   const wrapperEl = await page.$(wrapperSelector)
   await expect(wrapperEl).not.toBeNull()
+  await wrapperEl.scrollIntoViewIfNeeded()
 
   // move mouse inside node def wrapper to make edit buttons appear
   const boundingBox = await wrapperEl.boundingBox()
@@ -19,8 +20,11 @@ const makeEditButtonsVisible = async ({ nodeDefName }) => {
 export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   test(`${nodeDefParent.label} -> ${nodeDefChild.label} add`, async () => {
     await makeEditButtonsVisible({ nodeDefName: nodeDefParent.name })
-    await page.click(getSelector(TestId.surveyForm.nodeDefAddChildBtn(nodeDefParent.name), 'button'))
-    await Promise.all([page.waitForNavigation(), page.click(`text="${nodeDefChild.type}"`)])
+    await page.click(getSelector(TestId.surveyForm.nodeDefAddChildToBtn(nodeDefParent.name), 'button'))
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click(getSelector(TestId.surveyForm.nodeDefAddChildOfTypeBtn(nodeDefChild.type), 'button')),
+    ])
   })
 
   if (editDetails) editNodeDefDetails(nodeDefChild)
