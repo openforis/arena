@@ -45,7 +45,11 @@ const AttributesSelector = (props) => {
   if (NodeDef.isEntity(nodeDefContext)) {
     const includeAnalysis = showAnalysisAttributes && canUseAnalysis
     if (showSiblingsInSingleEntities) {
-      childDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
+      childDefs = Survey.getNodeDefDescendantsInSingleEntities({
+        nodeDef: nodeDefContext,
+        includeAnalysis,
+        filterFn: (n) => NodeDef.isAttribute(n) && (showMultipleAttributes || NodeDef.isSingle(n)),
+      })(survey)
     } else {
       childDefs = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
     }

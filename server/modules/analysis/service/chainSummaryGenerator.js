@@ -174,7 +174,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(samplingStrategySpecified ? { pValue: Chain.getPValue(chain) } : {}),
     areaWeightingMethod: Chain.isAreaWeightingMethod(chain),
     clusteringEntity: NodeDef.getName(clusteringNodeDef),
-    clusteringEntityKeys: Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName),
+    clusteringEntityKeys: clusteringNodeDef
+      ? Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName)
+      : null,
     clusteringVariances: Chain.isClusteringOnlyVariances(chain),
     resultVariables: await Promise.all(
       analysisNodeDefs.map((analysisNodeDef) => generateResultVariableSummary({ survey, analysisNodeDef, lang }))
