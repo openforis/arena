@@ -5,7 +5,7 @@
 .survey-form {
   display: grid;
   height: calc(100% - #{$formHeaderHeight});
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 1fr;
 
   &.form-preview {
     border: $orange 8px solid;
@@ -48,7 +48,7 @@
 
 // Survey form edit mode grid style
 .survey-form.edit {
-  grid-template-columns: 250px 1fr 200px;
+  grid-template-columns: 1fr 200px;
 
   .react-grid-item {
     border: $formBorderEdit;
@@ -69,7 +69,7 @@
 }
 
 .survey-form.edit.form-actions-off {
-  grid-template-columns: 250px 1fr 0;
+  grid-template-columns: 1fr 0;
 }
 
 .survey-form.edit.form-actions-off.page-navigation-off {

@@ -5,10 +5,14 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import { TestId } from '@webapp/utils/testId'
+import { useI18n } from '@webapp/store/system'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const ExpressionEditor = (props) => {
   const {
@@ -27,6 +31,10 @@ const ExpressionEditor = (props) => {
     types,
   } = props
 
+  const i18n = useI18n()
+  const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
+
   const [edit, setEdit] = useState(false)
 
   const applyChange = (_query) => {
@@ -35,6 +43,15 @@ const ExpressionEditor = (props) => {
   }
 
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
+
+  const qualifierLabel = i18n.t(`expressionEditor.qualifier.${qualifier}`)
+  const nodeDefCurrent = Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey)
+  const popupHeader = nodeDefCurrent
+    ? i18n.t('expressionEditor.header.editingExpressionForNodeDefinition', {
+        qualifier: qualifierLabel,
+        nodeDef: NodeDef.getLabel(nodeDefCurrent, lang),
+      })
+    : null
 
   return (
     <div className="expression-editor">
@@ -52,6 +69,7 @@ const ExpressionEditor = (props) => {
           onClose={() => setEdit(false)}
           onChange={applyChange}
           types={types}
+          header={popupHeader}
         />
       ) : (
         <div className="expression-editor__query-container">
