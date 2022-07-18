@@ -80,6 +80,7 @@ Please check also the Spam/Junk mail folder.`,
     label: 'Label',
     label_plural: 'Labels',
     language: 'Language',
+    language_plural: 'Languages',
     leavePageConfirmMessage: `There are unsaved changes in the form. 
 
 By confirming, all changes will be lost.
@@ -280,12 +281,7 @@ Do you want to proceed?`,
         country: 'Country',
         purpose: 'What do you need it for?',
         surveyName: 'Propose a Survey Name',
-        template: 'Start from a template?',
-        template_value: {
-          none: 'None (start from scratch)',
-          templateA: 'Template A',
-          templateB: 'Template B',
-        },
+        templateUuid: 'Start from a template?',
       },
     },
     introduction: `The platform is still beta, so if you want access, you have to request here.
@@ -302,6 +298,7 @@ We will send soon an email to **{{email}}** with the instructions on how to acce
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
+    templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
   },
 
@@ -597,6 +594,7 @@ $t(common.cantUndoWarning)`,
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',
       role: 'Role',
+      template: 'Template',
     },
   },
 
