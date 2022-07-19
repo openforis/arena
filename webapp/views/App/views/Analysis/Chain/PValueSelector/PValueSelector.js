@@ -8,7 +8,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-const pValueToItem = (value) => ({ key: value, label: value })
+const pValueToItem = (value) => ({ value, label: String(value) })
 
 export const PValueSelector = () => {
   const dispatch = useDispatch()
@@ -20,7 +20,7 @@ export const PValueSelector = () => {
   const selectedItem = pValueToItem(Chain.getPValue(chain))
 
   const onChange = (item) => {
-    const chainUpdated = Chain.assocPValue(item?.key)(chain)
+    const chainUpdated = Chain.assocPValue(item?.value)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 

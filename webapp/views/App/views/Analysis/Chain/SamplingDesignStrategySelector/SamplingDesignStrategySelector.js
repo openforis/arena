@@ -13,11 +13,11 @@ export const SamplingDesignStrategySelector = (props) => {
   const i18n = useI18n()
 
   const samplingStrategyCodeToItem = (samplingStrategyCode) => ({
-    key: samplingStrategyCode,
+    value: samplingStrategyCode,
     label: i18n.t(`chainView.samplingStrategy.${samplingStrategyCode}`),
   })
 
-  const emptyItem = { key: null, label: i18n.t('common.notSpecified') }
+  const emptyItem = { value: null, label: i18n.t('common.notSpecified') }
 
   const items = [emptyItem, ...Object.values(Chain.samplingStrategies).map(samplingStrategyCodeToItem)]
 
@@ -31,8 +31,7 @@ export const SamplingDesignStrategySelector = (props) => {
         className="sampling-strategy-dropdown"
         items={items}
         selection={selectedItem}
-        itemLabel="label"
-        onChange={(item) => updateChain(Chain.assocSamplingStrategy(item?.key)(chain))}
+        onChange={(item) => updateChain(Chain.assocSamplingStrategy(item?.value)(chain))}
       />
     </FormItem>
   )

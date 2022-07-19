@@ -30,8 +30,8 @@ const getDropdownItems = ({
         ? NodeDef.getName(nodeDef)
         : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
       entities.push({
-        key: NodeDef.getUuid(nodeDef),
-        value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
+        value: NodeDef.getUuid(nodeDef),
+        label: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
       })
     }
   }
@@ -56,7 +56,7 @@ const EntitySelector = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-  const emptySelection = { key: 'null', value: i18n.t('common.notSpecified') }
+  const emptySelection = { value: 'null', label: i18n.t('common.notSpecified') }
 
   const dropdownItems = getDropdownItems({
     emptySelection,
@@ -67,7 +67,7 @@ const EntitySelector = (props) => {
     useNameAsLabel,
     allowEmptySelection,
   })
-  const selection = nodeDefUuidEntity ? dropdownItems.find(R.propEq('key', nodeDefUuidEntity)) : emptySelection
+  const selection = nodeDefUuidEntity ? dropdownItems.find(R.propEq('value', nodeDefUuidEntity)) : emptySelection
 
   return (
     <Dropdown
@@ -77,7 +77,7 @@ const EntitySelector = (props) => {
       items={dropdownItems}
       selection={selection}
       validation={validation}
-      onChange={(item) => onChange(R.prop('key', item))}
+      onChange={(item) => onChange(item?.value)}
       disabled={disabled}
     />
   )

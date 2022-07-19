@@ -31,9 +31,10 @@ const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =
       if (draft && !backup) {
         // merge props_advanced and props_advanced_draft into props_advanced
         rowUpdated.props_advanced = R.mergeDeepLeft(row.props_advanced_draft, row.props_advanced)
+        delete rowUpdated.props_advanced_draft
       }
     }
-    if (!backup && !draft) {
+    if ((!backup && !draft) || R.isEmpty(rowUpdated.props_advanced_draft)) {
       // ignore props_advanced_draft
       delete rowUpdated.props_advanced_draft
     }
