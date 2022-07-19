@@ -97,7 +97,7 @@ To install RStudio Server as a Docker container run the following command:
 - replace YOUR_IP with your machine ip address
 
 ```shell script
-docker run -d --name arena-rstudio --add-host="localhost:YOUR_IP" -p 8787:8787 -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+docker run -d --name arena-rstudio ---network="host" -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
 ```
 
 To restart RStudio server run

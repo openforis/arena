@@ -1,0 +1,9 @@
+.split {
+  display: flex;
+
+  .gutter {
+    &.gutter-horizontal {
+      cursor: ew-resize;
+    }
+  }
+}

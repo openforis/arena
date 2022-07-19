@@ -29,8 +29,11 @@ const colTypesByType = {
   [nodeDefType.time]: [SQL.types.time],
 }
 
-const getColumnNames = (nodeDef) => {
+const getColumnNames = (nodeDef, tableNodeDef = null) => {
   const nodeDefName = NodeDef.getName(nodeDef)
+  if (tableNodeDef && NodeDef.isMultipleAttribute(nodeDef) && !NodeDef.isEqual(nodeDef)(tableNodeDef)) {
+    return [nodeDefName]
+  }
   const colsSuffix = columnNamesSuffixByType[NodeDef.getType(nodeDef)]
   if (colsSuffix) {
     return colsSuffix.map((col) => `${nodeDefName}${col}`)
@@ -43,7 +46,7 @@ const getColumnNames = (nodeDef) => {
 
 const extractColumnName = ({ nodeDef, columnName }) => {
   // this is because when there is not subfix whe should return
-  if(NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)){
+  if (NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)) {
     return 'code'
   }
   return camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
@@ -58,7 +61,7 @@ export default class ColumnNodeDef {
   constructor(table, nodeDef) {
     this._table = table
     this._nodeDef = nodeDef
-    this._names = getColumnNames(nodeDef)
+    this._names = getColumnNames(nodeDef, table.nodeDef)
     this._types = colTypesByType[NodeDef.getType(nodeDef)]
   }
 

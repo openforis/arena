@@ -1,18 +1,16 @@
 import './AccessRequest.scss'
 
 import React from 'react'
-import * as R from 'ramda'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
-import * as Validation from '@core/validation/validation'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
 import Markdown from '@webapp/components/markdown'
 import { ReCaptcha } from '@webapp/components/ReCaptcha'
 
 import { useI18n } from '@webapp/store/system'
+
 import { useAccessRequest } from './useAccessRequest'
+import { AccessRequestField } from './AccessRequestField'
 
 const AccessRequest = () => {
   const i18n = useI18n()
@@ -40,39 +38,15 @@ const AccessRequest = () => {
           <Markdown source={i18n.t('accessRequestView.introduction')} />
         </div>
         <form onSubmit={(event) => event.preventDefault()}>
-          {UserAccessRequest.editableFields.map((field) => {
-            const { name, normalizeFn, required, defaultValue } = field
-            const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
-            const value = R.path(name.split('.'))(request)
-            const items = UserAccessRequest.getFieldItems({ field })
-            const dropdownItems = items?.map((item) => ({
-              key: UserAccessRequest.getFieldItemKey({ field, item }),
-              value:
-                UserAccessRequest.getFieldItemLabel({ field, item }) ||
-                i18n.t(`accessRequestView.fields.${name}_value.${item}`),
-            }))
-            const dropdownSelection = dropdownItems?.find((item) => item.key === (value || defaultValue))
-
-            return (
-              <FormItem key={name} label={i18n.t(`accessRequestView.fields.${name}`)} required={required}>
-                {items ? (
-                  <Dropdown
-                    selection={dropdownSelection}
-                    items={dropdownItems}
-                    onChange={(item) => onFieldValueChange({ name, value: item.key })}
-                  />
-                ) : (
-                  <Input
-                    value={value}
-                    onChange={(val) => {
-                      onFieldValueChange({ name, value: normalizeFn ? normalizeFn(val) : val })
-                    }}
-                    validation={Validation.getFieldValidation(validationFieldName)(validation)}
-                  />
-                )}
-              </FormItem>
-            )
-          })}
+          {UserAccessRequest.editableFields.map((field) => (
+            <AccessRequestField
+              key={field.name}
+              field={field}
+              onChange={onFieldValueChange}
+              request={request}
+              validation={validation}
+            />
+          ))}
           <div className="recaptcha-wrapper">
             <ReCaptcha ref={reCaptchaRef} />
           </div>

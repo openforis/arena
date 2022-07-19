@@ -39,7 +39,6 @@ const QueryNodeDefsSelector = (props) => {
         onChangeQuery(Query.assocAttributeDefUuids(nodeDefUuidsAttributesUpdated)(query))
       }}
       showAnalysisAttributes
-      showMultipleAttributes={false}
     />
   )
 }
