@@ -7,4 +7,4 @@ import { _curry1 } from './internal/_curry1'
  *
  * @returns {boolean} - True if the input value is `null` or `undefined`, false otherwise.
  */
-export const isNull = _curry1((value) => value == null)
+export const isNull = _curry1((value) => value === null || value === undefined)

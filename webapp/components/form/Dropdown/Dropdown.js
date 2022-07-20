@@ -1,19 +1,10 @@
 import './dropdown.scss'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import ReactSelect from 'react-select'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
-
-import { TestId } from '@webapp/utils/testId'
-import * as StringUtils from '@core/stringUtils'
-import { Input } from '@webapp/components/form/Input'
-import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
-
-import ItemDialog from './ItemDialog'
-import { useLocalState, State } from './store'
 
 const Dropdown = (props) => {
   const {
@@ -78,7 +69,7 @@ const Dropdown = (props) => {
   const { items, loading } = state
 
   const fetchItems = useCallback(async () => {
-    const _items = typeof itemsProp === 'function' ? await itemsProp() : itemsProp
+    const _items = itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp()) : []
     setState({ items: _items, loading: false })
   }, [itemsProp])
 
@@ -86,19 +77,26 @@ const Dropdown = (props) => {
     fetchItems()
   }, [fetchItems])
 
-  const options = items?.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
+  const getItemFromOption = useCallback(
+    (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
+    [items, getOptionValue]
+  )
 
   const onChange = useCallback(
-    async (item) => {
+    async (option) => {
+      const item = getItemFromOption(option)
       if (!onBeforeChange || (await onBeforeChange(item))) {
         onChangeProp(item)
       }
     },
-    [onBeforeChange, onChangeProp]
+    [getItemFromOption, onBeforeChange, onChangeProp]
   )
 
-  const selectedValue = selection ? getOptionValue(selection) : null
-  const value = selection ? options.find((option) => option.value === selectedValue) : null
+  const options = items?.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
+
+  const emptySelection = A.isEmpty(selection)
+  const selectedValue = emptySelection ? null : getOptionValue(selection)
+  const value = emptySelection ? null : options.find((option) => option.value === selectedValue)
 
   return (
     <ReactSelect
