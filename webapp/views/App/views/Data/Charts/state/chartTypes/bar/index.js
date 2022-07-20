@@ -62,11 +62,11 @@ const bar = {
             id: 'metric',
             title: 'Metric',
             subtitle: 'Select the measurement to group the data',
-            type: 'select',
+            type: 'metric',
             isMulti: false,
             labelBuilder: (values) => {
-              const aggregation = values.aggregation.map(({ label }) => label)
-              const column = values.column.map(({ label }) => label)
+              const aggregation = values['query.metric.aggregation']['value'].map(({ label }) => label)
+              const column = values['query.metric.column']['value'].map(({ label }) => label)
 
               return `${aggregation}(${column})`
             },
@@ -82,24 +82,26 @@ const bar = {
                 type: 'select',
                 options: [
                   { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-                  { value: 'avg', label: 'Avg', name: 'avg', type: 'aggregation' },
+                  { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
                 ],
                 optionsParams: { showIcons: false },
               },
             },
             order: ['column', 'aggregation'],
             valuesToSpec: ({ value = [], spec = {} }) => {
-              console.log('IN', value)
-
+              value = value[0]
               const transform = {
-                calculate: `${value.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${value.map((val) => val.name).join('_')}`,
+                calculate: `${value['column'].map((val) => `datum.${val.value}`).join("+','+")}`,
+                as: `${value['column'].map((val) => val.name).join('_')}`,
               }
+
+              // TODO: Improve the way out of the aggregation
+              const ag = value['aggregation'][0]['value']
 
               const y = {
                 field: transform.as,
                 type: 'quantitative',
-                aggregate: 'mean',
+                aggregate: ag,
                 impute: {
                   value: 'NULL',
                 },

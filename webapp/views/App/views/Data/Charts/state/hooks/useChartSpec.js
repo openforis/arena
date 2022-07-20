@@ -7,6 +7,20 @@ const BASE_SPEC = {
 }
 
 const useChartSpec = ({ config, configItemsByPath } = {}) => {
+  // TODO: Revisit this to improve it
+  if (
+    'query.metric' in configItemsByPath &&
+    'query.metric.aggregation' in configItemsByPath &&
+    'query.metric.column' in configItemsByPath
+  ) {
+    configItemsByPath['query.metric']['value'] = [
+      {
+        aggregation: configItemsByPath['query.metric.aggregation']['value'],
+        column: configItemsByPath['query.metric.column']['value'],
+      },
+    ]
+  }
+
   const [spec, setSpec] = useState(BASE_SPEC)
 
   const updateSpecRaw = useCallback((newSpec) => {
@@ -24,7 +38,6 @@ const useChartSpec = ({ config, configItemsByPath } = {}) => {
       const block = key.split('.').reduce((_block, _key) => {
         return _block.blocks[_key]
       }, builderBlocks)
-
       if (block.valuesToSpec) {
         // maybe is better return items like [ transforms, encondigs] and the join here using a forEach instead a reduce and build the spec after the execution of the loop
         // but there is some functions that can transform some things like the innerRadios or outerRadious in mark
