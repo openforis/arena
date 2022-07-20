@@ -1,32 +1,32 @@
 import * as R from 'ramda'
 
 const logical = {
-  and: { key: '&&', value: '&&' },
-  or: { key: '||', value: '||' },
+  and: { value: '&&', label: '&&' },
+  or: { value: '||', label: '||' },
 }
 
 const comparison = {
-  eq: { key: '==', value: '=' },
-  notEq: { key: '!=', value: '!=' },
-  gt: { key: '>', value: '>' },
-  less: { key: '<', value: '<' },
-  gtOrEq: { key: '>=', value: '>=' },
-  lessOrEq: { key: '<=', value: '<=' },
+  eq: { value: '==', label: '=' },
+  notEq: { value: '!=', label: '!=' },
+  gt: { value: '>', label: '>' },
+  less: { value: '<', label: '<' },
+  gtOrEq: { value: '>=', label: '>=' },
+  lessOrEq: { value: '<=', label: '<=' },
 }
 
 const arithmetic = {
-  add: { key: '+', value: '+' },
-  sub: { key: '-', value: '-' },
-  mul: { key: '*', value: '*' },
-  div: { key: '/', value: '/' },
-  mod: { key: '%', value: '%' },
-  exp: { key: '**', value: '**' },
+  add: { value: '+', label: '+' },
+  sub: { value: '-', label: '-' },
+  mul: { value: '*', label: '*' },
+  div: { value: '/', label: '/' },
+  mod: { value: '%', label: '%' },
+  exp: { value: '**', label: '**' },
 }
 
 const binary = R.mergeLeft(arithmetic, comparison)
 const binaryValues = R.values(binary)
 
-const findBinary = (operator) => R.find(R.propEq('key', operator), binaryValues)
+const findBinary = (operator) => R.find(R.propEq('value', operator), binaryValues)
 
 const js2sqlOperators = {
   '&&': 'AND',

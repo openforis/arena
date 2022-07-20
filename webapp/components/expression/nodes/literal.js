@@ -98,8 +98,7 @@ const Literal = (props) => {
       return (
         <Dropdown
           items={(value) => loadItems({ ...literalSearchParams, value })}
-          itemLabel="label"
-          onChange={(_item) => onChangeValue(_item ? _item.key : null)}
+          onChange={(_item) => onChangeValue(_item ? _item.value : null)}
           selection={item}
         />
       )

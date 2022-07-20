@@ -40,7 +40,7 @@ const Binary = (props) => {
             className="operator"
             items={Expression.operators.binaryValues}
             selection={Expression.operators.findBinary(node.operator)}
-            onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'key', item), node))}
+            onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'value', item), node))}
           />
 
           {createOperand(BinaryOperandType.right)}

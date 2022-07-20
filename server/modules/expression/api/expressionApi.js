@@ -16,11 +16,11 @@ const toItem =
     item
       ? type === NodeDef.nodeDefType.code
         ? {
-            key: CategoryItem.getCode(item),
+            value: CategoryItem.getCode(item),
             label: CategoryItem.getLabel(lang)(item),
           }
         : {
-            key: Taxon.getCode(item),
+            value: Taxon.getCode(item),
             label: Taxon.getScientificName(item),
           }
       : null

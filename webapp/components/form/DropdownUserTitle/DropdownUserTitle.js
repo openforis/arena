@@ -7,12 +7,12 @@ import * as User from '@core/user/user'
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const titleItems = User.titleKeys.map((key) => ({ key }))
+const titleItems = User.titleKeys.map((value) => ({ value }))
 
 const DropdownUserTitle = (props) => {
   const { disabled, user, onChange, validation } = props
   const titleSelected = User.getTitle(user)
-  const itemSelected = A.isEmpty(titleSelected) ? undefined : { key: titleSelected }
+  const itemSelected = A.isEmpty(titleSelected) ? undefined : { value: titleSelected }
 
   const i18n = useI18n()
 
@@ -20,9 +20,9 @@ const DropdownUserTitle = (props) => {
     <Dropdown
       disabled={disabled}
       placeholder={i18n.t('user.title')}
-      onChange={(item) => onChange(User.assocTitle(item?.key)(user))}
+      onChange={(item) => onChange(User.assocTitle(item?.value)(user))}
       items={titleItems}
-      itemLabel={(item) => i18n.t(`user.titleValues.${item.key}`)}
+      itemLabel={(item) => i18n.t(`user.titleValues.${item.value}`)}
       selection={itemSelected}
       validation={validation}
     />

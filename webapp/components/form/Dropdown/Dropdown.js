@@ -11,6 +11,7 @@ const Dropdown = (props) => {
     autocompleteDialogClassName,
     autocompleteMinChars,
     className,
+    clearable,
     disabled,
     idInput,
     itemLabel,
@@ -101,10 +102,12 @@ const Dropdown = (props) => {
   return (
     <ReactSelect
       className={className}
+      isClearable={clearable}
       isDisabled={disabled}
       isLoading={loading}
       options={options}
       onChange={onChange}
+      isSearchable={!readOnlyInput}
       value={value}
     />
     // <div
@@ -177,6 +180,7 @@ Dropdown.propTypes = {
   autocompleteDialogClassName: PropTypes.string,
   autocompleteMinChars: PropTypes.number,
   className: PropTypes.string,
+  clearable: PropTypes.bool,
   disabled: PropTypes.bool,
   idInput: PropTypes.string,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
@@ -197,6 +201,7 @@ Dropdown.defaultProps = {
   autocompleteDialogClassName: null,
   autocompleteMinChars: 0,
   className: '',
+  clearable: false,
   disabled: false,
   idInput: null,
   itemKey: 'value',
