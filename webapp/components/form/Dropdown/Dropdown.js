@@ -102,11 +102,13 @@ const Dropdown = (props) => {
   return (
     <ReactSelect
       className={className}
-      isClearable={clearable}
+      isClearable={clearable && !readOnly}
       isDisabled={disabled}
       isLoading={loading}
-      isSearchable={!readOnlyInput}
+      isSearchable={!readOnlyInput && !readOnly}
       onChange={onChange}
+      openMenuOnClick={!readOnly}
+      menuIsOpen={readOnly ? false : undefined}
       options={options}
       placeholder={placeholder}
       value={value}
