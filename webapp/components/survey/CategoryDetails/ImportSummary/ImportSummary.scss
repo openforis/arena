@@ -3,8 +3,9 @@
   grid-template-rows: 1fr 50px;
 
   .modal-content {
-    margin: 5vh 3vw;
+    margin: 5vh auto;
     height: 90vh;
+    width: 70rem;
     padding: 2vh 1vw;
   }
 
@@ -22,15 +23,20 @@
     }
   }
 
-  .table, .table__content {
+  .table,
+  .table__content {
     height: 100%;
   }
 
   .table {
-
     .table__row-header,
     .table__row {
-      grid-template-columns: 30px .4fr .3fr .3fr;
+      grid-template-columns: 50px 1fr 20rem 14rem;
+
+      .column__extra-def {
+        width: 100%;
+        overflow: inherit;
+      }
     }
 
     .table__row > div:not(:first-child):not(:last-child) {
@@ -38,5 +44,4 @@
       padding: 0 1rem;
     }
   }
-
 }

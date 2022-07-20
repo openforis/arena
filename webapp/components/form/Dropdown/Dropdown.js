@@ -2,7 +2,6 @@ import './dropdown.scss'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import ReactSelect from 'react-select'
-import classNames from 'classnames'
 
 import * as A from '@core/arena'
 
@@ -24,6 +23,7 @@ const Dropdown = (props) => {
     readOnlyInput,
     selection,
     sourceElement,
+    style,
     title,
     validation,
   } = props
@@ -105,9 +105,10 @@ const Dropdown = (props) => {
       isClearable={clearable}
       isDisabled={disabled}
       isLoading={loading}
-      options={options}
-      onChange={onChange}
       isSearchable={!readOnlyInput}
+      onChange={onChange}
+      options={options}
+      placeholder={placeholder}
       value={value}
     />
     // <div
@@ -193,6 +194,7 @@ Dropdown.propTypes = {
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
+  style: PropTypes.object,
   title: PropTypes.string,
   validation: PropTypes.object,
 }
@@ -212,6 +214,7 @@ Dropdown.defaultProps = {
   readOnlyInput: false,
   selection: null,
   sourceElement: null,
+  style: {},
   title: null,
   validation: {},
 }
