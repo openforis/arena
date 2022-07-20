@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect, useMemo } from 'react'
-import { uuidv4 } from '@core/uuid'
 
 const defaultConfig = {
   type: 'pie',

@@ -13,8 +13,10 @@ const useGetDimensionsFromArena = (nodeDefLabelType) => {
   const [dimensions, setDimensions] = useState([])
 
   const generateDimensions = useCallback(() => {
-    const _dimensions = getArenaDimensions({ nodeDefUuid: entityDefUuid, survey, language, nodeDefLabelType })
-    setDimensions(_dimensions)
+    if (entityDefUuid) {
+      const _dimensions = getArenaDimensions({ nodeDefUuid: entityDefUuid, survey, language, nodeDefLabelType })
+      setDimensions(_dimensions)
+    }
   }, [entityDefUuid, language, survey, nodeDefLabelType])
 
   useEffect(() => {

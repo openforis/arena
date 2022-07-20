@@ -124,6 +124,8 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
     return blockItems
   }, [configItemsByPath, blockPath])
 
+  console.log('LABEL BUILDER', configItemsByPath, values)
+
   return (
     <CustomPopover
       config={config}
@@ -136,7 +138,7 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
       values={values}
     >
       <div className="block-metric-metrics-item">
-        <p>{block.labelBuilder(values)}</p>
+        <p>{block.labelBuilder(configItemsByPath)}</p>
       </div>
     </CustomPopover>
   )
