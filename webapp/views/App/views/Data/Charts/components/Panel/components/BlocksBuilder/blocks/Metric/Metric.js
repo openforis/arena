@@ -124,8 +124,6 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
     return blockItems
   }, [configItemsByPath, blockPath])
 
-  console.log('LABEL BUILDER', configItemsByPath, values)
-
   return (
     <CustomPopover
       config={config}

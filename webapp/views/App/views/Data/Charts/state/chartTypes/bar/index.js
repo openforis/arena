@@ -4,11 +4,14 @@ const bar = {
   },
   baseSpec: {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    layer: [
-      {
-        mark: { type: 'bar' },
+    spec: {
+      mark: { type: 'bar' },
+    },
+    config: {
+      mark: {
+        invalid: null,
       },
-    ],
+    },
   },
   builderBlocks: {
     blocks: {
@@ -33,24 +36,20 @@ const bar = {
               const x = {
                 field: transform.as,
                 type: 'nominal',
-                legend: {
-                  titleFontSize: 8,
-                  labelFontSize: 5,
-                },
-
                 impute: {
                   value: 'NULL',
                 },
-
-                sort: '-y',
               }
 
               const newSpec = {
                 ...spec,
                 transform: [transform],
-                encoding: {
-                  ...(spec.encoding || {}),
-                  x,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec.encoding || {}),
+                    x: x,
+                  },
                 },
               }
 
@@ -90,6 +89,7 @@ const bar = {
             order: ['column', 'aggregation'],
             valuesToSpec: ({ value = [], spec = {} }) => {
               value = value[0]
+              const metrics = value['column'].map((val) => val.value)
               const transform = {
                 calculate: `${value['column'].map((val) => `datum.${val.value}`).join("+','+")}`,
                 as: `${value['column'].map((val) => val.name).join('_')}`,
@@ -98,20 +98,40 @@ const bar = {
               // TODO: Improve the way out of the aggregation
               const ag = value['aggregation'][0]['value']
 
+              const repeat = {
+                layer: metrics,
+              }
               const y = {
-                field: transform.as,
+                field: { repeat: 'layer' },
                 type: 'quantitative',
                 aggregate: ag,
-                impute: {
-                  value: 'NULL',
+                title: transform.as,
+              }
+
+              const color = {
+                datum: {
+                  repeat: 'layer',
+                },
+                title: transform.as,
+              }
+
+              const xOffset = {
+                datum: {
+                  repeat: 'layer',
                 },
               }
 
               const newSpec = {
                 ...spec,
-                encoding: {
-                  ...(spec.encoding || {}),
-                  y,
+                repeat: repeat,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec.encoding || {}),
+                    y: y,
+                    color: color,
+                    xOffset: xOffset,
+                  },
                 },
               }
 
