@@ -79,8 +79,8 @@ const pie = {
             subtitle: 'Select the measurement to group the data',
             type: 'metric',
             labelBuilder: (values) => {
-              const aggregation = values.aggregation.map(({ label }) => label)
-              const column = values.column.map(({ label }) => label)
+              const aggregation = values['query.metric.aggregation']['value'].map(({ label }) => label)
+              const column = values['query.metric.column']['value'].map(({ label }) => label)
 
               return `${aggregation}(${column})`
             },
@@ -96,72 +96,118 @@ const pie = {
                 type: 'select',
                 options: [
                   { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-                  { value: 'avg', label: 'Avg', name: 'avg', type: 'aggregation' },
+                  { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
                 ],
                 optionsParams: { showIcons: false },
               },
             },
             order: ['column', 'aggregation'],
             valuesToSpec: ({ value = [], spec = {} }) => {
-              console.log('in', value)
-              /*
-                if (!dimension) {
-                  const newSpec = {
-                    ...spec,
-                  }
-                  delete newSpec.encoding.theta
-                  onUpdateSpec(A.stringify(newSpec))
-                  return
-                }
+              value = value[0]
 
-                const { name, type } = dimension
-                const { aggregateOp = 'sum' } = params
+              const transform = {
+                calculate: `${value['column'].map((val) => `datum.${val.value}`).join("+','+")}`,
+                as: `${value['column'].map((val) => val.name).join('_')}`,
+              }
 
-                const newSpec = {
-                  ...spec,
-                  encoding: {
-                    ...(spec.encoding || {}),
-                    theta: {
-                      field: name,
-                      type,
-                      aggregate: aggregateOp,
-                      impute: {
-                        value: 'NULL',
-                      },
-                      stack: true,
-                    },
-                  },
-                }
-                onUpdateSpec(A.stringify(newSpec))
-                */
-              return spec
+              // TODO: Improve the way out of the aggregation
+              const ag = value['aggregation'][0]['value']
+              const theta = {
+                field: transform.as,
+                type: 'quantitative',
+                aggregate: ag,
+                impute: {
+                  value: 'NULL',
+                },
+                stack: true,
+              }
+
+              const newSpec = {
+                ...spec,
+                encoding: {
+                  ...(spec.encoding || {}),
+                  theta: theta,
+                },
+              }
+              return newSpec
             },
           },
         },
         order: ['groupBy', 'metric'],
       },
       other: {
-        title: 'Other',
-        subtitle: 'hello world',
+        title: 'Chart Config',
+        subtitle: 'Configuration of the chart',
         type: 'container',
         blocks: {
-          size: {
-            id: 'size',
-            title: 'Size',
-            subtitle: 'Select with local options',
+          legend: {
+            id: 'legend',
+            title: 'Show Legend',
+            subtitle: 'Select wheter to show the Legend or not',
             type: 'select',
             options: [
-              { value: 1, label: 1, name: 'hello', type: 'nominal' },
-              { value: 10, label: 100, name: 'hello', type: 'nominal' },
+              { value: 1, label: 'Yes', name: 'Yes', type: 'nominal' },
+              { value: 0, label: 'No', name: 'No', type: 'nominal' },
             ],
             optionsParams: { showIcons: false },
             isMulti: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
+              const val = value.map((val) => val.value)
+              let legend = {
+                titleFontSize: 8,
+                labelFontSize: 5,
+              }
+
+              if (val == 0) {
+                legend = false
+              }
+
+              const newSpec = {
+                ...spec,
+                encoding: {
+                  ...(spec.encoding || {}),
+                  color: {
+                    // TODO: Fix this to work even when no encoding is defined.
+                    ...(spec.encoding.color || {}),
+                    legend: legend,
+                  },
+                },
+              }
+
+              return newSpec
+            },
+          },
+          donut: {
+            id: 'donut',
+            title: 'Inner Radius',
+            subtitle: 'Select the inner radius value (From donut to pie)',
+            type: 'select',
+            options: [
+              { value: 0, label: 0, name: 'inner_0' },
+              { value: 20, label: 20, name: 'inner_20' },
+              { value: 40, label: 40, name: 'inner_40' },
+            ],
+            optionsParams: { showIcons: false },
+            isMulti: false,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const val = value.map((val) => val.value)
+
+              const newSpec = {
+                ...spec,
+                layer: [
+                  {
+                    mark: {
+                      ...(spec.layer[0].mark || {}),
+                      innerRadius: val[0],
+                    },
+                  },
+                ],
+              }
+              return newSpec
             },
           },
         },
-        order: ['size'],
+        order: ['legend', 'donut'],
       },
     },
     order: ['query', 'other'],
