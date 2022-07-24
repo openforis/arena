@@ -16,3 +16,10 @@ export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
   } = await axios.get(`/api/surveys`, { params: { draft, template } })
   return surveys.map(Survey.getSurveyInfo)
 }
+
+export const fetchSurveyTemplatesPublished = async () => {
+  const {
+    data: { list: surveys },
+  } = await axios.get(`/api/surveyTemplates`)
+  return surveys
+}

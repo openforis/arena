@@ -21,3 +21,4 @@ export { ExpansionPanel, LoadingBar, PanelRight }
 
 export { Map } from './Map'
 export { Slider } from './Slider'
+export { Split } from './Split'
