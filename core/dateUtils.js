@@ -73,7 +73,7 @@ export const getRelativeDate = (i18n, date) => {
   return i18n.t('common.date.aMomentAgo')
 }
 
-/**
+/**.
  * Checks if the date is valid. Takes into account leap years
  * (i.e. 2015/2/29 is not valid).
  * Used for PostgreSQL date inserts
@@ -112,6 +112,8 @@ export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : n
 
 export const formatDateTimeDefault = (date) => (date ? format(date, formats.datetimeDefault) : null)
 
+export const formatDateTimeDisplay = (date) => (date ? format(date, formats.datetimeDisplay) : null)
+
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
@@ -135,6 +137,11 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
 }
 
 export const convertDateTimeFromISOToDisplay = (dateStr) =>
-  convertDate({ dateStr, formatFrom: formats.datetimeISO, formatTo: formats.datetimeDisplay, adjustTimezoneDifference: true })
+  convertDate({
+    dateStr,
+    formatFrom: formats.datetimeISO,
+    formatTo: formats.datetimeDisplay,
+    adjustTimezoneDifference: true,
+  })
 
 export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)

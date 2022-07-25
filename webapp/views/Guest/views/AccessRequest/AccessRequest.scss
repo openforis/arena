@@ -27,6 +27,10 @@
 
       .form-item {
         height: 3rem;
+
+        .loading-bar {
+          position: relative;
+        }
       }
 
       input {

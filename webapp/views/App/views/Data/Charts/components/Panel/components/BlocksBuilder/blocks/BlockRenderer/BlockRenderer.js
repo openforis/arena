@@ -1,9 +1,9 @@
 import ContainerBlock from '../Container/Container'
-import InputBlock from '../Input/Input'
+import SelectBlock from '../Select/SelectBlock'
 
 const RenderByType = {
   container: ContainerBlock,
-  input: InputBlock,
+  select: SelectBlock,
 }
 
 export default RenderByType

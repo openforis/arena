@@ -216,7 +216,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted, backup }, client),
     CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
     CategoryRepository.fetchIndex(surveyId, draft, client),
-    TaxonomyRepository.fetchIndex(surveyId, draft, client),
+    TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client),
   ])
 
   return R.pipe(
