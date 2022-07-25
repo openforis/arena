@@ -6,6 +6,23 @@ import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 export const init = (app) => {
   // ====== UPDATE - calculated entity data
+  app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+        surveyId,
+        draft: false,
+        backup: true,
+      })
+
+      res.json({ survey })
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  // ====== UPDATE - calculated entity data
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
