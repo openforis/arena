@@ -18,6 +18,7 @@ import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
 
 import { useSurveyInfoForm } from './store'
+import SamplingPolygonEditor from './SamplingPolygonEditor'
 
 const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
@@ -29,12 +30,14 @@ const SurveyInfo = () => {
     name,
     languages,
     srs,
+    samplingPolygon,
     labels,
     descriptions,
     cycles,
     setName,
     setLanguages,
     setSrs,
+    setSamplingPolygon,
     setLabels,
     setDescriptions,
     setCycles,
@@ -102,6 +105,15 @@ const SurveyInfo = () => {
             validation={getFieldValidation(Survey.infoKeys.cycles)}
           />
         </div>
+
+        <div className="form-item">
+          <label className="form-label">{i18n.t('samplingPolygonOptions.samplingPolygon')}</label>
+        </div>
+        <SamplingPolygonEditor
+          samplingPolygon={samplingPolygon}
+          setSamplingPolygon={setSamplingPolygon}
+          getFieldValidation={getFieldValidation}
+        />
 
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>

@@ -24,6 +24,7 @@ export const keys = {
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
+  samplingPolygon: 'samplingPolygon',
   srs: 'srs',
   steps: 'steps',
   template: 'template',
@@ -70,6 +71,8 @@ export const getLabel = (surveyInfo, lang) => {
   const label = ObjectUtils.getLabel(lang)(surveyInfo)
   return StringUtils.isBlank(label) ? getName(surveyInfo) : label
 }
+
+export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, { value: '{}' })
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

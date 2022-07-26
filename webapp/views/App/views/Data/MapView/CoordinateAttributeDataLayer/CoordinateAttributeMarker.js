@@ -1,8 +1,10 @@
 import React, { useCallback, useRef } from 'react'
 import { CircleMarker, Tooltip } from 'react-leaflet'
+import PropTypes from 'prop-types'
 
 import { Colors } from '@webapp/utils/colors'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
+import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 
 const markerRadius = 10
@@ -22,6 +24,10 @@ export const CoordinateAttributeMarker = (props) => {
     recordUuid,
   } = props
 
+  ancestorsKeys.propTypes = {
+    join: PropTypes.any,
+  }
+
   const tooltipRef = useRef()
 
   const onTooltipOpen = useCallback(() => {
@@ -37,33 +43,48 @@ export const CoordinateAttributeMarker = (props) => {
   const { showMarkersLabels } = options
 
   return (
-    <CircleMarker
-      center={[latitude, longitude]}
-      radius={markerRadius}
-      color={markersColor}
-      fillColor={markersColor}
-      fillOpacity={fillOpacity}
-    >
-      {showMarkersLabels && (
-        <Tooltip
-          ref={tooltipRef}
-          direction="top"
-          offset={[0, -10]}
-          opacity={tooltipOpacity}
-          permanent
-          onOpen={onTooltipOpen}
-        >
-          {ancestorsKeys.join(' - ')}
-        </Tooltip>
-      )}
-      <CoordinateAttributePopUp
-        attributeDef={attributeDef}
-        point={point}
-        recordUuid={recordUuid}
-        parentUuid={parentUuid}
-        ancestorsKeys={ancestorsKeys}
-        onRecordEditClick={onRecordEditClick}
-      />
-    </CircleMarker>
+    <div>
+      <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
+      <CircleMarker
+        center={[latitude, longitude]}
+        radius={markerRadius}
+        color={markersColor}
+        fillColor={markersColor}
+        fillOpacity={fillOpacity}
+      >
+        {showMarkersLabels && (
+          <Tooltip
+            ref={tooltipRef}
+            direction="top"
+            offset={[0, -10]}
+            opacity={tooltipOpacity}
+            permanent
+            onOpen={onTooltipOpen}
+          >
+            {ancestorsKeys.join(' - ')}
+          </Tooltip>
+        )}
+        <CoordinateAttributePopUp
+          attributeDef={attributeDef}
+          point={point}
+          recordUuid={recordUuid}
+          parentUuid={parentUuid}
+          ancestorsKeys={ancestorsKeys}
+          onRecordEditClick={onRecordEditClick}
+        />
+      </CircleMarker>
+    </div>
   )
+}
+
+CoordinateAttributeMarker.propTypes = {
+  ancestorsKeys: PropTypes.any,
+  attributeDef: PropTypes.any,
+  latitude: PropTypes.any,
+  longitude: PropTypes.any,
+  markersColor: PropTypes.any,
+  onRecordEditClick: PropTypes.any,
+  parentUuid: PropTypes.any,
+  point: PropTypes.any,
+  recordUuid: PropTypes.any,
 }

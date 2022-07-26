@@ -1,10 +1,14 @@
 import React, { useContext, useState } from 'react'
 import { defaultBaseLayer } from './baseLayers'
+import PropTypes from 'prop-types'
 
 const initialState = {
   baseLayer: null,
   options: {
     showMarkersLabels: false,
+    showSamplingPolygon: true,
+    showControlPoints: true,
+    showPlotReferencePoint: true,
   },
 }
 
@@ -49,4 +53,11 @@ export {
   useMapContext,
   useMapContextBaseLayer,
   useMapContextOptions,
+}
+
+MapContextConsumer.propTypes = {
+  children: PropTypes.any,
+}
+MapContextProvider.propTypes = {
+  children: PropTypes.any,
 }

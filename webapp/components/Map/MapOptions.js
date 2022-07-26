@@ -36,6 +36,24 @@ export const MapOptions = () => {
                 onChange={(value) => onOptionUpdate({ option: 'showMarkersLabels', value })}
               />
             </FormItem>
+            <FormItem label={i18n.t('mapView.options.showSamplingPolygon')}>
+              <Checkbox
+                checked={options.showSamplingPolygon}
+                onChange={(value) => onOptionUpdate({ option: 'showSamplingPolygon', value })}
+              />
+            </FormItem>
+            <FormItem label={i18n.t('mapView.options.showControlPoints')}>
+              <Checkbox
+                checked={options.showControlPoints}
+                onChange={(value) => onOptionUpdate({ option: 'showControlPoints', value })}
+              />
+            </FormItem>
+            <FormItem label={i18n.t('mapView.options.showPlotReferencePoint')}>
+              <Checkbox
+                checked={options.showPlotReferencePoint}
+                onChange={(value) => onOptionUpdate({ option: 'showPlotReferencePoint', value })}
+              />
+            </FormItem>
           </div>
         )}
       </div>
