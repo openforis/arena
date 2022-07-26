@@ -125,7 +125,8 @@ button:disabled,
   }
 }
 
-.btn-danger {
+.btn-danger,
+.btn-primary.btn-danger {
   color: white;
   background-color: $red;
   border-color: rgba($red, 0.5) !important;

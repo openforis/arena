@@ -120,7 +120,7 @@ export const fetchRecordAndNodesByUuid = async (
   )
 
   const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
-  return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate })(record)
+  return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'

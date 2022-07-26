@@ -11,7 +11,6 @@ const formatters = {
   [NodeDef.nodeDefType.decimal]: ({ value, nodeDef }) =>
     NumberUtils.formatDecimal(value, NodeDef.getMaxNumberDecimalDigits(nodeDef)),
   [NodeDef.nodeDefType.integer]: ({ value }) => NumberUtils.formatInteger(value),
-  [NodeDef.nodeDefType.time]: ({ value }) => DateUtils.format(DateUtils.parse(value, 'HH:mm:ss'), 'HH:mm'),
 }
 
 const format = ({ value, i18n, nodeDef }) => {
@@ -19,7 +18,9 @@ const format = ({ value, i18n, nodeDef }) => {
     return ''
   }
   const formatter = formatters[NodeDef.getType(nodeDef)]
-  return formatter ? formatter({ value, i18n, nodeDef }) : value
+  const formatValue = (v) => (formatter ? formatter({ value: v, i18n, nodeDef }) : value)
+
+  return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }
 
 export const ValueFormatter = {

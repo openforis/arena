@@ -51,6 +51,9 @@ export const TestId = {
     importFromCollectTab: 'importFromCollectTab',
     importFromCsvTab: 'importFromCsvTab',
   },
+  dialogConfirm: {
+    strongConfirmInput: 'dialog-confirm__strong-confirm-input',
+  },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
     toggleBtn: (id) => `${id}-toggle-btn`,
@@ -144,9 +147,6 @@ export const TestId = {
     surveyName: 'survey-name',
     surveyLabel: 'survey-label',
   },
-  surveyDelete: {
-    confirmNameInput: 'survey-delete-confirm-name',
-  },
   surveyExport: {
     downloadBtn: 'text="Download"',
   },
@@ -159,7 +159,8 @@ export const TestId = {
     entityAddBtn: (name) => `${name}-add-btn`,
     entityRowHeader: (name) => `${name}-row-header`,
     entityRowData: (name, idx) => `${name}-row-${idx}`,
-    nodeDefAddChildBtn: (name) => `${name}-add-child-btn`,
+    nodeDefAddChildToBtn: (name) => `${name}-add-child-btn`,
+    nodeDefAddChildOfTypeBtn: (type) => `add-child-of-type-${type}`,
     nodeDefEditBtn: (name) => `${name}-edit-btn`,
     nodeDefEntityTableCellWrapper: (name) => `node-def-entity-table-cell-wrapper-${name}`,
     nodeDefErrorBadge: (name) => `${name}-error-badge`,

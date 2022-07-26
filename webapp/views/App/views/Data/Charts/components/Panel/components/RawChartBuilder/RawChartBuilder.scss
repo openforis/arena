@@ -1,9 +1,14 @@
-@import '~@webapp/style/vars';
+@import 'webapp/style/vars';
 
 .raw-chart-builder {
-    display: flex;
+    display: none;
     flex-direction: column;
     flex: 1;
+
+    height: calc(100% - 32px);
+    &.visible{
+        display: flex;
+    }
 }
 
 .raw-chart-builder__editor{

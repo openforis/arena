@@ -137,7 +137,9 @@ class RChain {
   }
 
   async _initEntities() {
-    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey)
+    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey).filter(
+      NodeDef.isInCycle(this.cycle)
+    )
 
     const entitiesWithData = await SurveyRdbManager.filterEntitiesWithData({
       survey: this.survey,
@@ -155,6 +157,7 @@ class RChain {
       advanced: true,
       draft: true,
     })
+    this._survey = Survey.initAndAssocNodeDefsIndex(this._survey)
 
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId: this.surveyId })
     const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId: this.surveyId })

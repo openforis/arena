@@ -108,7 +108,16 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorT
   return variables
 }
 
-const getVariablesGroupedByParentUuid = ({ variables, survey, nodeDefCurrent = null }) => {
+const getThisVariable = ({ mode, variables, nodeDefCurrent }) => {
+  if (mode === Expression.modes.sql) return variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  return {
+    ...getJsVariables(nodeDefCurrent),
+    label: `this (${NodeDef.getName(nodeDefCurrent)})`,
+    value: 'this',
+  }
+}
+
+const getVariablesGroupedByParentUuid = ({ variables, survey, mode, nodeDefCurrent = null }) => {
   const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
@@ -132,8 +141,8 @@ const getVariablesGroupedByParentUuid = ({ variables, survey, nodeDefCurrent = n
     return groups
   }
   // always show current variable at the beginning
-  const currentVariable = variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
-  return [currentVariable, ...groups]
+  const thisVariable = getThisVariable({ variables, nodeDefCurrent, mode })
+  return [thisVariable, ...groups]
 }
 
 const _sortVariables = ({ nodeDefCurrent, variables }) => {

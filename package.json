@@ -98,7 +98,7 @@
     "yarn-audit-fix": "^9.3.1"
   },
   "dependencies": {
-    "@openforis/arena-core": "^0.0.102",
+    "@openforis/arena-core": "^0.0.107",
     "@openforis/arena-server": "^0.1.20",
     "@sendgrid/mail": "^7.7.0",
     "@shopify/draggable": "^1.0.0-beta.8",
@@ -159,6 +159,7 @@
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
     "react-select": "^5.3.2",
+    "react-split": "^2.0.14",
     "react-switch": "^6.0.0",
     "react-transition-group": "^4.4.2",
     "react-vega": "^7.5.1",

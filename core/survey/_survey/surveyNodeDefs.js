@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Surveys } from '@openforis/arena-core'
+
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
@@ -34,9 +36,8 @@ export const getNodeDefSource = (nodeDef) =>
 export const getNodeDefChildren =
   (nodeDef, includeAnalysis = true) =>
   (survey) => {
-    const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initNodeDefsIndex(survey)
-    let childDefs = SurveyNodeDefsIndex.getNodeDefChildren(nodeDef)(surveyIndexed)
-    childDefs = includeAnalysis ? childDefs : childDefs.filter((childDef) => !NodeDef.isAnalysis(childDef))
+    const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
+    let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
     // the next line filters the sampling analysis nodeDefs without sibilinings
     childDefs = childDefs.filter(
       (childDef) =>
@@ -160,11 +161,7 @@ export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predic
 
 export const assocNodeDefs = (nodeDefs) => (survey) => {
   const surveyUpdated = R.assoc(nodeDefsKey, nodeDefs)(survey)
-  const nodeDefsIndex = SurveyNodeDefsIndex.initNodeDefsIndex(surveyUpdated)
-  return {
-    ...surveyUpdated,
-    nodeDefsIndex,
-  }
+  return SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(surveyUpdated)
 }
 
 const updateNodeDefs = (updateFn) => (survey) => {
@@ -234,7 +231,7 @@ export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (surv
 }
 
 export const getNodeDefPath =
-  ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true }) =>
+  ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true, separator = ' / ' }) =>
   (survey) => {
     const pathParts = []
 
@@ -244,7 +241,7 @@ export const getNodeDefPath =
       pathParts.unshift(pathPart)
     })(survey)
 
-    return pathParts.join(' / ')
+    return pathParts.join(separator)
   }
 
 export const getHierarchy =

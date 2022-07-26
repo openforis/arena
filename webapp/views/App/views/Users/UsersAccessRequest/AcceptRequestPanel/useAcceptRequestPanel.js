@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 
@@ -16,6 +17,8 @@ export const useAcceptRequestPanel = (props) => {
   const { userAccessRequest, onRequestAccepted } = props
   const { uuid: accessRequestUuid, email, props: requestProps } = userAccessRequest
 
+  const { templateUuid } = requestProps
+
   const dispatch = useDispatch()
   const i18n = useI18n()
 
@@ -25,11 +28,28 @@ export const useAcceptRequestPanel = (props) => {
     surveyName: requestProps.surveyName,
     surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
     role: AuthGroup.groupNames.surveyManager,
+    templateUuid,
   })
 
   const { role, surveyName } = accessRequestAccept
 
   const [validation, setValidation] = useState(null)
+
+  const [templateLabel, setTemplateLabel] = useState('')
+
+  // load template label (if template is defined in the access request)
+  useEffect(() => {
+    const loadTemplateLabel = async () => {
+      const templates = await API.fetchSurveyTemplatesPublished()
+      const template = templates.find((template) => Survey.getUuid(template) === templateUuid)
+      setTemplateLabel(Survey.getDefaultLabel(template))
+    }
+    if (templateUuid) {
+      loadTemplateLabel()
+    } else {
+      setTemplateLabel(i18n.t('accessRequestView.templateNotSelected'))
+    }
+  }, [templateUuid])
 
   const roleLabelFunction = (r) => i18n.t(`authGroups.${r}.label`)
 
@@ -89,5 +109,5 @@ export const useAcceptRequestPanel = (props) => {
       )
     }
   }
-  return { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation }
+  return { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, templateLabel, validation }
 }

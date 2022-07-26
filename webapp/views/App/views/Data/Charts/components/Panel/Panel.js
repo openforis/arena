@@ -1,14 +1,51 @@
-import React from 'react'
-import RawChartBuilder from './components/RawChartBuilder'
+import './Panel.scss'
+import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 
-const Panel = ({ dimensions, spec, onUpdateSpec }) => {
+import ModeSelector from './components/ModeSelector'
+import RawChartBuilder from './components/RawChartBuilder'
+import BlocksBuilder from './components/BlocksBuilder'
+
+import { panelModes } from '../../state/config'
+
+const useModeSelector = () => {
+  const [currentMode, setCurrentMode] = useState(Object.keys(panelModes)[0])
+
+  const onSelectMode = useCallback((modeKey) => {
+    setCurrentMode(modeKey)
+  }, [])
+
+  return { currentMode, onSelectMode }
+}
+const Panel = ({ config, configItemsByPath, configActions, dimensions, spec, onUpdateSpec }) => {
+  const { currentMode, onSelectMode } = useModeSelector()
+
   return (
     <div className="charts_panel__container">
-      <RawChartBuilder dimensions={dimensions} spec={spec} onUpdateSpec={onUpdateSpec} />
+      <ModeSelector modes={panelModes} currentMode={currentMode} onSelectMode={onSelectMode} />
+
+      <RawChartBuilder
+        visible={currentMode === panelModes.RAW}
+        dimensions={dimensions}
+        spec={spec}
+        onUpdateSpec={onUpdateSpec}
+      />
+
+      <BlocksBuilder
+        visible={currentMode === panelModes.BUILDER}
+        dimensions={dimensions}
+        config={config}
+        configItemsByPath={configItemsByPath}
+        configActions={configActions}
+      />
     </div>
   )
 }
 
-Panel.propTypes = {}
+Panel.propTypes = {
+  spec: PropTypes.object.isRequired,
+  onUpdateSpec: PropTypes.func.isRequired,
+  dimensions: PropTypes.arrayOf(PropTypes.any),
+}
 
 export default Panel

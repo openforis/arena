@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '../survey'
 import * as NodeDef from '../nodeDef'
@@ -203,9 +204,11 @@ export const validateNodeDef = async (survey, nodeDef) => {
 export const validateNodeDefs = async (survey) => {
   const nodeDefs = Survey.getNodeDefs(survey)
 
-  const nodeDefsValidation = await Promise.all(
-    Object.values(nodeDefs).map((nodeDef) => validateNodeDef(survey, nodeDef))
-  )
+  const nodeDefsValidation = []
+  await PromiseUtils.each(Object.values(nodeDefs), async (nodeDef) => {
+    nodeDefsValidation.push(await validateNodeDef(survey, nodeDef))
+  })
+
   // exclude valid node def validations
   const fieldsValidation = Object.values(nodeDefs).reduce((fieldsValidationAcc, nodeDef, index) => {
     const nodeDefValidation = nodeDefsValidation[index]

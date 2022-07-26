@@ -10,6 +10,7 @@ import { uuidv4 } from '../../../core/uuid'
 export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
 
 export const rmdir = async (path) => promises.rmdir(path, { recursive: true })
+export const readDir = async (path) => promises.readdir(path, { recursive: true })
 
 export const existsDir = (path) => fs.existsSync(path)
 

@@ -29,6 +29,7 @@ Do you want to ignore them?`,
     cloneFrom: 'Clone from',
     cnt: 'Count',
     code: 'Code',
+    collapse: 'Collapse',
     copy: 'Copy',
     csvExport: 'CSV Export',
     csvImport: 'CSV Import',
@@ -60,7 +61,8 @@ Please check also the Spam/Junk mail folder.`,
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
-    expandCollapse: 'Expand / Collapse',
+    expand: 'Expand',
+    expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Export',
     exportAll: 'Export all',
     expression: 'Expression',
@@ -70,6 +72,7 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
     group: 'Group',
+    help: 'Help',
     hide: 'Hide',
     id: 'id',
     import: 'Import',
@@ -79,6 +82,7 @@ Please check also the Spam/Junk mail folder.`,
     label: 'Label',
     label_plural: 'Labels',
     language: 'Language',
+    language_plural: 'Languages',
     leavePageConfirmMessage: `There are unsaved changes in the form. 
 
 By confirming, all changes will be lost.
@@ -168,6 +172,10 @@ Do you want to proceed?`,
       nextPage: 'Next page',
       previousPage: 'Previous page',
     },
+  },
+
+  confirm: {
+    strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
   },
 
   error: {
@@ -276,12 +284,7 @@ Do you want to proceed?`,
         country: 'Country',
         purpose: 'What do you need it for?',
         surveyName: 'Propose a Survey Name',
-        template: 'Start from a template?',
-        template_value: {
-          none: 'None (start from scratch)',
-          templateA: 'Template A',
-          templateB: 'Template B',
-        },
+        templateUuid: 'Start from a template?',
       },
     },
     introduction: `The platform is still beta, so if you want access, you have to request here.
@@ -298,6 +301,7 @@ We will send soon an email to **{{email}}** with the instructions on how to acce
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
+    templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
   },
 
@@ -334,7 +338,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
+      confirmDeleteCycleHeader: 'Delete this cycle?',
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
+If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
@@ -342,7 +348,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
-      deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
+      deleteWarning: `Deleting the **{{surveyName}}** survey will delete all of its data.\n\n
+
+$t(common.cantUndoWarning)`,
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyList: {
@@ -500,7 +508,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     editSelectedRecord: 'Edit selected record',
     editMode: 'Edit Mode',
     filterAttributeTypes: 'Filter attribute types',
-    filterRecords: 'Filter records',
+    filterRecords: {
+      buttonTitle: 'Filter records',
+      expressionEditorHeader: 'Expression to filter records',
+    },
     invalidRecord: 'Invalid record',
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
@@ -609,6 +620,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',
       role: 'Role',
+      template: 'Template',
     },
   },
 
@@ -795,8 +807,11 @@ $t(common.cantUndoWarning)`,
     categorical: 'Categorical',
     emptyNodeDefs:
       '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
-    entityWithoutData:
-      'Entity {{name}} has no data: the entity and all the related result variables will be excluded in the RStudio scripts',
+    entityExcludedInRStudioScripts:
+      'the entity and all the related result variables will be excluded in the RStudio scripts',
+    entityWithoutData: 'Entity {{name}} has no data; $t(chain.entityExcludedInRStudioScripts)',
+    entityNotInCurrentCycle:
+      'Entity {{name}} is not available in the selected cycle; $t(chain.entityExcludedInRStudioScripts)',
   },
 
   itemsTable: {
@@ -864,7 +879,7 @@ $t(common.appNameFull)
       displayIn: 'Display in',
       form: 'Form',
       table: 'Table',
-      parentPage: 'Parent page',
+      parentPage: 'Parent page ({{parentPage}})',
       ownPage: 'Its own page',
       analysis: 'Analysis',
       entitySource: 'Entity Source',
@@ -943,6 +958,19 @@ $t(common.appNameFull)
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDefLabel}}',
     addChildToTitle: 'Add new node to {{nodeDefLabel}}',
+    addChildToTypes: {
+      boolean: 'Boolean',
+      code: 'Code',
+      coordinate: 'Coordinate',
+      date: 'Date',
+      decimal: 'Decimal',
+      entity: 'Table or form',
+      file: 'File',
+      integer: 'Integer',
+      taxon: 'Taxon',
+      text: 'Text',
+      time: 'Time',
+    },
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
@@ -1142,6 +1170,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     categoryImport: {
+      cannotDeleteItemsOfPublishedCategory:
+        'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',
+      cannotDeleteLevelsOfPublishedCategory:
+        'Cannot delete levels of published category. Levels missing in imported file: {{deletedLevelNames}}',
       codeColumnMissing: 'There should be at least one "code" column',
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
@@ -1386,6 +1418,18 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group',
     var: 'Var',
     const: 'Const',
+
+    header: {
+      editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+    },
+
+    qualifier: {
+      'default-values': 'default value',
+      'default-values-apply-if': 'default value apply if',
+      'relevant-if': 'relevant if',
+      validations: 'validation rule',
+      'validations-apply-if': 'validation rule apply if',
+    },
   },
 
   // ====== Auth

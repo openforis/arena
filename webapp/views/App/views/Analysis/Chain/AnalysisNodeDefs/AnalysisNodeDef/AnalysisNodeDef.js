@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, NodeDefsActions, useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
@@ -16,16 +16,20 @@ import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/warningBadge'
 
 const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
-  const survey = useSurvey()
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-
   const dispatch = useDispatch()
   const i18n = useI18n()
+  const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
+
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefDeleted = !nodeDef
   const parentEntity = Survey.getNodeDefParent(nodeDef)(survey)
   const parentEntityName = NodeDef.getName(parentEntity)
+  const parentEntityNotInCurrentCycle = !NodeDef.isInCycle(cycle)(parentEntity)
+  const noData = dataCount === 0
+  const warningShown = noData || parentEntityNotInCurrentCycle
 
   const handleSetActive = useCallback(() => {
     const active = NodeDef.getActive(nodeDef)
@@ -51,11 +55,14 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
           <span className="icon icon-menu" />
         </button>
       </div>
-      <div className={classNames('analysis-node-def__entity-name', { 'no-data': dataCount === 0 })}>
+      <div className={classNames('analysis-node-def__entity-name', { 'with-warning': warningShown })}>
         <span className="entity-label" title={parentEntityName}>
           {parentEntityName}
         </span>
-        <WarningBadge show={dataCount === 0} title="chain.entityWithoutData" titleParams={{ name: parentEntityName }} />
+        {noData && <WarningBadge title="chain.entityWithoutData" titleParams={{ name: parentEntityName }} />}
+        {!noData && parentEntityNotInCurrentCycle && (
+          <WarningBadge title="chain.entityNotInCurrentCycle" titleParams={{ name: parentEntityName }} />
+        )}
       </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>

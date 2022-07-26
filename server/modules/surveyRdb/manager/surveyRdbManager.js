@@ -247,7 +247,9 @@ export const fetchTableRowsCountByEntityDefUuid = async ({
   const entityDefUuids =
     entityDefUuidsParam?.length > 0
       ? entityDefUuidsParam
-      : Survey.getNodeDefsArray(survey).filter(NodeDef.isMultipleEntity).map(NodeDef.getUuid)
+      : Survey.getNodeDefsArray(survey)
+          .filter((nodeDef) => NodeDef.isMultipleEntity(nodeDef) && NodeDef.isInCycle(cycle)(nodeDef))
+          .map(NodeDef.getUuid)
 
   const countsArray = await Promise.all(
     entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }))

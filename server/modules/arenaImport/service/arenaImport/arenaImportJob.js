@@ -18,17 +18,24 @@ import ChainsImportJob from './jobs/chainsImportJob'
 import CreateRdbJob from './jobs/createRdb'
 
 const createInnerJobs = (params) => {
-  const { backup = true } = params
+  const { backup = true, mobile = false } = params
   return [
     new ArenaSurveyReaderJob(),
-    new SurveyCreatorJob(),
-    ...(backup ? [new UsersImportJob()] : []),
-    new TaxonomiesImportJob(),
-    new CategoriesImportJob(),
-    new NodeDefsImportJob(),
-    new ChainsImportJob(),
-    // when not restoring a survey backup, skip activity log, records and files
-    ...(backup ? [new ActivityLogImportJob(), new RecordsImportJob(), new FilesImportJob()] : []),
+
+    ...(!mobile
+      ? [
+          new SurveyCreatorJob(),
+          ...(backup ? [new UsersImportJob()] : []),
+          new TaxonomiesImportJob(),
+          new CategoriesImportJob(),
+          new NodeDefsImportJob(),
+          new ChainsImportJob(),
+          // when not restoring a survey backup, skip activity log, records and files
+          ...(backup ? [new ActivityLogImportJob()] : []),
+        ]
+      : []),
+    ...(backup ? [new RecordsImportJob()] : []),
+    ...(backup ? [new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
   ]
@@ -44,12 +51,13 @@ export default class ArenaImportJob extends Job {
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!object} [params.user] - The user performing the import.
    * @param {boolean} [params.backup = true] - If true, props and propsDraft will be imported separately and records, files, activity logs will be imported.
+   * @param {boolean} [params.mobile = false] - If true it cames from mobile.
    * @param {object} [params.surveyInfoTarget = null] - Target survey info (optional).
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
-    const { backup = true, ...paramsRest } = params
-    super(ArenaImportJob.type, { ...paramsRest, backup }, createInnerJobs(params))
+    const { backup = true, mobile = false, ...paramsRest } = params
+    super(ArenaImportJob.type, { ...paramsRest, backup, mobile }, createInnerJobs(params))
   }
 
   async onStart() {
@@ -68,14 +76,14 @@ export default class ArenaImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { arenaSurveyFileZip, backup, filePath, surveyId } = this.context
+    const { arenaSurveyFileZip, backup, filePath, surveyId, mobile } = this.context
 
     if (arenaSurveyFileZip) {
       arenaSurveyFileZip.close()
     }
 
     if (surveyId) {
-      if (backup) {
+      if (backup && !mobile) {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       } else {
         // if not backup (cloning) survey temporary flag or delete will be managed by parent SurveyCloneJob

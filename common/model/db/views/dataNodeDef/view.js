@@ -73,12 +73,21 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     }
     // attribute columns
     columns.push(...this.tableData.columnNodeDefs)
+    // multiple attribute columns
+    columns.push(
+      ...Survey.getNodeDefChildren(
+        this.nodeDef,
+        true
+      )(this.survey)
+        .filter(NodeDef.isMultipleAttribute)
+        .map((multAttrDef) => new ColumnNodeDef(this.tableData, multAttrDef))
+    )
     // parent view columns
     if (this.viewDataParent) {
       columns.unshift(
-        ...this.viewDataParent.columnNodeDefs.map(
-          (columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef)
-        )
+        ...this.viewDataParent.columnNodeDefs
+          .filter((parentColumnNodeDef) => !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef))
+          .map((columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef))
       )
     }
     return columns

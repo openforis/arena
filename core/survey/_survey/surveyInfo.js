@@ -12,7 +12,7 @@ export const keys = {
   ownerUuid: 'ownerUuid',
   ownerName: 'ownerName',
   draft: 'draft',
-  published: 'published',
+  published: ObjectUtils.keys.published,
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
   // Props
@@ -41,7 +41,8 @@ export const cycleOneKey = '0'
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // ====== READ surveyInfo
-export const { getId, getUuid, getProps, getPropsDraft } = ObjectUtils
+export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescription, getDescriptions, getLabels } =
+  ObjectUtils
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 
@@ -49,22 +50,21 @@ export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 
 export const getOwnerName = R.propOr('', keys.ownerName)
 
-export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
-
-export const isPublished = R.propEq(keys.published, true)
-
 export const isDraft = R.propEq(keys.draft, true)
 
 export const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
 export const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
-export const getLabels = ObjectUtils.getProp(keys.labels, {})
-
 export const getDefaultLabel = (surveyInfo) => {
-  const labels = getLabels(surveyInfo)
+  const labels = ObjectUtils.getLabels(surveyInfo)
   const lang = getDefaultLanguage(surveyInfo)
   return R.prop(lang, labels)
+}
+
+export const getDefaultDescription = (surveyInfo) => {
+  const lang = getDefaultLanguage(surveyInfo)
+  return ObjectUtils.getDescription(lang, '')(surveyInfo)
 }
 
 export const getLabel = (surveyInfo, lang) => {
