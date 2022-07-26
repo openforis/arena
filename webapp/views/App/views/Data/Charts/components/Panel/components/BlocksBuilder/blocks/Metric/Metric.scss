@@ -89,9 +89,19 @@
       min-width: 0;
       box-sizing: border-box;
       padding: 4px 8px;
+      position: relative;
+
       &:hover{
         cursor: pointer;
         opacity: 0.8;
+      }
+      .icon-delete{
+        position: absolute;
+        right: 4px;
+        top: 4px;
+        border: none;
+        background: transparent;
+
       }
     }
 

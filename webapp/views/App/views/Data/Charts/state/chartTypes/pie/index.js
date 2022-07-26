@@ -79,8 +79,8 @@ const pie = {
             subtitle: 'Select the measurement to group the data',
             type: 'metric',
             labelBuilder: (values) => {
-              const aggregation = values['query.metric.aggregation']['value'].map(({ label }) => label)
-              const column = values['query.metric.column']['value'].map(({ label }) => label)
+              const aggregation = values.aggregation.map(({ label }) => label)
+              const column = values.column.map(({ label }) => label)
 
               return `${aggregation}(${column})`
             },

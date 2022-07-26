@@ -27,6 +27,12 @@ const addItemByPath = (blockPath, item) => (obj) => {
   return updateObjectValueByPath({ obj, blockPath, value: _value })
 }
 
+const removeItemByPath = (blockPath, item) => (obj) => {
+  let _value = getValueByBlockPath({ obj, blockPath })
+  _value = _value.filter((_val) => _val.key !== item.key)
+  return updateObjectValueByPath({ obj, blockPath, value: _value })
+}
+
 const updateItemByPathAndKey = (blockPath, value) => (obj) => {
   let _value = getValueByBlockPath({ obj, blockPath })
   _value = _value.map((_val) => {
@@ -94,9 +100,7 @@ const useChartConfig = ({ table, setTable }) => {
 
       setConfigItemsByPath((_configItemsByPath) => {
         const newItems = Object.assign({}, _configItemsByPath)
-        let _value = newItems[blockPath]?.value || []
-        _value = _value.filter((_val) => _val.key !== value.key)
-        newItems[blockPath] = { ...(newItems[blockPath] || { blockPath }), value: _value }
+        removeItemByPath(blockPath, value)(newItems)
         return newItems
       })
 
@@ -153,6 +157,39 @@ const useChartConfig = ({ table, setTable }) => {
     [configItemsByPath]
   )
 
+  const deleteMetric = useCallback(
+    (payload) => {
+      const { blockPath, metric, values } = payload
+
+      // subitems
+      // bloackPath
+      console.log(blockPath, metric, values)
+
+      setConfigItemsByPath((_configItemsByPath) => {
+        const newItems = Object.assign({}, _configItemsByPath)
+        console.log('start newITems', JSON.stringify(newItems, null, 2))
+        removeItemByPath(blockPath, metric)(newItems)
+        Object.entries(values).forEach(([key, value]) => {
+          const _blockPath = `${blockPath}.${key}`
+          removeItemByPath(_blockPath, value)(newItems)
+        })
+
+        /*Object.entries(values).forEach(([key, value]) => {
+          if (pathsToDelete.includes(key)) {
+            // replace of values
+            console.log('key', key)
+          }
+        })*/
+
+        console.log('end newITems', JSON.stringify(newItems, null, 2))
+        return newItems
+      })
+
+      setHistory(updateHistory({ action: 'removeMetric', payload }))
+    },
+    [configItemsByPath]
+  )
+
   const configActions = useMemo(() => {
     return {
       changeType,
@@ -161,8 +198,9 @@ const useChartConfig = ({ table, setTable }) => {
       removeValue,
       replaceValue,
       addOrUpdateMetric,
+      deleteMetric,
     }
-  }, [changeType, addValue, updateValue, removeValue, replaceValue, addOrUpdateMetric])
+  }, [changeType, addValue, updateValue, removeValue, replaceValue, addOrUpdateMetric, deleteMetric])
 
   return { config, configItemsByPath, configActions }
 }

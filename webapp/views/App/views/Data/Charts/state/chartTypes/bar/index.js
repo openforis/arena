@@ -64,8 +64,9 @@ const bar = {
             type: 'metric',
             isMulti: false,
             labelBuilder: (values) => {
-              const aggregation = values['query.metric.aggregation']['value'].map(({ label }) => label)
-              const column = values['query.metric.column']['value'].map(({ label }) => label)
+              console.log('metric', values)
+              const aggregation = values.aggregation.map(({ label }) => label)
+              const column = values.column.map(({ label }) => label)
 
               return `${aggregation}(${column})`
             },
@@ -87,16 +88,38 @@ const bar = {
               },
             },
             order: ['column', 'aggregation'],
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              value = value[0]
-              const metrics = value['column'].map((val) => val.value)
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              /*
+              {
+                'item': {value: []},
+                'item.column': {value: [{value:'a', type: 'sum'}, {value, type}]}
+                'item.aggregation': {value: [{value, type}, {value, type}]}
+              }*/
+              // ====>
+              /*{
+                ...spec,
+                
+              }*/
+
+              // const value =
+
+              const values = console.log('value, spec, key, configItemsByPath', value, spec, key, configItemsByPath)
+
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
+              console.log('columnValues', columnValues)
+
+              // console.log('value', value)
+              // value = value[0]
+
+              const metrics = columnValues.map((val) => val.value)
               const transform = {
-                calculate: `${value['column'].map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${value['column'].map((val) => val.name).join('_')}`,
+                calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
+                as: `${columnValues.map((val) => val.name).join('_')}`,
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = value['aggregation'][0]['value']
+              const ag = aggregationValues[0].value
 
               const repeat = {
                 layer: metrics,
@@ -127,7 +150,7 @@ const bar = {
                 spec: {
                   ...(spec.spec || {}),
                   encoding: {
-                    ...(spec.spec.encoding || {}),
+                    ...(spec.spec?.encoding || {}),
                     y: y,
                     color: color,
                     xOffset: xOffset,
