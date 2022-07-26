@@ -17,17 +17,17 @@ export const CoordinateAttributePolygon = (props) => {
 
   const { latitude, longitude } = props
 
-  const len_lat_meters = Number(polygonProperties.length_latitude)
-  const len_lng_meters = Number(polygonProperties.length_longitude)
-  const offset_north_meters = Number(polygonProperties.offset_north)
-  const offset_east_meters = Number(polygonProperties.offset_east)
-  const numberOfPointsNorth = Number(polygonProperties.number_of_points_north)
-  const numberOfPointsEast = Number(polygonProperties.number_of_points_east)
-  const numberOfPointsCircle = Number(polygonProperties.number_of_points_circle)
-  const controlPointOffsetNorh = Number(polygonProperties.controlpoint_offset_north)
-  const controlPointOffsetEast = Number(polygonProperties.controlpoint_offset_east)
+  const len_lat_meters = Number(polygonProperties.length_latitude) || 0
+  const len_lng_meters = Number(polygonProperties.length_longitude) || 0
+  const offset_north_meters = Number(polygonProperties.offset_north) || 0
+  const offset_east_meters = Number(polygonProperties.offset_east) || 0
+  const numberOfPointsNorth = Number(polygonProperties.number_of_points_north) || 0
+  const numberOfPointsEast = Number(polygonProperties.number_of_points_east) || 0
+  const numberOfPointsCircle = Number(polygonProperties.number_of_points_circle) || 0
+  const controlPointOffsetNorh = Number(polygonProperties.controlpoint_offset_north) || 0
+  const controlPointOffsetEast = Number(polygonProperties.controlpoint_offset_east) || 0
   const isCircle = polygonProperties.isCircle == 'true' ? true : false
-  const radius = Number(polygonProperties.radius)
+  const radius = Number(polygonProperties.radius) || 0
 
   const len_lat = MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
   const len_lng = MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)
@@ -177,6 +177,7 @@ export const CoordinateAttributePolygon = (props) => {
                 onClickControlPoint(eastIndex, northIndex)
               },
             }}
+            key={'controlPoint' + northIndex + '' + eastIndex}
           />
         )
       }
@@ -185,7 +186,14 @@ export const CoordinateAttributePolygon = (props) => {
   }
 
   const referencePoint = () => {
-    return <Circle center={control_point_latlng} radius={5} pathOptions={{ color: 'red', fill: true }} />
+    return (
+      <Circle
+        center={control_point_latlng}
+        radius={5}
+        pathOptions={{ color: 'red', fill: true }}
+        key={'ReferencePoint'}
+      />
+    )
   }
 
   if (isCircle) {
@@ -233,6 +241,6 @@ const MetersToDegreesLongitude = (meters, lat) => {
 }
 
 CoordinateAttributePolygon.propTypes = {
-  latitude: PropTypes.Number,
-  longitude: PropTypes.Number,
+  latitude: PropTypes.any,
+  longitude: PropTypes.any,
 }
