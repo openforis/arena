@@ -3,7 +3,7 @@ import { uuidv4 } from '@core/uuid'
 import './Metric.scss'
 import { Popover } from 'react-tiny-popover'
 import RenderByType from '../BlockRenderer/BlockRenderer'
-import { ButtonAdd } from '@webapp/components'
+import { ButtonAdd, ButtonDelete } from '@webapp/components'
 
 const PopoverContent = (props) => {
   const {
@@ -124,6 +124,14 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
     return blockItems
   }, [configItemsByPath, blockPath])
 
+  const handleDelete = useCallback(
+    (e) => {
+      e.stopPropagation()
+      configActions.deleteMetric({ blockPath, metric, values })
+    },
+    [metric, blockPath, values]
+  )
+
   return (
     <CustomPopover
       config={config}
@@ -136,7 +144,11 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
       values={values}
     >
       <div className="block-metric-metrics-item">
-        <p>{block.labelBuilder(configItemsByPath)}</p>
+        <p>{block.labelBuilder(values)}</p>
+
+        <button type="button" className="btn btn-s btn-remove icon-delete" onClick={handleDelete}>
+          <span className="icon icon-cross icon-8px" />
+        </button>
       </div>
     </CustomPopover>
   )
