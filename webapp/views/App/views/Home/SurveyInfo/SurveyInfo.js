@@ -113,6 +113,7 @@ const SurveyInfo = () => {
           samplingPolygon={samplingPolygon}
           setSamplingPolygon={setSamplingPolygon}
           getFieldValidation={getFieldValidation}
+          readOnly={readOnly}
         />
 
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}

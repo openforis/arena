@@ -12,11 +12,18 @@ const SamplingPolygonEditor = (props) => {
   const getItems = () => {
     let items = []
 
-    items.push(<SamplingPolygonShapeEditor isCircle={samplingPolygonObject.isCircle} onChange={shapeOnChange} />)
+    items.push(
+      <SamplingPolygonShapeEditor
+        isCircle={samplingPolygonObject.isCircle}
+        onChange={shapeOnChange}
+        readOnly={readOnly}
+        key={'ShapeEditor'}
+      />
+    )
 
     if (samplingPolygonObject.isCircle == 'true') {
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'radiusEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-polygon-radius">
             {i18n.t('samplingPolygonOptions.radius')}
           </label>
@@ -31,7 +38,7 @@ const SamplingPolygonEditor = (props) => {
       )
 
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'numberOfPointsCircleEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-number-of-points-circle">
             {i18n.t('samplingPolygonOptions.numberOfControlPoints')}
           </label>
@@ -48,7 +55,7 @@ const SamplingPolygonEditor = (props) => {
       )
     } else {
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'lengthLatitudeEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-polygon-length-latitude">
             {i18n.t('samplingPolygonOptions.lengthLatitude')}
           </label>
@@ -63,7 +70,7 @@ const SamplingPolygonEditor = (props) => {
       )
 
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'lengthLongitudeEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-polygon-length-longitude">
             {i18n.t('samplingPolygonOptions.lengthLongitude')}
           </label>
@@ -78,7 +85,7 @@ const SamplingPolygonEditor = (props) => {
       )
 
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'numberOfPointsNorthEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-number-of-points-north">
             {i18n.t('samplingPolygonOptions.numberOfControlPointsNorth')}
           </label>
@@ -93,7 +100,7 @@ const SamplingPolygonEditor = (props) => {
       )
 
       items.push(
-        <div className="form-item">
+        <div className="form-item" key={'numberOfPointsEastEditor'}>
           <label className="form-label" htmlFor="survey-info-sampling-number-of-points-east">
             {i18n.t('samplingPolygonOptions.numberOfControlPointsEast')}
           </label>
@@ -108,7 +115,7 @@ const SamplingPolygonEditor = (props) => {
       )
     }
     items.push(
-      <div className="form-item">
+      <div className="form-item" key={'offsetNorthEditor'}>
         <label className="form-label" htmlFor="survey-info-sampling-offset-north">
           {i18n.t('samplingPolygonOptions.offsetNorth')}
         </label>
@@ -123,7 +130,7 @@ const SamplingPolygonEditor = (props) => {
     )
 
     items.push(
-      <div className="form-item">
+      <div className="form-item" key={'offsetEastEditor'}>
         <label className="form-label" htmlFor="survey-info-sampling-offset-east">
           {i18n.t('samplingPolygonOptions.offsetEast')}
         </label>
@@ -138,7 +145,7 @@ const SamplingPolygonEditor = (props) => {
     )
 
     items.push(
-      <div className="form-item">
+      <div className="form-item" key={'controlpointOffsetNorthEditor'}>
         <label className="form-label" htmlFor="survey-info-sampling-control-point-offset-north">
           {i18n.t('samplingPolygonOptions.controlPointOffsetNorth')}
         </label>
@@ -153,7 +160,7 @@ const SamplingPolygonEditor = (props) => {
     )
 
     items.push(
-      <div className="form-item">
+      <div className="form-item" key={'controlpointOffsetEastEditor'}>
         <label className="form-label" htmlFor="survey-info-sampling-control-point-offset-east">
           {i18n.t('samplingPolygonOptions.controlPointOffsetEast')}
         </label>
