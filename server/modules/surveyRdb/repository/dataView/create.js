@@ -38,6 +38,28 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
   return keys.length > 0 ? `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}` : ''
 }
 
+const _getGroupByColumns = (viewDataNodeDef) => {
+  const { tableData, viewDataParent } = viewDataNodeDef
+  const groupByColumns = []
+  if (NodeDef.isMultiple(viewDataNodeDef.nodeDef)) {
+    groupByColumns.push(tableData.columnId)
+    groupByColumns.push(..._getSelectFieldNodeDefs(viewDataNodeDef).filter((s) => !s.includes(' AS ')))
+  }
+
+  //  get parent keys names to groupby
+  if (viewDataParent) {
+    const keys = Survey.getNodeDefKeys(viewDataParent.nodeDef)(viewDataParent.survey)
+      .map((nodeDef) => {
+        const columnNodeDef = new ColumnNodeDef(viewDataParent, nodeDef)
+        return `${viewDataParent.alias}.${columnNodeDef.name}`
+      })
+      .flat()
+
+    groupByColumns.push(...(keys || []))
+  }
+  return groupByColumns
+}
+
 /**
  * Create a nodeDef data view.
  *
@@ -90,6 +112,8 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
       groupByColumns.push(viewDataParent.columnUuid)
     }
   }
+
+  groupByColumns.push(..._getGroupByColumns(viewDataNodeDef))
 
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
