@@ -45,6 +45,7 @@ const PopoverContent = (props) => {
     }
   }, [])
 
+  console.log('draftValues', draftValues, Object.values(draftValues).length === order.length)
   return (
     <div className="custom-option-modal-container">
       <div className="custom-option-modal-header">
@@ -68,7 +69,9 @@ const PopoverContent = (props) => {
       </div>
       <div className="custom-option-modal-actions">
         <button onClick={() => setIsPopoverOpen(false)}>close</button>
-        <button onClick={handleSaveOrUpdate}>save</button>
+        <button onClick={handleSaveOrUpdate} disabled={Object.values(draftValues).length !== order.length}>
+          save
+        </button>
       </div>
     </div>
   )

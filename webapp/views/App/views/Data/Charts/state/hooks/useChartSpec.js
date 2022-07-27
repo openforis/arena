@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect } from 'react'
-import * as A from '@core/arena'
 import { chartsConfig } from '../config'
 
 const BASE_SPEC = {
@@ -31,7 +30,7 @@ const useChartSpec = ({ config, configItemsByPath } = {}) => {
   }, [])
 
   const updateSpec = useCallback((newSpec) => {
-    updateSpecRaw(A.parse(newSpec))
+    updateSpecRaw(JSON.parse(newSpec))
   }, [])
 
   useEffect(() => {

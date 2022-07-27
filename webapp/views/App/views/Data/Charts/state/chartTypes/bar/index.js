@@ -103,8 +103,6 @@ const bar = {
 
               // const value =
 
-              const values = console.log('value, spec, key, configItemsByPath', value, spec, key, configItemsByPath)
-
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
               console.log('columnValues', columnValues)

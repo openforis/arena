@@ -135,8 +135,7 @@ const useChartConfig = ({ table, setTable }) => {
         setConfigItemsByPath((_configItemsByPath) => {
           const newItems = Object.assign({}, _configItemsByPath)
           Object.entries(values).forEach(([key, value]) => {
-            const _blockPath = `${blockPath}.${key}`
-            updateItemByPathAndKey(_blockPath, value[0])(newItems)
+            updateItemByPathAndKey(`${blockPath}.${key}`, value[0])(newItems)
           })
 
           return newItems
@@ -161,27 +160,17 @@ const useChartConfig = ({ table, setTable }) => {
     (payload) => {
       const { blockPath, metric, values } = payload
 
-      // subitems
-      // bloackPath
-      console.log(blockPath, metric, values)
-
       setConfigItemsByPath((_configItemsByPath) => {
         const newItems = Object.assign({}, _configItemsByPath)
-        console.log('start newITems', JSON.stringify(newItems, null, 2))
         removeItemByPath(blockPath, metric)(newItems)
         Object.entries(values).forEach(([key, value]) => {
           const _blockPath = `${blockPath}.${key}`
-          removeItemByPath(_blockPath, value)(newItems)
+          removeItemByPath(
+            _blockPath,
+            value.find((item) => item?.parentKey === metric?.key)
+          )(newItems)
         })
 
-        /*Object.entries(values).forEach(([key, value]) => {
-          if (pathsToDelete.includes(key)) {
-            // replace of values
-            console.log('key', key)
-          }
-        })*/
-
-        console.log('end newITems', JSON.stringify(newItems, null, 2))
         return newItems
       })
 
