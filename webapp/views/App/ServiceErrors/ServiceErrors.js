@@ -14,7 +14,7 @@ const ServiceErrors = () => {
   return (
     <TransitionGroup className={`service-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {errors.map((error) => (
-        <CSSTransition key={error.id} timeout={500} classNames="fade">
+        <CSSTransition key={String(error?.id || '_')} timeout={500} classNames="fade">
           <ServiceError error={error} />
         </CSSTransition>
       ))}

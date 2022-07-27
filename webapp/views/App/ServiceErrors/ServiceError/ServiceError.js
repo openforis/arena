@@ -11,7 +11,7 @@ import Markdown from '@webapp/components/markdown'
 const ServiceError = ({ error }) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const { key, params } = R.path(['response', 'data'], error)
+  const { key = false, params = false } = error //R.path(['response', 'data'], error)
 
   return (
     <div className="service-errors__error">
@@ -24,7 +24,7 @@ const ServiceError = ({ error }) => {
       </button>
 
       <div className="status">ERROR {R.path(['response', 'status'], error)}</div>
-      <Markdown className="message" source={i18n.t(key, params)} />
+      {key && params && <Markdown className="message" source={i18n.t(key, params)} />}
     </div>
   )
 }

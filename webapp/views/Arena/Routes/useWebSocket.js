@@ -29,6 +29,7 @@ export const useWebSocket = () => {
   }
 
   useEffect(() => {
+    console.log('UNMOUNT')
     return closeSocket
   }, [])
 
@@ -36,6 +37,7 @@ export const useWebSocket = () => {
     if (user) {
       openSocket()
     } else {
+      console.log('NO USER')
       closeSocket()
     }
   }, [User.getUuid(user)])
