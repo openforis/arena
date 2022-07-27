@@ -80,7 +80,7 @@ export const fetchUserSurveys = async (
   },
   client = db
 ) => {
-  const checkAccess = !User.isSystemAdmin(user)
+  const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -142,7 +142,7 @@ export const countUserSurveys = async (
   { user, template = false, search: searchParam = null, lang = null },
   client = db
 ) => {
-  const checkAccess = !User.isSystemAdmin(user)
+  const checkAccess = !template && !User.isSystemAdmin(user)
 
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
