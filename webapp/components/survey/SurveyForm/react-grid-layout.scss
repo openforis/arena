@@ -11,7 +11,7 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
-  overflow: hidden;
+  // overflow: hidden;
 }
 
 .react-grid-item.cssTransforms {

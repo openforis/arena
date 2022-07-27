@@ -1,42 +1,49 @@
 @import 'webapp/style/vars';
 
-.dropdown {
-  display: grid;
-  grid-template-columns: 1fr 20px;
-  border-bottom: 1px solid $greyBorder;
-  //align-self: stretch;
-
-  .btn-toggle {
-    color: $black;
-    justify-self: center;
-    align-self: center;
-    transform: rotate(90deg) scale(0.8, 1.1);
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .form-input,
-  .form-input[readonly] {
-    border-bottom: none;
-    padding-right: 0;
-    width: 100%;
-  }
-
-  &:focus-within {
-    background-color: $blueLightFocus;
+.tooltip-error {
+  .dropdown {
+    border: 1px solid red;
   }
 }
 
-.dropdown__list {
-  position: fixed;
-  z-index: $zIndex20Dropdown;
-  display: grid;
-  grid-template-columns: 1rem 1fr 1rem;
-  background-color: $blueLightFocus;
-  padding: 1rem 0;
-  justify-content: center;
 
-  overflow-y: auto;
-  max-height: 400px;
-  font-size: 0.9rem;
-}
+// .dropdown {
+//   display: grid;
+//   grid-template-columns: 1fr 20px;
+//   border-bottom: 1px solid $greyBorder;
+//   //align-self: stretch;
+
+//   .btn-toggle {
+//     color: $black;
+//     justify-self: center;
+//     align-self: center;
+//     transform: rotate(90deg) scale(0.8, 1.1);
+//     padding-top: 0;
+//     padding-bottom: 0;
+//   }
+
+//   .form-input,
+//   .form-input[readonly] {
+//     border-bottom: none;
+//     padding-right: 0;
+//     width: 100%;
+//   }
+
+//   &:focus-within {
+//     background-color: $blueLightFocus;
+//   }
+// }
+
+// .dropdown__list {
+//   position: fixed;
+//   z-index: $zIndex20Dropdown;
+//   display: grid;
+//   grid-template-columns: 1rem 1fr 1rem;
+//   background-color: $blueLightFocus;
+//   padding: 1rem 0;
+//   justify-content: center;
+
+//   overflow-y: auto;
+//   max-height: 400px;
+//   font-size: 0.9rem;
+// }

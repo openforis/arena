@@ -2,8 +2,10 @@ import './dropdown.scss'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import ReactSelect from 'react-select'
+import classNames from 'classnames'
 
 import * as A from '@core/arena'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const Dropdown = (props) => {
   const {
@@ -99,20 +101,35 @@ const Dropdown = (props) => {
   const selectedValue = emptySelection ? null : getOptionValue(selection)
   const value = emptySelection ? null : options.find((option) => option.value === selectedValue)
 
+  // prevent menu opening when readOnly is true
+  const openMenuOnClick = !readOnly
+  const menuIsOpen = readOnly ? false : undefined
+
   return (
-    <ReactSelect
-      className={className}
-      isClearable={clearable && !readOnly}
-      isDisabled={disabled}
-      isLoading={loading}
-      isSearchable={!readOnlyInput && !readOnly}
-      onChange={onChange}
-      openMenuOnClick={!readOnly}
-      menuIsOpen={readOnly ? false : undefined}
-      options={options}
-      placeholder={placeholder}
-      value={value}
-    />
+    <ValidationTooltip key={`validation-${idInput}`} validation={validation} className="dropdown-validation-tooltip">
+      <ReactSelect
+        className={classNames('dropdown', className)}
+        classNamePrefix="dropdown"
+        isClearable={clearable && !readOnly}
+        isDisabled={disabled}
+        isLoading={loading}
+        isSearchable={!readOnlyInput && !readOnly}
+        onChange={onChange}
+        openMenuOnClick={openMenuOnClick}
+        menuIsOpen={menuIsOpen}
+        options={options}
+        placeholder={placeholder}
+        value={value}
+      />
+    </ValidationTooltip>
+
+    //
+    // menuPosition="fixed"
+    // styles={{
+    //   menuPortal: ({ left, top, ...provided }, state) => ({
+    //     ...provided,
+    //   }),
+    // }}
     // <div
     //   ref={dropdownRef}
     //   className={classNames('dropdown', className)}
@@ -211,7 +228,7 @@ Dropdown.defaultProps = {
   itemKey: 'value',
   itemLabel: 'label',
   onBeforeChange: null,
-  placeholder: '',
+  placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   readOnlyInput: false,
   selection: null,
