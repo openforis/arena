@@ -1,5 +1,3 @@
-import * as A from '@core/arena'
-
 const pie = {
   selector: {
     title: 'Pie',
@@ -102,16 +100,19 @@ const pie = {
               },
             },
             order: ['column', 'aggregation'],
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              value = value[0]
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
 
+              const metrics = columnValues.map((val) => val.value)
               const transform = {
-                calculate: `${value['column'].map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${value['column'].map((val) => val.name).join('_')}`,
+                calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
+                as: `${columnValues.map((val) => val.name).join('_')}`,
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = value['aggregation'][0]['value']
+              const ag = aggregationValues[0].value
+
               const theta = {
                 field: transform.as,
                 type: 'quantitative',
@@ -136,8 +137,8 @@ const pie = {
         order: ['groupBy', 'metric'],
       },
       other: {
-        title: 'Chart Config',
-        subtitle: 'Configuration of the chart',
+        title: 'Custom Chart',
+        subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
           legend: {
