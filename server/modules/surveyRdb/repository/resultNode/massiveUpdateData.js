@@ -12,11 +12,12 @@ const pgp = pgPromise()
 const { Column } = pgp.helpers
 
 export default class MassiveUpdateData extends MassiveUpdate {
-  constructor({ survey, entity, chain, cycle }, tx) {
+  constructor({ survey, entity, cycle }, tx) {
     const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(
       entity,
       true
     )(survey).filter(NodeDef.isAnalysis)
+
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
       includeExtendedCols: true,
@@ -52,7 +53,6 @@ export default class MassiveUpdateData extends MassiveUpdate {
 
     this.survey = survey
     this.entity = entity
-    this.chain = chain
     this.nodeDefsByColumnName = nodeDefsByColumnName
     this.columnNames = columnNames
   }

@@ -44,6 +44,14 @@ export const fetchNodeData = async ({ surveyId, cycle, nodeDefUuid, draft = true
 
 // ==== UPDATE
 
+const _hasAnalysisNodeDefs = ({ survey, entity }) => {
+  const analysisNodeDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(
+    entity,
+    true
+  )(survey).filter(NodeDef.isAnalysis)
+  return analysisNodeDefs.length > 0
+}
+
 export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true })
   const chain = await AnalysisManager.fetchChain({
@@ -61,17 +69,26 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity, chain, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entity, chain, chainUuid, cycle }, tx)
+    const hasAnalysisNodeDefs = _hasAnalysisNodeDefs({ survey, entity })
+
+    const massiveUpdateData = hasAnalysisNodeDefs
+      ? new SurveyRdbManager.MassiveUpdateData({ survey, entity, cycle }, tx)
+      : null
     const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes(
       { survey, surveyId, entity, chain, chainUuid, cycle },
       tx
     )
 
-    await CSVReader.createReaderFromStream(stream, null, (row) => {
-      massiveUpdateData.push.bind(massiveUpdateData)(row)
-      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+    await CSVReader.createReaderFromStream(stream, null, async (row) => {
+      if (massiveUpdateData) {
+        await massiveUpdateData.push(row)
+      }
+      await massiveUpdateNodes.push(row)
     }).start()
-    await massiveUpdateData.flush()
+
+    if (hasAnalysisNodeDefs) {
+      await massiveUpdateData.flush()
+    }
     await massiveUpdateNodes.flush()
   })
 
