@@ -81,37 +81,29 @@ export const MapBaseLayerPeriodSelector = () => {
     })()
   }, [periodSelectorAvailable, provider, periodType, ready])
 
-  const onMapLayerPeriodChangeLeft = useCallback(
-    (event) => {
+  const onMapLayerPeriodChange = useCallback(
+    (isLeft) => (event) => {
       const periodValue = event.target.value
       // replace url in current layer
-      const layer = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+      let layer
+      if (isLeft) {
+        layer = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+      } else {
+        layer = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+      }
       if (layer) {
         const period = periodByValue[periodValue]
         const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
         layer.setUrl(url)
         onBaseLayerUpdate({ ...contextBaseLayer, url })
         // update state
-        setState((statePrev) => ({ ...statePrev, selectedPeriodValueLeft: Number(periodValue) }))
-        sideBySideObject.setLeftLayers(layer)
-      }
-    },
-    [map, contextBaseLayer, provider, onBaseLayerUpdate, setState]
-  )
-  const onMapLayerPeriodChangeRight = useCallback(
-    (event) => {
-      const periodValue = event.target.value
-      const period = periodByValue[periodValue]
-
-      // replace url in current layer
-      const layer = Object.values(map._layers).find((layer) => layer.options.id === 'side')
-      if (layer) {
-        const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
-        layer.setUrl(url)
-        onBaseLayerUpdate({ ...contextBaseLayer, url })
-        // update state
-        setState((statePrev) => ({ ...statePrev, selectedPeriodValueRight: Number(periodValue) }))
-        sideBySideObject.setRightLayers(layer)
+        if (isLeft) {
+          setState((statePrev) => ({ ...statePrev, selectedPeriodValueLeft: Number(periodValue) }))
+          sideBySideObject.setLeftLayers(layer)
+        } else {
+          setState((statePrev) => ({ ...statePrev, selectedPeriodValueRight: Number(periodValue) }))
+          sideBySideObject.setRightLayers(layer)
+        }
       }
     },
     [map, contextBaseLayer, provider, onBaseLayerUpdate, setState]
@@ -123,7 +115,7 @@ export const MapBaseLayerPeriodSelector = () => {
     <div className="leaflet-bottom map-layer-selector-wrapper">
       <div className="period-select-wrapper">
         <label className="selected-period-label">{i18n.t('mapView.selectedPeriod')}:</label>
-        <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChangeLeft}>
+        <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChange(true)}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
             const label =
@@ -135,7 +127,7 @@ export const MapBaseLayerPeriodSelector = () => {
             )
           })}
         </select>
-        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChangeRight}>
+        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
             const label =
