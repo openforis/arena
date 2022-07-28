@@ -18,8 +18,8 @@ const SamplingPolygonEditor = (props) => {
     items.push(
       <div className="form-item" key={'checkbox'}>
         <label className="form-label">
-          <Switch checked={jsonEditorChecked} onChange={() => setJsonEditorChecked(!jsonEditorChecked)} />
-          <span>JSON</span>
+          <span>JSON </span>
+          <Switch checked={jsonEditorChecked} onChange={() => setJsonEditorChecked(!jsonEditorChecked)} height={20} />
         </label>
       </div>
     )
