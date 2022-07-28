@@ -27,6 +27,11 @@ const getPeriodValue = (period) => {
   return year * 12 + month
 }
 
+const Proc = {
+  rgb: 'rgb',
+  cir: 'cir',
+}
+
 let sideBySideObject = null
 
 export const MapBaseLayerPeriodSelector = () => {
@@ -37,11 +42,31 @@ export const MapBaseLayerPeriodSelector = () => {
 
   const i18n = useI18n()
   const user = useUser()
-  const [state, setState] = useState({ ready: false, periods: [], periodByValue: {}, selectedPeriodValue: null })
+  const [state, setState] = useState({
+    ready: false,
+    periods: [],
+    periodByValue: {},
+    selectedPeriodValueLeft: null,
+    selectedPeriodValueRight: null,
+    leftChecked: false,
+    rightChecked: false,
+    procLeft: Proc.rgb,
+    procRight: Proc.rgb,
+  })
 
   const apiKey = User.getMapApiKey({ provider })(user)
 
-  const { ready, periods, periodByValue, selectedPeriodValueLeft, selectedPeriodValueRight } = state
+  const {
+    ready,
+    periods,
+    periodByValue,
+    selectedPeriodValueLeft,
+    selectedPeriodValueRight,
+    leftChecked,
+    rightChecked,
+    procLeft,
+    procRight,
+  } = state
 
   const initSideBySide = () => {
     const layerLeft = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
@@ -77,6 +102,8 @@ export const MapBaseLayerPeriodSelector = () => {
         periodByValue: availablePeriods.reduce((acc, period) => ({ ...acc, [getPeriodValue(period)]: period }), {}),
         selectedPeriodValueLeft: lastPeriodValue,
         selectedPeriodValueRight: lastPeriodValue,
+        procLeft: Proc.rgb,
+        procRight: Proc.rgb,
       })
     })()
   }, [periodSelectorAvailable, provider, periodType, ready])
@@ -93,7 +120,8 @@ export const MapBaseLayerPeriodSelector = () => {
       }
       if (layer) {
         const period = periodByValue[periodValue]
-        const url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
+        let url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
+        url += '&proc=' + (isLeft ? procLeft : procRight)
         layer.setUrl(url)
         onBaseLayerUpdate({ ...contextBaseLayer, url })
         // update state
@@ -106,8 +134,33 @@ export const MapBaseLayerPeriodSelector = () => {
         }
       }
     },
-    [map, contextBaseLayer, provider, onBaseLayerUpdate, setState]
+    [map, contextBaseLayer, provider, onBaseLayerUpdate, state]
   )
+
+  const onCheckboxValueChange = (isLeft) => () => {
+    let newProc
+    if (isLeft) {
+      newProc = !leftChecked ? Proc.cir : Proc.rgb
+      setState((statePev) => ({ ...statePev, leftChecked: !statePev.leftChecked, procLeft: newProc }))
+    } else {
+      newProc = !rightChecked ? Proc.cir : Proc.rgb
+      setState((statePev) => ({ ...statePev, rightChecked: !statePev.rightChecked, procRight: newProc }))
+    }
+    let layer
+    if (isLeft) {
+      layer = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+    } else {
+      layer = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+    }
+    if (layer) {
+      const periodValue = isLeft ? selectedPeriodValueLeft : selectedPeriodValueRight
+      const period = periodByValue[periodValue]
+      let url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
+      url += '&proc=' + newProc
+      layer.setUrl(url)
+      onBaseLayerUpdate({ ...contextBaseLayer, url })
+    }
+  }
 
   if (!periodSelectorAvailable || !provider || !ready) return null
 
@@ -139,6 +192,15 @@ export const MapBaseLayerPeriodSelector = () => {
             )
           })}
         </select>
+        <label>
+          <input type="checkbox" value={leftChecked} onChange={onCheckboxValueChange(true)} />
+          False Color Left
+        </label>
+        <label>
+          <input type="checkbox" value={rightChecked} onChange={onCheckboxValueChange(false)} />
+          False Color Right
+        </label>
+
         <TileLayer id={'side'} attribution={''} url={''} maxZoom={22} minZoom={3} />
       </div>
     </div>
