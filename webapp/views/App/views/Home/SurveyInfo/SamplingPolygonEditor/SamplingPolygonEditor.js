@@ -32,7 +32,7 @@ const SamplingPolygonEditor = (props) => {
           <label className="form-label" htmlFor="survey-info-sampling-json-editor">
             JSON
           </label>
-          <textarea value={JSON.stringify(samplingPolygonObject, null, 2)} rows={11} onChange={jsonEditorOnChange} />
+          <textarea value={JSON.stringify(samplingPolygonObject, null, 2)} rows={12} onChange={jsonEditorOnChange} />
         </div>
       )
       return items
