@@ -4,10 +4,12 @@ import { Input } from '@webapp/components/form/Input'
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
 import { useI18n } from '@webapp/store/system'
 import Switch from 'react-switch'
+import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
-  const samplingPolygonObject = JSON.parse(samplingPolygon.en || samplingPolygon)
+
+  const samplingPolygonObject = JSON.parse(samplingPolygon || getSamplingPolygonDefaults())
   const i18n = useI18n()
 
   const [jsonEditorChecked, setJsonEditorChecked] = useState(false)
