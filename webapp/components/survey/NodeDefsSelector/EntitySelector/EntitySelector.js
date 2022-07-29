@@ -1,7 +1,6 @@
 import './EntitySelector.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -31,7 +30,7 @@ const getDropdownItems = ({
         : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
       entities.push({
         value: NodeDef.getUuid(nodeDef),
-        label: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
+        label: `${StringUtils.nbsp}${StringUtils.nbsp.repeat(depth * 2)}${label}`,
       })
     }
   }
@@ -67,7 +66,7 @@ const EntitySelector = (props) => {
     useNameAsLabel,
     allowEmptySelection,
   })
-  const selection = nodeDefUuidEntity ? dropdownItems.find(R.propEq('value', nodeDefUuidEntity)) : emptySelection
+  const selection = nodeDefUuidEntity ? dropdownItems.find((item) => item.value === nodeDefUuidEntity) : emptySelection
 
   return (
     <Dropdown
