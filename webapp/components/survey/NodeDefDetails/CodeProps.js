@@ -73,6 +73,7 @@ const CodeProps = (props) => {
               }}
             >
               <Dropdown
+                clearable
                 disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
                 idInput={TestId.nodeDefDetails.nodeDefCodeParent}
                 items={candidateParentCodeNodeDefs}
