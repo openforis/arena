@@ -46,31 +46,33 @@ export const fetchNodeData = async ({ surveyId, cycle, nodeDefUuid, draft = true
 
 export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true })
+
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+
   const chain = await AnalysisManager.fetchChain({
     surveyId,
     chainUuid,
   })
 
-  const entity = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain, entityDefUuid, showSamplingNodeDefs: true })(survey)
+  if (analysisNodeDefs.length === 0) return
 
   const fileZip = new FileZip(filePath)
   await fileZip.init()
-  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entity)}.csv`)
+  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDef)}.csv`)
   await db.tx(async (tx) => {
     // Reset node results
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity, chain, cycle, chainUuid }, tx)
+    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity: entityDef, chain, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entity, chain, chainUuid, cycle }, tx)
-    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes(
-      { survey, surveyId, entity, chain, chainUuid, cycle },
-      tx
-    )
+    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entityDef, cycle, analysisNodeDefs }, tx)
+    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ surveyId, analysisNodeDefs }, tx)
 
-    await CSVReader.createReaderFromStream(stream, null, (row) => {
-      massiveUpdateData.push.bind(massiveUpdateData)(row)
-      massiveUpdateNodes.push.bind(massiveUpdateNodes)(row)
+    await CSVReader.createReaderFromStream(stream, null, async (row) => {
+      await massiveUpdateData.push(row)
+      await massiveUpdateNodes.push(row)
     }).start()
+
     await massiveUpdateData.flush()
     await massiveUpdateNodes.flush()
   })
