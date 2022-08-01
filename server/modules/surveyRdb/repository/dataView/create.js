@@ -9,29 +9,35 @@ import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../..
 const _canMultipleNodeDefBeAggregated = (nodeDef) =>
   NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isText(nodeDef)
 
-const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
-  viewDataNodeDef.columnNodeDefs
-    .map((columnNodeDef) => {
-      if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
-        if (!NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
-          return [`${viewDataNodeDef.tableData.columnUuid} AS ${columnNodeDef.name}`]
-        }
-      } else if (
-        NodeDef.isMultipleAttribute(columnNodeDef.nodeDef) &&
-        _canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)
-      ) {
-        const multAttrDataNodeDef = new TableDataNodeDef(viewDataNodeDef.survey, columnNodeDef.nodeDef)
-        const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
-        return `json_agg(${multAttrDataNodeDef.alias}.${nodeDefName}) AS ${nodeDefName}`
-      }
+const _getMultipleAttributeInnerSelect = ({ viewDataNodeDef, columnNodeDef }) => {
+  const { survey, tableData } = viewDataNodeDef
 
-      if (NodeDef.isFile(columnNodeDef.nodeDef)) {
-        return
+  const multAttrDef = columnNodeDef.nodeDef
+  const multAttrDataNodeDef = new TableDataNodeDef(survey, multAttrDef)
+  const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
+  const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
+
+  return `SELECT json_agg(${multAttrDataNodeDef.alias}.${nodeDefName}) 
+          FROM ${multAttrDataTable.nameAliased}
+          WHERE ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid}
+            AND ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+}
+
+const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
+  viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) => {
+    const { tableData } = viewDataNodeDef
+    if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
+      if (!NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
+        return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
-      return columnNodeDef.namesFull
-    })
-    .flat()
-    .filter((v) => !!v)
+    } else if (
+      NodeDef.isMultipleAttribute(columnNodeDef.nodeDef) &&
+      _canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)
+    ) {
+      return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+    }
+    return columnNodeDef.namesFull
+  })
 
 const _getSelectFieldKeys = (viewDataNodeDef) => {
   const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
@@ -41,38 +47,6 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
     })
     .flat()
   return keys.length > 0 ? `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}` : ''
-}
-
-const _getGroupByColumns = ({ viewDataNodeDef, shouldJoinWithParentView, multipleAttributeDataTableJoins }) => {
-  const { tableData, viewDataParent } = viewDataNodeDef
-  const groupByColumns = []
-
-  if (!NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef) && multipleAttributeDataTableJoins) {
-    groupByColumns.push(tableData.columnId)
-
-    if (shouldJoinWithParentView) {
-      groupByColumns.push(viewDataParent.columnUuid)
-    }
-  }
-
-  if (NodeDef.isMultiple(viewDataNodeDef.nodeDef)) {
-    groupByColumns.push(tableData.columnId)
-    groupByColumns.push(..._getSelectFieldNodeDefs(viewDataNodeDef).filter((s) => !s.includes(' AS ')))
-  }
-
-  //  get parent keys names to groupby
-  if (viewDataParent) {
-    const keys = Survey.getNodeDefKeys(viewDataParent.nodeDef)(viewDataParent.survey)
-      .map((nodeDef) => {
-        const columnNodeDef = new ColumnNodeDef(viewDataParent, nodeDef)
-        return `${viewDataParent.alias}.${columnNodeDef.name}`
-      })
-      .flat()
-      .filter((s) => !s.includes(' AS '))
-
-    groupByColumns.push(...keys)
-  }
-  return groupByColumns
 }
 
 /**
@@ -119,14 +93,6 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     })
     .join('\n')
 
-  const groupByColumns = _getGroupByColumns({
-    viewDataNodeDef,
-    multipleAttributeDataTableJoins,
-    shouldJoinWithParentView,
-  }).filter((column) => {
-    return selectFields.some((selectField) => selectField.includes(column))
-  })
-
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
       SELECT 
@@ -141,7 +107,6 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
       }
       ${multipleAttributeDataTableJoins}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
-      ${groupByColumns.length > 0 ? `GROUP BY ${groupByColumns.join(', ')}` : ''}
      )`
 
   return client.query(query)
