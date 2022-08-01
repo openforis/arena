@@ -24,9 +24,14 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
         const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
         return `json_agg(${multAttrDataNodeDef.alias}.${nodeDefName}) AS ${nodeDefName}`
       }
+
+      if (NodeDef.isFile(columnNodeDef.nodeDef)) {
+        return
+      }
       return columnNodeDef.namesFull
     })
     .flat()
+    .filter((v) => !!v)
 
 const _getSelectFieldKeys = (viewDataNodeDef) => {
   const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
@@ -38,9 +43,18 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
   return keys.length > 0 ? `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}` : ''
 }
 
-const _getGroupByColumns = (viewDataNodeDef) => {
+const _getGroupByColumns = ({ viewDataNodeDef, shouldJoinWithParentView, multipleAttributeDataTableJoins }) => {
   const { tableData, viewDataParent } = viewDataNodeDef
   const groupByColumns = []
+
+  if (!NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef) && multipleAttributeDataTableJoins) {
+    groupByColumns.push(tableData.columnId)
+
+    if (shouldJoinWithParentView) {
+      groupByColumns.push(viewDataParent.columnUuid)
+    }
+  }
+
   if (NodeDef.isMultiple(viewDataNodeDef.nodeDef)) {
     groupByColumns.push(tableData.columnId)
     groupByColumns.push(..._getSelectFieldNodeDefs(viewDataNodeDef).filter((s) => !s.includes(' AS ')))
@@ -54,8 +68,9 @@ const _getGroupByColumns = (viewDataNodeDef) => {
         return `${viewDataParent.alias}.${columnNodeDef.name}`
       })
       .flat()
+      .filter((s) => !s.includes(' AS '))
 
-    groupByColumns.push(...(keys || []))
+    groupByColumns.push(...keys)
   }
   return groupByColumns
 }
@@ -104,16 +119,13 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     })
     .join('\n')
 
-  const groupByColumns = []
-  if (!NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef) && multipleAttributeDataTableJoins) {
-    groupByColumns.push(tableData.columnId)
-
-    if (shouldJoinWithParentView) {
-      groupByColumns.push(viewDataParent.columnUuid)
-    }
-  }
-
-  groupByColumns.push(..._getGroupByColumns(viewDataNodeDef))
+  const groupByColumns = _getGroupByColumns({
+    viewDataNodeDef,
+    multipleAttributeDataTableJoins,
+    shouldJoinWithParentView,
+  }).filter((column) => {
+    return selectFields.some((selectField) => selectField.includes(column))
+  })
 
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
