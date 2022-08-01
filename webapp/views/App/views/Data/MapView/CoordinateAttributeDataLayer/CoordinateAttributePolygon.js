@@ -79,7 +79,6 @@ export const CoordinateAttributePolygon = (props) => {
       case 21:
         return twentyOneCircles(middle, radius)
     }
-    return tenCircles([latitude, longitude], 200)
   }
 
   /************************************************************************************************
@@ -102,7 +101,7 @@ export const CoordinateAttributePolygon = (props) => {
     return [...nCircles(middle, radius / 2, 4, 45), nCircles(middle, radius, 8, 20)]
   }
   const tenCircles = (middle, radius) => {
-    return [centerCircle(middle), ...nCircles(middle / 2, radius, 9, 45)]
+    return [centerCircle(middle), ...nCircles(middle, radius / 2, 9, 45)]
   }
 
   const fiveCircles = (middle, radius) => {
