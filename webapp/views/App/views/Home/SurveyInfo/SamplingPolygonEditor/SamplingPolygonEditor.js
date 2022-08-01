@@ -1,16 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Input } from '@webapp/components/form/Input'
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
 import { useI18n } from '@webapp/store/system'
+import Switch from 'react-switch'
+import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
-  const samplingPolygonObject = JSON.parse(samplingPolygon.en || samplingPolygon)
+
+  const samplingPolygonObject = JSON.parse(samplingPolygon || getSamplingPolygonDefaults())
   const i18n = useI18n()
+
+  const [jsonEditorChecked, setJsonEditorChecked] = useState(false)
 
   const getItems = () => {
     let items = []
+
+    items.push(
+      <div className="form-item" key={'checkbox'}>
+        <label className="form-label">
+          <span>JSON </span>
+          <Switch checked={jsonEditorChecked} onChange={() => setJsonEditorChecked(!jsonEditorChecked)} height={20} />
+        </label>
+      </div>
+    )
+
+    if (jsonEditorChecked) {
+      items.push(
+        <div className="form-item" key={'jsonEditor'}>
+          <label className="form-label" htmlFor="survey-info-sampling-json-editor">
+            JSON
+          </label>
+          <textarea value={JSON.stringify(samplingPolygonObject, null, 2)} rows={12} onChange={jsonEditorOnChange} />
+        </div>
+      )
+      return items
+    }
 
     items.push(
       <SamplingPolygonShapeEditor
@@ -220,6 +246,10 @@ const SamplingPolygonEditor = (props) => {
   const constrolPointOffsetEastOnChange = (value) => {
     samplingPolygonObject.controlpoint_offset_east = value
     setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+  }
+
+  const jsonEditorOnChange = (event) => {
+    setSamplingPolygon(event.target.value)
   }
 
   return getItems()
