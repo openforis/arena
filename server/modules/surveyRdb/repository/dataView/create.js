@@ -78,21 +78,6 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
 
   const shouldJoinWithParentView = !viewDataNodeDef.virtual && !viewDataNodeDef.root
 
-  const multipleAttributeDataTableJoins = Survey.getNodeDefChildren(
-    viewDataNodeDef.nodeDef,
-    true
-  )(survey)
-    .filter(
-      (nodeDefChild) => NodeDef.isMultipleAttribute(nodeDefChild) && _canMultipleNodeDefBeAggregated(nodeDefChild)
-    )
-    .map((multAttrDef) => {
-      const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
-      return `LEFT JOIN ${multAttrDataTable.nameAliased} 
-            ON ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid}
-            AND ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
-    })
-    .join('\n')
-
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
       SELECT 
@@ -105,7 +90,6 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
           : ''
       }
-      ${multipleAttributeDataTableJoins}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
 
