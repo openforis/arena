@@ -11,9 +11,7 @@ import * as API from '@webapp/service/api'
 
 import L from 'leaflet'
 
-// eslint-disable-next-line
-import sideBySide from './leaflet-side-by-side' //This import is required even though it is never read, it will still import the sideBySide to L.control
-
+require('./leaflet-side-by-side')
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
