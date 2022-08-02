@@ -23,7 +23,6 @@ const Dropdown = (props) => {
     readOnly,
     readOnlyInput,
     selection,
-    style,
     title,
     validation,
   } = props
@@ -59,6 +58,13 @@ const Dropdown = (props) => {
       fetchItems()
     }
   }, [])
+
+  // set title to control component
+  useEffect(() => {
+    if (title) {
+      selectRef.current.controlRef.title = title
+    }
+  }, [title])
 
   const getItemFromOption = useCallback(
     (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
@@ -136,7 +142,6 @@ Dropdown.propTypes = {
   readOnly: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
-  style: PropTypes.object,
   title: PropTypes.string,
   validation: PropTypes.object,
 }
@@ -154,7 +159,6 @@ Dropdown.defaultProps = {
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   readOnlyInput: false,
   selection: null,
-  style: {},
   title: null,
   validation: {},
 }
