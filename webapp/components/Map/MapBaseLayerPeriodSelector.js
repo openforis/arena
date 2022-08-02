@@ -199,7 +199,7 @@ export const MapBaseLayerPeriodSelector = () => {
           False Color Right
         </label>
 
-        <TileLayer id={'side'} attribution={''} url={''} maxZoom={22} minZoom={3} />
+        <TileLayer id={'side'} attribution={''} url={''} maxZoom={17} minZoom={3} />
       </div>
     </div>
   )
