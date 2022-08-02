@@ -21,8 +21,9 @@ export const KmlUploader = () => {
   //const user = useUser()
 
   const [selectedFile, setSelectedFile] = useState()
-
   const [isFilePicked, setIsFilePicked] = useState(false)
+  const [layers, setLayers] = useState([])
+  const [opacity, setOpacity] = useState(50)
 
   useEffect(() => {
     if (isFilePicked) {
@@ -50,6 +51,7 @@ export const KmlUploader = () => {
             },
           }
         ).addTo(map)
+        setLayers((old) => [...old, geo])
         const reader = new FileReader()
         reader.onload = async (e) => {
           const text = e.target.result
@@ -87,20 +89,44 @@ export const KmlUploader = () => {
       const kml = parser.parseFromString(text, 'text/xml')
       const track = new L.KML(kml)
       map.addLayer(track)
+      setLayers((old) => [...old, track])
     })
   }
 
-  const changeHandler = (event) => {
+  const fileChangeHandler = (event) => {
     setSelectedFile(event.target.files[0])
 
     setIsFilePicked(true)
   }
 
+  const rangeChangeHandler = (event) => {
+    const value = event.target.value
+    setOpacity(value)
+    layers.forEach((layer) => layer.setStyle({ fillOpacity: value / 100 }))
+  }
+
+  const rangeOnMouseDown = () => {
+    map.dragging.disable()
+  }
+
+  const rangeOnMouseUp = () => {
+    map.dragging.enable()
+  }
+
   return (
     <div className="leaflet-bottom map-kml-uploader-wrapper">
       <div className="file-select-wrapper">
+        <input
+          type="range"
+          min="1"
+          max="100"
+          value={opacity}
+          onChange={rangeChangeHandler}
+          onMouseDown={rangeOnMouseDown}
+          onMouseUp={rangeOnMouseUp}
+        />
         Upload KML
-        <input type="file" name="file" onChange={changeHandler} />
+        <input type="file" name="file" onChange={fileChangeHandler} />
         {isFilePicked ? (
           <div>
             <p>Filename: {selectedFile.name}</p>
