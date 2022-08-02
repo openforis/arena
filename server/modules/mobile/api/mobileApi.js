@@ -5,7 +5,7 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 export const init = (app) => {
-  // ====== UPDATE - calculated entity data
+  // ====== READ - all survey day
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
@@ -22,7 +22,7 @@ export const init = (app) => {
     }
   })
 
-  // ====== UPDATE - calculated entity data
+  // ====== UPDATE - records and files of the survey
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
@@ -33,7 +33,7 @@ export const init = (app) => {
       const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
         surveyId,
         draft: false,
-        backup: true,
+        backup: false,
       })
 
       const filePath = zipFile.tempFilePath
