@@ -37,7 +37,7 @@ const RecordsSummary = () => {
           <Dropdown
             items={timeRangeItems}
             selection={timeRangeSelection}
-            onChange={(item) => onChangeTimeRange({ timeRange: item.key })}
+            onChange={(item) => onChangeTimeRange({ timeRange: item.value })}
             sourceElement={timeRangeElementRef.current}
             readOnlyInput
           />

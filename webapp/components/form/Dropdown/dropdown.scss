@@ -1,11 +1,18 @@
 @import 'webapp/style/vars';
 
+.dropdown {
+  .dropdown__control,
+  .dropdown__indicators {
+    min-height: 32px;
+    height: 32px;
+  }
+}
+
 .tooltip-error {
   .dropdown {
     border: 1px solid red;
   }
 }
-
 
 // .dropdown {
 //   display: grid;
