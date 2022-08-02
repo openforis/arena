@@ -47,7 +47,6 @@ export const ReportingDataAttributeDefs = (props) => {
             label={i18n.t('chainView.reportingDataAttribute', { level: CategoryLevel.getName(level) })}
           >
             <Dropdown
-              className="reporting-data-node-def-dropdown"
               items={availableReportingDataNodeDefs}
               selection={Survey.getNodeDefByUuid(Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain))(
                 survey

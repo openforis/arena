@@ -28,7 +28,6 @@ export const SamplingDesignStrategySelector = (props) => {
   return (
     <FormItem label={i18n.t('chainView.samplingStrategyLabel')}>
       <Dropdown
-        className="sampling-strategy-dropdown"
         items={items}
         selection={selectedItem}
         onChange={(item) => updateChain(Chain.assocSamplingStrategy(item?.value)(chain))}

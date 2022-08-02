@@ -32,7 +32,7 @@ export const ClusteringEntitySelector = () => {
   }
 
   return (
-    <FormItem className="clustering-entity-form-item" label={i18n.t('chainView.clusteringEntity')}>
+    <FormItem label={i18n.t('chainView.clusteringEntity')}>
       <EntitySelector
         hierarchy={hierarchy}
         nodeDefUuidEntity={selectedEntityUuid}

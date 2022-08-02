@@ -60,12 +60,7 @@ export const StratumAttributeSelector = () => {
 
   return (
     <FormItem label={i18n.t('chainView.stratumAttribute')}>
-      <Dropdown
-        className="stratum-attribute-dropdown"
-        selection={selectedItem}
-        items={selectableItems}
-        onChange={onChange}
-      />
+      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} />
     </FormItem>
   )
 }

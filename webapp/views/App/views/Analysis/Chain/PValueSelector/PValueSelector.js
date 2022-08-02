@@ -26,13 +26,7 @@ export const PValueSelector = () => {
 
   return (
     <FormItem label={i18n.t('chainView.pValue')}>
-      <Dropdown
-        className="p-value-dropdown"
-        items={items}
-        selection={selectedItem}
-        itemLabel="label"
-        onChange={onChange}
-      />
+      <Dropdown className="p-value-dropdown" items={items} selection={selectedItem} onChange={onChange} />
     </FormItem>
   )
 }
