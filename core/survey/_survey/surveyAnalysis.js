@@ -32,7 +32,7 @@ export const getAnalysisNodeDefs =
       // remove nodeDefs not in this entity
       if (entity && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(entity)) return false
 
-      // remove nodeDefs not in this entity bu entityUuid
+      // remove nodeDefs not in this entity by entityDefUuid
       if (entityDefUuid && NodeDef.getParentUuid(nodeDef) !== entityDefUuid) return false
 
       if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
