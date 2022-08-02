@@ -72,7 +72,6 @@ const EntitySelector = (props) => {
     <Dropdown
       idInput={TestId.entities.entitySelector}
       className="entity-selector"
-      autocompleteDialogClassName="entity-selector__dialog"
       items={dropdownItems}
       selection={selection}
       validation={validation}

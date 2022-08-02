@@ -9,7 +9,6 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const Dropdown = (props) => {
   const {
-    autocompleteDialogClassName,
     autocompleteMinChars,
     className,
     clearable,
@@ -24,14 +23,10 @@ const Dropdown = (props) => {
     readOnly,
     readOnlyInput,
     selection,
-    sourceElement,
     style,
     title,
     validation,
   } = props
-
-  const dropdownRef = useRef(null)
-  const inputRef = useRef(null)
 
   const selectRef = useRef(null)
   const inputValue = selectRef?.current?.inputRef?.value
@@ -46,28 +41,6 @@ const Dropdown = (props) => {
     (item) => (itemKey.constructor === String ? A.prop(itemKey, item) : itemKey(item)),
     [itemKey]
   )
-
-  // const { state, Actions } = useLocalState({
-  //   autocompleteMinChars,
-  //   disabled,
-  //   itemKey,
-  //   itemLabelFunction,
-  //   items,
-  //   onBeforeChange,
-  //   onChange,
-  //   readOnly,
-  //   selection,
-  //   title,
-  // })
-
-  // update itemLabelFunction and input value on itemLabelFunction change
-  // useEffect(() => {
-  //   Actions.updateItemLabelFunction({ itemLabelFunction, selection })
-  // }, [itemLabelFunction])
-
-  // const showDialog = State.getShowDialog(state)
-  // const itemsDialog = State.getItemsDialog(state)
-  // const inputValue = State.getInputValue(state) || ''
 
   const [state, setState] = useState({ items: [], loading: false })
 
@@ -130,8 +103,8 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
-        isClearable={clearable && !readOnly}
         inputId={idInput}
+        isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
         isSearchable={!readOnlyInput && !readOnly}
@@ -145,82 +118,10 @@ const Dropdown = (props) => {
         value={value}
       />
     </ValidationTooltip>
-
-    //
-    // menuPosition="fixed"
-    // styles={{
-    //   menuPortal: ({ left, top, ...provided }, state) => ({
-    //     ...provided,
-    //   }),
-    // }}
-    // <div
-    //   ref={dropdownRef}
-    //   className={classNames('dropdown', className)}
-    //   onBlur={(event) => {
-    //     const { className: classNameTarget = '' } = event.relatedTarget || {}
-    //     if (classNameTarget !== ItemDialog.className) {
-    //       Actions.closeDialog({ selection })
-    //     }
-    //   }}
-    // >
-    //   <Input
-    //     id={idInput}
-    //     ref={inputRef}
-    //     placeholder={placeholder}
-    //     value={inputValue}
-    //     validation={validation}
-    //     readOnly={readOnly || readOnlyInput}
-    //     disabled={disabled}
-    //     onChange={async (value) => {
-    //       await Actions.updateInputValue({ value, state })
-    //     }}
-    //     onBlur={async (e) => {
-    //       await Actions.onBlurInput({ value: e.target.value, state, selection })
-    //     }}
-    //     onFocus={async () => Actions.openDialog({ state })}
-    //     title={title}
-    //   />
-
-    //   <button
-    //     type="button"
-    //     className="btn-s btn-transparent btn-toggle"
-    //     data-testid={idInput ? TestId.dropdown.toggleBtn(idInput) : null}
-    //     onClick={async (event) => {
-    //       event.preventDefault()
-    //       event.stopPropagation()
-    //       if (showDialog) Actions.closeDialog({ selection, state })
-    //       else await Actions.openDialog({ state })
-    //     }}
-    //     aria-disabled={disabled || !searchMinCharsReached}
-    //   >
-    //     <span className="icon icon-play3 icon-12px" />
-    //   </button>
-
-    //   {showDialog &&
-    //     ReactDOM.createPortal(
-    //       <AutocompleteDialog
-    //         className={autocompleteDialogClassName}
-    //         inputField={inputRef.current}
-    //         itemLabel={itemLabelFunction}
-    //         itemKey={State.getItemKey(state)}
-    //         itemRenderer={ItemDialog}
-    //         items={itemsDialog}
-    //         onItemSelect={async (item) => {
-    //           await Actions.updateSelection({ item, selection, state })
-    //         }}
-    //         onClose={() => {
-    //           Actions.closeDialog({ selection })
-    //         }}
-    //         sourceElement={sourceElement || dropdownRef.current}
-    //       />,
-    //       document.body
-    //     )}
-    // </div>
   )
 }
 
 Dropdown.propTypes = {
-  autocompleteDialogClassName: PropTypes.string,
   autocompleteMinChars: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
@@ -235,16 +136,14 @@ Dropdown.propTypes = {
   readOnly: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
-  sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
   style: PropTypes.object,
   title: PropTypes.string,
   validation: PropTypes.object,
 }
 
 Dropdown.defaultProps = {
-  autocompleteDialogClassName: null,
   autocompleteMinChars: 0,
-  className: '',
+  className: undefined,
   clearable: false,
   disabled: false,
   idInput: null,
@@ -255,7 +154,6 @@ Dropdown.defaultProps = {
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   readOnlyInput: false,
   selection: null,
-  sourceElement: null,
   style: {},
   title: null,
   validation: {},
