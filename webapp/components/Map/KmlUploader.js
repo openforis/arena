@@ -115,31 +115,24 @@ export const KmlUploader = () => {
 
   return (
     <div className="leaflet-bottom map-kml-uploader-wrapper">
+      <div className="kml-title">KML/KMZ/Shapefile Options</div>
+      <label htmlFor="range">Opacity</label>
+      <input
+        type="range"
+        min="1"
+        max="100"
+        value={opacity}
+        onChange={rangeChangeHandler}
+        onMouseDown={rangeOnMouseDown}
+        onMouseUp={rangeOnMouseUp}
+        name="range"
+        id="range"
+      />
       <div className="file-select-wrapper">
-        <input
-          type="range"
-          min="1"
-          max="100"
-          value={opacity}
-          onChange={rangeChangeHandler}
-          onMouseDown={rangeOnMouseDown}
-          onMouseUp={rangeOnMouseUp}
-        />
-        Upload KML
-        <input type="file" name="file" onChange={fileChangeHandler} />
-        {isFilePicked ? (
-          <div>
-            <p>Filename: {selectedFile.name}</p>
-
-            <p>Filetype: {selectedFile.type}</p>
-
-            <p>Size in bytes: {selectedFile.size}</p>
-
-            <p>lastModifiedDate: {selectedFile.lastModifiedDate.toLocaleDateString()}</p>
-          </div>
-        ) : (
-          <p>Select a file to show details</p>
-        )}
+        <div className="file-input">
+          <label htmlFor="file">Select file</label>
+          <input type="file" name="file" onChange={fileChangeHandler} className="file" id="file" />
+        </div>
       </div>
     </div>
   )
