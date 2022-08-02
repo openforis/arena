@@ -2,12 +2,12 @@ import './InputChips.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
 import Chip from './Chip'
-import classNames from 'classnames'
 
 const InputChips = (props) => {
   const {
@@ -93,15 +93,15 @@ InputChips.defaultProps = {
   className: undefined,
   idInput: null,
 
-  itemLabel: 'value',
-  itemKey: 'key',
+  itemLabel: 'label',
+  itemKey: 'value',
   selection: [],
   requiredItems: 0,
   autocompleteMinChars: 0,
   readOnly: false,
   disabled: false,
   validation: {},
-  placeholder: null,
+  placeholder: undefined,
 
   onChange: null, // Callback to receive all selection change
   onItemAdd: null, // Callback to receive added item
