@@ -33,6 +33,10 @@ const Dropdown = (props) => {
   const dropdownRef = useRef(null)
   const inputRef = useRef(null)
 
+  const selectRef = useRef(null)
+  const inputValue = selectRef?.current?.inputRef?.value
+  const searchMinCharsReached = !autocompleteMinChars || autocompleteMinChars <= inputValue?.trim()?.length
+
   const getOptionLabel = useCallback(
     (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
     [itemLabel]
@@ -65,20 +69,23 @@ const Dropdown = (props) => {
   // const itemsDialog = State.getItemsDialog(state)
   // const inputValue = State.getInputValue(state) || ''
 
-  // const searchMinCharsReached = autocompleteMinChars <= 0 || inputValue.trim().length >= autocompleteMinChars
-
-  const [state, setState] = useState({ items: [], loading: true })
+  const [state, setState] = useState({ items: [], loading: false })
 
   const { items, loading } = state
 
   const fetchItems = useCallback(async () => {
-    const _items = itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp()) : []
+    if (!loading) {
+      setState({ items: [], loading: true })
+    }
+    const _items = itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp(inputValue)) : []
     setState({ items: _items, loading: false })
-  }, [itemsProp])
+  }, [itemsProp, loading, inputValue])
 
   useEffect(() => {
-    fetchItems()
-  }, [fetchItems])
+    if (searchMinCharsReached) {
+      fetchItems()
+    }
+  }, [])
 
   const getItemFromOption = useCallback(
     (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
@@ -95,6 +102,19 @@ const Dropdown = (props) => {
     [getItemFromOption, onBeforeChange, onChangeProp]
   )
 
+  const onInputChange = useCallback(
+    (inputValue) => {
+      if (autocompleteMinChars) {
+        if (autocompleteMinChars <= inputValue?.length) {
+          fetchItems()
+        } else {
+          setState({ items: [] })
+        }
+      }
+    },
+    [autocompleteMinChars, fetchItems]
+  )
+
   const options = items?.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
 
   const emptySelection = A.isEmpty(selection)
@@ -102,8 +122,8 @@ const Dropdown = (props) => {
   const value = emptySelection ? null : options.find((option) => option.value === selectedValue)
 
   // prevent menu opening when readOnly is true
-  const openMenuOnClick = !readOnly
-  const menuIsOpen = readOnly ? false : undefined
+  const openMenuOnClick = !readOnly && searchMinCharsReached
+  const menuIsOpen = readOnly || !searchMinCharsReached ? false : undefined
 
   return (
     <ValidationTooltip key={`validation-${idInput}`} validation={validation} className="dropdown-validation-tooltip">
@@ -111,14 +131,17 @@ const Dropdown = (props) => {
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
         isClearable={clearable && !readOnly}
+        inputId={idInput}
         isDisabled={disabled}
         isLoading={loading}
         isSearchable={!readOnlyInput && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
         menuIsOpen={menuIsOpen}
+        onInputChange={onInputChange}
         options={options}
         placeholder={placeholder}
+        ref={selectRef}
         value={value}
       />
     </ValidationTooltip>

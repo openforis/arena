@@ -7,9 +7,11 @@ import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
 import Chip from './Chip'
+import classNames from 'classnames'
 
 const InputChips = (props) => {
   const {
+    className,
     idInput,
     items,
     itemKey,
@@ -35,7 +37,7 @@ const InputChips = (props) => {
   })
 
   return (
-    <div className="form-input-chip">
+    <div className={classNames('form-input-chip', className)}>
       {selection.map((item) => (
         <Chip
           key={State.getItemKey(state)(item)}
@@ -67,6 +69,7 @@ const InputChips = (props) => {
 }
 
 InputChips.propTypes = {
+  className: PropTypes.string,
   idInput: PropTypes.string,
 
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
@@ -87,6 +90,7 @@ InputChips.propTypes = {
 }
 
 InputChips.defaultProps = {
+  className: undefined,
   idInput: null,
 
   itemLabel: 'value',
