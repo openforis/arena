@@ -11,12 +11,7 @@
       grid-template-columns: 0.2fr 0.75fr;
     }
 
-    .stratum-attribute-dropdown {
-      width: 30rem;
-    }
-
-    .clustering-entity-dropdown,
-    .clustering-entity-form-item > .entity-selector {
+    .dropdown {
       width: 30rem;
     }
 
@@ -39,12 +34,6 @@
       }
     }
 
-    .sampling-strategy-dropdown,
-    .post-stratification-attribute-dropdown,
-    .reporting-data-node-def-dropdown {
-      width: 30rem;
-    }
-
     .p-value-dropdown {
       width: 7rem;
     }
@@ -57,11 +46,10 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      
+
       .nonResponseBiasCorrectionTip {
         color: red;
-      }  
+      }
     }
-
   }
 }

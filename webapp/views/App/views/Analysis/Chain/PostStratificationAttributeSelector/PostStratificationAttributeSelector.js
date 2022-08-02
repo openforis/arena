@@ -44,18 +44,18 @@ export const PostStratificationAttributeSelector = () => {
   )
 
   const codeAttributeDefToItem = (codeAttributeDef) => ({
-    key: codeAttributeDef.uuid,
+    value: codeAttributeDef.uuid,
     label: NodeDef.getLabel(codeAttributeDef, null, NodeDef.NodeDefLabelTypes.name),
   })
 
-  const emptyItem = { key: null, label: i18n.t('common.notSpecified') }
+  const emptyItem = { value: null, label: i18n.t('common.notSpecified') }
 
   const items = [emptyItem, ...selectableDefs.map(codeAttributeDefToItem)]
 
   const selectedItem = selectedCodeAttributeDef ? codeAttributeDefToItem(selectedCodeAttributeDef) : emptyItem
 
   const onChange = (item) => {
-    const chainUpdated = Chain.assocPostStratificationAttributeDefUuid(item?.key)(chain)
+    const chainUpdated = Chain.assocPostStratificationAttributeDefUuid(item?.value)(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
@@ -65,7 +65,6 @@ export const PostStratificationAttributeSelector = () => {
         className="post-stratification-attribute-dropdown"
         items={items}
         selection={selectedItem}
-        itemLabel="label"
         onChange={onChange}
       />
     </FormItem>
