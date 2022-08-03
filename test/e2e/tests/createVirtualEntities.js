@@ -15,7 +15,7 @@ export default () =>
         await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), entity.name)
         await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), entity.label)
 
-        await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.entities.entitySelector), 'button'))
+        await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.entities.entitySelector)))
         await page.click(`text="Tree"`)
 
         // Save
@@ -24,10 +24,7 @@ export default () =>
           page.click(getSelector(TestId.nodeDefDetails.saveBtn, 'button')),
         ])
         // Back
-        await Promise.all([
-          page.waitForNavigation(),
-          page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button')),
-        ])
+        await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button'))])
       })
     })
 

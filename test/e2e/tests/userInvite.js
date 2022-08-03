@@ -24,7 +24,7 @@ const inviteUser = (userToInvite) =>
 
     await page.fill(getSelector(TestId.userInvite.email, 'input'), userToInvite.email)
 
-    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.userInvite.group), 'button'))
+    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.userInvite.group)))
     await page.click(`text="${userToInvite.authGroup.label}"`)
 
     await Promise.all([

@@ -5,12 +5,12 @@ import { BASE_URL } from '../../config'
 const editCodeDetails = async (nodeDef) => {
   const category = categories[nodeDef.category]
   // select category
-  await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.categorySelector.category), 'button'))
+  await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.categorySelector.category)))
   await page.click(getSelector(TestId.dropdown.dropDownItem(category.uuid)))
 
   if (nodeDef.parent) {
     // select parent
-    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.nodeDefDetails.nodeDefCodeParent), 'button'))
+    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.nodeDefDetails.nodeDefCodeParent)))
     await page.click(`text="${nodeDef.parent}"`)
   } else {
     const codeParent = await page.$(getSelector(TestId.nodeDefDetails.nodeDefCodeParent, 'input'))

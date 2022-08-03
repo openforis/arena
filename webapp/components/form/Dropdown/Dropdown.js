@@ -1,11 +1,24 @@
 import './dropdown.scss'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import ReactSelect from 'react-select'
+import ReactSelect, { components } from 'react-select'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
+import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+
+const OptionComponent = (props) => (
+  <div data-testid={TestId.dropdown.dropDownItem(props.data?.value)}>
+    <components.Option {...props} />
+  </div>
+)
+
+const IndicatorsContainerComponent = (props) => (
+  <div data-testid={TestId.dropdown.toggleBtn(props.selectProps.inputId)}>
+    <components.IndicatorsContainer {...props} />
+  </div>
+)
 
 const Dropdown = (props) => {
   const {
@@ -46,18 +59,22 @@ const Dropdown = (props) => {
   const { items, loading } = state
 
   const fetchItems = useCallback(async () => {
-    if (!loading) {
+    if (searchMinCharsReached && !loading) {
       setState({ items: [], loading: true })
     }
     const _items = itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp(inputValue)) : []
     setState({ items: _items, loading: false })
-  }, [itemsProp, loading, inputValue])
+  }, [itemsProp, searchMinCharsReached, loading, inputValue])
 
+  // fetch items on mount
   useEffect(() => {
-    if (searchMinCharsReached) {
-      fetchItems()
-    }
+    fetchItems()
   }, [])
+
+  // fetch items on items prop update
+  useEffect(() => {
+    fetchItems()
+  }, [itemsProp])
 
   // set title to control component
   useEffect(() => {
@@ -65,6 +82,15 @@ const Dropdown = (props) => {
       selectRef.current.controlRef.title = title
     }
   }, [title])
+
+  // set id and test id to input component
+  useEffect(() => {
+    if (idInput) {
+      const input = selectRef.current.inputRef
+      input.id = idInput
+      input.dataset.testid = idInput
+    }
+  }, [idInput])
 
   const getItemFromOption = useCallback(
     (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
@@ -94,7 +120,7 @@ const Dropdown = (props) => {
     [autocompleteMinChars, fetchItems]
   )
 
-  const options = items?.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
+  const options = items.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
 
   const emptySelection = A.isEmpty(selection)
   const selectedValue = emptySelection ? null : getOptionValue(selection)
@@ -109,6 +135,7 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
+        components={{ Option: OptionComponent, IndicatorsContainer: IndicatorsContainerComponent }}
         inputId={idInput}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}

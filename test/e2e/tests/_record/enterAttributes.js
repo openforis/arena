@@ -24,8 +24,7 @@ const enterCode = async (nodeDef, value, parentSelector) => {
   // only dropdown for now
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const toggleBtnSelector = `${nodeDefSelector} ${getSelector(
-    TestId.dropdown.toggleBtn(TestId.surveyForm.codeInputDropdown(nodeDef.name)),
-    'button'
+    TestId.dropdown.toggleBtn(TestId.surveyForm.codeInputDropdown(nodeDef.name))
   )}`
   await page.click(toggleBtnSelector)
   const itemEl = await page.waitForSelector(`text="${value}"`)
