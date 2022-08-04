@@ -277,7 +277,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   const recordNotEqualCondition = Expression.newBinary({
     left: Expression.newIdentifier(DataTable.columnNameRecordUuuid),
     right: Expression.newLiteral(Record.getUuid(record)),
-    operator: Expression.operators.comparison.notEq.key,
+    operator: Expression.operators.comparison.notEq.value,
   })
 
   const filter = R.reduce(
@@ -290,13 +290,13 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const condition = Expression.newBinary({
         left: identifier,
         right: value,
-        operator: Expression.operators.comparison.eq.key,
+        operator: Expression.operators.comparison.eq.value,
       })
 
       return Expression.newBinary({
         left: whereExprAcc,
         right: condition,
-        operator: Expression.operators.logical.and.key,
+        operator: Expression.operators.logical.and.value,
       })
     },
     recordNotEqualCondition,

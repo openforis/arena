@@ -33,15 +33,15 @@ const Logical = (props) => {
         <div className="btns__add">
           <button
             type="button"
-            className={`btn btn-s${operator === logical.or.key ? ' active' : ''}`}
-            onClick={() => onChange(R.assoc('operator', logical.or.key, node))}
+            className={`btn btn-s${operator === logical.or.value ? ' active' : ''}`}
+            onClick={() => onChange(R.assoc('operator', logical.or.value, node))}
           >
             {i18n.t('expressionEditor.or')}
           </button>
           <button
             type="button"
-            className={`btn btn-s${operator === logical.and.key ? ' active' : ''}`}
-            onClick={() => onChange(R.assoc('operator', logical.and.key, node))}
+            className={`btn btn-s${operator === logical.and.value ? ' active' : ''}`}
+            onClick={() => onChange(R.assoc('operator', logical.and.value, node))}
           >
             {i18n.t('expressionEditor.and')}
           </button>
