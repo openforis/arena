@@ -71,6 +71,7 @@ export const TestId = {
     advancedQuery: 'expression-advanced-query',
     applyBtn: 'expression-apply-btn',
     editBtn: (id) => `${id}-edit-btn`,
+    literalDropdown: 'expression-literal-dropdown',
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },
