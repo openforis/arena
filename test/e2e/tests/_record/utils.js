@@ -11,6 +11,9 @@ export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
 export const getBooleanSelector = (nodeDef, parentSelector, value) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
 
+export const getCodeSelector = (nodeDef, parentSelector) =>
+  `${getNodeDefSelector(nodeDef, parentSelector)} .dropdown__single-value`
+
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
 

@@ -2,6 +2,7 @@ import {
   formatDate,
   formatTime,
   getBooleanSelector,
+  getCodeSelector,
   getCoordinateSelector,
   getNodeDefSelector,
   getTaxonSelector,
@@ -46,6 +47,12 @@ const verifyTaxon = async (nodeDef, value, parentSelector) => {
   await expect(await vernacularName.getAttribute('value')).toBe(value.vernacularName)
 }
 
+const verifyCode = async (nodeDef, value, parentSelector) => {
+  const dropdownValueEl = await page.$(getCodeSelector(nodeDef, parentSelector))
+  const dropdownValue = await dropdownValueEl.innerText()
+  await expect(dropdownValue).toBe(value)
+}
+
 const verifyText = async (nodeDef, value, parentSelector) => {
   const text = await page.$(getTextSelector(nodeDef, parentSelector))
   await expect(await text.getAttribute('value')).toBe(value)
@@ -62,7 +69,7 @@ const verifyTime = async (nodeDef, value, parentSelector) => {
 
 const verifyFns = {
   boolean: verifyBoolean,
-  code: verifyText,
+  code: verifyCode,
   coordinate: verifyCoordinate,
   date: verifyDate,
   decimal: verifyText,
