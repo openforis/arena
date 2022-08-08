@@ -108,7 +108,7 @@ const NodeDefCoordinate = (props) => {
 
   const srsDropdown = (
     <Dropdown
-      idInput={TestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
+      testId={TestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
       readOnly={entryDisabled}
       items={surveySrs}
       itemKey="code"

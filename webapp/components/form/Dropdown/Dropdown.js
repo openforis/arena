@@ -26,7 +26,8 @@ const Dropdown = (props) => {
     className,
     clearable,
     disabled,
-    idInput,
+    id,
+    idInput: idInputParam,
     itemLabel,
     itemKey,
     items: itemsProp,
@@ -36,6 +37,7 @@ const Dropdown = (props) => {
     readOnly,
     readOnlyInput,
     selection,
+    testId,
     title,
     validation,
   } = props
@@ -84,13 +86,14 @@ const Dropdown = (props) => {
   }, [title])
 
   // set id and test id to input component
+  const inputId = id || idInputParam || testId
   useEffect(() => {
-    if (idInput) {
+    if (inputId) {
       const input = selectRef.current.inputRef
-      input.id = idInput
-      input.dataset.testid = idInput
+      input.id = inputId
+      input.dataset.testid = inputId
     }
-  }, [idInput])
+  }, [inputId])
 
   const getItemFromOption = useCallback(
     (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
@@ -131,12 +134,12 @@ const Dropdown = (props) => {
   const menuIsOpen = readOnly || !searchMinCharsReached ? false : undefined
 
   return (
-    <ValidationTooltip key={`validation-${idInput}`} validation={validation} className="dropdown-validation-tooltip">
+    <ValidationTooltip className="dropdown-validation-tooltip" id={id} testId={testId} validation={validation}>
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent, IndicatorsContainer: IndicatorsContainerComponent }}
-        inputId={idInput}
+        inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
@@ -159,6 +162,7 @@ Dropdown.propTypes = {
   className: PropTypes.string,
   clearable: PropTypes.bool,
   disabled: PropTypes.bool,
+  id: PropTypes.string,
   idInput: PropTypes.string,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -169,6 +173,7 @@ Dropdown.propTypes = {
   readOnly: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
+  testId: PropTypes.string,
   title: PropTypes.string,
   validation: PropTypes.object,
 }
@@ -178,6 +183,7 @@ Dropdown.defaultProps = {
   className: undefined,
   clearable: false,
   disabled: false,
+  id: null,
   idInput: null,
   itemKey: 'value',
   itemLabel: 'label',
@@ -186,6 +192,7 @@ Dropdown.defaultProps = {
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   readOnlyInput: false,
   selection: null,
+  testId: null,
   title: null,
   validation: {},
 }

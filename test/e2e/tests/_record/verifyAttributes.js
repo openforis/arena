@@ -1,8 +1,10 @@
+import { getSelector } from '../../../../webapp/utils/testId'
+
 import {
+  expectDropdownValue,
   formatDate,
   formatTime,
   getBooleanSelector,
-  getCodeSelector,
   getCoordinateSelector,
   getNodeDefSelector,
   getTaxonSelector,
@@ -15,15 +17,22 @@ const verifyBoolean = async (nodeDef, value, parentSelector) => {
   await expect(await span.getAttribute('class')).toContain('icon-radio-checked2')
 }
 
+const verifyCode = async (nodeDef, value, parentSelector) => {
+  await expectDropdownValue({ parentSelector: `${parentSelector} ${getNodeDefSelector(nodeDef)}`, value })
+}
+
 const verifyCoordinate = async (nodeDef, value, parentSelector) => {
-  const { xSelector, ySelector, srsSelector } = getCoordinateSelector(nodeDef, parentSelector)
+  const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
 
   const x = await page.$(xSelector)
   const y = await page.$(ySelector)
-  const srs = await page.$(srsSelector)
+
   await expect(Number(await x.getAttribute('value'))).toBe(Number(value.x))
   await expect(Number(await y.getAttribute('value'))).toBe(Number(value.y))
-  await expect(await srs.getAttribute('value')).toBe(value.srsLabel)
+  await expectDropdownValue({
+    parentSelector: `${getNodeDefSelector(nodeDef, parentSelector)} ${getSelector(srsTestId)}`,
+    value: value.srsLabel,
+  })
 }
 
 const verifyDate = async (nodeDef, value, parentSelector) => {
@@ -45,12 +54,6 @@ const verifyTaxon = async (nodeDef, value, parentSelector) => {
   await expect(await code.getAttribute('value')).toBe(value.code)
   await expect(await scientificName.getAttribute('value')).toBe(value.scientificName)
   await expect(await vernacularName.getAttribute('value')).toBe(value.vernacularName)
-}
-
-const verifyCode = async (nodeDef, value, parentSelector) => {
-  const dropdownValueEl = await page.$(getCodeSelector(nodeDef, parentSelector))
-  const dropdownValue = await dropdownValueEl.innerText()
-  await expect(dropdownValue).toBe(value)
 }
 
 const verifyText = async (nodeDef, value, parentSelector) => {

@@ -9,6 +9,7 @@ import {
   getTaxonSelector,
   getTextSelector,
   parseValue,
+  selectDropdownValue,
 } from './utils'
 
 const enterBoolean = async (nodeDef, value, parentSelector) => {
@@ -32,14 +33,11 @@ const enterCode = async (nodeDef, value, parentSelector) => {
 }
 
 const enterCoordinate = async (nodeDef, value, parentSelector) => {
-  const { xSelector, ySelector, srsSelector } = getCoordinateSelector(nodeDef, parentSelector)
-
+  const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
   await page.fill(xSelector, value.x)
   await page.fill(ySelector, value.y)
-  if (await page.isEditable(srsSelector)) {
-    await page.focus(srsSelector)
-    await page.click(getSelector(TestId.dropdown.dropDownItem(value.srs)))
-  }
+
+  await selectDropdownValue({ testId: srsTestId, value: value.srs, parentSelector })
 }
 
 const enterTaxon = async (nodeDef, value, parentSelector) => {
