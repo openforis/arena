@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 
-import './Input.scss'
+import './Checkbox.scss'
 
-const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
+const CheckboxBlock = ({ configItemsByPath, configActions, blockPath, block }) => {
   const { title, subtitle, id } = block
 
   const handleChange = useCallback(
@@ -11,11 +11,13 @@ const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimen
     },
     [blockPath, configActions]
   )
+
   return (
     <div className="block block-input">
       <span className="block__title">{title}</span>
       <span className="block__subtitle">{subtitle}</span>
       <input
+        type="range"
         id={id}
         className="basic-input"
         defaultValue={configItemsByPath?.[blockPath]?.value}
@@ -25,4 +27,4 @@ const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimen
   )
 }
 
-export default InputBlock
+export default CheckboxBlock

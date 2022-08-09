@@ -163,23 +163,46 @@ const bar = {
         order: ['groupBy', 'metric'],
       },
       other: {
-        title: 'Other',
-        subtitle: 'hello world',
+        title: 'Custom Chart',
+        subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
           size: {
-            id: 'size',
-            title: 'Size',
-            subtitle: 'Select with local options',
+            id: 'legend',
+            title: 'Show Legend',
+            subtitle: 'Select wheter to show the Legend or not',
             type: 'select',
             options: [
-              { value: 1, label: 1, name: 'hello', type: 'nominal' },
-              { value: 10, label: 100, name: 'hello', type: 'nominal' },
+              { value: 1, label: 'Yes', name: 'Yes', type: 'nominal' },
+              { value: 0, label: 'No', name: 'No', type: 'nominal' },
             ],
             optionsParams: { showIcons: false },
             isMulti: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
+              const val = value.map((val) => val.value)
+              let legend = true
+              console.log('VALUES LEGEND', val)
+
+              if (val == 0) {
+                legend = null
+              }
+
+              console.log('LEGEND', legend)
+
+              const newSpec = {
+                ...spec,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec?.encoding || {}),
+                    color: {
+                      ...(spec.spec.encoding?.color || {}),
+                      legend: legend,
+                    },
+                  },
+                },
+              }
+              return newSpec
             },
           },
         },
