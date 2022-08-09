@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import './Container.scss'
+import * as A from '@core/arena'
 import { Button } from '@webapp/components'
 import RenderByType from '../BlockRenderer/BlockRenderer'
 import classNames from 'classnames'
@@ -26,18 +27,32 @@ const ContainerBlock = ({ config, configItemsByPath, configActions, blockPath = 
 
       <hr className="block-container__separator" />
       <div className={classNames('block-container__blocks', { visible: isVisible })}>
-        {order.map((blockKey) =>
-          React.createElement(RenderByType[blocks[blockKey].type], {
-            key: blockKey,
-            dimensions,
+        {order
+          .filter((blockKey) => {
+            const block = blocks[blockKey]
+            if (block?.hideIf) {
+              return !block.hideIf.some(
+                ([ruleBlockKey, ruleValue]) =>
+                  (!A.isEmpty(configItemsByPath?.[ruleBlockKey]?.value)
+                    ? configItemsByPath?.[ruleBlockKey]?.value
+                    : blocks[ruleBlockKey]?.defaultValue) === ruleValue
+              )
+            }
 
-            block: blocks[blockKey],
-            config,
-            configItemsByPath,
-            configActions,
-            blockPath: blockPath ? blockPath.split('.').concat([blockKey]).join('.') : blockKey,
+            return true
           })
-        )}
+          .map((blockKey) =>
+            React.createElement(RenderByType[blocks[blockKey].type], {
+              key: blockKey,
+              dimensions,
+
+              block: blocks[blockKey],
+              config,
+              configItemsByPath,
+              configActions,
+              blockPath: blockPath ? blockPath.split('.').concat([blockKey]).join('.') : blockKey,
+            })
+          )}
       </div>
     </div>
   )

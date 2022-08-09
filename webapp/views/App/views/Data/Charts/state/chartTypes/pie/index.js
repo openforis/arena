@@ -6,7 +6,7 @@ const pie = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     layer: [
       {
-        mark: { type: 'arc', innerRadius: 40, outerRadius: 60 },
+        mark: { type: 'arc', innerRadius: 40, outerRadius: 70 },
       },
     ],
   },
@@ -141,6 +141,27 @@ const pie = {
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
+          'show-title': {
+            id: 'show-title',
+            title: 'Show title',
+            subtitle: '',
+            label: 'show title',
+            type: 'checkbox',
+            defaultValue: true,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              return spec
+            },
+          },
+          title: {
+            id: 'title',
+            title: 'Chart Title',
+            subtitle: 'write the chart title',
+            hideIf: [['other.show-title', false]],
+            type: 'input',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              return spec
+            },
+          },
           legend: {
             id: 'legend',
             title: 'Show Legend',
@@ -168,13 +189,11 @@ const pie = {
                 encoding: {
                   ...(spec.encoding || {}),
                   color: {
-                    // TODO: Fix this to work even when no encoding is defined.
-                    ...(spec.encoding.color || {}),
+                    ...(spec.encoding?.color || {}),
                     legend: legend,
                   },
                 },
               }
-
               return newSpec
             },
           },
@@ -207,8 +226,18 @@ const pie = {
               return newSpec
             },
           },
+          'donut-radio': {
+            id: 'donut-radio',
+            title: 'Radio',
+            subtitle: '',
+            type: 'slider',
+            params: { min: 5, max: 10, step: 0.5, unit: 'px' },
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              return spec
+            },
+          },
         },
-        order: ['legend', 'donut'],
+        order: ['title', 'show-title', 'legend', 'donut', 'donut-radio'],
       },
     },
     order: ['query', 'other'],
