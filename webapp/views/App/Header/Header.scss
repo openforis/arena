@@ -8,7 +8,7 @@
   border-bottom: 1px solid $greyBorder;
 
   &.sidebar-open {
-    grid-template-columns: 200px 1fr 1fr 1fr 70px; 
+    grid-template-columns: 200px 1fr 1fr 1fr 70px;
   }
 }
 
@@ -31,13 +31,7 @@
 
   .dropdown {
     margin-left: 10px;
-    grid-template-columns: 70px 20px;
-    border-bottom: none;
-
-    input {
-      font-size: 0.85rem;
-      color: lighten($black, 20%);
-    }
+    width: 9rem;
   }
 
   .survey-preferred-language {
@@ -55,7 +49,7 @@
 }
 
 .header__survey-title {
-  max-width: 50vw;
+  max-width: 30vw;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

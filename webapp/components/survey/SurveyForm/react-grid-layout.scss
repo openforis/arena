@@ -1,7 +1,6 @@
 @import '~@webapp/style/vars';
 
 .react-grid-layout {
-  //position: relative;
   transition: height 200ms ease;
 
   overflow-y: auto;
@@ -11,7 +10,6 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
-  // overflow: hidden;
 }
 
 .react-grid-item.cssTransforms {

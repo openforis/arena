@@ -27,7 +27,7 @@ const Dropdown = (props) => {
     clearable,
     disabled,
     id,
-    idInput: idInputParam,
+    idInput: idInputProp,
     itemLabel,
     itemKey,
     items: itemsProp,
@@ -86,7 +86,7 @@ const Dropdown = (props) => {
   }, [title])
 
   // set id and test id to input component
-  const inputId = id || idInputParam || testId
+  const inputId = id || idInputProp || testId
   useEffect(() => {
     if (inputId) {
       const input = selectRef.current.inputRef
