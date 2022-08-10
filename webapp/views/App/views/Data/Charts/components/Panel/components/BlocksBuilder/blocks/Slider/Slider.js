@@ -2,8 +2,8 @@ import React, { useCallback } from 'react'
 
 import './Slider.scss'
 
-const CheckboxBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
-  const { title, subtitle, id } = block
+const SliderBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
+  const { params, title, subtitle, id } = block
 
   const handleChange = useCallback(
     (e) => {
@@ -20,11 +20,13 @@ const CheckboxBlock = ({ config, configItemsByPath, configActions, blockPath, di
         type="range"
         id={id}
         className="basic-input"
-        defaultValue={configItemsByPath?.[blockPath]?.value}
+        defaultValue={params?.default}
+        min={params?.min}
+        max={params?.max}
         onChange={handleChange}
       />
     </div>
   )
 }
 
-export default CheckboxBlock
+export default SliderBlock

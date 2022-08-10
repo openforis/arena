@@ -83,6 +83,11 @@ const bar = {
                 options: [
                   { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
                   { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
+                  { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
+                  { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
+                  { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
+                  { value: 'min', label: 'Min', name: 'min', type: 'aggregation' },
+                  { value: 'max', label: 'Max', name: 'max', type: 'aggregation' },
                 ],
                 optionsParams: { showIcons: false },
               },
@@ -167,27 +172,48 @@ const bar = {
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
-          size: {
+          'show-title': {
+            id: 'show-title',
+            title: 'Show title',
+            subtitle: '',
+            label: 'show title',
+            type: 'checkbox',
+            defaultValue: false,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              return spec
+            },
+          },
+          title: {
+            id: 'title',
+            title: 'Chart Title',
+            subtitle: 'write the chart title',
+            hideIf: [['other.show-title', false]],
+            type: 'input',
+            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+              console.log('title value', configItemsByPath?.['other.show-title']?.value)
+              console.log('conf', configItemsByPath)
+              if (configItemsByPath?.['other.show-title']?.value) {
+                const newSpec = {
+                  ...spec,
+                  title: value,
+                }
+                return newSpec
+              }
+              return spec
+            },
+          },
+          legend: {
             id: 'legend',
             title: 'Show Legend',
-            subtitle: 'Select wheter to show the Legend or not',
-            type: 'select',
-            options: [
-              { value: 1, label: 'Yes', name: 'Yes', type: 'nominal' },
-              { value: 0, label: 'No', name: 'No', type: 'nominal' },
-            ],
-            optionsParams: { showIcons: false },
-            isMulti: false,
+            subtitle: '',
+            label: 'show legend',
+            type: 'checkbox',
+            defaultValue: true,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const val = value.map((val) => val.value)
               let legend = true
-              console.log('VALUES LEGEND', val)
-
-              if (val == 0) {
+              if (!value) {
                 legend = null
               }
-
-              console.log('LEGEND', legend)
 
               const newSpec = {
                 ...spec,
@@ -205,8 +231,176 @@ const bar = {
               return newSpec
             },
           },
+          labelFontSize: {
+            id: 'labelFontSize',
+            title: 'labelFontSize',
+            subtitle: '',
+            type: 'slider',
+            params: { min: 1, max: 25, default: 11, step: 1, unit: 'px' },
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec?.encoding || {}),
+                    y: {
+                      ...spec.spec?.encoding?.y,
+                      axis: {
+                        labelFontSize: value,
+                      },
+                    },
+                    x: {
+                      ...spec.spec?.encoding?.x,
+                      axis: {
+                        labelFontSize: value,
+                      },
+                    },
+                  },
+                },
+              }
+
+              return newSpec
+            },
+          },
+          xTitle: {
+            id: 'xTitle',
+            title: 'X axis Title',
+            subtitle: 'write the x axis title',
+            type: 'input',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec?.encoding || {}),
+                    x: {
+                      ...spec.spec?.encoding?.x,
+                      title: value,
+                    },
+                  },
+                },
+              }
+              return newSpec
+            },
+          },
+          yTitle: {
+            id: 'yTitle',
+            title: 'Y axis Title',
+            subtitle: 'write the y axis title',
+            type: 'input',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                spec: {
+                  ...(spec.spec || {}),
+                  encoding: {
+                    ...(spec.spec?.encoding || {}),
+                    y: {
+                      ...spec.spec?.encoding?.y,
+                      title: value,
+                    },
+                  },
+                },
+              }
+              return newSpec
+            },
+          },
+          maxHeight: {
+            id: 'maxHeight',
+            title: 'Max Height of the bars',
+            subtitle: 'clip the bars to the number input',
+            type: 'input',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                spec: {
+                  ...(spec.spec || {}),
+                  mark: {
+                    ...(spec.spec?.mark || {}),
+                    clip: true,
+                  },
+                  encoding: {
+                    ...(spec.spec?.encoding || {}),
+                    y: {
+                      ...spec.spec?.encoding?.y,
+                      scale: { domainMax: value },
+                    },
+                  },
+                },
+              }
+              return newSpec
+            },
+          },
+          stack: {
+            id: 'stack',
+            title: 'Stack bars',
+            subtitle: '',
+            label: 'stack bars',
+            type: 'checkbox',
+            defaultValue: false,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              if (value) {
+                const newSpec = {
+                  ...spec,
+                  spec: {
+                    ...(spec.spec || {}),
+                    encoding: {
+                      ...(spec.spec?.encoding || {}),
+                      y: {
+                        ...(spec.spec?.encoding?.y || {}),
+                        stack: 'normalize',
+                      },
+                      xOffset: null,
+                    },
+                  },
+                }
+                return newSpec
+              }
+              return spec
+            },
+          },
+          switchHorizontal: {
+            id: 'horizontal',
+            title: 'Make chart Horizontal',
+            subtitle: '',
+            label: 'make horizontal',
+            type: 'checkbox',
+            defaultValue: false,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              if (value) {
+                const newSpec = {
+                  ...spec,
+                  spec: {
+                    ...(spec.spec || {}),
+                    encoding: {
+                      ...(spec.spec?.encoding || {}),
+                      y: spec.spec?.encoding?.x,
+                      x: spec.spec?.encoding?.y,
+                      yOffset: spec.spec?.encoding?.xOffset,
+                      xOffset: null,
+                    },
+                  },
+                }
+                return newSpec
+              }
+              return spec
+            },
+          },
         },
-        order: ['size'],
+
+        order: [
+          'show-title',
+          'title',
+          'legend',
+          'labelFontSize',
+          'xTitle',
+          'yTitle',
+          'maxHeight',
+          'stack',
+          'switchHorizontal',
+        ],
       },
     },
     order: ['query', 'other'],
