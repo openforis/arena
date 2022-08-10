@@ -1,7 +1,6 @@
 import * as pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 import { TableNode } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
@@ -29,13 +28,9 @@ const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
 }
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
-  constructor({ surveyId, survey, entity, chain }, tx) {
-    const analysisNodeDefsInEntity = Survey.getNodeDefDescendantAttributesInSingleEntities(
-      entity,
-      true
-    )(survey).filter(NodeDef.isAnalysis)
+  constructor({ surveyId, analysisNodeDefs }, tx) {
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
-      nodeDefs: analysisNodeDefsInEntity,
+      nodeDefs: analysisNodeDefs,
       includeExtendedCols: true,
     })
 
@@ -62,10 +57,6 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       },
       tx
     )
-
-    this.survey = survey
-    this.entity = entity
-    this.chain = chain
 
     this.nodeDefsByColumnName = nodeDefsByColumnName
   }
