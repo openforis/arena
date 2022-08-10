@@ -1,9 +1,11 @@
 import * as ProcessUtils from '@core/processUtils'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
+
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -11,7 +13,6 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisManager from '../../manager'
-import * as StringUtils from '../../../../../core/stringUtils'
 
 import {
   ListCategories,
@@ -67,6 +68,8 @@ class RChain {
     this._listTaxonomies = null
 
     this._entities = []
+    this._analysisNodeDefs = []
+    this._entitiesWithActiveQuantitativeVariables = []
   }
 
   get surveyId() {
@@ -135,6 +138,14 @@ class RChain {
 
   get entities() {
     return this._entities
+  }
+
+  get entitiesWithActiveQuantitativeVariables() {
+    return this._entitiesWithActiveQuantitativeVariables
+  }
+
+  get analysisNodeDefs() {
+    return this._analysisNodeDefs
   }
 
   async _initEntities() {
@@ -257,19 +268,36 @@ class RChain {
   }
 
   async _initAnalysisNodeDefsFiles() {
-    const { chain, survey } = this
-    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain })(survey).filter((nodeDef) =>
+    const { chain, survey, entities } = this
+
+    this._analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain })(survey).filter((nodeDef) =>
       // get only analysis node defs in entities with data
-      this.entities.find((entityDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entityDef))
+      entities.find((entityDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entityDef))
     )
-    if (analysisNodeDefs.length > 0) {
+
+    const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+
+    this._entitiesWithActiveQuantitativeVariables = entities.filter(
+      (entityDef) =>
+        // always include base unit entity
+        NodeDef.isEqual(entityDef)(baseUnitNodeDef) ||
+        this._analysisNodeDefs.some(
+          (analysisNodeDef) =>
+            NodeDef.isActive(analysisNodeDef) &&
+            !NodeDef.isSampling(analysisNodeDef) &&
+            NodeDef.getParentUuid(analysisNodeDef) === NodeDef.getUuid(entityDef)
+        )
+    )
+
+    if (this._analysisNodeDefs.length > 0) {
       const samplingPath = this.dirSampling
       await FileUtils.mkdir(samplingPath)
 
-      const samplingDefs = SamplingNodeDefs.getSamplingDefsWithActiveDefsInSameEntity({
+      const samplingDefs = SamplingNodeDefs.getSamplingDefsInEntities({
         survey,
         chain,
-        analysisNodeDefs,
+        entities: this.entitiesWithActiveQuantitativeVariables,
+        analysisNodeDefs: this.analysisNodeDefs,
       })
 
       await PromiseUtils.each(samplingDefs, async (nodeDef, index) => {
@@ -280,7 +308,7 @@ class RChain {
       await FileUtils.mkdir(entityPath)
 
       await PromiseUtils.each(
-        analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
+        this._analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
         async (nodeDef) => {
           await this._initNodeDefFile({ nodeDef, path: entityPath })
           const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)

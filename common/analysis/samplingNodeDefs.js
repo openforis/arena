@@ -128,33 +128,26 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   return { nodeDefsToCreate, nodeDefsToDelete }
 }
 
-const getSamplingDefsWithActiveDefsInSameEntity = ({ survey, chain, analysisNodeDefs }) => {
-  const samplingDefs = analysisNodeDefs.filter(NodeDef.isSampling)
+const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }) => {
+  const entityUuids = entities.map(NodeDef.getUuid)
+
+  const samplingDefs = analysisNodeDefs.filter(
+    (analysisNodeDef) =>
+      NodeDef.isSampling(analysisNodeDef) && entityUuids.includes(NodeDef.getParentUuid(analysisNodeDef))
+  )
 
   // put the "weight" node def first
   samplingDefs.sort((samplingDef1, samplingDef2) => {
-    if (SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) {
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) {
       return -1
     }
-    if (SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) {
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) {
       return 1
     }
     return 0
   })
 
-  const hasActiveDefsInSameEntity = (nodeDef) =>
-    analysisNodeDefs.some(
-      (analysisDef) =>
-        !NodeDef.isEqual(analysisDef)(nodeDef) &&
-        NodeDef.getParentUuid(analysisDef) === NodeDef.getParentUuid(nodeDef) &&
-        NodeDef.isActive(analysisDef)
-    )
-
-  return samplingDefs.filter(
-    (samplingDef) =>
-      SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef }) ||
-      hasActiveDefsInSameEntity(samplingDef)
-  )
+  return samplingDefs
 }
 
 export const SamplingNodeDefs = {
@@ -163,5 +156,5 @@ export const SamplingNodeDefs = {
   isEntityAreaNodeDef,
   isBaseUnitEntityAreaNodeDef,
   determinePlotAreaNodeDefs,
-  getSamplingDefsWithActiveDefsInSameEntity,
+  getSamplingDefsInEntities,
 }

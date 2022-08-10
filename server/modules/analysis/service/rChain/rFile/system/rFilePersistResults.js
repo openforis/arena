@@ -58,9 +58,9 @@ export default class RFilePersistResults extends RFileSystem {
   }
 
   async initPersistChainEntitiesResults() {
-    const { entities } = this.rChain
+    const { entitiesWithActiveQuantitativeVariables } = this.rChain
 
-    await PromiseUtils.each(entities, async (entity) => {
+    await PromiseUtils.each(entitiesWithActiveQuantitativeVariables, async (entity) => {
       const dfResults = new DfResults(this.rChain, entity)
 
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
