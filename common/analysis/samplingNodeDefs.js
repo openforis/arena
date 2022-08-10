@@ -27,6 +27,15 @@ const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, baseUnitNodeDef, includeO
   )
 }
 
+const isBaseUnitEntityAreaNodeDef = ({ survey, chain, nodeDef }) => {
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  return (
+    NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef) &&
+    SamplingNodeDefs.isEntityAreaNodeDef({ nodeDef, nodeDefParent, baseUnitNodeDef })
+  )
+}
+
 const getAllEntityAreaNodeDefs = ({ survey, chain }) => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const samplingNodeDefs = Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs: true })(survey)
@@ -119,8 +128,40 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   return { nodeDefsToCreate, nodeDefsToDelete }
 }
 
+const getSamplingDefsWithActiveDefsInSameEntity = ({ survey, chain, analysisNodeDefs }) => {
+  const samplingDefs = analysisNodeDefs.filter(NodeDef.isSampling)
+
+  // put the "weight" node def first
+  samplingDefs.sort((samplingDef1, samplingDef2) => {
+    if (SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) {
+      return -1
+    }
+    if (SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) {
+      return 1
+    }
+    return 0
+  })
+
+  const hasActiveDefsInSameEntity = (nodeDef) =>
+    analysisNodeDefs.some(
+      (analysisDef) =>
+        !NodeDef.isEqual(analysisDef)(nodeDef) &&
+        NodeDef.getParentUuid(analysisDef) === NodeDef.getParentUuid(nodeDef) &&
+        NodeDef.isActive(analysisDef)
+    )
+
+  return samplingDefs.filter(
+    (samplingDef) =>
+      SamplingNodeDefs.isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef }) ||
+      hasActiveDefsInSameEntity(samplingDef)
+  )
+}
+
 export const SamplingNodeDefs = {
   SAMPLING_NODE_DEF_BASE_UNIT_NAME: SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME,
   getEntityAreaNodeDefName,
+  isEntityAreaNodeDef,
+  isBaseUnitEntityAreaNodeDef,
   determinePlotAreaNodeDefs,
+  getSamplingDefsWithActiveDefsInSameEntity,
 }

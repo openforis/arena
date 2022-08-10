@@ -27,6 +27,7 @@ import RFile, { padStart } from './rFile'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
 
 import { dfVar, NA, setVar } from './rFunctions'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
@@ -256,20 +257,24 @@ class RChain {
   }
 
   async _initAnalysisNodeDefsFiles() {
-    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain: this.chain })(this.survey).filter((nodeDef) =>
+    const { chain, survey } = this
+    const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain })(survey).filter((nodeDef) =>
+      // get only analysis node defs in entities with data
       this.entities.find((entityDef) => NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(entityDef))
     )
-
     if (analysisNodeDefs.length > 0) {
       const samplingPath = this.dirSampling
       await FileUtils.mkdir(samplingPath)
 
-      await PromiseUtils.each(
-        analysisNodeDefs.filter((_nodeDef) => NodeDef.isSampling(_nodeDef)),
-        async (nodeDef, index) => {
-          await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
-        }
-      )
+      const samplingDefs = SamplingNodeDefs.getSamplingDefsWithActiveDefsInSameEntity({
+        survey,
+        chain,
+        analysisNodeDefs,
+      })
+
+      await PromiseUtils.each(samplingDefs, async (nodeDef, index) => {
+        await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
+      })
 
       const entityPath = this.dirUser
       await FileUtils.mkdir(entityPath)
