@@ -1,15 +1,25 @@
 @import 'webapp/style/vars';
 
-.block-input {
-  .basic-input{
-    width: 100%;
-    min-height: 38px;
-    border-radius: 4px;
-    border: 1px solid $greyBorder;
-    flex-wrap: wrap;
-    padding: 8px;
-    padding: 2px 8px;
+.block-checkbox {
+  .basic-checkbox {
+    justify-content: flex-start;
+    flex-direction: row;
+    padding: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    align-items: center;
+    display: flex;
+
+    .icon {
+      color: $black;
+    }
+
+    .checkbox-label {
+      padding-left: 4px;
+      font-size: 0.7rem;
+      color: $black;
+      font-weight: normal;
+      text-transform: capitalize;
+    }
   }
 }
-
-

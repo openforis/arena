@@ -6,7 +6,7 @@ const pie = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     layer: [
       {
-        mark: { type: 'arc', innerRadius: 40, outerRadius: 70 },
+        mark: { type: 'arc', innerRadius: 40, outerRadius: 80 },
       },
     ],
   },
@@ -95,6 +95,11 @@ const pie = {
                 options: [
                   { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
                   { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
+                  { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
+                  { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
+                  { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
+                  { value: 'min', label: 'Min', name: 'min', type: 'aggregation' },
+                  { value: 'max', label: 'Max', name: 'max', type: 'aggregation' },
                 ],
                 optionsParams: { showIcons: false },
               },
@@ -147,7 +152,7 @@ const pie = {
             subtitle: '',
             label: 'show title',
             type: 'checkbox',
-            defaultValue: true,
+            defaultValue: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
               return spec
             },
@@ -158,29 +163,33 @@ const pie = {
             subtitle: 'write the chart title',
             hideIf: [['other.show-title', false]],
             type: 'input',
-            valuesToSpec: ({ value = [], spec = {} }) => {
+            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+              console.log('title value', configItemsByPath?.['other.show-title']?.value)
+              console.log('conf', configItemsByPath)
+              if (configItemsByPath?.['other.show-title']?.value) {
+                const newSpec = {
+                  ...spec,
+                  title: value,
+                }
+                return newSpec
+              }
               return spec
             },
           },
           legend: {
             id: 'legend',
             title: 'Show Legend',
-            subtitle: 'Select wheter to show the Legend or not',
-            type: 'select',
-            options: [
-              { value: 1, label: 'Yes', name: 'Yes', type: 'nominal' },
-              { value: 0, label: 'No', name: 'No', type: 'nominal' },
-            ],
-            optionsParams: { showIcons: false },
-            isMulti: false,
+            subtitle: '',
+            label: 'show legend',
+            type: 'checkbox',
+            defaultValue: true,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const val = value.map((val) => val.value)
               let legend = {
                 titleFontSize: 8,
                 labelFontSize: 5,
               }
 
-              if (val == 0) {
+              if (!value) {
                 legend = false
               }
 
@@ -197,28 +206,20 @@ const pie = {
               return newSpec
             },
           },
-          donut: {
-            id: 'donut',
-            title: 'Inner Radius',
-            subtitle: 'Select the inner radius value (From donut to pie)',
-            type: 'select',
-            options: [
-              { value: 0, label: 0, name: 'inner_0' },
-              { value: 20, label: 20, name: 'inner_20' },
-              { value: 40, label: 40, name: 'inner_40' },
-            ],
-            optionsParams: { showIcons: false },
-            isMulti: false,
+          'donut-radio': {
+            id: 'donut-radio',
+            title: 'Radio',
+            subtitle: '',
+            type: 'slider',
+            params: { min: 0, max: 80, step: 1, default: 40, unit: 'px' },
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const val = value.map((val) => val.value)
-
               const newSpec = {
                 ...spec,
                 layer: [
                   {
                     mark: {
                       ...(spec.layer[0].mark || {}),
-                      innerRadius: val[0],
+                      innerRadius: value,
                     },
                   },
                 ],
@@ -226,18 +227,8 @@ const pie = {
               return newSpec
             },
           },
-          'donut-radio': {
-            id: 'donut-radio',
-            title: 'Radio',
-            subtitle: '',
-            type: 'slider',
-            params: { min: 5, max: 10, step: 0.5, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
-            },
-          },
         },
-        order: ['title', 'show-title', 'legend', 'donut', 'donut-radio'],
+        order: ['show-title', 'title', 'legend', 'donut-radio'],
       },
     },
     order: ['query', 'other'],
