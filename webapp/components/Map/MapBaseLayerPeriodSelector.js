@@ -67,13 +67,15 @@ export const MapBaseLayerPeriodSelector = () => {
   } = state
 
   const initSideBySide = () => {
-    const layerLeft = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
-    const layerRight = Object.values(map._layers).find((layer) => layer.options.id === 'side')
-    if (layerLeft && layerRight) {
-      sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
-      const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
-      layerRight.setUrl(url)
-      onBaseLayerUpdate({ ...contextBaseLayer, url })
+    if (User.isSystemAdmin(user)) {
+      const layerLeft = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+      const layerRight = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+      if (layerLeft && layerRight) {
+        sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
+        const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
+        layerRight.setUrl(url)
+        onBaseLayerUpdate({ ...contextBaseLayer, url })
+      }
     }
   }
 
@@ -164,8 +166,7 @@ export const MapBaseLayerPeriodSelector = () => {
 
   return (
     <div className="leaflet-bottom map-layer-selector-wrapper">
-      <div className="period-select-wrapper">
-        <label className="selected-period-label">{i18n.t('mapView.selectedPeriod')}:</label>
+      <div className="period-select-wrapper-left">
         <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChange(true)}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
@@ -178,29 +179,40 @@ export const MapBaseLayerPeriodSelector = () => {
             )
           })}
         </select>
-        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
-          {periods.map((period) => {
-            const value = getPeriodValue(period)
-            const label =
-              `${period.year} - ${period.month}` + (period.yearTo ? ` / ${period.yearTo} - ${period.monthTo}` : '')
-            return (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            )
-          })}
-        </select>
-        <label>
-          <input type="checkbox" value={leftChecked} onChange={onCheckboxValueChange(true)} />
-          False Color Left
-        </label>
-        <label>
-          <input type="checkbox" value={rightChecked} onChange={onCheckboxValueChange(false)} />
-          False Color Right
-        </label>
-
-        <TileLayer id={'side'} attribution={''} url={''} maxZoom={17} minZoom={3} />
+        <input
+          type="checkbox"
+          value={leftChecked}
+          onChange={onCheckboxValueChange(true)}
+          id="checkbox-left"
+          name="checkbox-left"
+        />
+        <label htmlFor="checkbox-left">False Color</label>
       </div>
+      {User.isSystemAdmin(user) && (
+        <div className="period-select-wrapper-right">
+          <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
+            {periods.map((period) => {
+              const value = getPeriodValue(period)
+              const label =
+                `${period.year} - ${period.month}` + (period.yearTo ? ` / ${period.yearTo} - ${period.monthTo}` : '')
+              return (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              )
+            })}
+          </select>
+          <input
+            type="checkbox"
+            value={rightChecked}
+            onChange={onCheckboxValueChange(false)}
+            id="checkbox-right"
+            name="checkbox-righ"
+          />
+          <label htmlFor="checkbox-right">{i18n.t('mapBaseLayerPeriodSelector.falseColor')}</label>
+        </div>
+      )}
+      <TileLayer id={'side'} attribution={''} url={''} maxZoom={17} minZoom={3} />
     </div>
   )
 }

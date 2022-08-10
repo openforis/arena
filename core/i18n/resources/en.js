@@ -566,19 +566,29 @@ $t(common.cantUndoWarning)`,
 
   samplingPolygonOptions: {
     circle: 'circle',
-    controlPointOffsetEast: 'Control Point Offset East',
-    controlPointOffsetNorth: 'Control Point Offset North',
-    lengthLatitude: 'Length Latitude',
-    lengthLongitude: 'Length Longitude',
+    controlPointOffsetEast: 'Control Point Offset East (m)',
+    controlPointOffsetNorth: 'Control Point Offset North (m)',
+    lengthLatitude: 'Length Latitude (m)',
+    lengthLongitude: 'Length Longitude (m)',
     numberOfControlPoints: 'Number of Control Points',
     numberOfControlPointsEast: 'Number of Control Points East',
     numberOfControlPointsNorth: 'Number of Control Points North',
-    offsetEast: 'Offset East',
-    offsetNorth: 'Offset North',
-    radius: 'Radius',
+    offsetEast: 'Offset East (m)',
+    offsetNorth: 'Offset North (m)',
+    radius: 'Radius (m)',
     rectangle: 'Rectangle',
     samplingPolygon: 'Sampling Polygon',
     shape: 'Shape',
+  },
+
+  kmlUploader: {
+    opacity: 'opacity',
+    selectFile: 'Select File',
+    title: 'KML/KMZ/Shapefile Options',
+  },
+
+  mapBaseLayerPeriodSelector: {
+    falseColor: 'False Color',
   },
 
   surveysView: {

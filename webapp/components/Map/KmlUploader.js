@@ -3,8 +3,9 @@ import './KmlUploader.scss'
 import React, { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-//import { useUser } from '@webapp/store/user'
-//import { useI18n } from '@webapp/store/system'
+import * as User from '@core/user/user'
+import { useUser } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import L from 'leaflet'
 //import * as KML from './L.KML'
@@ -17,8 +18,8 @@ export const KmlUploader = () => {
   const map = useMap()
   const jszip = new JSZip()
 
-  //const i18n = useI18n()
-  //const user = useUser()
+  const i18n = useI18n()
+  const user = useUser()
 
   const [selectedFile, setSelectedFile] = useState()
   const [isFilePicked, setIsFilePicked] = useState(false)
@@ -112,11 +113,13 @@ export const KmlUploader = () => {
   const rangeOnMouseUp = () => {
     map.dragging.enable()
   }
-
+  if (!User.isSystemAdmin(user)) {
+    return null
+  }
   return (
     <div className="leaflet-bottom map-kml-uploader-wrapper">
-      <div className="kml-title">KML/KMZ/Shapefile Options</div>
-      <label htmlFor="range">Opacity</label>
+      <div className="kml-title">{i18n.t('kmlUploader.title')}</div>
+      <label htmlFor="range">{i18n.t('kmlUploader.opacity')}</label>
       <input
         type="range"
         min="1"
@@ -130,7 +133,7 @@ export const KmlUploader = () => {
       />
       <div className="file-select-wrapper">
         <div className="file-input">
-          <label htmlFor="file">Select file</label>
+          <label htmlFor="file">{i18n.t('kmlUploader.selectFile')}</label>
           <input type="file" name="file" onChange={fileChangeHandler} className="file" id="file" />
         </div>
       </div>
