@@ -8,7 +8,7 @@ import {
   MaxHeightBlock,
 } from '../../blocks'
 
-const valuesToCalculations = (values) => {
+const valuesToCalculations = (values = []) => {
   const datumValues = values.map((val) => `datum.${val.value}`)
   return {
     calculate: `${datumValues.join("+','+")}`,
@@ -125,9 +125,7 @@ const bar = {
 
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              console.log('columnValues', columnValues)
-
-              const metrics = columnValues?.map((val) => val.value)
+              const metrics = columnValues.map((val) => val.value)
               const transform = valuesToCalculations(columnValues)
 
               const ag = aggregationValues?.[0]?.value
