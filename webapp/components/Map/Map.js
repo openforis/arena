@@ -20,7 +20,7 @@ import { useMap } from './useMap'
 import L from 'leaflet'
 import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 import { KmlUploader } from './KmlUploader'
-import { ShowZoomLevel } from './showZoomLevel'
+import { ShowZoomLevel } from './ShowZoomLevel'
 
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],

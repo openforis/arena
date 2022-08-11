@@ -22,23 +22,22 @@ export const KmlUploader = () => {
   const user = useUser()
 
   const [selectedFile, setSelectedFile] = useState()
-  const [isFilePicked, setIsFilePicked] = useState(false)
   const [layers, setLayers] = useState([])
   const [opacity, setOpacity] = useState(50)
 
   useEffect(() => {
-    if (isFilePicked) {
+    if (selectedFile) {
       if (selectedFile.name.endsWith('.kmz')) {
-        handleKMZ(selectedFile)
+        processKMZFile(selectedFile)
       } else if (selectedFile.name.endsWith('.kml')) {
-        handleKLM(selectedFile)
+        processKMLFile(selectedFile)
       } else if (selectedFile.name.endsWith('.zip')) {
-        handleShapefile(selectedFile)
+        processShapeFile(selectedFile)
       }
     }
   }, [selectedFile])
 
-  const handleShapefile = (file) => {
+  const processShapeFile = (file) => {
     const geo = L.geoJson(
       { features: [] },
       {
@@ -61,7 +60,7 @@ export const KmlUploader = () => {
     reader.readAsArrayBuffer(file)
   }
 
-  const handleKLM = (file) => {
+  const processKMLFile = (file) => {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const text = e.target.result
@@ -70,7 +69,7 @@ export const KmlUploader = () => {
     reader.readAsText(file)
   }
 
-  const handleKMZ = async (file) => {
+  const processKMZFile = async (file) => {
     const kmlList = []
     let promises = []
     await jszip.loadAsync(file).then(() => {
@@ -102,8 +101,6 @@ export const KmlUploader = () => {
 
   const fileChangeHandler = (event) => {
     setSelectedFile(event.target.files[0])
-
-    setIsFilePicked(true)
   }
 
   const rangeChangeHandler = (event) => {
