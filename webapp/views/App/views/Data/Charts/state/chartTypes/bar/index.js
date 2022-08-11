@@ -119,7 +119,7 @@ const bar = {
 
               const metrics = columnValues?.map((val) => val.value)
               const transform = {
-                calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
+                calculate: `${columnValues?.map((val) => `datum.${val.value}`).join("+','+")}`,
                 as: `${columnValues.map((val) => val.name).join('_')}`,
               }
 
