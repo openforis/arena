@@ -1,3 +1,5 @@
+import { ShowTitleBlock, TitleBlock, ShowLegendBlock } from '../../blocks'
+
 const pie = {
   selector: {
     title: 'Pie',
@@ -145,43 +147,9 @@ const pie = {
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
-          'show-title': {
-            id: 'show-title',
-            title: 'Show title',
-            subtitle: '',
-            label: 'show title',
-            type: 'checkbox',
-            defaultValue: false,
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
-            },
-          },
-          title: {
-            id: 'title',
-            title: 'Chart Title',
-            subtitle: 'write the chart title',
-            hideIf: [['other.show-title', false]],
-            type: 'input',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
-              console.log('title value', configItemsByPath?.['other.show-title']?.value)
-              console.log('conf', configItemsByPath)
-              if (configItemsByPath?.['other.show-title']?.value) {
-                const newSpec = {
-                  ...spec,
-                  title: value,
-                }
-                return newSpec
-              }
-              return spec
-            },
-          },
-          legend: {
-            id: 'legend',
-            title: 'Show Legend',
-            subtitle: '',
-            label: 'show legend',
-            type: 'checkbox',
-            defaultValue: true,
+          'show-title': ShowTitleBlock(),
+          title: TitleBlock(),
+          'show-legend': ShowLegendBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
               let legend = {
                 titleFontSize: 8,
@@ -204,7 +172,7 @@ const pie = {
               }
               return newSpec
             },
-          },
+          }),
           'donut-radio': {
             id: 'donut-radio',
             title: 'Radio',
@@ -227,7 +195,7 @@ const pie = {
             },
           },
         },
-        order: ['show-title', 'title', 'legend', 'donut-radio'],
+        order: ['show-title', 'title', 'show-legend', 'donut-radio'],
       },
     },
     order: ['query', 'other'],

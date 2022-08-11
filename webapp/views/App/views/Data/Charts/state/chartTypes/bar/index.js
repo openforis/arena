@@ -1,4 +1,20 @@
-import { TitleBlock, ShowTitleBlock } from '../../blocks'
+import {
+  TitleBlock,
+  ShowTitleBlock,
+  ShowLegendBlock,
+  SwitchHorizontalBlock,
+  LabelFontSizeBlock,
+  AxisTitleBlock,
+  MaxHeightBlock,
+} from '../../blocks'
+
+const valuesToCalculations = (values) => {
+  const datumValues = values.map((val) => `datum.${val.value}`)
+  return {
+    calculate: `${datumValues.join("+','+")}`,
+    as: `${values.map((val) => val.name).join('_')}`,
+  }
+}
 
 const bar = {
   selector: {
@@ -30,10 +46,7 @@ const bar = {
             optionsParams: { filter: ['nominal', 'temporal'] },
             isMulti: true,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const transform = {
-                calculate: `${value.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${value.map((val) => val.name).join('_')}`,
-              }
+              const transform = valuesToCalculations(value)
 
               const x = {
                 field: transform.as,
@@ -114,16 +127,9 @@ const bar = {
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
               console.log('columnValues', columnValues)
 
-              // console.log('value', value)
-              // value = value[0]
-
               const metrics = columnValues?.map((val) => val.value)
-              const transform = {
-                calculate: `${columnValues?.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${columnValues?.map((val) => val.name).join('_')}`,
-              }
+              const transform = valuesToCalculations(columnValues)
 
-              // TODO: Improve the way out of the aggregation
               const ag = aggregationValues?.[0]?.value
 
               const repeat = {
@@ -176,109 +182,12 @@ const bar = {
         blocks: {
           'show-title': ShowTitleBlock(),
           title: TitleBlock(),
-          'show-legend': ShowTitleBlock(),
-          labelFontSize: {
-            id: 'labelFontSize',
-            title: 'labelFontSize',
-            subtitle: '',
-            type: 'slider',
-            params: { min: 1, max: 25, default: 11, step: 1, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                spec: {
-                  ...(spec.spec || {}),
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    y: {
-                      ...spec.spec?.encoding?.y,
-                      axis: {
-                        labelFontSize: value,
-                      },
-                    },
-                    x: {
-                      ...spec.spec?.encoding?.x,
-                      axis: {
-                        labelFontSize: value,
-                      },
-                    },
-                  },
-                },
-              }
+          'show-legend': ShowLegendBlock(),
+          labelFontSize: LabelFontSizeBlock(),
+          xTitle: AxisTitleBlock({ id: 'xTitle', axisKey: 'x' }),
+          yTitle: AxisTitleBlock({ id: 'yTitle', axisKey: 'y' }),
 
-              return newSpec
-            },
-          },
-          xTitle: {
-            id: 'xTitle',
-            title: 'X axis Title',
-            subtitle: 'write the x axis title',
-            type: 'input',
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                spec: {
-                  ...(spec.spec || {}),
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    x: {
-                      ...spec.spec?.encoding?.x,
-                      title: value,
-                    },
-                  },
-                },
-              }
-              return newSpec
-            },
-          },
-          yTitle: {
-            id: 'yTitle',
-            title: 'Y axis Title',
-            subtitle: 'write the y axis title',
-            type: 'input',
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                spec: {
-                  ...(spec.spec || {}),
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    y: {
-                      ...spec.spec?.encoding?.y,
-                      title: value,
-                    },
-                  },
-                },
-              }
-              return newSpec
-            },
-          },
-          maxHeight: {
-            id: 'maxHeight',
-            title: 'Max Height of the bars',
-            subtitle: 'clip the bars to the number input',
-            type: 'input',
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                spec: {
-                  ...(spec.spec || {}),
-                  mark: {
-                    ...(spec.spec?.mark || {}),
-                    clip: true,
-                  },
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    y: {
-                      ...spec.spec?.encoding?.y,
-                      scale: { domainMax: value },
-                    },
-                  },
-                },
-              }
-              return newSpec
-            },
-          },
+          maxHeight: MaxHeightBlock(),
           stack: {
             id: 'stack',
             title: 'Stack bars',
@@ -286,7 +195,8 @@ const bar = {
             label: 'stack bars',
             type: 'checkbox',
             defaultValue: false,
-            valuesToSpec: ({ value = [], spec = {} }) => {
+            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+              const axisKey = configItemsByPath?.['other.switchHorizontal']?.value ? 'x' : 'y'
               if (value) {
                 const newSpec = {
                   ...spec,
@@ -294,8 +204,8 @@ const bar = {
                     ...(spec.spec || {}),
                     encoding: {
                       ...(spec.spec?.encoding || {}),
-                      y: {
-                        ...(spec.spec?.encoding?.y || {}),
+                      [axisKey]: {
+                        ...(spec.spec?.encoding?.[axisKey] || {}),
                         stack: 'normalize',
                       },
                       xOffset: null,
@@ -307,33 +217,7 @@ const bar = {
               return spec
             },
           },
-          switchHorizontal: {
-            id: 'horizontal',
-            title: 'Make chart Horizontal',
-            subtitle: '',
-            label: 'make horizontal',
-            type: 'checkbox',
-            defaultValue: false,
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              if (value) {
-                const newSpec = {
-                  ...spec,
-                  spec: {
-                    ...(spec.spec || {}),
-                    encoding: {
-                      ...(spec.spec?.encoding || {}),
-                      y: spec.spec?.encoding?.x,
-                      x: spec.spec?.encoding?.y,
-                      yOffset: spec.spec?.encoding?.xOffset,
-                      xOffset: null,
-                    },
-                  },
-                }
-                return newSpec
-              }
-              return spec
-            },
-          },
+          switchHorizontal: SwitchHorizontalBlock(),
         },
 
         order: [
