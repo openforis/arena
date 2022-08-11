@@ -13,11 +13,11 @@
       border-radius: 4px;
       border: 1px solid $greyBorder;
       height: 7px;
+      margin: auto 8px;
       margin-top: 8px;
       background: rgba(255, 255, 255, 0.6);
       background-image: linear-gradient($blue, $blue);
       background-repeat: no-repeat;
-      margin: auto 8px;
     }
 
     .basic-range::-webkit-slider-thumb {
