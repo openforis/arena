@@ -47,7 +47,6 @@ export const newSurvey = ({
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    [SurveyInfo.keys.samplingPolygon]: SurveyDefaults.getSamplingPolygonDefaults(),
     [SurveyInfo.keys.cycles]: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
     },

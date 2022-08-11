@@ -72,7 +72,7 @@ export const getLabel = (surveyInfo, lang) => {
   return StringUtils.isBlank(label) ? getName(surveyInfo) : label
 }
 
-export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, { value: '{}' })
+export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

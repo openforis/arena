@@ -78,7 +78,7 @@ export const CoordinateAttributeMarker = (props) => {
 }
 
 CoordinateAttributeMarker.propTypes = {
-  ancestorsKeys: PropTypes.any,
+  ancestorsKeys: PropTypes.array,
   attributeDef: PropTypes.any,
   latitude: PropTypes.any,
   longitude: PropTypes.any,

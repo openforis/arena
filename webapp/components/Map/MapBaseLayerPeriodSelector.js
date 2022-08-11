@@ -66,10 +66,17 @@ export const MapBaseLayerPeriodSelector = () => {
     procRight,
   } = state
 
+  const getLayer = (isLeft) => {
+    if (isLeft) {
+      return Object.values(map._layers).find((layer) => layer.options.id !== 'right')
+    } else {
+      return Object.values(map._layers).find((layer) => layer.options.id === 'right')
+    }
+  }
   const initSideBySide = () => {
     if (User.isSystemAdmin(user)) {
-      const layerLeft = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
-      const layerRight = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+      const layerLeft = getLayer(true)
+      const layerRight = getLayer(false)
       if (layerLeft && layerRight) {
         sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
         const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
@@ -114,9 +121,9 @@ export const MapBaseLayerPeriodSelector = () => {
       // replace url in current layer
       let layer
       if (isLeft) {
-        layer = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+        layer = getLayer(true)
       } else {
-        layer = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+        layer = getLayer(false)
       }
       if (layer) {
         const period = periodByValue[periodValue]
@@ -148,9 +155,9 @@ export const MapBaseLayerPeriodSelector = () => {
     }
     let layer
     if (isLeft) {
-      layer = Object.values(map._layers).find((layer) => layer.options.id !== 'side')
+      layer = getLayer(true)
     } else {
-      layer = Object.values(map._layers).find((layer) => layer.options.id === 'side')
+      layer = getLayer(false)
     }
     if (layer) {
       const periodValue = isLeft ? selectedPeriodValueLeft : selectedPeriodValueRight
@@ -212,7 +219,7 @@ export const MapBaseLayerPeriodSelector = () => {
           <label htmlFor="checkbox-right">{i18n.t('mapBaseLayerPeriodSelector.falseColor')}</label>
         </div>
       )}
-      <TileLayer id={'side'} attribution={''} url={''} maxZoom={17} minZoom={3} />
+      <TileLayer id={'right'} attribution={''} url={''} maxZoom={17} minZoom={3} />
     </div>
   )
 }

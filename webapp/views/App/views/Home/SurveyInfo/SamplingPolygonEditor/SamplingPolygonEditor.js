@@ -8,8 +8,7 @@ import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
-
-  const samplingPolygonObject = JSON.parse(samplingPolygon || getSamplingPolygonDefaults())
+  const samplingPolygonObject = samplingPolygon !== {} ? samplingPolygon : getSamplingPolygonDefaults()
   const i18n = useI18n()
 
   const [jsonEditorChecked, setJsonEditorChecked] = useState(false)
@@ -205,47 +204,47 @@ const SamplingPolygonEditor = (props) => {
 
   const shapeOnChange = (e) => {
     samplingPolygonObject.isCircle = e.target.value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const radiusOnChange = (value) => {
     samplingPolygonObject.radius = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const numberOfPointsCircleOnChange = (e) => {
     samplingPolygonObject.number_of_points_circle = e.target.value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const lengthLatitudeOnChange = (value) => {
     samplingPolygonObject.length_latitude = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const lengthLongitudeOnChange = (value) => {
     samplingPolygonObject.length_longitude = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const numberOfPointsNorthOnChange = (value) => {
     samplingPolygonObject.number_of_points_north = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const numberOfPointsEastOnChange = (value) => {
     samplingPolygonObject.number_of_points_east = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const offsetNorthOnChange = (value) => {
     samplingPolygonObject.offset_north = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const offsetEastOnChange = (value) => {
     samplingPolygonObject.offset_east = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const controlPointOffsetNorthOnChange = (value) => {
     samplingPolygonObject.controlpoint_offset_north = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
   const constrolPointOffsetEastOnChange = (value) => {
     samplingPolygonObject.controlpoint_offset_east = value
-    setSamplingPolygon(JSON.stringify(samplingPolygonObject))
+    setSamplingPolygon(samplingPolygonObject)
   }
 
   const jsonEditorOnChange = (event) => {

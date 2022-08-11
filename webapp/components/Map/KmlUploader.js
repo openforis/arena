@@ -8,7 +8,7 @@ import { useUser } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import L from 'leaflet'
-//import * as KML from './L.KML'
+
 require('./L.KML')
 
 import JSZip from 'jszip'
@@ -31,39 +31,45 @@ export const KmlUploader = () => {
       if (selectedFile.name.endsWith('.kmz')) {
         handleKMZ(selectedFile)
       } else if (selectedFile.name.endsWith('.kml')) {
-        const reader = new FileReader()
-        reader.onload = async (e) => {
-          const text = e.target.result
-          addKMLLayers([text])
-        }
-        reader.readAsText(selectedFile)
+        handleKLM(selectedFile)
       } else if (selectedFile.name.endsWith('.zip')) {
-        const geo = L.geoJson(
-          { features: [] },
-          {
-            onEachFeature: function popUp(f, l) {
-              var out = []
-              if (f.properties) {
-                for (var key in f.properties) {
-                  out.push(key + ': ' + f.properties[key])
-                }
-                l.bindPopup(out.join('<br />'))
-              }
-            },
-          }
-        ).addTo(map)
-        setLayers((old) => [...old, geo])
-        const reader = new FileReader()
-        reader.onload = async (e) => {
-          const text = e.target.result
-          shp(text).then(function (data) {
-            geo.addData(data)
-          })
-        }
-        reader.readAsArrayBuffer(selectedFile)
+        handleShapefile(selectedFile)
       }
     }
   }, [selectedFile])
+
+  const handleShapefile = (file) => {
+    const geo = L.geoJson(
+      { features: [] },
+      {
+        onEachFeature: function popUp(f, l) {
+          if (f.properties) {
+            const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
+            l.bindPopup(out.join('<br />'))
+          }
+        },
+      }
+    ).addTo(map)
+    setLayers((old) => [...old, geo])
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      const text = e.target.result
+      shp(text).then(function (data) {
+        geo.addData(data)
+      })
+    }
+    reader.readAsArrayBuffer(file)
+  }
+
+  const handleKLM = (file) => {
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      const text = e.target.result
+      addKMLLayers([text])
+    }
+    reader.readAsText(file)
+  }
+
   const handleKMZ = async (file) => {
     const kmlList = []
     let promises = []

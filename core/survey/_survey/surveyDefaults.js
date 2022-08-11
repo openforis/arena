@@ -52,16 +52,16 @@ export const getDefaultAuthGroups = () => [
 ]
 
 export const getSamplingPolygonDefaults = () => {
-  return `{
-    "length_latitude": "0",
-    "length_longitude": "0",
-    "number_of_points_north": "0",
-    "number_of_points_east": "0",
-    "offset_north": "0",
-    "offset_east": "0",
-    "controlpoint_offset_north": "0",
-    "controlpoint_offset_east": "0",
-    "isCircle": "true",
-    "radius": "0"
-  }`
+  return {
+    length_latitude: 0,
+    length_longitude: 0,
+    number_of_points_north: 0,
+    number_of_points_east: 0,
+    offset_north: 0,
+    offset_east: 0,
+    controlpoint_offset_north: 0,
+    controlpoint_offset_east: 0,
+    isCircle: true,
+    radius: 0,
+  }
 }
