@@ -125,7 +125,7 @@ const bar = {
 
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const metrics = columnValues.map((val) => val.value)
+              const metrics = columnValues?.map((val) => val.value)
               const transform = valuesToCalculations(columnValues)
 
               const ag = aggregationValues?.[0]?.value

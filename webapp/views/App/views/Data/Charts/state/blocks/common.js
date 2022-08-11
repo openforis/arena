@@ -4,7 +4,7 @@ export const blockTypes = {
   slider: 'slider',
 }
 
-export const valuesToCalculations = (values) => {
+export const valuesToCalculations = (values = []) => {
   const datumValues = values.map((val) => `datum.${val.value}`)
   return {
     calculate: `${datumValues.join("+','+")}`,
