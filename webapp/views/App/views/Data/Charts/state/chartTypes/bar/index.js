@@ -122,7 +122,7 @@ const bar = {
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = aggregationValues[0].value
+              const ag = aggregationValues[0]?.value
 
               const repeat = {
                 layer: metrics,
