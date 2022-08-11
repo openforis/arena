@@ -98,8 +98,8 @@ const pie = {
                   { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
                   { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
                   { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
-                  { value: 'min', label: 'Min', name: 'min', type: 'aggregation' },
-                  { value: 'max', label: 'Max', name: 'max', type: 'aggregation' },
+                  { value: 'min', label: 'Minimum', name: 'min', type: 'aggregation' },
+                  { value: 'max', label: 'Maximum', name: 'max', type: 'aggregation' },
                 ],
                 optionsParams: { showIcons: false },
               },
@@ -110,8 +110,8 @@ const pie = {
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
 
               const transform = {
-                calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${columnValues.map((val) => val.name).join('_')}`,
+                calculate: `${columnValues?.map((val) => `datum.${val.value}`).join("+','+")}`,
+                as: `${columnValues?.map((val) => val.name).join('_')}`,
               }
 
               // TODO: Improve the way out of the aggregation
