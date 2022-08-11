@@ -119,7 +119,7 @@ const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) 
     areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
     type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
     categoryName,
-    active: NodeDef.getActive(analysisNodeDef),
+    active: NodeDef.isActive(analysisNodeDef),
   }
 }
 

@@ -60,19 +60,19 @@ export const getAnalysisNodeDefs =
         return false
       }
 
-      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+      if (!showInactiveResultVariables && !NodeDef.isActive(nodeDef)) {
         return false
       }
 
       if (
         NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
         !showInactiveResultVariables &&
-        !NodeDef.getActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
+        !NodeDef.isActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
       ) {
         return false
       }
 
-      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+      if (!showInactiveResultVariables && !NodeDef.isActive(nodeDef)) {
         return false
       }
 
