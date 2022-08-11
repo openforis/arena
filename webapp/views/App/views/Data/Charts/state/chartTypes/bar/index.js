@@ -120,7 +120,7 @@ const bar = {
               const metrics = columnValues?.map((val) => val.value)
               const transform = {
                 calculate: `${columnValues?.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${columnValues.map((val) => val.name).join('_')}`,
+                as: `${columnValues?.map((val) => val.name).join('_')}`,
               }
 
               // TODO: Improve the way out of the aggregation
@@ -176,35 +176,7 @@ const bar = {
         blocks: {
           'show-title': ShowTitleBlock(),
           title: TitleBlock(),
-          legend: {
-            id: 'legend',
-            title: 'Show Legend',
-            subtitle: '',
-            label: 'show legend',
-            type: 'checkbox',
-            defaultValue: true,
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              let legend = true
-              if (!value) {
-                legend = null
-              }
-
-              const newSpec = {
-                ...spec,
-                spec: {
-                  ...(spec.spec || {}),
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    color: {
-                      ...(spec.spec?.encoding?.color || {}),
-                      legend: legend,
-                    },
-                  },
-                },
-              }
-              return newSpec
-            },
-          },
+          'show-legend': ShowTitleBlock(),
           labelFontSize: {
             id: 'labelFontSize',
             title: 'labelFontSize',
@@ -367,7 +339,7 @@ const bar = {
         order: [
           'show-title',
           'title',
-          'legend',
+          'show-legend',
           'labelFontSize',
           'xTitle',
           'yTitle',
