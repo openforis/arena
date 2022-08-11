@@ -135,17 +135,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
-        surveyId,
-        cycle,
-        offset,
-        limit,
-        sortBy,
-        sortOrder,
-        search,
-      })
+      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle(surveyId)
       res.json(recordsSummary)
     } catch (error) {
       next(error)
@@ -170,13 +162,24 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/records/dashboard/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, from, to } = Request.getParams(req)
 
       const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
 
       res.json(counts)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, search } = Request.getParams(req)
+
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
+      res.json(count)
     } catch (error) {
       next(error)
     }

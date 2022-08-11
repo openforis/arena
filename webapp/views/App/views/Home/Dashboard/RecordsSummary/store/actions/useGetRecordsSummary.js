@@ -18,7 +18,7 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
       const now = Date.now()
       const from = formatDate(getFromDate(now, timeRange))
       const to = formatDate(now)
-      const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/summary/count`, {
+      const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
         params: { cycle: surveyCycleKey, from, to },
       })
 
