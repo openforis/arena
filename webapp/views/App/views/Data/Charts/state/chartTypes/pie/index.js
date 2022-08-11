@@ -109,14 +109,13 @@ const pie = {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
 
-              const metrics = columnValues.map((val) => val.value)
               const transform = {
                 calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
                 as: `${columnValues.map((val) => val.name).join('_')}`,
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = aggregationValues[0].value
+              const ag = aggregationValues?[0].value
 
               const theta = {
                 field: transform.as,

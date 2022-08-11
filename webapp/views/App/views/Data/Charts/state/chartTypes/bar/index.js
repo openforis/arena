@@ -47,7 +47,7 @@ const bar = {
                 spec: {
                   ...(spec.spec || {}),
                   encoding: {
-                    ...(spec.spec.encoding || {}),
+                    ...(spec.spec?.encoding || {}),
                     x: x,
                   },
                 },
@@ -115,7 +115,7 @@ const bar = {
               // console.log('value', value)
               // value = value[0]
 
-              const metrics = columnValues.map((val) => val.value)
+              const metrics = columnValues?.map((val) => val.value)
               const transform = {
                 calculate: `${columnValues.map((val) => `datum.${val.value}`).join("+','+")}`,
                 as: `${columnValues.map((val) => val.name).join('_')}`,
@@ -222,7 +222,7 @@ const bar = {
                   encoding: {
                     ...(spec.spec?.encoding || {}),
                     color: {
-                      ...(spec.spec.encoding?.color || {}),
+                      ...(spec.spec?.encoding?.color || {}),
                       legend: legend,
                     },
                   },
