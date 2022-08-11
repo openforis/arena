@@ -1,3 +1,5 @@
+import { TitleBlock } from '../../blocks'
+
 const bar = {
   selector: {
     title: 'Bar',
@@ -122,7 +124,7 @@ const bar = {
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = aggregationValues[0]?.value
+              const ag = aggregationValues?.[0]?.value
 
               const repeat = {
                 layer: metrics,
@@ -183,25 +185,7 @@ const bar = {
               return spec
             },
           },
-          title: {
-            id: 'title',
-            title: 'Chart Title',
-            subtitle: 'write the chart title',
-            hideIf: [['other.show-title', false]],
-            type: 'input',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
-              console.log('title value', configItemsByPath?.['other.show-title']?.value)
-              console.log('conf', configItemsByPath)
-              if (configItemsByPath?.['other.show-title']?.value) {
-                const newSpec = {
-                  ...spec,
-                  title: value,
-                }
-                return newSpec
-              }
-              return spec
-            },
-          },
+          title: TitleBlock(),
           legend: {
             id: 'legend',
             title: 'Show Legend',

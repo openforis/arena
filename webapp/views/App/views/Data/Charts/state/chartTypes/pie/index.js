@@ -94,7 +94,7 @@ const pie = {
                 type: 'select',
                 options: [
                   { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-                  { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
+                  { value: 'average', label: 'Avgerage', name: 'avg', type: 'aggregation' },
                   { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
                   { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
                   { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
@@ -115,7 +115,7 @@ const pie = {
               }
 
               // TODO: Improve the way out of the aggregation
-              const ag = aggregationValues?[0].value
+              const ag = aggregationValues?.[0]?.value
 
               const theta = {
                 field: transform.as,
