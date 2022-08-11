@@ -27,6 +27,15 @@ const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, baseUnitNodeDef, includeO
   )
 }
 
+const isBaseUnitEntityAreaNodeDef = ({ survey, chain, nodeDef }) => {
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  return (
+    NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef) &&
+    SamplingNodeDefs.isEntityAreaNodeDef({ nodeDef, nodeDefParent, baseUnitNodeDef })
+  )
+}
+
 const getAllEntityAreaNodeDefs = ({ survey, chain }) => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const samplingNodeDefs = Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs: true })(survey)
@@ -119,8 +128,33 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   return { nodeDefsToCreate, nodeDefsToDelete }
 }
 
+const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }) => {
+  const entityUuids = entities.map(NodeDef.getUuid)
+
+  const samplingDefs = analysisNodeDefs.filter(
+    (analysisNodeDef) =>
+      NodeDef.isSampling(analysisNodeDef) && entityUuids.includes(NodeDef.getParentUuid(analysisNodeDef))
+  )
+
+  // put the "weight" node def first
+  samplingDefs.sort((samplingDef1, samplingDef2) => {
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) {
+      return -1
+    }
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) {
+      return 1
+    }
+    return 0
+  })
+
+  return samplingDefs
+}
+
 export const SamplingNodeDefs = {
   SAMPLING_NODE_DEF_BASE_UNIT_NAME: SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME,
   getEntityAreaNodeDefName,
+  isEntityAreaNodeDef,
+  isBaseUnitEntityAreaNodeDef,
   determinePlotAreaNodeDefs,
+  getSamplingDefsInEntities,
 }
