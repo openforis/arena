@@ -1,4 +1,4 @@
-import { TitleBlock } from '../../blocks'
+import { TitleBlock, ShowTitleBlock } from '../../blocks'
 
 const bar = {
   selector: {
@@ -174,17 +174,7 @@ const bar = {
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
-          'show-title': {
-            id: 'show-title',
-            title: 'Show title',
-            subtitle: '',
-            label: 'show title',
-            type: 'checkbox',
-            defaultValue: false,
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
-            },
-          },
+          'show-title': ShowTitleBlock(),
           title: TitleBlock(),
           legend: {
             id: 'legend',

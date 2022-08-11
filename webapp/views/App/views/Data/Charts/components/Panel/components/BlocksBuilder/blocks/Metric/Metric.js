@@ -3,7 +3,7 @@ import { uuidv4 } from '@core/uuid'
 import './Metric.scss'
 import { Popover } from 'react-tiny-popover'
 import RenderByType from '../BlockRenderer/BlockRenderer'
-import { ButtonAdd, ButtonDelete } from '@webapp/components'
+import { ButtonAdd } from '@webapp/components'
 
 const PopoverContent = (props) => {
   const {
