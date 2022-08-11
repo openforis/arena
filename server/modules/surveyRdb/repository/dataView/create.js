@@ -30,11 +30,13 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
       if (!NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
         return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
-    } else if (
-      NodeDef.isMultipleAttribute(columnNodeDef.nodeDef) &&
-      _canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)
-    ) {
-      return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+    } else if (NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
+      if (_canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)) {
+        return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+      } else {
+        // skip multiple attributes that cannot be aggregated into a single column yet
+        return []
+      }
     }
     return columnNodeDef.namesFull
   })
