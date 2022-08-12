@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
+import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
@@ -23,6 +24,7 @@ export const ChainBasicProps = (props) => {
   const survey = useSurvey()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
+  const [recordsCountByStep, setRecordsCountByStep] = useState({})
 
   useEffect(() => {
     const fetchChains = async () => {
@@ -32,7 +34,13 @@ export const ChainBasicProps = (props) => {
       )
     }
 
+    const fetchRecordCountByStep = async () => {
+      const _recordsCountByStep = {} //await API.fetchRecordsCountByStep()
+      setRecordsCountByStep(_recordsCountByStep)
+    }
+
     fetchChains()
+    fetchRecordCountByStep()
   }, [survey, chain])
 
   const validation = Chain.getValidation(chain)
@@ -66,6 +74,21 @@ export const ChainBasicProps = (props) => {
           onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
           disabled={samplingDesignDisabled}
         />
+      </FormItem>
+      <FormItem label={i18n.t('chainView.records')}>
+        <div className="records-count-wrapper">
+          {RecordStep.steps.map(({ id, name }, index) => (
+            <div className="records-count" key={id}>
+              {index > 0 && <span>-</span>}
+              <span>
+                {i18n.t('chainView.recordsInStepCount', {
+                  recordsCount: recordsCountByStep[id],
+                  step: i18n.t(`surveyForm.step.${name}`),
+                })}
+              </span>
+            </div>
+          ))}
+        </div>
       </FormItem>
     </>
   )
