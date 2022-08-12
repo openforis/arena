@@ -1,4 +1,4 @@
-import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock } from '../../blocks'
+import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock, MetricBlock } from '../../blocks'
 
 const pie = {
   selector: {
@@ -51,40 +51,7 @@ const pie = {
               return newSpec
             },
           }),
-          metric: {
-            id: 'metric',
-            title: 'Metric',
-            subtitle: 'Select the measurement to group the data',
-            type: 'metric',
-            labelBuilder: (values) => {
-              const aggregation = values.aggregation.map(({ label }) => label)
-              const column = values.column.map(({ label }) => label)
-
-              return `${aggregation}(${column})`
-            },
-            blocks: {
-              column: {
-                id: 'column',
-                title: 'Column',
-                type: 'select',
-              },
-              aggregation: {
-                id: 'aggregation',
-                title: 'Aggregation',
-                type: 'select',
-                options: [
-                  { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-                  { value: 'average', label: 'Avgerage', name: 'avg', type: 'aggregation' },
-                  { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
-                  { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
-                  { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
-                  { value: 'min', label: 'Minimum', name: 'min', type: 'aggregation' },
-                  { value: 'max', label: 'Maximum', name: 'max', type: 'aggregation' },
-                ],
-                optionsParams: { showIcons: false },
-              },
-            },
-            order: ['column', 'aggregation'],
+          metric: MetricBlock({
             valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
@@ -116,7 +83,7 @@ const pie = {
               }
               return newSpec
             },
-          },
+          }),
         },
         order: ['groupBy', 'metric'],
       },

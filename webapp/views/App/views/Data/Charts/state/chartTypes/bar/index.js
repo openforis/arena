@@ -7,6 +7,7 @@ import {
   AxisTitleBlock,
   MaxHeightBlock,
   GroupByBlock,
+  MetricBlock,
 } from '../../blocks'
 
 const valuesToCalculations = (values = []) => {
@@ -40,105 +41,7 @@ const bar = {
         type: 'container',
         blocks: {
           groupBy: GroupByBlock(),
-
-          metric: {
-            id: 'metric',
-            title: 'Metric',
-            subtitle: 'Select the measurement to group the data',
-            type: 'metric',
-            isMulti: false,
-            labelBuilder: (values) => {
-              console.log('metric', values)
-              const aggregation = values.aggregation.map(({ label }) => label)
-              const column = values.column.map(({ label }) => label)
-
-              return `${aggregation}(${column})`
-            },
-            blocks: {
-              column: {
-                id: 'column',
-                title: 'Column',
-                type: 'select',
-              },
-              aggregation: {
-                id: 'aggregation',
-                title: 'Aggregation',
-                type: 'select',
-                options: [
-                  { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-                  { value: 'average', label: 'Avg', name: 'avg', type: 'aggregation' },
-                  { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
-                  { value: 'variance', label: 'Variance', name: 'variance', type: 'aggregation' },
-                  { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
-                  { value: 'min', label: 'Min', name: 'min', type: 'aggregation' },
-                  { value: 'max', label: 'Max', name: 'max', type: 'aggregation' },
-                ],
-                optionsParams: { showIcons: false },
-              },
-            },
-            order: ['column', 'aggregation'],
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
-              /*
-              {
-                'item': {value: []},
-                'item.column': {value: [{value:'a', type: 'sum'}, {value, type}]}
-                'item.aggregation': {value: [{value, type}, {value, type}]}
-              }*/
-              // ====>
-              /*{
-                ...spec,
-                
-              }*/
-
-              // const value =
-
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const metrics = columnValues?.map((val) => val.value)
-              const transform = valuesToCalculations(columnValues)
-
-              const ag = aggregationValues?.[0]?.value
-
-              const repeat = {
-                layer: metrics,
-              }
-              const y = {
-                field: { repeat: 'layer' },
-                type: 'quantitative',
-                aggregate: ag,
-                title: transform.as,
-              }
-
-              const color = {
-                datum: {
-                  repeat: 'layer',
-                },
-                title: transform.as,
-              }
-
-              const xOffset = {
-                datum: {
-                  repeat: 'layer',
-                },
-              }
-
-              const newSpec = {
-                ...spec,
-                repeat: repeat,
-                spec: {
-                  ...(spec.spec || {}),
-                  encoding: {
-                    ...(spec.spec?.encoding || {}),
-                    y: y,
-                    color: color,
-                    xOffset: xOffset,
-                  },
-                },
-              }
-
-              return newSpec
-            },
-          },
+          metric: MetricBlock(),
         },
         order: ['groupBy', 'metric'],
       },

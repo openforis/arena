@@ -3,6 +3,7 @@ export const blockTypes = {
   checkbox: 'checkbox',
   slider: 'slider',
   select: 'select',
+  metric: 'metric',
 }
 
 export const valuesToCalculations = (values = []) => {
