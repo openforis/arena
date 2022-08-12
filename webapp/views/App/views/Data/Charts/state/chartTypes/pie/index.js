@@ -1,4 +1,5 @@
 import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { valuesToCalculations } from '../../blocks/common'
 
 const pie = {
   selector: {
@@ -21,10 +22,7 @@ const pie = {
         blocks: {
           groupBy: GroupByBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const transform = {
-                calculate: `${value.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${value.map((val) => val.name).join('_')}`,
-              }
+              const transform = valuesToCalculations(value)
 
               const color = {
                 field: transform.as,
