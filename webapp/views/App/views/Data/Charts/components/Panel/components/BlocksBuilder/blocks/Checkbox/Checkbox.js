@@ -5,9 +5,11 @@ import './Checkbox.scss'
 const CheckboxBlock = ({ configItemsByPath, configActions, blockPath, block }) => {
   const { title, subtitle, label, id, isRadio = false, defaultValue = false } = block
 
+  const configValues = configItemsByPath?.[blockPath]?.value
+
   const currentValue = useMemo(
-    () => (!A.isEmpty(configItemsByPath?.[blockPath]?.value) ? configItemsByPath?.[blockPath]?.value : defaultValue),
-    [configItemsByPath?.[blockPath]?.value, defaultValue]
+    () => (!A.isEmpty(configValues) ? configValues : defaultValue),
+    [configValues, defaultValue]
   )
   const handleChange = useCallback(() => {
     configActions.replaceValue({ blockPath, value: !currentValue })
