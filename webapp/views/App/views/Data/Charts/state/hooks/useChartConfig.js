@@ -45,7 +45,6 @@ const updateItemByPathAndKey = (blockPath, value) => (obj) => {
 }
 
 const useChartConfig = ({ table, setTable }) => {
-  const [initialConfig, setInitialConfig] = useState(defaultConfig)
   const [history, setHistory] = useState([])
   const [config, setConfig] = useState(defaultConfig)
   const [configItemsByPath, setConfigItemsByPath] = useState({})
