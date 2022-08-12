@@ -54,10 +54,7 @@ const pie = {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
 
-              const transform = {
-                calculate: `${columnValues?.map((val) => `datum.${val.value}`).join("+','+")}`,
-                as: `${columnValues?.map((val) => val.name).join('_')}`,
-              }
+              const transform = valuesToCalculations(columnValues)
 
               // TODO: Improve the way out of the aggregation
               const ag = aggregationValues?.[0]?.value
