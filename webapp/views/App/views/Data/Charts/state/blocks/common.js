@@ -2,6 +2,7 @@ export const blockTypes = {
   input: 'input',
   checkbox: 'checkbox',
   slider: 'slider',
+  select: 'select',
 }
 
 export const valuesToCalculations = (values = []) => {

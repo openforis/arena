@@ -1,4 +1,4 @@
-import { ShowTitleBlock, TitleBlock, ShowLegendBlock } from '../../blocks'
+import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock } from '../../blocks'
 
 const pie = {
   selector: {
@@ -19,13 +19,7 @@ const pie = {
         subtitle: 'Here we config the query of the pie',
         type: 'container',
         blocks: {
-          groupBy: {
-            id: 'groupBy',
-            title: 'Group by',
-            subtitle: 'Select the dimension to group the data',
-            type: 'select',
-            optionsParams: { filter: ['nominal', 'temporal'] },
-            isMulti: true,
+          groupBy: GroupByBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = {
                 calculate: `${value.map((val) => `datum.${val.value}`).join("+','+")}`,
@@ -56,23 +50,7 @@ const pie = {
 
               return newSpec
             },
-          },
-
-          size: {
-            id: 'size',
-            title: 'Size',
-            subtitle: 'Select with local options',
-            type: 'select',
-            options: [
-              { value: 1, label: 1, name: 'hello', type: 'nominal' },
-              { value: 10, label: 100, name: 'hello', type: 'nominal' },
-            ],
-            optionsParams: { showIcons: false },
-            isMulti: false,
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              return spec
-            },
-          },
+          }),
           metric: {
             id: 'metric',
             title: 'Metric',
