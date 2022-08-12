@@ -45,7 +45,6 @@ const PopoverContent = (props) => {
     }
   }, [])
 
-  console.log('draftValues', draftValues, Object.values(draftValues).length === order.length)
   return (
     <div className="custom-option-modal-container">
       <div className="custom-option-modal-header">
