@@ -10,14 +10,6 @@ import {
   MetricBlock,
 } from '../../blocks'
 
-const valuesToCalculations = (values = []) => {
-  const datumValues = values.map((val) => `datum.${val.value}`)
-  return {
-    calculate: `${datumValues.join("+','+")}`,
-    as: `${values.map((val) => val.name).join('_')}`,
-  }
-}
-
 const bar = {
   selector: {
     title: 'Bar',
