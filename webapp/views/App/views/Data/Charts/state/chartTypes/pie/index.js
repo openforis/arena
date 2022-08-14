@@ -1,26 +1,17 @@
-import * as A from '@core/arena'
+import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { valuesToCalculations } from '../../blocks/common'
 
 const pie = {
   selector: {
     title: 'Pie',
-    onSelect:
-      ({ spec, onUpdateSpec }) =>
-      () => {
-        const newSpec = {
-          ...spec,
-          layer: [
-            {
-              mark: {
-                type: 'arc',
-                innerRadius: 40,
-                outerRadius: 60,
-              },
-            },
-          ],
-        }
-        delete newSpec.encoding
-        onUpdateSpec(A.stringify(newSpec))
+  },
+  baseSpec: {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    layer: [
+      {
+        mark: { type: 'arc', innerRadius: 40, outerRadius: 80 },
       },
+    ],
   },
   builderBlocks: {
     blocks: {
@@ -29,88 +20,125 @@ const pie = {
         subtitle: 'Here we config the query of the pie',
         type: 'container',
         blocks: {
-          groupBy: {
-            id: 'groupBy',
-            title: 'Group by',
-            subtitle: 'Select the dimension to group the data',
-            type: 'input',
-            onUpdateSpec:
-              ({ spec, onUpdateSpec }) =>
-              ({ dimension }) => {
-                if (!dimension) {
-                  const newSpec = {
-                    ...spec,
-                  }
-                  delete newSpec.encoding.color
-                  onUpdateSpec(A.stringify(newSpec))
-                  return
-                }
+          groupBy: GroupByBlock({
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const transform = valuesToCalculations(value)
 
-                const { name, type } = dimension
+              const color = {
+                field: transform.as,
+                type: 'nominal',
+                legend: {
+                  titleFontSize: 8,
+                  labelFontSize: 5,
+                },
 
-                const newSpec = {
-                  ...spec,
-                  encoding: {
-                    ...(spec.encoding || {}),
-                    color: {
-                      field: name,
-                      type,
-                      legend: {
-                        titleFontSize: 8,
-                        labelFontSize: 5,
-                      },
+                impute: {
+                  value: 'NULL',
+                },
+              }
 
-                      impute: {
-                        value: 'NULL',
-                      },
-                    },
-                  },
-                }
-                onUpdateSpec(A.stringify(newSpec))
-              },
-          },
-          metric: {
-            id: 'metric',
-            title: 'Metric',
-            subtitle: 'Select the measurement to group the data',
-            type: 'input',
-            onUpdateSpec:
-              ({ spec, onUpdateSpec }) =>
-              ({ dimension, aggregateOp = 'sum' }) => {
-                if (!dimension) {
-                  const newSpec = {
-                    ...spec,
-                  }
-                  delete newSpec.encoding.theta
-                  onUpdateSpec(A.stringify(newSpec))
-                  return
-                }
+              const newSpec = {
+                ...spec,
+                transform: [transform],
+                encoding: {
+                  ...(spec.encoding || {}),
+                  color,
+                },
+              }
 
-                const { name, type } = dimension
+              return newSpec
+            },
+          }),
+          metric: MetricBlock({
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
 
-                const newSpec = {
-                  ...spec,
-                  encoding: {
-                    ...(spec.encoding || {}),
-                    theta: {
-                      field: name,
-                      type,
-                      aggregate: aggregateOp,
-                      impute: {
-                        value: 'NULL',
-                      },
-                      stack: true,
-                    },
-                  },
-                }
-                onUpdateSpec(A.stringify(newSpec))
-              },
-          },
+              const transform = valuesToCalculations(columnValues)
+
+              // TODO: Improve the way out of the aggregation
+              const ag = aggregationValues?.[0]?.value
+
+              const theta = {
+                field: transform.as,
+                type: 'quantitative',
+                aggregate: ag,
+                impute: {
+                  value: 'NULL',
+                },
+                stack: true,
+              }
+
+              const newSpec = {
+                ...spec,
+                encoding: {
+                  ...(spec.encoding || {}),
+                  theta: theta,
+                },
+              }
+              return newSpec
+            },
+          }),
         },
         order: ['groupBy', 'metric'],
       },
+      other: {
+        title: 'Custom Chart',
+        subtitle: 'Custom configuration of the chart',
+        type: 'container',
+        blocks: {
+          'show-title': ShowTitleBlock(),
+          title: TitleBlock(),
+          'show-legend': ShowLegendBlock({
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              let legend = {
+                titleFontSize: 8,
+                labelFontSize: 5,
+              }
+
+              if (!value) {
+                legend = false
+              }
+
+              const newSpec = {
+                ...spec,
+                encoding: {
+                  ...(spec.encoding || {}),
+                  color: {
+                    ...(spec.encoding?.color || {}),
+                    legend: legend,
+                  },
+                },
+              }
+              return newSpec
+            },
+          }),
+          'donut-radio': {
+            id: 'donut-radio',
+            title: 'Radio',
+            subtitle: '',
+            type: 'slider',
+            params: { min: 0, max: 80, step: 1, default: 40, unit: 'px' },
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                layer: [
+                  {
+                    mark: {
+                      ...(spec.layer[0].mark || {}),
+                      innerRadius: value,
+                    },
+                  },
+                ],
+              }
+              return newSpec
+            },
+          },
+        },
+        order: ['show-title', 'title', 'show-legend', 'donut-radio'],
+      },
     },
-    order: ['query'],
+    order: ['query', 'other'],
   },
 }
 

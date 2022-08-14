@@ -1,13 +1,15 @@
 @import "~@webapp/style/vars";
 
 .block-input {
+  .basic-input{
+    width: 100%;
+    min-height: 38px;
+    border-radius: 4px;
+    border: 1px solid $greyBorder;
+    flex-wrap: wrap;
+    padding: 8px;
+    padding: 2px 8px;
+  }
 }
 
-.block-input__title {
-  font-size: 0.9rem;
-}
 
-.block-input__subtitle {
-  font-size: 0.7rem;
-  color: $grey;
-}
