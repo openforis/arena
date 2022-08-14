@@ -20,7 +20,7 @@ const aceLangTools = ace.require('ace/ext/language_tools')
 const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
 
-const getDimensionsCompleter = ({ dimensions }) => {
+const getDimensionsCompleter = ({ dimensions = [] } = {}) => {
   return {
     getCompletions: (_editor, _session, _pos, _prefix, callback) => {
       callback(
@@ -85,7 +85,7 @@ const getAggregationsCompleter = () => {
 }
 
 const populateVegaRawEditorCompleters =
-  ({ dimensions }) =>
+  ({ dimensions } = {}) =>
   (editor) => {
     // reset completers
     editor.completers = [...defaultCompleters]
@@ -102,7 +102,7 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
   const editorRef = useRef()
 
   const setSpecAsValue = useCallback(() => {
-    editorRef.current.editor.session.setValue(A.stringify(spec, null, 2))
+    editorRef?.current?.editor?.session.setValue(A.stringify(spec, null, 2))
   }, [spec])
 
   const discardChanges = useCallback(setSpecAsValue, [setSpecAsValue])
@@ -126,7 +126,9 @@ const RawChartBuilder = ({ visible, spec, onUpdateSpec, dimensions }) => {
 
   useEffect(() => {
     const { editor } = editorRef.current
-    populateVegaRawEditorCompleters({ dimensions })(editor)
+    if (editor) {
+      populateVegaRawEditorCompleters({ dimensions })(editor)
+    }
   }, [dimensions])
 
   const toggleHelp = useCallback(() => {

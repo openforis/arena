@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react'
 
-import './Input.scss'
+import './Slider.scss'
 
-const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
-  const { title, subtitle, id } = block
+const SliderBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
+  const { params, title, subtitle, id } = block
 
   const handleChange = useCallback(
     (e) => {
@@ -11,18 +11,22 @@ const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimen
     },
     [blockPath, configActions]
   )
+
   return (
     <div className="block block-input">
       <span className="block__title">{title}</span>
       <span className="block__subtitle">{subtitle}</span>
       <input
+        type="range"
         id={id}
         className="basic-input"
-        defaultValue={configItemsByPath?.[blockPath]?.value}
+        defaultValue={params?.default}
+        min={params?.min}
+        max={params?.max}
         onChange={handleChange}
       />
     </div>
   )
 }
 
-export default InputBlock
+export default SliderBlock
