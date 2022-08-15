@@ -201,7 +201,7 @@ L.Util.extend(L.KML, {
 	},
 
 	parsePlacemark: function (place, xml, style, options) {
-		var h, i, j, k, el, il, opts = options || {};
+		var i, k, el, il, opts = options || {};
 
 		el = place.getElementsByTagName('styleUrl');
 		for (i = 0; i < el.length; i++) {
