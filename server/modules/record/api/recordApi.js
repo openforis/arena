@@ -132,6 +132,7 @@ export const init = (app) => {
       next(error)
     }
   })
+
   app.get('/survey/:surveyId/records/summary', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
@@ -216,16 +217,20 @@ export const init = (app) => {
   })
 
   app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
-    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+    try {
+      const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
 
-    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
+      setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
 
-    await DataImportTemplateService.writeDataImportTemplateToStream({
-      surveyId,
-      cycle,
-      entityDefUuid,
-      outputStream: res,
-    })
+      await DataImportTemplateService.writeDataImportTemplateToStream({
+        surveyId,
+        cycle,
+        entityDefUuid,
+        outputStream: res,
+      })
+    } catch (error) {
+      next(error)
+    }
   })
 
   // ==== UPDATE

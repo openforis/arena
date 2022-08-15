@@ -14,7 +14,7 @@ export default () =>
         await Promise.all([
           page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
           page.waitForNavigation(),
-          page.dblclick(getSelector(TestId.table.row(TestId.records.records, 0))),
+          page.dblclick(getSelector(TestId.table.row(TestId.records.tableModule, 0))),
         ])
       })
 
@@ -29,7 +29,7 @@ export default () =>
           // last record deleted: no items in table
           await expectNoItems()
         } else {
-          const rowsSelector = getSelector(TestId.table.rows(TestId.records.records))
+          const rowsSelector = getSelector(TestId.table.rows(TestId.records.tableModule))
           await page.waitForSelector(rowsSelector)
           const recordsEl = await page.$$(`${rowsSelector} > div`)
           await expect(recordsEl.length).toBe(records.length - (idx + 1))
