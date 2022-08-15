@@ -14,12 +14,9 @@ const _valuesToSpec = ({ value = [], spec = {} }) => {
   const newSpec = {
     ...spec,
     transform: [transform],
-    spec: {
-      ...(spec.spec || {}),
-      encoding: {
-        ...(spec.spec?.encoding || {}),
-        x: x,
-      },
+    encoding: {
+      ...(spec.encoding || {}),
+      x: x,
     },
   }
 

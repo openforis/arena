@@ -5,14 +5,11 @@ const _valuesToSpec =
   ({ value = [], spec = {} }) => {
     const newSpec = {
       ...spec,
-      spec: {
-        ...(spec.spec || {}),
-        encoding: {
-          ...(spec.spec?.encoding || {}),
-          [axisKey]: {
-            ...spec.spec?.encoding?.[axisKey],
-            title: value,
-          },
+      encoding: {
+        ...(spec.encoding || {}),
+        [axisKey]: {
+          ...spec.encoding?.[axisKey],
+          title: value,
         },
       },
     }

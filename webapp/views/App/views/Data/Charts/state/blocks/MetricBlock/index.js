@@ -4,45 +4,52 @@ const _valuesToSpec = ({ value = [], spec = {}, key, configItemsByPath }) => {
   const columnValues = configItemsByPath[`${key}.column`]?.value
   const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
   const metrics = columnValues?.map((val) => val.value)
-  const transform = valuesToCalculations(columnValues)
 
-  const ag = aggregationValues?.[0]?.value
+  const aggValues = configItemsByPath['query.groupBy']?.value
+  const aggs = aggValues?.map((val) => val.value)
 
-  const repeat = {
-    layer: metrics,
-  }
+  const aggregations = metrics.map((value, index) => {
+    const ag = aggregationValues[index]?.value
+    return {
+      op: ag,
+      field: value,
+      impute: {
+        value: 'NULL',
+      },
+      as: `${ag}_${value}`,
+    }
+  })
+
+  const fold = metrics.map((value, index) => `${aggregationValues[index]?.value}_${value}`)
+
   const y = {
-    field: { repeat: 'layer' },
+    field: 'value',
     type: 'quantitative',
-    aggregate: ag,
-    title: transform.as,
+    title: 'value',
+    aggregate: 'max',
+    impute: {
+      value: 'NULL',
+    },
   }
 
   const color = {
-    datum: {
-      repeat: 'layer',
-    },
-    title: transform.as,
+    field: 'key',
+    title: 'values',
   }
 
   const xOffset = {
-    datum: {
-      repeat: 'layer',
-    },
+    field: 'key',
   }
 
   const newSpec = {
     ...spec,
-    repeat: repeat,
-    spec: {
-      ...(spec.spec || {}),
-      encoding: {
-        ...(spec.spec?.encoding || {}),
-        y: y,
-        color: color,
-        xOffset: xOffset,
-      },
+    encoding: {
+      ...(spec.encoding || {}),
+      y: y,
+      color: color,
+      xOffset: xOffset,
     },
+    transform: [...spec.transform, { aggregate: aggregations, groupby: aggs }, { fold: fold }],
   }
 
   return newSpec

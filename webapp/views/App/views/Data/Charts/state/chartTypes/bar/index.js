@@ -16,9 +16,7 @@ const bar = {
   },
   baseSpec: {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    spec: {
-      mark: { type: 'bar' },
-    },
+    mark: { type: 'bar' },
     config: {
       mark: {
         invalid: null,
@@ -52,26 +50,22 @@ const bar = {
           maxHeight: MaxHeightBlock(),
           stack: {
             id: 'stack',
-            title: 'Stack bars',
+            title: 'Stack and normalize bars',
             subtitle: '',
             label: 'stack bars',
             type: 'checkbox',
             defaultValue: false,
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
-              const axisKey = configItemsByPath?.['other.switchHorizontal']?.value ? 'x' : 'y'
+            valuesToSpec: ({ value = [], spec = {} }) => {
               if (value) {
                 const newSpec = {
                   ...spec,
-                  spec: {
-                    ...(spec.spec || {}),
-                    encoding: {
-                      ...(spec.spec?.encoding || {}),
-                      [axisKey]: {
-                        ...(spec.spec?.encoding?.[axisKey] || {}),
-                        stack: 'normalize',
-                      },
-                      xOffset: null,
+                  encoding: {
+                    ...(spec.encoding || {}),
+                    y: {
+                      ...(spec.encoding?.y || {}),
+                      stack: 'normalize',
                     },
+                    xOffset: null,
                   },
                 }
                 return newSpec
