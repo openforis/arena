@@ -129,7 +129,7 @@ export const TestId = {
   records: {
     addBtn: 'record-add-btn',
     cellNodeDef: (name) => `${name}-cell`,
-    records: 'records',
+    tableModule: 'records/summary',
   },
   recordsImport: {
     importDataBtn: 'records-import-data-btn',

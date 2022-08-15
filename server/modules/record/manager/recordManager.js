@@ -82,11 +82,6 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 }
 
-export const fetchRecordSummaryByRecordUuid = async ({ surveyId, cycle, recordUuid }, client = db) => {
-  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, recordUuid }, client)
-  return list.length === 1 ? list[0] : null
-}
-
 export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)

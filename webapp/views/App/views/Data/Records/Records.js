@@ -35,7 +35,7 @@ const Records = () => {
 
   return (
     <Table
-      module="records"
+      module="records/summary"
       restParams={{ cycle, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
