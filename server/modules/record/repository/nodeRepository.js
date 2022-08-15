@@ -69,7 +69,8 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
             WHEN n.value->>'itemUuid' IS NOT NULL
             THEN json_build_object( 'category_item',json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) )
             ELSE NULL
-        END AS ref_data
+        END AS ref_data,
+        (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})
     FROM
         ${schema}.node n
     LEFT OUTER JOIN
