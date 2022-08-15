@@ -25,7 +25,7 @@ const ShowLegendBlock = ({
   subtitle = '',
   label = 'Show legend',
   type = blockTypes.checkbox,
-  defaultValue = false,
+  defaultValue = true,
   valuesToSpec = _valuesToSpec,
 } = {}) => ({
   id,
