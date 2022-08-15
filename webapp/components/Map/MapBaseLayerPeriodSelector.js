@@ -207,9 +207,7 @@ export const MapBaseLayerPeriodSelector = () => {
                 </option>
               )
             })}
-            <option value={''} selected>
-              Choose a period
-            </option>
+            <option value={''}>Choose a period</option>
           </select>
           <input
             type="checkbox"
