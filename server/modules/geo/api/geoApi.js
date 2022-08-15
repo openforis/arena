@@ -49,11 +49,9 @@ export const init = (app) => {
         res.json(periods)
         return
       }
-    } catch (error) {
-      null
+    } finally {
+      // error or provider not supported
+      res.json([])
     }
-
-    // error or provider not supported
-    res.json([])
   })
 }
