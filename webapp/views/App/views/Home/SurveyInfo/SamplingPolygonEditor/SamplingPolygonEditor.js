@@ -10,7 +10,9 @@ import { RectangleOnlyItems } from './RectangleOnlyItems'
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
   const samplingPolygonObject =
-    samplingPolygon === undefined || samplingPolygon === {} ? getSamplingPolygonDefaults() : samplingPolygon
+    samplingPolygon === undefined || Object.entries(samplingPolygon).length == 0
+      ? getSamplingPolygonDefaults()
+      : samplingPolygon
 
   const [jsonEditorChecked, setJsonEditorChecked] = useState(false)
   const [jsonEditorValue, setJsonEditorValue] = useState(JSON.stringify(samplingPolygonObject, null, 2))
