@@ -9,12 +9,12 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
 
+import * as API from '@webapp/service/api'
+
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-
-import * as API from '@webapp/service/api'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -24,7 +24,9 @@ export const ChainBasicProps = (props) => {
   const survey = useSurvey()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
-  const [recordsCountByStep, setRecordsCountByStep] = useState({})
+  const [recordsCountByStep, setRecordsCountByStep] = useState(
+    RecordStep.steps.reduce((acc, { id }) => ({ ...acc, [id]: '...' }), {})
+  )
 
   useEffect(() => {
     const fetchChains = async () => {
@@ -89,6 +91,13 @@ export const ChainBasicProps = (props) => {
             </div>
           ))}
         </div>
+      </FormItem>
+      <FormItem label={i18n.t('chainView.submitOnlyAnalysisStepDataIntoR')}>
+        <Checkbox
+          checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
+          validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
+          onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+        />
       </FormItem>
     </>
   )

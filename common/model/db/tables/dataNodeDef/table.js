@@ -15,6 +15,7 @@ const columnSet = {
   uuid: Table.columnSetCommon.uuid,
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
+  recordStep: 'record_step',
   parentUuid: 'parent_uuid',
 }
 
@@ -79,6 +80,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       `${columnSet.uuid}          uuid        NOT NULL`,
       `${columnSet.recordUuid}    uuid        NOT NULL`,
       `${columnSet.recordCycle}   varchar(2)  NOT NULL`,
+      `${columnSet.recordStep}    varchar(2)  NOT NULL`,
       `${columnSet.parentUuid}    uuid            NULL`
     )
     this.columnNodeDefs.forEach((nodeDefColumn) => {
