@@ -12,8 +12,8 @@ const SamplingPolygonShapeEditor = (props) => {
     <div className="form-item">
       <label className="form-label">Shape</label>
       <select value={isCircle} onChange={onChange} disabled={readOnly}>
-        <option value="false">{i18n.t('samplingPolygonOptions.rectangle')}</option>
-        <option value="true">{i18n.t('samplingPolygonOptions.circle')}</option>
+        <option value={false}>{i18n.t('samplingPolygonOptions.rectangle')}</option>
+        <option value={true}>{i18n.t('samplingPolygonOptions.circle')}</option>
       </select>
     </div>
   )
