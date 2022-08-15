@@ -80,7 +80,6 @@ export const MapBaseLayerPeriodSelector = () => {
       if (layerLeft && layerRight) {
         sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
         const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
-        layerRight.setUrl(url)
         onBaseLayerUpdate({ ...contextBaseLayer, url })
       }
     }
@@ -108,7 +107,7 @@ export const MapBaseLayerPeriodSelector = () => {
         periods: availablePeriods,
         periodByValue: availablePeriods.reduce((acc, period) => ({ ...acc, [getPeriodValue(period)]: period }), {}),
         selectedPeriodValueLeft: lastPeriodValue,
-        selectedPeriodValueRight: lastPeriodValue,
+        selectedPeriodValueRight: '',
         procLeft: Proc.rgb,
         procRight: Proc.rgb,
       })
@@ -208,6 +207,9 @@ export const MapBaseLayerPeriodSelector = () => {
                 </option>
               )
             })}
+            <option value={''} selected>
+              Choose a period
+            </option>
           </select>
           <input
             type="checkbox"
