@@ -1,4 +1,4 @@
-import { blockTypes, valuesToCalculations } from '../common'
+import { blockTypes } from '../common'
 
 const _valuesToSpec = ({ value = [], spec = {}, key, configItemsByPath }) => {
   const columnValues = configItemsByPath[`${key}.column`]?.value
@@ -8,7 +8,7 @@ const _valuesToSpec = ({ value = [], spec = {}, key, configItemsByPath }) => {
   const aggValues = configItemsByPath['query.groupBy']?.value
   const aggs = aggValues?.map((val) => val.value)
 
-  const aggregations = metrics.map((value, index) => {
+  const aggregations = metrics?.map((value, index) => {
     const ag = aggregationValues[index]?.value
     return {
       op: ag,
@@ -20,7 +20,7 @@ const _valuesToSpec = ({ value = [], spec = {}, key, configItemsByPath }) => {
     }
   })
 
-  const fold = metrics.map((value, index) => `${aggregationValues[index]?.value}_${value}`)
+  const fold = metrics?.map((value, index) => `${aggregationValues[index]?.value}_${value}`)
 
   const y = {
     field: 'value',
