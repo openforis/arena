@@ -139,7 +139,7 @@ L.Util.extend(L.KML, {
 		}
 
 		id = xml.getAttribute('id');
-		if (id && style) {
+		if (id) {
 			style.id = id;
 		}
 
@@ -222,22 +222,22 @@ L.Util.extend(L.KML, {
 		}
 
 		var multi = ['MultiGeometry', 'MultiTrack', 'gx:MultiTrack'];
-		for (h in multi) {
-			el = place.getElementsByTagName(multi[h]);
+		for (let h of multi) {
+			el = place.getElementsByTagName(h);
 			for (i = 0; i < el.length; i++) {
-				var layer = this.parsePlacemark(el[i], xml, style, opts);
-				if (layer === undefined)
+				var new_layer = this.parsePlacemark(el[i], xml, style, opts);
+				if (new_layer === undefined)
 					continue;
-				this.addPlacePopup(place, layer);
-				return layer;
+				this.addPlacePopup(place, new_layer);
+				return new_layer;
 			}
 		}
 
 		var layers = [];
 
 		var parse = ['LineString', 'Polygon', 'Point', 'Track', 'gx:Track'];
-		for (j in parse) {
-			var tag = parse[j];
+		for (let j of parse) {
+			var tag = j;
 			el = place.getElementsByTagName(tag);
 			for (i = 0; i < el.length; i++) {
 				var l = this['parse' + tag.replace(/gx:/, '')](el[i], xml, opts);
