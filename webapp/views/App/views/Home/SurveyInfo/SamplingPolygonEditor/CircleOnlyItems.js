@@ -14,7 +14,7 @@ export const CircleOnlyItems = (props) => {
           {i18n.t('samplingPolygonOptions.numberOfControlPoints')}
         </label>
 
-        <select value={samplingPolygonObject.number_of_points_circle} onChange={onPropertyChange}>
+        <select value={samplingPolygonObject.numberOfPointsCircle} onChange={onPropertyChange('numberOfPointsCircle')}>
           <option value="0">0</option>
           <option value="4">4</option>
           <option value="5">5</option>

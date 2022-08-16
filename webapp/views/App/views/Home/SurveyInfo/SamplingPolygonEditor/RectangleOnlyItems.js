@@ -5,10 +5,10 @@ import PropTypes from 'prop-types'
 export const RectangleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
   const inputPropertiesForRectangle = [
-    { key: 'length_latitude', labelKey: 'lengthLatitude' },
-    { key: 'length_longitude', labelKey: 'lengthLongitude' },
-    { key: 'number_of_points_north', labelKey: 'numberOfControlPointsNorth' },
-    { key: 'number_of_points_east', labelKey: 'numberOfControlPointsEast' },
+    { key: 'lengthLatitude', labelKey: 'lengthLatitude' },
+    { key: 'lengthLongitude', labelKey: 'lengthLongitude' },
+    { key: 'numberOfPointsNorth', labelKey: 'numberOfControlPointsNorth' },
+    { key: 'numberOfPointsEast', labelKey: 'numberOfControlPointsEast' },
   ]
   return (
     <div className="form">

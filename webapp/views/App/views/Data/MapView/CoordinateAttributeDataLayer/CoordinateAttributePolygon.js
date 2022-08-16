@@ -17,15 +17,15 @@ export const CoordinateAttributePolygon = (props) => {
 
   const { latitude, longitude } = props
 
-  const len_lat_meters = Number(polygonProperties.length_latitude) || 0
-  const len_lng_meters = Number(polygonProperties.length_longitude) || 0
-  const offset_north_meters = Number(polygonProperties.offset_north) || 0
-  const offset_east_meters = Number(polygonProperties.offset_east) || 0
-  const numberOfPointsNorth = Number(polygonProperties.number_of_points_north) || 0
-  const numberOfPointsEast = Number(polygonProperties.number_of_points_east) || 0
-  const numberOfPointsCircle = Number(polygonProperties.number_of_points_circle) || 0
-  const controlPointOffsetNorh = Number(polygonProperties.controlpoint_offset_north) || 0
-  const controlPointOffsetEast = Number(polygonProperties.controlpoint_offset_east) || 0
+  const len_lat_meters = Number(polygonProperties.lengthLatitude) || 0
+  const len_lng_meters = Number(polygonProperties.lengthLongitude) || 0
+  const offset_north_meters = Number(polygonProperties.offsetNorth) || 0
+  const offset_east_meters = Number(polygonProperties.offsetEast) || 0
+  const numberOfPointsNorth = Number(polygonProperties.numberOfPointsNorth) || 0
+  const numberOfPointsEast = Number(polygonProperties.numberOfPointsEast) || 0
+  const numberOfPointsCircle = Number(polygonProperties.numberOfPointsCircle) || 0
+  const controlPointOffsetNorh = Number(polygonProperties.controlPointOffsetNorth) || 0
+  const controlPointOffsetEast = Number(polygonProperties.controlPointOffsetEast) || 0
   const isCircle = polygonProperties.isCircle || false
   const radius = Number(polygonProperties.radius) || 0
 

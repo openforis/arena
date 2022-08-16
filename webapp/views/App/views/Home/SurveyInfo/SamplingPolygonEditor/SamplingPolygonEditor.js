@@ -18,10 +18,10 @@ const SamplingPolygonEditor = (props) => {
   const [jsonEditorValue, setJsonEditorValue] = useState(JSON.stringify(samplingPolygonObject, null, 2))
 
   const inputPropertiesForAll = [
-    { key: 'offset_north', labelKey: 'offsetNorth' },
-    { key: 'offset_east', labelKey: 'offsetEast' },
-    { key: 'control_point_offset_north', labelKey: 'controlPointOffsetNorth' },
-    { key: 'control_point_offset_east', labelKey: 'controlPointOffsetEast' },
+    { key: 'offsetNorth', labelKey: 'offsetNorth' },
+    { key: 'offsetEast', labelKey: 'offsetEast' },
+    { key: 'controlPointOffsetNorth', labelKey: 'controlPointOffsetNorth' },
+    { key: 'controlPointOffsetEast', labelKey: 'controlPointOffsetEast' },
   ]
 
   const onPropertyChange = (key) => (e) => {

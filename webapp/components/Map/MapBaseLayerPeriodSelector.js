@@ -74,14 +74,13 @@ export const MapBaseLayerPeriodSelector = () => {
     }
   }
   const initSideBySide = () => {
-    if (User.isSystemAdmin(user)) {
-      const layerLeft = getLayer(true)
-      const layerRight = getLayer(false)
-      if (layerLeft && layerRight) {
-        sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
-        const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
-        onBaseLayerUpdate({ ...contextBaseLayer, url })
-      }
+    if (User.isSystemAdmin(user)) return
+    const layerLeft = getLayer(true)
+    const layerRight = getLayer(false)
+    if (layerLeft && layerRight) {
+      sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
+      const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
+      onBaseLayerUpdate({ ...contextBaseLayer, url })
     }
   }
 
