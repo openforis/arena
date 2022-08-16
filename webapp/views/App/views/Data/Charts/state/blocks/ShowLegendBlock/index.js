@@ -8,14 +8,11 @@ const _valuesToSpec = ({ value = [], spec = {} }) => {
 
   const newSpec = {
     ...spec,
-    spec: {
-      ...(spec.spec || {}),
-      encoding: {
-        ...(spec.spec?.encoding || {}),
-        color: {
-          ...(spec.spec?.encoding?.color || {}),
-          legend: legend,
-        },
+    encoding: {
+      ...(spec.encoding || {}),
+      color: {
+        ...(spec.encoding?.color || {}),
+        legend: legend,
       },
     },
   }
@@ -28,7 +25,7 @@ const ShowLegendBlock = ({
   subtitle = '',
   label = 'Show legend',
   type = blockTypes.checkbox,
-  defaultValue = false,
+  defaultValue = true,
   valuesToSpec = _valuesToSpec,
 } = {}) => ({
   id,

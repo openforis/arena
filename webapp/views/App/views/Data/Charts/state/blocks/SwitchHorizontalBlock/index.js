@@ -4,15 +4,12 @@ const _valuesToSpec = ({ value = [], spec = {} }) => {
   if (value) {
     const newSpec = {
       ...spec,
-      spec: {
-        ...(spec.spec || {}),
-        encoding: {
-          ...(spec.spec?.encoding || {}),
-          y: spec.spec?.encoding?.x,
-          x: spec.spec?.encoding?.y,
-          yOffset: spec.spec?.encoding?.xOffset,
-          xOffset: null,
-        },
+      encoding: {
+        ...(spec.encoding || {}),
+        y: spec.encoding?.x,
+        x: spec.encoding?.y,
+        yOffset: spec.encoding?.xOffset,
+        xOffset: null,
       },
     }
     return newSpec
