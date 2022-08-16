@@ -72,21 +72,19 @@ export const KmlUploader = () => {
   const processKMZFile = async (file) => {
     const kmlList = []
     let promises = []
-    await jszip.loadAsync(file).then(() => {
-      jszip.forEach((relativePath, file) => {
-        promises.push(
-          new Promise((resolve) => {
-            if (relativePath.endsWith('.kml')) {
-              resolve(file.async('string').then((data) => kmlList.push(data)))
-            }
-            resolve()
-          })
-        )
-      })
+    await jszip.loadAsync(file)
+    jszip.forEach((relativePath, file) => {
+      promises.push(
+        new Promise((resolve) => {
+          if (relativePath.endsWith('.kml')) {
+            resolve(file.async('string').then((data) => kmlList.push(data)))
+          }
+          resolve()
+        })
+      )
     })
-    Promise.all(promises).then(() => {
-      addKMLLayers(kmlList)
-    })
+    await Promise.all(promises)
+    addKMLLayers(kmlList)
   }
 
   const addKMLLayers = (kmlTexts) => {
