@@ -75,7 +75,6 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
 
   const handleChange = useCallback(
     (optionsSelected) => {
-      console.log(optionsSelected)
       let option = optionsSelected || null
       if (!isMulti) {
         option = optionsSelected ? [optionsSelected] : []
