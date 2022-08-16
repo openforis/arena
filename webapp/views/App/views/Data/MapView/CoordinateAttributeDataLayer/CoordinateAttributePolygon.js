@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 
 export const CoordinateAttributePolygon = (props) => {
   const surveyInfo = useSurveyInfo()
-  const polygonProperties = JSON.parse(surveyInfo.props.samplingPolygon)
+  const polygonProperties = surveyInfo.props.samplingPolygon || {}
 
   const options = useMapContextOptions()
   const { showSamplingPolygon, showControlPoints, showPlotReferencePoint } = options
@@ -26,7 +26,7 @@ export const CoordinateAttributePolygon = (props) => {
   const numberOfPointsCircle = Number(polygonProperties.number_of_points_circle) || 0
   const controlPointOffsetNorh = Number(polygonProperties.controlpoint_offset_north) || 0
   const controlPointOffsetEast = Number(polygonProperties.controlpoint_offset_east) || 0
-  const isCircle = polygonProperties.isCircle == 'true' ? true : false
+  const isCircle = polygonProperties.isCircle || false
   const radius = Number(polygonProperties.radius) || 0
 
   const len_lat = MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
