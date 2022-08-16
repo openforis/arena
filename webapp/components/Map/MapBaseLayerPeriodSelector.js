@@ -152,12 +152,7 @@ export const MapBaseLayerPeriodSelector = () => {
       newProc = !rightChecked ? Proc.cir : Proc.rgb
       setState((statePev) => ({ ...statePev, rightChecked: !statePev.rightChecked, procRight: newProc }))
     }
-    let layer
-    if (isLeft) {
-      layer = getLayer(true)
-    } else {
-      layer = getLayer(false)
-    }
+    const layer = getLayer(isLeft)
     if (layer) {
       const periodValue = isLeft ? selectedPeriodValueLeft : selectedPeriodValueRight
       const period = periodByValue[periodValue]
