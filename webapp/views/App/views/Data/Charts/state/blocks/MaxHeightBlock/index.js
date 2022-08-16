@@ -3,18 +3,15 @@ import { blockTypes } from '../common'
 const _valuesToSpec = ({ value = [], spec = {} }) => {
   const newSpec = {
     ...spec,
-    spec: {
-      ...(spec.spec || {}),
-      mark: {
-        ...(spec.spec?.mark || {}),
-        clip: true,
-      },
-      encoding: {
-        ...(spec.spec?.encoding || {}),
-        y: {
-          ...spec.spec?.encoding?.y,
-          scale: { domainMax: value },
-        },
+    mark: {
+      ...(spec.mark || {}),
+      clip: true,
+    },
+    encoding: {
+      ...(spec.encoding || {}),
+      y: {
+        ...spec.encoding?.y,
+        scale: { domainMax: value },
       },
     },
   }
