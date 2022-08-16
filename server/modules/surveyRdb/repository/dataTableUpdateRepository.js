@@ -33,7 +33,7 @@ const _getColumnNames = (nodeDef, type) =>
   type === types.insert
     ? [
         DataTable.columnNameUuuid,
-        DataTable.columnNameRecordUuuid,
+        DataTable.columnNameRecordUuid,
         DataTable.columnNameRecordCycle,
         DataTable.columnNameParentUuuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity

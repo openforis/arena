@@ -275,7 +275,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
   const recordNotEqualCondition = Expression.newBinary({
-    left: Expression.newIdentifier(DataTable.columnNameRecordUuuid),
+    left: Expression.newIdentifier(DataTable.columnNameRecordUuid),
     right: Expression.newLiteral(Record.getUuid(record)),
     operator: Expression.operators.comparison.notEq.key,
   })
@@ -353,12 +353,12 @@ export const fetchRecordsCountByRootNodesValue = async (
         ${rootTable}
       WHERE 
         ${DataTable.columnNameRecordCycle} = $2
-        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)` : ''} 
+        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuid} NOT IN ($1:csv)` : ''} 
       GROUP BY 
         ${filterColumnsString}
     )
     SELECT
-      ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
+      ${rootTableAlias}.${DataTable.columnNameRecordUuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
@@ -369,8 +369,8 @@ export const fetchRecordsCountByRootNodesValue = async (
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $2
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)
-    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, cr.count
+      AND ${rootTableAlias}.${DataTable.columnNameRecordUuid} NOT IN ($1:csv)
+    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuid}, cr.count
   `,
     [recordUuidsExcluded, cycle],
     camelize
