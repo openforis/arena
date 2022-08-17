@@ -288,10 +288,12 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
     }, {})
 
     await DataTableUpdateRepository.updateTables(
-      survey,
-      Record.getCycle(record),
-      nodeDefs,
-      updatedNodesAndDependentsAndAncestors,
+      {
+        survey,
+        record,
+        nodeDefs,
+        nodes: updatedNodesAndDependentsAndAncestors,
+      },
       t
     )
 
