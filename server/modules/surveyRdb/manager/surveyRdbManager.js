@@ -203,7 +203,6 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     await fetchViewData({
       survey,
-      columnNodeDefs: childDefs,
       streamOutput: stream,
       query,
       addCycle: true,
