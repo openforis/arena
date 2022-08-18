@@ -136,3 +136,15 @@ export const updateTables = async ({ survey, record, nodeDefs, nodes }, client) 
   const updates = _toUpdates({ survey, record, nodeDefs, nodes })
   await client.batch(updates.map((update) => queryByType[update.type](update, client)))
 }
+
+export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {
+  const tableName = DataTable.getName(tableDef)
+
+  return client.one(
+    `UPDATE ${SchemaRdb.getName(surveyId)}.${tableName}
+    SET ${DataTable.columnNameRecordStep} = $/stepId/
+    WHERE ${DataTable.columnNameRecordUuid} = $/recordUuid/
+    RETURNING uuid`,
+    { recordUuid, stepId }
+  )
+}
