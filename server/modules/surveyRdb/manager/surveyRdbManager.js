@@ -65,6 +65,7 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
@@ -78,6 +79,7 @@ export const fetchViewData = async (params) => {
     query,
     columnNodeDefs = false,
     includeFileAttributeDefs = true,
+    recordSteps = null,
     offset = 0,
     limit = null,
     streamOutput = null,
@@ -92,6 +94,7 @@ export const fetchViewData = async (params) => {
     query,
     columnNodeDefs,
     includeFileAttributeDefs,
+    recordSteps,
     offset,
     limit,
     stream: Boolean(streamOutput),

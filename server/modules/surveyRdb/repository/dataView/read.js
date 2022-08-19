@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
+import { Objects } from '@openforis/arena-core'
+
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
@@ -162,6 +164,7 @@ const _dbTransformCallbackSelect =
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
@@ -176,6 +179,7 @@ export const fetchViewData = async (params, client = db) => {
     query,
     columnNodeDefs,
     includeFileAttributeDefs = true,
+    recordSteps,
     offset = null,
     limit = null,
     stream = false,
@@ -207,14 +211,19 @@ export const fetchViewData = async (params, client = db) => {
     if (Query.getFilterRecordUuid(query)) {
       whereConditions.push(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
     }
-    queryBuilder.where(whereConditions.join(' AND '))
+    queryBuilder.where(...whereConditions)
     queryBuilder.addParams({ cycle, recordUuid: Query.getFilterRecordUuid(query) })
+  }
+
+  if (!Objects.isEmpty(recordSteps)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordStep} IN ($/recordSteps:csv/)`)
+    queryBuilder.addParams({ recordSteps })
   }
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (!R.isNil(filterClause)) {
-    queryBuilder.where(`AND ${filterClause}`)
+    queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
   }
 
