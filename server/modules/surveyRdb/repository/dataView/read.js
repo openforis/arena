@@ -207,12 +207,14 @@ export const fetchViewData = async (params, client = db) => {
 
   // WHERE clause
   if (!R.isNil(cycle)) {
-    const whereConditions = [`${viewDataNodeDef.columnRecordCycle} = $/cycle/`]
-    if (Query.getFilterRecordUuid(query)) {
-      whereConditions.push(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
+    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+    queryBuilder.addParams({ cycle })
+
+    const recordUuid = Query.getFilterRecordUuid(query)
+    if (recordUuid) {
+      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
+      queryBuilder.addParams({ recordUuid })
     }
-    queryBuilder.where(...whereConditions)
-    queryBuilder.addParams({ cycle, recordUuid: Query.getFilterRecordUuid(query) })
   }
 
   if (!Objects.isEmpty(recordSteps)) {
