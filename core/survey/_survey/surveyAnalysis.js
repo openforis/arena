@@ -37,7 +37,7 @@ export const getAnalysisNodeDefs =
 
       if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
 
-      if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+      if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) return false
 
       // show base unit nodeDefs with nodeDef analysis siblings
       if (
@@ -54,10 +54,6 @@ export const getAnalysisNodeDefs =
         )
 
         if (!hasAnalysisSiblings) return false
-      }
-
-      if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
-        return false
       }
 
       if (!showInactiveResultVariables && !NodeDef.isActive(nodeDef)) {
