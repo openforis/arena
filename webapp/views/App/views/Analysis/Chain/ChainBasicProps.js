@@ -37,7 +37,7 @@ export const ChainBasicProps = (props) => {
     }
 
     const fetchRecordCountByStep = async () => {
-      const _recordsCountByStep = {} //await API.fetchRecordsCountByStep()
+      const _recordsCountByStep = await API.fetchRecordsCountByStep({ surveyId: Survey.getId(survey) })
       setRecordsCountByStep(_recordsCountByStep)
     }
 
