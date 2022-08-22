@@ -8,6 +8,7 @@ import * as Chain from '@common/analysis/chain'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
+import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
 
 import * as API from '@webapp/service/api'
 
@@ -24,9 +25,8 @@ export const ChainBasicProps = (props) => {
   const survey = useSurvey()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
-  const [recordsCountByStep, setRecordsCountByStep] = useState(
-    RecordStep.steps.reduce((acc, { id }) => ({ ...acc, [id]: '...' }), {})
-  )
+
+  const recordsCountByStep = useChainRecordsCountByStep()
 
   useEffect(() => {
     const fetchChains = async () => {
@@ -36,13 +36,7 @@ export const ChainBasicProps = (props) => {
       )
     }
 
-    const fetchRecordCountByStep = async () => {
-      const _recordsCountByStep = await API.fetchRecordsCountByStep({ surveyId: Survey.getId(survey) })
-      setRecordsCountByStep(_recordsCountByStep)
-    }
-
     fetchChains()
-    fetchRecordCountByStep()
   }, [survey, chain])
 
   const validation = Chain.getValidation(chain)
