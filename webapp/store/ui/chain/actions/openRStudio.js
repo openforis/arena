@@ -69,18 +69,31 @@ const isInstanceRunning = async () => {
   return Boolean(currentInstance?.instanceId)
 }
 
+const checkCanOpenRStudio = ({ dispatch, state }) => {
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+
+  if (Survey.isDraft(surveyInfo)) {
+    dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.surveyNotPublished' }))
+    return false
+  }
+
+  if (!ChainState.hasRecordsToProcess(state)) {
+    dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.noRecords' }))
+    return false
+  }
+
+  return true
+}
+
 export const openRStudio =
   ({ isLocal = false } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
 
-    if (!ChainState.hasRecordsToProcess(state)) {
-      dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudioNoRecords' }))
-      return
-    }
+    if (!checkCanOpenRStudio({ dispatch, state })) return
 
-    const surveyId = SurveyState.getSurveyId(state)
     const surveyInfo = SurveyState.getSurveyInfo(state)
+    const surveyId = SurveyState.getSurveyId(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
     const user = UserState.getUser(state)
     const userUuid = User.getUuid(user)

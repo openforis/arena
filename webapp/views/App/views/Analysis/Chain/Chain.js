@@ -31,7 +31,6 @@ const ChainComponent = () => {
   const chain = useChain()
   const survey = useSurvey()
 
-  const surveyInfo = Survey.getSurveyInfo(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const validation = Chain.getValidation(chain)
 
@@ -75,11 +74,8 @@ const ChainComponent = () => {
   return (
     <div className="chain">
       <div className="btn-rstudio-container">
-        {Survey.isDraft(surveyInfo) && (
-          <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
-        )}
-        <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
-        <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
+        <ButtonRStudio onClick={_openRStudio} />
+        <ButtonRStudio isLocal onClick={_openRStudioLocal} />
       </div>
 
       <TabBar
