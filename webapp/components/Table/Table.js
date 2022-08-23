@@ -12,6 +12,8 @@ const Table = (props) => {
   const {
     cellTestIdExtractor,
     className,
+    columns,
+    expandableRows,
     gridTemplateColumns,
     headerLeftComponent,
     isRowExpandable,
@@ -29,8 +31,7 @@ const Table = (props) => {
     rowHeaderComponent,
     headerProps,
     rowProps,
-    columns,
-    expandableRows,
+    selectable,
   } = props
 
   const {
@@ -52,8 +53,9 @@ const Table = (props) => {
     keyExtractor,
     moduleApiUri,
     module,
-    restParams,
     onRowClick: onRowClickProp,
+    restParams,
+    selectable,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -112,8 +114,11 @@ const DummyComponent = () => <div />
 Table.propTypes = {
   cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
+  columns: PropTypes.array,
+  expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string,
   headerLeftComponent: PropTypes.elementType,
+  headerProps: PropTypes.object,
   isRowActive: PropTypes.func, // Checks whether a row must be highlighted
   isRowExpandable: PropTypes.func, // Checks if a row rendering an item can be expanded
   keyExtractor: PropTypes.func,
@@ -122,14 +127,13 @@ Table.propTypes = {
   noItemsLabelKey: PropTypes.string,
   noItemsLabelForSearchKey: PropTypes.string,
   onRowClick: PropTypes.func, // Row click handler
+  onRowDoubleClick: PropTypes.func, // Row double click handler
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
   rowExpandedComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
-  headerProps: PropTypes.object,
-  columns: PropTypes.array,
-  expandableRows: PropTypes.bool,
+  selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
 }
 
 Table.defaultProps = {
@@ -147,11 +151,13 @@ Table.defaultProps = {
   noItemsLabelKey: 'common.noItems',
   noItemsLabelForSearchKey: 'common.noItems',
   onRowClick: null,
+  onRowDoubleClick: null,
   restParams: {},
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
   rowExpandedComponent: DummyComponent,
   rowProps: {},
+  selectable: true,
 }
 
 export default Table
