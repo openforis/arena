@@ -22,6 +22,10 @@ export const CoordinateAttributeMarker = (props) => {
     parentUuid,
     point,
     recordUuid,
+    getNextPoint,
+    getPreviousPoint,
+    openPopupOfUuid,
+    setRef
   } = props
 
   ancestorsKeys.propTypes = {
@@ -51,6 +55,7 @@ export const CoordinateAttributeMarker = (props) => {
         color={markersColor}
         fillColor={markersColor}
         fillOpacity={fillOpacity}
+        ref={setRef(parentUuid)}
       >
         {showMarkersLabels && (
           <Tooltip
@@ -71,6 +76,9 @@ export const CoordinateAttributeMarker = (props) => {
           parentUuid={parentUuid}
           ancestorsKeys={ancestorsKeys}
           onRecordEditClick={onRecordEditClick}
+          getNextPoint={getNextPoint}
+          getPreviousPoint={getPreviousPoint}
+          openPopupOfUuid={openPopupOfUuid}
         />
       </CircleMarker>
     </div>
@@ -87,4 +95,8 @@ CoordinateAttributeMarker.propTypes = {
   parentUuid: PropTypes.any,
   point: PropTypes.any,
   recordUuid: PropTypes.any,
+  getNextPoint: PropTypes.func,
+  getPreviousPoint: PropTypes.func,
+  openPopupOfUuid: PropTypes.func,
+  setRef: PropTypes.func
 }

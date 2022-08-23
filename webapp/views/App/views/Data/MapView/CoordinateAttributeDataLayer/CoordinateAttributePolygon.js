@@ -4,30 +4,30 @@ import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
+import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 
 export const CoordinateAttributePolygon = (props) => {
   const surveyInfo = useSurveyInfo()
-  const polygonProperties = surveyInfo.props.samplingPolygon || {}
 
   const options = useMapContextOptions()
   const { showSamplingPolygon, showControlPoints, showPlotReferencePoint } = options
   const SamplingPolygonOpoacity = showSamplingPolygon ? 1 : 0
 
   const { latitude, longitude } = props
-
-  const len_lat_meters = Number(polygonProperties.lengthLatitude) || 0
-  const len_lng_meters = Number(polygonProperties.lengthLongitude) || 0
-  const offset_north_meters = Number(polygonProperties.offsetNorth) || 0
-  const offset_east_meters = Number(polygonProperties.offsetEast) || 0
-  const numberOfPointsNorth = Number(polygonProperties.numberOfPointsNorth) || 0
-  const numberOfPointsEast = Number(polygonProperties.numberOfPointsEast) || 0
-  const numberOfPointsCircle = Number(polygonProperties.numberOfPointsCircle) || 0
-  const controlPointOffsetNorh = Number(polygonProperties.controlPointOffsetNorth) || 0
-  const controlPointOffsetEast = Number(polygonProperties.controlPointOffsetEast) || 0
-  const isCircle = polygonProperties.isCircle || false
-  const radius = Number(polygonProperties.radius) || 0
+  
+  const len_lat_meters = SamplingPolygon.getLengthLatitude(surveyInfo)
+  const len_lng_meters = SamplingPolygon.getLengthLongitude(surveyInfo)
+  const offset_north_meters = SamplingPolygon.getOffsetNorth(surveyInfo)
+  const offset_east_meters = SamplingPolygon.getOffsetEast(surveyInfo)
+  const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(surveyInfo)
+  const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(surveyInfo)
+  const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(surveyInfo)
+  const controlPointOffsetNorh = SamplingPolygon.getControlPointOffsetNorth(surveyInfo)
+  const controlPointOffsetEast = SamplingPolygon.getControlPointOffsetEast(surveyInfo)
+  const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
+  const radius = SamplingPolygon.getRadius(surveyInfo)
 
   const len_lat = MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
   const len_lng = MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)

@@ -28,7 +28,7 @@ ${codes
 `
   const onClickNext = () => {
     const nextPoint = getNextPoint(itemUuid)
-    map.flyTo(nextPoint.latLng, 15)
+    map.flyTo(nextPoint.latLng)
     map.once('zoomend', () => openPopupOfUuid(nextPoint.uuid))
   }
 

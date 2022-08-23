@@ -74,7 +74,7 @@ export const MapBaseLayerPeriodSelector = () => {
     }
   }
   const initSideBySide = () => {
-    if (User.isSystemAdmin(user)) return
+    if (!User.isSystemAdmin(user)) return
     const layerLeft = getLayer(true)
     const layerRight = getLayer(false)
     if (layerLeft && layerRight) {
