@@ -54,7 +54,12 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     chainUuid,
   })
 
-  const analysisNodeDefs = Survey.getAnalysisNodeDefs({ chain, entityDefUuid, showSamplingNodeDefs: true })(survey)
+  const analysisNodeDefs = Survey.getAnalysisNodeDefs({
+    chain,
+    entityDefUuid,
+    showSamplingNodeDefs: true,
+    hideAreaBasedEstimate: false,
+  })(survey)
   if (analysisNodeDefs.length === 0) return
 
   const fileZip = new FileZip(filePath)
