@@ -22,7 +22,7 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
 
   const props = {
-    [NodeDef.propKeys.name]: AreaBasedEstimatedOfNodeDef.getName({ estimatedOfNodeDef }),
+    [NodeDef.propKeys.name]: getName({ estimatedOfNodeDef }),
   }
 
   const advancedProps = {
@@ -31,7 +31,7 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
     [NodeDef.keysPropsAdvanced.isBaseUnit]: false,
     [NodeDef.keysPropsAdvanced.isSampling]: true,
     [NodeDef.keysPropsAdvanced.areaBasedEstimatedOf]: NodeDef.getUuid(estimatedOfNodeDef),
-    [NodeDef.keysPropsAdvanced.script]: AreaBasedEstimatedOfNodeDef.getScript({
+    [NodeDef.keysPropsAdvanced.script]: getScript({
       survey,
       chainUuid,
       estimatedOfNodeDef,
