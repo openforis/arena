@@ -20,6 +20,7 @@ export const createDataTable = async ({ survey, nodeDef }, client) => {
 
   const tableDataNodeDef = new TableDataNodeDef(survey, nodeDef)
   const constraintFkParent = tableDataNodeDef.getConstraintFkParent()
+  const constraintFkRecord = tableDataNodeDef.getConstraintFkRecord()
 
   return client.query(
     `CREATE TABLE
@@ -27,8 +28,8 @@ export const createDataTable = async ({ survey, nodeDef }, client) => {
       (
         ${tableDataNodeDef.getColumnsWithType().join(', ')},
         ${tableDataNodeDef.getConstraintUuidUnique()},
-        ${tableDataNodeDef.getConstraintFkRecord()},
         ${constraintFkParent ? `${constraintFkParent}, ` : ''}
+        ${constraintFkRecord ? `${constraintFkRecord}, ` : ''}
         PRIMARY KEY (${TableDataNodeDef.columnSet.id})
       )`
   )

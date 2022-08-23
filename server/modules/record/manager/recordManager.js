@@ -98,6 +98,7 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client
 }
 
 export {
+  countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
