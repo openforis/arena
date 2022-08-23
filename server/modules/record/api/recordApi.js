@@ -111,6 +111,17 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/records/count/by-step', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const countsByStep = await RecordService.countRecordsBySurveyIdGroupedByStep({ surveyId })
+      res.json(countsByStep)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/record', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)

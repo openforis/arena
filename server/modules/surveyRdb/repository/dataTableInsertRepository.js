@@ -27,9 +27,15 @@ const getSelectQuery = ({
 
   const selectNodeRows = `
     SELECT
-      n.id, n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value, 
-      ${nodeAncestorUuidColumn} AS ancestor_uuid, 
-      r.cycle AS record_cycle
+      n.id, n.uuid, n.node_def_uuid, n.parent_uuid, n.value, 
+      ${nodeAncestorUuidColumn} AS ancestor_uuid
+      ${
+        NodeDef.isRoot(nodeDef)
+          ? `, n.record_uuid, 
+      r.cycle AS record_cycle,
+      r.step AS record_step`
+          : ''
+      }
     FROM
       ${surveySchema}.node n
     JOIN

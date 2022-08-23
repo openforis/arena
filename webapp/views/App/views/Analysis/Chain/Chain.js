@@ -31,16 +31,17 @@ const ChainComponent = () => {
   const chain = useChain()
   const survey = useSurvey()
 
-  const surveyInfo = Survey.getSurveyInfo(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const validation = Chain.getValidation(chain)
 
-  const _openRStudio = () => {
-    dispatch(ChainActions.openRStudio({ chain }))
-  }
-  const _openRStudioLocal = () => {
-    dispatch(ChainActions.openRStudio({ chain, isLocal: true }))
-  }
+  const _openRStudio = useCallback(() => {
+    dispatch(ChainActions.openRStudio())
+  }, [dispatch])
+
+  const _openRStudioLocal = useCallback(() => {
+    dispatch(ChainActions.openRStudio({ isLocal: true }))
+  }, [dispatch])
+
   const updateChain = useCallback(
     (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
     [dispatch]
@@ -48,6 +49,8 @@ const ChainComponent = () => {
 
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
+
+    dispatch(ChainActions.fetchRecordsCountByStep)
   }, [chainUuid])
 
   const locationPathMatcher = useLocationPathMatcher()
@@ -71,11 +74,8 @@ const ChainComponent = () => {
   return (
     <div className="chain">
       <div className="btn-rstudio-container">
-        {Survey.isDraft(surveyInfo) && (
-          <small className="btn-rstudio-container-message">{i18n.t('chainView.surveyShouldBePublished')}</small>
-        )}
-        <ButtonRStudio onClick={_openRStudio} disabled={Survey.isDraft(surveyInfo)} />
-        <ButtonRStudio isLocal onClick={_openRStudioLocal} disabled={Survey.isDraft(surveyInfo)} />
+        <ButtonRStudio onClick={_openRStudio} />
+        <ButtonRStudio isLocal onClick={_openRStudioLocal} />
       </div>
 
       <TabBar

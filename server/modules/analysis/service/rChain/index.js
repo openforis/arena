@@ -1,19 +1,21 @@
 import * as PromiseUtils from '@core/promiseUtils'
 
-import { db } from '../../../../db/db'
+import { db } from '@server/db/db'
 
-import FileZip from '../../../../utils/file/fileZip'
-import * as CSVReader from '../../../../utils/file/csvReader'
+import FileZip from '@server/utils/file/fileZip'
+import * as CSVReader from '@server/utils/file/csvReader'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as RecordStep from '@core/record/recordStep'
 
-import { TableChain } from '../../../../../common/model/db'
-import { Query } from '../../../../../common/model/query'
+import { TableChain } from '@common/model/db'
+import { Query } from '@common/model/query'
+import * as Chain from '@common/analysis/chain'
 
-import * as SurveyManager from '../../../survey/manager/surveyManager'
-import * as NodeDefManager from '../../../nodeDef/manager/nodeDefManager'
-import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
@@ -22,7 +24,7 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) 
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 
 // ==== READ
-export const fetchNodeData = async ({ surveyId, cycle, nodeDefUuid, draft = true }) => {
+export const fetchNodeData = async ({ surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
   const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
     cycle,
@@ -31,11 +33,16 @@ export const fetchNodeData = async ({ surveyId, cycle, nodeDefUuid, draft = true
     includeAnalysis: false,
   })
 
+  const chain = await AnalysisManager.fetchChain({ surveyId, chainUuid })
+  const recordSteps = Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)
+    ? [RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]
+    : null
   const query = Query.create({ entityDefUuid: nodeDefUuid })
 
   return SurveyRdbManager.fetchViewData({
     survey: surveyAndNodeDefs,
     cycle,
+    recordSteps,
     query,
     columnNodeDefs: true,
     includeFileAttributeDefs: false,
