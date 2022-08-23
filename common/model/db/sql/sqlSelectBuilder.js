@@ -52,7 +52,7 @@ class SqlSelectBuilder extends SqlBuilder {
     const parts = [`SELECT ${this._select.join(', ')}`, `FROM ${this._from.join(' ')}`]
 
     if (!A.isEmpty(this._where)) {
-      parts.push(`WHERE ${this._where.join(' ')}`)
+      parts.push(`WHERE ${this._where.join(' AND ')}`)
     }
     if (!A.isEmpty(this._groupBy)) {
       parts.push(`GROUP BY ${this._groupBy.join(', ')}`)

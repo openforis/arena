@@ -23,9 +23,15 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, entityDefUuid } = Request.getParams(req)
+        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchNodeData({ surveyId, cycle, nodeDefUuid: entityDefUuid, draft: false })
+        const data = await AnalysisService.fetchNodeData({
+          surveyId,
+          cycle,
+          chainUuid,
+          nodeDefUuid: entityDefUuid,
+          draft: false,
+        })
         res.json(data)
       } catch (error) {
         next(error)
@@ -44,11 +50,12 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
+        const { surveyId, cycle, chainUuid, attributeDefUuid } = Request.getParams(req)
 
         const data = await AnalysisService.fetchNodeData({
           surveyId,
           cycle,
+          chainUuid,
           nodeDefUuid: attributeDefUuid,
           draft: false,
         })

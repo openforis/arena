@@ -70,15 +70,14 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     ? ['*']
     : [
         `${tableData.columnId} AS ${viewDataNodeDef.columnIdName}`,
-        tableData.columnRecordUuid,
-        tableData.columnRecordCycle,
+        ...(viewDataNodeDef.root
+          ? [tableData.columnRecordUuid, tableData.columnRecordCycle, tableData.columnRecordStep]
+          : [viewDataParent.columnRecordUuid, viewDataParent.columnRecordCycle, viewDataParent.columnRecordStep]),
         tableData.columnDateCreated,
         tableData.columnDateModified,
         _getSelectFieldKeys(viewDataNodeDef),
         ..._getSelectFieldNodeDefs(viewDataNodeDef),
       ]
-
-  const shouldJoinWithParentView = !viewDataNodeDef.virtual && !viewDataNodeDef.root
 
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
@@ -87,7 +86,7 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
       FROM 
         ${tableData.nameAliased}
       ${
-        shouldJoinWithParentView
+        viewDataParent
           ? `LEFT JOIN ${viewDataParent.nameAliased}  
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
           : ''

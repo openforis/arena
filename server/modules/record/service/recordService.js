@@ -47,6 +47,7 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
 }
 
 export const {
+  countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
