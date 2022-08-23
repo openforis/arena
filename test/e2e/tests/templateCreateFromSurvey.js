@@ -6,7 +6,7 @@ export default () =>
   describe('Template Create from Survey', () => {
     createTemplate(templateFromSurvey)
 
-    exportSurvey(templateFromSurvey)
+    exportSurvey(templateFromSurvey, true)
 
     verifySurvey(templateFromSurvey)
 

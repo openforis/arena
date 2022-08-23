@@ -4,7 +4,7 @@ import fs from 'fs'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
-export const exportSurvey = (survey) =>
+export const exportSurvey = (survey, template = false) =>
   test(`Export survey ${survey?.name}`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
@@ -12,7 +12,10 @@ export const exportSurvey = (survey) =>
     const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
     await page.click(exportButtonMenuSelector)
 
-    const exportWithDataButtonSelector = getSelector(TestId.dashboard.surveyExportWithDataBtn, 'button')
+    const exportWithDataButtonSelector = getSelector(
+      template ? TestId.dashboard.surveyExportOnlySurveyBtn : TestId.dashboard.surveyExportWithDataBtn,
+      'button'
+    )
     await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(exportWithDataButtonSelector)])
 
     await page.waitForSelector(TestId.surveyExport.downloadBtn)
