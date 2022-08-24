@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useActions } from './actions'
 
@@ -16,6 +16,7 @@ const initialState = {
   cloneFrom: '',
   template: false,
   validation: {},
+  uploadProgressPercent: -1,
 }
 
 export const useCreateSurvey = ({ template = false } = {}) => {
@@ -40,11 +41,20 @@ export const useCreateSurvey = ({ template = false } = {}) => {
     setNewSurvey(newSurveyUpdated)
   }
 
+  const onUploadProgress = useCallback(
+    (progressPercent) => {
+      const newSurveyUpdated = { ...newSurvey, uploadProgressPercent: progressPercent }
+      setNewSurvey(newSurveyUpdated)
+    },
+    [newSurvey, setNewSurvey]
+  )
+
   return {
     newSurvey,
     onUpdate,
     onCreate,
     onImport,
     onCreateTypeUpdate,
+    onUploadProgress,
   }
 }

@@ -20,6 +20,7 @@ import { Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
+import { ProgressBar } from '@webapp/components'
 
 import { createTypes, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
@@ -31,8 +32,10 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const navigate = useNavigate()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
-  const { createType, name, label, lang, validation, cloneFrom } = newSurvey
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onUploadProgress } = useCreateSurvey({
+    template,
+  })
+  const { createType, name, label, lang, validation, cloneFrom, uploadProgressPercent } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -122,24 +125,32 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          <div className="row">
-            <UploadButton
-              inputFieldId={TestId.surveyCreate.importFromArena}
-              label={i18n.t('homeView.surveyCreate.importFromArena')}
-              accept=".zip"
-              maxSize={1000}
-              onChange={(files) => onImport.Arena({ file: files[0] })}
-            />
-          </div>
-          <div className="row">
-            <UploadButton
-              inputFieldId={TestId.surveyCreate.importFromCollect}
-              label={i18n.t('homeView.surveyCreate.importFromCollect')}
-              accept=".collect,.collect-backup"
-              maxSize={1000}
-              onChange={(files) => onImport.Collect({ file: files[0] })}
-            />
-          </div>
+          {uploadProgressPercent >= 0 ? (
+            <div className="row">
+              <ProgressBar progress={uploadProgressPercent} />
+            </div>
+          ) : (
+            <>
+              <div className="row">
+                <UploadButton
+                  inputFieldId={TestId.surveyCreate.importFromArena}
+                  label={i18n.t('homeView.surveyCreate.importFromArena')}
+                  accept=".zip"
+                  maxSize={1000}
+                  onChange={(files) => onImport.Arena({ file: files[0], onUploadProgress })}
+                />
+              </div>
+              <div className="row">
+                <UploadButton
+                  inputFieldId={TestId.surveyCreate.importFromCollect}
+                  label={i18n.t('homeView.surveyCreate.importFromCollect')}
+                  accept=".collect,.collect-backup"
+                  maxSize={1000}
+                  onChange={(files) => onImport.Collect({ file: files[0], onUploadProgress })}
+                />
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

@@ -21,10 +21,18 @@ export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.co
   const dispatch = useDispatch()
 
   return useCallback(
-    async ({ file }) => {
+    async ({ file, onUploadProgress }) => {
       const formData = objectToFormData({ file, survey: JSON.stringify(newSurvey) })
 
-      const { data } = await axios.post(urlBasedOnSource[source], formData)
+      const { data } = await axios.post(urlBasedOnSource[source], formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+          onUploadProgress(percentCompleted)
+        },
+      })
+
+      onUploadProgress(-1) // reset upload progress (hide progress bar)
+
       const { job, validation } = data
 
       if (job && (!validation || Validation.isValid(validation))) {
