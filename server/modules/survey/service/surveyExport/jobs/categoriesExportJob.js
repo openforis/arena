@@ -14,10 +14,8 @@ export default class CategoriesExportJob extends Job {
 
     // categories.json: list of all categories with levels
     const categoriesPathFile = ExportFile.categories
-    const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId(
-      { surveyId, backup, draft: true },
-      this.tx
-    )
+    const draft = true // always include draft categories
+    const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId({ surveyId, backup, draft }, this.tx)
 
     archive.append(JSON.stringify(categories, null, 2), { name: categoriesPathFile })
 

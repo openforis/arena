@@ -13,7 +13,8 @@ export default class TaxonomiesExportJob extends Job {
     const { archive, backup, surveyId } = this.context
 
     // taxonomies.json: list of all categories with levels
-    const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, backup }, this.tx)
+    const draft = true // always include draft taxonomies
+    const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, backup, draft }, this.tx)
     archive.append(JSON.stringify(taxonomies, null, 2), { name: ExportFile.taxonomies })
 
     this.total = taxonomies.length
