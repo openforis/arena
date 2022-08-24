@@ -24,7 +24,10 @@ export default class CategoriesExportJob extends Job {
     this.total = categoriesUuids.length
 
     await PromiseUtils.each(categoriesUuids, async (categoryUuid) => {
-      const itemsData = await CategoryService.fetchItemsByCategoryUuid({ surveyId, categoryUuid, backup }, this.tx)
+      const itemsData = await CategoryService.fetchItemsByCategoryUuid(
+        { surveyId, categoryUuid, backup, draft },
+        this.tx
+      )
 
       archive.append(JSON.stringify(itemsData, null, 2), {
         name: ExportFile.categoryItems({ categoryUuid }),
