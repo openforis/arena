@@ -106,12 +106,13 @@ export const countRecordsBySurveyId = async (
   )
 }
 
-export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId }, client = db) => {
-  const counts = await client.many(
+export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, client = db) => {
+  const counts = await client.manyOrNone(
     `SELECT step, count(*)
     FROM ${getSurveyDBSchema(surveyId)}.record 
-    WHERE preview = FALSE
-    GROUP BY step`
+    WHERE preview = FALSE AND cycle = $1
+    GROUP BY step`,
+    [cycle]
   )
   return RecordStep.steps.reduce(
     (acc, step) => ({
