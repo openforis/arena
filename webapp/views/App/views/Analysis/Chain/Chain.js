@@ -50,7 +50,7 @@ const ChainComponent = () => {
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
 
-    if (Survey.isPublished(survey)) {
+    if (Survey.isPublished(survey) || Survey.isFromCollect(survey)) {
       dispatch(ChainActions.fetchRecordsCountByStep)
     }
   }, [dispatch, chainUuid, survey])
