@@ -97,18 +97,20 @@ export const deleteRecord = async (user, survey, record) =>
       [ActivityLog.keysContent.keys]: keys,
     }
 
-    // validate uniqueness of records with same keys/unique node values
-    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
-      { survey, record, excludeRecordFromCount: true },
-      t
-    )
-    const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
-    await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
-      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
-        { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
+    if (!R.isEmpty(Record.getNodes(record))) {
+      // validate uniqueness of records with same keys/unique node values
+      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+        { survey, record, excludeRecordFromCount: true },
         t
       )
-    )
+      const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
+      await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
+        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+          { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
+          t
+        )
+      )
+    }
 
     const surveyId = Survey.getId(survey)
     await Promise.all([
