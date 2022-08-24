@@ -64,8 +64,8 @@ export const downloadDataQueryExport = ({ surveyId, entityDefUuid, tempFileName 
 }
 
 // ==== READ
-export const fetchRecordsCountByStep = async ({ surveyId }) => {
-  const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/count/by-step`)
+export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
+  const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/count/by-step`, { params: { cycle } })
   return countsByStep
 }
 
