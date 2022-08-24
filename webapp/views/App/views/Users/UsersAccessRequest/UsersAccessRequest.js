@@ -107,6 +107,7 @@ export const UsersAccessRequest = () => {
             width: '5rem',
           },
         ]}
+        selectable={false}
       />
 
       {currentUserAccessRequest && (

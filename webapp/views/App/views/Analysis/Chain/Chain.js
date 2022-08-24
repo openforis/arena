@@ -50,8 +50,10 @@ const ChainComponent = () => {
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
 
-    dispatch(ChainActions.fetchRecordsCountByStep)
-  }, [chainUuid])
+    if (Survey.isPublished(survey) || Survey.isFromCollect(survey)) {
+      dispatch(ChainActions.fetchRecordsCountByStep)
+    }
+  }, [dispatch, chainUuid, survey])
 
   const locationPathMatcher = useLocationPathMatcher()
   // un unmount, if changing location into node def edit, keep chain store, otherwise reset it
