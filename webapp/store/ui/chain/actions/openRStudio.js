@@ -8,10 +8,12 @@ import * as Survey from '@core/survey/survey'
 import * as DateUtils from '@core/dateUtils'
 
 import { copyToClipboard } from '@webapp/utils/domUtils'
-import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 import { UserState } from '@webapp/store/user'
 import * as API from '@webapp/service/api'
+
+import { ChainState } from '../state'
 
 const _getRStudioParams = async ({ userUuid }) => {
   if (ProcessUtils.ENV.rStudioServerUrl) {
@@ -67,15 +69,35 @@ const isInstanceRunning = async () => {
   return Boolean(currentInstance?.instanceId)
 }
 
+const checkCanOpenRStudio = ({ dispatch, state }) => {
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+
+  if (Survey.isDraft(surveyInfo)) {
+    dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.surveyNotPublished' }))
+    return false
+  }
+
+  if (!ChainState.hasRecordsToProcess(state)) {
+    dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.noRecords' }))
+    return false
+  }
+
+  return true
+}
+
 export const openRStudio =
-  ({ chain, isLocal = false }) =>
+  ({ isLocal = false } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
-    const surveyId = SurveyState.getSurveyId(state)
+
+    if (!checkCanOpenRStudio({ dispatch, state })) return
+
     const surveyInfo = SurveyState.getSurveyInfo(state)
+    const surveyId = SurveyState.getSurveyId(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
     const user = UserState.getUser(state)
     const userUuid = User.getUuid(user)
+    const chain = ChainState.getChain(state)
 
     dispatch(LoaderActions.showLoader())
 

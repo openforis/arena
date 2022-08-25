@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
+import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
+import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
+
+import * as API from '@webapp/service/api'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-
-import * as API from '@webapp/service/api'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -23,6 +25,8 @@ export const ChainBasicProps = (props) => {
   const survey = useSurvey()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
+
+  const recordsCountByStep = useChainRecordsCountByStep()
 
   useEffect(() => {
     const fetchChains = async () => {
@@ -65,6 +69,28 @@ export const ChainBasicProps = (props) => {
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
           onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
           disabled={samplingDesignDisabled}
+        />
+      </FormItem>
+      <FormItem label={i18n.t('chainView.records')}>
+        <div className="records-count-wrapper">
+          {RecordStep.steps.map(({ id, name }, index) => (
+            <div className="records-count" key={id}>
+              {index > 0 && <span>-</span>}
+              <span>
+                {i18n.t('chainView.recordsInStepCount', {
+                  recordsCount: recordsCountByStep[id],
+                  step: i18n.t(`surveyForm.step.${name}`),
+                })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </FormItem>
+      <FormItem label={i18n.t('chainView.submitOnlyAnalysisStepDataIntoR')}>
+        <Checkbox
+          checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
+          validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
+          onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
         />
       </FormItem>
     </>

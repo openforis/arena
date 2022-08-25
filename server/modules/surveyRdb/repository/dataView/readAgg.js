@@ -39,7 +39,7 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
 
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (filterClause) {
-    queryBuilder.where(` AND ${filterClause}`)
+    queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
   }
 

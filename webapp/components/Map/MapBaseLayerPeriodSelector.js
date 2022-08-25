@@ -11,7 +11,7 @@ import * as API from '@webapp/service/api'
 
 import L from 'leaflet'
 
-require('./leaflet-side-by-side')
+require('leaflet-side-by-side')
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
