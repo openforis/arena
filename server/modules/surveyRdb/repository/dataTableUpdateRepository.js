@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
@@ -29,12 +30,13 @@ const _getType = (nodeDef, node) => {
   return null
 }
 
-const _getColumnNames = (nodeDef, type) =>
+const _getColumnNames = ({ nodeDef, type }) =>
   type === types.insert
     ? [
         DataTable.columnNameUuuid,
-        DataTable.columnNameRecordUuuid,
-        DataTable.columnNameRecordCycle,
+        ...(NodeDef.isRoot(nodeDef)
+          ? [DataTable.columnNameRecordUuid, DataTable.columnNameRecordCycle, DataTable.columnNameRecordStep]
+          : []),
         DataTable.columnNameParentUuuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getNames(nodeDef)
@@ -42,12 +44,11 @@ const _getColumnNames = (nodeDef, type) =>
       ]
     : DataCol.getNames(nodeDef)
 
-const _getColValues = ({ survey, cycle, nodeDef, node, ancestorMultipleEntity, type }) =>
+const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) =>
   type === types.insert
     ? [
         Node.getUuid(node),
-        Node.getRecordUuid(node),
-        cycle,
+        ...(NodeDef.isRoot(nodeDef) ? [Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record)] : []),
         Node.getUuid(ancestorMultipleEntity),
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getValues(survey, nodeDef, node)
@@ -66,7 +67,7 @@ const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
 const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
   _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
 
-const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
+const _toUpdates = ({ survey, record, nodeDefs, nodes }) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
   const nodesArray = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
@@ -87,8 +88,8 @@ const _toUpdates = (survey, cycle, nodeDefs, nodes) => {
         type,
         schemaName: SchemaRdb.getName(Survey.getId(survey)),
         tableName: DataTable.getName(nodeDef, ancestorDef),
-        columnNames: _getColumnNames(nodeDef, type),
-        colValues: _getColValues({ survey, cycle, nodeDef, node, ancestorMultipleEntity, type }),
+        columnNames: _getColumnNames({ nodeDef, type }),
+        colValues: _getColValues({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
         rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
       })
     }
@@ -131,7 +132,19 @@ const queryByType = {
   [types.update]: _update,
 }
 
-export const updateTables = async (survey, cycle, nodeDefs, nodes, client) => {
-  const updates = _toUpdates(survey, cycle, nodeDefs, nodes)
+export const updateTables = async ({ survey, record, nodeDefs, nodes }, client) => {
+  const updates = _toUpdates({ survey, record, nodeDefs, nodes })
   await client.batch(updates.map((update) => queryByType[update.type](update, client)))
+}
+
+export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {
+  const tableName = DataTable.getName(tableDef)
+
+  return client.one(
+    `UPDATE ${SchemaRdb.getName(surveyId)}.${tableName}
+    SET ${DataTable.columnNameRecordStep} = $/stepId/
+    WHERE ${DataTable.columnNameRecordUuid} = $/recordUuid/
+    RETURNING uuid`,
+    { recordUuid, stepId }
+  )
 }

@@ -32,6 +32,7 @@ export {
   updateRecordsStep,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
+  fetchRecordsCountByStep,
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
 } from './data'

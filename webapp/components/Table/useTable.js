@@ -6,7 +6,14 @@ import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 import { ArrayUtils } from '@core/arrayUtils'
 
-export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRowClick: onRowClickProp }) => {
+export const useTable = ({
+  keyExtractor,
+  moduleApiUri,
+  module,
+  restParams,
+  onRowClick: onRowClickProp,
+  selectable,
+}) => {
   const [totalCount, setTotalCount] = useState(0)
   const navigate = useNavigate()
   const surveyId = useSurveyId()
@@ -94,14 +101,16 @@ export const useTable = ({ keyExtractor, moduleApiUri, module, restParams, onRow
       if (onRowClickProp) {
         await onRowClickProp(item)
       }
-      const key = keyExtractor({ item })
-      const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
-        item,
-        compareFn: (_item) => keyExtractor({ item: _item }) === key,
-      })
-      setSelectedItems(selectedItemsUpdated)
+      if (selectable) {
+        const key = keyExtractor({ item })
+        const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
+          item,
+          compareFn: (_item) => keyExtractor({ item: _item }) === key,
+        })
+        setSelectedItems(selectedItemsUpdated)
+      }
     },
-    [onRowClickProp, selectedItems]
+    [keyExtractor, onRowClickProp, selectable]
   )
 
   return {

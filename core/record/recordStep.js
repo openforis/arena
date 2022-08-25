@@ -14,7 +14,7 @@ export const stepNames = {
   analysis: 'analysis',
 }
 
-const steps = [
+export const steps = [
   { id: '1', name: stepNames.entry },
   { id: '2', name: stepNames.cleansing },
   { id: '3', name: stepNames.analysis },

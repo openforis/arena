@@ -13,9 +13,10 @@ const columnSet = {
   dateCreated: Table.columnSetCommon.dateCreated,
   dateModified: Table.columnSetCommon.dateModified,
   uuid: Table.columnSetCommon.uuid,
+  parentUuid: 'parent_uuid',
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
-  parentUuid: 'parent_uuid',
+  recordStep: 'record_step',
 }
 
 /**
@@ -47,6 +48,10 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.uuid)
   }
 
+  get columnParentUuid() {
+    return this.getColumn(columnSet.parentUuid)
+  }
+
   get columnRecordUuid() {
     return this.getColumn(columnSet.recordUuid)
   }
@@ -55,8 +60,8 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.recordCycle)
   }
 
-  get columnParentUuid() {
-    return this.getColumn(columnSet.parentUuid)
+  get columnRecordStep() {
+    return this.getColumn(columnSet.recordStep)
   }
 
   get columnNodeDefs() {
@@ -77,9 +82,14 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       `${columnSet.dateCreated}   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
       `${columnSet.dateModified}  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
       `${columnSet.uuid}          uuid        NOT NULL`,
-      `${columnSet.recordUuid}    uuid        NOT NULL`,
-      `${columnSet.recordCycle}   varchar(2)  NOT NULL`,
-      `${columnSet.parentUuid}    uuid            NULL`
+      `${columnSet.parentUuid}    uuid            NULL`,
+      ...(NodeDef.isRoot(this.nodeDef)
+        ? [
+            `${columnSet.recordUuid}    uuid        NOT NULL`,
+            `${columnSet.recordCycle}   varchar(2)  NOT NULL`,
+            `${columnSet.recordStep}    varchar(63) NOT NULL`,
+          ]
+        : [])
     )
     this.columnNodeDefs.forEach((nodeDefColumn) => {
       columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
@@ -95,6 +105,9 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   getConstraintFkRecord() {
+    if (!NodeDef.isRoot(this.nodeDef)) {
+      return null
+    }
     return this._getConstraintFk(new TableRecord(this.surveyId), columnSet.recordUuid)
   }
 
