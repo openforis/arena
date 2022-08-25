@@ -18,6 +18,7 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 
@@ -53,9 +54,11 @@ export const updateRecordStep = async ({ user, surveyId, record, stepId, system 
 
   if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
     const recordUuid = Record.getUuid(record)
+    const rootDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
 
     await Promise.all([
       RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
+      DataTableUpdateRepository.updateRecordStep({ surveyId, recordUuid, stepId, tableDef: rootDef }, client),
       ActivityLogRepository.insert(
         user,
         surveyId,
@@ -94,18 +97,20 @@ export const deleteRecord = async (user, survey, record) =>
       [ActivityLog.keysContent.keys]: keys,
     }
 
-    // validate uniqueness of records with same keys/unique node values
-    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
-      { survey, record, excludeRecordFromCount: true },
-      t
-    )
-    const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
-    await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
-      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
-        { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
+    if (!R.isEmpty(Record.getNodes(record))) {
+      // validate uniqueness of records with same keys/unique node values
+      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+        { survey, record, excludeRecordFromCount: true },
         t
       )
-    )
+      const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
+      await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
+        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+          { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
+          t
+        )
+      )
+    }
 
     const surveyId = Survey.getId(survey)
     await Promise.all([
@@ -288,10 +293,12 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
     }, {})
 
     await DataTableUpdateRepository.updateTables(
-      survey,
-      Record.getCycle(record),
-      nodeDefs,
-      updatedNodesAndDependentsAndAncestors,
+      {
+        survey,
+        record,
+        nodeDefs,
+        nodes: updatedNodesAndDependentsAndAncestors,
+      },
       t
     )
 

@@ -90,20 +90,24 @@ const SurveyInfo = () => {
                     onClick={() => dispatch(SurveyActions.exportSurvey())}
                     label="common.export"
                   />
-                  <ButtonDownload
-                    testId={TestId.dashboard.surveyExportWithDataBtn}
-                    className="btn-transparent"
-                    onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
-                    label="homeView.dashboard.exportWithData"
-                  />
-                  <ButtonDownload
-                    testId={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
-                    className="btn-transparent"
-                    onClick={() =>
-                      dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
-                    }
-                    label="homeView.dashboard.exportWithDataNoActivityLog"
-                  />
+                  {!Survey.isTemplate(surveyInfo) && (
+                    <>
+                      <ButtonDownload
+                        testId={TestId.dashboard.surveyExportWithDataBtn}
+                        className="btn-transparent"
+                        onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
+                        label="homeView.dashboard.exportWithData"
+                      />
+                      <ButtonDownload
+                        testId={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
+                        className="btn-transparent"
+                        onClick={() =>
+                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
+                        }
+                        label="homeView.dashboard.exportWithDataNoActivityLog"
+                      />
+                    </>
+                  )}
                 </>
               }
             />

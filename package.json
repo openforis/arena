@@ -132,6 +132,7 @@
     "jwk-to-pem": "^2.0.4",
     "leaflet": "^1.8.0",
     "leaflet-geometryutil": "^0.10.1",
+    "leaflet-side-by-side": "^2.2.0",
     "leaflet.markercluster": "^1.5.3",
     "lodash": "^4.17.21",
     "log4js": "^6.5.2",
