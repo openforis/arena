@@ -11,7 +11,7 @@ import * as API from '@webapp/service/api'
 
 import L from 'leaflet'
 
-require('./leaflet-side-by-side')
+require('leaflet-side-by-side')
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
@@ -74,7 +74,7 @@ export const MapBaseLayerPeriodSelector = () => {
     }
   }
   const initSideBySide = () => {
-    if (User.isSystemAdmin(user)) return
+    if (!User.isSystemAdmin(user)) return
     const layerLeft = getLayer(true)
     const layerRight = getLayer(false)
     if (layerLeft && layerRight) {
