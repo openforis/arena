@@ -109,7 +109,6 @@ PopupContent.propTypes = {
   attributeDef: PropTypes.any,
   recordUuid: PropTypes.string,
   parentUuid: PropTypes.string,
-  ancestorKeys: PropTypes.any,
   ancestorsKeys: PropTypes.any,
   point: PropTypes.any,
   onRecordEditClick: PropTypes.func
@@ -121,7 +120,6 @@ CoordinateAttributePopUp.propTypes = {
   attributeDef: PropTypes.any,
   recordUuid: PropTypes.string,
   parentUuid: PropTypes.string,
-  ancestorKeys: PropTypes.any,
   ancestorsKeys: PropTypes.any,
   point: PropTypes.any,
   onRecordEditClick: PropTypes.func,
