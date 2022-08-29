@@ -9,6 +9,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
+import * as User from '@core/user/user'
+import { useUser } from '@webapp/store/user'
+
 import { Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ButtonSave } from '@webapp/components'
@@ -18,23 +21,26 @@ import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
 
 import { useSurveyInfoForm } from './store'
+import SamplingPolygonEditor from './SamplingPolygonEditor'
 
 const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
   const readOnly = !useAuthCanEditSurvey()
-
+  const user = useUser()
   const i18n = useI18n()
 
   const {
     name,
     languages,
     srs,
+    samplingPolygon,
     labels,
     descriptions,
     cycles,
     setName,
     setLanguages,
     setSrs,
+    setSamplingPolygon,
     setLabels,
     setDescriptions,
     setCycles,
@@ -101,6 +107,20 @@ const SurveyInfo = () => {
             surveyInfo={surveyInfo}
             validation={getFieldValidation(Survey.infoKeys.cycles)}
           />
+        </div>
+
+        <div className="sampling-polygon-editor form">
+          <div className="form-item">
+            <label className="form-label">{i18n.t('samplingPolygonOptions.samplingPolygon')}</label>
+          </div>
+          {User.isSystemAdmin(user) && (
+            <SamplingPolygonEditor
+              samplingPolygon={samplingPolygon}
+              setSamplingPolygon={setSamplingPolygon}
+              getFieldValidation={getFieldValidation}
+              readOnly={readOnly}
+            />
+          )}
         </div>
 
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}

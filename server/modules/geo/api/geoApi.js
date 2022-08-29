@@ -8,10 +8,10 @@ import { MapUtils } from '@core/map/mapUtils'
 import { PlanetApi } from './planetApi'
 
 const getMapTileForwardUrl = (req) => {
-  const { provider, period, x, y, z } = Request.getParams(req)
+  const { provider, period, x, y, z, proc } = Request.getParams(req)
   const apiKey = MapUtils.mapApiKeyByProvider[provider]
 
-  return MapUtils.getMapTileUrl({ provider, x, y, z, period, apiKey })
+  return MapUtils.getMapTileUrl({ provider, x, y, z, period, apiKey, proc })
 }
 
 export const init = (app) => {
@@ -49,9 +49,9 @@ export const init = (app) => {
         res.json(periods)
         return
       }
-    } catch (error) {}
-
-    // error or provider not supported
-    res.json([])
+    } finally {
+      // error or provider not supported
+      res.json([])
+    }
   })
 }

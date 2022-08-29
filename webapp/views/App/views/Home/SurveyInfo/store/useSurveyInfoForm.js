@@ -27,6 +27,7 @@ export const useSurveyInfoForm = () => {
   const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
+  const setSamplingPolygon = (value) => setObjectField(Survey.infoKeys.samplingPolygon, value)
   const setCycles = (value) => setObjectField(Survey.infoKeys.cycles, value)
 
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
@@ -42,6 +43,7 @@ export const useSurveyInfoForm = () => {
     setName,
     setLanguages,
     setSrs,
+    setSamplingPolygon,
     setLabels,
     setDescriptions,
     setCycles,

@@ -178,6 +178,7 @@ export const TestId = {
     surveyName: 'survey-name',
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',
+    surveySamplingPolygon: 'survey-sampling-polygon',
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
