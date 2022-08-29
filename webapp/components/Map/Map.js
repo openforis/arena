@@ -19,6 +19,8 @@ import { useMap } from './useMap'
 // start of workaround to show leaflet marker icon
 import L from 'leaflet'
 import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
+import { KmlUploader } from './KmlUploader'
+import { ShowZoomLevel } from './ShowZoomLevel'
 
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
@@ -53,7 +55,9 @@ export const Map = (props) => {
             title={markerTitle}
           />
           {showOptions && <MapOptions />}
+          <KmlUploader />
           <MapBaseLayerPeriodSelector />
+          <ShowZoomLevel />
         </MapContainer>
       </MapContextProvider>
 
