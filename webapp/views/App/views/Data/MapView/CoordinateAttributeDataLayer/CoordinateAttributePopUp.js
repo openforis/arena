@@ -68,19 +68,21 @@ export const CoordinateAttributePopUp = (props) => {
 
   const i18n = useI18n()
   const map = useMap()
-
+  
+  const flyTo = (latlng, point) => {
+    map.flyTo([latlng[1], latlng[0]])
+    map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
+  }
   const onClickNext = () => {
     const nextPoint = getNextPoint(parentUuid)
     const latlng = nextPoint.geometry.coordinates
-    map.flyTo([latlng[1], latlng[0]])
-    map.once('zoomend', () => openPopupOfUuid(nextPoint.properties.parentUuid))
+    flyTo(latlng, nextPoint)
   }
 
   const onClickPrevious = () => {
     const previousPoint = getPreviousPoint(parentUuid)
     const latlng = previousPoint.geometry.coordinates
-    map.flyTo([latlng[1], latlng[0]])
-    map.once('zoomend', () => openPopupOfUuid(previousPoint.properties.parentUuid))
+    flyTo(latlng, previousPoint)
   }
 
   point.propTypes = {
