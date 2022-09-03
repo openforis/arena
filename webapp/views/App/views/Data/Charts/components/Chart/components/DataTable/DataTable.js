@@ -122,11 +122,50 @@ export default function EnhancedTable({ data }) {
     setPage(0)
   }
 
+  const downloadFile = ({ data, fileName, fileType }) => {
+    const blob = new Blob([data], { type: fileType })
+
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = window.URL.createObjectURL(blob)
+    const clickEvt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    a.dispatchEvent(clickEvt)
+    a.remove()
+  }
+
+  const downloadCSV = (event) => {
+    event.preventDefault()
+
+    console.log(rows, headers)
+
+    const _headers = headers.map((head) => head.label || head.id).join(',')
+    const _headersIds = headers.map((head) => head.id)
+    const dataCsv = rows.reduce((acc, row) => {
+      const rowData = _headersIds.map((headerId) => row[headerId])
+      acc.push(rowData.join(','))
+      return acc
+    }, [])
+
+    downloadFile({
+      data: [..._headers, ...dataCsv].join('\n'),
+      fileName: 'data.csv',
+      fileType: 'text/csv',
+    })
+  }
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
 
   return (
     <>
+      <button onClick={downloadCSV} label="Download">
+        {' '}
+        Download{' '}
+      </button>
       <TableContainer>
         <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="small">
           <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headers={headers} />
