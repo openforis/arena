@@ -32,9 +32,7 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const navigate = useNavigate()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onUploadProgress } = useCreateSurvey({
-    template,
-  })
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
   const { createType, name, label, lang, validation, cloneFrom, uploadProgressPercent } = newSurvey
 
   // Redirect to dashboard on survey change
@@ -137,7 +135,7 @@ const SurveyCreate = (props) => {
                   label={i18n.t('homeView.surveyCreate.importFromArena')}
                   accept=".zip"
                   maxSize={1000}
-                  onChange={(files) => onImport.Arena({ file: files[0], onUploadProgress })}
+                  onChange={(files) => onImport.Arena({ file: files[0] })}
                 />
               </div>
               <div className="row">
@@ -146,7 +144,7 @@ const SurveyCreate = (props) => {
                   label={i18n.t('homeView.surveyCreate.importFromCollect')}
                   accept=".collect,.collect-backup"
                   maxSize={1000}
-                  onChange={(files) => onImport.Collect({ file: files[0], onUploadProgress })}
+                  onChange={(files) => onImport.Collect({ file: files[0] })}
                 />
               </div>
             </>
