@@ -81,6 +81,7 @@ export const UsersList = () => {
       isRowExpandable={({ item }) => !User.isSystemAdmin(item)}
       rowExpandedComponent={({ item }) => <UserSurveysTable user={item} />}
       headerLeftComponent={TableHeaderLeft}
+      selectable={false}
     />
   )
 }

@@ -31,6 +31,8 @@ const ChainComponent = () => {
   const chain = useChain()
   const survey = useSurvey()
 
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canHaveRecords = Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const validation = Chain.getValidation(chain)
 
@@ -50,8 +52,10 @@ const ChainComponent = () => {
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
 
-    dispatch(ChainActions.fetchRecordsCountByStep)
-  }, [chainUuid])
+    if (canHaveRecords) {
+      dispatch(ChainActions.fetchRecordsCountByStep)
+    }
+  }, [dispatch, chainUuid, canHaveRecords])
 
   const locationPathMatcher = useLocationPathMatcher()
   // un unmount, if changing location into node def edit, keep chain store, otherwise reset it

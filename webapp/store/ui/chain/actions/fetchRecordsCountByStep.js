@@ -10,8 +10,9 @@ export const fetchRecordsCountByStep = async (dispatch, getState) => {
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const recordsCountByStep = await API.fetchRecordsCountByStep({ surveyId })
+  const recordsCountByStep = await API.fetchRecordsCountByStep({ surveyId, cycle })
 
   dispatch({ type: ChainActionTypes.chainRecordsCountUpdate, recordsCountByStep })
 
