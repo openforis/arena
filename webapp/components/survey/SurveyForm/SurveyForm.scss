@@ -2,10 +2,15 @@
 @import './SurveyFormVars';
 @import './react-grid-layout';
 
+.survey-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .survey-form {
-  display: grid;
+  display: flex;
   height: calc(100% - #{$formHeaderHeight});
-  grid-template-columns: 1fr;
 
   &.form-preview {
     border: $orange 8px solid;
@@ -39,17 +44,19 @@
       }
     }
   }
-}
 
-// Survey form grid style
-.survey-form.page-navigation-off {
-  grid-template-columns: 1fr;
+  .split {
+    width: 100%;
+  }
+
+  .survey-form__node-def-page {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 // Survey form edit mode grid style
 .survey-form.edit {
-  grid-template-columns: 1fr 200px;
-
   .react-grid-item {
     border: $formBorderEdit;
 
@@ -64,23 +71,12 @@
   }
 }
 
-.survey-form.edit.page-navigation-off {
-  grid-template-columns: 1fr 200px;
-}
-
-.survey-form.edit.form-actions-off {
-  grid-template-columns: 1fr 0;
-}
-
-.survey-form.edit.form-actions-off.page-navigation-off {
-  grid-template-columns: 1fr 0;
-}
-
 // entity-selector-tree
 .survey-form {
   .survey-form__sidebar {
     height: 100%;
     position: relative;
+    overflow-y: auto;
 
     .entity-selector-tree {
       position: absolute;
