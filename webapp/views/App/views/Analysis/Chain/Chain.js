@@ -99,7 +99,7 @@ const ChainComponent = () => {
             },
           },
         ]}
-        showTabs={Chain.isSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
+        showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
       />
 
       <AnalysisNodeDefs />

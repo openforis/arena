@@ -19,6 +19,7 @@ import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
 import { PValueSelector } from './PValueSelector'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -30,27 +31,34 @@ export const ChainSamplingDesignProps = (props) => {
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hasBaseUnit = Boolean(baseUnitNodeDef)
+  const samplingDesign = Chain.getSamplingDesign(chain)
 
   return (
     <>
-      {(Chain.isSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
+      {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
       {hasBaseUnit && (
         <>
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          {Chain.isStratificationEnabled(chain) && <StratumAttributeSelector />}
-          {Chain.isPostStratificationEnabled(chain) && <PostStratificationAttributeSelector />}
+          {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
+          {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />}
 
           <ClusteringEntitySelector />
 
-          {Chain.getClusteringNodeDefUuid(chain) && (
+          {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
             <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
               <Checkbox
-                checked={Chain.isClusteringOnlyVariances(chain)}
-                validation={Validation.getFieldValidation(Chain.keysProps.clusteringOnlyVariances)(validation)}
+                checked={ChainSamplingDesign.isClusteringOnlyVariances(samplingDesign)}
+                validation={Validation.getFieldValidation(ChainSamplingDesign.keysProps.clusteringOnlyVariances)(
+                  validation
+                )}
                 onChange={(clusteringOnlyVariances) =>
-                  updateChain(Chain.assocClusteringOnlyVariances(clusteringOnlyVariances)(chain))
+                  updateChain(
+                    Chain.updateSamplingDesign(
+                      ChainSamplingDesign.assocClusteringOnlyVariances(clusteringOnlyVariances)
+                    )(chain)
+                  )
                 }
               />
             </FormItem>
@@ -58,9 +66,15 @@ export const ChainSamplingDesignProps = (props) => {
           <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
             <div className="nonResponseBiasCorrectionContainer">
               <Checkbox
-                checked={Chain.isNonResponseBiasCorrection(chain)}
-                validation={Validation.getFieldValidation(Chain.keysProps.nonResponseBiasCorrection)(validation)}
-                onChange={(value) => updateChain(Chain.assocNonResponseBiasCorrection(value)(chain))}
+                checked={ChainSamplingDesign.isNonResponseBiasCorrection(samplingDesign)}
+                validation={Validation.getFieldValidation(ChainSamplingDesign.keysProps.nonResponseBiasCorrection)(
+                  validation
+                )}
+                onChange={(value) =>
+                  updateChain(
+                    Chain.updateSamplingDesign(ChainSamplingDesign.assocNonResponseBiasCorrection(value))(chain)
+                  )
+                }
               />
               <label className="nonResponseBiasCorrectionTip">{i18n.t('chainView.nonResponseBiasCorrectionTip')}</label>
             </div>
@@ -70,7 +84,7 @@ export const ChainSamplingDesignProps = (props) => {
 
       <ReportingDataAttributeDefs chain={chain} updateChain={updateChain} />
 
-      {Chain.getSamplingStrategy(chain) && <PValueSelector />}
+      {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && <PValueSelector />}
     </>
   )
 }
