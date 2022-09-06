@@ -16,6 +16,7 @@ const initialState = {
   cloneFrom: '',
   template: false,
   validation: {},
+  uploadProgressPercent: -1,
 }
 
 export const useCreateSurvey = ({ template = false } = {}) => {
