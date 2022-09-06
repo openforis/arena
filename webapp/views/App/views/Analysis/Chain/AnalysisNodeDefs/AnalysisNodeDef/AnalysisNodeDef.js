@@ -32,7 +32,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
   const warningShown = noData || parentEntityNotInCurrentCycle
 
   const handleSetActive = useCallback(() => {
-    const active = NodeDef.getActive(nodeDef)
+    const active = NodeDef.isActive(nodeDef)
     const newNodeDef = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: !active })(nodeDef)
 
     dispatch(
@@ -78,7 +78,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
       </div>
       <div>
         <InputSwitch
-          checked={!nodeDefDeleted && NodeDef.getActive(nodeDef)}
+          checked={!nodeDefDeleted && NodeDef.isActive(nodeDef)}
           disabled={nodeDefDeleted || NodeDef.isSampling(nodeDef)}
           onChange={handleSetActive}
         />

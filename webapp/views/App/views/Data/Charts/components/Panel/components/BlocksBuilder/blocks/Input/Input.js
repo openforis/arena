@@ -1,29 +1,24 @@
 import React, { useCallback } from 'react'
 
-import Select from 'react-select'
 import './Input.scss'
 
-const InputBlock = ({ dimensions, block, spec, onUpdateSpec }) => {
+const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { title, subtitle, id } = block
 
   const handleChange = useCallback(
-    (dimensionsSelected) => {
-      const [dimension] = dimensionsSelected
-      block.onUpdateSpec({ spec, onUpdateSpec })({ dimension })
+    (e) => {
+      configActions.replaceValue({ blockPath, value: e.target.value })
     },
-    [spec, onUpdateSpec]
+    [blockPath, configActions]
   )
   return (
     <div className="block block-input">
-      <span className="block-input__title">{title}</span>
-      <span className="block-input__subtitle">{subtitle}</span>
-
-      <Select
-        isMulti
-        name={id}
-        options={dimensions}
-        className="basic-multi-select"
-        classNamePrefix="select"
+      <span className="block__title">{title}</span>
+      <span className="block__subtitle">{subtitle}</span>
+      <input
+        id={id}
+        className="basic-input"
+        defaultValue={configItemsByPath?.[blockPath]?.value}
         onChange={handleChange}
       />
     </div>

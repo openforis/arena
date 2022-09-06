@@ -33,6 +33,7 @@ export const keysProps = {
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
   nonResponseBiasCorrection: 'nonResponseBiasCorrection',
   pValue: 'pValue',
+  submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
 }
 
 export const statusExec = {
@@ -80,6 +81,7 @@ export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrateg
 export const getPostStratificationAttributeDefUuid = ObjectUtils.getProp(keysProps.postStratificationAttributeDefUuid)
 export const isNonResponseBiasCorrection = ObjectUtils.isPropTrue(keysProps.nonResponseBiasCorrection)
 export const getPValue = ObjectUtils.getProp(keysProps.pValue, pValueDefault)
+export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
 
 // ====== READ (reporting data)
 export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
@@ -133,6 +135,9 @@ export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
   }
   return chainUpdated
 }
+
+export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
+  ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
 
 // ====== UPDATE (reporting data)
 const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([

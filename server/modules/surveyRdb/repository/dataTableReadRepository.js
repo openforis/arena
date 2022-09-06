@@ -39,7 +39,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
 
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
     ? ''
-    : `AND ${getColEqualCondition(DataTable.columnNameRecordUuuid)}
+    : `AND ${getColEqualCondition(DataTable.columnNameRecordUuid)}
          AND ${getColEqualCondition(DataTable.columnNameParentUuuid)}`
 
   return await client.any(
@@ -47,7 +47,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
-        ON r.uuid = ${aliasA}.${DataTable.columnNameRecordUuuid} 
+        ON r.uuid = ${aliasA}.${DataTable.columnNameRecordUuid} 
     WHERE
       r.cycle = $1 
       AND EXISTS (
@@ -89,7 +89,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
     FROM
       ${table}
     WHERE
-      ${DataTable.columnNameRecordUuuid} = $1
+      ${DataTable.columnNameRecordUuid} = $1
       ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.columnNameUuuid} = $2`}`,
     [recordUuid, nodeUuid],
     (row) => (row ? Object.values(row) : [])

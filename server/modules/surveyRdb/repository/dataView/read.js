@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
+import { Objects } from '@openforis/arena-core'
+
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
@@ -162,6 +164,7 @@ const _dbTransformCallbackSelect =
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
@@ -176,6 +179,7 @@ export const fetchViewData = async (params, client = db) => {
     query,
     columnNodeDefs,
     includeFileAttributeDefs = true,
+    recordSteps,
     offset = null,
     limit = null,
     stream = false,
@@ -203,18 +207,25 @@ export const fetchViewData = async (params, client = db) => {
 
   // WHERE clause
   if (!R.isNil(cycle)) {
-    const whereConditions = [`${viewDataNodeDef.columnRecordCycle} = $/cycle/`]
-    if (Query.getFilterRecordUuid(query)) {
-      whereConditions.push(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
+    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+    queryBuilder.addParams({ cycle })
+
+    const recordUuid = Query.getFilterRecordUuid(query)
+    if (recordUuid) {
+      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
+      queryBuilder.addParams({ recordUuid })
     }
-    queryBuilder.where(whereConditions.join(' AND '))
-    queryBuilder.addParams({ cycle, recordUuid: Query.getFilterRecordUuid(query) })
+  }
+
+  if (!Objects.isEmpty(recordSteps)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordStep} IN ($/recordSteps:csv/)`)
+    queryBuilder.addParams({ recordSteps })
   }
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (!R.isNil(filterClause)) {
-    queryBuilder.where(`AND ${filterClause}`)
+    queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
   }
 
@@ -275,7 +286,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
   const recordNotEqualCondition = Expression.newBinary({
-    left: Expression.newIdentifier(DataTable.columnNameRecordUuuid),
+    left: Expression.newIdentifier(DataTable.columnNameRecordUuid),
     right: Expression.newLiteral(Record.getUuid(record)),
     operator: Expression.operators.comparison.notEq.value,
   })
@@ -353,12 +364,12 @@ export const fetchRecordsCountByRootNodesValue = async (
         ${rootTable}
       WHERE 
         ${DataTable.columnNameRecordCycle} = $2
-        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)` : ''} 
+        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuid} NOT IN ($1:csv)` : ''} 
       GROUP BY 
         ${filterColumnsString}
     )
     SELECT
-      ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
+      ${rootTableAlias}.${DataTable.columnNameRecordUuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
@@ -369,8 +380,8 @@ export const fetchRecordsCountByRootNodesValue = async (
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $2
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.columnNameRecordUuuid} NOT IN ($1:csv)
-    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuuid}, cr.count
+      AND ${rootTableAlias}.${DataTable.columnNameRecordUuid} NOT IN ($1:csv)
+    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuid}, cr.count
   `,
     [recordUuidsExcluded, cycle],
     camelize

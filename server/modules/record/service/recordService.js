@@ -25,9 +25,14 @@ import { messageTypes as RecordThreadMessageTypes } from './update/thread/record
 const Logger = Log.getLogger('RecordService')
 
 /**
- * ======
+ * ======.
  * RECORD
- * ======
+ * ======.
+ *
+ * @param socketId
+ * @param user
+ * @param surveyId
+ * @param recordToCreate
  */
 export const createRecord = async (socketId, user, surveyId, recordToCreate) => {
   Logger.debug('create record: ', recordToCreate)
@@ -42,12 +47,12 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
 }
 
 export const {
+  countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchRecordSummaryByRecordUuid,
   fetchRecordCreatedCountsByDates,
   updateRecordsStep,
 } = RecordManager
@@ -150,9 +155,15 @@ export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityD
 }
 
 /**
- * ======
+ * ======.
  * NODE
- * ======
+ * ======.
+ *
+ * @param socketId
+ * @param user
+ * @param surveyId
+ * @param recordUuid
+ * @param msg
  */
 const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
   RecordServiceThreads.assocSocket(recordUuid, socketId)

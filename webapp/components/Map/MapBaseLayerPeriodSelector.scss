@@ -2,14 +2,22 @@
 
 .map-layer-selector-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   pointer-events: all;
   margin-left: 2rem;
-  width: 80%;
+  left: 20%;
+  width: 60%;
 
-  .period-select-wrapper {
+  .period-select-wrapper-left {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: rgba($white, 0.4);
+  }
+  .period-select-wrapper-right {
     display: flex;
     align-items: center;
     column-gap: 0.5rem;

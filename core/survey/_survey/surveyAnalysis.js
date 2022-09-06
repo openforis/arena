@@ -37,7 +37,7 @@ export const getAnalysisNodeDefs =
 
       if (!showSamplingNodeDefs && NodeDef.isSampling(nodeDef)) return false
 
-      if (hideAreaBasedEstimate && NodeDef.getAreaBasedEstimatedOf(nodeDef)) return false
+      if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) return false
 
       // show base unit nodeDefs with nodeDef analysis siblings
       if (
@@ -56,23 +56,19 @@ export const getAnalysisNodeDefs =
         if (!hasAnalysisSiblings) return false
       }
 
-      if (hideAreaBasedEstimate && NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
-        return false
-      }
-
-      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+      if (!showInactiveResultVariables && !NodeDef.isActive(nodeDef)) {
         return false
       }
 
       if (
         NodeDef.isAreaBasedEstimatedOf(nodeDef) &&
         !showInactiveResultVariables &&
-        !NodeDef.getActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
+        !NodeDef.isActive(Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey))
       ) {
         return false
       }
 
-      if (!showInactiveResultVariables && !NodeDef.getActive(nodeDef)) {
+      if (!showInactiveResultVariables && !NodeDef.isActive(nodeDef)) {
         return false
       }
 

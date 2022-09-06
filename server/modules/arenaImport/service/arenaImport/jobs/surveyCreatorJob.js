@@ -26,7 +26,7 @@ export default class SurveyCreatorJob extends Job {
     surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
 
     // skip collect report
-    const { collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
+    const { collectUri, collectNodeDefsInfoByPath, collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
 
     const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
     const surveyTargetName = Survey.getName(surveyInfoTarget)
@@ -42,9 +42,11 @@ export default class SurveyCreatorJob extends Job {
       (await ArenaSurveyFileZip.hasRecords(arenaSurveyFileZip)) && Survey.isPublished(surveyInfoArenaSurvey)
     const draft = !published
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
+    const collectProps = collectUri && !template ? { collectUri, collectNodeDefsInfoByPath } : {}
 
     const newSurveyInfo = Survey.newSurvey({
       ...propsToImport,
+      ...collectProps,
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.published]: published,

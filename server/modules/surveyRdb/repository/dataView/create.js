@@ -13,14 +13,12 @@ const _getMultipleAttributeInnerSelect = ({ viewDataNodeDef, columnNodeDef }) =>
   const { survey, tableData } = viewDataNodeDef
 
   const multAttrDef = columnNodeDef.nodeDef
-  const multAttrDataNodeDef = new TableDataNodeDef(survey, multAttrDef)
   const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
   const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
 
-  return `SELECT json_agg(${multAttrDataNodeDef.alias}.${nodeDefName}) 
+  return `SELECT json_agg(${multAttrDataTable.alias}.${nodeDefName}) 
           FROM ${multAttrDataTable.nameAliased}
-          WHERE ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid}
-            AND ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+          WHERE ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
@@ -30,11 +28,13 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
       if (!NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
         return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
-    } else if (
-      NodeDef.isMultipleAttribute(columnNodeDef.nodeDef) &&
-      _canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)
-    ) {
-      return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+    } else if (NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
+      if (_canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)) {
+        return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+      } else {
+        // skip multiple attributes that cannot be aggregated into a single column yet
+        return []
+      }
     }
     return columnNodeDef.namesFull
   })
@@ -68,15 +68,14 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     ? ['*']
     : [
         `${tableData.columnId} AS ${viewDataNodeDef.columnIdName}`,
-        tableData.columnRecordUuid,
-        tableData.columnRecordCycle,
+        ...(viewDataNodeDef.root
+          ? [tableData.columnRecordUuid, tableData.columnRecordCycle, tableData.columnRecordStep]
+          : [viewDataParent.columnRecordUuid, viewDataParent.columnRecordCycle, viewDataParent.columnRecordStep]),
         tableData.columnDateCreated,
         tableData.columnDateModified,
         _getSelectFieldKeys(viewDataNodeDef),
         ..._getSelectFieldNodeDefs(viewDataNodeDef),
       ]
-
-  const shouldJoinWithParentView = !viewDataNodeDef.virtual && !viewDataNodeDef.root
 
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
@@ -85,7 +84,7 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
       FROM 
         ${tableData.nameAliased}
       ${
-        shouldJoinWithParentView
+        viewDataParent
           ? `LEFT JOIN ${viewDataParent.nameAliased}  
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
           : ''

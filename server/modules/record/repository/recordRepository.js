@@ -8,6 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -102,6 +103,23 @@ export const countRecordsBySurveyId = async (
         WHERE preview = FALSE AND cycle = $1
       `,
     [cycle]
+  )
+}
+
+export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, client = db) => {
+  const counts = await client.manyOrNone(
+    `SELECT step, count(*)
+    FROM ${getSurveyDBSchema(surveyId)}.record 
+    WHERE preview = FALSE AND cycle = $1
+    GROUP BY step`,
+    [cycle]
+  )
+  return RecordStep.steps.reduce(
+    (acc, step) => ({
+      ...acc,
+      [step.id]: counts.find((count) => count.step === step.id)?.count || 0,
+    }),
+    {}
   )
 }
 

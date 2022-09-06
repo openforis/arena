@@ -130,7 +130,7 @@ export const TestId = {
   records: {
     addBtn: 'record-add-btn',
     cellNodeDef: (name) => `${name}-cell`,
-    records: 'records',
+    tableModule: 'records/summary',
   },
   recordsImport: {
     importDataBtn: 'records-import-data-btn',
@@ -179,6 +179,7 @@ export const TestId = {
     surveyName: 'survey-name',
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',
+    surveySamplingPolygon: 'survey-sampling-polygon',
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,

@@ -51,18 +51,29 @@ const NodeDefCoordinate = (props) => {
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
-  const handleValueChange = (newValue) => {
-    // adjust value:
-    // - if x and y are blank, consider store value as null
-    // - if single srs, set it into value
-    let valueAdjusted = { ...newValue }
-    if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
-      valueAdjusted = null
-    } else if (singleSrs) {
-      valueAdjusted[Node.valuePropsCoordinate.srs] = selectedSrs.code
-    }
-    updateNode(nodeDef, node, valueAdjusted)
-  }
+  const adjustValue = useCallback(
+    (newValue) => {
+      if (StringUtils.isBlank(newValue.x) && StringUtils.isBlank(newValue.y) && (singleSrs || newValue.srs === null)) {
+        // if x and y are blank, consider store value as null
+        return null
+      } else if (singleSrs) {
+        // if single srs, set it into value
+        const valueAdjusted = { ...newValue }
+        valueAdjusted[Node.valuePropsCoordinate.srs] = selectedSrs.code
+        return valueAdjusted
+      }
+      return newValue
+    },
+    [selectedSrs.code, singleSrs]
+  )
+
+  const handleValueChange = useCallback(
+    (newValue) => {
+      const valueAdjusted = adjustValue(newValue)
+      updateNode(nodeDef, node, valueAdjusted)
+    },
+    [nodeDef, node, adjustValue, updateNode]
+  )
 
   const handleInputChange = (field, value) => {
     if (entryDisabled) {
@@ -79,10 +90,13 @@ const NodeDefCoordinate = (props) => {
     handleValueChange({ ...Node.getValue(node), [field]: fieldValue })
   }
 
-  const handleLocationOnMapChanged = useCallback((markerPointUpdated) => {
-    handleValueChange(markerPointUpdated)
-    setShowMap(false)
-  }, [])
+  const handleLocationOnMapChanged = useCallback(
+    (markerPointUpdated) => {
+      handleValueChange(markerPointUpdated)
+      setShowMap(false)
+    },
+    [handleValueChange]
+  )
 
   const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
 

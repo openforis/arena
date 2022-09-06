@@ -111,11 +111,22 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/records/count/by-step', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+
+      const countsByStep = await RecordService.countRecordsBySurveyIdGroupedByStep({ surveyId, cycle })
+      res.json(countsByStep)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/record', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
 
-      const record = await RecordService.fetchRecordSummaryByRecordUuid({ surveyId, cycle, recordUuid })
+      const record = await RecordService.fetchRecordAndNodesByUuid({ surveyId, cycle, recordUuid })
       res.json(record)
     } catch (error) {
       next(error)
@@ -123,6 +134,17 @@ export const init = (app) => {
   })
 
   app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle(surveyId)
+      res.json(recordsSummary)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/records/summary', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
 
@@ -141,13 +163,24 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/records/dashboard/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, from, to } = Request.getParams(req)
 
       const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
 
       res.json(counts)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, search } = Request.getParams(req)
+
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
+      res.json(count)
     } catch (error) {
       next(error)
     }
@@ -195,16 +228,20 @@ export const init = (app) => {
   })
 
   app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
-    const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
+    try {
+      const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
 
-    setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
+      setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
 
-    await DataImportTemplateService.writeDataImportTemplateToStream({
-      surveyId,
-      cycle,
-      entityDefUuid,
-      outputStream: res,
-    })
+      await DataImportTemplateService.writeDataImportTemplateToStream({
+        surveyId,
+        cycle,
+        entityDefUuid,
+        outputStream: res,
+      })
+    } catch (error) {
+      next(error)
+    }
   })
 
   // ==== UPDATE

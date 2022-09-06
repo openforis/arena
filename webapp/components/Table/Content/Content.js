@@ -128,12 +128,15 @@ Content.propTypes = {
   noItemsLabelForSearchKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
+  onRowDoubleClick: PropTypes.func,
   initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
   rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
+  selectedItems: PropTypes.array,
   sort: PropTypes.object.isRequired,
+  totalCount: PropTypes.number,
 }
 
 Content.defaultProps = {
@@ -141,10 +144,13 @@ Content.defaultProps = {
   expandableRows: false,
   isRowActive: null,
   onRowClick: null,
+  onRowDoubleClick: null,
   initData: null,
   loading: false,
   rowExpandedComponent: null,
   rowProps: {},
+  selectedItems: [],
+  totalCount: undefined,
 }
 
 export default Content

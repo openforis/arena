@@ -118,7 +118,7 @@ export const keysPropsAdvanced = {
 
   isBaseUnit: 'isBaseUnit',
   isSampling: 'isSampling',
-  areaBasedEstimatedOf: 'areaBasedEstimatedOf',
+  areaBasedEstimatedOf: 'areaBasedEstimatedOf', // uuid of arena based estimated node def
 }
 
 const metaKeys = {
@@ -288,7 +288,7 @@ export const getChainUuid = getPropOrDraftAdvanced(keysPropsAdvanced.chainUuid, 
 
 export const getChainIndex = getPropOrDraftAdvanced(keysPropsAdvanced.index, 0)
 
-export const getActive = getPropAdvanced(keysPropsAdvanced.active, false)
+export const isActive = getPropAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
@@ -301,7 +301,7 @@ export const isReadOnlyOrAnalysis = (nodeDef) => isReadOnly(nodeDef) || isAnalys
 
 export const isBaseUnit = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isBaseUnit, false)(nodeDef))
 export const isSampling = (nodeDef) => Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.isSampling, false)(nodeDef))
-export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, false)
+export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, null)
 export const isAreaBasedEstimatedOf = (nodeDef) => Boolean(getAreaBasedEstimatedOf(nodeDef))
 
 // ==== CREATE
