@@ -2,9 +2,13 @@ import './CoordinateAttributePopUp.scss'
 
 import React from 'react'
 import { Popup } from 'react-leaflet'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+
+import { useI18n } from '@webapp/store/system'
+import { useMap } from 'react-leaflet'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -60,7 +64,32 @@ const PopupContent = (props) => {
 }
 
 export const CoordinateAttributePopUp = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
+  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick, getNextPoint, getPreviousPoint, openPopupOfUuid } = props
+
+  const i18n = useI18n()
+  const map = useMap()
+  
+  const flyTo = (latlng, point) => {
+    map.flyTo([latlng[1], latlng[0]])
+    map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
+  }
+  const onClickNext = () => {
+    const nextPoint = getNextPoint(parentUuid)
+    const latlng = nextPoint.geometry.coordinates
+    flyTo(latlng, nextPoint)
+  }
+
+  const onClickPrevious = () => {
+    const previousPoint = getPreviousPoint(parentUuid)
+    const latlng = previousPoint.geometry.coordinates
+    flyTo(latlng, previousPoint)
+  }
+
+  point.propTypes = {
+    x: PropTypes.number,
+    y: PropTypes.number,
+    srs: PropTypes.number
+  }
 
   return (
     <Popup>
@@ -72,6 +101,31 @@ export const CoordinateAttributePopUp = (props) => {
         point={point}
         onRecordEditClick={onRecordEditClick}
       />
+      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
+      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
     </Popup>
   )
+}
+
+PopupContent.propTypes = {
+  attributeDef: PropTypes.any,
+  recordUuid: PropTypes.string,
+  parentUuid: PropTypes.string,
+  ancestorsKeys: PropTypes.any,
+  point: PropTypes.any,
+  onRecordEditClick: PropTypes.func
+}
+
+
+
+CoordinateAttributePopUp.propTypes = {
+  attributeDef: PropTypes.any,
+  recordUuid: PropTypes.string,
+  parentUuid: PropTypes.string,
+  ancestorsKeys: PropTypes.any,
+  point: PropTypes.any,
+  onRecordEditClick: PropTypes.func,
+  getNextPoint: PropTypes.func,
+  getPreviousPoint: PropTypes.func,
+  openPopupOfUuid: PropTypes.func
 }
