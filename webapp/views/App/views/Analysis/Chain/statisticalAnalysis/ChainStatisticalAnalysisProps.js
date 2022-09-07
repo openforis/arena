@@ -47,7 +47,7 @@ export const ChainStatisticalAnalysisProps = () => {
   )
 
   return (
-    <>
+    <div className="statistical-analysis">
       <FormItem label={i18n.t('common.entity')}>
         <EntitySelector
           hierarchy={Survey.getHierarchy((nodeDef) => {
@@ -78,6 +78,7 @@ export const ChainStatisticalAnalysisProps = () => {
           nodeDefUuidsAttributes={dimensionUuids}
           onToggleAttribute={onToggleAttribute}
           filterChainUuids={[Chain.getUuid(chain)]}
+          filterFunction={(nodeDef) => NodeDef.isAnalysis(nodeDef)}
           filterTypes={[NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]}
           showAnalysisAttributes
           showAncestors
@@ -86,6 +87,6 @@ export const ChainStatisticalAnalysisProps = () => {
           nodeDefLabelType={NodeDef.NodeDefLabelTypes.name}
         />
       </FormItem>
-    </>
+    </div>
   )
 }

@@ -1,13 +1,19 @@
-.entity-selector,
-.attributes-selector {
-  width: 20rem;
-}
+.statistical-analysis {
+  display: flex;
+  flex-direction: column;
 
-.attributes-selector {
-  max-height: 10rem;
-  overflow-y: auto;
+  .entity-selector,
+  .attributes-selector {
+    width: 30rem;
+  }
 
-  .attribute-selector {
-    width: 100%;
+  .attributes-selector {
+    max-height: 10rem;
+    overflow-y: auto;
+
+    .attribute-selector {
+      width: 100%;
+      margin: 0;
+    }
   }
 }
