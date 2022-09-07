@@ -3,6 +3,7 @@ import React, { useCallback } from 'react'
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
@@ -33,7 +34,19 @@ export const ChainStatisticalAnalysisProps = () => {
     <>
       <FormItem label={i18n.t('chainView.statisticalAnalysis.entity')}>
         <EntitySelector
-          hierarchy={Survey.getHierarchy()(survey)}
+          hierarchy={Survey.getHierarchy((nodeDef) => {
+            if (NodeDef.isEntity(nodeDef)) {
+              const childDefs = Survey.getNodeDefChildren(nodeDef, true)(survey)
+
+              return childDefs.some(
+                (childDef) =>
+                  NodeDef.getChainUuid(childDef) === Chain.getUuid(chain) &&
+                  NodeDef.isActive(childDef) &&
+                  NodeDef.hasAreaBasedEstimated(childDef)
+              )
+            }
+            return false
+          })(survey)}
           nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityUuid(chainStatisticalAnalysis)}
           onChange={onEntityChange}
           showSingleEntities={false}
