@@ -1,0 +1,13 @@
+.entity-selector,
+.attributes-selector {
+  width: 20rem;
+}
+
+.attributes-selector {
+  max-height: 10rem;
+  overflow-y: auto;
+
+  .attribute-selector {
+    width: 100%;
+  }
+}

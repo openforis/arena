@@ -23,7 +23,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
-import { ChainStatisticalAnalysisProps } from './ChainStatisticalAnalysisProps'
+import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()

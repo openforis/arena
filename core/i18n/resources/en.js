@@ -769,7 +769,6 @@ $t(common.cantUndoWarning)`,
     },
     statisticalAnalysis: {
       header: 'Statistical analysis',
-      entity: 'Select entity',
     },
     stratumAttribute: 'Stratum attribute',
     postStratificationAttribute: 'Post stratification attribute',
