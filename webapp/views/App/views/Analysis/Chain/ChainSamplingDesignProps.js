@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import * as Chain from '@common/analysis/chain'
-import * as Survey from '@core/survey/survey'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
@@ -19,7 +20,6 @@ import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
 import { PValueSelector } from './PValueSelector'
-import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props

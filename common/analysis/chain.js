@@ -24,6 +24,7 @@ export const keysProps = {
   samplingDesign: 'samplingDesign',
   analysisNodeDefs: 'analysisNodeDefs',
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
+  statisticalAnalysis: 'statisticalAnalysis',
 }
 
 export const statusExec = {
@@ -53,18 +54,28 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDesign)
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
+export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 
 // ====== UPDATE
 export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
-const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 
 export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
+
+const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 
 export const updateSamplingDesign = (updateFn) => (chain) => {
   const samplingDesign = getSamplingDesign(chain)
   const samplingDesignUpdated = updateFn(samplingDesign)
   return assocSamplingDesign(samplingDesignUpdated)(chain)
+}
+
+const assocStatisticalAnalysis = (value) => ObjectUtils.setProp(keysProps.statisticalAnalysis, value)
+
+export const updateStatisticalAnalysis = (updateFn) => (chain) => {
+  const statisticalAnalysis = getStatisticalAnalysis(chain)
+  const getStatisticalAnalysisUpdated = updateFn(statisticalAnalysis)
+  return assocStatisticalAnalysis(getStatisticalAnalysisUpdated)(chain)
 }
 
 // ====== CHECK
