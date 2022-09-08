@@ -769,6 +769,11 @@ $t(common.cantUndoWarning)`,
     },
     statisticalAnalysis: {
       header: 'Statistical analysis',
+      reportingMethod: 'Reporting method',
+      reportingMethods: {
+        dimensionsCombined: 'Combination of dimensions',
+        dimensionsSeparate: 'Dimensions separately',
+      },
     },
     stratumAttribute: 'Stratum attribute',
     postStratificationAttribute: 'Post stratification attribute',

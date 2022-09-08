@@ -14,6 +14,7 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { FormItem } from '@webapp/components/form/Input'
 import { AttributesSelector, EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { ArrayUtils } from '@core/arrayUtils'
+import { Dropdown } from '@webapp/components/form'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
@@ -25,25 +26,42 @@ export const ChainStatisticalAnalysisProps = () => {
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
   const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
 
-  const onEntityChange = useCallback(
-    (entityDefUuid) => {
-      const chainUpdated = Chain.updateStatisticalAnalysis(ChainStatisticalAnalysis.assocEntityDefUuid(entityDefUuid))(
-        chain
-      )
+  const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
+    key,
+    value: i18n.t(`chainView.statisticalAnalysis.reportingMethods.${name}`),
+  }))
+  const selectedReportingMethodItem = reportingMethodItems.find(
+    (item) => item.key === ChainStatisticalAnalysis.getReportingMethod(chainStatisticalAnalysis)
+  )
+
+  const updateStatisticalAnalysis = useCallback(
+    (updateFn) => {
+      const chainUpdated = Chain.updateStatisticalAnalysis(updateFn)(chain)
       dispatch(ChainActions.updateChain({ chain: chainUpdated }))
     },
     [chain, dispatch]
   )
 
-  const onToggleAttribute = useCallback(
+  const onEntityChange = useCallback(
+    (entityDefUuid) => {
+      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocEntityDefUuid(entityDefUuid))
+    },
+    [updateStatisticalAnalysis]
+  )
+
+  const onDimensionToggle = useCallback(
     (attributeUuid) => {
       const dimensionUuidsUpdated = ArrayUtils.addOrRemoveItem({ item: attributeUuid })(dimensionUuids)
-      const chainUpdated = Chain.updateStatisticalAnalysis(
-        ChainStatisticalAnalysis.assocDimensionUuids(dimensionUuidsUpdated)
-      )(chain)
-      dispatch(ChainActions.updateChain({ chain: chainUpdated }))
+      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocDimensionUuids(dimensionUuidsUpdated))
     },
-    [chain, dimensionUuids, dispatch]
+    [dimensionUuids, updateStatisticalAnalysis]
+  )
+
+  const onReportingMethodChange = useCallback(
+    (reportingMethod) => {
+      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingMethod(reportingMethod?.key))
+    },
+    [updateStatisticalAnalysis]
   )
 
   return (
@@ -76,7 +94,7 @@ export const ChainStatisticalAnalysisProps = () => {
           lang={lang}
           nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
           nodeDefUuidsAttributes={dimensionUuids}
-          onToggleAttribute={onToggleAttribute}
+          onToggleAttribute={onDimensionToggle}
           filterChainUuids={[Chain.getUuid(chain)]}
           filterFunction={(nodeDef) => NodeDef.isAnalysis(nodeDef)}
           filterTypes={[NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]}
@@ -85,6 +103,15 @@ export const ChainStatisticalAnalysisProps = () => {
           showMultipleAttributes={false}
           showSiblingsInSingleEntities={true}
           nodeDefLabelType={NodeDef.NodeDefLabelTypes.name}
+        />
+      </FormItem>
+
+      <FormItem label={i18n.t('chainView.statisticalAnalysis.reportingMethod')}>
+        <Dropdown
+          className="reporting-method"
+          items={reportingMethodItems}
+          onChange={onReportingMethodChange}
+          selection={selectedReportingMethodItem}
         />
       </FormItem>
     </div>

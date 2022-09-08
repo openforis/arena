@@ -1,9 +1,11 @@
 .statistical-analysis {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 
   .entity-selector,
-  .attributes-selector {
+  .attributes-selector,
+  .reporting-method {
     width: 30rem;
   }
 
