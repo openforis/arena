@@ -61,8 +61,8 @@ export const ChainStatisticalAnalysisProps = () => {
     [dimensionUuids, updateStatisticalAnalysis]
   )
 
-  const onFilteringChange = useCallback(
-    (filtering) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocFiltering(filtering)),
+  const onFilterChange = useCallback(
+    (filter) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocFilter(filter)),
     [updateStatisticalAnalysis]
   )
 
@@ -114,12 +114,12 @@ export const ChainStatisticalAnalysisProps = () => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('chainView.statisticalAnalysis.filtering')}>
+      <FormItem label={i18n.t('chainView.statisticalAnalysis.filter')}>
         <Input
-          className="filtering"
+          className="filter"
           inputType="textarea"
-          onChange={onFilteringChange}
-          value={ChainStatisticalAnalysis.getFiltering(chainStatisticalAnalysis)}
+          onChange={onFilterChange}
+          value={ChainStatisticalAnalysis.getFilter(chainStatisticalAnalysis)}
         />
       </FormItem>
 

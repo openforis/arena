@@ -11,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as ChainManager from '../manager'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -126,6 +127,21 @@ const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) 
   }
 }
 
+const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
+  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return null
+
+  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
+  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
+
+  return {
+    entity: NodeDef.getName(entity),
+    dimensions: dimensions.map(NodeDef.getName),
+    filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
+    reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+  }
+}
+
 const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
@@ -156,6 +172,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   })(survey)
 
   const reportingCategorySummary = await generateReportingDataCategorySummary({ survey, chain, lang })
+  const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
   return {
     label: Chain.getLabel(lang, defaultLang)(chain),
@@ -192,6 +209,11 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(reportingCategorySummary
       ? {
           reportingCategory: reportingCategorySummary,
+        }
+      : {}),
+    ...(statisticalAnalysisSummary
+      ? {
+          analysis: statisticalAnalysisSummary,
         }
       : {}),
   }

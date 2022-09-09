@@ -769,7 +769,7 @@ $t(common.cantUndoWarning)`,
     },
     statisticalAnalysis: {
       header: 'Statistical analysis',
-      filtering: 'Filtering',
+      filter: 'Filter',
       reportingMethod: 'Reporting method',
       reportingMethods: {
         dimensionsCombined: 'Combination of dimensions',
