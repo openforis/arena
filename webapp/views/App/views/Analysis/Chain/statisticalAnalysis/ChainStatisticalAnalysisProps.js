@@ -5,17 +5,17 @@ import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { ArrayUtils } from '@core/arrayUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { debounceAction } from '@webapp/utils/reduxUtils'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ButtonGroup } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { AttributesSelector, EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { ArrayUtils } from '@core/arrayUtils'
-import { Dropdown } from '@webapp/components/form'
-import { debounceAction } from '@webapp/utils/reduxUtils'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
@@ -31,11 +31,8 @@ export const ChainStatisticalAnalysisProps = () => {
 
   const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
     key,
-    value: i18n.t(`chainView.statisticalAnalysis.reportingMethods.${name}`),
+    label: i18n.t(`chainView.statisticalAnalysis.reportingMethods.${name}`),
   }))
-  const selectedReportingMethodItem = reportingMethodItems.find(
-    (item) => item.key === ChainStatisticalAnalysis.getReportingMethod(chainStatisticalAnalysis)
-  )
 
   const updateStatisticalAnalysis = useCallback(
     (updateFn) => {
@@ -71,7 +68,7 @@ export const ChainStatisticalAnalysisProps = () => {
 
   const onReportingMethodChange = useCallback(
     (reportingMethod) => {
-      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingMethod(reportingMethod?.key))
+      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingMethod(reportingMethod))
     },
     [updateStatisticalAnalysis]
   )
@@ -120,17 +117,17 @@ export const ChainStatisticalAnalysisProps = () => {
       <FormItem label={i18n.t('chainView.statisticalAnalysis.filtering')}>
         <Input
           className="filtering"
+          inputType="textarea"
           onChange={onFilteringChange}
           value={ChainStatisticalAnalysis.getFiltering(chainStatisticalAnalysis)}
         />
       </FormItem>
 
       <FormItem label={i18n.t('chainView.statisticalAnalysis.reportingMethod')}>
-        <Dropdown
-          className="reporting-method"
-          items={reportingMethodItems}
+        <ButtonGroup
+          selectedItemKey={ChainStatisticalAnalysis.getReportingMethod(chainStatisticalAnalysis)}
           onChange={onReportingMethodChange}
-          selection={selectedReportingMethodItem}
+          items={reportingMethodItems}
         />
       </FormItem>
     </div>

@@ -4,8 +4,7 @@
   gap: 1rem;
 
   .entity-selector,
-  .attributes-selector,
-  .reporting-method {
+  .attributes-selector {
     width: 30rem;
   }
 
@@ -22,5 +21,9 @@
     .expansion-panel {
       padding-right: 1rem;
     }
+  }
+
+  .filtering {
+    width: 60rem;
   }
 }
