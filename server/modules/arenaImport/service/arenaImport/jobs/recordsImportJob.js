@@ -70,6 +70,12 @@ export default class RecordsImportJob extends Job {
       }
 
       const recordToStore = this.prepareRecordToStore(record)
+
+      const existingRecord = await RecordManager.fetchRecordByUuid(surveyId, recordUuid, this.tx)
+      if (existingRecord) {
+        // delete existing record before import, if any
+        await RecordManager.deleteRecord(this.user, survey, existingRecord, this.tx)
+      }
       await RecordManager.insertRecord(this.user, surveyId, recordToStore, true, this.tx)
 
       // insert nodes (add them to batch persister)

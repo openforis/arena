@@ -31,6 +31,8 @@ const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate(
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
   (record) => {
+    if (!record) return null
+
     const validation = Record.getValidation(record)
     return R.pipe(
       R.dissoc(Validation.keys.validation),
