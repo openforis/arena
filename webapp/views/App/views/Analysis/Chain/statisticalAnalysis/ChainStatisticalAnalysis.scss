@@ -10,12 +10,17 @@
   }
 
   .attributes-selector {
-    max-height: 10rem;
+    height: auto;
     overflow-y: auto;
+    max-height: 10rem;
 
     .attribute-selector {
       width: 100%;
       margin: 0;
+    }
+
+    .expansion-panel {
+      padding-right: 1rem;
     }
   }
 }

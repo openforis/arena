@@ -1,6 +1,6 @@
 import './ChainStatisticalAnalysis.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
@@ -11,10 +11,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { AttributesSelector, EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { ArrayUtils } from '@core/arrayUtils'
 import { Dropdown } from '@webapp/components/form'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
@@ -23,7 +24,9 @@ export const ChainStatisticalAnalysisProps = () => {
   const lang = useSurveyPreferredLang()
 
   const chain = useChain()
-  const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  const chainUuid = Chain.getUuid(chain)
+  const [chainUpdated, setChainUpdated] = useState(chain)
+  const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chainUpdated)
   const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
 
   const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
@@ -36,10 +39,14 @@ export const ChainStatisticalAnalysisProps = () => {
 
   const updateStatisticalAnalysis = useCallback(
     (updateFn) => {
-      const chainUpdated = Chain.updateStatisticalAnalysis(updateFn)(chain)
-      dispatch(ChainActions.updateChain({ chain: chainUpdated }))
+      const _chainUpdated = Chain.updateStatisticalAnalysis(updateFn)(chainUpdated)
+      dispatch(
+        debounceAction(ChainActions.updateChain({ chain: _chainUpdated }), 'update-chain-statistical-analysis'),
+        1000
+      )
+      setChainUpdated(_chainUpdated)
     },
-    [chain, dispatch]
+    [chainUpdated, dispatch]
   )
 
   const onEntityChange = useCallback(
@@ -55,6 +62,11 @@ export const ChainStatisticalAnalysisProps = () => {
       updateStatisticalAnalysis(ChainStatisticalAnalysis.assocDimensionUuids(dimensionUuidsUpdated))
     },
     [dimensionUuids, updateStatisticalAnalysis]
+  )
+
+  const onFilteringChange = useCallback(
+    (filtering) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocFiltering(filtering)),
+    [updateStatisticalAnalysis]
   )
 
   const onReportingMethodChange = useCallback(
@@ -74,7 +86,7 @@ export const ChainStatisticalAnalysisProps = () => {
 
               return childDefs.some(
                 (childDef) =>
-                  NodeDef.getChainUuid(childDef) === Chain.getUuid(chain) &&
+                  NodeDef.getChainUuid(childDef) === chainUuid &&
                   NodeDef.isActive(childDef) &&
                   NodeDef.hasAreaBasedEstimated(childDef)
               )
@@ -84,8 +96,8 @@ export const ChainStatisticalAnalysisProps = () => {
           nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
           onChange={onEntityChange}
           showSingleEntities={false}
-          useNameAsLabel={true}
-          allowEmptySelection={true}
+          useNameAsLabel
+          allowEmptySelection
         />
       </FormItem>
 
@@ -95,14 +107,21 @@ export const ChainStatisticalAnalysisProps = () => {
           nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
           nodeDefUuidsAttributes={dimensionUuids}
           onToggleAttribute={onDimensionToggle}
-          filterChainUuids={[Chain.getUuid(chain)]}
-          filterFunction={(nodeDef) => NodeDef.isAnalysis(nodeDef)}
+          filterChainUuids={[chainUuid]}
           filterTypes={[NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]}
           showAnalysisAttributes
           showAncestors
           showMultipleAttributes={false}
-          showSiblingsInSingleEntities={true}
+          showSiblingsInSingleEntities
           nodeDefLabelType={NodeDef.NodeDefLabelTypes.name}
+        />
+      </FormItem>
+
+      <FormItem label={i18n.t('chainView.statisticalAnalysis.filtering')}>
+        <Input
+          className="filtering"
+          onChange={onFilteringChange}
+          value={ChainStatisticalAnalysis.getFiltering(chainStatisticalAnalysis)}
         />
       </FormItem>
 
