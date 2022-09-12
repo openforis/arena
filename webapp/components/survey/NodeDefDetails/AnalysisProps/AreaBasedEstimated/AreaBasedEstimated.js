@@ -43,13 +43,13 @@ const AreaBasedEstimated = (props) => {
 
       dispatch(NodeDefsActions.postNodeDef({ nodeDef: _nodeDef }))
       dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef: _nodeDef })
-      Actions.setProp({ state, key: 'hasAreaBasedEstimated', value: true })
+      Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hasAreaBasedEstimated, value: true })
       setAreaBasedEstimatedNodeDef(_nodeDef)
     } else {
       dispatch(
         NodeDefsActions.removeNodeDef(areaBasedEstimatedNodeDef, null, () => {
           setAreaBasedEstimatedNodeDef(false)
-          Actions.setProp({ state, key: 'hasAreaBasedEstimated', value: false })
+          Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hasAreaBasedEstimated, value: false })
         })
       )
     }

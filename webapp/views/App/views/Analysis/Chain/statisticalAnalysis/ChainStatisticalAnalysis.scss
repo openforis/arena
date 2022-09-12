@@ -1,0 +1,29 @@
+.statistical-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .entity-selector,
+  .attributes-selector {
+    width: 30rem;
+  }
+
+  .attributes-selector {
+    height: auto;
+    overflow-y: auto;
+    max-height: 10rem;
+
+    .attribute-selector {
+      width: 100%;
+      margin: 0;
+    }
+
+    .expansion-panel {
+      padding-right: 1rem;
+    }
+  }
+
+  .filter {
+    width: 60rem;
+  }
+}

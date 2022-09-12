@@ -5,7 +5,7 @@ import * as PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 import AttributeSelector from './AttributeSelector'
@@ -31,6 +31,7 @@ const AttributesSelector = (props) => {
   } = props
 
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
@@ -57,27 +58,35 @@ const AttributesSelector = (props) => {
     childDefs = [nodeDefContext] // Multiple attribute
   }
 
+  const isNodeDefVisible = (nodeDef) =>
+    ((NodeDef.isAttribute(nodeDef) && (showMultipleAttributes || NodeDef.isSingle(nodeDef))) ||
+      NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+    NodeDef.getCycles(nodeDef).includes(cycle) &&
+    (filterFunction === null || filterFunction(nodeDef)) &&
+    (filterTypes.length === 0 || filterTypes.includes(NodeDef.getType(nodeDef))) &&
+    (filterChainUuids.length === 0 ||
+      !NodeDef.getChainUuid(nodeDef) ||
+      filterChainUuids.includes(NodeDef.getChainUuid(nodeDef)))
+
+  const visibleChildDefs = childDefs.filter(isNodeDefVisible)
+
   return (
     <div className="attributes-selector">
-      <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
-        {childDefs.map((childDef) => (
-          <AttributeSelector
-            key={NodeDef.getUuid(childDef)}
-            canSelectAttributes={canSelectAttributes}
-            filterFunction={filterFunction}
-            filterTypes={filterTypes}
-            filterChainUuids={filterChainUuids}
-            nodeDef={childDef}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            nodeDefContext={nodeDefContext}
-            onToggleAttribute={onToggleAttribute}
-            showMultipleAttributes={showMultipleAttributes}
-            showNodeDefPath={!showAncestorsLabel}
-            nodeDefLabelType={nodeDefLabelType}
-          />
-        ))}
-      </ExpansionPanel>
-
+      {visibleChildDefs.length > 0 && (
+        <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
+          {visibleChildDefs.map((childDef) => (
+            <AttributeSelector
+              key={NodeDef.getUuid(childDef)}
+              canSelectAttributes={canSelectAttributes}
+              nodeDef={childDef}
+              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+              onToggleAttribute={onToggleAttribute}
+              showNodeDefPath={!showAncestorsLabel}
+              nodeDefLabelType={nodeDefLabelType}
+            />
+          ))}
+        </ExpansionPanel>
+      )}
       {showAncestors && nodeDefAncestor && (
         <AttributesSelector
           lang={lang}
