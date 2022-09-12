@@ -51,7 +51,7 @@ const isStratificationEnabled = (chain) => {
   )
 }
 
-export const isStratificationNotSpecifiedAllowed = () => {
+const isStratificationNotSpecifiedAllowed = () => {
   return false
   // TODO return true if samplingStrategy is double phase
   // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
@@ -134,6 +134,7 @@ export const ChainSamplingDesign = {
   isNonResponseBiasCorrection,
   isPostStratificationEnabled,
   isStratificationEnabled,
+  isStratificationNotSpecifiedAllowed,
   getPostStratificationAttributeDefUuid,
   getPValue,
   getReportingDataAttributeDefUuid,
