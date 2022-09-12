@@ -32,7 +32,7 @@ export const ChainBasicProps = (props) => {
     const fetchChains = async () => {
       const { chains } = await API.fetchChains({ surveyId: Survey.getId(survey) })
       setExistsAnotherChainWithSamplingDesign(
-        chains.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.isSamplingDesign(_chain))
+        chains.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.hasSamplingDesign(_chain))
       )
     }
 
@@ -43,7 +43,7 @@ export const ChainBasicProps = (props) => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const samplingDesignDisabled =
-    existsAnotherChainWithSamplingDesign || (Chain.isSamplingDesign(chain) && Boolean(baseUnitNodeDef))
+    existsAnotherChainWithSamplingDesign || (Chain.hasSamplingDesign(chain) && Boolean(baseUnitNodeDef))
 
   return (
     <>
@@ -65,9 +65,9 @@ export const ChainBasicProps = (props) => {
       />
       <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
         <Checkbox
-          checked={Chain.isSamplingDesign(chain)}
+          checked={Chain.hasSamplingDesign(chain)}
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
-          onChange={(samplingDesign) => updateChain(Chain.assocSamplingDesign(samplingDesign)(chain))}
+          onChange={(value) => updateChain(Chain.assocHasSamplingDesign(value)(chain))}
           disabled={samplingDesignDisabled}
         />
       </FormItem>

@@ -1,6 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
@@ -98,8 +99,11 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }) =>
-  (survey) =>
-    SurveyNodeDefs.getNodeDefByUuid(Chain.getBaseUnitNodeDefUuid(chain))(survey)
+  (survey) => {
+    const samplingDesign = Chain.getSamplingDesign(chain)
+    const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
+    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey)
+  }
 
 export const getSamplingNodeDefChild =
   ({ nodeDefParent, chainUuid }) =>

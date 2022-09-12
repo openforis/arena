@@ -39,10 +39,10 @@ const AnalysisNodeDefs = () => {
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {
-    if (!Chain.isSamplingDesign(chain)) {
+    if (!Chain.hasSamplingDesign(chain)) {
       setShowSamplingNodeDefs(false)
     }
-  }, [Chain.isSamplingDesign(chain)])
+  }, [Chain.hasSamplingDesign(chain)])
 
   return (
     <div className="analysis-node-defs">
