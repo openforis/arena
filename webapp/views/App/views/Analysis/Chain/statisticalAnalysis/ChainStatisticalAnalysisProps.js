@@ -77,19 +77,17 @@ export const ChainStatisticalAnalysisProps = () => {
     <div className="statistical-analysis">
       <FormItem label={i18n.t('common.entity')}>
         <EntitySelector
-          hierarchy={Survey.getHierarchy((nodeDef) => {
-            if (NodeDef.isEntity(nodeDef)) {
-              const childDefs = Survey.getNodeDefChildren(nodeDef, true)(survey)
+          hierarchy={Survey.getHierarchy()(survey)}
+          filterFn={(entityDef) => {
+            const childDefs = Survey.getNodeDefChildren(entityDef, true)(survey)
 
-              return childDefs.some(
-                (childDef) =>
-                  NodeDef.getChainUuid(childDef) === chainUuid &&
-                  NodeDef.isActive(childDef) &&
-                  NodeDef.hasAreaBasedEstimated(childDef)
-              )
-            }
-            return false
-          })(survey)}
+            return childDefs.some(
+              (childDef) =>
+                NodeDef.getChainUuid(childDef) === chainUuid &&
+                NodeDef.isActive(childDef) &&
+                NodeDef.hasAreaBasedEstimated(childDef)
+            )
+          }}
           nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
           onChange={onEntityChange}
           showSingleEntities={false}
