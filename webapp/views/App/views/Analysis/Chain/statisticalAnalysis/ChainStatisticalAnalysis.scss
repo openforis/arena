@@ -8,6 +8,14 @@
     width: 30rem;
   }
 
+  .entity-selector-wrapper {
+    display: flex;
+
+    .warning-badge {
+      position: relative;
+    }
+  }
+
   .attributes-selector {
     height: auto;
     overflow-y: auto;
