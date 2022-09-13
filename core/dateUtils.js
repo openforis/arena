@@ -108,9 +108,21 @@ export const isValidDateInFormat = (dateStr, format) => {
   return fnsIsValid(parsed)
 }
 
+const substractTimezoneOffset = (date) => {
+  const timezoneOffset = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() - timezoneOffset)
+}
+
+const addTimezoneOffset = (date) => {
+  const timezoneOffset = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() + timezoneOffset)
+}
+
 export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
 
 export const formatDateTimeDefault = (date) => (date ? format(date, formats.datetimeDefault) : null)
+
+export const formatDateTimeISO = (date) => (date ? format(addTimezoneOffset(date), formats.datetimeISO) : null)
 
 export const formatDateTimeDisplay = (date) => (date ? format(date, formats.datetimeDisplay) : null)
 
@@ -126,13 +138,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
   if (!fnsIsValid(dateParsed)) {
     return null
   }
-  let dateAdjusted
-  if (adjustTimezoneDifference) {
-    const timezoneOffset = dateParsed.getTimezoneOffset() * 60000
-    dateAdjusted = new Date(dateParsed.getTime() - timezoneOffset)
-  } else {
-    dateAdjusted = dateParsed
-  }
+  const dateAdjusted = adjustTimezoneDifference ? substractTimezoneOffset(dateParsed) : dateParsed
   return format(dateAdjusted, formatTo)
 }
 
