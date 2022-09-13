@@ -7,7 +7,7 @@ import {
   differenceInDays,
   differenceInHours,
   differenceInMinutes,
-  format,
+  format as dateFnsFormat,
   isValid as fnsIsValid,
 } from 'date-fns'
 
@@ -16,7 +16,6 @@ import { isBlank } from './stringUtils'
 export {
   isBefore,
   isAfter,
-  format,
   parseISO,
   subDays,
   addDays,
@@ -37,6 +36,8 @@ export const formats = {
 
 const normalizeDateTimeValue = (length) => (value) =>
   R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
+
+export const format = (date, format, options) => (date ? dateFnsFormat(date, format, options) : null)
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -108,23 +109,18 @@ export const isValidDateInFormat = (dateStr, format) => {
   return fnsIsValid(parsed)
 }
 
-const substractTimezoneOffset = (date) => {
-  const timezoneOffset = date.getTimezoneOffset() * 60000
-  return new Date(date.getTime() - timezoneOffset)
+const addOrSubtractTimezoneOffset = (date, add = true) => {
+  const offset = date.getTimezoneOffset() * 60000 * (add ? 1 : -1)
+  return new Date(date.getTime() + offset)
 }
 
-const addTimezoneOffset = (date) => {
-  const timezoneOffset = date.getTimezoneOffset() * 60000
-  return new Date(date.getTime() + timezoneOffset)
-}
+export const formatDateISO = (date) => format(date, formats.dateISO)
 
-export const formatDateISO = (date) => (date ? format(date, formats.dateISO) : null)
+export const formatDateTimeDefault = (date) => format(date, formats.datetimeDefault)
 
-export const formatDateTimeDefault = (date) => (date ? format(date, formats.datetimeDefault) : null)
+export const formatDateTimeISO = (date) => format(addOrSubtractTimezoneOffset(date), formats.datetimeISO)
 
-export const formatDateTimeISO = (date) => (date ? format(addTimezoneOffset(date), formats.datetimeISO) : null)
-
-export const formatDateTimeDisplay = (date) => (date ? format(date, formats.datetimeDisplay) : null)
+export const formatDateTimeDisplay = (date) => format(date, formats.datetimeDisplay)
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
@@ -138,7 +134,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
   if (!fnsIsValid(dateParsed)) {
     return null
   }
-  const dateAdjusted = adjustTimezoneDifference ? substractTimezoneOffset(dateParsed) : dateParsed
+  const dateAdjusted = adjustTimezoneDifference ? addOrSubtractTimezoneOffset(dateParsed, false) : dateParsed
   return format(dateAdjusted, formatTo)
 }
 
