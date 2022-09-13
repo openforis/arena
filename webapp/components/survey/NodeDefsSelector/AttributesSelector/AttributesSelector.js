@@ -101,6 +101,7 @@ const AttributesSelector = (props) => {
           filterChainUuids={filterChainUuids}
           canSelectAttributes={canSelectAttributes}
           showLabel={showAncestorsLabel}
+          showAnalysisAttributes={showAnalysisAttributes}
           showAncestorsLabel={showAncestorsLabel}
           showMultipleAttributes={showMultipleAttributes}
           showSiblingsInSingleEntities={showSiblingsInSingleEntities}
