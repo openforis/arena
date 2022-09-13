@@ -769,6 +769,7 @@ $t(common.cantUndoWarning)`,
     },
     statisticalAnalysis: {
       header: 'Statistical analysis',
+      entityWithoutData: 'The entity {{name}} has no data',
       filter: 'Filter',
       reportingMethod: 'Reporting method',
       reportingMethods: {

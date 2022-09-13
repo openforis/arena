@@ -13,8 +13,11 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const [dataCountByEntityDefUuid, setDataCountsByEntityDefUuid] = useState({})
 
   const entityDefUuids = useMemo(() => {
-    const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, analysisNodeDef) => {
-      const parentUuid = NodeDef.getParentUuid(analysisNodeDef)
+    const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, nodeDef) => {
+      if (NodeDef.isEntity(nodeDef)) {
+        entityDefUuidsSet.add(NodeDef.getUuid(nodeDef))
+      }
+      const parentUuid = NodeDef.getParentUuid(nodeDef)
       if (parentUuid) {
         const parentEntityDef = Survey.getNodeDefByUuid(parentUuid)(survey)
         if (parentEntityDef && NodeDef.isInCycle(cycle)(parentEntityDef)) {
@@ -24,7 +27,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
       return entityDefUuidsSet
     }, new Set())
     return [...uuidsSet.values()]
-  }, [nodeDefs])
+  }, [cycle, nodeDefs, survey])
 
   const updateCounts = useCallback(async () => {
     const surveyInfo = Survey.getSurveyInfo(survey)
@@ -33,7 +36,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
         await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
           surveyId: Survey.getId(survey),
           cycle,
-          entityDefUuids: [...entityDefUuids.values()],
+          entityDefUuids,
         })
       )
     }

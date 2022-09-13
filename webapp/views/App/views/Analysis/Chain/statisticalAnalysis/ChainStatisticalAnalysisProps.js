@@ -12,8 +12,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
+
 import { ButtonGroup } from '@webapp/components/form'
+import WarningBadge from '@webapp/components/warningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { AttributesSelector, EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
@@ -28,6 +31,22 @@ export const ChainStatisticalAnalysisProps = () => {
   const [chainUpdated, setChainUpdated] = useState(chain)
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chainUpdated)
   const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
+  const entityDefUuid = ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)
+  const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
+  const entityDataCount = useEntityDataCount(entityDefUuid)
+
+  const entitiesFilterFn = useCallback(
+    (entityDef) => {
+      const childDefs = Survey.getNodeDefChildren(entityDef, true)(survey)
+      return childDefs.some(
+        (childDef) =>
+          NodeDef.getChainUuid(childDef) === chainUuid &&
+          NodeDef.isActive(childDef) &&
+          NodeDef.hasAreaBasedEstimated(childDef)
+      )
+    },
+    [chainUuid, survey]
+  )
 
   const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
     key,
@@ -76,26 +95,23 @@ export const ChainStatisticalAnalysisProps = () => {
   return (
     <div className="statistical-analysis">
       <FormItem label={i18n.t('common.entity')}>
-        <EntitySelector
-          hierarchy={Survey.getHierarchy((nodeDef) => {
-            if (NodeDef.isEntity(nodeDef)) {
-              const childDefs = Survey.getNodeDefChildren(nodeDef, true)(survey)
-
-              return childDefs.some(
-                (childDef) =>
-                  NodeDef.getChainUuid(childDef) === chainUuid &&
-                  NodeDef.isActive(childDef) &&
-                  NodeDef.hasAreaBasedEstimated(childDef)
-              )
-            }
-            return false
-          })(survey)}
-          nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
-          onChange={onEntityChange}
-          showSingleEntities={false}
-          useNameAsLabel
-          allowEmptySelection
-        />
+        <div className="entity-selector-wrapper">
+          <EntitySelector
+            hierarchy={Survey.getHierarchy()(survey)}
+            filterFn={entitiesFilterFn}
+            nodeDefUuidEntity={entityDefUuid}
+            onChange={onEntityChange}
+            showSingleEntities={false}
+            useNameAsLabel
+            allowEmptySelection
+          />
+          {entityDataCount === 0 && (
+            <WarningBadge
+              title="chainView.statisticalAnalysis.entityWithoutData"
+              titleParams={{ name: NodeDef.getName(entityDef) }}
+            />
+          )}
+        </div>
       </FormItem>
 
       <FormItem label={i18n.t('common.dimension_plural')}>
