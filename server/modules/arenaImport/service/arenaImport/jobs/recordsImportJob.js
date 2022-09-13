@@ -80,18 +80,12 @@ export default class RecordsImportJob extends Job {
     await nodesBatchPersister.flush()
   }
 
-  async fetchRecordSummary({ recordUuid }) {
-    const { surveyId } = this.context
-    const { list } = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, recordUuid }, this.tx)
-    return list[0]
-  }
-
   async insertOrSkipRecord({ record, nodesBatchPersister }) {
     const { survey, surveyId } = this.context
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecord = await this.fetchRecordSummary({ surveyId, recordUuid })
+    const existingRecord = await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
 
     if (!existingRecord || DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecord))) {
       if (existingRecord) {
