@@ -10,6 +10,7 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import ExpansionPanel from '@webapp/components/expansionPanel'
 import AttributeSelector from './AttributeSelector'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import classNames from 'classnames'
 
 const AttributesSelector = (props) => {
   const {
@@ -18,6 +19,7 @@ const AttributesSelector = (props) => {
     filterTypes,
     filterChainUuids,
     lang,
+    ancestorSelector,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -71,7 +73,7 @@ const AttributesSelector = (props) => {
   const visibleChildDefs = childDefs.filter(isNodeDefVisible)
 
   return (
-    <div className="attributes-selector">
+    <div className={classNames('attributes-selector', { ancestor: ancestorSelector })}>
       {visibleChildDefs.length > 0 && (
         <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
           {visibleChildDefs.map((childDef) => (
@@ -90,6 +92,7 @@ const AttributesSelector = (props) => {
       {showAncestors && nodeDefAncestor && (
         <AttributesSelector
           lang={lang}
+          ancestorSelector
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onToggleAttribute={onToggleAttribute}
@@ -109,6 +112,7 @@ const AttributesSelector = (props) => {
 }
 
 AttributesSelector.propTypes = {
+  ancestorSelector: PropTypes.bool,
   canSelectAttributes: PropTypes.bool,
   filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
@@ -127,6 +131,7 @@ AttributesSelector.propTypes = {
 }
 
 AttributesSelector.defaultProps = {
+  ancestorSelector: false,
   canSelectAttributes: true,
   filterFunction: null,
   filterTypes: [],
