@@ -83,7 +83,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 }
 
 export const fetchRecordSummary = async ({ surveyId, recordUuid }, client = db) => {
-  const { list } = fetchRecordsSummaryBySurveyId({ surveyId, recordUuid }, client)
+  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, recordUuid }, client)
   return list[0]
 }
 
