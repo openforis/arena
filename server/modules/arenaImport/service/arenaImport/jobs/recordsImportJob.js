@@ -31,7 +31,7 @@ export default class RecordsImportJob extends Job {
       userUuidNewByUserUuid,
       mobile,
     } = this.context
-    let surveyId = mobile ? Survey.getId(survey) : _surveyId
+    const surveyId = mobile ? Survey.getId(survey) : _surveyId
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
@@ -81,11 +81,11 @@ export default class RecordsImportJob extends Job {
   }
 
   async insertOrSkipRecord({ record, nodesBatchPersister }) {
-    const { survey, surveyId } = this.context
+    const { mobile, survey, surveyId } = this.context
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecord = await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
+    const existingRecord = mobile ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx) : null
 
     if (!existingRecord || DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecord))) {
       if (existingRecord) {
