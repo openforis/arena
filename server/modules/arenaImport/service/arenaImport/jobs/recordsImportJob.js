@@ -70,9 +70,7 @@ export default class RecordsImportJob extends Job {
         record = Record.assocOwnerUuid(ownerUuid)(record)
       }
 
-      const recordToStore = this.prepareRecordToStore(record)
-
-      await this.insertOrSkipRecord({ record: recordToStore, nodesBatchPersister })
+      await this.insertOrSkipRecord({ record, nodesBatchPersister })
 
       this.incrementProcessedItems()
     })
@@ -85,16 +83,23 @@ export default class RecordsImportJob extends Job {
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecord = mobile ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx) : null
+    const recordSummary = this.prepareRecordSummaryToStore(record)
 
-    if (!existingRecord || DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecord))) {
-      if (existingRecord) {
+    const existingRecordSummary = mobile
+      ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
+      : null
+
+    if (
+      !existingRecordSummary ||
+      DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
+    ) {
+      if (existingRecordSummary) {
         // delete existing record before import (if the record to import has more recent changes)
         this.logDebug(`deleting existing record ${recordUuid}`)
-        await RecordManager.deleteRecord(this.user, survey, existingRecord, this.tx)
+        await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
       }
       // insert record
-      await RecordManager.insertRecord(this.user, surveyId, record, true, this.tx)
+      await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
       // insert nodes (add them to batch persister)
       await PromiseUtils.each(Record.getNodesArray(record), async (node) => {
@@ -114,7 +119,7 @@ export default class RecordsImportJob extends Job {
    * @param {!object} record - The record to cleanup.
    * @returns {object} - The cleaned up record.
    */
-  prepareRecordToStore(record) {
+  prepareRecordSummaryToStore(record) {
     let recordUpdated = Record.dissocNodes(record)
     if (Validation.isObjValid(recordUpdated)) {
       recordUpdated = Validation.dissocValidation(recordUpdated)
