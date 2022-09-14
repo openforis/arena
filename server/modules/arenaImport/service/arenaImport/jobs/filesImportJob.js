@@ -23,8 +23,9 @@ export default class FilesImportJob extends Job {
         // load file content from a separate file
         const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, RecordFile.getUuid(fileSummary))
         file = RecordFile.assocContent(fileContent)(file)
-        // persist file
-        await FileManager.insertFile(surveyId, file, this.tx)
+
+        await this.persistFile(file)
+
         this.incrementProcessedItems()
       })
     } else {
@@ -37,6 +38,16 @@ export default class FilesImportJob extends Job {
         await FileManager.insertFile(surveyId, file, this.tx)
         this.incrementProcessedItems()
       })
+    }
+  }
+
+  async persistFile(file) {
+    const { surveyId } = this.context
+    const existingFileSummary = await FileManager.fetchFileSummaryByUuid(surveyId, file.uuid, this.tx)
+    if (existingFileSummary) {
+      await FileManager.updateFileProps(surveyId, RecordFile.getUuid(file), RecordFile.getProps(file), this.tx)
+    } else {
+      await FileManager.insertFile(surveyId, file, this.tx)
     }
   }
 }

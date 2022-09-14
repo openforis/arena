@@ -42,7 +42,7 @@ export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
 
-export const { getNodes, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
+export const { getNodes, getNodesArray, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
 
 // ==== hierarchy
 export const {
@@ -68,7 +68,7 @@ export const { getEntityKeyNodes, getEntityKeyValues, findDescendantByKeyValues,
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
-export const { assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
+export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
 export const { updateNodesDependents, updateAttributesWithValues } = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
