@@ -11,7 +11,7 @@ const pgp = pgPromise()
 const { Column } = pgp.helpers
 
 export default class MassiveUpdateData extends MassiveUpdate {
-  constructor({ survey, entityDef, cycle, analysisNodeDefs }, tx) {
+  constructor({ survey, entityDef, analysisNodeDefs }, tx) {
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
       includeExtendedCols: true,
@@ -38,9 +38,7 @@ export default class MassiveUpdateData extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE t.record_uuid::uuid = v.record_uuid::uuid
-        AND t.uuid::uuid = v.uuid::uuid
-        AND t.record_cycle = '${cycle}' `,
+        where: ` WHERE t.uuid::uuid = v.uuid::uuid`,
       },
       tx
     )
