@@ -3,16 +3,15 @@ import './SurveyInfo.scss'
 import React from 'react'
 
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useAuthCanEditSurvey, useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import * as User from '@core/user/user'
-import { useUser } from '@webapp/store/user'
-
-import { Input } from '@webapp/components/form/Input'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ButtonSave } from '@webapp/components'
 
@@ -33,6 +32,7 @@ const SurveyInfo = () => {
     name,
     languages,
     srs,
+    sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     labels,
     descriptions,
@@ -44,6 +44,7 @@ const SurveyInfo = () => {
     setLabels,
     setDescriptions,
     setCycles,
+    setSampleBasedImageInterpretationEnabled,
     getFieldValidation,
     saveProps,
   } = useSurveyInfoForm()
@@ -109,20 +110,28 @@ const SurveyInfo = () => {
           />
         </div>
 
-        <div className="sampling-polygon-editor form">
-          <div className="form-item">
-            <label className="form-label">{i18n.t('samplingPolygonOptions.samplingPolygon')}</label>
-          </div>
-          {User.isSystemAdmin(user) && (
+        <FormItem label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}>
+          <Checkbox
+            checked={sampleBasedImageInterpretationEnabled}
+            onChange={setSampleBasedImageInterpretationEnabled}
+            validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
+          />
+        </FormItem>
+
+        {User.isSystemAdmin(user) && sampleBasedImageInterpretationEnabled && (
+          <div className="sampling-polygon-editor form">
+            <div className="form-item">
+              <label className="form-label">{i18n.t('samplingPolygonOptions.samplingPolygon')}</label>
+            </div>
+
             <SamplingPolygonEditor
               samplingPolygon={samplingPolygon}
               setSamplingPolygon={setSamplingPolygon}
               getFieldValidation={getFieldValidation}
               readOnly={readOnly}
             />
-          )}
-        </div>
-
+          </div>
+        )}
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
     </div>
