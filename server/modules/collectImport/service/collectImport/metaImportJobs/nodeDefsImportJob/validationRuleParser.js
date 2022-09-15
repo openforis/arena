@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -46,7 +47,7 @@ const checkExpressionParserByType = {
   },
   [collectCheckType.pattern]: (collectCheck) => {
     const { regex } = CollectSurvey.getAttributes(collectCheck)
-    return `$this must respect the pattern: ${regex}`
+    return regex
   },
   [collectCheckType.unique]: (collectCheck) => {
     const { expr } = CollectSurvey.getAttributes(collectCheck)
@@ -82,8 +83,11 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
       expression: to,
     })
     if (toExprConverted) {
-      exprConverted = `distance(${NodeDef.getName(nodeDefCurrent)}, ${toExprConverted}) <= ${max}`
+      exprConverted = `distance(${NodeDef.getName(nodeDefCurrent)}, ${toExprConverted}) <= ${max}\n`
     }
+  } else if (checkType === collectCheckType.pattern) {
+    const regexDelimited = `${A.pipe(StringUtils.prependIfMissing('^'), StringUtils.appendIfMissing('$'))(collectExpr)}`
+    exprConverted = `/${regexDelimited}/.test(this)\n`
   } else if (checkType === collectCheckType.unique) {
     const { expr } = CollectSurvey.getAttributes(collectValidationRule)
     const nodeDefName = NodeDef.getName(nodeDefCurrent)
