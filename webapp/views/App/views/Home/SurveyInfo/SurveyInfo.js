@@ -119,18 +119,12 @@ const SurveyInfo = () => {
         </FormItem>
 
         {User.isSystemAdmin(user) && sampleBasedImageInterpretationEnabled && (
-          <div className="sampling-polygon-editor form">
-            <div className="form-item">
-              <label className="form-label">{i18n.t('samplingPolygonOptions.samplingPolygon')}</label>
-            </div>
-
-            <SamplingPolygonEditor
-              samplingPolygon={samplingPolygon}
-              setSamplingPolygon={setSamplingPolygon}
-              getFieldValidation={getFieldValidation}
-              readOnly={readOnly}
-            />
-          </div>
+          <SamplingPolygonEditor
+            samplingPolygon={samplingPolygon}
+            setSamplingPolygon={setSamplingPolygon}
+            getFieldValidation={getFieldValidation}
+            readOnly={readOnly}
+          />
         )}
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
