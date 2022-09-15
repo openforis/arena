@@ -847,6 +847,7 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
+    invalid: 'Invalid expression: {{details}}',
     undefinedFunction: 'Undefined function: {{name}}',
   },
 
