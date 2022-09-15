@@ -1,6 +1,7 @@
 import React from 'react'
-import { FormPropertyItem } from './FormPropertyItem'
 import PropTypes from 'prop-types'
+
+import { FormPropertyItem } from './FormPropertyItem'
 
 export const RectangleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
@@ -11,7 +12,7 @@ export const RectangleOnlyItems = (props) => {
     { key: 'numberOfPointsEast', labelKey: 'numberOfControlPointsEast' },
   ]
   return (
-    <div className="form">
+    <>
       {inputPropertiesForRectangle.map(({ key, labelKey }) => (
         <FormPropertyItem
           key={key}
@@ -24,7 +25,7 @@ export const RectangleOnlyItems = (props) => {
           getFieldValidation={getFieldValidation}
         />
       ))}
-    </div>
+    </>
   )
 }
 
