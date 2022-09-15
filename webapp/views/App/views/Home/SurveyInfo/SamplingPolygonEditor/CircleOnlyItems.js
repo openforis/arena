@@ -1,19 +1,17 @@
 import React from 'react'
-import { useI18n } from '@webapp/store/system'
-import { FormPropertyItem } from './FormPropertyItem'
 import PropTypes from 'prop-types'
+
+import { useI18n } from '@webapp/store/system'
+import { FormItem } from '@webapp/components/form/Input'
+import { FormPropertyItem } from './FormPropertyItem'
 
 export const CircleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
   const i18n = useI18n()
   const inputPropertiesForCircle = [{ key: 'radius', labelKey: 'radius' }]
   return (
-    <div className="form">
-      <div className="form-item" key={'numberOfPointsCircleEditor'}>
-        <label className="form-label" htmlFor="survey-info-sampling-number-of-points-circle">
-          {i18n.t('samplingPolygonOptions.numberOfControlPoints')}
-        </label>
-
+    <>
+      <FormItem label={i18n.t('samplingPolygonOptions.numberOfControlPoints')}>
         <select value={samplingPolygonObject.numberOfPointsCircle} onChange={onPropertyChange('numberOfPointsCircle')}>
           <option value="0">0</option>
           <option value="4">4</option>
@@ -22,7 +20,7 @@ export const CircleOnlyItems = (props) => {
           <option value="12">12</option>
           <option value="21">21</option>
         </select>
-      </div>
+      </FormItem>
       {inputPropertiesForCircle.map(({ key, labelKey }) => (
         <FormPropertyItem
           key={key}
@@ -35,7 +33,7 @@ export const CircleOnlyItems = (props) => {
           getFieldValidation={getFieldValidation}
         />
       ))}
-    </div>
+    </>
   )
 }
 
