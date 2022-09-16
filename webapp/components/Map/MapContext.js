@@ -1,15 +1,12 @@
 import React, { useContext, useState } from 'react'
-import { defaultBaseLayer } from './baseLayers'
 import PropTypes from 'prop-types'
+
+import { defaultBaseLayer } from './baseLayers'
+import { MapOptions } from './mapOptions'
 
 const initialState = {
   baseLayer: null,
-  options: {
-    showMarkersLabels: false,
-    showSamplingPolygon: true,
-    showControlPoints: true,
-    showPlotReferencePoint: true,
-  },
+  options: MapOptions.defaultOptions(),
 }
 
 const MapContext = React.createContext({})
