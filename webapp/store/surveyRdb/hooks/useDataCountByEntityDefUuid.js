@@ -14,15 +14,12 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
 
   const entityDefUuids = useMemo(() => {
     const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, nodeDef) => {
-      if (NodeDef.isEntity(nodeDef)) {
+      if (NodeDef.isMultipleEntity(nodeDef)) {
         entityDefUuidsSet.add(NodeDef.getUuid(nodeDef))
       }
-      const parentUuid = NodeDef.getParentUuid(nodeDef)
-      if (parentUuid) {
-        const parentEntityDef = Survey.getNodeDefByUuid(parentUuid)(survey)
-        if (parentEntityDef && NodeDef.isInCycle(cycle)(parentEntityDef)) {
-          entityDefUuidsSet.add(parentUuid)
-        }
+      const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+      if (ancestorMultipleEntityDef && NodeDef.isInCycle(cycle)(ancestorMultipleEntityDef)) {
+        entityDefUuidsSet.add(NodeDef.getUuid(ancestorMultipleEntityDef))
       }
       return entityDefUuidsSet
     }, new Set())
