@@ -12,7 +12,7 @@ import i18n from '@core/i18n/i18nFactory'
 
 import { MapLayersControl } from './MapLayersControl'
 import { MapMarker } from './MapMarker'
-import { MapOptions } from './MapOptions'
+import { MapOptionsEditor } from './MapOptionsEditor'
 import { MapContextProvider } from './MapContext'
 import { useMap } from './useMap'
 
@@ -54,7 +54,7 @@ export const Map = (props) => {
             onPointUpdated={onMarkerPointUpdated}
             title={markerTitle}
           />
-          {showOptions && <MapOptions />}
+          {showOptions && <MapOptionsEditor />}
           <KmlUploader />
           <MapBaseLayerPeriodSelector />
           <ShowZoomLevel />
