@@ -550,6 +550,7 @@ $t(common.cantUndoWarning)`,
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     options: {
+      hideLocationMarkers: 'Hide location markers',
       showMarkersLabels: `Show markers' labels`,
       showSamplingPolygon: `Sampling polygon`,
       showControlPoints: `Control points`,

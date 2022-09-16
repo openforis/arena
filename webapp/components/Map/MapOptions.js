@@ -2,6 +2,9 @@ import './MapOptions.scss'
 
 import React, { useCallback, useState } from 'react'
 
+import * as Survey from '@core/survey/survey'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconGear } from '../buttons'
 import { Checkbox } from '../form'
@@ -10,6 +13,9 @@ import { useMapContext } from './MapContext'
 
 export const MapOptions = () => {
   const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
+
+  const sampleBasedImageInterpretation = Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)
 
   const { contextObject, onOptionUpdate } = useMapContext()
   const { options } = contextObject
@@ -36,12 +42,22 @@ export const MapOptions = () => {
                 onChange={(value) => onOptionUpdate({ option: 'showMarkersLabels', value })}
               />
             </FormItem>
-            <FormItem label={i18n.t('mapView.options.showSamplingPolygon')}>
-              <Checkbox
-                checked={options.showSamplingPolygon}
-                onChange={(value) => onOptionUpdate({ option: 'showSamplingPolygon', value })}
-              />
-            </FormItem>
+            {sampleBasedImageInterpretation && (
+              <>
+                <FormItem label={i18n.t('mapView.options.showSamplingPolygon')}>
+                  <Checkbox
+                    checked={options.showSamplingPolygon}
+                    onChange={(value) => onOptionUpdate({ option: 'showSamplingPolygon', value })}
+                  />
+                </FormItem>
+                <FormItem label={i18n.t('mapView.options.hideLocationMarkers')}>
+                  <Checkbox
+                    checked={options.hideLocationMarkers}
+                    onChange={(value) => onOptionUpdate({ option: 'hideLocationMarkers', value })}
+                  />
+                </FormItem>
+              </>
+            )}
             <FormItem label={i18n.t('mapView.options.showControlPoints')}>
               <Checkbox
                 checked={options.showControlPoints}

@@ -1,11 +1,12 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { CircleMarker, Tooltip } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { Colors } from '@webapp/utils/colors'
+import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -28,7 +29,11 @@ export const CoordinateAttributeMarker = (props) => {
     join: PropTypes.any,
   }
 
+  const circleRef = useRef()
   const tooltipRef = useRef()
+
+  const options = useMapContextOptions()
+  const { showMarkersLabels, hideLocationMarkers } = options
 
   const onTooltipOpen = useCallback(() => {
     // set tooltip style
@@ -37,15 +42,21 @@ export const CoordinateAttributeMarker = (props) => {
       color: Colors.getHighContrastTextColor(markersColor),
     }
     Object.assign(tooltipRef.current._container.style, customStyle)
-  }, [tooltipRef])
+  }, [markersColor])
 
-  const options = useMapContextOptions()
-  const { showMarkersLabels } = options
+  useEffect(() => {
+    const circleMarker = circleRef.current
+    circleMarker.setStyle({
+      fill: !hideLocationMarkers,
+      stroke: !hideLocationMarkers,
+    })
+  }, [hideLocationMarkers])
 
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       <CircleMarker
+        ref={circleRef}
         center={[latitude, longitude]}
         radius={markerRadius}
         color={markersColor}
