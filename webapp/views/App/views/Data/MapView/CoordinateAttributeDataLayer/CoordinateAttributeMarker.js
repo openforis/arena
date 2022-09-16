@@ -33,7 +33,7 @@ export const CoordinateAttributeMarker = (props) => {
   const tooltipRef = useRef()
 
   const options = useMapContextOptions()
-  const { showMarkersLabels, hideLocationMarkers } = options
+  const { showMarkersLabels, showLocationMarkers } = options
 
   const onTooltipOpen = useCallback(() => {
     // set tooltip style
@@ -47,10 +47,10 @@ export const CoordinateAttributeMarker = (props) => {
   useEffect(() => {
     const circleMarker = circleRef.current
     circleMarker.setStyle({
-      fill: !hideLocationMarkers,
-      stroke: !hideLocationMarkers,
+      fill: showLocationMarkers,
+      stroke: showLocationMarkers,
     })
-  }, [hideLocationMarkers])
+  }, [showLocationMarkers])
 
   return (
     <div>
