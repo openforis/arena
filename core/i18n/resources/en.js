@@ -344,6 +344,7 @@ If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
+      sampleBasedImageInterpretation: 'Sample-based image interpretation',
       srsPlaceholder: 'Type code or label',
     },
     deleteSurveyDialog: {
@@ -846,6 +847,7 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
+    invalid: 'Invalid expression: {{details}}',
     undefinedFunction: 'Undefined function: {{name}}',
   },
 

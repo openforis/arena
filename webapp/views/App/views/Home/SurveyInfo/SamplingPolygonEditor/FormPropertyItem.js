@@ -1,16 +1,14 @@
 import React from 'react'
-import { useI18n } from '@webapp/store/system'
-import { Input } from '@webapp/components/form/Input'
 import PropTypes from 'prop-types'
+
+import { useI18n } from '@webapp/store/system'
+import { FormItem, Input } from '@webapp/components/form/Input'
 
 export const FormPropertyItem = (props) => {
   const { objectkey, labelKey, onPropertyChange, value, samplingPolygonObject, readOnly, getFieldValidation } = props
   const i18n = useI18n()
   return (
-    <div className="form-item" key={labelKey}>
-      <label className="form-label" htmlFor={`survey-info-${labelKey}`}>
-        {i18n.t(`samplingPolygonOptions.${labelKey}`)}
-      </label>
+    <FormItem label={i18n.t(`samplingPolygonOptions.${labelKey}`)}>
       <Input
         key={objectkey}
         id={`sampling-polygon-${labelKey}`}
@@ -19,7 +17,7 @@ export const FormPropertyItem = (props) => {
         onChange={onPropertyChange}
         readOnly={readOnly}
       />
-    </div>
+    </FormItem>
   )
 }
 
