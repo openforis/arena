@@ -5,26 +5,25 @@ import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
-import { ArrayUtils } from '@core/arrayUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { ButtonGroup } from '@webapp/components/form'
 import WarningBadge from '@webapp/components/warningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { AttributesSelector, EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { DimensionsSelector } from './DimensionsSelector'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
   const survey = useSurvey()
   const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
 
   const chain = useChain()
   const chainUuid = Chain.getUuid(chain)
@@ -72,12 +71,11 @@ export const ChainStatisticalAnalysisProps = () => {
     [updateStatisticalAnalysis]
   )
 
-  const onDimensionToggle = useCallback(
-    (attributeUuid) => {
-      const dimensionUuidsUpdated = ArrayUtils.addOrRemoveItem({ item: attributeUuid })(dimensionUuids)
+  const onDimensionsChange = useCallback(
+    (dimensionUuidsUpdated) => {
       updateStatisticalAnalysis(ChainStatisticalAnalysis.assocDimensionUuids(dimensionUuidsUpdated))
     },
-    [dimensionUuids, updateStatisticalAnalysis]
+    [updateStatisticalAnalysis]
   )
 
   const onFilterChange = useCallback(
@@ -115,18 +113,11 @@ export const ChainStatisticalAnalysisProps = () => {
       </FormItem>
 
       <FormItem label={i18n.t('common.dimension_plural')}>
-        <AttributesSelector
-          lang={lang}
-          nodeDefUuidEntity={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
-          nodeDefUuidsAttributes={dimensionUuids}
-          onToggleAttribute={onDimensionToggle}
-          filterChainUuids={[chainUuid]}
-          filterTypes={[NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]}
-          showAnalysisAttributes
-          showAncestors
-          showMultipleAttributes={false}
-          showSiblingsInSingleEntities
-          nodeDefLabelType={NodeDef.NodeDefLabelTypes.name}
+        <DimensionsSelector
+          chainUuid={chainUuid}
+          entityDefUuid={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
+          dimensionUuids={dimensionUuids}
+          onDimensionsChange={onDimensionsChange}
         />
       </FormItem>
 
