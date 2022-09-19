@@ -22,6 +22,7 @@ export const TestId = {
     itemErrorBadge: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-error-badge`,
     itemCode: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-code`,
     itemLabel: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-label`),
+    itemDescription: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-description`),
     exportBtn: 'category-export-btn',
     templateForDataImportBtn: 'category-template-data-import-btn',
     templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
