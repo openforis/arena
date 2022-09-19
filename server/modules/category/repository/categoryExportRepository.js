@@ -151,8 +151,8 @@ export const getCategoryExportHeaders = ({ category, languages = [] }) => {
   return levels
     .sort((la, lb) => la.index - lb.index)
     .reduce((headers, level) => [...headers, CategoryExportFile.getLevelCodeHeader({ level })], [])
-    .concat(languages.map((language) => CategoryExportFile.getLabelHeader({ language }))
-    .concat(languages.map((language) => CategoryExportFile.getDescriptionHeader({ language }))
+    .concat(languages.map((language) => CategoryExportFile.getLabelHeader({ language })))
+    .concat(languages.map((language) => CategoryExportFile.getDescriptionHeader({ language })))
     .concat(Category.getItemExtraDefKeys(category))
 }
 
