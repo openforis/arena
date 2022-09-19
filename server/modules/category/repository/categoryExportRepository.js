@@ -69,6 +69,7 @@ const getSelectFields = ({ levelIndex, levels, headers, extraProps, languages })
     }, [])
     .concat([
       ...getFieldsLabels({ levels, languages, headers, levelIndex }),
+      ...getFieldsDescriptions({ levels, languages, headers, levelIndex }),
       ...(extraProps ? getExtraProps({ extraProps, levels, levelIndex }) : []),
     ])
     .join(', ')
@@ -145,16 +146,17 @@ const generateCategoryExportQuery = ({ surveyId, category, headers, languages })
   ) AS sel`
 }
 
-export const getCategoryExportHeaders = ({ category, languages }) => {
+export const getCategoryExportHeaders = ({ category, languages = [] }) => {
   const levels = Category.getLevelsArray(category)
   return levels
     .sort((la, lb) => la.index - lb.index)
     .reduce((headers, level) => [...headers, CategoryExportFile.getLevelCodeHeader({ level })], [])
-    .concat([...(languages || []).map((language) => CategoryExportFile.getLabelHeader({ language }))])
+    .concat(languages.map((language) => CategoryExportFile.getLabelHeader({ language }))
+    .concat(languages.map((language) => CategoryExportFile.getDescriptionHeader({ language }))
     .concat(Category.getItemExtraDefKeys(category))
 }
 
-export const generateCategoryExportStreamAndHeaders = ({ surveyId, category, languages }) => {
+export const generateCategoryExportStreamAndHeaders = ({ surveyId, category, languages = [] }) => {
   const headers = getCategoryExportHeaders({ category, languages })
   const query = generateCategoryExportQuery({ surveyId, category, headers, languages })
   const categoryUuid = Category.getUuid(category)
