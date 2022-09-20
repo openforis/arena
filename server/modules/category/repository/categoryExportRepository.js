@@ -1,4 +1,5 @@
 import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 
 import * as DbUtils from '@server/db/dbUtils'
@@ -17,22 +18,23 @@ const getFieldCode = ({ index, header, isEmpty }) =>
  * Return the labels if needed by language.
  *
  * @param {!object} params - The parameters object.
- * @param {number} [params.index] - Current level iteration index.
- * @param {string[]} [params.languages] - Array with the languages in the survey.
- * @param {string[]} [params.headers] - Array with the names of the headers.
- * @param {!boolean} [params.isEmpty] - Check if the value returned should be empty.
+ * @param {!string[]} [params.languages] - Array with the languages in the survey.
+ * @param {!object[]} [params.levels] - The category levels.
+ * @param {!number} [params.levelIndex] - Current level iteration index.
+ * @param {!string} [params.prop] - Key of the prop being fetched from item props.
+ * @param {!string} [params.aliasPrefix] - Prefix for the column alias.
  *
  * @returns {string} The labels to be returned.
  */
-const getFieldsLabels = ({ languages, levels, levelIndex }) => {
+const getFieldsLabelsOrDescriptions = ({ languages, levels, levelIndex, prop, aliasPrefix }) => {
   return (languages || []).map((language) => {
     return `COALESCE(${levels.map((l, lindex) =>
       levels.length - lindex - 1 > levelIndex
         ? 'NULL'
         : `(((c${levels.length - lindex - 1}.props || c${
             levels.length - lindex - 1
-          }.props_draft) -> 'labels') ->> '${language}')`
-    )}, NULL) AS label_${language}`
+          }.props_draft) -> '${prop}') ->> '${language}')`
+    )}, NULL) AS ${aliasPrefix}_${language}`
   })
 }
 
@@ -68,8 +70,22 @@ const getSelectFields = ({ levelIndex, levels, headers, extraProps, languages })
       return [...selectFields, getFieldId({ index, isEmpty }), getFieldCode({ index, header: headers[index], isEmpty })]
     }, [])
     .concat([
-      ...getFieldsLabels({ levels, languages, headers, levelIndex }),
-      ...getFieldsDescriptions({ levels, languages, headers, levelIndex }),
+      ...getFieldsLabelsOrDescriptions({
+        levels,
+        languages,
+        headers,
+        levelIndex,
+        prop: CategoryItem.keysProps.labels,
+        aliasPrefix: 'label',
+      }),
+      ...getFieldsLabelsOrDescriptions({
+        levels,
+        languages,
+        headers,
+        levelIndex,
+        prop: CategoryItem.keysProps.descriptions,
+        aliasPrefix: 'description',
+      }),
       ...(extraProps ? getExtraProps({ extraProps, levels, levelIndex }) : []),
     ])
     .join(', ')
