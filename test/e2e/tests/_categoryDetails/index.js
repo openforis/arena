@@ -40,9 +40,7 @@ const addItem = (level, levelIdx, itemIdx, codePrefix) => {
     await waitForApi(page.click(getSelector(TestId.categoryDetails.levelAddItemBtn(levelIdx), 'button')))
 
     const itemCodeSelector = getSelector(TestId.categoryDetails.itemCode(levelIdx, itemIdx), 'input')
-    const itemLabelTestId = TestId.categoryDetails.itemLabel(levelIdx, itemIdx)()
-    expect(itemLabelTestId).toBe(TestId.categoryDetails.itemLabel(levelIdx, itemIdx)('en'))
-    const itemLabelSelector = getSelector(itemLabelTestId, 'input')
+    const itemLabelSelector = getSelector(TestId.categoryDetails.itemLabel(levelIdx, itemIdx)(), 'input')
     // fill code and label
     await waitForApi(page.fill(itemCodeSelector, itemCode))
     await waitForApi(page.fill(itemLabelSelector, itemLabel))
