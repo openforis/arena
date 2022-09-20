@@ -21,6 +21,7 @@ import L from 'leaflet'
 import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 import { KmlUploader } from './KmlUploader'
 import { ShowZoomLevel } from './ShowZoomLevel'
+import { WmtsComponent } from './WmtsComponent'
 
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
@@ -58,6 +59,7 @@ export const Map = (props) => {
           <KmlUploader />
           <MapBaseLayerPeriodSelector />
           <ShowZoomLevel />
+          <WmtsComponent />
         </MapContainer>
       </MapContextProvider>
 

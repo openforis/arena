@@ -4,6 +4,7 @@ const baseLayerProviders = {
   esri: 'ESRI',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
+  wmts: 'WMTS'
 }
 
 const baseLayerAttribution = {
@@ -65,6 +66,13 @@ export const baseLayers = [
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  },
+  {
+    key: 'WMTS',
+    name: 'Custom WMTS',
+    provider: baseLayerProviders.wmts,
+    attribution: '',
+    url: ''
   },
   // Planet Labs maps
   {
