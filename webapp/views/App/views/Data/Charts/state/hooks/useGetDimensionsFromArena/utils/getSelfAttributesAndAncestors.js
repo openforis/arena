@@ -118,11 +118,17 @@ const parseNodeDefToDimension = ({ nodeDef, language, nodeDefLabelType }) => {
 }
 
 const getSelfAttributesAndAncestors = ({ nodeDefUuid, survey, language, nodeDefLabelType }) => {
-  let groupedOptions = []
+  const groupedOptions = []
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const children = Survey.getNodeDefChildren(nodeDef)(survey)
-  const attributes = children.filter((child) => !NodeDef.isEntity(child))
+  const attributes = Survey.getNodeDefDescendantsInSingleEntities({
+    nodeDef,
+    filterFn: (descendantDef) =>
+      NodeDef.isAttribute(descendantDef) &&
+      [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon].includes(
+        NodeDef.getType(descendantDef)
+      ),
+  })(survey)
 
   const options = attributes.flatMap((attribute) =>
     parseNodeDefToDimension({ nodeDef: attribute, language, nodeDefLabelType })
@@ -130,13 +136,18 @@ const getSelfAttributesAndAncestors = ({ nodeDefUuid, survey, language, nodeDefL
 
   groupedOptions.push({
     label: NodeDef.getLabel(nodeDef, language, nodeDefLabelType),
-    options: options,
+    options,
   })
 
-  const parentUuid = NodeDef.getParentUuid(nodeDef)
-  if (parentUuid) {
-    groupedOptions = groupedOptions.concat(
-      getSelfAttributesAndAncestors({ nodeDefUuid: parentUuid, survey, language, nodeDefLabelType })
+  const parentMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  if (parentMultipleEntityDef) {
+    groupedOptions.push(
+      ...getSelfAttributesAndAncestors({
+        nodeDefUuid: NodeDef.getUuid(parentMultipleEntityDef),
+        survey,
+        language,
+        nodeDefLabelType,
+      })
     )
   }
 

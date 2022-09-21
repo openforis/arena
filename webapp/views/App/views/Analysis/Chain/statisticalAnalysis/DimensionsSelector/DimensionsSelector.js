@@ -33,6 +33,9 @@ export const DimensionsSelector = (props) => {
 
   const isDimensionIncluded = (nodeDef) =>
     NodeDef.isSingleAttribute(nodeDef) &&
+    [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon].includes(
+      NodeDef.getType(nodeDef)
+    ) &&
     NodeDef.isInCycle(cycle)(nodeDef) &&
     (!chainUuid || !NodeDef.getChainUuid(nodeDef) || chainUuid === NodeDef.getChainUuid(nodeDef))
 
