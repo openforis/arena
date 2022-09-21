@@ -68,6 +68,16 @@ const generateTemplate = ({ category: categoryProp = null, languages }) => {
       }),
       {}
     ),
+    // labels
+    ...languages.reduce(
+      (acc, language) => ({
+        ...acc,
+        [CategoryExportFile.getDescriptionHeader({ language })]: `Item ${item.levelCodes.join(
+          '-'
+        )} description (${language})`,
+      }),
+      {}
+    ),
     // extra
     ...extraDefs.reduce(
       (acc, extraDef) => ({

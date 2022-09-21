@@ -1,0 +1,12 @@
+.dimensions-selector {
+  width: 60rem;
+  
+  .select__menu {
+    width: 30rem;
+  }
+
+  .select__option {
+    display: flex;
+    justify-content: space-between;
+  }
+}

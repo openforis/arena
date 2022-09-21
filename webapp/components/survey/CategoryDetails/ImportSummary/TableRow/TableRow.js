@@ -12,10 +12,10 @@ import { useI18n } from '@webapp/store/system'
 
 const _getColumnSummaryKey = ({ column }) => {
   if (CategoryImportSummary.isColumnLabel(column)) {
-    return 'categoryEdit.importSummary.columnTypeLabelWithLanguage'
+    return 'categoryEdit.importSummary.columnTypeLabel'
   }
-  if (CategoryImportSummary.hasColumnLang(column)) {
-    return 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
+  if (CategoryImportSummary.isColumnDescription(column)) {
+    return 'categoryEdit.importSummary.columnTypeDescription'
   }
   if (CategoryImportSummary.isColumnExtra(column)) {
     return 'categoryEdit.importSummary.columnTypeSummaryExtra'
