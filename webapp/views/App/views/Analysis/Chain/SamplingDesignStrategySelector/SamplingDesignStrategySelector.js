@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -19,18 +20,20 @@ export const SamplingDesignStrategySelector = (props) => {
 
   const emptyItem = { value: null, label: i18n.t('common.notSpecified') }
 
-  const items = [emptyItem, ...Object.values(Chain.samplingStrategies).map(samplingStrategyCodeToItem)]
+  const items = [emptyItem, ...Object.values(ChainSamplingDesign.samplingStrategies).map(samplingStrategyCodeToItem)]
 
-  const selectedItem = Chain.getSamplingStrategy(chain)
-    ? samplingStrategyCodeToItem(Chain.getSamplingStrategy(chain))
-    : emptyItem
+  const samplingDesing = Chain.getSamplingDesign(chain)
+  const samplingStrategy = ChainSamplingDesign.getSamplingStrategy(samplingDesing)
+  const selectedItem = samplingStrategy ? samplingStrategyCodeToItem(samplingStrategy) : emptyItem
 
   return (
     <FormItem label={i18n.t('chainView.samplingStrategyLabel')}>
       <Dropdown
         items={items}
         selection={selectedItem}
-        onChange={(item) => updateChain(Chain.assocSamplingStrategy(item?.value)(chain))}
+        onChange={(item) =>
+          updateChain(Chain.updateSamplingDesign(ChainSamplingDesign.assocSamplingStrategy(item?.value))(chain))
+        }
       />
     </FormItem>
   )

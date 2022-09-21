@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { FormItem } from '@webapp/components/form/Input'
@@ -22,16 +23,20 @@ export const ReportingDataAttributeDefs = (props) => {
 
   const availableReportingDataNodeDefs = Survey.getAvailableReportingDataNodeDefs({ chain })(survey)
 
+  const samplingDesign = Chain.getSamplingDesign(chain)
+
   return (
     <>
       <FormItem label={i18n.t('chainView.reportingDataCategory')}>
         <CategorySelector
-          categoryUuid={Chain.getReportingDataCategoryUuid(chain)}
+          categoryUuid={ChainSamplingDesign.getReportingDataCategoryUuid(samplingDesign)}
           emptySelection
           filterFunction={Category.isReportingData}
           onChange={(category) => {
             const categoryUuid = Category.getUuid(category)
-            updateChain(Chain.assocReportingDataCategoryUuid(categoryUuid)(chain))
+            updateChain(
+              Chain.updateSamplingDesign(ChainSamplingDesign.assocReportingDataCategoryUuid(categoryUuid))(chain)
+            )
             if (!categoryUuid) setReportingDataCategory(null)
           }}
           onCategoryLoad={setReportingDataCategory}
@@ -48,17 +53,19 @@ export const ReportingDataAttributeDefs = (props) => {
           >
             <Dropdown
               items={availableReportingDataNodeDefs}
-              selection={Survey.getNodeDefByUuid(Chain.getReportingDataAttributeDefUuid({ categoryLevelUuid })(chain))(
-                survey
-              )}
+              selection={Survey.getNodeDefByUuid(
+                ChainSamplingDesign.getReportingDataAttributeDefUuid({ categoryLevelUuid })(samplingDesign)
+              )(survey)}
               itemKey="uuid"
               itemLabel={(nodeDef) => NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name)}
               onChange={(def) =>
                 updateChain(
-                  Chain.assocReportingDataAttributeDefUuid({
-                    categoryLevelUuid,
-                    nodeDefUuid: NodeDef.getUuid(def),
-                  })(chain)
+                  Chain.updateSamplingDesign(
+                    ChainSamplingDesign.assocReportingDataAttributeDefUuid({
+                      categoryLevelUuid,
+                      nodeDefUuid: NodeDef.getUuid(def),
+                    })
+                  )(chain)
                 )
               }
             />

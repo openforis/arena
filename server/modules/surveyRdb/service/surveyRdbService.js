@@ -66,9 +66,7 @@ export const countTable = async (params) => {
     : SurveyRdbManager.countTable({ survey, cycle, query })
 }
 
-export const fetchTableRowsCountByEntityDefUuid = async (params) => {
-  const { surveyId, cycle, entityDefUuids = [] } = params
-
+export const fetchTableRowsCountByEntityDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
   const survey = await _fetchSurvey(surveyId, cycle)
 
   return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })

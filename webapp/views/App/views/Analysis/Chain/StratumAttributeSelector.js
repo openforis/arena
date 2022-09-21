@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
@@ -20,8 +21,8 @@ export const StratumAttributeSelector = () => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const onChange = (item) => {
-    const stratumNodeDefUuid = item?.value
-    const chainUpdated = Chain.assocStratumNodeDefUuid(stratumNodeDefUuid)(chain)
+    const stratumDefUuid = item?.value
+    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
@@ -49,12 +50,13 @@ export const StratumAttributeSelector = () => {
   })
 
   const emptySelectionItem = { value: null, label: i18n.t('common.notSpecified') }
+  const samplingDesign = Chain.getSamplingDesign(chain)
   const selectableItems = [
-    ...(Chain.isStratificationNotSpecifiedAllowed(chain) ? [emptySelectionItem] : []),
+    ...(ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign) ? [emptySelectionItem] : []),
     ...selectableDefs.map(nodeDefToItem),
   ]
 
-  const selectedNodeDefUuid = Chain.getStratumNodeDefUuid(chain)
+  const selectedNodeDefUuid = ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)
   const selectedNodeDef = selectedNodeDefUuid ? Survey.getNodeDefByUuid(selectedNodeDefUuid)(survey) : null
   const selectedItem = selectedNodeDef ? nodeDefToItem(selectedNodeDef) : emptySelectionItem
 

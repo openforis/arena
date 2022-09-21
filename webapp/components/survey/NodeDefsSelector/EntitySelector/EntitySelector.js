@@ -20,11 +20,15 @@ const getDropdownItems = ({
   showSingleEntities,
   useNameAsLabel,
   allowEmptySelection,
+  filterFn,
 }) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    if (NodeDef.isRoot(nodeDef) || showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) {
+    if (
+      (NodeDef.isRoot(nodeDef) || showSingleEntities || !NodeDef.isSingleEntity(nodeDef)) &&
+      (!filterFn || filterFn(nodeDef))
+    ) {
       const label = useNameAsLabel
         ? NodeDef.getName(nodeDef)
         : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
@@ -51,6 +55,7 @@ const EntitySelector = (props) => {
     disabled,
     useNameAsLabel,
     allowEmptySelection,
+    filterFn,
   } = props
 
   const i18n = useI18n()
@@ -65,6 +70,7 @@ const EntitySelector = (props) => {
     showSingleEntities,
     useNameAsLabel,
     allowEmptySelection,
+    filterFn,
   })
   const selection = nodeDefUuidEntity ? dropdownItems.find((item) => item.value === nodeDefUuidEntity) : emptySelection
 
@@ -91,6 +97,7 @@ EntitySelector.propTypes = {
   onChange: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string,
   allowEmptySelection: PropTypes.bool,
+  filterFn: PropTypes.func,
 }
 
 EntitySelector.defaultProps = {
@@ -101,6 +108,7 @@ EntitySelector.defaultProps = {
   validation: null,
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
   allowEmptySelection: false,
+  filterFn: null,
 }
 
 export default EntitySelector

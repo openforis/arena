@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
@@ -24,10 +25,13 @@ export const ClusteringEntitySelector = () => {
     (nodeDef) =>
       NodeDef.isRoot(nodeDef) || (NodeDef.isMultipleEntity(nodeDef) && NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef))
   )(survey)
-  const selectedEntityUuid = Chain.getClusteringNodeDefUuid(chain)
+  const samplingDesign = Chain.getSamplingDesign(chain)
+  const selectedEntityUuid = ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign)
 
   const onChange = (entityDefUuid) => {
-    const chainUpdated = Chain.assocClusteringNodeDefUuid(entityDefUuid === 'null' ? null : entityDefUuid)(chain)
+    const chainUpdated = Chain.updateSamplingDesign(
+      ChainSamplingDesign.assocClusteringNodeDefUuid(entityDefUuid === 'null' ? null : entityDefUuid)
+    )(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 

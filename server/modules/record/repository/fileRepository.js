@@ -3,8 +3,8 @@ import * as RecordFile from '@core/record/recordFile'
 
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const SIMPLE_SELECT_FIELDS = ['id', 'uuid', 'props']
-const SIMPLE_SELECT_FIELDS_COMMA_SEPARATED = SIMPLE_SELECT_FIELDS.join(', ')
+const SUMMARY_FIELDS = ['id', 'uuid', 'props']
+const SUMMARY_FIELDS_COMMA_SEPARATED = SUMMARY_FIELDS.join(', ')
 
 const NOT_DELETED_CONDITION = `props ->> '${RecordFile.propKeys.deleted}' IS NULL OR props ->> '${RecordFile.propKeys.deleted}' <> 'true'`
 
@@ -17,7 +17,7 @@ export const insertFile = async (surveyId, file, client = db) => {
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.file (uuid, props, content)
     VALUES ($1, $2, $3)
-    RETURNING ${SIMPLE_SELECT_FIELDS_COMMA_SEPARATED}`,
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [uuid, props, content]
   )
 }
@@ -37,7 +37,7 @@ export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
 export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
   client.manyOrNone(
     `
-    SELECT ${SIMPLE_SELECT_FIELDS_COMMA_SEPARATED}
+    SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
     FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE ${NOT_DELETED_CONDITION}`
   )
@@ -46,6 +46,15 @@ export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
   client.one(
     `
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE uuid = $1`,
+    [uuid]
+  )
+
+export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
+  client.oneOrNone(
+    `
+    SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED} 
+    FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
@@ -59,15 +68,35 @@ export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
     [nodeUuid]
   )
 
-// ============== DELETE
+// ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
   client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.file
     SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
     WHERE uuid = $1
-    RETURNING ${SIMPLE_SELECT_FIELDS_COMMA_SEPARATED}`,
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [uuid]
+  )
+
+export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db) =>
+  client.manyOrNone(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.file
+    SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
+    WHERE props ->> '${RecordFile.propKeys.recordUuid}' = $1 
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
+    [recordUuid]
+  )
+
+export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
+  client.one(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.file
+    SET props = $2
+    WHERE uuid = $1
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
+    [fileUuid, props]
   )
 
 // ============== DELETE

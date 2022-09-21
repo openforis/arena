@@ -48,6 +48,7 @@ const NodeDefCoordinate = (props) => {
   const surveySrs = Survey.getSRS(surveyInfo)
   const singleSrs = surveySrs.length === 1
   const selectedSrs = singleSrs ? surveySrs[0] : surveySrs.find((srs) => srs.code === value.srs)
+  const selectedSrsCode = selectedSrs?.code
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
@@ -59,12 +60,12 @@ const NodeDefCoordinate = (props) => {
       } else if (singleSrs) {
         // if single srs, set it into value
         const valueAdjusted = { ...newValue }
-        valueAdjusted[Node.valuePropsCoordinate.srs] = selectedSrs.code
+        valueAdjusted[Node.valuePropsCoordinate.srs] = selectedSrsCode
         return valueAdjusted
       }
       return newValue
     },
-    [selectedSrs.code, singleSrs]
+    [selectedSrsCode, singleSrs]
   )
 
   const handleValueChange = useCallback(

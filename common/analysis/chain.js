@@ -20,20 +20,11 @@ export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
   cycles: ObjectUtils.keysProps.cycles,
+  hasSamplingDesign: 'hasSamplingDesign',
   samplingDesign: 'samplingDesign',
-  baseUnitNodeDefUuid: 'baseUnitNodeDefUuid',
   analysisNodeDefs: 'analysisNodeDefs',
-  stratumNodeDefUuid: 'stratumNodeDefUuid',
-  areaWeightingMethod: 'areaWeightingMethod',
-  clusteringNodeDefUuid: 'clusteringNodeDefUuid',
-  clusteringOnlyVariances: 'clusteringOnlyVariances',
-  reportingDataCategoryUuid: 'reportingDataCategoryUuid',
-  reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
-  samplingStrategy: 'samplingStrategy',
-  postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
-  nonResponseBiasCorrection: 'nonResponseBiasCorrection',
-  pValue: 'pValue',
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
+  statisticalAnalysis: 'statisticalAnalysis',
 }
 
 export const statusExec = {
@@ -41,17 +32,6 @@ export const statusExec = {
   success: 'success',
   running: 'running',
 }
-
-export const samplingStrategies = {
-  simpleRandom: 'simpleRandom',
-  systematic: 'systematic',
-  stratifiedRandom: 'stratifiedRandom',
-  stratifiedSystematic: 'stratifiedSystematic',
-  // doublePhase: 'doublePhase'
-}
-
-export const pValues = [0.99, 0.98, 0.95, 0.9, 0.8]
-export const pValueDefault = 0.95
 
 // ====== READ
 
@@ -71,105 +51,37 @@ export const {
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
-export const isSamplingDesign = ObjectUtils.isPropTrue(keysProps.samplingDesign)
-export const getBaseUnitNodeDefUuid = ObjectUtils.getProp(keysProps.baseUnitNodeDefUuid)
-export const getStratumNodeDefUuid = ObjectUtils.getProp(keysProps.stratumNodeDefUuid)
-export const isAreaWeightingMethod = ObjectUtils.isPropTrue(keysProps.areaWeightingMethod)
-export const getClusteringNodeDefUuid = ObjectUtils.getProp(keysProps.clusteringNodeDefUuid)
-export const isClusteringOnlyVariances = ObjectUtils.isPropTrue(keysProps.clusteringOnlyVariances)
-export const getSamplingStrategy = ObjectUtils.getProp(keysProps.samplingStrategy)
-export const getPostStratificationAttributeDefUuid = ObjectUtils.getProp(keysProps.postStratificationAttributeDefUuid)
-export const isNonResponseBiasCorrection = ObjectUtils.isPropTrue(keysProps.nonResponseBiasCorrection)
-export const getPValue = ObjectUtils.getProp(keysProps.pValue, pValueDefault)
+export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDesign)
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
-
-// ====== READ (reporting data)
-export const getReportingDataCategoryUuid = ObjectUtils.getProp(keysProps.reportingDataCategoryUuid)
-export const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
-  R.pathOr(null, [keys.props, keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid])
+export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
+export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 
 // ====== UPDATE
-export const assocSamplingDesign = (samplingDesign) => ObjectUtils.setProp(keysProps.samplingDesign, samplingDesign)
-
-export const assocBaseUnitNodeDefUuid = (baseUnitNodeDefUuid) =>
-  ObjectUtils.setProp(keysProps.baseUnitNodeDefUuid, baseUnitNodeDefUuid)
-
-export const assocAreaWeightingMethod = (areaWeightingMethod) =>
-  ObjectUtils.setProp(keysProps.areaWeightingMethod, areaWeightingMethod)
-
-export const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
-  ObjectUtils.setProp(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
-
-export const assocClusteringOnlyVariances = (clusteringOnlyVariances) =>
-  ObjectUtils.setProp(keysProps.clusteringOnlyVariances, clusteringOnlyVariances)
-
-export const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
-  ObjectUtils.setProp(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
-const resetPostStratificationAttributeDefUuid = assocPostStratificationAttributeDefUuid(null)
-
-export const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (chain) => {
-  let chainUpdated = ObjectUtils.setProp(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)(chain)
-  if (getPostStratificationAttributeDefUuid(chainUpdated) === stratumNodeDefUuid) {
-    chainUpdated = assocPostStratificationAttributeDefUuid(null)(chainUpdated)
-  }
-  return chainUpdated
-}
-const resetStratumNodeDefUuid = assocStratumNodeDefUuid(null)
-
-export const assocNonResponseBiasCorrection = (nonResponseBiasCorrection) =>
-  ObjectUtils.setProp(keysProps.nonResponseBiasCorrection, nonResponseBiasCorrection)
-
-export const assocPValue = (pValue) => ObjectUtils.setProp(keysProps.pValue, pValue)
-const resetPValue = assocPValue(null)
-
-export const assocSamplingStrategy = (samplingStrategy) => (chain) => {
-  let chainUpdated = ObjectUtils.setProp(keysProps.samplingStrategy, samplingStrategy)(chain)
-  if (!isStratificationEnabled(chainUpdated) && getStratumNodeDefUuid(chainUpdated)) {
-    chainUpdated = resetStratumNodeDefUuid(chainUpdated)
-  }
-  if (!isPostStratificationEnabled(chainUpdated) && getPostStratificationAttributeDefUuid(chainUpdated)) {
-    chainUpdated = resetPostStratificationAttributeDefUuid(chainUpdated)
-  }
-  if (!samplingStrategy) {
-    chainUpdated = resetPValue(chainUpdated)
-  }
-  return chainUpdated
-}
+export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
 
 export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
 
-// ====== UPDATE (reporting data)
-const dissocReportingDataAttributeDefsByLevelUuid = R.dissocPath([
-  keys.props,
-  keysProps.reportingDataAttributeDefsByLevelUuid,
-])
-export const assocReportingDataCategoryUuid = (reportingDataCategoryUuid) =>
-  R.pipe(
-    dissocReportingDataAttributeDefsByLevelUuid,
-    ObjectUtils.setProp(keysProps.reportingDataCategoryUuid, reportingDataCategoryUuid)
-  )
-export const assocReportingDataAttributeDefUuid = ({ categoryLevelUuid, nodeDefUuid }) =>
-  R.assocPath([keys.props, keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid], nodeDefUuid)
+const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
+
+export const updateSamplingDesign = (updateFn) => (chain) => {
+  const samplingDesign = getSamplingDesign(chain)
+  const samplingDesignUpdated = updateFn(samplingDesign)
+  return assocSamplingDesign(samplingDesignUpdated)(chain)
+}
+
+const assocStatisticalAnalysis = (value) => ObjectUtils.setProp(keysProps.statisticalAnalysis, value)
+
+export const updateStatisticalAnalysis = (updateFn) => (chain) => {
+  const statisticalAnalysis = getStatisticalAnalysis(chain)
+  const getStatisticalAnalysisUpdated = updateFn(statisticalAnalysis)
+  return assocStatisticalAnalysis(getStatisticalAnalysisUpdated)(chain)
+}
 
 // ====== CHECK
-
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
   DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
-export const isStratificationEnabled = (chain) => {
-  const samplingStrategy = getSamplingStrategy(chain)
-  return (
-    samplingStrategy && ![samplingStrategies.simpleRandom, samplingStrategies.systematic].includes(samplingStrategy)
-  )
-}
-export const isPostStratificationEnabled = (chain) => Boolean(getSamplingStrategy(chain))
-
-export const isStratificationNotSpecifiedAllowed = () => {
-  return false
-  // TODO return true if samplingStrategy is double phase
-  // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
-}
 
 // ====== VALIDATION
 // The validation object contains the validation of chain index by uuids

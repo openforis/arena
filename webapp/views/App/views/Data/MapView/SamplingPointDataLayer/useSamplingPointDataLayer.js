@@ -115,7 +115,9 @@ export const useSamplingPointDataLayer = (props) => {
           const { points, bounds } = _convertItemsToPoints(items)
 
           // pan map into layer bounds center
-          map.panTo(bounds.getCenter())
+          if (map.getZoom() < 5) {
+            map.panTo(bounds.getCenter())
+          }
 
           setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
         })()

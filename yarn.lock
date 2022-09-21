@@ -2012,10 +2012,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.107":
-  version "0.0.107"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.107/4380b84920f81d81c6c22c6b303e2fd725c41838ab72eaba1763c68504007277#bb9e8f35f59f3e3cb1a85595fbf92a376b081c9e"
-  integrity sha512-wLjiiShU+Cnu8RGMeA27Gusi31XfULp5UOBp8QS6coNER1tLtM2auSpymUwfmlqPPFblKhXJqp3692sjf3Zg7w==
+"@openforis/arena-core@^0.0.108":
+  version "0.0.108"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.108/04917afa77d34b1fd3e330cc6ed69076399d44d8#04917afa77d34b1fd3e330cc6ed69076399d44d8"
+  integrity sha512-smx4NqMnJGEz7HcI/gDXIz1Zj54WMyW1x6vEJ4TBdbLoGGWF+muAG0dshhdNbBNhDbL5W7ZeAulz/ipBDjYAjg==
   dependencies:
     "@esri/proj-codes" "^3.0.0"
     date-fns "^2.28.0"
