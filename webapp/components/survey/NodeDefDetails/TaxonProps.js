@@ -81,11 +81,11 @@ const TaxonProps = (props) => {
             items={itemsLookupFunction}
             itemKey="uuid"
             itemLabel={Taxonomy.getName}
-            idInput={TestId.nodeDefDetails.taxonomySelector}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
+            testId={TestId.nodeDefDetails.taxonomySelector}
           />
           <ButtonMetaItemAdd
             id={TestId.nodeDefDetails.taxonomySelectorAddBtn}

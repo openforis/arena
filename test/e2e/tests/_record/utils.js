@@ -1,13 +1,11 @@
-import { Objects } from '@openforis/arena-core'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { tree } from '../../mock/nodeDefs'
+import { FormUtils } from '../utils/formUtils'
 
 // ==== value parser
 export const parseValue = (value) => (typeof value === 'function' ? value() : value)
 
 // ==== selector utils
-export const getDropdownValueSelector = (parentSelector) => `${parentSelector} .dropdown__single-value`
-
 export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
   `${parentSelector} ${getSelector(TestId.surveyForm.nodeDefWrapper(nodeDef.name))}`.trim()
 
@@ -15,7 +13,7 @@ export const getBooleanSelector = (nodeDef, parentSelector, value) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
 
 export const getCodeSelector = (nodeDef, parentSelector) =>
-  getDropdownValueSelector(getNodeDefSelector(nodeDef, parentSelector))
+  FormUtils.getDropdownValueSelector(getNodeDefSelector(nodeDef, parentSelector))
 
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
@@ -40,27 +38,6 @@ export const getTextSelector = (nodeDef, parentSelector) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} input[type="text"]`
 
 export const getTreeSelector = (treeIdx) => getSelector(TestId.surveyForm.entityRowData(tree.name, treeIdx))
-
-// ==== dropdown utils
-export const selectDropdownValue = async ({ testId, value, parentSelector = '' }) => {
-  const inputSelector = `${parentSelector} ${getSelector(testId, 'input')}`
-  if (await page.isEditable(inputSelector)) {
-    const toggleBtnSelector = `${parentSelector} ${getSelector(TestId.dropdown.toggleBtn(testId))}`
-    await page.click(toggleBtnSelector)
-    await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
-  }
-}
-
-export const expectDropdownValue = async ({ parentSelector, value }) => {
-  const dropdownValueEl = await page.$(getDropdownValueSelector(parentSelector))
-  if (Objects.isEmpty(value)) {
-    await expect(dropdownValueEl).toBeNull()
-  } else {
-    await expect(dropdownValueEl).not.toBeNull()
-    const dropdownValue = await dropdownValueEl.innerText()
-    await expect(dropdownValue).toBe(value)
-  }
-}
 
 // ==== format utils
 export const formatTime = (date) => {

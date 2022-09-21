@@ -1,5 +1,6 @@
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { user, user2 } from '../mock/user'
+import { FormUtils } from './utils/formUtils'
 import { gotoUserList, gotoHome } from './_navigation'
 
 const expectUsers = (users) => {
@@ -24,8 +25,7 @@ const inviteUser = (userToInvite) =>
 
     await page.fill(getSelector(TestId.userInvite.email, 'input'), userToInvite.email)
 
-    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.userInvite.group)))
-    await page.click(`text="${userToInvite.authGroup.label}"`)
+    await FormUtils.selectDropdownItem({ testId: TestId.userInvite.group, label: userToInvite.authGroup.label })
 
     await Promise.all([
       page.waitForNavigation(),

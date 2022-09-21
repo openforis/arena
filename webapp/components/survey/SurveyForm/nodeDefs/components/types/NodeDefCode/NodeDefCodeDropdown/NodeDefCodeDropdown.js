@@ -41,7 +41,6 @@ const NodeDefCodeDropdown = (props) => {
         />
       ) : (
         <Dropdown
-          idInput={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}
@@ -53,6 +52,7 @@ const NodeDefCodeDropdown = (props) => {
             if (item) onItemAdd(item)
             else onItemRemove(item)
           }}
+          testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
         />
       )}
     </div>

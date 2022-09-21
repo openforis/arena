@@ -1,17 +1,16 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { categories } from '../../mock/categories'
 import { BASE_URL } from '../../config'
+import { FormUtils } from '../utils/formUtils'
 
 const editCodeDetails = async (nodeDef) => {
   const category = categories[nodeDef.category]
   // select category
-  await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.categorySelector.category)))
-  await page.click(getSelector(TestId.dropdown.dropDownItem(category.uuid)))
+  await FormUtils.selectDropdownItem({ testId: TestId.categorySelector.category, value: category.uuid })
 
   if (nodeDef.parent) {
     // select parent
-    await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.nodeDefDetails.nodeDefCodeParent)))
-    await page.click(`text="${nodeDef.parent}"`)
+    await FormUtils.selectDropdownItem({ testId: TestId.nodeDefDetails.nodeDefCodeParent, label: nodeDef.parent })
   } else {
     const codeParent = await page.$(getSelector(TestId.nodeDefDetails.nodeDefCodeParent, 'input'))
     await expect(await codeParent.isDisabled()).toBeTruthy()

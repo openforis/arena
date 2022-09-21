@@ -75,7 +75,6 @@ const CodeProps = (props) => {
               <Dropdown
                 clearable
                 disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
-                idInput={TestId.nodeDefDetails.nodeDefCodeParent}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
                 itemKey="uuid"
@@ -83,6 +82,7 @@ const CodeProps = (props) => {
                 onChange={(def) =>
                   Actions.setProp({ state, key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
                 }
+                testId={TestId.nodeDefDetails.nodeDefCodeParent}
               />
             </div>
           </FormItem>

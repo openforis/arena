@@ -76,13 +76,13 @@ const EntitySelector = (props) => {
 
   return (
     <Dropdown
-      idInput={TestId.entities.entitySelector}
       className="entity-selector"
       items={dropdownItems}
       selection={selection}
       validation={validation}
       onChange={(item) => onChange(item?.value)}
       disabled={disabled}
+      testId={TestId.entities.entitySelector}
     />
   )
 }

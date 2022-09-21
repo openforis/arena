@@ -1,6 +1,7 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
 
-import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { TestId } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 import {
   formatTime,
   getBooleanSelector,
@@ -9,7 +10,6 @@ import {
   getTaxonSelector,
   getTextSelector,
   parseValue,
-  selectDropdownValue,
 } from './utils'
 
 const enterBoolean = async (nodeDef, value, parentSelector) => {
@@ -24,12 +24,11 @@ const enterBoolean = async (nodeDef, value, parentSelector) => {
 const enterCode = async (nodeDef, value, parentSelector) => {
   // only dropdown for now
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const toggleBtnSelector = `${nodeDefSelector} ${getSelector(
-    TestId.dropdown.toggleBtn(TestId.surveyForm.codeInputDropdown(nodeDef.name))
-  )}`
-  await page.click(toggleBtnSelector)
-  const itemEl = await page.waitForSelector(`text="${value}"`)
-  await itemEl.click()
+  await FormUtils.selectDropdownItem({
+    testId: TestId.surveyForm.codeInputDropdown(nodeDef.name),
+    label: value,
+    parentSelector: nodeDefSelector,
+  })
 }
 
 const enterCoordinate = async (nodeDef, value, parentSelector) => {
@@ -37,7 +36,7 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
   await page.fill(xSelector, value.x)
   await page.fill(ySelector, value.y)
 
-  await selectDropdownValue({ testId: srsTestId, value: value.srs, parentSelector })
+  await FormUtils.selectDropdownItem({ testId: srsTestId, value: value.srs, parentSelector })
 }
 
 const enterTaxon = async (nodeDef, value, parentSelector) => {
