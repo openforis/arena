@@ -95,7 +95,6 @@ DimensionsSelector.propTypes = {
 }
 
 DimensionsSelector.defaultProps = {
-  chainUuid: undefined,
   labelType: NodeDef.NodeDefLabelTypes.name,
   showAnalysisAttributes: false,
 }
