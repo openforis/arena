@@ -118,6 +118,7 @@ export const ChainStatisticalAnalysisProps = () => {
           entityDefUuid={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
           dimensionUuids={dimensionUuids}
           onDimensionsChange={onDimensionsChange}
+          showAnalysisAttributes
         />
       </FormItem>
 
