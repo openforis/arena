@@ -7,7 +7,9 @@ const keys = {
 }
 
 const isOnlyForSampleBasedImageInterpretation = (key) =>
-  [keys.showLocationMarkers, keys.showPlotReferencePoint, keys.showSamplingPolygon].includes(key)
+  [keys.showControlPoints, keys.showLocationMarkers, keys.showPlotReferencePoint, keys.showSamplingPolygon].includes(
+    key
+  )
 
 const defaultOptions = () => ({
   [keys.showControlPoints]: true,
