@@ -57,7 +57,12 @@ const Dropdown = (props) => {
     })
 
   return (
-    <ValidationTooltip className="dropdown-validation-tooltip" id={id} testId={testId} validation={validation}>
+    <ValidationTooltip
+      className="dropdown-wrapper dropdown-validation-tooltip"
+      id={id}
+      testId={testId}
+      validation={validation}
+    >
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"

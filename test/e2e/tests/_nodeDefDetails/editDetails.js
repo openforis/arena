@@ -12,8 +12,7 @@ const editCodeDetails = async (nodeDef) => {
     // select parent
     await FormUtils.selectDropdownItem({ testId: TestId.nodeDefDetails.nodeDefCodeParent, label: nodeDef.parent })
   } else {
-    const codeParent = await page.$(getSelector(TestId.nodeDefDetails.nodeDefCodeParent, 'input'))
-    await expect(await codeParent.isDisabled()).toBeTruthy()
+    await FormUtils.expectDropdownToBeDisabled({ testId: TestId.nodeDefDetails.nodeDefCodeParent })
   }
 }
 

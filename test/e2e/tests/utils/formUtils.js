@@ -17,6 +17,12 @@ const selectDropdownItem = async ({ testId, value = null, label = null, parentSe
   }
 }
 
+const expectDropdownToBeDisabled = async ({ testId, parentSelector = '' }) => {
+  const dropdownSelector = `${parentSelector} ${getSelector(testId)} .dropdown`
+  await expect(dropdownSelector).not.toBeNull()
+  await expect(dropdownSelector).toHaveClass('dropdown--is-disabled')
+}
+
 const expectDropdownValue = async ({ parentSelector, value }) => {
   const dropdownValueEl = await page.$(getDropdownValueSelector(parentSelector))
   if (Objects.isEmpty(value)) {
@@ -31,5 +37,6 @@ const expectDropdownValue = async ({ parentSelector, value }) => {
 export const FormUtils = {
   getDropdownValueSelector,
   selectDropdownItem,
+  expectDropdownToBeDisabled,
   expectDropdownValue,
 }
