@@ -156,6 +156,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const chainSamplingDesign = Chain.getSamplingDesign(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const baseUnitEntityKeys = baseUnitNodeDef ? Survey.getNodeDefKeys(baseUnitNodeDef)(survey).map(NodeDef.getName) : []
   const samplingStrategyIndex = Object.values(ChainSamplingDesign.samplingStrategies).indexOf(
     ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
   )
@@ -180,6 +181,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.hasSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
+    baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
       ? {
