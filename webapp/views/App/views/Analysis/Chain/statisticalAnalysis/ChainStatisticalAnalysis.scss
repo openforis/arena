@@ -16,28 +16,7 @@
     }
   }
 
-  .attributes-selector {
-    height: auto;
-    overflow-y: auto;
-    max-height: 10rem;
-
-    &.ancestor {
-      overflow: hidden;
-      max-height: none;
-      padding-left: 1rem;
-      width: 100%;
-    }
-
-    .attribute-selector {
-      width: 100%;
-      margin: 0;
-    }
-
-    .expansion-panel {
-      padding-right: 1rem;
-    }
-  }
-
+  .dimensions-selector,
   .filter {
     width: 60rem;
   }

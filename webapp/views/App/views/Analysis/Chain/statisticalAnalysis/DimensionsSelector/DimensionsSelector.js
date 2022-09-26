@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 const OptionComponent = (props) => {
@@ -23,16 +23,20 @@ const OptionComponent = (props) => {
 }
 
 export const DimensionsSelector = (props) => {
-  const { chainUuid, entityDefUuid, dimensionUuids, onDimensionsChange, showAnalysisAttributes } = props
+  const { chainUuid, entityDefUuid, dimensionUuids, labelType, onDimensionsChange, showAnalysisAttributes } = props
 
   const cycle = useSurveyCycleKey()
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
 
   const options = []
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
   const isDimensionIncluded = (nodeDef) =>
     NodeDef.isSingleAttribute(nodeDef) &&
+    [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon].includes(
+      NodeDef.getType(nodeDef)
+    ) &&
     NodeDef.isInCycle(cycle)(nodeDef) &&
     (!chainUuid || !NodeDef.getChainUuid(nodeDef) || chainUuid === NodeDef.getChainUuid(nodeDef))
 
@@ -44,13 +48,13 @@ export const DimensionsSelector = (props) => {
 
     const nestedOptions = dimensionsInAncestor.map((dimension) => ({
       value: NodeDef.getUuid(dimension),
-      label: NodeDef.getName(dimension),
+      label: NodeDef.getLabel(dimension, lang, labelType),
       icon: NodeDefUIProps.getIconByType(NodeDef.getType(dimension)),
     }))
 
     const option = {
       value: NodeDef.getUuid(ancestorDef),
-      label: NodeDef.getName(ancestorDef),
+      label: NodeDef.getLabel(ancestorDef, lang, labelType),
       options: nestedOptions,
     }
     options.push(option)
@@ -85,11 +89,12 @@ DimensionsSelector.propTypes = {
   chainUuid: PropTypes.string.isRequired,
   entityDefUuid: PropTypes.string.isRequired,
   dimensionUuids: PropTypes.array.isRequired,
+  labelType: PropTypes.string,
   onDimensionsChange: PropTypes.func.isRequired,
   showAnalysisAttributes: PropTypes.bool,
 }
 
-DimensionsSelector.defaultValues = {
-  chainUuid: undefined,
+DimensionsSelector.defaultProps = {
+  labelType: NodeDef.NodeDefLabelTypes.name,
   showAnalysisAttributes: false,
 }
