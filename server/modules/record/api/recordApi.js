@@ -1,5 +1,4 @@
 import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
 
 import { sendOk, sendFileContent, setContentTypeFile, contentTypes } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
@@ -233,10 +232,7 @@ export const init = (app) => {
     try {
       const { surveyId, cycle, lang, recordUuid } = Request.getParams(req)
 
-      const fileName = `validation_report.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await RecordService.exportValidationReportToCSV({ outputStream: res, surveyId, cycle, lang, recordUuid })
+      await RecordService.exportValidationReportToCSV({ res, surveyId, cycle, lang, recordUuid })
     } catch (error) {
       next(error)
     }

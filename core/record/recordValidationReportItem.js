@@ -49,10 +49,12 @@ const getKeysHierarchy = (survey) => (item) =>
     )
   )(item)
 
-export const getPath = (survey, lang) => (item) => {
-  const keys = getKeysHierarchy(survey)(item)
-  return NodeKeys.getKeysHierarchyPath(survey, lang, true)(keys)
-}
+export const getPath =
+  ({ survey, lang, labelType = NodeDef.NodeDefLabelTypes.label }) =>
+  (item) => {
+    const keys = getKeysHierarchy(survey)(item)
+    return NodeKeys.getKeysHierarchyPath({ survey, lang, includeRootKeys: true, labelType })(keys)
+  }
 
 export const getNodeContextUuid = R.ifElse(
   isValidationCount,

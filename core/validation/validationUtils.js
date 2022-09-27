@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -18,7 +16,7 @@ const getValidationCountErrorText =
     })
   }
 
-const getErrorText =
+const getValidationText =
   ({ survey, i18n }) =>
   (validationResult) => {
     if (ValidationResult.hasMessages(validationResult)) {
@@ -30,76 +28,75 @@ const getErrorText =
     return i18n.t(ValidationResult.getKey(validationResult), ValidationResult.getParams(validationResult))
   }
 
-const getJointMessages =
-  ({ i18n, survey, getterFn, severity }) =>
-  (validation) => {
-    const text = getterFn(validation).map(getErrorText({ survey, i18n })).join(', ')
-    return text ? { severity, text } : null
-  }
+const getJointText =
+  ({ i18n, survey, getterFn }) =>
+  (validation) =>
+    getterFn(validation).map(getValidationText({ survey, i18n })).join(', ')
 
-const getValidationErrorMessages =
+const getValidationMessage =
   ({ survey, i18n }) =>
   (validation) => {
-    const errors = getJointMessages({
-      i18n,
-      survey,
-      getterFn: Validation.getErrors,
-      severity: ValidationResult.severity.error,
-    })(validation)
+    const errorText = getJointText({ i18n, survey, getterFn: Validation.getErrors })(validation)
 
-    if (errors) {
-      return errors
+    if (errorText) {
+      return { severity: ValidationResult.severity.error, text: errorText }
     }
 
-    const warnings = getJointMessages({
-      i18n,
-      survey,
-      getterFn: Validation.getWarnings,
-      severity: ValidationResult.severity.warning,
-    })(validation)
+    const warningText = getJointText({ i18n, survey, getterFn: Validation.getWarnings })(validation)
 
-    return warnings
+    if (warningText) {
+      return { severity: ValidationResult.severity.warning, text: warningText }
+    }
+    return null
   }
 
-const getValidationFieldErrorMessage = ({ survey, field, i18n }) =>
-  R.pipe(
-    getValidationErrorMessages({ survey, i18n }),
-    R.when(R.isEmpty, () => ({
+const getFieldValidationMessage =
+  ({ survey, field, i18n }) =>
+  (validation) => {
+    const message = getValidationMessage({ survey, i18n })(validation)
+    if (message) {
+      return message
+    }
+    return {
       severity: ValidationResult.severity.error,
-      text: getErrorText({ survey, i18n })(
+      text: getValidationText({ survey, i18n })(
         ValidationResult.newInstance(
           Validation.messageKeys.invalidField, // Default error message
           { field }
         )
       ),
-    }))
-  )
+    }
+  }
 
-const getValidationFieldMessages =
+const getJointMessages =
   ({ i18n, survey, showKeys = true }) =>
   (validation) => {
     const messages = [] // Every message is an object of type {severity, text}
 
     // Add messages from fields
-    R.pipe(
-      Validation.getFieldValidations,
-      Object.entries,
-      // Extract invalid fields error messages
-      R.forEach(([field, childValidation]) => {
-        const { severity, text } = getValidationFieldErrorMessage({ survey, field, i18n })(childValidation)
-        messages.push({ severity, text: `${showKeys ? `${i18n.t(field)}: ` : ''}${text}` })
-      })
-    )(validation)
+    Object.entries(Validation.getFieldValidations(validation)).forEach(([field, childValidation]) => {
+      const { severity, text } = getFieldValidationMessage({ survey, field, i18n })(childValidation)
+      messages.push({ severity, text: `${showKeys ? `${i18n.t(field)}: ` : ''}${text}` })
+    })
 
     // Add messages from validation errors and warnings
-    R.pipe(
-      getValidationErrorMessages({ survey, i18n }),
-      R.unless(R.isEmpty, (message) => messages.push(message))
-    )(validation)
+    const mainErrorMessage = getValidationMessage({ survey, i18n })(validation)
+    if (mainErrorMessage) {
+      messages.push(mainErrorMessage)
+    }
 
     return messages
   }
 
+const getJointMessage =
+  ({ i18n, survey, showKeys = true, severity = null }) =>
+  (validation) => {
+    const messages = getJointMessages({ i18n, survey, showKeys })(validation)
+    const messagesFiltered = severity ? messages.filter((message) => message.severity === severity) : messages
+    return messagesFiltered.map(({ text }) => text).join(', ')
+  }
+
 export const ValidationUtils = {
-  getValidationFieldMessages,
+  getJointMessages,
+  getJointMessage,
 }
