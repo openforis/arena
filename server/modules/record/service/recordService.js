@@ -146,7 +146,6 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   const objectTransformer = (row) => {
     const item = A.camelizePartial({ limitToLevel: 1 })(row)
 
-    const recordStep = RecordValidationReportItem.getRecordStep(item)
     const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
     const validation = RecordValidationReportItem.getValidation(item)
 
@@ -164,9 +163,15 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
       severity: ValidationResult.severity.warning,
     })(validation)
 
-    return { record_step: recordStep, path, errors, warnings }
+    return {
+      path,
+      errors,
+      warnings,
+      record_step: RecordValidationReportItem.getRecordStep(item),
+      record_cycle: RecordValidationReportItem.getRecordCycle(item),
+    }
   }
-  const headers = ['path', 'errors', 'warnings', 'record_step']
+  const headers = ['path', 'errors', 'warnings', 'record_step', 'record_cycle']
   const streamTransformer = CSVWriter.transformToStream(res, headers, { objectTransformer })
 
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })

@@ -6,9 +6,10 @@ import * as Record from '@core/record/record'
 import * as NodeKeys from '@core/record/nodeKeys'
 
 const keys = {
-  recordUuid: 'recordUuid',
-  recordStep: 'recordStep',
+  recordCycle: 'recordCycle',
   recordOwnerUuid: 'recordOwnerUuid',
+  recordStep: 'recordStep',
+  recordUuid: 'recordUuid',
   nodeUuid: 'nodeUuid',
   nodeDefUuid: 'nodeDefUuid',
   keysHierarchy: 'keysHierarchy',
@@ -17,9 +18,10 @@ const keys = {
   validationCountChildDefUuid: 'validationCountChildDefUuid',
 }
 
-export const getRecordUuid = R.prop(keys.recordUuid)
+export const getRecordCycle = R.prop(keys.recordCycle)
 export const getRecordStep = R.prop(keys.recordStep)
 export const getRecordOwnerUuid = R.prop(keys.recordOwnerUuid)
+export const getRecordUuid = R.prop(keys.recordUuid)
 const getNodeUuid = R.prop(keys.nodeUuid)
 const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 const getValidationCountChildDefUuid = R.prop(keys.validationCountChildDefUuid)

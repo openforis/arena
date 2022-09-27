@@ -43,9 +43,10 @@ const query = ({ surveyId, recordUuid }) => {
   )
     
   SELECT
-      r.uuid AS record_uuid,
-      r.step AS record_step,
+      r.cycle AS record_cycle,
       r.owner_uuid AS record_owner_uuid,
+      r.step AS record_step,
+      r.uuid AS record_uuid,
       n.id AS node_id,
       n.uuid AS node_uuid,
       n.node_def_uuid,
