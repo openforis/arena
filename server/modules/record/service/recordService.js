@@ -153,6 +153,9 @@ export const exportValidationReportToCSV = async ({ outputStream, surveyId, cycl
   }
   const headers = ['record_step', 'path', 'errors', 'warnings']
   const streamTransformer = CSVWriter.transformToStream(outputStream, headers, { objectTransformer })
+
+  console.log(recordUuid)
+
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
 }
 

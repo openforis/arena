@@ -32,7 +32,7 @@ const ValidationReport = () => {
     navigate(recordEditUrl)
   }
 
-  const restParams = { cycle: surveyCycleKey, recordUuid, lang }
+  const restParams = { cycle: surveyCycleKey, ...(recordUuid ? { recordUuid } : {}), lang }
 
   return (
     <div className="validation-report">
