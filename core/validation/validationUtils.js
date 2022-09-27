@@ -76,7 +76,8 @@ const getJointMessages =
     // Add messages from fields
     Object.entries(Validation.getFieldValidations(validation)).forEach(([field, childValidation]) => {
       const { severity, text } = getFieldValidationMessage({ survey, field, i18n })(childValidation)
-      messages.push({ severity, text: `${showKeys ? `${i18n.t(field)}: ` : ''}${text}` })
+      const textPrefix = showKeys ? `${i18n.t(field)}: ` : ''
+      messages.push({ severity, text: `${textPrefix}${text}` })
     })
 
     // Add messages from validation errors and warnings
