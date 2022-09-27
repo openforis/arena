@@ -5,6 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -14,6 +15,8 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisManager from '../../manager'
 
+import { dfVar, NA, setVar } from './rFunctions'
+import RFile, { padStart } from './rFile'
 import {
   ListCategories,
   ListTaxonomies,
@@ -24,11 +27,8 @@ import {
   RFileReadData,
 } from './rFile/system'
 import { RFileCommon } from './rFile/user'
-import RFile, { padStart } from './rFile'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
-
-import { dfVar, NA, setVar } from './rFunctions'
-import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
+import RFileStatisticalAnalysis from './rFile/system/rFileStatisticalAnalysis'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
@@ -57,6 +57,7 @@ class RChain {
     this._fileLogin = null
     this._fileReadData = null
     this._filePersistResults = null
+    this._fileStatisticalAnalysis = null
     this._fileClose = null
     // User files
     this._fileCommon = null
@@ -329,6 +330,7 @@ class RChain {
 
   async _initFilesClosing() {
     this._filePersistResults = await new RFilePersistResults(this).init()
+    this._fileStatisticalAnalysis = await new RFileStatisticalAnalysis(this).init()
     this._fileClose = await new RFileClose(this).init() // Check if we should remove this
   }
 
