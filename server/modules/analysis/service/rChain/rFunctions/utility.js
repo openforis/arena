@@ -64,3 +64,5 @@ export const paste0 = (parts) => paste(parts, '')
 export const sysTime = () => `Sys.time()`
 
 export const q = () => `q()`
+
+export const print = (value) => `print( ${value} )`
