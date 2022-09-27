@@ -94,7 +94,7 @@ const getJointMessage =
   (validation) => {
     const messages = getJointMessages({ i18n, survey, showKeys })(validation)
     const messagesFiltered = severity ? messages.filter((message) => message.severity === severity) : messages
-    return messagesFiltered.map(({ text }) => text).join(', ')
+    return messagesFiltered.map(({ text }) => text.trim()).join(', ')
   }
 
 export const ValidationUtils = {
