@@ -87,12 +87,12 @@ export const useDropdown = ({
 
   const onInputChange = useCallback(
     (inputValue) => {
-      if (minCharactersToAutocomplete) {
-        if (minCharactersToAutocomplete <= inputValue?.length) {
-          fetchItems()
-        } else {
-          setState({ items: [] })
-        }
+      if (!minCharactersToAutocomplete) return
+
+      if (minCharactersToAutocomplete <= inputValue?.length) {
+        fetchItems()
+      } else {
+        setState({ items: [] })
       }
     },
     [minCharactersToAutocomplete, fetchItems]
