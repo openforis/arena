@@ -1,6 +1,5 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { tree } from '../../mock/nodeDefs'
-import { FormUtils } from '../utils/formUtils'
 
 // ==== value parser
 export const parseValue = (value) => (typeof value === 'function' ? value() : value)
@@ -11,9 +10,6 @@ export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
 
 export const getBooleanSelector = (nodeDef, parentSelector, value) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
-
-export const getCodeSelector = (nodeDef, parentSelector) =>
-  FormUtils.getDropdownValueSelector(getNodeDefSelector(nodeDef, parentSelector))
 
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)

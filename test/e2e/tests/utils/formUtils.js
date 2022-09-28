@@ -8,7 +8,7 @@ const getDropdownSelector = ({ testId = null, parentSelector = '' }) =>
 const getDropdownValueSelector = ({ testId = null, parentSelector = '' }) =>
   `${getDropdownSelector({ testId, parentSelector })} .dropdown__single-value`
 
-const selectDropdownItem = async ({ testId = null, value = null, label = null, parentSelector = '' }) => {
+const selectDropdownItem = async ({ testId = null, parentSelector = '', value = null, label = null }) => {
   const dropdownSelector = getDropdownSelector({ testId, parentSelector })
   const inputSelector = `${dropdownSelector} .dropdown__input`
   if (await page.isEditable(inputSelector)) {
@@ -40,7 +40,6 @@ const expectDropdownValue = async ({ testId = null, parentSelector = '', value }
 }
 
 export const FormUtils = {
-  getDropdownValueSelector,
   selectDropdownItem,
   expectDropdownToBeDisabled,
   expectDropdownValue,

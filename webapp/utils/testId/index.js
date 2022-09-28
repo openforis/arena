@@ -59,7 +59,6 @@ export const TestId = {
   },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
-    toggleBtn: (id) => `${id}-toggle-btn`,
   },
   entities: {
     addBtn: 'entity-add-btn',

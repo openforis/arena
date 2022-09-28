@@ -1,4 +1,3 @@
-import { getSelector } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import {
   formatDate,
@@ -18,7 +17,7 @@ const verifyBoolean = async (nodeDef, value, parentSelector) => {
 
 const verifyCode = async (nodeDef, value, parentSelector) =>
   FormUtils.expectDropdownValue({
-    parentSelector: `${parentSelector} ${getNodeDefSelector(nodeDef)}`,
+    parentSelector: getNodeDefSelector(nodeDef, parentSelector),
     value,
   })
 
@@ -31,7 +30,8 @@ const verifyCoordinate = async (nodeDef, value, parentSelector) => {
   await expect(Number(await x.getAttribute('value'))).toBe(Number(value.x))
   await expect(Number(await y.getAttribute('value'))).toBe(Number(value.y))
   await FormUtils.expectDropdownValue({
-    parentSelector: `${getNodeDefSelector(nodeDef, parentSelector)} ${getSelector(srsTestId)}`,
+    testId: srsTestId,
+    parentSelector: getNodeDefSelector(nodeDef, parentSelector),
     value: value.srsLabel,
   })
 }
