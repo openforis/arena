@@ -2,12 +2,17 @@ import { Objects } from '@openforis/arena-core'
 
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
-const getDropdownValueSelector = (parentSelector) => `${parentSelector} .dropdown__single-value`
+const getDropdownSelector = ({ testId, parentSelector = '' }) =>
+  `${parentSelector} ${getSelector(testId, '.dropdown-wrapper')} .dropdown`
+
+const getDropdownValueSelector = ({ testId, parentSelector }) =>
+  `${getDropdownSelector({ testId, parentSelector })} .dropdown__single-value`
 
 const selectDropdownItem = async ({ testId, value = null, label = null, parentSelector = '' }) => {
-  const inputSelector = `${parentSelector} ${getSelector(testId, 'input')}`
+  const dropdownSelector = getDropdownSelector({ testId, parentSelector })
+  const inputSelector = `${dropdownSelector} .dropdown__input`
   if (await page.isEditable(inputSelector)) {
-    const toggleBtnSelector = `${parentSelector} ${getSelector(TestId.dropdown.toggleBtn(testId))}`
+    const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
     await page.click(toggleBtnSelector)
     if (value) {
       await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
@@ -18,13 +23,13 @@ const selectDropdownItem = async ({ testId, value = null, label = null, parentSe
 }
 
 const expectDropdownToBeDisabled = async ({ testId, parentSelector = '' }) => {
-  const dropdownSelector = `${parentSelector} ${getSelector(testId)} .dropdown`
-  await expect(dropdownSelector).not.toBeNull()
-  await expect(dropdownSelector).toHaveClass('dropdown--is-disabled')
+  const dropdownValueEl = await page.$(getDropdownSelector({ testId, parentSelector }))
+  await expect(dropdownValueEl).not.toBeNull()
+  await expect(dropdownValueEl).toHaveClass('dropdown--is-disabled')
 }
 
-const expectDropdownValue = async ({ parentSelector, value }) => {
-  const dropdownValueEl = await page.$(getDropdownValueSelector(parentSelector))
+const expectDropdownValue = async ({ testId, parentSelector = '', value }) => {
+  const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
   if (Objects.isEmpty(value)) {
     await expect(dropdownValueEl).toBeNull()
   } else {

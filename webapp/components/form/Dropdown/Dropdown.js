@@ -15,12 +15,6 @@ const OptionComponent = (props) => (
   </div>
 )
 
-const IndicatorsContainerComponent = (props) => (
-  <div data-testid={TestId.dropdown.toggleBtn(props.selectProps.inputId)}>
-    <components.IndicatorsContainer {...props} />
-  </div>
-)
-
 const Dropdown = (props) => {
   const {
     minCharactersToAutocomplete,
@@ -66,7 +60,7 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
-        components={{ Option: OptionComponent, IndicatorsContainer: IndicatorsContainerComponent }}
+        components={{ Option: OptionComponent }}
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}

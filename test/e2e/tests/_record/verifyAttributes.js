@@ -16,9 +16,12 @@ const verifyBoolean = async (nodeDef, value, parentSelector) => {
   await expect(await span.getAttribute('class')).toContain('icon-radio-checked2')
 }
 
-const verifyCode = async (nodeDef, value, parentSelector) => {
-  await FormUtils.expectDropdownValue({ parentSelector: `${parentSelector} ${getNodeDefSelector(nodeDef)}`, value })
-}
+const verifyCode = async (nodeDef, value, parentSelector) =>
+  FormUtils.expectDropdownValue({
+    testId: nodeDef.name,
+    parentSelector: `${parentSelector} ${getNodeDefSelector(nodeDef)}`,
+    value,
+  })
 
 const verifyCoordinate = async (nodeDef, value, parentSelector) => {
   const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
