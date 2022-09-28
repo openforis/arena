@@ -2,13 +2,13 @@ import { Objects } from '@openforis/arena-core'
 
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
-const getDropdownSelector = ({ testId, parentSelector = '' }) =>
-  `${parentSelector} ${getSelector(testId, '.dropdown-wrapper')} .dropdown`
+const getDropdownSelector = ({ testId = null, parentSelector = '' }) =>
+  `${parentSelector} ${testId ? getSelector(testId, '.dropdown-wrapper') : '.dropdown-wrapper'} .dropdown`
 
-const getDropdownValueSelector = ({ testId, parentSelector }) =>
+const getDropdownValueSelector = ({ testId = null, parentSelector = '' }) =>
   `${getDropdownSelector({ testId, parentSelector })} .dropdown__single-value`
 
-const selectDropdownItem = async ({ testId, value = null, label = null, parentSelector = '' }) => {
+const selectDropdownItem = async ({ testId = null, value = null, label = null, parentSelector = '' }) => {
   const dropdownSelector = getDropdownSelector({ testId, parentSelector })
   const inputSelector = `${dropdownSelector} .dropdown__input`
   if (await page.isEditable(inputSelector)) {
@@ -22,13 +22,13 @@ const selectDropdownItem = async ({ testId, value = null, label = null, parentSe
   }
 }
 
-const expectDropdownToBeDisabled = async ({ testId, parentSelector = '' }) => {
+const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }) => {
   const selector = `${getDropdownSelector({ testId, parentSelector })}.dropdown--is-disabled`
   const dropdownEl = await page.$(selector)
   await expect(dropdownEl).not.toBeNull()
 }
 
-const expectDropdownValue = async ({ testId, parentSelector = '', value }) => {
+const expectDropdownValue = async ({ testId = null, parentSelector = '', value }) => {
   const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
   if (Objects.isEmpty(value)) {
     await expect(dropdownValueEl).toBeNull()

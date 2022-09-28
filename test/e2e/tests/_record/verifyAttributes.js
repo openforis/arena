@@ -18,7 +18,6 @@ const verifyBoolean = async (nodeDef, value, parentSelector) => {
 
 const verifyCode = async (nodeDef, value, parentSelector) =>
   FormUtils.expectDropdownValue({
-    testId: nodeDef.name,
     parentSelector: `${parentSelector} ${getNodeDefSelector(nodeDef)}`,
     value,
   })
