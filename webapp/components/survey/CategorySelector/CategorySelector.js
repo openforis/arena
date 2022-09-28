@@ -40,7 +40,7 @@ export const CategorySelector = (props) => {
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
-  const emptyItem = useMemo(() => ({ uuid: null, label: i18n.t('common.notSpecified') }))
+  const emptyItem = useMemo(() => ({ uuid: null, label: i18n.t('common.notSpecified') }), [])
 
   const categoriesLookupFunction = useCallback(
     async (value) => {
