@@ -6,6 +6,9 @@
     min-height: 32px;
     height: 32px;
   }
+  .dropdown__menu {
+    z-index: 10;
+  }
 }
 
 .tooltip-error {
