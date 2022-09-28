@@ -23,7 +23,7 @@ const IndicatorsContainerComponent = (props) => (
 
 const Dropdown = (props) => {
   const {
-    autocompleteMinChars,
+    minCharactersToAutocomplete,
     className,
     clearable,
     disabled,
@@ -45,7 +45,7 @@ const Dropdown = (props) => {
 
   const { inputId, loading, menuIsOpen, onChange, onInputChange, openMenuOnClick, options, selectRef, value } =
     useDropdown({
-      autocompleteMinChars,
+      minCharactersToAutocomplete,
       idInputProp,
       itemKey,
       itemLabel,
@@ -86,7 +86,7 @@ const Dropdown = (props) => {
 }
 
 Dropdown.propTypes = {
-  autocompleteMinChars: PropTypes.number,
+  minCharactersToAutocomplete: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -107,7 +107,7 @@ Dropdown.propTypes = {
 }
 
 Dropdown.defaultProps = {
-  autocompleteMinChars: 0,
+  minCharactersToAutocomplete: 0,
   className: undefined,
   clearable: false,
   disabled: false,

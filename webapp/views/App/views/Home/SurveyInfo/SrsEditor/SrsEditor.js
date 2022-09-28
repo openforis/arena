@@ -29,7 +29,7 @@ const SrsEditor = (props) => {
       itemKey={Srs.keys.code}
       itemLabel={Srs.getNameAndCode}
       selection={srs}
-      autocompleteMinChars={3}
+      minCharactersToAutocomplete={3}
       requiredItems={1}
       validation={validation}
       onChange={setSrs}

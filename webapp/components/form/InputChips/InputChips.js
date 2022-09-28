@@ -18,7 +18,7 @@ const InputChips = (props) => {
     itemLabel,
     selection,
     requiredItems,
-    autocompleteMinChars,
+    minCharactersToAutocomplete,
     readOnly,
     disabled,
     validation,
@@ -57,7 +57,7 @@ const InputChips = (props) => {
           itemLabel={State.getItemLabel(state)}
           onChange={Actions.onDropdownChange({ selection, state })}
           selection={null}
-          autocompleteMinChars={autocompleteMinChars}
+          minCharactersToAutocomplete={minCharactersToAutocomplete}
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
@@ -78,7 +78,7 @@ InputChips.propTypes = {
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
 
   requiredItems: PropTypes.number,
-  autocompleteMinChars: PropTypes.number,
+  minCharactersToAutocomplete: PropTypes.number,
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
   validation: PropTypes.object,
@@ -97,7 +97,7 @@ InputChips.defaultProps = {
   itemKey: 'value',
   selection: [],
   requiredItems: 0,
-  autocompleteMinChars: 0,
+  minCharactersToAutocomplete: 0,
   readOnly: false,
   disabled: false,
   validation: {},

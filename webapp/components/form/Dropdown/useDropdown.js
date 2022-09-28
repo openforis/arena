@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as A from '@core/arena'
 
 export const useDropdown = ({
-  autocompleteMinChars,
+  minCharactersToAutocomplete,
   id,
   idInputProp,
   itemLabel,
@@ -18,7 +18,8 @@ export const useDropdown = ({
 }) => {
   const selectRef = useRef(null)
   const inputValue = selectRef?.current?.inputRef?.value
-  const searchMinCharsReached = !autocompleteMinChars || autocompleteMinChars <= inputValue?.trim()?.length
+  const searchMinCharsReached =
+    !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
 
   const getOptionLabel = useCallback(
     (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
@@ -86,15 +87,15 @@ export const useDropdown = ({
 
   const onInputChange = useCallback(
     (inputValue) => {
-      if (autocompleteMinChars) {
-        if (autocompleteMinChars <= inputValue?.length) {
+      if (minCharactersToAutocomplete) {
+        if (minCharactersToAutocomplete <= inputValue?.length) {
           fetchItems()
         } else {
           setState({ items: [] })
         }
       }
     },
-    [autocompleteMinChars, fetchItems]
+    [minCharactersToAutocomplete, fetchItems]
   )
 
   const options = items.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
