@@ -26,7 +26,7 @@ const expectDropdownToBeDisabled = async ({ testId, parentSelector = '' }) => {
   const dropdownSelector = getDropdownSelector({ testId, parentSelector })
   const dropdownValueEl = await page.$(dropdownSelector)
   await expect(dropdownValueEl).not.toBeNull()
-  await expect(dropdownSelector).toHaveClass('dropdown--is-disabled')
+  await expect(page.locator(dropdownSelector)).toHaveClass('dropdown--is-disabled')
 }
 
 const expectDropdownValue = async ({ testId, parentSelector = '', value }) => {
