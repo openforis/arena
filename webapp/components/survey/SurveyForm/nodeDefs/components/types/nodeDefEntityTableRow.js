@@ -145,11 +145,17 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
         )
       })}
 
-      {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
+      {
+        //placeholder used for drag&drop column (during survey edit)
+        edit && <div className="react-grid-item" style={{ width: '100px', display: 'none' }} ref={placeholderRef} />
+      }
 
-      {entry && renderType === NodeDefLayout.renderType.tableHeader && (
-        <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: 100 + 'px' }} />
-      )}
+      {
+        // header for delete column (visible only in data entry)
+        entry && renderType === NodeDefLayout.renderType.tableHeader && canEditRecord && (
+          <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: '100px' }} />
+        )
+      }
 
       {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
         <NodeDeleteButton nodeDef={nodeDef} node={node} disabled={!canDelete} />
