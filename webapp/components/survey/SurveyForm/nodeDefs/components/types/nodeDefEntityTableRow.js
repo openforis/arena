@@ -146,7 +146,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
       })}
 
       {
-        //placeholder used for drag&drop column (during survey edit)
+        // placeholder used for drag&drop (during survey editing)
         edit && <div className="react-grid-item" style={{ width: '100px', display: 'none' }} ref={placeholderRef} />
       }
 
