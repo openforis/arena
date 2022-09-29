@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -12,7 +12,7 @@ import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
-const NodeDefEntityTableRow = (props) => {
+const NodeDefEntityTableRow = forwardRef((props, ref) => {
   const {
     edit,
     entry,
@@ -30,6 +30,7 @@ const NodeDefEntityTableRow = (props) => {
 
   const placeholderRef = useRef()
   const rowRef = useRef()
+  useImperativeHandle(ref, () => rowRef.current)
   const [dragged, setDragged] = useState(null)
   const [resizing, setResizing] = useState(false)
 
@@ -146,12 +147,16 @@ const NodeDefEntityTableRow = (props) => {
 
       {edit && <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={placeholderRef} />}
 
+      {entry && renderType === NodeDefLayout.renderType.tableHeader && (
+        <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: 100 + 'px' }} />
+      )}
+
       {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
         <NodeDeleteButton nodeDef={nodeDef} node={node} disabled={!canDelete} />
       )}
     </div>
   )
-}
+})
 
 NodeDefEntityTableRow.propTypes = {
   edit: PropTypes.bool.isRequired,
