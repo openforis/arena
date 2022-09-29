@@ -23,14 +23,22 @@ const OptionComponent = (props) => {
 }
 
 export const DimensionsSelector = (props) => {
-  const { chainUuid, entityDefUuid, dimensionUuids, labelType, onDimensionsChange, showAnalysisAttributes } = props
+  const {
+    chainUuid,
+    entityDefUuid,
+    disabled,
+    labelType,
+    onDimensionsChange,
+    selectedDimensionsUuids,
+    showAnalysisAttributes,
+  } = props
 
   const cycle = useSurveyCycleKey()
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
 
   const options = []
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
 
   const isDimensionIncluded = (nodeDef) =>
     NodeDef.isSingleAttribute(nodeDef) &&
@@ -40,29 +48,31 @@ export const DimensionsSelector = (props) => {
     NodeDef.isInCycle(cycle)(nodeDef) &&
     (!chainUuid || !NodeDef.getChainUuid(nodeDef) || chainUuid === NodeDef.getChainUuid(nodeDef))
 
-  Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-    const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities(
-      ancestorDef,
-      showAnalysisAttributes
-    )(survey).filter(isDimensionIncluded)
+  if (entityDef) {
+    Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
+      const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities(
+        ancestorDef,
+        showAnalysisAttributes
+      )(survey).filter(isDimensionIncluded)
 
-    const nestedOptions = dimensionsInAncestor.map((dimension) => ({
-      value: NodeDef.getUuid(dimension),
-      label: NodeDef.getLabel(dimension, lang, labelType),
-      icon: NodeDefUIProps.getIconByType(NodeDef.getType(dimension)),
-    }))
+      const nestedOptions = dimensionsInAncestor.map((dimension) => ({
+        value: NodeDef.getUuid(dimension),
+        label: NodeDef.getLabel(dimension, lang, labelType),
+        icon: NodeDefUIProps.getIconByType(NodeDef.getType(dimension)),
+      }))
 
-    const option = {
-      value: NodeDef.getUuid(ancestorDef),
-      label: NodeDef.getLabel(ancestorDef, lang, labelType),
-      options: nestedOptions,
-    }
-    options.push(option)
-  })(survey)
+      const option = {
+        value: NodeDef.getUuid(ancestorDef),
+        label: NodeDef.getLabel(ancestorDef, lang, labelType),
+        options: nestedOptions,
+      }
+      options.push(option)
+    })(survey)
+  }
 
   const selectedOptions = options
     .flatMap((ancestorDefOption) => ancestorDefOption.options)
-    .filter((option) => dimensionUuids.includes(option.value))
+    .filter((option) => selectedDimensionsUuids.includes(option.value))
 
   const onChange = useCallback(
     (_selectedOptions) => {
@@ -77,24 +87,29 @@ export const DimensionsSelector = (props) => {
       className="dimensions-selector"
       classNamePrefix="select"
       components={{ Option: OptionComponent }}
-      defaultValue={selectedOptions}
+      isDisabled={disabled}
       isMulti
       options={options}
       onChange={onChange}
+      value={selectedOptions}
     />
   )
 }
 
 DimensionsSelector.propTypes = {
   chainUuid: PropTypes.string.isRequired,
-  entityDefUuid: PropTypes.string.isRequired,
-  dimensionUuids: PropTypes.array.isRequired,
+  entityDefUuid: PropTypes.string,
+  disabled: PropTypes.bool,
   labelType: PropTypes.string,
   onDimensionsChange: PropTypes.func.isRequired,
+  selectedDimensionsUuids: PropTypes.array,
   showAnalysisAttributes: PropTypes.bool,
 }
 
 DimensionsSelector.defaultProps = {
+  disabled: false,
+  entityDefUuid: null,
   labelType: NodeDef.NodeDefLabelTypes.name,
+  selectedDimensionsUuids: [],
   showAnalysisAttributes: false,
 }
