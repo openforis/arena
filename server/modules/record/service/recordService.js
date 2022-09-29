@@ -168,7 +168,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
       errors,
       warnings,
       record_step: RecordValidationReportItem.getRecordStep(item),
-      record_cycle: RecordValidationReportItem.getRecordCycle(item),
+      record_cycle: Number(RecordValidationReportItem.getRecordCycle(item)) + 1,
     }
   }
   const headers = ['path', 'errors', 'warnings', 'record_step', 'record_cycle']
