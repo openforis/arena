@@ -3,8 +3,10 @@ import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
+
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as NodeKeysRepository from './nodeKeysRepository'
+import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
@@ -41,14 +43,17 @@ const query = ({ surveyId, recordUuid }) => {
   )
     
   SELECT
-      r.uuid AS record_uuid,
-      r.step AS record_step,
+      r.cycle AS record_cycle,
       r.owner_uuid AS record_owner_uuid,
+      r.step AS record_step,
+      r.uuid AS record_uuid,
       n.id AS node_id,
       n.uuid AS node_uuid,
       n.node_def_uuid,
       nv.validation_count_child_def_uuid,
-      nv.validation
+      nv.validation,
+      h.keys_hierarchy,
+      h.keys_self
     FROM
       ${surveySchema}.record r
     JOIN 
@@ -57,6 +62,9 @@ const query = ({ surveyId, recordUuid }) => {
     JOIN
       ${surveySchema}.node n
     ON n.uuid = nv.node_uuid
+    LEFT JOIN
+      ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} h 
+      ON h.node_uuid = n.uuid
     WHERE 
       r.cycle = $/cycle/
       AND NOT r.preview
@@ -80,14 +88,20 @@ export const fetchValidationReport = async (
   if (A.isEmpty(validationReportItems)) {
     return []
   }
-  // fetch node keys and associate them to the validation report items
-  const nodeUuids = validationReportItems.map((item) => item.nodeUuid)
-  const nodesKeys = await NodeKeysRepository.fetchNodesHierarchyKeys({ surveyId, nodeUuids }, client)
-  return validationReportItems.map((item) => {
-    const nodeKeys = nodesKeys.find((nodeKeys) => nodeKeys.nodeUuid === item.nodeUuid) || {}
-    return { ...item, ...nodeKeys }
-  })
+
+  return validationReportItems
 }
 
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
   client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
+
+export const exportValidationReportToStream = (
+  { streamTransformer, surveyId, cycle, recordUuid = null },
+  client = db
+) => {
+  const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
+  const validationReportStream = new DbUtils.QueryStream(queryFormatted)
+  return client.stream(validationReportStream, (dbStream) => {
+    dbStream.pipe(streamTransformer)
+  })
+}
