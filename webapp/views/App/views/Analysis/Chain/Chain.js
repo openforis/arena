@@ -23,6 +23,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
+import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -87,19 +88,20 @@ const ChainComponent = () => {
           {
             label: i18n.t('chainView.basic'),
             component: ChainBasicProps,
-            props: {
-              updateChain,
-            },
+            props: { updateChain },
           },
           {
             label: i18n.t('chainView.samplingDesign'),
             component: ChainSamplingDesignProps,
-            props: {
-              updateChain,
-            },
+            props: { updateChain },
+          },
+          {
+            label: i18n.t('chainView.statisticalAnalysis.header'),
+            component: ChainStatisticalAnalysisProps,
+            props: { updateChain },
           },
         ]}
-        showTabs={Chain.isSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
+        showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
       />
 
       <AnalysisNodeDefs />

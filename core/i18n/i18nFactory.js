@@ -6,8 +6,10 @@ import { enTranslation } from './resources/en'
 
 export const Trans = i18nTrans
 
+const defaultLanguage = 'en'
+
 const createParams = (lang) => ({
-  fallbackLng: 'en',
+  fallbackLng: defaultLanguage,
   debug: ProcessUtils.isEnvDevelopment,
 
   // React i18next special options (optional)
@@ -23,7 +25,7 @@ const createParams = (lang) => ({
   },
 })
 
-export const createI18nPromise = (lang) => {
+export const createI18nPromise = (lang = defaultLanguage) => {
   // Import and require return different objects
   const createInstance = i18next.createInstance || i18next.default.createInstance
 
@@ -40,6 +42,6 @@ export const createI18nPromise = (lang) => {
 }
 
 const i18n = i18next.createInstance()
-i18n.use(initReactI18next).init(createParams('en'))
+i18n.use(initReactI18next).init(createParams(defaultLanguage))
 
 export default i18n

@@ -4,16 +4,23 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as ValidationResult from '@core/validation/validationResult'
+import i18n from '@core/i18n/i18nFactory'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
+import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -21,6 +28,7 @@ import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
+import { ValidationUtils } from '@core/validation/validationUtils'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -126,8 +134,50 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 
 export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
+// VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
 
+export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, recordUuid = null }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const fileName = `${Survey.getName(survey)}_validation_report.csv`
+  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+
+  const objectTransformer = (row) => {
+    const item = A.camelizePartial({ limitToLevel: 1 })(row)
+
+    const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
+    const validation = RecordValidationReportItem.getValidation(item)
+
+    const errors = ValidationUtils.getJointMessage({
+      i18n,
+      survey,
+      showKeys: false,
+      severity: ValidationResult.severity.error,
+    })(validation)
+
+    const warnings = ValidationUtils.getJointMessage({
+      i18n,
+      survey,
+      showKeys: false,
+      severity: ValidationResult.severity.warning,
+    })(validation)
+
+    return {
+      path,
+      errors,
+      warnings,
+      record_step: RecordValidationReportItem.getRecordStep(item),
+      record_cycle: RecordValidationReportItem.getRecordCycle(item),
+    }
+  }
+  const headers = ['path', 'errors', 'warnings', 'record_step', 'record_cycle']
+  const streamTransformer = CSVWriter.transformToStream(res, headers, { objectTransformer })
+
+  await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
+}
+
+// DATA IMPORT
 export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
   const job = new CollectDataImportJob({
     user,

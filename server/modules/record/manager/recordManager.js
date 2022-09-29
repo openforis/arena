@@ -82,6 +82,11 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 }
 
+export const fetchRecordSummary = async ({ surveyId, recordUuid }, client = db) => {
+  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, recordUuid }, client)
+  return list[0]
+}
+
 export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -174,4 +179,8 @@ export {
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
-export { fetchValidationReport, countValidationReportItems } from './_recordManager/validationReportManager'
+export {
+  exportValidationReportToStream,
+  fetchValidationReport,
+  countValidationReportItems,
+} from './_recordManager/validationReportManager'

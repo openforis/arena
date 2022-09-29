@@ -5,6 +5,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
+import * as DateUtils from '@core/dateUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
@@ -30,7 +31,7 @@ export default class RecordsImportJob extends Job {
       userUuidNewByUserUuid,
       mobile,
     } = this.context
-    let surveyId = mobile ? Survey.getId(survey) : _surveyId
+    const surveyId = mobile ? Survey.getId(survey) : _surveyId
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
@@ -69,21 +70,47 @@ export default class RecordsImportJob extends Job {
         record = Record.assocOwnerUuid(ownerUuid)(record)
       }
 
-      const recordToStore = this.prepareRecordToStore(record)
-      await RecordManager.insertRecord(this.user, surveyId, recordToStore, true, this.tx)
+      await this.insertOrSkipRecord({ record, nodesBatchPersister })
+
+      this.incrementProcessedItems()
+    })
+
+    await nodesBatchPersister.flush()
+  }
+
+  async insertOrSkipRecord({ record, nodesBatchPersister }) {
+    const { mobile, survey, surveyId } = this.context
+
+    const recordUuid = Record.getUuid(record)
+
+    const recordSummary = this.prepareRecordSummaryToStore(record)
+
+    const existingRecordSummary = mobile
+      ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
+      : null
+
+    if (
+      !existingRecordSummary ||
+      DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
+    ) {
+      if (existingRecordSummary) {
+        // delete existing record before import (if the record to import has more recent changes)
+        this.logDebug(`deleting existing record ${recordUuid}`)
+        await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
+      }
+      // insert record
+      await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
       // insert nodes (add them to batch persister)
-      const nodes = Record.getNodes(record)
-      await PromiseUtils.each(Object.values(nodes), async (node) => {
+      await PromiseUtils.each(Record.getNodesArray(record), async (node) => {
         // check that the node definition associated to the node has not been deleted from the survey
         if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
           await nodesBatchPersister.addItem(node)
         }
       })
-      this.incrementProcessedItems()
-    })
-
-    await nodesBatchPersister.flush()
+    } else {
+      this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
+    }
   }
 
   /**
@@ -92,11 +119,13 @@ export default class RecordsImportJob extends Job {
    * @param {!object} record - The record to cleanup.
    * @returns {object} - The cleaned up record.
    */
-  prepareRecordToStore(record) {
+  prepareRecordSummaryToStore(record) {
     let recordUpdated = Record.dissocNodes(record)
     if (Validation.isObjValid(recordUpdated)) {
       recordUpdated = Validation.dissocValidation(recordUpdated)
     }
+    const maxNodeModifiedDate = new Date(Math.max.apply(null, Record.getNodesArray(record).map(Record.getDateModified)))
+    recordUpdated = Record.assocDateModified(maxNodeModifiedDate)(recordUpdated)
     return recordUpdated
   }
 }

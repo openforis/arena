@@ -136,7 +136,7 @@ const NodeDefEntityTableCell = (props) => {
           <NodeDefSwitch {...props} node={null} nodeDef={nodeDef} parentNode={parentNode} renderType={renderType} />
         ) : (
           <div className="survey-form__node-def-entity-table-cell-placeholder">
-            <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
+            <ProgressBar className="progress-bar-striped" progress={100} showText={false} />
           </div>
         )}
       </NodeDefEntityTableCellContent>

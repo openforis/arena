@@ -5,13 +5,14 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as Authorizer from '@core/auth/authorizer'
+import { ValidationUtils } from '@core/validation/validationUtils'
 
 import { useI18n, useLang } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import ValidationFieldMessages, { getValidationFieldMessages } from '@webapp/components/validationFieldMessages'
+import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 
 const Row = (props) => {
   const { rowNo, row } = props
@@ -22,7 +23,7 @@ const Row = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
 
-  const path = RecordValidationReportItem.getPath(survey, lang)(row)
+  const path = RecordValidationReportItem.getPath({ survey, lang })(row)
   const canEdit =
     Survey.isPublished(surveyInfo) &&
     Authorizer.canEditRecord(user, {
@@ -33,13 +34,7 @@ const Row = (props) => {
     })
 
   const validation = RecordValidationReportItem.getValidation(row)
-  const messages = getValidationFieldMessages(
-    i18n,
-    survey,
-    false
-  )(validation)
-    .map(([, message]) => message.trim())
-    .join(',')
+  const jointValidationText = ValidationUtils.getJointMessage({ i18n, survey, showKeys: false })(validation)
 
   return (
     <>
@@ -48,7 +43,7 @@ const Row = (props) => {
       <div
         className="validation-report__message"
         data-testid={TestId.validationReport.cellMessages}
-        data-value={messages}
+        data-value={jointValidationText}
       >
         <ValidationFieldMessages validation={validation} showKeys={false} showIcons />
       </div>

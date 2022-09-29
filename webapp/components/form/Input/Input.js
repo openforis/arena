@@ -3,12 +3,14 @@ import '../form.scss'
 import React, { useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
+import classNames from 'classnames'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 
 export const Input = React.forwardRef((props, ref) => {
   const {
+    className: classNameProp,
     disabled,
     id,
     inputType,
@@ -62,13 +64,15 @@ export const Input = React.forwardRef((props, ref) => {
     }
   }, [value])
 
+  const className = classNames('form-input', classNameProp)
+
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
         <NumberFormat
           autoComplete="off"
           disabled={disabled}
-          className="form-input"
+          className={className}
           getInputRef={(el) => {
             inputRef.current = el
           }}
@@ -89,7 +93,7 @@ export const Input = React.forwardRef((props, ref) => {
           ref: inputRef,
           'aria-disabled': disabled,
           autoComplete: 'off',
-          className: 'form-input',
+          className,
           'data-testid': id,
           disabled,
           id,
@@ -110,6 +114,7 @@ export const Input = React.forwardRef((props, ref) => {
 })
 
 Input.propTypes = {
+  className: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   inputType: PropTypes.oneOf(['input', 'textarea']),
@@ -134,6 +139,7 @@ Input.propTypes = {
 }
 
 Input.defaultProps = {
+  className: null,
   disabled: false,
   id: null,
   inputType: 'input',

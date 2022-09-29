@@ -344,6 +344,7 @@ If there are records associated to this cycle, they will be deleted.`,
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
+      sampleBasedImageInterpretation: 'Sample-based image interpretation',
       srsPlaceholder: 'Type code or label',
     },
     deleteSurveyDialog: {
@@ -549,6 +550,7 @@ $t(common.cantUndoWarning)`,
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     options: {
+      showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
       showSamplingPolygon: `Sampling polygon`,
       showControlPoints: `Control points`,
@@ -767,6 +769,16 @@ $t(common.cantUndoWarning)`,
       stratifiedRandom: 'Stratified Random Sampling',
       stratifiedSystematic: 'Stratified Systematic Sampling',
     },
+    statisticalAnalysis: {
+      header: 'Statistical analysis',
+      entityWithoutData: 'The entity {{name}} has no data',
+      filter: 'Filter',
+      reportingMethod: 'Reporting method',
+      reportingMethods: {
+        dimensionsCombined: 'Combination of dimensions',
+        dimensionsSeparate: 'Dimensions separately',
+      },
+    },
     stratumAttribute: 'Stratum attribute',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
@@ -822,8 +834,7 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
-    emptyNodeDefs:
-      '$t(validationErrors.analysis.analysisNodeDefsRequired), click the entity in the left side panel which contains a new result variable',
+    emptyNodeDefs: '$t(validationErrors.analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'the entity and all the related result variables will be excluded in the RStudio scripts',
     entityWithoutData: 'Entity {{name}} has no data; $t(chain.entityExcludedInRStudioScripts)',
@@ -837,6 +848,7 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
+    invalid: 'Invalid expression: {{details}}',
     undefinedFunction: 'Undefined function: {{name}}',
   },
 
@@ -1136,8 +1148,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       column: 'Column',
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
       columnTypeSummaryExtra: '$t(categoryEdit.extraProp)',
-      columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
-      columnTypeLabelWithLanguage: 'Label ({{language}})',
+      columnTypeDescription: 'Description ({{language}})',
+      columnTypeLabel: 'Label ({{language}})',
       columnType: {
         code: 'code',
         description: 'description',
