@@ -12,7 +12,7 @@ const _getParams = (survey, i18n) => (activityLog) => {
 
   const parentPath = R.pipe(
     ActivityLog.getKeysHierarchy,
-    NodeKeys.getKeysHierarchyPath(survey, i18n.language)
+    NodeKeys.getKeysHierarchyPath({ survey, lang: i18n.language })
   )(activityLog)
 
   // Get record keys from parent path first item (root)

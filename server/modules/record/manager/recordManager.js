@@ -179,4 +179,8 @@ export {
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
-export { fetchValidationReport, countValidationReportItems } from './_recordManager/validationReportManager'
+export {
+  exportValidationReportToStream,
+  fetchValidationReport,
+  countValidationReportItems,
+} from './_recordManager/validationReportManager'
