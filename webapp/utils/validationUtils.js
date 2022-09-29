@@ -1,9 +1,7 @@
-import React from 'react'
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import Markdown from '../components/markdown'
 
 const getErrorText = (i18n) => (error) =>
   ValidationResult.hasMessages(error)
@@ -42,12 +40,4 @@ export const getValidationFieldMessages =
       ),
       // Prepend validation error messages
       (messages) => R.pipe(getValidationErrorMessages(i18n), R.concat(messages))(validation)
-    )(validation)
-
-export const getValidationFieldMessagesHTML =
-  (i18n, showKeys = true) =>
-  (validation) =>
-    R.pipe(
-      getValidationFieldMessages(i18n, showKeys),
-      R.addIndex(R.map)((msg, i) => <Markdown key={i} source={msg} />)
     )(validation)
