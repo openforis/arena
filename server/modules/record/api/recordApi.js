@@ -1,4 +1,5 @@
 import * as Request from '@server/utils/request'
+
 import { sendOk, sendFileContent, setContentTypeFile, contentTypes } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
@@ -222,6 +223,16 @@ export const init = (app) => {
       const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
 
       res.json(count)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/validationReport/csv', requireRecordCleansePermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, lang, recordUuid } = Request.getParams(req)
+
+      await RecordService.exportValidationReportToCSV({ res, surveyId, cycle, lang, recordUuid })
     } catch (error) {
       next(error)
     }
