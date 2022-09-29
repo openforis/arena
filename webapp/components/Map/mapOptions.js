@@ -11,16 +11,16 @@ const isOnlyForSampleBasedImageInterpretation = (key) =>
     key
   )
 
-const defaultOptions = () => ({
-  [keys.showControlPoints]: true,
+const createDefaultOptions = ({ sampleBasedImageInterpretationEnabled = false } = {}) => ({
+  [keys.showControlPoints]: sampleBasedImageInterpretationEnabled,
   [keys.showMarkersLabels]: false,
   [keys.showLocationMarkers]: true,
-  [keys.showPlotReferencePoint]: true,
-  [keys.showSamplingPolygon]: true,
+  [keys.showPlotReferencePoint]: sampleBasedImageInterpretationEnabled,
+  [keys.showSamplingPolygon]: sampleBasedImageInterpretationEnabled,
 })
 
 export const MapOptions = {
-  defaultOptions,
+  createDefaultOptions,
   keys,
   isOnlyForSampleBasedImageInterpretation,
 }
