@@ -179,19 +179,19 @@ export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUui
 
 // ====== HIERARCHY
 
-export const visitAncestorsAndSelf = (nodeDef, visitorFn) => (survey) => {
-  let nodeDefCurrent = nodeDef
-  do {
-    visitorFn(nodeDefCurrent)
-    nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
-  } while (nodeDefCurrent)
-}
+export const visitAncestors =
+  (nodeDef, visitorFn, includeSelf = true) =>
+  (survey) => {
+    let nodeDefCurrent = nodeDef
+    do {
+      if (!includeSelf && NodeDef.getUuid(nodeDefCurrent) === NodeDef.getUuid(nodeDef)) continue
 
-export const visitAncestors = (nodeDef, visitorFn) => (survey) =>
-  visitAncestorsAndSelf(nodeDef, (currentDef) => {
-    if (NodeDef.getUuid(currentDef) === NodeDef.getUuid(nodeDef)) return
-    visitorFn(currentDef)
-  })(survey)
+      visitorFn(nodeDefCurrent)
+      nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
+    } while (nodeDefCurrent)
+  }
+
+export const visitAncestorsAndSelf = (nodeDef, visitorFn) => visitAncestors(nodeDef, visitorFn, true)
 
 export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => (survey) => {
   if (NodeDef.isRoot(nodeDefDescendant)) {
@@ -212,14 +212,20 @@ export const getNodeDefAncestorMultipleEntity = (nodeDef) => (survey) => {
   return nodeDefCurrent
 }
 
-export const getNodeDefAncestorsKeyAttributes = (nodeDef) => (survey) => {
-  let ancestorsKeyAttributes = []
-  visitAncestors(nodeDef, (ancestorDef) => {
-    const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
-    ancestorsKeyAttributes = [...ancestorKeyAttributes, ...ancestorsKeyAttributes]
-  })(survey)
-  return ancestorsKeyAttributes
-}
+export const getNodeDefAncestorsKeyAttributes =
+  (nodeDef, includeSelf = false) =>
+  (survey) => {
+    let ancestorsKeyAttributes = []
+    visitAncestors(
+      nodeDef,
+      (ancestorDef) => {
+        const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
+        ancestorsKeyAttributes = [...ancestorKeyAttributes, ...ancestorsKeyAttributes]
+      },
+      includeSelf
+    )(survey)
+    return ancestorsKeyAttributes
+  }
 
 export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (survey) => {
   let ancestorsKeyAttributesIndexed = {}
