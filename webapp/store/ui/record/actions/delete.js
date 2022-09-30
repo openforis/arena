@@ -29,7 +29,7 @@ export const recordDeleted =
   }
 
 export const deleteRecord =
-  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true, onRecordsUpdate }) =>
+  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true, onRecordsUpdate = null }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -40,15 +40,15 @@ export const deleteRecord =
 
     await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
 
+    dispatch(LoaderActions.hideLoader())
+
     dispatch(recordDeleted(navigate, goBackOnDelete))
 
-    onRecordsUpdate()
-
-    dispatch(LoaderActions.hideLoader())
+    onRecordsUpdate?.()
   }
 
 export const deleteRecords =
-  ({ records, onRecordsUpdate }) =>
+  ({ records, onRecordsUpdate = null }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -57,11 +57,12 @@ export const deleteRecords =
     await axios.delete(`/api/survey/${surveyId}/records`, {
       params: { recordUuids: records.map((record) => Record.getUuid(record)) },
     })
-    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordDeleted', params: { count: records.length } }))
-
-    onRecordsUpdate()
 
     dispatch(LoaderActions.hideLoader())
+
+    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordDeleted', params: { count: records.length } }))
+
+    onRecordsUpdate?.()
   }
 
 export const deleteRecordUuidPreview = () => (dispatch) =>
