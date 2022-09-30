@@ -29,7 +29,7 @@ export const recordDeleted =
   }
 
 export const deleteRecord =
-  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true }) =>
+  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true, onRecordsUpdate }) =>
   async (dispatch, getState) => {
     const state = getState()
 
@@ -39,6 +39,8 @@ export const deleteRecord =
     await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
 
     dispatch(recordDeleted(navigate, goBackOnDelete))
+
+    onRecordsUpdate()
   }
 
 export const deleteRecords =

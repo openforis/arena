@@ -27,16 +27,20 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
+  const onDeleteConfirm = useCallback(
+    () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
+    [dispatch, onRecordsUpdate, selectedItems]
+  )
   const onDeleteButtonClick = useCallback(
     () =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'dataView.records.confirmDeleteSelectedRecords',
           params: { count: selectedItems.length },
-          onOk: () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
+          onOk: onDeleteConfirm,
         })
       ),
-    [dispatch, selectedItems, onRecordsUpdate]
+    [dispatch, selectedItems.length, onDeleteConfirm]
   )
 
   return (

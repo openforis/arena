@@ -1,3 +1,5 @@
+import { Promises } from '@openforis/arena-core'
+
 import * as Request from '@server/utils/request'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -51,6 +53,19 @@ const requireRecordPermission = (permissionFn) => async (req, _res, next) => {
   }
 }
 
+const requireRecordsPermission = (permissionFn) => async (req, _res, next) => {
+  try {
+    const { surveyId, recordUuids } = Request.getParams(req)
+
+    await Promises.each(recordUuids, async (recordUuid) => {
+      const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
+      checkPermission(req, next, permissionFn, record)
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
@@ -91,6 +106,7 @@ export const requireSurveyRdbRefreshPermission = requirePermission(Authorizer.ca
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
 export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
+export const requireRecordsEditPermission = requireRecordsPermission(Authorizer.canEditRecord)
 export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
 export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 
