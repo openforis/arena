@@ -1,3 +1,5 @@
+import { Transform } from 'stream'
+
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
@@ -6,7 +8,8 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
+
+import * as NodeKeysRepository from './nodeKeysRepository'
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
@@ -51,20 +54,15 @@ const query = ({ surveyId, recordUuid }) => {
       n.uuid AS node_uuid,
       n.node_def_uuid,
       nv.validation_count_child_def_uuid,
-      nv.validation,
-      h.keys_hierarchy,
-      h.keys_self
+      nv.validation
     FROM
       ${surveySchema}.record r
-    JOIN 
-      node_validation nv
-    ON (r.uuid = nv.record_uuid)
-    JOIN
-      ${surveySchema}.node n
-    ON n.uuid = nv.node_uuid
-    LEFT JOIN
-      ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} h 
-      ON h.node_uuid = n.uuid
+      JOIN 
+        node_validation nv
+        ON (r.uuid = nv.record_uuid)
+      JOIN
+        ${surveySchema}.node n
+        ON n.uuid = nv.node_uuid
     WHERE 
       r.cycle = $/cycle/
       AND NOT r.preview
@@ -74,22 +72,31 @@ const query = ({ surveyId, recordUuid }) => {
     ORDER BY r.date_created, n.id`
 }
 
+const _transformRowsToItems = async ({ surveyId, rows }, client = db) => {
+  const items = rows.map(A.camelizePartial({ limitToLevel: 1 }))
+  const nodeUuids = items.map((item) => item.nodeUuid)
+  const nodesKeys = await NodeKeysRepository.fetchNodesHierarchyKeys({ surveyId, nodeUuids }, client)
+
+  return items.map((item) => {
+    const nodeKeys = nodesKeys.find((nodeKeys) => nodeKeys.nodeUuid === item.nodeUuid) || {}
+    return { ...item, ...nodeKeys }
+  })
+}
+
 export const fetchValidationReport = async (
   { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
   client = db
 ) => {
-  const validationReportItems = await client.map(
+  const rows = await client.manyOrNone(
     `${query({ surveyId, recordUuid })}
       LIMIT $/limit/
       OFFSET $/offset/`,
-    { cycle, limit, offset, recordUuid },
-    A.camelizePartial({ limitToLevel: 1 })
+    { cycle, limit, offset, recordUuid }
   )
-  if (A.isEmpty(validationReportItems)) {
+  if (A.isEmpty(rows)) {
     return []
   }
-
-  return validationReportItems
+  return await _transformRowsToItems({ surveyId, rows }, client)
 }
 
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
@@ -98,10 +105,23 @@ export const countValidationReportItems = async ({ surveyId, cycle, recordUuid =
 export const exportValidationReportToStream = (
   { streamTransformer, surveyId, cycle, recordUuid = null },
   client = db
-) => {
-  const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
-  const validationReportStream = new DbUtils.QueryStream(queryFormatted)
-  return client.stream(validationReportStream, (dbStream) => {
-    dbStream.pipe(streamTransformer)
+) =>
+  client.tx(async (tx) => {
+    const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
+
+    const rowsToItemsTransformer = new Transform({
+      objectMode: true,
+      transform(row, _encoding, callback) {
+        _transformRowsToItems({ surveyId, rows: [row] }, tx)
+          .then((transformedItems) => {
+            const transformedItem = transformedItems[0]
+            callback(null, transformedItem)
+          })
+          .catch((error) => callback(error))
+      },
+    })
+
+    return tx.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
+      dbStream.pipe(rowsToItemsTransformer).pipe(streamTransformer)
+    })
   })
-}
