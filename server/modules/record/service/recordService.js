@@ -58,6 +58,7 @@ export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
   fetchRecordByUuid,
+  fetchRecordsByUuids,
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,

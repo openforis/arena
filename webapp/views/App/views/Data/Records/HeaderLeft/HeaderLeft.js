@@ -35,7 +35,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
     () =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'dataView.records.confirmDeleteSelectedRecords',
+          key: 'dataView.records.confirmDeleteSelectedRecord',
           params: { count: selectedItems.length },
           onOk: onDeleteConfirm,
         })

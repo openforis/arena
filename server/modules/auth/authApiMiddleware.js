@@ -1,5 +1,3 @@
-import { Promises } from '@openforis/arena-core'
-
 import * as Request from '@server/utils/request'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -56,11 +54,15 @@ const requireRecordPermission = (permissionFn) => async (req, _res, next) => {
 const requireRecordsPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, recordUuids } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-    await Promises.each(recordUuids, async (recordUuid) => {
-      const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
-      checkPermission(req, next, permissionFn, record)
-    })
+    const records = await RecordService.fetchRecordsByUuids(surveyId, recordUuids)
+    const hasPermission = records.every((record) => permissionFn(user, record))
+    if (hasPermission) {
+      next()
+    } else {
+      next(new UnauthorizedError(User.getName(user)))
+    }
   } catch (error) {
     next(error)
   }
