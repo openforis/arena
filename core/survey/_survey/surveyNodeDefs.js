@@ -182,13 +182,11 @@ export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUui
 export const visitAncestors =
   (nodeDef, visitorFn, includeSelf = true) =>
   (survey) => {
-    let nodeDefCurrent = nodeDef
+    let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
     do {
-      if (!includeSelf && NodeDef.getUuid(nodeDefCurrent) === NodeDef.getUuid(nodeDef)) continue
-
-      visitorFn(nodeDefCurrent)
-      nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
-    } while (nodeDefCurrent)
+      visitorFn(nodeDefToVisit)
+      nodeDefToVisit = getNodeDefParent(nodeDefToVisit)(survey)
+    } while (nodeDefToVisit)
   }
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => visitAncestors(nodeDef, visitorFn, true)
