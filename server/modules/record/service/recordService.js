@@ -4,7 +4,6 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -146,9 +145,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   const fileName = `${Survey.getName(survey)}_validation_report.csv`
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  const objectTransformer = (row) => {
-    const item = A.camelizePartial({ limitToLevel: 1 })(row)
-
+  const objectTransformer = (item) => {
     const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
     const validation = RecordValidationReportItem.getValidation(item)
 

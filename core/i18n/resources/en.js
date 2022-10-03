@@ -1256,6 +1256,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       uniqueAttributeDuplicate: 'Duplicate value',
+      valueRequired: 'Required value',
     },
 
     surveyInfoEdit: {
