@@ -136,7 +136,7 @@ const SurveyForm = (props) => {
   )
 
   return (
-    <div>
+    <div className="survey-form-wrapper">
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
       <div className={`survey-form${className}`} data-testid={TestId.surveyForm.surveyForm}>

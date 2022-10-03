@@ -22,7 +22,7 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
   return (
     <div className="analysis-node-defs-header">
       <div className="analysis-node-defs-header__buttons_container">
-        {Chain.isSamplingDesign(chain) && (
+        {Chain.hasSamplingDesign(chain) && (
           <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">
             <div>
               <button className="btn btn-s" onClick={toggleShowSamplingNodeDefs} type="button">

@@ -53,7 +53,7 @@ const ChainsView = () => {
         {
           key: 'samplingDesign',
           header: 'chainView.samplingDesign',
-          renderItem: ({ item }) => Chain.isSamplingDesign(item) && <span className="icon icon-checkmark" />,
+          renderItem: ({ item }) => Chain.hasSamplingDesign(item) && <span className="icon icon-checkmark" />,
           width: '10rem',
         },
         {

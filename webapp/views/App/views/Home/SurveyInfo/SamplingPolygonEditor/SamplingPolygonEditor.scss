@@ -1,0 +1,26 @@
+.sampling-polygon {
+  width: 60%;
+  padding: 10px;
+  margin: auto;
+
+  .json-editor {
+    width: 100%;
+  }
+
+  .props-editor-wrapper {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    column-gap: 3rem;
+  }
+
+  .form-item {
+    display: flex;
+    width: auto;
+
+    .form-label {
+      width: auto;
+      white-space: nowrap;
+    }
+  }
+}
