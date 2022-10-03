@@ -1,10 +1,11 @@
 import './EntitySelectorTreeNode.scss'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
@@ -24,30 +25,49 @@ const EntitySelectorTreeNode = (props) => {
   const record = useRecord()
   const pagesUuidMap = usePagesUuidMap()
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const root = NodeDef.isRoot(nodeDef)
-  const parentPageNodeUuid = pagesUuidMap[NodeDef.getParentUuid(nodeDef)]
-  const pageNodeParent = parentPageNodeUuid ? Record.getNodeByUuid(parentPageNodeUuid)(record) : null
-
-  const childEntityDefs = onlyPages
-    ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
-    : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
-
-  const applicable = pageNodeParent ? Node.isChildApplicable(nodeDefUuid)(pageNodeParent) : true
 
   const [showChildren, setShowChildren] = useState(root || expanded)
-  const toggleShowChildren = () => setShowChildren((prevState) => !prevState)
+  const toggleShowChildren = useCallback(() => setShowChildren((prevState) => !prevState), [])
 
   useOnUpdate(() => {
     setShowChildren(expanded)
   }, [expanded])
 
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const pageNodeUuid = pagesUuidMap[nodeDefUuid]
+  const pageNode = record && pageNodeUuid ? Record.getNodeByUuid(pageNodeUuid)(record) : null
+  const parentPageNodeUuid = pagesUuidMap[NodeDef.getParentUuid(nodeDef)]
+  const parentPageNode = record && parentPageNodeUuid ? Record.getNodeByUuid(parentPageNodeUuid)(record) : null
+
+  const childEntityDefs = onlyPages
+    ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+    : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
+
+  const visible =
+    !record ||
+    root ||
+    !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef) ||
+    (parentPageNode && Node.isChildApplicable(nodeDefUuid)(parentPageNode))
+
+  const visibleChildren = pageNode
+    ? childEntityDefs.filter(
+        (childDef) =>
+          !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) ||
+          Node.isChildApplicable(NodeDef.getUuid(childDef))(pageNode)
+      )
+    : childEntityDefs
+
+  const hasVisibleChildren = visibleChildren.length > 0
+
   return (
-    <div
-      className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, 'not-applicable': !applicable })}
-    >
-      <div className={classNames('display-flex', 'entity-selector-tree-node', { 'with-children': showChildren })}>
-        {childEntityDefs.length > 0 && (
+    <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, hidden: !visible })}>
+      <div
+        className={classNames('display-flex', 'entity-selector-tree-node', {
+          'with-children': showChildren,
+        })}
+      >
+        {hasVisibleChildren && (
           <button type="button" className="btn-xs btn-toggle" onClick={toggleShowChildren}>
             <span className="icon icon-play3 icon-14px" />
           </button>
