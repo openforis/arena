@@ -16,9 +16,9 @@ const Chart = ({ data, draft, renderChart, fullScreen }) => {
       {data && !draft && (
         <Split sizes={[70, 30]} expandToMin={true} className="wrap wrap_vertical" direction="vertical">
           <div className="charts_chart__image_container">
-            {data?.svg && (
+            {data.svg && (
               <img
-                src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(data?.svg)))}`}
+                src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(data.svg)))}`}
                 id="chartImg"
                 alt=""
                 width="100%"
@@ -26,7 +26,7 @@ const Chart = ({ data, draft, renderChart, fullScreen }) => {
               />
             )}
           </div>
-          {data?.table && <Data data={data} fullScreen={fullScreen} />}
+          {data.table && <Data data={data} fullScreen={fullScreen} />}
         </Split>
       )}
     </div>

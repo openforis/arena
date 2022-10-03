@@ -14,7 +14,7 @@ const useTableData = ({ data }) => {
   return useMemo(() => {
     const rows = data?.data || []
 
-    const headCells = Object.keys(rows?.[0] || {})
+    const headCells = Object.keys(rows[0] || {})
       .map((key) => ({
         id: key,
         numeric: false,
@@ -93,7 +93,6 @@ function EnhancedTableHead(props) {
 EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   headers: PropTypes.array.isRequired,
-  data: PropTypes.object.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
 }
