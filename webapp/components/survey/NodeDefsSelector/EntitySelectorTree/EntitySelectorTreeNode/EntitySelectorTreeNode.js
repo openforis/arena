@@ -40,28 +40,25 @@ const EntitySelectorTreeNode = (props) => {
   const parentPageNodeUuid = pagesUuidMap[NodeDef.getParentUuid(nodeDef)]
   const parentPageNode = record && parentPageNodeUuid ? Record.getNodeByUuid(parentPageNodeUuid)(record) : null
 
-  const childEntityDefs = onlyPages
+  const isPageVisible = ({ pageNodeDef, parentNode }) =>
+    !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
+    Node.isChildApplicable(NodeDef.getUuid(pageNodeDef))(parentNode)
+
+  const hidden =
+    !root && record && parentPageNode && !isPageVisible({ pageNodeDef: nodeDef, parentNode: parentPageNode })
+
+  const childrenPageDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
     : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
 
-  const visible =
-    !record ||
-    root ||
-    !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef) ||
-    (parentPageNode && Node.isChildApplicable(nodeDefUuid)(parentPageNode))
-
   const visibleChildren = pageNode
-    ? childEntityDefs.filter(
-        (childDef) =>
-          !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) ||
-          Node.isChildApplicable(NodeDef.getUuid(childDef))(pageNode)
-      )
-    : childEntityDefs
+    ? childrenPageDefs.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
+    : childrenPageDefs
 
   const hasVisibleChildren = visibleChildren.length > 0
 
   return (
-    <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, hidden: !visible })}>
+    <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, hidden })}>
       <div
         className={classNames('display-flex', 'entity-selector-tree-node', {
           'with-children': showChildren,
@@ -88,7 +85,7 @@ const EntitySelectorTreeNode = (props) => {
       </div>
 
       {showChildren &&
-        childEntityDefs.map((nodeDefChild) => (
+        childrenPageDefs.map((nodeDefChild) => (
           <EntitySelectorTreeNode
             key={NodeDef.getUuid(nodeDefChild)}
             expanded={expanded}

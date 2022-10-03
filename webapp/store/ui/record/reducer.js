@@ -35,7 +35,7 @@ const actionHandlers = {
 
   // Record preview
   [RecordActions.recordUuidPreviewUpdate]: (state, { recordUuid }) =>
-    RecordState.assocRecordUuidPreview(recordUuid)(state),
+    recordUuid ? RecordState.assocRecordUuidPreview(recordUuid)(state) : RecordState.reset(state),
 }
 
 export default exportReducer(actionHandlers)
