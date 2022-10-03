@@ -3,13 +3,12 @@ import { Transform } from 'stream'
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-
-import * as NodeKeysRepository from './nodeKeysRepository'
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
@@ -54,7 +53,17 @@ const query = ({ surveyId, recordUuid }) => {
       n.uuid AS node_uuid,
       n.node_def_uuid,
       nv.validation_count_child_def_uuid,
-      nv.validation
+      nv.validation,
+      
+      -- TODO: check why subquery is faster than outer join when joining _node_keys_hierarchy view
+      (SELECT h.keys_self 
+        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        WHERE h.node_uuid = n.uuid
+      ),
+      (SELECT h.keys_hierarchy 
+        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        WHERE h.node_uuid = n.uuid
+      )
     FROM
       ${surveySchema}.record r
       JOIN 
@@ -72,32 +81,19 @@ const query = ({ surveyId, recordUuid }) => {
     ORDER BY r.date_created, n.id`
 }
 
-const _transformRowsToItems = async ({ surveyId, rows }, client = db) => {
-  const items = rows.map(A.camelizePartial({ limitToLevel: 1 }))
-  const nodeUuids = items.map((item) => item.nodeUuid)
-  const nodesKeys = await NodeKeysRepository.fetchNodesHierarchyKeys({ surveyId, nodeUuids }, client)
-
-  return items.map((item) => {
-    const nodeKeys = nodesKeys.find((nodeKeys) => nodeKeys.nodeUuid === item.nodeUuid) || {}
-    return { ...item, ...nodeKeys }
-  })
-}
+const _rowToItem = A.camelizePartial({ limitToLevel: 1 })
 
 export const fetchValidationReport = async (
   { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
   client = db
-) => {
-  const rows = await client.manyOrNone(
+) =>
+  client.map(
     `${query({ surveyId, recordUuid })}
       LIMIT $/limit/
       OFFSET $/offset/`,
-    { cycle, limit, offset, recordUuid }
+    { cycle, limit, offset, recordUuid },
+    _rowToItem
   )
-  if (A.isEmpty(rows)) {
-    return []
-  }
-  return await _transformRowsToItems({ surveyId, rows }, client)
-}
 
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
   client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
@@ -105,23 +101,18 @@ export const countValidationReportItems = async ({ surveyId, cycle, recordUuid =
 export const exportValidationReportToStream = (
   { streamTransformer, surveyId, cycle, recordUuid = null },
   client = db
-) =>
-  client.tx(async (tx) => {
-    const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
+) => {
+  const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
 
-    const rowsToItemsTransformer = new Transform({
-      objectMode: true,
-      transform(row, _encoding, callback) {
-        _transformRowsToItems({ surveyId, rows: [row] }, tx)
-          .then((transformedItems) => {
-            const transformedItem = transformedItems[0]
-            callback(null, transformedItem)
-          })
-          .catch((error) => callback(error))
-      },
-    })
-
-    return tx.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
-      dbStream.pipe(rowsToItemsTransformer).pipe(streamTransformer)
-    })
+  const rowsToItemsTransformer = new Transform({
+    objectMode: true,
+    transform(row, _encoding, callback) {
+      const item = _rowToItem(row)
+      callback(null, item)
+    },
   })
+
+  return client.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
+    dbStream.pipe(rowsToItemsTransformer).pipe(streamTransformer)
+  })
+}
