@@ -234,6 +234,16 @@ export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
+  client.map(
+    `SELECT 
+     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSurveyDBSchema(surveyId)}.record 
+     WHERE uuid IN ($1:csv)`,
+    [recordUuids, surveyId],
+    dbTransformCallback(surveyId)
+  )
+
 export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
   client.any(`
     SELECT uuid, cycle 

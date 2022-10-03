@@ -57,6 +57,7 @@ export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
   fetchRecordByUuid,
+  fetchRecordsByUuids,
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
@@ -87,13 +88,15 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
-  Logger.debug('delete records. surveyId:', surveyId, 'recordUuids:', recordUuids)
+  Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   await PromiseUtils.each(recordUuids, async (recordUuid) => {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
     await RecordManager.deleteRecord(user, survey, record)
   })
+
+  Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
 }
 
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
