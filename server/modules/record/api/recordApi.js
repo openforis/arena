@@ -16,6 +16,7 @@ import {
   requireRecordEditPermission,
   requireRecordCreatePermission,
   requireRecordViewPermission,
+  requireRecordsEditPermission,
 } from '../../auth/authApiMiddleware'
 import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
@@ -328,7 +329,7 @@ export const init = (app) => {
     }
   })
 
-  app.delete('/survey/:surveyId/records', requireRecordEditPermission, async (req, res, next) => {
+  app.delete('/survey/:surveyId/records', requireRecordsEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuids } = Request.getParams(req)
       const user = Request.getUser(req)

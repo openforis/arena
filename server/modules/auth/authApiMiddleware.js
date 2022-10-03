@@ -51,6 +51,23 @@ const requireRecordPermission = (permissionFn) => async (req, _res, next) => {
   }
 }
 
+const requireRecordsPermission = (permissionFn) => async (req, _res, next) => {
+  try {
+    const { surveyId, recordUuids } = Request.getParams(req)
+    const user = Request.getUser(req)
+
+    const records = await RecordService.fetchRecordsByUuids(surveyId, recordUuids)
+    const hasPermission = records.every((record) => permissionFn(user, record))
+    if (hasPermission) {
+      next()
+    } else {
+      next(new UnauthorizedError(User.getName(user)))
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
 const requireUserPermission = (permissionFn) => async (req, _res, next) => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
@@ -91,6 +108,7 @@ export const requireSurveyRdbRefreshPermission = requirePermission(Authorizer.ca
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
 export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
+export const requireRecordsEditPermission = requireRecordsPermission(Authorizer.canEditRecord)
 export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
 export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 
