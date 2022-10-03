@@ -13,10 +13,12 @@ export const importSources = {
   collect: 'collect',
   arena: 'arena',
 }
+
 const urlBasedOnSource = {
   [importSources.collect]: '/api/survey/collect-import',
   [importSources.arena]: '/api/survey/arena-import',
 }
+
 export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.collect }) => {
   const dispatch = useDispatch()
 
@@ -24,7 +26,15 @@ export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.co
     async ({ file }) => {
       const formData = objectToFormData({ file, survey: JSON.stringify(newSurvey) })
 
-      const { data } = await axios.post(urlBasedOnSource[source], formData)
+      const onUploadProgress = (progressEvent) => {
+        const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+        setNewSurvey({ ...newSurvey, uploadProgressPercent })
+      }
+      const { data } = await axios.post(urlBasedOnSource[source], formData, { onUploadProgress })
+
+      // reset upload progress (hide progress bar)
+      setNewSurvey({ ...newSurvey, uploadProgressPercent: -1 })
+
       const { job, validation } = data
 
       if (job && (!validation || Validation.isValid(validation))) {
@@ -44,6 +54,6 @@ export const useOnImport = ({ newSurvey, setNewSurvey, source = importSources.co
         })
       }
     },
-    [dispatch, newSurvey, setNewSurvey]
+    [dispatch, newSurvey, setNewSurvey, source]
   )
 }

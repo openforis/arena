@@ -25,6 +25,7 @@ const {
  * === simple getters
  */
 export const getNodes = R.propOr({}, keys.nodes)
+export const getNodesArray = (record) => Object.values(getNodes(record))
 
 export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
 

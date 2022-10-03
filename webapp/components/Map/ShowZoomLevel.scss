@@ -1,0 +1,9 @@
+@import '~@webapp/style/vars';
+
+.show-zoom-level {
+  background-color: rgba($color: $white, $alpha: 0.4);
+  position: absolute;
+  bottom: 100px;
+  left: 1px;
+  font-size: 20px;
+}

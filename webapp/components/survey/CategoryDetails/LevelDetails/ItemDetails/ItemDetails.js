@@ -107,9 +107,18 @@ const ItemDetails = (props) => {
           </FormItem>
 
           <LabelsEditor
-            inputFieldIdPrefix={TestId.categoryDetails.itemLabel(levelIndex, index)('')}
+            inputFieldIdPrefix={TestId.categoryDetails.itemLabelPrefix(levelIndex, index)}
             labels={CategoryItem.getLabels(item)}
             onChange={(labels) => updateProp({ key: CategoryItem.keysProps.labels, value: labels })}
+            readOnly={readOnly}
+          />
+
+          <LabelsEditor
+            formLabelKey="common.description"
+            inputFieldIdPrefix={TestId.categoryDetails.itemDescriptionPrefix(levelIndex, index)}
+            inputType="textarea"
+            labels={CategoryItem.getDescriptions(item)}
+            onChange={(descriptions) => updateProp({ key: CategoryItem.keysProps.descriptions, value: descriptions })}
             readOnly={readOnly}
           />
 

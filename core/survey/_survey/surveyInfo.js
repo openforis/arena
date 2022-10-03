@@ -24,6 +24,8 @@ export const keys = {
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
+  sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
+  samplingPolygon: 'samplingPolygon',
   srs: 'srs',
   steps: 'steps',
   template: 'template',
@@ -70,6 +72,11 @@ export const getLabel = (surveyInfo, lang) => {
   const label = ObjectUtils.getLabel(lang)(surveyInfo)
   return StringUtils.isBlank(label) ? getName(surveyInfo) : label
 }
+
+export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
+  keys.sampleBasedImageInterpretationEnabled
+)
+export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

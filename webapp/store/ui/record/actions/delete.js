@@ -5,7 +5,7 @@ import * as Node from '@core/record/node'
 
 import { AppSavingActions } from '@webapp/store/app'
 import { SurveyState } from '@webapp/store/survey'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
@@ -29,8 +29,10 @@ export const recordDeleted =
   }
 
 export const deleteRecord =
-  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true }) =>
+  ({ navigate, recordUuid: recordUuidParam = null, goBackOnDelete = true, onRecordsUpdate = null }) =>
   async (dispatch, getState) => {
+    dispatch(LoaderActions.showLoader())
+
     const state = getState()
 
     const surveyId = SurveyState.getSurveyId(state)
@@ -38,20 +40,29 @@ export const deleteRecord =
 
     await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
 
+    dispatch(LoaderActions.hideLoader())
+
     dispatch(recordDeleted(navigate, goBackOnDelete))
+
+    onRecordsUpdate?.()
   }
 
 export const deleteRecords =
-  ({ records, onRecordsUpdate }) =>
+  ({ records, onRecordsUpdate = null }) =>
   async (dispatch, getState) => {
+    dispatch(LoaderActions.showLoader())
+
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     await axios.delete(`/api/survey/${surveyId}/records`, {
       params: { recordUuids: records.map((record) => Record.getUuid(record)) },
     })
-    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsDeleted', params: { count: records.length } }))
 
-    onRecordsUpdate()
+    dispatch(LoaderActions.hideLoader())
+
+    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordDeleted', params: { count: records.length } }))
+
+    onRecordsUpdate?.()
   }
 
 export const deleteRecordUuidPreview = () => (dispatch) =>

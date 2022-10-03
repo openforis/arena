@@ -8,6 +8,9 @@ export const {
   fetchFileByUuid,
   fetchFileByNodeUuid,
   fetchFileSummariesBySurveyId,
+  fetchFileSummaryByUuid,
+  // UPDATE
+  updateFileProps,
   // DELETE
   deleteFileByUuid,
   deleteFilesByRecordUuids,

@@ -4,6 +4,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -40,10 +41,13 @@ const BaseUnitSelector = () => {
   const survey = useSurvey()
 
   const chain = useChain()
+  const samplingDesign = Chain.getSamplingDesign(chain)
 
   const onBaseUnitChange = useCallback(
     (entityDefUuid) => {
-      const chainUpdated = Chain.assocBaseUnitNodeDefUuid(entityDefUuid)(chain)
+      const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocBaseUnitNodeDefUuid(entityDefUuid))(
+        chain
+      )
       dispatch(ChainActions.updateChain({ chain: chainUpdated }))
     },
     [dispatch, chain]
@@ -56,7 +60,7 @@ const BaseUnitSelector = () => {
       <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}
-          nodeDefUuidEntity={Chain.getBaseUnitNodeDefUuid(chain)}
+          nodeDefUuidEntity={ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)}
           onChange={onBaseUnitChange}
           showSingleEntities={false}
           useNameAsLabel={true}

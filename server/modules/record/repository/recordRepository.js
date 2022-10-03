@@ -31,6 +31,8 @@ const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate(
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
   (record) => {
+    if (!record) return null
+
     const validation = Record.getValidation(record)
     return R.pipe(
       R.dissoc(Validation.keys.validation),
@@ -229,6 +231,16 @@ export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
     [recordUuid, surveyId],
+    dbTransformCallback(surveyId)
+  )
+
+export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
+  client.map(
+    `SELECT 
+     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSurveyDBSchema(surveyId)}.record 
+     WHERE uuid IN ($1:csv)`,
+    [recordUuids, surveyId],
     dbTransformCallback(surveyId)
   )
 

@@ -38,3 +38,6 @@ export const capitalizeFirstLetter = (text) => text.charAt(0).toUpperCase() + te
 export const removeNewLines = R.when(isString, R.pipe(R.split(/\r\n|\r|\n/g), R.join(' ')))
 
 export const nullToEmpty = (value) => (value === null ? '' : value)
+
+export const appendIfMissing = (suffix) => (text) => text.endsWith(suffix) ? text : `${text}${suffix}`
+export const prependIfMissing = (prefix) => (text) => text.startsWith(prefix) ? text : `${prefix}${text}`

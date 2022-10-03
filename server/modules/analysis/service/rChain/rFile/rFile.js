@@ -44,13 +44,14 @@ export default class RFile {
 
   async init() {
     await FileUtils.appendFile(this.path)
-    if (this.path.includes('system/init') || this.path.includes('system/close')) {
-      await FileUtils.appendFile(this._rChain.fileArena, source(this.pathRelative))
-    } else {
-      await FileUtils.appendFile(this._rChain.fileArena, sourceWithTryCatch(this.pathRelative))
-    }
 
-    await FileUtils.appendFile(this._rChain.fileArena, _contentSeparator)
+    const fileArenaContent =
+      this.path.includes('system/init') || this.path.includes('system/close')
+        ? source(this.pathRelative)
+        : sourceWithTryCatch(this.pathRelative)
+
+    await FileUtils.appendFile(this._rChain.fileArena, fileArenaContent + _contentSeparator)
+
     return this
   }
 }

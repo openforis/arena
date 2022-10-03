@@ -13,14 +13,12 @@ const _getMultipleAttributeInnerSelect = ({ viewDataNodeDef, columnNodeDef }) =>
   const { survey, tableData } = viewDataNodeDef
 
   const multAttrDef = columnNodeDef.nodeDef
-  const multAttrDataNodeDef = new TableDataNodeDef(survey, multAttrDef)
   const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
   const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
 
-  return `SELECT json_agg(${multAttrDataNodeDef.alias}.${nodeDefName}) 
+  return `SELECT json_agg(${multAttrDataTable.alias}.${nodeDefName}) 
           FROM ${multAttrDataTable.nameAliased}
-          WHERE ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid}
-            AND ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+          WHERE ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>

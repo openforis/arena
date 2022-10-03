@@ -30,7 +30,7 @@
     "react-hooks/exhaustive-deps": 1,
     "import/prefer-default-export": 0,
     "jsdoc/check-alignment": 2,
-    "jsdoc/check-examples": 2,
+    "jsdoc/check-examples": 0, //eslint 8 does not support this yet
     "jsdoc/check-indentation": 2,
     "jsdoc/check-param-names": 2,
     "jsdoc/check-syntax": 2,

@@ -23,6 +23,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
+import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()
@@ -31,6 +32,8 @@ const ChainComponent = () => {
   const chain = useChain()
   const survey = useSurvey()
 
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canHaveRecords = Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const validation = Chain.getValidation(chain)
 
@@ -50,10 +53,10 @@ const ChainComponent = () => {
   useEffect(() => {
     dispatch(ChainActions.fetchChain({ chainUuid }))
 
-    if (Survey.isPublished(survey) || Survey.isFromCollect(survey)) {
+    if (canHaveRecords) {
       dispatch(ChainActions.fetchRecordsCountByStep)
     }
-  }, [dispatch, chainUuid, survey])
+  }, [dispatch, chainUuid, canHaveRecords])
 
   const locationPathMatcher = useLocationPathMatcher()
   // un unmount, if changing location into node def edit, keep chain store, otherwise reset it
@@ -85,19 +88,20 @@ const ChainComponent = () => {
           {
             label: i18n.t('chainView.basic'),
             component: ChainBasicProps,
-            props: {
-              updateChain,
-            },
+            props: { updateChain },
           },
           {
             label: i18n.t('chainView.samplingDesign'),
             component: ChainSamplingDesignProps,
-            props: {
-              updateChain,
-            },
+            props: { updateChain },
+          },
+          {
+            label: i18n.t('chainView.statisticalAnalysis.header'),
+            component: ChainStatisticalAnalysisProps,
+            props: { updateChain },
           },
         ]}
-        showTabs={Chain.isSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
+        showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
       />
 
       <AnalysisNodeDefs />

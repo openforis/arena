@@ -1,15 +1,22 @@
-import './MapOptions.scss'
+import './MapOptionsEditor.scss'
 
 import React, { useCallback, useState } from 'react'
 
+import * as Survey from '@core/survey/survey'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconGear } from '../buttons'
 import { Checkbox } from '../form'
 import { FormItem } from '../form/Input'
 import { useMapContext } from './MapContext'
+import { MapOptions } from './mapOptions'
 
-export const MapOptions = () => {
+export const MapOptionsEditor = () => {
   const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
+
+  const sampleBasedImageInterpretation = Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)
 
   const { contextObject, onOptionUpdate } = useMapContext()
   const { options } = contextObject
@@ -30,12 +37,18 @@ export const MapOptions = () => {
         {!popupOpen && <ButtonIconGear onMouseOver={onIconMouseOver} />}
         {popupOpen && (
           <div className="popup" onMouseLeave={onPopupMouseLeave}>
-            <FormItem label={i18n.t('mapView.options.showMarkersLabels')}>
-              <Checkbox
-                checked={options.showMarkersLabels}
-                onChange={(value) => onOptionUpdate({ option: 'showMarkersLabels', value })}
-              />
-            </FormItem>
+            {Object.entries(options)
+              .filter(
+                ([key]) => !MapOptions.isOnlyForSampleBasedImageInterpretation(key) || sampleBasedImageInterpretation
+              )
+              .map(([key, value]) => (
+                <FormItem key={key} label={i18n.t(`mapView.options.${key}`)}>
+                  <Checkbox
+                    checked={value}
+                    onChange={(valueUpdated) => onOptionUpdate({ option: key, value: valueUpdated })}
+                  />
+                </FormItem>
+              ))}
           </div>
         )}
       </div>

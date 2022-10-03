@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -49,7 +50,7 @@ const NodeDefEntityTableRows = (props) => {
     nodeDefColumnUuids
   )
 
-  const tableRowsRef = useRef(null)
+  const tableRowsHeaderRef = useRef(null)
   const tableDataRowsRef = useRef(null)
 
   const [gridSize, setGridSize] = useState({
@@ -58,46 +59,35 @@ const NodeDefEntityTableRows = (props) => {
     top: 0,
     left: 0,
   })
-  const debounceDelayOnScroll = 100
-
-  const onScrollTableRows = () => {
-    const onScroll = () => {
-      const scrollLeft = tableRowsRef?.current?.scrollLeft || false
-      if (scrollLeft !== gridSize.left) {
-        setGridSize((gridSizePrev) => ({
-          ...gridSizePrev,
-          left: scrollLeft,
-        }))
-      }
-    }
-
-    debounce(onScroll, 'scroll-table-rows', debounceDelayOnScroll)()
-  }
 
   const onScrollTableDataRows = () => {
     const onScroll = () => {
-      const { scrollTop } = tableDataRowsRef.current
-      if (scrollTop !== gridSize.top) {
+      const { scrollLeft, scrollTop } = tableDataRowsRef.current
+      if (scrollLeft !== gridSize.left || scrollTop !== gridSize.top) {
         setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
+          left: scrollLeft,
           top: scrollTop,
         }))
       }
     }
 
-    debounce(onScroll, 'scroll-table-data-rows', debounceDelayOnScroll)()
+    debounce(onScroll, 'scroll-table-data-rows', 100)()
+
+    // adjust header row position
+    tableRowsHeaderRef.current.style.left = `${-tableDataRowsRef.current.scrollLeft}px`
   }
 
   // NodeDef update effect entry mode
   if (!edit) {
     useEffect(() => {
       // Reset scrolls and set grid size
-      tableRowsRef.current.scrollLeft = 0
-      tableDataRowsRef.current.scrollTop = 0
+      const tableDataRowsRefEl = tableDataRowsRef.current
+      tableDataRowsRefEl.scrollLeft = 0
+      tableDataRowsRefEl.scrollTop = 0
 
       const updateGridSize = () => {
-        const { width } = elementOffset(tableRowsRef.current)
-        const { height } = elementOffset(tableDataRowsRef.current)
+        const { height, width } = elementOffset(tableDataRowsRef.current)
 
         setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
@@ -121,7 +111,7 @@ const NodeDefEntityTableRows = (props) => {
     }, [NodeDef.getUuid(nodeDef)])
   }
 
-  const createRow = ({ renderType, node = null, key = undefined, canDelete = true, index = undefined }) => {
+  const createRow = ({ renderType, node = null, key = undefined, canDelete = true, index = undefined, ref = null }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return (
       <NodeDefEntityTableRow
@@ -131,6 +121,7 @@ const NodeDefEntityTableRows = (props) => {
             : TestId.surveyForm.entityRowData(nodeDefName, index)
         }
         key={key}
+        ref={ref}
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
@@ -154,26 +145,29 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   return (
-    <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
-      {(edit || !R.isEmpty(nodes)) && createRow({ renderType: NodeDefLayout.renderType.tableHeader })}
+    <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
+      {(edit || !R.isEmpty(nodes)) &&
+        createRow({ renderType: NodeDefLayout.renderType.tableHeader, ref: tableRowsHeaderRef })}
 
       {entry && (
         <div
-          className="survey-form__node-def-entity-table-data-rows"
+          className="survey-form__node-def-entity-table-data-rows-wrapper"
           ref={tableDataRowsRef}
           onScroll={onScrollTableDataRows}
         >
-          {gridSize.height > 0 &&
-            gridSize.width > 0 &&
-            nodes.map((node, index) =>
-              createRow({
-                renderType: NodeDefLayout.renderType.tableBody,
-                node,
-                key: `entity-table-row-${Node.getUuid(node)}`,
-                canDelete: canDeleteRows,
-                index,
-              })
-            )}
+          <div className="survey-form__node-def-entity-table-data-rows">
+            {gridSize.height > 0 &&
+              gridSize.width > 0 &&
+              nodes.map((node, index) =>
+                createRow({
+                  renderType: NodeDefLayout.renderType.tableBody,
+                  node,
+                  key: `entity-table-row-${Node.getUuid(node)}`,
+                  canDelete: canDeleteRows,
+                  index,
+                })
+              )}
+          </div>
         </div>
       )}
     </div>

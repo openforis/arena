@@ -1,0 +1,71 @@
+@import '~@webapp/style/vars';
+
+.map-kml-uploader-wrapper {
+  display: flexbox;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  margin-left: 1rem;
+  width: 15%;
+  height: 20px;
+  background-color: rgba($white, 0.7);
+  overflow: hidden;
+
+  &:hover {
+    height: 220px;
+    display: flex;
+  }
+
+  .file-select-wrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .kml-title {
+    font-size: 16px;
+  }
+
+  .file {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+  }
+
+  .file-input label {
+    display: flex;
+    position: relative;
+    width: 200px;
+    height: 50px;
+    border-radius: 25px;
+    background: rgba($blue, 1);
+    box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4);
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease-out;
+  }
+
+  .file-name {
+    position: absolute;
+    bottom: -35px;
+    left: 10px;
+    font-size: 0.85rem;
+    color: #555;
+  }
+
+  input:hover + label,
+  input:focus + label {
+    transform: scale(1);
+  }
+
+  /* Adding an outline to the label on focus */
+  input:focus + label {
+    outline: 1px solid #000;
+    outline: -webkit-focus-ring-color auto 2px;
+  }
+}
