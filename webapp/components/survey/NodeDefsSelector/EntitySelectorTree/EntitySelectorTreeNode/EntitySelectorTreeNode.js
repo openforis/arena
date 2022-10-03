@@ -26,9 +26,8 @@ const EntitySelectorTreeNode = (props) => {
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const root = NodeDef.isRoot(nodeDef)
-  const pageNodeUuid = pagesUuidMap[nodeDefUuid]
-  const pageNode = record && pageNodeUuid ? Record.getNodeByUuid(pageNodeUuid)(record) : null
-  const pageNodeParent = pageNode ? Record.getParentNode(pageNode)(record) : null
+  const parentPageNodeUuid = pagesUuidMap[NodeDef.getParentUuid(nodeDef)]
+  const pageNodeParent = parentPageNodeUuid ? Record.getNodeByUuid(parentPageNodeUuid)(record) : null
 
   const childEntityDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
