@@ -139,9 +139,6 @@ export default function EnhancedTable({ data }) {
 
   const downloadCSV = (event) => {
     event.preventDefault()
-
-    console.log(rows, headers)
-
     const _headers = headers.map((head) => head.label || head.id).join(',')
     const _headersIds = headers.map((head) => head.id)
     const dataCsv = rows.reduce((acc, row) => {
