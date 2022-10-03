@@ -183,10 +183,10 @@ export const visitAncestors =
   (nodeDef, visitorFn, includeSelf = true) =>
   (survey) => {
     let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
-    do {
+    while (nodeDefToVisit) {
       visitorFn(nodeDefToVisit)
       nodeDefToVisit = getNodeDefParent(nodeDefToVisit)(survey)
-    } while (nodeDefToVisit)
+    }
   }
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => visitAncestors(nodeDef, visitorFn, true)
@@ -222,6 +222,7 @@ export const getNodeDefAncestorsKeyAttributes =
       },
       includeSelf
     )(survey)
+
     return ancestorsKeyAttributes
   }
 
