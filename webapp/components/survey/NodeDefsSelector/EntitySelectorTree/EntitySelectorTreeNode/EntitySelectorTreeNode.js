@@ -5,9 +5,12 @@ import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
 import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
+import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
+import { useRecord } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -18,10 +21,20 @@ const EntitySelectorTreeNode = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
+  const record = useRecord()
+  const pagesUuidMap = usePagesUuidMap()
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const root = NodeDef.isRoot(nodeDef)
+  const pageNodeUuid = pagesUuidMap[nodeDefUuid]
+  const pageNode = record && pageNodeUuid ? Record.getNodeByUuid(pageNodeUuid)(record) : null
+  const pageNodeParent = pageNode ? Record.getParentNode(pageNode)(record) : null
+
   const childEntityDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
     : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
-  const root = NodeDef.isRoot(nodeDef)
+
+  const applicable = pageNodeParent ? Node.isChildApplicable(nodeDefUuid)(pageNodeParent) : true
 
   const [showChildren, setShowChildren] = useState(root || expanded)
   const toggleShowChildren = () => setShowChildren((prevState) => !prevState)
@@ -31,7 +44,9 @@ const EntitySelectorTreeNode = (props) => {
   }, [expanded])
 
   return (
-    <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root })}>
+    <div
+      className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, 'not-applicable': !applicable })}
+    >
       <div className={classNames('display-flex', 'entity-selector-tree-node', { 'with-children': showChildren })}>
         {childEntityDefs.length > 0 && (
           <button type="button" className="btn-xs btn-toggle" onClick={toggleShowChildren}>
@@ -42,7 +57,7 @@ const EntitySelectorTreeNode = (props) => {
         <button
           type="button"
           className={classNames('btn', 'btn-s', 'btn-node-def', {
-            active: NodeDef.getUuid(nodeDef) === nodeDefUuidActive,
+            active: nodeDefUuid === nodeDefUuidActive,
           })}
           data-testid={TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef))}
           onClick={() => onSelect(nodeDef)}

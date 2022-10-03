@@ -8,6 +8,11 @@
       margin-left: -4px;
     }
   }
+
+  &.not-applicable {
+    opacity: 0;
+    transition: all 250ms linear 2s;
+  }
 }
 
 .entity-selector-tree-node {
