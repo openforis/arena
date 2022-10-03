@@ -56,8 +56,14 @@ const Row = (props) => {
   )
 
   const onDeleteConfirmed = useCallback(() => {
-    dispatch(RecordActions.deleteRecord({ navigate, recordUuid: Record.getUuid(record), goBackOnDelete: false }))
-    onRecordsUpdate()
+    dispatch(
+      RecordActions.deleteRecord({
+        navigate,
+        recordUuid: Record.getUuid(record),
+        goBackOnDelete: false,
+        onRecordsUpdate,
+      })
+    )
   }, [dispatch, navigate, onRecordsUpdate, record])
 
   const onDeleteButtonClick = useCallback(
@@ -73,7 +79,7 @@ const Row = (props) => {
         })
       )
     },
-    [dispatch, navigate]
+    [dispatch, keyValues, onDeleteConfirmed]
   )
 
   return (
