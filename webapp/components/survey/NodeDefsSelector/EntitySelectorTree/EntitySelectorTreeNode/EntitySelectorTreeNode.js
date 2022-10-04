@@ -41,8 +41,14 @@ const EntitySelectorTreeNode = (props) => {
   const parentPageNode = record && parentPageNodeUuid ? Record.getNodeByUuid(parentPageNodeUuid)(record) : null
 
   const isPageVisible = ({ pageNodeDef, parentNode }) =>
+    NodeDef.isRoot(pageNodeDef) ||
     !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
-    Node.isChildApplicable(NodeDef.getUuid(pageNodeDef))(parentNode)
+    Node.isChildApplicable(NodeDef.getUuid(pageNodeDef))(parentNode) ||
+    // has some non-empty descendant
+    Record.getNodeChildrenByDefUuid(
+      parentNode,
+      NodeDef.getUuid(pageNodeDef)
+    )(record).some((pageChildNode) => !Record.isNodeEmpty(pageChildNode)(record))
 
   const hidden =
     !root && record && parentPageNode && !isPageVisible({ pageNodeDef: nodeDef, parentNode: parentPageNode })
