@@ -105,6 +105,7 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client
 export {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,
+  fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
   insertRecordsInBatch,

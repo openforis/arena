@@ -520,7 +520,8 @@ $t(common.cantUndoWarning)`,
     },
     records: {
       confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
-      confirmDeleteSelectedRecords: `Delete the selected {{count}} records?`,
+      confirmDeleteSelectedRecord_one: `Delete the selected record?`,
+      confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
       confirmUpdateRecordsStep: `Move all the records from the {{stepFrom}} to {{stepTo}}?`,
       deleteRecord: 'Delete record',
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
@@ -535,7 +536,8 @@ $t(common.cantUndoWarning)`,
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
       updateRecordsStep: 'Update records step',
     },
-    recordsDeleted: `{{count}} records deleted successfully!`,
+    recordDeleted_one: `Record deleted successfully!`,
+    recordDeleted_other: `{{count}} records deleted successfully!`,
     recordsUpdated: '{{count}} records updated successfully!',
     rowNum: 'Row #',
     showValidationReport: 'Show validation report',
@@ -1254,6 +1256,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       uniqueAttributeDuplicate: 'Duplicate value',
+      valueRequired: 'Required value',
     },
 
     surveyInfoEdit: {

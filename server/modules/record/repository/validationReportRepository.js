@@ -1,12 +1,14 @@
+import { Transform } from 'stream'
+
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
@@ -52,19 +54,24 @@ const query = ({ surveyId, recordUuid }) => {
       n.node_def_uuid,
       nv.validation_count_child_def_uuid,
       nv.validation,
-      h.keys_hierarchy,
-      h.keys_self
+      
+      -- TODO: check why subquery is faster than outer join when joining _node_keys_hierarchy view
+      (SELECT h.keys_self 
+        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        WHERE h.node_uuid = n.uuid
+      ),
+      (SELECT h.keys_hierarchy 
+        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        WHERE h.node_uuid = n.uuid
+      )
     FROM
       ${surveySchema}.record r
-    JOIN 
-      node_validation nv
-    ON (r.uuid = nv.record_uuid)
-    JOIN
-      ${surveySchema}.node n
-    ON n.uuid = nv.node_uuid
-    LEFT JOIN
-      ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} h 
-      ON h.node_uuid = n.uuid
+      JOIN 
+        node_validation nv
+        ON (r.uuid = nv.record_uuid)
+      JOIN
+        ${surveySchema}.node n
+        ON n.uuid = nv.node_uuid
     WHERE 
       r.cycle = $/cycle/
       AND NOT r.preview
@@ -74,23 +81,19 @@ const query = ({ surveyId, recordUuid }) => {
     ORDER BY r.date_created, n.id`
 }
 
+const _rowToItem = A.camelizePartial({ limitToLevel: 1 })
+
 export const fetchValidationReport = async (
   { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
   client = db
-) => {
-  const validationReportItems = await client.map(
+) =>
+  client.map(
     `${query({ surveyId, recordUuid })}
       LIMIT $/limit/
       OFFSET $/offset/`,
     { cycle, limit, offset, recordUuid },
-    A.camelizePartial({ limitToLevel: 1 })
+    _rowToItem
   )
-  if (A.isEmpty(validationReportItems)) {
-    return []
-  }
-
-  return validationReportItems
-}
 
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
   client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
@@ -100,8 +103,16 @@ export const exportValidationReportToStream = (
   client = db
 ) => {
   const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
-  const validationReportStream = new DbUtils.QueryStream(queryFormatted)
-  return client.stream(validationReportStream, (dbStream) => {
-    dbStream.pipe(streamTransformer)
+
+  const rowsToItemsTransformer = new Transform({
+    objectMode: true,
+    transform(row, _encoding, callback) {
+      const item = _rowToItem(row)
+      callback(null, item)
+    },
+  })
+
+  return client.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
+    dbStream.pipe(rowsToItemsTransformer).pipe(streamTransformer)
   })
 }

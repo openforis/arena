@@ -16,7 +16,7 @@ import {
   requireRecordEditPermission,
   requireRecordCreatePermission,
   requireRecordViewPermission,
-  requireRecordCleansePermission,
+  requireRecordsEditPermission,
 } from '../../auth/authApiMiddleware'
 import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
@@ -204,7 +204,7 @@ export const init = (app) => {
     }
   )
 
-  app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
 
@@ -216,7 +216,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/count', requireRecordCleansePermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
 
@@ -228,7 +228,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/csv', requireRecordCleansePermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport/csv', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, lang, recordUuid } = Request.getParams(req)
 
@@ -329,7 +329,7 @@ export const init = (app) => {
     }
   })
 
-  app.delete('/survey/:surveyId/records', requireRecordEditPermission, async (req, res, next) => {
+  app.delete('/survey/:surveyId/records', requireRecordsEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuids } = Request.getParams(req)
       const user = Request.getUser(req)

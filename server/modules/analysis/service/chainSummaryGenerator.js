@@ -156,7 +156,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const chainSamplingDesign = Chain.getSamplingDesign(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const baseUnitEntityKeys = baseUnitNodeDef ? Survey.getNodeDefKeys(baseUnitNodeDef)(survey).map(NodeDef.getName) : []
+  const baseUnitEntityKeys = baseUnitNodeDef
+    ? Survey.getNodeDefAncestorsKeyAttributes(baseUnitNodeDef, true)(survey).map(NodeDef.getName)
+    : []
   const samplingStrategyIndex = Object.values(ChainSamplingDesign.samplingStrategies).indexOf(
     ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
   )
@@ -165,7 +167,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   const postStratificationAttributeDef = getNodeDefByUuid(
     ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   )
-  const clusteringNodeDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
+  const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
     showSamplingNodeDefs: true,
@@ -200,9 +202,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
       : {}),
     ...(samplingStrategySpecified ? { pValue: ChainSamplingDesign.getPValue(chainSamplingDesign) } : {}),
     areaWeightingMethod: ChainSamplingDesign.isAreaWeightingMethod(chainSamplingDesign),
-    clusteringEntity: NodeDef.getName(clusteringNodeDef),
-    clusteringEntityKeys: clusteringNodeDef
-      ? Survey.getNodeDefKeys(clusteringNodeDef)(survey).map(NodeDef.getName)
+    clusteringEntity: NodeDef.getName(clusteringEntityDef),
+    clusteringEntityKeys: clusteringEntityDef
+      ? Survey.getNodeDefAncestorsKeyAttributes(clusteringEntityDef, true)(survey).map(NodeDef.getName)
       : null,
     clusteringVariances: ChainSamplingDesign.isClusteringOnlyVariances(chainSamplingDesign),
     resultVariables: await Promise.all(
