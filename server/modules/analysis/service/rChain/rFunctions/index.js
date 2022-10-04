@@ -23,6 +23,7 @@ export {
   asNumeric,
   paste,
   paste0,
+  print,
   q,
 } from './utility'
 

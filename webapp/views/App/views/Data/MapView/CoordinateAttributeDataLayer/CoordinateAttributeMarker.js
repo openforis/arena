@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { CircleMarker, Tooltip } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -32,7 +32,11 @@ export const CoordinateAttributeMarker = (props) => {
     join: PropTypes.any,
   }
 
+  const circleRef = useRef()
   const tooltipRef = useRef()
+
+  const options = useMapContextOptions()
+  const { showMarkersLabels, showLocationMarkers } = options
 
   const onTooltipOpen = useCallback(() => {
     // set tooltip style
@@ -41,21 +45,27 @@ export const CoordinateAttributeMarker = (props) => {
       color: Colors.getHighContrastTextColor(markersColor),
     }
     Object.assign(tooltipRef.current._container.style, customStyle)
-  }, [tooltipRef])
+  }, [markersColor])
 
-  const options = useMapContextOptions()
-  const { showMarkersLabels } = options
+  useEffect(() => {
+    const circleMarker = circleRef.current
+    circleMarker.setStyle({
+      fill: showLocationMarkers,
+      stroke: showLocationMarkers,
+    })
+    setRef(parentUuid, circleRef)
+  }, [showLocationMarkers, circleRef])
 
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       <CircleMarker
+        ref={circleRef}
         center={[latitude, longitude]}
         radius={markerRadius}
         color={markersColor}
         fillColor={markersColor}
         fillOpacity={fillOpacity}
-        ref={setRef(parentUuid)}
       >
         {showMarkersLabels && (
           <Tooltip

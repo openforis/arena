@@ -81,7 +81,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
       pointIndexByDataIndex: _pointIndexByDataIndex,
     }))
 
-    if (_points.length > 0) {
+    if (_points.length > 0 && map.getZoom() < 5) {
       // pan map into layer bounds center
       map.panTo(bounds.getCenter())
     }

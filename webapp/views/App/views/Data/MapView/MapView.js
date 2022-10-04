@@ -1,3 +1,5 @@
+import './MapView.scss'
+
 import React, { useCallback, useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'

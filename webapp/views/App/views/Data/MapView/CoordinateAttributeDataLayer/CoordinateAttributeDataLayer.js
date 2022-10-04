@@ -32,8 +32,8 @@ export const CoordinateAttributeDataLayer = (props) => {
     return points[index > 0 ? index - 1 : points.length - 1]
   }
 
-  const setRef = useCallback( (parentUuid) => (ref) => {
-    if (ref != null) markerRefs.current[parentUuid] = ref
+  const setRef = useCallback( (parentUuid, ref) => {
+    if (ref != null) markerRefs.current[parentUuid] = ref.current
   }, [clusters])
   return (
     <LayersControl.Overlay name={layerName}>

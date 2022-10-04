@@ -1,3 +1,5 @@
+import pgPromise from 'pg-promise'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -65,7 +67,7 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
- * @param {array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
+ * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
@@ -191,16 +193,11 @@ export const fetchEntitiesDataToCsvFiles = async (
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
       : [nodeDefContext] // Multiple attribute
 
-    let parentKeys = []
-    Survey.visitAncestorsAndSelf(nodeDefContext, (n) => {
-      if (NodeDef.getUuid(n) === NodeDef.getUuid(nodeDefContext)) return
-      const keys = Survey.getNodeDefKeys(n)(survey)
-      parentKeys = parentKeys.concat(keys)
-    })(survey)
+    const ancestorKeys = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
 
     let query = Query.create({ entityDefUuid })
-    const queryAttributeDefs = parentKeys.reverse().concat(childDefs)
-    query = Query.assocAttributeDefUuids(queryAttributeDefs.map(NodeDef.getUuid))(query)
+    const queryAttributeDefsUuids = ancestorKeys.concat(childDefs).map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
@@ -220,15 +217,15 @@ export const fetchEntitiesDataToCsvFiles = async (
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the rows.
- *
+ * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<number>} - The number of rows.
  */
-export const countTable = async ({ survey, cycle, query }) => {
+export const countTable = async ({ survey, cycle, query }, client = db) => {
   const surveyId = Survey.getId(survey)
   const nodeDefTable = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
   const filter = Query.getFilter(query)
-  return DataViewRepository.runCount({ surveyId, cycle, tableName, filter })
+  return DataViewRepository.runCount({ surveyId, cycle, tableName, filter }, client)
 }
 
 /**
@@ -239,13 +236,13 @@ export const countTable = async ({ survey, cycle, query }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
+ * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
  */
-export const fetchTableRowsCountByEntityDefUuid = async ({
-  survey,
-  cycle,
-  entityDefUuids: entityDefUuidsParam = [],
-}) => {
+export const fetchTableRowsCountByEntityDefUuid = async (
+  { survey, cycle, entityDefUuids: entityDefUuidsParam = [] },
+  client = db
+) => {
   const entityDefUuids =
     entityDefUuidsParam?.length > 0
       ? entityDefUuidsParam
@@ -253,8 +250,10 @@ export const fetchTableRowsCountByEntityDefUuid = async ({
           .filter((nodeDef) => NodeDef.isMultipleEntity(nodeDef) && NodeDef.isInCycle(cycle)(nodeDef))
           .map(NodeDef.getUuid)
 
-  const countsArray = await Promise.all(
-    entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }))
+  const countsArray = await client.tx(async (tx) =>
+    Promise.all(
+      entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }, tx))
+    )
   )
   return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
 }

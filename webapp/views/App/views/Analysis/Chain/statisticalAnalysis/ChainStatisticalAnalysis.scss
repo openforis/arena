@@ -1,0 +1,23 @@
+.statistical-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .entity-selector,
+  .attributes-selector {
+    width: 30rem;
+  }
+
+  .entity-selector-wrapper {
+    display: flex;
+
+    .warning-badge {
+      position: relative;
+    }
+  }
+
+  .dimensions-selector,
+  .filter {
+    width: 60rem;
+  }
+}

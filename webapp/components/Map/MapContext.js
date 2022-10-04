@@ -1,16 +1,17 @@
 import React, { useContext, useState } from 'react'
-import { defaultBaseLayer } from './baseLayers'
 import PropTypes from 'prop-types'
 
-const initialState = {
+import * as Survey from '@core/survey/survey'
+
+import { useSurvey } from '@webapp/store/survey'
+
+import { defaultBaseLayer } from './baseLayers'
+import { MapOptions } from './mapOptions'
+
+const createInitialState = ({ sampleBasedImageInterpretationEnabled }) => ({
   baseLayer: null,
-  options: {
-    showMarkersLabels: false,
-    showSamplingPolygon: true,
-    showControlPoints: true,
-    showPlotReferencePoint: true,
-  },
-}
+  options: MapOptions.createDefaultOptions({ sampleBasedImageInterpretationEnabled }),
+})
 
 const MapContext = React.createContext({})
 
@@ -19,7 +20,10 @@ const MapContextConsumer = ({ children }) => <MapContext.Consumer>{(context) => 
 
 // Provider
 const MapContextProvider = ({ children }) => {
-  const [contextObject, setContextObject] = useState(initialState)
+  const survey = useSurvey()
+
+  const sampleBasedImageInterpretationEnabled = Survey.isSampleBasedImageInterpretationEnabled(survey)
+  const [contextObject, setContextObject] = useState(createInitialState({ sampleBasedImageInterpretationEnabled }))
 
   // Context values passed to consumer
   const value = {

@@ -58,7 +58,7 @@ const Header = () => {
       <div className="header__survey">
         {Survey.isValid(surveyInfo) &&
           (appSaving ? (
-            <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
+            <ProgressBar className="progress-bar-striped" progress={100} showText={false} />
           ) : (
             <>
               <Link

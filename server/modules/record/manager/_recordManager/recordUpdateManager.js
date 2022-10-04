@@ -26,9 +26,9 @@ import * as RecordValidationManager from './recordValidationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
 
 /**
- * =======
+ * =======.
  * RECORD
- * =======
+ * =======.
  */
 
 // ==== CREATE
@@ -81,8 +81,8 @@ export const updateRecordStepInTransaction = async ({ user, surveyId, record, st
   client.tx(async (t) => updateRecordStep({ user, surveyId, record, stepId, system }, t))
 
 // ==== DELETE
-export const deleteRecord = async (user, survey, record) =>
-  db.tx(async (t) => {
+export const deleteRecord = async (user, survey, record, client = db) =>
+  client.tx(async (t) => {
     const { uuid } = record
     const rootDef = Survey.getNodeDefRoot(survey)
     const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(
@@ -115,6 +115,7 @@ export const deleteRecord = async (user, survey, record) =>
     const surveyId = Survey.getId(survey)
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
+      FileRepository.markRecordFilesAsDeleted(surveyId, uuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
@@ -137,9 +138,9 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
 export const { deleteRecordsByCycles } = RecordRepository
 
 /**
- * ======
+ * ======.
  * NODE
- * ======
+ * ======.
  */
 
 // inserts/updates a node skipping record uniqueness validation

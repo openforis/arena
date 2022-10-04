@@ -33,6 +33,9 @@ export const useSurveyInfoForm = () => {
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setDescriptions = (descriptions) => setObjectField(Survey.infoKeys.descriptions, descriptions)
 
+  const setSampleBasedImageInterpretationEnabled = (value) =>
+    setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
+
   const saveProps = () => {
     enableValidation()
     dispatch(SurveyInfoActions.updateSurveyInfoProps(object))
@@ -47,6 +50,7 @@ export const useSurveyInfoForm = () => {
     setLabels,
     setDescriptions,
     setCycles,
+    setSampleBasedImageInterpretationEnabled,
     getFieldValidation,
     saveProps,
   }

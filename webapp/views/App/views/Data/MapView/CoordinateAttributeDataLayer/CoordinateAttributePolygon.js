@@ -47,8 +47,8 @@ export const CoordinateAttributePolygon = (props) => {
   const pointSizeLat = MetersToDegreesLatitude(pointSize)
 
   const pointDistanceLat = len_lat / numberOfPointsNorth
-  const startLat = bounds.getSouthWest().lat + pointDistanceLat / 3
-  const startLon = bounds.getSouthWest().lng + len_lng / numberOfPointsEast / 3
+  const startLat = bounds.getSouthWest().lat + len_lat / numberOfPointsEast / 2 - pointSizeLat / 2
+
   const [colors, setColors] = useState([...Array(numberOfPointsEast)].map(() => Array(numberOfPointsNorth).fill(0))) // this generates zero matrix
   const [circleColors, setCircleColors] = useState(Array(numberOfPointsCircle).fill(0))
   let circleControlPointIndex = 0
@@ -160,6 +160,7 @@ export const CoordinateAttributePolygon = (props) => {
         const pointDistanceLng =
           MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) / numberOfPointsEast
         const pointSizeLng = MetersToDegreesLongitude(pointSize, startLat + northIndex * pointDistanceLat)
+        const startLon = bounds.getSouthWest().lng + len_lng / numberOfPointsNorth / 2 - pointSizeLat / 2
         points.push(
           <Rectangle
             bounds={[

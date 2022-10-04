@@ -70,7 +70,7 @@ export const CoordinateAttributePopUp = (props) => {
   const map = useMap()
   
   const flyTo = (latlng, point) => {
-    map.flyTo([latlng[1], latlng[0]])
+    map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
     map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
   }
   const onClickNext = () => {

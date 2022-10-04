@@ -68,7 +68,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div>
         {NodeDef.isDecimal(nodeDef)
-          ? Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
+          ? NodeDef.hasAreaBasedEstimated(nodeDef)
             ? i18n.t('common.true')
             : i18n.t('common.false')
           : '-'}

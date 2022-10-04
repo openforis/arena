@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as Validation from '@core/validation/validation'
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as DateUtils from '@core/dateUtils'
 
 import { keys } from './recordKeys'
 import * as RecordReader from './recordReader'
@@ -83,6 +84,11 @@ export const mergeNodeValidations = (nodeValidations) => (record) =>
   )(record)
 
 export const dissocNodes = R.dissoc(keys.nodes)
+
+export const assocDateModified = (dateModified) => (record) => {
+  const dateModifiedString = DateUtils.formatDateTimeISO(dateModified)
+  return R.assoc(keys.dateModified, dateModifiedString)(record)
+}
 
 // ====== DELETE
 
