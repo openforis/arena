@@ -10,17 +10,17 @@ const useChart = (query, table, setTable) => {
   const { config, configItemsByPath, configActions } = useChartConfig({ table, setTable })
   const { spec, updateSpec } = useChartSpec({ config, configItemsByPath })
 
-  const { chartImage, renderChart } = useChartRender(spec, query)
+  const { chartData, renderChart } = useChartRender(spec, query)
 
   useEffect(() => {
     setDraft(false)
-  }, [chartImage])
+  }, [chartData])
 
   useEffect(() => {
     setDraft(true)
   }, [spec])
 
-  return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartImage, renderChart }
+  return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartData, renderChart }
 }
 
 export default useChart

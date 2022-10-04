@@ -67,6 +67,7 @@ const _blocks = {
     id: 'column',
     title: 'Column',
     type: 'select',
+    optionsParams: { filter: ['quantitative'] },
   },
   aggregation: {
     id: 'aggregation',

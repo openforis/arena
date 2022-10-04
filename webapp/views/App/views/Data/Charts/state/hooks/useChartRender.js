@@ -11,26 +11,26 @@ const useChartRender = (spec, query) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
-  const [chartImage, setChartImage] = useState(null)
+  const [chartData, setChartData] = useState(null)
 
   const renderChart = useCallback(async () => {
     try {
       if (!query) return
-      setChartImage(null)
+      setChartData(null)
       const { data } = await axios.post(getUrl({ surveyId, query }), {
         cycle,
         query: A.stringify(query),
         chart: A.stringify(spec),
       })
 
-      setChartImage(data.svg)
+      setChartData(data)
     } catch (err) {
       console.log(err)
     }
   }, [spec, surveyId, cycle])
 
   return {
-    chartImage,
+    chartData,
     renderChart,
   }
 }

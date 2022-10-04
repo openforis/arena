@@ -14,7 +14,7 @@ const dimensionTypeByNodeDefType = {
   [NodeDef.nodeDefType.coordinate]: vegaTypes.nominal,
   [NodeDef.nodeDefType.date]: vegaTypes.temporal,
   [NodeDef.nodeDefType.time]: vegaTypes.temporal,
-  [NodeDef.nodeDefType.decimal]: vegaTypes.temporal,
+  [NodeDef.nodeDefType.decimal]: vegaTypes.quantitative,
   [NodeDef.nodeDefType.entity]: vegaTypes.quantitative,
   [NodeDef.nodeDefType.file]: vegaTypes.nominal,
   [NodeDef.nodeDefType.integer]: vegaTypes.quantitative,
