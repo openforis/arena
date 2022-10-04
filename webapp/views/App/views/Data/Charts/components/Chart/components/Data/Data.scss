@@ -1,0 +1,12 @@
+@import 'webapp/style/vars';
+
+
+.charts_chart__data_container {
+  background: $white;
+  overflow: scroll;
+  padding: 12px;
+}
+
+.charts_chart__data_container__table_container{
+  overflow: scroll;
+}

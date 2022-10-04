@@ -27,6 +27,7 @@ const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dime
       {Object.keys(chartsConfig).map((configKey) => (
         <button
           key={configKey}
+          className={`${configKey === config.type ? 'active' : ''}`}
           onClick={() => {
             configActions.changeType(configKey)
           }}
