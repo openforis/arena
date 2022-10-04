@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects, Records } from '@openforis/arena-core'
+import { Records } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
