@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -14,6 +14,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
+import axios from 'axios'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -47,13 +48,31 @@ const PopupContent = (props) => {
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
+  const [elevation, setElevation] = useState(null)
+
+  useEffect(() => {
+    const getElevation = async (lat, lng) => {
+      const url = `/api/geo/map/elevation/${lat}/${lng}`
+      let res, data
+      try {
+        res = await axios.get(url)
+        data = res.data
+      } catch {
+        return null
+      }
+      setElevation(data.elevation)
+    }
+    getElevation(point.y, point.x)
+
+  }, [])
 
   const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
 
   const content = `**${path}**
 * **x**: ${point.x}
 * **y**: ${point.y}
-* **SRS**: ${point.srs}`
+* **SRS**: ${point.srs}
+* **elevation (m)**: ${elevation}`
 
   return (
     <div className="coordinate-attribute-popup-content">
@@ -62,6 +81,8 @@ const PopupContent = (props) => {
     </div>
   )
 }
+
+
 
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick, getNextPoint, getPreviousPoint, openPopupOfUuid } = props
