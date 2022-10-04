@@ -75,7 +75,7 @@ const _prepareSelectFields = ({
       ...viewDataNodeDef.columnNodeDefs
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
         .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)),
-      `${DataTable.columnNameRecordCycle}::integer + 1 AS ${DataTable.columnNameRecordCycle}`
+      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`
     )
     // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {
@@ -83,6 +83,7 @@ const _prepareSelectFields = ({
   } else {
     queryBuilder.select(
       viewDataNodeDef.columnRecordUuid,
+      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
       viewDataNodeDef.columnUuid,
       // selected node def columns
       ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
@@ -164,7 +165,7 @@ const _dbTransformCallbackSelect =
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
- * @param {array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
+ * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.

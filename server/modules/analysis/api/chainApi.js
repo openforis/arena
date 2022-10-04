@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-import * as StringUtils from '@core/stringUtils'
 import * as Chain from '@common/analysis/chain'
 import * as ChainValidator from '@common/analysis/chainValidator'
 
@@ -86,9 +85,8 @@ export const init = (app) => {
         const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
         const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle })
-        const chainName = StringUtils.normalizeName(chainSummary.label)
 
-        Response.setContentTypeFile({ res, fileName: `chain_${chainName}_summary.json` })
+        Response.setContentTypeFile({ res, fileName: 'chain_summary.json' })
         res.json(chainSummary)
       } catch (error) {
         next(error)

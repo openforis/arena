@@ -2,9 +2,15 @@
 
 .validation-report {
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr auto;
+  
+  .footer {
+    display: grid;
+    grid-template-columns: 8rem 1fr 8rem;
+  }
 
-  .btn-back {
+  .btn-csv-export {
+    width: fit-content;
     margin: auto;
   }
 }

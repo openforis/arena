@@ -105,6 +105,7 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client
 export {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,
+  fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
   insertRecordsInBatch,
@@ -179,4 +180,8 @@ export {
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
-export { fetchValidationReport, countValidationReportItems } from './_recordManager/validationReportManager'
+export {
+  exportValidationReportToStream,
+  fetchValidationReport,
+  countValidationReportItems,
+} from './_recordManager/validationReportManager'

@@ -7,18 +7,20 @@ const keys = {
 }
 
 const isOnlyForSampleBasedImageInterpretation = (key) =>
-  [keys.showLocationMarkers, keys.showPlotReferencePoint, keys.showSamplingPolygon].includes(key)
+  [keys.showControlPoints, keys.showLocationMarkers, keys.showPlotReferencePoint, keys.showSamplingPolygon].includes(
+    key
+  )
 
-const defaultOptions = () => ({
-  [keys.showControlPoints]: true,
+const createDefaultOptions = ({ sampleBasedImageInterpretationEnabled = false } = {}) => ({
+  [keys.showControlPoints]: sampleBasedImageInterpretationEnabled,
   [keys.showMarkersLabels]: false,
   [keys.showLocationMarkers]: true,
-  [keys.showPlotReferencePoint]: true,
-  [keys.showSamplingPolygon]: true,
+  [keys.showPlotReferencePoint]: sampleBasedImageInterpretationEnabled,
+  [keys.showSamplingPolygon]: sampleBasedImageInterpretationEnabled,
 })
 
 export const MapOptions = {
-  defaultOptions,
+  createDefaultOptions,
   keys,
   isOnlyForSampleBasedImageInterpretation,
 }
