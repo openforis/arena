@@ -54,4 +54,20 @@ export const init = (app) => {
       res.json([])
     }
   })
+
+  app.get('/geo/map/elevation/:lat/:lng', AuthMiddleware.requireMapUsePermission, async (req, res) => {
+    const { lat, lng } = Request.getParams(req)
+    const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
+    let data, dataRes
+    try {
+      dataRes = await axios.get(url)
+      data = dataRes.data
+    }
+    finally {
+      res.json({
+        elevation: data.results[0].elevation
+      })
+    }
+  })
+
 }
