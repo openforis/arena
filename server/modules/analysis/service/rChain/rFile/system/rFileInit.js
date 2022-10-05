@@ -30,6 +30,10 @@ export default class RFileInit extends RFileSystem {
       await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
     })
 
-    return this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl.replace('http://', 'https://')}/'`))
+    let arenaServerUrl = this.rChain.serverUrl
+    if (arenaServerUrl.startsWith('http://') && !arenaServerUrl.startsWith('http://localhost')) {
+      arenaServerUrl = arenaServerUrl.replace('http://', 'https://')
+    }
+    return this.appendContent(setVar('arena.host', `'${arenaServerUrl}/'`))
   }
 }

@@ -24,28 +24,31 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) 
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 
 // ==== READ
-export const fetchNodeData = async ({ surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
-  const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
+  // prepare query
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
     cycle,
     advanced: true,
     draft,
     includeAnalysis: false,
   })
-
   const chain = await AnalysisManager.fetchChain({ surveyId, chainUuid })
   const recordSteps = Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)
     ? [RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]
     : null
   const query = Query.create({ entityDefUuid: nodeDefUuid })
 
+  // fetch data
   return SurveyRdbManager.fetchViewData({
-    survey: surveyAndNodeDefs,
+    survey,
     cycle,
     recordSteps,
     query,
     columnNodeDefs: true,
     includeFileAttributeDefs: false,
+    addCycle: true,
+    streamOutput: res,
   })
 }
 

@@ -5,7 +5,7 @@ import * as ApiRoutes from '@common/apiRoutes'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGet, asCharacter, asLogical, asNumeric } from '../../rFunctions'
+import { dfVar, setVar, arenaGetCSV, asCharacter, asLogical, asNumeric } from '../../rFunctions'
 
 const dataTypeConvertersByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: asLogical,
@@ -29,7 +29,8 @@ export default class RFileReadData extends RFileSystem {
 
     await PromiseUtils.each(entities, async (entityDef) => {
       // Fetch entity data
-      const getEntityData = arenaGet(
+      const dfName = NodeDef.getName(entityDef)
+      const dataCSV = arenaGetCSV(
         ApiRoutes.rChain.entityData({
           surveyId: Survey.getId(survey),
           cycle,
@@ -37,9 +38,7 @@ export default class RFileReadData extends RFileSystem {
           entityUuid: NodeDef.getUuid(entityDef),
         })
       )
-      const dfName = NodeDef.getName(entityDef)
-      await this.appendContent(setVar(dfName, getEntityData))
-
+      await this.appendContent(setVar(dfName, dataCSV))
       await this.appendContentToConvertDataTypes({ entityDef })
 
       await this.initMultipleAttributesData({ entityDef })
@@ -51,7 +50,8 @@ export default class RFileReadData extends RFileSystem {
 
     const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
     await PromiseUtils.each(multipleAttrDefs, async (multipleAttrDef) => {
-      const getMultipleAttributeData = arenaGet(
+      const dfName = NodeDef.getName(multipleAttrDef)
+      const dataCSV = arenaGetCSV(
         ApiRoutes.rChain.multipleAttributeData({
           surveyId: Survey.getId(survey),
           cycle,
@@ -59,8 +59,7 @@ export default class RFileReadData extends RFileSystem {
           attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
         })
       )
-      const dfName = NodeDef.getName(multipleAttrDef)
-      await this.appendContent(setVar(dfName, getMultipleAttributeData))
+      await this.appendContent(setVar(dfName, dataCSV))
     })
   }
 
