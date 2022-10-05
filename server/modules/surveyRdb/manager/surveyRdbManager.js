@@ -40,41 +40,21 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 // ==== DML
 
-const _getExportFields = ({
-  survey,
-  query,
-  columnNodeDefs = false,
-  addCycle = false,
-  includeFileAttributeDefs = false,
-  includeCategoryItemsLabels = true,
-}) => {
+const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItemsLabels = true }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
-  const fields = []
-  if (columnNodeDefs) {
-    fields.push(
-      ...[
-        ViewDataNodeDef.columnSet.recordUuid,
-        ...viewDataNodeDef.columnNodeDefs
-          .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
-          .flatMap((columnNodeDef) => columnNodeDef.name),
-      ]
-    )
-  } else {
-    // Consider only user selected fields (from column node defs)
-    const nodeDefUuidCols = Query.getAttributeDefUuids(query)
-    const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-    fields.push(
-      ...nodeDefCols.flatMap((nodeDefCol) => {
-        if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
-          // keep only code column
-          return [NodeDef.getName(nodeDefCol)]
-        } else {
-          return new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names
-        }
-      })
-    )
-  }
+
+  // Consider only user selected fields (from column node defs)
+  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  const fields = nodeDefCols.flatMap((nodeDefCol) => {
+    if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
+      // keep only code column
+      return [NodeDef.getName(nodeDefCol)]
+    } else {
+      return new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names
+    }
+  })
   // Cycle is 0-based
   return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
 }
@@ -124,7 +104,9 @@ export const fetchViewData = async (params) => {
   })
 
   if (streamOutput) {
-    const fields = _getExportFields({ survey, query, columnNodeDefs, addCycle, includeCategoryItemsLabels })
+    const fields = columnNodeDefs
+      ? null // all fields will be included in the CSV file
+      : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
 
     await db.stream(result, (dbStream) => {
       dbStream.pipe(CSVWriter.transformToStream(streamOutput, fields))
