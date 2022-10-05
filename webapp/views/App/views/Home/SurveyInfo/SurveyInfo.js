@@ -110,22 +110,29 @@ const SurveyInfo = () => {
           />
         </div>
 
-        <FormItem label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}>
-          <Checkbox
-            checked={sampleBasedImageInterpretationEnabled}
-            onChange={setSampleBasedImageInterpretationEnabled}
-            validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
-          />
-        </FormItem>
-
-        {User.isSystemAdmin(user) && sampleBasedImageInterpretationEnabled && (
-          <SamplingPolygonEditor
-            samplingPolygon={samplingPolygon}
-            setSamplingPolygon={setSamplingPolygon}
-            getFieldValidation={getFieldValidation}
-            readOnly={readOnly}
-          />
+        {User.isSystemAdmin(user) && (
+          <FormItem
+            label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}
+            className="sample-based-image-interpretation-form-item"
+          >
+            <div>
+              <Checkbox
+                checked={sampleBasedImageInterpretationEnabled}
+                onChange={setSampleBasedImageInterpretationEnabled}
+                validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
+              />
+              {sampleBasedImageInterpretationEnabled && (
+                <SamplingPolygonEditor
+                  samplingPolygon={samplingPolygon}
+                  setSamplingPolygon={setSamplingPolygon}
+                  getFieldValidation={getFieldValidation}
+                  readOnly={readOnly}
+                />
+              )}
+            </div>
+          </FormItem>
         )}
+
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
     </div>

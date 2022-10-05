@@ -1,7 +1,7 @@
 @import 'webapp/style/vars';
 
 $sidebarWidthClosed: 70px;
-$sidebarWidthOpened: 200px;
+$sidebarWidthOpened: 220px;
 //== buttons
 $sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
@@ -13,6 +13,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   align-content: center;
   position: relative;
   width: $sidebarWidthClosed;
+  min-width: $sidebarWidthClosed;
 }
 
 .sidebar__btn-toggle {
@@ -91,6 +92,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 //=== sidebar opened
 .sidebar.opened {
   width: $sidebarWidthOpened;
+  min-width: $sidebarWidthOpened;
 
   .sidebar__module {
     cursor: auto;
