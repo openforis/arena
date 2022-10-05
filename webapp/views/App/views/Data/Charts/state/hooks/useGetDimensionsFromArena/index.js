@@ -21,8 +21,13 @@ const useGetDimensionsFromArena = (nodeDefLabelType) => {
 
   useEffect(() => {
     setQuery(entityDefUuid ? Query.create({ entityDefUuid }) : null)
-    generateDimensions()
-  }, [entityDefUuid])
+
+    if (!entityDefUuid && dimensions.length > 0) {
+      setDimensions([])
+    } else {
+      generateDimensions()
+    }
+  }, [dimensions.length, entityDefUuid, generateDimensions])
 
   useEffect(() => {
     generateDimensions()
