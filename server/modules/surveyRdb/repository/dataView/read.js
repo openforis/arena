@@ -77,7 +77,6 @@ const _prepareSelectFields = ({
         .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)),
       `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`
     )
-    // queryBuilder.select(viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesFull)
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
