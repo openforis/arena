@@ -569,7 +569,7 @@ $t(common.cantUndoWarning)`,
   },
 
   samplingPolygonOptions: {
-    circle: 'circle',
+    circle: 'Circle',
     controlPointOffsetEast: 'Control Point Offset East (m)',
     controlPointOffsetNorth: 'Control Point Offset North (m)',
     lengthLatitude: 'Length Latitude (m)',
