@@ -25,14 +25,16 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchNodeData({
+        Response.setContentTypeFile({ res, fileName: 'data.csv', contentType: Response.contentTypes.csv })
+
+        await AnalysisService.fetchNodeData({
           surveyId,
           cycle,
           chainUuid,
           nodeDefUuid: entityDefUuid,
           draft: false,
+          res,
         })
-        res.json(data)
       } catch (error) {
         next(error)
       }
@@ -52,14 +54,16 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, chainUuid, attributeDefUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchNodeData({
+        Response.setContentTypeFile({ res, fileName: 'data.csv', contentType: Response.contentTypes.csv })
+
+        await AnalysisService.fetchNodeData({
           surveyId,
           cycle,
           chainUuid,
           nodeDefUuid: attributeDefUuid,
           draft: false,
+          res,
         })
-        res.json(data)
       } catch (error) {
         next(error)
       }

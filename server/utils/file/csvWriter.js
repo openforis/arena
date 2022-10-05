@@ -15,7 +15,7 @@ const _transformObj =
     )
   }
 
-export const transformToStream = (stream, columns, options = {}) => {
+export const transformToStream = (stream, columns = null, options = {}) => {
   const { objectTransformer = null } = options
   const transformFunction = objectTransformer || _transformObj(options)
   const transformer = transform(transformFunction)

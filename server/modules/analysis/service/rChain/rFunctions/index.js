@@ -31,4 +31,4 @@ export { zipr } from './zip'
 
 export { arenaStartTime, arenaEndTime, arenaInfo } from './arena'
 
-export { arenaGet, arenaPost, arenaDelete, arenaPut, arenaPutFile } from './arenaApi'
+export { arenaGet, arenaGetCSV, arenaGetToFile, arenaPost, arenaDelete, arenaPut, arenaPutFile } from './arenaApi'
