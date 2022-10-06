@@ -1,42 +1,40 @@
 @import 'webapp/style/vars';
 
-.charts_data-selector__container{
-        width: 180px;
-        border-right: 1px solid $greyBorder;
-        display: flex;
-        flex-direction: column;
-        padding: 12px;
-        background: $white;
+.charts_data-selector__container {
+  width: 180px;
+  border-right: 1px solid $greyBorder;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: $white;
 }
 
-.charts_data-selector_group-dimension_container{
-    overflow-y: scroll;
-    flex: 1;
-
+.charts_data-selector_group-dimension_container {
+  overflow-y: auto;
+  flex: 1;
 }
-.charts_data-selector_group-dimension{
-    padding-left: 8px;
 
-    .btn-toggle{
-        border: none;
-        &.rotate{
-            transform: rotate(90deg);
-        }
+.charts_data-selector_group-dimension {
+  padding-left: 8px;
+
+  .btn-toggle {
+    border: none;
+    &.rotate {
+      transform: rotate(90deg);
     }
+  }
 }
 
-.charts_data-selector_dimension{
-    justify-content: space-between;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 2px 0px;
-    .icon-left {
-        font-size: 12px !important;
-    }
-    .icon{
-        font-size: 12px !important;
-    }
-    
+.charts_data-selector_dimension {
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 2px 0px;
+  .icon-left {
+    font-size: 12px !important;
+  }
+  .icon {
+    font-size: 12px !important;
+  }
 }
-
