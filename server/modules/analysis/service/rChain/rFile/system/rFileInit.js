@@ -6,9 +6,9 @@ import { setVar, source } from '../../rFunctions'
 
 const dirNameInit = 'init'
 const fileNamesInit = [
-  'init-utils',
   'init-session',
   'init-packages',
+  'init-utils',
   'init-log',
   'init-api',
   'init-chain',
