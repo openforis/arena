@@ -570,8 +570,8 @@ $t(common.cantUndoWarning)`,
 
   samplingPolygonOptions: {
     circle: 'circle',
-    controlPointOffsetEast: 'Control Point Offset East (m)',
-    controlPointOffsetNorth: 'Control Point Offset North (m)',
+    controlPointOffsetEast: 'Reference Point Offset East (m)',
+    controlPointOffsetNorth: 'Reference Point Offset North (m)',
     lengthLatitude: 'Length Latitude (m)',
     lengthLongitude: 'Length Longitude (m)',
     numberOfControlPoints: 'Number of Control Points',

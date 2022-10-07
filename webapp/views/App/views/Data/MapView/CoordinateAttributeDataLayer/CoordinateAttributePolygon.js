@@ -16,7 +16,7 @@ export const CoordinateAttributePolygon = (props) => {
   const SamplingPolygonOpoacity = showSamplingPolygon ? 1 : 0
 
   const { latitude, longitude } = props
-  
+
   const len_lat_meters = SamplingPolygon.getLengthLatitude(surveyInfo)
   const len_lng_meters = SamplingPolygon.getLengthLongitude(surveyInfo)
   const offset_north_meters = SamplingPolygon.getOffsetNorth(surveyInfo)
@@ -24,7 +24,7 @@ export const CoordinateAttributePolygon = (props) => {
   const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(surveyInfo)
   const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(surveyInfo)
   const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(surveyInfo)
-  const controlPointOffsetNorh = SamplingPolygon.getControlPointOffsetNorth(surveyInfo)
+  const controlPointOffsetNorth = SamplingPolygon.getControlPointOffsetNorth(surveyInfo)
   const controlPointOffsetEast = SamplingPolygon.getControlPointOffsetEast(surveyInfo)
   const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
   const radius = SamplingPolygon.getRadius(surveyInfo)
@@ -32,8 +32,8 @@ export const CoordinateAttributePolygon = (props) => {
   const len_lat = MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
   const len_lng = MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)
   const control_point_latlng = L.latLng(
-    latitude + MetersToDegreesLatitude(controlPointOffsetEast),
-    longitude + MetersToDegreesLongitude(controlPointOffsetNorh, latitude)
+    latitude + MetersToDegreesLatitude(controlPointOffsetNorth),
+    longitude + MetersToDegreesLongitude(controlPointOffsetEast, latitude)
   )
 
   const middle_latlng = L.latLng(latitude, longitude)
