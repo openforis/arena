@@ -1,14 +1,13 @@
 import './CoordinateAttributePopUp.scss'
 
 import React, { useEffect, useState } from 'react'
-import { Popup } from 'react-leaflet'
+import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
-import { useMap } from 'react-leaflet'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
