@@ -1,5 +1,3 @@
-import * as Category from '../../../../core/survey/category'
-import * as CategoryItem from '../../../../core/survey/categoryItem'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as ApiRoutes from '../../../../common/apiRoutes'
@@ -78,19 +76,12 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, language, draft } = Request.getParams(req)
 
-        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-        const extraDefKeys = Category.getItemExtraDefKeys(category)
-        const items = await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, null, draft)
-
-        const itemsSummary = items.map((item) => ({
-          uuid: CategoryItem.getUuid(item),
-          code: CategoryItem.getCode(item),
-          label: CategoryItem.getLabel(language)(item),
-          ...extraDefKeys.reduce(
-            (acc, extraDefKey) => ({ ...acc, [extraDefKey]: CategoryItem.getExtraProp(extraDefKey)(item) }),
-            {}
-          ),
-        }))
+        const itemsSummary = await CategoryService.fetchCategoryItemsSummary({
+          surveyId,
+          categoryUuid,
+          language,
+          draft,
+        })
         res.json(itemsSummary)
       } catch (error) {
         next(error)

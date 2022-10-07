@@ -112,6 +112,86 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   return samplingPointData
 }
 
+export const fetchCategoryItemsSummary = async ({ surveyId, categoryUuid, language, draft = false }) => {
+  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+  const extraDefKeys = Category.getItemExtraDefKeys(category)
+  const levels = Category.getLevelsArray(category)
+  const hierarchical = levels.length > 1
+  const items = await fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft })
+
+  if (hierarchical) {
+    // iterate only one time the items to get children and parent for every item
+    items.forEach((item) => {
+      const children = items.filter((itm) => CategoryItem.getParentUuid(itm) === CategoryItem.getUuid(item))
+      children.forEach((child) => (child.parent = item))
+      item.children = children
+    })
+  }
+
+  if (Category.isReportingData(category)) {
+    // calculate cumulative area for each item
+    // if item is leaf, cumulative area = area
+    // otherwise it's the sum of the cumulative areas of the children
+    const calculateCumulativeArea = (item) => {
+      if (!isNaN(item.areaCumulative)) {
+        return item.areaCumulative
+      }
+      if (Category.isItemLeaf(item)(category)) {
+        return Number(CategoryItem.getExtraProp('area')(item)) || 0
+      }
+      return item.children.reduce((totalArea, childItem) => totalArea + calculateCumulativeArea(childItem), 0)
+    }
+    items.forEach((item) => {
+      item.areaCumulative = calculateCumulativeArea(item)
+    })
+  }
+
+  const getAncestorItem = ({ item, levelIndex }) => {
+    const { parent } = item
+    if (levelIndex === Category.getItemLevelIndex(item)(category) - 1) {
+      return parent
+    }
+    return getAncestorItem({ item: parent, levelIndex })
+  }
+
+  const getAncestorItemCode = ({ item, levelIndex }) => {
+    const itemLevelIndex = Category.getItemLevelIndex(item)(category)
+    if (itemLevelIndex === levelIndex) {
+      return CategoryItem.getCode(item)
+    }
+    if (itemLevelIndex > levelIndex) {
+      return CategoryItem.getCode(getAncestorItem({ item, levelIndex }))
+    }
+    return null
+  }
+
+  return items.map((item) => ({
+    code: CategoryItem.getCode(item),
+    ...(hierarchical
+      ? {
+          level: Category.getItemLevelIndex(item)(category) + 1,
+          ...levels.reduce(
+            (acc, _level, levelIndex) => ({
+              ...acc,
+              [`level_${levelIndex + 1}_code`]: getAncestorItemCode({ item, levelIndex }),
+            }),
+            {}
+          ),
+        }
+      : {}),
+    label: CategoryItem.getLabel(language)(item),
+    ...extraDefKeys.reduce(
+      (acc, extraDefKey) => ({ ...acc, [extraDefKey]: CategoryItem.getExtraProp(extraDefKey)(item) }),
+      {}
+    ),
+    ...(Category.isReportingData(category)
+      ? {
+          area_cumulative: item.areaCumulative,
+        }
+      : {}),
+  }))
+}
+
 export const {
   insertCategory,
   createImportSummary,
