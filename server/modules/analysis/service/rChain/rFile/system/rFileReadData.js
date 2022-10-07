@@ -1,23 +1,17 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { ViewDataNodeDef } from '@common/model/db'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGetCSV, asCharacter, asLogical, asNumeric } from '../../rFunctions'
-
-const dataTypeConvertersByNodeDefType = {
-  [NodeDef.nodeDefType.boolean]: asLogical,
-  [NodeDef.nodeDefType.code]: asCharacter,
-  [NodeDef.nodeDefType.coordinate]: asCharacter,
-  [NodeDef.nodeDefType.date]: asCharacter,
-  [NodeDef.nodeDefType.decimal]: asNumeric,
-  [NodeDef.nodeDefType.integer]: asNumeric,
-  [NodeDef.nodeDefType.taxon]: asCharacter,
-  [NodeDef.nodeDefType.text]: asCharacter,
-  [NodeDef.nodeDefType.time]: asCharacter,
-}
+import {
+  setVar,
+  arenaGetCSV,
+  arenaDfColumnsAsCharacter,
+  arenaDfColumnsAsLogical,
+  arenaDfColumnsAsNumeric,
+} from '../../rFunctions'
 
 export default class RFileReadData extends RFileSystem {
   constructor(rChain) {
@@ -65,33 +59,52 @@ export default class RFileReadData extends RFileSystem {
 
   async appendContentToConvertDataTypes({ entityDef }) {
     const { survey } = this.rChain
-    const contentConvertDataTypes = []
 
-    Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-      Survey.getNodeDefChildren(
-        ancestorDef,
-        false
-      )(survey).forEach((childDef) => {
-        if (NodeDef.isSingleAttribute(childDef)) {
-          contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
+    const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
+
+    const columnsToConvertAsCharacter = []
+    const columnsToConvertAsLogical = []
+    const columnsToConvertAsNumeric = []
+
+    viewDataNodeDef.columnNodeDefs.map((columnNodeDef) => {
+      const { nodeDef, names: columnNames } = columnNodeDef
+      columnNames.forEach((colName) => {
+        if (NodeDef.isSingleAttribute(nodeDef) && !NodeDef.isAnalysis(nodeDef)) {
+          const type = NodeDef.getType(nodeDef)
+          if (NodeDef.isBoolean(nodeDef)) {
+            columnsToConvertAsLogical.push(colName)
+          } else if (
+            [
+              NodeDef.nodeDefType.code,
+              NodeDef.nodeDefType.coordinate,
+              NodeDef.nodeDefType.date,
+              NodeDef.nodeDefType.taxon,
+              NodeDef.nodeDefType.text,
+              NodeDef.nodeDefType.time,
+            ].includes(type)
+          ) {
+            columnsToConvertAsCharacter.push(colName)
+          } else if ([NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(type)) {
+            columnsToConvertAsNumeric.push(colName)
+          }
         }
       })
-    })(survey)
-    await this.appendContent(...contentConvertDataTypes)
-  }
-
-  createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }) {
-    const content = []
-    const dfEntity = NodeDef.getName(entityDef)
-    const columnNames = NodeDefTable.getColumnNames(childDef)
-    columnNames.forEach((columnName) => {
-      const nodeDefDfVar = dfVar(dfEntity, columnName)
-      const dataTypeConverter = dataTypeConvertersByNodeDefType[NodeDef.getType(childDef)]
-      if (dataTypeConverter) {
-        content.push(setVar(nodeDefDfVar, dataTypeConverter(nodeDefDfVar)))
-      }
     })
-    return content
+    const dfEntity = NodeDef.getName(entityDef)
+
+    const content = []
+    if (columnsToConvertAsCharacter.length > 0) {
+      content.push(setVar(dfEntity, arenaDfColumnsAsCharacter(dfEntity, columnsToConvertAsCharacter)))
+    }
+    if (columnsToConvertAsLogical.length > 0) {
+      content.push(setVar(dfEntity, arenaDfColumnsAsLogical(dfEntity, columnsToConvertAsLogical)))
+    }
+    if (columnsToConvertAsNumeric.length > 0) {
+      content.push(setVar(dfEntity, arenaDfColumnsAsNumeric(dfEntity, columnsToConvertAsNumeric)))
+    }
+    if (content.length > 0) {
+      await this.appendContent(...content)
+    }
   }
 
   async init() {

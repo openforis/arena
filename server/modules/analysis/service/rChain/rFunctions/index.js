@@ -32,3 +32,5 @@ export { zipr } from './zip'
 export { arenaStartTime, arenaEndTime, arenaInfo } from './arena'
 
 export { arenaGet, arenaGetCSV, arenaGetToFile, arenaPost, arenaDelete, arenaPut, arenaPutFile } from './arenaApi'
+
+export { arenaDfColumnsAsCharacter, arenaDfColumnsAsLogical, arenaDfColumnsAsNumeric } from './arenaUtils'
