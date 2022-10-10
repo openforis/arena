@@ -111,6 +111,17 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }
 
 // ============== READ
 
+export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client = DB) =>
+  client.one(
+    `
+    SELECT COUNT(*)
+    FROM ${getSurveyDBSchema(surveyId)}.node_def
+    WHERE TRUE
+    ${!draft ? " AND props <> '{}'::jsonb" : ''}`,
+    {},
+    (row) => Number(row.count)
+  )
+
 export const fetchNodeDefsBySurveyId = async (
   { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true },
   client = DB

@@ -91,7 +91,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle, nodeDefRoot, nodeDefKeys, search = false },
+  { surveyId, cycle, nodeDefRoot, nodeDefKeys, search = null },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
@@ -104,7 +104,8 @@ export const countRecordsBySurveyId = async (
         FROM ${getSurveyDBSchema(surveyId)}.record 
         WHERE preview = FALSE AND cycle = $1
       `,
-    [cycle]
+    [cycle],
+    (row) => Number(row.count)
   )
 }
 

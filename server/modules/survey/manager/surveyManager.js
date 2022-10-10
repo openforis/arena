@@ -18,9 +18,12 @@ import { db } from '@server/db/db'
 import { DBMigrator } from '@openforis/arena-server'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -244,18 +247,32 @@ export const fetchUserSurveysInfo = async ({
   if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
     throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
-  const surveys = await SurveyRepository.fetchUserSurveys({
-    user,
-    draft,
-    template,
-    offset,
-    limit,
-    lang,
-    search,
-    sortBy,
-    sortOrder,
-  })
-  return surveys.map(assocSurveyInfo)
+  const surveys = (
+    await SurveyRepository.fetchUserSurveys({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+    })
+  ).map(assocSurveyInfo)
+
+  return Promise.all(
+    surveys.map(async (survey) => {
+      const surveyId = Survey.getId(survey)
+      const canHaveData = Survey.isPublished(survey) || Survey.isFromCollect(survey)
+      return {
+        ...survey,
+        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : {},
+        chainsCount: await ChainRepository.countChains({ surveyId }),
+      }
+    })
+  )
 }
 
 // ====== UPDATE

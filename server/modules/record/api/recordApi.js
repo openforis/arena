@@ -106,7 +106,7 @@ export const init = (app) => {
       const { surveyId, cycle, search } = Request.getParams(req)
 
       const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
@@ -181,7 +181,7 @@ export const init = (app) => {
       const { surveyId, cycle, search } = Request.getParams(req)
 
       const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
