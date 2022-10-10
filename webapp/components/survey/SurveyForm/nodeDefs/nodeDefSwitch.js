@@ -25,6 +25,7 @@ import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefFormItem from './components/NodeDefFormItem'
+import classNames from 'classnames'
 
 class NodeDefSwitch extends React.Component {
   constructor(props) {
@@ -79,22 +80,24 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const { surveyCycleKey, nodeDef, label, lang, edit, canEditDef, renderType, applicable } = this.props
+    const { surveyCycleKey, nodeDef, label, lang, edit, canEditDef, renderType, applicable, empty } = this.props
     const { isHovering } = this.state
 
     const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
     const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
 
-    const className =
-      'survey-form__node-def-page' +
-      (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item') +
-      (applicable ? '' : ' not-applicable') +
-      (!applicable &&
-      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
-      renderType !== NodeDefLayout.renderType.tableBody
-        ? ' hidden'
-        : '') +
-      (NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader ? ' read-only' : '')
+    const className = classNames(
+      'survey-form__node-def-page' + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'),
+      {
+        'not-applicable': !applicable,
+        hidden:
+          !applicable &&
+          NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+          renderType !== NodeDefLayout.renderType.tableBody &&
+          empty,
+        'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
+      }
+    )
 
     return (
       <div
@@ -164,6 +167,7 @@ const mapStateToProps = (state, props) => {
 
     return {
       nodes: nodesValidated,
+      nodesEmpty: nodesValidated.every((node) => Record.isNodeEmpty(node)(record)),
       canAddNode,
       readOnly: NodeDef.isReadOnlyOrAnalysis(nodeDef),
     }
