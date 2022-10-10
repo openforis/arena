@@ -47,30 +47,39 @@ const assocCumulativeArea = ({ category, items }) => {
   })
 }
 
-const toItemSummary = ({ category, language, item }) => {
-  const extraDefKeys = Category.getItemExtraDefKeys(category)
+const extractAncestoLevelCodes = ({ category, item }) => {
   const levels = Category.getLevelsArray(category)
   const hierarchical = levels.length > 1
 
+  if (!hierarchical) return {}
+
   return {
-    code: CategoryItem.getCode(item),
-    ...(hierarchical
-      ? {
-          level: Category.getItemLevelIndex(item)(category) + 1,
-          ...levels.reduce(
-            (acc, _level, levelIndex) => ({
-              ...acc,
-              [`level_${levelIndex + 1}_code`]: getAncestorItemCode({ category, item, levelIndex }),
-            }),
-            {}
-          ),
-        }
-      : {}),
-    label: CategoryItem.getLabel(language)(item),
-    ...extraDefKeys.reduce(
-      (acc, extraDefKey) => ({ ...acc, [extraDefKey]: CategoryItem.getExtraProp(extraDefKey)(item) }),
+    level: Category.getItemLevelIndex(item)(category) + 1,
+    ...levels.reduce(
+      (acc, _level, levelIndex) => ({
+        ...acc,
+        [`level_${levelIndex + 1}_code`]: getAncestorItemCode({ category, item, levelIndex }),
+      }),
       {}
     ),
+  }
+}
+
+const extractExtraDefsSummary = ({ category, item }) => {
+  const extraDefKeys = Category.getItemExtraDefKeys(category)
+
+  return extraDefKeys.reduce(
+    (acc, extraDefKey) => ({ ...acc, [extraDefKey]: CategoryItem.getExtraProp(extraDefKey)(item) }),
+    {}
+  )
+}
+
+const toItemSummary = ({ category, language, item }) => {
+  return {
+    code: CategoryItem.getCode(item),
+    ...extractAncestoLevelCodes({ category, item }),
+    label: CategoryItem.getLabel(language)(item),
+    ...extractExtraDefsSummary({ category, item }),
     ...(Category.isReportingData(category)
       ? {
           area_cumulative: item.areaCumulative,
