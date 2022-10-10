@@ -1,6 +1,17 @@
 @import 'webapp/style/vars';
 
 .entity-selector-tree-node-wrapper {
+  opacity: 1;
+  visibility: visible;
+  height: 2rem;
+  transition: all 500ms linear;
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+  }
+
   &:not(.is-root) {
     margin-left: 24px;
 
