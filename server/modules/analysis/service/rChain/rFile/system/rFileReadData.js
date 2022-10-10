@@ -86,15 +86,15 @@ export default class RFileReadData extends RFileSystem {
 
     const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
-    const columnNodeDefsToConvert = viewDataNodeDef.columnNodeDefs.filter(
-      (columnNodeDef) =>
-        NodeDef.isSingleAttribute(columnNodeDef.nodeDef) &&
-        !NodeDef.isAnalysis(columnNodeDef.nodeDef) &&
-        conversionTypeByNodeDefType[NodeDef.getType(columnNodeDef.nodeDef)]
-    )
-
     const columnsByConversionType = {}
-    columnNodeDefsToConvert.forEach((columnNodeDef) => {
+    viewDataNodeDef.forEach((columnNodeDef) => {
+      if (
+        !NodeDef.isSingleAttribute(columnNodeDef.nodeDef) ||
+        NodeDef.isAnalysis(columnNodeDef.nodeDef) ||
+        !conversionTypeByNodeDefType[NodeDef.getType(columnNodeDef.nodeDef)]
+      )
+        return
+
       const { nodeDef, names: columnNames } = columnNodeDef
       const conversionType = conversionTypeByNodeDefType[NodeDef.getType(nodeDef)]
       const columns = columnsByConversionType[conversionType] || []
@@ -106,9 +106,9 @@ export default class RFileReadData extends RFileSystem {
 
     const content = []
     Object.entries(columnsByConversionType).forEach(([conversionType, columnNames]) => {
-      if (columnNames.length > 0) {
-        content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))
-      }
+      if (columnNames.length === 0) return
+
+      content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))
     })
     if (content.length > 0) {
       await this.appendContent(...content)
