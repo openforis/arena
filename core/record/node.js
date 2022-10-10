@@ -198,6 +198,8 @@ export const isValueBlank = (node) => {
   return R.isEmpty(value)
 }
 
+export const hasUserInputValue = (node) => !isValueBlank(node) && !isDefaultValueApplied(node)
+
 // ====== Node Value extractor
 
 // Code

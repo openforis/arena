@@ -55,8 +55,10 @@ export const {
   getNodeChildByDefUuid,
   visitAncestorsAndSelf,
   visitDescendantsAndSelf,
-  isNodeApplicable,
 } = RecordReader
+
+// ==== utils
+export const { isNodeApplicable, isNodeEmpty } = RecordReader
 
 // ==== dependency
 export const { getDependentNodePointers, getParentCodeAttribute, getDependentCodeAttributes } = RecordReader
