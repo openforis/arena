@@ -13,6 +13,30 @@ import {
   arenaDfColumnsAsNumeric,
 } from '../../rFunctions'
 
+const dataConversionTypes = {
+  asCharacter: 'asCharacter',
+  asLogical: 'asLogical',
+  asNumeric: 'asNumeric',
+}
+
+const conversionTypeByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: dataConversionTypes.asLogical,
+  [NodeDef.nodeDefType.code]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.coordinate]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.date]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.decimal]: dataConversionTypes.asNumeric,
+  [NodeDef.nodeDefType.integer]: dataConversionTypes.asNumeric,
+  [NodeDef.nodeDefType.taxon]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.text]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.time]: dataConversionTypes.asCharacter,
+}
+
+const conversionFunctionByType = {
+  [dataConversionTypes.asCharacter]: arenaDfColumnsAsCharacter,
+  [dataConversionTypes.asLogical]: arenaDfColumnsAsLogical,
+  [dataConversionTypes.asNumeric]: arenaDfColumnsAsNumeric,
+}
+
 export default class RFileReadData extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'read-data')
@@ -62,46 +86,30 @@ export default class RFileReadData extends RFileSystem {
 
     const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
-    const columnsToConvertAsCharacter = []
-    const columnsToConvertAsLogical = []
-    const columnsToConvertAsNumeric = []
+    const columnNodeDefsToConvert = viewDataNodeDef.columnNodeDefs.filter(
+      (columnNodeDef) =>
+        NodeDef.isSingleAttribute(columnNodeDef.nodeDef) &&
+        !NodeDef.isAnalysis(columnNodeDef.nodeDef) &&
+        conversionTypeByNodeDefType[NodeDef.getType(columnNodeDef.nodeDef)]
+    )
 
-    viewDataNodeDef.columnNodeDefs.map((columnNodeDef) => {
+    const columnsByConversionType = {}
+    columnNodeDefsToConvert.forEach((columnNodeDef) => {
       const { nodeDef, names: columnNames } = columnNodeDef
-      columnNames.forEach((colName) => {
-        if (NodeDef.isSingleAttribute(nodeDef) && !NodeDef.isAnalysis(nodeDef)) {
-          const type = NodeDef.getType(nodeDef)
-          if (NodeDef.isBoolean(nodeDef)) {
-            columnsToConvertAsLogical.push(colName)
-          } else if (
-            [
-              NodeDef.nodeDefType.code,
-              NodeDef.nodeDefType.coordinate,
-              NodeDef.nodeDefType.date,
-              NodeDef.nodeDefType.taxon,
-              NodeDef.nodeDefType.text,
-              NodeDef.nodeDefType.time,
-            ].includes(type)
-          ) {
-            columnsToConvertAsCharacter.push(colName)
-          } else if ([NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(type)) {
-            columnsToConvertAsNumeric.push(colName)
-          }
-        }
-      })
+      const conversionType = conversionTypeByNodeDefType[NodeDef.getType(nodeDef)]
+      const columns = columnsByConversionType[conversionType] || []
+      columns.push(...columnNames)
+      columnsByConversionType[conversionType] = columns
     })
+
     const dfEntity = NodeDef.getName(entityDef)
 
     const content = []
-    if (columnsToConvertAsCharacter.length > 0) {
-      content.push(setVar(dfEntity, arenaDfColumnsAsCharacter(dfEntity, columnsToConvertAsCharacter)))
-    }
-    if (columnsToConvertAsLogical.length > 0) {
-      content.push(setVar(dfEntity, arenaDfColumnsAsLogical(dfEntity, columnsToConvertAsLogical)))
-    }
-    if (columnsToConvertAsNumeric.length > 0) {
-      content.push(setVar(dfEntity, arenaDfColumnsAsNumeric(dfEntity, columnsToConvertAsNumeric)))
-    }
+    Object.entries(columnsByConversionType).forEach(([conversionType, columnNames]) => {
+      if (columnNames.length > 0) {
+        content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))
+      }
+    })
     if (content.length > 0) {
       await this.appendContent(...content)
     }
