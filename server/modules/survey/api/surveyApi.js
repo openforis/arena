@@ -100,7 +100,7 @@ export const init = (app) => {
 
       const count = await SurveyService.countUserSurveys({ user, template, search, lang })
 
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
