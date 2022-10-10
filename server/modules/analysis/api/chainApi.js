@@ -52,7 +52,7 @@ export const init = (app) => {
 
         const count = await AnalysisService.countChains({ surveyId, cycle })
 
-        res.json(count)
+        res.json({ count })
       } catch (error) {
         next(error)
       }

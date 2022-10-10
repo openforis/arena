@@ -238,6 +238,7 @@ export const fetchUserSurveysInfo = async ({
   search,
   sortBy,
   sortOrder,
+  includeCounts = false,
 }) => {
   // check sortBy is valid
   if (sortBy && !Object.values(Survey.sortableKeys).includes(sortBy)) {
@@ -260,6 +261,10 @@ export const fetchUserSurveysInfo = async ({
       sortOrder,
     })
   ).map(assocSurveyInfo)
+
+  if (!includeCounts) {
+    return surveys
+  }
 
   return Promise.all(
     surveys.map(async (survey) => {

@@ -57,7 +57,7 @@ const Surveys = (props) => {
       className="surveys"
       module={module}
       moduleApiUri={moduleApiUri}
-      restParams={{ lang, template, requestedAt }}
+      restParams={{ lang, template, requestedAt, includeCounts: true }}
       headerLeftComponent={HeaderLeft}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
@@ -114,6 +114,28 @@ const Surveys = (props) => {
           width: '15rem',
           sortable: true,
         },
+        {
+          key: 'nodeDefinitions',
+          header: 'surveysView.nodeDefinitions',
+          renderItem: ({ item }) => item.nodeDefsCount,
+          width: '5rem',
+        },
+        ...(template
+          ? []
+          : [
+              {
+                key: 'records',
+                header: 'surveysView.records',
+                renderItem: ({ item }) => item.recordsCount,
+                width: '5rem',
+              },
+              {
+                key: 'chains',
+                header: 'surveysView.chains',
+                renderItem: ({ item }) => item.chainsCount,
+                width: '5rem',
+              },
+            ]),
       ]}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
       keyExtractor={({ item }) => Survey.getId(item)}
