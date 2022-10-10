@@ -78,19 +78,42 @@ export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
   R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
 
-export const visitDescendantsAndSelf = (node, visitor) => (record) => {
-  const queue = new Queue()
+export const visitDescendantsAndSelf =
+  (node, visitor, stopIfFn = null) =>
+  (record) => {
+    const queue = new Queue()
 
-  queue.enqueue(node)
+    queue.enqueue(node)
 
-  while (!queue.isEmpty()) {
-    const node = queue.dequeue()
+    while (!queue.isEmpty()) {
+      const node = queue.dequeue()
 
-    visitor(node)
+      visitor(node)
 
-    const children = getNodeChildren(node)(record)
-    queue.enqueueItems(children)
+      if (stopIfFn && stopIfFn(node)) {
+        break
+      }
+      const children = getNodeChildren(node)(record)
+      queue.enqueueItems(children)
+    }
   }
+
+export const findDescendantOrSelf = (node, filterFn) => (record) => {
+  let found = null
+
+  visitDescendantsAndSelf(
+    node,
+    () => {},
+    (currentNode) => {
+      if (filterFn(currentNode)) {
+        found = currentNode
+        return true
+      }
+      return false
+    }
+  )(record)
+
+  return found
 }
 
 /**
@@ -284,3 +307,5 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   }
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }
+
+export const isNodeEmpty = (node) => (record) => !findDescendantOrSelf(node, Node.hasUserInputValue)(record)
