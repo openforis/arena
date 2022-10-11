@@ -1,22 +1,40 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { ViewDataNodeDef } from '@common/model/db'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGetCSV, asCharacter, asLogical, asNumeric } from '../../rFunctions'
+import {
+  setVar,
+  arenaGetCSV,
+  arenaDfColumnsAsCharacter,
+  arenaDfColumnsAsLogical,
+  arenaDfColumnsAsNumeric,
+} from '../../rFunctions'
 
-const dataTypeConvertersByNodeDefType = {
-  [NodeDef.nodeDefType.boolean]: asLogical,
-  [NodeDef.nodeDefType.code]: asCharacter,
-  [NodeDef.nodeDefType.coordinate]: asCharacter,
-  [NodeDef.nodeDefType.date]: asCharacter,
-  [NodeDef.nodeDefType.decimal]: asNumeric,
-  [NodeDef.nodeDefType.integer]: asNumeric,
-  [NodeDef.nodeDefType.taxon]: asCharacter,
-  [NodeDef.nodeDefType.text]: asCharacter,
-  [NodeDef.nodeDefType.time]: asCharacter,
+const dataConversionTypes = {
+  asCharacter: 'asCharacter',
+  asLogical: 'asLogical',
+  asNumeric: 'asNumeric',
+}
+
+const conversionTypeByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: dataConversionTypes.asLogical,
+  [NodeDef.nodeDefType.code]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.coordinate]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.date]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.decimal]: dataConversionTypes.asNumeric,
+  [NodeDef.nodeDefType.integer]: dataConversionTypes.asNumeric,
+  [NodeDef.nodeDefType.taxon]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.text]: dataConversionTypes.asCharacter,
+  [NodeDef.nodeDefType.time]: dataConversionTypes.asCharacter,
+}
+
+const conversionFunctionByType = {
+  [dataConversionTypes.asCharacter]: arenaDfColumnsAsCharacter,
+  [dataConversionTypes.asLogical]: arenaDfColumnsAsLogical,
+  [dataConversionTypes.asNumeric]: arenaDfColumnsAsNumeric,
 }
 
 export default class RFileReadData extends RFileSystem {
@@ -65,33 +83,36 @@ export default class RFileReadData extends RFileSystem {
 
   async appendContentToConvertDataTypes({ entityDef }) {
     const { survey } = this.rChain
-    const contentConvertDataTypes = []
 
-    Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-      Survey.getNodeDefChildren(
-        ancestorDef,
-        false
-      )(survey).forEach((childDef) => {
-        if (NodeDef.isSingleAttribute(childDef)) {
-          contentConvertDataTypes.push(...this.createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }))
-        }
-      })
-    })(survey)
-    await this.appendContent(...contentConvertDataTypes)
-  }
+    const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
-  createContentToConvertNodeDefColumnsDataTypes({ entityDef, childDef }) {
-    const content = []
-    const dfEntity = NodeDef.getName(entityDef)
-    const columnNames = NodeDefTable.getColumnNames(childDef)
-    columnNames.forEach((columnName) => {
-      const nodeDefDfVar = dfVar(dfEntity, columnName)
-      const dataTypeConverter = dataTypeConvertersByNodeDefType[NodeDef.getType(childDef)]
-      if (dataTypeConverter) {
-        content.push(setVar(nodeDefDfVar, dataTypeConverter(nodeDefDfVar)))
-      }
+    const columnsByConversionType = {}
+    viewDataNodeDef.forEach((columnNodeDef) => {
+      if (
+        !NodeDef.isSingleAttribute(columnNodeDef.nodeDef) ||
+        NodeDef.isAnalysis(columnNodeDef.nodeDef) ||
+        !conversionTypeByNodeDefType[NodeDef.getType(columnNodeDef.nodeDef)]
+      )
+        return
+
+      const { nodeDef, names: columnNames } = columnNodeDef
+      const conversionType = conversionTypeByNodeDefType[NodeDef.getType(nodeDef)]
+      const columns = columnsByConversionType[conversionType] || []
+      columns.push(...columnNames)
+      columnsByConversionType[conversionType] = columns
     })
-    return content
+
+    const dfEntity = NodeDef.getName(entityDef)
+
+    const content = []
+    Object.entries(columnsByConversionType).forEach(([conversionType, columnNames]) => {
+      if (columnNames.length === 0) return
+
+      content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))
+    })
+    if (content.length > 0) {
+      await this.appendContent(...content)
+    }
   }
 
   async init() {

@@ -5,7 +5,15 @@ import RFileSystem from './rFileSystem'
 import { setVar, source } from '../../rFunctions'
 
 const dirNameInit = 'init'
-const fileNamesInit = ['init-session', 'init-packages', 'init-log', 'init-api', 'init-chain', 'init-handle-errors']
+const fileNamesInit = [
+  'init-session',
+  'init-packages',
+  'init-utils',
+  'init-log',
+  'init-api',
+  'init-chain',
+  'init-handle-errors',
+]
 
 export default class RFileInit extends RFileSystem {
   constructor(rChain) {
