@@ -115,8 +115,8 @@ const Surveys = (props) => {
           sortable: true,
         },
         {
-          key: 'nodeDefinitions',
-          header: 'surveysView.nodeDefinitions',
+          key: 'nodes',
+          header: 'surveysView.nodes',
           renderItem: ({ item }) => item.nodeDefsCount,
           width: '5rem',
         },
