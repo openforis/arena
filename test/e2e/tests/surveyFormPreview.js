@@ -42,8 +42,8 @@ export default () =>
 
     describe('Verify initial values/checks', () => {
       test(`Verify ${cluster.name} required`, async () => {
-        // wait for validation feedback
-        await page.waitForTimeout(2000)
+        // wait for validation feedback (loader to disappear)
+        await page.waitForSelector('.loader', { state: 'hidden', timeout: 5000 })
         await page.hover(`text="${cluster_id.label}"`)
         await expect(page).toHaveText('Required value')
       })
