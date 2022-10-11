@@ -87,7 +87,7 @@ export default class RFileReadData extends RFileSystem {
     const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
     const columnsByConversionType = {}
-    viewDataNodeDef.forEach((columnNodeDef) => {
+    viewDataNodeDef.columnNodeDefs.forEach((columnNodeDef) => {
       if (
         !NodeDef.isSingleAttribute(columnNodeDef.nodeDef) ||
         NodeDef.isAnalysis(columnNodeDef.nodeDef) ||
