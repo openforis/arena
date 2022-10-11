@@ -3,10 +3,9 @@ import { CircleMarker, Tooltip } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { Colors } from '@webapp/utils/colors'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
-
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -23,6 +22,10 @@ export const CoordinateAttributeMarker = (props) => {
     parentUuid,
     point,
     recordUuid,
+    getNextPoint,
+    getPreviousPoint,
+    openPopupOfUuid,
+    setRef
   } = props
 
   ancestorsKeys.propTypes = {
@@ -50,7 +53,8 @@ export const CoordinateAttributeMarker = (props) => {
       fill: showLocationMarkers,
       stroke: showLocationMarkers,
     })
-  }, [showLocationMarkers])
+    setRef(parentUuid, circleRef)
+  }, [showLocationMarkers, circleRef])
 
   return (
     <div>
@@ -82,6 +86,9 @@ export const CoordinateAttributeMarker = (props) => {
           parentUuid={parentUuid}
           ancestorsKeys={ancestorsKeys}
           onRecordEditClick={onRecordEditClick}
+          getNextPoint={getNextPoint}
+          getPreviousPoint={getPreviousPoint}
+          openPopupOfUuid={openPopupOfUuid}
         />
       </CircleMarker>
     </div>
@@ -98,4 +105,8 @@ CoordinateAttributeMarker.propTypes = {
   parentUuid: PropTypes.any,
   point: PropTypes.any,
   recordUuid: PropTypes.any,
+  getNextPoint: PropTypes.func,
+  getPreviousPoint: PropTypes.func,
+  openPopupOfUuid: PropTypes.func,
+  setRef: PropTypes.func
 }
