@@ -57,7 +57,7 @@ const Surveys = (props) => {
       className="surveys"
       module={module}
       moduleApiUri={moduleApiUri}
-      restParams={{ lang, template, requestedAt }}
+      restParams={{ lang, template, requestedAt, includeCounts: true }}
       headerLeftComponent={HeaderLeft}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
@@ -70,50 +70,72 @@ const Surveys = (props) => {
           renderItem: ({ active }) => (
             <span className={`icon icon-14px icon-action icon-radio-${active ? 'checked2' : 'unchecked'}`} />
           ),
-          width: '50px',
+          width: '30px',
         },
         {
           key: Survey.sortableKeys.name,
           header: 'common.name',
           renderItem: ({ item }) => Survey.getName(Survey.getSurveyInfo(item)),
-          width: '1fr',
+          width: 'minmax(8rem, 1fr)',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.label,
           header: 'common.label',
           renderItem: ({ item }) => Survey.getLabel(Survey.getSurveyInfo(item), lang),
-          width: '1fr',
+          width: 'minmax(8rem, 1fr)',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.ownerName,
           header: 'common.owner',
           renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
-          width: '15rem',
+          width: 'minmax(5rem, 12rem)',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.dateCreated,
           header: 'common.dateCreated',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateCreated(Survey.getSurveyInfo(item))),
-          width: '15rem',
+          width: '12rem',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.dateModified,
           header: 'common.dateLastModified',
           renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateModified(Survey.getSurveyInfo(item))),
-          width: '15rem',
+          width: '12rem',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.status,
           header: 'common.status',
           renderItem: ({ item }) => Survey.getStatus(Survey.getSurveyInfo(item)),
-          width: '15rem',
+          width: '12rem',
           sortable: true,
         },
+        {
+          key: 'nodeDefinitions',
+          header: 'surveysView.nodeDefinitions',
+          renderItem: ({ item }) => item.nodeDefsCount,
+          width: '5rem',
+        },
+        ...(template
+          ? []
+          : [
+              {
+                key: 'records',
+                header: 'surveysView.records',
+                renderItem: ({ item }) => item.recordsCount,
+                width: '5rem',
+              },
+              {
+                key: 'chains',
+                header: 'surveysView.chains',
+                renderItem: ({ item }) => item.chainsCount,
+                width: '5rem',
+              },
+            ]),
       ]}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
       keyExtractor={({ item }) => Survey.getId(item)}

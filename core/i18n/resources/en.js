@@ -599,6 +599,9 @@ $t(common.cantUndoWarning)`,
     filter: 'Filter',
     filterPlaceholder: 'Name, label or owner',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
+    nodeDefinitions: 'Node Definitions',
+    chains: 'Chains',
+    records: 'Records',
   },
 
   usersView: {

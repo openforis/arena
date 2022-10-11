@@ -148,7 +148,7 @@ export const countUserSurveys = async (
 
   return client.one(
     `
-    SELECT count(s.id)
+    SELECT COUNT(s.id)
     FROM survey s
       JOIN "user" u 
         ON u.uuid = s.owner_uuid
@@ -163,7 +163,8 @@ export const countUserSurveys = async (
         : ''
     }
     WHERE ${_getSelectWhereCondition({ search, lang })}`,
-    { search, template, userUuid: User.getUuid(user) }
+    { search, template, userUuid: User.getUuid(user) },
+    (row) => Number(row.count)
   )
 }
 

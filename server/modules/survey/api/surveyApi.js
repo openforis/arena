@@ -62,7 +62,17 @@ export const init = (app) => {
   app.get('/surveys', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { draft = true, template = false, offset, limit, lang, search, sortBy, sortOrder } = Request.getParams(req)
+      const {
+        draft = true,
+        template = false,
+        offset,
+        limit,
+        lang,
+        search,
+        sortBy,
+        sortOrder,
+        includeCounts = false,
+      } = Request.getParams(req)
 
       const list = await SurveyService.fetchUserSurveysInfo({
         user,
@@ -74,6 +84,7 @@ export const init = (app) => {
         search,
         sortBy,
         sortOrder,
+        includeCounts,
       })
 
       res.json({ list })
@@ -89,7 +100,7 @@ export const init = (app) => {
 
       const count = await SurveyService.countUserSurveys({ user, template, search, lang })
 
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
