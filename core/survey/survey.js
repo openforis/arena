@@ -72,6 +72,10 @@ export const { getDefaultAuthGroups } = SurveyDefaults
 export const getSurveyInfo = SurveyInfo.getInfo
 export const getId = R.pipe(getSurveyInfo, SurveyInfo.getId)
 export const getIdSurveyInfo = SurveyInfo.getId
+export const canHaveData = (survey) => {
+  const surveyInfo = getSurveyInfo(survey)
+  return isPublished(surveyInfo) || isFromCollect(surveyInfo)
+}
 
 // === context is surveyInfo
 export const {

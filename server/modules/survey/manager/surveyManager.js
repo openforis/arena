@@ -269,11 +269,10 @@ export const fetchUserSurveysInfo = async ({
   return Promise.all(
     surveys.map(async (survey) => {
       const surveyId = Survey.getId(survey)
-      const canHaveData = Survey.isPublished(survey) || Survey.isFromCollect(survey)
       return {
         ...survey,
         nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
-        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : {},
+        recordsCount: Survey.canHaveData(survey) ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
         chainsCount: await ChainRepository.countChains({ surveyId }),
       }
     })
