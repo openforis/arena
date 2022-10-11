@@ -3,7 +3,7 @@
 .entity-selector-tree-node-wrapper {
   opacity: 1;
   visibility: visible;
-  height: 2rem;
+  height: auto;
   transition: all 500ms linear;
 
   &.hidden {
