@@ -43,6 +43,7 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItemsLabels = true }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
+
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
@@ -103,9 +104,12 @@ export const fetchViewData = async (params) => {
   })
 
   if (streamOutput) {
-    await db.stream(result, (stream) => {
-      const fields = _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
-      stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
+    const fields = columnNodeDefs
+      ? null // all fields will be included in the CSV file
+      : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
+
+    await db.stream(result, (dbStream) => {
+      dbStream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
     return null
   }

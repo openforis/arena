@@ -75,7 +75,7 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
         </>
       )}
 
-      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
+      {entityDefUuid && <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />}
     </div>
   )
 }

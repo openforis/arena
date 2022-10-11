@@ -6,6 +6,7 @@ import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { MapUtils } from '@core/map/mapUtils'
 import { PlanetApi } from './planetApi'
+import xmljs from 'xml-js'
 
 const getMapTileForwardUrl = (req) => {
   const { provider, period, x, y, z, proc } = Request.getParams(req)
@@ -62,12 +63,24 @@ export const init = (app) => {
     try {
       dataRes = await axios.get(url)
       data = dataRes.data
-    }
-    finally {
+    } finally {
       res.json({
-        elevation: data.results[0].elevation
+        elevation: data.results[0].elevation,
       })
     }
   })
 
+  app.get('/geo/map/wmts/getCapabilities/:url', AuthMiddleware.requireMapUsePermission, async (req, res) => {
+    const { url } = Request.getParams(req)
+    const decodedUrl = decodeURIComponent(url)
+    let dataRes, data
+    try {
+      dataRes = await axios.get(decodedUrl)
+      data = dataRes.data
+    } finally {
+      const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
+      const json = JSON.parse(jsonstring)
+      res.json(json)
+    }
+  })
 }

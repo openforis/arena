@@ -17,7 +17,7 @@ const Charts = () => {
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
 
-  const { config, configItemsByPath, configActions, spec, updateSpec, draft, chartImage, renderChart } = useChart(
+  const { config, configItemsByPath, configActions, spec, updateSpec, draft, chartData, renderChart } = useChart(
     entityDefUuid ? Query.create({ entityDefUuid }) : null,
     entityDefUuid,
     setEntityDefUuid
@@ -50,7 +50,7 @@ const Charts = () => {
           dimensions={dimensions}
         />
 
-        <Chart draft={draft} renderChart={renderChart} src={chartImage} />
+        <Chart draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
       </Split>
     </div>
   )
