@@ -15,6 +15,7 @@ import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
 import * as CategoryManager from '../manager/categoryManager'
 import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
+import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -110,6 +111,13 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     }
   })
   return samplingPointData
+}
+
+export const fetchCategoryItemsSummary = async ({ surveyId, categoryUuid, language, draft = false }) => {
+  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+  const items = await fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft })
+
+  return CategoryItemsSummaryBuilder.toItemsSummary({ category, items, language })
 }
 
 export const {
