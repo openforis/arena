@@ -2,15 +2,20 @@ import './profilePicture.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { useProfilePicture } from '@webapp/store/user'
+import ImageProgressive from './ImageProgressive'
 
 const ProfilePicture = (props) => {
   const { userUuid, forceUpdateKey, thumbnail } = props
 
-  const src = useProfilePicture(userUuid, forceUpdateKey)
-
-  return <img src={src} alt="profile" className={`profile-picture${thumbnail ? '-thumbnail' : ''}`} />
+  return (
+    <ImageProgressive
+      className={`profile-picture${thumbnail ? '-thumbnail' : ''}`}
+      alt="profile"
+      altSrc="/img/user-profile-picture-default-32x32.png"
+      placeholderSrc="/img/user-profile-picture-default-32x32.png"
+      src={`/api/user/${userUuid}/profilePicture?updateKey=${forceUpdateKey}`}
+    />
+  )
 }
 
 ProfilePicture.propTypes = {
