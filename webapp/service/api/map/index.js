@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { MapUtils } from '@core/map/mapUtils'
 import { periodTypes } from '@webapp/components/Map/baseLayers'
 
@@ -40,6 +42,15 @@ export const fetchAvailableMapPeriods = async ({ provider, periodType }) => {
     }
   }
   return null
+}
+
+export const fetchElevation = async ({ lat, lng }) => {
+  try {
+    const { data } = await axios.get(`/api/geo/map/elevation/${lat}/${lng}`)
+    return data
+  } catch {
+    return null
+  }
 }
 
 export const testMapApiKey = async ({ provider, apiKey }) => {

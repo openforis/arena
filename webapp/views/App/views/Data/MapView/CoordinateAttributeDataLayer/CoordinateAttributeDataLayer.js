@@ -20,7 +20,8 @@ export const CoordinateAttributeDataLayer = (props) => {
 
   const getPointIndex = (uuid) => {
     return points.findIndex((item) => {
-      return item.properties.parentUuid === uuid})
+      return item.properties.parentUuid === uuid
+    })
   }
 
   const getNextPoint = (uuid) => {
@@ -32,9 +33,13 @@ export const CoordinateAttributeDataLayer = (props) => {
     return points[index > 0 ? index - 1 : points.length - 1]
   }
 
-  const setRef = useCallback( (parentUuid, ref) => {
-    if (ref != null) markerRefs.current[parentUuid] = ref.current
-  }, [clusters])
+  const setRef = useCallback(
+    (parentUuid, ref) => {
+      if (ref != null) markerRefs.current[parentUuid] = ref.current
+    },
+    [clusters]
+  )
+
   return (
     <LayersControl.Overlay name={layerName}>
       <LayerGroup>
@@ -85,5 +90,5 @@ export const CoordinateAttributeDataLayer = (props) => {
 CoordinateAttributeDataLayer.propTypes = {
   attributeDef: PropTypes.any,
   markersColor: PropTypes.any,
-  onRecordEditClick: PropTypes.func
+  onRecordEditClick: PropTypes.func,
 }

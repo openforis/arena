@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { CircleMarker, Tooltip } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import { PointFactory } from '@openforis/arena-core'
+
 import { Colors } from '@webapp/utils/colors'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
@@ -25,12 +27,14 @@ export const CoordinateAttributeMarker = (props) => {
     getNextPoint,
     getPreviousPoint,
     openPopupOfUuid,
-    setRef
+    setRef,
   } = props
 
   ancestorsKeys.propTypes = {
     join: PropTypes.any,
   }
+
+  const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
   const circleRef = useRef()
   const tooltipRef = useRef()
@@ -82,6 +86,7 @@ export const CoordinateAttributeMarker = (props) => {
         <CoordinateAttributePopUp
           attributeDef={attributeDef}
           point={point}
+          pointLatLong={pointLatLong}
           recordUuid={recordUuid}
           parentUuid={parentUuid}
           ancestorsKeys={ancestorsKeys}
@@ -108,5 +113,5 @@ CoordinateAttributeMarker.propTypes = {
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
   openPopupOfUuid: PropTypes.func,
-  setRef: PropTypes.func
+  setRef: PropTypes.func,
 }

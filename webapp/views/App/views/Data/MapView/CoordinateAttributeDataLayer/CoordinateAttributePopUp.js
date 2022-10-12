@@ -8,12 +8,11 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
-
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
-import axios from 'axios'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -43,26 +42,18 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 }
 
 const PopupContent = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
+  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, pointLatLong, onRecordEditClick } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const [elevation, setElevation] = useState(null)
+  const [elevation, setElevation] = useState('...')
 
   useEffect(() => {
     const getElevation = async (lat, lng) => {
-      const url = `/api/geo/map/elevation/${lat}/${lng}`
-      let res, data
-      try {
-        res = await axios.get(url)
-        data = res.data
-      } catch {
-        return null
-      }
-      setElevation(data.elevation)
+      const elev = await API.fetchElevation({ lat, lng })
+      setElevation(elev === null ? 'error' : elev)
     }
-    getElevation(point.y, point.x)
-
+    getElevation(pointLatLong.y, pointLatLong.x)
   }, [])
 
   const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
@@ -81,14 +72,23 @@ const PopupContent = (props) => {
   )
 }
 
-
-
 export const CoordinateAttributePopUp = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick, getNextPoint, getPreviousPoint, openPopupOfUuid } = props
+  const {
+    attributeDef,
+    recordUuid,
+    parentUuid,
+    ancestorsKeys,
+    point,
+    pointLatLong,
+    onRecordEditClick,
+    getNextPoint,
+    getPreviousPoint,
+    openPopupOfUuid,
+  } = props
 
   const i18n = useI18n()
   const map = useMap()
-  
+
   const flyTo = (latlng, point) => {
     map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
     map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
@@ -105,12 +105,6 @@ export const CoordinateAttributePopUp = (props) => {
     flyTo(latlng, previousPoint)
   }
 
-  point.propTypes = {
-    x: PropTypes.number,
-    y: PropTypes.number,
-    srs: PropTypes.number
-  }
-
   return (
     <Popup>
       <PopupContent
@@ -119,6 +113,7 @@ export const CoordinateAttributePopUp = (props) => {
         parentUuid={parentUuid}
         ancestorsKeys={ancestorsKeys}
         point={point}
+        pointLatLong={pointLatLong}
         onRecordEditClick={onRecordEditClick}
       />
       <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
@@ -132,11 +127,10 @@ PopupContent.propTypes = {
   recordUuid: PropTypes.string,
   parentUuid: PropTypes.string,
   ancestorsKeys: PropTypes.any,
-  point: PropTypes.any,
-  onRecordEditClick: PropTypes.func
+  point: PropTypes.object,
+  pointLatLong: PropTypes.object,
+  onRecordEditClick: PropTypes.func,
 }
-
-
 
 CoordinateAttributePopUp.propTypes = {
   attributeDef: PropTypes.any,
@@ -144,8 +138,9 @@ CoordinateAttributePopUp.propTypes = {
   parentUuid: PropTypes.string,
   ancestorsKeys: PropTypes.any,
   point: PropTypes.any,
+  pointLatLong: PropTypes.object,
   onRecordEditClick: PropTypes.func,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
-  openPopupOfUuid: PropTypes.func
+  openPopupOfUuid: PropTypes.func,
 }
