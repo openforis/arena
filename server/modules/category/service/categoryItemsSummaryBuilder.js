@@ -76,9 +76,10 @@ const extractExtraDefsSummary = ({ category, item }) => {
 
 const toItemSummary = ({ category, language, item }) => {
   return {
+    uuid: CategoryItem.getUuid(item),
     code: CategoryItem.getCode(item),
-    ...extractAncestoLevelCodes({ category, item }),
     label: CategoryItem.getLabel(language)(item),
+    ...extractAncestoLevelCodes({ category, item }),
     ...extractExtraDefsSummary({ category, item }),
     ...(Category.isReportingData(category)
       ? {
