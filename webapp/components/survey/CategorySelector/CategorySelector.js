@@ -13,6 +13,7 @@ import * as API from '@webapp/service/api'
 import { TestId } from '@webapp/utils/testId'
 
 import { useNotifyWarning } from '@webapp/components/hooks'
+import { ButtonIconEdit } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
@@ -24,12 +25,13 @@ export const CategorySelector = (props) => {
     disabled,
     categoryUuid,
     validation,
-    showManage,
-    showAdd,
     onChange,
     onCategoryLoad,
     filterFunction,
     emptySelection,
+    showAdd,
+    showEdit,
+    showManage,
   } = props
 
   const i18n = useI18n()
@@ -105,7 +107,12 @@ export const CategorySelector = (props) => {
         selection={category}
         onChange={onChange}
       />
-      {!disabled && showAdd && (
+
+      {showEdit && category && (
+        <ButtonIconEdit label="common.edit" onClick={() => setCategoryToEdit(category)} size="small" />
+      )}
+
+      {showAdd && !disabled && (
         <ButtonMetaItemAdd
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
@@ -155,22 +162,24 @@ CategorySelector.propTypes = {
   categoryUuid: PropTypes.string,
   validation: PropTypes.object,
   disabled: PropTypes.bool,
-  showManage: PropTypes.bool,
-  showAdd: PropTypes.bool,
   onChange: PropTypes.func,
   onCategoryLoad: PropTypes.func,
   filterFunction: PropTypes.func,
   emptySelection: PropTypes.bool,
+  showAdd: PropTypes.bool,
+  showEdit: PropTypes.bool,
+  showManage: PropTypes.bool,
 }
 
 CategorySelector.defaultProps = {
   categoryUuid: null, // Selected categoryUuid
   validation: null,
   disabled: false,
-  showManage: true,
-  showAdd: true,
   onChange: () => ({}),
   onCategoryLoad: () => ({}),
   filterFunction: null,
   emptySelection: false,
+  showAdd: true,
+  showEdit: true,
+  showManage: true,
 }

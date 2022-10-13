@@ -1,6 +1,10 @@
 @import 'webapp/style/vars';
 
 .category-selector {
-  display: grid;
-  grid-template-columns: 1fr repeat(2, 100px);
+  display: flex;
+  gap: 1rem;
+
+  .dropdown {
+    width: 100%;
+  }
 }
