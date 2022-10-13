@@ -19,13 +19,13 @@ const ProfilePictureEditor = (props) => {
 
   const i18n = useI18n()
 
-  const initialProfilePicture = useProfilePicture(userUuid) || profilePicturePlaceholderImg
+  const initialProfilePicture = useProfilePicture(userUuid)
 
   const dropRef = useRef(null)
   const avatarRef = useRef(null)
 
   const [settingInitialPicture, setSettingInitialPicture] = useState(false)
-  const [image, setImage] = useState(null)
+  const [image, setImage] = useState(profilePicturePlaceholderImg)
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
