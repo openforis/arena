@@ -33,7 +33,7 @@ export const transformCallback = (row) => {
 export const countChains = async (params, client = DB.client) => {
   const { surveyId, cycle = null } = params
   const tableChain = new TableChain(surveyId)
-  return client.one(`${tableChain.getSelect({ surveyId, cycle, count: true })}`)
+  return client.one(`${tableChain.getSelect({ surveyId, cycle, count: true })}`, [], (row) => Number(row.count))
 }
 
 /**

@@ -8,7 +8,7 @@ const ShowTitleBlock = ({
   subtitle = '',
   label = 'Show title',
   type = blockTypes.checkbox,
-  defaultValue = true,
+  defaultValue = false,
   valuesToSpec = _valuesToSpec,
 } = {}) => ({
   id,

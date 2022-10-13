@@ -13,6 +13,7 @@ import * as API from '@webapp/service/api'
 import { TestId } from '@webapp/utils/testId'
 
 import { useNotifyWarning } from '@webapp/components/hooks'
+import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
@@ -24,12 +25,13 @@ export const CategorySelector = (props) => {
     disabled,
     categoryUuid,
     validation,
-    showManage,
-    showAdd,
     onChange,
     onCategoryLoad,
     filterFunction,
     emptySelection,
+    showAdd,
+    showEdit,
+    showManage,
   } = props
 
   const i18n = useI18n()
@@ -111,24 +113,17 @@ export const CategorySelector = (props) => {
         selection={category}
         onChange={onChange}
       />
-      {!disabled && showAdd && (
+
+      {showEdit && category && <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel />}
+
+      {showAdd && !disabled && (
         <ButtonMetaItemAdd
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
           metaItemType={metaItemTypes.category}
         />
       )}
-      {showManage && (
-        <button
-          type="button"
-          className="btn btn-s"
-          style={{ justifySelf: 'center' }}
-          onClick={() => setShowCategoriesPanel(true)}
-        >
-          <span className="icon icon-list icon-12px icon-left" />
-          {i18n.t('common.manage')}
-        </button>
-      )}
+      {showManage && <ButtonManage size="small" onClick={() => setShowCategoriesPanel(true)} />}
       {showCategoriesPanel && !categoryToEdit && (
         <PanelRight
           width="100vw"
@@ -161,22 +156,24 @@ CategorySelector.propTypes = {
   categoryUuid: PropTypes.string,
   validation: PropTypes.object,
   disabled: PropTypes.bool,
-  showManage: PropTypes.bool,
-  showAdd: PropTypes.bool,
   onChange: PropTypes.func,
   onCategoryLoad: PropTypes.func,
   filterFunction: PropTypes.func,
   emptySelection: PropTypes.bool,
+  showAdd: PropTypes.bool,
+  showEdit: PropTypes.bool,
+  showManage: PropTypes.bool,
 }
 
 CategorySelector.defaultProps = {
   categoryUuid: null, // Selected categoryUuid
   validation: null,
   disabled: false,
-  showManage: true,
-  showAdd: true,
   onChange: () => ({}),
   onCategoryLoad: () => ({}),
   filterFunction: null,
   emptySelection: false,
+  showAdd: true,
+  showEdit: true,
+  showManage: true,
 }

@@ -15,7 +15,7 @@ export const SamplingPointDataLayer = (props) => {
     useSamplingPointDataLayer(props)
 
   // Have a Reference to points for opening popups automatically
-  let markerRefs = useRef([])
+  const markerRefs = useRef([])
 
   const openPopupOfUuid = (uuid) => {
     markerRefs.current[uuid].openPopup()

@@ -3,8 +3,6 @@ import './KmlUploader.scss'
 import React, { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-import * as User from '@core/user/user'
-import { useUser } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import L from 'leaflet'
@@ -19,7 +17,6 @@ export const KmlUploader = () => {
   const jszip = new JSZip()
 
   const i18n = useI18n()
-  const user = useUser()
 
   const [selectedFile, setSelectedFile] = useState()
   const [layers, setLayers] = useState([])
@@ -114,9 +111,7 @@ export const KmlUploader = () => {
   const rangeOnMouseUp = () => {
     map.dragging.enable()
   }
-  if (!User.isSystemAdmin(user)) {
-    return null
-  }
+
   return (
     <div className="leaflet-bottom map-kml-uploader-wrapper">
       <div className="kml-title">{i18n.t('kmlUploader.title')}</div>

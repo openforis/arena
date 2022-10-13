@@ -26,6 +26,8 @@ export const isInsideMap = R.pipe(getState, R.prop(keys.insideMap))
 
 // ====== UPDATE
 
+export const reset = () => ({})
+
 export const assocRecord = R.assoc(keys.recordEdit)
 
 export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)

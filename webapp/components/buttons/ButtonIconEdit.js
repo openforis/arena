@@ -10,4 +10,6 @@ ButtonIconEdit.propTypes = {
 
 ButtonIconEdit.defaultProps = {
   ...Button.defaultProps,
+  label: 'common.edit',
+  showLabel: false,
 }

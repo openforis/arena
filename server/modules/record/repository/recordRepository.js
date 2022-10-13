@@ -91,7 +91,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle, nodeDefRoot, nodeDefKeys, search = false },
+  { surveyId, cycle = null, nodeDefRoot, nodeDefKeys, search = null },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
@@ -102,9 +102,11 @@ export const countRecordsBySurveyId = async (
     `
         SELECT count(*) 
         FROM ${getSurveyDBSchema(surveyId)}.record 
-        WHERE preview = FALSE AND cycle = $1
+        WHERE preview = FALSE 
+          ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
       `,
-    [cycle]
+    { cycle },
+    (row) => Number(row.count)
   )
 }
 
@@ -231,6 +233,16 @@ export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
     [recordUuid, surveyId],
+    dbTransformCallback(surveyId)
+  )
+
+export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
+  client.map(
+    `SELECT 
+     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSurveyDBSchema(surveyId)}.record 
+     WHERE uuid IN ($1:csv)`,
+    [recordUuids, surveyId],
     dbTransformCallback(surveyId)
   )
 

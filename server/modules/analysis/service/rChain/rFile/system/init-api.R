@@ -23,9 +23,21 @@ arena.getApiUrl = function(url) {
   return(apiUrl)
 }
 
-arena.get = function(url, query) {
+arena.get = function(url, query = NULL) {
   resp <- httr::GET(arena.getApiUrl(url), query = query)
   return(arena.parseResponse(resp))
+}
+
+arena.getToFile = function (url, query = NULL, file) {
+  httr::GET(arena.getApiUrl(url), query = query, write_disk(file))
+}
+
+arena.getCSV = function (url, query = NULL) {
+  tmp <- tempfile()
+  arena.getToFile(url, query, file = tmp)
+  content <- read.csv(tmp)
+  rm(tmp)
+  return(content)
 }
 
 arena.post = function(url, body) {

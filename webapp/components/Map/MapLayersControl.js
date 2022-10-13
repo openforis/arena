@@ -6,6 +6,7 @@ import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'
+import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
   const { layers } = props
@@ -39,7 +40,7 @@ export const MapLayersControl = (props) => {
         const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
 
         const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
-        if (!tileUrl) return acc
+        if (!tileUrl && provider != 'WMTS') return acc
 
         const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
 
@@ -50,6 +51,7 @@ export const MapLayersControl = (props) => {
           </LayersControl.BaseLayer>,
         ]
       }, [])}
+      <WmtsComponent />
       {layers}
     </LayersControl>
   )

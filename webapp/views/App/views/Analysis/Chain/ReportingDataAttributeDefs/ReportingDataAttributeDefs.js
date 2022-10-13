@@ -40,8 +40,6 @@ export const ReportingDataAttributeDefs = (props) => {
             if (!categoryUuid) setReportingDataCategory(null)
           }}
           onCategoryLoad={setReportingDataCategory}
-          showAdd={false}
-          showManage={false}
         />
       </FormItem>
       {Category.getLevelsArray(reportingDataCategory).map((level) => {

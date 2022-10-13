@@ -40,13 +40,12 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
   })
 
 const _getSelectFieldKeys = (viewDataNodeDef) => {
-  const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
-    .map((nodeDef) => {
-      const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
-      return [`'${NodeDef.getUuid(nodeDef)}'`, `${viewDataNodeDef.tableData.alias}.${columnNodeDef.name}`]
-    })
-    .flat()
-  return keys.length > 0 ? `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}` : ''
+  const nodeDefKeys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
+  const keys = nodeDefKeys.flatMap((nodeDef) => {
+    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
+    return [`'${NodeDef.getUuid(nodeDef)}'`, `${viewDataNodeDef.tableData.alias}.${columnNodeDef.name}`]
+  })
+  return `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}`
 }
 
 /**

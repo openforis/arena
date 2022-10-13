@@ -7,7 +7,6 @@ import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
-import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -197,9 +196,7 @@ export const init = (app) => {
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
-        res.sendFile(`${__dirname}/avatar.png`, {
-          root: ProcessUtils.ENV.arenaRoot,
-        })
+        res.end()
       }
     } catch (error) {
       next(error)

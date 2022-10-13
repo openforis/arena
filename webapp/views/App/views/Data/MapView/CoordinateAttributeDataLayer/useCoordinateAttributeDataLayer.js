@@ -131,5 +131,6 @@ export const useCoordinateAttributeDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     totalPoints: points.length,
+    points
   }
 }

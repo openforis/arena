@@ -45,11 +45,11 @@ const _valuesToSpec = ({ value = [], spec = {}, key, configItemsByPath }) => {
     ...spec,
     encoding: {
       ...(spec.encoding || {}),
-      y: y,
-      color: color,
-      xOffset: xOffset,
+      y,
+      color,
+      xOffset,
     },
-    transform: [...spec.transform, { aggregate: aggregations, groupby: aggs }, { fold: fold }],
+    transform: [...(spec.transform || []), { aggregate: aggregations, groupby: aggs }, { fold: fold }],
   }
 
   return newSpec
@@ -67,6 +67,7 @@ const _blocks = {
     id: 'column',
     title: 'Column',
     type: 'select',
+    optionsParams: { filter: ['quantitative'] },
   },
   aggregation: {
     id: 'aggregation',

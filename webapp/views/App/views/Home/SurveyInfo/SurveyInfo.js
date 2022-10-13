@@ -3,11 +3,10 @@ import './SurveyInfo.scss'
 import React from 'react'
 
 import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditSurvey, useUser } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import { Checkbox } from '@webapp/components/form'
@@ -25,7 +24,6 @@ import SamplingPolygonEditor from './SamplingPolygonEditor'
 const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
   const readOnly = !useAuthCanEditSurvey()
-  const user = useUser()
   const i18n = useI18n()
 
   const {
@@ -110,22 +108,27 @@ const SurveyInfo = () => {
           />
         </div>
 
-        <FormItem label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}>
-          <Checkbox
-            checked={sampleBasedImageInterpretationEnabled}
-            onChange={setSampleBasedImageInterpretationEnabled}
-            validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
-          />
+        <FormItem
+          label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}
+          className="sample-based-image-interpretation-form-item"
+        >
+          <div>
+            <Checkbox
+              checked={sampleBasedImageInterpretationEnabled}
+              onChange={setSampleBasedImageInterpretationEnabled}
+              validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
+            />
+            {sampleBasedImageInterpretationEnabled && (
+              <SamplingPolygonEditor
+                samplingPolygon={samplingPolygon}
+                setSamplingPolygon={setSamplingPolygon}
+                getFieldValidation={getFieldValidation}
+                readOnly={readOnly}
+              />
+            )}
+          </div>
         </FormItem>
 
-        {User.isSystemAdmin(user) && sampleBasedImageInterpretationEnabled && (
-          <SamplingPolygonEditor
-            samplingPolygon={samplingPolygon}
-            setSamplingPolygon={setSamplingPolygon}
-            getFieldValidation={getFieldValidation}
-            readOnly={readOnly}
-          />
-        )}
         {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
     </div>

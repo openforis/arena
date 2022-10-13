@@ -43,17 +43,23 @@
   top: $formTableRowHeaderHeight;
   width: 100%;
   height: calc(100% - #{$formTableRowHeaderHeight});
-  overflow-x: auto;
-  overflow-y: hidden;
-  //overflow: hidden;
-}
+  overflow: hidden;
 
-.survey-form__node-def-entity-table-data-rows {
-  position: absolute;
-  top: $formTableRowHeaderHeight;
-  height: calc(100% - #{$formTableRowHeaderHeight});
-  overflow-y: auto;
-  overflow-x: hidden;
+  &.edit {
+    overflow-x: auto;
+  }
+
+  .survey-form__node-def-entity-table-data-rows-wrapper {
+    position: absolute;
+    top: $formTableRowHeaderHeight;
+    width: 100%;
+    height: calc(100% - #{$formTableRowHeaderHeight});
+    overflow: auto;
+
+    .survey-form__node-def-entity-table-data-rows {
+      width: fit-content;
+    }
+  }
 }
 
 .survey-form__node-def-entity-table-row-header {

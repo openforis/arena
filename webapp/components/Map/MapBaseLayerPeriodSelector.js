@@ -2,6 +2,8 @@ import './MapBaseLayerPeriodSelector.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useMap, TileLayer } from 'react-leaflet'
+import L from 'leaflet'
+require('leaflet-side-by-side')
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
@@ -9,9 +11,6 @@ import { useI18n } from '@webapp/store/system'
 
 import * as API from '@webapp/service/api'
 
-import L from 'leaflet'
-
-require('leaflet-side-by-side')
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContext, useMapContextBaseLayer } from './MapContext'
 
@@ -74,7 +73,6 @@ export const MapBaseLayerPeriodSelector = () => {
     }
   }
   const initSideBySide = () => {
-    if (!User.isSystemAdmin(user)) return
     const layerLeft = getLayer(true)
     const layerRight = getLayer(false)
     if (layerLeft && layerRight) {
@@ -188,31 +186,30 @@ export const MapBaseLayerPeriodSelector = () => {
         />
         <label htmlFor="checkbox-left">False Color</label>
       </div>
-      {User.isSystemAdmin(user) && (
-        <div className="period-select-wrapper-right">
-          <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
-            {periods.map((period) => {
-              const value = getPeriodValue(period)
-              const label =
-                `${period.year} - ${period.month}` + (period.yearTo ? ` / ${period.yearTo} - ${period.monthTo}` : '')
-              return (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              )
-            })}
-            <option value={''}>Choose a period</option>
-          </select>
-          <input
-            type="checkbox"
-            value={rightChecked}
-            onChange={onCheckboxValueChange(false)}
-            id="checkbox-right"
-            name="checkbox-righ"
-          />
-          <label htmlFor="checkbox-right">{i18n.t('mapBaseLayerPeriodSelector.falseColor')}</label>
-        </div>
-      )}
+      <div className="period-select-wrapper-right">
+        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
+          {periods.map((period) => {
+            const value = getPeriodValue(period)
+            const label =
+              `${period.year} - ${period.month}` + (period.yearTo ? ` / ${period.yearTo} - ${period.monthTo}` : '')
+            return (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            )
+          })}
+          <option value={''}>Choose a period</option>
+        </select>
+        <input
+          type="checkbox"
+          value={rightChecked}
+          onChange={onCheckboxValueChange(false)}
+          id="checkbox-right"
+          name="checkbox-righ"
+        />
+        <label htmlFor="checkbox-right">{i18n.t('mapBaseLayerPeriodSelector.falseColor')}</label>
+      </div>
+
       <TileLayer id={'right'} attribution={''} url={''} maxZoom={17} minZoom={3} />
     </div>
   )

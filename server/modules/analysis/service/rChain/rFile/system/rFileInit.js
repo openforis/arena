@@ -5,7 +5,15 @@ import RFileSystem from './rFileSystem'
 import { setVar, source } from '../../rFunctions'
 
 const dirNameInit = 'init'
-const fileNamesInit = ['init-session', 'init-packages', 'init-log', 'init-api', 'init-chain', 'init-handle-errors']
+const fileNamesInit = [
+  'init-session',
+  'init-packages',
+  'init-utils',
+  'init-log',
+  'init-api',
+  'init-chain',
+  'init-handle-errors',
+]
 
 export default class RFileInit extends RFileSystem {
   constructor(rChain) {
@@ -30,6 +38,10 @@ export default class RFileInit extends RFileSystem {
       await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
     })
 
-    return this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl.replace('http://', 'https://')}/'`))
+    let arenaServerUrl = this.rChain.serverUrl
+    if (arenaServerUrl.startsWith('http://') && !arenaServerUrl.startsWith('http://localhost')) {
+      arenaServerUrl = arenaServerUrl.replace('http://', 'https://')
+    }
+    return this.appendContent(setVar('arena.host', `'${arenaServerUrl}/'`))
   }
 }

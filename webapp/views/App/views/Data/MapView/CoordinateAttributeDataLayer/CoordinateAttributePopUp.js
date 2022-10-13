@@ -1,12 +1,15 @@
 import './CoordinateAttributePopUp.scss'
 
-import React from 'react'
-import { Popup } from 'react-leaflet'
+import React, { useEffect, useState } from 'react'
+import { Popup, useMap } from 'react-leaflet'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
@@ -39,17 +42,27 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 }
 
 const PopupContent = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
+  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, pointLatLong, onRecordEditClick } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
+  const [elevation, setElevation] = useState('...')
+
+  useEffect(() => {
+    const getElevation = async (lat, lng) => {
+      const elev = await API.fetchElevation({ lat, lng })
+      setElevation(elev === null ? 'error' : elev)
+    }
+    getElevation(pointLatLong.y, pointLatLong.x)
+  }, [])
 
   const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
 
   const content = `**${path}**
 * **x**: ${point.x}
 * **y**: ${point.y}
-* **SRS**: ${point.srs}`
+* **SRS**: ${point.srs}
+* **elevation (m)**: ${elevation}`
 
   return (
     <div className="coordinate-attribute-popup-content">
@@ -60,7 +73,37 @@ const PopupContent = (props) => {
 }
 
 export const CoordinateAttributePopUp = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, onRecordEditClick } = props
+  const {
+    attributeDef,
+    recordUuid,
+    parentUuid,
+    ancestorsKeys,
+    point,
+    pointLatLong,
+    onRecordEditClick,
+    getNextPoint,
+    getPreviousPoint,
+    openPopupOfUuid,
+  } = props
+
+  const i18n = useI18n()
+  const map = useMap()
+
+  const flyTo = (latlng, point) => {
+    map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
+    map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
+  }
+  const onClickNext = () => {
+    const nextPoint = getNextPoint(parentUuid)
+    const latlng = nextPoint.geometry.coordinates
+    flyTo(latlng, nextPoint)
+  }
+
+  const onClickPrevious = () => {
+    const previousPoint = getPreviousPoint(parentUuid)
+    const latlng = previousPoint.geometry.coordinates
+    flyTo(latlng, previousPoint)
+  }
 
   return (
     <Popup>
@@ -70,8 +113,34 @@ export const CoordinateAttributePopUp = (props) => {
         parentUuid={parentUuid}
         ancestorsKeys={ancestorsKeys}
         point={point}
+        pointLatLong={pointLatLong}
         onRecordEditClick={onRecordEditClick}
       />
+      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
+      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
     </Popup>
   )
+}
+
+PopupContent.propTypes = {
+  attributeDef: PropTypes.any,
+  recordUuid: PropTypes.string,
+  parentUuid: PropTypes.string,
+  ancestorsKeys: PropTypes.any,
+  point: PropTypes.object,
+  pointLatLong: PropTypes.object,
+  onRecordEditClick: PropTypes.func,
+}
+
+CoordinateAttributePopUp.propTypes = {
+  attributeDef: PropTypes.any,
+  recordUuid: PropTypes.string,
+  parentUuid: PropTypes.string,
+  ancestorsKeys: PropTypes.any,
+  point: PropTypes.any,
+  pointLatLong: PropTypes.object,
+  onRecordEditClick: PropTypes.func,
+  getNextPoint: PropTypes.func,
+  getPreviousPoint: PropTypes.func,
+  openPopupOfUuid: PropTypes.func,
 }

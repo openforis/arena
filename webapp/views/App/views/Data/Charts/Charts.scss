@@ -14,6 +14,8 @@
     top: 0px;
     left: 0px;
     background: white;
+    display: flex;
+    flex-direction: column;
   }
 }
 .charts_header {
@@ -23,8 +25,11 @@
 .wrap {
   display: flex;
   height: 100%;
-  width: 100%;
+  min-width: 1;
+
   background: $greyBorder;
+  flex: 1;
+  overflow: hidden;
   
 }
 .gutter {

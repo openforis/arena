@@ -4,7 +4,6 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -58,6 +57,7 @@ export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
   fetchRecordByUuid,
+  fetchRecordsByUuids,
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
@@ -88,13 +88,15 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
-  Logger.debug('delete records. surveyId:', surveyId, 'recordUuids:', recordUuids)
+  Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   await PromiseUtils.each(recordUuids, async (recordUuid) => {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
     await RecordManager.deleteRecord(user, survey, record)
   })
+
+  Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
 }
 
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
@@ -143,9 +145,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   const fileName = `${Survey.getName(survey)}_validation_report.csv`
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  const objectTransformer = (row) => {
-    const item = A.camelizePartial({ limitToLevel: 1 })(row)
-
+  const objectTransformer = (item) => {
     const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
     const validation = RecordValidationReportItem.getValidation(item)
 
@@ -168,7 +168,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
       errors,
       warnings,
       record_step: RecordValidationReportItem.getRecordStep(item),
-      record_cycle: RecordValidationReportItem.getRecordCycle(item),
+      record_cycle: Number(RecordValidationReportItem.getRecordCycle(item)) + 1,
     }
   }
   const headers = ['path', 'errors', 'warnings', 'record_step', 'record_cycle']
