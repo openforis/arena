@@ -43,6 +43,15 @@
       margin-right: 5rem;
     }
   }
+
+  .taxonomy-selector {
+    display: flex;
+    gap: 1rem;
+
+    .dropdown {
+      width: 100%;
+    }
+  }
 }
 
 .form-item.node-def-edit__title {
