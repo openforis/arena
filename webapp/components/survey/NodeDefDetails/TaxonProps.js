@@ -11,14 +11,15 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
+import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
-
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+
 import { State } from './store'
 
 const TaxonProps = (props) => {
@@ -71,12 +72,7 @@ const TaxonProps = (props) => {
   return (
     <>
       <FormItem label="Taxonomy">
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr repeat(2, 100px)',
-          }}
-        >
+        <div className="taxonomy-selector">
           <Dropdown
             items={itemsLookupFunction}
             itemKey="uuid"
@@ -87,20 +83,14 @@ const TaxonProps = (props) => {
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
           />
+          {taxonomy && <ButtonIconEdit onClick={() => setTaxonomyToEdit(taxonomy)} size="small" showLabel />}
+
           <ButtonMetaItemAdd
             id={TestId.nodeDefDetails.taxonomySelectorAddBtn}
             onAdd={setTaxonomyToEdit}
             metaItemType={metaItemTypes.taxonomy}
           />
-          <button
-            type="button"
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={() => setShowTaxonomiesPanel(true)}
-          >
-            <span className="icon icon-list icon-12px icon-left" />
-            {i18n.t('common.manage')}
-          </button>
+          <ButtonManage size="small" onClick={() => setShowTaxonomiesPanel(true)} />
         </div>
       </FormItem>
 

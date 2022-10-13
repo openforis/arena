@@ -57,7 +57,6 @@ const CodeProps = (props) => {
           categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           editingNodeDef
-          analysis={NodeDef.isAnalysis(nodeDef)}
           onChange={setCategoryProp}
           onCategoryLoad={setCategory}
         />
