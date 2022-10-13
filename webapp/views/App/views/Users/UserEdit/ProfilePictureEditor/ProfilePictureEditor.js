@@ -12,6 +12,8 @@ import { useI18n } from '@webapp/store/system'
 
 import UploadButton from '@webapp/components/form/uploadButton'
 
+const profilePicturePlaceholderImg = '/img/user-profile-picture-default.png'
+
 const ProfilePictureEditor = (props) => {
   const { userUuid, onPictureUpdate } = props
 
@@ -23,7 +25,7 @@ const ProfilePictureEditor = (props) => {
   const avatarRef = useRef(null)
 
   const [settingInitialPicture, setSettingInitialPicture] = useState(false)
-  const [image, setImage] = useState(null)
+  const [image, setImage] = useState(profilePicturePlaceholderImg)
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
