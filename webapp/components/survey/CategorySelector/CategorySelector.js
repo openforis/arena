@@ -13,7 +13,7 @@ import * as API from '@webapp/service/api'
 import { TestId } from '@webapp/utils/testId'
 
 import { useNotifyWarning } from '@webapp/components/hooks'
-import { ButtonIconEdit } from '@webapp/components/buttons'
+import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import CategoryList from '@webapp/components/survey/CategoryList'
@@ -108,9 +108,7 @@ export const CategorySelector = (props) => {
         onChange={onChange}
       />
 
-      {showEdit && category && (
-        <ButtonIconEdit label="common.edit" onClick={() => setCategoryToEdit(category)} size="small" />
-      )}
+      {showEdit && category && <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel />}
 
       {showAdd && !disabled && (
         <ButtonMetaItemAdd
@@ -119,17 +117,7 @@ export const CategorySelector = (props) => {
           metaItemType={metaItemTypes.category}
         />
       )}
-      {showManage && (
-        <button
-          type="button"
-          className="btn btn-s"
-          style={{ justifySelf: 'center' }}
-          onClick={() => setShowCategoriesPanel(true)}
-        >
-          <span className="icon icon-list icon-12px icon-left" />
-          {i18n.t('common.manage')}
-        </button>
-      )}
+      {showManage && <ButtonManage size="small" onClick={() => setShowCategoriesPanel(true)} />}
       {showCategoriesPanel && !categoryToEdit && (
         <PanelRight
           width="100vw"
