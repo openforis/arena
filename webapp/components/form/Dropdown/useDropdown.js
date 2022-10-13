@@ -39,7 +39,9 @@ export const useDropdown = ({
     if (searchMinCharsReached && !loading) {
       setState({ items: [], loading: true })
     }
-    const _items = itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp(inputValue)) : []
+    const _items =
+      searchMinCharsReached && itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp(inputValue)) : []
+
     setState({ items: _items, loading: false })
   }, [itemsProp, searchMinCharsReached, loading, inputValue])
 
