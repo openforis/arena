@@ -4,6 +4,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { Objects } from '@openforis/arena-core'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -20,6 +21,7 @@ export const keys = {
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
   cycles: 'cycles',
+  defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
@@ -95,9 +97,14 @@ export const getCycles = ObjectUtils.getProp(keys.cycles)
 
 export const getCycleKeys = R.pipe(getCycles, R.keys)
 
-export const { getDateCreated } = ObjectUtils
+const getLastCycleKey = R.pipe(getCycleKeys, R.last)
 
-export const { getDateModified } = ObjectUtils
+export const getDefaultCycleKey = (surveyInfo) => {
+  const defaultCycleKey = ObjectUtils.getProp(keys.defaultCycleKey)(surveyInfo)
+  return Objects.isEmpty(defaultCycleKey) ? getLastCycleKey(surveyInfo) : defaultCycleKey
+}
+
+export const { getDateCreated, getDateModified } = ObjectUtils
 
 export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
