@@ -8,10 +8,11 @@ export const init = (app) => {
   // ====== READ - all survey day
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle } = Request.getParams(req)
 
       const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
         surveyId,
+        cycle,
         draft: false,
         backup: true,
       })
@@ -26,10 +27,11 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle } = Request.getParams(req)
+
       const filePath = Request.getFilePath(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
+      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle })
 
       const job = ArenaMobileImportService.startArenaMobileImportJob({ user, filePath, survey, surveyId })
 
