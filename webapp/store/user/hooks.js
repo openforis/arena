@@ -80,7 +80,7 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
   useEffect(dispatch, [userUuid, forceUpdateKey])
 
   useEffect(() => {
-    if (data) {
+    if (data && data.size > 0) {
       setProfilePicture(URL.createObjectURL(data))
     }
   }, [data])
