@@ -39,8 +39,11 @@ const expectDropdownValue = async ({ testId = null, parentSelector = '', value }
   }
 }
 
+const waitForLoaderToDisappear = async () => page.waitForSelector('.loader', { state: 'hidden', timeout: 5000 })
+
 export const FormUtils = {
   selectDropdownItem,
   expectDropdownToBeDisabled,
   expectDropdownValue,
+  waitForLoaderToDisappear,
 }
