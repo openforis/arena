@@ -867,10 +867,11 @@ About
 $t(common.appNameFull)
 --------
  
- * Developed by: [Open Foris](https://www.openforis.org/)
+ * Developed by: <a href="https://www.openforis.org" target="_blank">Open Foris</a>
  * Version: {{version}}
- * Support: [https://openforis.support](https://openforis.support)
- * Arena in GitHub: [https://github.com/openforis/arena](https://github.com/openforis/arena)
+ * Support Forum: <a href="https://openforis.support" target="_blank">https://openforis.support</a>
+ * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
+ * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
 `,
     },
   },
