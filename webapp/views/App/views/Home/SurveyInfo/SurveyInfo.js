@@ -20,6 +20,7 @@ import LanguagesEditor from './LanguagesEditor'
 
 import { useSurveyInfoForm } from './store'
 import SamplingPolygonEditor from './SamplingPolygonEditor'
+import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
@@ -27,19 +28,21 @@ const SurveyInfo = () => {
   const i18n = useI18n()
 
   const {
-    name,
+    cycles,
+    defaultCycleKey,
+    descriptions,
+    labels,
     languages,
-    srs,
+    name,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
-    labels,
-    descriptions,
-    cycles,
+    srs,
     setName,
     setLanguages,
     setSrs,
     setSamplingPolygon,
     setLabels,
+    setDefaultCycleKey,
     setDescriptions,
     setCycles,
     setSampleBasedImageInterpretationEnabled,
@@ -88,17 +91,11 @@ const SurveyInfo = () => {
           setLanguages={setLanguages}
         />
 
-        <div className="form-item">
-          <label className="form-label" htmlFor="survey-info-srs">
-            {i18n.t('common.srs')}
-          </label>
+        <FormItem label={i18n.t('common.srs')}>
           <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
-        </div>
+        </FormItem>
 
-        <div className="form-item">
-          <label className="form-label" htmlFor="survey-info-cycles">
-            {i18n.t('common.cycle_plural')}
-          </label>
+        <FormItem label={i18n.t('common.cycle_plural')}>
           <CyclesEditor
             readOnly={readOnly}
             cycles={cycles}
@@ -106,7 +103,13 @@ const SurveyInfo = () => {
             surveyInfo={surveyInfo}
             validation={getFieldValidation(Survey.infoKeys.cycles)}
           />
-        </div>
+        </FormItem>
+
+        {Object.values(cycles).length > 1 && (
+          <FormItem label={i18n.t('homeView.surveyInfo.cycleForArenaMobile')}>
+            <CycleSelector surveyCycleKey={defaultCycleKey} onChange={setDefaultCycleKey} />
+          </FormItem>
+        )}
 
         <FormItem
           label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}
