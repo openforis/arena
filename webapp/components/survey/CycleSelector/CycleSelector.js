@@ -26,6 +26,7 @@ const CycleSelector = (props) => {
 
   return (
     <Dropdown
+      className="cycle-selector"
       items={cycleItems}
       selection={cycleSelection}
       onChange={(item) => onChange(R.prop('key', item))}
