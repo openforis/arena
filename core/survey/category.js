@@ -39,12 +39,12 @@ export const { getValidation } = Validation
 
 const getLevels = R.propOr({}, keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
-
 export const getLevelByUuid = (uuid) => R.pipe(getLevelsArray, R.find(R.propEq('uuid', uuid)))
 export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
 
-export const getLevelsCount = (category) =>
-  Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
+const getLevelsCount = (category) => Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
+export const isFlat = (category) => getLevelsCount(category) === 1
+export const isHierarchical = (category) => !isFlat(category)
 
 export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))

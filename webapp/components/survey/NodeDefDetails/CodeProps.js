@@ -64,28 +64,29 @@ const CodeProps = (props) => {
 
       {!NodeDef.isAnalysis(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 200px',
-              }}
-            >
-              <Dropdown
-                clearable
-                disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
-                items={candidateParentCodeNodeDefs}
-                selection={parentCodeDef}
-                itemValue="uuid"
-                itemLabel={NodeDef.getName}
-                onChange={(def) =>
-                  Actions.setProp({ state, key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
-                }
-                testId={TestId.nodeDefDetails.nodeDefCodeParent}
-              />
-            </div>
-          </FormItem>
-
+          {Category.isHierarchical(category) && (
+            <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 200px',
+                }}
+              >
+                <Dropdown
+                  clearable
+                  disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
+                  items={candidateParentCodeNodeDefs}
+                  selection={parentCodeDef}
+                  itemValue="uuid"
+                  itemLabel={NodeDef.getName}
+                  onChange={(def) =>
+                    Actions.setProp({ state, key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
+                  }
+                  testId={TestId.nodeDefDetails.nodeDefCodeParent}
+                />
+              </div>
+            </FormItem>
+          )}
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
