@@ -215,15 +215,17 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
-  const [survey, categories, categoryItemsRefData, taxaIndexRefData] = await Promise.all([
+  const [survey, categories, categoryItemsRefData, taxonomies, taxaIndexRefData] = await Promise.all([
     fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted, backup }, client),
     CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
     CategoryRepository.fetchIndex(surveyId, draft, client),
+    TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
     TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client),
   ])
 
   return R.pipe(
     Survey.assocCategories(categories),
+    Survey.assocTaxonomies(taxonomies),
     Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })
   )(survey)
 }

@@ -23,7 +23,13 @@ const CycleSelector = (props) => {
   const cycleSelection = cycleItems.find((cycleItem) => cycleItem.value === surveyCycleKey)
 
   return (
-    <Dropdown items={cycleItems} selection={cycleSelection} onChange={(item) => onChange(item?.value)} readOnlyInput />
+    <Dropdown
+      className="cycle-selector"
+      items={cycleItems}
+      selection={cycleSelection}
+      onChange={(item) => onChange(item?.value)}
+      readOnlyInput
+    />
   )
 }
 

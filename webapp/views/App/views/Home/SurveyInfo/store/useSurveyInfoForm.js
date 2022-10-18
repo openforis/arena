@@ -14,16 +14,17 @@ export const useSurveyInfoForm = () => {
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
 
-  const { object, setObjectField, enableValidation, getFieldValidation, setValidation } = useFormObject(
-    ObjectUtils.getProps(surveyInfo),
-    null
-  )
+  const { object, setObjectField, enableValidation, getFieldValidation, setValidation } = useFormObject({
+    ...ObjectUtils.getProps(surveyInfo),
+    defaultCycleKey: Survey.getDefaultCycleKey(surveyInfo),
+  })
 
   useEffect(() => {
     setValidation(Validation.getValidation(surveyInfo))
   }, [surveyInfo])
 
   // Setter methods
+  const setDefaultCycleKey = (value) => setObjectField(Survey.infoKeys.defaultCycleKey, value)
   const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
@@ -43,15 +44,16 @@ export const useSurveyInfoForm = () => {
 
   return {
     ...object,
-    setName,
-    setLanguages,
-    setSrs,
-    setSamplingPolygon,
-    setLabels,
-    setDescriptions,
-    setCycles,
-    setSampleBasedImageInterpretationEnabled,
     getFieldValidation,
     saveProps,
+    setCycles,
+    setDefaultCycleKey,
+    setDescriptions,
+    setLabels,
+    setLanguages,
+    setName,
+    setSampleBasedImageInterpretationEnabled,
+    setSamplingPolygon,
+    setSrs,
   }
 }
