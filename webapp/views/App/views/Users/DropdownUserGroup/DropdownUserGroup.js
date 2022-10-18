@@ -23,15 +23,15 @@ const DropdownUserGroup = (props) => {
   return (
     <Dropdown
       disabled={disabled}
-      validation={validation}
-      placeholder={i18n.t('common.group')}
       items={groups}
       itemValue={AuthGroup.keys.uuid}
       itemLabel={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
-      selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
       onChange={(group) => onChange(group)}
-      readOnlyInput
+      placeholder={i18n.t('common.group')}
+      selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
+      searchable={false}
       testId={TestId.userInvite.group}
+      validation={validation}
     />
   )
 }

@@ -40,11 +40,11 @@ export const ItemExtraDefEditor = (props) => {
         validation={Validation.getFieldValidation(CategoryItemExtraDef.keys.name)(validation)}
       />
       <Dropdown
-        readOnlyInput
         readOnly={readOnly || !editing}
         items={Object.keys(CategoryItemExtraDef.dataTypes)}
         itemValue={A.identity}
         itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
+        searchable={false}
         selection={dataType}
         onChange={(dataTypeUpdated) =>
           updateItemExtraDef({ itemExtraDefUpdated: { ...itemExtraDef, dataType: dataTypeUpdated } })

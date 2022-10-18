@@ -30,7 +30,7 @@ const Dropdown = (props) => {
     onChange: onChangeProp,
     placeholder,
     readOnly,
-    readOnlyInput,
+    searchable,
     selection,
     testId,
     title,
@@ -65,7 +65,7 @@ const Dropdown = (props) => {
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
-        isSearchable={!readOnlyInput && !readOnly}
+        isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
         menuIsOpen={menuIsOpen}
@@ -93,7 +93,7 @@ Dropdown.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
-  readOnlyInput: PropTypes.bool,
+  searchable: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   testId: PropTypes.string,
   title: PropTypes.string,
@@ -112,7 +112,7 @@ Dropdown.defaultProps = {
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
-  readOnlyInput: false,
+  searchable: true,
   selection: null,
   testId: null,
   title: null,

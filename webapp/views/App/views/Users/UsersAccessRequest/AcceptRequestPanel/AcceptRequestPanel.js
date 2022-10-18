@@ -52,9 +52,9 @@ export const AcceptRequestPanel = (props) => {
           items={UserAccessRequestAccept.requestAcceptRoles}
           itemValue={A.identity}
           itemLabel={roleLabelFunction}
-          selection={role}
           onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.role, value })}
-          readOnlyInput
+          searchable={false}
+          selection={role}
         />
       </FormItem>
 
