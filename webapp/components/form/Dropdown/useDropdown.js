@@ -107,7 +107,7 @@ export const useDropdown = ({
   const options = items.map((item) => ({
     value: getOptionValue(item),
     label: getOptionLabel(item),
-    options: item.options,
+    ...(item.options ? { options: item.options } : {}),
   }))
 
   const emptySelection = A.isEmpty(selection)

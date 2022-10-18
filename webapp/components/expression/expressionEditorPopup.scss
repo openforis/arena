@@ -90,9 +90,10 @@
     .binary-left,
     .binary-right {
       display: flex;
-      flex-grow: 1;
 
-      .identifier {
+      .identifier, 
+      .dropdown-literal{
+        width: 40rem;
         max-width: 40rem;
       }
     }
@@ -113,9 +114,7 @@
     }
 
     .operator {
-      .form-input {
-        width: 80px;
-      }
+        width: 10rem;
     }
 
     .literal-btn-group-boolean {
