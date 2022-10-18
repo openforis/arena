@@ -56,7 +56,7 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) => {
         const type = Category.isReportingData(category)
           ? 'reportingData'
-          : Category.getLevelsCount(category) > 1
+          : Category.isHierarchical(category)
           ? 'hierarchical'
           : 'flat'
         return i18n.t(`categoryList.types.${type}`)
