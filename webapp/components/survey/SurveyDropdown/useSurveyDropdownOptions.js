@@ -14,7 +14,7 @@ const toOption = (surveyInfo) => {
   }
 }
 
-export const useOptions = () => {
+export const useSurveyDropdownOptions = () => {
   const [options, setOptions] = useState([])
 
   const i18n = useI18n()
@@ -31,7 +31,7 @@ export const useOptions = () => {
           label: i18n.t('homeView.surveyCreate.template', { count: templates.length }),
           options: templates.map(toOption),
         },
-        { label: i18n.t('homeView.surveyCreate.survey', { count: templates.length }), options: surveys.map(toOption) },
+        { label: i18n.t('homeView.surveyCreate.survey', { count: surveys.length }), options: surveys.map(toOption) },
       ])
     })()
   }, [])

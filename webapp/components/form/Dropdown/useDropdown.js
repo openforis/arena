@@ -73,7 +73,11 @@ export const useDropdown = ({
   }, [inputId])
 
   const getItemFromOption = useCallback(
-    (option) => (option ? items.find((itm) => getOptionValue(itm) === option.value) : null),
+    (option) => {
+      if (!option) return null
+      const flattenItems = items.flatMap((item) => (item.options ? item.options : [item]))
+      return flattenItems.find((item) => getOptionValue(item) === option.value)
+    },
     [items, getOptionValue]
   )
 
@@ -100,7 +104,11 @@ export const useDropdown = ({
     [minCharactersToAutocomplete, fetchItems]
   )
 
-  const options = items.map((item) => ({ value: getOptionValue(item), label: getOptionLabel(item) }))
+  const options = items.map((item) => ({
+    value: getOptionValue(item),
+    label: getOptionLabel(item),
+    options: item.options,
+  }))
 
   const emptySelection = A.isEmpty(selection)
   const selectedValue = emptySelection ? null : getOptionValue(selection)
