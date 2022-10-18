@@ -1,6 +1,6 @@
 import './CategorySelector.scss'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -42,13 +42,19 @@ export const CategorySelector = (props) => {
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
   const [categoryToEdit, setCategoryToEdit] = useState(null)
 
-  const emptyItem = { uuid: null, label: i18n.t('common.notSpecified') }
+  const emptyItem = useMemo(() => ({ uuid: null, label: i18n.t('common.notSpecified') }), [])
 
-  const categoriesLookupFunction = async (value) => {
-    const categories = await API.fetchCategories({ surveyId, search: value })
-    const filteredCategories = filterFunction ? categories.filter(filterFunction) : categories
-    return emptySelection ? [emptyItem, ...filteredCategories] : filteredCategories
-  }
+  const categoriesLookupFunction = useCallback(
+    async (value) => {
+      if (showCategoriesPanel || categoryToEdit) return []
+
+      const categories = await API.fetchCategories({ surveyId, search: value })
+      const filteredCategories = filterFunction ? categories.filter(filterFunction) : categories
+      return emptySelection ? [emptyItem, ...filteredCategories] : filteredCategories
+    },
+    // force dropdown items to reload when edit panel is closed
+    [filterFunction, surveyId, emptySelection, emptyItem, showCategoriesPanel, categoryToEdit]
+  )
 
   useEffect(() => {
     ;(async () => {
@@ -98,7 +104,7 @@ export const CategorySelector = (props) => {
   return (
     <div className="category-selector">
       <Dropdown
-        idInput={TestId.categorySelector.category}
+        testId={TestId.categorySelector.category}
         disabled={disabled}
         items={categoriesLookupFunction}
         itemKey={Category.keys.uuid}

@@ -6,9 +6,9 @@ const keys = {
 }
 
 const dataTypes = {
-  text: 'text',
-  number: 'number',
   geometryPoint: 'geometryPoint',
+  number: 'number',
+  text: 'text',
 }
 
 const newItem = ({ dataType }) => ({

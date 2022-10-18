@@ -1,6 +1,7 @@
 import { gotoHome, gotoEntities } from './_navigation'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { virtualEntities } from '../mock/nodeDefs'
+import { FormUtils } from './utils/formUtils'
 
 export default () =>
   describe('Create virtual entities', () => {
@@ -15,8 +16,7 @@ export default () =>
         await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), entity.name)
         await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), entity.label)
 
-        await page.click(getSelector(TestId.dropdown.toggleBtn(TestId.entities.entitySelector), 'button'))
-        await page.click(`text="Tree"`)
+        await FormUtils.selectDropdownItem({ testId: TestId.entities.entitySelector, label: 'Tree' })
 
         // Save
         await Promise.all([
@@ -24,10 +24,7 @@ export default () =>
           page.click(getSelector(TestId.nodeDefDetails.saveBtn, 'button')),
         ])
         // Back
-        await Promise.all([
-          page.waitForNavigation(),
-          page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button')),
-        ])
+        await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.nodeDefDetails.backBtn, 'button'))])
       })
     })
 

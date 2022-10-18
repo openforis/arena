@@ -94,19 +94,6 @@
     text-align: left;
     border: $formBorder;
   }
-
-  .dropdown {
-    grid-template-columns: 1fr 35px;
-    border: $formBorder;
-
-    .form-input {
-      border: none;
-    }
-
-    > :nth-child(2) {
-      justify-self: center;
-    }
-  }
 }
 
 //multiple node def

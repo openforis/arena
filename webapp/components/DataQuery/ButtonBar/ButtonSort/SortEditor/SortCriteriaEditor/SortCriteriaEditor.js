@@ -15,14 +15,12 @@ const SortCriteriaEditor = (props) => {
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
 
   const i18n = useI18n()
- 
+
   return (
     <div className="sort-criteria-editor">
       <Dropdown
         items={selection ? [...variablesAvailable, selection] : variablesAvailable}
         selection={selection}
-        itemLabel="label"
-        itemKey="value"
         onChange={(variable) =>
           variable &&
           onChange(SortCriteria.assocVariable({ variable: variable.value, label: variable.label })(sortCriteria))

@@ -13,11 +13,11 @@ export const getBooleanSelector = (nodeDef, parentSelector, value) =>
 
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-
   const xSelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateX(nodeDef.name), 'input')}`
   const ySelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateY(nodeDef.name), 'input')}`
-  const srsSelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateSRS(nodeDef.name), 'input')}`
-  return { xSelector, ySelector, srsSelector }
+  const srsTestId = TestId.surveyForm.coordinateSRS(nodeDef.name)
+
+  return { xSelector, ySelector, srsTestId }
 }
 
 export const getTaxonSelector = (nodeDef, parentSelector) => {

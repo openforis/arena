@@ -1,6 +1,6 @@
 import './RecordsSummary.scss'
 
-import React, { useRef } from 'react'
+import React from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
@@ -20,8 +20,6 @@ const RecordsSummary = () => {
   const { from, to, counts, timeRange, onChangeTimeRange } = useRecordsSummary()
   const { timeRangeItems, timeRangeSelection } = useTimeRanges({ timeRange })
 
-  const timeRangeElementRef = useRef(null)
-
   return (
     <div className="home-dashboard__records-summary">
       <div className="home-dashboard__records-summary-header">
@@ -32,13 +30,12 @@ const RecordsSummary = () => {
           })}
         </h6>
 
-        <div className="time-range" ref={timeRangeElementRef}>
+        <div className="time-range">
           <span className="icon icon-calendar icon-12px icon-left" />
           <Dropdown
             items={timeRangeItems}
             selection={timeRangeSelection}
-            onChange={(item) => onChangeTimeRange({ timeRange: item.key })}
-            sourceElement={timeRangeElementRef.current}
+            onChange={(item) => onChangeTimeRange({ timeRange: item.value })}
             readOnlyInput
           />
         </div>

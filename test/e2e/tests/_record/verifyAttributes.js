@@ -1,3 +1,4 @@
+import { FormUtils } from '../utils/formUtils'
 import {
   formatDate,
   formatTime,
@@ -14,15 +15,25 @@ const verifyBoolean = async (nodeDef, value, parentSelector) => {
   await expect(await span.getAttribute('class')).toContain('icon-radio-checked2')
 }
 
+const verifyCode = async (nodeDef, value, parentSelector) =>
+  FormUtils.expectDropdownValue({
+    parentSelector: getNodeDefSelector(nodeDef, parentSelector),
+    value,
+  })
+
 const verifyCoordinate = async (nodeDef, value, parentSelector) => {
-  const { xSelector, ySelector, srsSelector } = getCoordinateSelector(nodeDef, parentSelector)
+  const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
 
   const x = await page.$(xSelector)
   const y = await page.$(ySelector)
-  const srs = await page.$(srsSelector)
+
   await expect(Number(await x.getAttribute('value'))).toBe(Number(value.x))
   await expect(Number(await y.getAttribute('value'))).toBe(Number(value.y))
-  await expect(await srs.getAttribute('value')).toBe(value.srsLabel)
+  await FormUtils.expectDropdownValue({
+    testId: srsTestId,
+    parentSelector: getNodeDefSelector(nodeDef, parentSelector),
+    value: value.srsLabel,
+  })
 }
 
 const verifyDate = async (nodeDef, value, parentSelector) => {
@@ -62,7 +73,7 @@ const verifyTime = async (nodeDef, value, parentSelector) => {
 
 const verifyFns = {
   boolean: verifyBoolean,
-  code: verifyText,
+  code: verifyCode,
   coordinate: verifyCoordinate,
   date: verifyDate,
   decimal: verifyText,

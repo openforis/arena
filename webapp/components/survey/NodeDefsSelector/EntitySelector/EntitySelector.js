@@ -1,7 +1,6 @@
 import './EntitySelector.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -34,8 +33,8 @@ const getDropdownItems = ({
         ? NodeDef.getName(nodeDef)
         : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
       entities.push({
-        key: NodeDef.getUuid(nodeDef),
-        value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
+        value: NodeDef.getUuid(nodeDef),
+        label: `${StringUtils.nbsp}${StringUtils.nbsp.repeat(depth * 2)}${label}`,
       })
     }
   }
@@ -61,7 +60,7 @@ const EntitySelector = (props) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-  const emptySelection = { key: 'null', value: i18n.t('common.notSpecified') }
+  const emptySelection = { value: 'null', label: i18n.t('common.notSpecified') }
 
   const dropdownItems = getDropdownItems({
     emptySelection,
@@ -73,18 +72,17 @@ const EntitySelector = (props) => {
     allowEmptySelection,
     filterFn,
   })
-  const selection = nodeDefUuidEntity ? dropdownItems.find(R.propEq('key', nodeDefUuidEntity)) : emptySelection
+  const selection = nodeDefUuidEntity ? dropdownItems.find((item) => item.value === nodeDefUuidEntity) : emptySelection
 
   return (
     <Dropdown
-      idInput={TestId.entities.entitySelector}
       className="entity-selector"
-      autocompleteDialogClassName="entity-selector__dialog"
       items={dropdownItems}
       selection={selection}
       validation={validation}
-      onChange={(item) => onChange(R.prop('key', item))}
+      onChange={(item) => onChange(item?.value)}
       disabled={disabled}
+      testId={TestId.entities.entitySelector}
     />
   )
 }

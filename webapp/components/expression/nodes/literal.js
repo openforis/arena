@@ -18,6 +18,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { Input } from '@webapp/components/form/Input'
 import DateInput from '@webapp/components/form/DateInput'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { TestId } from '@webapp/utils/testId'
 
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
@@ -97,9 +98,9 @@ const Literal = (props) => {
     if (literalSearchParams) {
       return (
         <Dropdown
+          testId={TestId.expressionEditor.literalDropdown}
           items={(value) => loadItems({ ...literalSearchParams, value })}
-          itemLabel="label"
-          onChange={(_item) => onChangeValue(_item ? _item.key : null)}
+          onChange={(_item) => onChangeValue(_item ? _item.value : null)}
           selection={item}
         />
       )

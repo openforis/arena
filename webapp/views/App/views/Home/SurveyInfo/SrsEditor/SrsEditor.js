@@ -1,3 +1,5 @@
+import './SrsEditor.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
@@ -22,11 +24,12 @@ const SrsEditor = (props) => {
 
   return (
     <InputChips
+      className="srs_editor__input_chips"
       items={srsLookupFunction}
       itemKey={Srs.keys.code}
       itemLabel={Srs.getNameAndCode}
       selection={srs}
-      autocompleteMinChars={3}
+      minCharactersToAutocomplete={3}
       requiredItems={1}
       validation={validation}
       onChange={setSrs}

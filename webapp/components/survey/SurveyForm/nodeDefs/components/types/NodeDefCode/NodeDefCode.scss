@@ -20,9 +20,12 @@
     }
   }
 
+  .dropdown-wrapper,
+  .dropdown {
+    width: 100%;
+  }
   .dropdown {
     height: 29px;
-    width: 100%;
   }
 }
 

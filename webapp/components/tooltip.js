@@ -47,7 +47,7 @@ class Tooltip extends React.Component {
   }
 
   render() {
-    const { children, className, id, type, showContent, insideTable } = this.props
+    const { children, className, id, type, showContent, insideTable, testId } = this.props
     const { messageElement } = this.state
 
     const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
@@ -57,7 +57,7 @@ class Tooltip extends React.Component {
     return (
       <div
         className={tooltipClass}
-        data-testid={id}
+        data-testid={testId || id}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}
         ref={this.tooltipRef}
@@ -78,6 +78,7 @@ Tooltip.defaultProps = {
   messageComponent: null, // React message component
   type: null, // Tooltip type (error or warning)
   showContent: true, // Set to false not to show the tooltip on mouse over
+  testId: null,
 }
 
 export default Tooltip

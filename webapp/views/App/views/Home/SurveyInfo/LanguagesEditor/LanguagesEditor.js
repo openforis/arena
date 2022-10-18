@@ -12,8 +12,8 @@ const LanguagesEditor = (props) => {
   const { idInput, languages, setLanguages, readOnly } = props
 
   const selection = languages.map((lang) => ({
-    key: lang,
-    value: getLanguageLabel(lang),
+    value: lang,
+    label: getLanguageLabel(lang),
   }))
 
   const i18n = useI18n()
@@ -29,7 +29,7 @@ const LanguagesEditor = (props) => {
         items={appLanguages}
         selection={selection}
         onChange={(items) => {
-          setLanguages(R.pluck('key', items))
+          setLanguages(R.pluck('value', items))
         }}
         requiredItems={1}
         readOnly={readOnly}

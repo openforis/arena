@@ -21,10 +21,8 @@ export const StratumAttributeSelector = () => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
   const onChange = (item) => {
-    const stratumNodeDefUuid = item?.key
-    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumNodeDefUuid))(
-      chain
-    )
+    const stratumDefUuid = item?.value
+    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
@@ -47,11 +45,11 @@ export const StratumAttributeSelector = () => {
   }
 
   const nodeDefToItem = (nodeDef) => ({
-    key: NodeDef.getUuid(nodeDef),
-    value: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
+    value: NodeDef.getUuid(nodeDef),
+    label: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
   })
 
-  const emptySelectionItem = { key: null, value: i18n.t('common.notSpecified') }
+  const emptySelectionItem = { value: null, label: i18n.t('common.notSpecified') }
   const samplingDesign = Chain.getSamplingDesign(chain)
   const selectableItems = [
     ...(ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign) ? [emptySelectionItem] : []),
@@ -64,12 +62,7 @@ export const StratumAttributeSelector = () => {
 
   return (
     <FormItem label={i18n.t('chainView.stratumAttribute')}>
-      <Dropdown
-        className="stratum-attribute-dropdown"
-        selection={selectedItem}
-        items={selectableItems}
-        onChange={onChange}
-      />
+      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} />
     </FormItem>
   )
 }

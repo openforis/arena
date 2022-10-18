@@ -44,9 +44,10 @@ const TableRow = (props) => {
           language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.language),
         })}
       </div>
-      <div>
+      <div className="column__extra-def">
         {CategoryImportSummary.isColumnExtra(column) && (
           <Dropdown
+            className="dropdown__extra-def-type"
             readOnlyInput
             items={Object.keys(CategoryItemExtraDef.dataTypes)}
             itemKey={A.identity}

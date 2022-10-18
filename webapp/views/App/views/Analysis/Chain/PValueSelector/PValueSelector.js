@@ -9,7 +9,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-const pValueToItem = (value) => ({ key: value, label: value })
+const pValueToItem = (value) => ({ value, label: String(value) })
 
 export const PValueSelector = () => {
   const dispatch = useDispatch()
@@ -22,19 +22,13 @@ export const PValueSelector = () => {
   const selectedItem = pValueToItem(ChainSamplingDesign.getPValue(samplingDesign))
 
   const onChange = (item) => {
-    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocPValue(item?.key))(chain)
+    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocPValue(item?.value))(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
   return (
     <FormItem label={i18n.t('chainView.pValue')}>
-      <Dropdown
-        className="p-value-dropdown"
-        items={items}
-        selection={selectedItem}
-        itemLabel="label"
-        onChange={onChange}
-      />
+      <Dropdown className="p-value-dropdown" items={items} selection={selectedItem} onChange={onChange} />
     </FormItem>
   )
 }

@@ -59,7 +59,6 @@ export const TestId = {
   },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
-    toggleBtn: (id) => `${id}-toggle-btn`,
   },
   entities: {
     addBtn: 'entity-add-btn',
@@ -74,6 +73,7 @@ export const TestId = {
     advancedQuery: 'expression-advanced-query',
     applyBtn: 'expression-apply-btn',
     editBtn: (id) => `${id}-edit-btn`,
+    literalDropdown: 'expression-literal-dropdown',
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },

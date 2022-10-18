@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
@@ -10,26 +9,25 @@ import Dropdown from '@webapp/components/form/Dropdown'
 const CycleSelector = (props) => {
   const { surveyCycleKey, onChange } = props
 
+  const i18n = useI18n()
   const cycleKeys = useSurveyCycleKeys()
 
   if (cycleKeys.length === 1) {
     return null
   }
 
-  const i18n = useI18n()
-
-  const cycleItems = cycleKeys.map((key) => ({
-    key,
-    value: `${i18n.t('common.cycle')} ${Number(key) + 1}`,
+  const cycleItems = cycleKeys.map((cycleKey) => ({
+    value: cycleKey,
+    label: `${i18n.t('common.cycle')} ${Number(cycleKey) + 1}`,
   }))
-  const cycleSelection = R.find(R.propEq('key', surveyCycleKey), cycleItems)
+  const cycleSelection = cycleItems.find((cycleItem) => cycleItem.value === surveyCycleKey)
 
   return (
     <Dropdown
       className="cycle-selector"
       items={cycleItems}
       selection={cycleSelection}
-      onChange={(item) => onChange(R.prop('key', item))}
+      onChange={(item) => onChange(item?.value)}
       readOnlyInput
     />
   )

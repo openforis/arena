@@ -23,7 +23,7 @@ export const SurveyPreferredLanguageSelector = () => {
     return null
   }
 
-  const langToDropdownItem = (lang) => ({ key: lang, value: getLanguageLabel(lang) })
+  const langToDropdownItem = (lang) => ({ value: lang, label: getLanguageLabel(lang) })
   const dropdownItems = langs.map(langToDropdownItem)
   const selection = langToDropdownItem(preferredLang)
 
@@ -33,7 +33,7 @@ export const SurveyPreferredLanguageSelector = () => {
       items={dropdownItems}
       selection={selection}
       onChange={(langItem) => {
-        const { key: lang } = langItem
+        const { value: lang } = langItem
         const userUpdated = User.assocPrefSurveyLang({ surveyId, lang })(user)
         dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
       }}

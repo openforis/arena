@@ -2,6 +2,7 @@ import './InputChips.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import Dropdown from '../Dropdown'
 
@@ -10,13 +11,14 @@ import Chip from './Chip'
 
 const InputChips = (props) => {
   const {
+    className,
     idInput,
     items,
     itemKey,
     itemLabel,
     selection,
     requiredItems,
-    autocompleteMinChars,
+    minCharactersToAutocomplete,
     readOnly,
     disabled,
     validation,
@@ -35,7 +37,7 @@ const InputChips = (props) => {
   })
 
   return (
-    <div className="form-input-chip">
+    <div className={classNames('form-input-chip', className)}>
       {selection.map((item) => (
         <Chip
           key={State.getItemKey(state)(item)}
@@ -55,7 +57,7 @@ const InputChips = (props) => {
           itemLabel={State.getItemLabel(state)}
           onChange={Actions.onDropdownChange({ selection, state })}
           selection={null}
-          autocompleteMinChars={autocompleteMinChars}
+          minCharactersToAutocomplete={minCharactersToAutocomplete}
           readOnly={readOnly}
           disabled={disabled}
           validation={validation}
@@ -67,6 +69,7 @@ const InputChips = (props) => {
 }
 
 InputChips.propTypes = {
+  className: PropTypes.string,
   idInput: PropTypes.string,
 
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
@@ -75,7 +78,7 @@ InputChips.propTypes = {
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
 
   requiredItems: PropTypes.number,
-  autocompleteMinChars: PropTypes.number,
+  minCharactersToAutocomplete: PropTypes.number,
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
   validation: PropTypes.object,
@@ -87,17 +90,18 @@ InputChips.propTypes = {
 }
 
 InputChips.defaultProps = {
+  className: undefined,
   idInput: null,
 
-  itemLabel: 'value',
-  itemKey: 'key',
+  itemLabel: 'label',
+  itemKey: 'value',
   selection: [],
   requiredItems: 0,
-  autocompleteMinChars: 0,
+  minCharactersToAutocomplete: 0,
   readOnly: false,
   disabled: false,
   validation: {},
-  placeholder: null,
+  placeholder: undefined,
 
   onChange: null, // Callback to receive all selection change
   onItemAdd: null, // Callback to receive added item

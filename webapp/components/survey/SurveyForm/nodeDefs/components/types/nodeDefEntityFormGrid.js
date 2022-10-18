@@ -14,6 +14,7 @@ import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useIsMountedRef } from '@webapp/components/hooks'
+import classNames from 'classnames'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -62,11 +63,11 @@ const NodeDefEntityFormGrid = (props) => {
       isDraggable={edit && canEditDef}
       isResizable={edit && canEditDef}
       compactType={null}
-      useCSSTransforms={true}
-      preventCollision={true}
-      className={mountedRef.current ? 'mounted' : ''}
+      preventCollision
+      className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
+      useCSSTransforms={false}
     >
       {visibleNodeDefsInnerPage.map((childDef) => (
         <div key={NodeDef.getUuid(childDef)}>

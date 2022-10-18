@@ -1,6 +1,7 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
 
-import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { TestId } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 import {
   formatTime,
   getBooleanSelector,
@@ -23,24 +24,19 @@ const enterBoolean = async (nodeDef, value, parentSelector) => {
 const enterCode = async (nodeDef, value, parentSelector) => {
   // only dropdown for now
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const toggleBtnSelector = `${nodeDefSelector} ${getSelector(
-    TestId.dropdown.toggleBtn(TestId.surveyForm.codeInputDropdown(nodeDef.name)),
-    'button'
-  )}`
-  await page.click(toggleBtnSelector)
-  const itemEl = await page.waitForSelector(`text="${value}"`)
-  await itemEl.click()
+  await FormUtils.selectDropdownItem({
+    testId: TestId.surveyForm.codeInputDropdown(nodeDef.name),
+    label: value,
+    parentSelector: nodeDefSelector,
+  })
 }
 
 const enterCoordinate = async (nodeDef, value, parentSelector) => {
-  const { xSelector, ySelector, srsSelector } = getCoordinateSelector(nodeDef, parentSelector)
-
+  const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
   await page.fill(xSelector, value.x)
   await page.fill(ySelector, value.y)
-  if (await page.isEditable(srsSelector)) {
-    await page.focus(srsSelector)
-    await page.click(getSelector(TestId.dropdown.dropDownItem(value.srs)))
-  }
+
+  await FormUtils.selectDropdownItem({ testId: srsTestId, value: value.srs, parentSelector })
 }
 
 const enterTaxon = async (nodeDef, value, parentSelector) => {

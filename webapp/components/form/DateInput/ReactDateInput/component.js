@@ -129,8 +129,8 @@ const DateInput = React.forwardRef(
 
     const globalClickListener = (e) => {
       if (
-        !(e.path.includes(calendarContainer.current) || e.path.includes(dateInputContainer.current)) &&
-        isCalendarOpen
+        isCalendarOpen &&
+        !(e.path?.includes(calendarContainer.current) || e.path?.includes(dateInputContainer.current))
       ) {
         setIsCalendarOpen(false)
       }

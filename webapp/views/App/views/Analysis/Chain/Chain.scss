@@ -11,23 +11,7 @@
       grid-template-columns: 0.2fr 0.75fr;
     }
 
-    .records-count-wrapper {
-      margin-left: 2rem;
-    }
-    .records-count-wrapper,
-    .records-count {
-      display: flex;
-      flex-direction: row;
-      gap: 2rem;
-      font-size: 0.9rem;
-    }
-
-    .stratum-attribute-dropdown {
-      width: 30rem;
-    }
-
-    .clustering-entity-dropdown,
-    .clustering-entity-form-item > .entity-selector {
+    .dropdown {
       width: 30rem;
     }
 
@@ -50,18 +34,8 @@
       }
     }
 
-    .sampling-strategy-dropdown,
-    .post-stratification-attribute-dropdown,
-    .reporting-data-node-def-dropdown {
-      width: 30rem;
-    }
-
     .p-value-dropdown {
-      width: 5rem;
-    }
-
-    .category-selector {
-      width: 44rem;
+      width: 7rem;
     }
 
     .nonResponseBiasCorrectionContainer {

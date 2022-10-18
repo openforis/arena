@@ -1,22 +1,7 @@
-@import 'webapp/style/vars';
-
 .entity-selector {
-  background-color: $greyBorder;
-  height: 30px;
-
-  input {
-    justify-self: center;
-    border-bottom: none;
-    font-weight: 600;
-    font-size: 0.8rem;
-    width: 100%;
-    text-align: center;
-    padding: 0.3rem 0;
-  }
-}
-
-.entity-selector__dialog {
-  .dropdown__list-item {
-    text-align: left !important;
+  .dropdown__option {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }

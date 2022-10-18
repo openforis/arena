@@ -1,5 +1,6 @@
 import { each } from '../../../../core/promiseUtils'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 import { persistNodeDefChanges } from './editDetails'
 
 const editAdvanced = async (expressionStr) => {
@@ -16,9 +17,7 @@ const editAdvanced = async (expressionStr) => {
 const editBoolean = async (expressionStr) => page.click(`text="${expressionStr}"`)
 
 const editDropdown = async (expressionStr) => {
-  // TODO make a better selector
-  await page.focus("//div[normalize-space(.)='VarConst']/div/div/div/input[normalize-space(@type)='text']")
-  await page.click(getSelector(TestId.dropdown.dropDownItem(expressionStr)))
+  await FormUtils.selectDropdownItem({ testId: TestId.expressionEditor.literalDropdown, value: expressionStr })
   await expect(page).toHaveText(expressionStr)
 }
 

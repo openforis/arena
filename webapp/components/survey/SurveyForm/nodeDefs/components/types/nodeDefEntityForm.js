@@ -32,7 +32,7 @@ const NodeDefEntityForm = (props) => {
   }, [entry, selectedNode, nodes, NodeDef.getUuid(nodeDef)])
 
   return (
-    <div>
+    <>
       <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes} />
 
       {entryMultiple && (
@@ -44,7 +44,7 @@ const NodeDefEntityForm = (props) => {
       )}
 
       {(edit || (entry && selectedNode)) && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
-    </div>
+    </>
   )
 }
 

@@ -598,9 +598,9 @@ export const getLanguageISO639part2Label = (lang, translationLang = 'en') => {
 
 export const languages = R.pipe(
   R.keys,
-  R.map((lang) => ({ key: lang, value: getLanguageLabel(lang) }))
+  R.map((lang) => ({ value: lang, label: getLanguageLabel(lang) }))
 )(languagesMap)
 
-export const languageCodes = languages.map(R.prop('key'))
+export const languageCodes = languages.map(R.prop('value'))
 
 export const languageCodesISO639part2 = R.keys(iso639part2Names)

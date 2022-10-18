@@ -41,18 +41,19 @@ const NodeDefCodeDropdown = (props) => {
         />
       ) : (
         <Dropdown
-          idInput={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
-          readOnly={entryDisabled}
-          items={items}
+          clearable
           disabled={disabled}
           itemKey="uuid"
           itemLabel={itemLabelFunction}
-          selection={R.head(selectedItems)}
+          items={items}
           onChange={(item) => {
             // NB: onItemRemove is not possible?
             if (item) onItemAdd(item)
             else onItemRemove(item)
           }}
+          readOnly={entryDisabled}
+          selection={R.head(selectedItems)}
+          testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
         />
       )}
     </div>
