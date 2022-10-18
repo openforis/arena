@@ -76,7 +76,7 @@ const CodeProps = (props) => {
                 disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
-                itemKey="uuid"
+                itemValue="uuid"
                 itemLabel={NodeDef.getName}
                 onChange={(def) =>
                   Actions.setProp({ state, key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })

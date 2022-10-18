@@ -75,7 +75,7 @@ const TaxonProps = (props) => {
         <div className="taxonomy-selector">
           <Dropdown
             items={itemsLookupFunction}
-            itemKey="uuid"
+            itemValue="uuid"
             itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}

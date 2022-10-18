@@ -54,7 +54,7 @@ export const ReportingDataAttributeDefs = (props) => {
               selection={Survey.getNodeDefByUuid(
                 ChainSamplingDesign.getReportingDataAttributeDefUuid({ categoryLevelUuid })(samplingDesign)
               )(survey)}
-              itemKey="uuid"
+              itemValue="uuid"
               itemLabel={(nodeDef) => NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name)}
               onChange={(def) =>
                 updateChain(

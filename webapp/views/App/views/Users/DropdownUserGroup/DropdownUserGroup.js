@@ -26,7 +26,7 @@ const DropdownUserGroup = (props) => {
       validation={validation}
       placeholder={i18n.t('common.group')}
       items={groups}
-      itemKey={AuthGroup.keys.uuid}
+      itemValue={AuthGroup.keys.uuid}
       itemLabel={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
       selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
       onChange={(group) => onChange(group)}

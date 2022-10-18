@@ -26,7 +26,7 @@ const Paginator = (props) => {
         <div className="label">{i18n.t('common.paginator.itemsPerPage')}:</div>
         <Dropdown
           items={itemsPerPageValues}
-          itemKey={A.identity}
+          itemValue={A.identity}
           itemLabel={A.identity}
           selection={limit}
           onChange={(limitUpdated) => {

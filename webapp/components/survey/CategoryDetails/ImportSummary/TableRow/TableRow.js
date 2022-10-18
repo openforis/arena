@@ -50,7 +50,7 @@ const TableRow = (props) => {
             className="dropdown__extra-def-type"
             readOnlyInput
             items={Object.keys(CategoryItemExtraDef.dataTypes)}
-            itemKey={A.identity}
+            itemValue={A.identity}
             itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
             selection={dataType}
             onChange={(item) => onDataTypeChange(item)}

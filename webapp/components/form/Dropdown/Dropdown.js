@@ -24,7 +24,7 @@ const Dropdown = (props) => {
     id,
     idInput: idInputProp,
     itemLabel,
-    itemKey,
+    itemValue,
     items: itemsProp,
     onBeforeChange,
     onChange: onChangeProp,
@@ -41,7 +41,7 @@ const Dropdown = (props) => {
     useDropdown({
       minCharactersToAutocomplete,
       idInputProp,
-      itemKey,
+      itemValue,
       itemLabel,
       itemsProp,
       onBeforeChange,
@@ -87,7 +87,7 @@ Dropdown.propTypes = {
   id: PropTypes.string,
   idInput: PropTypes.string,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
-  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
@@ -107,8 +107,8 @@ Dropdown.defaultProps = {
   disabled: false,
   id: null,
   idInput: null,
-  itemKey: 'value',
   itemLabel: 'label',
+  itemValue: 'value',
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly

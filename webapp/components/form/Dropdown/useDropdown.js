@@ -7,7 +7,7 @@ export const useDropdown = ({
   id,
   idInputProp,
   itemLabel,
-  itemKey,
+  itemValue,
   itemsProp,
   onBeforeChange,
   onChangeProp,
@@ -27,8 +27,8 @@ export const useDropdown = ({
   )
 
   const getOptionValue = useCallback(
-    (item) => (itemKey.constructor === String ? A.prop(itemKey, item) : itemKey(item)),
-    [itemKey]
+    (item) => (itemValue.constructor === String ? A.prop(itemValue, item) : itemValue(item)),
+    [itemValue]
   )
 
   const [state, setState] = useState({ items: [], loading: false })
