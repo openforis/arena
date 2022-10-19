@@ -1,4 +1,5 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 import { gotoSurveyCreate } from '../_navigation'
 
 export const createSurvey = (surveyToAdd) => {
@@ -10,12 +11,11 @@ export const createSurvey = (surveyToAdd) => {
     await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
 
     if (cloneFrom) {
-      await page.click(
-        getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'clone' }))
-      )
+      // select create type "clone"
+      await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'clone' })))
+
       // set survey 'Clone from' field
-      await page.click(`#${TestId.surveyCreate.surveyCloneFrom}`)
-      await page.click(`text="${cloneFrom}"`)
+      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: cloneFrom })
 
       // press "Create survey" and wait for the job to complete
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
