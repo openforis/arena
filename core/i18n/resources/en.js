@@ -127,7 +127,9 @@ Do you want to proceed?`,
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
+    raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     required: 'Required',
+    requiredField: 'required field',
     reset: 'Reset',
     retry: 'Retry',
     save: 'Save',
@@ -287,13 +289,14 @@ Do you want to proceed?`,
         templateUuid: 'Start from a template?',
       },
     },
-    introduction: `The platform is still beta, so if you want access, you have to request here.
+    introduction: `Our resources are limited, so you have to request access to the platform.
 We are also interested in what you want to do with it so please let us know!
-**A new blank survey** will be created, so please provide a name for it.
-You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it. You can also create new surveys (up to 5) if needed.
-For more information please visit our website: *https://www.openforis.org/tools/arena/*
-**Once you send the request, please wait for an invitation email to access Arena.**
-\\* = required field`,
+You have the possibility to start from a **new blank survey** or clone an existing **template** and you will have to suggest a name for the newly created survey.
+You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it.
+You will be also a ***Survey Manager*** and you will be able to **create new surveys** (up to 5) if needed.
+For more information please visit our website: $t(links.openforisArenaWebsite)
+$t(common.raiseTicketInSupportForum)
+**Once you send the request, please wait for an invitation email to access Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
     requestSentMessage: `Please give us a couple of days to process your request.
@@ -868,9 +871,9 @@ About
 $t(common.appNameFull)
 --------
  
- * Developed by: <a href="https://www.openforis.org" target="_blank">Open Foris</a>
+ * Developed by: $t(links.openforis)
  * Version: {{version}}
- * Support Forum: <a href="https://openforis.support" target="_blank">https://openforis.support</a>
+ * Support Forum: $t(links.supportForum)
  * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
  * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
 `,
@@ -1532,7 +1535,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.temporaryMsg)
              <p><i>You have received this email because you have requested access to $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
              <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
-             <p>In case of problems please raise a ticket in our <b>Support Forum</b> at <a href="https://openforis.support">https://openforis.support</a></p>
+             <p>$t(common.raiseTicketInSupportForum)</p>
              $t(emails.signature)`,
     },
     userInviteExistingUser: {
@@ -1580,5 +1583,15 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>
       $t(emails.signature)`,
     },
+  },
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/tools/arena',
+    supportForum: 'https://openforis.support',
+  },
+  links: {
+    openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
+    openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
+    supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
   },
 }
