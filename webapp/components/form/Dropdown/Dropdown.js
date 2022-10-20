@@ -9,11 +9,19 @@ import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import { useDropdown } from './useDropdown'
 
-const OptionComponent = (props) => (
-  <div data-testid={TestId.dropdown.dropDownItem(props.data?.value)}>
-    <components.Option {...props} />
-  </div>
-)
+const OptionComponent = (props) => {
+  const { data = {} } = props
+  const { label, icon, value } = data
+
+  return (
+    <div data-testid={TestId.dropdown.dropDownItem(value)}>
+      <components.Option {...props}>
+        <span>{label}</span>
+        {icon}
+      </components.Option>
+    </div>
+  )
+}
 
 const Dropdown = (props) => {
   const {
@@ -26,6 +34,7 @@ const Dropdown = (props) => {
     itemLabel,
     itemValue,
     items: itemsProp,
+    multiple,
     onBeforeChange,
     onChange: onChangeProp,
     placeholder,
@@ -40,6 +49,7 @@ const Dropdown = (props) => {
   const { inputId, loading, menuIsOpen, onChange, onInputChange, openMenuOnClick, options, selectRef, value } =
     useDropdown({
       minCharactersToAutocomplete,
+      multiple,
       idInputProp,
       itemValue,
       itemLabel,
@@ -65,6 +75,7 @@ const Dropdown = (props) => {
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
+        isMulti={multiple}
         isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
@@ -89,6 +100,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
@@ -103,12 +115,13 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   minCharactersToAutocomplete: 0,
   className: undefined,
-  clearable: false,
+  clearable: true,
   disabled: false,
   id: null,
   idInput: null,
   itemLabel: 'label',
   itemValue: 'value',
+  multiple: false,
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly

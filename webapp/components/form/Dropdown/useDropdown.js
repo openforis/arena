@@ -9,6 +9,7 @@ export const useDropdown = ({
   itemLabel,
   itemValue,
   itemsProp,
+  multiple,
   onBeforeChange,
   onChangeProp,
   readOnly,
@@ -82,13 +83,15 @@ export const useDropdown = ({
   )
 
   const onChange = useCallback(
-    async (option) => {
-      const item = getItemFromOption(option)
-      if (!onBeforeChange || (await onBeforeChange(item))) {
-        onChangeProp(item)
+    async (selection) => {
+      const options = multiple ? selection : [selection]
+      const items = options.map(getItemFromOption)
+      const paramToPass = multiple ? items : items[0]
+      if (!onBeforeChange || (await onBeforeChange(paramToPass))) {
+        onChangeProp(paramToPass)
       }
     },
-    [getItemFromOption, onBeforeChange, onChangeProp]
+    [getItemFromOption, multiple, onBeforeChange, onChangeProp]
   )
 
   const onInputChange = useCallback(

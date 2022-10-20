@@ -34,6 +34,12 @@
       }
     }
 
+    .records-count-wrapper,
+    .records-count {
+      display: flex;
+      gap: 2rem;
+    }
+
     .p-value-dropdown {
       width: 7rem;
     }
