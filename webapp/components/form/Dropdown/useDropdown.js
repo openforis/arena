@@ -107,15 +107,37 @@ export const useDropdown = ({
     [minCharactersToAutocomplete, fetchItems]
   )
 
-  const options = items.map((item) => ({
-    value: getOptionValue(item),
-    label: getOptionLabel(item),
-    ...(item.options ? { options: item.options } : {}),
-  }))
+  const itemToOption = useCallback(
+    (item) => ({
+      value: getOptionValue(item),
+      label: getOptionLabel(item),
+      ...(item.options ? { options: item.options } : {}),
+    }),
+    [getOptionLabel, getOptionValue]
+  )
 
-  const emptySelection = A.isEmpty(selection)
-  const selectedValue = emptySelection ? null : getOptionValue(selection)
-  const value = emptySelection ? null : options.find((option) => option.value === selectedValue)
+  const options = items.map(itemToOption)
+
+  const findOptionByValue = useCallback(
+    (value) =>
+      options
+        .flatMap((option) => (option.options ? option.options : [option]))
+        .find((option) => option.value === value),
+    [options]
+  )
+
+  const getValue = useCallback(() => {
+    if (A.isEmpty(selection)) return null
+
+    if (multiple) {
+      // selection is an array of items
+      return selection.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
+    }
+    // selection is a single item
+    return findOptionByValue(getOptionValue(selection))
+  }, [findOptionByValue, getOptionValue, multiple, selection])
+
+  const value = getValue()
 
   // prevent menu opening when readOnly is true
   const openMenuOnClick = !readOnly && searchMinCharsReached
