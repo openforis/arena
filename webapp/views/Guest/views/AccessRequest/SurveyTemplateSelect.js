@@ -9,7 +9,7 @@ import { LoadingBar } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 
 export const SurveyTemplateSelect = (props) => {
-  const { defaultValue, onChange } = props
+  const { selectedValue, onChange } = props
 
   const [state, setState] = useState({ loading: true, items: null })
   const { loading, items } = state
@@ -26,11 +26,10 @@ export const SurveyTemplateSelect = (props) => {
 
   if (loading) return <LoadingBar />
 
-  const selectedItem = defaultValue ? items?.find((item) => Survey.getUuid(item) === defaultValue) : null
+  const selectedItem = selectedValue ? items?.find((item) => Survey.getUuid(item) === selectedValue) : null
 
   return (
     <Dropdown
-      value={selectedItem}
       items={items}
       itemDescription={
         (item) =>
@@ -42,15 +41,16 @@ export const SurveyTemplateSelect = (props) => {
       itemValue={Survey.getUuid}
       onChange={(item) => onChange(Survey.getUuid(item))}
       placeholder={i18n.t('accessRequestView.templateNotSelected')}
+      selection={selectedItem}
     />
   )
 }
 
 SurveyTemplateSelect.propTypes = {
-  defaultValue: PropTypes.string,
+  selectedValue: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 }
 
 SurveyTemplateSelect.defaultValues = {
-  defaultValue: null,
+  selectedValue: null,
 }

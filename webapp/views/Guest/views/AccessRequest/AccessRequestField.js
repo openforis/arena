@@ -36,7 +36,7 @@ export const AccessRequestField = (props) => {
             onChange={(item) => onChange({ name, value: item?.code })}
           />
         ) : name === `${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}` ? (
-          <SurveyTemplateSelect defaultValue={defaultValue} onChange={(value) => onChange({ name, value })} />
+          <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
         ) : (
           <Input
             value={value}
