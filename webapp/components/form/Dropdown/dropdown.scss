@@ -9,6 +9,21 @@
   .dropdown__menu {
     z-index: 10;
   }
+
+  .dropdown__option {
+    display: grid;
+
+    .dropdown-option__description {
+      grid-row: 2;
+      font-size: small;
+      font-style: italic;
+      white-space: pre-line;
+      line-height: 1rem;
+    }
+    .dropdown-option__icon {
+      grid-row: 1;
+    }
+  }
 }
 
 .tooltip-error {

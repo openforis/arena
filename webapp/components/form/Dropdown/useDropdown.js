@@ -6,6 +6,7 @@ export const useDropdown = ({
   minCharactersToAutocomplete,
   id,
   idInputProp,
+  itemDescription,
   itemLabel,
   itemValue,
   itemsProp,
@@ -22,15 +23,12 @@ export const useDropdown = ({
   const searchMinCharsReached =
     !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
 
-  const getOptionLabel = useCallback(
-    (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
-    [itemLabel]
-  )
+  const getProperty = (propOrFunction) => (item) =>
+    propOrFunction.constructor === String ? A.prop(propOrFunction, item) : propOrFunction(item)
 
-  const getOptionValue = useCallback(
-    (item) => (itemValue.constructor === String ? A.prop(itemValue, item) : itemValue(item)),
-    [itemValue]
-  )
+  const getOptionDescription = useCallback((item) => getProperty(itemDescription)(item), [itemDescription])
+  const getOptionLabel = useCallback((item) => getProperty(itemLabel)(item), [itemLabel])
+  const getOptionValue = useCallback((item) => getProperty(itemValue)(item), [itemValue])
 
   const [state, setState] = useState({ items: [], loading: false })
 
@@ -109,11 +107,12 @@ export const useDropdown = ({
 
   const itemToOption = useCallback(
     (item) => ({
-      value: getOptionValue(item),
+      description: getOptionDescription(item),
       label: getOptionLabel(item),
+      value: getOptionValue(item),
       ...(item.options ? { options: item.options } : {}),
     }),
-    [getOptionLabel, getOptionValue]
+    [getOptionDescription, getOptionLabel, getOptionValue]
   )
 
   const options = items.map(itemToOption)

@@ -11,13 +11,14 @@ import { useDropdown } from './useDropdown'
 
 const OptionComponent = (props) => {
   const { data = {} } = props
-  const { label, icon, value } = data
+  const { description, label, icon, value } = data
 
   return (
     <div data-testid={TestId.dropdown.dropDownItem(value)}>
       <components.Option {...props}>
-        <span>{label}</span>
-        {icon}
+        <span className="dropdown-option__label">{label}</span>
+        {description && <span className="dropdown-option__description">{description}</span>}
+        {icon && <span className="dropdown-option__icon">{icon}</span>}
       </components.Option>
     </div>
   )
@@ -31,6 +32,7 @@ const Dropdown = (props) => {
     disabled,
     id,
     idInput: idInputProp,
+    itemDescription,
     itemLabel,
     itemValue,
     items: itemsProp,
@@ -51,8 +53,9 @@ const Dropdown = (props) => {
       minCharactersToAutocomplete,
       multiple,
       idInputProp,
-      itemValue,
+      itemDescription,
       itemLabel,
+      itemValue,
       itemsProp,
       onBeforeChange,
       onChangeProp,
@@ -97,6 +100,7 @@ Dropdown.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
   idInput: PropTypes.string,
+  itemDescription: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item description function or property name
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
@@ -119,6 +123,7 @@ Dropdown.defaultProps = {
   disabled: false,
   id: null,
   idInput: null,
+  itemDescription: 'description',
   itemLabel: 'label',
   itemValue: 'value',
   multiple: false,
