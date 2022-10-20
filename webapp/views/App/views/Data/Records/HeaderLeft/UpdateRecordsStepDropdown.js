@@ -71,9 +71,9 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
         value: key,
         label: i18n.t(`dataView.records.${key}`),
       }))}
-      placeholder={i18n.t(placeholder)}
       onChange={(item) => onMoveAllRecords(item.value)}
-      readOnlyInput
+      placeholder={i18n.t(placeholder)}
+      searchable={false}
     />
   )
 }

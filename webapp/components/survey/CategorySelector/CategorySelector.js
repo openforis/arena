@@ -107,7 +107,7 @@ export const CategorySelector = (props) => {
         testId={TestId.categorySelector.category}
         disabled={disabled}
         items={categoriesLookupFunction}
-        itemKey={Category.keys.uuid}
+        itemValue={Category.keys.uuid}
         itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
         selection={category}

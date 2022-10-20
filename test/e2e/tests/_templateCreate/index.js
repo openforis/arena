@@ -1,4 +1,5 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 import { gotoTemplateCreate } from '../_navigation'
 
 export const createTemplate = (template) => {
@@ -10,11 +11,8 @@ export const createTemplate = (template) => {
     await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
 
     if (cloneFrom) {
-      await page.click(
-        getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' }))
-      )
-      await page.click(`#${TestId.surveyCreate.surveyCloneFrom}`)
-      await page.click(`text="${cloneFrom}"`)
+      await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' })))
+      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: cloneFrom })
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),

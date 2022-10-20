@@ -34,9 +34,9 @@ const RecordsSummary = () => {
           <span className="icon icon-calendar icon-12px icon-left" />
           <Dropdown
             items={timeRangeItems}
-            selection={timeRangeSelection}
             onChange={(item) => onChangeTimeRange({ timeRange: item.value })}
-            readOnlyInput
+            searchable={false}
+            selection={timeRangeSelection}
           />
         </div>
       </div>

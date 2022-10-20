@@ -24,13 +24,13 @@ const Dropdown = (props) => {
     id,
     idInput: idInputProp,
     itemLabel,
-    itemKey,
+    itemValue,
     items: itemsProp,
     onBeforeChange,
     onChange: onChangeProp,
     placeholder,
     readOnly,
-    readOnlyInput,
+    searchable,
     selection,
     testId,
     title,
@@ -41,7 +41,7 @@ const Dropdown = (props) => {
     useDropdown({
       minCharactersToAutocomplete,
       idInputProp,
-      itemKey,
+      itemValue,
       itemLabel,
       itemsProp,
       onBeforeChange,
@@ -65,7 +65,7 @@ const Dropdown = (props) => {
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
-        isSearchable={!readOnlyInput && !readOnly}
+        isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
         menuIsOpen={menuIsOpen}
@@ -87,13 +87,13 @@ Dropdown.propTypes = {
   id: PropTypes.string,
   idInput: PropTypes.string,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
-  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
-  readOnlyInput: PropTypes.bool,
+  searchable: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   testId: PropTypes.string,
   title: PropTypes.string,
@@ -107,12 +107,12 @@ Dropdown.defaultProps = {
   disabled: false,
   id: null,
   idInput: null,
-  itemKey: 'value',
   itemLabel: 'label',
+  itemValue: 'value',
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
-  readOnlyInput: false,
+  searchable: true,
   selection: null,
   testId: null,
   title: null,

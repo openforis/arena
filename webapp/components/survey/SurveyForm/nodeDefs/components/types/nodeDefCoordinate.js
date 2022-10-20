@@ -126,7 +126,7 @@ const NodeDefCoordinate = (props) => {
       testId={TestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
       readOnly={entryDisabled}
       items={surveySrs}
-      itemKey="code"
+      itemValue="code"
       itemLabel={Srs.getNameAndCode}
       selection={selectedSrs}
       onChange={(selection) => handleInputChange(Node.valuePropsCoordinate.srs, selection?.code)}

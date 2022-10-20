@@ -50,11 +50,11 @@ export const AcceptRequestPanel = (props) => {
       <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.role')}>
         <Dropdown
           items={UserAccessRequestAccept.requestAcceptRoles}
-          itemKey={A.identity}
+          itemValue={A.identity}
           itemLabel={roleLabelFunction}
-          selection={role}
           onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.role, value })}
-          readOnlyInput
+          searchable={false}
+          selection={role}
         />
       </FormItem>
 

@@ -26,9 +26,9 @@ const CycleSelector = (props) => {
     <Dropdown
       className="cycle-selector"
       items={cycleItems}
-      selection={cycleSelection}
       onChange={(item) => onChange(item?.value)}
-      readOnlyInput
+      searchable={false}
+      selection={cycleSelection}
     />
   )
 }

@@ -98,6 +98,7 @@ const Literal = (props) => {
     if (literalSearchParams) {
       return (
         <Dropdown
+          className="dropdown-literal"
           testId={TestId.expressionEditor.literalDropdown}
           items={(value) => loadItems({ ...literalSearchParams, value })}
           onChange={(_item) => onChangeValue(_item ? _item.value : null)}

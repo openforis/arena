@@ -43,7 +43,7 @@ const NodeDefCodeDropdown = (props) => {
         <Dropdown
           clearable
           disabled={disabled}
-          itemKey="uuid"
+          itemValue="uuid"
           itemLabel={itemLabelFunction}
           items={items}
           onChange={(item) => {

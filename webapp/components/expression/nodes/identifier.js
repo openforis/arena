@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 
-import Select from '@webapp/components/form/Select'
+import { Dropdown } from '@webapp/components/form'
 
 const findVariableByValue = ({ variables, value }) => variables.find((variable) => variable.value === value)
 
@@ -36,15 +36,15 @@ const Identifier = ({ node, variables, onChange }) => {
   const variablesFiltered = filterVariablesOrGroups({ variables })
 
   return (
-    <Select
+    <Dropdown
       className="identifier"
-      options={variablesFiltered}
-      value={getSelectedVariable({ variables: variablesFiltered, node })}
+      items={variablesFiltered}
       onChange={(item) => {
         const name = item.value || ''
         const expressionNodeUpdated = { ...node, name }
         onChange(expressionNodeUpdated)
       }}
+      selection={getSelectedVariable({ variables: variablesFiltered, node })}
     />
   )
 }
