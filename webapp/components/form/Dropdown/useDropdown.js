@@ -7,6 +7,7 @@ export const useDropdown = ({
   id,
   idInputProp,
   itemDescription,
+  itemIcon,
   itemLabel,
   itemValue,
   itemsProp,
@@ -27,6 +28,7 @@ export const useDropdown = ({
     propOrFunction.constructor === String ? A.prop(propOrFunction, item) : propOrFunction(item)
 
   const getOptionDescription = useCallback((item) => getProperty(itemDescription)(item), [itemDescription])
+  const getOptionIcon = useCallback((item) => getProperty(itemIcon)(item), [itemIcon])
   const getOptionLabel = useCallback((item) => getProperty(itemLabel)(item), [itemLabel])
   const getOptionValue = useCallback((item) => getProperty(itemValue)(item), [itemValue])
 
@@ -108,11 +110,12 @@ export const useDropdown = ({
   const itemToOption = useCallback(
     (item) => ({
       description: getOptionDescription(item),
+      icon: getOptionIcon(item),
       label: getOptionLabel(item),
       value: getOptionValue(item),
       ...(item.options ? { options: item.options } : {}),
     }),
-    [getOptionDescription, getOptionLabel, getOptionValue]
+    [getOptionDescription, getOptionIcon, getOptionLabel, getOptionValue]
   )
 
   const options = items.map(itemToOption)
@@ -126,7 +129,7 @@ export const useDropdown = ({
   )
 
   const getValue = useCallback(() => {
-    if (A.isEmpty(selection)) return null
+    if (A.isEmpty(selection)) return undefined
 
     if (multiple) {
       // selection is an array of items

@@ -29,10 +29,12 @@ const Dropdown = (props) => {
     minCharactersToAutocomplete,
     className,
     clearable,
+    defaultValue,
     disabled,
     id,
     idInput: idInputProp,
     itemDescription,
+    itemIcon,
     itemLabel,
     itemValue,
     items: itemsProp,
@@ -54,6 +56,7 @@ const Dropdown = (props) => {
       multiple,
       idInputProp,
       itemDescription,
+      itemIcon,
       itemLabel,
       itemValue,
       itemsProp,
@@ -74,6 +77,7 @@ const Dropdown = (props) => {
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent }}
+        defaultValue={defaultValue}
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
@@ -97,10 +101,12 @@ Dropdown.propTypes = {
   minCharactersToAutocomplete: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
+  defaultValue: PropTypes.any,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   idInput: PropTypes.string,
   itemDescription: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item description function or property name
+  itemIcon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
@@ -120,10 +126,12 @@ Dropdown.defaultProps = {
   minCharactersToAutocomplete: 0,
   className: undefined,
   clearable: true,
+  defaultValue: undefined,
   disabled: false,
   id: null,
   idInput: null,
   itemDescription: 'description',
+  itemIcon: 'icon',
   itemLabel: 'label',
   itemValue: 'value',
   multiple: false,

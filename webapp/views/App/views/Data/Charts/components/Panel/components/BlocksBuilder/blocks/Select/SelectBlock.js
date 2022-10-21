@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
+
 import { uuidv4 } from '@core/uuid'
-import Select, { components } from 'react-select'
-import './SelectBlock.scss'
+
+import { Dropdown } from '@webapp/components/form'
 
 const icons = {
   quantitative: <span className="icon-left node_def__icon">1.23</span>,
@@ -13,19 +14,6 @@ const icons = {
     </span>
   ),
   temporal: <span className="icon icon-clock icon-left" />,
-}
-
-const CustomOption = (props) => {
-  const { data, showIcons } = props
-
-  return (
-    <components.Option {...props}>
-      <div className="option">
-        {data.label}
-        {showIcons && icons[data.type]}
-      </div>
-    </components.Option>
-  )
 }
 
 const useOptionsAndDefaultValues = ({ block, dimensions }) => {
@@ -67,6 +55,7 @@ const useDefaultValue = ({ configItemsByPath, flatOptions, block, values, blockP
     }
   }, [configItemsByPath, blockPath, flatOptions])
 }
+
 const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, block, onChange, values }) => {
   const { title, subtitle, id, isMulti, optionsParams = {} } = block
   const { showIcons = true } = optionsParams
@@ -92,26 +81,18 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
     [configActions]
   )
 
-  const renderCustomOption = useCallback(
-    (_props) => {
-      return <CustomOption {..._props} showIcons={showIcons} />
-    },
-    [block]
-  )
-
   return (
     <div className="block block-select">
       <span className="block__title">{title}</span>
       <span className="block__subtitle">{subtitle}</span>
 
       {typeof defaultValues !== 'undefined' && (
-        <Select
-          components={{ Option: renderCustomOption }}
-          isMulti={isMulti}
-          name={id}
-          options={options}
+        <Dropdown
           className="basic-multi-select"
-          classNamePrefix="select"
+          itemIcon={(item) => (showIcons ? icons[item.type] : null)}
+          items={options}
+          multiple={isMulti}
+          name={id}
           onChange={handleChange}
           defaultValue={defaultValues}
         />
