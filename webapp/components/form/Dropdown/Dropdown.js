@@ -29,7 +29,7 @@ const Dropdown = (props) => {
     minCharactersToAutocomplete,
     className,
     clearable,
-    defaultValue,
+    defaultSelection,
     disabled,
     id,
     idInput: idInputProp,
@@ -50,21 +50,32 @@ const Dropdown = (props) => {
     validation,
   } = props
 
-  const { inputId, loading, menuIsOpen, onChange, onInputChange, openMenuOnClick, options, selectRef, value } =
-    useDropdown({
-      minCharactersToAutocomplete,
-      multiple,
-      idInputProp,
-      itemDescription,
-      itemIcon,
-      itemLabel,
-      itemValue,
-      itemsProp,
-      onBeforeChange,
-      onChangeProp,
-      selection,
-      title,
-    })
+  const {
+    defaultValue,
+    inputId,
+    loading,
+    menuIsOpen,
+    onChange,
+    onInputChange,
+    openMenuOnClick,
+    options,
+    selectRef,
+    value,
+  } = useDropdown({
+    defaultSelection,
+    minCharactersToAutocomplete,
+    multiple,
+    idInputProp,
+    itemDescription,
+    itemIcon,
+    itemLabel,
+    itemValue,
+    itemsProp,
+    onBeforeChange,
+    onChangeProp,
+    selection,
+    title,
+  })
 
   return (
     <ValidationTooltip
@@ -101,7 +112,7 @@ Dropdown.propTypes = {
   minCharactersToAutocomplete: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
-  defaultValue: PropTypes.any,
+  defaultSelection: PropTypes.any,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   idInput: PropTypes.string,
@@ -126,7 +137,7 @@ Dropdown.defaultProps = {
   minCharactersToAutocomplete: 0,
   className: undefined,
   clearable: true,
-  defaultValue: undefined,
+  defaultSelection: undefined,
   disabled: false,
   id: null,
   idInput: null,

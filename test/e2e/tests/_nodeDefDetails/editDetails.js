@@ -6,7 +6,7 @@ import { FormUtils } from '../utils/formUtils'
 const editCodeDetails = async (nodeDef) => {
   const category = categories[nodeDef.category]
   // select category
-  await FormUtils.selectDropdownItem({ testId: TestId.categorySelector.category, value: category.uuid })
+  await FormUtils.selectDropdownItem({ testId: TestId.categorySelector.dropdown, value: category.uuid })
 
   if (nodeDef.parent) {
     // select parent

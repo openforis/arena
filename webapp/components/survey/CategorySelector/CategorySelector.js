@@ -104,7 +104,7 @@ export const CategorySelector = (props) => {
   return (
     <div className="category-selector">
       <Dropdown
-        testId={TestId.categorySelector.category}
+        testId={TestId.categorySelector.dropdown}
         disabled={disabled}
         items={categoriesLookupFunction}
         itemValue={Category.keys.uuid}

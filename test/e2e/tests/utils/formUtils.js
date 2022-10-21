@@ -11,12 +11,16 @@ const getDropdownValueSelector = ({ testId = null, parentSelector = '' }) =>
 const selectDropdownItem = async ({ testId = null, parentSelector = '', value = null, label = null }) => {
   const dropdownSelector = getDropdownSelector({ testId, parentSelector })
   const inputSelector = `${dropdownSelector} .dropdown__input`
+
   if (await page.isEditable(inputSelector)) {
+    // open dropdown menu
     const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
-    await page.click(toggleBtnSelector)
+    await page.locator(toggleBtnSelector).last().click()
     if (value) {
+      // select dropdown option by test id
       await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
     } else if (label) {
+      // select dropdown option by label
       await page.click(`text="${label}"`)
     }
   }

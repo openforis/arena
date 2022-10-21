@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as A from '@core/arena'
 
 export const useDropdown = ({
-  minCharactersToAutocomplete,
+  defaultSelection,
   id,
   idInputProp,
   itemDescription,
@@ -11,6 +11,7 @@ export const useDropdown = ({
   itemLabel,
   itemValue,
   itemsProp,
+  minCharactersToAutocomplete,
   multiple,
   onBeforeChange,
   onChangeProp,
@@ -128,24 +129,29 @@ export const useDropdown = ({
     [options]
   )
 
-  const getValue = useCallback(() => {
-    if (A.isEmpty(selection)) return undefined
+  const selectionToValue = useCallback(
+    (sel) => {
+      if (A.isEmpty(sel)) return undefined
 
-    if (multiple) {
-      // selection is an array of items
-      return selection.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
-    }
-    // selection is a single item
-    return findOptionByValue(getOptionValue(selection))
-  }, [findOptionByValue, getOptionValue, multiple, selection])
+      if (multiple) {
+        // selection is an array of items
+        return sel.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
+      }
+      // selection is a single item
+      return findOptionByValue(getOptionValue(sel))
+    },
+    [findOptionByValue, getOptionValue, multiple]
+  )
 
-  const value = getValue()
+  const defaultValue = selectionToValue(defaultSelection)
+  const value = selectionToValue(selection)
 
   // prevent menu opening when readOnly is true
   const openMenuOnClick = !readOnly && searchMinCharsReached
   const menuIsOpen = readOnly || !searchMinCharsReached ? false : undefined
 
   return {
+    defaultValue,
     inputId,
     loading,
     menuIsOpen,
