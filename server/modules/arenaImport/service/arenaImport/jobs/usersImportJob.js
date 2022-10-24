@@ -86,16 +86,16 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
   return userAlreadyExisting || user
 }
 
-const insertInvitations = async ({ survey, arenaSurveyFileZip, user, userUuidNewByUserUuid }, client) => {
+const insertInvitations = async ({ survey, arenaSurveyFileZip, user, newUserUuidByOldUuid }, client) => {
   const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
   if (userInvitations.length > 0) {
     // exclude invitations with user not in users list (user invited that never accepted the invitation)
     const userInvitationsValid = []
     userInvitations.forEach((userInvitation) => {
-      const userUuidNew = userUuidNewByUserUuid[UserInvitation.getUserUuid(userInvitation)]
-      if (userUuidNew) {
-        const invitedBy = userUuidNewByUserUuid[UserInvitation.getInvitedBy(userInvitation)] || User.getUuid(user)
-        userInvitationsValid.push({ ...userInvitation, userUuid: userUuidNew, invitedBy })
+      const newUserUuid = newUserUuidByOldUuid[UserInvitation.getUserUuid(userInvitation)]
+      if (newUserUuid) {
+        const invitedBy = newUserUuidByOldUuid[UserInvitation.getInvitedBy(userInvitation)] || User.getUuid(user)
+        userInvitationsValid.push({ ...userInvitation, userUuid: newUserUuid, invitedBy })
       }
     })
     if (userInvitationsValid.length > 0) {
@@ -127,13 +127,13 @@ export default class UsersImportJob extends Job {
       users.map(async (user) => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
     )
     // map of user uuids in the db by user uuid in the zip file being imported (users could be already inserted in the db with a different uuid)
-    const userUuidNewByUserUuid = users.reduce(
+    const newUserUuidByOldUuid = users.reduce(
       (acc, user, index) => ({ ...acc, [User.getUuid(user)]: User.getUuid(insertedUsers[index]) }),
       {}
     )
 
-    await insertInvitations({ survey, arenaSurveyFileZip, user, userUuidNewByUserUuid }, this.tx)
+    await insertInvitations({ survey, arenaSurveyFileZip, user, newUserUuidByOldUuid }, this.tx)
 
-    this.setContext({ users, includingUsers, userUuidNewByUserUuid })
+    this.setContext({ users, includingUsers, newUserUuidByOldUuid })
   }
 }
