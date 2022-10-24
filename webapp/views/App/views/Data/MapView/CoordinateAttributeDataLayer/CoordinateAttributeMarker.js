@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { CircleMarker, Tooltip } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -37,19 +37,9 @@ export const CoordinateAttributeMarker = (props) => {
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
   const circleRef = useRef()
-  const tooltipRef = useRef()
 
   const options = useMapContextOptions()
   const { showMarkersLabels, showLocationMarkers } = options
-
-  const onTooltipOpen = useCallback(() => {
-    // set tooltip style
-    const customStyle = {
-      backgroundColor: markersColor,
-      color: Colors.getHighContrastTextColor(markersColor),
-    }
-    Object.assign(tooltipRef.current._container.style, customStyle)
-  }, [markersColor])
 
   useEffect(() => {
     const circleMarker = circleRef.current
@@ -57,9 +47,23 @@ export const CoordinateAttributeMarker = (props) => {
       fill: showLocationMarkers,
       stroke: showLocationMarkers,
     })
+    if (showMarkersLabels && !circleMarker.isTooltipOpen()) {
+      circleMarker.toggleTooltip()
+    }
     setRef(parentUuid, circleRef)
-  }, [showLocationMarkers, circleRef])
+  }, [circleRef, showLocationMarkers, showMarkersLabels])
 
+  const tooltipEventHandlers = {
+    add: (e) => {
+      const tooltip = e.target
+      // set tooltip style
+      const customStyle = {
+        backgroundColor: markersColor,
+        color: Colors.getHighContrastTextColor(markersColor),
+      }
+      Object.assign(tooltip._container.style, customStyle)
+    },
+  }
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
@@ -73,12 +77,12 @@ export const CoordinateAttributeMarker = (props) => {
       >
         {showMarkersLabels && (
           <Tooltip
-            ref={tooltipRef}
+            eventHandlers={tooltipEventHandlers}
             direction="top"
+            interactive
             offset={[0, -10]}
             opacity={tooltipOpacity}
             permanent
-            onOpen={onTooltipOpen}
           >
             {ancestorsKeys.join(' - ')}
           </Tooltip>
