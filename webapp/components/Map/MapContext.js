@@ -25,11 +25,17 @@ const MapContextProvider = ({ children }) => {
   const sampleBasedImageInterpretationEnabled = Survey.isSampleBasedImageInterpretationEnabled(survey)
   const [contextObject, setContextObject] = useState(createInitialState({ sampleBasedImageInterpretationEnabled }))
 
+  const onOptionUpdate = ({ option, value }) =>
+    setContextObject((contextPrev) => {
+      const optionsPrev = contextPrev.options
+      const optionsNext = MapOptions.assocOption({ option, value })(optionsPrev)
+      return { ...contextPrev, options: optionsNext }
+    })
+
   // Context values passed to consumer
   const value = {
     contextObject,
-    onOptionUpdate: ({ option, value }) =>
-      setContextObject((contextPrev) => ({ ...contextPrev, options: { ...contextPrev.options, [option]: value } })),
+    onOptionUpdate,
     onBaseLayerUpdate: (baseLayer) => setContextObject((contextPrev) => ({ ...contextPrev, baseLayer })),
   }
 
