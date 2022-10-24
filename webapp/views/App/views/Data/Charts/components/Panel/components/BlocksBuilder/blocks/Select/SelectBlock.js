@@ -94,7 +94,7 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
           multiple={isMulti}
           name={id}
           onChange={handleChange}
-          defaultValue={defaultValues}
+          defaultSelection={defaultValues}
         />
       )}
       <span className="block__number-options">{flatOptions.length} Option(s)</span>
