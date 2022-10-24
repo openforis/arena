@@ -19,8 +19,23 @@ const createDefaultOptions = ({ sampleBasedImageInterpretationEnabled = false } 
   [keys.showSamplingPolygon]: sampleBasedImageInterpretationEnabled,
 })
 
+const assocOption =
+  ({ option, value }) =>
+  (options) => {
+    const optionsUpdated = { ...options, [option]: value }
+    if (option === keys.showLocationMarkers && !value) {
+      // when location markers are hidden, hide even markers' labels
+      optionsUpdated[keys.showMarkersLabels] = false
+    }
+    return optionsUpdated
+  }
+
 export const MapOptions = {
-  createDefaultOptions,
   keys,
+  // create
+  createDefaultOptions,
+  // read
   isOnlyForSampleBasedImageInterpretation,
+  // update
+  assocOption,
 }
