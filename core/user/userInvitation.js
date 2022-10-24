@@ -8,6 +8,8 @@ const keys = {
   removedDate: 'removedDate',
 }
 
+const getUserUuid = A.prop(keys.userUuid)
+const getInvitedBy = A.prop(keys.invitedBy)
 const getRemovedDate = A.prop(keys.removedDate)
 
 const hasBeenRemoved = (userInvitation) => {
@@ -17,5 +19,7 @@ const hasBeenRemoved = (userInvitation) => {
 
 export const UserInvitation = {
   keys,
+  getUserUuid,
+  getInvitedBy,
   hasBeenRemoved,
 }

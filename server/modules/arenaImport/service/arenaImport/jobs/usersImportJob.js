@@ -1,6 +1,7 @@
 import Job from '@server/job/job'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
+import { UserInvitation } from '@core/user/userInvitation'
 import * as Survey from '@core/survey/survey'
 
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -85,6 +86,24 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
   return userAlreadyExisting || user
 }
 
+const insertInvitations = async ({ survey, arenaSurveyFileZip, user, userUuidNewByUserUuid }, client) => {
+  const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
+  if (userInvitations.length > 0) {
+    // exclude invitations with user not in users list (user invited that never accepted the invitation)
+    const userInvitationsValid = []
+    userInvitations.forEach((userInvitation) => {
+      const userUuidNew = userUuidNewByUserUuid[UserInvitation.getUserUuid(userInvitation)]
+      if (userUuidNew) {
+        const invitedBy = userUuidNewByUserUuid[UserInvitation.getInvitedBy(userInvitation)] || User.getUuid(user)
+        userInvitationsValid.push({ ...userInvitation, userUuid: userUuidNew, invitedBy })
+      }
+    })
+    if (userInvitationsValid.length > 0) {
+      await UserInvitationsRepository.insertManyBatch({ survey, userInvitations: userInvitationsValid }, client)
+    }
+  }
+}
+
 /**
  * Inserts a taxonomy for each taxonomy
  * Saves the list of inserted taxonomies in the "taxonomies" context property.
@@ -95,7 +114,7 @@ export default class UsersImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip, surveyId, arenaSurvey, survey } = this.context
+    const { arenaSurveyFileZip, surveyId, arenaSurvey, survey, user } = this.context
 
     const users = await ArenaSurveyFileZip.getUsers(arenaSurveyFileZip)
     const includingUsers = users.length > 0
@@ -113,10 +132,7 @@ export default class UsersImportJob extends Job {
       {}
     )
 
-    const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
-    if (userInvitations.length > 0) {
-      await UserInvitationsRepository.insertManyBatch({ survey, userInvitations }, this.tx)
-    }
+    await insertInvitations({ survey, arenaSurveyFileZip, user, userUuidNewByUserUuid }, this.tx)
 
     this.setContext({ users, includingUsers, userUuidNewByUserUuid })
   }
