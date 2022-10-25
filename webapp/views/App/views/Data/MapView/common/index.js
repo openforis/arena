@@ -1,3 +1,5 @@
-export { ClusterMarker } from './ClusterMarker'
-export { useMapClusters } from './useMapClusters'
+import MarkerClusterGroup from './MarkerClusterGroup'
+
 export { useMapLayerAdd } from './useMapLayerAdd'
+
+export { MarkerClusterGroup }

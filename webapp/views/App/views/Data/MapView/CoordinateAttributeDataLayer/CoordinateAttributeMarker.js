@@ -30,10 +30,6 @@ export const CoordinateAttributeMarker = (props) => {
     setRef,
   } = props
 
-  ancestorsKeys.propTypes = {
-    join: PropTypes.any,
-  }
-
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
   const circleRef = useRef()
@@ -47,9 +43,6 @@ export const CoordinateAttributeMarker = (props) => {
       fill: showLocationMarkers,
       stroke: showLocationMarkers,
     })
-    if (showMarkersLabels && !circleMarker.isTooltipOpen()) {
-      circleMarker.toggleTooltip()
-    }
     setRef(parentUuid, circleRef)
   }, [circleRef, showLocationMarkers, showMarkersLabels])
 

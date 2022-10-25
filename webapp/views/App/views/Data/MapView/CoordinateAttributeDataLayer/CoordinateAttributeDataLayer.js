@@ -1,16 +1,15 @@
 import React, { useCallback, useRef } from 'react'
-import { LayerGroup, LayersControl } from 'react-leaflet'
+import { LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { ClusterMarker } from '../common'
+import { MarkerClusterGroup } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
 
-  const { layerName, clusters, clusterExpansionZoomExtractor, clusterIconCreator, totalPoints, points } =
-    useCoordinateAttributeDataLayer(props)
+  const { layerName, points } = useCoordinateAttributeDataLayer(props)
 
   // Have a Reference to points for opening popups automatically
   let markerRefs = useRef([])
@@ -37,32 +36,19 @@ export const CoordinateAttributeDataLayer = (props) => {
     (parentUuid, ref) => {
       if (ref != null) markerRefs.current[parentUuid] = ref.current
     },
-    [clusters]
+    [points]
   )
 
   return (
     <LayersControl.Overlay name={layerName}>
-      <LayerGroup>
-        {clusters.map((cluster) => {
-          // the point may be either a cluster or a node value point
-          const { cluster: isCluster, key, recordUuid, parentUuid, point, ancestorsKeys } = cluster.properties
+      <MarkerClusterGroup markersColor={markersColor}>
+        {points.map((pointFeature) => {
+          const { geometry, properties } = pointFeature
+          const { key } = properties
 
-          // we have a cluster to render
-          if (isCluster) {
-            return (
-              <ClusterMarker
-                key={cluster.id}
-                cluster={cluster}
-                color={markersColor}
-                clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
-                clusterIconCreator={clusterIconCreator}
-                totalPoints={totalPoints}
-              />
-            )
-          }
-          const [longitude, latitude] = cluster.geometry.coordinates
+          const { recordUuid, parentUuid, ancestorsKeys, point } = properties
+          const [longitude, latitude] = geometry.coordinates
 
-          // we have a single point (node value) to render
           return (
             <CoordinateAttributeMarker
               key={key}
@@ -73,8 +59,8 @@ export const CoordinateAttributeDataLayer = (props) => {
               markersColor={markersColor}
               parentUuid={parentUuid}
               point={point}
-              onRecordEditClick={onRecordEditClick}
               recordUuid={recordUuid}
+              onRecordEditClick={onRecordEditClick}
               getNextPoint={getNextPoint}
               getPreviousPoint={getPreviousPoint}
               openPopupOfUuid={openPopupOfUuid}
@@ -82,7 +68,7 @@ export const CoordinateAttributeDataLayer = (props) => {
             />
           )
         })}
-      </LayerGroup>
+      </MarkerClusterGroup>
     </LayersControl.Overlay>
   )
 }

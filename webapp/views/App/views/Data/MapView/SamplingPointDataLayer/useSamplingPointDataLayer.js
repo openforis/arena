@@ -13,7 +13,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapLayerAdd } from '../common'
 
 const itemsPageSize = 2000
 
@@ -29,7 +29,7 @@ const _convertItemsToPoints = (items) => {
 
     return {
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, location },
+      properties: { itemUuid, itemCodes, itemPoint, location },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
@@ -135,13 +135,9 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [])
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
   return {
-    clusters,
-    clusterExpansionZoomExtractor,
-    clusterIconCreator,
-    overlayName,
-    totalPoints: points.length,
     items,
+    overlayName,
+    points,
   }
 }

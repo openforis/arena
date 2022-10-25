@@ -1,5 +1,4 @@
 @import 'leaflet/dist/leaflet.css';
-@import 'react-leaflet-markercluster/dist/styles.min.css';
 
 .panel-right {
   &.map-panel > * {
@@ -105,12 +104,16 @@
 
   .cluster-marker {
     color: #fff;
-    border-radius: 50%;
-    padding: 10px;
-    width: 10px;
-    height: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+    .cluster-marker-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      border-style: solid;
+      border-width: 5px;
+    }
   }
 }

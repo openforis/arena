@@ -1,8 +1,8 @@
 import React, { useRef } from 'react'
-import { CircleMarker, LayersControl, LayerGroup } from 'react-leaflet'
+import { CircleMarker, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { ClusterMarker } from '../common'
+import { MarkerClusterGroup } from '../common'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
@@ -11,8 +11,7 @@ const markerRadius = 10
 export const SamplingPointDataLayer = (props) => {
   const { markersColor } = props
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints, items } =
-    useSamplingPointDataLayer(props)
+  const { overlayName, items, points } = useSamplingPointDataLayer(props)
 
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
@@ -36,25 +35,11 @@ export const SamplingPointDataLayer = (props) => {
 
   return (
     <LayersControl.Overlay name={overlayName}>
-      <LayerGroup>
-        {clusters.map((cluster) => {
-          // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid, itemCodes, location } = cluster.properties
-
-          // we have a cluster to render
-          if (isCluster) {
-            return (
-              <ClusterMarker
-                key={cluster.id}
-                cluster={cluster}
-                clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
-                clusterIconCreator={clusterIconCreator}
-                color={markersColor}
-                totalPoints={totalPoints}
-              />
-            )
-          }
-          const [longitude, latitude] = cluster.geometry.coordinates
+      <MarkerClusterGroup markersColor={markersColor}>
+        {points.map((pointFeature) => {
+          const { geometry, properties } = pointFeature
+          const { itemUuid, itemCodes, location } = properties
+          const [longitude, latitude] = geometry.coordinates
 
           // we have a single point (sampling point item) to render
           return (
@@ -78,7 +63,7 @@ export const SamplingPointDataLayer = (props) => {
             </CircleMarker>
           )
         })}
-      </LayerGroup>
+      </MarkerClusterGroup>
     </LayersControl.Overlay>
   )
 }

@@ -13,7 +13,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useWebSocket } from '@webapp/components/hooks'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapLayerAdd } from '../common'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 import { convertDataToPoints } from './convertDataToPoints'
 
@@ -123,14 +123,8 @@ export const useCoordinateAttributeDataLayer = (props) => {
     setState,
   })
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
-
   return {
     layerName,
-    clusters,
-    clusterExpansionZoomExtractor,
-    clusterIconCreator,
-    totalPoints: points.length,
-    points
+    points,
   }
 }
