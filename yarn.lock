@@ -7608,7 +7608,7 @@ leaflet-geometryutil@^0.10.1:
   dependencies:
     leaflet "^1.6.0"
 
-leaflet-side-by-side@^2.2.0:
+leaflet-side-by-side@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/leaflet-side-by-side/-/leaflet-side-by-side-2.2.0.tgz#f5f19a995a693086073c1ec48a0513146147bfed"
   integrity sha512-JLN9dUoQgSJcZWowOOG19s4zpHasZfGsBeJ/ceObJ1f7vQ0OGGvx564yH7+JOF/zk1zNDi1RYjeJZUwVCC7YNA==
