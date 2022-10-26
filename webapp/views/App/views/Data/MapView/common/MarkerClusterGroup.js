@@ -48,7 +48,12 @@ const MarkerClusterGroup = (props) => {
 MarkerClusterGroup.propTypes = {
   children: PropTypes.node,
   markersColor: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
+}
+
+MarkerClusterGroup.defaultProps = {
+  onClick: undefined,
+  children: undefined,
 }
 
 export default MarkerClusterGroup
