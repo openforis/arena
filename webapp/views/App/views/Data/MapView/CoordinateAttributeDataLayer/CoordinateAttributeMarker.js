@@ -57,12 +57,14 @@ export const CoordinateAttributeMarker = (props) => {
       Object.assign(tooltip._container.style, customStyle)
     },
   }
+
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       <CircleMarker
         ref={circleRef}
         center={[latitude, longitude]}
+        data={{ ancestorsKeys, recordUuid }}
         radius={markerRadius}
         color={markersColor}
         fillColor={markersColor}

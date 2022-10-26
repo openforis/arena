@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -89,21 +89,24 @@ export const CoordinateAttributePopUp = (props) => {
   const i18n = useI18n()
   const map = useMap()
 
-  const flyTo = (latlng, point) => {
-    map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
-    map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
-  }
-  const onClickNext = () => {
-    const nextPoint = getNextPoint(parentUuid)
-    const latlng = nextPoint.geometry.coordinates
-    flyTo(latlng, nextPoint)
-  }
+  const flyTo = useCallback(
+    (point) => {
+      const [lat, lng] = point.geometry.coordinates
+      map.flyTo([lng, lat], map.getMaxZoom())
+      map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
+    },
+    [map, openPopupOfUuid]
+  )
 
-  const onClickPrevious = () => {
+  const onClickNext = useCallback(() => {
+    const nextPoint = getNextPoint(parentUuid)
+    flyTo(nextPoint)
+  }, [flyTo, getNextPoint, parentUuid])
+
+  const onClickPrevious = useCallback(() => {
     const previousPoint = getPreviousPoint(parentUuid)
-    const latlng = previousPoint.geometry.coordinates
-    flyTo(latlng, previousPoint)
-  }
+    flyTo(previousPoint)
+  }, [flyTo, getPreviousPoint, parentUuid])
 
   return (
     <Popup>

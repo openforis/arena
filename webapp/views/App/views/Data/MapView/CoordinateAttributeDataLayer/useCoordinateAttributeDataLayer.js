@@ -106,7 +106,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
           }
         }
       },
-      [setState, editingRecordUuid, query]
+      [editingRecordUuid, attributeDef]
     ),
   })
 

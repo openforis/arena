@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
-import LeafletCluster from 'react-leaflet-cluster'
+import LeafletMarkerClusterGroup from 'react-leaflet-markercluster'
 import PropTypes from 'prop-types'
 import L from 'leaflet'
 
 import { Colors } from '@webapp/utils/colors'
 
 const MarkerClusterGroup = (props) => {
-  const { markersColor, children } = props
+  const { markersColor, children, onClick } = props
 
   const clusterIconsCache = useMemo(() => ({}), [markersColor])
 
@@ -20,9 +20,10 @@ const MarkerClusterGroup = (props) => {
 
         const backgroundColor = `${markersColor}ee`
         const borderColor = `${markersColor}aa`
+        const style = `border-color: ${borderColor}; background-color: ${backgroundColor}; color: ${textColor}`
 
         clusterIconsCache[count] = L.divIcon({
-          html: `<span class="cluster-marker-content" style="border-color: ${borderColor}; background-color: ${backgroundColor}; color: ${textColor}">${count}</span>`,
+          html: `<span class="cluster-marker-content" style="${style}">${count}</span>`,
           className: 'cluster-marker',
           iconSize: L.point(clusterIconSize, clusterIconSize, true),
         })
@@ -33,15 +34,21 @@ const MarkerClusterGroup = (props) => {
   )
 
   return (
-    <LeafletCluster chunkedLoading zoomToBoundsOnClick iconCreateFunction={iconCreateFunction}>
+    <LeafletMarkerClusterGroup
+      chunkedLoading
+      zoomToBoundsOnClick
+      iconCreateFunction={iconCreateFunction}
+      onClick={onClick}
+    >
       {children}
-    </LeafletCluster>
+    </LeafletMarkerClusterGroup>
   )
 }
 
 MarkerClusterGroup.propTypes = {
-  markersColor: PropTypes.string.isRequired,
   children: PropTypes.node,
+  markersColor: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
 }
 
 export default MarkerClusterGroup

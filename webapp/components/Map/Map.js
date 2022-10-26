@@ -46,7 +46,15 @@ export const Map = (props) => {
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
 
       <MapContextProvider>
-        <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={4} eventHandlers={mapEventHandlers}>
+        <MapContainer
+          center={centerPositionLatLon}
+          doubleClickZoom={false}
+          zoom={4}
+          eventHandlers={mapEventHandlers}
+          whenCreated={(map) => {
+            window.arenaMap = map // hook to get the leaflet map object statically
+          }}
+        >
           <ScaleControl position="topleft" />
           <MapLayersControl layers={layers} />
           <MapMarker

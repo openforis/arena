@@ -47,7 +47,7 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancesto
 
       acc.points.push({
         type: 'Feature',
-        properties: { key, cluster: false, point, recordUuid, parentUuid, location, ancestorsKeys },
+        properties: { key, point, recordUuid, parentUuid, location, ancestorsKeys },
         geometry: {
           type: 'Point',
           coordinates: [long, lat],
