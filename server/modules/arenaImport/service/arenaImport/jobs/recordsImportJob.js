@@ -28,7 +28,7 @@ export default class RecordsImportJob extends Job {
       survey,
       arenaSurveyFileZip,
       includingUsers,
-      userUuidNewByUserUuid,
+      newUserUuidByOldUuid,
       mobile,
     } = this.context
     const surveyId = mobile ? Survey.getId(survey) : _surveyId
@@ -64,7 +64,7 @@ export default class RecordsImportJob extends Job {
       if (!mobile) {
         const ownerUuid = includingUsers
           ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
-            userUuidNewByUserUuid[Record.getOwnerUuid(record)]
+            newUserUuidByOldUuid[Record.getOwnerUuid(record)]
           : // ignore owner in imported file; consider current user as owner
             User.getUuid(this.user)
         record = Record.assocOwnerUuid(ownerUuid)(record)
