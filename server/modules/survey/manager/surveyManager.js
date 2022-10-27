@@ -230,18 +230,10 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   )(survey)
 }
 
-export const fetchUserSurveysInfo = async ({
-  user,
-  draft = true,
-  template = false,
-  offset,
-  limit,
-  lang,
-  search,
-  sortBy,
-  sortOrder,
-  includeCounts = false,
-}) => {
+export const fetchUserSurveysInfo = async (
+  { user, draft = true, template = false, offset, limit, lang, search, sortBy, sortOrder, includeCounts = false },
+  client = db
+) => {
   // check sortBy is valid
   if (sortBy && !Object.values(Survey.sortableKeys).includes(sortBy)) {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
@@ -250,35 +242,38 @@ export const fetchUserSurveysInfo = async ({
   if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
     throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
-  const surveys = (
-    await SurveyRepository.fetchUserSurveys({
-      user,
-      draft,
-      template,
-      offset,
-      limit,
-      lang,
-      search,
-      sortBy,
-      sortOrder,
-    })
-  ).map(assocSurveyInfo)
+  return client.tx(async (tx) => {
+    const surveys = (
+      await SurveyRepository.fetchUserSurveys({
+        user,
+        draft,
+        template,
+        offset,
+        limit,
+        lang,
+        search,
+        sortBy,
+        sortOrder,
+      })
+    ).map(assocSurveyInfo)
 
-  if (!includeCounts) {
-    return surveys
-  }
-
-  return Promise.all(
-    surveys.map(async (survey) => {
-      const surveyId = Survey.getId(survey)
-      return {
-        ...survey,
-        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
-        recordsCount: Survey.canHaveData(survey) ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
-        chainsCount: await ChainRepository.countChains({ surveyId }),
-      }
-    })
-  )
+    if (!includeCounts) {
+      return surveys
+    }
+    return Promise.all(
+      surveys.map(async (survey) => {
+        const surveyId = Survey.getId(survey)
+        return {
+          ...survey,
+          nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
+          recordsCount: Survey.canHaveData(survey)
+            ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx)
+            : 0,
+          chainsCount: await ChainRepository.countChains({ surveyId }, tx),
+        }
+      })
+    )
+  })
 }
 
 // ====== UPDATE
