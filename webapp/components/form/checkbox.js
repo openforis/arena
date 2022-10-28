@@ -1,10 +1,22 @@
-import React from 'react'
+import './checkbox.scss'
+
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import ValidationTooltip from '../validationTooltip'
+import { useI18n } from '@webapp/store/system'
+import { Objects } from '@openforis/arena-core'
 
 const Checkbox = (props) => {
-  const { id, validation, checked, label, onChange, disabled, radio } = props
+  const { id, validation, checked, label, onChange: onChangeProp, disabled, radio } = props
+
+  const i18n = useI18n()
+
+  const onChange = useCallback((e) => onChangeProp?.(e.target.checked), [onChangeProp])
+
+  const hasLabel = !Objects.isEmpty(label)
+  const classNameIcon = `icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked`
+  const className = `icon icon-18px ${classNameIcon}${hasLabel ? ' icon-left' : ''}`
 
   return (
     <div style={{ justifySelf: 'start' }}>
@@ -13,11 +25,11 @@ const Checkbox = (props) => {
           type="button"
           data-testid={id}
           className="btn btn-s btn-transparent btn-checkbox"
-          onClick={() => onChange?.(!checked)}
+          onClick={onChange}
           aria-disabled={disabled}
         >
-          <span className={`icon icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked icon-18px`} />
-          {label}
+          <span className={className} />
+          {i18n.t(label)}
         </button>
       </ValidationTooltip>
     </div>

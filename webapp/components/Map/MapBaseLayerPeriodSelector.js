@@ -12,7 +12,8 @@ import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 
 import { baseLayerUrlByProviderFunction } from './baseLayers'
-import { useMapContext, useMapContextBaseLayer } from './MapContext'
+import { useMapContextBaseLayer } from './MapContext'
+import { Checkbox } from '../form'
 
 const getPeriodValue = (period) => {
   const { year, month, yearTo } = period
@@ -29,12 +30,13 @@ const Proc = {
   cir: 'cir',
 }
 
+const PERIOD_EMPTY_VALUE = ''
+
 let sideBySideObject = null
 
 export const MapBaseLayerPeriodSelector = () => {
   const map = useMap()
   const contextBaseLayer = useMapContextBaseLayer()
-  const { onBaseLayerUpdate } = useMapContext()
   const { periodSelectorAvailable, provider, periodType } = contextBaseLayer
 
   const i18n = useI18n()
@@ -45,10 +47,8 @@ export const MapBaseLayerPeriodSelector = () => {
     periodByValue: {},
     selectedPeriodValueLeft: null,
     selectedPeriodValueRight: null,
-    leftChecked: false,
-    rightChecked: false,
-    procLeft: Proc.rgb,
-    procRight: Proc.rgb,
+    falseColorLeftChecked: false,
+    falseColorRightChecked: false,
   })
 
   const apiKey = User.getMapApiKey({ provider })(user)
@@ -59,39 +59,17 @@ export const MapBaseLayerPeriodSelector = () => {
     periodByValue,
     selectedPeriodValueLeft,
     selectedPeriodValueRight,
-    leftChecked,
-    rightChecked,
-    procLeft,
-    procRight,
+    falseColorLeftChecked,
+    falseColorRightChecked,
   } = state
 
-  const getLayer = (isLeft) => {
-    if (isLeft) {
-      return Object.values(map._layers).find((layer) => layer.options.id !== 'right')
-    } else {
-      return Object.values(map._layers).find((layer) => layer.options.id === 'right')
-    }
-  }
-  const initSideBySide = () => {
-    const layerLeft = getLayer(true)
-    const layerRight = getLayer(false)
-    if (layerLeft && layerRight) {
-      sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
-      const url = baseLayerUrlByProviderFunction[provider]({ selectedPeriodValueRight, apiKey })
-      onBaseLayerUpdate({ ...contextBaseLayer, url })
-    }
-  }
+  const procLeft = falseColorLeftChecked ? Proc.cir : Proc.rgb
+  const procRight = falseColorRightChecked ? Proc.cir : Proc.rgb
 
+  // fetch available periods on provider change
   useEffect(() => {
     if (!periodSelectorAvailable || !provider) {
-      if (sideBySideObject != null) {
-        sideBySideObject.remove()
-        sideBySideObject = null
-      }
       return
-    }
-    if (sideBySideObject == null) {
-      initSideBySide()
     }
     ;(async () => {
       const availablePeriods = await API.fetchAvailableMapPeriods({
@@ -104,68 +82,106 @@ export const MapBaseLayerPeriodSelector = () => {
         periods: availablePeriods,
         periodByValue: availablePeriods.reduce((acc, period) => ({ ...acc, [getPeriodValue(period)]: period }), {}),
         selectedPeriodValueLeft: lastPeriodValue,
-        selectedPeriodValueRight: '',
-        procLeft: Proc.rgb,
-        procRight: Proc.rgb,
+        selectedPeriodValueRight: PERIOD_EMPTY_VALUE,
+        falseColorLeftChecked: false,
+        falseColorRightChecked: false,
       })
     })()
-  }, [periodSelectorAvailable, provider, periodType, ready])
+  }, [periodSelectorAvailable, provider, periodType])
 
-  const onMapLayerPeriodChange = useCallback(
-    (isLeft) => (event) => {
-      const periodValue = event.target.value
-      // replace url in current layer
-      let layer
-      if (isLeft) {
-        layer = getLayer(true)
+  const getLayer = useCallback(
+    (isLeft) =>
+      Object.values(map._layers).find(
+        (layer) => (isLeft && layer.options.id !== 'right') || (!isLeft && layer.options.id === 'right')
+      ),
+    [map._layers]
+  )
+
+  const updateSideBySide = useCallback(() => {
+    const layerLeft = getLayer(true)
+    const layerRight = getLayer(false)
+    if (layerLeft && layerRight && selectedPeriodValueLeft && selectedPeriodValueRight) {
+      if (sideBySideObject) {
+        sideBySideObject.setLeftLayers(layerLeft)
+        sideBySideObject.setRightLayers(layerRight)
       } else {
-        layer = getLayer(false)
+        sideBySideObject = L.control.sideBySide(layerLeft, layerRight).addTo(map)
       }
-      if (layer) {
+    } else if (sideBySideObject) {
+      sideBySideObject.remove()
+      sideBySideObject = null
+    }
+  }, [getLayer, map, selectedPeriodValueLeft, selectedPeriodValueRight])
+
+  // update side by side on selections change
+  useEffect(() => {
+    updateSideBySide()
+  }, [
+    updateSideBySide,
+    falseColorLeftChecked,
+    falseColorRightChecked,
+    selectedPeriodValueLeft,
+    selectedPeriodValueRight,
+  ])
+
+  const updateLayer = useCallback(
+    (isLeft) => {
+      const layer = getLayer(isLeft)
+      if (layer && provider) {
+        const periodValue = isLeft ? selectedPeriodValueLeft : selectedPeriodValueRight
         const period = periodByValue[periodValue]
-        let url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
-        url += '&proc=' + (isLeft ? procLeft : procRight)
-        layer.setUrl(url)
-        onBaseLayerUpdate({ ...contextBaseLayer, url })
-        // update state
-        if (isLeft) {
-          setState((statePrev) => ({ ...statePrev, selectedPeriodValueLeft: Number(periodValue) }))
-          sideBySideObject.setLeftLayers(layer)
-        } else {
-          setState((statePrev) => ({ ...statePrev, selectedPeriodValueRight: Number(periodValue) }))
-          sideBySideObject.setRightLayers(layer)
+        const proc = isLeft ? procLeft : procRight
+        const baseLayerUrlFunction = baseLayerUrlByProviderFunction[provider]
+        if (baseLayerUrlFunction) {
+          const url = `${baseLayerUrlFunction({ period, apiKey })}&proc=${proc}`
+          if (layer._url !== url) {
+            layer.setUrl(url)
+          }
         }
       }
     },
-    [map, contextBaseLayer, provider, onBaseLayerUpdate, state]
+    [apiKey, getLayer, periodByValue, procLeft, procRight, provider, selectedPeriodValueLeft, selectedPeriodValueRight]
   )
 
-  const onCheckboxValueChange = (isLeft) => () => {
-    let newProc
-    if (isLeft) {
-      newProc = !leftChecked ? Proc.cir : Proc.rgb
-      setState((statePev) => ({ ...statePev, leftChecked: !statePev.leftChecked, procLeft: newProc }))
-    } else {
-      newProc = !rightChecked ? Proc.cir : Proc.rgb
-      setState((statePev) => ({ ...statePev, rightChecked: !statePev.rightChecked, procRight: newProc }))
-    }
-    const layer = getLayer(isLeft)
-    if (layer) {
-      const periodValue = isLeft ? selectedPeriodValueLeft : selectedPeriodValueRight
-      const period = periodByValue[periodValue]
-      let url = baseLayerUrlByProviderFunction[provider]({ period, apiKey })
-      url += '&proc=' + newProc
-      layer.setUrl(url)
-      onBaseLayerUpdate({ ...contextBaseLayer, url })
-    }
-  }
+  // update layers on selections change
+  useEffect(() => {
+    updateLayer(false)
+  }, [updateLayer, provider, falseColorRightChecked, selectedPeriodValueRight])
+
+  useEffect(() => {
+    updateLayer(true)
+  }, [updateLayer, provider, falseColorLeftChecked, selectedPeriodValueLeft])
+
+  const onMapLayerPeriodChange = useCallback((isLeft, event) => {
+    const value = event.target.value
+    const periodValue = value ? Number(value) : PERIOD_EMPTY_VALUE
+    const prop = isLeft ? 'selectedPeriodValueLeft' : 'selectedPeriodValueRight'
+    setState((statePrev) => ({ ...statePrev, [prop]: periodValue }))
+  }, [])
+
+  const onMapLayerPeriodChangeLeft = useCallback(
+    (event) => onMapLayerPeriodChange(true, event),
+    [onMapLayerPeriodChange]
+  )
+  const onMapLayerPeriodChangeRight = useCallback(
+    (event) => onMapLayerPeriodChange(false, event),
+    [onMapLayerPeriodChange]
+  )
+
+  const toggleFalseColor = useCallback((isLeft) => {
+    const prop = isLeft ? 'falseColorLeftChecked' : 'falseColorRightChecked'
+    setState((statePrev) => ({ ...statePrev, [prop]: !statePrev[prop] }))
+  }, [])
+
+  const toggleFalseColorLeft = useCallback(() => toggleFalseColor(true), [toggleFalseColor])
+  const toggleFalseColorRight = useCallback(() => toggleFalseColor(false), [toggleFalseColor])
 
   if (!periodSelectorAvailable || !provider || !ready) return null
 
   return (
     <div className="leaflet-bottom map-layer-selector-wrapper">
       <div className="period-select-wrapper-left">
-        <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChange(true)}>
+        <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChangeLeft}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
             const label =
@@ -177,17 +193,16 @@ export const MapBaseLayerPeriodSelector = () => {
             )
           })}
         </select>
-        <input
-          type="checkbox"
-          value={leftChecked}
-          onChange={onCheckboxValueChange(true)}
-          id="checkbox-left"
-          name="checkbox-left"
+        <Checkbox
+          checked={falseColorLeftChecked}
+          onChange={toggleFalseColorLeft}
+          label={'mapBaseLayerPeriodSelector.falseColor'}
         />
-        <label htmlFor="checkbox-left">False Color</label>
       </div>
       <div className="period-select-wrapper-right">
-        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChange(false)}>
+        <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChangeRight}>
+          <option value={PERIOD_EMPTY_VALUE}>{i18n.t('mapBaseLayerPeriodSelector.chooseAPeriodToCompareWith')}</option>
+
           {periods.map((period) => {
             const value = getPeriodValue(period)
             const label =
@@ -198,16 +213,14 @@ export const MapBaseLayerPeriodSelector = () => {
               </option>
             )
           })}
-          <option value={''}>Choose a period</option>
         </select>
-        <input
-          type="checkbox"
-          value={rightChecked}
-          onChange={onCheckboxValueChange(false)}
-          id="checkbox-right"
-          name="checkbox-righ"
-        />
-        <label htmlFor="checkbox-right">{i18n.t('mapBaseLayerPeriodSelector.falseColor')}</label>
+        {selectedPeriodValueRight && (
+          <Checkbox
+            checked={falseColorRightChecked}
+            onChange={toggleFalseColorRight}
+            label={'mapBaseLayerPeriodSelector.falseColor'}
+          />
+        )}
       </div>
 
       <TileLayer id={'right'} attribution={''} url={''} maxZoom={17} minZoom={3} />
