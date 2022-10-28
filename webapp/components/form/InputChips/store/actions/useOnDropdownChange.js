@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 
-import * as R from 'ramda'
 import { State } from '../state'
+import { Objects } from '@openforis/arena-core'
 
 const removeDuplicates = ({ items, state }) => {
   const itemsByKey = items.reduce((acc, item) => ({ ...acc, [State.getItemKey(state)(item)]: item }), {})
@@ -11,14 +11,15 @@ const removeDuplicates = ({ items, state }) => {
 
 export const useOnDropdownChange = ({ onChange, onItemAdd }) =>
   useCallback(
-    ({ selection, state }) => (item) => {
-      if (onChange) {
-        const newItems = removeDuplicates({ items: R.append(item)(selection), state })
-        onChange(newItems)
-      }
-      if (onItemAdd) {
-        onItemAdd(item)
-      }
-    },
+    ({ selection, state }) =>
+      (item) => {
+        if (onChange) {
+          const newItems = Objects.isEmpty(item) ? selection : removeDuplicates({ items: [...selection, item], state })
+          onChange(newItems)
+        }
+        if (onItemAdd) {
+          onItemAdd(item)
+        }
+      },
     [onChange, onItemAdd]
   )

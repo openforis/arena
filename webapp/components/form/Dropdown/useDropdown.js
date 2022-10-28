@@ -131,7 +131,8 @@ export const useDropdown = ({
 
   const selectionToValue = useCallback(
     (sel) => {
-      if (A.isEmpty(sel)) return undefined
+      if (sel === null) return null // force resetting selection
+      if (A.isEmpty(sel)) return undefined // allows using defaultSelection, if specified
 
       if (multiple) {
         // selection is an array of items
