@@ -12,7 +12,7 @@ const Checkbox = (props) => {
 
   const i18n = useI18n()
 
-  const onChange = useCallback((e) => onChangeProp?.(e.target.checked), [onChangeProp])
+  const onChange = useCallback(() => onChangeProp?.(!checked), [onChangeProp, checked])
 
   const hasLabel = !Objects.isEmpty(label)
   const classNameIcon = `icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked`
