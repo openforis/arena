@@ -55,11 +55,7 @@ const extractCoordinateValueAndMeta = (collectNode) => {
     const srsId = R.ifElse(R.isEmpty, R.identity, R.pipe(R.split(':'), R.last))(srs)
 
     return {
-      value: {
-        [Node.valuePropsCoordinate.x]: x,
-        [Node.valuePropsCoordinate.y]: y,
-        [Node.valuePropsCoordinate.srs]: srsId,
-      },
+      value: Node.newNodeValueCoordinate({ x: Number(x), y: Number(y), srsId }),
     }
   }
 
@@ -149,6 +145,21 @@ const extractTimeValueAndMeta = (collectNode) => {
   return { value }
 }
 
+const valueAndMetaExtractorByType = {
+  [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
+  [nodeDefType.code]: ({ collectNode, survey, nodeDef, record, node }) =>
+    extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode),
+  [nodeDefType.coordinate]: ({ collectNode }) => extractCoordinateValueAndMeta(collectNode),
+  [nodeDefType.date]: ({ collectNode }) => extractDateValueAndMeta(collectNode),
+  [nodeDefType.decimal]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
+  [nodeDefType.file]: ({ collectNode, survey, node, collectSurveyFileZip, collectNodeDef, tx }) =>
+    extractFileValueAndMeta(survey, node, collectSurveyFileZip, collectNodeDef, tx)(collectNode),
+  [nodeDefType.integer]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
+  [nodeDefType.taxon]: ({ collectNode, survey, nodeDef }) => extractTaxonValueAndMeta(survey, nodeDef)(collectNode),
+  [nodeDefType.text]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
+  [nodeDefType.time]: ({ collectNode }) => extractTimeValueAndMeta(collectNode),
+}
+
 export const extractAttributeValueAndMeta = async ({
   survey,
   nodeDef,
@@ -160,32 +171,19 @@ export const extractAttributeValueAndMeta = async ({
   collectNodeField, // Collect items
   tx,
 }) => {
-  switch (NodeDef.getType(nodeDef)) {
-    case nodeDefType.boolean:
-    case nodeDefType.decimal:
-    case nodeDefType.integer:
-    case nodeDefType.text:
-      return extractTextValueAndMeta(collectNode, collectNodeField)
+  const nodeDefType = NodeDef.getType(nodeDef)
+  const valueAndMetaExtractor = valueAndMetaExtractorByType[nodeDefType]
+  if (!valueAndMetaExtractor) throw new Error(`Unknown NodeDef type: ${nodeDefType}`)
 
-    case nodeDefType.code:
-      return extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode)
-
-    case nodeDefType.coordinate:
-      return extractCoordinateValueAndMeta(collectNode)
-
-    case nodeDefType.date:
-      return extractDateValueAndMeta(collectNode)
-
-    case nodeDefType.file:
-      return extractFileValueAndMeta(survey, node, collectSurveyFileZip, collectNodeDef, tx)(collectNode)
-
-    case nodeDefType.taxon:
-      return extractTaxonValueAndMeta(survey, nodeDef)(collectNode)
-
-    case nodeDefType.time:
-      return extractTimeValueAndMeta(collectNode)
-
-    default:
-      throw new Error(`Unknown NodeDef type: ${NodeDef.getType(nodeDef)}`)
-  }
+  return valueAndMetaExtractor({
+    collectSurveyFileZip,
+    collectNode,
+    collectNodeDef,
+    collectNodeField,
+    survey,
+    nodeDef,
+    record,
+    node,
+    tx,
+  })
 }
