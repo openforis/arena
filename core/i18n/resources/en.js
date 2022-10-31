@@ -596,6 +596,7 @@ $t(common.cantUndoWarning)`,
   },
 
   mapBaseLayerPeriodSelector: {
+    chooseAPeriodToCompareWith: 'Choose a period to compare with',
     falseColor: 'False Color',
   },
 
