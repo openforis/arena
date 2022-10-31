@@ -3,12 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as A from '@core/arena'
 
 export const useDropdown = ({
-  minCharactersToAutocomplete,
+  defaultSelection,
   id,
   idInputProp,
+  itemDescription,
+  itemIcon,
   itemLabel,
   itemValue,
   itemsProp,
+  minCharactersToAutocomplete,
+  multiple,
   onBeforeChange,
   onChangeProp,
   readOnly,
@@ -21,15 +25,13 @@ export const useDropdown = ({
   const searchMinCharsReached =
     !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
 
-  const getOptionLabel = useCallback(
-    (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
-    [itemLabel]
-  )
+  const getProperty = (propOrFunction) => (item) =>
+    propOrFunction.constructor === String ? A.prop(propOrFunction, item) : propOrFunction(item)
 
-  const getOptionValue = useCallback(
-    (item) => (itemValue.constructor === String ? A.prop(itemValue, item) : itemValue(item)),
-    [itemValue]
-  )
+  const getOptionDescription = useCallback((item) => getProperty(itemDescription)(item), [itemDescription])
+  const getOptionIcon = useCallback((item) => getProperty(itemIcon)(item), [itemIcon])
+  const getOptionLabel = useCallback((item) => getProperty(itemLabel)(item), [itemLabel])
+  const getOptionValue = useCallback((item) => getProperty(itemValue)(item), [itemValue])
 
   const [state, setState] = useState({ items: [], loading: false })
 
@@ -82,13 +84,15 @@ export const useDropdown = ({
   )
 
   const onChange = useCallback(
-    async (option) => {
-      const item = getItemFromOption(option)
-      if (!onBeforeChange || (await onBeforeChange(item))) {
-        onChangeProp(item)
+    async (selection) => {
+      const options = multiple ? selection : [selection]
+      const items = options.map(getItemFromOption)
+      const paramToPass = multiple ? items : items[0]
+      if (!onBeforeChange || (await onBeforeChange(paramToPass))) {
+        onChangeProp(paramToPass)
       }
     },
-    [getItemFromOption, onBeforeChange, onChangeProp]
+    [getItemFromOption, multiple, onBeforeChange, onChangeProp]
   )
 
   const onInputChange = useCallback(
@@ -104,21 +108,51 @@ export const useDropdown = ({
     [minCharactersToAutocomplete, fetchItems]
   )
 
-  const options = items.map((item) => ({
-    value: getOptionValue(item),
-    label: getOptionLabel(item),
-    ...(item.options ? { options: item.options } : {}),
-  }))
+  const itemToOption = useCallback(
+    (item) => ({
+      description: getOptionDescription(item),
+      icon: getOptionIcon(item),
+      label: getOptionLabel(item),
+      value: getOptionValue(item),
+      ...(item.options ? { options: item.options } : {}),
+    }),
+    [getOptionDescription, getOptionIcon, getOptionLabel, getOptionValue]
+  )
 
-  const emptySelection = A.isEmpty(selection)
-  const selectedValue = emptySelection ? null : getOptionValue(selection)
-  const value = emptySelection ? null : options.find((option) => option.value === selectedValue)
+  const options = items.map(itemToOption)
+
+  const findOptionByValue = useCallback(
+    (value) =>
+      options
+        .flatMap((option) => (option.options ? option.options : [option]))
+        .find((option) => option.value === value),
+    [options]
+  )
+
+  const selectionToValue = useCallback(
+    (sel) => {
+      if (sel === null) return null // force resetting selection
+      if (A.isEmpty(sel)) return undefined // allows using defaultSelection, if specified
+
+      if (multiple) {
+        // selection is an array of items
+        return sel.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
+      }
+      // selection is a single item
+      return findOptionByValue(getOptionValue(sel))
+    },
+    [findOptionByValue, getOptionValue, multiple]
+  )
+
+  const defaultValue = selectionToValue(defaultSelection)
+  const value = selectionToValue(selection)
 
   // prevent menu opening when readOnly is true
   const openMenuOnClick = !readOnly && searchMinCharsReached
   const menuIsOpen = readOnly || !searchMinCharsReached ? false : undefined
 
   return {
+    defaultValue,
     inputId,
     loading,
     menuIsOpen,

@@ -30,7 +30,7 @@ export const TestId = {
     templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
   },
   categorySelector: {
-    category: 'category-selector-category',
+    dropdown: 'category-selector-dropdown',
     addCategoryBtn: 'category-selector-add-btn',
   },
   dashboard: {
