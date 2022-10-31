@@ -1,7 +1,4 @@
-import './SurveyTemplateSelect.scss'
-
 import React, { useEffect, useState } from 'react'
-import Select, { components } from 'react-select'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -9,25 +6,10 @@ import * as Survey from '@core/survey/survey'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { LoadingBar } from '@webapp/components'
-
-const OptionWithDescription = (props) => {
-  const { data } = props
-
-  const { label, description: descriptionProp } = data
-  const description = descriptionProp || ''
-
-  return (
-    <components.Option {...props}>
-      <div className="select-option">
-        <span className="select-option__label">{label}</span>
-        <span className="select-option__description">{description}</span>
-      </div>
-    </components.Option>
-  )
-}
+import { Dropdown } from '@webapp/components/form'
 
 export const SurveyTemplateSelect = (props) => {
-  const { defaultValue, onChange } = props
+  const { selectedValue, onChange } = props
 
   const [state, setState] = useState({ loading: true, items: null })
   const { loading, items } = state
@@ -42,36 +24,33 @@ export const SurveyTemplateSelect = (props) => {
     loadItems()
   }, [])
 
-  const options = items?.map((item) => ({
-    value: Survey.getUuid(item),
-    label: Survey.getDefaultLabel(item) || Survey.getName(item),
-    description: [
-      Survey.getDefaultDescription(item),
-      `${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`,
-    ]
-      .filter(Boolean)
-      .join('\n\n'), // separate Languages from description only if description is not empty
-  }))
-
   if (loading) return <LoadingBar />
 
+  const selectedItem = selectedValue ? items?.find((item) => Survey.getUuid(item) === selectedValue) : null
+
   return (
-    <Select
-      components={{ Option: OptionWithDescription }}
-      isClearable
-      defaultValue={defaultValue}
-      options={options}
-      onChange={(item) => onChange(item?.value)}
+    <Dropdown
+      items={items}
+      itemDescription={
+        (item) =>
+          [Survey.getDefaultDescription(item), `${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`]
+            .filter(Boolean)
+            .join('\n\n') // separate Languages from description only if description is not empty
+      }
+      itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
+      itemValue={Survey.getUuid}
+      onChange={(item) => onChange(Survey.getUuid(item))}
       placeholder={i18n.t('accessRequestView.templateNotSelected')}
+      selection={selectedItem}
     />
   )
 }
 
 SurveyTemplateSelect.propTypes = {
-  defaultValue: PropTypes.string,
+  selectedValue: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 }
 
 SurveyTemplateSelect.defaultValues = {
-  defaultValue: null,
+  selectedValue: null,
 }

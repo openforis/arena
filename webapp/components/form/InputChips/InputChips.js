@@ -53,8 +53,8 @@ const InputChips = (props) => {
         <Dropdown
           idInput={idInput}
           items={Actions.rejectSelectedItems({ selection, state, items })}
-          itemKey={State.getItemKey(state)}
           itemLabel={State.getItemLabel(state)}
+          itemValue={State.getItemKey(state)}
           onChange={Actions.onDropdownChange({ selection, state })}
           selection={null}
           minCharactersToAutocomplete={minCharactersToAutocomplete}

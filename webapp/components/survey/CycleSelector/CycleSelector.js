@@ -25,6 +25,7 @@ const CycleSelector = (props) => {
   return (
     <Dropdown
       className="cycle-selector"
+      clearable={false}
       items={cycleItems}
       onChange={(item) => onChange(item?.value)}
       searchable={false}

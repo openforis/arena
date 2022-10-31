@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Select from 'react-select'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -12,6 +11,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 
 import { useI18n } from '@webapp/store/system'
 import { SurveyTemplateSelect } from './SurveyTemplateSelect'
+import { Dropdown } from '@webapp/components/form'
 
 export const AccessRequestField = (props) => {
   const { field, onChange, request, validation } = props
@@ -22,19 +22,21 @@ export const AccessRequestField = (props) => {
 
   const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
   const value = Objects.path(name.split('.'))(request)
+  const selectedValue = value || defaultValue
 
   return (
     <FormItem key={name} label={i18n.t(`accessRequestView.fields.${name}`)} required={required}>
       <>
         {name === `${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}` ? (
-          <Select
-            isClearable
-            defaultValue={defaultValue}
-            options={Countries.list().map((countryItem) => ({ value: countryItem.code, label: countryItem.name }))}
-            onChange={(item) => onChange({ name, value: item?.value })}
+          <Dropdown
+            selection={selectedValue ? Countries.list.find((item) => item.code === selectedValue) : null}
+            items={Countries.list}
+            itemValue="code"
+            itemLabel="name"
+            onChange={(item) => onChange({ name, value: item?.code })}
           />
         ) : name === `${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}` ? (
-          <SurveyTemplateSelect defaultValue={defaultValue} onChange={(value) => onChange({ name, value })} />
+          <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
         ) : (
           <Input
             value={value}

@@ -86,13 +86,14 @@
   .binary {
     display: flex;
     justify-content: center;
+    gap: 1rem;
 
     .binary-left,
     .binary-right {
       display: flex;
 
-      .identifier, 
-      .dropdown-literal{
+      .identifier,
+      .dropdown-literal {
         width: 40rem;
         max-width: 40rem;
       }
@@ -102,11 +103,6 @@
       width: 200px;
     }
 
-    .dropdown,
-    .literal {
-      margin-right: 1.5rem;
-    }
-
     .btn-switch-operand {
       font-size: 0.75rem;
       margin: 0 0.1rem;
@@ -114,7 +110,7 @@
     }
 
     .operator {
-        width: 10rem;
+      width: 10rem;
     }
 
     .literal-btn-group-boolean {
