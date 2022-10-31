@@ -30,6 +30,7 @@ export const SurveyPreferredLanguageSelector = () => {
   return (
     <Dropdown
       className="survey-preferred-language"
+      clearable={false}
       items={dropdownItems}
       selection={selection}
       onChange={(langItem) => {

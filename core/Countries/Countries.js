@@ -1,6 +1,6 @@
 import countriesData from './countries_data.json'
 
-const list = () => Object.entries(countriesData).reduce((acc, [code, item]) => [...acc, { code, ...item }], [])
+const list = Object.entries(countriesData).map(([code, item]) => ({ code, ...item }))
 
 const _getCountry = ({ code }) => countriesData[code]
 

@@ -1,7 +1,6 @@
 import './DimensionsSelector.scss'
 
 import React, { useCallback } from 'react'
-import Select, { components } from 'react-select'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -9,18 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
-const OptionComponent = (props) => {
-  const { data } = props
-  const { label, icon } = data
-
-  return (
-    <components.Option {...props}>
-      <span>{label}</span>
-      {icon}
-    </components.Option>
-  )
-}
+import { Dropdown } from '@webapp/components/form'
 
 export const DimensionsSelector = (props) => {
   const {
@@ -83,15 +71,13 @@ export const DimensionsSelector = (props) => {
   )
 
   return (
-    <Select
+    <Dropdown
       className="dimensions-selector"
-      classNamePrefix="select"
-      components={{ Option: OptionComponent }}
-      isDisabled={disabled}
-      isMulti
-      options={options}
+      disabled={disabled}
+      multiple
+      items={options}
       onChange={onChange}
-      value={selectedOptions}
+      selection={selectedOptions}
     />
   )
 }

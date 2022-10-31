@@ -25,6 +25,7 @@ const Paginator = (props) => {
       <div className="table__paginator-items-per-page">
         <div className="label">{i18n.t('common.paginator.itemsPerPage')}:</div>
         <Dropdown
+          clearable={false}
           items={itemsPerPageValues}
           itemValue={A.identity}
           itemLabel={A.identity}

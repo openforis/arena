@@ -9,23 +9,36 @@ import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import { useDropdown } from './useDropdown'
 
-const OptionComponent = (props) => (
-  <div data-testid={TestId.dropdown.dropDownItem(props.data?.value)}>
-    <components.Option {...props} />
-  </div>
-)
+const OptionComponent = (props) => {
+  const { data = {} } = props
+  const { description, label, icon, value } = data
+
+  return (
+    <div data-testid={TestId.dropdown.dropDownItem(value)}>
+      <components.Option {...props}>
+        <span className="dropdown-option__label">{label}</span>
+        {description && <span className="dropdown-option__description">{description}</span>}
+        {icon && <span className="dropdown-option__icon">{icon}</span>}
+      </components.Option>
+    </div>
+  )
+}
 
 const Dropdown = (props) => {
   const {
     minCharactersToAutocomplete,
     className,
     clearable,
+    defaultSelection,
     disabled,
     id,
     idInput: idInputProp,
+    itemDescription,
+    itemIcon,
     itemLabel,
     itemValue,
     items: itemsProp,
+    multiple,
     onBeforeChange,
     onChange: onChangeProp,
     placeholder,
@@ -37,18 +50,32 @@ const Dropdown = (props) => {
     validation,
   } = props
 
-  const { inputId, loading, menuIsOpen, onChange, onInputChange, openMenuOnClick, options, selectRef, value } =
-    useDropdown({
-      minCharactersToAutocomplete,
-      idInputProp,
-      itemValue,
-      itemLabel,
-      itemsProp,
-      onBeforeChange,
-      onChangeProp,
-      selection,
-      title,
-    })
+  const {
+    defaultValue,
+    inputId,
+    loading,
+    menuIsOpen,
+    onChange,
+    onInputChange,
+    openMenuOnClick,
+    options,
+    selectRef,
+    value,
+  } = useDropdown({
+    defaultSelection,
+    minCharactersToAutocomplete,
+    multiple,
+    idInputProp,
+    itemDescription,
+    itemIcon,
+    itemLabel,
+    itemValue,
+    itemsProp,
+    onBeforeChange,
+    onChangeProp,
+    selection,
+    title,
+  })
 
   return (
     <ValidationTooltip
@@ -61,10 +88,12 @@ const Dropdown = (props) => {
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent }}
+        defaultValue={defaultValue}
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
         isLoading={loading}
+        isMulti={multiple}
         isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
@@ -83,12 +112,16 @@ Dropdown.propTypes = {
   minCharactersToAutocomplete: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
+  defaultSelection: PropTypes.any,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   idInput: PropTypes.string,
+  itemDescription: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item description function or property name
+  itemIcon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
@@ -103,12 +136,16 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   minCharactersToAutocomplete: 0,
   className: undefined,
-  clearable: false,
+  clearable: true,
+  defaultSelection: undefined,
   disabled: false,
   id: null,
   idInput: null,
+  itemDescription: 'description',
+  itemIcon: 'icon',
   itemLabel: 'label',
   itemValue: 'value',
+  multiple: false,
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly

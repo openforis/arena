@@ -1,13 +1,48 @@
 @import 'webapp/style/vars';
 
 .dropdown {
-  .dropdown__control,
-  .dropdown__indicators {
-    min-height: 32px;
-    height: 32px;
+  line-height: 1.2rem;
+
+  .dropdown__control {
+    min-height: auto;
   }
+
+  .dropdown__input-container {
+    margin: 0;
+    padding: 0;
+  }
+
+  .dropdown__indicators {
+    height: 30px;
+  }
+
   .dropdown__menu {
     z-index: 10;
+  }
+
+  .dropdown__option {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    .dropdown-option__label {
+      grid-row: 1;
+    }
+
+    .dropdown-option__description {
+      grid-row: 2;
+      font-size: small;
+      font-style: italic;
+      white-space: pre-line;
+      line-height: 1rem;
+    }
+
+    .dropdown-option__icon {
+      grid-row: 1;
+    }
   }
 }
 
