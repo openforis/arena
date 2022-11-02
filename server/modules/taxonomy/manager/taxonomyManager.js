@@ -4,7 +4,6 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
-import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
 
@@ -17,8 +16,17 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
 
-/**
+/**.
  * ====== CREATE
+ *
+ * @param root0
+ * @param root0.user
+ * @param root0.surveyId
+ * @param root0.taxonomy
+ * @param root0.addLogs
+ * @param root0.system
+ * @param root0.backup
+ * @param client
  */
 export const insertTaxonomy = async (
   { user, surveyId, taxonomy, addLogs = true, system = false, backup = false },
@@ -51,8 +59,18 @@ export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup 
     ])
   )
 
-/**
+/**.
  * ====== READ
+ *
+ * @param root0
+ * @param root0.surveyId
+ * @param root0.draft
+ * @param root0.validate
+ * @param root0.backup
+ * @param root0.limit
+ * @param root0.offset
+ * @param root0.search
+ * @param client
  */
 export const fetchTaxonomiesBySurveyId = async (
   { surveyId, draft = false, validate = false, backup = false, limit = null, offset = 0, search = null },
@@ -165,11 +183,6 @@ export const findTaxaByVernacularName = async (
 
 export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
   TaxonomyRepository
-
-export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
-  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft })
-  return ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
-}
 
 export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft) => {
   const taxonomy = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)

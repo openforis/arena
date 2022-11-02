@@ -1282,6 +1282,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     taxonomyEdit: {
+      codeChangedAfterPublishing: `Published code has changed: '{{oldCode}}' => '{{newCode}}'`,
       codeDuplicate: 'Duplicate code {{value}}; $t(validationErrors.rowsDuplicate)',
       codeRequired: 'Code is required',
       familyRequired: 'Family is required',

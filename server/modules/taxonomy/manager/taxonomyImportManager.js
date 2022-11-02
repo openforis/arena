@@ -4,6 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import BatchPersister from '@server/db/batchPersister'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as Validation from '@core/validation/validation'
@@ -43,35 +44,78 @@ export default class TaxonomyImportManager {
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)
     )
     this.insertedCodes = new Set() // Inserted taxa codes
-    this.existingUuidAndVernacularNamesByCode = {} // Existing taxon uuids and vernacular names (indexed by code)
+    this.existingTaxaByCode = {} // Existing taxa (indexed by code)
+    this.existingTaxaByScientificName = {} // Existing taxa (indexed by scientific name)
   }
 
   async init() {
     if (this.taxonomy && Taxonomy.isPublished(this.taxonomy)) {
       // Taxa deleted before import for draft taxonomies
-      this.existingUuidAndVernacularNamesByCode = await TaxonomyManager.fetchTaxonUuidAndVernacularNamesByCode(
-        this.surveyId,
-        Taxonomy.getUuid(this.taxonomy),
-        true,
+      const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(
+        {
+          surveyId: this.surveyId,
+          taxonomyUuid: Taxonomy.getUuid(this.taxonomy),
+          draft: true,
+        },
         this.tx
+      )
+      this.existingTaxaByCode = ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
+      this.existingTaxaByScientificName = ObjectUtils.toIndexedObj(
+        taxa,
+        `${Taxon.keys.props}.${Taxon.propKeys.scientificName}`
       )
     }
   }
 
-  async addTaxonToUpdateBuffer(taxon) {
-    const taxonExisting = this.existingUuidAndVernacularNamesByCode[Taxon.getCode(taxon)]
-    if (taxonExisting) {
-      // Update existing item
-      const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
-      if (!Objects.isEqual(taxonUpdated, taxonExisting)) {
-        await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
+  async updateExistingTaxonWithSameCodeIfAny(taxon) {
+    const taxonExisting = this.existingTaxaByCode[Taxon.getCode(taxon)]
+    if (!taxonExisting) {
+      return false
+    }
+    // Update existing item
+    const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
+    if (!Objects.isEqual(taxonUpdated, taxonExisting)) {
+      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
+    }
+    return true
+  }
+
+  checkTaxonCodeHasNotChanged(taxon) {
+    const scientificName = Taxon.getScientificName(taxon)
+    const taxonWithSameScientificName = this.existingTaxaByScientificName[scientificName]
+    if (taxonWithSameScientificName) {
+      const oldCode = Taxon.getCode(taxonWithSameScientificName)
+      const newCode = Taxon.getCode(taxon)
+      if (oldCode !== newCode) {
+        return {
+          key: Validation.messageKeys.taxonomyEdit.codeChangedAfterPublishing,
+          params: {
+            oldCode,
+            newCode,
+            scientificName,
+          },
+        }
       }
-    } else {
-      // Insert new one
-      await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
+    }
+    return null
+  }
+
+  async addTaxonToUpdateBuffer(taxon) {
+    if (await this.updateExistingTaxonWithSameCodeIfAny(taxon)) {
+      return { success: true }
     }
 
+    const error = this.checkTaxonCodeHasNotChanged(taxon)
+    if (error) {
+      return { success: false, error }
+    }
+
+    // Insert new one
+    await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
+
     this.insertedCodes.add(Taxon.getCode(taxon))
+
+    return { success: true }
   }
 
   async finalizeImport() {
@@ -103,7 +147,8 @@ export default class TaxonomyImportManager {
     const extraPropsDefsCleaned = Object.entries(this.extraPropsDefs).reduce((extraPropsDefsAcc, [key, extraProp]) => {
       const extraPropProps = { ...extraProp }
       delete extraPropProps['originalHeader']
-      return { ...extraPropsDefsAcc, [key]: { ...extraPropProps } }
+      extraPropsDefsAcc[key] = { ...extraPropProps }
+      return extraPropsDefsAcc
     }, {})
 
     await TaxonomyManager.updateTaxonomyProp(
