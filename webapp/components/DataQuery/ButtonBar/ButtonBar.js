@@ -13,15 +13,18 @@ import { useButtonBar } from './store'
 import ButtonDownload from './ButtonDownload'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 const ButtonBar = (props) => {
   const {
     dataEmpty,
     dataLoaded,
     dataLoading,
+    nodeDefLabelType,
     nodeDefsSelectorVisible,
     query,
     onChangeQuery,
+    onNodeDefLabelTypeChange,
     setNodeDefsSelectorVisible,
   } = props
 
@@ -86,6 +89,8 @@ const ButtonBar = (props) => {
           <ButtonDownload query={query} disabled={modeEdit || !dataLoaded || dataLoading} />
         </div>
       )}
+
+      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
     </div>
   )
 }
@@ -95,8 +100,10 @@ ButtonBar.propTypes = {
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
+  nodeDefLabelType: PropTypes.string.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  onNodeDefLabelTypeChange: PropTypes.func.isRequired,
   setNodeDefsSelectorVisible: PropTypes.func.isRequired,
 }
 

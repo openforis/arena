@@ -10,7 +10,7 @@ import { Query } from '@common/model/query'
 import { NodeDefsSelectorAggregate, NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 
 const QueryNodeDefsSelector = (props) => {
-  const { query, onChangeQuery } = props
+  const { nodeDefLabelType, query, onChangeQuery } = props
 
   const survey = useSurvey()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
@@ -18,6 +18,7 @@ const QueryNodeDefsSelector = (props) => {
 
   return Query.isModeAggregate(query) ? (
     <NodeDefsSelectorAggregate
+      nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
       dimensions={Query.getDimensions(query)}
       measures={Query.getMeasures(query)}
@@ -32,6 +33,7 @@ const QueryNodeDefsSelector = (props) => {
   ) : (
     <NodeDefsSelector
       hierarchy={hierarchy}
+      nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
       nodeDefUuidsAttributes={Query.getAttributeDefUuids(query)}
       onChangeEntity={onChangeEntity}
@@ -44,8 +46,13 @@ const QueryNodeDefsSelector = (props) => {
 }
 
 QueryNodeDefsSelector.propTypes = {
+  nodeDefLabelType: PropTypes.string,
   query: PropTypes.object.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+}
+
+QueryNodeDefsSelector.defaultProps = {
+  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default QueryNodeDefsSelector

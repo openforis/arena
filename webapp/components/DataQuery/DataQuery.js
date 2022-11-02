@@ -12,6 +12,7 @@ import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
+import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 
 const DataQuery = (props) => {
   const { query, onChangeQuery } = props
@@ -21,9 +22,11 @@ const DataQuery = (props) => {
     { query }
   )
 
+  const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
+
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector query={query} onChangeQuery={onChangeQuery} />
+      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -39,8 +42,10 @@ const DataQuery = (props) => {
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
             query={query}
+            nodeDefLabelType={nodeDefLabelType}
             nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             onChangeQuery={onChangeQuery}
+            onNodeDefLabelTypeChange={toggleLabelFunction}
             setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
           />
 
@@ -54,6 +59,7 @@ const DataQuery = (props) => {
             query={query}
             data={data}
             dataEmpty={dataEmpty}
+            nodeDefLabelType={nodeDefLabelType}
             nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             offset={offset}
             onChangeQuery={onChangeQuery}
