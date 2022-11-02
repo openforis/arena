@@ -80,7 +80,7 @@ const Data = () => {
               ]
             : []),
           // Data export
-          ...(Authorizer.canEditSurvey(user, surveyInfo)
+          ...(Authorizer.canExportRecords(user, surveyInfo)
             ? [
                 {
                   component: ExportData,
@@ -89,7 +89,7 @@ const Data = () => {
               ]
             : []),
           // Data import
-          ...(Authorizer.canEditSurvey(user, surveyInfo)
+          ...(Authorizer.canImportRecords(user, surveyInfo)
             ? [
                 {
                   component: DataImport,
@@ -97,7 +97,6 @@ const Data = () => {
                 },
               ]
             : []),
-          ,
           // Validation report
           ...(Authorizer.canCleanseRecords(user, surveyInfo)
             ? [
@@ -107,7 +106,6 @@ const Data = () => {
                 },
               ]
             : []),
-          ,
         ]}
       />
     </SurveyDefsLoader>
