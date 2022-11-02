@@ -30,9 +30,22 @@ export const KmlUploader = () => {
         processKMLFile(selectedFile)
       } else if (selectedFile.name.endsWith('.zip')) {
         processShapeFile(selectedFile)
+      } else if (selectedFile.name.endsWith('.json')) {
+        processGeoJson(selectedFile)
       }
     }
   }, [selectedFile])
+
+  const processGeoJson = (file) => {
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      const text = e.target.result
+      console.log(text)
+      const geo = JSON.parse(text)
+      L.geoJSON(geo).addTo(map)
+    }
+    reader.readAsText(file)
+  }
 
   const processShapeFile = (file) => {
     const geo = L.geoJson(

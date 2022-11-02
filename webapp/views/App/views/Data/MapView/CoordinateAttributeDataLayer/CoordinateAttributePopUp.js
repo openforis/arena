@@ -13,6 +13,7 @@ import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
+import L from 'leaflet'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -88,7 +89,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const i18n = useI18n()
   const map = useMap()
-
+  
   const flyTo = (latlng, point) => {
     map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
     map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
@@ -98,12 +99,20 @@ export const CoordinateAttributePopUp = (props) => {
     const latlng = nextPoint.geometry.coordinates
     flyTo(latlng, nextPoint)
   }
-
+  
   const onClickPrevious = () => {
     const previousPoint = getPreviousPoint(parentUuid)
     const latlng = previousPoint.geometry.coordinates
     flyTo(latlng, previousPoint)
   }
+  
+  const earthMapLink = () => {
+    const geojson = L.circle([pointLatLong.y, pointLatLong.x]).toGeoJSON()
+    const url = "https://collectearth.users.earthengine.app/view/plot#geoJson=" + JSON.stringify(geojson.geometry)
+    return url
+    
+  }
+  earthMapLink()
 
   return (
     <Popup>
@@ -118,6 +127,9 @@ export const CoordinateAttributePopUp = (props) => {
       />
       <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
       <button onClick={onClickNext}>{i18n.t('common.next')} </button>
+      <a href={earthMapLink()} target="_blank" rel="noreferrer">
+          <button>Open in Earth Map</button>
+        </a>
     </Popup>
   )
 }
