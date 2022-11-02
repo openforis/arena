@@ -91,6 +91,10 @@ export const canEditRecord = (user, record) => {
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
+export const canExportRecords = _hasSurveyPermission(permissions.recordView)
+
+export const canImportRecords = _hasSurveyPermission(permissions.recordCreate)
+
 export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 
 export const canUpdateRecordsStep = canAnalyzeRecords
