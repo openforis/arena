@@ -34,7 +34,15 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
 }
 
 const NodeDefsSelectorAggregate = (props) => {
-  const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
+  const {
+    dimensions,
+    measures,
+    nodeDefLabelType,
+    nodeDefUuidEntity,
+    onChangeEntity,
+    onChangeMeasures,
+    onChangeDimensions,
+  } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
@@ -71,6 +79,7 @@ const NodeDefsSelectorAggregate = (props) => {
     <div className="node-defs-selector">
       <EntitySelector
         hierarchy={hierarchy}
+        nodeDefLabelType={nodeDefLabelType}
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         showSingleEntities={false}
@@ -85,6 +94,7 @@ const NodeDefsSelectorAggregate = (props) => {
               filterFunction={(nodeDef) =>
                 NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
               }
+              nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
               showAncestorsLabel={false}
@@ -97,6 +107,7 @@ const NodeDefsSelectorAggregate = (props) => {
               onToggleAttribute={onToggleMeasure}
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
+              nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={[...measures.keys()]}
               showAncestors={false}
@@ -113,6 +124,7 @@ const NodeDefsSelectorAggregate = (props) => {
                   <AttributeSelector
                     key={variableNodeDefUuid}
                     nodeDef={childDef}
+                    nodeDefLabelType={nodeDefLabelType}
                     nodeDefUuidsAttributes={[...measures.keys()]}
                     nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}
                     onToggleAttribute={onToggleMeasure}
@@ -130,6 +142,7 @@ const NodeDefsSelectorAggregate = (props) => {
 NodeDefsSelectorAggregate.propTypes = {
   dimensions: PropTypes.arrayOf(String).isRequired,
   measures: PropTypes.instanceOf(Map).isRequired,
+  nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,
   onChangeEntity: PropTypes.func.isRequired,
   onChangeMeasures: PropTypes.func.isRequired,
@@ -137,6 +150,7 @@ NodeDefsSelectorAggregate.propTypes = {
 }
 
 NodeDefsSelectorAggregate.defaultProps = {
+  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
   nodeDefUuidEntity: null,
 }
 

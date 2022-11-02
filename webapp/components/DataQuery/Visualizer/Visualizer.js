@@ -10,7 +10,7 @@ const components = {
 }
 
 const Visualizer = (props) => {
-  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
+  const { query, data, dataEmpty, nodeDefLabelType, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
 
   return (
     <div className="table__content">
@@ -18,6 +18,7 @@ const Visualizer = (props) => {
         query,
         data,
         dataEmpty,
+        nodeDefLabelType,
         nodeDefsSelectorVisible,
         offset,
         onChangeQuery,
@@ -30,6 +31,7 @@ const Visualizer = (props) => {
 Visualizer.propTypes = {
   data: PropTypes.array.isRequired,
   dataEmpty: PropTypes.bool.isRequired,
+  nodeDefLabelType: PropTypes.string.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
   onChangeQuery: PropTypes.func.isRequired,

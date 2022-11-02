@@ -7,6 +7,7 @@ import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { LabelWithTooltip } from '../LabelWithTooltip'
 import { useDropdown } from './useDropdown'
 
 const OptionComponent = (props) => {
@@ -16,7 +17,7 @@ const OptionComponent = (props) => {
   return (
     <div data-testid={TestId.dropdown.dropDownItem(value)}>
       <components.Option {...props}>
-        <span className="dropdown-option__label">{label}</span>
+        <LabelWithTooltip className="dropdown-option__label" label={label} />
         {description && <span className="dropdown-option__description">{description}</span>}
         {icon && <span className="dropdown-option__icon">{icon}</span>}
       </components.Option>
