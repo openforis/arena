@@ -9,6 +9,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
@@ -38,6 +39,7 @@ export default class TaxonomyImportJob extends Job {
     this.vernacularLanguageCodes = null
     this.extraPropsDefs = null
     this.taxonCSVParser = null
+    this.currentRow = 0
   }
 
   async execute() {
@@ -137,15 +139,30 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async _onRow(row) {
+    this.currentRow += 1
     const taxon = await this.taxonCSVParser.parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
-      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
+      await this.addTaxonToUpdateBuffer(taxon)
     } else {
       this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
 
     this.incrementProcessedItems()
+  }
+
+  async addTaxonToUpdateBuffer(taxon) {
+    const { error } = await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
+    if (error) {
+      const { params: errorParams } = error
+      const errorUpdated = { ...error, params: { ...errorParams, currentRow: this.currentRow } }
+      this.addError({
+        [Taxon.propKeys.code]: {
+          valid: false,
+          errors: [errorUpdated],
+        },
+      })
+    }
   }
 
   _addHeaderError({ key, params }) {

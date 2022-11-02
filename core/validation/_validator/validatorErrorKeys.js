@@ -105,6 +105,7 @@ export const ValidatorErrorKeys = {
   },
 
   taxonomyEdit: {
+    codeChangedAfterPublishing: 'validationErrors.taxonomyEdit.codeChangedAfterPublishing',
     codeDuplicate: 'validationErrors.taxonomyEdit.codeDuplicate',
     codeRequired: 'validationErrors.taxonomyEdit.codeRequired',
     familyRequired: 'validationErrors.taxonomyEdit.familyRequired',
