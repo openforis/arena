@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 export const LabelWithTooltip = (props) => {
-  const { label, style, children } = props
+  const { className, label, style, children } = props
 
   const labelRef = useRef(null)
 
@@ -18,7 +19,7 @@ export const LabelWithTooltip = (props) => {
   }, [label])
 
   return (
-    <div className="label ellipsis" style={style} title={tooltip} ref={labelRef}>
+    <div className={classNames(className, 'label', 'ellipsis')} style={style} title={tooltip} ref={labelRef}>
       {children}
       {label}
     </div>
@@ -26,12 +27,14 @@ export const LabelWithTooltip = (props) => {
 }
 
 LabelWithTooltip.propTypes = {
+  className: PropTypes.string,
   label: PropTypes.string.isRequired,
   style: PropTypes.object,
   children: PropTypes.node,
 }
 
 LabelWithTooltip.defaultProps = {
+  className: undefined,
   style: {},
   children: null,
 }

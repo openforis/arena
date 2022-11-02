@@ -20,6 +20,7 @@ const AttributesSelector = (props) => {
     filterChainUuids,
     lang,
     ancestorSelector,
+    nodeDefLabelType,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -29,7 +30,6 @@ const AttributesSelector = (props) => {
     showLabel,
     showMultipleAttributes,
     showSiblingsInSingleEntities,
-    nodeDefLabelType,
   } = props
 
   const survey = useSurvey()

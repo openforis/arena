@@ -8,8 +8,8 @@ import { useI18n } from '@webapp/store/system'
 export const useNodeDefLabelSwitch = () => {
   const [nodeDefLabelType, setNodeDefLabelType] = useState(NodeDef.NodeDefLabelTypes.label)
   const toggleLabelFunction = () => {
-    setNodeDefLabelType(
-      nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
+    setNodeDefLabelType((nodeDefLabelTypeOld) =>
+      nodeDefLabelTypeOld === NodeDef.NodeDefLabelTypes.label
         ? NodeDef.NodeDefLabelTypes.name
         : NodeDef.NodeDefLabelTypes.label
     )
