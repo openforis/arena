@@ -38,11 +38,21 @@ ${codes
     map.once('zoomend', () => openPopupOfUuid(previousPoint.uuid))
   }
 
+  const earthMapLink = () => {
+    const geojson = L.circle([point.y, point.x]).toGeoJSON()
+    const url = "https://collectearth.users.earthengine.app/view/plot#geoJson=" + JSON.stringify(geojson.geometry)
+    return url
+    
+  }
+
   return (
     <Popup>
       <Markdown source={content} />
       <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
       <button onClick={onClickNext}>{i18n.t('common.next')} </button>
+      <a href={earthMapLink()} target="_blank" rel="noreferrer">
+        <button>Open in Earth Map</button>
+      </a>
     </Popup>
   )
 }

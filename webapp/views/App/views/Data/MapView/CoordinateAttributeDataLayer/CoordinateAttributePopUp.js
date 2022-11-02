@@ -112,7 +112,6 @@ export const CoordinateAttributePopUp = (props) => {
     return url
     
   }
-  earthMapLink()
 
   return (
     <Popup>
@@ -128,8 +127,8 @@ export const CoordinateAttributePopUp = (props) => {
       <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
       <button onClick={onClickNext}>{i18n.t('common.next')} </button>
       <a href={earthMapLink()} target="_blank" rel="noreferrer">
-          <button>Open in Earth Map</button>
-        </a>
+        <button>Open in Earth Map</button>
+      </a>
     </Popup>
   )
 }
