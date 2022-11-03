@@ -6,19 +6,23 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { useSurvey } from '@webapp/store/survey'
+import { SurveyActions, useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 
-const _delete = async ({ survey, category, callback }) => {
-  const surveyId = Survey.getId(survey)
-  const categoryUuid = Category.getUuid(category)
-  await API.deleteCategory({ surveyId, categoryUuid })
+const _delete =
+  ({ survey, category, callback }) =>
+  async (dispatch) => {
+    const surveyId = Survey.getId(survey)
+    const categoryUuid = Category.getUuid(category)
+    await API.deleteCategory({ surveyId, categoryUuid })
 
-  if (callback) {
-    callback()
+    dispatch(SurveyActions.surveyCategoryDeleted(category))
+
+    if (callback) {
+      callback()
+    }
   }
-}
 
 export const useDelete = () => {
   const i18n = useI18n()
@@ -34,7 +38,7 @@ export const useDelete = () => {
           DialogConfirmActions.showDialogConfirm({
             key: 'categoryEdit.confirmDelete',
             params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-            onOk: async () => _delete({ survey, category, callback: initData }),
+            onOk: async () => dispatch(_delete({ survey, category, callback: initData })),
           })
         )
       } else {

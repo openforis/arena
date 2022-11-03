@@ -120,6 +120,7 @@ export const updateNodeDefProps = async (
 ) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
+
     const nodeDefsDependent = Survey.getNodeDefDependencies(nodeDefUuid)(survey)
 
     // remove dependent node defs from dependency graph (add them back later)

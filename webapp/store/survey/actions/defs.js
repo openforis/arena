@@ -1,3 +1,4 @@
+import * as ObjectUtils from '@core/objectUtils'
 import * as API from '@webapp/service/api'
 import { LoaderActions } from '@webapp/store/ui/loader'
 
@@ -18,11 +19,16 @@ export const initSurveyDefs =
 
       const { nodeDefs, nodeDefsValidation } = await API.fetchNodeDefs({ surveyId, params })
 
+      const categories = ObjectUtils.toUuidIndexedObj(await API.fetchCategories({ surveyId, draft }))
+      const taxonomies = ObjectUtils.toUuidIndexedObj(await API.fetchTaxonomies({ surveyId, draft }))
+
       dispatch({
         type: surveyDefsLoad,
+        draft,
+        categories,
         nodeDefs,
         nodeDefsValidation,
-        draft,
+        taxonomies,
       })
       dispatch(LoaderActions.hideLoader())
     }

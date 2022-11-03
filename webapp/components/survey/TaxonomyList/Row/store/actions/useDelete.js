@@ -21,19 +21,23 @@ export const useDelete = () => {
   return useCallback(
     ({ state }) => {
       const taxonomy = State.getTaxonomy(state)
+      const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
-      if (!A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))) {
+      if (!A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(taxonomyUuid)(survey))) {
         dispatch(NotificationActions.notifyInfo({ key: 'taxonomy.cantBeDeleted' }))
       } else {
+        const taxonomyName = Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName')
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'taxonomy.confirmDelete',
-            params: { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
+            params: { taxonomyName },
             onOk: async () => {
-              dispatch(SurveyActions.metaUpdated())
-              await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
+              await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`)
               const initData = State.getInitData(state)
               if (initData) initData()
+
+              dispatch(SurveyActions.surveyTaxonomyDeleted(taxonomyUuid))
+              dispatch(SurveyActions.metaUpdated())
             },
           })
         )

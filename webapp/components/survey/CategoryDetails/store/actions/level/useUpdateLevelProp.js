@@ -10,15 +10,18 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { State } from '../../state'
 
-const _putProp = ({ surveyId, categoryUuid, levelUuid, key, value, setState }) => async (dispatch) => {
-  const {
-    data: { category },
-  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/levels/${levelUuid}`, { key, value })
+const _putProp =
+  ({ surveyId, categoryUuid, levelUuid, key, value, setState }) =>
+  async (dispatch) => {
+    const {
+      data: { category },
+    } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/levels/${levelUuid}`, { key, value })
 
-  dispatch(SurveyActions.metaUpdated())
+    setState(State.assocCategory({ category }))
 
-  setState(State.assocCategory({ category }))
-}
+    dispatch(SurveyActions.surveyCategoryUpdated(category))
+    dispatch(SurveyActions.metaUpdated())
+  }
 
 export const useUpdateLevelProp = ({ setState }) => {
   const dispatch = useDispatch()
