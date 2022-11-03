@@ -59,6 +59,10 @@ export const ValidatorErrorKeys = {
     unableToFindNodeSibling: 'validationErrors.expressions.unableToFindNodeSibling',
   },
 
+  extraPropEdit: {
+    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
+    dataTypeRequired: 'validationErrors.extraPropEdit.dataTypeRequired',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',

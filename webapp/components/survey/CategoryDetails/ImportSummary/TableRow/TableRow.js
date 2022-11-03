@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
 
@@ -48,9 +48,9 @@ const TableRow = (props) => {
         {CategoryImportSummary.isColumnExtra(column) && (
           <Dropdown
             className="dropdown__extra-def-type"
-            items={Object.keys(CategoryItemExtraDef.dataTypes)}
+            items={Object.keys(ExtraPropDef.dataTypes)}
             itemValue={A.identity}
-            itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
+            itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
             searchable={false}
             selection={dataType}
             onChange={(item) => onDataTypeChange(item)}

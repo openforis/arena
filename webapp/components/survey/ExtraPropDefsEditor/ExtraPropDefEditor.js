@@ -2,54 +2,55 @@ import React from 'react'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
 import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from '@webapp/components'
 
-import { useItemExtraDefEditor } from './useItemExtraDefEditor'
+import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 
-export const ItemExtraDefEditor = (props) => {
+export const ExtraPropDefEditor = (props) => {
   const { index, readOnly, onItemDelete } = props
   const {
     dirty,
     editing,
     i18n,
-    itemExtraDef,
+    extraPropDef,
     onCancelClick,
     onEditClick,
     onSaveClick,
-    updateItemExtraDef,
+    updateExtraPropDef,
     validation,
-  } = useItemExtraDefEditor(props)
+  } = useExtraPropDefEditor(props)
 
-  const { name, dataType } = itemExtraDef
+  const { name, dataType } = extraPropDef
 
   return (
-    <FormItem label={`${i18n.t('categoryEdit.extraProp')} ${index + 1}`}>
+    <FormItem label={`${i18n.t('extraProp.label')} ${index + 1}`}>
       <Input
         value={name}
         readOnly={readOnly || !editing}
         onChange={(value) => {
           const valueNormalized = StringUtils.normalizeName(value)
-          const itemExtraDefUpdated = { ...itemExtraDef, name: valueNormalized }
-          updateItemExtraDef({ itemExtraDefUpdated })
+          const extraPropDefUpdated = { ...extraPropDef, name: valueNormalized }
+          updateExtraPropDef({ extraPropDefUpdated })
         }}
-        validation={Validation.getFieldValidation(CategoryItemExtraDef.keys.name)(validation)}
+        validation={Validation.getFieldValidation(ExtraPropDef.keys.name)(validation)}
       />
       <Dropdown
-        readOnly={readOnly || !editing}
-        items={Object.keys(CategoryItemExtraDef.dataTypes)}
+        clearable={false}
+        items={Object.keys(ExtraPropDef.dataTypes)}
         itemValue={A.identity}
-        itemLabel={(item) => i18n.t(`categoryEdit.extraPropDataType.${item}`)}
+        itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
+        readOnly={readOnly || !editing}
         searchable={false}
         selection={dataType}
         onChange={(dataTypeUpdated) =>
-          updateItemExtraDef({ itemExtraDefUpdated: { ...itemExtraDef, dataType: dataTypeUpdated } })
+          updateExtraPropDef({ extraPropDefUpdated: { ...extraPropDef, dataType: dataTypeUpdated } })
         }
-        validation={Validation.getFieldValidation(CategoryItemExtraDef.keys.dataType)(validation)}
+        validation={Validation.getFieldValidation(ExtraPropDef.keys.dataType)(validation)}
       />
       {!editing && (
         <>

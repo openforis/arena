@@ -5,7 +5,7 @@ import { Points } from '@openforis/arena-core'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -73,16 +73,16 @@ const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
 })
 
 const _extraPropValidators = {
-  [CategoryItemExtraDef.dataTypes.number]: (key, extra) =>
+  [ExtraPropDef.dataTypes.number]: (key, extra) =>
     Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
-  [CategoryItemExtraDef.dataTypes.geometryPoint]: (key, extra) => {
+  [ExtraPropDef.dataTypes.geometryPoint]: (key, extra) => {
     const point = Points.parse(extra[key])
     if (point && Points.isValid(point)) {
       return null
     }
     return ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
   },
-  [CategoryItemExtraDef.dataTypes.text]: () => null,
+  [ExtraPropDef.dataTypes.text]: () => null,
 }
 
 const _validateItemExtraProps = (extraDefs, validation) => (item) => {
@@ -91,7 +91,7 @@ const _validateItemExtraProps = (extraDefs, validation) => (item) => {
       return null
     }
 
-    const extraDefType = R.path([key, CategoryItemExtraDef.keys.dataType], extraDefs)
+    const extraDefType = R.path([key, ExtraPropDef.keys.dataType], extraDefs)
     return _extraPropValidators[extraDefType](key, extra)
   }
 

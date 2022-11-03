@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
@@ -103,7 +103,7 @@ export const createImportSummaryFromColumnNames = ({
     const level = getOrCreateLevel({ columnName, columnType })
     const { name: levelName, index: levelIndex } = level
 
-    const dataType = extra ? CategoryItemExtraDef.dataTypes.text : null
+    const dataType = extra ? ExtraPropDef.dataTypes.text : null
 
     const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
 

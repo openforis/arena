@@ -10,7 +10,7 @@ import Job from '@server/job/job'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -112,7 +112,7 @@ export default class CategoryImportJob extends Job {
 
     return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
       if (CategoryImportSummary.isColumnExtra(column)) {
-        accExtraDef[columnName] = CategoryItemExtraDef.newItem({
+        accExtraDef[columnName] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getColumnDataType(column),
         })
       }
