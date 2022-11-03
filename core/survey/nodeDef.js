@@ -409,9 +409,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.taxon,
     nodeDefType.text,
     nodeDefType.time,
-  ]) &&
-  // Allow default value when parent code is null (for node def code)
-  !getParentCodeDefUuid(nodeDef)
+  ])
 
 export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
 
