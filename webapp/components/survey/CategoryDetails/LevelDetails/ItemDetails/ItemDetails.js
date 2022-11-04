@@ -124,7 +124,7 @@ const ItemDetails = (props) => {
 
           {extraPropsEditorVisible && (
             <fieldset className="extra-props">
-              <legend>{i18n.t('extraProp.label', { count: 2 })}</legend>
+              <legend>{i18n.t('extraProp.label_plural')}</legend>
               {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
                 <FormItem label={key} key={key}>
                   <Input

@@ -89,7 +89,7 @@ const Header = (props) => {
 
       {State.isEditingExtraPropDefs(state) && (
         <ExtraPropDefsEditor
-          toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
+          canAdd={false}
           extraPropDefs={Taxonomy.getExtraPropsDefsArray(taxonomy)}
           onExtraPropDefDelete={({ propName }) =>
             Actions.updateTaxonomyExtraPropDef({
@@ -105,6 +105,7 @@ const Header = (props) => {
               extraPropDef,
             })
           }
+          toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
         />
       )}
     </div>
