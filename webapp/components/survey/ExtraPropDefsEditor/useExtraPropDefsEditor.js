@@ -24,12 +24,12 @@ export const useExtraPropDefsEditor = (props) => {
   )
 
   const onItemAdd = useCallback(async () => {
-    const itemExtraDef = {
+    const extraPropDef = {
       ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
       name: '', // name property is used only in UI
       newItem: true,
     }
-    updateExtraPropDefsState([...extraPropDefs, itemExtraDef])
+    updateExtraPropDefsState([...extraPropDefs, extraPropDef])
   }, [extraPropDefs])
 
   const onItemDelete = useCallback(

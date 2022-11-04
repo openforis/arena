@@ -138,7 +138,7 @@ export const taxonUpdateTest = async () => {
   })
 
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
-  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
+  await TaxonomyManager.updateTaxonAndVernacularNames(user, surveyId, taxonUpdated)
 
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 

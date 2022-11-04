@@ -5,6 +5,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import * as Taxonomy from '@core/survey/taxonomy'
+import { ExtraPropDef } from './extraPropDef'
 
 export const keysProps = {
   name: ObjectUtils.keys.name,
@@ -28,10 +29,11 @@ export const getExtraPropsDefs = ObjectUtils.getProp(keysProps.extraPropsDefs, {
 export const getExtraPropKeys = (taxonomy) => Object.keys(getExtraPropsDefs(taxonomy))
 export const getExtraPropsDefsArray = (taxonomy) =>
   // add uuid and name to each extra prop definition and put them in a array
-  Object.entries(getExtraPropsDefs(taxonomy)).map(([name, item]) => ({
-    ...item,
+  Object.entries(getExtraPropsDefs(taxonomy)).map(([name, extraPropDef]) => ({
+    ...extraPropDef,
     uuid: uuidv4(),
     name,
+    dataType: ExtraPropDef.getDataType(extraPropDef),
   }))
 
 // UPDATE

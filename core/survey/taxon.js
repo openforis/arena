@@ -40,8 +40,7 @@ export const newTaxon = ({ taxonomyUuid, code, family, genus, scientificName, ve
 })
 
 // ====== READ
-export const { getUuid } = ObjectUtils
-export const { getProps, getPropsDraft } = ObjectUtils
+export const { getUuid, getProps, getPropsDraft, setProp } = ObjectUtils
 export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
 export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')
@@ -116,3 +115,15 @@ export const mergeProps = (taxonNew) => (taxon) => {
     [keys.vernacularNames]: vernacularNamesUpdated,
   }
 }
+
+export const dissocExtraProp = (key) => R.dissocPath([keys.props, propKeys.extra, key])
+export const renameExtraProp =
+  ({ nameOld, nameNew }) =>
+  (taxon) => {
+    const extra = getExtra(taxon)
+    const extraUpdated = { ...extra }
+    const extraProp = extra[nameOld]
+    delete extraUpdated[nameOld]
+    extraUpdated[nameNew] = extraProp
+    return setProp(propKeys.extra, extraUpdated)(taxon)
+  }

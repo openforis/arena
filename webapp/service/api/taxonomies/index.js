@@ -50,7 +50,7 @@ export const updateTaxonomyExtraPropDef = async ({
     data: { taxonomy },
   } = await axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/extradef`, {
     propName,
-    itemExtraDef: A.stringify(extraPropDef),
+    extraPropDef: A.stringify(extraPropDef),
     deleted,
   })
   return taxonomy

@@ -71,7 +71,7 @@ export const taxonPublishedUpdateTest = async () => {
     scientificName: 'Albizia glaberrima updated',
   })
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxonPublished)
-  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
+  await TaxonomyManager.updateTaxonAndVernacularNames(user, surveyId, taxonUpdated)
 
   // Reload taxon
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
