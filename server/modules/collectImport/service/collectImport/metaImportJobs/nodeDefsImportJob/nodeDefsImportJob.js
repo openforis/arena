@@ -173,6 +173,8 @@ export default class NodeDefsImportJob extends Job {
     if (type === NodeDef.nodeDefType.entity) {
       // 3a. insert child definitions
       const childrenUuids = await this.insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout)
+      // current node def layout could have been modified during children insert; keep the latest version of it
+      nodeDef = this.nodeDefs[nodeDefUuid]
 
       if (tableLayout) {
         _updateLayoutProp({ propName: NodeDefLayout.keys.layoutChildren, value: childrenUuids })
@@ -204,7 +206,7 @@ export default class NodeDefsImportJob extends Job {
       _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
     }
 
-    Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
+    Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
 
     // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
