@@ -139,7 +139,7 @@ export default class NodeDefsImportJob extends Job {
             [NodeDef.propKeys.readOnly]: calculated,
           }),
       // Extra props
-      ...this.extractNodeDefExtraProps(type, collectNodeDef),
+      ...this.extractNodeDefSpecificProps(type, collectNodeDef),
     }
 
     // 2. insert node def into db
@@ -240,7 +240,7 @@ export default class NodeDefsImportJob extends Job {
 
     nodeDefsInserted[nodeDefUuid] = nodeDef
 
-    Object.assign(this.nodeDefs, { ...nodeDefsInserted, ...nodeDefsUpdated })
+    Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
 
     return nodeDefsInserted
   }
@@ -349,7 +349,7 @@ export default class NodeDefsImportJob extends Job {
     return propsAdvanced
   }
 
-  extractNodeDefExtraProps(type, collectNodeDef) {
+  extractNodeDefSpecificProps(type, collectNodeDef) {
     switch (type) {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
@@ -426,8 +426,11 @@ export default class NodeDefsImportJob extends Job {
     return { validationRules, unique }
   }
 
-  /**
+  /**.
    * Adds a text attribute with name ${nodeDefName}_${qualifiableCode} (for each 'qualifiable' code list item in the list)
+   *
+   * @param parentNodeDef
+   * @param nodeDef
    */
   async addSpecifyTextAttribute(parentNodeDef, nodeDef) {
     const categories = this.getContextProp('categories', {})
