@@ -4,7 +4,7 @@ const baseLayerProviders = {
   esri: 'ESRI',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
-  wmts: 'WMTS'
+  // wmts: 'WMTS',
 }
 
 const baseLayerAttribution = {
@@ -67,13 +67,14 @@ export const baseLayers = [
     maxZoom: 19,
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   },
-  {
-    key: 'WMTS',
-    name: 'Custom WMTS',
-    provider: baseLayerProviders.wmts,
-    attribution: '',
-    url: ''
-  },
+  // {
+  //   key: 'WMTS',
+  //   name: 'Custom WMTS',
+  //   provider: baseLayerProviders.wmts,
+  //   attribution: '',
+  //   url: ''
+  // },
+
   // Planet Labs maps
   {
     key: 'planet_monthly_mosaics',
