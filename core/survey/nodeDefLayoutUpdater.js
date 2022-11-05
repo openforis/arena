@@ -179,33 +179,31 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const childPagesIndexPrev = _getOrInitializeChildPagesIndex({ survey, cycle, nodeDefParent })
-
   const layoutChildrenPrev = NodeDefLayout.getLayoutChildren(cycle)(nodeDefParent)
 
   const layoutForCycleUpdated = Object.assign({}, layoutForCycle)
 
   if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
     // Add or node def to children (render as table)
-    const layoutChildrenUpdated = R.append(nodeDefUuid)(layoutChildrenPrev)
-    layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
+    layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenPrev.concat(nodeDefUuid)
     return layoutForCycleUpdated
   }
 
   // render as form
   if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
     // Node def displayed in its own page
-    const childPagesIndexUpdated = [...childPagesIndexPrev, nodeDefUuid]
-    layoutForCycleUpdated[NodeDefLayout.keys.indexChildren] = childPagesIndexUpdated
+    const childPagesIndexPrev = _getOrInitializeChildPagesIndex({ survey, cycle, nodeDefParent })
+    layoutForCycleUpdated[NodeDefLayout.keys.indexChildren] = childPagesIndexPrev.concat(nodeDefUuid)
+    return layoutForCycleUpdated
   }
   // render as form in current page (grid layout)
   // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
-  const h = R.propOr(1, NodeDef.getType(nodeDef), DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE)
+  const h = DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)] || 1
 
-  const layoutChildrenUpdated = R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildrenPrev)
+  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
   return layoutForCycleUpdated
 }
@@ -222,7 +220,7 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
     // Remove node def from children (render as table)
     const layoutChildrenUpdated = R.without([nodeDefUuid])(layoutChildrenPrev)
-    return { ...layoutForCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated }
+    return Object.assign({}, layoutForCycle, { [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated })
   }
   // render as form
 
@@ -231,14 +229,13 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
     // Node def displayed in its own page
     const childrenPagesIndexUpdated = R.without([nodeDefUuid])(childrenPagesIndexPrev)
-    return { ...layoutForCycle, [NodeDefLayout.keys.indexChildren]: childrenPagesIndexUpdated }
+    return Object.assign({}, layoutForCycle, { [NodeDefLayout.keys.indexChildren]: childrenPagesIndexUpdated })
   }
   // render as form in current page (grid layout)
   // Remove node def from children
-  const layoutForCycleUpdated = {
-    ...layoutForCycle,
+  const layoutForCycleUpdated = Object.assign({}, layoutForCycle, {
     [NodeDefLayout.keys.layoutChildren]: R.reject(R.propEq('i', nodeDefUuid), layoutChildrenPrev),
-  }
+  })
   return layoutForCycleUpdated
 }
 
