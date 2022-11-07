@@ -8,7 +8,6 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconGear } from '../buttons'
 import { Checkbox } from '../form'
-import { FormItem } from '../form/Input'
 import { useMapContext } from './MapContext'
 import { MapOptions } from './mapOptions'
 
@@ -42,12 +41,12 @@ export const MapOptionsEditor = () => {
                 ([key]) => !MapOptions.isOnlyForSampleBasedImageInterpretation(key) || sampleBasedImageInterpretation
               )
               .map(([key, value]) => (
-                <FormItem key={key} label={i18n.t(`mapView.options.${key}`)}>
-                  <Checkbox
-                    checked={value}
-                    onChange={(valueUpdated) => onOptionUpdate({ option: key, value: valueUpdated })}
-                  />
-                </FormItem>
+                <Checkbox
+                  key={key}
+                  checked={value}
+                  label={i18n.t(`mapView.options.${key}`)}
+                  onChange={(valueUpdated) => onOptionUpdate({ option: key, value: valueUpdated })}
+                />
               ))}
           </div>
         )}
