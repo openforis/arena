@@ -30,13 +30,14 @@ const NodeDefEntityFormGrid = (props) => {
   const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   useEffect(() => {
     const gridEl = gridElRef.current
     if (gridEl) {
       gridEl.scrollTop = 0
     }
-  }, [gridElRef, nodeDef, edit])
+  }, [edit, nodeDefUuid])
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
