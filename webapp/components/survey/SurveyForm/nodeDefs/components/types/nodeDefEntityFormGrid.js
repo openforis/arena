@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -20,7 +20,6 @@ const NodeDefEntityFormGrid = (props) => {
   const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
   const dispatch = useDispatch()
-  const gridElRef = useRef(null)
 
   const survey = useSelector(SurveyState.getSurvey)
   const cycle = useSelector(SurveyState.getSurveyCycleKey)
@@ -30,14 +29,6 @@ const NodeDefEntityFormGrid = (props) => {
   const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-
-  useEffect(() => {
-    const gridEl = gridElRef.current
-    if (gridEl) {
-      gridEl.scrollTop = 0
-    }
-  }, [gridElRef, edit, nodeDefUuid])
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
@@ -77,7 +68,6 @@ const NodeDefEntityFormGrid = (props) => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
       useCSSTransforms={false}
-      innerRef={gridElRef}
     >
       {visibleNodeDefsInnerPage.map((childDef) => (
         <div key={NodeDef.getUuid(childDef)}>
