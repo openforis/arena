@@ -49,13 +49,13 @@ class SurveyBuilder {
     this.taxonomyBuilders = []
   }
 
-  taxonomy(name, ...taxonBuilders) {
-    this.taxonomyBuilders.push(new TaxonomyBuilder(name, ...taxonBuilders))
+  categories(...categoryBuilders) {
+    this.categoryBuilders = categoryBuilders
     return this
   }
 
-  categories(...categoryBuilders) {
-    this.categoryBuilders = categoryBuilders
+  taxonomies(...taxonomyBuilders) {
+    this.taxonomyBuilders = taxonomyBuilders
     return this
   }
 
@@ -163,5 +163,6 @@ export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefA
 export const category = (name) => new CategoryBuilder(name)
 export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
+export const taxonomy = (name) => new TaxonomyBuilder(name)
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>
   new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

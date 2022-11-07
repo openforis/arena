@@ -29,12 +29,14 @@ beforeAll(async () => {
     // Cluster
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
-    .taxonomy(
-      taxonomyNameDefault,
-      SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-        .vernacularName('eng', 'Mahogany')
-        .vernacularName('swa', 'Mbambakofi'),
-      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+    .taxonomies(
+      SB.taxonomy(
+        taxonomyNameDefault,
+        SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+          .vernacularName('eng', 'Mahogany')
+          .vernacularName('swa', 'Mbambakofi'),
+        SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+      )
     )
     .buildAndStore(false)
 })
