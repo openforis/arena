@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,12 +10,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Node from '@core/record/node'
 
 import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
-
-import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useIsMountedRef } from '@webapp/components/hooks'
-import classNames from 'classnames'
+import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -39,7 +37,6 @@ const NodeDefEntityFormGrid = (props) => {
   }
 
   const columns = NodeDefLayout.getColumnsNo(cycle)(nodeDef)
-  const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
   const nodeDefsInnerPage = NodeDefLayout.rejectNodeDefsWithPage(cycle)(childDefs)
   const visibleNodeDefsInnerPage = entry
     ? nodeDefsInnerPage.filter(
@@ -49,9 +46,12 @@ const NodeDefEntityFormGrid = (props) => {
       )
     : nodeDefsInnerPage
 
+  const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
   const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal
 
-  return nodeDefsInnerPage.length > 0 ? (
+  if (nodeDefsInnerPage.length === 0) return null
+
+  return (
     <ResponsiveGridLayout
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       autoSize={entry}
@@ -87,7 +87,7 @@ const NodeDefEntityFormGrid = (props) => {
         </div>
       ))}
     </ResponsiveGridLayout>
-  ) : null
+  )
 }
 
 NodeDefEntityFormGrid.propTypes = {
