@@ -39,6 +39,7 @@ const Dropdown = (props) => {
     itemLabel,
     itemValue,
     items: itemsProp,
+    menuPlacement,
     multiple,
     onBeforeChange,
     onChange: onChangeProp,
@@ -99,6 +100,7 @@ const Dropdown = (props) => {
         isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
+        menuPlacement={menuPlacement}
         menuIsOpen={menuIsOpen}
         onInputChange={onInputChange}
         options={options}
@@ -123,6 +125,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
@@ -147,12 +150,13 @@ Dropdown.defaultProps = {
   itemIcon: 'icon',
   itemLabel: 'label',
   itemValue: 'value',
+  menuPlacement: 'auto',
   multiple: false,
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   searchable: true,
-  selection: null,
+  selection: undefined,
   testId: null,
   title: null,
   validation: {},
