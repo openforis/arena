@@ -37,7 +37,7 @@ const NodeDefEntityFormGrid = (props) => {
     if (gridEl) {
       gridEl.scrollTop = 0
     }
-  }, [edit, nodeDefUuid])
+  }, [gridElRef, edit, nodeDefUuid])
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
