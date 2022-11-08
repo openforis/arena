@@ -7,6 +7,31 @@ import * as JobManager from '@server/job/jobManager'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportJob from './taxonomyImportJob'
 
+export const {
+  // Create
+  insertTaxonomy,
+
+  // Read
+  fetchTaxonomyByUuid,
+  fetchTaxonomiesBySurveyId,
+  countTaxonomiesBySurveyId,
+  countTaxaByTaxonomyUuid,
+  findTaxaByCode,
+  findTaxaByScientificName,
+  findTaxaByCodeOrScientificName,
+  findTaxaByVernacularName,
+  fetchTaxaWithVernacularNames,
+  fetchTaxonByUuid,
+  fetchTaxonVernacularNameByUuid,
+
+  // Update
+  updateTaxonomyProp,
+  updateTaxonomyExtraPropDef,
+  // Delete
+
+  deleteTaxonomy,
+} = TaxonomyManager
+
 export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
@@ -35,25 +60,3 @@ export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
 
   return job
 }
-
-export const insertTaxonomy = TaxonomyManager.insertTaxonomy
-
-export const fetchTaxonomyByUuid = TaxonomyManager.fetchTaxonomyByUuid
-export const fetchTaxonomiesBySurveyId = TaxonomyManager.fetchTaxonomiesBySurveyId
-
-export const countTaxonomiesBySurveyId = TaxonomyManager.countTaxonomiesBySurveyId
-export const countTaxaByTaxonomyUuid = TaxonomyManager.countTaxaByTaxonomyUuid
-export const findTaxaByCode = TaxonomyManager.findTaxaByCode
-export const findTaxaByScientificName = TaxonomyManager.findTaxaByScientificName
-export const findTaxaByCodeOrScientificName = TaxonomyManager.findTaxaByCodeOrScientificName
-export const findTaxaByVernacularName = TaxonomyManager.findTaxaByVernacularName
-
-export const fetchTaxaWithVernacularNames = TaxonomyManager.fetchTaxaWithVernacularNames
-export const fetchTaxonByUuid = TaxonomyManager.fetchTaxonByUuid
-export const fetchTaxonVernacularNameByUuid = TaxonomyManager.fetchTaxonVernacularNameByUuid
-
-// Update
-export const updateTaxonomyProp = TaxonomyManager.updateTaxonomyProp
-
-// Delete
-export const deleteTaxonomy = TaxonomyManager.deleteTaxonomy

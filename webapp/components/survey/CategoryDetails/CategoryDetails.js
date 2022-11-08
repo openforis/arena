@@ -18,11 +18,11 @@ import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, UploadButton } from '@webapp/components/form'
 
+import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
-import { ItemExtraDefsEditor } from './ItemExtraDefsEditor'
 
 const MAX_LEVELS = 5
 
@@ -120,7 +120,7 @@ const CategoryDetails = (props) => {
                   />
                   <Button
                     className="btn-transparent"
-                    label="categoryEdit.extraPropertiesEditor.title"
+                    label="extraProp.editor.title"
                     onClick={Actions.toggleEditExtraPropertiesPanel}
                   />
                 </>
@@ -129,7 +129,26 @@ const CategoryDetails = (props) => {
           )}
         </div>
 
-        {editingItemExtraDefs && <ItemExtraDefsEditor state={state} setState={setState} />}
+        {editingItemExtraDefs && (
+          <ExtraPropDefsEditor
+            toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
+            extraPropDefs={Category.getItemExtraDefsArray(category)}
+            onExtraPropDefDelete={({ propName }) =>
+              Actions.updateCategoryItemExtraPropItem({
+                categoryUuid,
+                name: propName,
+                deleted: true,
+              })
+            }
+            onExtraPropDefUpdate={({ propName, extraPropDef }) =>
+              Actions.updateCategoryItemExtraPropItem({
+                categoryUuid,
+                name: propName,
+                itemExtraDef: extraPropDef,
+              })
+            }
+          />
+        )}
 
         <div className="category__levels">
           {levels.map((level) => (

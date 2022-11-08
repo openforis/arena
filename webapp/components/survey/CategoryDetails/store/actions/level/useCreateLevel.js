@@ -16,11 +16,12 @@ export const useCreateLevel = ({ setState }) => {
     const level = Category.newLevel(category)
 
     const {
-      data: { category: categoryUpdatd },
+      data: { category: categoryUpdated },
     } = await axios.post(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/levels`, level)
 
-    setState(State.assocCategory({ category: categoryUpdatd }))
+    setState(State.assocCategory({ category: categoryUpdated }))
 
+    dispatch(SurveyActions.surveyCategoryUpdated(categoryUpdated))
     dispatch(SurveyActions.metaUpdated())
   }, [])
 }

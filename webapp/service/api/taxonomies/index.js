@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import * as A from '@core/arena'
+
 import * as Taxonomy from '@core/survey/taxonomy'
 
 // ==== READ
@@ -37,10 +39,27 @@ export const uploadTaxa = async ({ surveyId, taxonomyUuid, formData }) =>
 export const updateTaxonomy = async ({ surveyId, taxonomyUuid, data }) =>
   axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, data)
 
+export const updateTaxonomyExtraPropDef = async ({
+  surveyId,
+  taxonomyUuid,
+  propName,
+  extraPropDef,
+  deleted = false,
+}) => {
+  const {
+    data: { taxonomy },
+  } = await axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/extradef`, {
+    propName,
+    extraPropDef: A.stringify(extraPropDef),
+    deleted,
+  })
+  return taxonomy
+}
+
 export const deleteTaxonomyIfEmpty = async ({ surveyId, taxonomyUuid }) => {
   const {
     data: { taxonomies: updatedTaxonomies },
   } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}`, { data: { onlyIfEmpty: true } })
-  const deleted = !Boolean(updatedTaxonomies[taxonomyUuid])
+  const deleted = !updatedTaxonomies[taxonomyUuid]
   return deleted
 }

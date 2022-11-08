@@ -32,6 +32,8 @@ export const useUpdate = ({ setState }) => {
       })
     }
 
+    const taxonomyUpdated = State.assocTaxonomyProp({ key, value })(taxonomy)
+    dispatch(SurveyActions.surveyTaxonomyUpdated(taxonomyUpdated))
     dispatch(SurveyActions.metaUpdated())
     dispatch(debounceAction(action, `taxonomy_updated_${taxonomyUuid}_${key}`))
   }, [])

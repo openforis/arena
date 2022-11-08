@@ -75,6 +75,7 @@ const Dropdown = (props) => {
     itemsProp,
     onBeforeChange,
     onChangeProp,
+    readOnly,
     selection,
     title,
   })

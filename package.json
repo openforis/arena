@@ -102,7 +102,7 @@
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/material": "^5.10.0",
-    "@openforis/arena-core": "^0.0.113",
+    "@openforis/arena-core": "^0.0.117",
     "@openforis/arena-server": "^0.1.20",
     "@sendgrid/mail": "^7.7.0",
     "@shopify/draggable": "^1.0.0-beta.8",

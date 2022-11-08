@@ -11,7 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
@@ -25,7 +25,7 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryValidator from '../categoryValidator'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 import * as CategoryRepository from '../repository/categoryRepository'
-import { validateCategoryItemExtraDef } from '@core/survey/categoryItemExtraDefValidator'
+import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 
 // ====== VALIDATION
 
@@ -221,7 +221,7 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
     }
     const itemUpdated = deleted
       ? CategoryItem.dissocExtraProp(name)(item)
-      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: CategoryItemExtraDef.getName(itemExtraDef) })(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: ExtraPropDef.getName(itemExtraDef) })(item)
 
     return [...acc, itemUpdated]
   }, [])
@@ -241,15 +241,15 @@ export const updateCategoryItemExtraDefItem = async (
     // validate new item extra def
     let itemExtraDefsArrayUpdated = [...Category.getItemExtraDefsArray(category)]
     // remove old item
-    itemExtraDefsArrayUpdated = itemExtraDefsArrayUpdated.filter((item) => CategoryItemExtraDef.getName(item) !== name)
+    itemExtraDefsArrayUpdated = itemExtraDefsArrayUpdated.filter((item) => ExtraPropDef.getName(item) !== name)
 
     if (!deleted) {
       // add new extra def item
       itemExtraDefsArrayUpdated.push(itemExtraDef)
 
-      const validation = await validateCategoryItemExtraDef({
-        itemExtraDef,
-        itemExtraDefsArray: itemExtraDefsArrayUpdated,
+      const validation = await validateExtraPropDef({
+        extraPropDef: itemExtraDef,
+        extraPropDefsArray: itemExtraDefsArrayUpdated,
       })
       if (!Validation.isValid(validation)) {
         throw new Error('Invalid category item extra def')
@@ -257,7 +257,7 @@ export const updateCategoryItemExtraDefItem = async (
     }
 
     // update category items
-    if (deleted || name !== CategoryItemExtraDef.getName(itemExtraDef)) {
+    if (deleted || name !== ExtraPropDef.getName(itemExtraDef)) {
       await _updateCategoryItemsExtraDef({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t)
     }
 
@@ -267,8 +267,8 @@ export const updateCategoryItemExtraDefItem = async (
     const itemExtraDefsToStore = itemExtraDefsArrayUpdated.reduce(
       (acc, item) => ({
         ...acc,
-        [CategoryItemExtraDef.getName(item)]: CategoryItemExtraDef.newItem({
-          dataType: CategoryItemExtraDef.getDataType(item),
+        [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
+          dataType: ExtraPropDef.getDataType(item),
         }),
       }),
       {}
@@ -405,8 +405,8 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
     const itemExtraDefUpdated = {
       ...itemExtraDef,
-      [Category.reportingDataItemExtraDefKeys.area]: CategoryItemExtraDef.newItem({
-        dataType: CategoryItemExtraDef.dataTypes.number,
+      [Category.reportingDataItemExtraDefKeys.area]: ExtraPropDef.newItem({
+        dataType: ExtraPropDef.dataTypes.number,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)

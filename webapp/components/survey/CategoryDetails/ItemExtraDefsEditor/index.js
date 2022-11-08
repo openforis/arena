@@ -1,1 +1,0 @@
-export { ItemExtraDefsEditor } from './ItemExtraDefsEditor'

@@ -1,0 +1,1 @@
+export { ExtraPropDefsEditor } from './ExtraPropDefsEditor'

@@ -186,6 +186,31 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
     (r) => parseInt(r.count, 10)
   )
 
+export const fetchTaxa = async (
+  { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
+  client = db
+) =>
+  client.map(
+    `SELECT t.*
+    FROM
+        ${getSurveyDBSchema(surveyId)}.taxon t
+    ${
+      !backup && !draft
+        ? `--exclude not published taxonomies if not draft
+      JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
+        ON t.taxonomy_uuid = taxonomy.uuid 
+        AND taxonomy.props <> '{}'::jsonb`
+        : ''
+    }
+    ORDER BY
+        t.id
+    LIMIT ${limit ? limit : 'ALL'} 
+    OFFSET $/offset/
+    `,
+    { taxonomyUuid, offset },
+    (record) => DB.transformCallback(record, draft, true, backup)
+  )
+
 export const fetchTaxaWithVernacularNames = async (
   { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
   client = db
@@ -409,14 +434,17 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
 export const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyUuid, key, value, client)
 
-export const updateTaxon = async (surveyId, taxon, client = db) =>
+export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
+  client.none(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.taxon
+     SET props_draft = $2
+     WHERE uuid = $1`,
+    [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
+  )
+
+export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db) =>
   client.batch([
-    client.none(
-      `UPDATE ${getSurveyDBSchema(surveyId)}.taxon
-       SET props_draft = $2
-       WHERE uuid = $1`,
-      [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
-    ),
+    updateTaxonProps({ surveyId, taxon }, client),
     ..._insertOrUpdateVernacularNames({
       surveyId,
       taxonUuid: Taxon.getUuid(taxon),
@@ -426,7 +454,10 @@ export const updateTaxon = async (surveyId, taxon, client = db) =>
   ])
 
 export const updateTaxa = async (surveyId, taxa, client = db) =>
-  client.batch(taxa.map((taxon) => updateTaxon(surveyId, taxon, client)))
+  client.batch(taxa.map((taxon) => updateTaxonAndVernacularNames(surveyId, taxon, client)))
+
+export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
+  client.batch(taxa.map((taxon) => updateTaxonProps({ surveyId, taxon }, client)))
 
 // ============== DELETE
 

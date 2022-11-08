@@ -4,7 +4,7 @@ import { ArrayUtils } from '@core/arrayUtils'
 
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 const generateDescendantItems = ({ levels, levelIndex = 0, previousLevelCodes = [], numItemsPerLevel = 2 }) => {
   const codes = ArrayUtils.fromNumberOfElements(numItemsPerLevel).map((codeIndex) => `${codeIndex + 1}`)
@@ -37,9 +37,9 @@ const generateCategoryTemplate = () => {
   category = Category.assocLevel({ level: Category.newLevel(category) })(category)
   // extra props
   category = Category.assocItemExtraDef({
-    ['extra_prop_text']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
-    ['extra_prop_number']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.number }),
-    ['extra_prop_geometry']: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.geometryPoint }),
+    ['extra_prop_text']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+    ['extra_prop_number']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+    ['extra_prop_geometry']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint }),
   })(category)
   return category
 }
@@ -82,7 +82,7 @@ const generateTemplate = ({ category: categoryProp = null, languages }) => {
     ...extraDefs.reduce(
       (acc, extraDef) => ({
         ...acc,
-        [extraDef.name]: templateExtraValueByType[CategoryItemExtraDef.getDataType(extraDef)],
+        [extraDef.name]: templateExtraValueByType[ExtraPropDef.getDataType(extraDef)],
       }),
       {}
     ),
@@ -90,9 +90,9 @@ const generateTemplate = ({ category: categoryProp = null, languages }) => {
 }
 
 const templateExtraValueByType = {
-  [CategoryItemExtraDef.dataTypes.number]: 100,
-  [CategoryItemExtraDef.dataTypes.text]: 'Text Value',
-  [CategoryItemExtraDef.dataTypes.geometryPoint]: Points.toString(
+  [ExtraPropDef.dataTypes.number]: 100,
+  [ExtraPropDef.dataTypes.text]: 'Text Value',
+  [ExtraPropDef.dataTypes.geometryPoint]: Points.toString(
     PointFactory.createInstance({ x: 12.48902, y: 41.88302, srs: '4326' })
   ),
 }

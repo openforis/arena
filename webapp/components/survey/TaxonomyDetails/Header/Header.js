@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
@@ -16,6 +16,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
+import { ExtraPropDefsEditor } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 
 const Header = (props) => {
@@ -25,6 +26,7 @@ const Header = (props) => {
   const canEdit = useAuthCanEditSurvey()
   const taxonomy = State.getTaxonomy(state)
   const validation = Validation.getValidation(taxonomy)
+  const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
   return (
     <div className="taxonomy__header">
@@ -69,7 +71,43 @@ const Header = (props) => {
           requestParams={{ draft: canEdit }}
           label="common.csvExport"
         />
+        {canEdit && (
+          <ButtonMenu
+            iconClassName="icon-cog icon-14px"
+            popupComponent={
+              <>
+                <Button
+                  className="btn-transparent"
+                  label="extraProp.editor.title"
+                  onClick={Actions.toggleEditExtraPropertiesPanel}
+                />
+              </>
+            }
+          />
+        )}
       </div>
+
+      {State.isEditingExtraPropDefs(state) && (
+        <ExtraPropDefsEditor
+          canAdd={false}
+          extraPropDefs={Taxonomy.getExtraPropsDefsArray(taxonomy)}
+          onExtraPropDefDelete={({ propName }) =>
+            Actions.updateTaxonomyExtraPropDef({
+              taxonomyUuid,
+              propName,
+              deleted: true,
+            })
+          }
+          onExtraPropDefUpdate={({ propName, extraPropDef }) =>
+            Actions.updateTaxonomyExtraPropDef({
+              taxonomyUuid,
+              propName,
+              extraPropDef,
+            })
+          }
+          toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
+        />
+      )}
     </div>
   )
 }
