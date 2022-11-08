@@ -136,17 +136,17 @@ describe('RecordExpressionParser Test', () => {
     { q: 'distance(plot[0].plot_location, remarks)', r: null },
     // distance (using categoryItemProp)
     {
-      q: `distance(cluster_location, categoryItemProp('sampling_point', 'location', cluster_id)).toFixed(2)`,
+      q: `distance(cluster_location, categoryItemProp('sampling_point_data', 'location', cluster_id)).toFixed(2)`,
       r: '4307919.62',
     },
     {
-      q: `distance(plot_location, categoryItemProp('sampling_point', 'location', cluster_id, plot_id)).toFixed(2)`,
+      q: `distance(plot_location, categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)).toFixed(2)`,
       r: '4311422.21',
       n: 'cluster/plot[1]/plot_id',
     },
     // taxonProp
-    { q: `taxonProp('trees', 'max_height', 'AFZ/QUA')`, r: '200' },
-    { q: `taxonProp('trees', 'max_dbh', 'OLE/CAP')`, r: '40' },
+    { q: `taxonProp('trees', 'max_height', 'AFZ/QUA')`, r: 200 },
+    { q: `taxonProp('trees', 'max_dbh', 'OLE/CAP')`, r: 40 },
     // taxonProp: unexisting prop or code
     { q: `taxonProp('trees', 'unexisting_prop', 'AFZ/QUA')`, r: null },
     { q: `taxonProp('trees', 'max_dbh', 'AFZ/QUA/OTHER')`, r: null },

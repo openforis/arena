@@ -30,8 +30,7 @@ beforeAll(async () => {
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
     .taxonomies(
-      SB.taxonomy(
-        taxonomyNameDefault,
+      SB.taxonomy(taxonomyNameDefault).taxa(
         SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
           .vernacularName('eng', 'Mahogany')
           .vernacularName('swa', 'Mbambakofi'),

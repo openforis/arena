@@ -68,7 +68,7 @@ export const createTestSurvey = ({ user }) =>
             .extra({ prop1: 'Extra prop1 item 3', prop2: 'Extra prop2 item 3' })
             .items(SB.categoryItem('3a').extra({ prop1: 'Extra prop1 item 3a', prop2: 'Extra prop2 item 3a' }))
         ),
-      SB.category('sampling_point')
+      SB.category('sampling_point_data')
         .extraProps({
           location: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint }),
           region: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
@@ -109,18 +109,19 @@ export const createTestSurvey = ({ user }) =>
       )
     )
     .taxonomies(
-      SB.taxonomy(
-        'trees',
-        SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-          .vernacularName('eng', 'Mahogany')
-          .vernacularName('swa', 'Mbambakofi')
-          .extra('max_height', '200')
-          .extra('max_dbh', '30'),
-        SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis').extra('max_height', '300').extra('max_dbh', '40')
-      ).extraProps({
-        max_height: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
-        max_dbh: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
-      })
+      SB.taxonomy('trees')
+        .extraProps({
+          max_height: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+          max_dbh: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+        })
+        .taxa(
+          SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+            .vernacularName('eng', 'Mahogany')
+            .vernacularName('swa', 'Mbambakofi')
+            .extra('max_height', '200')
+            .extra('max_dbh', '30'),
+          SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis').extra('max_height', '300').extra('max_dbh', '40')
+        )
     )
     .build()
 

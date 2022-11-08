@@ -2,14 +2,18 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 
 export class TaxonomyBuilder {
-  constructor(name, ...taxonBuilders) {
+  constructor(name) {
     this.name = name
-    this.taxonBuilders = taxonBuilders
     this._extraProps = {}
   }
 
   extraProps(extraPropsDefs) {
     this._extraProps = extraPropsDefs
+    return this
+  }
+
+  taxa(...taxonBuilders) {
+    this.taxonBuilders = taxonBuilders
     return this
   }
 

@@ -8,7 +8,6 @@ import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as Category from '../../../core/survey/category'
 import * as Taxonomy from '../../../core/survey/taxonomy'
-import * as Taxon from '../../../core/survey/taxon'
 import * as User from '../../../core/user/user'
 import * as PromiseUtils from '../../../core/promiseUtils'
 
@@ -83,18 +82,8 @@ class SurveyBuilder {
     const taxaIndexRefData = []
     this.taxonomyBuilders.forEach((taxonomyBuilder) => {
       const { taxonomy, taxa } = taxonomyBuilder.build()
-      const extraPropsDefs = {}
-
+      taxonomiesByUuid[Taxonomy.getUuid(taxonomy)] = taxonomy
       taxaIndexRefData.push(...taxa)
-
-      // extract extra props defs
-      taxa.forEach((taxon) => {
-        const extraPropsKeys = Object.keys(Taxon.getExtra(taxon))
-        extraPropsKeys.forEach((extraPropKey) => {
-          extraPropsDefs[extraPropKey] = { key: extraPropKey }
-        })
-      })
-      taxonomiesByUuid[Taxonomy.getUuid(taxonomy)] = Taxonomy.assocExtraPropsDefs(extraPropsDefs)(taxonomy)
     })
 
     survey = A.pipe(

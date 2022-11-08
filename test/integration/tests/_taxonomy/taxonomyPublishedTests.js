@@ -25,8 +25,7 @@ beforeAll(async () => {
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
     .taxonomies(
-      SB.taxonomy(
-        taxonomyName,
+      SB.taxonomy(taxonomyName).taxa(
         SB.taxon('ALB/GLA', 'Fabaceae', 'Albizia', 'Albizia glaberrima'),
         SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
           .vernacularName('eng', 'Mahogany')
