@@ -207,14 +207,13 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     Survey.assocTaxonomies(taxonomies)
   )(surveyDb)
 
-  if (dependencies) {
-    survey = Survey.assocDependencyGraph(dependencies)(survey)
-  }
   if (validate) {
     const dependencyGraph = dependencies || Survey.buildDependencyGraph(survey)
     survey = Survey.assocDependencyGraph(dependencyGraph)(survey)
     const validation = await SurveyValidator.validateNodeDefs(survey)
     survey = Survey.assocNodeDefsValidation(validation)(survey)
+  } else if (dependencies) {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
   return survey
 }
