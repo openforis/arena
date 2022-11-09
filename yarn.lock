@@ -1622,24 +1622,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@../arena-core":
-  version "0.0.117"
-  dependencies:
-    "@esri/proj-codes" "^3.0.0"
-    "@jsep-plugin/regex" "^1.0.3"
-    date-fns "^2.29.3"
-    jsep "^1.3.7"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    proj4 "^2.8.0"
-    uuid "^9.0.0"
-
-"@openforis/arena-core@^0.0.117":
-  version "0.0.117"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.117/a9d5f8a5008804c173c95df8fc6d7b21382d8681#a9d5f8a5008804c173c95df8fc6d7b21382d8681"
-  integrity sha512-Mc8I5DDY92xa+kbYoBi9QfG3pZqogRpCiERaigIjZ1os/IVjB3Iw59GQTo5wpA+i2dcPD1sYwp+VRMK2xIza6Q==
+"@openforis/arena-core@^0.0.118":
+  version "0.0.118"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.118/1b658d1991eee234e3d411de876d8d288c5252b1#1b658d1991eee234e3d411de876d8d288c5252b1"
+  integrity sha512-U5T+8IxjtjODlZ1MPi1LHDn8wqLjLnoM0CjdXA3zLHHg4KZHfo54cep0HC12tevEkxv3rON4HcTJ/0QreqUSCA==
   dependencies:
     "@esri/proj-codes" "^3.0.0"
     "@jsep-plugin/regex" "^1.0.3"
