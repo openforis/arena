@@ -15,20 +15,19 @@ const tooltipOpacity = 0.6
 
 export const CoordinateAttributeMarker = (props) => {
   const {
-    ancestorsKeys,
     attributeDef,
-    latitude,
-    longitude,
     markersColor,
     onRecordEditClick,
-    parentUuid,
-    point,
-    recordUuid,
+    pointFeature,
     getNextPoint,
     getPreviousPoint,
-    openPopupOfUuid,
-    setRef,
+    openPopupOfPoint,
+    popupOpen,
+    setMarkerByParentUuid,
   } = props
+
+  const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
+  const [longitude, latitude] = pointFeature.geometry.coordinates
 
   ancestorsKeys.propTypes = {
     join: PropTypes.any,
@@ -36,7 +35,7 @@ export const CoordinateAttributeMarker = (props) => {
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
-  const circleRef = useRef()
+  const circleRef = useRef(null)
 
   const options = useMapContextOptions()
   const { showMarkersLabels, showLocationMarkers } = options
@@ -50,8 +49,11 @@ export const CoordinateAttributeMarker = (props) => {
     if (showMarkersLabels && !circleMarker.isTooltipOpen()) {
       circleMarker.toggleTooltip()
     }
-    setRef(parentUuid, circleRef)
-  }, [circleRef, showLocationMarkers, showMarkersLabels])
+    setMarkerByParentUuid?.({ parentUuid, marker: circleMarker })
+    if (popupOpen) {
+      circleMarker.openPopup()
+    }
+  }, [circleRef, parentUuid, popupOpen, setMarkerByParentUuid, showLocationMarkers, showMarkersLabels])
 
   const tooltipEventHandlers = {
     add: (e) => {
@@ -64,6 +66,7 @@ export const CoordinateAttributeMarker = (props) => {
       Object.assign(tooltip._container.style, customStyle)
     },
   }
+
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
@@ -97,7 +100,7 @@ export const CoordinateAttributeMarker = (props) => {
           onRecordEditClick={onRecordEditClick}
           getNextPoint={getNextPoint}
           getPreviousPoint={getPreviousPoint}
-          openPopupOfUuid={openPopupOfUuid}
+          openPopupOfPoint={openPopupOfPoint}
         />
       </CircleMarker>
     </div>
@@ -112,10 +115,11 @@ CoordinateAttributeMarker.propTypes = {
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.any,
   parentUuid: PropTypes.any,
-  point: PropTypes.any,
+  pointFeature: PropTypes.any,
   recordUuid: PropTypes.any,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
-  openPopupOfUuid: PropTypes.func,
-  setRef: PropTypes.func,
+  openPopupOfPoint: PropTypes.func,
+  popupOpen: PropTypes.bool,
+  setMarkerByParentUuid: PropTypes.func,
 }

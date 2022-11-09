@@ -17,8 +17,9 @@ export const SamplingPointDataLayer = (props) => {
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
 
-  const openPopupOfUuid = (uuid) => {
-    markerRefs.current[uuid].openPopup()
+  const openPopupOfPoint = (point) => {
+    const marker = markerRefs.current[point.uuid]
+    marker?.openPopup()
   }
 
   const getPointIndex = (uuid) => {
@@ -29,8 +30,9 @@ export const SamplingPointDataLayer = (props) => {
     const index = getPointIndex(uuid)
     return items[(index + 1) % items.length]
   }
+
   const getPreviousPoint = (uuid) => {
-    let index = getPointIndex(uuid)
+    const index = getPointIndex(uuid)
     return items[index > 0 ? index - 1 : items.length - 1]
   }
 
@@ -50,6 +52,7 @@ export const SamplingPointDataLayer = (props) => {
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
                 color={markersColor}
+                openPopupOfPoint={openPopupOfPoint}
                 totalPoints={totalPoints}
               />
             )
@@ -73,7 +76,7 @@ export const SamplingPointDataLayer = (props) => {
                 itemUuid={itemUuid}
                 getNextPoint={getNextPoint}
                 getPreviousPoint={getPreviousPoint}
-                openPopupOfUuid={openPopupOfUuid}
+                openPopupOfPoint={openPopupOfPoint}
               />
             </CircleMarker>
           )
