@@ -1,50 +1,41 @@
 ############################################################
 
+ARG NPM_TOKEN
 ARG node_version=14.17.0
 
-FROM node:${node_version} AS base
-RUN apt update
-RUN apt install -y git
+FROM node:${node_version} AS arena
 
-# Cache these as much as possible:
-COPY package.json yarn.lock /app/
+ARG NPM_TOKEN
+ENV NPM_TOKEN $NPM_TOKEN
 
-RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
+RUN apt update && apt install -y git curl
+
+# Pull code from GitHub
 
 COPY .git /app/.git
+
 RUN cd /app; git reset --hard
 
-############################################################
-
-FROM rocker/rstudio:3.6.1 AS arena-web
-
-# Set RStudio Server working directory
-RUN mkdir -p /home/rstudio/chains
-RUN echo 'setwd("/home/rstudio/chains")' >> /usr/local/lib/R/etc/Rprofile.site
-
-# Install required RStudio Server libraries
-RUN apt update
-RUN apt install -y libpq-dev
-
-# Install NGINX
-RUN apt update
-RUN apt install -y nginx
-COPY --from=base /app/infra/nginx/nginx.conf /etc/nginx/sites-available/default
-COPY --from=base /app/infra/nginx/rstudio_pass /etc/nginx/rstudio_pass
-
 # Build Arena
-RUN apt update
-RUN apt install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt install -y nodejs git
-RUN npm install pm2 -g
-COPY --from=base /app /app
-RUN cd /app; npm run build:server:prod; npm run build-prod
 
-# Start
 WORKDIR /app
+
+RUN echo -e "scripts-prepend-node-path=true\n\
+    @openforis:registry=https://npm.pkg.github.com\n\
+    always-auth=true\n\
+    //npm.pkg.github.com/:_authToken=$NPM_TOKEN\n" > /app/.npmrc
+
+RUN yarn install --frozen-lockfile \
+    && yarn build \
+    && npm rebuild node-sass \
+    && rm -r /app/.npmrc
+
+RUN npm install pm2 -g
+
+# Prepare start script
+
 RUN ln -s dist/server.js .
-COPY --from=base /app/infra/web/start.sh /app/start.sh
+RUN ln -s /app/infra/web/start.sh /app/start.sh
 RUN chmod +x start.sh
 CMD ["./start.sh"]
 
