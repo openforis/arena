@@ -31,13 +31,16 @@ const afterNodeDefUpdate = async (
   client = db
 ) => {
   const allUpdatedNodeDefs = { ...(nodeDef ? { [nodeDef.uuid]: nodeDef } : nodeDefsUpdated) }
+  const updatedNodeDefsNotDeleted = ObjectUtils.toUuidIndexedObj(
+    Object.values(allUpdatedNodeDefs).filter((def) => !NodeDef.isDeleted(def))
+  )
 
   // merge node defs with existing ones
   let surveyUpdated = Survey.mergeNodeDefs(allUpdatedNodeDefs)(survey)
 
   // add dependent node defs to dependency graph
   surveyUpdated = Survey.addNodeDefsDependencies({
-    ...allUpdatedNodeDefs,
+    ...updatedNodeDefsNotDeleted,
     ...ObjectUtils.toUuidIndexedObj(nodeDefsDependent),
   })(surveyUpdated)
 
