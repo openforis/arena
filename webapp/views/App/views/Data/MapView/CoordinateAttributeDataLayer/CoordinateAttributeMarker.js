@@ -50,6 +50,7 @@ export const CoordinateAttributeMarker = (props) => {
       circleMarker.toggleTooltip()
     }
     setMarkerByParentUuid?.({ parentUuid, marker: circleMarker })
+
     if (popupOpen) {
       circleMarker.openPopup()
     }
@@ -108,15 +109,10 @@ export const CoordinateAttributeMarker = (props) => {
 }
 
 CoordinateAttributeMarker.propTypes = {
-  ancestorsKeys: PropTypes.array,
   attributeDef: PropTypes.any,
-  latitude: PropTypes.any,
-  longitude: PropTypes.any,
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.any,
-  parentUuid: PropTypes.any,
   pointFeature: PropTypes.any,
-  recordUuid: PropTypes.any,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
   openPopupOfPoint: PropTypes.func,
