@@ -11,8 +11,15 @@ const markerRadius = 10
 export const SamplingPointDataLayer = (props) => {
   const { markersColor } = props
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, overlayName, totalPoints, items } =
-    useSamplingPointDataLayer(props)
+  const {
+    clusters,
+    clusterExpansionZoomExtractor,
+    clusterIconCreator,
+    getClusterLeaves,
+    overlayName,
+    totalPoints,
+    items,
+  } = useSamplingPointDataLayer(props)
 
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
@@ -52,7 +59,9 @@ export const SamplingPointDataLayer = (props) => {
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
                 color={markersColor}
+                getClusterLeaves={getClusterLeaves}
                 openPopupOfPoint={openPopupOfPoint}
+                pointLabelFunction={(point) => point.properties.itemCodes.join(' - ')}
                 totalPoints={totalPoints}
               />
             )

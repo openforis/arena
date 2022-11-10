@@ -76,6 +76,7 @@ export const CoordinateAttributeDataLayer = (props) => {
                 getClusterLeaves={getClusterLeaves}
                 onRecordEditClick={onRecordEditClick}
                 openPopupOfPoint={openPopupOfPoint}
+                pointLabelFunction={(point) => point.properties.ancestorsKeys.join(' - ')}
                 totalPoints={totalPoints}
               />
             )

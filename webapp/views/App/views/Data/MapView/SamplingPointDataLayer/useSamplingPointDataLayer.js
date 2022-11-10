@@ -135,11 +135,13 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [])
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({ points })
+
   return {
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
+    getClusterLeaves,
     overlayName,
     totalPoints: points.length,
     items,

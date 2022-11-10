@@ -5,18 +5,18 @@ import PropTypes from 'prop-types'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const ClusteredPointsPopup = (props) => {
-  const { clusteredPoints, openPopupOfPoint } = props
+  const { clusteredPoints, openPopupOfPoint, pointLabelFunction } = props
 
   return (
     <Popup className="cluster-marker__clustered-points-popup">
       <ul>
         {clusteredPoints.map((point) => {
           const { properties } = point
-          const { ancestorsKeys, key } = properties
+          const { key } = properties
           return (
             <li key={key}>
               <a onClick={() => openPopupOfPoint(point)}>
-                <LabelWithTooltip label={ancestorsKeys.join(' - ')} />
+                <LabelWithTooltip label={pointLabelFunction(point)} />
               </a>
             </li>
           )
@@ -29,6 +29,7 @@ const ClusteredPointsPopup = (props) => {
 ClusteredPointsPopup.propTypes = {
   clusteredPoints: PropTypes.array.isRequired,
   openPopupOfPoint: PropTypes.func.isRequired,
+  pointLabelFunction: PropTypes.func.isRequired,
 }
 
 export const ClusterMarker = (props) => {
@@ -39,6 +40,7 @@ export const ClusterMarker = (props) => {
     color,
     getClusterLeaves,
     openPopupOfPoint,
+    pointLabelFunction,
     totalPoints,
   } = props
 
@@ -82,7 +84,11 @@ export const ClusterMarker = (props) => {
       eventHandlers={{ click: onClick }}
       ref={markerRef}
     >
-      <ClusteredPointsPopup clusteredPoints={clusteredPoints} openPopupOfPoint={openPopupOfPoint} />
+      <ClusteredPointsPopup
+        clusteredPoints={clusteredPoints}
+        openPopupOfPoint={openPopupOfPoint}
+        pointLabelFunction={pointLabelFunction}
+      />
     </Marker>
   )
 }
@@ -94,5 +100,6 @@ ClusterMarker.propTypes = {
   color: PropTypes.string.isRequired,
   getClusterLeaves: PropTypes.func.isRequired,
   openPopupOfPoint: PropTypes.func.isRequired,
+  pointLabelFunction: PropTypes.func.isRequired,
   totalPoints: PropTypes.number.isRequired,
 }
