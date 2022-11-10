@@ -29,7 +29,7 @@ const _convertItemsToPoints = (items) => {
 
     return {
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, location },
+      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
