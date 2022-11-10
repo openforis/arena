@@ -1,5 +1,35 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Marker, Popup, useMap } from 'react-leaflet'
+import PropTypes from 'prop-types'
+
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+
+const ClusteredPointsPopup = (props) => {
+  const { clusteredPoints, openPopupOfPoint } = props
+
+  return (
+    <Popup className="cluster-marker__clustered-points-popup">
+      <ul>
+        {clusteredPoints.map((point) => {
+          const { properties } = point
+          const { ancestorsKeys, key } = properties
+          return (
+            <li key={key}>
+              <a onClick={() => openPopupOfPoint(point)}>
+                <LabelWithTooltip label={ancestorsKeys.join(' - ')} />
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </Popup>
+  )
+}
+
+ClusteredPointsPopup.propTypes = {
+  clusteredPoints: PropTypes.array.isRequired,
+  openPopupOfPoint: PropTypes.func.isRequired,
+}
 
 export const ClusterMarker = (props) => {
   const {
@@ -52,19 +82,17 @@ export const ClusterMarker = (props) => {
       eventHandlers={{ click: onClick }}
       ref={markerRef}
     >
-      <Popup>
-        <ul>
-          {clusteredPoints.map((point) => {
-            const { properties } = point
-            const { ancestorsKeys, key } = properties
-            return (
-              <li key={key}>
-                <a onClick={() => openPopupOfPoint(point)}>{ancestorsKeys.join(' - ')}</a>
-              </li>
-            )
-          })}
-        </ul>
-      </Popup>
+      <ClusteredPointsPopup clusteredPoints={clusteredPoints} openPopupOfPoint={openPopupOfPoint} />
     </Marker>
   )
+}
+
+ClusterMarker.propTypes = {
+  cluster: PropTypes.object.isRequired,
+  clusterExpansionZoomExtractor: PropTypes.func.isRequired,
+  clusterIconCreator: PropTypes.func.isRequired,
+  color: PropTypes.string.isRequired,
+  getClusterLeaves: PropTypes.func.isRequired,
+  openPopupOfPoint: PropTypes.func.isRequired,
+  totalPoints: PropTypes.number.isRequired,
 }
