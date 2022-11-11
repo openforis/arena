@@ -29,7 +29,7 @@ const _convertItemsToPoints = (items) => {
 
     return {
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, location },
+      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
@@ -135,11 +135,13 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [])
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({ points })
+
   return {
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
+    getClusterLeaves,
     overlayName,
     totalPoints: points.length,
     items,
