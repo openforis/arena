@@ -1,14 +1,18 @@
 import { Points } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Record from '@core/record/record'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
@@ -74,8 +78,7 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   return job
 }
 
-const _getSamplingPointDataCategory = async ({ surveyId }) => {
-  const draft = true
+const _getSamplingPointDataCategory = async ({ surveyId, draft = true }) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
   return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
 }
@@ -87,9 +90,50 @@ export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
   return count
 }
 
+const _createSamplingPointDataRecordFinder = async ({ surveyId, draft }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft })
+  if (!Survey.canHaveData(survey)) return null
+
+  const samplingPointDataCategory = Survey.getCategoryByName(Survey.samplingPointDataCategoryName)(survey)
+  if (!samplingPointDataCategory) return null
+
+  const samplingPointDataNodeDefs = Survey.findDescendants({
+    nodeDef: Survey.getNodeDefRoot(survey),
+    filterFn: (nodeDef) => NodeDef.getCategoryUuid(nodeDef) === samplingPointDataCategory.uuid,
+  })(survey)
+
+  if (samplingPointDataNodeDefs.length === 0) return null
+
+  const rootEntityKeyDefs = Survey.getNodeDefRootKeys(survey)
+  const allKeyDefsUseSamplingPointData = rootEntityKeyDefs.every((rootKeyDef) =>
+    samplingPointDataNodeDefs.includes(rootKeyDef)
+  )
+  if (!allKeyDefsUseSamplingPointData) return null
+
+  const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId })
+  const { list: records } = recordsSummary
+
+  return (samplingPointDataItem) => {
+    const itemCodes = CategoryItem.getCodesHierarchy(samplingPointDataItem)
+
+    const record = records.find((record) =>
+      rootEntityKeyDefs.every((keyDef) => {
+        const keyDefCategoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(keyDef)(survey)
+        const codeValue = itemCodes[keyDefCategoryLevelIndex]
+        const keyDefName = NodeDef.getName(keyDef)
+        const recordKeyValue = record[A.camelize(keyDefName)]
+        return codeValue === recordKeyValue
+      })
+    )
+    return record
+  }
+}
+
 export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
   const draft = true
-  const category = await _getSamplingPointDataCategory({ surveyId })
+  const category = await _getSamplingPointDataCategory({ surveyId, draft })
+  if (!category) return []
+
   const items = await CategoryManager.fetchItemsByLevelIndex({
     surveyId,
     categoryUuid: Category.getUuid(category),
@@ -98,16 +142,23 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     offset,
     draft,
   })
+
+  const recordFinder = await _createSamplingPointDataRecordFinder({ surveyId })
+
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
     const ancestorCodes = CategoryItem.getAncestorCodes(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point)
+
+    const record = recordFinder?.(item)
+
     return {
       uuid: CategoryItem.getUuid(item),
       codes: [...ancestorCodes, CategoryItem.getCode(item)],
       latLng: [pointLatLong.y, pointLatLong.x],
       location,
+      ...(record ? { recordUuid: Record.getUuid(record) } : {}),
     }
   })
   return samplingPointData

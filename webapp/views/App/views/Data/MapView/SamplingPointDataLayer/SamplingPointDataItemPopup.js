@@ -8,9 +8,14 @@ import Markdown from '@webapp/components/markdown'
 
 import { useI18n } from '@webapp/store/system'
 import { useMap } from 'react-leaflet'
+import { ButtonIconEdit } from '@webapp/components'
+import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
+import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 
 export const SamplingPointDataItemPopup = (props) => {
-  const { location, codes, itemUuid, getNextPoint, getPreviousPoint, openPopupOfPoint } = props
+  const { pointFeature, getNextPoint, getPreviousPoint, openPopupOfPoint, onRecordEditClick } = props
+
+  const { itemUuid, itemCodes, location, recordUuid } = pointFeature.properties
 
   const i18n = useI18n()
   const map = useMap()
@@ -18,7 +23,7 @@ export const SamplingPointDataItemPopup = (props) => {
   const point = Points.parse(location)
 
   const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
-${codes
+${itemCodes
   .map((code, index) => `* **${i18n.t('mapView.samplingPointItemPopup.levelCode', { level: index + 1 })}**: ${code}`)
   .join('\n')}
 * **${i18n.t('mapView.samplingPointItemPopup.location')}**:
@@ -42,19 +47,23 @@ ${codes
   }
 
   return (
-    <Popup>
+    <Popup className="sampling-point-data__item-popup-content">
       <Markdown source={content} />
-      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
-      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
+      <div className="button-bar">
+        <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
+        {recordUuid && (
+          <ButtonIconEdit label="mapView.editRecord" showLabel onClick={() => onRecordEditClick({ recordUuid })} />
+        )}
+        <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
+      </div>
     </Popup>
   )
 }
 
 SamplingPointDataItemPopup.propTypes = {
-  location: PropTypes.string,
-  codes: PropTypes.any,
-  itemUuid: PropTypes.string,
+  pointFeature: PropTypes.any,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
   openPopupOfPoint: PropTypes.func,
+  onRecordEditClick: PropTypes.func,
 }
