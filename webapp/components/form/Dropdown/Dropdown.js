@@ -101,6 +101,7 @@ const Dropdown = (props) => {
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
         menuPlacement={menuPlacement}
+        menuPosition="fixed"
         menuIsOpen={menuIsOpen}
         onInputChange={onInputChange}
         options={options}
