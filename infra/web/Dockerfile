@@ -8,13 +8,10 @@ FROM node:${node_version} AS arena
 ARG NPM_TOKEN
 ENV NPM_TOKEN $NPM_TOKEN
 
-RUN apt update && apt install -y git curl
+# RUN apt update && apt upgrade -y
+# RUN apt autoremove && apt autoclean
 
-# Pull code from GitHub
-
-COPY .git /app/.git
-
-RUN cd /app; git reset --hard
+COPY . /app/
 
 # Build Arena
 
