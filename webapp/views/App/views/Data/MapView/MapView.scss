@@ -22,12 +22,16 @@
       display: flex;
       flex-direction: column;
 
-      .button-bar {
-        justify-content: space-between;
-        gap: 1rem;
+      .leaflet-popup-content {
+        width: 18rem;
 
-        button {
-          margin: 0;
+        .button-bar {
+          justify-content: space-between;
+          gap: 1rem;
+
+          button {
+            margin: 0;
+          }
         }
       }
     }
