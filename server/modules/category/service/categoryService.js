@@ -1,8 +1,6 @@
 import { Points } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
@@ -12,7 +10,6 @@ import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
@@ -20,6 +17,7 @@ import CategoriesExportJob from './CategoriesExportJob'
 import * as CategoryManager from '../manager/categoryManager'
 import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
 import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
+import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -90,45 +88,6 @@ export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
   return count
 }
 
-const _createSamplingPointDataRecordFinder = async ({ surveyId, draft }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft })
-  if (!Survey.canHaveData(survey)) return null
-
-  const samplingPointDataCategory = Survey.getCategoryByName(Survey.samplingPointDataCategoryName)(survey)
-  if (!samplingPointDataCategory) return null
-
-  const samplingPointDataNodeDefs = Survey.findDescendants({
-    nodeDef: Survey.getNodeDefRoot(survey),
-    filterFn: (nodeDef) => NodeDef.getCategoryUuid(nodeDef) === samplingPointDataCategory.uuid,
-  })(survey)
-
-  if (samplingPointDataNodeDefs.length === 0) return null
-
-  const rootEntityKeyDefs = Survey.getNodeDefRootKeys(survey)
-  const allKeyDefsUseSamplingPointData = rootEntityKeyDefs.every((rootKeyDef) =>
-    samplingPointDataNodeDefs.includes(rootKeyDef)
-  )
-  if (!allKeyDefsUseSamplingPointData) return null
-
-  const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId })
-  const { list: records } = recordsSummary
-
-  return (samplingPointDataItem) => {
-    const itemCodes = CategoryItem.getCodesHierarchy(samplingPointDataItem)
-
-    const record = records.find((record) =>
-      rootEntityKeyDefs.every((keyDef) => {
-        const keyDefCategoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(keyDef)(survey)
-        const codeValue = itemCodes[keyDefCategoryLevelIndex]
-        const keyDefName = NodeDef.getName(keyDef)
-        const recordKeyValue = record[A.camelize(keyDefName)]
-        return codeValue === recordKeyValue
-      })
-    )
-    return record
-  }
-}
-
 export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
   const draft = true
   const category = await _getSamplingPointDataCategory({ surveyId, draft })
@@ -143,7 +102,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     draft,
   })
 
-  const recordFinder = await _createSamplingPointDataRecordFinder({ surveyId })
+  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, draft })
 
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
