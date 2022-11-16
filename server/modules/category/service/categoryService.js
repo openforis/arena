@@ -106,7 +106,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
 
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
-    const ancestorCodes = CategoryItem.getAncestorCodes(item)
+    const codes = CategoryItem.getCodesHierarchy(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point)
 
@@ -114,7 +114,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
 
     return {
       uuid: CategoryItem.getUuid(item),
-      codes: [...ancestorCodes, CategoryItem.getCode(item)],
+      codes,
       latLng: [pointLatLong.y, pointLatLong.x],
       location,
       ...(record ? { recordUuid: Record.getUuid(record) } : {}),

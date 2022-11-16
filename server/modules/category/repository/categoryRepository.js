@@ -228,6 +228,21 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
+export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {
+  const item = await client.oneOrNone(
+    `
+      SELECT i.*, l.category_uuid
+      FROM ${getSurveyDBSchema(surveyId)}.category_item i
+        JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+        ON l.uuid = i.level_uuid
+      WHERE i.uuid = $1
+    `,
+    [uuid],
+    (def) => DB.transformCallback(def, draft, true, backup)
+  )
+  return backup || draft || item.published ? item : null
+}
+
 export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>
   client.one(
     `SELECT COUNT(*) 
