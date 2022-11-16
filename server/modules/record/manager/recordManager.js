@@ -105,7 +105,6 @@ export {
   persistNode,
   updateNode,
   updateNodesDependents,
-  validateNodesAndPersistToRDB,
 } from './_recordManager/recordUpdateManager'
 
 export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo }, client = db) =>
