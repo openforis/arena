@@ -33,29 +33,32 @@ export const useDropdown = ({
   const getOptionLabel = useCallback((item) => getProperty(itemLabel)(item), [itemLabel])
   const getOptionValue = useCallback((item) => getProperty(itemValue)(item), [itemValue])
 
-  const [state, setState] = useState({ items: [], loading: false })
+  const asyncItemsLoading = itemsProp && !Array.isArray(itemsProp)
+
+  const [state, setState] = useState({
+    items: asyncItemsLoading ? [] : itemsProp,
+    loading: asyncItemsLoading,
+  })
 
   const { items, loading } = state
 
   const fetchItems = useCallback(async () => {
-    if (searchMinCharsReached && !loading) {
-      setState({ items: [], loading: true })
+    if (!asyncItemsLoading) {
+      setState({ items: itemsProp, loading: false })
+    } else {
+      if (searchMinCharsReached && !loading) {
+        setState({ items: [], loading: true })
+      }
+      const _items = searchMinCharsReached && itemsProp ? await itemsProp(inputValue) : []
+
+      setState({ items: _items, loading: false })
     }
-    const _items =
-      searchMinCharsReached && itemsProp ? (Array.isArray(itemsProp) ? itemsProp : await itemsProp(inputValue)) : []
-
-    setState({ items: _items, loading: false })
-  }, [itemsProp, searchMinCharsReached, loading, inputValue])
-
-  // fetch items on mount
-  useEffect(() => {
-    fetchItems()
-  }, [])
+  }, [asyncItemsLoading, itemsProp, searchMinCharsReached, loading, inputValue])
 
   // fetch items on items prop update
   useEffect(() => {
     fetchItems()
-  }, [itemsProp])
+  }, [asyncItemsLoading, itemsProp])
 
   // set title to control component
   useEffect(() => {
