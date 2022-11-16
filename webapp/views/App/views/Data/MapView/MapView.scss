@@ -17,5 +17,20 @@
         }
       }
     }
+
+    .sampling-point-data__item-popup-content {
+      .leaflet-popup-content {
+        width: 18rem;
+
+        .button-bar {
+          justify-content: space-between;
+          gap: 1rem;
+
+          button {
+            margin: 0;
+          }
+        }
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 const markerRadius = 10
 
 export const SamplingPointDataLayer = (props) => {
-  const { markersColor } = props
+  const { markersColor, onRecordEditClick } = props
 
   const {
     clusters,
@@ -48,7 +48,7 @@ export const SamplingPointDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid, itemCodes, location } = cluster.properties
+          const { cluster: isCluster, itemUuid } = cluster.properties
 
           // we have a cluster to render
           if (isCluster) {
@@ -80,12 +80,11 @@ export const SamplingPointDataLayer = (props) => {
               }}
             >
               <SamplingPointDataItemPopup
-                location={location}
-                codes={itemCodes}
-                itemUuid={itemUuid}
+                pointFeature={cluster}
                 getNextPoint={getNextPoint}
                 getPreviousPoint={getPreviousPoint}
                 openPopupOfPoint={openPopupOfPoint}
+                onRecordEditClick={onRecordEditClick}
               />
             </CircleMarker>
           )
@@ -97,7 +96,8 @@ export const SamplingPointDataLayer = (props) => {
 
 SamplingPointDataLayer.propTypes = {
   levelIndex: PropTypes.number,
-  markersColor: PropTypes.any,
+  markersColor: PropTypes.any.isRequired,
+  onRecordEditClick: PropTypes.func.isRequired,
 }
 
 SamplingPointDataLayer.defaultProps = {

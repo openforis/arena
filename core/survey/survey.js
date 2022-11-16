@@ -60,10 +60,8 @@ export const newSurvey = ({
 
 export const infoKeys = SurveyInfo.keys
 export const { dependencyTypes } = SurveyDependencies
-export const { collectReportKeys, cycleOneKey } = SurveyInfo
+export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
 export const { sortableKeys } = SurveySortKeys
-
-export const samplingPointDataCategoryName = 'sampling_point_data'
 
 // ====== DEFAULTS
 export const { getDefaultAuthGroups } = SurveyDefaults
@@ -75,6 +73,23 @@ export const getIdSurveyInfo = SurveyInfo.getId
 export const canHaveData = (survey) => {
   const surveyInfo = getSurveyInfo(survey)
   return isPublished(surveyInfo) || isFromCollect(surveyInfo)
+}
+/**
+ * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
+ *
+ * @param {!Survey} survey - The survey object.
+ * @returns {boolean} - True if all key attributes are using the sampling point data category.
+ */
+export const canRecordBeIdentifiedBySamplingPointDataItem = (survey) => {
+  const samplingPointDataNodeDefs = getSamplingPointDataNodeDefs(survey)
+  if (samplingPointDataNodeDefs.length === 0) return false
+
+  const rootEntityKeyDefs = SurveyNodeDefs.getNodeDefRootKeys(survey)
+
+  const allKeyDefsUseSamplingPointData = rootEntityKeyDefs.every((rootKeyDef) =>
+    samplingPointDataNodeDefs.includes(rootKeyDef)
+  )
+  return allKeyDefsUseSamplingPointData
 }
 
 // === context is surveyInfo
@@ -227,8 +242,15 @@ export const { getNodeDefCategoryLevelIndex, getNodeDefParentCode, getNodeDefCod
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories
-export const { getCategories, getCategoriesArray, getCategoryByUuid, getCategoryByName, assocCategories } =
-  SurveyCategories
+export const {
+  getCategories,
+  getCategoriesArray,
+  getCategoryByUuid,
+  getCategoryByName,
+  getSamplingPointDataCategory,
+  getSamplingPointDataNodeDefs,
+  assocCategories,
+} = SurveyCategories
 
 // ====== Taxonomies
 export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies

@@ -21,7 +21,7 @@ const _convertItemsToPoints = (items) => {
   const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
 
   const points = items.map((item) => {
-    const { codes: itemCodes, latLng, location, uuid: itemUuid } = item
+    const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
     const [lat, long] = latLng
     const itemPoint = PointFactory.createInstance({ x: long, y: lat, srs: '4326' })
 
@@ -29,7 +29,7 @@ const _convertItemsToPoints = (items) => {
 
     return {
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location },
+      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location, recordUuid },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
