@@ -7,6 +7,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { Objects } from '@openforis/arena-core'
 
 const NodeDefCodeDropdown = (props) => {
   const {
@@ -51,7 +52,7 @@ const NodeDefCodeDropdown = (props) => {
             else onItemRemove(item)
           }}
           readOnly={entryDisabled}
-          selection={R.head(selectedItems)}
+          selection={Objects.isEmpty(selectedItems) ? null : R.head(selectedItems)}
           testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
         />
       )}
