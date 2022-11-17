@@ -67,13 +67,13 @@ const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
 const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
   _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
 
-const _toUpdates = ({ survey, record, nodeDefs, nodes }) => {
+const _toUpdates = ({ survey, record, nodes }) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
   const nodesArray = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
   )
   return nodesArray.reduce((updatesAcc, node) => {
-    const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     // skip single entities
     if (!NodeDef.isRoot(nodeDef) && NodeDef.isSingleEntity(nodeDef)) {
       return updatesAcc
@@ -132,8 +132,8 @@ const queryByType = {
   [types.update]: _update,
 }
 
-export const updateTables = async ({ survey, record, nodeDefs, nodes }, client) => {
-  const updates = _toUpdates({ survey, record, nodeDefs, nodes })
+export const updateTables = async ({ survey, record, nodes }, client) => {
+  const updates = _toUpdates({ survey, record, nodes })
   await client.batch(updates.map((update) => queryByType[update.type](update, client)))
 }
 

@@ -126,7 +126,8 @@ export const getNodeParentInDescendantSingleEntities =
     const nodeDefParent = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
     const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
     if (!NodeDef.isDescendantOf(nodeDefParent)(nodeDef)) {
-      throw new Error('target node is not a descendant of the specified parent entity')
+      throw new Error(`target node is not a descendant of the specified parent entity:\
+        parentNodeDef: ${NodeDef.getName(nodeDefParent)} descendantDef: ${NodeDef.getName(nodeDef)}`)
     }
     const nodeDefHierarchy = NodeDef.getMetaHierarchy(nodeDef)
     const nodeDefParentHierarchy = NodeDef.getMetaHierarchy(nodeDefParent)

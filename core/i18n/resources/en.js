@@ -552,6 +552,7 @@ $t(common.cantUndoWarning)`,
   },
 
   mapView: {
+    createRecord: 'Create new record',
     editRecord: 'Edit record',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',

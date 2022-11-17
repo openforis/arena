@@ -4,6 +4,12 @@ import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 import { objectToFormData } from '..'
 
+// ==== RECORD
+export const createRecordFromSamplingPointDataItem = async ({ surveyId, itemUuid }) => {
+  const { data: recordUuid } = await axios.post(`/api/survey/${surveyId}/record/fromspditem`, { itemUuid })
+  return recordUuid
+}
+
 // ==== DATA IMPORT
 export const startCollectRecordsImportJob = async ({
   surveyId,
