@@ -1,5 +1,9 @@
 import { Query } from '../../../../common/model/query'
 
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
@@ -12,6 +16,13 @@ import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 const _fetchSurvey = async (surveyId, cycle) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
   return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
+}
+
+const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  return Authorizer.canViewAllRecords(user, surveyInfo)
+    ? null // fetch all records' data
+    : User.getUuid(user) // fetch only owned records' data
 }
 
 /**
@@ -29,6 +40,7 @@ const _fetchSurvey = async (surveyId, cycle) => {
  */
 export const fetchViewData = async (params) => {
   const {
+    user,
     surveyId,
     cycle,
     query,
@@ -40,10 +52,21 @@ export const fetchViewData = async (params) => {
   } = params
 
   const survey = await _fetchSurvey(surveyId, cycle)
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   return Query.isModeAggregate(query)
-    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, offset, limit, streamOutput })
-    : SurveyRdbManager.fetchViewData({ survey, cycle, query, columnNodeDefs, offset, limit, streamOutput, addCycle })
+    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
+    : SurveyRdbManager.fetchViewData({
+        survey,
+        cycle,
+        query,
+        columnNodeDefs,
+        recordOwnerUuid,
+        offset,
+        limit,
+        streamOutput,
+        addCycle,
+      })
 }
 
 /**
@@ -57,13 +80,14 @@ export const fetchViewData = async (params) => {
  * @returns {Promise<number>} - The count of rows.
  */
 export const countTable = async (params) => {
-  const { surveyId, cycle, query } = params
+  const { user, surveyId, cycle, query } = params
 
   const survey = await _fetchSurvey(surveyId, cycle)
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   return Query.isModeAggregate(query)
-    ? SurveyRdbManager.countViewDataAgg({ survey, cycle, query })
-    : SurveyRdbManager.countTable({ survey, cycle, query })
+    ? SurveyRdbManager.countViewDataAgg({ survey, cycle, recordOwnerUuid, query })
+    : SurveyRdbManager.countTable({ survey, cycle, recordOwnerUuid, query })
 }
 
 export const fetchTableRowsCountByEntityDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
@@ -94,4 +118,25 @@ export const exportViewDataToTempFile = async (params) => {
   await fetchViewData({ surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
 
   return tempFileName
+}
+
+export const fetchEntitiesDataToCsvFiles = async ({
+  user,
+  surveyId,
+  outputDir,
+  includeCategoryItemsLabels,
+  includeAnalysis,
+  callback,
+}) => {
+  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+
+  return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
+    surveyId,
+    outputDir,
+    includeCategoryItemsLabels,
+    includeAnalysis,
+    recordOwnerUuid,
+    callback,
+  })
 }

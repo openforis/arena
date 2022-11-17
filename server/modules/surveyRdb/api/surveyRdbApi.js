@@ -23,10 +23,11 @@ export const init = (app) => {
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, query: queryParam, offset, limit } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       const query = A.parse(queryParam)
 
-      const rows = await SurveyRdbService.fetchViewData({ surveyId, cycle, query, offset, limit })
+      const rows = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, offset, limit })
 
       res.json(rows)
     } catch (error) {
@@ -40,10 +41,11 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+        const user = Request.getUser(req)
 
         const query = A.parse(queryParam)
 
-        const count = await SurveyRdbService.countTable({ surveyId, cycle, query })
+        const count = await SurveyRdbService.countTable({ user, surveyId, cycle, query })
 
         res.json(count)
       } catch (error) {

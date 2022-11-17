@@ -10,7 +10,7 @@ import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
 import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
 
-const _getSelectQuery = ({ survey, cycle, query }) => {
+const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -37,6 +37,11 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   queryBuilder.where(`${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/`)
   queryBuilder.addParams({ cycle })
 
+  if (recordOwnerUuid) {
+    queryBuilder.where(`${ViewDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/`)
+    queryBuilder.addParams({ recordOwnerUuid })
+  }
+
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (filterClause) {
     queryBuilder.where(filterClause)
@@ -62,13 +67,14 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query })
+  const { survey, cycle, query, recordOwnerUuid = null } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
 
   return client.one(
     `

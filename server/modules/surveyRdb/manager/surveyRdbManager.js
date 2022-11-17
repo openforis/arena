@@ -69,6 +69,7 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
@@ -83,6 +84,7 @@ export const fetchViewData = async (params) => {
     columnNodeDefs = false,
     includeFileAttributeDefs = true,
     recordSteps = null,
+    recordOwnerUuid = null,
     offset = 0,
     limit = null,
     streamOutput = null,
@@ -98,6 +100,7 @@ export const fetchViewData = async (params) => {
     columnNodeDefs,
     includeFileAttributeDefs,
     recordSteps,
+    recordOwnerUuid,
     offset,
     limit,
     stream: Boolean(streamOutput),
@@ -155,13 +158,14 @@ const _getExportFieldsAgg = ({ survey, query }) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params) => {
-  const { survey, cycle, query, limit, offset, streamOutput } = params
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, streamOutput = null } = params
 
   // Fetch data
   const result = await DataViewRepository.fetchViewDataAgg({
     survey,
     cycle,
     query,
+    recordOwnerUuid,
     limit,
     offset,
     stream: Boolean(streamOutput),
@@ -178,7 +182,7 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  { surveyId, outputDir, includeCategoryItemsLabels, includeAnalysis, callback },
+  { surveyId, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
   client
 ) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, includeAnalysis }, client)
@@ -207,6 +211,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     await fetchViewData({
       survey,
+      recordOwnerUuid,
       streamOutput: stream,
       query,
       addCycle: true,
@@ -224,12 +229,12 @@ export const fetchEntitiesDataToCsvFiles = async (
  * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<number>} - The number of rows.
  */
-export const countTable = async ({ survey, cycle, query }, client = db) => {
+export const countTable = async ({ survey, cycle, recordOwnerUuid, query }, client = db) => {
   const surveyId = Survey.getId(survey)
   const nodeDefTable = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
   const filter = Query.getFilter(query)
-  return DataViewRepository.runCount({ surveyId, cycle, tableName, filter }, client)
+  return DataViewRepository.runCount({ surveyId, cycle, tableName, filter, recordOwnerUuid }, client)
 }
 
 /**
