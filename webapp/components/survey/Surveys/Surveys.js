@@ -10,10 +10,9 @@ import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
-import { useOnUpdate } from '@webapp/components/hooks'
-import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
+import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 
 import Table from '@webapp/components/Table'
 
@@ -26,8 +25,7 @@ const Surveys = (props) => {
   const navigate = useNavigate()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
-  const lang = useSurveyPreferredLang()
-  const i18n = useI18n()
+  const lang = useBrowserLanguageCode()
 
   /**
    * Parameter passed to table rest params
@@ -82,7 +80,10 @@ const Surveys = (props) => {
         {
           key: Survey.sortableKeys.label,
           header: 'common.label',
-          renderItem: ({ item }) => Survey.getLabel(Survey.getSurveyInfo(item), lang),
+          renderItem: ({ item }) => {
+            const surveyInfo = Survey.getSurveyInfo(item)
+            return Survey.getLabel(surveyInfo, lang, false) || Survey.getDefaultLabel(surveyInfo)
+          },
           width: 'minmax(8rem, 1fr)',
           sortable: true,
         },
@@ -96,14 +97,14 @@ const Surveys = (props) => {
         {
           key: Survey.sortableKeys.dateCreated,
           header: 'common.dateCreated',
-          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateCreated(Survey.getSurveyInfo(item))),
+          renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Survey.getDateCreated(Survey.getSurveyInfo(item))),
           width: '12rem',
           sortable: true,
         },
         {
           key: Survey.sortableKeys.dateModified,
           header: 'common.dateLastModified',
-          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Survey.getDateModified(Survey.getSurveyInfo(item))),
+          renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Survey.getDateModified(Survey.getSurveyInfo(item))),
           width: '12rem',
           sortable: true,
         },
