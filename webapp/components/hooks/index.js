@@ -23,6 +23,7 @@ export {
 } from './useIsInRoute'
 export { useOnBrowserBack } from './useOnBrowserBack'
 export { useOnPageUnload } from './useOnPageUnload'
+export { useBrowserLanguageCode } from './useBrowserLanguageCode'
 export { useRequest } from './useRequest'
 export { useShouldShowFirstTimeHelp } from './useShouldShowFirstTimeHelp'
 export { useSRSs } from './useSRSs'
