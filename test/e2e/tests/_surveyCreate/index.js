@@ -6,16 +6,16 @@ export const createSurvey = (surveyToAdd) => {
   gotoSurveyCreate()
 
   test(`Create Survey ${surveyToAdd.name}`, async () => {
-    const { cloneFrom, label, name } = surveyToAdd
+    const { cloneFromLabel, label, name } = surveyToAdd
 
     await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
 
-    if (cloneFrom) {
+    if (cloneFromLabel) {
       // select create type "clone"
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'clone' })))
 
       // set survey 'Clone from' field
-      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: cloneFrom })
+      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: cloneFromLabel })
 
       // press "Create survey" and wait for the job to complete
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
