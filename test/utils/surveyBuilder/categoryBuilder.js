@@ -6,6 +6,7 @@ export class CategoryBuilder {
     this.name = name
     this.childItemBuilders = []
     this.levelNames = []
+    this._extraProps = {}
   }
 
   levels(...levelNames) {
@@ -18,8 +19,16 @@ export class CategoryBuilder {
     return this
   }
 
+  extraProps(extraPropsDefs) {
+    this._extraProps = extraPropsDefs
+    return this
+  }
+
   build() {
-    let category = Category.newCategory({ [Category.keysProps.name]: this.name })
+    let category = Category.newCategory({
+      [Category.keysProps.name]: this.name,
+      [Category.keysProps.itemExtraDef]: this._extraProps,
+    })
     if (this.levelNames.length > 0) {
       const levels = this.levelNames.map((levelName, index) =>
         Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)

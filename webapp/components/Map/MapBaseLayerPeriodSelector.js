@@ -180,7 +180,7 @@ export const MapBaseLayerPeriodSelector = () => {
 
   return (
     <div className="leaflet-bottom map-layer-selector-wrapper">
-      <div className="period-select-wrapper-left">
+      <div className="period-select-wrapper">
         <select value={selectedPeriodValueLeft} onChange={onMapLayerPeriodChangeLeft}>
           {periods.map((period) => {
             const value = getPeriodValue(period)
@@ -199,7 +199,7 @@ export const MapBaseLayerPeriodSelector = () => {
           label={'mapBaseLayerPeriodSelector.falseColor'}
         />
       </div>
-      <div className="period-select-wrapper-right">
+      <div className="period-select-wrapper">
         <select value={selectedPeriodValueRight} onChange={onMapLayerPeriodChangeRight}>
           <option value={PERIOD_EMPTY_VALUE}>{i18n.t('mapBaseLayerPeriodSelector.chooseAPeriodToCompareWith')}</option>
 

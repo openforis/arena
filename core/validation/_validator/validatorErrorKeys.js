@@ -59,6 +59,10 @@ export const ValidatorErrorKeys = {
     unableToFindNodeSibling: 'validationErrors.expressions.unableToFindNodeSibling',
   },
 
+  extraPropEdit: {
+    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
+    dataTypeRequired: 'validationErrors.extraPropEdit.dataTypeRequired',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
@@ -105,6 +109,7 @@ export const ValidatorErrorKeys = {
   },
 
   taxonomyEdit: {
+    codeChangedAfterPublishing: 'validationErrors.taxonomyEdit.codeChangedAfterPublishing',
     codeDuplicate: 'validationErrors.taxonomyEdit.codeDuplicate',
     codeRequired: 'validationErrors.taxonomyEdit.codeRequired',
     familyRequired: 'validationErrors.taxonomyEdit.familyRequired',

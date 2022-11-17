@@ -218,6 +218,31 @@ export const init = (app) => {
     }
   )
 
+  app.put(
+    '/survey/:surveyId/taxonomies/:taxonomyUuid/extradef',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, taxonomyUuid, propName, deleted } = Request.getParams(req)
+        const extraPropDef = Request.getJsonParam(req, 'extraPropDef')
+        const user = Request.getUser(req)
+
+        const taxonomy = await TaxonomyService.updateTaxonomyExtraPropDef({
+          user,
+          surveyId,
+          taxonomyUuid,
+          propName,
+          extraPropDef,
+          deleted,
+        })
+
+        res.json({ taxonomy })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== DELETE
 
   app.delete(

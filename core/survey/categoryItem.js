@@ -60,15 +60,17 @@ export const renameExtraProp =
 
 // gets the ancestor codes as an array (only if ancestor codes have been populated during fetch)
 export const getAncestorCodes = (item) => {
+  const getLevelCode = (levelIndex) => R.propOr(null, `level${levelIndex}Code`)
+
   const codes = []
   let levelIndex = 0
-  while (true) {
-    const levelCode = R.propOr(null, `level${levelIndex}Code`)(item)
-    if (levelCode === null) {
-      break
-    }
+  let levelCode = getLevelCode(levelIndex)(item)
+  while (levelCode !== null) {
     codes.push(levelCode)
     levelIndex += 1
+    levelCode = getLevelCode(levelIndex)(item)
   }
   return codes
 }
+
+export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(item)]

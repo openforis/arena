@@ -6,6 +6,7 @@ import * as Srs from '@core/geo/srs'
 import * as SB from '../surveyBuilder'
 import * as RB from '../recordBuilder'
 import * as SurveyUtils from '../surveyUtils'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 export const createTestSurvey = ({ user }) =>
   SB.survey(
@@ -47,6 +48,10 @@ export const createTestSurvey = ({ user }) =>
     .categories(
       SB.category('simple_category').items(SB.categoryItem('1'), SB.categoryItem('2'), SB.categoryItem('3')),
       SB.category('hierarchical_category')
+        .extraProps({
+          prop1: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+          prop2: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+        })
         .levels('level_1', 'level_2')
         .items(
           SB.categoryItem('1')
@@ -63,7 +68,11 @@ export const createTestSurvey = ({ user }) =>
             .extra({ prop1: 'Extra prop1 item 3', prop2: 'Extra prop2 item 3' })
             .items(SB.categoryItem('3a').extra({ prop1: 'Extra prop1 item 3a', prop2: 'Extra prop2 item 3a' }))
         ),
-      SB.category('sampling_point')
+      SB.category('sampling_point_data')
+        .extraProps({
+          location: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint }),
+          region: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+        })
         .levels('cluster', 'plot')
         .items(
           SB.categoryItem('11')
@@ -99,14 +108,20 @@ export const createTestSurvey = ({ user }) =>
         SB.categoryItem('P').label('Palm')
       )
     )
-    .taxonomy(
-      'trees',
-      SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-        .vernacularName('eng', 'Mahogany')
-        .vernacularName('swa', 'Mbambakofi')
-        .extra('max_height', '200')
-        .extra('max_dbh', '30'),
-      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis').extra('max_height', '300').extra('max_dbh', '40')
+    .taxonomies(
+      SB.taxonomy('trees')
+        .extraProps({
+          max_height: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+          max_dbh: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+        })
+        .taxa(
+          SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+            .vernacularName('eng', 'Mahogany')
+            .vernacularName('swa', 'Mbambakofi')
+            .extra('max_height', '200')
+            .extra('max_dbh', '30'),
+          SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis').extra('max_height', '300').extra('max_dbh', '40')
+        )
     )
     .build()
 

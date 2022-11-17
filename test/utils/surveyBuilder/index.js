@@ -8,7 +8,6 @@ import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as Category from '../../../core/survey/category'
 import * as Taxonomy from '../../../core/survey/taxonomy'
-import * as Taxon from '../../../core/survey/taxon'
 import * as User from '../../../core/user/user'
 import * as PromiseUtils from '../../../core/promiseUtils'
 
@@ -49,13 +48,13 @@ class SurveyBuilder {
     this.taxonomyBuilders = []
   }
 
-  taxonomy(name, ...taxonBuilders) {
-    this.taxonomyBuilders.push(new TaxonomyBuilder(name, ...taxonBuilders))
+  categories(...categoryBuilders) {
+    this.categoryBuilders = categoryBuilders
     return this
   }
 
-  categories(...categoryBuilders) {
-    this.categoryBuilders = categoryBuilders
+  taxonomies(...taxonomyBuilders) {
+    this.taxonomyBuilders = taxonomyBuilders
     return this
   }
 
@@ -83,18 +82,8 @@ class SurveyBuilder {
     const taxaIndexRefData = []
     this.taxonomyBuilders.forEach((taxonomyBuilder) => {
       const { taxonomy, taxa } = taxonomyBuilder.build()
-      const extraPropsDefs = {}
-
+      taxonomiesByUuid[Taxonomy.getUuid(taxonomy)] = taxonomy
       taxaIndexRefData.push(...taxa)
-
-      // extract extra props defs
-      taxa.forEach((taxon) => {
-        const extraPropsKeys = Object.keys(Taxon.getExtra(taxon))
-        extraPropsKeys.forEach((extraPropKey) => {
-          extraPropsDefs[extraPropKey] = { key: extraPropKey }
-        })
-      })
-      taxonomiesByUuid[Taxonomy.getUuid(taxonomy)] = Taxonomy.assocExtraPropsDefs(extraPropsDefs)(taxonomy)
     })
 
     survey = A.pipe(
@@ -163,5 +152,6 @@ export const attribute = (name, type = NodeDef.nodeDefType.text) => new NodeDefA
 export const category = (name) => new CategoryBuilder(name)
 export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
+export const taxonomy = (name) => new TaxonomyBuilder(name)
 export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>
   new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

@@ -4,6 +4,8 @@ import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import { elementOffset } from '@webapp/utils/domUtils'
+
 import { Button } from './Button'
 
 export const ButtonMenu = (props) => {
@@ -24,15 +26,14 @@ export const ButtonMenu = (props) => {
       if (showPopupNew) {
         // align popup (with fixed position) to the trigger button
         const btnEl = buttonRef.current
-        const bntElX = btnEl.offsetParent.offsetLeft + btnEl.offsetLeft
-        const bntElY = btnEl.offsetParent.offsetTop + btnEl.offsetTop
-        popupTopNew = bntElY + btnEl.clientHeight
+        const btnOffset = elementOffset(btnEl)
+        popupTopNew = btnOffset.y + btnOffset.height
         if (popupAlignment === 'left') {
           // align popup to button bottom left corner
-          popupLeftNew = bntElX
+          popupLeftNew = btnOffset.x
         } else if (popupAlignment === 'right') {
           // align popup to button bottom right corner
-          popupRightNew = window.innerWidth - (bntElX + btnEl.clientWidth)
+          popupRightNew = window.innerWidth - (btnOffset.x + btnOffset.width)
         }
       }
       return {
@@ -45,14 +46,7 @@ export const ButtonMenu = (props) => {
     })
   }, [buttonRef])
 
-  const closePopup = useCallback(
-    () =>
-      setState((statePrev) => ({
-        ...statePrev,
-        showPopup: false,
-      })),
-    []
-  )
+  const closePopup = useCallback(() => setState((statePrev) => ({ ...statePrev, showPopup: false })), [])
 
   const cancelPopupCloseTimeout = () => {
     if (closeTimeoutRef.current) {
@@ -117,6 +111,7 @@ export const ButtonMenu = (props) => {
 }
 
 // onClick prop is not required in ButtonMenu
+// eslint-disable-next-line no-unused-vars
 const { onClick, ...otherButtonPropTypes } = Button.propTypes
 
 ButtonMenu.propTypes = {

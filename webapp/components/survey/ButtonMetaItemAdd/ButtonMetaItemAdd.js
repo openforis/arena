@@ -17,6 +17,11 @@ const creatorsByType = {
   [metaItemTypes.category]: API.createCategory,
 }
 
+const actionsByType = {
+  [metaItemTypes.taxonomy]: SurveyActions.surveyTaxonomyInserted,
+  [metaItemTypes.category]: SurveyActions.surveyCategoryInserted,
+}
+
 const ButtonMetaItemAdd = (props) => {
   const { id, onAdd, metaItemType } = props
 
@@ -26,6 +31,8 @@ const ButtonMetaItemAdd = (props) => {
   const add = useCallback(async () => {
     if (creatorsByType[metaItemType]) {
       const item = await creatorsByType[metaItemType]({ surveyId })
+      const action = actionsByType[metaItemType]
+      dispatch(action(item))
       dispatch(SurveyActions.metaUpdated())
       onAdd(item)
     }

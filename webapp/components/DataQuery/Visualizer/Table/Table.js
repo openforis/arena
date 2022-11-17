@@ -8,7 +8,7 @@ import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {
-  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
+  const { query, data, dataEmpty, nodeDefLabelType, nodeDefsSelectorVisible, offset, onChangeQuery, setData } = props
 
   const i18n = useI18n()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, query, nodeDefsSelectorVisible, setData })
@@ -25,6 +25,7 @@ const Table = (props) => {
         colWidth={colWidth}
         colIndexWidth={colIndexWidth}
         nodeDefCols={nodeDefCols}
+        nodeDefLabelType={nodeDefLabelType}
         onChangeQuery={onChangeQuery}
         query={query}
       />
@@ -53,6 +54,7 @@ Table.propTypes = {
   query: PropTypes.object.isRequired,
   data: PropTypes.array.isRequired,
   dataEmpty: PropTypes.bool.isRequired,
+  nodeDefLabelType: PropTypes.string.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
   onChangeQuery: PropTypes.func.isRequired,

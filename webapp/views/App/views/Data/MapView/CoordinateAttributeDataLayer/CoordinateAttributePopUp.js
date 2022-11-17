@@ -84,26 +84,26 @@ export const CoordinateAttributePopUp = (props) => {
     onRecordEditClick,
     getNextPoint,
     getPreviousPoint,
-    openPopupOfUuid,
+    openPopupOfPoint,
   } = props
 
   const i18n = useI18n()
   const map = useMap()
-  
-  const flyTo = (latlng, point) => {
-    map.flyTo([latlng[1], latlng[0]], map.getMaxZoom())
-    map.once('zoomend', () => openPopupOfUuid(point.properties.parentUuid))
+
+  const flyTo = (point) => {
+    const [longitude, latitude] = point.geometry.coordinates
+    map.flyTo([latitude, longitude], map.getMaxZoom())
+    map.once('zoomend', () => openPopupOfPoint(point))
   }
+
   const onClickNext = () => {
     const nextPoint = getNextPoint(parentUuid)
-    const latlng = nextPoint.geometry.coordinates
-    flyTo(latlng, nextPoint)
+    flyTo(nextPoint)
   }
   
   const onClickPrevious = () => {
     const previousPoint = getPreviousPoint(parentUuid)
-    const latlng = previousPoint.geometry.coordinates
-    flyTo(latlng, previousPoint)
+    flyTo(previousPoint)
   }
   
   const earthMapLink = () => {
@@ -153,5 +153,5 @@ CoordinateAttributePopUp.propTypes = {
   onRecordEditClick: PropTypes.func,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
-  openPopupOfUuid: PropTypes.func,
+  openPopupOfPoint: PropTypes.func,
 }

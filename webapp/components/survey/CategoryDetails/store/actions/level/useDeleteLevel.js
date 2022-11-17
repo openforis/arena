@@ -27,6 +27,7 @@ const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch 
     )
   )
 
+  dispatch(SurveyActions.surveyCategoryUpdated(categoryUpdated))
   dispatch(SurveyActions.metaUpdated())
 }
 

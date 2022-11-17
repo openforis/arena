@@ -74,6 +74,7 @@ const MapWrapper = () => {
               key={CategoryLevel.getUuid(level)}
               levelIndex={CategoryLevel.getIndex(level)}
               markersColor={layerColors[index]}
+              onRecordEditClick={onRecordEditClick}
             />
           )),
           ...coordinateAttributeDefs.map((attributeDef, index) => (

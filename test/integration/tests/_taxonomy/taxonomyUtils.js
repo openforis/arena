@@ -44,7 +44,7 @@ export const updateTaxonWithNewVernacularNames = async (user, surveyId, taxonomy
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
 
   // Update taxon
-  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
+  await TaxonomyManager.updateTaxonAndVernacularNames(user, surveyId, taxonUpdated)
 
   return {
     vernacularNamesNew: Taxon.getVernacularNamesByLang(lang)(taxonUpdated),

@@ -1,10 +1,10 @@
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummaryGenerator from '@server/modules/category/manager/categoryImportSummaryGenerator'
 
 const { newSummary, newColumn } = CategoryImportSummary
 const { code, label, description, extra } = CategoryImportSummary.columnTypes
-const { text } = CategoryItemExtraDef.dataTypes
+const { text } = ExtraPropDef.dataTypes
 
 describe('CategoryImportSummaryGenerator Test', () => {
   const columnNamesTests = [

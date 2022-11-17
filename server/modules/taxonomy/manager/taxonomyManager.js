@@ -2,9 +2,11 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
-import * as ObjectUtils from '@core/objectUtils'
+import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
 
@@ -17,8 +19,17 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
 
-/**
+/**.
  * ====== CREATE
+ *
+ * @param root0
+ * @param root0.user
+ * @param root0.surveyId
+ * @param root0.taxonomy
+ * @param root0.addLogs
+ * @param root0.system
+ * @param root0.backup
+ * @param client
  */
 export const insertTaxonomy = async (
   { user, surveyId, taxonomy, addLogs = true, system = false, backup = false },
@@ -51,8 +62,18 @@ export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup 
     ])
   )
 
-/**
+/**.
  * ====== READ
+ *
+ * @param root0
+ * @param root0.surveyId
+ * @param root0.draft
+ * @param root0.validate
+ * @param root0.backup
+ * @param root0.limit
+ * @param root0.offset
+ * @param root0.search
+ * @param client
  */
 export const fetchTaxonomiesBySurveyId = async (
   { surveyId, draft = false, validate = false, backup = false, limit = null, offset = 0, search = null },
@@ -166,11 +187,6 @@ export const findTaxaByVernacularName = async (
 export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
   TaxonomyRepository
 
-export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
-  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft })
-  return ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
-}
-
 export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft) => {
   const taxonomy = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
@@ -218,10 +234,10 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
       )[0]
   )
 
-export const updateTaxon = async (user, surveyId, taxon, client = db) =>
+export const updateTaxonAndVernacularNames = async (user, surveyId, taxon, client = db) =>
   client.tx(async (t) =>
     Promise.all([
-      TaxonomyRepository.updateTaxon(surveyId, taxon, t),
+      TaxonomyRepository.updateTaxonAndVernacularNames(surveyId, taxon, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonUpdate, taxon, true, t),
     ])
   )
@@ -238,6 +254,79 @@ export const updateTaxa = async (user, surveyId, taxa, client = db) =>
       ),
     ])
   )
+
+const _updateTaxaExtraDefProp = async ({ surveyId, taxonomyUuid, propName, extraPropDef, deleted }, t) => {
+  const taxa = await TaxonomyRepository.fetchTaxa({ surveyId, taxonomyUuid, draft: true }, t)
+  if (taxa.length === 0) return
+
+  const taxaUpdated = []
+  taxa.forEach((taxon) => {
+    if (R.isNil(Taxon.getExtraProp(propName)(taxon))) return
+
+    const taxonUpdated = deleted
+      ? Taxon.dissocExtraProp(propName)(taxon)
+      : Taxon.renameExtraProp({ nameOld: propName, nameNew: ExtraPropDef.getName(extraPropDef) })(taxon)
+
+    taxaUpdated.push(taxonUpdated)
+  })
+  if (taxaUpdated.length > 0) {
+    await TaxonomyRepository.updateTaxaProps({ surveyId, taxa: taxaUpdated }, t)
+  }
+}
+
+export const updateTaxonomyExtraPropDef = async (
+  { user, surveyId, taxonomyUuid, propName, extraPropDef = null, deleted = false },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, t)
+
+    // validate new item extra def
+    let extraPropDefsArrayUpdated = [...Taxonomy.getExtraPropsDefsArray(taxonomy)]
+    // remove old item
+    extraPropDefsArrayUpdated = extraPropDefsArrayUpdated.filter((def) => ExtraPropDef.getName(def) !== propName)
+
+    if (!deleted) {
+      // add new extra def item
+      extraPropDefsArrayUpdated.push(extraPropDef)
+
+      const validation = await validateExtraPropDef({
+        extraPropDef,
+        extraPropDefsArray: extraPropDefsArrayUpdated,
+      })
+      if (!Validation.isValid(validation)) {
+        throw new Error('Invalid taxonomy item extra def')
+      }
+    }
+
+    // update category items
+    if (deleted || propName !== ExtraPropDef.getName(extraPropDef)) {
+      await _updateTaxaExtraDefProp({ surveyId, taxonomyUuid, propName, extraPropDef, deleted }, t)
+    }
+
+    // prepare extraPropDefs for storage
+    // - remove unnecessary information (uuid, name)
+    // - index stored object by extra def name
+    const extraPropDefsToStore = extraPropDefsArrayUpdated.reduce(
+      (acc, item) => ({
+        ...acc,
+        [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
+          dataType: ExtraPropDef.getDataType(item),
+        }),
+      }),
+      {}
+    )
+
+    return updateTaxonomyProp(
+      user,
+      surveyId,
+      taxonomyUuid,
+      Taxonomy.keysProps.extraPropsDefs,
+      extraPropDefsToStore,
+      false,
+      t
+    )
+  })
 
 // ============== DELETE
 

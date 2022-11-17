@@ -7,6 +7,7 @@ import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { LabelWithTooltip } from '../LabelWithTooltip'
 import { useDropdown } from './useDropdown'
 
 const OptionComponent = (props) => {
@@ -16,7 +17,7 @@ const OptionComponent = (props) => {
   return (
     <div data-testid={TestId.dropdown.dropDownItem(value)}>
       <components.Option {...props}>
-        <span className="dropdown-option__label">{label}</span>
+        <LabelWithTooltip className="dropdown-option__label" label={label} />
         {description && <span className="dropdown-option__description">{description}</span>}
         {icon && <span className="dropdown-option__icon">{icon}</span>}
       </components.Option>
@@ -38,6 +39,7 @@ const Dropdown = (props) => {
     itemLabel,
     itemValue,
     items: itemsProp,
+    menuPlacement,
     multiple,
     onBeforeChange,
     onChange: onChangeProp,
@@ -73,6 +75,7 @@ const Dropdown = (props) => {
     itemsProp,
     onBeforeChange,
     onChangeProp,
+    readOnly,
     selection,
     title,
   })
@@ -97,6 +100,8 @@ const Dropdown = (props) => {
         isSearchable={searchable && !readOnly}
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
+        menuPlacement={menuPlacement}
+        menuPosition="fixed"
         menuIsOpen={menuIsOpen}
         onInputChange={onInputChange}
         options={options}
@@ -121,6 +126,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
@@ -145,12 +151,13 @@ Dropdown.defaultProps = {
   itemIcon: 'icon',
   itemLabel: 'label',
   itemValue: 'value',
+  menuPlacement: 'auto',
   multiple: false,
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
   searchable: true,
-  selection: null,
+  selection: undefined,
   testId: null,
   title: null,
   validation: {},

@@ -41,6 +41,8 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
+export const samplingPointDataCategoryName = 'sampling_point_data'
+
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // ====== READ surveyInfo

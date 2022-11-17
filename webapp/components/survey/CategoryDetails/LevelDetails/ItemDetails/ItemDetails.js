@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
@@ -124,12 +124,12 @@ const ItemDetails = (props) => {
 
           {extraPropsEditorVisible && (
             <fieldset className="extra-props">
-              <legend>{i18n.t('categoryEdit.extraProp', { count: 2 })}</legend>
+              <legend>{i18n.t('extraProp.label_plural')}</legend>
               {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
                 <FormItem label={key} key={key}>
                   <Input
                     value={CategoryItem.getExtraProp(key)(item)}
-                    numberFormat={dataType === CategoryItemExtraDef.dataTypes.number ? NumberFormats.decimal() : null}
+                    numberFormat={dataType === ExtraPropDef.dataTypes.number ? NumberFormats.decimal() : null}
                     readOnly={readOnly}
                     validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                     onChange={(value) => {

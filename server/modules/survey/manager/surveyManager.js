@@ -190,23 +190,30 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   },
   client = db
 ) => {
-  const [surveyDb, nodeDefs, dependencies] = await Promise.all([
+  const [surveyDb, nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
     fetchSurveyById({ surveyId, draft, validate, backup }, client),
     NodeDefManager.fetchNodeDefsBySurveyId(
       { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
       client
     ),
     fetchDependencies(surveyId, client),
+    CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
+    TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
   ])
-  let survey = Survey.assocNodeDefs({ nodeDefs })(surveyDb)
-  if (dependencies) {
-    survey = Survey.assocDependencyGraph(dependencies)(survey)
-  }
+
+  let survey = R.pipe(
+    Survey.assocNodeDefs({ nodeDefs }),
+    Survey.assocCategories(categories),
+    Survey.assocTaxonomies(taxonomies)
+  )(surveyDb)
+
   if (validate) {
     const dependencyGraph = dependencies || Survey.buildDependencyGraph(survey)
     survey = Survey.assocDependencyGraph(dependencyGraph)(survey)
     const validation = await SurveyValidator.validateNodeDefs(survey)
     survey = Survey.assocNodeDefsValidation(validation)(survey)
+  } else if (dependencies) {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
   return survey
 }
@@ -215,19 +222,12 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
-  const [survey, categories, categoryItemsRefData, taxonomies, taxaIndexRefData] = await Promise.all([
+  const [survey, categoryItemsRefData, taxaIndexRefData] = await Promise.all([
     fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted, backup }, client),
-    CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
     CategoryRepository.fetchIndex(surveyId, draft, client),
-    TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
     TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client),
   ])
-
-  return R.pipe(
-    Survey.assocCategories(categories),
-    Survey.assocTaxonomies(taxonomies),
-    Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })
-  )(survey)
+  return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
 export const fetchUserSurveysInfo = async (

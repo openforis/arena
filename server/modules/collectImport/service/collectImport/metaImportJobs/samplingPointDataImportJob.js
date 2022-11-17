@@ -4,7 +4,7 @@ import { PointFactory, Points, SRSs } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
@@ -81,10 +81,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   extractItemExtraDef() {
     return R.pipe(
       R.omit(R.keys(keysExtra)),
-      R.assoc(
-        keysItem.location,
-        CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.geometryPoint })
-      )
+      R.assoc(keysItem.location, ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint }))
     )(super.extractItemExtraDef())
   }
 

@@ -15,10 +15,10 @@ const newItem = ({ dataType }) => ({
   [keys.dataType]: dataType,
 })
 
-const getDataType = A.prop(keys.dataType)
+const getDataType = A.propOr(dataTypes.text, keys.dataType)
 const getName = A.prop(keys.name)
 
-export const CategoryItemExtraDef = {
+export const ExtraPropDef = {
   keys,
   dataTypes,
   newItem,

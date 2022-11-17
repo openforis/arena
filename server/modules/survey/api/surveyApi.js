@@ -167,29 +167,33 @@ export const init = (app) => {
 
   // export-csv-data
   // generate zip with CSV
-  app.post('/survey/:surveyId/export-csv-data', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, includeCategories, includeCategoryItemsLabels, includeAnalysis } = Request.getParams(req)
+  app.post(
+    '/survey/:surveyId/export-csv-data',
+    AuthMiddleware.requireRecordsExportPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, includeCategories, includeCategoryItemsLabels, includeAnalysis } = Request.getParams(req)
 
-      const user = Request.getUser(req)
+        const user = Request.getUser(req)
 
-      const job = SurveyService.startExportCsvDataJob({
-        surveyId,
-        user,
-        includeCategories,
-        includeCategoryItemsLabels,
-        includeAnalysis,
-      })
-      res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (error) {
-      next(error)
+        const job = SurveyService.startExportCsvDataJob({
+          surveyId,
+          user,
+          includeCategories,
+          includeCategoryItemsLabels,
+          includeAnalysis,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   // get zip with csv
   app.get(
     '/survey/:surveyId/export-csv-data/:exportUuid',
-    AuthMiddleware.requireSurveyViewPermission,
+    AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {
         const { surveyId, exportUuid } = Request.getParams(req)

@@ -23,8 +23,11 @@ export const useGetSiblingNodeDefUuid = () => {
         const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDefParent)
         siblingUuids = layoutChildren.map((layoutItem) => layoutItem.i)
       }
-      // filter existing node defs (shown in UI)
-      siblingUuids = siblingUuids.filter((siblingUuid) => Survey.getNodeDefByUuid(siblingUuid)(survey))
+      // filter out not existing and analysis node defs (shown in UI)
+      siblingUuids = siblingUuids.filter((siblingUuid) => {
+        const siblingNodeDef = Survey.getNodeDefByUuid(siblingUuid)(survey)
+        return siblingNodeDef && !NodeDef.isAnalysis(siblingNodeDef)
+      })
       return siblingUuids
     },
     [survey, cycle]

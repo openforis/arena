@@ -4,7 +4,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { CategoryItemExtraDef } from '@core/survey/categoryItemExtraDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { getContextSurveyId, getContextUser } from '../../config/context'
 
 export const createCategoryTest = async () => {
@@ -12,8 +12,8 @@ export const createCategoryTest = async () => {
   const user = getContextUser()
 
   const extraDef = {
-    extraDefText: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.text }),
-    extraDefNumber: CategoryItemExtraDef.newItem({ dataType: CategoryItemExtraDef.dataTypes.number }),
+    extraDefText: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+    extraDefNumber: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
   }
   const categoryReq = Category.assocItemExtraDef(extraDef)(Category.newCategory({ name: 'category_test' }))
   const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
@@ -115,10 +115,10 @@ export const updateCategoryItemExtraDefTest = async () => {
     surveyId,
     categoryUuid: Category.getUuid(category),
     name: 'extraDefText',
-    value: { name: 'extraDefText_modified', dataType: CategoryItemExtraDef.dataTypes.text },
+    value: { name: 'extraDefText_modified', dataType: ExtraPropDef.dataTypes.text },
   })
 
-  const itemExtraDefExpected = { extraDefText_modified: { dataType: CategoryItemExtraDef.dataTypes.text } }
+  const itemExtraDefExpected = { extraDefText_modified: { dataType: ExtraPropDef.dataTypes.text } }
 
   expect(Category.getItemExtraDef(categoryUpdated)).toBe(itemExtraDefExpected)
 }

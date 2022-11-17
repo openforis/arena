@@ -21,6 +21,7 @@ const _putCategoryProp =
       return stateUpdated
     })
 
+    dispatch(SurveyActions.surveyCategoryUpdated(category))
     dispatch(SurveyActions.metaUpdated())
   }
 

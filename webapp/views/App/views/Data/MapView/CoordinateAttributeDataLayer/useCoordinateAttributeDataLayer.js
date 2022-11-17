@@ -123,14 +123,17 @@ export const useCoordinateAttributeDataLayer = (props) => {
     setState,
   })
 
-  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator } = useMapClusters({ points })
+  const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({
+    points,
+  })
 
   return {
     layerName,
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
+    getClusterLeaves,
     totalPoints: points.length,
-    points
+    points,
   }
 }

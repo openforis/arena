@@ -1,10 +1,12 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useRefreshCategory } from './useRefreshCategory'
+import { useDispatch } from 'react-redux'
 
 export const useUpdateCategoryItemExtraPropItem = ({ setState }) => {
+  const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const refreshCategory = useRefreshCategory({ setState })
 
@@ -12,5 +14,8 @@ export const useUpdateCategoryItemExtraPropItem = ({ setState }) => {
     const category = await API.updateCategoryItemExtraDefItem({ surveyId, categoryUuid, name, itemExtraDef, deleted })
 
     refreshCategory({ category })
+
+    dispatch(SurveyActions.surveyCategoryUpdated(category))
+    dispatch(SurveyActions.metaUpdated())
   }, [])
 }

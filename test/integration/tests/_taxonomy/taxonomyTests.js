@@ -29,12 +29,13 @@ beforeAll(async () => {
     // Cluster
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
-    .taxonomy(
-      taxonomyNameDefault,
-      SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-        .vernacularName('eng', 'Mahogany')
-        .vernacularName('swa', 'Mbambakofi'),
-      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+    .taxonomies(
+      SB.taxonomy(taxonomyNameDefault).taxa(
+        SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+          .vernacularName('eng', 'Mahogany')
+          .vernacularName('swa', 'Mbambakofi'),
+        SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+      )
     )
     .buildAndStore(false)
 })
@@ -138,7 +139,7 @@ export const taxonUpdateTest = async () => {
   })
 
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
-  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
+  await TaxonomyManager.updateTaxonAndVernacularNames(user, surveyId, taxonUpdated)
 
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 

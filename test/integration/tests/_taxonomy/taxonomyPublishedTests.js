@@ -24,13 +24,14 @@ beforeAll(async () => {
     // Cluster
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
-    .taxonomy(
-      taxonomyName,
-      SB.taxon('ALB/GLA', 'Fabaceae', 'Albizia', 'Albizia glaberrima'),
-      SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-        .vernacularName('eng', 'Mahogany')
-        .vernacularName('swa', 'Mbambakofi'),
-      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+    .taxonomies(
+      SB.taxonomy(taxonomyName).taxa(
+        SB.taxon('ALB/GLA', 'Fabaceae', 'Albizia', 'Albizia glaberrima'),
+        SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
+          .vernacularName('eng', 'Mahogany')
+          .vernacularName('swa', 'Mbambakofi'),
+        SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
+      )
     )
     .buildAndStore()
 })
@@ -71,7 +72,7 @@ export const taxonPublishedUpdateTest = async () => {
     scientificName: 'Albizia glaberrima updated',
   })
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxonPublished)
-  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
+  await TaxonomyManager.updateTaxonAndVernacularNames(user, surveyId, taxonUpdated)
 
   // Reload taxon
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)

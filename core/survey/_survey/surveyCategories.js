@@ -1,6 +1,9 @@
 import * as R from 'ramda'
 
 import * as Category from '../category'
+import * as NodeDef from '../nodeDef'
+import * as SurveyInfo from './surveyInfo'
+import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const categories = 'categories'
 
@@ -28,6 +31,18 @@ export const getCategoryByName = (name) =>
     R.values,
     R.find((category) => Category.getName(category) === name)
   )
+
+export const getSamplingPointDataCategory = getCategoryByName(SurveyInfo.samplingPointDataCategoryName)
+
+export const getSamplingPointDataNodeDefs = (survey) => {
+  const samplingPointDataCategory = getSamplingPointDataCategory(survey)
+  if (!samplingPointDataCategory) return []
+
+  return SurveyNodeDefs.findDescendants({
+    nodeDef: SurveyNodeDefs.getNodeDefRoot(survey),
+    filterFn: (nodeDef) => NodeDef.getCategoryUuid(nodeDef) === samplingPointDataCategory.uuid,
+  })(survey)
+}
 
 // ====== UPDATE
 export const assocCategories = (newCategories) => R.assoc(categories, newCategories)

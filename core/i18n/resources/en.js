@@ -895,7 +895,7 @@ $t(common.appNameFull)
     editorCompletionHelp: '- Show the available variables and functions that can be used',
     functionDescriptions: {
       categoryItemProp:
-        'Returns the value of the specified $t(categoryEdit.extraProp) of a category item having the specified code',
+        'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
       distance: 'Returns the distance (in meters) between the specified coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the context node among its siblings',
@@ -1133,39 +1133,19 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
     deleteItem: 'Delete item',
-    extraPropertiesEditor: {
-      title: 'Edit $t(categoryEdit.extraProp_plural)',
-      confirmDelete: 'Delete the extra properties "{{name}}"?',
-      confirmSave: `Save the changes to the extra properties definitions?
-
-**Warnings**:
-
-{{warnings}}`,
-      warnings: {
-        nameChanged: 'Name changed from {{nameOld}} to {{nameNew}}',
-        dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
-      },
-    },
-    extraProp: 'Extra property',
-    extraProp_plural: 'Extra properties',
-    extraPropDataType: {
-      geometryPoint: 'Geometry Point',
-      number: 'Number',
-      text: 'Text',
-    },
     level: 'Level',
 
     importSummary: {
       column: 'Column',
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
-      columnTypeSummaryExtra: '$t(categoryEdit.extraProp)',
+      columnTypeSummaryExtra: '$t(extraProp.label)',
       columnTypeDescription: 'Description ({{language}})',
       columnTypeLabel: 'Label ({{language}})',
       columnType: {
         code: 'code',
         description: 'description',
         label: 'label',
-        extra: '$t(categoryEdit.extraProp)',
+        extra: '$t(extraProp.label)',
       },
       dataType: 'Data Type',
     },
@@ -1173,6 +1153,29 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     reportingData: 'Reporting data',
     templateForDataImport: 'Template for data import',
     templateForDataImportGeneric: 'Template for data import (generic)',
+  },
+
+  extraProp: {
+    label: 'Extra property',
+    label_plural: 'Extra properties',
+    dataTypes: {
+      geometryPoint: 'Geometry Point',
+      number: 'Number',
+      text: 'Text',
+    },
+    editor: {
+      title: 'Edit $t(extraProp.label_plural)',
+      confirmDelete: 'Delete the extra property "{{name}}"?',
+      confirmSave: `Save the changes to the extra properties definitions?
+
+  **Warnings**:
+
+  {{warnings}}`,
+      warnings: {
+        nameChanged: 'Name changed from {{nameOld}} to {{nameNew}}',
+        dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
+      },
+    },
   },
 
   // ===== All validation errors
@@ -1198,10 +1201,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeCannotBeKeyword: `Code "{{value}}" cannot be used: it's a reserved word`,
       codeDuplicate: 'Code is duplicate',
       codeRequired: 'Code is required',
-      itemExtraPropDataTypeRequired: 'Data type required for $t(categoryEdit.extraProp) "{{key}}"',
-      itemExtraPropNameInvalid: 'Invalid name for $t(categoryEdit.extraProp) "{{key}}"',
-      itemExtraPropInvalidNumber: 'Invalid number for $t(categoryEdit.extraProp) "{{key}}"',
-      itemExtraPropInvalidGeometryPoint: 'Invalid geometry point for $t(categoryEdit.extraProp) "{{key}}"',
+      itemExtraPropDataTypeRequired: 'Data type required for $t(extraProp.label) "{{key}}"',
+      itemExtraPropNameInvalid: 'Invalid name for $t(extraProp.label) "{{key}}"',
+      itemExtraPropInvalidNumber: 'Invalid number for $t(extraProp.label) "{{key}}"',
+      itemExtraPropInvalidGeometryPoint: 'Invalid geometry point for $t(extraProp.label) "{{key}}"',
       itemsInvalid: 'At least one invalid item',
       itemsEmpty: 'Define at least one item',
       levelDuplicate: 'Level name is duplicate',
@@ -1282,6 +1285,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     taxonomyEdit: {
+      codeChangedAfterPublishing: `Published code has changed: '{{oldCode}}' => '{{newCode}}'`,
       codeDuplicate: 'Duplicate code {{value}}; $t(validationErrors.rowsDuplicate)',
       codeRequired: 'Code is required',
       familyRequired: 'Family is required',

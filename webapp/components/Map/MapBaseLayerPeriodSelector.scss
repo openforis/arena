@@ -10,18 +10,11 @@
   left: 20%;
   width: 60%;
 
-  .period-select-wrapper-left {
+  .period-select-wrapper {
     display: flex;
     align-items: center;
     column-gap: 0.5rem;
-    padding: 0.5rem;
-    background-color: rgba($white, 0.4);
-  }
-  .period-select-wrapper-right {
-    display: flex;
-    align-items: center;
-    column-gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.2rem;
     background-color: rgba($white, 0.4);
   }
 

@@ -22,6 +22,7 @@ export {
   createTaxonomy,
   uploadTaxa,
   updateTaxonomy,
+  updateTaxonomyExtraPropDef,
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
