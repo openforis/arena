@@ -108,14 +108,19 @@ export const refreshAllRdbs = async () => {
   return { job: JobUtils.jobToJSON(job) }
 }
 
-export const exportViewDataToTempFile = async (params) => {
-  const { surveyId, cycle, query, columnNodeDefs = false, addCycle = false } = params
-
+export const exportViewDataToTempFile = async ({
+  user,
+  surveyId,
+  cycle,
+  query,
+  columnNodeDefs = false,
+  addCycle = false,
+}) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
   const streamOutput = FileUtils.createWriteStream(tempFilePath)
 
-  await fetchViewData({ surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
+  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
 
   return tempFileName
 }
@@ -128,7 +133,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   includeAnalysis,
   callback,
 }) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const survey = await SurveyManager.fetchSurveyById({ surveyId })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({

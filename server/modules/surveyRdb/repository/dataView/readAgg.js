@@ -96,6 +96,7 @@ export const countViewDataAgg = async (params, client = db) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
+ * @param {string} [params.recordOwnerUuid=null] - The record owner UUID used to filter records. If null, all records will be considered.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
@@ -104,8 +105,8 @@ export const countViewDataAgg = async (params, client = db) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, limit, offset, stream } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query })
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
 
   const selectWithLimit = `${select}     
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}

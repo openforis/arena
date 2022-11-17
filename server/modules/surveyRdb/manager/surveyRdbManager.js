@@ -152,6 +152,7 @@ const _getExportFieldsAgg = ({ survey, query }) => {
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
  * @param {number} [params.offset=null] - The query offset.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
  *
