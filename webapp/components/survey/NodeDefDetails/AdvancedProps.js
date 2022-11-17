@@ -32,12 +32,35 @@ const AdvancedProps = (props) => {
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
-            <Checkbox
-              checked={NodeDef.isReadOnly(nodeDef)}
-              disabled={readOnly || NodeDef.isMultiple(nodeDef)}
-              validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
-            />
+            <div className="readonly_row">
+              <Checkbox
+                checked={NodeDef.isReadOnly(nodeDef)}
+                disabled={readOnly || NodeDef.isMultiple(nodeDef)}
+                validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
+                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
+              />
+              {NodeDef.isReadOnly(nodeDef) && (
+                <>
+                  <FormItem label={i18n.t('nodeDefEdit.advancedProps.hidden')}>
+                    <Checkbox
+                      checked={NodeDef.isHidden(nodeDef)}
+                      validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
+                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
+                    />
+                  </FormItem>
+
+                  <FormItem label={i18n.t('nodeDefEdit.advancedProps.excludedFromDataExport')}>
+                    <Checkbox
+                      checked={NodeDef.isExcludedFromDataExport(nodeDef)}
+                      validation={Validation.getFieldValidation(NodeDef.propKeys.excludedFromDataExport)(validation)}
+                      onChange={(value) =>
+                        Actions.setProp({ state, key: NodeDef.propKeys.excludedFromDataExport, value })
+                      }
+                    />
+                  </FormItem>
+                </>
+              )}
+            </div>
           </FormItem>
 
           <NodeDefExpressionsProp

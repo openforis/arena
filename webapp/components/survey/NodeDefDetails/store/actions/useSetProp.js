@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -26,7 +27,7 @@ const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   return true
 }
 
-const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, multiple }) => {
+const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple }) => {
   // Reset validations required or count
   const validations = NodeDef.getValidations(nodeDef)
   const validationsUpdated = multiple
@@ -51,6 +52,23 @@ const _onUpdateCategoryUuid = ({ nodeDef }) => {
   return NodeDef.mergeProps({ [NodeDef.propKeys.parentCodeDefUuid]: null })(nodeDef)
 }
 
+const _onUpdateReadOnly = ({ nodeDef, value: readOnly }) => {
+  if (!readOnly) {
+    // dissoc properties valid only when readOnly is true
+    return A.pipe(
+      NodeDef.dissocProp(NodeDef.propKeys.hidden),
+      NodeDef.dissocProp(NodeDef.propKeys.excludedFromDataExport)
+    )(nodeDef)
+  }
+  return nodeDef
+}
+
+const updateFunctionByProp = {
+  [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
+  [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
+}
+
 export const useSetProp = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
@@ -66,10 +84,9 @@ export const useSetProp = ({ setState }) => {
 
     let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
 
-    if (key === NodeDef.propKeys.multiple) {
-      nodeDefUpdated = _onUpdateMultiple({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, multiple: value })
-    } else if (key === NodeDef.propKeys.categoryUuid) {
-      nodeDefUpdated = _onUpdateCategoryUuid({ nodeDef: nodeDefUpdated })
+    const propUpdater = updateFunctionByProp[key]
+    if (propUpdater) {
+      nodeDefUpdated = propUpdater({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, value })
     }
 
     validateNodeDef({ state, nodeDefUpdated })
