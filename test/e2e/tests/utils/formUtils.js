@@ -21,7 +21,10 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
       await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
     } else if (label) {
       // select dropdown option by label
-      await page.click(`text="${label}"`)
+      const itemSelector = `.dropdown-option__label:has-text("${label}")`
+      const itemEl = await page.$(itemSelector)
+      await expect(itemEl).not.toBeNull()
+      await page.click(itemSelector)
     }
   }
 }
