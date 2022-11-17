@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -8,14 +8,22 @@ import Markdown from '@webapp/components/markdown'
 
 import { useI18n } from '@webapp/store/system'
 import { useMap } from 'react-leaflet'
-import { ButtonIconEdit } from '@webapp/components'
+import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 
 export const SamplingPointDataItemPopup = (props) => {
-  const { pointFeature, getNextPoint, getPreviousPoint, openPopupOfPoint, onRecordEditClick } = props
+  const {
+    pointFeature,
+    getNextPoint,
+    getPreviousPoint,
+    openPopupOfPoint,
+    onRecordEditClick,
+    createRecordFromSamplingPointDataItem,
+  } = props
 
-  const { itemUuid, itemCodes, location, recordUuid } = pointFeature.properties
+  const { properties: pointProperties } = pointFeature
+  const { itemUuid, itemCodes, location, recordUuid } = pointProperties
 
   const i18n = useI18n()
   const map = useMap()
@@ -46,6 +54,14 @@ ${itemCodes
     flyToPoint(previousPoint)
   }
 
+  const onRecordCreate = useCallback(
+    ({ recordUuid }) => {
+      // update current point
+      pointProperties.recordUuid = recordUuid
+    },
+    [pointProperties]
+  )
+
   return (
     <Popup className="sampling-point-data__item-popup-content">
       <Markdown source={content} />
@@ -53,6 +69,13 @@ ${itemCodes
         <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
         {recordUuid && (
           <ButtonIconEdit label="mapView.editRecord" showLabel onClick={() => onRecordEditClick({ recordUuid })} />
+        )}
+        {!recordUuid && (
+          <ButtonAdd
+            label="mapView.createRecord"
+            showLabel
+            onClick={() => createRecordFromSamplingPointDataItem({ itemUuid, callback: onRecordCreate })}
+          />
         )}
         <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
       </div>
@@ -66,4 +89,5 @@ SamplingPointDataItemPopup.propTypes = {
   getPreviousPoint: PropTypes.func,
   openPopupOfPoint: PropTypes.func,
   onRecordEditClick: PropTypes.func,
+  createRecordFromSamplingPointDataItem: PropTypes.func,
 }

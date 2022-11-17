@@ -356,8 +356,11 @@ export default class RecordsImportJob extends Job {
     return recordUpdated
   }
 
-  async nodesBatchInsertHandler(nodes, tx) {
-    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodes, systemActivity: true }, tx)
+  async nodesBatchInsertHandler(nodesArray, tx) {
+    await RecordManager.insertNodesInBulk(
+      { user: this.user, surveyId: this.surveyId, nodesArray, systemActivity: true },
+      tx
+    )
   }
 }
 
