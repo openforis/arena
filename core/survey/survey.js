@@ -58,7 +58,7 @@ export const newSurvey = ({
   [SurveyInfo.keys.template]: template,
 })
 
-export const infoKeys = SurveyInfo.keys
+export const { keys: infoKeys, status } = SurveyInfo
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
 export const { sortableKeys } = SurveySortKeys
