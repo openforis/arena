@@ -1,15 +1,10 @@
 ############################################################
 
-ARG NPM_TOKEN
 ARG node_version=14.17.0
 
 FROM node:${node_version} AS arena
 
 ARG NPM_TOKEN
-ENV NPM_TOKEN $NPM_TOKEN
-
-# RUN apt update && apt upgrade -y
-# RUN apt autoremove && apt autoclean
 
 COPY . /app/
 
@@ -29,11 +24,9 @@ RUN yarn install --frozen-lockfile \
 
 RUN npm install pm2 -g
 
-# Prepare start script
+# Startup
 
 RUN ln -s dist/server.js .
-RUN ln -s /app/infra/web/start.sh /app/start.sh
-RUN chmod +x start.sh
-CMD ["./start.sh"]
+CMD ["pm2-runtime", "server.js"]
 
 #############################################################
