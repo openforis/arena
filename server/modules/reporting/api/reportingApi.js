@@ -28,9 +28,10 @@ export const init = (app) => {
   app.post('/reporting/:surveyId/:nodeDefUuidTable/chart', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, query: queryParam, chart } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       const query = A.parse(queryParam)
-      const data = await SurveyRdbService.fetchViewData({ surveyId, cycle, query })
+      const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })
 
       const chartSpec = A.parse(chart)
       const svg = await generateSvgChart({ chartSpec, data })
