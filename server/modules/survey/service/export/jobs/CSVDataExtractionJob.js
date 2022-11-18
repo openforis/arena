@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
 
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 
 export default class CSVDataExtractionJob extends Job {
   constructor(params) {
@@ -10,8 +10,9 @@ export default class CSVDataExtractionJob extends Job {
   async execute() {
     const { surveyId, includeCategoryItemsLabels, includeAnalysis, outputDir } = this.context
 
-    await SurveyRdbManager.fetchEntitiesDataToCsvFiles(
+    await SurveyRdbService.fetchEntitiesDataToCsvFiles(
       {
+        user: this.user,
         surveyId,
         outputDir,
         includeCategoryItemsLabels,

@@ -35,7 +35,12 @@ const _getColumnNames = ({ nodeDef, type }) =>
     ? [
         DataTable.columnNameUuuid,
         ...(NodeDef.isRoot(nodeDef)
-          ? [DataTable.columnNameRecordUuid, DataTable.columnNameRecordCycle, DataTable.columnNameRecordStep]
+          ? [
+              DataTable.columnNameRecordUuid,
+              DataTable.columnNameRecordCycle,
+              DataTable.columnNameRecordStep,
+              DataTable.columnNameRecordOwnerUuid,
+            ]
           : []),
         DataTable.columnNameParentUuuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
@@ -48,7 +53,9 @@ const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, 
   type === types.insert
     ? [
         Node.getUuid(node),
-        ...(NodeDef.isRoot(nodeDef) ? [Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record)] : []),
+        ...(NodeDef.isRoot(nodeDef)
+          ? [Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record), Record.getOwnerUuid(record)]
+          : []),
         Node.getUuid(ancestorMultipleEntity),
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getValues(survey, nodeDef, node)

@@ -162,6 +162,7 @@ const _dbTransformCallbackSelect =
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
@@ -177,6 +178,7 @@ export const fetchViewData = async (params, client = db) => {
     columnNodeDefs,
     includeFileAttributeDefs = true,
     recordSteps,
+    recordOwnerUuid = null,
     offset = null,
     limit = null,
     stream = false,
@@ -219,6 +221,11 @@ export const fetchViewData = async (params, client = db) => {
     queryBuilder.addParams({ recordSteps })
   }
 
+  if (!Objects.isEmpty(recordOwnerUuid)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordOwnerUuid} = $/recordOwnerUuid/`)
+    queryBuilder.addParams({ recordOwnerUuid })
+  }
+
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (!R.isNil(filterClause)) {
@@ -250,7 +257,7 @@ export const fetchViewData = async (params, client = db) => {
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
-export const runCount = async ({ surveyId, cycle, tableName, filter }, client = db) => {
+export const runCount = async ({ surveyId, cycle, tableName, filter = null, recordOwnerUuid = null }, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
@@ -262,11 +269,13 @@ export const runCount = async ({ surveyId, cycle, tableName, filter }, client = 
         $/schemaName:name/.$/tableName:name/
     WHERE 
       ${DataTable.columnNameRecordCycle} = $/cycle/
+      ${recordOwnerUuid ? ` AND ${DataTable.columnNameRecordOwnerUuid} = $/recordOwnerUuid/` : ''}
       ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
     {
-      cycle,
       ...filterParams,
+      cycle,
+      recordOwnerUuid,
       schemaName,
       tableName,
     }
