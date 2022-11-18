@@ -187,8 +187,8 @@ export default class RecordCheckJob extends Job {
     return { record: recordUpdated, nodes: nodesUpdated }
   }
 
-  async nodesBatchInsertHandler(nodes, tx) {
-    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodes }, tx)
+  async nodesBatchInsertHandler(nodesArray, tx) {
+    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodesArray }, tx)
   }
 
   async beforeSuccess() {

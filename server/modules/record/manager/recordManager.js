@@ -19,38 +19,8 @@ import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 
 // ==== CREATE
 
-export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
-  client.tx(async (t) => {
-    const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
-    if (!Record.isPreview(record)) {
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
-    }
-
-    return recordDb
-  })
-
-export const insertNodesInBulk = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
-  const nodeValues = nodes.map((node) => [
-    Node.getUuid(node),
-    Node.getDateCreated(node),
-    Node.getDateCreated(node),
-    Node.getRecordUuid(node),
-    Node.getParentUuid(node),
-    Node.getNodeDefUuid(node),
-    JSON.stringify(Node.getValue(node, null)),
-    Node.getMeta(node),
-  ])
-  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
-
-  await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
-  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
-}
-
-export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
-  await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
-  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
-  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
-}
+export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordManager/recordCreationManager'
+export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
 export const { insertNode } = RecordUpdateManager
 

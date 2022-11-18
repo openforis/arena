@@ -14,7 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { PanelRight } from '@webapp/components'
-import Record from '@webapp/components/survey/Record'
+import RecordEditor from '@webapp/components/survey/Record'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
@@ -52,12 +52,22 @@ const MapWrapper = () => {
     })()
   }, [])
 
-  const onRecordEditClick = useCallback(
-    (params) => {
-      const { recordUuid, parentUuid } = params || {}
-      setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeUuid: parentUuid }))
+  const onRecordEditClick = useCallback((params) => {
+    const { recordUuid, parentUuid } = params || {}
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeUuid: parentUuid }))
+  }, [])
+
+  const closeRecordEditor = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
+  }, [])
+
+  const createRecordFromSamplingPointDataItem = useCallback(
+    async ({ itemUuid, callback }) => {
+      const recordUuid = await API.createRecordFromSamplingPointDataItem({ surveyId, itemUuid })
+      setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid }))
+      callback?.({ recordUuid })
     },
-    [setState]
+    [surveyId]
   )
 
   if (samplingPointDataLevels.length + coordinateAttributeDefs.length > 0 && layerColors.length === 0) {
@@ -74,6 +84,8 @@ const MapWrapper = () => {
               key={CategoryLevel.getUuid(level)}
               levelIndex={CategoryLevel.getIndex(level)}
               markersColor={layerColors[index]}
+              onRecordEditClick={onRecordEditClick}
+              createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
             />
           )),
           ...coordinateAttributeDefs.map((attributeDef, index) => (
@@ -92,9 +104,9 @@ const MapWrapper = () => {
           className="record-panel"
           header={i18n.t('mapView.editRecord')}
           width="70vw"
-          onClose={() => onRecordEditClick(null)}
+          onClose={closeRecordEditor}
         >
-          <Record recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
+          <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
         </PanelRight>
       )}
     </>

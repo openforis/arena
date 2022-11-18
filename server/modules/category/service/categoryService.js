@@ -3,6 +3,7 @@ import { Points } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Record from '@core/record/record'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
@@ -16,6 +17,7 @@ import CategoriesExportJob from './CategoriesExportJob'
 import * as CategoryManager from '../manager/categoryManager'
 import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
 import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
+import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -74,8 +76,7 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
   return job
 }
 
-const _getSamplingPointDataCategory = async ({ surveyId }) => {
-  const draft = true
+const _getSamplingPointDataCategory = async ({ surveyId, draft = true }) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
   return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
 }
@@ -89,7 +90,9 @@ export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
 
 export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
   const draft = true
-  const category = await _getSamplingPointDataCategory({ surveyId })
+  const category = await _getSamplingPointDataCategory({ surveyId, draft })
+  if (!category) return []
+
   const items = await CategoryManager.fetchItemsByLevelIndex({
     surveyId,
     categoryUuid: Category.getUuid(category),
@@ -98,16 +101,23 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     offset,
     draft,
   })
+
+  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, draft })
+
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
-    const ancestorCodes = CategoryItem.getAncestorCodes(item)
+    const codes = CategoryItem.getCodesHierarchy(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point)
+
+    const record = recordFinder?.(item)
+
     return {
       uuid: CategoryItem.getUuid(item),
-      codes: [...ancestorCodes, CategoryItem.getCode(item)],
+      codes,
       latLng: [pointLatLong.y, pointLatLong.x],
       location,
+      ...(record ? { recordUuid: Record.getUuid(record) } : {}),
     }
   })
   return samplingPointData

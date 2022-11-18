@@ -41,6 +41,19 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/record/fromspditem', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, cycle, itemUuid } = Request.getParams(req)
+
+      const recordUuid = await RecordService.createRecordFromSamplingPointDataItem({ user, surveyId, cycle, itemUuid })
+
+      res.json(recordUuid)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)

@@ -1,6 +1,6 @@
 import './NodeDefCode.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -39,7 +39,7 @@ const NodeDefCode = (props) => {
     : []
 
   const items = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
-  const itemsArray = Object.values(items)
+  const itemsArray = useMemo(() => Object.values(items), [items])
   const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems
@@ -49,7 +49,7 @@ const NodeDefCode = (props) => {
       const selectedItemsUpdate = itemsArray.filter((item) => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
     }
-  }, [edit, items, nodes])
+  }, [edit, itemsArray, nodes])
 
   const onItemAdd = (item) => {
     const node =
