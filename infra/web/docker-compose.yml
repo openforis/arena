@@ -8,5 +8,5 @@ services:
     build:
       context: ../..
       dockerfile: ./infra/web/Dockerfile
-      target: arena
+      target: arena-web
     image: of-arena-web
