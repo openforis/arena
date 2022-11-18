@@ -111,39 +111,44 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
     (dragged ? ' drag-in-progress' : '')
 
+  const isChildHidden = (nodeDefChild) => {
+    if (!entry) {
+      return false
+    }
+    if (NodeDef.isReadOnly(nodeDefChild) && NodeDef.isHidden(nodeDefChild)) {
+      return true
+    }
+    if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefChild)) {
+      const allSiblinNodesNotRelevant = siblingEntities.every(
+        (siblingEntity) => !Node.isChildApplicable(nodeDefChild.uuid)(siblingEntity)
+      )
+      return allSiblinNodesNotRelevant
+    }
+    return false
+  }
+
   return (
     <div ref={rowRef} className={className} data-testid={id} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
-      {nodeDefColumns.map((nodeDefChild) => {
-        const nodeDefChildUuid = nodeDefChild.uuid
-        let hidden = false
-        if (entry && NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefChild)) {
-          const allSiblinNodesNotRelevant = siblingEntities.every(
-            (siblingEntity) => !Node.isChildApplicable(nodeDefChildUuid)(siblingEntity)
+      {nodeDefColumns
+        .filter((nodeDefChild) => !isChildHidden(nodeDefChild))
+        .map((nodeDefChild) => {
+          return (
+            <NodeDefEntityTableCell
+              key={nodeDefChild.uuid}
+              {...props}
+              nodeDef={nodeDefChild}
+              parentNode={node}
+              draggable={draggable}
+              renderType={renderType}
+              resizable={resizable}
+              onDragStart={dragStart}
+              onDragOver={dragOver}
+              onDragEnd={dragEnd}
+              onResizeStart={onChildResizeStart}
+              onResizeStop={onChildResizeStop}
+            />
           )
-          if (allSiblinNodesNotRelevant) {
-            hidden = true
-          }
-        }
-        if (hidden) {
-          return null
-        }
-        return (
-          <NodeDefEntityTableCell
-            key={nodeDefChildUuid}
-            {...props}
-            nodeDef={nodeDefChild}
-            parentNode={node}
-            draggable={draggable}
-            renderType={renderType}
-            resizable={resizable}
-            onDragStart={dragStart}
-            onDragOver={dragOver}
-            onDragEnd={dragEnd}
-            onResizeStart={onChildResizeStart}
-            onResizeStop={onChildResizeStop}
-          />
-        )
-      })}
+        })}
 
       {
         // placeholder used for drag&drop (during survey editing)
@@ -153,7 +158,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
       {
         // header for delete column (visible only in data entry)
         entry && renderType === NodeDefLayout.renderType.tableHeader && canEditRecord && (
-          <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: '100px' }} />
+          <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: '26px' }} />
         )
       }
 
@@ -166,6 +171,8 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
 
 NodeDefEntityTableRow.propTypes = {
   edit: PropTypes.bool.isRequired,
+  entry: PropTypes.bool.isRequired,
+  id: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefColumns: PropTypes.array,
   node: PropTypes.object,
@@ -174,6 +181,7 @@ NodeDefEntityTableRow.propTypes = {
   canEditRecord: PropTypes.bool.isRequired,
   renderType: PropTypes.string.isRequired,
   i: PropTypes.any,
+  siblingEntities: PropTypes.array,
 }
 
 NodeDefEntityTableRow.defaultProps = {
