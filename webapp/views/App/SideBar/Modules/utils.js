@@ -41,6 +41,7 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
 export const getModulesHierarchy = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
   const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
+  const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
 
   return [
     // home
@@ -63,7 +64,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
         dataModules.explorer,
         ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
         ...(Authorizer.canUseCharts(user, surveyInfo) ? [dataModules.charts] : []),
-        ...(canEditSurvey ? [dataModules.export] : []),
+        ...(canExportRecords ? [dataModules.export] : []),
         ...(canEditSurvey ? [dataModules.import] : []),
         ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
       ],

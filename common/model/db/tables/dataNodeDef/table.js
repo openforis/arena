@@ -17,6 +17,7 @@ const columnSet = {
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
   recordStep: 'record_step',
+  recordOwnerUuid: 'record_owner_uuid',
 }
 
 /**
@@ -64,6 +65,10 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.recordStep)
   }
 
+  get columnRecordOwnerUuid() {
+    return this.getColumn(columnSet.recordOwnerUuid)
+  }
+
   get columnNodeDefs() {
     let nodeDefs = null
     if (NodeDef.isAttribute(this.nodeDef)) {
@@ -82,15 +87,16 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       `${columnSet.dateCreated}   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
       `${columnSet.dateModified}  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
       `${columnSet.uuid}          uuid        NOT NULL`,
-      `${columnSet.parentUuid}    uuid            NULL`,
-      ...(NodeDef.isRoot(this.nodeDef)
-        ? [
-            `${columnSet.recordUuid}    uuid        NOT NULL`,
-            `${columnSet.recordCycle}   varchar(2)  NOT NULL`,
-            `${columnSet.recordStep}    varchar(63) NOT NULL`,
-          ]
-        : [])
+      `${columnSet.parentUuid}    uuid            NULL`
     )
+    if (NodeDef.isRoot(this.nodeDef)) {
+      columnsAndType.push(
+        `${columnSet.recordUuid}      uuid        NOT NULL`,
+        `${columnSet.recordCycle}     varchar(2)  NOT NULL`,
+        `${columnSet.recordStep}      varchar(63) NOT NULL`,
+        `${columnSet.recordOwnerUuid} uuid        NOT NULL`
+      )
+    }
     this.columnNodeDefs.forEach((nodeDefColumn) => {
       columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
     })

@@ -31,6 +31,11 @@ export const columnNameRecordCycle = 'record_cycle'
  * @deprecated - Use TableDataNodeDef.
  */
 export const columnNameRecordStep = 'record_step'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
+export const columnNameRecordOwnerUuid = 'record_owner_uuid'
+
 // eslint-disable-next-line
 /**
  * @deprecated - Use TableDataNodeDef
@@ -57,7 +62,9 @@ export const getName = NodeDefTable.getTableName
 export const getColumnNames = (survey, nodeDef) => [
   columnNameUuuid,
   columnNameParentUuuid,
-  ...(NodeDef.isRoot(nodeDef) ? [columnNameRecordUuid, columnNameRecordCycle, columnNameRecordStep] : []),
+  ...(NodeDef.isRoot(nodeDef)
+    ? [columnNameRecordUuid, columnNameRecordCycle, columnNameRecordStep, columnNameRecordOwnerUuid]
+    : []),
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map((nodeDefCol) => DataCol.getNames(nodeDefCol))),
 ]
 
@@ -72,7 +79,12 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
     Node.getUuid(nodeRow),
     nodeRow[columnNameAncestorUuid],
     ...(NodeDef.isRoot(nodeDefRow)
-      ? [nodeRow[columnNameRecordUuid], nodeRow[columnNameRecordCycle], nodeRow[columnNameRecordStep]]
+      ? [
+          nodeRow[columnNameRecordUuid],
+          nodeRow[columnNameRecordCycle],
+          nodeRow[columnNameRecordStep],
+          nodeRow[columnNameRecordOwnerUuid],
+        ]
       : []),
     ...rowValues,
   ]
