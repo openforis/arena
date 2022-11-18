@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -55,10 +54,7 @@ const _onUpdateCategoryUuid = ({ nodeDef }) => {
 const _onUpdateReadOnly = ({ nodeDef, value: readOnly }) => {
   if (!readOnly) {
     // dissoc properties valid only when readOnly is true
-    return A.pipe(
-      NodeDef.dissocProp(NodeDef.propKeys.hidden),
-      NodeDef.dissocProp(NodeDef.propKeys.excludedFromDataExport)
-    )(nodeDef)
+    return NodeDef.dissocProp(NodeDef.propKeys.hidden)(nodeDef)
   }
   return nodeDef
 }

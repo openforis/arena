@@ -63,7 +63,6 @@ export const propKeys = {
   layout: 'layout',
   // available only when readOnly is true
   hidden: 'hidden',
-  excludedFromDataExport: 'excludedFromDataExport',
 
   // Text
   textTransform: 'textTransform',
@@ -185,7 +184,6 @@ export const isTime = isType(nodeDefType.time)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
-export const isExcludedFromDataExport = getProp(propKeys.excludedFromDataExport, false)
 
 export const getLayout = getProp(propKeys.layout, {})
 

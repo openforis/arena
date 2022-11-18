@@ -929,7 +929,6 @@ $t(common.appNameFull)
     advancedProps: {
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
-      excludedFromDataExport: 'Excluded from Data Export / Reporting / Charts',
       hidden: 'Hidden',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',

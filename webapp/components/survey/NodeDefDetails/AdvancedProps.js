@@ -40,25 +40,13 @@ const AdvancedProps = (props) => {
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
               />
               {NodeDef.isReadOnly(nodeDef) && (
-                <>
-                  <FormItem label={i18n.t('nodeDefEdit.advancedProps.hidden')}>
-                    <Checkbox
-                      checked={NodeDef.isHidden(nodeDef)}
-                      validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
-                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
-                    />
-                  </FormItem>
-
-                  <FormItem label={i18n.t('nodeDefEdit.advancedProps.excludedFromDataExport')}>
-                    <Checkbox
-                      checked={NodeDef.isExcludedFromDataExport(nodeDef)}
-                      validation={Validation.getFieldValidation(NodeDef.propKeys.excludedFromDataExport)(validation)}
-                      onChange={(value) =>
-                        Actions.setProp({ state, key: NodeDef.propKeys.excludedFromDataExport, value })
-                      }
-                    />
-                  </FormItem>
-                </>
+                <FormItem label={i18n.t('nodeDefEdit.advancedProps.hidden')}>
+                  <Checkbox
+                    checked={NodeDef.isHidden(nodeDef)}
+                    validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
+                    onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
+                  />
+                </FormItem>
               )}
             </div>
           </FormItem>
