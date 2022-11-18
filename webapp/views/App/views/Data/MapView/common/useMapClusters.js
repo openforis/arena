@@ -5,7 +5,7 @@ import useSupercluster from 'use-supercluster'
 
 import { Colors } from '@webapp/utils/colors'
 
-const clusterRadius = 150
+const clusterRadius = 100
 const clusterMaxZoom = 17
 const initialZoom = 12
 
@@ -32,21 +32,21 @@ export const useMapClusters = (props) => {
     return _clusterIconsCache[count]
   }
 
-  const updateState = () => {
+  const updateState = useCallback(() => {
     const b = map.getBounds()
     setState({
       bounds: [b.getSouthWest().lng, b.getSouthWest().lat, b.getNorthEast().lng, b.getNorthEast().lat],
       zoom: map.getZoom(),
     })
-  }
+  }, [map])
 
   const onMove = useCallback(() => {
     updateState()
-  }, [map])
+  }, [updateState])
 
   useEffect(() => {
     updateState()
-  }, [map])
+  }, [map, updateState])
 
   useEffect(() => {
     map.on('move', onMove)
@@ -62,11 +62,24 @@ export const useMapClusters = (props) => {
     options: { radius: clusterRadius, maxZoom: clusterMaxZoom },
   })
 
+  const getClusterLeaves = useCallback(
+    (cluster) => {
+      const { id, properties } = cluster
+      const { cluster: isCluster } = properties
+      if (isCluster) {
+        return supercluster.getLeaves(id)
+      }
+      return []
+    },
+    [supercluster]
+  )
+
   const clusterExpansionZoomExtractor = (cluster) => supercluster.getClusterExpansionZoom(cluster.id)
 
   return {
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
+    getClusterLeaves,
   }
 }

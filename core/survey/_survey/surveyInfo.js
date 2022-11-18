@@ -41,6 +41,14 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
+export const samplingPointDataCategoryName = 'sampling_point_data'
+
+export const status = {
+  draft: 'DRAFT',
+  published: 'PUBLISHED',
+  publishedDraft: 'PUBLISHED-DRAFT',
+}
+
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 // ====== READ surveyInfo
@@ -70,9 +78,15 @@ export const getDefaultDescription = (surveyInfo) => {
   return ObjectUtils.getDescription(lang, '')(surveyInfo)
 }
 
-export const getLabel = (surveyInfo, lang) => {
+export const getLabel = (surveyInfo, lang, defaultToName = true) => {
   const label = ObjectUtils.getLabel(lang)(surveyInfo)
-  return StringUtils.isBlank(label) ? getName(surveyInfo) : label
+  if (StringUtils.isNotBlank(label)) {
+    return label
+  }
+  if (defaultToName) {
+    return getName(surveyInfo)
+  }
+  return null
 }
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
@@ -87,9 +101,9 @@ export const getDefaultSRS = R.pipe(getSRS, R.head)
 export const getStatus = (surveyInfo) => {
   const published = isPublished(surveyInfo)
   const draft = isDraft(surveyInfo)
-  if (published && draft) return 'PUBLISHED-DRAFT'
-  if (published) return 'PUBLISHED'
-  if (draft) return 'DRAFT'
+  if (published && draft) return status.publishedDraft
+  if (published) return status.published
+  if (draft) return status.draft
   return ''
 }
 

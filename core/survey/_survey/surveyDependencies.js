@@ -80,17 +80,5 @@ export const buildAndAssocDependencyGraph = (survey) => Surveys.buildAndAssocDep
 // DELETE
 export const removeNodeDefDependencies =
   (nodeDefUuid, dependencyType = null) =>
-  (survey) => {
-    const dependencyGraph = getDependencyGraph(survey)
-    let dependencyGraphUpdated
-    if (dependencyType) {
-      dependencyGraphUpdated = R.dissocPath([dependencyType, nodeDefUuid])(dependencyGraph)
-    } else {
-      const dependencyTypes = Object.keys(dependencyGraph)
-      dependencyGraphUpdated = dependencyTypes.reduce(
-        (dependencyGraphAcc, type) => R.dissocPath([type, nodeDefUuid])(dependencyGraphAcc),
-        dependencyGraph
-      )
-    }
-    return assocDependencyGraph(dependencyGraphUpdated)(survey)
-  }
+  (survey) =>
+    Surveys.removeNodeDefDependencies({ survey, nodeDefUuid, dependencyType })

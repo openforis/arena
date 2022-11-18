@@ -1622,10 +1622,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.117":
-  version "0.0.117"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.117/a9d5f8a5008804c173c95df8fc6d7b21382d8681#a9d5f8a5008804c173c95df8fc6d7b21382d8681"
-  integrity sha512-Mc8I5DDY92xa+kbYoBi9QfG3pZqogRpCiERaigIjZ1os/IVjB3Iw59GQTo5wpA+i2dcPD1sYwp+VRMK2xIza6Q==
+"@openforis/arena-core@^0.0.119":
+  version "0.0.119"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.119/f5b403212e7237cee27d2fc7b6955ff11da6508e#f5b403212e7237cee27d2fc7b6955ff11da6508e"
+  integrity sha512-00Zq1FZ2GotBy4OJDjfCp1GNvuromyrefv08XIhURcQdfHGNAiV1+HukZU/9Vnz+trPyRNDAXmaEGcBotBqb7w==
   dependencies:
     "@esri/proj-codes" "^3.0.0"
     "@jsep-plugin/regex" "^1.0.3"
