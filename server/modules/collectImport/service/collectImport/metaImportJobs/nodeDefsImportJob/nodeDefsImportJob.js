@@ -126,20 +126,23 @@ export default class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
       [NodeDef.propKeys.descriptions]: CollectSurvey.toLabels('description', defaultLanguage)(collectNodeDef),
-      // Layout props (render)
-      ...(type === NodeDef.nodeDefType.entity // Calculated
-        ? {
-            [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-              Survey.cycleOneKey,
-              tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
-              determineNodeDefPageUuid(type, collectNodeDef)
-            ),
-          }
-        : {
-            [NodeDef.propKeys.readOnly]: calculated,
-          }),
       // Extra props
       ...this.extractNodeDefSpecificProps(type, collectNodeDef),
+    }
+    if (type === NodeDef.nodeDefType.entity) {
+      // Layout props (render)
+      props[NodeDefLayout.keys.layout] = NodeDefLayout.newLayout(
+        Survey.cycleOneKey,
+        tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
+        determineNodeDefPageUuid(type, collectNodeDef)
+      )
+    } else if (calculated) {
+      // Calculated attribute
+      props[NodeDef.propKeys.readOnly] = true
+      const hidden = CollectSurvey.getUiAttribute('hide')(collectNodeDef)
+      if (hidden) {
+        props[NodeDef.propKeys.hidden] = true
+      }
     }
 
     // 2. insert node def into db
