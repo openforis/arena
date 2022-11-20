@@ -5,9 +5,8 @@ const BATCH_SIZE = 10000
 
 export class NodesUpdateBatchPersister extends BatchPersister {
   constructor({ user, surveyId, tx }) {
-    super(async (nodes) => RecordManager.updateNodes({ user, surveyId, nodes }, this.tx), BATCH_SIZE)
+    super(async (nodes) => RecordManager.updateNodes({ user, surveyId, nodes }, this.tx), BATCH_SIZE, tx)
     this.user = user
     this.surveyId = surveyId
-    this.tx = tx
   }
 }

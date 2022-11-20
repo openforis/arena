@@ -7,7 +7,6 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -104,8 +103,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
     nodesArray.forEach((node) => {
       node[Node.keys.created] = true
     })
-    const nodesToPersist = ObjectUtils.toUuidIndexedObj(nodesArray)
-    await RecordUpdateManager.persistNodesToRDB({ survey, record: recordUpdated, nodes: nodesToPersist }, tx)
+    await RecordUpdateManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
 
     return recordUuid
   })

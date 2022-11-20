@@ -10,6 +10,7 @@ import * as Validation from '@core/validation/validation'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+
 import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
@@ -19,6 +20,9 @@ import { DataImportFileReader } from './dataImportFileReader'
 export default class DataImportJob extends Job {
   constructor(params) {
     super(DataImportJob.type, params)
+
+    this.insertedRecords = 0
+    this.updatedRecords = 0
   }
 
   async execute() {
@@ -97,8 +101,7 @@ export default class DataImportJob extends Job {
   }
 
   async getOrFetchRecord({ valuesByDefUuid }) {
-    const { user } = this
-    const { cycle, insertNewRecords, recordsSummary, survey } = this.context
+    const { cycle, insertNewRecords, recordsSummary, survey, surveyId, user } = this.context
 
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
@@ -134,7 +137,13 @@ export default class DataImportJob extends Job {
       const recordToInsert = Record.newRecord(user, cycle)
       const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
       this.currentRecord = await RecordManager.initNewRecord({ user, survey, record }, this.tx)
-      return this.currentRecord
+
+      this.insertedRecords += 1
+
+      return {
+        newRecord: true,
+        record: this.currentRecord,
+      }
     }
 
     // insertNewRecords === false : updating existing record
@@ -153,17 +162,22 @@ export default class DataImportJob extends Job {
     // avoid loading the same record multiple times
     if (this.currentRecord?.uuid !== recordUuid) {
       this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
-        { surveyId: this.surveyId, recordUuid, draft: false },
+        { surveyId, recordUuid, draft: false },
         this.tx
       )
     }
-    return this.currentRecord
+    return {
+      newRecord: false,
+      record: this.currentRecord,
+    }
   }
 
   async onRowItem({ valuesByDefUuid }) {
-    const { survey, entityDefUuid } = this.context
+    const { context, tx } = this
+    const { survey, entityDefUuid } = context
 
-    const record = await this.getOrFetchRecord({ valuesByDefUuid })
+    const { record } = (await this.getOrFetchRecord({ valuesByDefUuid })) || {}
+
     if (record) {
       const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
         survey,
@@ -178,19 +192,29 @@ export default class DataImportJob extends Job {
         Record.getValidation(this.currentRecord),
       ])
       const nodesArray = Object.values(nodesUpdated)
-      nodesArray.sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
+      nodesArray.forEach((node) => {
+        node[Node.keys.updated] = true
+      })
+      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
+
       await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
       await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
     }
     this.incrementProcessedItems()
   }
 
-  async beforeEnd() {
-    if (this.isRunning()) {
-      await this.recordsValidationBatchPersister.flush()
-      await this.nodesInsertBatchPersister.flush()
-      await this.nodesUpdateBatchPersister.flush()
-    }
+  async beforeSuccess() {
+    const { insertedRecords, updatedRecords, processed: rowsProcessed } = this
+
+    await this.nodesInsertBatchPersister.flush()
+    await this.nodesUpdateBatchPersister.flush()
+    await this.recordsValidationBatchPersister.flush()
+
+    this.setResult({
+      insertedRecords,
+      updatedRecords,
+      rowsProcessed,
+    })
   }
 }
 

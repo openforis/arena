@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -63,11 +65,11 @@ export const DataImportCsvView = () => {
         job,
         autoHide: true,
         onComplete: async (jobCompleted) => {
-          // const { insertedRecords } = JobSerialized.getResult(jobCompleted)
+          const { insertedRecords } = JobSerialized.getResult(jobCompleted)
           dispatch(
             NotificationActions.notifyInfo({
               key: 'dataImportView.importComplete',
-              // params: { insertedRecords },
+              params: { insertedRecords },
             })
           )
         },

@@ -88,7 +88,6 @@ const _toUpdates = ({ survey, record, nodes }) => {
     const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
     const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
     const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
-
     const type = _getType(nodeDef, node)
     if (type) {
       updatesAcc.push({

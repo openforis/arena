@@ -43,6 +43,7 @@ const valueConverterByNodeDefType = {
  */
 const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTotalChange }) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+
   const csvDataExportModel = new CsvDataExportModel({
     survey,
     nodeDefContext: entityDef,
@@ -66,14 +67,16 @@ const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTota
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
         const value = valuesByDefUuidAcc[nodeDefUuid] || {}
         value[valueProp] = cellValue
-        return { ...valuesByDefUuidAcc, [nodeDefUuid]: value }
+        valuesByDefUuidAcc[nodeDefUuid] = value
+        return valuesByDefUuidAcc
       }, {})
 
       const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, value]) => {
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         const valueConverter = valueConverterByNodeDefType[NodeDef.getType(nodeDef)]
         const nodeValue = valueConverter({ survey, nodeDef, value })
-        return { ...acc, [nodeDefUuid]: nodeValue }
+        acc[nodeDefUuid] = nodeValue
+        return acc
       }, {})
 
       await onRowItem({ valuesByDefUuid })
