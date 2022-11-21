@@ -4,6 +4,7 @@ import UserReducer from './reducer'
 import {
   useUser,
   useAuthCanEditSurvey,
+  useAuthCanCreateRecord,
   useAuthCanEditRecord,
   useAuthCanCleanseRecords,
   useAuthCanDeleteAllRecords,
@@ -21,6 +22,7 @@ export {
   UserReducer,
   useUser,
   useAuthCanEditSurvey,
+  useAuthCanCreateRecord,
   useAuthCanEditRecord,
   useAuthCanCleanseRecords,
   useAuthCanDeleteAllRecords,

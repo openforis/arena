@@ -1,16 +1,19 @@
 import React, { useCallback } from 'react'
-import { Popup } from 'react-leaflet'
+import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
+
+import * as Survey from '@core/survey/survey'
 
 import { Points } from '@openforis/arena-core'
 
 import Markdown from '@webapp/components/markdown'
 
 import { useI18n } from '@webapp/store/system'
-import { useMap } from 'react-leaflet'
 import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
+import { useAuthCanCreateRecord } from '@webapp/store/user'
+import { useSurveyInfo } from '@webapp/store/survey'
 
 export const SamplingPointDataItemPopup = (props) => {
   const {
@@ -27,6 +30,8 @@ export const SamplingPointDataItemPopup = (props) => {
 
   const i18n = useI18n()
   const map = useMap()
+  const surveyInfo = useSurveyInfo()
+  const canCreateRecord = useAuthCanCreateRecord() && Survey.isPublished(surveyInfo)
 
   const point = Points.parse(location)
 
@@ -70,7 +75,7 @@ ${itemCodes
         {recordUuid && (
           <ButtonIconEdit label="mapView.editRecord" showLabel onClick={() => onRecordEditClick({ recordUuid })} />
         )}
-        {!recordUuid && (
+        {canCreateRecord && !recordUuid && (
           <ButtonAdd
             label="mapView.createRecord"
             showLabel
