@@ -1,4 +1,11 @@
 .coordinate-attribute-popup-content {
   display: flex;
   flex-direction: column;
+
+  .button-bar {
+    button {
+      margin: 0 0.5rem;
+      white-space: nowrap;
+    }
+  }
 }

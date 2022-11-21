@@ -1,18 +1,20 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
+import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
+import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
+
+import { useElevation } from '../common/useElevation'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -41,37 +43,6 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   return pathParts.join(' -> ')
 }
 
-const PopupContent = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, pointLatLong, onRecordEditClick } = props
-
-  const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
-  const [elevation, setElevation] = useState('...')
-
-  useEffect(() => {
-    const getElevation = async (lat, lng) => {
-      const elev = await API.fetchElevation({ lat, lng })
-      setElevation(elev === null ? 'error' : elev)
-    }
-    getElevation(pointLatLong.y, pointLatLong.x)
-  }, [])
-
-  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
-
-  const content = `**${path}**
-* **x**: ${point.x}
-* **y**: ${point.y}
-* **SRS**: ${point.srs}
-* **elevation (m)**: ${elevation}`
-
-  return (
-    <div className="coordinate-attribute-popup-content">
-      <Markdown source={content} />
-      <ButtonIconEdit label="mapView.editRecord" onClick={() => onRecordEditClick({ recordUuid, parentUuid })} />
-    </div>
-  )
-}
-
 export const CoordinateAttributePopUp = (props) => {
   const {
     attributeDef,
@@ -86,8 +57,14 @@ export const CoordinateAttributePopUp = (props) => {
     openPopupOfPoint,
   } = props
 
-  const i18n = useI18n()
   const map = useMap()
+
+  const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
+
+  const [open, setOpen] = useState(false)
+
+  const elevation = useElevation(pointLatLong, open)
 
   const flyTo = (point) => {
     const [longitude, latitude] = point.geometry.coordinates
@@ -105,31 +82,38 @@ export const CoordinateAttributePopUp = (props) => {
     flyTo(previousPoint)
   }
 
+  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
+
+  const content = `**${path}**
+* **x**: ${point.x}
+* **y**: ${point.y}
+* **SRS**: ${point.srs}
+* **elevation (m)**: ${elevation}`
+
   return (
-    <Popup>
-      <PopupContent
-        attributeDef={attributeDef}
-        recordUuid={recordUuid}
-        parentUuid={parentUuid}
-        ancestorsKeys={ancestorsKeys}
-        point={point}
-        pointLatLong={pointLatLong}
-        onRecordEditClick={onRecordEditClick}
-      />
-      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
-      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
+    <Popup
+      eventHandlers={{
+        add: () => setOpen(true),
+        remove: () => setOpen(false),
+      }}
+    >
+      <div className="coordinate-attribute-popup-content">
+        <Markdown source={content} />
+
+        <div className="button-bar">
+          <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
+
+          <ButtonIconEdit
+            label="mapView.editRecord"
+            showLabel
+            onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
+          />
+
+          <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
+        </div>
+      </div>
     </Popup>
   )
-}
-
-PopupContent.propTypes = {
-  attributeDef: PropTypes.any,
-  recordUuid: PropTypes.string,
-  parentUuid: PropTypes.string,
-  ancestorsKeys: PropTypes.any,
-  point: PropTypes.object,
-  pointLatLong: PropTypes.object,
-  onRecordEditClick: PropTypes.func,
 }
 
 CoordinateAttributePopUp.propTypes = {
