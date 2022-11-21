@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -8,12 +8,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
+
+import { useElevation } from '../common/useElevation'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -60,16 +61,10 @@ export const CoordinateAttributePopUp = (props) => {
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const [elevation, setElevation] = useState('...')
 
-  useEffect(() => {
-    const getElevation = async (pointLatLong) => {
-      const { y: lat, x: lng } = pointLatLong
-      const elev = await API.fetchElevation({ lat, lng })
-      setElevation(elev === null ? 'error' : elev)
-    }
-    getElevation(pointLatLong)
-  }, [pointLatLong])
+  const [open, setOpen] = useState(false)
+
+  const elevation = useElevation(pointLatLong, open)
 
   const flyTo = (point) => {
     const [longitude, latitude] = point.geometry.coordinates
@@ -96,7 +91,12 @@ export const CoordinateAttributePopUp = (props) => {
 * **elevation (m)**: ${elevation}`
 
   return (
-    <Popup>
+    <Popup
+      eventHandlers={{
+        add: () => setOpen(true),
+        remove: () => setOpen(false),
+      }}
+    >
       <div className="coordinate-attribute-popup-content">
         <Markdown source={content} />
 

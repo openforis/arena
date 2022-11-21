@@ -1,10 +1,8 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
-
-import { Points } from '@openforis/arena-core'
 
 import Markdown from '@webapp/components/markdown'
 
@@ -13,7 +11,8 @@ import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { useAuthCanCreateRecord } from '@webapp/store/user'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
+import { useElevation } from '../common/useElevation'
 
 export const SamplingPointDataItemPopup = (props) => {
   const {
@@ -26,14 +25,22 @@ export const SamplingPointDataItemPopup = (props) => {
   } = props
 
   const { properties: pointProperties } = pointFeature
-  const { itemUuid, itemCodes, location, recordUuid } = pointProperties
+  const { itemUuid, itemCodes, itemPoint: point, recordUuid } = pointProperties
 
   const i18n = useI18n()
   const map = useMap()
-  const surveyInfo = useSurveyInfo()
-  const canCreateRecord = useAuthCanCreateRecord() && Survey.isPublished(surveyInfo)
 
-  const point = Points.parse(location)
+  const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  const canCreateRecord =
+    useAuthCanCreateRecord() &&
+    Survey.isPublished(surveyInfo) &&
+    Survey.canRecordBeIdentifiedBySamplingPointDataItem(survey)
+
+  const [open, setOpen] = useState(false)
+
+  const elevation = useElevation(point, open)
 
   const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
 ${itemCodes
@@ -43,7 +50,8 @@ ${itemCodes
   * **x**: ${point.x}
   * **y**: ${point.y}
   * **SRS**: ${point.srs}
-`
+  * **elevation (m)**: ${elevation}`
+
   const flyToPoint = (point) => {
     map.flyTo(point.latLng)
     map.once('zoomend', () => openPopupOfPoint(point))
@@ -68,7 +76,13 @@ ${itemCodes
   )
 
   return (
-    <Popup className="sampling-point-data__item-popup-content">
+    <Popup
+      className="sampling-point-data__item-popup-content"
+      eventHandlers={{
+        add: () => setOpen(true),
+        remove: () => setOpen(false),
+      }}
+    >
       <Markdown source={content} />
       <div className="button-bar">
         <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
