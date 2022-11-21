@@ -7,12 +7,13 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
+import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
+import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -42,7 +43,7 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 }
 
 const PopupContent = (props) => {
-  const { attributeDef, recordUuid, parentUuid, ancestorsKeys, point, pointLatLong, onRecordEditClick } = props
+  const { attributeDef, ancestorsKeys, point, pointLatLong } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
@@ -67,7 +68,6 @@ const PopupContent = (props) => {
   return (
     <div className="coordinate-attribute-popup-content">
       <Markdown source={content} />
-      <ButtonIconEdit label="mapView.editRecord" onClick={() => onRecordEditClick({ recordUuid, parentUuid })} />
     </div>
   )
 }
@@ -86,7 +86,6 @@ export const CoordinateAttributePopUp = (props) => {
     openPopupOfPoint,
   } = props
 
-  const i18n = useI18n()
   const map = useMap()
 
   const flyTo = (point) => {
@@ -107,17 +106,28 @@ export const CoordinateAttributePopUp = (props) => {
 
   return (
     <Popup>
-      <PopupContent
-        attributeDef={attributeDef}
-        recordUuid={recordUuid}
-        parentUuid={parentUuid}
-        ancestorsKeys={ancestorsKeys}
-        point={point}
-        pointLatLong={pointLatLong}
-        onRecordEditClick={onRecordEditClick}
-      />
-      <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
-      <button onClick={onClickNext}>{i18n.t('common.next')} </button>
+      <div className="coordinate-attribute-popup-content">
+        <PopupContent
+          attributeDef={attributeDef}
+          recordUuid={recordUuid}
+          parentUuid={parentUuid}
+          ancestorsKeys={ancestorsKeys}
+          point={point}
+          pointLatLong={pointLatLong}
+          onRecordEditClick={onRecordEditClick}
+        />
+        <div className="button-bar">
+          <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
+
+          <ButtonIconEdit
+            label="mapView.editRecord"
+            showLabel
+            onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
+          />
+
+          <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
+        </div>
+      </div>
     </Popup>
   )
 }

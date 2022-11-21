@@ -72,7 +72,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
       points: _points,
       pointIndexByDataIndex: _pointIndexByDataIndex,
       bounds,
-    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey, i18n })
+    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey, i18n })
 
     setState((statePrev) => ({
       ...statePrev,
