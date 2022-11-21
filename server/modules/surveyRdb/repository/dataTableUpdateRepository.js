@@ -11,7 +11,7 @@ const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 // ==== parsing
 
-const _hasTable = NodeDef.isEntityOrMultiple
+const _hasTable = NodeDef.isMultiple
 
 const _getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
@@ -24,7 +24,7 @@ const _getType = (nodeDef, node) => {
   if (deleted && _hasTable(nodeDef)) {
     return types.delete
   }
-  if (updated || created) {
+  if ((updated || created) && !_hasTable(nodeDef)) {
     return types.update
   }
   return null

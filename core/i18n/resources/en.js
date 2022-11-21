@@ -495,7 +495,13 @@ $t(common.cantUndoWarning)`,
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importComplete: 'Import complete. {{insertedRecords}} records imported',
+    importComplete: `## Import complete:
+
+- {{rowsProcessed}} rows processed
+- {{updatedValues}} values updated
+- {{insertedRecords}} records created
+- {{updatedRecords}} records updated
+    `,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',

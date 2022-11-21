@@ -15,12 +15,12 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
 import { TestId } from '@webapp/utils/testId'
-import { NotificationActions } from '@webapp/store/ui'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import { ButtonDownload } from '@webapp/components'
 import { ButtonGroup } from '@webapp/components/form'
+import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
@@ -38,6 +38,7 @@ export const DataImportCsvView = () => {
   const [cycle, setCycle] = useState(surveyCycle)
   const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
   const [dataImportType, setDataImportType] = useState(importTypes.updateExistingRecords)
+  const [importCompleteResult, setImportCompleteResult] = useState(null)
 
   const onEntitySelect = (entityDef) => setSelectedEntityDefUuid(NodeDef.getUuid(entityDef))
 
@@ -65,13 +66,8 @@ export const DataImportCsvView = () => {
         job,
         autoHide: true,
         onComplete: async (jobCompleted) => {
-          const { insertedRecords } = JobSerialized.getResult(jobCompleted)
-          dispatch(
-            NotificationActions.notifyInfo({
-              key: 'dataImportView.importComplete',
-              params: { insertedRecords },
-            })
-          )
+          const importCompleteResult = JobSerialized.getResult(jobCompleted)
+          setImportCompleteResult(importCompleteResult)
         },
       })
     )
@@ -121,6 +117,13 @@ export const DataImportCsvView = () => {
         onChange={(files) => onFileChange(files[0])}
         disabled={!selectedEntityDefUuid}
       />
+
+      {importCompleteResult && (
+        <DataImportCompleteDialog
+          importCompleteResult={importCompleteResult}
+          onClose={() => setImportCompleteResult(null)}
+        />
+      )}
     </div>
   )
 }

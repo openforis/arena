@@ -21,8 +21,14 @@ export default class DataImportJob extends Job {
   constructor(params) {
     super(DataImportJob.type, params)
 
-    this.insertedRecords = 0
-    this.updatedRecords = 0
+    this.insertedRecordsUuids = new Set()
+    this.updatedRecordsUuids = new Set()
+    this.updatedValues = 0
+
+    this.currentRecord = null
+    this.nodesUpdateBatchPersister = null
+    this.nodesInsertBatchPersister = null
+    this.recordsValidationBatchPersister = null
   }
 
   async execute() {
@@ -105,10 +111,12 @@ export default class DataImportJob extends Job {
 
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+
         return NodeValues.isValueEqual({
           survey,
           nodeDef: rootKeyDef,
@@ -117,6 +125,7 @@ export default class DataImportJob extends Job {
         })
       })
     )
+
     const keyValues = rootKeyDefs
       .map((rootKeyDef) => {
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
@@ -138,7 +147,7 @@ export default class DataImportJob extends Job {
       const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
       this.currentRecord = await RecordManager.initNewRecord({ user, survey, record }, this.tx)
 
-      this.insertedRecords += 1
+      this.insertedRecordsUuids.add(Record.getUuid(record))
 
       return {
         newRecord: true,
@@ -176,7 +185,7 @@ export default class DataImportJob extends Job {
     const { context, tx } = this
     const { survey, entityDefUuid } = context
 
-    const { record } = (await this.getOrFetchRecord({ valuesByDefUuid })) || {}
+    const { record, newRecord } = (await this.getOrFetchRecord({ valuesByDefUuid })) || {}
 
     if (record) {
       const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
@@ -187,33 +196,52 @@ export default class DataImportJob extends Job {
 
       this.currentRecord = recordUpdated
 
-      await this.recordsValidationBatchPersister.addItem([
-        Record.getUuid(this.currentRecord),
-        Record.getValidation(this.currentRecord),
-      ])
-      const nodesArray = Object.values(nodesUpdated)
-      nodesArray.forEach((node) => {
-        node[Node.keys.updated] = true
-      })
-      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
+      const recordUuid = Record.getUuid(this.currentRecord)
 
-      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+      const nodesArray = Object.values(nodesUpdated)
+
+      // update counts
+      if (newRecord) {
+        this.updatedValues += Record.getNodesArray(record).length
+      } else if (nodesArray.length > 0) {
+        this.updatedValues += nodesArray.length
+        this.updatedRecordsUuids.add(recordUuid)
+      }
+
+      if (nodesArray.length > 0) {
+        await this.recordsValidationBatchPersister.addItem([recordUuid, Record.getValidation(this.currentRecord)])
+        nodesArray.forEach((node) => {
+          node[Node.keys.updated] = true
+        })
+
+        this.updatedValues += nodesArray.length
+
+        this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
+
+        await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+        await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+      }
     }
     this.incrementProcessedItems()
   }
 
   async beforeSuccess() {
-    const { insertedRecords, updatedRecords, processed: rowsProcessed } = this
-
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()
 
+    const {
+      insertedRecordsUuids,
+      updatedRecordsUuids: updatedRecordsByUuid,
+      processed: rowsProcessed,
+      updatedValues,
+    } = this
+
     this.setResult({
-      insertedRecords,
-      updatedRecords,
+      insertedRecords: insertedRecordsUuids.size,
+      updatedRecords: updatedRecordsByUuid.size,
       rowsProcessed,
+      updatedValues,
     })
   }
 }

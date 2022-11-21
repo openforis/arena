@@ -3,6 +3,7 @@ import { Points } from '@openforis/arena-core'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
 
 import * as CSVReader from '@server/utils/file/csvReader'
@@ -15,9 +16,14 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueConverter,
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
-    const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
-    const nodeValue = Node.newNodeValueCode({ itemUuid })
-    return { ...nodeValue, [Node.valuePropsCode.code]: code }
+
+    const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
+      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+      return Node.newNodeValueCode({ itemUuid })
+    }
+    // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
+    return { [Node.valuePropsCode.code]: code }
   },
   [NodeDef.nodeDefType.coordinate]: ({ value }) => {
     const point = Points.parse(value)
