@@ -2,14 +2,18 @@ import { latLngBounds } from 'leaflet'
 
 import { Points } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
+
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 
 import { ValueFormatter } from '@webapp/components/DataQuery'
 
-export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, ancestorsKeyAttributes, survey, i18n }) => {
+export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey, i18n }) => {
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
+
+  const ancestorsKeyAttributes = Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey)
   const ancestorsKeysColumns = ancestorsKeyAttributes.map(
     (ancestorKeyAttribute) => new ColumnNodeDef(dataTable, ancestorKeyAttribute)
   )

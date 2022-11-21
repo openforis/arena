@@ -1,17 +1,16 @@
 import React, { useEffect, useRef } from 'react'
-import { CircleMarker, Tooltip } from 'react-leaflet'
+import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { PointFactory } from '@openforis/arena-core'
 
-import { Colors } from '@webapp/utils/colors'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+import { MarkerTooltip } from '../common/MarkerTooltip'
 
 const markerRadius = 10
 const fillOpacity = 0.5
-const tooltipOpacity = 0.6
 
 export const CoordinateAttributeMarker = (props) => {
   const {
@@ -28,10 +27,6 @@ export const CoordinateAttributeMarker = (props) => {
 
   const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
-
-  ancestorsKeys.propTypes = {
-    join: PropTypes.any,
-  }
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
@@ -56,18 +51,6 @@ export const CoordinateAttributeMarker = (props) => {
     }
   }, [circleRef, parentUuid, popupOpen, setMarkerByParentUuid, showLocationMarkers, showMarkersLabels])
 
-  const tooltipEventHandlers = {
-    add: (e) => {
-      const tooltip = e.target
-      // set tooltip style
-      const customStyle = {
-        backgroundColor: markersColor,
-        color: Colors.getHighContrastTextColor(markersColor),
-      }
-      Object.assign(tooltip._container.style, customStyle)
-    },
-  }
-
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
@@ -79,18 +62,8 @@ export const CoordinateAttributeMarker = (props) => {
         fillColor={markersColor}
         fillOpacity={fillOpacity}
       >
-        {showMarkersLabels && (
-          <Tooltip
-            eventHandlers={tooltipEventHandlers}
-            direction="top"
-            interactive
-            offset={[0, -10]}
-            opacity={tooltipOpacity}
-            permanent
-          >
-            {ancestorsKeys.join(' - ')}
-          </Tooltip>
-        )}
+        {showMarkersLabels && <MarkerTooltip color={markersColor}>{ancestorsKeys.join(' - ')}</MarkerTooltip>}
+
         <CoordinateAttributePopUp
           attributeDef={attributeDef}
           point={point}
