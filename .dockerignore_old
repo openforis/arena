@@ -1,0 +1,13 @@
+# Ignore everything by default, whitelist relevant files
+*
+
+# Simpler to just git clone everything that's important
+!.git
+
+# Dependencies are specified separately for caching purposes
+!package.json
+!yarn.lock
+!babel.config.js
+!jsconfig.json
+!webpack.config.babel.js
+!webpack.config.server.babel.js
