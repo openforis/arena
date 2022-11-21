@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMap } from 'react-leaflet'
+
+import { Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
@@ -60,13 +62,19 @@ export const useCoordinateAttributeDataLayer = (props) => {
   })
 
   const {
-    data: dataFetched,
+    data: dataFetchedTemp,
     //  count, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData
   } = useDataQuery({ query, limitData: false })
 
+  // exclude data with null coordinate values
+  const dataFetched = useMemo(
+    () => dataFetchedTemp?.filter((item) => !Objects.isEmpty(item[NodeDef.getName(attributeDef)])),
+    [dataFetchedTemp]
+  )
+
   // when data has been loaded, convert fetched items to GEOJson points
   useEffect(() => {
-    if (dataFetched === null) return
+    if (!dataFetched) return
 
     const {
       points: _points,
@@ -93,12 +101,15 @@ export const useCoordinateAttributeDataLayer = (props) => {
     eventHandler: useCallback(
       (nodesUpdated) => {
         if (editingRecordUuid) {
-          const attributesChanged = Object.values(nodesUpdated).some(
+          const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+          const rootKeyDefsUuids = rootKeyDefs.map(NodeDef.getUuid)
+          const shouldFetchRecordData = Object.values(nodesUpdated).some(
             (nodeUpdated) =>
               Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
-              Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef)
+              (Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef) ||
+                rootKeyDefsUuids.includes(Node.getNodeDefUuid(nodeUpdated)))
           )
-          if (attributesChanged) {
+          if (shouldFetchRecordData) {
             setState((statePrev) => ({
               ...statePrev,
               editedRecordQuery: Query.assocFilterRecordUuid(editingRecordUuid)(statePrev.query),

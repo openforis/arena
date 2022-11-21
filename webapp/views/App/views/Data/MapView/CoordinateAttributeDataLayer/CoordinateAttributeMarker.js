@@ -28,10 +28,6 @@ export const CoordinateAttributeMarker = (props) => {
   const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
-  ancestorsKeys.propTypes = {
-    join: PropTypes.any,
-  }
-
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
   const circleRef = useRef(null)

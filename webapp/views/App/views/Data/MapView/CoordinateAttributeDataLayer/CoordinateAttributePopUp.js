@@ -42,36 +42,6 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   return pathParts.join(' -> ')
 }
 
-const PopupContent = (props) => {
-  const { attributeDef, ancestorsKeys, point, pointLatLong } = props
-
-  const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
-  const [elevation, setElevation] = useState('...')
-
-  useEffect(() => {
-    const getElevation = async (lat, lng) => {
-      const elev = await API.fetchElevation({ lat, lng })
-      setElevation(elev === null ? 'error' : elev)
-    }
-    getElevation(pointLatLong.y, pointLatLong.x)
-  }, [])
-
-  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
-
-  const content = `**${path}**
-* **x**: ${point.x}
-* **y**: ${point.y}
-* **SRS**: ${point.srs}
-* **elevation (m)**: ${elevation}`
-
-  return (
-    <div className="coordinate-attribute-popup-content">
-      <Markdown source={content} />
-    </div>
-  )
-}
-
 export const CoordinateAttributePopUp = (props) => {
   const {
     attributeDef,
@@ -87,6 +57,19 @@ export const CoordinateAttributePopUp = (props) => {
   } = props
 
   const map = useMap()
+
+  const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
+  const [elevation, setElevation] = useState('...')
+
+  useEffect(() => {
+    const getElevation = async (pointLatLong) => {
+      const { y: lat, x: lng } = pointLatLong
+      const elev = await API.fetchElevation({ lat, lng })
+      setElevation(elev === null ? 'error' : elev)
+    }
+    getElevation(pointLatLong)
+  }, [pointLatLong])
 
   const flyTo = (point) => {
     const [longitude, latitude] = point.geometry.coordinates
@@ -104,18 +87,19 @@ export const CoordinateAttributePopUp = (props) => {
     flyTo(previousPoint)
   }
 
+  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
+
+  const content = `**${path}**
+* **x**: ${point.x}
+* **y**: ${point.y}
+* **SRS**: ${point.srs}
+* **elevation (m)**: ${elevation}`
+
   return (
     <Popup>
       <div className="coordinate-attribute-popup-content">
-        <PopupContent
-          attributeDef={attributeDef}
-          recordUuid={recordUuid}
-          parentUuid={parentUuid}
-          ancestorsKeys={ancestorsKeys}
-          point={point}
-          pointLatLong={pointLatLong}
-          onRecordEditClick={onRecordEditClick}
-        />
+        <Markdown source={content} />
+
         <div className="button-bar">
           <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
 
@@ -130,13 +114,6 @@ export const CoordinateAttributePopUp = (props) => {
       </div>
     </Popup>
   )
-}
-
-PopupContent.propTypes = {
-  attributeDef: PropTypes.any,
-  ancestorsKeys: PropTypes.any,
-  point: PropTypes.object,
-  pointLatLong: PropTypes.object,
 }
 
 CoordinateAttributePopUp.propTypes = {
