@@ -134,12 +134,9 @@ export const CoordinateAttributePopUp = (props) => {
 
 PopupContent.propTypes = {
   attributeDef: PropTypes.any,
-  recordUuid: PropTypes.string,
-  parentUuid: PropTypes.string,
   ancestorsKeys: PropTypes.any,
   point: PropTypes.object,
   pointLatLong: PropTypes.object,
-  onRecordEditClick: PropTypes.func,
 }
 
 CoordinateAttributePopUp.propTypes = {
