@@ -73,7 +73,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
 
     const surveyId = Survey.getId(survey)
 
-    let record = await _createRecordAndNodes({ user, survey, cycle })
+    const record = await _createRecordAndNodes({ user, survey, cycle })
     await insertRecord(user, surveyId, record, false, tx)
 
     const valuesByDefUuid = await _fetchKeyValuesBySamplingPointDataItem({ survey, itemUuid }, tx)
@@ -81,14 +81,12 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
     const rootDef = Survey.getNodeDefRoot(survey)
 
     // update record and validate nodes
-    const recordUpdateResult = await Record.updateAttributesWithValues({
+    const { record: recordUpdated } = await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: NodeDef.getUuid(rootDef),
       valuesByDefUuid,
       insertMissingNodes: true,
     })(record)
-
-    const recordUpdated = recordUpdateResult.record
 
     // insert nodes following hierarchy
     const nodesArray = Record.getNodesArray(recordUpdated)
