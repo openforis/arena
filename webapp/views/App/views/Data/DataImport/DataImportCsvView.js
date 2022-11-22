@@ -66,8 +66,10 @@ export const DataImportCsvView = () => {
         job,
         autoHide: true,
         onComplete: async (jobCompleted) => {
-          const importCompleteResult = JobSerialized.getResult(jobCompleted)
-          setImportCompleteResult(importCompleteResult)
+          if (JobSerialized.isSucceeded(jobCompleted)) {
+            const importCompleteResult = JobSerialized.getResult(jobCompleted)
+            setImportCompleteResult(importCompleteResult)
+          }
         },
       })
     )
