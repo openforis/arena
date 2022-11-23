@@ -1,4 +1,4 @@
-import { Points } from '@openforis/arena-core'
+import { Objects, Points } from '@openforis/arena-core'
 
 import { CsvDataExportModel } from '@common/model/csvExport'
 
@@ -13,34 +13,49 @@ import * as CSVReader from '@server/utils/file/csvReader'
 const VALUE_PROP_DEFAULT = 'value'
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
+const numericValueConverter = ({ value, headers }) => {
+  const val = singlePropValueConverter({ value })
+  const numericVal = Number(val)
+  if (Number.isNaN(numericVal)) {
+    throw new SystemError('validationErrors.dataImport.invalidNumber', { value: val, headers })
+  }
+}
 
 const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueConverter,
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value, headers }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+      if (!itemUuid) {
+        throw new SystemError('validationErrors.dataImport.invalidCode', { code, headers })
+      }
       return Node.newNodeValueCode({ itemUuid })
     }
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
     return { [Node.valuePropsCode.code]: code }
   },
-  [NodeDef.nodeDefType.coordinate]: ({ value }) => {
+  [NodeDef.nodeDefType.coordinate]: ({ value, headers }) => {
     const point = Points.parse(value)
-    if (!point) return null
+    if (!point) {
+      throw new SystemError('validationErrors.dataImport.invalidCoordinate', { value, headers })
+    }
     const { x, y, srs: srsId } = point
     return Node.newNodeValueCoordinate({ x, y, srsId })
   },
   [NodeDef.nodeDefType.date]: singlePropValueConverter,
-  [NodeDef.nodeDefType.decimal]: singlePropValueConverter,
-  [NodeDef.nodeDefType.integer]: singlePropValueConverter,
-  [NodeDef.nodeDefType.taxon]: ({ survey, nodeDef, value }) => {
+  [NodeDef.nodeDefType.decimal]: numericValueConverter,
+  [NodeDef.nodeDefType.integer]: numericValueConverter,
+  [NodeDef.nodeDefType.taxon]: ({ survey, nodeDef, value, headers }) => {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxonCode = value[Node.valuePropsTaxon.code]
     const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-    return taxon ? Node.newNodeValueTaxon({ taxonUuid: taxon.uuid }) : null
+    if (taxon) {
+      return Node.newNodeValueTaxon({ taxonUuid: taxon.uuid })
+    }
+    throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
   [NodeDef.nodeDefType.time]: singlePropValueConverter,
@@ -94,22 +109,32 @@ const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTota
     filePath,
     validateHeaders({ csvDataExportModel }),
     async (row) => {
+      // combine several columns into single values for every attribute definition
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
+
         if (!row.hasOwnProperty(header)) return valuesByDefUuidAcc
 
         const cellValue = row[header]
+        if (Objects.isEmpty(cellValue)) return valuesByDefUuidAcc
+
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        const value = valuesByDefUuidAcc[nodeDefUuid] || {}
-        value[valueProp] = cellValue
-        valuesByDefUuidAcc[nodeDefUuid] = value
+        const valueTemp = valuesByDefUuidAcc[nodeDefUuid] || {}
+        const valueHeaders = valueTemp.headers || []
+        valueHeaders.push(header)
+        valueTemp._headers = valueHeaders
+        valueTemp[valueProp] = cellValue
+        valuesByDefUuidAcc[nodeDefUuid] = valueTemp
         return valuesByDefUuidAcc
       }, {})
 
-      const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, value]) => {
+      // prepare attribute values
+      const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, valueTemp]) => {
+        const headers = valueTemp._headers
+        delete valueTemp._headers
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         const valueConverter = valueConverterByNodeDefType[NodeDef.getType(nodeDef)]
-        const nodeValue = valueConverter({ survey, nodeDef, value })
+        const nodeValue = valueConverter({ survey, nodeDef, value: valueTemp, headers })
         acc[nodeDefUuid] = nodeValue
         return acc
       }, {})

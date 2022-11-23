@@ -1236,8 +1236,12 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     dataImport: {
       emptyFile: 'The file you are trying to import is empty',
-      invalidHeaders: 'Invalid headers: {{invalidHeaders}}',
-      missingRequiredHeaders: 'Missing required headers: {{missingRequiredHeaders}}',
+      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
+      invalidCode: 'Invalid code in column {{headers}}: {{code}}',
+      invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
+      invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
+      invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
+      missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
