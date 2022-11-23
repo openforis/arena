@@ -46,7 +46,7 @@ export default class DataImportJob extends Job {
 
     await this.startCsvReader()
 
-    if (this.processed === 0) {
+    if (!this.hasErrors() && this.processed === 0) {
       // Error: empty file
       this._addError(Validation.messageKeys.dataImport.emptyFile)
     }
@@ -103,15 +103,21 @@ export default class DataImportJob extends Job {
   async startCsvReader() {
     const { entityDefUuid, filePath, survey } = this.context
 
-    const reader = await DataImportFileReader.createReader({
-      filePath,
-      survey,
-      entityDefUuid,
-      onRowItem: (item) => this.onRowItem(item),
-      onTotalChange: (total) => (this.total = total),
-    })
+    try {
+      const reader = await DataImportFileReader.createReader({
+        filePath,
+        survey,
+        entityDefUuid,
+        onRowItem: (item) => this.onRowItem(item),
+        onTotalChange: (total) => (this.total = total),
+      })
 
-    await reader.start()
+      await reader.start()
+    } catch (e) {
+      const errorKey = e.key || e.toString()
+      const errorParams = e.params
+      this._addError(errorKey, errorParams)
+    }
   }
 
   async getOrFetchRecord({ valuesByDefUuid }) {
