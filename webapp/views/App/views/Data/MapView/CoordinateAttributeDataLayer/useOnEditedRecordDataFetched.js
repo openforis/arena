@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
+import { useI18n } from '@webapp/store/system'
+
 import { convertDataToPoints } from './convertDataToPoints'
 
 const _updateDataAndPoints = ({
@@ -15,6 +17,7 @@ const _updateDataAndPoints = ({
   parentEntityColumn,
   dataUpdated,
   pointsUpdated,
+  i18n,
 }) => {
   const { data, pointIndexByDataIndex } = state
 
@@ -30,6 +33,7 @@ const _updateDataAndPoints = ({
       attributeDef,
       nodeDefParent,
       survey,
+      i18n,
     })
     const pointConverted = pointsConverted.length > 0 ? pointsConverted[0] : null
     if (pointConverted) {
@@ -52,6 +56,8 @@ export const useOnEditedRecordDataFetched = ({
 }) => {
   const { data, points } = state
 
+  const i18n = useI18n()
+
   // when edited record data has been fetched, update points
   useEffect(() => {
     if (dataEditedRecord?.length > 0) {
@@ -72,6 +78,7 @@ export const useOnEditedRecordDataFetched = ({
           parentEntityColumn,
           dataUpdated,
           pointsUpdated,
+          i18n,
         })
       }, [])
 

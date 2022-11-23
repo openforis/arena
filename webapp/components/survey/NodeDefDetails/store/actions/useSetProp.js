@@ -26,7 +26,7 @@ const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   return true
 }
 
-const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, multiple }) => {
+const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple }) => {
   // Reset validations required or count
   const validations = NodeDef.getValidations(nodeDef)
   const validationsUpdated = multiple
@@ -51,6 +51,20 @@ const _onUpdateCategoryUuid = ({ nodeDef }) => {
   return NodeDef.mergeProps({ [NodeDef.propKeys.parentCodeDefUuid]: null })(nodeDef)
 }
 
+const _onUpdateReadOnly = ({ nodeDef, value: readOnly }) => {
+  if (!readOnly) {
+    // dissoc properties valid only when readOnly is true
+    return NodeDef.dissocProp(NodeDef.propKeys.hidden)(nodeDef)
+  }
+  return nodeDef
+}
+
+const updateFunctionByProp = {
+  [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
+  [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
+}
+
 export const useSetProp = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
@@ -66,10 +80,9 @@ export const useSetProp = ({ setState }) => {
 
     let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
 
-    if (key === NodeDef.propKeys.multiple) {
-      nodeDefUpdated = _onUpdateMultiple({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, multiple: value })
-    } else if (key === NodeDef.propKeys.categoryUuid) {
-      nodeDefUpdated = _onUpdateCategoryUuid({ nodeDef: nodeDefUpdated })
+    const propUpdater = updateFunctionByProp[key]
+    if (propUpdater) {
+      nodeDefUpdated = propUpdater({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, value })
     }
 
     validateNodeDef({ state, nodeDefUpdated })

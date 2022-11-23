@@ -1,4 +1,8 @@
-import { RecordNodesUpdater as CoreRecordNodesUpdater, RecordValidator } from '@openforis/arena-core'
+import {
+  RecordUpdater as CoreRecordUpdater,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+  RecordValidator,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -10,7 +14,8 @@ import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
 import RecordUpdateResult from './RecordUpdateResult'
 
-const updateNodesDependents = CoreRecordNodesUpdater.updateNodesDependents
+const { createNodeAndDescendants, createRootEntity } = CoreRecordUpdater
+const { updateNodesDependents } = CoreRecordNodesUpdater
 
 const _addOrUpdateAttribute =
   ({ survey, entity, attributeDef, value }) =>
@@ -175,17 +180,20 @@ const updateAttributesWithValues =
         (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
+        const { record: currentRecord } = updateResult
+
         const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
           survey,
           parentNode: entity,
           nodeDefUuid: attributeDefUuid,
-        })(updateResult.record)
+        })(currentRecord)
+
         const attributeUpdateResult = _addOrUpdateAttribute({
           survey,
           entity: attributeParentEntity,
           attributeDef,
           value,
-        })(updateResult.record)
+        })(currentRecord)
 
         if (attributeUpdateResult) {
           updateResult.merge(attributeUpdateResult)
@@ -197,6 +205,8 @@ const updateAttributesWithValues =
   }
 
 export const RecordNodesUpdater = {
+  createNodeAndDescendants,
+  createRootEntity,
   updateNodesDependents,
   updateAttributesWithValues,
 }

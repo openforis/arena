@@ -10,6 +10,7 @@ const columnSet = {
   dateModified: TableDataNodeDef.columnSetCommon.dateModified,
   recordUuid: TableDataNodeDef.columnSet.recordUuid,
   recordCycle: TableDataNodeDef.columnSet.recordCycle,
+  recordOwnerUuid: TableDataNodeDef.columnSet.recordOwnerUuid,
   keys: '_keys',
 }
 

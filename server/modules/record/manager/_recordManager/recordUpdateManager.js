@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -265,50 +264,17 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 
   // 3. update node validations
   // exclude deleted nodes
-  const nodesToValidate = Object.values(updatedNodesAndDependents).reduce(
-    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
-    {}
-  )
-  const validations = await RecordValidationManager.validateNodesAndPersistValidation(
-    survey,
-    record,
-    nodesToValidate,
-    true,
+  let recordUpdated = await validateNodesAndPersistToRDB(
+    {
+      survey,
+      record,
+      nodes: updatedNodesAndDependents,
+      nodesValidationListener,
+    },
     t
   )
-  if (nodesValidationListener) {
-    nodesValidationListener(validations)
-  }
-
-  record = Record.mergeNodeValidations(validations)(record)
-
-  // 4. update survey rdb
-  if (!Record.isPreview(record)) {
-    const nodeDefs = ObjectUtils.toUuidIndexedObj(
-      Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
-    )
-    // include ancestor nodes (used to find the correct rdb table to update)
-    const updatedNodesAndDependentsAndAncestors = Object.values(updatedNodesAndDependents).reduce((nodesAcc, node) => {
-      Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
-      return nodesAcc
-    }, {})
-
-    await DataTableUpdateRepository.updateTables(
-      {
-        survey,
-        record,
-        nodeDefs,
-        nodes: updatedNodesAndDependentsAndAncestors,
-      },
-      t
-    )
-
-    // Merge updated nodes with existing ones (remove created/updated flags nodes)
-    record = Record.mergeNodes(updatedNodesAndDependents, true)(record)
-  }
-
   return {
-    record,
+    record: recordUpdated,
     nodes: updatedNodesAndDependents,
   }
 }
@@ -344,4 +310,42 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
       )
     }
   }
+}
+
+export const persistNodesToRDB = async ({ survey, record, nodes }, t) => {
+  // include ancestor nodes (used to find the correct rdb table to update)
+  const nodesAndDependentsAndAncestors = Object.values(nodes).reduce((nodesAcc, node) => {
+    Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
+    return nodesAcc
+  }, {})
+
+  await DataTableUpdateRepository.updateTables({ survey, record, nodes: nodesAndDependentsAndAncestors }, t)
+
+  // Merge updated nodes with existing ones (remove created/updated flags nodes)
+  return Record.mergeNodes(nodes, true)(record)
+}
+
+const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
+  const nodesToValidate = Object.values(nodes).reduce(
+    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
+    {}
+  )
+  const validations = await RecordValidationManager.validateNodesAndPersistValidation(
+    survey,
+    record,
+    nodesToValidate,
+    true,
+    t
+  )
+  if (nodesValidationListener) {
+    nodesValidationListener(validations)
+  }
+
+  let recordUpdated = Record.mergeNodeValidations(validations)(record)
+
+  // 4. update survey rdb
+  if (!Record.isPreview(recordUpdated)) {
+    recordUpdated = await persistNodesToRDB({ survey, record: recordUpdated, nodes }, t)
+  }
+  return recordUpdated
 }

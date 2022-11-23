@@ -5,11 +5,13 @@ import PropTypes from 'prop-types'
 import { ClusterMarker } from '../common'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
+import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+import { MarkerTooltip } from '../common/MarkerTooltip'
 
 const markerRadius = 10
 
 export const SamplingPointDataLayer = (props) => {
-  const { markersColor, onRecordEditClick } = props
+  const { markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
     clusters,
@@ -23,6 +25,9 @@ export const SamplingPointDataLayer = (props) => {
 
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
+
+  const options = useMapContextOptions()
+  const { showMarkersLabels } = options
 
   const openPopupOfPoint = (point) => {
     const marker = markerRefs.current[point.uuid]
@@ -48,7 +53,7 @@ export const SamplingPointDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid } = cluster.properties
+          const { cluster: isCluster, itemUuid, itemCodes } = cluster.properties
 
           // we have a cluster to render
           if (isCluster) {
@@ -79,12 +84,15 @@ export const SamplingPointDataLayer = (props) => {
                 if (ref != null) markerRefs.current[itemUuid] = ref
               }}
             >
+              {showMarkersLabels && <MarkerTooltip color={markersColor}>{itemCodes.join(' - ')}</MarkerTooltip>}
+
               <SamplingPointDataItemPopup
                 pointFeature={cluster}
                 getNextPoint={getNextPoint}
                 getPreviousPoint={getPreviousPoint}
                 openPopupOfPoint={openPopupOfPoint}
                 onRecordEditClick={onRecordEditClick}
+                createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
               />
             </CircleMarker>
           )
@@ -97,6 +105,7 @@ export const SamplingPointDataLayer = (props) => {
 SamplingPointDataLayer.propTypes = {
   levelIndex: PropTypes.number,
   markersColor: PropTypes.any.isRequired,
+  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
   onRecordEditClick: PropTypes.func.isRequired,
 }
 

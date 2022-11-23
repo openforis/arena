@@ -41,8 +41,11 @@ const NodeDefEntityFormGrid = (props) => {
   const visibleNodeDefsInnerPage = entry
     ? nodeDefsInnerPage.filter(
         (nodeDefInnerPage) =>
-          !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
-          Node.isChildApplicable(nodeDefInnerPage.uuid)(node)
+          // hide hidden read-only fields
+          !(NodeDef.isReadOnly(nodeDefInnerPage) && NodeDef.isHidden(nodeDefInnerPage)) &&
+          // hide not applicable fields marked as 'hidden when not applicable'
+          (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
+            Node.isChildApplicable(nodeDefInnerPage.uuid)(node))
       )
     : nodeDefsInnerPage
 

@@ -68,8 +68,18 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     : [
         `${tableData.columnId} AS ${viewDataNodeDef.columnIdName}`,
         ...(viewDataNodeDef.root
-          ? [tableData.columnRecordUuid, tableData.columnRecordCycle, tableData.columnRecordStep]
-          : [viewDataParent.columnRecordUuid, viewDataParent.columnRecordCycle, viewDataParent.columnRecordStep]),
+          ? [
+              tableData.columnRecordUuid,
+              tableData.columnRecordCycle,
+              tableData.columnRecordStep,
+              tableData.columnRecordOwnerUuid,
+            ]
+          : [
+              viewDataParent.columnRecordUuid,
+              viewDataParent.columnRecordCycle,
+              viewDataParent.columnRecordStep,
+              viewDataParent.columnRecordOwnerUuid,
+            ]),
         tableData.columnDateCreated,
         tableData.columnDateModified,
         _getSelectFieldKeys(viewDataNodeDef),

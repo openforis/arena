@@ -33,7 +33,8 @@ const getSelectQuery = ({
         NodeDef.isRoot(nodeDef)
           ? `, n.record_uuid, 
       r.cycle AS record_cycle,
-      r.step AS record_step`
+      r.step AS record_step,
+      r.owner_uuid AS record_owner_uuid`
           : ''
       }
     FROM

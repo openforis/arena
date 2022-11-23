@@ -552,6 +552,7 @@ $t(common.cantUndoWarning)`,
   },
 
   mapView: {
+    createRecord: 'Create new record',
     editRecord: 'Edit record',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
@@ -928,6 +929,7 @@ $t(common.appNameFull)
     advancedProps: {
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      hidden: 'Hide in entry form',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',

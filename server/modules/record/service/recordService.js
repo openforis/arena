@@ -53,6 +53,16 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
   return record
 }
 
+export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cycle, itemUuid }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true })
+  return RecordManager.createRecordFromSamplingPointDataItem({
+    user,
+    survey,
+    cycle: cycle || Survey.getDefaultCycleKey(survey),
+    itemUuid,
+  })
+}
+
 export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,

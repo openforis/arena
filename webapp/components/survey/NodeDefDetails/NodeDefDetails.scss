@@ -8,6 +8,15 @@
   left: 0px;
   z-index: $zIndex10TopOfApp;
   background-color: white;
+
+  .readonly_row {
+    display: flex;
+    gap: 3rem;
+
+    .form-item {
+      display: flex;
+    }
+  }
 }
 
 .node-def-edit__container {
