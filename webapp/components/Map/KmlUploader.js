@@ -41,7 +41,8 @@ export const KmlUploader = () => {
     reader.onload = async (e) => {
       const text = e.target.result
       const geo = JSON.parse(text)
-      L.geoJSON(geo).addTo(map)
+      const geojson = L.geoJSON(geo).addTo(map)
+      setLayers((old) => [...old, geojson])
     }
     reader.readAsText(file)
   }
