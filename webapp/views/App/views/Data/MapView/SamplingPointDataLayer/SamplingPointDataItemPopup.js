@@ -46,13 +46,6 @@ ${itemCodes
     flyToPoint(previousPoint)
   }
 
-  const earthMapLink = () => {
-    const geojson = L.circle([point.y, point.x]).toGeoJSON()
-    const url = "https://collectearth.users.earthengine.app/view/plot#geoJson=" + JSON.stringify(geojson.geometry)
-    return url
-    
-  }
-
   return (
     <Popup className="sampling-point-data__item-popup-content">
       <Markdown source={content} />
