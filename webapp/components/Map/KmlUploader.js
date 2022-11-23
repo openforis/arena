@@ -30,7 +30,7 @@ export const KmlUploader = () => {
         processKMLFile(selectedFile)
       } else if (selectedFile.name.endsWith('.zip')) {
         processShapeFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.json')) {
+      } else if (selectedFile.name.endsWith('.json') || selectedFile.name.endsWith('.geojson')) {
         processGeoJson(selectedFile)
       }
     }
@@ -40,7 +40,6 @@ export const KmlUploader = () => {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const text = e.target.result
-      console.log(text)
       const geo = JSON.parse(text)
       L.geoJSON(geo).addTo(map)
     }
@@ -143,7 +142,14 @@ export const KmlUploader = () => {
       <div className="file-select-wrapper">
         <div className="file-input">
           <label htmlFor="file">{i18n.t('kmlUploader.selectFile')}</label>
-          <input type="file" name="file" onChange={fileChangeHandler} className="file" id="file" />
+          <input
+            type="file"
+            name="file"
+            onChange={fileChangeHandler}
+            className="file"
+            id="file"
+            accept=".kml,.kmz,.zip,.json,.geojson"
+          />
         </div>
       </div>
     </div>
