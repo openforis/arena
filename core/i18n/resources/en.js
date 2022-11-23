@@ -1230,8 +1230,15 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
-      emptyFile: 'The file you are trying to import is empty',
+      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+    },
+
+    dataImport: {
+      emptyFile: 'The file you are trying to import is empty',
+      errorUpdatingValues: 'Error updating values',
+      recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
+      recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
     expressions: {

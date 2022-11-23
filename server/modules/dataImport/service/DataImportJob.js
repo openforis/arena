@@ -221,11 +221,7 @@ export default class DataImportJob extends Job {
         }
       } catch (e) {
         const { params } = e
-        this.addError({
-          error: Validation.newInstance(false, {}, [
-            { key: Validation.messageKeys.dataImport.errorUpdatingValues, params },
-          ]),
-        })
+        this._addError(Validation.messageKeys.dataImport.errorUpdatingValues, params)
       }
     }
     this.incrementProcessedItems()
