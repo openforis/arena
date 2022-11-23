@@ -7,9 +7,11 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
+import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+import L from 'leaflet'
 
-import { ButtonIconEdit } from '@webapp/components'
+import { ButtonIconEdit, ButtonIconGear } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
@@ -58,6 +60,7 @@ export const CoordinateAttributePopUp = (props) => {
   } = props
 
   const map = useMap()
+  const surveyInfo = useSurveyInfo()
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
@@ -76,10 +79,18 @@ export const CoordinateAttributePopUp = (props) => {
     const nextPoint = getNextPoint(parentUuid)
     flyTo(nextPoint)
   }
-
+  
   const onClickPrevious = () => {
     const previousPoint = getPreviousPoint(parentUuid)
     flyTo(previousPoint)
+  }
+  
+  const earthMapLink = () => {
+    const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
+    const geojson = L.rectangle(bounds).toGeoJSON()
+    const url = "https://earthmap.org/?polygon=" + JSON.stringify(geojson)
+    return url
+    
   }
 
   const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
@@ -110,6 +121,13 @@ export const CoordinateAttributePopUp = (props) => {
           />
 
           <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
+        </div>
+        <div className="button-bar">
+          <ButtonIconGear 
+            label="Open in Earth Map"
+            showLabel
+            onClick={() => window.open(earthMapLink(), "EarthMap")}
+            />
         </div>
       </div>
     </Popup>
