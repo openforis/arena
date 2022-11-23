@@ -8,8 +8,11 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
+import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+
+
 
 import { ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
@@ -89,6 +92,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const i18n = useI18n()
   const map = useMap()
+  const surveyInfo = useSurveyInfo()
 
   const flyTo = (point) => {
     const [longitude, latitude] = point.geometry.coordinates
@@ -107,8 +111,9 @@ export const CoordinateAttributePopUp = (props) => {
   }
   
   const earthMapLink = () => {
-    const geojson = L.circle([pointLatLong.y, pointLatLong.x]).toGeoJSON()
-    const url = "https://collectearth.users.earthengine.app/view/plot#geoJson=" + JSON.stringify(geojson.geometry)
+    const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
+    const geojson = L.rectangle(bounds).toGeoJSON()
+    const url = "https://earthmap.org/?polygon=" + JSON.stringify(geojson)
     return url
     
   }
@@ -126,7 +131,7 @@ export const CoordinateAttributePopUp = (props) => {
       />
       <button onClick={onClickPrevious}>{i18n.t('common.previous')}</button>
       <button onClick={onClickNext}>{i18n.t('common.next')} </button>
-      <a href={earthMapLink()} target="_blank" rel="noreferrer">
+      <a href={earthMapLink()} target="earthmap" rel="origin">
         <button>Open in Earth Map</button>
       </a>
     </Popup>
