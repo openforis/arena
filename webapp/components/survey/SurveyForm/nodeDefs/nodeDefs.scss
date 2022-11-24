@@ -59,7 +59,8 @@
   &.read-only {
     input,
     .survey-form__node-def-code,
-    .survey-form__node-def-date {
+    .survey-form__node-def-date,
+    .dropdown__control {
       background-color: rgba($greyBorder, 0.3);
     }
   }

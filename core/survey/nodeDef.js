@@ -407,6 +407,7 @@ export const canHaveDefaultValue = (nodeDef) =>
   R.includes(getType(nodeDef), [
     nodeDefType.boolean,
     nodeDefType.code,
+    nodeDefType.coordinate,
     nodeDefType.date,
     nodeDefType.decimal,
     nodeDefType.integer,

@@ -19,8 +19,6 @@ export const CoordinateAttributePolygon = (props) => {
 
   const len_lat_meters = SamplingPolygon.getLengthLatitude(surveyInfo)
   const len_lng_meters = SamplingPolygon.getLengthLongitude(surveyInfo)
-  const offset_north_meters = SamplingPolygon.getOffsetNorth(surveyInfo)
-  const offset_east_meters = SamplingPolygon.getOffsetEast(surveyInfo)
   const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(surveyInfo)
   const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(surveyInfo)
   const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(surveyInfo)
@@ -29,22 +27,18 @@ export const CoordinateAttributePolygon = (props) => {
   const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
   const radius = SamplingPolygon.getRadius(surveyInfo)
 
-  const len_lat = MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
-  const len_lng = MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)
+  const len_lat = SamplingPolygon.MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
+  const len_lng = SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)
   const control_point_latlng = L.latLng(
-    latitude + MetersToDegreesLatitude(controlPointOffsetNorth),
-    longitude + MetersToDegreesLongitude(controlPointOffsetEast, latitude)
+    latitude + SamplingPolygon.MetersToDegreesLatitude(controlPointOffsetNorth),
+    longitude + SamplingPolygon.MetersToDegreesLongitude(controlPointOffsetEast, latitude)
   )
 
-  const middle_latlng = L.latLng(latitude, longitude)
-  const north_point = GeometryUtil.destination(middle_latlng, 0, len_lat_meters / 2 + offset_north_meters)
-  const south_point = GeometryUtil.destination(middle_latlng, 180, len_lat_meters / 2 - offset_north_meters)
-  const northeast_corner = GeometryUtil.destination(north_point, 90, len_lng_meters / 2 + offset_east_meters)
-  const southwest_corner = GeometryUtil.destination(south_point, 270, len_lng_meters / 2 - offset_east_meters)
-  const bounds = L.latLngBounds(southwest_corner, northeast_corner)
+
+  const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
 
   const pointSize = 10
-  const pointSizeLat = MetersToDegreesLatitude(pointSize)
+  const pointSizeLat = SamplingPolygon.MetersToDegreesLatitude(pointSize)
 
   const pointDistanceLat = len_lat / numberOfPointsNorth
   const startLat = bounds.getSouthWest().lat + len_lat / numberOfPointsEast / 2 - pointSizeLat / 2
@@ -158,8 +152,8 @@ export const CoordinateAttributePolygon = (props) => {
     for (let eastIndex = 0; eastIndex < numberOfPointsEast; eastIndex++) {
       for (let northIndex = 0; northIndex < numberOfPointsNorth; northIndex++) {
         const pointDistanceLng =
-          MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) / numberOfPointsEast
-        const pointSizeLng = MetersToDegreesLongitude(pointSize, startLat + northIndex * pointDistanceLat)
+        SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) / numberOfPointsEast
+        const pointSizeLng = SamplingPolygon.MetersToDegreesLongitude(pointSize, startLat + northIndex * pointDistanceLat)
         const startLon = bounds.getSouthWest().lng + len_lng / numberOfPointsNorth / 2 - pointSizeLat / 2
         points.push(
           <Rectangle
@@ -230,14 +224,6 @@ const PointColor = {
 const LineColor = {
   0: 'Yellow',
   1: 'Red',
-}
-
-//https://stackoverflow.com/a/39540339/13745527
-const MetersToDegreesLatitude = (meters) => {
-  return meters / (111.32 * 1000)
-}
-const MetersToDegreesLongitude = (meters, lat) => {
-  return meters / ((40075 * 1000 * Math.cos((Math.PI * lat) / 180)) / 360)
 }
 
 CoordinateAttributePolygon.propTypes = {

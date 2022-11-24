@@ -192,17 +192,20 @@ const updateAttributesWithValues =
         (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
         !NodeDef.isReadOnly(attributeDef)
       ) {
+        const { record: currentRecord } = updateResult
+
         const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
           survey,
           parentNode: entity,
           nodeDefUuid: attributeDefUuid,
-        })(updateResult.record)
+        })(currentRecord)
+
         const attributeUpdateResult = _addOrUpdateAttribute({
           survey,
           entity: attributeParentEntity,
           attributeDef,
           value,
-        })(updateResult.record)
+        })(currentRecord)
 
         if (attributeUpdateResult) {
           updateResult.merge(attributeUpdateResult)
