@@ -68,6 +68,16 @@ const UserInviteComponent = () => {
         </FormItem>
       )}
 
+      <FormItem label={i18n.t('userInviteView.messageOptional')}>
+        <Input
+          id={TestId.userInvite.message}
+          inputType="textarea"
+          onChange={(value) => onUpdate({ name: UserInvite.keys.message, value })}
+          validation={Validation.getFieldValidation(UserInvite.keys.message)(validation)}
+          value={UserInvite.getMessage(userInvite)}
+        />
+      </FormItem>
+
       <div className="user-invite__buttons">
         <Button
           testId={TestId.userInvite.submitBtn}

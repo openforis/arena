@@ -104,10 +104,10 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
 }
 
 export const inviteUser = async (
-  { user, surveyId, surveyCycleKey, userToInvite: userToInviteParam, serverUrl, repeatInvitation = false },
+  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
   client = db
 ) => {
-  const groupUuid = UserGroupInvitation.getGroupUuid(userToInviteParam)
+  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
   const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
   const groupName = AuthGroup.getName(group)
 
@@ -117,7 +117,7 @@ export const inviteUser = async (
 
   _checkCanInviteToGroup({ user, group, surveyInfo })
 
-  const email = UserGroupInvitation.getEmail(userToInviteParam)
+  const email = UserGroupInvitation.getEmail(invitation)
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const emailParams = {
@@ -126,6 +126,7 @@ export const inviteUser = async (
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${groupName}.label)`,
     groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
+    message: UserGroupInvitation.getMessage(invitation),
   }
 
   return client.tx(async (t) => {
