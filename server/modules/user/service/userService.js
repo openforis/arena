@@ -120,13 +120,16 @@ export const inviteUser = async (
   const email = UserGroupInvitation.getEmail(invitation)
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
+  const message = UserGroupInvitation.getMessage(invitation)
+  const messageParam = message ? `<hr><p>${message}</p><hr>` : undefined
+
   const emailParams = {
     serverUrl,
     surveyName: Survey.getName(surveyInfo),
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${groupName}.label)`,
     groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
-    message: UserGroupInvitation.getMessage(invitation),
+    message: messageParam,
   }
 
   return client.tx(async (t) => {

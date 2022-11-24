@@ -1531,9 +1531,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       </p>`,
     temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
     userInviteCommon: `<p>You have been invited to join the survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
-      <hr>
-      <p>{{message}}</p>
-      <hr>
+      {{message}}
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,
