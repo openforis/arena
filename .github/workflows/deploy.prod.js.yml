@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-  deploy_to_docker_hub:
+  push_to_docker_hub:
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
 
@@ -80,4 +80,6 @@ jobs:
           build-args: |
             NPM_TOKEN=${{ secrets.NPM_TOKEN }}
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/arena:${{ steps.app_version.outputs.APP_VERSION }}
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/arena:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/arena:${{ steps.app_version.outputs.APP_VERSION }}
