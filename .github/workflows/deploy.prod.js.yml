@@ -12,14 +12,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          fetch-depth: '0' # fetch all tags, default 1
+          fetch-depth: 0 # fetch all tags, default 1
 
-      - name: Use Node.js 14.17.0
-        uses: actions/setup-node@v1
+      - name: Use Node.js 18.12.1
+        uses: actions/setup-node@v3
         with:
-          node-version: '14.17.0'
+          node-version: '18.12.1'
 
       - name: Get the version
         id: app_version
@@ -28,7 +28,7 @@ jobs:
       - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
 
       - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.6.8 # This is the action
+        uses: akhileshns/heroku-deploy@vv3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME_PRODUCTION}}
@@ -48,14 +48,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          fetch-depth: '0' # fetch all tags, default 1
+          fetch-depth: 0 # fetch all tags, default 1
 
-      - name: Use Node.js 14.17.0
-        uses: actions/setup-node@v1
+      - name: Use Node.js 18.12.1
+        uses: actions/setup-node@v3
         with:
-          node-version: '14.17.0'
+          node-version: '18.12.1'
 
       - name: Get the version
         id: app_version
