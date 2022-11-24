@@ -25,8 +25,11 @@ export default class ExportCsvDataJob extends Job {
     const exportUuid = this.uuid
     // use job uuid as temp folder name
     const outputDir = FileUtils.tempFilePath(exportUuid)
-    // delete output dir if already existing (it shouldn't be possible...)
-    await FileUtils.rmdir(outputDir)
+
+    if (FileUtils.existsDir(outputDir)) {
+      // delete output dir if already existing (it shouldn't be possible...)
+      await FileUtils.rmdir(outputDir)
+    }
     await FileUtils.mkdir(outputDir)
 
     this.setContext({
